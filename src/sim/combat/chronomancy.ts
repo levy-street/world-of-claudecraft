@@ -34,7 +34,6 @@ export const TEMPORAL_ECHO_ID = 'temporal_echo';
 const TEMPORAL_ECHO_NAME = ABILITIES[TEMPORAL_ECHO_ID]?.name ?? 'Temporal Echo';
 // Playtest-provisional (PRD section 13.1 / 13.14): 15s window, 40% single-target
 // conversion, 15% area conversion. Not balance-locked.
-export const TEMPORAL_ECHO_DURATION = 15;
 export const ECHO_CONVERT_SINGLE = 0.4;
 export const ECHO_CONVERT_AOE = 0.15;
 // Cascada temporal (Phase 4 group echo, docs/prd/mage-chronomancy.md): the group

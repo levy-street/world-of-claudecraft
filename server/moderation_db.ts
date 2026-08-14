@@ -21,7 +21,6 @@ export const REPORT_REASONS = [
   'other',
 ] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
-export type ModerationAction = 'ignore' | 'kick' | 'kill' | 'suspend' | 'ban' | 'unban';
 
 // The closed set of values ever written to account_moderation_actions.action. The
 // column is free-text in SQL, so this const is the single source of truth: every

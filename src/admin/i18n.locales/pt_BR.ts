@@ -1061,4 +1061,32 @@ export const pt_BR: Record<string, string> = {
   'generalChatRateLimit.windowMinutesError': 'Insira um número inteiro entre {min} e {max}.',
   'generalChatRateLimit.windowMinutesLabel': 'Duração da janela (minutos)',
   'moderationHistory.actionGeneralChatRateLimit': 'Limite da chat Geral alterado',
+  'detail.cheaterMarkModeration': 'Marca de trapaceiro',
+  'detail.cheaterMarkActions': 'Ações de moderação da marca de trapaceiro',
+  'detail.cheaterMarkApply': 'Aplicar marca de trapaceiro',
+  'detail.cheaterMarkLift': 'Remover marca de trapaceiro',
+  'detail.cheaterMarkReason': 'Motivo da marca: {value}',
+  'detail.cheaterMarkRemaining': 'Tempo jogado restante: {value}',
+  'detail.cheaterMarkSetAt': 'Aplicada em: {value}',
+  'detail.cheaterMarkRelength': 'Alterar duração da marca',
+  'detail.cheaterMarkDuration': 'Crédito em horas jogadas',
+  'detail.cheaterMarkDurationPlaceholder': 'Horas',
+  'detail.cheaterMarkDurationHint':
+    'Todos os personagens da conta exibem a etiqueta pública até que esse tempo jogado se esgote.',
+  'detail.cheaterMarkRelengthHint':
+    'Substitui totalmente o crédito restante; não soma a ele. A etiqueta pública continua visível.',
+  'dialog.confirmCheaterMark': 'Confirmar marca de trapaceiro',
+  'dialog.confirmCheaterMarkRelength': 'Confirmar a nova duração da marca',
+  'dialog.confirmCheaterMarkLift': 'Confirmar remoção da marca',
+  'dialog.actionCheaterMark':
+    'Exibir a etiqueta pública Trapaceiro em todos os personagens desta conta',
+  'dialog.actionCheaterMarkRelength': 'Substituir o crédito de tempo jogado restante desta marca',
+  'dialog.actionCheaterMarkLift': 'Remover a marca de trapaceiro antes do fim',
+  'alert.cheaterMarkDurationInvalid': 'Insira um número inteiro de 1 a {max} horas.',
+  'error.cheaterMarkDurationInvalid': 'O crédito de tempo jogado deve ficar entre 1 e 100 horas.',
+  'error.cheaterMarkNotMarked': 'Esta conta não está usando a marca de trapaceiro.',
+  'error.cheaterMarkAdminTarget':
+    'Contas de administrador não podem receber a marca de trapaceiro.',
+  'moderationHistory.actionCheaterMark': 'Marca de trapaceiro aplicada',
+  'moderationHistory.actionCheaterMarkLift': 'Marca de trapaceiro removida',
 };

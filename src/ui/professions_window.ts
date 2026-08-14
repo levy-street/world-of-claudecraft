@@ -90,6 +90,11 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation {
   consumePeek(): boolean;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** Open the Harvest Journal (the farming row's entry control). Optional so
+   *  a host that has not wired the journal simply paints no button rather
+   *  than a dead one. Not a command: the journal is a reader, so this window
+   *  keeps its no-repaint-on-click contract. */
+  openHarvestJournal?(): void;
 }
 
 export class ProfessionsWindow {
@@ -541,12 +546,27 @@ export class ProfessionsWindow {
           )}</span></div>` +
           `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div>` +
           this.gatherEffectHtml(row) +
+          this.harvestJournalHtml(row) +
           `</div></li>`
         );
       })
       .join('');
     if (rows === '') return '';
     return `<section class="prof-gathering"><h3 class="prof-section-header">${esc(t('hudChrome.professions.gatheringHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
+  }
+
+  // Farming's one extra row control: the Harvest Journal entry point, under
+  // the Farming skill bar. It rides this window rather than a side-rail
+  // button because the journal is a farming readout and this is where a
+  // farmer already comes to read their skill. Unlike every other button in
+  // here it SPENDS NOTHING (it opens a reader), which is what earns it a
+  // focus key of its own: a rebuild under a focused row can park focus back
+  // on it without handing an Enter to an action the player never aimed at.
+  private harvestJournalHtml(row: ProfessionsGatheringRow): string {
+    if (row.professionId !== 'farming' || this.deps.openHarvestJournal === undefined) return '';
+    return `<div class="prof-effect-actions"><button type="button" class="btn prof-effect-btn" data-harvest-journal data-focus-key="harvestJournal">${esc(
+      t('hudChrome.harvestJournal.title'),
+    )}</button></div>`;
   }
 
   // The slotted tool effect, under its profession's skill bar, plus the
@@ -655,6 +675,13 @@ export class ProfessionsWindow {
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       this.close();
       audio.click();
+    });
+    // The journal opener: no command, no send guard, and no repaint of this
+    // window. It opens a reader over the caller's own plots, so a second
+    // click costs nothing and there is nothing for a peek-guard to protect.
+    el.querySelector('[data-harvest-journal]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openHarvestJournal?.();
     });
     // Slot/recharge senders: command only, never predicted, and NO repaint
     // here. The pid-scoped toolEffectResult event is the one repaint path

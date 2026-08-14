@@ -30,19 +30,25 @@
 // a maintainer machine where gh is a given.
 
 import { execFileSync } from 'node:child_process';
+import {
+  parseReleaseMintArgs,
+  RELEASE_MINT_USAGE,
+  requiredChecksCoverage,
+} from './lib/release_mint.mjs';
 
 const OWNER_REPO = 'levy-street/world-of-claudecraft';
 const REQUIRED_CHECKS_RULESET = 20533396;
 const MERGE_QUEUE_RULESET = 20533398;
 
 const args = process.argv.slice(2);
-const dryRun = args.includes('--dry-run');
-const version = args.find((a) => !a.startsWith('--'));
-if (!version || !/^v\d+\.\d+\.\d+$/.test(version)) {
-  console.error('usage: node scripts/release_mint.mjs vX.Y.Z [--dry-run]');
+let parsed;
+try {
+  parsed = parseReleaseMintArgs(args);
+} catch {
+  console.error(RELEASE_MINT_USAGE);
   process.exit(1);
 }
-const releaseRef = `refs/heads/release/${version}`;
+const { dryRun, releaseRef } = parsed;
 
 /**
  * @param {string[]} ghArgs
@@ -58,6 +64,14 @@ function fetchRuleset(id) {
   return JSON.parse(gh(['api', `repos/${OWNER_REPO}/rulesets/${id}`]));
 }
 
+/** @param {unknown[]} actual @param {string[]} expected */
+function sameRefSet(actual, expected) {
+  return (
+    Array.isArray(actual) &&
+    JSON.stringify([...actual].sort()) === JSON.stringify([...expected].sort())
+  );
+}
+
 console.log(`[release-mint] target ${releaseRef}${dryRun ? ' (dry run)' : ''}`);
 
 const before96 = fetchRuleset(REQUIRED_CHECKS_RULESET);
@@ -67,20 +81,16 @@ console.log(JSON.stringify(before96, null, 2));
 console.log('[release-mint] BEFORE merge-queue ruleset:');
 console.log(JSON.stringify(before98, null, 2));
 
-const include96 = before96.conditions?.ref_name?.include ?? [];
-const covered = include96.some((pat) => pat === releaseRef || pat === 'refs/heads/release/**');
-if (!covered) {
-  console.error(
-    `[release-mint] FAIL: required-checks ruleset include ${JSON.stringify(include96)} ` +
-      `does not cover ${releaseRef}; fix the ruleset before minting`,
-  );
+const coverage = requiredChecksCoverage(before96, releaseRef);
+if (!coverage.covered) {
+  console.error(`[release-mint] FAIL: ${coverage.reason}; fix the ruleset before minting`);
   process.exit(1);
 }
-console.log('[release-mint] required-checks include covers the new ref');
+console.log('[release-mint] active required-checks ruleset covers the new ref');
 
 const desired = ['refs/heads/main', releaseRef];
 const current98 = before98.conditions?.ref_name?.include ?? [];
-const sameInclude = JSON.stringify([...current98].sort()) === JSON.stringify([...desired].sort());
+const sameInclude = sameRefSet(current98, desired);
 
 if (sameInclude) {
   console.log('[release-mint] merge-queue include already correct; nothing to write');
@@ -90,6 +100,10 @@ if (sameInclude) {
       `-> ${JSON.stringify(desired)}`,
   );
 } else {
+  // A typo must not retarget the canonical queue to a branch that does not
+  // exist. GitHub returns nonzero here and execFileSync stops before the PUT.
+  gh(['api', `repos/${OWNER_REPO}/git/ref/${releaseRef.slice('refs/'.length)}`]);
+
   // PUT replaces the whole ruleset, so resend every field unchanged except
   // the include list; a partial body would silently drop the queue rule.
   const body = JSON.stringify({
@@ -117,6 +131,14 @@ if (sameInclude) {
     body,
   );
   const after98 = fetchRuleset(MERGE_QUEUE_RULESET);
+  if (!sameRefSet(after98.conditions?.ref_name?.include, desired)) {
+    console.error(
+      `[release-mint] FAIL: merge-queue include after PUT is ` +
+        `${JSON.stringify(after98.conditions?.ref_name?.include ?? [])}; expected ` +
+        JSON.stringify(desired),
+    );
+    process.exit(1);
+  }
   console.log('[release-mint] AFTER merge-queue ruleset:');
   console.log(JSON.stringify(after98, null, 2));
 }

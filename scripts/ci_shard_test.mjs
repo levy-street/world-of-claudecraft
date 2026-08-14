@@ -39,7 +39,7 @@ const usage =
 
 const argv = process.argv.slice(2);
 const shard = parseShardArg(argv);
-// The long-sims lanes ("PR gate (long sims A)" / "PR gate (long sims B)"):
+// The long-sims lanes ("PR long sims A" / "PR long sims B"):
 // the two jobs that split the CI_LONG_SUITES files the shard legs exclude
 // (CI_LONG_SUITE_HALVES). Exactly one --lane flag with one of the two exact
 // literals; any other value, a duplicate, or ANY --shard token beside it
@@ -189,7 +189,7 @@ if (lane) {
     // every leg below and owned by the two long-sims lane jobs in this run.
     console.log(
       `[ci-shard] long-sims lane: ${plan.laneExcluded.length} suite(s) excluded from this ` +
-        'shard and owned by the "PR gate (long sims A)" and "PR gate (long sims B)" jobs',
+        'shard and owned by the "PR long sims A" and "PR long sims B" jobs',
     );
   }
   if (plan.mode === 'selective') {

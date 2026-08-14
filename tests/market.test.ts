@@ -26,6 +26,7 @@ function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
     rarity: 'all',
     sort: 'name',
     page: 0,
+    collapseLowest: false,
     ...extra,
   };
 }
@@ -1299,6 +1300,319 @@ describe('the World Market: the Merchant', () => {
   });
 });
 
+describe('World Market: collapse to lowest price per item (issue #3103)', () => {
+  it("includes the viewer's listings when choosing the one cheapest row", () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'A',
+        sellerName: 'A',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 500,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: 'B',
+        sellerName: 'B',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 3,
+        sellerKey: marketSellerKey(viewer),
+        sellerName: 'Viewer',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 800,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: false }), viewer);
+    const full = marketInfo(sim, viewer);
+    expect(full.listings.map((l) => ({ id: l.id, price: l.price, mine: l.mine }))).toEqual([
+      { id: 3, price: 800, mine: true }, // own rows all wire while collapse is off
+      { id: 2, price: 300, mine: false },
+      { id: 1, price: 500, mine: false },
+    ]);
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    const collapsed = marketInfo(sim, viewer);
+    expect(collapsed.listings.map((l) => ({ id: l.id, price: l.price, mine: l.mine }))).toEqual([
+      { id: 2, price: 300, mine: false },
+    ]);
+  });
+
+  it("shows one own row when the viewer's listing is the cheapest copy", () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 1,
+        sellerKey: marketSellerKey(viewer),
+        sellerName: 'Viewer',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 100,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: marketSellerKey(viewer),
+        sellerName: 'Viewer',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 200,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 3,
+        sellerKey: 'Other',
+        sellerName: 'Other',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    const collapsed = marketInfo(sim, viewer);
+    expect(collapsed.listings).toEqual([
+      expect.objectContaining({ id: 1, price: 100, mine: true }),
+    ]);
+    expect(collapsed.totalCount).toBe(1);
+  });
+
+  it('keeps totalCount and pageCount in step with the collapsed set, not the raw match count', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    // Three duplicate listings of the same item from three sellers, plus two
+    // distinct single-seller items: 5 raw "other" rows, 3 distinct items.
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'A',
+        sellerName: 'A',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: 'B',
+        sellerName: 'B',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 200,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 3,
+        sellerKey: 'C',
+        sellerName: 'C',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 100,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 4,
+        sellerKey: 'D',
+        sellerName: 'D',
+        itemId: 'copper_ore',
+        count: 1,
+        price: 50,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 5,
+        sellerKey: 'E',
+        sellerName: 'E',
+        itemId: 'linen_pouch',
+        count: 1,
+        price: 900,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: false }), viewer);
+    expect(marketInfo(sim, viewer).totalCount).toBe(5);
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    const collapsed = marketInfo(sim, viewer);
+    expect(collapsed.totalCount).toBe(3); // worn_sword collapses 3 rows into 1
+    expect(collapsed.pageCount).toBe(1);
+    expect(collapsed.listings.find((l) => l.itemId === 'worn_sword')?.price).toBe(100);
+  });
+
+  it('keeps enchanted, rolled, masterwork, and signed copies as distinct goods', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'PlainCheap',
+        sellerName: 'PlainCheap',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 100,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: 'PlainExpensive',
+        sellerName: 'PlainExpensive',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 200,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 3,
+        sellerKey: 'Enchanter',
+        sellerName: 'Enchanter',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+        instance: { enchant: 'fiery' },
+      },
+      {
+        id: 4,
+        sellerKey: 'Masterworker',
+        sellerName: 'Masterworker',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 400,
+        expiresAt: sim.time + 1000,
+        house: false,
+        instance: { rolled: { masterwork: true, stats: { str: 2 } } },
+      },
+      {
+        id: 5,
+        sellerKey: 'Artisan',
+        sellerName: 'Artisan',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 500,
+        expiresAt: sim.time + 1000,
+        house: false,
+        instance: { signer: 'Artisan' },
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    const collapsed = marketInfo(sim, viewer);
+    expect(collapsed.listings.map((listing) => listing.id)).toEqual([1, 3, 4, 5]);
+    expect(collapsed.totalCount).toBe(4);
+  });
+
+  it('breaks an exact price tie by the older listing id, matching the pure core', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 20,
+        sellerKey: 'Newer',
+        sellerName: 'Newer',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 10,
+        sellerKey: 'Older',
+        sellerName: 'Older',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    expect(marketInfo(sim, viewer).listings).toEqual([
+      expect.objectContaining({ id: 10, sellerName: 'Older', price: 300 }),
+    ]);
+  });
+
+  it('toggling collapseLowest off restores the full listing set on the same session', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'A',
+        sellerName: 'A',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 500,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: 'B',
+        sellerName: 'B',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 300,
+        expiresAt: sim.time + 1000,
+        house: false,
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    expect(marketInfo(sim, viewer).listings).toHaveLength(1);
+
+    sim.marketSearch(q('', { collapseLowest: false }), viewer);
+    expect(marketInfo(sim, viewer).listings).toHaveLength(2);
+  });
+});
+
 describe('World Market: a now-soulbound listing is returned to the seller', () => {
   it('moves a soulbound listing off the book and into the seller collection on load', () => {
     const sim = makeWorld();
@@ -1506,5 +1820,139 @@ describe('purgeMarketSeller - deleting a character', () => {
     expect(sim.purgeMarketSeller(Number.NaN, 'Seller')).toBe(false);
     expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(true);
     expect(collectionsOf(sim).has('Seller')).toBe(true);
+  });
+});
+
+// Issue #3043: the Sell tab shows the item's current lowest active listing price
+// (per unit, matching the "price each" field the player is about to fill in) so
+// they never have to leave the sell flow to check Browse first. The staged item
+// is echoed back alongside the price so a stale snapshot across an item switch
+// never shows a price that no longer belongs to what is on screen.
+describe('sell-tab lowest listing price reference (issue #3043)', () => {
+  it('echoes nothing checked and no price when nothing has been staged yet', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBeNull();
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('reports the lowest PER-UNIT price across multiple stacks, not the lowest stack total', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('healing_potion', 8, seller);
+    // 400cp for a stack of 4 is 100cp/unit; 150cp for a single is 150cp/unit.
+    // The single's TOTAL is lower, but its per-unit price is not: the reference
+    // must compare per-unit, matching the "price each" field the player fills in.
+    sim.marketList('healing_potion', 4, 400, seller);
+    sim.marketList('healing_potion', 4, 600, seller);
+    sim.addItem('healing_potion', 1, seller);
+    sim.marketList('healing_potion', 1, 150, seller);
+
+    sim.marketSellPriceCheck('healing_potion', viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBe('healing_potion');
+    expect(info.sellLowestPrice).toBe(100);
+  });
+
+  it('rounds a non-divisible stack total up to the copper amount Browse shows per unit', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('healing_potion', 3, seller);
+    sim.marketList('healing_potion', 3, 100, seller);
+
+    sim.marketSellPriceCheck('healing_potion', viewer);
+    expect(marketInfo(sim, viewer).sellLowestPrice).toBe(34);
+  });
+
+  it('never reports zero when a positive stack total is smaller than its count', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('healing_potion', 3, seller);
+    sim.marketList('healing_potion', 3, 1, seller);
+
+    sim.marketSellPriceCheck('healing_potion', viewer);
+    expect(marketInfo(sim, viewer).sellLowestPrice).toBe(1);
+  });
+
+  it('reports null when the checked item has no active listings', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    sim.marketSellPriceCheck('wolf_fang', viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBe('wolf_fang');
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('refuses an unknown item id: the echo clears rather than naming a bogus item', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+
+    sim.marketSellPriceCheck('not_a_real_item_id', viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBeNull();
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('clearing the check (null) clears the echoed item and price', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, viewer);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 100, seller);
+
+    sim.marketSellPriceCheck('wolf_fang', viewer);
+    expect(marketInfo(sim, viewer).sellPriceItemId).toBe('wolf_fang');
+
+    sim.marketSellPriceCheck(null, viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBeNull();
+    expect(info.sellLowestPrice).toBeNull();
+  });
+
+  it('a house-stock row counts as real active supply for the reference price', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const houseRow = sim.marketListings.find((l) => l.house);
+    if (!houseRow) throw new Error('expected at least one seeded house listing');
+
+    sim.marketSellPriceCheck(houseRow.itemId, viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellLowestPrice).toBe(Math.ceil(houseRow.price / houseRow.count));
+  });
+
+  it('does not require standing at the Merchant to set the check (a display/query narrowing, like marketSearch)', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 100, seller);
+    teleport(sim, viewer, 0, 0); // far from the Merchant
+
+    sim.marketSellPriceCheck('wolf_fang', viewer);
+    expect(sim.marketInfoFor(viewer)).toBeNull(); // no snapshot while away, same as marketSearch
+
+    standAtMerchant(sim, viewer);
+    const info = marketInfo(sim, viewer);
+    expect(info.sellPriceItemId).toBe('wolf_fang');
+    expect(info.sellLowestPrice).toBe(100);
   });
 });

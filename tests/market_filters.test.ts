@@ -32,6 +32,7 @@ function q(over: Partial<MarketQuery> = {}): MarketQuery {
     rarity: 'all',
     sort: 'name',
     page: 0,
+    collapseLowest: false,
     ...over,
   };
 }

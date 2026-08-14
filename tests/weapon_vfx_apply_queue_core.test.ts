@@ -348,7 +348,7 @@ describe('renderer wiring', () => {
     expect(callbacks).toContain('resolveQueuedSkinLookup(this.sim.entities.get(viewId))');
     expect(callbacks).not.toContain('?.weaponSkinId ?? undefined');
     // Nearest first, by the same squared-XZ measure the view bands use.
-    expect(callbacks).toContain('distSqXZ(entity, this.sim.player)');
+    expect(callbacks).toContain('entityViewDistanceSq(entity, this.sim.player)');
     // Bound as instance fields, so the drain mints no closure pair per frame.
     expect(callbacks).toContain('private readonly weaponSkinRank = (viewId: number)');
   });

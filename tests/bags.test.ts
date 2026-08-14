@@ -15,9 +15,11 @@ import {
   migrationBagsFor,
   stackSizeOf,
 } from '../src/sim/bags';
-import { ITEMS } from '../src/sim/data';
+import { ALL_RECIPES, ITEMS } from '../src/sim/data';
 import { removePreferFungible } from '../src/sim/items';
+import { isCommissionEligibleKind } from '../src/sim/professions/commission';
 import { isEnchantedInstance } from '../src/sim/professions/enchanting';
+import { isSignableMaterialRarity } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot } from '../src/sim/types';
 
@@ -262,6 +264,105 @@ describe('capacity budget and the equip/unequip commands', () => {
     const ev = sim.drainEvents();
     expect(ok).toBe(false);
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
+  });
+
+  it('equipping a payload-bearing copy by id is refused, not stripped (#2837)', () => {
+    // meta.bags stores only a bare item id: not reachable through shipped
+    // content today, but the copy must be refused rather than silently
+    // stripped the moment one ever does carry a payload.
+    const sim = makeSim();
+    sim.addItemInstance('linen_pouch', { signer: 'Provenance' }, sim.playerId, 1, {
+      craftedRecipeId: 'recipe_eastbrook_chain_vest',
+    });
+    sim.drainEvents();
+    sim.equipBag('linen_pouch');
+    const ev = sim.drainEvents();
+    expect(
+      ev.some(
+        (e) =>
+          e.type === 'error' &&
+          e.text === 'That bag cannot be equipped while it carries a special property.',
+      ),
+    ).toBe(true);
+    expect(sim.bags.every((b) => b === null)).toBe(true);
+    const slot = sim.inventory.find((s) => s.itemId === 'linen_pouch');
+    expect(slot?.instance?.signer).toBe('Provenance');
+    expect(slot?.craftedRecipeId).toBe('recipe_eastbrook_chain_vest');
+  });
+
+  it('equipping a payload-bearing copy by named slot index is refused, not stripped (#2837)', () => {
+    // The shipped UI/wire path always names a slot index (bags_window.ts,
+    // server/game.ts): this is the arm nearly every real equip goes through,
+    // distinct from the id-only fallback covered above.
+    const sim = makeSim();
+    sim.addItemInstance('linen_pouch', { signer: 'Provenance' }, sim.playerId, 1, {
+      craftedRecipeId: 'recipe_eastbrook_chain_vest',
+    });
+    const slotIndex = sim.inventory.findIndex((s) => s.itemId === 'linen_pouch');
+    sim.drainEvents();
+    sim.equipBag('linen_pouch', undefined, { slotIndex });
+    const ev = sim.drainEvents();
+    expect(
+      ev.some(
+        (e) =>
+          e.type === 'error' &&
+          e.text === 'That bag cannot be equipped while it carries a special property.',
+      ),
+    ).toBe(true);
+    expect(sim.bags.every((b) => b === null)).toBe(true);
+    const slot = sim.inventory.find((s) => s.itemId === 'linen_pouch');
+    expect(slot?.instance?.signer).toBe('Provenance');
+    expect(slot?.craftedRecipeId).toBe('recipe_eastbrook_chain_vest');
+  });
+
+  it('a plain copy still equips by named slot index while another copy of the same id carries a payload', () => {
+    const sim = makeSim();
+    sim.addItemInstance('linen_pouch', { signer: 'Provenance' }, sim.playerId, 1, {
+      craftedRecipeId: 'recipe_eastbrook_chain_vest',
+    });
+    sim.addItem('linen_pouch', 1);
+    const plainIndex = sim.inventory.findIndex(
+      (s) => s.itemId === 'linen_pouch' && !s.instance && s.craftedRecipeId === undefined,
+    );
+    expect(plainIndex).toBeGreaterThanOrEqual(0);
+    sim.equipBag('linen_pouch', undefined, { slotIndex: plainIndex });
+    expect(sim.bags[0]).toBe('linen_pouch');
+    const remaining = sim.inventory.find((s) => s.itemId === 'linen_pouch');
+    expect(remaining?.instance?.signer, 'the payload-bearing copy is untouched').toBe('Provenance');
+  });
+});
+
+describe('bags are declared payload-free (#2837)', () => {
+  // equipBag/unequipBag store only a bare item id in meta.bags: there is
+  // nowhere to park an instance payload or a craftedRecipeId while a bag is
+  // worn. craftedRecipeId is already impossible for a bag (crafting.ts
+  // isCraftedDisenchantTrackedOutput and the commission opt-in are both
+  // weapon/armor/held_offhand-only, checked below), but an `instance.signer`
+  // payload is NOT gated by kind: resolveCraftForRecipe's
+  // isSignableMaterialRarity arm mints one for ANY rare-or-better CRAFTED
+  // output, bag included (a loot-only bag never reaches it: two shipped bags
+  // already sit at rare/epic, gravewoven_bag and mistcallers_duffel, both
+  // recipe-free dungeon drops granted plain, which is why the pin below is
+  // scoped to bags a recipe can actually produce, not every bag-kind def).
+  // This pins the content-authoring half of the equip-time guard (bags.ts
+  // equipBag): the day a bag RECIPE crosses this line, this fails at test
+  // time instead of the first player equip.
+  it('no craftable bag-kind item def is authored at a signable material rarity', () => {
+    const bagRecipes = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.kind === 'bag');
+    expect(bagRecipes.length, 'sanity: there is a bag recipe to check').toBeGreaterThan(0);
+    for (const recipe of bagRecipes) {
+      const def = ITEMS[recipe.resultItemId];
+      const outputQuality =
+        def?.quality === undefined || def.quality === 'poor' ? 'common' : def.quality;
+      expect(
+        isSignableMaterialRarity(outputQuality),
+        `${recipe.id} -> ${recipe.resultItemId}: a craftable bag must never be rare or better`,
+      ).toBe(false);
+    }
+  });
+
+  it('bags are never a commission-eligible kind', () => {
+    expect(isCommissionEligibleKind('bag')).toBe(false);
   });
 });
 

@@ -64,7 +64,8 @@ export const fr_CA: EnTranslations = {
       "dungeon": "Donjon",
       "difficulty": "Difficulté",
       "name": "Nom",
-      "spec": "Spécialisation"
+      "spec": "Spécialisation",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const fr_CA: EnTranslations = {
       "gather": {
         "label": "Augmenter la compétence de récolte",
         "description": "Augmente la compétence d’un métier de récolte."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Téléporter",
@@ -2463,7 +2468,7 @@ export const fr_CA: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Tricheur >"
     },
     "mobTooltip": {
       "levelFamily": "{family} niveau {level}",
@@ -3088,7 +3093,36 @@ export const fr_CA: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titre",
@@ -3976,10 +4010,10 @@ export const fr_CA: EnTranslations = {
       "current_ownership_required": "La possession actuelle d'un Seeker Genesis Token est requise."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Les comptes d'opérateur ne peuvent pas être marqués.",
+      "reason_required": "Un motif est requis.",
+      "invalid_duration": "Entrez une durée de marquage d'au moins une seconde.",
+      "not_marked": "Ce compte n'est pas marqué."
     }
   },
   "guide": {
@@ -6699,19 +6733,19 @@ export const fr_CA: EnTranslations = {
     "style": "Style",
     "resetLook": "Réinitialiser l'apparence",
     "resetShort": "Réinitialiser",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Partager",
+    "designCode": "Code d'apparence",
+    "designCodeHint": "Copiez ce code pour sauvegarder ou partager cette apparence. Collez un code ici et importez-le pour la charger.",
+    "copyCode": "Copier le code",
+    "importCode": "Importer",
+    "designCodeCopied": "Code d'apparence copié.",
+    "designCodeCopyManual": "La copie automatique est bloquée ici. Le code est sélectionné; copiez-le avec votre clavier.",
+    "designCodeImported": "Apparence importée.",
+    "designCodeImportedPartial": "Apparence importée. Les valeurs inconnues de cette version ont été ignorées.",
+    "designCodeErrEmpty": "Collez d'abord un code d'apparence.",
+    "designCodeErrHeader": "Cela ne ressemble pas à un code d'apparence.",
+    "designCodeErrVersion": "Ce code d'apparence vient d'une version plus récente du jeu.",
+    "designCodeErrMalformed": "Ce code d'apparence est endommagé. Copiez le code au complet et réessayez.",
     "browFlat": "Plat",
     "browArched": "Arqué",
     "browThin": "Fin",
@@ -8106,6 +8140,7 @@ export const fr_CA: EnTranslations = {
         "cooldownLockedHerb": "Parcelle de plantes épuisée, outil indisponible",
         "station": "Poste d'artisanat : {name}",
         "service": "Service : {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Membre du groupe : {name}",
         "deadPartyMember": "Membre du groupe mort : {name}",
         "partyMemberGeneric": "Membre du groupe",
@@ -9087,6 +9122,7 @@ export const fr_CA: EnTranslations = {
       "filterSort": "Trier",
       "sortName": "Nom (A-Z)",
       "sortPriceAsc": "Prix : du plus bas au plus élevé",
+      "collapseLowest": "Prix le plus bas uniquement",
       "weaponSword": "Épées",
       "weaponDagger": "Dagues",
       "weaponStaff": "Bâtons",
@@ -9117,6 +9153,8 @@ export const fr_CA: EnTranslations = {
       "quantity": "Quantité",
       "quantityOf": "sur {count}",
       "priceEach": "Prix unitaire",
+      "lowestPriceLabel": "Prix de vente le plus bas actuellement",
+      "lowestPriceNone": "Aucune annonce active pour cet objet pour le moment.",
       "listButton": "Publier au Marché mondial",
       "minPriceError": "Indiquez un prix d'au moins 1 cuivre.",
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",
@@ -17296,6 +17334,7 @@ export const fr_CA: EnTranslations = {
     "delveRiteShrineReedInteract": "Autel du roseau : appuyez sur F pour le toucher",
     "delveRiteShrineSkullInteract": "Autel du crâne : appuyez sur F pour le toucher",
     "mailboxName": "Boîte aux lettres",
-    "noticeboardName": "Panneau d'affichage"
+    "noticeboardName": "Panneau d'affichage",
+    "farmPatchName": "Garden Beds"
   }
 };

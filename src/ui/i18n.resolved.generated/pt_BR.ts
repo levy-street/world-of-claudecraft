@@ -64,7 +64,8 @@ export const pt_BR: EnTranslations = {
       "dungeon": "Masmorra",
       "difficulty": "Dificuldade",
       "name": "Nome",
-      "spec": "Especialização"
+      "spec": "Especialização",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const pt_BR: EnTranslations = {
       "gather": {
         "label": "Conceder habilidade de coleta",
         "description": "Aumenta a habilidade em uma profissão de coleta."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teletransportar",
@@ -2463,7 +2468,7 @@ export const pt_BR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Trapaceiro >"
     },
     "mobTooltip": {
       "levelFamily": "{family} de nível {level}",
@@ -3088,7 +3093,36 @@ export const pt_BR: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Título",
@@ -3976,10 +4010,10 @@ export const pt_BR: EnTranslations = {
       "current_ownership_required": "É necessário possuir atualmente o Seeker Genesis Token."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Contas de operador não podem receber a marca.",
+      "reason_required": "É necessário informar um motivo.",
+      "invalid_duration": "Informe uma duração de pelo menos um segundo para a marca.",
+      "not_marked": "Essa conta não está marcada."
     }
   },
   "guide": {
@@ -6699,19 +6733,19 @@ export const pt_BR: EnTranslations = {
     "style": "Estilo",
     "resetLook": "Redefinir Aparência",
     "resetShort": "Redefinir",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Compartilhar",
+    "designCode": "Código de aparência",
+    "designCodeHint": "Copie este código para salvar ou compartilhar esta aparência. Cole um código aqui e importe-o para carregá-la.",
+    "copyCode": "Copiar código",
+    "importCode": "Importar",
+    "designCodeCopied": "Código de aparência copiado.",
+    "designCodeCopyManual": "A cópia automática está bloqueada aqui. O código está selecionado; copie-o com o teclado.",
+    "designCodeImported": "Aparência importada.",
+    "designCodeImportedPartial": "Aparência importada. Os valores que esta versão não reconhece foram ignorados.",
+    "designCodeErrEmpty": "Cole primeiro um código de aparência.",
+    "designCodeErrHeader": "Isso não parece ser um código de aparência.",
+    "designCodeErrVersion": "Esse código de aparência veio de uma versão mais recente do jogo.",
+    "designCodeErrMalformed": "Esse código de aparência está corrompido. Copie o código inteiro e tente novamente.",
     "browFlat": "Reta",
     "browArched": "Arqueada",
     "browThin": "Fina",
@@ -8106,6 +8140,7 @@ export const pt_BR: EnTranslations = {
         "cooldownLockedHerb": "Canteiro de ervas colhido, ferramenta indisponível",
         "station": "Estação de criação: {name}",
         "service": "Serviço: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Membro do grupo: {name}",
         "deadPartyMember": "Membro morto do grupo: {name}",
         "partyMemberGeneric": "Membro do grupo",
@@ -9087,6 +9122,7 @@ export const pt_BR: EnTranslations = {
       "filterSort": "Ordenar",
       "sortName": "Nome (A-Z)",
       "sortPriceAsc": "Preço: menor para maior",
+      "collapseLowest": "Apenas o menor preço",
       "weaponSword": "Espadas",
       "weaponDagger": "Adagas",
       "weaponStaff": "Cajados",
@@ -9117,6 +9153,8 @@ export const pt_BR: EnTranslations = {
       "quantity": "Quantidade",
       "quantityOf": "de {count}",
       "priceEach": "Preço unitário",
+      "lowestPriceLabel": "Menor preço anunciado no momento",
+      "lowestPriceNone": "Ainda não há anúncios ativos para este item.",
       "listButton": "Listar no Mercado Mundial",
       "minPriceError": "Informe um preço de pelo menos 1 cobre.",
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",
@@ -17296,6 +17334,7 @@ export const pt_BR: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuário do Junco: Pressione F para tocá-lo",
     "delveRiteShrineSkullInteract": "Santuário da Caveira: Pressione F para tocá-lo",
     "mailboxName": "Caixa de correio",
-    "noticeboardName": "Quadro de Avisos"
+    "noticeboardName": "Quadro de Avisos",
+    "farmPatchName": "Garden Beds"
   }
 };

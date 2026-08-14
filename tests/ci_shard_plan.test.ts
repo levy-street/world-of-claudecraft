@@ -1107,9 +1107,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     });
     expect(run.exitCode).toBe(0);
     for (const f of CI_LONG_SUITES) expect(run.log).toContain(`--exclude=${f}`);
-    expect(run.log).toContain(
-      'owned by the "PR gate (long sims A)" and "PR gate (long sims B)" jobs',
-    );
+    expect(run.log).toContain('owned by the "PR long sims A" and "PR long sims B" jobs');
   });
 
   it('plans the full suite when the mode env is missing (fail closed)', async () => {

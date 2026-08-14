@@ -3280,6 +3280,129 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-collapse-toggle',
+    label: 'World Market Browse "lowest price only" toggle (issue 3103)',
+    when: ['ui/market_window', 'sim/market', 'sim/market_query', 'sim/market_collapse'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Offline there is only one player, so four DIFFERENT sellers of the same item can
+    // only be staged by seeding the book directly (the market-collect-ledger precedent),
+    // not by driving four real marketList commands. Same seeded data on both commits: on
+    // the base commit the toggle does not exist yet, so the shot is the full uncollapsed
+    // list; on this branch the toggle exists, checking it collapses those four rows down
+    // to the one cheapest, which is the contrast this pair is for.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (p?.pos) {
+          p.pos.x = 0;
+          p.pos.z = 11.5;
+        }
+        const book = sim?.market?.marketListings;
+        if (book) {
+          book.length = 0;
+          book.push(
+            {
+              id: 1,
+              sellerKey: 'Bramblefoot',
+              sellerName: 'Bramblefoot',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 600,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+            {
+              id: 2,
+              sellerKey: 'Rhaelin',
+              sellerName: 'Rhaelin',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 400,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+            {
+              id: 3,
+              sellerKey: 'Torvald',
+              sellerName: 'Torvald',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 250,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+            {
+              id: 4,
+              sellerKey: 'Mirelle',
+              sellerName: 'Mirelle',
+              itemId: 'worn_sword',
+              count: 1,
+              price: 100,
+              expiresAt: (sim?.time ?? 0) + 1000,
+              house: false,
+            },
+          );
+        }
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+        const bags = document.querySelector('#bags');
+        if (bags) bags.style.display = 'none';
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      // Present only on this branch; absent on the base commit, which leaves the
+      // seeded four rows uncollapsed as the "before" half of the pair.
+      await page.evaluate(() => {
+        const box = document.querySelector('.mkt-collapse-checkbox');
+        if (box instanceof HTMLInputElement) {
+          box.checked = true;
+          box.dispatchEvent(new Event('change'));
+        }
+      });
+      await wait(300);
+      return { clip: '#market-window' };
+    },
+  },
+  {
+    key: 'market-sell-price-ref',
+    label: 'World Market Sell tab (current lowest listing price reference, issue 3043)',
+    when: ['ui/market_window', 'ui/market_view', 'sim/market'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Grant a house-stocked food item (roasted_boar, seeded at 700c/5 = 140c/unit
+    // by market.ts's standing stock, so the reference always has a real, non-zero
+    // price to show), open the Sell tab, then stage the item through the REAL bag
+    // click path (isMarketSell -> stageMarketSell), not a debug-hook shortcut:
+    // bag rows carry a stable `bag:<itemId>:<ordinal>` focus key.
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (p?.pos) {
+          p.pos.x = 0;
+          p.pos.z = 11.5;
+        }
+        sim?.addItem?.('roasted_boar', 5, p?.id);
+        const el = document.querySelector('#market-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openMarket?.();
+      });
+      if (!(await pollForSize(page, '#market-window'))) return {};
+      const staged = await page.evaluate(() => {
+        const tab = document.querySelector('#market-window [data-tab="sell"]');
+        if (!tab) return false;
+        tab.click();
+        const row = document.querySelector('[data-focus-key^="bag:roasted_boar:"]');
+        if (!row) return false;
+        row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        return true;
+      });
+      if (!staged) return {};
+      await wait(300);
+      return { clip: '#market-window' };
+    },
+  },
+  {
     key: 'market-collect-ledger',
     label: 'World Market Collect tab (itemized sale ledger under the proceeds line)',
     when: ['ui/market_window', 'ui/market_view', 'sim/market'],
@@ -9214,7 +9337,142 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
+  {
+    key: 'harvest-journal',
+    label: 'Harvest Journal window with staged growth ladder (Eastbrook beds)',
+    when: ['ui/harvest_journal'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await stageEastbrookBeds(page);
+      // Open through the real toggle the keybind dispatches to; the window's
+      // own 1 Hz countdown driver needs a beat to stamp the time cells.
+      await page.evaluate(() => window.__game?.hud?.toggleHarvestJournal?.());
+      const open = await pollForSize(page, '#harvest-journal-window');
+      if (!open) return { skip: 'the harvest journal never opened' };
+      await wait(1600);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      // Mobile clips the whole HUD so the shot also proves safe-area placement
+      // and shows the minimap farm-patch pin beside the open window.
+      return { clip: shot?.mobile ? '#ui' : '#harvest-journal-window' };
+    },
+  },
+  {
+    key: 'farm-map-pins',
+    label: 'World map farm-patch pins from the Eastbrook garden beds',
+    when: [
+      'ui/map_window_view',
+      'ui/map_window_painter',
+      'ui/minimap_markers',
+      'ui/minimap_painter',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageEastbrookBeds(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      const open = await pollForSize(page, '#map-window');
+      if (!open) return { skip: 'the map window never opened' };
+      await wait(600);
+      return { clip: '#map-window' };
+    },
+  },
 ];
+
+// Shared staging for the farming Phase 8 shots: stand in the Eastbrook patch,
+// plant the four beds one cast at a time, and spread the timers into a
+// growth ladder (the farm-patches target above documents every step's why).
+async function stageEastbrookBeds(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  const staged = await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const player = sim?.player;
+    if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    player.pos.x = 18.5;
+    player.pos.z = 32.5;
+    sim.addItem?.('garden_hoe', 1);
+    sim.addItem?.('vale_wheat_seed', 4);
+    sim.addItem?.('brook_carrot_seed', 4);
+    const ents = sim.entities?.values?.();
+    if (ents) {
+      for (const e of ents) {
+        if (!e?.hostile || !e.pos) continue;
+        const dx = e.pos.x - player.pos.x;
+        const dz = e.pos.z - player.pos.z;
+        if (dx * dx + dz * dz < 60 * 60) {
+          e.pos.x += 500;
+          e.pos.z += 500;
+        }
+      }
+    }
+    return { ok: true };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  const PLANTS = [
+    ['bed_eastbrook_1', 'vale_wheat'],
+    ['bed_eastbrook_2', 'brook_carrot'],
+    ['bed_eastbrook_3', 'vale_wheat'],
+    ['bed_eastbrook_4', 'brook_carrot'],
+  ];
+  for (const [bedId, cropId] of PLANTS) {
+    let planted = false;
+    for (let attempt = 0; attempt < 4 && !planted; attempt++) {
+      await page.evaluate((bed, crop) => window.__game?.sim?.plantCrop?.(bed, crop), bedId, cropId);
+      for (let i = 0; i < 10; i++) {
+        planted = await page.evaluate((bed) => {
+          const sim = window.__game?.sim;
+          return !!sim?.players?.get?.(sim?.playerId)?.farmPlots?.get?.(bed);
+        }, bedId);
+        if (planted) break;
+        await wait(400);
+      }
+    }
+  }
+  await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const plots = sim?.players?.get?.(sim?.playerId)?.farmPlots;
+    const now = sim?.farmNowMs?.();
+    if (!plots?.get || typeof now !== 'number') return;
+    const shape = (bedId, elapsedMs, totalMs) => {
+      const p = plots.get(bedId);
+      if (!p) return;
+      p.plantedAtMs = now - elapsedMs;
+      p.readyAtMs = p.plantedAtMs + totalMs;
+    };
+    shape('bed_eastbrook_1', 5_000, 100_000);
+    shape('bed_eastbrook_2', 40_000, 100_000);
+    shape('bed_eastbrook_3', 75_000, 100_000);
+    shape('bed_eastbrook_4', 200_000, 100_000);
+  });
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+    });
+    await wait(500);
+  }
+}
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
 // open the bags window on it. Shared by the tooltip targets above, which each

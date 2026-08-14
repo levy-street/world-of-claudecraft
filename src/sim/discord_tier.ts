@@ -80,8 +80,6 @@ export const DISCORD_REWARD_GRANTS = {
   dailyActive: { reason: 'daily_active', points: 50 },
 } as const satisfies Record<string, { reason: string; points: number }>;
 
-export type DiscordRewardGrantKey = keyof typeof DISCORD_REWARD_GRANTS;
-
 // ── Swag catalog ─────────────────────────────────────────────────────────────
 // Claimable rewards. A claim is recorded idempotently server-side (one per
 // account per swag id). `kind` tells the renderer/bot how to fulfil it:

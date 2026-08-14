@@ -27,6 +27,7 @@ import {
   sanitizeEscrowSlot,
 } from './item_instance_transfer';
 import { removeVendorSellUnits } from './items';
+import { collapseToLowestPerItem } from './market_collapse';
 import { planListingIds, playerListingIdFloor } from './market_listing_ids';
 import {
   MARKET_PAGE_SIZE,
@@ -102,6 +103,27 @@ export const MARKET_HOUSE_STOCK = [
   { itemId: 'linen_pouch', count: 1, price: 250 },
   { itemId: 'travelers_knapsack', count: 1, price: 2000 },
 ] as const;
+// The current lowest active listing price for `itemId`, PER UNIT (issue #3043):
+// `MarketListing.price` is the total buyout for the whole stack, but the Sell
+// tab's "price each" field the player is about to fill in is per-unit, so this
+// normalizes every stack (including a single-copy instanced listing, count 1)
+// before comparing. House stock counts as real active supply: a buyer can pick
+// it over the player's new listing exactly like any other row. Null when no
+// listing of the item is active. Round up to the next whole copper, matching
+// Browse's indivisible-copper per-unit display and never understating a price.
+export function lowestListingPricePerUnit(
+  listings: readonly MarketListing[],
+  itemId: string,
+): number | null {
+  let lowest: number | null = null;
+  for (const l of listings) {
+    if (l.itemId !== itemId) continue;
+    const perUnit = Math.ceil(l.price / l.count);
+    if (lowest === null || perUnit < lowest) lowest = perUnit;
+  }
+  return lowest;
+}
+
 const MARKET_MIN_PRICE = 1; // copper
 const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling, guards against overflow / fat-finger
 // Exported for the wiki generator (scripts/wiki/build_content.mjs) and its
@@ -481,6 +503,19 @@ export class Market {
     // including ones added later.
     if (JSON.stringify(r.meta.marketQuery) === JSON.stringify(next)) return;
     r.meta.marketQuery = next;
+  }
+
+  // Set (or clear, with null) the item the Sell tab wants a current-price
+  // reference for (issue #3043: the sell form shows the item's lowest active
+  // listing price so the player never has to leave the sell path to check
+  // Browse first). Purely a display/query narrowing (no gameplay effect, the
+  // Browse precedent above), so like marketSearch it needs no proximity or
+  // liveness gate; the next marketInfoFor snapshot reflects it. An unknown
+  // item id clears the check rather than naming a bogus item.
+  marketSellPriceCheck(itemId: string | null, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    r.meta.sellPriceItemId = itemId && ITEMS[itemId] ? itemId : null;
   }
 
   marketList(itemId: string, count: number, price: number, pid?: number): void {
@@ -977,13 +1012,19 @@ export class Market {
     // book to filter is the one thing that DOES depend on the viewer: their chosen
     // sort axis (name, the classic default, or price ascending, issue 3102).
     const sorted = this.sortedBookFor(query.sort).filter((l) => marketItemMatches(l.itemId, query));
-    // The viewer's own listings are always wired (so they can reclaim from the Browse
-    // tab without hunting for the right page); other sellers' listings are paged. Own
-    // count (<= MARKET_MAX_LISTINGS = 12) plus one page (MARKET_PAGE_SIZE = 50) stays
-    // well under MARKET_WIRE_LIMIT, which remains a hard safety bound on wire size.
+    // The viewer's own matching listings are wired before the paged other-seller rows.
+    // Outside collapse mode this preserves the full reclaim set. In collapse mode the
+    // whole matched book collapses first, so an own row appears only when it is the
+    // cheapest row for its plain item identity. Turning the toggle off restores every
+    // reclaim row. Own count (<= MARKET_MAX_LISTINGS = 12) plus one page
+    // (MARKET_PAGE_SIZE = 50) stays well under MARKET_WIRE_LIMIT.
     const isMine = (l: MarketListing) => this.marketListingBelongsTo(l, meta);
-    const mineSorted = sorted.filter(isMine);
-    const others = sorted.filter((l) => !isMine(l));
+    // Collapse BEFORE ownership partitioning so the player sees at most one plain row
+    // per item even when their own listing is among the matches. Instanced copies remain
+    // distinct in collapseToLowestPerItem because their payload changes the goods.
+    const visibleSorted = query.collapseLowest ? collapseToLowestPerItem(sorted) : sorted;
+    const mineSorted = visibleSorted.filter(isMine);
+    const others = visibleSorted.filter((l) => !isMine(l));
     const pageCount = Math.max(1, Math.ceil(others.length / MARKET_PAGE_SIZE));
     const page = Math.max(0, Math.min(pageCount - 1, query.page));
     const othersPage = others.slice(
@@ -1012,9 +1053,10 @@ export class Market {
     );
     return {
       listings,
-      // Every listing matching the filter (the viewer's own plus all others), so the
-      // SELL/notes read true counts; `pageCount` below paginates the others.
-      totalCount: sorted.length,
+      // Every visible listing after filters and optional collapse. pageCount below
+      // paginates the other-seller rows; the market view subtracts visible own rows
+      // from this total when deriving its "N of M" range.
+      totalCount: mineSorted.length + others.length,
       filter: query.search,
       // Echo every filter axis, not just the search text: a fresh join (post-
       // linkdead-grace reconnect) resets this session-only query to default, and
@@ -1027,6 +1069,7 @@ export class Market {
       primaryStat: query.primaryStat,
       rarity: query.rarity,
       sort: query.sort,
+      collapseLowest: query.collapseLowest,
       page,
       pageCount,
       collectionCopper: col?.copper ?? 0,
@@ -1042,6 +1085,15 @@ export class Market {
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
+      // The Sell tab's current-lowest-price reference (issue #3043), echoed
+      // alongside the item id it was computed for: the UI shows the price only
+      // when this echo matches what it currently has staged, so a stale
+      // snapshot across an item switch never displays a price that belongs to
+      // the PREVIOUS item.
+      sellPriceItemId: meta.sellPriceItemId,
+      sellLowestPrice: meta.sellPriceItemId
+        ? lowestListingPricePerUnit(this.marketListings, meta.sellPriceItemId)
+        : null,
     };
   }
 

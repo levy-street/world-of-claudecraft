@@ -11,6 +11,7 @@
 // is OPEN-only and never exercises reconnect).
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
 import type { PlayerClass } from '../src/sim/types';
 
 const PROBE_CLASS: PlayerClass = 'warrior';
@@ -24,6 +25,7 @@ class StubWebSocket {
   onmessage: ((ev: { data: unknown }) => void) | null = null;
   onclose: (() => void) | null = null;
   readyState = StubWebSocket.OPEN;
+  bufferedAmount = 0;
   sent: string[] = [];
   constructor(public readonly url: string) {
     StubWebSocket.instances.push(this);
@@ -147,6 +149,39 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
       expect(doc.listenerCount()).toBe(1);
       world.close();
       expect(doc.listenerCount()).toBe(0);
+    });
+  });
+
+  it('clears shed transient input intent when a fresh transport is established', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const wire = world as unknown as {
+        onMessage(raw: string): void;
+        reconnectAttempts: number;
+      };
+      const first = StubWebSocket.instances[0];
+      wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+
+      first.bufferedAmount = INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1;
+      world.moveInput.jump = true;
+      world.moveInput.turnLeft = true;
+      expect(world.flushInput(1_000)).toBe(false);
+      world.moveInput.jump = false;
+      world.moveInput.turnLeft = false;
+
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.();
+      expect(wire.reconnectAttempts).toBe(1);
+      harness.fire(harness.timers[0].id);
+      const second = StubWebSocket.instances[1];
+      wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+
+      expect(world.flushInput(2_000)).toBe(true);
+      const input = JSON.parse(second.sent.at(-1) ?? '{}') as {
+        mi?: { j?: number; tl?: number; tr?: number };
+      };
+      expect(input.mi).toMatchObject({ j: 0, tl: 0, tr: 0 });
+      world.close();
     });
   });
 

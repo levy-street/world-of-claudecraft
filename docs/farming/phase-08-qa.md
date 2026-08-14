@@ -1,5 +1,17 @@
 # Phase 8 QA: Verify The Harvest Journal and ready notices
 
+PHASE 8 EXECUTED 2026-08-14 (read before auditing; state.md deviations (ay) to
+(bd) are the authority): msRemaining wire DECLINED, the countdown mechanism is
+readyAtMs minus farmNowMs() with status the sole Ready authority and a
+"finishing" zero-clamp arm; entry is the professions-window row plus Shift+K, no
+rail button; the journal is informational (no harvest button, confirm channel
+re-deferred); farmReady joined HEAVY_SELF_EVENTS; the farming_session golden was
+deliberately re-minted (md5 50a2e54c3e809a1a4aa0ecf99ea43c5f) for the appended
+ready-notice beat in an isolated commit; pins are procedural station-color
+sprouts through the static-marker family, NOT the semantics core; the linkdead
+transient-notice loss and the unsharded sweep are recorded acceptances to
+verify as ledgered, not re-litigate blind.
+
 Independent verification of Phase 8 in a fresh session. The emphasis is honesty and
 restraint: the countdown must be correct under a skewed client clock, the login notice
 must fire exactly once for a ready crop on a fresh session, the online sweep must emit

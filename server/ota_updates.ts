@@ -39,7 +39,7 @@ import type * as http from 'node:http';
 import { gzipSync } from 'node:zlib';
 import { type CachedRead, createCachedRead } from './cached_read';
 import { withBody } from './http/middleware/body';
-import { type Infer, object, optional, str } from './http/schema';
+import { object, optional, str } from './http/schema';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json } from './http_util';
 import { publicReadRateLimited, rateLimitNow, requestIp } from './ratelimit';
@@ -166,7 +166,6 @@ export const otaUpdatesBodySchema = object({
   version_build: optional(str({ maxLength: 64 })),
   plugin_version: optional(str({ maxLength: 64 })),
 });
-export type OtaUpdatesBody = Infer<typeof otaUpdatesBodySchema>;
 
 /** An update offer in the plugin's response shape; null means "no update". */
 export interface OtaUpdateOffer {

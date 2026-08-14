@@ -9,8 +9,6 @@ import { formatDateTime, type SupportedLanguage } from '../../i18n';
 
 export type ChatClock = '12h' | '24h';
 
-export const CHAT_CLOCKS: readonly ChatClock[] = ['12h', '24h'];
-
 // Coerce arbitrary localStorage junk back to a valid clock (default 24h).
 export function clampChatClock(v: string | null): ChatClock {
   return v === '12h' ? '12h' : '24h';

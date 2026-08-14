@@ -445,6 +445,7 @@ import {
   type PlotState,
   projectFarmPlots,
 } from './professions/farm_projection';
+import { notifyFarmReady } from './professions/farm_ready';
 import {
   convertHusks as convertHusksAction,
   harvestCrop as harvestCropAction,
@@ -1547,6 +1548,10 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
+  // Session-only: the item id the Sell tab wants a current-lowest-listing-price
+  // reference for (issue #3043), or null when nothing is staged. Never
+  // persisted, resets on login, same as marketQuery.
+  sellPriceItemId: string | null;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -3066,6 +3071,7 @@ export class Sim {
       // on load too, since savedState carries no mobile-station field.
       mobileStation: null,
       marketQuery: defaultMarketQuery(),
+      sellPriceItemId: null,
       mailWelcomed: false,
       guildLetterSent: false,
       questCadence: new Map(),
@@ -3691,6 +3697,7 @@ export class Sim {
     deedsMod.evaluateDeedsFor(this.ctx, meta, player, true);
     this.deedDirtyPids.delete(player.id);
     this.deedDirtyKeys.delete(player.id);
+    notifyFarmReady(this.ctx, meta);
     return player.id;
   }
 
@@ -6439,12 +6446,12 @@ export class Sim {
     lap?.('delayedEv');
     // The farming sweep (the growth-engine phase): APPENDED here, never
     // inserted, because the shared rng stream makes any reorder of the tail
-    // fork every golden. Draws ZERO rng and emits nothing (it is the
-    // ready-notice phase's placeholder, behind its own internal 1 Hz guard),
-    // so its position cannot fork the draw order, exactly like the
-    // updateProfNudges and updateDeeds neighbours. Farming growth itself is
-    // NOT ticked: a plot is an absolute deadline the projection compares
-    // against, so there is no timer here to fire.
+    // fork every golden. Draws ZERO rng (it emits the ready notice behind its
+    // own internal 1 Hz guard, and decides it from stored state alone), so its
+    // position cannot fork the draw order, exactly like the updateProfNudges
+    // and updateDeeds neighbours. Farming growth itself is NOT ticked: a plot
+    // is an absolute deadline the projection compares against, so there is no
+    // timer here to fire.
     updateFarming(this.ctx);
     lap?.('farming');
     // The Book of Deeds evaluator runs at the very end of the tail: it sees
@@ -11341,6 +11348,10 @@ export class Sim {
 
   marketSearch(query: MarketQuery, pid?: number): void {
     this.market.marketSearch(query, pid);
+  }
+
+  marketSellPriceCheck(itemId: string | null, pid?: number): void {
+    this.market.marketSellPriceCheck(itemId, pid);
   }
 
   marketList(itemId: string, count: number, price: number, pid?: number): void {

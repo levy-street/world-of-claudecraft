@@ -3867,6 +3867,77 @@ export const hudChromeStrings = {
     // quantity split follows the grant-line families above.
     husksConvertedLine: 'You trade {husksName} x{husks} for {name}.',
     husksConvertedLineQty: 'You trade {husksName} x{husks} for {name} x{qty}.',
+    // The ready notice (the ready-notice phase), rendered on BOTH the ambient
+    // banner and the chat log from one text-free farmReady event. Two
+    // sentences, one per outcome, so a mixed notice reports both halves
+    // honestly; a notice never repeats for the same plot, so each reads as
+    // news rather than a standing reminder. {count} is a count of BEDS, not a
+    // stack size, which is why these carry a spelled-out plural sibling
+    // instead of the grant families' " xN" form.
+    readyLine: 'A crop is ready to harvest.',
+    readyLineQty: '{count} crops are ready to harvest.',
+    // The failed-crop half. Says only that the crop is finished and lost, not
+    // what it will pay: the husks arrive at the harvest, and the withered
+    // harvest line above is where they get counted.
+    readyWitheredLine: 'A crop withered in its bed.',
+    readyWitheredLineQty: '{count} crops withered in their beds.',
+  },
+  // The Harvest Journal window: the farmer's read-only list of their own
+  // planted beds. INFORMATIONAL ONLY, so nothing in here labels an action:
+  // the plant and harvest verbs stay at the beds themselves and this window
+  // sends no command, which is why there is no button copy but the entry
+  // control and the close chrome.
+  harvestJournal: {
+    title: 'Harvest Journal',
+    close: 'Close',
+    listLabel: 'Planted crop beds',
+    // The time cell, one arm per plot state. `growing` wraps whichever clock
+    // arm below the remaining duration selected. READY IS ITS OWN ARM AND
+    // COMES FROM THE AUTHORITY'S `status`, never from a countdown reaching
+    // zero, which is what `finishing` is for: the deadline has passed on this
+    // client's clock while the server still calls the plot growing, so the
+    // line reports the wait honestly instead of promising a harvest that
+    // would be refused.
+    growing: 'Ready in {time}',
+    ready: 'Ready to harvest',
+    finishing: 'Finishing up',
+    withered: 'Withered',
+    // The clock arms, selected by scale in harvest_journal_view.ts. Token-only
+    // on purpose: no colon string is ever hand-built, and a locale is free to
+    // reorder the units or change the unit letters. The seconds value arrives
+    // zero-padded, so the minute arms read 3m 07s.
+    remainingDaysHours: '{days}d {hours}h',
+    remainingHoursMinutes: '{hours}h {minutes}m',
+    remainingMinutesSeconds: '{minutes}m {seconds}s',
+    remainingSeconds: '{seconds}s',
+    // Where the bed is. The patch's ZONE is the only localized location handle
+    // farming content carries (patches and beds have ids, not names), so the
+    // line pairs it with the bed's 1-based position in that garden; the
+    // unknown arm covers a bed id no shipped patch claims (content drift
+    // between a client and a newer server).
+    bedLine: '{zone}, bed {index}',
+    bedLineUnknown: 'Unknown bed',
+    // The plant-time knobs this plot was paid for. Compost and the growth
+    // tonic are real items and take their names from the item catalog, so
+    // they need no copy here; the farmer's watch is a produce FEE with no
+    // item of its own, which makes it the one knob that needs a name.
+    careWatch: "Farmer's Watch",
+    careNone: 'No extras',
+    // The four derived growth stages (farmGrowthStage), shown on growing rows
+    // so a journal line matches what the bed itself looks like in the world.
+    stageSprout: 'Sprout',
+    stageSeedling: 'Seedling',
+    stageMaturing: 'Maturing',
+    stageRipe: 'Ripe',
+    // The two empty states. Gathering professions have no learn gate in this
+    // game, so NEITHER sentence claims a plant would be refused: the skill-0
+    // one simply says where to start, and the other says the list fills
+    // itself.
+    emptyTitle: 'No crops planted',
+    emptyBody: 'Sow a seed in any garden bed and the plot appears here with its timer.',
+    noviceTitle: 'You have not worked a garden bed yet',
+    noviceBody:
+      'Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin.',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the

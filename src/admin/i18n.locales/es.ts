@@ -1075,4 +1075,32 @@ export const es: Record<string, string> = {
   'generalChatRateLimit.windowMinutesError': 'Introduce un número entero de {min} a {max}.',
   'generalChatRateLimit.windowMinutesLabel': 'Duración de la ventana (minutos)',
   'moderationHistory.actionGeneralChatRateLimit': 'Límite de chat General modificado',
+  'detail.cheaterMarkModeration': 'Marca de tramposo',
+  'detail.cheaterMarkActions': 'Acciones de moderación de la marca de tramposo',
+  'detail.cheaterMarkApply': 'Aplicar la marca de tramposo',
+  'detail.cheaterMarkLift': 'Quitar la marca de tramposo',
+  'detail.cheaterMarkReason': 'Motivo de la marca: {value}',
+  'detail.cheaterMarkRemaining': 'Tiempo jugado restante: {value}',
+  'detail.cheaterMarkSetAt': 'Aplicada: {value}',
+  'detail.cheaterMarkRelength': 'Cambiar la duración de la marca',
+  'detail.cheaterMarkDuration': 'Crédito en horas de tiempo jugado',
+  'detail.cheaterMarkDurationPlaceholder': 'Horas',
+  'detail.cheaterMarkDurationHint':
+    'Todos los personajes de la cuenta muestran la etiqueta pública hasta que se agote este tiempo de juego.',
+  'detail.cheaterMarkRelengthHint':
+    'Sustituye por completo el tiempo restante; no se suma. La etiqueta pública permanece visible.',
+  'dialog.confirmCheaterMark': 'Confirmar marca de tramposo',
+  'dialog.confirmCheaterMarkRelength': 'Confirmar la nueva duración de la marca',
+  'dialog.confirmCheaterMarkLift': 'Confirmar que se quite la marca',
+  'dialog.actionCheaterMark':
+    'Mostrar la etiqueta pública Tramposo en todos los personajes de esta cuenta',
+  'dialog.actionCheaterMarkRelength': 'Sustituir el tiempo jugado restante de esta marca',
+  'dialog.actionCheaterMarkLift': 'Quitar la marca de tramposo antes de tiempo',
+  'alert.cheaterMarkDurationInvalid': 'Introduce un número entero de 1 a {max} horas.',
+  'error.cheaterMarkDurationInvalid': 'El crédito de tiempo jugado debe ser de 1 a 100 horas.',
+  'error.cheaterMarkNotMarked': 'Esta cuenta no lleva la marca de tramposo.',
+  'error.cheaterMarkAdminTarget':
+    'Las cuentas de administrador no pueden recibir la marca de tramposo.',
+  'moderationHistory.actionCheaterMark': 'Marca de tramposo aplicada',
+  'moderationHistory.actionCheaterMarkLift': 'Marca de tramposo retirada',
 };

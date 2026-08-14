@@ -79,11 +79,11 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const git = (cmd, args) => {
   const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
   if (res.error !== undefined) {
-    console.error(`[gate:select] could not spawn ${cmd}: ${res.error.message}`);
     return {
       status: res.status,
       stdout: res.stdout,
       stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+      error: res.error,
     };
   }
   return res;

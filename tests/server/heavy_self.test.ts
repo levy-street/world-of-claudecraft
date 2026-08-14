@@ -78,6 +78,7 @@ const EXPECTED_EVENTS = [
   'dismissPet',
   'enchantResult',
   'farmPlanted',
+  'farmReady',
   'learnAbility',
   'levelup',
   'loot',
@@ -118,6 +119,11 @@ describe('heavy-self policy sets', () => {
       expect(HEAVY_SELF_CMDS.has(cmd), cmd).toBe(true);
     }
     expect(HEAVY_SELF_EVENTS.has('farmPlanted')).toBe(true);
+    // The ready notice (the ready-notice phase): the sweep flips the plot's
+    // persisted `notified` flag with no inventory change and no command
+    // behind it, so the heavy-gated `fplot` row refreshes off THIS event or
+    // not until the staggered backstop.
+    expect(HEAVY_SELF_EVENTS.has('farmReady')).toBe(true);
     // farmDenied is deliberately NOT a member (refusals ride their own event
     // and must not buy a heavy re-serialize); pin the negative arm too.
     expect(HEAVY_SELF_EVENTS.has('farmDenied')).toBe(false);

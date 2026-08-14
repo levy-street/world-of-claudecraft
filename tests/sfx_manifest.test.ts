@@ -164,15 +164,18 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 9 mount cues, and all 65 UI cues in one 267-key inventory', () => {
+  it('keeps the release catalog, all 9 mount cues, and all 66 UI cues in one 268-key inventory', () => {
     // 265 -> 267 and 63 -> 65 UI cues with the Farming render/juice placeholder
-    // pair (ui_farm_plant, ui_farm_harvest) joining UI_SFX_CATALOG.
+    // pair (ui_farm_plant, ui_farm_harvest) joining UI_SFX_CATALOG, then
+    // 267 -> 268 and 65 -> 66 with the ready-notice placeholder
+    // (ui_farm_ready).
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(267);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(65);
+    expect(keys.size).toBe(268);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(66);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
     expect(keys.has('ui_farm_harvest')).toBe(true);
+    expect(keys.has('ui_farm_ready')).toBe(true);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
@@ -248,7 +251,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(267);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(268);
   });
 });
 

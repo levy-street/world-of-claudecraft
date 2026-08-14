@@ -117,6 +117,7 @@ const hudStringsEn = {
         cooldownLockedHerb: 'Depleted herb node, tool locked',
         station: 'Crafting station: {name}',
         service: 'Service: {name}',
+        farmPatch: 'Garden beds',
         partyMember: 'Party member: {name}',
         deadPartyMember: 'Dead party member: {name}',
         partyMemberGeneric: 'Party member',

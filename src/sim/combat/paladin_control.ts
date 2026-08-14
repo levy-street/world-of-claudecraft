@@ -1,3 +1,4 @@
+import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import { DT, type Entity } from '../types';
@@ -5,6 +6,17 @@ import { relocateSwept } from './heroic_leap';
 import { isVeilboundMarchActive } from './paladin_veilbound_state';
 
 const OATH_CHAIN_PULL_SUFFIX = '_pull';
+
+// A practice dummy (Highwatch training dummy, MOBS.*.dummy) is a fixed
+// world fixture: moveSpeed 0, never chases, never flees. Letting a forced-move
+// pull ignore that would drag it off its marker (issue: it went MIA after an
+// Oath Chain). Scoped to dummy rather than the general ccImmune flag: several
+// existing suites deliberately land hard CC (root/incapacitate/polymorph) on
+// MOBS.training_dummy as a generic, undying practice target, so ccImmune
+// would silence those tests too.
+function isPullEligible(target: Entity): boolean {
+  return MOBS[target.templateId]?.dummy !== true;
+}
 
 function finishOathChainPull(ctx: SimContext, target: Entity, aura: Entity['auras'][number]): void {
   const slowDuration = aura.pullSlowDuration ?? 0;
@@ -70,27 +82,29 @@ export function pullPaladinTarget(
   abilityId: string,
   abilityName: string,
 ): void {
-  const dx = target.pos.x - source.pos.x;
-  const dz = target.pos.z - source.pos.z;
-  const distance = Math.hypot(dx, dz);
-  const traveling = distance > stopDistance && distance > 1e-6 && !isVeilboundMarchActive(target);
-  const travelDuration = traveling
-    ? Math.max(0.05, (distance - stopDistance) / Math.max(0.01, travelSpeed) + 1)
-    : slowDuration;
-  ctx.applyAura(target, {
-    id: `${abilityId}_${traveling ? 'pull' : 'slow'}`,
-    name: abilityName,
-    kind: traveling ? 'forced_move' : 'slow',
-    remaining: travelDuration,
-    duration: travelDuration,
-    value: traveling ? 1 : slowMult,
-    sourceId: source.id,
-    school: 'holy',
-    pullStopDistance: traveling ? stopDistance : undefined,
-    pullSpeed: traveling ? travelSpeed : undefined,
-    pullSlowMult: traveling ? slowMult : undefined,
-    pullSlowDuration: traveling ? slowDuration : undefined,
-  });
+  if (isPullEligible(target)) {
+    const dx = target.pos.x - source.pos.x;
+    const dz = target.pos.z - source.pos.z;
+    const distance = Math.hypot(dx, dz);
+    const traveling = distance > stopDistance && distance > 1e-6 && !isVeilboundMarchActive(target);
+    const travelDuration = traveling
+      ? Math.max(0.05, (distance - stopDistance) / Math.max(0.01, travelSpeed) + 1)
+      : slowDuration;
+    ctx.applyAura(target, {
+      id: `${abilityId}_${traveling ? 'pull' : 'slow'}`,
+      name: abilityName,
+      kind: traveling ? 'forced_move' : 'slow',
+      remaining: travelDuration,
+      duration: travelDuration,
+      value: traveling ? 1 : slowMult,
+      sourceId: source.id,
+      school: 'holy',
+      pullStopDistance: traveling ? stopDistance : undefined,
+      pullSpeed: traveling ? travelSpeed : undefined,
+      pullSlowMult: traveling ? slowMult : undefined,
+      pullSlowDuration: traveling ? slowDuration : undefined,
+    });
+  }
   ctx.enterCombat(source, target);
 }
 
@@ -113,7 +127,10 @@ export function pullPaladinTargets(
       .hostilesInRadius(source, source.pos, searchRadius)
       .filter(
         (candidate) =>
-          candidate.id !== primary.id && !candidate.dead && ctx.hasLineOfSight(source, candidate),
+          candidate.id !== primary.id &&
+          !candidate.dead &&
+          isPullEligible(candidate) &&
+          ctx.hasLineOfSight(source, candidate),
       )
       .sort((a, b) => {
         const adx = a.pos.x - source.pos.x;

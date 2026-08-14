@@ -188,11 +188,3 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     enough: 'Every coastal watchbell has been rung.',
   },
 };
-
-export function groundPickupDeny(itemId: string, itemName: string): string {
-  return GROUND_PICKUP_LINES[itemId]?.deny ?? `You cannot take the ${itemName} yet.`;
-}
-
-export function groundPickupEnough(itemId: string): string {
-  return GROUND_PICKUP_LINES[itemId]?.enough ?? 'You have enough of those.';
-}

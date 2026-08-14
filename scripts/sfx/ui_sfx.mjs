@@ -35,6 +35,8 @@ const MASTER_GAINS_DB = {
   // recording can drop in without a mix re-balance.
   ui_farm_plant: 0,
   ui_farm_harvest: 0,
+  // The ready-notice PLACEHOLDER, unity gain with its two siblings.
+  ui_farm_ready: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -180,6 +182,17 @@ export const UI_SFX_SPECS = [
     noise('white', 0, 0.18, 0.05, { highpass: 2200, lowpass: 7000 }),
     tone(420, 0.02, 0.16, 0.12, { wave: 'triangle' }),
     tone(620, 0.16, 0.3, 0.1, { wave: 'triangle', endFrequency: 880 }),
+  ]),
+  // Farming PLACEHOLDER (the ready-notice phase), for the sound engineer: the
+  // unprompted "your crops are in" chime. Deliberately the QUIETEST and
+  // softest of the three farming stand-ins and the only one with no noise
+  // layer: it arrives without the player pressing anything, so it must read as
+  // a gentle notice rather than an action landing. Two clean rising thirds,
+  // the notification vocabulary the mail and quest chimes share. Swap for a
+  // real recording when one lands.
+  cue('ui_farm_ready', 0.5, 'Soft two-note wooden chime announcing that crops have finished.', [
+    tone(587, 0, 0.18, 0.08, { wave: 'triangle' }),
+    tone(784, 0.12, 0.26, 0.07, { wave: 'triangle' }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

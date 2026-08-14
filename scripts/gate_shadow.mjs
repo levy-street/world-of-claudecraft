@@ -52,11 +52,11 @@ const LOG = process.env.GATE_SHADOW_LOG ?? path.join(TMP, 'gate-shadow.jsonl');
 const git = (cmd, args) => {
   const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
   if (res.error !== undefined) {
-    console.error(`[gate:shadow] could not spawn ${cmd}: ${res.error.message}`);
     return {
       status: res.status,
       stdout: res.stdout,
       stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+      error: res.error,
     };
   }
   return res;

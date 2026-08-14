@@ -21,7 +21,7 @@ const shell = process.platform === 'win32';
 // (e.g. invoked directly from a subdirectory).
 const REPO_ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string }} */
+/** @type {(cmd: string, args: string[]) => { status: number | null, stdout?: string, stderr?: string, error?: Error }} */
 function run(cmd, args) {
   // git is a real executable, so it never needs the .cmd shell shim, and it
   // must not get one: cmd.exe eats the caret in the resolver's `^{commit}`
@@ -35,6 +35,7 @@ function run(cmd, args) {
       status: res.status,
       stdout: res.stdout,
       stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+      error: res.error,
     };
   }
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };

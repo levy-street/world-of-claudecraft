@@ -189,16 +189,6 @@ export function grantHunterFocus(
   return granted;
 }
 
-export function consumeResolvedHunterGenerator(
-  ctx: SimContext,
-  hunter: Entity,
-  res: ResolvedAbility,
-): void {
-  if (res.hunterRhythm) removeAura(ctx, hunter, EFFICIENT_READY_ID);
-  const meta = ctx.players.get(hunter.id);
-  if (meta && isFocusGenerator(res.def.id)) triggerPredatorsPace(ctx, hunter, meta);
-}
-
 export function noteHunterFocusSpend(
   ctx: SimContext,
   hunter: Entity,

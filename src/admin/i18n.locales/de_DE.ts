@@ -1074,4 +1074,33 @@ export const de_DE: Record<string, string> = {
   'generalChatRateLimit.windowMinutesError': 'Gib eine ganze Zahl von {min} bis {max} ein.',
   'generalChatRateLimit.windowMinutesLabel': 'Fensterlänge (Minuten)',
   'moderationHistory.actionGeneralChatRateLimit': 'Allgemein-Chat-Limit geändert',
+  'detail.cheaterMarkModeration': 'Schummler-Markierung',
+  'detail.cheaterMarkActions': 'Moderationsaktionen für die Schummler-Markierung',
+  'detail.cheaterMarkApply': 'Schummler-Markierung anwenden',
+  'detail.cheaterMarkLift': 'Schummler-Markierung entfernen',
+  'detail.cheaterMarkReason': 'Grund der Markierung: {value}',
+  'detail.cheaterMarkRemaining': 'Verbleibende Spielzeit: {value}',
+  'detail.cheaterMarkSetAt': 'Angewendet: {value}',
+  'detail.cheaterMarkRelength': 'Dauer der Markierung ändern',
+  'detail.cheaterMarkDuration': 'Kontingent in gespielten Stunden',
+  'detail.cheaterMarkDurationPlaceholder': 'Stunden',
+  'detail.cheaterMarkDurationHint':
+    'Jeder Charakter des Kontos trägt das öffentliche Kennzeichen, bis diese Spielzeit aufgebraucht ist.',
+  'detail.cheaterMarkRelengthHint':
+    'Ersetzt das verbleibende Kontingent vollständig und addiert nichts hinzu. Das öffentliche Kennzeichen bleibt sichtbar.',
+  'dialog.confirmCheaterMark': 'Schummler-Markierung bestätigen',
+  'dialog.confirmCheaterMarkRelength': 'Neue Dauer der Markierung bestätigen',
+  'dialog.confirmCheaterMarkLift': 'Entfernen der Markierung bestätigen',
+  'dialog.actionCheaterMark':
+    'Alle Charaktere dieses Kontos mit dem öffentlichen Kennzeichen Schummler versehen',
+  'dialog.actionCheaterMarkRelength':
+    'Das verbleibende Spielzeitkontingent dieser Markierung ersetzen',
+  'dialog.actionCheaterMarkLift': 'Schummler-Markierung vorzeitig entfernen',
+  'alert.cheaterMarkDurationInvalid': 'Gib eine ganze Zahl von 1 bis {max} Stunden ein.',
+  'error.cheaterMarkDurationInvalid':
+    'Das Spielzeitkontingent muss zwischen 1 und 100 Stunden liegen.',
+  'error.cheaterMarkNotMarked': 'Dieses Konto trägt keine Schummler-Markierung.',
+  'error.cheaterMarkAdminTarget': 'Administratorkonten können keine Schummler-Markierung erhalten.',
+  'moderationHistory.actionCheaterMark': 'Schummler-Markierung angewendet',
+  'moderationHistory.actionCheaterMarkLift': 'Schummler-Markierung entfernt',
 };

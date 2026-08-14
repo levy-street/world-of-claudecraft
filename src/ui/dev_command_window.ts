@@ -180,6 +180,12 @@ function actionFields(actionId: string): string {
         'raidDifficulty',
         `<option value="heroic">${esc(t('devCommand.difficulty.heroic'))}</option><option value="normal">${esc(t('devCommand.difficulty.normal'))}</option>`,
       );
+    case 'farmgrow':
+      // Free text with NO default, unlike every other text field here: the
+      // empty value is the useful one (advance every planted bed), and the
+      // bed table carries ids only (no display name), so a select would be a
+      // list of raw save keys 23 rows long.
+      return textField('devCommand.fields.bed', 'bed', '');
     case 'bot':
       return textField('devCommand.fields.name', 'botName', 'TestBot');
     default:

@@ -123,11 +123,21 @@ export class MarketWindow {
   private primaryStatFilter: MarketPrimaryStatFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
   private sortFilter: MarketSort = 'name';
+  // Browse toggle: collapse matching plain listings to the cheapest per item
+  // (issue 3103). Server-side, like every other filter axis, so it narrows the
+  // WHOLE market, not just the wired page.
+  private collapseLowest = false;
   private browsePage = 0;
   private sellItemId: string | null = null;
   private sellInstance: ItemInstancePayload | null = null;
   private searchQuery = '';
   private lastSig = '';
+  // The Sell tab's price-reference echo signature (issue 3043), tracked SEPARATELY
+  // from lastSig: the Sell tab is excluded from the general per-frame rebuild (it
+  // holds typed inputs a rebuild would clobber), but the price reference still
+  // needs to land once the server's async echo catches up, via a narrow
+  // DOM-only patch. See refreshSellPriceRef.
+  private lastSellPriceRefSig = '';
   private openerFocus: HTMLElement | null = null;
   // Armed by onReconnected() and cleared by the next refreshIfChanged() that
   // actually observes a post-reconnect MarketInfo. onReconnected() fires
@@ -162,11 +172,13 @@ export class MarketWindow {
     this.primaryStatFilter = 'all';
     this.rarityFilter = 'all';
     this.sortFilter = 'name';
+    this.collapseLowest = false;
     this.browsePage = 0;
     this.sellItemId = null;
     this.sellInstance = null;
     this.searchQuery = '';
     this.pushQuery();
+    this.pushSellPriceCheck();
     this.lastSig = '';
     this.render();
     this.deps.root().style.display = 'flex';
@@ -185,6 +197,7 @@ export class MarketWindow {
     this.opened = false;
     this.sellItemId = null;
     this.sellInstance = null;
+    this.pushSellPriceCheck();
     this.deps.root().style.display = 'none';
     this.deps.hideTooltip();
     document.body.classList.remove('market-open');
@@ -199,6 +212,7 @@ export class MarketWindow {
   stageSell(itemId: string, instance?: ItemInstancePayload): void {
     this.sellItemId = itemId;
     this.sellInstance = instance ?? null;
+    this.pushSellPriceCheck();
     this.render();
   }
 
@@ -213,6 +227,7 @@ export class MarketWindow {
       rarity: this.rarityFilter,
       sort: this.sortFilter,
       page: this.browsePage,
+      collapseLowest: this.collapseLowest,
     };
   }
 
@@ -222,6 +237,15 @@ export class MarketWindow {
   // per-frame refreshIfChanged repaints when the new page arrives.
   private pushQuery(): void {
     this.deps.world().marketSearch(this.currentQuery());
+  }
+
+  // Push (or clear, when nothing is staged) the Sell tab's current-lowest-price
+  // check (issue 3043), the pushQuery precedent: offline this resolves
+  // synchronously, online it round-trips and refreshSellPriceRef (called from
+  // refreshIfChanged) patches just the reference line once the echo arrives,
+  // without touching the rest of the form (which holds typed inputs).
+  private pushSellPriceCheck(): void {
+    this.deps.world().marketSellPriceCheck(this.sellItemId);
   }
 
   // Reconnect resync (issue 2416). A fresh join (the server's linkdead grace
@@ -254,15 +278,28 @@ export class MarketWindow {
     if (queryDiffersFromEcho(query, info) || searchDiffersFromEcho(query, info)) {
       this.pushQuery();
     }
+    // The Sell tab's price-check axis (issue 3043) resets to null server-side on
+    // a fresh join too (PlayerMeta.sellPriceItemId is session-only, same as
+    // marketQuery), independent of whatever item this window still has staged
+    // client-side across the socket drop. Re-push unconditionally: a null or
+    // already-matching value costs nothing extra (the server's gate is a plain
+    // value compare), and without this a staged item's reference could never
+    // resolve again post-reconnect.
+    this.pushSellPriceCheck();
   }
 
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
-  // change. The Sell tab holds typed inputs, so it is only rebuilt on actions.
+  // change. The Sell tab holds typed inputs, so the general rebuild below never
+  // touches it; its one async surface, the price reference (issue 3043), gets
+  // its own narrow patch instead (refreshSellPriceRef).
   refreshIfChanged(): void {
     if (!this.opened) return;
     const info = this.deps.world().marketInfo;
     this.resolvePendingReconnectResync(info);
-    if (this.tab === 'sell') return;
+    if (this.tab === 'sell') {
+      this.refreshSellPriceRef(info);
+      return;
+    }
     const sig = JSON.stringify([
       this.tab,
       this.itemTypeFilter,
@@ -271,6 +308,7 @@ export class MarketWindow {
       this.primaryStatFilter,
       this.rarityFilter,
       this.sortFilter,
+      this.collapseLowest,
       this.browsePage,
       info?.listings,
       info?.totalCount,
@@ -308,6 +346,54 @@ export class MarketWindow {
     this.renderContent();
   }
 
+  // The Sell tab's price-reference echo (issue 3043), patched independently of
+  // the general per-frame rebuild above: the rest of the Sell tab holds typed
+  // quantity/price inputs a rebuild would clobber, but the server-round-tripped
+  // price check still needs to land without the player taking another action.
+  // Touches only the two nodes renderSell already mints in the 'form' state
+  // (.mkt-sell-price-ref, its visible text, and .mkt-sell-price-status, the
+  // matching off-screen live-region announcement), never the form itself.
+  private refreshSellPriceRef(info: MarketInfo | null): void {
+    if (!this.sellItemId) return; // pick-empty/cannot-market: no ref node exists
+    const priceRef =
+      info && info.sellPriceItemId === this.sellItemId ? info.sellLowestPrice : undefined;
+    const sig = this.sellPriceRefSig(this.sellItemId, priceRef);
+    if (sig === this.lastSellPriceRefSig) return;
+    const body = this.deps.root().querySelector<HTMLElement>('#market-body');
+    const ref = body?.querySelector<HTMLElement>('.mkt-sell-price-ref');
+    const status = body?.querySelector<HTMLElement>('.mkt-sell-price-status');
+    if (!ref || !status) return; // the form isn't showing this frame
+    this.lastSellPriceRefSig = sig;
+    const html = priceRef !== undefined ? this.sellPriceRefHtml(priceRef) : '';
+    ref.innerHTML = html;
+    status.innerHTML = html;
+  }
+
+  // The price-ref signature, shared by renderSell's initial stamp and
+  // refreshSellPriceRef's later compare so the two can never drift apart (the
+  // sellPriceRefHtml split below is the same doctrine for the markup). NOT a
+  // plain JSON.stringify([itemId, priceRef]): JSON.stringify encodes an
+  // array's `undefined` ELEMENT as the literal null (unlike an object
+  // property, where undefined is omitted), so "the echo has not caught up yet"
+  // (undefined) and "the server confirmed no active listings" (null) would
+  // stringify identically and the null-state line could never repaint once an
+  // undefined signature had already been latched. String()-tagging keeps the
+  // three states (a number, null, undefined) distinct.
+  private sellPriceRefSig(itemId: string, priceRef: number | null | undefined): string {
+    return `${itemId}|${priceRef === undefined ? 'pending' : String(priceRef)}`;
+  }
+
+  // The price-ref line's markup for a resolved price (or the no-listings copy),
+  // shared by renderSell's initial build and refreshSellPriceRef's later patch
+  // so the two paths can never drift apart. Label and money sit in separate
+  // spans (the saleProceeds precedent below) rather than a hand-built ":"
+  // separator, since a fixed ASCII colon between two t() outputs would not
+  // match every locale's punctuation (e.g. a fullwidth colon in CJK).
+  private sellPriceRefHtml(priceRef: number | null): string {
+    if (priceRef === null) return esc(t('itemUi.market.lowestPriceNone'));
+    return `<span>${esc(t('itemUi.market.lowestPriceLabel'))}</span><span class="mkt-price">${this.deps.moneyHtml(priceRef)}</span>`;
+  }
+
   render(): void {
     const el = this.deps.root();
     this.deps.hideTooltip();
@@ -337,6 +423,7 @@ export class MarketWindow {
         ? `<div class="mkt-controls" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
           `<input type="search" class="mkt-search" placeholder="${esc(t('itemUi.market.searchPlaceholder'))}" aria-label="${esc(t('itemUi.market.searchAria'))}" value="${esc(this.searchQuery)}">` +
           this.renderMarketFilters() +
+          this.renderCollapseLowestToggle() +
           `</div>`
         : '';
     el.innerHTML =
@@ -354,6 +441,19 @@ export class MarketWindow {
       this.searchQuery = searchInput.value;
       this.browsePage = 0;
       this.pushQuery();
+    });
+    const collapseCheckbox = el.querySelector<HTMLInputElement>('.mkt-collapse-checkbox');
+    collapseCheckbox?.addEventListener('change', () => {
+      this.collapseLowest = collapseCheckbox.checked;
+      this.browsePage = 0;
+      this.pushQuery(); // filtering is server-side now, so the query must round-trip
+      this.lastSig = '';
+      audio.click();
+      this.render();
+      // Return focus to the checkbox after render() rebuilds the controls row, so a
+      // keyboard user is not dropped to <body> (WCAG 2.4.3), the same pattern the
+      // filter dropdowns use below.
+      (this.deps.root().querySelector('.mkt-collapse-checkbox') as HTMLElement | null)?.focus();
     });
     el.querySelectorAll('[data-tab]').forEach((node) => {
       node.addEventListener('click', () => {
@@ -776,13 +876,14 @@ export class MarketWindow {
     if (view.state === 'cannot-market') {
       this.sellItemId = null;
       this.sellInstance = null;
+      this.pushSellPriceCheck();
       const pick = document.createElement('div');
       pick.className = 'mkt-sell-pick empty';
       pick.textContent = t('itemUi.tooltip.cannotMarket');
       body.appendChild(pick);
       return;
     }
-    const { item, have, suggested } = view.form;
+    const { item, have, suggested, priceRef, itemId: stagedItemId } = view.form;
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
@@ -791,6 +892,27 @@ export class MarketWindow {
     // AND special copies can see WHICH one is staged (the mail chip precedent).
     this.deps.attachTooltip(pick, () => this.deps.itemTooltip(item, view.form.instance));
     body.appendChild(pick);
+
+    // The current-lowest-price reference (issue 3043). Always minted (even
+    // empty) so refreshSellPriceRef can find and patch it later without a DOM
+    // insert: text stays blank until the server's echo has confirmed a value
+    // for THIS staged item (priceRef undefined while a fresh stage or a stale
+    // snapshot has not caught up yet), so the player never sees a price that
+    // might belong to a different item. The paired off-screen status node
+    // announces the same text to a screen reader once it lands (the Browse
+    // tab's .mkt-status precedent above, for the same async-arrival reason).
+    const priceRefHtml = priceRef !== undefined ? this.sellPriceRefHtml(priceRef) : '';
+    const ref = document.createElement('div');
+    ref.className = 'mkt-sell-price-ref';
+    ref.innerHTML = priceRefHtml;
+    body.appendChild(ref);
+    const priceRefStatus = document.createElement('div');
+    priceRefStatus.className = 'mkt-sell-price-status visually-hidden';
+    priceRefStatus.setAttribute('role', 'status');
+    priceRefStatus.setAttribute('aria-live', 'polite');
+    priceRefStatus.innerHTML = priceRefHtml;
+    body.appendChild(priceRefStatus);
+    this.lastSellPriceRefSig = this.sellPriceRefSig(stagedItemId, priceRef);
 
     const form = document.createElement('div');
     form.className = 'mkt-price-form';
@@ -844,6 +966,7 @@ export class MarketWindow {
       else this.deps.world().marketList(view.form.itemId, qty, each * qty);
       this.sellItemId = null;
       this.sellInstance = null;
+      this.pushSellPriceCheck();
       audio.coin();
       this.render(); // the next snapshot echoes the new bags + listings
     });
@@ -1042,6 +1165,21 @@ export class MarketWindow {
       `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
       `<div class="mkt-select-menu" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
+    );
+  }
+
+  // The "lowest price of each" Browse toggle (issue 3103): collapses matching plain
+  // listings to the cheapest row per item while preserving non-fungible instanced copies.
+  // A real labeled checkbox (the professions "Ask each use" toggle precedent):
+  // keyboard-operable and announced by its own text, not a bare icon button.
+  private renderCollapseLowestToggle(): string {
+    if (this.tab !== 'browse') return '';
+    const checked = this.collapseLowest ? ' checked' : '';
+    return (
+      `<label class="mkt-collapse-toggle">` +
+      `<input type="checkbox" class="mkt-collapse-checkbox"${checked}> ` +
+      `<span>${esc(t('itemUi.market.collapseLowest'))}</span>` +
+      `</label>`
     );
   }
 

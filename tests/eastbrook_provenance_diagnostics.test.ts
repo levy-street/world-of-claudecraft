@@ -40,6 +40,26 @@ describe('diffProvenanceComponents', () => {
     ]);
   });
 
+  it('names a policy-only divergence at its explicit runtime leaf', () => {
+    const sealed = structuredClone(SEALED) as Record<string, unknown>;
+    const computed = structuredClone(SEALED) as Record<string, unknown>;
+    (sealed.runtimeRender as Record<string, unknown>).entityViewPolicy = {
+      path: 'src/render/entity_view_policy_core.ts',
+      sha256: 'e'.repeat(64),
+    };
+    (computed.runtimeRender as Record<string, unknown>).entityViewPolicy = {
+      path: 'src/render/entity_view_policy_core.ts',
+      sha256: 'f'.repeat(64),
+    };
+    expect(diffProvenanceComponents(sealed, computed)).toEqual([
+      {
+        key: 'runtimeRender.entityViewPolicy.sha256',
+        sealed: 'e'.repeat(64),
+        computed: 'f'.repeat(64),
+      },
+    ]);
+  });
+
   it('returns empty for identical trees and reports missing branches leaf by leaf', () => {
     expect(diffProvenanceComponents(SEALED, structuredClone(SEALED))).toEqual([]);
     const missingBranch = { townAsset: SEALED.townAsset };
@@ -105,7 +125,7 @@ describe('collectPolishProvenanceInputPaths', () => {
     expect(paths).toEqual(['src/render/renderer.ts']);
   });
 
-  it('matches the real provenance input surface: lockfile and renderer both in scope', async () => {
+  it('matches the real provenance input surface: lockfile and runtime policies in scope', async () => {
     const [contract, town, mailbox, notice] = await Promise.all([
       // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
       import('../scripts/assets/eastbrook_grand_armoury/capture_contract.mjs'),
@@ -121,8 +141,9 @@ describe('collectPolishProvenanceInputPaths', () => {
         notice.EASTBROOK_NOTICEBOARD_SOURCE_FILES,
       ],
     });
-    // The two inputs the incident history proves matter most.
+    // The incident input and the extracted policy authority are both explicit.
     expect(paths).toContain('src/render/renderer.ts');
+    expect(paths).toContain('src/render/entity_view_policy_core.ts');
     expect(paths).toContain('pnpm-lock.yaml');
     expect(paths).not.toContain('polish-v2');
   });

@@ -17,10 +17,14 @@ merged into the target branch (`PR gate (long sims)` was the first case), and
 expect open PRs whose heads predate the job to need a base re-merge before
 they can queue, since a required context that never reports blocks the merge
 forever. Renames follow the same choreography in reverse plus forward: when
-the lane-diet PR split `PR gate (long sims)` into `PR gate (long sims A)` and
-`PR gate (long sims B)`, the old context had to leave the ruleset at the same
-time the two new ones joined (after the split merged), because a required
-name no run produces anymore blocks every later merge.
+the lane-diet PR split `PR gate (long sims)` into `PR gate (long sims A)`
+and `PR gate (long sims B)` (the names those jobs carried then), the old
+context had to leave the ruleset at the same time the two new ones joined
+(after the split merged), because a required name no run produces anymore
+blocks every later merge. The 2026-08-14 clean-scheme rename is the same
+choreography at full width: all fourteen required contexts swapped in one
+ruleset edit at merge time, with every open PR needing a base update
+afterward so its next run reports under the new names.
 
 Why: on 2026-08-05 two merges landed on an already-red release tip, every open
 PR inherited 67 broken tests, and repair took a day of close/reopen churn. The
@@ -31,7 +35,14 @@ automatically instead of by hand.
 ## What changes at the merge button
 
 - The merge button becomes **Merge when ready**. It queues the PR instead of
-  merging it. `gh pr merge` queues the same way.
+  merging it. From the CLI, `gh pr merge` does NOT work here (measured
+  2026-08-14: it calls the auto-merge API, which this repo disables, and
+  fails with "Auto merge is not allowed"); queue from the CLI with the
+  GraphQL mutation instead:
+
+  ```bash
+  gh api graphql -f query='mutation { enqueuePullRequest(input: {pullRequestId: "<gh pr view N --json id -q .id>"}) { mergeQueueEntry { position } } }'
+  ```
 - A PR can be queued once its own required checks are green. The queue then
   builds the candidate merge result (your PR merged onto the current tip, plus
   any PRs queued ahead of you) and runs CI on it as a `merge_group` event.
@@ -117,7 +128,7 @@ the Checks tab (filter by event: merge_group).
 
 Required on both `main` and `release/**`, all sourced from GitHub Actions:
 
-- `Detect code path changes`. Required itself, and load-bearing: when it fails,
+- `Classify changes`. Required itself, and load-bearing: when it fails,
   its non-matrix dependents report skipped under their exact names, and branch
   protection treats skipped as satisfied (the shard matrix instead collapses to
   an unsuffixed check run, which blocks by accident rather than by decision).
@@ -128,7 +139,7 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   (`.github/workflows/`) and the selection pipeline's own scripts are
   themselves fail-closed triggers (always `code=true`, always full mode); a
   hostile edit is a review problem, not something protection can solve.
-- `PR gate (English-only legal) (1)` through `(8)`: the sharded test suite.
+- `PR tests (1)` through `(8)`: the sharded test suite.
   The matrix legs START on every `pull_request` and `merge_group` run and gate
   their work at STEP level: on a run the suite does not apply to (a docs-only
   PR, a release-to-main PR) each leg skips its steps and reports green in
@@ -137,7 +148,7 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   which string-matches none of these required contexts and leaves them
   "expected" forever, so the PR could never be queued or merged (observed live
   on the Phase 3 queue drills).
-- `PR gate (long sims A)` and `PR gate (long sims B)`: the dedicated lane
+- `PR long sims A` and `PR long sims B`: the dedicated lane
   pair for the long rotation sims (`CI_LONG_SUITES` split by
   `CI_LONG_SUITE_HALVES` in `scripts/lib/ci_shard_plan.mjs`). The shard
   matrix deliberately excludes those files, so these jobs carry coverage
@@ -146,26 +157,28 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   `merge_group` run; unlike the shard matrix, a job-level skip is safe here
   because a non-matrix job's skipped check run keeps its exact required name,
   which satisfies protection.
-- `PR checks (freshness, typecheck, builds)`.
-- `Format + lint (Biome, changed files)`: deterministic, diff-scoped, minutes
+- `PR checks`.
+- `Lint (changed files)`: deterministic, diff-scoped, minutes
   long, and a red here is always a real defect in the changed files. On queue
   runs it diffs against the merge group's base SHA, falling back to the live
   target-branch tip if that SHA is unreachable, so a `release/**` queue run
   never sweeps the release-vs-main delta (and its intentionally-red whole-repo
   debt) into biome.
-- `Browser regressions (Chromium)`: the real-browser net for a browser game.
+- `Browser tests`: the real-browser net for a browser game.
   It reports (or is skipped, which satisfies) on every PR and queue run.
 
 Never require these, deliberately:
 
-- The release lanes (`Release gate (tests)`, `Release i18n (21-locale fill)`,
-  `Release checks (freshness, typecheck, builds)`, `Release version gate`):
+- The release lanes (`Release tests`, `Release i18n`,
+  `Release checks`, `Release version gate`):
   release-process lanes, legitimately red or skipped mid-cycle. Release i18n in
   particular is red by design until the release-time locale fill.
-- `Dependency audit`: its workflow is path-filtered to dependency changes, so
-  on most PRs (and on every queue run) the check never reports at all, and a
-  required check that never reports blocks the merge forever. Skipped jobs
-  satisfy protection; absent workflows do not.
+- `pnpm audit` (the job in the `Dependency audit` workflow; protection sees
+  JOB names, and this list keeps the exact form protection sees): its
+  workflow is path-filtered to dependency changes, so on most PRs (and on
+  every queue run) the check never reports at all, and a required check that
+  never reports blocks the merge forever. Skipped jobs satisfy protection;
+  absent workflows do not.
 
 The same rule generalizes: a check may only join the required list if ci.yml
 produces (or explicitly skips) it on every `pull_request` AND every
@@ -195,10 +208,12 @@ right after creating the new `release/vX.Y.Z` branch:
 node scripts/release_mint.mjs vX.Y.Z            # or --dry-run first
 ```
 
-It dumps both green-tip rulesets as the audit trail, verifies the
-required-checks ruleset's `release/**` include covers the new ref, and
-rewrites the merge-queue ruleset's include to exactly `refs/heads/main` plus
-the new release ref (the previous release branch leaves; its tip is frozen).
+It dumps both green-tip rulesets as the audit trail, verifies the active
+required-checks ruleset includes the new ref without excluding it, proves the
+canonical release ref exists, and rewrites the merge-queue ruleset's include to
+exactly `refs/heads/main` plus the new release ref (the previous release branch
+leaves; its tip is frozen). It fetches the after-state and fails unless the
+include now matches that exact pair.
 It runs locally by design: editing rulesets needs an admin-scoped gh login
 that a workflow token does not have and ci.yml deliberately refuses secrets.
 

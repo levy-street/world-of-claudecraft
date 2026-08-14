@@ -63,6 +63,7 @@ import {
   buildOverworldMapModel,
   type MapAllyMarker,
   type MapDetail,
+  type MapFarmPatchMarker,
   type MapGatherNodeMarker,
   type MapNavigationMarker,
   type MapNpcMarker,
@@ -154,6 +155,7 @@ interface MapPaintGeometry {
   readonly pingLineWidth: number;
   readonly gatherGlowExtra: number;
   readonly gatherFallbackScale: number;
+  readonly farmPatchRadius: number;
 }
 
 /** Frozen responsive geometry selected once per redraw. The compact canvas is
@@ -186,6 +188,7 @@ const MAP_PAINT_GEOMETRY = Object.freeze({
     pingLineWidth: 3,
     gatherGlowExtra: 4,
     gatherFallbackScale: 1,
+    farmPatchRadius: 6.5,
   }),
   compact: Object.freeze({
     markerOutlineWidth: 2,
@@ -213,8 +216,17 @@ const MAP_PAINT_GEOMETRY = Object.freeze({
     pingLineWidth: 4,
     gatherGlowExtra: 6,
     gatherFallbackScale: 1.4,
+    farmPatchRadius: 9,
   }),
 } as const satisfies Readonly<Record<MapMarkerProfile, Readonly<MapPaintGeometry>>>);
+// Farm-patch sprout, as fractions of the badge radius: where the two leaves
+// and the stem meet (the crown, above centre), and where each leaf's inner
+// heel sits (just below centre, so the leaves read as a pair springing from
+// one stalk). minimap_painter.ts repeats these ratios for the same silhouette
+// at its own smaller radius, the way both surfaces repeat the station diamond.
+const FARM_SPROUT_CROWN = 0.2;
+const FARM_SPROUT_HEEL_X = 0.15;
+const FARM_SPROUT_HEEL_Y = 0.25;
 // Herb clover: three petal offsets as fractions of radius (equilateral).
 const HERB_PETAL_OFFSET = 0.55;
 const HERB_PETAL_SCALE = 0.55;
@@ -456,6 +468,8 @@ export interface MapPaintResult {
   stations: MapStationMarker[];
   /** The civic-service badges of this paint, for hover/tap hit-testing. */
   services: MapServiceMarker[];
+  /** The farming garden-bed badges of this paint, for hover/tap hit-testing. */
+  farmPatches: MapFarmPatchMarker[];
   /** Stable route badges and host-fair nearby Rift entrances for hit-testing. */
   navigation: MapNavigationMarker[];
   /** Direct references to the already-painted live/landmark model for a11y output. */
@@ -543,6 +557,7 @@ export class MapWindowPainter {
       gatherNodes: model.gatherNodes,
       stations: model.stations,
       services: model.services,
+      farmPatches: model.farmPatches,
       navigation: model.navigation,
       player: model.player,
       allies: model.allies,
@@ -701,6 +716,39 @@ export class MapWindowPainter {
         ctx.fill();
         ctx.stroke();
       }
+    }
+
+    // Farming garden beds share the static-landmark layer with stations and
+    // services. The glyph is a two-leaf sprout over a short stem: procedural
+    // only this phase (no marker art id, so nothing to blit), and its
+    // silhouette is what separates a patch from the station diamond and the
+    // noticeboard rectangle beside it. The fill is the map palette's oak green
+    // rather than the herb-node green, so a growing site never reads as a
+    // gather node's readiness. Tier-identical (fairness): the pin is actionable
+    // information, never preset- or governor-gated.
+    for (const patch of model.farmPatches) {
+      const radius = geometry.farmPatchRadius;
+      const crownY = patch.my - radius * FARM_SPROUT_CROWN;
+      const heelX = radius * FARM_SPROUT_HEEL_X;
+      const heelY = patch.my + radius * FARM_SPROUT_HEEL_Y;
+      ctx.fillStyle = colors.oak;
+      ctx.strokeStyle = colors.outline;
+      ctx.lineWidth = geometry.markerOutlineWidth;
+      ctx.beginPath();
+      ctx.moveTo(patch.mx, crownY);
+      ctx.lineTo(patch.mx - radius, patch.my - radius);
+      ctx.lineTo(patch.mx - heelX, heelY);
+      ctx.closePath();
+      ctx.moveTo(patch.mx, crownY);
+      ctx.lineTo(patch.mx + radius, patch.my - radius);
+      ctx.lineTo(patch.mx + heelX, heelY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(patch.mx, crownY);
+      ctx.lineTo(patch.mx, patch.my + radius);
+      ctx.stroke();
     }
 
     // Zone title (drawn on-canvas; the world map has no DOM zone label). Inside

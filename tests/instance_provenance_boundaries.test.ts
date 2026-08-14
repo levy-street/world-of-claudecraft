@@ -127,6 +127,37 @@ describe('provenance survives every container boundary', () => {
     expectFullyMarked(fullSlot(), 'fixture');
   });
 
+  it('bags: equipping a payload-bearing copy is refused, not stripped', () => {
+    // The bag-equip boundary has no round trip to pin (#2837): meta.bags
+    // stores only a bare item id, with nowhere to park an instance payload or
+    // a craftedRecipeId while a bag is worn. Not reachable through shipped
+    // content today (no bag is ever craft-marked or instance-granted), but
+    // bags are declared payload-free with a guard that refuses the equip the
+    // moment one ever does carry a payload, rather than silently dropping it
+    // on the next unequip's plain grant.
+    const sim = makeSim(4106);
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    const bagId = 'linen_pouch';
+    inv(sim, pid).push({
+      itemId: bagId,
+      count: 1,
+      instance: payload(),
+      craftedRecipeId: GEAR_RECIPE,
+    });
+
+    sim.equipBag(bagId, undefined, pid);
+
+    expect(
+      meta.bags.every((b) => b === null),
+      'no socket was filled',
+    ).toBe(true);
+    expectFullyMarked(
+      inv(sim, pid).find((s) => s.itemId === bagId),
+      'bags after refused equip',
+    );
+  });
+
   it('bank: deposit -> withdraw', () => {
     const sim = makeSim(4101);
     const pid = sim.playerId;

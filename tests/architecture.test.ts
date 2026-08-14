@@ -308,6 +308,7 @@ const UI_PURE_CORES = [
   'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/farming_view.ts',
+  'src/ui/harvest_journal_view.ts',
   'src/ui/crafting_view.ts',
   'src/ui/commission_order_view.ts',
   'src/ui/craft_cast_view.ts',
@@ -438,6 +439,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/entity_view_policy_core.ts',
+  'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
@@ -1780,6 +1783,7 @@ const UI_DOM_MODULES = [
   'src/ui/gpu_notice_toast.ts',
   'src/ui/guild_bank_log_window.ts',
   'src/ui/guild_bank_window.ts',
+  'src/ui/harvest_journal_window.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',

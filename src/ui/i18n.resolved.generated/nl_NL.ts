@@ -64,7 +64,8 @@ export const nl_NL: EnTranslations = {
       "dungeon": "Kerker",
       "difficulty": "Moeilijkheidsgraad",
       "name": "Naam",
-      "spec": "Spec"
+      "spec": "Spec",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normaal",
@@ -150,6 +151,10 @@ export const nl_NL: EnTranslations = {
       "gather": {
         "label": "Verzamelvaardigheid verhogen",
         "description": "Verhoog de vaardigheid van een verzamelberoep."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleporteren",
@@ -2463,7 +2468,7 @@ export const nl_NL: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Valsspeler >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3088,7 +3093,36 @@ export const nl_NL: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -3976,10 +4010,10 @@ export const nl_NL: EnTranslations = {
       "current_ownership_required": "Actueel bezit van het Seeker Genesis Token is vereist."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Operatoraccounts kunnen niet worden gemarkeerd.",
+      "reason_required": "Een reden is vereist.",
+      "invalid_duration": "Voer een markeringsduur van minstens één seconde in.",
+      "not_marked": "Dat account is niet gemarkeerd."
     }
   },
   "guide": {
@@ -6699,19 +6733,19 @@ export const nl_NL: EnTranslations = {
     "style": "Stijl",
     "resetLook": "Uiterlijk Herstellen",
     "resetShort": "Herstellen",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Delen",
+    "designCode": "Uiterlijkcode",
+    "designCodeHint": "Kopieer deze code om dit uiterlijk op te slaan of te delen. Plak hier een code en importeer die om het uiterlijk te laden.",
+    "copyCode": "Code kopiëren",
+    "importCode": "Importeren",
+    "designCodeCopied": "Uiterlijkcode gekopieerd.",
+    "designCodeCopyManual": "Automatisch kopiëren is hier geblokkeerd. De code is geselecteerd; kopieer hem met je toetsenbord.",
+    "designCodeImported": "Uiterlijk geïmporteerd.",
+    "designCodeImportedPartial": "Uiterlijk geïmporteerd. Waarden die deze versie niet kent, zijn overgeslagen.",
+    "designCodeErrEmpty": "Plak eerst een uiterlijkcode.",
+    "designCodeErrHeader": "Dat lijkt niet op een uiterlijkcode.",
+    "designCodeErrVersion": "Die uiterlijkcode komt uit een nieuwere spelversie.",
+    "designCodeErrMalformed": "Die uiterlijkcode is beschadigd. Kopieer de volledige code en probeer het opnieuw.",
     "browFlat": "Vlak",
     "browArched": "Gebogen",
     "browThin": "Dun",
@@ -8106,6 +8140,7 @@ export const nl_NL: EnTranslations = {
         "cooldownLockedHerb": "Uitgeput kruidenveld, gereedschap vergrendeld",
         "station": "Ambachtsstation: {name}",
         "service": "Dienst: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Groepslid: {name}",
         "deadPartyMember": "Dood groepslid: {name}",
         "partyMemberGeneric": "Groepslid",
@@ -9087,6 +9122,7 @@ export const nl_NL: EnTranslations = {
       "filterSort": "Sorteren",
       "sortName": "Naam (A-Z)",
       "sortPriceAsc": "Prijs: laag naar hoog",
+      "collapseLowest": "Alleen de laagste prijs",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",
@@ -9117,6 +9153,8 @@ export const nl_NL: EnTranslations = {
       "quantity": "Aantal",
       "quantityOf": "van {count}",
       "priceEach": "Prijs per stuk",
+      "lowestPriceLabel": "Huidige laagste aanbiedingsprijs",
+      "lowestPriceNone": "Er zijn nog geen actieve aanbiedingen voor dit voorwerp.",
       "listButton": "Aanbieden op de Wereldmarkt",
       "minPriceError": "Noem een prijs van minstens 1 koper.",
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",
@@ -17296,6 +17334,7 @@ export const nl_NL: EnTranslations = {
     "delveRiteShrineReedInteract": "Rietschrijn: druk op F om het aan te raken",
     "delveRiteShrineSkullInteract": "Schedelschrijn: druk op F om het aan te raken",
     "mailboxName": "Brievenbus",
-    "noticeboardName": "Mededelingenbord"
+    "noticeboardName": "Mededelingenbord",
+    "farmPatchName": "Garden Beds"
   }
 };

@@ -334,6 +334,7 @@ import {
   harvestLineKey,
 } from './grant_line_view';
 import { decideGuildMotdLine } from './guild_motd_login';
+import { HarvestJournalWindow } from './harvest_journal_window';
 import {
   healLandingFloatTextKey,
   healLandingLogKey,
@@ -2011,6 +2012,7 @@ export class Hud {
       station: (marker) => this.mapMarkerTooltipContent.station(marker),
       service: (marker) => this.mapMarkerTooltipContent.service(marker),
       gather: (marker) => this.mapMarkerTooltipContent.gather(marker),
+      farm: (marker) => this.mapMarkerTooltipContent.farm(marker),
       questArea: (refs, count) => this.mapMarkerTooltipContent.questArea(refs, count),
       paint: (html, x, y) => this.paintTooltipAt(html, x, y),
       clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
@@ -2742,6 +2744,7 @@ export class Hud {
       '#deeds-window',
       '#reliquary-window',
       '#professions-window',
+      '#harvest-journal-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
         if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
@@ -3458,6 +3461,10 @@ export class Hud {
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.professionsWindow.close();
+        break;
+      case 'harvest-journal-window':
+        // Route through the painter: focus returns (WCAG 2.2 AA), clock disposed.
+        this.harvestJournalWindow.close();
         break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
@@ -4808,6 +4815,16 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#professions-window'),
+    openHarvestJournal: () => this.harvestJournalWindow.open(),
+  });
+  // The Harvest Journal painter (harvest_journal_view.ts core +
+  // harvest_journal_window.ts painter): the read-only plot list over
+  // IWorldFarming. Self-driven (its own 1 Hz clock), so Hud only relocalizes it.
+  private readonly harvestJournalWindow = new HarvestJournalWindow({
+    root: () => $('#harvest-journal-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
+    ...this.windowFocus('#harvest-journal-window'),
   });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
@@ -6408,6 +6425,7 @@ export class Hud {
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
+    if (this.harvestJournalWindow.isOpen) this.harvestJournalWindow.render();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
     // alone never moves them and an open window kept the previous locale
@@ -12414,7 +12432,8 @@ export class Hud {
         case 'farmWithered':
         case 'farmDenied':
         case 'farmHusksConverted':
-          // Farming's five feedback arms, extracted whole to
+        case 'farmReady':
+          // Farming's six feedback arms, extracted whole to
           // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
           // ratchet heal); the Hud itself is the host seam.
           handleFarmEvent(ev, this);
@@ -16370,6 +16389,11 @@ export class Hud {
 
   toggleReliquary(): void {
     this.reliquaryWindow.toggle();
+  }
+
+  // The Harvest Journal keybind entry (the professions row opens it directly).
+  toggleHarvestJournal(): void {
+    this.harvestJournalWindow.toggle();
   }
 
   // Repaint the deed tracker from the live facet: the slow band, a watch

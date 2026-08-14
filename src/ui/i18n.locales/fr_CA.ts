@@ -319,4 +319,13 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
     'Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.',
   'hudChrome.otaUpdate.progressLabel': 'Progreso de descarga de la actualización',
   'hudChrome.otaUpdate.title': 'Actualización del juego',
+  'apiError.cheater_mark.admin_target': "Les comptes d'opérateur ne peuvent pas être marqués.",
+  'apiError.cheater_mark.invalid_duration': "Entrez une durée de marquage d'au moins une seconde.",
+  'auth.designCodeHint':
+    'Copiez ce code pour sauvegarder ou partager cette apparence. Collez un code ici et importez-le pour la charger.',
+  'auth.designCodeCopyManual':
+    'La copie automatique est bloquée ici. Le code est sélectionné; copiez-le avec votre clavier.',
+  'auth.designCodeErrVersion': "Ce code d'apparence vient d'une version plus récente du jeu.",
+  'auth.designCodeErrMalformed':
+    "Ce code d'apparence est endommagé. Copiez le code au complet et réessayez.",
 };

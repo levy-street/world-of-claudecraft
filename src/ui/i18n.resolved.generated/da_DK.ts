@@ -64,7 +64,8 @@ export const da_DK: EnTranslations = {
       "dungeon": "Fangekælder",
       "difficulty": "Sværhedsgrad",
       "name": "Navn",
-      "spec": "Specialisering"
+      "spec": "Specialisering",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const da_DK: EnTranslations = {
       "gather": {
         "label": "Giv indsamlingsfærdighed",
         "description": "Forøg færdigheden i et indsamlingsfag."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleportér",
@@ -2463,7 +2468,7 @@ export const da_DK: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Cheater >"
+      "cheaterTag": "< Snyder >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3088,7 +3093,36 @@ export const da_DK: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -3976,10 +4010,10 @@ export const da_DK: EnTranslations = {
       "current_ownership_required": "Der kræves aktuelt ejerskab af et Seeker Genesis Token."
     },
     "cheater_mark": {
-      "admin_target": "Operator accounts cannot be marked.",
-      "reason_required": "A reason is required.",
-      "invalid_duration": "Enter a mark duration of at least one second.",
-      "not_marked": "That account is not marked."
+      "admin_target": "Operatørkonti kan ikke markeres.",
+      "reason_required": "Der skal angives en grund.",
+      "invalid_duration": "Angiv en markeringsvarighed på mindst ét sekund.",
+      "not_marked": "Den konto er ikke markeret."
     }
   },
   "guide": {
@@ -6699,19 +6733,19 @@ export const da_DK: EnTranslations = {
     "style": "Stil",
     "resetLook": "Nulstil Udseende",
     "resetShort": "Nulstil",
-    "shareTab": "Share",
-    "designCode": "Design code",
-    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
-    "copyCode": "Copy code",
-    "importCode": "Import",
-    "designCodeCopied": "Design code copied.",
-    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
-    "designCodeImported": "Design imported.",
-    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
-    "designCodeErrEmpty": "Paste a design code first.",
-    "designCodeErrHeader": "That does not look like a design code.",
-    "designCodeErrVersion": "That design code comes from a newer game version.",
-    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
+    "shareTab": "Del",
+    "designCode": "Udseendeskode",
+    "designCodeHint": "Kopiér denne kode for at gemme eller dele dette udseende. Indsæt en kode her, og importér den for at indlæse udseendet.",
+    "copyCode": "Kopiér kode",
+    "importCode": "Importér",
+    "designCodeCopied": "Udseendeskoden er kopieret.",
+    "designCodeCopyManual": "Automatisk kopiering er blokeret her. Koden er markeret; kopiér den med tastaturet.",
+    "designCodeImported": "Udseendet er importeret.",
+    "designCodeImportedPartial": "Udseendet er importeret. Værdier, som denne version ikke kender, blev sprunget over.",
+    "designCodeErrEmpty": "Indsæt først en udseendeskode.",
+    "designCodeErrHeader": "Det ligner ikke en udseendeskode.",
+    "designCodeErrVersion": "Den udseendeskode stammer fra en nyere spilversion.",
+    "designCodeErrMalformed": "Den udseendeskode er beskadiget. Kopiér hele koden, og prøv igen.",
     "browFlat": "Flad",
     "browArched": "Buet",
     "browThin": "Tynd",
@@ -8106,6 +8140,7 @@ export const da_DK: EnTranslations = {
         "cooldownLockedHerb": "Udtømt urteplet, værktøj låst",
         "station": "Håndværksstation: {name}",
         "service": "Tjeneste: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Gruppemedlem: {name}",
         "deadPartyMember": "Dødt gruppemedlem: {name}",
         "partyMemberGeneric": "Gruppemedlem",
@@ -9087,6 +9122,7 @@ export const da_DK: EnTranslations = {
       "filterSort": "Sortering",
       "sortName": "Navn (A-Z)",
       "sortPriceAsc": "Pris: laveste til højeste",
+      "collapseLowest": "Kun laveste pris",
       "weaponSword": "Sværd",
       "weaponDagger": "Dolke",
       "weaponStaff": "Stave",
@@ -9117,6 +9153,8 @@ export const da_DK: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "af {count}",
       "priceEach": "Pris pr. styk",
+      "lowestPriceLabel": "Nuværende laveste udbudspris",
+      "lowestPriceNone": "Der er endnu ingen aktive opslag for denne genstand.",
       "listButton": "Sæt til salg på Verdensmarkedet",
       "minPriceError": "Angiv en pris på mindst 1 kobber.",
       "collectEmpty": "Intet venter. Salgsindtægter og udløbne varer hentes her.",
@@ -17296,6 +17334,7 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineReedInteract": "Sivskrin: Tryk på F for at røre det",
     "delveRiteShrineSkullInteract": "Kranieskrin: Tryk på F for at røre det",
     "mailboxName": "Postkasse",
-    "noticeboardName": "Opslagstavle"
+    "noticeboardName": "Opslagstavle",
+    "farmPatchName": "Garden Beds"
   }
 };

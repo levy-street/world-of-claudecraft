@@ -33,7 +33,7 @@ import { resolveSelectBase } from './gate_discovery.mjs';
 /**
  * @param {{
  *   env?: Record<string, string | undefined>,
- *   run: (cmd: string, args: string[]) => { status: number | null, stdout?: string },
+ *   run: (cmd: string, args: string[]) => { status: number | null, stdout?: string, error?: Error },
  * }} deps
  * @returns {string} the resolved base ref
  * @throws {Error} when no base ref can be resolved (env override invalid, and

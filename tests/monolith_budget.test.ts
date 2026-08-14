@@ -48,7 +48,8 @@ const MONOLITHS: MonolithRow[] = [
     // (the ratchet's own rule: an extraction lowers the ceiling, never raises
     // it). The previous lowering came from src/render/fire_light_registry.ts:
     // the fire-light adopter, the budget pass, the stranded-light reparent and
-    // the registry prune.
+    // the registry prune. The release arm's v0.38.0 trim landed on the same
+    // 13700 independently; the fifteenth absorb keeps the shared number.
     ceiling: 13700,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },

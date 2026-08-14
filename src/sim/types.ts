@@ -118,7 +118,6 @@ export const CAST_COMPLETE_EPS = 1e-9;
 // erroring, and fires the instant the current cast completes.
 export const CAST_QUEUE_WINDOW_SEC = 0.4;
 export const FISHING_CAST_ID = 'fishing';
-export const FISHING_CAST_NAME = 'Fishing';
 // The constant castTotal/castRemaining of a fishing session (Professions 2.0,
 // retiring the fixed FISHING_CAST_TIME cast): a generous cap that
 // carries ZERO information about the hidden bite (max bite delay plus max
@@ -6603,6 +6602,19 @@ export type SimEvent = { pid?: number } & (
   // rides the hub loot event with the silent/callerLogs flags, exactly like a
   // harvest grant, so this event owns both halves of the feedback.
   | { type: 'farmHusksConverted'; pid: number; husks: number; compost: number }
+  // Farming: one or more of this player's plots FINISHED (the ready-notice
+  // phase). Personal (pid = the farmer) and text-free like every other farm
+  // event, and COUNTS ONLY: `ready` is how many beds are waiting to be
+  // brought in and `withered` how many finished as failed crops, omitted
+  // when zero (the seedBackCount idiom). `ready` is always present and IS 0
+  // on a withered-only notice: consumers branch on each count, not on the
+  // event's presence. Deliberately carries no bed or crop
+  // id, and no timing: the fplot projection is already the ONE place a client
+  // learns which bed holds what, so a per-plot payload here would be a second
+  // definition of plot state free to drift from it. Emitted once per plot per
+  // growth cycle, gated by the plot's persisted `notified` flag
+  // (professions/farm_ready.ts), so relogging never repeats a notice.
+  | { type: 'farmReady'; pid: number; ready: number; withered?: number }
 );
 
 export interface MoveInput {
@@ -7747,12 +7759,6 @@ export interface DrownedLitanyBaptistryState {
   burstIds: number[];
 }
 
-export interface DelveDailyState {
-  date: string;
-  firstClearXp: string[];
-  markClears: number;
-}
-
 export interface DelveCompanionDef {
   id: string;
   name: string;
@@ -7847,8 +7853,6 @@ export const RITE_SHRINE_KINDS: RiteShrineKind[] = [
 /** Player-chosen rite difficulty: more playbacks + shorter for Easy, fewer + longer
  * for Hard. Loot ceiling rises with difficulty (Easy=low, Medium=medium, Hard=premium). */
 export type RiteIntensity = 'easy' | 'medium' | 'hard';
-
-export const RITE_INTENSITIES: RiteIntensity[] = ['easy', 'medium', 'hard'];
 
 /** Per-run Drowned Reliquary Rite puzzle state (DelveRun.drownedLitanyRite). */
 export interface DrownedLitanyRiteState {

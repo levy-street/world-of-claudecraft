@@ -664,6 +664,7 @@ type WorldEntityTranslations = {
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
     noticeboardName: string;
+    farmPatchName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -786,6 +787,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
       noticeboardName: 'Notice Board',
+      farmPatchName: 'Garden Beds',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

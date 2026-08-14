@@ -85,7 +85,6 @@ import {
 import {
   initLitanyBaptistryModule,
   isDelvePuzzleKind,
-  LITANY_PUZZLE_KINDS,
   pullLitanyBellRope,
   tickDrownedLitanyRooms,
 } from './drowned_litany_rooms';
@@ -132,10 +131,6 @@ const DELVE_LORE_ORDER = [
 // these so a Heroic run never rolls an inert affix (PRD §6.7 v1 subset). The
 // other registered crypt affixes (grave_tax / unstable_roof / cult_remnants)
 // keep their UI/i18n entries but are excluded from the roll until implemented.
-export const DELVE_PUZZLE_KINDS = new Set<string>([
-  'pressure_plate',
-  ...Array.from(LITANY_PUZZLE_KINDS),
-]);
 export const DELVE_IMPLEMENTED_AFFIXES = new Set<string>([
   'restless_graves',
   'bad_air',

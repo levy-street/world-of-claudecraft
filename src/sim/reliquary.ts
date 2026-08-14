@@ -886,11 +886,6 @@ export interface OwnedIdLookup {
   has(id: string): boolean;
 }
 
-/** True when an item relic is owned via the discovery ledger. */
-export function ownsItemRelic(ownedItems: OwnedIdLookup, itemId: string): boolean {
-  return ownedItems.has(itemId);
-}
-
 /** True when a relic slot is filled for the given ownership surfaces. */
 export function isRelicFilled(
   relic: ReliquaryRelicDef,

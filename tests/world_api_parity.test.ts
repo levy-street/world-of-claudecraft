@@ -281,6 +281,7 @@ export const IWORLD_MEMBERS = [
   { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
+  { name: 'marketSellPriceCheck', kind: 'method' },
   { name: 'marketList', kind: 'method' },
   { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
@@ -607,14 +608,16 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a method),
     // leaving 320. The player item lock (issue #3042) adds setItemLocked
     // (IWorldInventory, a method), leaving 321. Civic service anchors add
-    // civicServicePlacements (IWorldInteraction, data), leaving 322.
+    // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
+    // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
+    // method), leaving 323.
     // Farming's patches-and-plots phase adds farmPatches and myFarmPlots
-    // (IWorldFarming, data), leaving 324. Farming's growth phase adds the two
+    // (IWorldFarming, data), leaving 325. Farming's growth phase adds the two
     // plot mutations, plantCrop and harvestCrop (IWorldFarming, methods),
-    // leaving 326. Farming's knobs phase adds the husk conversion,
-    // convertHusks (IWorldFarming, a method), leaving 327. Farming's render
+    // leaving 327. Farming's knobs phase adds the husk conversion,
+    // convertHusks (IWorldFarming, a method), leaving 328. Farming's render
     // phase adds the clock read farmNowMs (IWorldFarming, a method), leaving
-    // 328.
+    // 329.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -624,9 +627,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(328);
+    expect(IWORLD_MEMBERS.length).toBe(329);
     expect(DATA_MEMBERS.length).toBe(88);
-    expect(METHOD_MEMBERS.length).toBe(240);
+    expect(METHOD_MEMBERS.length).toBe(241);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -827,6 +830,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1197,6 +1201,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1641,6 +1646,7 @@ const FACET_MARKET = [
   'marketInfo',
   'marketCollectPending',
   'marketSearch',
+  'marketSellPriceCheck',
   'marketList',
   'marketListInstance',
   'marketBuy',
@@ -1925,8 +1931,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(328);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(328);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(329);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(329);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
