@@ -6,10 +6,21 @@
 // each event writes, how many lines, which item ids the lines name, the
 // half-pair and positive-count guards, and the literal colors.
 
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The module reaches the audio facade directly (the src/ui precedent) rather
+// than through FarmFeedbackHost, so the cue arms are pinned through a mocked
+// facade the same way the sibling window suites stub `audio`.
+const audioMock = vi.hoisted(() => ({ farmPlant: vi.fn(), farmHarvest: vi.fn() }));
+vi.mock('../src/game/audio', () => ({ audio: audioMock }));
+
 import type { FarmEvent, FarmFeedbackHost } from '../src/ui/farm_event_feedback';
 import { handleFarmEvent } from '../src/ui/farm_event_feedback';
 import { grantItemToken } from '../src/ui/grant_line_view';
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 interface Call {
   fn: 'log' | 'showSelfNote' | 'showError';
@@ -184,5 +195,82 @@ describe('farm_event_feedback: the five HUD arms', () => {
     expect(calls[0].text).toContain(grantItemToken('compost'));
     expect(calls[0].text).toContain('4');
     expect(calls[0].text).toContain('2');
+  });
+});
+
+describe('farm_event_feedback: the cue arms', () => {
+  const HARVEST: FarmEvent = {
+    type: 'farmHarvested',
+    pid: 1,
+    bedId: 'eastbrook_1',
+    cropId: 'vale_wheat',
+    itemId: 'vale_wheat_produce',
+    count: 3,
+  };
+
+  it('farmPlanted fires the plant cue EXACTLY once and never the harvest cue', () => {
+    drive({ type: 'farmPlanted', pid: 1, bedId: 'eastbrook_1', cropId: 'vale_wheat' });
+    expect(audioMock.farmPlant).toHaveBeenCalledTimes(1);
+    expect(audioMock.farmHarvest).not.toHaveBeenCalled();
+  });
+
+  it('farmHarvested fires the harvest cue EXACTLY once and never the plant cue', () => {
+    drive(HARVEST);
+    expect(audioMock.farmHarvest).toHaveBeenCalledTimes(1);
+    expect(audioMock.farmPlant).not.toHaveBeenCalled();
+  });
+
+  it('the extra harvest LINES do not each earn their own cue', () => {
+    // A mixed harvest that also pays a seed back and spends the last tool
+    // charge writes four surfaces; it is still ONE harvest, so still one cue.
+    const calls = drive({
+      ...HARVEST,
+      count: 2,
+      fineItemId: 'fine_vale_wheat',
+      fineCount: 1,
+      seedBackCount: 1,
+      effectDepleted: true,
+    });
+    expect(calls.length).toBeGreaterThan(1);
+    expect(audioMock.farmHarvest).toHaveBeenCalledTimes(1);
+  });
+
+  it('farmWithered SHARES the harvest cue: the same action resolved, unluckily', () => {
+    drive({ type: 'farmWithered', pid: 1, bedId: 'high_1', cropId: 'highland_barley', count: 2 });
+    expect(audioMock.farmHarvest).toHaveBeenCalledTimes(1);
+    expect(audioMock.farmPlant).not.toHaveBeenCalled();
+  });
+
+  it('farmDenied and farmHusksConverted stay SILENT on every cue', () => {
+    // The refusals already speak through the error toast, and the husk trade
+    // is a menu conversion; a borrowed world-action cue on either is the bug
+    // this negative arm exists to catch. Every SimEvent farmDenied reason is
+    // listed (hand-maintained against the union in src/sim/types.ts, the
+    // routes-table convention), so a cue added to one refusal branch cannot
+    // hide behind a reason the test never drives.
+    const reasons = [
+      'bad_bed',
+      'bad_crop',
+      'range',
+      'bed_taken',
+      'skill',
+      'no_seed',
+      'not_ready',
+      'no_plot',
+      'no_husks',
+      'no_compost',
+      'no_fee_produce',
+      'no_tonic',
+      'tool',
+      'locked',
+    ] as const;
+    for (const reason of reasons) {
+      // Each reason still produces its one toast: proof the loop actually
+      // reached the arm rather than silently no-opping past it.
+      expect(drive({ type: 'farmDenied', pid: 1, reason }), reason).toHaveLength(1);
+    }
+    drive({ type: 'farmHusksConverted', pid: 1, husks: 4, compost: 2 });
+    expect(audioMock.farmPlant).not.toHaveBeenCalled();
+    expect(audioMock.farmHarvest).not.toHaveBeenCalled();
   });
 });

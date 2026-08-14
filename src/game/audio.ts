@@ -121,6 +121,13 @@ export const UI_CUES = {
   // no conflict sharing the file with the real applyEnchant/enchantResult
   // action here.
   enchant: 'ui_craft_enchanting',
+  // Farming (the render / juice phase): the plant ACTION and the harvest
+  // RESULT, the same cast/result split the gathering family uses. Both are
+  // procedural placeholders in scripts/sfx/ui_sfx.mjs until real recordings
+  // land; the withered outcome deliberately shares farmHarvest (it is the
+  // same harvest action resolving, just unluckily).
+  farmPlant: 'ui_farm_plant',
+  farmHarvest: 'ui_farm_harvest',
 } as const;
 
 type UiCue =
@@ -427,6 +434,18 @@ export class GameAudio {
 
   enchant(): void {
     this.playFeedback(UI_CUES.enchant);
+  }
+
+  // Farming plant: the direct-affordance half (you pressed plant and the soil
+  // answers), so it rides the ungated arm like click/bagOpen.
+  farmPlant(): void {
+    this.play(UI_CUES.farmPlant);
+  }
+
+  // Farming harvest: the reward half, feedback-gated like the other result
+  // notifications (loot, gather, craftSuccess).
+  farmHarvest(): void {
+    this.playFeedback(UI_CUES.farmHarvest);
   }
 }
 
