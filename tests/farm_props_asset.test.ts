@@ -208,6 +208,24 @@ function colorBand(values: ArrayLike<number>): { min: number; max: number } {
   return { min, max };
 }
 
+describe('license record', () => {
+  // Every shipped GLB prop set carries a CREDITS.md row (the streetlamp and
+  // battleground-rune waves pin theirs the same way), so the next art wave
+  // cannot drop the farming set's provenance silently.
+  it('CREDITS.md carries the farm prop set row naming every asset', () => {
+    const credits = readFileSync(path.join(REPO_ROOT, 'CREDITS.md'), 'utf8');
+    expect(credits).toContain(
+      'Generated farming prop set (`public/models/props/farm_bed.glb`',
+    );
+    expect(credits).toContain(
+      'produced via `scripts/assets/farm_props` and optimized via `scripts/assets/specs/farm_props.json`',
+    );
+    for (const id of FARM_PROP_IDS) {
+      expect(credits, `${id} named in the CREDITS row`).toContain(`${id}.glb`);
+    }
+  });
+});
+
 describe('exporter and renderer agree on the authored node names', () => {
   // Two INDEPENDENT literal sets describe the same contract: the exporter
   // writes these names into the GLBs, and the render core looks them up at
