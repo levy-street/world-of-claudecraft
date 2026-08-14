@@ -344,3 +344,22 @@ never future-PR items, per the delivery contract in `state.md`).
   round all applied; three open maintainer decisions recorded (reliquary
   curation for the two tools, forge world-visibility, the fired
   masterwork:engineering revisit trigger). Full ledger in state.md.
+- Phase 09 QA (2026-08-13): verdict PASS (followups all fixed in-session).
+  Owned the v0.38.0 re-sync (release tip b08d79ef91, nine provenance
+  conflicts re-minted at the merged tree, full suite green at the merge
+  BEFORE any fix, 7-agent release-merge audit CLEAN). Fan-out: four QA
+  auditors, architecture + cross-platform reviewers, an 11-probe mutation
+  audit in an isolated worktree (all decisive), qa-checklist, and two
+  fresh reviewers over the fix round itself; zero blocking findings; the
+  as-shipped catalog, flag set, art ownership, and rating-band ties all
+  verified exact. Fix round, seven commits: the party walk unified behind
+  one shared iterator with the offline/online array contract aligned and
+  pinned in both worlds; the proven-vacuous kept-2H disjunct test rebuilt
+  and re-proven by mutation kill; the shaman kept pair pinned literal with
+  a premise loop; the recharge self-gathered 320 arm, exact-275 tie, and
+  three-path forward guards; a new recipe-index memo contract suite; the
+  redundant S3 corpus row reverted after refutation (the directory sweep
+  already covers it). Adjudications and conscious residues in state.md.
+  Gate PASS at the final tip. Phase 10 note: renderer.ts now sits at
+  ZERO monolith headroom (13708, the release's own pin) and the blob band
+  reds by design.

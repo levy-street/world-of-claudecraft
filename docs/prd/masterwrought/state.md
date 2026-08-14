@@ -3108,3 +3108,95 @@ Phase 09 close-out addendum (2026-08-13, after the qa-checklist gate):
   code step (the first re-bless sat mid-phase and went stale as later
   commits moved the stills bundle graph, exactly the phase 06 lesson;
   230/230 byte-identical both times, acceptance sha 3a5e4816).
+
+Phase 09 QA (2026-08-13, fresh session): verdict PASS-WITH-FOLLOWUPS, all
+followups fixed in-session, nothing carried as future work.
+- Release sync: merged origin/release/v0.38.0 at b08d79ef91 (38 commits:
+  night-lighting overhaul, GPU hitch instrumentation, the CI second-tier and
+  merged-leg splits, the suite-duration ratchet, OTA overlay changes) as
+  d4e313e74b. Nine conflicts, three clusters, all provenance-shaped: the
+  portrait manifest pair (both sides re-blessed; resolved by a fresh full
+  rerender at the merged tree, 230/230 byte-identical, manifest sha
+  e8725c80, accepted-art row advanced), the eastbrook polish seals (both
+  sides moved renderer.ts; re-minted at the merged tree with the remint
+  tool, three literals repinned), and the fire tuning comment (this
+  branch's originality renames kept over the release's renamed
+  chronomancy_balance_targets reference, both halves unioned). i18n:gen
+  reconciled clean. The full suite ran green at the merge tip (2735 files,
+  38109 tests) BEFORE any fix landed, so the merge introduced zero reds.
+- Release-merge audit (7-agent overlap workflow): CLEAN. All 14
+  branch-authored auto-merged overlaps verified against both parents; zero
+  server files in the release delta, no new endpoints, injected helpers all
+  re-bound, zero db-mock sites, i18n comment-only. Worth knowing:
+  src/render/renderer.ts sits at EXACTLY its 13708 monolith ceiling (the
+  release's own pin; any renderer line added on this branch reds the
+  ratchet until an extraction lowers it), and the release's lane-gated
+  balance splits (chronomancy_balance_targets, owned_class_*, warlock
+  anchors) first meet this branch's sim delta in CI's lane jobs after
+  push; residual risk low, the branch's changes in those areas are
+  display-name strings only. docs/local-gate-perf/baselines.md:596 cites
+  the deleted chronomancy_balance.test.ts: pre-existing release-side debt,
+  not touched here.
+- Audit fan-out: four QA auditors (correctness, seam, flag, cleanup), the
+  architecture and cross-platform reviewers on the phase diff, an 11-probe
+  mutation audit in an isolated worktree (all probes decisive, cap
+  boundary redding 26 tests, party credential 10; final tree byte-clean),
+  the qa-checklist gate, and two fresh reviewers over the fix round
+  itself. Zero blocking findings anywhere. The correctness/flag/seam
+  catalogs verified exact: all ten items at the recorded budgets, the flag
+  set exactly eight, art batch ownership single-owner, jewelry purity and
+  all three rating-band ties live.
+- Fix round (seven commits on the merge): 9cae1bd4cf unified the party
+  walk (eachPartyStationInRange, both consumers, type filter deliberately
+  outside the walk) and aligned the array contract (offline non-empty
+  return frozen; online shared frozen EMPTY_MST_CRAFTS incl the initial
+  value; malformed '' mst decodes as empty); 583a155261 + 348cae43d7 the
+  S3 corpus row added then correctly REVERTED (the professions
+  whole-directory sweep at localization_fixes.test.ts:1202 already feeds
+  the file; the perturb-proof redded through the sweep) and the
+  professions CLAUDE.md mobile_station row landed; 9e31de9b6b the
+  decisiveness repairs (the kept-2H disjunct test was a PROVEN mutation
+  survivor, rebuilt with offhand fodder and re-proven by kill; shaman
+  kept pair pinned literal with a premise loop; recharge self-gathered
+  320 arm with the exact-275 tie and forward guards; recipe_index_memo
+  suite pinning the lazily-rebuilt-maps ruling's contract; weapon census
+  title 125; dps tolerance); 217379026e + 71a7798e55 + a4c641a6ec the two
+  fresh-review rounds' residuals (corpse-harvest signing arm in the
+  forward guard, per-row derived dps bound, bare_client frozen-default
+  identity mirror, the online empty-identity and ''-decode pins in
+  snapshots, the one-hand refill-lands premise sibling, recipe memo
+  try/finally, honesty rewords).
+- Adjudicated, no change, do not re-raise: the recipes.ts length-keyed
+  memo stands per the phase 09 ruling (the fix-round reviewer's
+  WeakMap+freeze prescription would break the pattern-suite pushers; the
+  new guard suite pins the actual contract instead); the fourth
+  private line() tooltip helper copy stays (a shared helper is a
+  triple-registered architectural entity for a one-line body whose real
+  content is each module's tt-class union; revisit only if a tooltip
+  module family barrel forms); the pbe_boost measured counts (cap fires
+  on 9 of 16 kits, ring arm live in 8) stay dated sourced prose in the
+  enforcer header and the test comment, verified by three independent
+  probes this session, not pinned (a live assertion needs a
+  pre-enforcement builder export nothing else wants); the mst
+  layout-version non-bump stands as recorded in the migration notes.
+- Conscious residues recorded by reviewers, accepted: the resolver pays
+  one bounded closure per partied-viewer call on the 20 Hz snapshot path
+  (banner reworded to say so); the '' decode arm is defensively
+  unreachable from the shipped encoder; the shield armor 26-slope literal
+  stays hand-authored prose-documented extrapolation; flaggedCandidates
+  in the shaman case remains a maintained input (a sixth flagged
+  raw pick reds the worn-equality, the correct failure for that case).
+- Phase 10 carries, in ADDITION to the addendum above: the professions
+  blob band WILL red by design (re-measure around the new settled bytes);
+  renderer.ts has ZERO monolith headroom at 13708 (do not touch it
+  without an extraction); cap TRANSIENCE inherits to the Grand Cauldron /
+  Laden Hearth family reuse; sweep appends ride the family tables (arm 2
+  unions APEX_ARMOR_RECIPES + APEX_GEAR_RECIPES).
+- Phase 11 carries: the makers_charm rollback-runbook line; never a
+  flagged def in heroic-eligible loot (makeHeroicVariant spreads base);
+  the commission-board re-check.
+- The three OPEN maintainer decisions above stand unchanged (reliquary
+  curation for the two tools, forge world-visibility, the fired
+  masterwork:engineering revisit trigger), plus the sunder lock-exemption
+  ratification and the five release-owned findings recorded at the phase
+  09 sync; none were affected by this QA.
