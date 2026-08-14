@@ -22,6 +22,7 @@ import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, GFX, surfaceMat } from './gfx';
+import { addInstancedParts, type GlbTemplatePart, glbTemplateParts } from './glb_instanced_props';
 import { type StationPropKind, stationPropPlacements } from './stations_core';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
@@ -102,11 +103,6 @@ export const stationsPreloadInternalsForTest = {
 // no x/z offset (GLTFLoader always creates a fresh identity root): the old
 // clone path applied the scale around the reseated root, which cancels a
 // root y offset exactly but would drift x/z by offset*(1-scale).
-interface StationTemplatePart {
-  geo: THREE.BufferGeometry;
-  mat: THREE.Material | THREE.Material[];
-  local: THREE.Matrix4;
-}
 
 // Loader cache scenes are IMMUTABLE and Object3D.clone shares materials, so
 // the surface-detail layer goes on a one-time CLONE cached per source
@@ -133,38 +129,14 @@ function stationMaterial(src: THREE.Material): THREE.Material {
   return out;
 }
 
-function stationTemplateParts(kind: StationPropKind): StationTemplatePart[] {
-  const loaded = loadedStationGltf.get(kind);
-  if (!loaded) {
-    const h = STATION_TARGET_HEIGHT[kind];
-    return [
-      {
-        geo: new THREE.BoxGeometry(h * 0.7, h, h * 0.7),
-        mat: surfaceMat({ color: 0x8a6a4a }),
-        local: new THREE.Matrix4().makeTranslation(0, h / 2, 0),
-      },
-    ];
-  }
-  loaded.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(loaded);
-  const rawHeight = box.max.y - box.min.y;
-  const scale = rawHeight > 1e-4 ? STATION_TARGET_HEIGHT[kind] / rawHeight : 1;
-  const normalize = new THREE.Matrix4()
-    .makeTranslation(0, -box.min.y * scale, 0)
-    .multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
-  const parts: StationTemplatePart[] = [];
-  loaded.traverse((child) => {
-    if (child instanceof THREE.Mesh) {
-      parts.push({
-        geo: child.geometry,
-        mat: Array.isArray(child.material)
-          ? child.material.map(stationMaterial)
-          : stationMaterial(child.material),
-        local: new THREE.Matrix4().multiplyMatrices(normalize, child.matrixWorld),
-      });
-    }
+function stationTemplateParts(kind: StationPropKind): GlbTemplatePart[] {
+  // The shared glb_instanced_props kernel (extracted at farming Phase 7 QA on
+  // the rule of three); the worn-detail material cache rides mapMaterial.
+  return glbTemplateParts(loadedStationGltf.get(kind), STATION_TARGET_HEIGHT[kind], {
+    fallbackWidthFactor: 0.7,
+    makeFallbackMat: () => surfaceMat({ color: 0x8a6a4a }),
+    mapMaterial: stationMaterial,
   });
-  return parts;
 }
 
 export interface StationPropsView {
@@ -257,20 +229,7 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
   }
   const matrix = new THREE.Matrix4();
   for (const { kind, mats: matrices } of byKind.values()) {
-    for (const part of stationTemplateParts(kind)) {
-      const im = new THREE.InstancedMesh(part.geo, part.mat, matrices.length);
-      im.name = `stationProps:${kind}`;
-      matrices.forEach((m, i) => {
-        matrix.multiplyMatrices(m, part.local);
-        im.setMatrixAt(i, matrix);
-      });
-      im.instanceMatrix.needsUpdate = true;
-      im.castShadow = true;
-      im.receiveShadow = true;
-      im.computeBoundingBox();
-      im.computeBoundingSphere();
-      group.add(im);
-    }
+    addInstancedParts(group, `stationProps:${kind}`, stationTemplateParts(kind), matrices, matrix);
   }
   return { group, flames, fireLights };
 }

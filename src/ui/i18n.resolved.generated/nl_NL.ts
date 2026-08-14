@@ -2462,7 +2462,8 @@ export const nl_NL: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3973,6 +3974,12 @@ export const nl_NL: EnTranslations = {
       "genesis_token_claimed": "Dat Seeker Genesis Token is al geclaimd.",
       "entitlement_required": "Geverifieerde Seeker-rechten zijn vereist.",
       "current_ownership_required": "Actueel bezit van het Seeker Genesis Token is vereist."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const nl_NL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "jij@voorbeeld.nl",
     "emailError": "Voer een geldig e-mailadres in.",
+    "marketingOptIn": "Stuur mij nieuws en updates over het spel per e-mail (optioneel)",
     "showPassword": "Wachtwoord tonen",
     "hidePassword": "Wachtwoord verbergen",
     "logIn": "Inloggen",
@@ -6691,6 +6699,19 @@ export const nl_NL: EnTranslations = {
     "style": "Stijl",
     "resetLook": "Uiterlijk Herstellen",
     "resetShort": "Herstellen",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Vlak",
     "browArched": "Gebogen",
     "browThin": "Dun",

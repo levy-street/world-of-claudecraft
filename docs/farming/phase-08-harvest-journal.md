@@ -23,7 +23,9 @@ map_window_painter/minimap_painter/map_window_view heavily reworked around them.
 Explore step and Agent B's scope must read those cores on the CURRENT tree and derive
 the farming pin's marker kind, profile, icon, accessibility, and tooltip rows from the
 family's own recipes before writing any pin code. Also note deviation (an) in
-state.md: hud.ts and sim.ts sit at near-zero monolith-ratchet headroom, so every new
+state.md: coordinator headroom is absorb-eroded (the fourteenth absorb put hud.ts
+and server/game.ts OVER ceiling from release growth alone, healed by extraction;
+post-heal headroom is recorded in state.md's (an) standing warning), so every new
 block this phase writes lands as a sibling module from the start.
 
 ### Starter Prompt

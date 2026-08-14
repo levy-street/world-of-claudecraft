@@ -42,6 +42,26 @@ export const I18N_ARTIFACTS = Object.freeze([
   'src/ui/i18n.catalog/translation_keys.generated.ts',
 ]);
 
+// The manifest freshness set: EVERY tracked file the three manifest
+// generators write, a strict SUPERSET of the classifier's carve-out family
+// (lib/gate_select_plan.mjs, GENERATED_MANIFEST_ARTIFACT_FILES: the three
+// .ts graph nodes). The SFX generator also writes the runtime pack and the
+// gain-ceiling cache; those are fs-read data, never graph nodes, so they
+// belong in the DIFF (a partial diff would let the local gate silently heal
+// them mid-run while CI reads the stale committed copies) but never in the
+// classifier. tests/ci_workflow.test.ts welds this list, both check jobs'
+// diff argv, and the classifier containment to each other. The wiki content
+// regenerates in the artifacts turbo step (wiki:content); the SFX and media
+// manifests regenerate in their own steps directly (sub-second scripts, not
+// turbo tasks).
+export const MANIFEST_ARTIFACTS = Object.freeze([
+  'src/game/sfx_manifest.generated.ts',
+  'src/guide/content.generated.ts',
+  'src/render/assets/manifest.generated.ts',
+  'public/audio/sfx/runtime-pack.json',
+  'scripts/sfx/sfx_gain_ceiling.generated.json',
+]);
+
 /**
  * Full local gate steps (after dep-sync and ffmpeg preflights in gate.mjs).
  *
@@ -85,6 +105,27 @@ export function buildFullGateSteps(workers, opts = {}) {
       hint:
         'the regenerated i18n artifacts differ from the staged/committed copies: stage them ' +
         `(git add ${I18N_ARTIFACTS.join(' ')}) and re-run`,
+    },
+    // The two manifest generators run directly (each is a deterministic
+    // sub-second script; the wiki content regenerated in the turbo step
+    // above), then one diff proves all three committed manifests fresh.
+    {
+      name: 'sfx manifest regen',
+      cmd: 'node',
+      args: ['scripts/build_sfx_manifest.mjs'],
+    },
+    {
+      name: 'media manifest regen',
+      cmd: 'node',
+      args: ['scripts/build_media_manifest.mjs', 'generate'],
+    },
+    {
+      name: 'manifest freshness',
+      cmd: 'git',
+      args: ['diff', '--exit-code', '--', ...MANIFEST_ARTIFACTS],
+      hint:
+        'the regenerated build manifests differ from the staged/committed copies: stage them ' +
+        `(git add ${MANIFEST_ARTIFACTS.join(' ')}) and re-run`,
     },
     {
       name: 'malware scan',

@@ -4,8 +4,29 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 7 (render and juice) done 2026-08-14; Phase 7 QA is
-next (docs/farming/phase-07-qa.md). Phase 6 QA done 2026-08-13 (merge
+Current phase: Phase 7 QA done 2026-08-14 (PASS-WITH-FOLLOWUPS, merged
+--no-ff from fix/farming-phase-07-qa; next is Phase 8, Harvest Journal
+and ready notices, docs/farming/phase-08-harvest-journal.md); the
+FOURTEENTH absorb opened the QA round (merge
+20e9b6a987 of tip 51aa4eab13: 98 commits, 225 files, roughly 60-file
+farming intersection, no lockfile move; the only conflicts were the
+generated pending.ts, regen-resolved, and the accepted-art registry row,
+re-pointed at the CLI-re-minted portrait manifest per the (al)
+checklist, which the auto-merge had reproduced byte-identically;
+4-lane release-merge-audit delivered: arms/endpoints CLEAN, bindings
+CLEAN, overlaps and premises FINDINGS, all healed in-branch. The
+release's cheater-mark growth put hud.ts and server/game.ts OVER their
+monolith ceilings on the merged tree; healed by extraction a3b5ea431b
+per the (an) policy: both HEAVY_SELF policy sets moved whole to
+server/heavy_self.ts and the castDisplayName mapper with its rift key
+table to src/ui/cast_display_name.ts, membership pins in
+tests/server/heavy_self.test.ts, ceilings untouched. gate_select gained
+the manifest-freshness family this absorb; see the validation matrix
+note. Count pins re-run live and unchanged: command_schema 201/214,
+delta keys 87, IWorld 328 = 88 data + 240 method, facets 34; golden
+f017045f unchanged; tsc clean). Phase 7 (render and juice) done
+2026-08-14; Phase 7 QA runbook is docs/farming/phase-07-qa.md.
+Phase 6 QA done 2026-08-13 (merge
 ae695397d1, twelfth absorb 1a5d6fd5b4 of tip b08d79ef91 inside it); the
 THIRTEENTH absorb opened Phase 7 (merge a0d8ddc127 of tip 6ee7f3fd27: 4
 commits, 8 files, one-file intersection at sim.ts, audit clean, no
@@ -439,6 +460,9 @@ question does not arise (farming has no station).
   `scripts/sfx/sfx_prompts.mjs` + `npm run sfx:ui` (deterministic placeholder) +
   `sfx:manifest` + `sfx:check`; the completeness guard in `tests/game_audio.test.ts`
   fails a key with no file. Placeholder rows are marked for the sound engineer.
+  Since the fourteenth absorb the gate also freshness-diffs the SFX manifest,
+  the runtime pack, and the gain-ceiling cache (the manifest-freshness family
+  in the validation matrix): commit all of them fresh in the same change.
 - Countdowns: the daily-rewards window owns the live-countdown pattern (dedicated
   interval, `[data-...]` rebind, `formatDateTime` absolutes, t() token mm:ss). Copy it;
   never hand-build a clock string with a literal colon.
@@ -464,7 +488,17 @@ question does not arise (farming has no station).
 - Phase end: `node scripts/gate_select.mjs` (the fast pre-merge gate);
   `npm run gate` for the deep check. Known environmental red: the armory browser
   pixel test; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code, and PR CI
-  is the arbiter.
+  is the arbiter. Since the fourteenth absorb (PR 3386) the gate carries a
+  MANIFEST-FRESHNESS family: it regenerates and diffs
+  src/game/sfx_manifest.generated.ts, src/guide/content.generated.ts, and
+  src/render/assets/manifest.generated.ts plus
+  public/audio/sfx/runtime-pack.json and
+  scripts/sfx/sfx_gain_ceiling.generated.json, and reds at the "manifest
+  freshness" step if any regen differs from the committed bytes; a
+  committed-manifest edit now classifies into its own family and feeds
+  vitest related instead of forcing the full-suite fallback, so the old
+  "the fallback caught it" catch-path no longer exists for those five
+  files: commit them fresh in the same change, always.
 
 ## Key planned files (working names; a phase may refine with a note here)
 
@@ -1010,7 +1044,10 @@ question does not arise (farming has no station).
   its own fire_light_registry extraction, leaving renderer.ts at EXACTLY
   its ceiling (see the phase-07 sync note), and reworked CI selection
   plumbing without changing scripts/gate_select.mjs semantics or its FAIL
-  markers. Release-merge-audit lane: CLEAN on all five hazard axes.
+  markers (true of THAT absorb only: the FOURTEENTH absorb DID change
+  selection semantics with the manifest-freshness family; see the
+  validation matrix note). Release-merge-audit lane: CLEAN on all five
+  hazard axes.
   GUARD EXTENSIONS (commit 719d701d66): (1) the item art audit's expected
   block now pins pendingArtCount (39) beside the ART-SUBJECT liveItemCount,
   so a standalone audit run reds when the debt grows even though the
@@ -1058,10 +1095,17 @@ question does not arise (farming has no station).
   plus the fplot row builder moved whole to server/farming_commands.ts (the
   case labels stay in dispatchMessage for the command-schema scan; the
   snapshots delta-key scrape gained the extracted emitter as a second
-  source). STANDING WARNING for phases 7 to 13: the merged tree sits at
-  NEAR-ZERO headroom under these ceilings (hud.ts 4 lines, server/game.ts 2,
-  sim.ts 82), so every future phase touching a ratcheted coordinator works
-  extraction-first: land the new logic as a sibling module from the start.
+  source). STANDING WARNING for phases 7 to 13: coordinator headroom is
+  absorb-eroded, and release growth alone can break a ceiling (the
+  FOURTEENTH absorb put hud.ts and server/game.ts OVER ceiling with no
+  farming change at all; healed by extraction a3b5ea431b: both
+  HEAVY_SELF policy sets moved whole to server/heavy_self.ts and the
+  castDisplayName mapper with its rift key table to
+  src/ui/cast_display_name.ts). Post-heal headroom 2026-08-14: hud.ts
+  31 lines (19459/19490), server/game.ts 118 (10782/10900), sim.ts 15
+  (12645/12660), renderer.ts 21 (13679/13700). Every future phase
+  touching a ratcheted coordinator works extraction-first: land the new
+  logic as a sibling module from the start.
   Ceiling raises stay a maintainer decision. The ceilings were deliberately
   NOT lowered after these extractions (the root CLAUDE.md lower-after-
   extraction rule): the values are the release's own mints and the
@@ -1182,6 +1226,98 @@ question does not arise (farming has no station).
   placeholder rows ride sfx_prompts.mjs through its UI_SFX_CATALOG import
   (no hand row there), PLACEHOLDER-marked in ui_sfx.mjs, both at 0 dB so a
   real recording drops in without a mix re-balance.
+  Phase 7 QA (2026-08-14, branch fix/farming-phase-07-qa), the round's
+  addenda; the audit found 0 BLOCKING anywhere (7-lane fan-out, all
+  delivered first try) and the fixes below landed in-branch:
+  - (ap) ADDENDUM, the owed re-argument, verdict KEEP as the design's own
+    anticipated seam: the clock-base contract on myFarmPlots explicitly
+    deferred the derived-duration surface to the first timer surface, which
+    the render phase's stage fractions ARE; every alternative is worse (a
+    per-plot msRemaining wire field costs 20 Hz bytes for a cosmetic read
+    and pre-empts the Phase 8 timer decision; letting render subtract
+    Date.now violates the contract on the offline host; a status-only poll
+    cannot drive smooth fractions); the member is minimal (no wire, no
+    persistence, both worlds return their OWN base fresh per call) and
+    cosmetically scoped by its comment. MAINTAINER READ STILL OWED at
+    feature review per D22. RECORDED ACCEPTANCES riding it: (1) online, a
+    client wall clock running fast can render the stage4 "looks ready" mesh
+    before the authority flips status (the riftEventMsRemaining skew class;
+    magnitude NTP-scale; the harvest then refuses not_ready; authority
+    facts stay status plus events, so this is cosmetic annoyance, not
+    information leak; capping the fraction path at stage3 was rejected
+    because it would lag the ready mesh for EVERYONE online by the refresh
+    cadence to fix a rare skew case). (2) withered surfaces online only
+    when the heavy-gated fplot re-diffs (no command and no event marks it),
+    so a doomed crop can render stage4 for up to the staggered-refresh
+    backstop; correct direction (authority owns withered), bounded,
+    recorded.
+  - (av) ADDENDUM: the renderer drives sync/update from BOTH the main frame
+    and prewarmWorldFrame (boot settle, zone warm, and the render-budget
+    shader warm), the exact riftDeathZoneVisuals idiom; a warm burst can
+    add transient extra reads and sway ticks. Ruled acceptable and NOT a
+    governor coupling: the direction is refresh-sooner only, the steady
+    state stays the uniform 0.5s, and no continuous preset/governor input
+    exists (the fairness suite now also scans the GFX surface with the
+    surfaceMat allowance pinned as an exact single-name import). Editing
+    renderer.ts to single-site the drive was rejected: it would re-stale
+    all three renderer-edit evidence-seal families for zero player-visible
+    gain.
+  - ONLINE EVENT-ORDER RACE healed (commit 4d6ff0e21e): the farm event and
+    the fplot rows ride two ws messages in a fixed order (events first), so
+    the adapter's event-forced read could spend its dirty flag on
+    pre-change rows and the change then waited out the full 0.5s throttle.
+    The forced read now stays armed until a read OBSERVES a change
+    (create, rebuild, or dispose), bounded at one interval; offline
+    behavior unchanged (the change is same-tick there). Both arms pinned,
+    mutation-proven (M1/M6). GENERAL RULE for any future event-forced
+    cache invalidation over the wire: the event frame and the state frame
+    are separate messages, so a one-shot dirty flag consumed by the next
+    read is a race by construction.
+  - (aq) SCOPE NOTE: the +174,844-byte delta bar counts public/models/props
+    only; the phase also added ui_farm_plant.mp3, ui_farm_harvest.mp3, and
+    the regenerated runtime-pack.json under public/audio/sfx, owned-build
+    artifacts in the audio group (now also freshness-welded by the gate's
+    manifest-freshness family).
+  - (as) ADDENDUM: pnpm-lock.yaml is a member of FARM_PROPS_SOURCE_FILES,
+    so tests/farm_props_asset.test.ts JOINS the lockfile-seal family (the
+    8-suite class is 9 with it): any lockfile bump reds it and takes the
+    size-preserving re-mint runbook, never pin edits. Exporter determinism
+    was re-proven this QA end to end: the driver's built-in
+    candidate/repeat byte-compare passed and the in-place shipping rewrite
+    left git byte-identical (the clean tree IS the proof).
+  - RELOAD-REGROW PREMISE RE-POINTED: the offline client persists NO
+    character state across a page reload (proven live twice: every offline
+    entry is a fresh character), so the "offline-reload regrow asymmetry"
+    the parity review named cannot exist offline; the re-anchor semantics
+    it described live in the ONLINE path (farm_persist.ts). The live
+    render check of a resumed mid-growth plot moves to Phase 9 QA, which
+    owns the online rig (the disposable-PG hard gate).
+  - DEFERRAL VERDICTS (the six owed): instanced-prop extraction FIXED
+    (src/render/glb_instanced_props.ts, stations and farm adopt whole,
+    gather_nodes documented out on its per-instance matrix composition);
+    cloneMaterialWithHooks FIXED (tintOne, with the decisive
+    cache-key-survival arm); GLB-loaded branch synthetic coverage FIXED
+    (test-only setLoaded seam, four arms: socket mount, accent tint plus
+    wet darken, shared-geometry survival, hook survival); two-tier BUILT
+    fairness arm RE-DEFERRED with reason (no quality input exists
+    structurally: the build and the visuals take no preset, pinned by
+    arity and the GFX allowance scan; implement the two-preset build diff
+    only if gfx.ts ever grows preset-keyed geometry); releaseGltf
+    residency RE-DEFERRED as a no-leak verdict, policy stated at the
+    preload block; the offline-reload live check re-pointed per the
+    premise correction above.
+  - SMALLER LEDGERED NOTES: FarmPatchVisuals.dispose() is never called by
+    the renderer (the riftDeathZoneVisuals family-wide precedent; the
+    fallback template material is likewise never disposed, bounded at 15
+    kinds per session); the 12 crop-stage GLBs ride the CRITICAL preload
+    lane though only bed/bin are needed at scene build (maintainer ruling
+    invited on a background-lane split); idle sway ignores reducedMotion
+    (ambient world motion, the foliage precedent; maintainer glance); the
+    renderer's three-case farm event route has no direct pin (the adapter
+    guard is pinned; a dropped case label is only caught live); the
+    correctness lane measured rendered plot heights above STAGE_HEIGHT
+    targets through a bbox tilt-projection artifact of its own probe, not
+    a normalization bug (heights ascend strictly, stages distinct).
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the

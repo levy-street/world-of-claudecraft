@@ -891,6 +891,15 @@
             />
           </div>
 
+          <!-- Marketing opt-in, register mode only (setAuthMode toggles it).
+               Unchecked by default: consent is explicit, never pre-ticked. -->
+          <div class="auth-field auth-optin" id="login-marketing-field" hidden>
+            <label class="auth-optin-label">
+              <input id="login-marketing" name="marketingOptIn" type="checkbox" />
+              <span data-i18n="auth.marketingOptIn">Email me game news and updates (optional)</span>
+            </label>
+          </div>
+
           <!-- Cloudflare Turnstile widget mounts here when configured (src/main.ts). -->
           <div id="cf-turnstile-container" class="auth-turnstile"></div>
 
@@ -1376,7 +1385,7 @@
                 <div class="auth-field">
                   <label for="account-email" class="auth-label" data-i18n="hudChrome.account.emailLabel">Email (optional)</label>
                   <input id="account-email" type="email" maxlength="254" autocomplete="email" disabled />
-                  <p class="account-hint" data-i18n="hudChrome.account.emailHint">Used only for account recovery. We never send marketing email.</p>
+                  <p class="account-hint" data-i18n="hudChrome.account.emailHint">Used only for account recovery. Use Change Email below to update it.</p>
                 </div>
               </div>
             </section>

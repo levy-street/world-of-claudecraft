@@ -476,6 +476,15 @@ export class Api {
     turnstileToken = '',
     ref = '',
     nativeAttestation: unknown = undefined,
+    // UA analytics extras, all optional: the first-touch attribution payload
+    // (src/attribution.ts), the marketing opt-in checkbox state, and the
+    // player's selected language. The server validates every field
+    // (server/signup_attribution.ts) and none can fail registration.
+    extras: {
+      attribution?: Record<string, string> | null;
+      marketingOptIn?: boolean;
+      locale?: string;
+    } = {},
   ): Promise<{ accountId?: number }> {
     const data = await this.post('/api/register', {
       username,
@@ -484,6 +493,9 @@ export class Api {
       turnstileToken,
       ref,
       nativeAttestation,
+      attribution: extras.attribution ?? undefined,
+      marketingOptIn: extras.marketingOptIn === true ? true : undefined,
+      locale: extras.locale,
     });
     this.token = data.token;
     this.username = data.username;
@@ -2990,6 +3002,12 @@ export class ClientWorld implements IWorld {
         // is authoritative and complete (the server re-sends one whenever flair
         // changes), so this both sets and CLEARS.
         if (e.kind === 'player') this.rememberFlair(e.name, e.aiAccount, streamerLinks);
+        // Operator-applied Cheater tag (src/sim/moderation/). A bare flag: the wire
+        // carries no budget, because only the wearer needs the countdown and the
+        // wearer already has it on the mark's own aura. Written as a strict boolean
+        // like aiAccount above so an identity record WITHOUT `chm` clears a mirror
+        // whose sanction was just lifted, matching Sim.setCheaterMark's own write.
+        e.cheaterMark = w.chm === 1;
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;

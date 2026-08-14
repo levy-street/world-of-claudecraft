@@ -3054,6 +3054,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Finger',
   'auth.email': 'E-Mail',
   'auth.emailError': 'Bitte gib eine gültige E-Mail-Adresse ein.',
+  'auth.marketingOptIn': 'Schick mir Neuigkeiten und Updates zum Spiel per E-Mail (optional)',
   'auth.emailPlaceholder': 'du@example.com',
   'auth.recovery.body':
     'Hinterlege eine E-Mail-Adresse, damit du dein Konto wiederherstellen kannst. Wir verwenden sie nur, um zu bestätigen, dass dir dieses Konto gehört, falls du je dein Passwort zurücksetzen musst.',

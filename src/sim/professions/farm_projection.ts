@@ -190,18 +190,23 @@ export function projectFarmPlots(
 
 /** The four derived visual growth stages (see the banner). Pure, stateless,
  *  and exported so the render phase reads THIS definition rather than
- *  re-deriving the thirds. A zero-length window (the grow-now mint) or a
- *  negative one reads as ready.
+ *  re-deriving the thirds: src/render/farm_patches_core.ts imports the
+ *  FUNCTION from this leaf directly (the one sanctioned value import, per
+ *  deviation (ar); the world_api facet re-exports the TYPE only), so a
+ *  re-home or rename here must move that import with it. A zero-length
+ *  window (the grow-now mint) or a negative one reads as ready.
  *
- *  CLOCK-BASE CONTRACT for the future render/ui consumer: `nowMs` MUST be the
+ *  CLOCK-BASE CONTRACT for every render/ui consumer: `nowMs` MUST be the
  *  same world's lockoutNowMs-base clock the plot's own timestamps were written
- *  in (epoch ms online, sim-clock ms on the offline and headless hosts).
+ *  in (epoch ms online, sim-clock ms on the offline and headless hosts), which
+ *  is exactly what IWorldFarming.farmNowMs() serves since Phase 7.
  *  Feeding Date.now() to an offline plot makes every bed render ready the
  *  instant it is planted; there is no cross-base conversion. The parameter is
  *  a structural minimum (the two timestamps), so both the public FarmPlotView
  *  and the sim-side PlotState fit without ever needing the hidden slots. The
- *  derived msRemaining wire field (the RaidLockout template) stays owed to the
- *  first timer surface, Phase 8. */
+ *  derived msRemaining WIRE field (the RaidLockout template) is still not
+ *  wired; the Phase 8 timer UI decides whether farmNowMs subtraction
+ *  suffices or the wire field earns its bytes. */
 export type FarmGrowthStage = 'sprout' | 'seedling' | 'maturing' | 'ready';
 
 export function farmGrowthStage(

@@ -13,6 +13,7 @@ import {
   FARM_CROP_FAMILY,
   FARM_FALLBACK_ACCENT,
   FARM_FALLBACK_FAMILY,
+  FARM_FALLBACK_PALETTE,
   FARM_SOIL_SOCKET_NAME,
   FARM_SPROUT_MODEL_URL,
   FARM_WET_BAND_1_MS,
@@ -119,6 +120,10 @@ describe('farm biome palettes', () => {
     const fallback = farmBiomePalette('no_such_zone');
     expect(Object.keys(FARM_BIOME_PALETTES)).not.toContain('no_such_zone');
     expect(fallback.soil).toBeGreaterThan(0);
+    // The fallback arm resolves to the EXPORTED fallback object itself, so
+    // the export has a pinned consumer and the arm cannot silently detach
+    // from it (the Phase 7 QA dead-code finding).
+    expect(fallback).toBe(FARM_FALLBACK_PALETTE);
   });
 });
 
@@ -166,6 +171,15 @@ describe('stage mesh mapping', () => {
 });
 
 describe('wet bands', () => {
+  it('the band widths are the shipped literals: ten minutes deep, one hour damp', () => {
+    // Every boundary arm below derives from these constants, so without the
+    // literals a silently retuned constant would keep the whole suite green
+    // (the Phase 7 QA coverage finding). Moving a band is a deliberate retune
+    // that edits this pin with it.
+    expect(FARM_WET_BAND_2_MS).toBe(600_000);
+    expect(FARM_WET_BAND_1_MS).toBe(3_600_000);
+  });
+
   it('bands the soil at 10 minutes and one hour', () => {
     const p = plot({ plantedAtMs: 1_000_000 });
     expect(farmWetBand(p, 1_000_000)).toBe(2);

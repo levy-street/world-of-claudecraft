@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { HEAVY_SELF_CMDS } from '../server/heavy_self';
 import { stackSizeOf } from '../src/sim/bags';
 // Aliased: this file declares a small synthetic table for the ladder arms; the
 // real merged catalog drives the whole-catalog and grade-family arms.
@@ -652,10 +653,12 @@ describe('server wiring for inv_sort (source pins)', () => {
   );
 
   it("keeps 'inv_sort' in HEAVY_SELF_CMDS", () => {
-    const start = gameSource.indexOf('const HEAVY_SELF_CMDS = new Set<string>([');
-    expect(start).toBeGreaterThanOrEqual(0);
-    const declaration = gameSource.slice(start, gameSource.indexOf(']);', start));
-    expect(declaration).toContain("'inv_sort'");
+    // The set moved WHOLE to server/heavy_self.ts (an exported leaf) at the
+    // v0.38.0 fourteenth absorb, so the old game.ts source scrape became a
+    // direct membership read: stronger than the regex pin it replaces, and
+    // tests/server/heavy_self.test.ts pins the full set plus the game.ts
+    // import that keeps the policy consumed.
+    expect(HEAVY_SELF_CMDS.has('inv_sort')).toBe(true);
   });
 
   it('dispatches the inv_sort case to sim.sortInventory(pid)', () => {

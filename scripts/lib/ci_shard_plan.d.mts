@@ -12,6 +12,11 @@ export function collectedLaneFiles(opts: {
 
 export function parseShardArg(argv: string[]): { index: number; total: number } | null;
 
+export function resolveWorkerCount(opts: { cores: number; envValue?: string }): {
+  workers: number;
+  source: 'default' | 'env' | 'invalid';
+};
+
 export function buildFloor(opts: {
   alwaysRun: string[];
   testFiles: string[];

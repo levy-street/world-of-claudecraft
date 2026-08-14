@@ -3027,6 +3027,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Jari',
   'auth.email': 'Email',
   'auth.emailError': 'Silakan masukkan alamat email yang valid.',
+  'auth.marketingOptIn': 'Kirimkan berita dan pembaruan game ke email saya (opsional)',
   'auth.emailPlaceholder': 'kamu@contoh.com',
   'auth.recovery.body':
     'Atur alamat email agar kamu bisa memulihkan akunmu. Kami hanya memakainya untuk memastikan kamu pemilik akun ini jika suatu saat kamu perlu mengatur ulang kata sandimu.',

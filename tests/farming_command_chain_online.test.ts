@@ -479,6 +479,35 @@ describe('a plot change reaches the planter in the very next snapshot', () => {
     return { session, fc };
   }
 
+  it('the fplot timestamps ride the wire in the authority base farmNowMs serves', () => {
+    // The mirror of the sim-side clock-base arm (deviation (ap)): the live
+    // GameServer injects lockoutNowMs as Date.now, ClientWorld.farmNowMs()
+    // returns Date.now, and the render adapter subtracts one from the other,
+    // so the wire row must carry the authority's clock VERBATIM. A re-basing
+    // regression anywhere in the projection or the serializer (sim-clock
+    // milliseconds, seconds, an epoch offset) lands outside the bounds below
+    // and makes every online stage fraction nonsense.
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 7, 'Clock');
+    const pid = session.pid as number;
+    standAtBed(server, pid, BED);
+    server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid);
+    const before = Date.now();
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
+    );
+    const after = Date.now();
+    broadcast(server);
+    const rows = lastSnap(fc.sent).self.fplot as Record<string, unknown>[];
+    expect(rows).toHaveLength(1);
+    const plantedAtMs = rows[0].plantedAtMs as number;
+    expect(plantedAtMs).toBeGreaterThanOrEqual(before);
+    expect(plantedAtMs).toBeLessThanOrEqual(after);
+    expect(rows[0].readyAtMs as number).toBeGreaterThan(plantedAtMs);
+  });
+
   it('carries the new plot on the first broadcast after the plant, not on a later refresh', () => {
     const server = new GameServer();
     const { session, fc } = joinWithSocket(server, 1, 'Fresh');

@@ -460,6 +460,15 @@ describe('farmGrowthStage (the derived visual stages)', () => {
     notified: false,
   };
 
+  it('lives in the farm_projection leaf; the farming.ts import is a re-export of it', async () => {
+    // Deviation (ar): the render core imports the FUNCTION from the leaf
+    // directly, so the leaf home and the re-export must stay one value. A
+    // re-home that leaves either path pointing at a copy diverges silently
+    // without this identity pin.
+    const leaf = await import('../src/sim/professions/farm_projection');
+    expect(leaf.farmGrowthStage).toBe(farmGrowthStage);
+  });
+
   it('cuts the elapsed fraction into thirds, with no stored state', () => {
     expect(farmGrowthStage(plot, 0)).toBe('sprout');
     expect(farmGrowthStage(plot, 99)).toBe('sprout');

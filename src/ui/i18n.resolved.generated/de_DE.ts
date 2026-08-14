@@ -2462,7 +2462,8 @@ export const de_DE: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Stufe {level} {family}",
@@ -3973,6 +3974,12 @@ export const de_DE: EnTranslations = {
       "genesis_token_claimed": "Dieser Seeker Genesis Token wurde bereits beansprucht.",
       "entitlement_required": "Eine verifizierte Seeker-Berechtigung ist erforderlich.",
       "current_ownership_required": "Der Seeker Genesis Token muss sich aktuell in deinem Besitz befinden."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const de_DE: EnTranslations = {
     "email": "E-Mail",
     "emailPlaceholder": "du@example.com",
     "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "marketingOptIn": "Schick mir Neuigkeiten und Updates zum Spiel per E-Mail (optional)",
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort ausblenden",
     "logIn": "Einloggen",
@@ -6691,6 +6699,19 @@ export const de_DE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Aussehen zurücksetzen",
     "resetShort": "Zurücksetzen",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Flach",
     "browArched": "Gebogen",
     "browThin": "Dünn",

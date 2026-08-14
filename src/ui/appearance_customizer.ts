@@ -1,6 +1,6 @@
 // Character-creation appearance customizer for the modular character.
 //
-// A compact tabbed panel (Body / Face / Hair / Style) in the visual language of
+// A compact tabbed panel (Body / Face / Hair / Style / Share) in the visual language of
 // a AAA creator: stepper rows for the long style lists, centre-notched sliders
 // for the morph pairs, switches for the boolean views, swatch strips for makeup
 // and for the recolourable materials, each with an HSL wheel folded away behind
@@ -9,6 +9,12 @@
 // that to CharacterPreview.setModular so the turntable updates live.
 // Persistence is the caller's job, this component is stateless across mounts
 // apart from the value it is constructed with.
+
+import {
+  type DesignCodeError,
+  decodeDesignCode,
+  encodeDesignCode,
+} from '../render/characters/design_code_core';
 import {
   type ArmorSetId,
   BEARD_STYLES,
@@ -474,7 +480,14 @@ export function mountAppearanceCustomizer(
   host.textContent = '';
   host.classList.add('appearance-customizer');
 
-  const emit = () => opts.onChange(value);
+  // The Share tab mirrors the whole look as a design code, so every change
+  // refreshes it alongside the caller's own onChange. Assigned when the tab
+  // is built (below); a no-op until then.
+  let refreshShareCode: () => void = () => {};
+  const emit = () => {
+    refreshShareCode();
+    opts.onChange(value);
+  };
   /** Close callbacks for the custom-colour drawers, so opening one shuts the
    *  rest (see colorRow). */
   const drawerClosers: (() => void)[] = [];
@@ -573,6 +586,9 @@ export function mountAppearanceCustomizer(
     }
     pagesHost.scrollTop = 0;
     if (focus) tabButtons[idx].focus();
+    // The Share box only re-encodes while its page is visible (see sync's
+    // hidden guard), so entering the tab is what refreshes it.
+    refreshShareCode();
   }
 
   function tabPage(labelKey: TranslationKey): HTMLElement {
@@ -1034,6 +1050,7 @@ export function mountAppearanceCustomizer(
   const pFace = tabPage('auth.face');
   const pHair = tabPage('auth.hair');
   const pStyle = tabPage('auth.style');
+  const pShare = tabPage('auth.shareTab');
 
   // Body: pick a body, tone it, then shape the silhouette.
   seg<Gender>(
@@ -1267,6 +1284,112 @@ export function mountAppearanceCustomizer(
       },
       () => onHelm(helm),
     );
+  }
+
+  // Share: the whole look as one line of feature=value pairs (the design
+  // code), exported and imported in place. The box always mirrors the current
+  // design except while the player is editing it to paste a code; Import
+  // replaces every changeable feature and KEEPS the body proportions (Fit
+  // Studio data no creator row can reach), which is what randomize does too.
+  // Reset is the deliberate exception: it returns the proportions to neutral
+  // with the rest of the look.
+  {
+    const hint = el('div', 'ac-share-hint', t('auth.designCodeHint'));
+    hint.id = `${uid}-share-hint`;
+    row(pShare, null, 'ac-r-full').appendChild(hint);
+
+    const code = el('textarea', 'ac-code');
+    code.rows = 4;
+    code.spellcheck = false;
+    code.setAttribute('autocomplete', 'off');
+    code.setAttribute('autocapitalize', 'off');
+    code.setAttribute('aria-label', t('auth.designCode'));
+    // the visible instruction doubles as the box's description for AT
+    code.setAttribute('aria-describedby', hint.id);
+    row(pShare, null, 'ac-r-full').appendChild(code);
+
+    const btns = el('div', 'ac-share-btns');
+    const copyBtn = el('button', 'ac-share-btn', t('auth.copyCode'));
+    copyBtn.type = 'button';
+    const importBtn = el('button', 'ac-share-btn', t('auth.importCode'));
+    importBtn.type = 'button';
+    btns.appendChild(copyBtn);
+    btns.appendChild(importBtn);
+    row(pShare, null, 'ac-r-full').appendChild(btns);
+
+    const status = el('div', 'ac-share-status');
+    status.setAttribute('aria-live', 'polite');
+    pShare.appendChild(status);
+    const setStatus = (text: string, isError: boolean) => {
+      status.textContent = text;
+      status.classList.toggle('err', isError);
+    };
+
+    const sync = () => {
+      // A hidden page does not re-encode: a slider drag emits per input
+      // event, and paying a 19-field serialize for a box nobody can see is
+      // waste. selectTab refreshes on entry, so the box is never stale.
+      if (pShare.hidden) return;
+      // Never clobber a paste in progress: while the caret is in the box the
+      // player owns it. Any other change re-mirrors the code and clears the
+      // last action's status, so what the row says always tracks the look.
+      if (document.activeElement === code) return;
+      code.value = encodeDesignCode(value);
+      setStatus('', false);
+    };
+    // emit() already runs this on every change, so it is deliberately NOT in
+    // `syncers` too: syncAll callers always emit right after, and a double
+    // registration would just encode the same look twice per action.
+    refreshShareCode = sync;
+
+    const ERR_LABEL: Record<DesignCodeError, TranslationKey> = {
+      empty: 'auth.designCodeErrEmpty',
+      header: 'auth.designCodeErrHeader',
+      version: 'auth.designCodeErrVersion',
+      malformed: 'auth.designCodeErrMalformed',
+    };
+
+    on(copyBtn, 'click', () => {
+      const text = code.value.trim() || encodeDesignCode(value);
+      // Clipboard access can be denied or absent (older engines, iframes):
+      // fall back to selecting the code so one keystroke finishes the job.
+      const manual = () => {
+        code.focus();
+        code.select();
+        // informational, not an error: the copy is one keystroke away
+        setStatus(t('auth.designCodeCopyManual'), false);
+      };
+      const clip = navigator.clipboard;
+      if (clip?.writeText) {
+        clip.writeText(text).then(() => setStatus(t('auth.designCodeCopied'), false), manual);
+      } else {
+        manual();
+      }
+    });
+
+    on(importBtn, 'click', () => {
+      const parsed = decodeDesignCode(code.value);
+      if (!parsed.ok) {
+        setStatus(t(ERR_LABEL[parsed.reason]), true);
+        return;
+      }
+      value = { ...parsed.appearance, body: value.body };
+      syncAll();
+      emit();
+      // Re-mirror the canonical encode HERE rather than leaning on sync():
+      // this handler owns the box at this moment, and sync's paste guard
+      // skips a textarea that still holds focus, which would leave the raw
+      // pasted text sitting in a box that claims to show the imported look.
+      code.value = encodeDesignCode(value);
+      setStatus(
+        t(
+          parsed.ignored.length > 0 || parsed.coerced.length > 0
+            ? 'auth.designCodeImportedPartial'
+            : 'auth.designCodeImported',
+        ),
+        false,
+      );
+    });
   }
 
   selectTab(0);

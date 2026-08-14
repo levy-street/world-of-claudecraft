@@ -16,6 +16,7 @@ vi.mock('../src/game/audio', () => ({ audio: audioMock }));
 
 import type { FarmEvent, FarmFeedbackHost } from '../src/ui/farm_event_feedback';
 import { handleFarmEvent } from '../src/ui/farm_event_feedback';
+import type { FarmDeniedReason } from '../src/ui/farming_view';
 import { grantItemToken } from '../src/ui/grant_line_view';
 
 beforeEach(() => {
@@ -244,26 +245,28 @@ describe('farm_event_feedback: the cue arms', () => {
   it('farmDenied and farmHusksConverted stay SILENT on every cue', () => {
     // The refusals already speak through the error toast, and the husk trade
     // is a menu conversion; a borrowed world-action cue on either is the bug
-    // this negative arm exists to catch. Every SimEvent farmDenied reason is
-    // listed (hand-maintained against the union in src/sim/types.ts, the
-    // routes-table convention), so a cue added to one refusal branch cannot
-    // hide behind a reason the test never drives.
-    const reasons = [
-      'bad_bed',
-      'bad_crop',
-      'range',
-      'bed_taken',
-      'skill',
-      'no_seed',
-      'not_ready',
-      'no_plot',
-      'no_husks',
-      'no_compost',
-      'no_fee_produce',
-      'no_tonic',
-      'tool',
-      'locked',
-    ] as const;
+    // this negative arm exists to catch. The reason list is TYPE-FORCED
+    // against the union in src/sim/types.ts (via the FarmDeniedReason
+    // extract): a fifteenth reason is a tsc error here until its row joins,
+    // so no refusal branch can ship outside this sweep (the Phase 7 QA
+    // hand-maintenance finding).
+    const REASON_ROWS: Record<FarmDeniedReason, true> = {
+      bad_bed: true,
+      bad_crop: true,
+      range: true,
+      bed_taken: true,
+      skill: true,
+      no_seed: true,
+      not_ready: true,
+      no_plot: true,
+      no_husks: true,
+      no_compost: true,
+      no_fee_produce: true,
+      no_tonic: true,
+      tool: true,
+      locked: true,
+    };
+    const reasons = Object.keys(REASON_ROWS) as FarmDeniedReason[];
     for (const reason of reasons) {
       // Each reason still produces its one toast: proof the loop actually
       // reached the arm rather than silently no-opping past it.

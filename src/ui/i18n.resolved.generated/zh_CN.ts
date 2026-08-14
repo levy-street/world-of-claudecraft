@@ -2462,7 +2462,8 @@ export const zh_CN: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "暂离"
+      "afkTag": "暂离",
+      "cheaterTag": "< 作弊者 >"
     },
     "mobTooltip": {
       "levelFamily": "等级 {level} {family}",
@@ -3973,6 +3974,12 @@ export const zh_CN: EnTranslations = {
       "genesis_token_claimed": "该 Seeker Genesis Token 已被领取。",
       "entitlement_required": "需要已验证的 Seeker 权益。",
       "current_ownership_required": "需要当前持有 Seeker Genesis Token。"
+    },
+    "cheater_mark": {
+      "admin_target": "管理员账号无法被标记。",
+      "reason_required": "必须填写原因。",
+      "invalid_duration": "标记时长至少需为 1 秒。",
+      "not_marked": "该账号未被标记。"
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const zh_CN: EnTranslations = {
     "email": "邮箱",
     "emailPlaceholder": "you@example.com",
     "emailError": "请输入有效的邮箱地址。",
+    "marketingOptIn": "向我发送游戏新闻和更新邮件（可选）",
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
     "logIn": "登录",
@@ -6691,6 +6699,19 @@ export const zh_CN: EnTranslations = {
     "style": "风格",
     "resetLook": "重置外观",
     "resetShort": "重置",
+    "shareTab": "分享",
+    "designCode": "外观代码",
+    "designCodeHint": "复制此代码即可保存或分享这个造型。将代码粘贴到此处并导入即可加载造型。",
+    "copyCode": "复制代码",
+    "importCode": "导入",
+    "designCodeCopied": "外观代码已复制。",
+    "designCodeCopyManual": "此处无法自动复制。代码已选中，请使用键盘复制。",
+    "designCodeImported": "造型已导入。",
+    "designCodeImportedPartial": "造型已导入。此版本无法识别的数值已被跳过。",
+    "designCodeErrEmpty": "请先粘贴外观代码。",
+    "designCodeErrHeader": "这看起来不像外观代码。",
+    "designCodeErrVersion": "该外观代码来自更新的游戏版本。",
+    "designCodeErrMalformed": "该外观代码已损坏。请复制完整代码后重试。",
     "browFlat": "平直",
     "browArched": "拱形",
     "browThin": "细眉",

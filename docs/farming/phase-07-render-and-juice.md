@@ -182,8 +182,10 @@ Agent C, SFX (the two-file wiring from the state.md seam reference):
 - farm_plant and farm_harvest cues: UI_CUES keys plus facade methods in
   src/game/audio.ts, widening the UiCue union if the family is nested.
 - The hud cases for the Phase 3 plant and harvest events, triggering the cues.
-- Prompt rows in scripts/sfx/sfx_prompts.mjs, marked PLACEHOLDER for the sound
-  engineer.
+- Prompt rows in the SFX catalog, marked PLACEHOLDER for the sound engineer.
+  [AS LANDED per (ax): the rows live in scripts/sfx/ui_sfx.mjs and ride into
+  sfx_prompts.mjs through its UI_SFX_CATALOG import; no hand row in
+  sfx_prompts.mjs itself.]
 - Run npm run sfx:ui, then npm run sfx:manifest, then npm run sfx:check; the
   completeness guard tests/game_audio.test.ts must pass.
 

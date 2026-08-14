@@ -3148,6 +3148,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Vinger',
   'auth.email': 'E-mail',
   'auth.emailError': 'Voer een geldig e-mailadres in.',
+  'auth.marketingOptIn': 'Stuur mij nieuws en updates over het spel per e-mail (optioneel)',
   'auth.emailPlaceholder': 'jij@voorbeeld.nl',
   'auth.recovery.body':
     'Stel een e-mailadres in zodat je je account kunt herstellen. We gebruiken het alleen om te bevestigen dat dit account van jou is als je ooit je wachtwoord opnieuw moet instellen.',

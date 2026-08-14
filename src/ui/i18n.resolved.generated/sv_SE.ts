@@ -2462,7 +2462,8 @@ export const sv_SE: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "BV"
+      "afkTag": "BV",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -3973,6 +3974,12 @@ export const sv_SE: EnTranslations = {
       "genesis_token_claimed": "Denna Seeker Genesis Token har redan hämtats.",
       "entitlement_required": "Verifierad Seeker-behörighet krävs.",
       "current_ownership_required": "Du måste fortfarande äga din Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const sv_SE: EnTranslations = {
     "email": "E-post",
     "emailPlaceholder": "du@exempel.se",
     "emailError": "Ange en giltig e-postadress.",
+    "marketingOptIn": "Skicka mig nyheter och uppdateringar om spelet via e-post (valfritt)",
     "showPassword": "Visa lösenord",
     "hidePassword": "Dölj lösenord",
     "logIn": "Logga in",
@@ -6691,6 +6699,19 @@ export const sv_SE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Återställ utseende",
     "resetShort": "Återställ",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Platt",
     "browArched": "Bågformad",
     "browThin": "Tunn",

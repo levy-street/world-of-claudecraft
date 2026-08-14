@@ -19,8 +19,8 @@
 | Phase 6 (economy hooks) | done | 2026-08-09 | 2026-08-09 |
 | Phase 6b (release sync, v0.38.0 at authoring) | done | 2026-08-13 | 2026-08-13 |
 | Phase 6 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-13 | 2026-08-13 |
-| Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merge hash in the Phase 7 notes tail) | 0 BLOCKING across three domain reviews plus qa-checklist; 7 SHOULD-FIX fixed in-phase |
-| Phase 7 QA | not started | | |
+| Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merge hash in the Phase 7 notes tail) | 0 BLOCKING across three domain reviews plus qa-checklist and the gate-integrity cone pass; 5 SHOULD-FIX fixed in-phase plus 2 adopted notes (the QA round reconciled this row with the Notes: the old "7 SHOULD-FIX" counted both) |
+| Phase 7 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-14 | 2026-08-14 |
 | Phase 8 (Harvest Journal) | not started | | |
 | Phase 8 QA | not started | | |
 | Phase 9 (world presence, go-live) | not started | | |
@@ -1365,6 +1365,86 @@ high, golden f017045f unchanged, tree clean.
 
 Merge: b4632b8c54 into feature/farming-plan (--no-ff, ten phase commits,
 branch fix/farming-phase-07-render-and-juice deleted).
+
+### Phase 7 QA (2026-08-14, PASS-WITH-FOLLOWUPS)
+
+Branch fix/farming-phase-07-qa off feature/farming-plan. FOURTEENTH absorb
+FIRST (merge 20e9b6a987 of release/v0.38.0 tip 51aa4eab13: 98 commits, 225
+files, roughly 60-file farming intersection, no lockfile move; conflicts
+only the generated pending.ts, regen-resolved, and the accepted-art
+registry row, re-pointed at the CLI-re-minted portrait manifest, which the
+auto-merge had reproduced byte-identically; 4-lane release-merge-audit:
+arms/endpoints CLEAN, bindings CLEAN, overlaps and premises FINDINGS, all
+healed in-branch; count pins re-run live and unchanged, golden f017045f
+unchanged, tsc clean). The release's cheater-mark growth broke the hud.ts
+and server/game.ts monolith ceilings on the merged tree with no farming
+change at all (the third absorb-driven collision); healed by extraction
+a3b5ea431b: both HEAVY_SELF policy sets whole to server/heavy_self.ts and
+the castDisplayName mapper with its rift key table to
+src/ui/cast_display_name.ts, membership pins in
+tests/server/heavy_self.test.ts, ceilings untouched per the (an)
+precedent. Premise corrections committed as d7bc896b37 (state.md header
+and headroom numbers, the manifest-freshness gate family, phase 8/9/10
+notes).
+
+Audit: 7-lane Workflow (three audit lanes with the correctness lane
+driving the REAL dev client headless on the LOW preset, plus
+frontend-seam, architecture, cross-platform-sync, and qa-checklist),
+7/7 delivered first try, zero report-less deaths, 0 BLOCKING anywhere.
+Live verification: beds plus one compost bin at all four hubs with
+per-hub tints matched programmatically to FARM_BIOME_PALETTES and on
+screen; the full stage ladder swapped meshes with crop identity visible;
+wet-band darkening (the exact 0.72 inverse) fades with age; the withered
+silhouette renders from the derived status; harvest bares the bed in
+under half a second; beds walkable, zero pageerrors. Per-viewer held at
+core and adapter level (a second live client needs the online rig this
+box lacks; said so, not assumed).
+
+FIXES, all test-first and mutation-proven (six commits on the QA branch):
+the shared GLB-instanced-prop kernel extraction 049d4e65fe (deferral (a),
+rule of three met; stations and farm adopt whole, gather_nodes documented
+out); the adapter heal 4d6ff0e21e (the ONLINE event-order race: the
+event-forced read now stays armed until it observes a change, bounded at
+one interval; cloneMaterialWithHooks on tintOne; socket-offset caching;
+the GLB-loaded branch synthetic coverage through a test-only setLoaded
+seam; the foreign-pid dirty-flag negative arm); the pin batch 02541502d5
+(heavy-self exact-set literals with the orphan guard; type-forced
+farmDenied exhaustiveness; the fairness GFX allowance scan; wet-band and
+15-model literals; the fallback-palette consumer; dedicated suites for
+the delve scheduler and castDisplayName; the farm_projection banner
+re-tensed and naming its render consumer); the fplot clock-base wire arm
+51a018147d; the residency policy note 3830308827. Mutation battery 6/6
+KILLED with named reds (dirty-set drop, throttle-gate drop, rotation.z
+clobber, accent-name literal both sides, heavy-self member drop,
+unconditional dirty clear). Exporter determinism re-proven end to end:
+the driver's candidate/repeat byte-compare passed and the in-place
+shipping rewrite left git byte-identical (174,844 bytes, fingerprint
+425f34e4 matching the committed pins).
+
+Deferral verdicts and the (ap) re-argument: recorded in the state.md
+Phase 7 QA addenda block (KEEP farmNowMs, maintainer read still owed;
+(av) prewarm-drive acceptance; the reload-regrow premise re-pointed at
+the online path with the live check moved to Phase 9 QA; the two-tier
+built fairness arm re-deferred with its structural-impossibility reason;
+releaseGltf residency verdict stated at the preload block).
+
+GATE RECORD, judged by log markers on frozen committed trees, three runs:
+run 1 FAIL at "biome (changed files)" (one format diff: stations.ts had
+missed the extraction commit's scoped format pass; healed 7be0628340);
+run 2 FAIL at the full-suite fallback's single red,
+tests/inventory_sort.test.ts "keeps 'inv_sort' in HEAVY_SELF_CMDS" (a
+game.ts source scrape dangled by the heavy-self extraction: the
+full-suite-fallback-only class again, seventh-plus strike; re-pointed as
+a direct membership read on the exported set, 2a3b7a154d); run 3
+"[gate:select] PASS: all 11 steps green", planner mode=full (the branch
+footprint includes a broad-class helper), fallback 38,546 passed / 0
+failed (2 expected-fail, 115 skipped), browser batch 125/125, malware
+scan 0 high after priors, manifest freshness green (the new family's
+first pass over farming's SFX artifacts), i18n freshness green, golden
+f017045f5fa0e85f6d740c99ea4eb225 unchanged, tree clean. Note the gate
+now runs ELEVEN steps (the fourteenth absorb added the manifest regen
+and freshness steps); the phase files' "all 8 steps" wording is
+historical per-run truth, not a stable count.
 
 ### Phase 8
 (not started)

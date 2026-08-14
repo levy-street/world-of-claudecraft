@@ -226,19 +226,21 @@ describe('selective gate planning', () => {
     },
   );
 
-  it('classifies paths into the five planner buckets', () => {
+  it('classifies paths into the six planner buckets', () => {
     const c = classifySelectPaths([
       'src/sim/sim.ts',
       'tests/threat.test.ts',
       'package.json',
       'docs/x.md',
       'src/ui/i18n.resolved.generated/en.ts',
+      'src/game/sfx_manifest.generated.ts',
     ]);
     expect(c.relatedSources).toEqual(['src/sim/sim.ts']);
     expect(c.testFiles).toEqual(['tests/threat.test.ts']);
     expect(c.broadConfigs).toEqual(['package.json']);
     expect(c.nonCode).toEqual(['docs/x.md']);
     expect(c.generatedI18n).toEqual(['src/ui/i18n.resolved.generated/en.ts']);
+    expect(c.generatedManifests).toEqual(['src/game/sfx_manifest.generated.ts']);
   });
 
   // Generated i18n artifacts: never widen while present (pr-checks and the
@@ -345,10 +347,13 @@ describe('selective gate planning', () => {
   });
 
   it('keeps every other generated tree a full-suite widen', () => {
+    // The SFX/guide/media manifests moved to the freshness-guarded family
+    // (GENERATED_MANIFEST_ARTIFACT_FILES; their arms are below), so the
+    // widen examples here are generated paths OUTSIDE both families.
     for (const p of [
-      'src/game/sfx_manifest.generated.ts',
-      'src/guide/content.generated.ts',
       'src/ui/map_bg_manifest.generated.ts',
+      'src/editor/asset_catalog.generated.ts',
+      'src/sim/thornhollow_field.generated.ts',
     ]) {
       const plan = buildSelectPlan({
         changedPaths: [p],
@@ -358,6 +363,61 @@ describe('selective gate planning', () => {
       expect(plan.mode).toBe('full');
       expect(plan.reason).toContain('broad/unclassified change');
     }
+  });
+
+  it('feeds a present manifest artifact to related without widening', () => {
+    const plan = buildSelectPlan({
+      changedPaths: [
+        'src/game/sfx_manifest.generated.ts',
+        'src/render/assets/manifest.generated.ts',
+      ],
+      alwaysRunFiles: ALWAYS,
+      exists: () => true,
+    });
+    expect(plan.mode).toBe('selective');
+    expect(plan.relatedSources).toEqual([
+      'src/game/sfx_manifest.generated.ts',
+      'src/render/assets/manifest.generated.ts',
+    ]);
+    expect(plan.reason).toContain(
+      '2 generated manifest artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('names both artifact families in one reason when a diff carries both', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/ui/i18n.resolved.generated/en.ts', 'src/game/sfx_manifest.generated.ts'],
+      alwaysRunFiles: ALWAYS,
+      exists: () => true,
+    });
+    expect(plan.mode).toBe('selective');
+    expect(plan.reason).toContain(
+      '1 generated i18n artifact(s) fed to related (freshness-guarded)',
+    );
+    expect(plan.reason).toContain(
+      '1 generated manifest artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('falls back to the FULL suite when a changed manifest is missing from the tree', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/guide/content.generated.ts'],
+      alwaysRunFiles: ALWAYS,
+      exists: (p) => p !== 'src/guide/content.generated.ts',
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('generated manifest artifact(s) removed');
+  });
+
+  it('falls back to the FULL suite when the caller cannot verify manifest existence', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/guide/content.generated.ts'],
+      alwaysRunFiles: ALWAYS,
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain(
+      'generated manifest artifact(s) changed but existence cannot be verified',
+    );
   });
 });
 

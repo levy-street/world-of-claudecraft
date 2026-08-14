@@ -2462,7 +2462,8 @@ export const cs_CZ: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "PRYČ"
+      "afkTag": "PRYČ",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -3973,6 +3974,12 @@ export const cs_CZ: EnTranslations = {
       "genesis_token_claimed": "Tento Seeker Genesis Token už byl uplatněn.",
       "entitlement_required": "Je vyžadováno ověřené oprávnění Seeker.",
       "current_ownership_required": "Je vyžadováno aktuální vlastnictví Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const cs_CZ: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Zadej platnou e-mailovou adresu.",
+    "marketingOptIn": "Chci dostávat novinky a aktualizace hry e-mailem (volitelné)",
     "showPassword": "Zobrazit heslo",
     "hidePassword": "Skrýt heslo",
     "logIn": "Přihlásit se",
@@ -6691,6 +6699,19 @@ export const cs_CZ: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetovat vzhled",
     "resetShort": "Resetovat",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Rovné",
     "browArched": "Klenuté",
     "browThin": "Tenké",

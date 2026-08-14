@@ -2769,7 +2769,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.07,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -2781,7 +2781,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8c5f8738f47b14d6552cae1dee2f65e73e948467835d4723f3f2ce7f416af6fb",
+      "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
         "bytes": 2830,
@@ -7298,7 +7298,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -7310,11 +7310,11 @@
         "resolved": "#9c640c",
         "strength": 0.12
       },
-      "sourceFingerprint": "d19ee3b2692349523e7ade48a684084ba842f30fb1c7a51507397787dc8a5030",
+      "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 2564,
-        "sha256": "54329ab570e0a0dbde0530e22955cf1dc65be72907e8894de831b2c9a504acb2"
+        "bytes": 2560,
+        "sha256": "f9cd6552c6514dc9832fff101740cacc2c021dd978e3a1b120f484c07ba1640b"
       }
     },
     {

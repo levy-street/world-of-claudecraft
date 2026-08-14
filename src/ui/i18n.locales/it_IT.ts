@@ -3032,6 +3032,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.ring': 'Dito',
   'auth.email': 'Email',
   'auth.emailError': 'Inserisci un indirizzo email valido.',
+  'auth.marketingOptIn': 'Inviami via email notizie e aggiornamenti sul gioco (facoltativo)',
   'auth.emailPlaceholder': 'tu@esempio.com',
   'auth.recovery.body':
     'Imposta un indirizzo email per poter recuperare il tuo account. Lo usiamo solo per confermare che questo account è tuo, se mai dovessi reimpostare la password.',

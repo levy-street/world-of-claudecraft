@@ -2462,7 +2462,8 @@ export const vi_VN: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "VắngMặt"
+      "afkTag": "VắngMặt",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -3973,6 +3974,12 @@ export const vi_VN: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token đó đã được nhận rồi.",
       "entitlement_required": "Cần có quyền lợi Seeker đã được xác minh.",
       "current_ownership_required": "Bạn phải đang sở hữu Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6591,6 +6598,7 @@ export const vi_VN: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "emailError": "Vui lòng nhập một địa chỉ email hợp lệ.",
+    "marketingOptIn": "Gửi cho tôi tin tức và cập nhật trò chơi qua email (tùy chọn)",
     "showPassword": "Hiện mật khẩu",
     "hidePassword": "Ẩn mật khẩu",
     "logIn": "Đăng Nhập",
@@ -6691,6 +6699,19 @@ export const vi_VN: EnTranslations = {
     "style": "Kiểu Dáng",
     "resetLook": "Đặt Lại Diện Mạo",
     "resetShort": "Đặt Lại",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Thẳng",
     "browArched": "Cong",
     "browThin": "Mảnh",

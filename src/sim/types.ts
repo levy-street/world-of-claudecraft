@@ -498,6 +498,13 @@ export type AuraKind =
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
   | 'buff_scale'
   | 'buff_jump'
+  // The operator-applied Cheater mark's countdown readout (src/sim/moderation/
+  // cheater_mark.ts). DELIBERATELY INERT: no stat fold, no combat branch, and no
+  // recalc reads it, so the sanction is visibility and never a handicap. It is a
+  // distinct kind rather than a zeroed borrow of a real debuff so that intent is
+  // unmistakable and no later tuning pass can quietly give it a mechanical
+  // effect. Classified as a debuff for the buff-bar sort only.
+  | 'cheater_mark'
   // Percent raid buffs (vanilla group-buff style). Value is stored as integer percent
   // POINTS (5 = +5%, 10 = +10%) so it survives the integer-rounding talent value
   // multiplier; divided by 100 when folded in recalcPlayerStats. Distinct from
@@ -4569,6 +4576,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
+  /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
+   *  via setCheaterMark at join restore and when an operator applies or lifts a
+   *  mark; never true offline, never user-settable. Cosmetic: nothing reads it
+   *  for power, and the countdown lives on the mark's own aura. */
+  cheaterMark?: boolean;
   /** True for a mob spawned BY a delve affix (e.g. Restless Graves' Raised
    *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
    *  own death can never re-trigger the same affix (would otherwise chain forever). */

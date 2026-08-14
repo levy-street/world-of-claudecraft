@@ -7,7 +7,10 @@ function randomVisitorId(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-function visitorId(): string {
+/** The stable per-browser visitor id (get-or-create). Exported so signup
+ *  attribution (src/attribution.ts) can link the pre-signup web session to
+ *  the created account; storage-unavailable degrades to an ephemeral id. */
+export function visitorId(): string {
   try {
     const existing = localStorage.getItem(STORAGE_KEY);
     if (existing) return existing;

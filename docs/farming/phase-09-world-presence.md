@@ -20,9 +20,12 @@ V0.38.0 SYNC NOTE (2026-08-13, Phase 6b): the release's map marker overhaul move
 quest marker TOOLTIPS into src/ui/map_marker_tooltip_adapter.ts (the quest_targets
 recipe below still holds at the sim level, but the marker/tooltip wiring details must
 be re-derived from the merged tree, the phase-08 correction's marker family). Also
-note deviation (an) in state.md: server/game.ts and hud.ts sit at near-zero
-monolith-ratchet headroom, so this phase's NPC/vendor/quest wiring lands in sibling
-modules (the server/farming_commands.ts precedent) from the start.
+note deviation (an) in state.md: coordinator headroom is absorb-eroded (the
+fourteenth absorb broke the hud.ts and server/game.ts ceilings from release growth
+alone, healed by extraction; post-heal headroom lives in state.md's (an) standing
+warning), so this phase's NPC/vendor/quest wiring lands in sibling
+modules (the server/farming_commands.ts and server/heavy_self.ts precedents) from
+the start.
 
 ### Starter Prompt
 
@@ -146,7 +149,10 @@ Agent C, work orders and the wiki:
   the summed vendor sellValue), guarded by tests/professions_work_orders.test.ts.
   Keep the arithmetic comment on every row.
 - Wiki regen: npm run wiki:content; the freshness gate (tests/guide.test.ts)
-  passes; farming's page reflects the now-live loop.
+  passes; farming's page reflects the now-live loop. Since the fourteenth
+  absorb the gate ALSO freshness-diffs src/guide/content.generated.ts in its
+  manifest-freshness step (state.md validation matrix), so commit the regen
+  in the same change, always.
 
 Orchestrator-owned, AFTER the agents' work is integrated:
 - The deliberate NPC parity golden regen (D23): static NPCs shift the world-ctor
@@ -194,7 +200,9 @@ Run, in order:
   tests/architecture.test.ts plus the quest suites the Explore summary named
 - The parity verify-then-regen sequence for the NPC id shift (verify mechanical,
   regen isolated, re-run npx vitest run tests/parity green)
-- npm run wiki:content, then the freshness gate (tests/guide.test.ts)
+- npm run wiki:content, then the freshness gate (tests/guide.test.ts; the gate's
+  manifest-freshness step also diffs content.generated.ts since the fourteenth
+  absorb, so the regen must be committed)
 - npm run ci:changed
 Then run git diff --name-only against the phase-start commit and dispatch ONLY the
 matching rows per the Review Dispatch Matrix in docs/farming/implementation-plan.md.

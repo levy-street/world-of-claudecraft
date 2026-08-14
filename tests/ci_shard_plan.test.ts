@@ -15,6 +15,7 @@ import {
   collectedLaneFiles,
   FLOOR_SANITY_MIN,
   parseShardArg,
+  resolveWorkerCount,
 } from '../scripts/lib/ci_shard_plan.mjs';
 import { collectSuiteVisibility } from '../scripts/lib/gate_discovery.mjs';
 
@@ -51,6 +52,35 @@ describe('parseShardArg', () => {
     [[], null],
   ])('%j -> %j', (argv, expected) => {
     expect(parseShardArg(argv as string[])).toEqual(expected);
+  });
+});
+
+describe('resolveWorkerCount', () => {
+  // The half-cores default is the MEASURED ruling (run 31107474546; the
+  // entry's comment); WOC_TEST_WORKERS is its sanctioned trial knob. Every
+  // rejected shape falls back to the ruling value with source 'invalid' so
+  // the entry reports it, and a bad value can never mean fewer tests, only
+  // the calibrated worker bound.
+  it.each([
+    [4, undefined, { workers: 2, source: 'default' }],
+    [4, '', { workers: 2, source: 'default' }],
+    [4, '3', { workers: 3, source: 'env' }],
+    [4, '1', { workers: 1, source: 'env' }],
+    [4, '4', { workers: 4, source: 'env' }],
+    [4, '5', { workers: 2, source: 'invalid' }],
+    [4, '0', { workers: 2, source: 'invalid' }],
+    [4, '-2', { workers: 2, source: 'invalid' }],
+    [4, '2.5', { workers: 2, source: 'invalid' }],
+    [4, '03', { workers: 2, source: 'invalid' }],
+    [4, ' 3', { workers: 2, source: 'invalid' }],
+    [4, 'banana', { workers: 2, source: 'invalid' }],
+    [1, undefined, { workers: 1, source: 'default' }],
+    [1, '1', { workers: 1, source: 'env' }],
+    [1, '2', { workers: 1, source: 'invalid' }],
+  ])('cores=%j env=%j -> %j', (cores, envValue, expected) => {
+    expect(resolveWorkerCount({ cores, envValue: envValue as string | undefined })).toEqual(
+      expected,
+    );
   });
 });
 
@@ -241,10 +271,24 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
         changedPaths: ['src/ui/i18n.resolved.generated/da_DK.ts'],
         exists: (p: string) => p !== 'src/ui/i18n.resolved.generated/da_DK.ts',
       },
+      'generated i18n artifact(s) missing from the tree',
     ],
-  ])('%s falls back to the full leg', (_label, overrides) => {
+    [
+      // Same doctrine, second freshness-guarded family. The reason substring
+      // proves THIS family's guard fired: with the family emptied the path
+      // would fall back through broadConfigs instead and this row would pass
+      // for the wrong reason (audit finding).
+      'generated manifest artifact missing from the tree',
+      {
+        changedPaths: ['src/game/sfx_manifest.generated.ts'],
+        exists: (p: string) => p !== 'src/game/sfx_manifest.generated.ts',
+      },
+      'generated manifest artifact(s) missing from the tree',
+    ],
+  ])('%s falls back to the full leg', (_label, overrides, reasonContains?: string) => {
     const plan = buildShardPlan({ ...BASE, ...overrides });
     expect(plan.mode).toBe('full');
+    if (reasonContains) expect(plan.reason).toContain(reasonContains);
     expect(plan.legs).toEqual([
       {
         name: 'npm test (full suite, shard 3/8)',
@@ -269,6 +313,20 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
     expect(related?.args).toContain('src/ui/unit_portrait.ts');
     expect(related?.args).toContain('src/ui/i18n.resolved.generated/da_DK.ts');
     expect(plan.relatedCount).toBe(2);
+  });
+
+  it('keeps a PRESENT generated manifest artifact selective and IN the related leg', () => {
+    // Second freshness-guarded family, same graph-node rationale: manifest
+    // consumer suites hang off the artifact side of the import graph.
+    const plan = buildShardPlan({
+      ...BASE,
+      changedPaths: ['src/render/assets/manifest.generated.ts'],
+    });
+    expect(plan.mode).toBe('selective');
+    const related = plan.legs.find((l) => l.args.includes('related'));
+    expect(related).toBeDefined();
+    expect(related?.args).toContain('src/render/assets/manifest.generated.ts');
+    expect(plan.relatedCount).toBe(1);
   });
 
   it('truncates the missing-artifact fallback reason past three entries', () => {
@@ -806,6 +864,41 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(malformed.exitCode).toBe(1);
   });
 
+  it('honors a valid WOC_TEST_WORKERS and reports the source in the job log', async () => {
+    // The entry, not just the resolver: the ci.yml trial env line only works
+    // if the spawned entry reads it. workers=1 is valid on every core count,
+    // so this arm is machine-independent.
+    const run = await runEntry(['--shard=1/8', '--plan-only'], {
+      TEST_MODE: 'full',
+      WOC_TEST_WORKERS: '1',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('shard 1/8, workers=1 (WOC_TEST_WORKERS)');
+    // \b so a --maxWorkers=10..19 from a wide-cores regression cannot satisfy
+    // a bare prefix match.
+    expect(run.log).toMatch(/--maxWorkers=1\b/);
+  });
+
+  it('falls back loudly to the measured default on a junk WOC_TEST_WORKERS', async () => {
+    const fallback = Math.max(1, Math.floor(os.availableParallelism() / 2));
+    // GITHUB_ACTIONS gates the ::warning (same idiom as the leg runner's
+    // known-flake annotation): set it so the annotation arm is exercised; a
+    // local repro without it prints only the plain log line.
+    const run = await runEntry(['--shard=1/8', '--plan-only'], {
+      TEST_MODE: 'full',
+      WOC_TEST_WORKERS: 'banana',
+      GITHUB_ACTIONS: 'true',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('WOC_TEST_WORKERS="banana" is not an integer');
+    expect(run.log).toContain('::warning title=ci-shard invalid WOC_TEST_WORKERS::');
+    // The ` (default)` suffix bounds the number AND names the arm; the
+    // honored marker must be absent (its positive control is the sibling
+    // test above).
+    expect(run.log).toContain(`shard 1/8, workers=${fallback} (default)`);
+    expect(run.log).not.toContain('(WOC_TEST_WORKERS)');
+  });
+
   it('fails loud on an unknown lane or an ambiguous lane-plus-shard spec', async () => {
     const unknown = await runEntry(['--lane=bogus', '--plan-only'], {});
     expect(unknown.exitCode).toBe(1);
@@ -848,13 +941,16 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
       expect(run.log).toContain('plan: mode=full (mode=full from the changes job)');
       for (const f of CI_LONG_SUITE_HALVES[half]) expect(run.log).toContain(f);
       expect(run.log).not.toContain('--shard=');
-      // The lane keeps the half-cores bound, a MEASURED decision (see the
-      // entry's comment: the full-core trial in run 31107474546 inflated the
-      // sims' aggregate CPU time ~1.6x through contention and timed out the
-      // eastbrook sweep). Pinned so neither direction changes silently: the
-      // budgets are calibrated against this bound.
+      // This pins the resolver DEFAULT: runEntry spawns with a scrubbed env,
+      // so the assertion holds even inside a CI job that exports
+      // WOC_TEST_WORKERS (the lane's real CI worker count is pinned in
+      // tests/ci_workflow.test.ts). The default is the half-cores MEASURED
+      // ruling (the full-core trial in run 31107474546 inflated the sims'
+      // aggregate CPU time ~1.6x through contention and timed out the
+      // eastbrook sweep); the budgets are calibrated against this bound, and
+      // the ` (default)` suffix proves no env override leaked in.
       expect(run.log).toContain(
-        `long-sims-${half} lane, workers=${Math.max(1, Math.floor(os.availableParallelism() / 2))}`,
+        `long-sims-${half} lane, workers=${Math.max(1, Math.floor(os.availableParallelism() / 2))} (default)`,
       );
     }
     // Each half runs ITS files and none of the other's; together they cover

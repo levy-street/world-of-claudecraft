@@ -67,8 +67,27 @@ import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers
 const shell = process.platform === 'win32';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/** @param {string} cmd @param {string[]} args */
-const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
+/** @param {string} cmd @param {string[]} args
+ *  git is a real executable and must not get the .cmd shim: cmd.exe eats the
+ *  caret in resolveSelectBase's `ref^{commit}` probes, so with a shell every
+ *  base candidate "fails" to verify on Windows and the selective gate dies
+ *  before selecting anything (same fix as ci_changed.mjs). Dropping the shim
+ *  makes a spawn FAILURE reachable (Node refuses to spawn a .cmd without a
+ *  shell), so report it: the callers only see a non-zero status and would
+ *  otherwise blame the git ref, sending the operator after a base problem
+ *  that does not exist. */
+const git = (cmd, args) => {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
+  if (res.error !== undefined) {
+    console.error(`[gate:select] could not spawn ${cmd}: ${res.error.message}`);
+    return {
+      status: res.status,
+      stdout: res.stdout,
+      stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+    };
+  }
+  return res;
+};
 
 // Resolve the vitest binary directly instead of going through `npx --no-install
 // vitest`: npx still pays a real per-invocation startup cost even when it skips

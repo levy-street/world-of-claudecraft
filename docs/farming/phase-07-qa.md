@@ -124,7 +124,12 @@ Agent 3, dead code and cleanup:
 - Unused imports, types, and exports across the diff; no unresolved TODOs; naming
   consistency with the farming modules landed in Phases 1 to 6.
 - The sim import invariant: src/sim/ imports nothing from render, ui, game, or net,
-  and src/render/farm_patches.ts imports nothing from src/sim/ beyond the world_api
+  and src/render/farm_patches.ts takes its STATE reads through the world_api
+  facet only [AS LANDED: the module also legitimately imports terrainHeight
+  from ../sim/world and the SimEvent type, the standing stations.ts render
+  idiom, plus the one sanctioned farm_projection pure-function import per
+  deviation (ar); "no state read outside the facet" is the invariant, not
+  "no src/sim import"] and nothing else from src/sim/ beyond that world_api
   facet.
 - No hand-edits to generated files (media manifest, SFX manifest, runtime pack);
   regen commands reproduce them byte-identically.
