@@ -17,8 +17,8 @@
 | Phase 5 (crops and tools) | done | 2026-08-09 | 2026-08-09 |
 | Phase 5 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-09 | 2026-08-09 |
 | Phase 6 (economy hooks) | done | 2026-08-09 | 2026-08-09 |
-| Phase 6b (release sync, v0.38.0 at authoring) | not started | | |
-| Phase 6 QA | not started | | |
+| Phase 6b (release sync, v0.38.0 at authoring) | done | 2026-08-13 | 2026-08-13 |
+| Phase 6 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-13 | 2026-08-13 |
 | Phase 7 (render and juice) | not started | | |
 | Phase 7 QA | not started | | |
 | Phase 8 (Harvest Journal) | not started | | |
@@ -1157,6 +1157,79 @@ Notes (the phase report):
   fee-leg id-space aliasing comment, the hudSrc rename) were all fixed in
   the same round; the optional-chained quest hook call stays as the
   deliberate crafting.ts-idiom match.
+
+### Phase 6 QA (2026-08-13, PASS-WITH-FOLLOWUPS, local-only per D22)
+
+Audit of merge 1a26881d0b (the Phase 6 economy hooks diff, 61 files,
++3205/-571), run on branch fix/farming-phase-06-qa.
+
+- PRE-FLIGHT, the TWELFTH absorb: release/v0.38.0 had moved to b08d79ef91
+  (38 commits, 120 files, 5-file farming intersection, below the D22
+  mid-phase bar), absorbed as merge 1a5d6fd5b4. Both conflicts were the
+  art evidence pair, resolved per the (al) checklist (fingerprint-only
+  portrait re-mint c447fe88, registry re-pointed, item audit verify
+  green); no lockfile move, seal runbook silent. The release lowered the
+  renderer.ts ceiling to EXACTLY its current size (13708/13708, zero
+  headroom; phase-07 premise amended in its file). Release-merge-audit
+  lane CLEAN on all five hazard axes; gate_select semantics unchanged.
+- AUDIT SHAPE: one Workflow, a context loader then 8 parallel read-only
+  lanes (correctness, test-coverage, dead-code, architecture-reviewer,
+  frontend-seam-reviewer, content-obligations-reviewer, qa-checklist,
+  release-merge-audit), budget + report-first lines baked in; 9/9
+  delivered first try, ZERO report-less deaths (first fan-out of the
+  program with no recovery round). cross-platform-sync correctly skipped
+  (no wire, event, or matcher surface in the diff).
+- VERDICT INPUTS: 0 BLOCKING anywhere. Acceptance checklist re-verified
+  against the real code by independent walks (vendor-goods-alone held on
+  every stock surface; all 25 reagent/output ids resolve; consumer rule
+  closed; dishes exactly the six-key plain-food shape; sim side provably
+  content-only, parity goldens untouched).
+- FIXED (3 commits): test(economy) 22b0ef02cd hardened the pin battery:
+  the dormancy arms' stocked universe now unions DELVE_SHOPS and
+  HEROIC_VENDOR_STOCK (the Marks-route blind spot three lanes converged
+  on), reagent ids must resolve before the priceless filter reads them,
+  a raw-sellValue no-mint bound covers all nine rows (the braise's
+  exactly-break-even shape is executable now; soup margin 2, bannock 4),
+  the tonic brews END TO END through real ticks with a short-reagent
+  refusal (the one recipe with a live faucet had no executed craft; the
+  cast completes through the casting_lifecycle tick slot, and the
+  deterministic alchemy skill grant is pinned), the (aj) fee pin gained
+  the rung-25 row (2500), and a stay-in-step arm pins catalog English to
+  ItemDef.name for the nine phase ids. fix(scripts) 719d701d66 pinned
+  pendingArtCount (39) beside liveItemCount in the item art audit and
+  gated the portrait manifest's receipt-free path on the drift
+  classifier's bookkeepingOnly verdict (tracked-file edits demand a
+  receipt again), with the second-order evidence re-mints riding along
+  (details in the state.md (al) QA paragraph). fix(ui) 05aae684f7 rewrote
+  the growth tonic hint from the live mechanic (spent at plant time,
+  forfeited if the crop withers) with all five non-Latin fills
+  re-supplied in the same change (M16), fixing the ja register and ru yo
+  nits.
+- MUTATION BATTERY (committed-first, all killed with named reds): deleted
+  fine-twin reagent (4 reds), silverleaf buyValue (4 reds across 3
+  suites), silverleaf on a DELVE counter and a dish on the HEROIC counter
+  (the pre-fix silent pair, now 1 named red each), soup sellValue bump
+  (curve + raw arms), tonic herb count (3 reds incl. the tick-driven
+  craft), a struck pending id (item_icons pair + standalone CLI red), the
+  pendingArtCount literal off by one (named CLI assert), the guard
+  tightening reverted (its new fixture arm), a catalog name drift (the
+  stay-in-step arm).
+- DEFERRALS, all ledgered with owners: (1) tonic-as-cheapest-rung-0
+  alchemy skill-up faucet, maintainer ruling owed ((ai) QA addendum);
+  (2) the 2500/10000 trainer fees on dormant rungs, maintainer ruling
+  owed ((aj) QA addendum); (3) tier-3 rung-50 domination, restated,
+  ruling still open (Phase 6 flags above); (4) the portrait bundle-hash
+  renderer/content split, the sharpened (al) maintainer read; (5) art
+  debt owner NAMED (Phase 13 asset handoff + the A4 cross-family
+  extension trigger, state.md Phase 6 entry); (6) the five-locale "frost
+  gourd" qualifier and ru Eastbrook stem stay release-time locale-pass
+  notes; (7) closure arm's merged-ALL_RECIPES derivation stays the
+  bounded, ledgered residual (a).
+- Also corrected in this round: the status table's Phase 6b row (said
+  "not started" against its own DONE block) and the stale
+  material_hint_view test title.
+
+Gate record: pending below.
 
 ### Phase 7
 (not started)

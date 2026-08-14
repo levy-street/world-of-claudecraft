@@ -601,7 +601,14 @@ question does not arise (farming has no station).
   consumers. fine_marsh_rice and fine_highland_barley remain hoe-reagent-only
   by design of the 5-slot closure (see OPEN items). ITEM_ART_PENDING re-pinned
   31 to 39 (the 8 dishes ride as art debt with pairwise-distinct procedural
-  recipes on the food radial, no pair separated by palette alone). growth_tonic
+  recipes on the food radial, no pair separated by palette alone). DEBT
+  OWNER (named in Phase 6 QA): the pending set's scheduled closer is the
+  Phase 13 asset handoff (docs/design/farming-asset-manifest.json lists
+  every debt id for the maintainer art pass); the self-clearing pins force
+  each id off the set as its art lands, and the A4 distinctness pin must be
+  EXTENDED across every procedurally-resolving id when the first debt id
+  leaves the set (today it discriminates only within the pending family).
+  growth_tonic
   joined MATERIAL_HINT_KEYS (the exact-set pin re-minted deliberately): a
   recipe output must render purpose text and its junk kind has no def-level
   use line. No new deeds (dishes are not conquerable content).
@@ -872,6 +879,17 @@ question does not arise (farming has no station).
   Crafting it early is a strict gold loss (output 6 under input 20), so no
   exploit window opens. The dishes keep the stronger property (farm produce
   nobody can grow); the arm asserts unstocked-ness, never uncraftability.
+  QA ADDENDUM (Phase 6 QA, 2026-08-13, RULING OWED): the gold-loss argument
+  above weighs only copper; the tonic is ALSO the cheapest rung-0 alchemy
+  SKILL-UP craft in the game (silverleaf x2 + vial, under the shipped
+  rung-0 rows at herbs x3-x4 + extras), so alchemy leveling gains a
+  strictly cheaper mat path live today, which is a real pre-go-live
+  behavior change the dormancy ruling never considered. Maintainer call:
+  raise the herb count to the shipped floor, or accept the cheap skill-up
+  faucet and record the intent here; the reagent literals are pinned either
+  way, so either ruling is a visible edit. The tonic craft path itself is
+  now executed end to end through real ticks (tests/farm_recipes.test.ts),
+  including the deterministic alchemy skill grant.
   (aj) all nine FARM_RECIPES rows are TRAINABLE in the live game before
   go-live, deliberately: the binding Live-surface note wants the recipes
   visible in the crafting window while the farm is dormant, trainer
@@ -883,6 +901,13 @@ question does not arise (farming has no station).
   and FREE per the settled R8 fee curve's tier-0 point, the rung-50 platter
   resolves ok charging 10000) so a future availability gate cannot land
   silently. Maintainer flag rides the FARM_RECIPES header.
+  QA ADDENDUM (Phase 6 QA, 2026-08-13, RULING OWED): the (aj) ruling covers
+  trainability, not the FEE dimension: the rung-25 and rung-50 rows charge
+  2500 and 10000 copper (both now pinned) for recipes that cannot be
+  crafted until Phase 9, a non-refundable spend on a dormant capability
+  with no trainer-list signal, and the garden_hoe precedent it extends was
+  a usable item. Maintainer call: gate the priced rungs to go-live, or
+  record the early fee as accepted cost here.
   (ak) the crafted-tooltip provenance partition (tests/item_instance_tooltip
   .test.ts, "every crafted recipe output resolves to a crafted-kind def")
   gained its ONE sanctioned exception: growth_tonic is a crafted output that
@@ -959,6 +984,42 @@ question does not arise (farming has no station).
   run (catalog sha 731bc17b, the merged lib self-hash; renderer fingerprint
   f748b74e, the branch value, because the release never touched the item
   renderer).
+  PHASE 6 QA ROUND (2026-08-13; the TWELFTH absorb plus two guard
+  extensions, commits on fix/farming-phase-06-qa): the QA pre-flight
+  absorbed release/v0.38.0 tip b08d79ef91 as merge 1a5d6fd5b4 (38 commits,
+  120 files, 5-file farming intersection, below the D22 mid-phase bar; NO
+  lockfile move, so the seal runbook did not fire). The only conflicts were
+  the two art evidence files, resolved exactly per this checklist
+  (fingerprint-only portrait re-mint, registry re-pointed); the release
+  delta also lowered the renderer.ts monolith ceiling 13764 to 13708 via
+  its own fire_light_registry extraction, leaving renderer.ts at EXACTLY
+  its ceiling (see the phase-07 sync note), and reworked CI selection
+  plumbing without changing scripts/gate_select.mjs semantics or its FAIL
+  markers. Release-merge-audit lane: CLEAN on all five hazard axes.
+  GUARD EXTENSIONS (commit 719d701d66): (1) the item art audit's expected
+  block now pins pendingArtCount (39) beside the ART-SUBJECT liveItemCount,
+  so a standalone audit run reds when the debt grows even though the
+  subtraction leaves liveItemCount unmoved (the structural blindness the QA
+  fan-out converged on); the builder test proves the mismatch arm both
+  directions. (2) the portrait manifest's receipt-free refresh now requires
+  describeManifestDrift's own bookkeepingOnly verdict (bundle-only drift:
+  rows, tracked renderer files, bootstrap review, and row set all intact),
+  so an edit to the stills renderer scripts demands a rendered receipt
+  again. SHARPENED RESIDUAL for the owed (al) maintainer read: a
+  pixel-affecting src/render edit inside the stills bundle is still
+  indistinguishable from content churn in the single bundle digest;
+  splitting the bundle hash into renderer-code and content-graph halves is
+  the open call. QA-round evidence re-mints, superseding the
+  eleventh-absorb literals above: the audit lib self-hash moved with
+  extension (1) (renderer fingerprint 84410592, catalog sha a6918c8d,
+  verdict re-minted through --refresh-verdict, bytes preserved 107997, new
+  digest acc3cd10), and the portrait manifest was re-minted fingerprint-only
+  for a recipes.ts comment reword (c6fd6b24, adopted receipt-free by the
+  tightened guard itself, the live proof of its bookkeeping path); both
+  registries re-pointed. ABSORB CHECKLIST ADDITION: the release added
+  tests/suite_duration_budget.test.ts (a declared per-suite duration
+  ratchet); any future farming phase adding a slow suite declares its
+  budget there in the same change.
   (am) The farming_session parity golden was deliberately re-minted at the
   v0.38.0 sync (commit ddb718b95e), the ONE golden move of the phase and the
   mirror of D23's own recipe: the release samples the new Reliquary block

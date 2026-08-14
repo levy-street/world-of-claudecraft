@@ -27,6 +27,19 @@ release's monolith ratchet leaves renderer.ts and hud.ts near their ceilings, so
 every new render block lands as its own src/render/<thing>.ts module from the start
 (which this phase already planned).
 
+PHASE 6 QA AMENDMENT (2026-08-13, after the twelfth absorb b08d79ef91): the
+headroom premise above is now SHARPER than "near". renderer.ts sits at EXACTLY
+its ceiling (13708/13708, zero lines) because the release extracted
+fire_light_registry and lowered the ceiling to match, so this phase cannot add
+even the import and call-site lines its sibling-module adapters need without
+planning a compensating renderer.ts extraction UP FRONT. The release also
+reworked render again since the 6b snapshot: the day/night system was
+overhauled (longer cycle, moon phases, night ambient floor in day_night_core,
+far-terrain night dim), a point-light budget seam and adaptive shader pacing
+landed, and RENDER_PURE_CORES gained five entries. The Explore step reads the
+current tree, so treat the 6b-era "renderer.ts was reworked" anchor as stale
+rather than authoritative.
+
 ### Starter Prompt
 
 ```
