@@ -47,11 +47,8 @@ import {
   resolveFarmPlotVisual,
 } from './farm_patches_core';
 import { surfaceMat } from './gfx';
-import {
-  addInstancedParts,
-  type GlbTemplatePart,
-  glbTemplateParts,
-} from './glb_instanced_props';
+import { addInstancedParts, type GlbTemplatePart, glbTemplateParts } from './glb_instanced_props';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { setRenderCategory } from './renderer_diagnostics';
 
 /**
@@ -107,6 +104,16 @@ export const farmPatchesPreloadInternalsForTest = {
   modelUrls: farmModelUrls(),
   bedUrl: FARM_BED_MODEL_URL,
   binUrl: FARM_COMPOST_BIN_MODEL_URL,
+  /** Test-only: inject a loaded scene so a Node suite can exercise the
+   *  GLB-loaded arm (the preload block above is window-gated and never runs
+   *  headless). Pair with clearLoaded() so suites cannot leak into each
+   *  other. */
+  setLoaded(url: string, scene: THREE.Group): void {
+    loadedFarmGltf.set(url, scene);
+  },
+  clearLoaded(): void {
+    loadedFarmGltf.clear();
+  },
 };
 
 // Local ground normal at (x, z), from a finite-difference terrainHeight sample.
@@ -284,11 +291,21 @@ export class FarmPatchVisuals {
   private readonly plots = new Map<string, PlotVisual>();
   private readonly seen = new Set<string>();
   private socketY = SOIL_SOCKET_FALLBACK_Y;
+  // True once socketY came from a real loaded bed GLB: from then on the Box3
+  // walk in soilSocketOffset() need not repeat on every plot create.
+  private socketYResolved = false;
   // Seeded at the interval so the very first frame reads the plot set.
   private sinceReadS = FARM_SYNC_INTERVAL_S;
-  // Set by a farm event, cleared by the read it forces: a plant or a harvest
-  // must show on the NEXT frame, not up to half a second later.
+  // Set by a farm event, cleared by the first forced read that OBSERVES a
+  // change: a plant or a harvest must show on the NEXT frame, not up to half
+  // a second later. Online the event and the fplot rows arrive as two ws
+  // messages in a fixed order (events first), so the frame between them would
+  // otherwise spend the flag on a read of the pre-change rows and the change
+  // itself would wait out the full throttle. dirtyForS bounds the arming at
+  // one interval, so a change that never arrives cannot pin the read to every
+  // frame forever.
   private dirty = false;
+  private dirtyForS = 0;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -313,18 +330,31 @@ export class FarmPatchVisuals {
    * Rows are compared FIELDWISE against the live records, never by array or
    * row identity: the Sim allocates a fresh array (and fresh rows) per read
    * while ClientWorld keeps one array until the next fplot delta, so neither
-   * === on the array nor === on a row means anything here. The steady state
-   * therefore allocates nothing at all.
+   * === on the array nor === on a row means anything here. The steady-state
+   * COMPARE therefore allocates nothing; the read itself is whatever the
+   * world's myFarmPlots getter costs (offline it projects and sorts a fresh
+   * array), which is exactly why the throttle sits in front of it.
    */
   sync(world: FarmPlotSource, dt: number): void {
     this.sinceReadS += dt;
+    if (this.dirty) this.dirtyForS += dt;
     if (!this.dirty && this.sinceReadS < FARM_SYNC_INTERVAL_S) return;
     this.sinceReadS = 0;
-    this.dirty = false;
-    this.applyPlots(world.myFarmPlots, world.farmNowMs());
+    const changed = this.applyPlots(world.myFarmPlots, world.farmNowMs());
+    // The event-forced read stays armed until it actually observes a change
+    // (see the field comment: online the changed rows ride a LATER message
+    // than the event), bounded at one interval so the normal cadence is the
+    // worst case, never a permanent per-frame read.
+    if (changed || this.dirtyForS >= FARM_SYNC_INTERVAL_S) {
+      this.dirty = false;
+      this.dirtyForS = 0;
+    }
   }
 
-  private applyPlots(plots: readonly FarmPlotView[], nowMs: number): void {
+  /** Mirrors the rows into the scene; true when any plot was created,
+   *  rebuilt, or disposed by this read. */
+  private applyPlots(plots: readonly FarmPlotView[], nowMs: number): boolean {
+    let changed = false;
     this.seen.clear();
     for (const plot of plots) {
       const seat = this.seats.get(plot.bedId);
@@ -335,13 +365,20 @@ export class FarmPatchVisuals {
       if (existing && farmPlotKeyMatches(existing, plot, nowMs)) continue;
       if (existing) this.disposePlot(plot.bedId, existing);
       this.create(plot.bedId, seat, resolveFarmPlotVisual(plot, nowMs), plot);
+      changed = true;
     }
     for (const [bedId, visual] of this.plots) {
-      if (!this.seen.has(bedId)) this.disposePlot(bedId, visual);
+      if (!this.seen.has(bedId)) {
+        this.disposePlot(bedId, visual);
+        changed = true;
+      }
     }
+    return changed;
   }
 
-  /** Per-frame writes only: the idle sway. Allocates nothing. */
+  /** Per-frame writes only: the idle sway. No per-plot allocation (the one
+   *  Map iterator per frame is the family idiom shared with the sibling
+   *  visuals). */
   update(dt: number): void {
     for (const visual of this.plots.values()) {
       if (visual.sway === 0) continue;
@@ -373,6 +410,7 @@ export class FarmPatchVisuals {
     }
     if (ev.pid !== viewerPid) return;
     this.dirty = true;
+    this.dirtyForS = 0;
     const seat = this.seats.get(ev.bedId);
     if (!seat) return;
     const at = new THREE.Vector3(seat.x, seat.y + this.socketY, seat.z);
@@ -400,10 +438,15 @@ export class FarmPatchVisuals {
     visual: FarmPlotVisual,
     plot: FarmPlotView,
   ): void {
-    // Resolved once per created plot, never per frame: the socket offset needs
-    // the loaded bed GLB, which may only have arrived after the static half
-    // was built.
-    this.socketY = soilSocketOffset();
+    // Resolved on plot creates (never per frame) until a REAL bed GLB has
+    // answered once: the socket offset needs the loaded bed, which may only
+    // arrive after the static half was built, and once it has resolved there
+    // is nothing left to re-measure (a 23-plot resync would otherwise walk
+    // the bed's Box3 23 times for the same number).
+    if (!this.socketYResolved) {
+      this.socketY = soilSocketOffset();
+      this.socketYResolved = loadedFarmGltf.has(FARM_BED_MODEL_URL);
+    }
     const group = new THREE.Group();
     group.name = `farmPlot:${bedId}`;
     group.position.set(seat.x, seat.y + this.socketY, seat.z);
@@ -470,7 +513,11 @@ export class FarmPatchVisuals {
   ): THREE.Material {
     const colored = src as THREE.MeshStandardMaterial;
     if (!colored.color) return src;
-    const clone = src.clone() as THREE.MeshStandardMaterial;
+    // The hook-preserving clone, never a bare Material.clone(): clone() drops
+    // onBeforeCompile, so a bare clone of the fallback surfaceMat would lose
+    // the zone-haze layer AND link a fresh program (material_clone_hooks.ts
+    // has the whole story; castle_features.ts is the precedent).
+    const clone = cloneMaterialWithHooks(src) as THREE.MeshStandardMaterial;
     if (accent) clone.color.setHex(visual.accent);
     else clone.color.multiplyScalar(damp);
     owned.push(clone);
@@ -485,9 +532,6 @@ export class FarmPatchVisuals {
   }
 }
 
-/** The Vfx surface this module uses, narrowed to the two emitters it calls so
- *  a test can drive it without a renderer. Both go through vfx.ts, whose
- *  scaledCount IS the graphics tier shed. */
 /** The slice of IWorld this module reads, narrowed to the two farming members
  *  it needs. Taken as a WORLD rather than an array so the throttle can decide
  *  before touching myFarmPlots, which projects and sorts on every access. */
@@ -496,6 +540,9 @@ export interface FarmPlotSource {
   farmNowMs(): number;
 }
 
+/** The Vfx surface this module uses, narrowed to the two emitters it calls so
+ *  a test can drive it without a renderer. Both go through vfx.ts, whose
+ *  scaledCount IS the graphics tier shed. */
 export interface FarmVfxSink {
   burst(at: THREE.Vector3, school: string, count?: number, power?: number, color?: number): void;
   groundPuff(at: THREE.Vector3, power: number, color: number): void;
