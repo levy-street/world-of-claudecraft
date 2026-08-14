@@ -153,17 +153,16 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   seam, raid-sourced epics only (`isSunderable` over the item_level source
   index), deterministic 1:1 yield, the disenchant-style pinned-slot re-check
   at completion; draws NO rng.
-- `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
-  gates and bonuses (gather-tool tier, per-type crafting stations
-  (superseding the retired level-20 hub), town focus allocation, field
-  crafting station). Tool effects in `tools.ts` are LIVE end to end and this
-  leaf owns every DECISION: `resolveSlotToolEffect` is the one mint
-  authority (it also picks WHICH crafted charm copy the mint consumes, whose
-  signer becomes the slot's `craftedBy`) and `resolveRechargeToolEffect`
-  prices and sizes a refill (R30 fill from the tool held now, R39 material
-  identity, R47 price rung floored at the slot's own ceiling). The R9 slot
-  policy (`slotToolEffectRefused`) keeps Springback and fishing slots
-  refused until their arms have real behavior.
+- `tools.ts` / `stations.ts` / `focus.ts`: pure-leaf gates and bonuses
+  (gather-tool tier, per-type crafting stations (superseding the retired
+  level-20 hub), town focus allocation). Tool effects in `tools.ts` are LIVE
+  end to end and this leaf owns every DECISION: `resolveSlotToolEffect` is
+  the one mint authority (it also picks WHICH crafted charm copy the mint
+  consumes, whose signer becomes the slot's `craftedBy`) and
+  `resolveRechargeToolEffect` prices and sizes a refill (R30 fill from the
+  tool held now, R39 material identity, R47 price rung floored at the slot's
+  own ceiling). The R9 slot policy (`slotToolEffectRefused`) keeps Springback
+  and fishing slots refused until their arms have real behavior.
 - `tool_effect_actions.ts`: the slot and recharge COMMAND BODIES behind the
   seam (`Sim` keeps thin delegates). Everything stateful lives here and, for
   those TWO, every decision in the `tools.ts` leaf above: resolve first, then
@@ -179,6 +178,29 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   NOT route through `resolveSlotToolEffect`: it carries its own copy of the
   shared gate chain, which the same test pins tuple-for-tuple against the
   resolver so the two cannot drift.
+- `mobile_station.ts`: the field crafting station. NOT a pure leaf: it takes
+  `SimContext`, and two placement paths write the transient
+  `PlayerMeta.mobileStation` slot. `placeMobileStationForPlayer` (the IWorld
+  member and the `/dev mobilestation` cheat) places through the
+  specialization-gated pure builder `placeMobileCraftingStation`, owner-only.
+  `placeMobileStationFromItem` (the Master's Field Forge, Masterwrought phase
+  09) has NO specialization gate, because holding the item IS the credential,
+  never consumes the item, and stamps the station `partyShared`. That
+  discriminator on `MobileCraftingStation` is what the party arm of the
+  crafting station gate reads: `partySharedStationSatisfies` walks the OTHER
+  party members for an ACTIVE partyShared station matching
+  `stationTypeForCraft` within a squared-distance STATION_RADIUS, while the
+  owner's own station still satisfies at ANY distance.
+  `activeMobileStationCraftsForViewer` is the per-viewer resolver behind the
+  `mst` snapshot delta: the deduped, sorted set of every craft a station
+  serves the viewer, so the crafting-window rows mirror the craft gate rather
+  than shadowing a shared craft behind the viewer's own. Both ride the ONE
+  private party walk (`eachPartyStationInRange`), so the gate's deny and the
+  row set cannot drift; the station-TYPE filter deliberately stays out of the
+  walk (the gate layers it per craft, the resolver leaves it to
+  `inRangeStationTypes` on the consumer side). Its one
+  player-visible emit is the placement log line (matched by `log.placeStation`
+  in `src/ui/sim_i18n.ts`); draws NO rng.
 - `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
   water gated by the WATER's zone) the cast gate and the vendor rows read;
   since R19 the SAME column also caps how far each water teaches
