@@ -2349,6 +2349,34 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'toolEffect', effectId: 'makers_charm' },
     sellValue: 150,
   },
+  grand_cauldron: {
+    id: 'grand_cauldron',
+    name: 'Grand Cauldron',
+    kind: 'tool',
+    quality: 'epic',
+    // The alchemy skill-125 capstone placement: pure masters_field_forge
+    // reuse, no new machinery. stationCraftId is a CRAFT id, so
+    // stationTypeForCraft('alchemy') resolves the APOTHECARY, and the tool
+    // inherits the shared party radius, the 10-minute duration, and the
+    // never-consumed rule from that one implementation. A player owns ONE
+    // mobile station slot, so placing this clobbers their own field forge;
+    // that is deliberate and the replace tooltip line already says so.
+    // Deliberately NOT masterwrought: a tool, never counted combat power.
+    use: { type: 'placeMobileStation', stationCraftId: 'alchemy' },
+    sellValue: 380,
+  },
+  laden_hearth: {
+    id: 'laden_hearth',
+    name: 'The Laden Hearth',
+    kind: 'tool',
+    quality: 'epic',
+    // The cooking skill-125 capstone placement, the Grand Cauldron's twin:
+    // stationTypeForCraft('cooking') resolves the KITCHENS. Same one-slot
+    // replace rule, same duration, same price, because they are the same tool
+    // pointed at a different station.
+    use: { type: 'placeMobileStation', stationCraftId: 'cooking' },
+    sellValue: 380,
+  },
 
   // --- Quartermaster's Consignment ---------------------------------------
   // A standing line of practical adventuring gear. The Merchant keeps eight

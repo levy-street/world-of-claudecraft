@@ -1,5 +1,6 @@
 // The Masterwrought apex budget sweep (born in phase 08, grew the phase 09
-// gear families): EVERY apex item authored so far has a primary stat sum
+// gear families, then the phase 10 consumables and capstones): EVERY apex item
+// authored so far has a primary stat sum
 // EQUAL to the formula budget, a pinned single-rating allocation at its
 // FAMILY band (armor 40, weapons 50, jewelry 25, held/shield 20), the
 // masterwrought flag on the counted pieces, and the R2/R12/R14 texture
@@ -9,11 +10,17 @@
 // balance (the constant-self-comparison trap: deriving expectations from
 // the same tables under test proves nothing). The two completeness arms
 // force every future masterwrought def and every apex recipe row into these
-// tables, so phase 10 APPENDS rows here in the same change that ships its
-// items.
+// tables, so a later phase APPENDS rows here in the same change that ships its
+// items. Not every apex output is FLAGGED: the bag, the tools, and the phase 10
+// consumables carry no worn power, so they are pinned in their own tables and
+// the flag's ABSENCE is part of what each of those arms asserts.
 import { describe, expect, it } from 'vitest';
 import { ARMOR_RATING, FIVE_MAN_WEAPON_RATING } from '../src/sim/content/heroic_loot';
-import { APEX_ARMOR_RECIPES, APEX_GEAR_RECIPES } from '../src/sim/content/recipes';
+import {
+  APEX_ARMOR_RECIPES,
+  APEX_CONSUMABLE_RECIPES,
+  APEX_GEAR_RECIPES,
+} from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
   primaryStatBudget,
@@ -339,23 +346,180 @@ const APEX_HELD: Record<
   },
 };
 
-// The two deliberately UNFLAGGED phase 09 outputs: tools, never counted
-// combat power, pinned the way APEX_BAG_ID is below.
+// The two uniform phase 10 consumable bills, one per craft: the consumable
+// idiom is a BATCH output off ONE of the craft's intermediate, where the gear
+// rungs take three for a single piece. Shared by all three rows of each family,
+// so a role choice is never also an economy choice.
+const FLASK_BILL: { itemId: string; count: number }[] = [
+  { itemId: 'quickening_catalyst', count: 1 },
+  { itemId: 'pristine_venom_gland', count: 1 },
+  { itemId: 'venom_gland', count: 2 },
+  { itemId: 'sunpetal_herb', count: 2 },
+  { itemId: 'glass_vial', count: 1 },
+];
+const ROLE_FOOD_BILL: { itemId: string; count: number }[] = [
+  { itemId: 'seasoned_stock', count: 1 },
+  { itemId: 'prime_cut', count: 2 },
+  { itemId: 'game_meat', count: 4 },
+  { itemId: 'sunpetal_herb', count: 2 },
+  { itemId: 'cooking_salt', count: 2 },
+];
+
+// The deliberately UNFLAGGED tool outputs: tools, never counted combat power,
+// pinned the way APEX_BAG_ID is below. The phase 09 pair came off
+// APEX_GEAR_RECIPES at skillReq 100; the phase 10 capstones off
+// APEX_CONSUMABLE_RECIPES at skillReq 125, which is why each row names its own
+// recipe array and skill rung rather than inheriting one.
 const APEX_TOOLS: Record<
   string,
-  { craft: string; use: Record<string, unknown>; sellValue: number }
+  {
+    craft: string;
+    use: Record<string, unknown>;
+    sellValue: number;
+    recipes: typeof APEX_GEAR_RECIPES;
+    skillReq: number;
+    stationType: string;
+    reagents: { itemId: string; count: number }[];
+  }
 > = {
   masters_field_forge: {
     craft: 'engineering',
     // stationCraftId is a CRAFT id (stationTypeForCraft resolves 'forge').
     use: { type: 'placeMobileStation', stationCraftId: 'weaponcrafting' },
     sellValue: 380,
+    recipes: APEX_GEAR_RECIPES,
+    skillReq: 100,
+    stationType: 'toolworks',
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
   },
   makers_charm: {
     craft: 'engineering',
     // Effect id EQUALS the item id (one identity across mint and slot).
     use: { type: 'toolEffect', effectId: 'makers_charm' },
     sellValue: 150,
+    recipes: APEX_GEAR_RECIPES,
+    skillReq: 100,
+    stationType: 'toolworks',
+    reagents: [
+      { itemId: 'precision_chassis', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'thorium_ore', count: 2 },
+    ],
+  },
+  // The phase 10 capstones: pure mobile_station family reuse, one rung above
+  // everything else in the game. stationCraftId is again a CRAFT id, so
+  // stationTypeForCraft resolves apothecary and kitchens respectively.
+  grand_cauldron: {
+    craft: 'alchemy',
+    use: { type: 'placeMobileStation', stationCraftId: 'alchemy' },
+    sellValue: 380,
+    recipes: APEX_CONSUMABLE_RECIPES,
+    skillReq: 125,
+    stationType: 'apothecary',
+    reagents: [
+      { itemId: 'quickening_catalyst', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'sunpetal_herb', count: 4 },
+      { itemId: 'goldleaf_herb', count: 2 },
+    ],
+  },
+  laden_hearth: {
+    craft: 'cooking',
+    use: { type: 'placeMobileStation', stationCraftId: 'cooking' },
+    sellValue: 380,
+    recipes: APEX_CONSUMABLE_RECIPES,
+    skillReq: 125,
+    stationType: 'kitchens',
+    reagents: [
+      { itemId: 'seasoned_stock', count: 3 },
+      { itemId: 'wyrmfall_core', count: 2 },
+      { itemId: 'prime_cut', count: 4 },
+      { itemId: 'game_meat', count: 4 },
+      { itemId: 'sunpetal_herb', count: 2 },
+    ],
+  },
+};
+
+// The phase 10 apex CONSUMABLES: the alchemy flasks and the cooking role
+// foods. Unflagged like the tools and the bag (a consumable is not worn power),
+// so they are pinned here rather than in the flagged family tables. Values are
+// literal for the same reason every table above is: a retune must red here.
+const APEX_CONSUMABLES: Record<
+  string,
+  {
+    craft: string;
+    kind: string;
+    resultCount: number;
+    stationType: string;
+    sellValue: number;
+    // The flask payload (kind 'flask') or the wellFed payload (kind 'food').
+    effect: { aura: string; kind: string; value: number; duration: number };
+    foodHp?: number;
+    reagents: { itemId: string; count: number }[];
+  }
+> = {
+  ironhusk_flask: {
+    craft: 'alchemy',
+    kind: 'flask',
+    resultCount: 2,
+    stationType: 'apothecary',
+    sellValue: 25,
+    effect: { aura: 'Ironhusk Vigor', kind: 'buff_sta', value: 15, duration: 1200 },
+    reagents: FLASK_BILL,
+  },
+  warboar_flask: {
+    craft: 'alchemy',
+    kind: 'flask',
+    resultCount: 2,
+    stationType: 'apothecary',
+    sellValue: 25,
+    effect: { aura: 'Warboar Might', kind: 'buff_ap', value: 15, duration: 1200 },
+    reagents: FLASK_BILL,
+  },
+  runewater_flask: {
+    craft: 'alchemy',
+    kind: 'flask',
+    resultCount: 2,
+    stationType: 'apothecary',
+    sellValue: 25,
+    effect: { aura: 'Runewater Clarity', kind: 'buff_int', value: 15, duration: 1200 },
+    reagents: FLASK_BILL,
+  },
+  stonepot_stew: {
+    craft: 'cooking',
+    kind: 'food',
+    resultCount: 4,
+    stationType: 'kitchens',
+    sellValue: 90,
+    effect: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 600 },
+    foodHp: 1392,
+    reagents: ROLE_FOOD_BILL,
+  },
+  warspice_skewers: {
+    craft: 'cooking',
+    kind: 'food',
+    resultCount: 4,
+    stationType: 'kitchens',
+    sellValue: 90,
+    effect: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 600 },
+    foodHp: 1392,
+    reagents: ROLE_FOOD_BILL,
+  },
+  sageleaf_chowder: {
+    craft: 'cooking',
+    kind: 'food',
+    resultCount: 4,
+    stationType: 'kitchens',
+    sellValue: 90,
+    effect: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 600 },
+    foodHp: 1392,
+    reagents: ROLE_FOOD_BILL,
   },
 };
 
@@ -436,6 +600,21 @@ const ALLOWED_SHIELD_KEYS = new Set([
 const ALLOWED_JEWELRY_KEYS = new Set(APEX_BASE_KEYS);
 const ALLOWED_HELD_KEYS = new Set([...APEX_BASE_KEYS, 'requiredClass']);
 const ALLOWED_TOOL_KEYS = new Set(['id', 'name', 'kind', 'quality', 'use', 'sellValue']);
+// The consumable families' own whole-def whitelists, the same review-moment
+// device. A flask carries its effect payload under `elixir` (the shipped family
+// field it deliberately reuses); a role food carries the sit-down restore plus
+// the separate `wellFed` payload. Neither may grow a stat line, a rating, a
+// bind, or a market ban without being admitted here.
+const ALLOWED_FLASK_KEYS = new Set(['id', 'name', 'kind', 'quality', 'elixir', 'sellValue']);
+const ALLOWED_ROLE_FOOD_KEYS = new Set([
+  'id',
+  'name',
+  'kind',
+  'quality',
+  'foodHp',
+  'wellFed',
+  'sellValue',
+]);
 
 // Shared per-family pins. Helpers rather than one mega it.each so each family
 // block keeps its own band constants and shape laws readable in place.
@@ -490,6 +669,32 @@ function expectGearRecipe(id: string, craft: string): void {
   expect(recipe?.oncePerDay).toBeUndefined();
 }
 
+// The phase 10 rows do NOT go through expectGearRecipe: that helper hard-codes
+// skillReq 100, resultCount 1, and the per-craft GEAR bill, and every one of
+// those is deliberately different here (a batch output, a one-intermediate
+// bill, and for the capstones the 125 rung). A sibling helper rather than a
+// widened one, so neither shape can drift into the other's pins.
+function expectConsumableRecipe(
+  id: string,
+  row: { craft: string; resultCount: number; stationType: string; reagents: unknown },
+  skillReq: number,
+): void {
+  const recipe = APEX_CONSUMABLE_RECIPES.find((r) => r.resultItemId === id);
+  expect(recipe, `${id} recipe`).toBeTruthy();
+  expect(recipe?.id).toBe(`recipe_${id}`);
+  expect(recipe?.professionId).toBe(row.craft);
+  expect(recipe?.skillReq).toBe(skillReq);
+  expect(recipe?.level).toBe(25);
+  expect(recipe?.itemLevelBudget).toBe(25);
+  expect(recipe?.resultCount).toBe(row.resultCount);
+  expect(recipe?.acquisition).toEqual(['drop']);
+  expect(recipe?.stationType).toBe(row.stationType);
+  expect(recipe?.reagents).toEqual(row.reagents);
+  // No daily gate spelled on the row itself. The flask chain is still paced
+  // daily, TRANSITIVELY, through recipe_quickening_catalyst's own oncePerDay.
+  expect(recipe?.oncePerDay).toBeUndefined();
+}
+
 describe('masterwrought apex budget sweep', () => {
   it('the EXPECTED tables cover exactly the flagged defs (phase 10 appends here)', () => {
     // R6 note: this sweep pins the DEFS; the counted-family cap interplay
@@ -505,9 +710,26 @@ describe('masterwrought apex budget sweep', () => {
     expect(flagged).toEqual([...FLAGGED_TABLE_IDS].sort());
   });
 
-  it('every apex recipe output is in a table, plus the unflagged bag and tools', () => {
-    const outputs = [...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES].map((r) => r.resultItemId).sort();
-    expect(outputs).toEqual([...FLAGGED_TABLE_IDS, APEX_BAG_ID, ...Object.keys(APEX_TOOLS)].sort());
+  it('every apex recipe output is in a table, plus the unflagged bag, tools, and consumables', () => {
+    // The union runs over ALL THREE apex arrays against ALL the tables that
+    // claim an output, so a new apex row is forced into a table here in the
+    // change that ships it. The right-hand side is deliberately the whole
+    // census, flagged and unflagged alike: the flagged families are counted
+    // combat power, while the bag, the tools, and the phase 10 consumables are
+    // apex outputs that carry no worn power and so live outside the flag. An
+    // output belonging to no table (or a table naming an id nothing crafts)
+    // fails the equality in whichever direction the mistake was made.
+    const outputs = [...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES, ...APEX_CONSUMABLE_RECIPES]
+      .map((r) => r.resultItemId)
+      .sort();
+    expect(outputs).toEqual(
+      [
+        ...FLAGGED_TABLE_IDS,
+        APEX_BAG_ID,
+        ...Object.keys(APEX_TOOLS),
+        ...Object.keys(APEX_CONSUMABLES),
+      ].sort(),
+    );
   });
 
   it.each(Object.entries(APEX_ARMOR))('%s: budget, rating, armor, and texture', (id, row) => {
@@ -891,14 +1113,132 @@ describe('masterwrought apex budget sweep', () => {
     for (const key of Object.keys(def)) {
       expect(ALLOWED_TOOL_KEYS.has(key), `${id} carries unexpected field ${key}`).toBe(true);
     }
-    expectGearRecipe(id, row.craft);
+    // Each tool names its own array and rung, so the phase 09 pair keeps the
+    // gear-recipe shape while the phase 10 capstones are checked at 125.
+    const recipe = row.recipes.find((r) => r.resultItemId === id);
+    expect(recipe, `${id} recipe`).toBeTruthy();
+    expect(recipe?.id).toBe(`recipe_${id}`);
+    expect(recipe?.professionId).toBe(row.craft);
+    expect(recipe?.skillReq).toBe(row.skillReq);
+    expect(recipe?.level).toBe(25);
+    expect(recipe?.itemLevelBudget).toBe(25);
+    expect(recipe?.resultCount).toBe(1);
+    expect(recipe?.acquisition).toEqual(['drop']);
+    expect(recipe?.stationType).toBe(row.stationType);
+    expect(recipe?.reagents).toEqual(row.reagents);
+    expect(recipe?.oncePerDay).toBeUndefined();
+  });
+
+  it.each(Object.entries(APEX_CONSUMABLES))(
+    '%s: unflagged consumable, epic, tradable, payload and recipe pinned',
+    (id, row) => {
+      const def = ITEMS[id] as ItemDef & Record<string, unknown>;
+      expect(def, `${id} must exist in the merged table`).toBeTruthy();
+      expect(def.kind).toBe(row.kind);
+      expect(def.quality).toBe('epic');
+      // The flag ABSENCE is the point, as with the bag and the tools: a
+      // consumable buff is never counted worn power, so it never competes for
+      // the masterwrought family cap.
+      expect(def.masterwrought).toBeUndefined();
+      expect(def.stats).toBeUndefined();
+      for (const field of RATING_FIELDS) expect(def[field]).toBeUndefined();
+      // Not item-level eligible (no slot, non-combat kind), and outside R12:
+      // neither kind clears the disenchant gate.
+      expect(itemLevel(def)).toBeUndefined();
+      expect(isDisenchantable(def)).toBe(false);
+      expectTradableTexture(def, row.sellValue);
+      // The effect payload pinned WHOLE, so a retuned value, kind, duration, or
+      // aura display name reds here rather than drifting past the sweep. A
+      // flask carries it under `elixir` (the reused family field); a role food
+      // under `wellFed` beside its ordinary sit-down restore.
+      if (row.kind === 'flask') {
+        expect(def.elixir).toEqual(row.effect);
+        expect(def.wellFed).toBeUndefined();
+        expect(def.foodHp).toBeUndefined();
+        for (const key of Object.keys(def)) {
+          expect(ALLOWED_FLASK_KEYS.has(key), `${id} carries unexpected field ${key}`).toBe(true);
+        }
+      } else {
+        expect(def.wellFed).toEqual(row.effect);
+        expect(def.elixir).toBeUndefined();
+        expect(def.foodHp).toBe(row.foodHp);
+        for (const key of Object.keys(def)) {
+          expect(ALLOWED_ROLE_FOOD_KEYS.has(key), `${id} carries unexpected field ${key}`).toBe(
+            true,
+          );
+        }
+      }
+      expectConsumableRecipe(id, row, 100);
+    },
+  );
+
+  it('the flasks break the elixir band ceiling deliberately, and only there', () => {
+    // The value <= 12 / duration <= 900 ceiling is the ELIXIR and SCROLL band
+    // rule (tests/inscription_scroll_exclusivity.test.ts states it there). The
+    // apex rung is meant to beat it, so this asserts the break EXPLICITLY
+    // rather than letting the flasks quietly sit outside a pin that never sees
+    // them: every flask clears both bounds, and no elixir or scroll does.
+    const flasks = Object.values(ITEMS).filter((d) => d.kind === 'flask');
+    expect(flasks.map((d) => d.id).sort()).toEqual(
+      ['ironhusk_flask', 'runewater_flask', 'warboar_flask'].sort(),
+    );
+    for (const def of flasks) {
+      expect(def.elixir!.value, `${def.id} beats the elixir value ceiling`).toBeGreaterThan(12);
+      expect(def.elixir!.duration, `${def.id} beats the elixir duration ceiling`).toBeGreaterThan(
+        900,
+      );
+    }
+    for (const def of Object.values(ITEMS)) {
+      if (def.kind !== 'elixir' && def.kind !== 'scroll') continue;
+      expect(def.elixir!.value, `${def.id} stays inside the band`).toBeLessThanOrEqual(12);
+      expect(def.elixir!.duration, `${def.id} stays inside the band`).toBeLessThanOrEqual(900);
+    }
+  });
+
+  it('the role foods clear the shipped food ceiling, and Well Fed shares one band', () => {
+    const roleFoodIds = Object.keys(APEX_CONSUMABLES).filter(
+      (id) => APEX_CONSUMABLES[id].kind === 'food',
+    );
+    for (const id of roleFoodIds) {
+      const def = ITEMS[id];
+      // Strictly above every other food in the game: 1392 is the next classic
+      // band over the shipped 980 ceiling, and this reds if anything else is
+      // ever authored at or past it without moving the apex rung too.
+      for (const other of Object.values(ITEMS)) {
+        if (other.kind !== 'food' || roleFoodIds.includes(other.id)) continue;
+        expect(other.foodHp ?? 0, `${other.id} must stay below the apex food`).toBeLessThan(
+          def.foodHp!,
+        );
+      }
+    }
+    // Resolved through the KIND narrowing rather than a cast: wellFed lives on
+    // FoodItemDef alone, so reading it requires proving the def is a food,
+    // which is the scoping this arm exists to hold.
+    const wellFedOf = (id: string) => {
+      const def = ITEMS[id];
+      if (def.kind !== 'food' || !def.wellFed) throw new Error(`${id} carries no wellFed payload`);
+      return def.wellFed;
+    };
+    // One shared entry-rung value and duration across all three roles, so the
+    // choice is which stat you carry, never how much.
+    const bands = new Set(
+      roleFoodIds.map((id) => `${wellFedOf(id).value}/${wellFedOf(id).duration}`),
+    );
+    expect(bands).toEqual(new Set(['6/600']));
+    // One shared aura display NAME too, which is what puts every role food on
+    // the single 'well_fed' exclusivity id in src/sim/combat/auras.ts.
+    expect(new Set(roleFoodIds.map((id) => wellFedOf(id).aura))).toEqual(new Set(['Well Fed']));
   });
 
   it('economy: every apex output vendors strictly below its reagent input value', () => {
     // recipe_economy.test.ts owns the invariant repo-wide; this arm keeps the
     // apex slice self-contained so a phase 09/10 row appended to the table
     // cannot ship priced above its bill even if the sweep list there drifts.
-    for (const recipe of [...APEX_ARMOR_RECIPES, ...APEX_GEAR_RECIPES]) {
+    for (const recipe of [
+      ...APEX_ARMOR_RECIPES,
+      ...APEX_GEAR_RECIPES,
+      ...APEX_CONSUMABLE_RECIPES,
+    ]) {
       const input = recipe.reagents.reduce((sum, r) => {
         const def = ITEMS[r.itemId];
         const unit =
