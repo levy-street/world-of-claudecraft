@@ -3527,6 +3527,36 @@ collapseLowest + Sell-tab price reference, repo-wide dead-code cleanup).
   only (leaves the runtime equip refusal live: crafted copies would be
   unequippable, not an option by itself). Maintainer call before the QA
   fan-out proceeds past validation.
+- SECOND MERGE-CREATED FINDING, also LEFT RED deliberately
+  (tests/rogue_dps_balance.test.ts, one test): the release's new
+  deterministic rogue DPS band suite (commit 7541d301e8) derives its
+  loadout live from bestEpicGearFor, and on the merged tree the picker
+  swaps exactly two slots in all three spec loadouts: neck
+  medallion_of_endless_profit to the branch's wyrmfall_pendant and ring2
+  architects_cornerstone to prismglass_loop. Measured on the merged tree
+  (fight-6498, three seeds): combat 199.37 (in its 195-205 band),
+  assassination 170.38 (SIXTEEN under its 180 floor AND below subtlety,
+  inverting the pinned assassination-over-subtlety ordering), subtlety
+  171.02 (in band). The suite is green at the pure release tip (verified
+  in a throwaway worktree at 70e5416fee), so this is the apex jewelry's
+  rating-heavy stat shape out-SCORING the raid pieces in the picker while
+  measuring WORSE in the real fight for assassination: the exact
+  score-vs-fight stat-shape hazard the research record flags (Lionheart /
+  Lariat class) and the first fight-DPS measurement ever taken through
+  the apex catalog. For the QA fan-out plus a maintainer call: re-shape
+  the two jewelry defs' rating allocation (a phase 05/09 catalog
+  decision), fix the picker's rating scoring, or re-cut the release band;
+  do NOT silently re-band. Feeds the R5 five-percent-envelope method for
+  phase 15: measure fights, never scores.
 - ALSO RELEASE-OWNED, new this sync: none beyond the (b) resolution note;
   (a) queue-pop forward-port still absent from v0.38.0 (verified at
   70e5416fee), (c) vendor toast and (d) ratchet hygiene stand.
+- FULL-SUITE VERDICT at the sync tip (after pnpm install --frozen-lockfile
+  resynced node_modules to the release's lockfile bump, which alone cleared
+  the two three_compile_async_patch reds): 38733 passed, 8 failed, all
+  accounted: the bags ruling red (1), the rogue band red (1), the two
+  Three.js patch checks (stale node_modules, green after reinstall), and
+  the four inscription-tome fingerprint arms (the lockfile-hash staleness
+  class from phase 07, re-minted at this sync). After the reinstall and the
+  tome re-mint the ONLY reds on this tree are the two deliberate ruling
+  reds above.

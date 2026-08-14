@@ -24,7 +24,7 @@ const REPO_ROOT = path.join(__dirname, '..');
 // source fingerprint, so the extras stamps and hashes were re-minted via
 // scripts/assets/remint_lockfile_fingerprints.mjs. Geometry is unchanged
 // (bytes, triangles, and bounds pins did not move).
-const SOURCE_FINGERPRINT = '8939987ba41667b7cf1f4422a16f584d0afb844437f18be297322021c05c2055';
+const SOURCE_FINGERPRINT = '1fa804f97e8c97ea63faefc3570a4907c3f1c023f80fc1562662217ca5cb6ef5';
 
 interface TomePin {
   itemId: string;
@@ -40,7 +40,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'silverleaf_primer',
     rootName: 'InscriptionTomeSilverleaf',
     bytes: 11_136,
-    sha256: 'b9befed5b6c3c6befb646923fde90d91c0a5e39d529a1c168341a586d6bccad8',
+    sha256: 'a671d8a3003531b660ddf239fca31cd950ff68e35226eee250bf15cb86bbd551',
     triangles: 404,
     bounds: { min: [-0.1763, -0.1, -0.0555], max: [0.163, 0.3, 0.0622] },
   },
@@ -48,7 +48,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'goldleaf_folio',
     rootName: 'InscriptionTomeGoldleaf',
     bytes: 12_948,
-    sha256: '704895ef6206c28db77d70962ddcaa8877e770422675061092c9d2ca7b2a3413',
+    sha256: 'a4af1cabc3b6ec76d6e9d2761752cd150667eb81a1dbed4a2e15b5971cd7d0b4',
     triangles: 512,
     bounds: { min: [-0.1866, -0.1668, -0.0605], max: [0.1705, 0.33, 0.0672] },
   },
@@ -56,7 +56,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'sunpetal_grimoire',
     rootName: 'InscriptionTomeSunpetal',
     bytes: 13_956,
-    sha256: '22887639e967bbe187458476ead6ff9e0fb7f6d2ce159414c3a2ad5826b9c946',
+    sha256: '8c784e21653322521ac72a10590fc1cd6e01ad2777032cd7838ed8228c3c3c43',
     triangles: 584,
     bounds: { min: [-0.2007, -0.1668, -0.068], max: [0.1805, 0.36, 0.0863] },
   },
