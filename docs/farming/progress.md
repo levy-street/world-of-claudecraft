@@ -1351,10 +1351,20 @@ Notes (surprises, deviations, deferrals with reasons):
   a crop (the load-path re-anchor preserves duration, so the sprout restart
   is FAITHFUL to authoritative state, first made visible this phase).
 
-Gate record: run 1 on the frozen committed tree, judged by log markers per
-the standing rule. See the Notes above for validation detail; suites
-1,078/1,080 green in the targeted battery (2 pre-existing skips), ci:changed
-exit 0 with warnings only.
+Gate record, judged by log markers per the standing rule, four runs on
+frozen committed trees: run 1 FAIL at changed-files biome (one late test
+edit missed its single-file format pass); run 2 FAIL at the full-suite
+fallback with the three renderer-edit evidence families (the sparse
+checkout cone coupling, the Eastbrook polish composite, the portrait
+stills bundle: the recurring fallback-only class, healed through each
+family's sanctioned re-mint, commit 393bde72a3, gate-integrity review
+PASS on the cone edit); run 3 FAIL on the one second-order accepted-art
+registry row; run 4 "[gate:select] PASS: all 8 steps green", full-suite
+fallback 38,238 passed / 0 failed, browser batch 125/125, malware scan 0
+high, golden f017045f unchanged, tree clean.
+
+Merge: b4632b8c54 into feature/farming-plan (--no-ff, ten phase commits,
+branch fix/farming-phase-07-render-and-juice deleted).
 
 ### Phase 8
 (not started)
