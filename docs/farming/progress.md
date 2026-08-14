@@ -1521,6 +1521,24 @@ Acceptance criteria, with states:
       second 1 Hz boundary silent). No other golden moved.
 - [x] tsc, the named suites, ci:changed green in-phase; gate_select run
       recorded in the notes tail.
+
+Gate record (judged by log markers per the standing rule): run one hit the
+full-suite fallback (a pre-existing branch edit to tests/helpers/
+bare_client.ts is unclassifiable) and FAILED with three REAL reds, all
+fifteenth-absorb classes the targeted runs structurally cannot see: the
+entry window-id parity pair (the journal root was in index.html only;
+play.html healed), the three r165 compileAsync patch pins (patches/ and the
+lockfile moved in the absorb while node_modules predated them; healed by
+pnpm install), and the farm-props seal family (pnpm-lock.yaml is a
+fingerprint input and the branch-only seal could not have been re-minted
+release-side; healed by the exporter's in-place rewrite, all fifteen byte
+counts preserved, sha pins re-recorded). Run two on the healed frozen tree:
+38887 passed, 2 expected-fail, 115 skipped, and exactly ONE red, the
+druid_engines 20s TEST TIMEOUT in tests/parity/coverage_c.test.ts under
+12-worker contention, the environmental flake the QA review pre-registered
+on the pre-extension tree; proven green standalone twice on the same frozen
+tree (filtered 1/1 and whole-file 20/20). Verdict: green with the one
+recorded environmental flake, the dungeon_finder-class precedent.
 - [x] Screenshots, LOW preset, desktop and mobile, committed under
       docs/screenshots/farming-phase-08/ with the five ci.yml cone rows and
       the ci_workflow literal in the same change.
