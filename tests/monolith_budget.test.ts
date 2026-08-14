@@ -57,7 +57,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/sim.ts',
-    ceiling: 12660,
+    ceiling: 12650,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -67,7 +67,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/game.ts',
-    ceiling: 10900,
+    ceiling: 10890,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

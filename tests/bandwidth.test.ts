@@ -40,7 +40,7 @@ interface RefSent {
   settled: boolean;
 }
 
-// interestLimitSq re-typed verbatim from server/game.ts.
+// interestLimitSq re-typed verbatim from server/interest_policy.ts.
 function refInterestLimitSq(e: Entity, known: boolean): number {
   if (e.kind === 'npc') {
     return known ? NPC_DROP_RADIUS * NPC_DROP_RADIUS : NPC_INTEREST_RADIUS * NPC_INTEREST_RADIUS;

@@ -422,6 +422,7 @@ import {
   completeCraftCast as completeCraftCastImpl,
   craftItem as craftItemImpl,
 } from './professions/crafting';
+import { sanitizeDailyGateLoad } from './professions/daily_gate_load';
 import {
   type ApplyEnchantResult,
   applyEnchant as applyEnchantImpl,
@@ -451,10 +452,7 @@ import {
   normalizeHobbyMemoryOnLoad,
 } from './professions/hobby_memory';
 import type { MasterworkProc } from './professions/masterwork';
-import {
-  awardWyrmfallCores as awardWyrmfallCoresImpl,
-  emberWeekAnchorOf,
-} from './professions/masterwrought_materials';
+import { awardWyrmfallCores as awardWyrmfallCoresImpl } from './professions/masterwrought_materials';
 import { applyMasteryReset, updateMasteryResetNotices } from './professions/mastery_reset';
 import {
   activeMobileStationCraftsForViewer,
@@ -858,13 +856,6 @@ const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
  *  flag; it only reaches the Reliquary's first-find provenance stamp. */
 const MOVEMENT_GRANT = { movement: true } as const;
 
-/** Live oncePerDay recipe ids, derived once from static content: the
- *  craftDaily load clamp filters saved stamps to this set (the node_persist
- *  anti-tamper doctrine). Module-level because content is immutable, so a
- *  per-load rebuild would be a constant wearing a per-load costume. */
-const ONCE_PER_DAY_RECIPE_IDS: ReadonlySet<string> = new Set(
-  ALL_RECIPES.filter((r) => r.oncePerDay).map((r) => r.id),
-);
 // OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
 // respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
 // gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
@@ -3502,79 +3493,15 @@ export class Sim {
       if (s.heroicDaily) {
         meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
       }
-      // Load hardening (migration review): a tampered or corrupt row must
-      // degrade to defaults, never throw inside addPlayer (the unloadable-
-      // character class) and never poison the gate with junk entries. A
-      // malformed emberWeekAnchor would otherwise stall the weekly grant
-      // forever: emberWeeksBetween returns 0 for unparseable input, which is
-      // indistinguishable from same-week. The clamps bound the blob too
-      // (this field is outside the professions byte ceiling, so the load
-      // clamp is what bounds it, the knownRecipes doctrine): real source
-      // tokens are short (dungeonId:difficulty, 'rift') and the live set is
-      // content-bounded near ten, so oversized junk simply drops here.
-      if (s.wyrmfallDaily) {
-        meta.wyrmfallDaily = {
-          // The date carries the same 64-char cap as the tokens: a real value
-          // is always 10 chars, and an uncapped corrupt date would re-save
-          // verbatim forever (the omission arm keeps any non-empty date).
-          date:
-            typeof s.wyrmfallDaily.date === 'string' && s.wyrmfallDaily.date.length <= 64
-              ? s.wyrmfallDaily.date
-              : '',
-          sources: new Set(
-            Array.isArray(s.wyrmfallDaily.sources)
-              ? s.wyrmfallDaily.sources
-                  .filter((x) => typeof x === 'string' && x.length <= 64)
-                  .slice(0, 32)
-              : [],
-          ),
-        };
-      }
-      // The oncePerDay craft stamp (Masterwrought phase 07): the exact clamps
-      // the wyrmfallDaily arm above applies (64-char cap on the date and on
-      // every token, 32-entry cap, type-checked), for the same reason: a
-      // tampered or corrupt row degrades here instead of throwing in
-      // addPlayer or riding back out through the save verbatim. Real recipe
-      // ids are short and the oncePerDay set is content-bounded near ten.
-      // One deliberate divergence from the sibling: this arm resets the
-      // date when the stamp set empties (below); wyrmfallDaily keeps its
-      // date, so its {date, sources: []} shape can still re-serialize (its
-      // sources carry no live-id filter, so the corner needs a tampered
-      // row there rather than a retired recipe).
-      if (s.craftDaily) {
-        // Tokens are additionally filtered to LIVE oncePerDay recipe ids
-        // (the node_persist anti-tamper doctrine: load-side, so a tampered
-        // or orphaned stamp, or one whose recipe lost the flag, drops here
-        // instead of riding the save verbatim). A date whose stamps ALL
-        // filtered away resets with them: an empty set gates nothing, and a
-        // kept date would re-serialize {date, crafted: []} forever, breaking
-        // the zero-default omission's byte-identity claim below.
-        const craftedStamps = new Set(
-          Array.isArray(s.craftDaily.crafted)
-            ? s.craftDaily.crafted
-                .filter(
-                  (x) => typeof x === 'string' && x.length <= 64 && ONCE_PER_DAY_RECIPE_IDS.has(x),
-                )
-                .slice(0, 32)
-            : [],
-        );
-        meta.craftDaily = {
-          date:
-            craftedStamps.size > 0 &&
-            typeof s.craftDaily.date === 'string' &&
-            s.craftDaily.date.length <= 64
-              ? s.craftDaily.date
-              : '',
-          crafted: craftedStamps,
-        };
-      }
-      // Normalized through the anchor parser, not stored verbatim: any
-      // unparseable or off-anchor value (corrupt row, tampered save, a future
-      // date-format change) degrades to a state the weekly grant recovers
-      // from, instead of stalling it forever (unparseable reads as same-week).
-      meta.emberWeekAnchor = emberWeekAnchorOf(
-        typeof s.emberWeekAnchor === 'string' ? s.emberWeekAnchor : '',
-      );
+      // Load hardening (migration review) for the daily/weekly gate state:
+      // the clamps and their rationale live in the extracted pure leaf
+      // professions/daily_gate_load.ts (monolith ratchet). The optional
+      // fragments mirror the save's zero-default omission, so an absent
+      // fragment keeps createPlayer's default.
+      const dailyGate = sanitizeDailyGateLoad(s);
+      if (dailyGate.wyrmfallDaily) meta.wyrmfallDaily = dailyGate.wyrmfallDaily;
+      if (dailyGate.craftDaily) meta.craftDaily = dailyGate.craftDaily;
+      meta.emberWeekAnchor = dailyGate.emberWeekAnchor;
       // The Book of Deeds. Earned days load verbatim; the legacy milestone set
       // unions into the earned map (milestone unification); renown is
       // RECOMPUTED from the earned set below (the sim is authoritative, the
