@@ -325,6 +325,17 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyX'],
   },
+  // The Harvest Journal parks on Shift+K. Its own initials are both spoken
+  // for on the shifted layer (Shift+H is Damage Meters, Shift+J is Target
+  // Buffs and Debuffs), and K is the free key next to them; bare KeyK stays
+  // the Leaderboard. Rebindable like any action.
+  {
+    id: 'harvestJournal',
+    label: 'Harvest Journal',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyK'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',

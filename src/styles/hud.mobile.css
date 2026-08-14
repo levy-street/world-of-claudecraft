@@ -4473,6 +4473,42 @@
   body.mobile-touch #professions-window .prof-list {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* The Harvest Journal on touch: inset-pinned on all four edges like the
+     professions window above, since its row list is the whole window and a
+     centered 520px card wastes a landscape phone. The .hj-body scroller is
+     the one internal scroll container; the title bar stays pinned chrome and
+     the close button keeps the shared 40px x-btn tap floor. */
+  body.mobile-touch #harvest-journal-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area; this
+       window is already inset-pinned on all four edges, so that rule would
+       double count the inset. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  /* Narrow phones stack each row into one column: the right-hand state and
+     care cells keep their full width rather than crushing the crop name. */
+  @media (max-width: 560px) {
+    body.mobile-touch .hj-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    body.mobile-touch .hj-state,
+    body.mobile-touch .hj-care {
+      grid-column: 1;
+      grid-row: auto;
+      justify-content: flex-start;
+    }
+  }
   /* The tool-effect controls' touch floors, the body.mobile-touch twin of the
      @media (pointer: coarse) rules in components.css (the map-zoom-btn idiom):
      the coarse-pointer media rule serves real devices, and this class-scoped

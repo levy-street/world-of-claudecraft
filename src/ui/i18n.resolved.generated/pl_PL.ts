@@ -64,7 +64,8 @@ export const pl_PL: EnTranslations = {
       "dungeon": "Loch",
       "difficulty": "Poziom trudności",
       "name": "Nazwa",
-      "spec": "Specjalizacja"
+      "spec": "Specjalizacja",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normalny",
@@ -150,6 +151,10 @@ export const pl_PL: EnTranslations = {
       "gather": {
         "label": "Dodaj umiejętność zbierania",
         "description": "Zwiększ poziom profesji zbierackiej."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleportuj",
@@ -3088,7 +3093,36 @@ export const pl_PL: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Tytuł",
@@ -8106,6 +8140,7 @@ export const pl_PL: EnTranslations = {
         "cooldownLockedHerb": "Zebrany łan ziół, narzędzie niedostępne",
         "station": "Stacja rzemieślnicza: {name}",
         "service": "Usługa: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Członek drużyny: {name}",
         "deadPartyMember": "Martwy członek drużyny: {name}",
         "partyMemberGeneric": "Członek drużyny",
@@ -17299,6 +17334,7 @@ export const pl_PL: EnTranslations = {
     "delveRiteShrineReedInteract": "Kapliczka Trzciny: Naciśnij F, aby jej dotknąć",
     "delveRiteShrineSkullInteract": "Kapliczka Czaszki: Naciśnij F, aby jej dotknąć",
     "mailboxName": "Skrzynka pocztowa",
-    "noticeboardName": "Tablica ogłoszeń"
+    "noticeboardName": "Tablica ogłoszeń",
+    "farmPatchName": "Garden Beds"
   }
 };

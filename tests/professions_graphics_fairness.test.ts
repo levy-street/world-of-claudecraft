@@ -37,6 +37,7 @@ import { buildGatherNodes } from '../src/render/gather_nodes';
 import { NODE_TIER_SCALE_STEP, nodeTierScale } from '../src/render/gather_nodes_lookup';
 import { GATHER_NODES } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
+import { HARVEST_JOURNAL_TICK_MS } from '../src/ui/harvest_journal_window';
 import type { FarmPlotView } from '../src/world_api/farming';
 
 // Comments stripped before scanning (the architecture-test rule): prose that
@@ -170,6 +171,32 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // The shared instanced-prop kernel is on the same actionable path since
     // the Phase 7 QA extraction.
     expectProfileFree('src/render/glb_instanced_props.ts');
+  });
+
+  it('the Harvest Journal reads no profile and no governor, and its clock is wall-clock', () => {
+    // A crop's remaining time is the number a farmer plans their session
+    // around, so the journal is ACTIONABLE end to end: the pure core, the
+    // window that paints it, and above all the CADENCE of the countdown.
+    expectProfileFree('src/ui/harvest_journal_view.ts');
+    expectProfileFree('src/ui/harvest_journal_window.ts');
+    // The tick interval is a literal wall-clock second, not a tier knob: a
+    // preset that slowed it would make a low-preset player's timer lag a
+    // high-preset player's, which is exactly the shed the invariant forbids.
+    expect(HARVEST_JOURNAL_TICK_MS).toBe(1000);
+    const window = read('src/ui/harvest_journal_window.ts');
+    expect(
+      window.includes(`, ${HARVEST_JOURNAL_TICK_MS})`) ||
+        window.includes('HARVEST_JOURNAL_TICK_MS)'),
+      'the countdown interval must be armed with the fixed constant, not a derived cadence',
+    ).toBe(true);
+  });
+
+  it('the farm-patch pin surfaces read no profile and no governor', () => {
+    // The map and minimap pins are the "where" half of the journal's promise,
+    // so the marker build and both view models are actionable the same way
+    // the countdown is: drawn on every tier, never preset-gated.
+    expectProfileFree('src/ui/minimap_markers.ts');
+    expectProfileFree('src/ui/map_window_view.ts');
   });
 
   it('the farm modules reach ./gfx ONLY for the sanctioned fallback material', () => {

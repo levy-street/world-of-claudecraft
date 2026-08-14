@@ -64,7 +64,8 @@ export const cs_CZ: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Obtížnost",
       "name": "Jméno",
-      "spec": "Specializace"
+      "spec": "Specializace",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normální",
@@ -150,6 +151,10 @@ export const cs_CZ: EnTranslations = {
       "gather": {
         "label": "Přidat sběračskou dovednost",
         "description": "Zvyš úroveň sběračského povolání."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleportovat",
@@ -3088,7 +3093,36 @@ export const cs_CZ: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titul",
@@ -8106,6 +8140,7 @@ export const cs_CZ: EnTranslations = {
         "cooldownLockedHerb": "Sesbíraný porost bylin, potřebný nástroj je uzamčený",
         "station": "Řemeslná stanice: {name}",
         "service": "Služba: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Člen skupiny: {name}",
         "deadPartyMember": "Mrtvý člen skupiny: {name}",
         "partyMemberGeneric": "Člen skupiny",
@@ -17299,6 +17334,7 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineReedInteract": "Rákosová svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
     "mailboxName": "Poštovní schránka",
-    "noticeboardName": "Vývěska"
+    "noticeboardName": "Vývěska",
+    "farmPatchName": "Garden Beds"
   }
 };

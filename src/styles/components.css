@@ -9285,6 +9285,135 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* ---------- harvest journal ---------- */
+  /* The Harvest Journal: a cold, read-only list of the caller's own planted
+     garden beds over IWorldFarming. One row per plot (crop name, bed location,
+     state, plant-time care), with a 1 Hz countdown that rewrites only the
+     .hj-time text. IDENTICAL ON EVERY GRAPHICS PRESET AND FPS TIER: a crop
+     timer is actionable information, so nothing here is preset- or tier-gated.
+     The rows ride the showcase inset-card idiom the professions sections use;
+     the two state hues are the shared success/error text tokens and never the
+     only signal (each state also says its word). */
+  #harvest-journal-window {
+    width: 520px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #harvest-journal-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #harvest-journal-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .hj-body {
+    flex: 1 1 auto;
+    min-height: 120px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .hj-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Two columns: what and where on the left, when and how tended on the
+     right. Both columns wrap rather than truncate, so a long localized crop
+     or zone name stays readable. */
+  .hj-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    gap: 2px 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  .hj-crop {
+    grid-column: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: var(--color-text-light);
+  }
+  .hj-bed {
+    grid-column: 1;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .hj-state {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+  .hj-time {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+  }
+  .hj-ready .hj-time {
+    color: var(--color-text-success);
+  }
+  .hj-withered .hj-time {
+    color: var(--color-text-error);
+  }
+  .hj-stage {
+    font-size: 11px;
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+    color: var(--gold-dim);
+  }
+  .hj-care {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .hj-care-chip {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: var(--color-bg-input);
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .hj-care-none {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .hj-empty {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 14px;
+    text-align: center;
+  }
+  .hj-empty h3 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+    color: var(--gold);
+  }
+  .hj-empty p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
   /* The quest log, mailbox, social panel, and spellbook adopt the shared
      window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the

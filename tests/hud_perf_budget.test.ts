@@ -835,6 +835,43 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     ],
   },
   { file: 'deeds_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The Harvest Journal's countdown clock: ONE 1 Hz interval armed on open and
+  // cleared on close, the finest resolution any line in that window renders. It
+  // is also the window's only refresh path (nothing else drives it but a
+  // language switch), which is deliberate: the plot model is re-read from the
+  // world every tick, so the journal stays consistent with the server's
+  // events-before-snapshots order without an event-forced cache.
+  {
+    file: 'harvest_journal_window.ts',
+    reflowAllow: {},
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: "the crop countdown: once a second, rebuild the pure view from a fresh myFarmPlots read and compare its VALUE signature with the painted one. A moved model (a plot planted or harvested, a growing plot flipping to ready or withered, a countdown crossing its deadline) repaints whole through the SAME paint an open takes; an unmoved one rewrites only the time cells' text. Armed on open, cleared on close, and never armed at rest.",
+        stopsAt: {
+          paint:
+            "the window's ordinary full re-render, shared with open() and the language-switch render(). Counting a render path per driver would re-run the argument the cold bucket settled (a count over a render churns on every edit and never moves when the real hazard lands); what this entry holds is that the tick does nothing EXTRA on its way there, and that it only gets there when the model actually moved.",
+        },
+        // `.style` is the `isOpen` getter reading root().style.display, the
+        // daily_rewards shape (this matcher counts ACCESSES, not writes).
+        // `.dataset` reads each cell's stamped readyAtMs. `.textContent` is
+        // TWO because the write is elided: the tick compares the rendered
+        // string first and skips an unchanged cell entirely, so a journal of
+        // day-long crops writes nothing at all between minute boundaries.
+        writeAllow: { '.style': 1, '.textContent': 2, '.dataset': 1 },
+        // ONE subtree walk per tick for the countdown cells. A re-query rather
+        // than a cached ref because every repaint replaces the nodes; at 1 Hz
+        // over at most a couple of dozen beds that is cheap, and the count is
+        // what makes a second one a conscious act.
+        queryAllow: { '.querySelectorAll': 1 },
+        idlAllow: {},
+        // Zero: the tick writes text but never reads a layout box back.
+        reflowAllow: {},
+      },
+    ],
+  },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
@@ -1485,6 +1522,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'gather_node_tooltip_controller.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
+      'harvest_journal_window.ts#0',
       'hud/delve/lockpick_window.ts#0',
     ]);
     // THIRD, the matchers must have seen real source. The positive control is the lockpick
@@ -1512,6 +1550,11 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       // shown guard plus one pure model rebuild.
       'gather_node_tooltip_controller.ts: paintAt',
       'daily_rewards_window.ts: renderCurrent',
+      // The journal's countdown tick cuts at the SAME full paint an open takes,
+      // and only reaches it when the model's value signature actually moved
+      // (argued in the entry's why/stopsAt above): the tick body itself is the
+      // isOpen guard, one pure view rebuild, and the text-only cell rewrite.
+      'harvest_journal_window.ts: paint',
     ]);
     expect(
       sweep.violations,

@@ -64,7 +64,8 @@ export const ko_KR: EnTranslations = {
       "dungeon": "던전",
       "difficulty": "난이도",
       "name": "이름",
-      "spec": "전문화"
+      "spec": "전문화",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "일반",
@@ -150,6 +151,10 @@ export const ko_KR: EnTranslations = {
       "gather": {
         "label": "채집 기술 부여",
         "description": "채집 전문 기술을 올립니다."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "순간이동",
@@ -3088,7 +3093,36 @@ export const ko_KR: EnTranslations = {
         "locked": "지불에 쓸 아이템이 잠겨 있습니다."
       },
       "husksConvertedLine": "{husksName} x{husks}을(를) {name}(으)로 교환했습니다.",
-      "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다."
+      "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다.",
+      "readyLine": "작물 1구획을 수확할 수 있습니다.",
+      "readyLineQty": "작물 {count}구획을 수확할 수 있습니다.",
+      "readyWitheredLine": "작물 1구획이 밭에서 시들었습니다.",
+      "readyWitheredLineQty": "작물 {count}구획이 밭에서 시들었습니다."
+    },
+    "harvestJournal": {
+      "title": "수확 일지",
+      "close": "닫기",
+      "listLabel": "심어 둔 작물밭",
+      "growing": "{time} 후 수확 가능",
+      "ready": "수확 가능",
+      "finishing": "마무리 중",
+      "withered": "시들었음",
+      "remainingDaysHours": "{days}일 {hours}시간",
+      "remainingHoursMinutes": "{hours}시간 {minutes}분",
+      "remainingMinutesSeconds": "{minutes}분 {seconds}초",
+      "remainingSeconds": "{seconds}초",
+      "bedLine": "{zone}, {index}번 작물밭",
+      "bedLineUnknown": "알 수 없는 작물밭",
+      "careWatch": "농부의 관리",
+      "careNone": "추가 관리 없음",
+      "stageSprout": "새싹",
+      "stageSeedling": "모종",
+      "stageMaturing": "자라는 중",
+      "stageRipe": "다 익음",
+      "emptyTitle": "심어 둔 작물이 없습니다",
+      "emptyBody": "아무 작물밭에나 씨앗을 심으면 그 밭이 남은 시간과 함께 여기에 표시됩니다.",
+      "noviceTitle": "아직 작물밭을 가꾼 적이 없습니다",
+      "noviceBody": "작물을 수확할 때마다 농사 숙련도가 올라갑니다. 아무 작물밭에나 씨앗을 심어 시작하세요."
     },
     "archetypeTitle": {
       "label": "칭호",
@@ -8106,6 +8140,7 @@ export const ko_KR: EnTranslations = {
         "cooldownLockedHerb": "고갈된 약초, 도구 잠김",
         "station": "제작 시설: {name}",
         "service": "편의 시설: {name}",
+        "farmPatch": "텃밭",
         "partyMember": "파티원: {name}",
         "deadPartyMember": "사망한 파티원: {name}",
         "partyMemberGeneric": "파티원",
@@ -17299,6 +17334,7 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
     "mailboxName": "우편함",
-    "noticeboardName": "게시판"
+    "noticeboardName": "게시판",
+    "farmPatchName": "텃밭"
   }
 };

@@ -64,7 +64,8 @@ export const es: EnTranslations = {
       "dungeon": "Mazmorra",
       "difficulty": "Dificultad",
       "name": "Nombre",
-      "spec": "Especialización"
+      "spec": "Especialización",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const es: EnTranslations = {
       "gather": {
         "label": "Otorgar habilidad de recolección",
         "description": "Aumenta la habilidad de una profesión de recolección."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teletransportar",
@@ -3088,7 +3093,36 @@ export const es: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Título",
@@ -8106,6 +8140,7 @@ export const es: EnTranslations = {
         "cooldownLockedHerb": "Parcela de hierbas agotada, herramienta no disponible",
         "station": "Estación de artesanía: {name}",
         "service": "Servicio: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Miembro del grupo: {name}",
         "deadPartyMember": "Miembro del grupo caído: {name}",
         "partyMemberGeneric": "Miembro del grupo",
@@ -17299,6 +17334,7 @@ export const es: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario del Junco: pulsa F para tocarlo",
     "delveRiteShrineSkullInteract": "Santuario de la Calavera: pulsa F para tocarlo",
     "mailboxName": "Buzón",
-    "noticeboardName": "Tablón de anuncios"
+    "noticeboardName": "Tablón de anuncios",
+    "farmPatchName": "Garden Beds"
   }
 };

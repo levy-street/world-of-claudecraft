@@ -64,7 +64,8 @@ export const ru_RU: EnTranslations = {
       "dungeon": "Подземелье",
       "difficulty": "Сложность",
       "name": "Имя",
-      "spec": "Специализация"
+      "spec": "Специализация",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Обычная",
@@ -150,6 +151,10 @@ export const ru_RU: EnTranslations = {
       "gather": {
         "label": "Дать навык сбора",
         "description": "Повысить навык собирательной профессии."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Телепортироваться",
@@ -3088,7 +3093,36 @@ export const ru_RU: EnTranslations = {
         "locked": "Предмет, которым можно за это заплатить, заблокирован."
       },
       "husksConvertedLine": "Вы обмениваете {husksName} x{husks} на {name}.",
-      "husksConvertedLineQty": "Вы обмениваете {husksName} x{husks} на {name} x{qty}."
+      "husksConvertedLineQty": "Вы обмениваете {husksName} x{husks} на {name} x{qty}.",
+      "readyLine": "Урожай на одной грядке готов к сбору.",
+      "readyLineQty": "Урожай готов к сбору на грядках: {count}.",
+      "readyWitheredLine": "Урожай на одной грядке засох.",
+      "readyWitheredLineQty": "Грядок с засохшим урожаем: {count}."
+    },
+    "harvestJournal": {
+      "title": "Журнал урожая",
+      "close": "Закрыть",
+      "listLabel": "Засаженные грядки",
+      "growing": "Готово через {time}",
+      "ready": "Готово к сбору",
+      "finishing": "Почти созрел",
+      "withered": "Засох",
+      "remainingDaysHours": "{days} д {hours} ч",
+      "remainingHoursMinutes": "{hours} ч {minutes} мин",
+      "remainingMinutesSeconds": "{minutes} мин {seconds} с",
+      "remainingSeconds": "{seconds} с",
+      "bedLine": "{zone}, грядка {index}",
+      "bedLineUnknown": "Неизвестная грядка",
+      "careWatch": "Присмотр земледельца",
+      "careNone": "Без дополнений",
+      "stageSprout": "Росток",
+      "stageSeedling": "Всходы",
+      "stageMaturing": "Созревает",
+      "stageRipe": "Созрел",
+      "emptyTitle": "Ничего не посажено",
+      "emptyBody": "Посейте семя на любой грядке, и она появится здесь вместе с таймером.",
+      "noviceTitle": "Вы еще не работали на грядке",
+      "noviceBody": "Навык земледелия растет с каждым собранным урожаем. Посейте семя на любой грядке, чтобы начать."
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -8106,6 +8140,7 @@ export const ru_RU: EnTranslations = {
         "cooldownLockedHerb": "Истощённая трава, инструмент недоступен",
         "station": "Ремесленная станция: {name}",
         "service": "Служба: {name}",
+        "farmPatch": "Грядки",
         "partyMember": "Участник группы: {name}",
         "deadPartyMember": "Погибший участник группы: {name}",
         "partyMemberGeneric": "Участник группы",
@@ -17299,6 +17334,7 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
     "mailboxName": "Почтовый ящик",
-    "noticeboardName": "Доска объявлений"
+    "noticeboardName": "Доска объявлений",
+    "farmPatchName": "Грядки"
   }
 };

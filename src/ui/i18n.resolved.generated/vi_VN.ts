@@ -64,7 +64,8 @@ export const vi_VN: EnTranslations = {
       "dungeon": "Hầm Ngục",
       "difficulty": "Độ Khó",
       "name": "Tên",
-      "spec": "Chuyên Môn"
+      "spec": "Chuyên Môn",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Thường",
@@ -150,6 +151,10 @@ export const vi_VN: EnTranslations = {
       "gather": {
         "label": "Tăng kỹ năng thu thập",
         "description": "Tăng cấp một nghề thu thập."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Dịch chuyển",
@@ -3088,7 +3093,36 @@ export const vi_VN: EnTranslations = {
         "locked": "An item that would pay for that is locked."
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}."
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -8106,6 +8140,7 @@ export const vi_VN: EnTranslations = {
         "cooldownLockedHerb": "Khóm thảo dược đã hái, dụng cụ chưa mở khóa",
         "station": "Trạm chế tác: {name}",
         "service": "Dịch vụ: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Thành viên tổ đội: {name}",
         "deadPartyMember": "Thành viên tổ đội đã chết: {name}",
         "partyMemberGeneric": "Thành viên tổ đội",
@@ -17299,6 +17334,7 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineReedInteract": "Miếu Lau Sậy: Nhấn F để chạm vào",
     "delveRiteShrineSkullInteract": "Miếu Đầu Lâu: Nhấn F để chạm vào",
     "mailboxName": "Hòm Thư",
-    "noticeboardName": "Bảng Thông Báo"
+    "noticeboardName": "Bảng Thông Báo",
+    "farmPatchName": "Garden Beds"
   }
 };

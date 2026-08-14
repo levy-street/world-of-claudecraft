@@ -24,21 +24,31 @@ import {
 import { grantItemToken, grantQtyText } from './grant_line_view';
 import { formatNumber, t } from './i18n';
 
-/** The five farming events, narrowed from the shared SimEvent union. */
+/** The six farming events, narrowed from the shared SimEvent union. */
 export type FarmEvent = Extract<
   SimEvent,
   {
-    type: 'farmPlanted' | 'farmHarvested' | 'farmWithered' | 'farmDenied' | 'farmHusksConverted';
+    type:
+      | 'farmPlanted'
+      | 'farmHarvested'
+      | 'farmWithered'
+      | 'farmDenied'
+      | 'farmHusksConverted'
+      | 'farmReady';
   }
 >;
 
-/** The three HUD feedback surfaces the farming arms write to. The Hud class
+/** The four HUD feedback surfaces the farming arms write to. The Hud class
  *  satisfies this structurally; keep the member shapes assignable from its
- *  public methods. */
+ *  public methods. `showBanner` takes only the text because every later
+ *  parameter of the Hud's own method is defaulted (and its default
+ *  `bannerClass` is the ambient one this notice wants), so the seam stays a
+ *  one-argument call and hud.ts gains nothing. */
 export interface FarmFeedbackHost {
   log(text: string, color: string): void;
   showSelfNote(text: string): void;
   showError(text: string): void;
+  showBanner(text: string): void;
 }
 
 export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
@@ -188,6 +198,62 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
         }),
         '#7fdc4f',
       );
+      break;
+    }
+    case 'farmReady': {
+      // One or more plots FINISHED (the ready-notice phase): the sim's 1 Hz
+      // sweep and its login check both emit this once per plot per growth
+      // cycle, so every surface here is a one-shot nudge rather than a
+      // repeating reminder. COUNTS ONLY on the wire, so the lines say how
+      // many beds are waiting and the plot rows themselves stay the fplot
+      // projection's job (the farming window and the map pins read those).
+      //
+      // The plural split is written here rather than through the grant-line
+      // family in farming_view.ts on purpose: this is a count of BEDS, with
+      // no item and no quantity token, so isMultiUnitGrant's grant contract
+      // does not describe it and borrowing it would tie a plot count to the
+      // rules for " xN" on a stack.
+      //
+      // Each half is resolved ONCE and only when its count is POSITIVE, so a
+      // mixed notice reports both outcomes honestly instead of rounding a
+      // failed crop into "ready", and a malformed zero from a stale or
+      // foreign server prints nothing rather than "0 crops".
+      const witheredCount = ev.withered ?? 0;
+      const readyText =
+        ev.ready > 0
+          ? t(ev.ready > 1 ? 'hudChrome.farming.readyLineQty' : 'hudChrome.farming.readyLine', {
+              count: formatNumber(ev.ready, { maximumFractionDigits: 0 }),
+            })
+          : null;
+      const witheredText =
+        witheredCount > 0
+          ? t(
+              witheredCount > 1
+                ? 'hudChrome.farming.readyWitheredLineQty'
+                : 'hudChrome.farming.readyWitheredLine',
+              { count: formatNumber(witheredCount, { maximumFractionDigits: 0 }) },
+            )
+          : null;
+      // The banner leads with the READY sentence, the actionable half, and
+      // falls back to the withered one only when nothing is waiting to be
+      // brought in. Ambient (the showBanner default), so it replaces rather
+      // than queues: a zone name or a prompt is welcome to take the slot back,
+      // because the log lines are the durable record.
+      const bannerText = readyText ?? witheredText;
+      // An all-zero notice cannot come from this sim, so it is a stale or
+      // foreign server: say nothing and make no sound rather than announce an
+      // empty sentence.
+      if (!bannerText) break;
+      // ONE cue for the whole event, like the harvest arm: a notice about four
+      // beds is still one notice (the #2430 one-cue rule).
+      audio.farmReady();
+      host.showBanner(bannerText);
+      // The plant line's pale green, not the grant green: nothing was granted
+      // here, this is news about the player's own beds. The withered half
+      // keeps the grey no-cost-miss register of the withered harvest line
+      // (the crop was lost, the bed was not).
+      if (readyText) host.log(readyText, '#c8f7c5');
+      if (witheredText) host.log(witheredText, '#a8a8a8');
       break;
     }
   }

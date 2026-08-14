@@ -64,7 +64,8 @@ export const en_XA: EnTranslations = {
       "dungeon": "[Ðúñĝéóñ]",
       "difficulty": "[Ðíƒƒíçúļţý]",
       "name": "[Ñáɱé]",
-      "spec": "[Šþéç]"
+      "spec": "[Šþéç]",
+      "bed": "[Ɓéð íð (óþţíóñáļ)]"
     },
     "difficulty": {
       "normal": "[Ñóŕɱáļ]",
@@ -150,6 +151,10 @@ export const en_XA: EnTranslations = {
       "gather": {
         "label": "[Ĝŕáñţ ĝáţĥéŕíñĝ šķíļļ]",
         "description": "[Íñçŕéášé á ĝáţĥéŕíñĝ þŕóƒéššíóñ.]"
+      },
+      "farmgrow": {
+        "label": "[Ŕíþéñ çŕóþš]",
+        "description": "[Ɓŕíñĝ ýóúŕ þļáñţéð çŕóþ ƀéðš ţó ţĥéíŕ ŕéáðý ţíɱé, óŕ óñé ƀéð ƀý íð. Ñóţĥíñĝ éļšé çĥáñĝéš: ţĥé óúţçóɱé ŵáš ŕóļļéð ŵĥéñ ýóú þļáñţéð.]"
       },
       "teleport": {
         "label": "[Ţéļéþóŕţ]",
@@ -3088,7 +3093,36 @@ export const en_XA: EnTranslations = {
         "locked": "[Áñ íţéɱ ţĥáţ ŵóúļð þáý ƒóŕ ţĥáţ íš ļóçķéð.]"
       },
       "husksConvertedLine": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name}.]",
-      "husksConvertedLineQty": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name} ẋ{qty}.]"
+      "husksConvertedLineQty": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name} ẋ{qty}.]",
+      "readyLine": "[Á çŕóþ íš ŕéáðý ţó ĥáŕʋéšţ.]",
+      "readyLineQty": "[{count} çŕóþš áŕé ŕéáðý ţó ĥáŕʋéšţ.]",
+      "readyWitheredLine": "[Á çŕóþ ŵíţĥéŕéð íñ íţš ƀéð.]",
+      "readyWitheredLineQty": "[{count} çŕóþš ŵíţĥéŕéð íñ ţĥéíŕ ƀéðš.]"
+    },
+    "harvestJournal": {
+      "title": "[Ĥáŕʋéšţ Ĵóúŕñáļ]",
+      "close": "[Çļóšé]",
+      "listLabel": "[Þļáñţéð çŕóþ ƀéðš]",
+      "growing": "[Ŕéáðý íñ {time}]",
+      "ready": "[Ŕéáðý ţó ĥáŕʋéšţ]",
+      "finishing": "[Ƒíñíšĥíñĝ úþ]",
+      "withered": "[Ŵíţĥéŕéð]",
+      "remainingDaysHours": "[{days}ð {hours}ĥ]",
+      "remainingHoursMinutes": "[{hours}ĥ {minutes}ɱ]",
+      "remainingMinutesSeconds": "[{minutes}ɱ {seconds}š]",
+      "remainingSeconds": "[{seconds}š]",
+      "bedLine": "[{zone}, ƀéð {index}]",
+      "bedLineUnknown": "[Úñķñóŵñ ƀéð]",
+      "careWatch": "[Ƒáŕɱéŕ'š Ŵáţçĥ]",
+      "careNone": "[Ñó éẋţŕáš]",
+      "stageSprout": "[Šþŕóúţ]",
+      "stageSeedling": "[Šééðļíñĝ]",
+      "stageMaturing": "[Ɱáţúŕíñĝ]",
+      "stageRipe": "[Ŕíþé]",
+      "emptyTitle": "[Ñó çŕóþš þļáñţéð]",
+      "emptyBody": "[Šóŵ á šééð íñ áñý ĝáŕðéñ ƀéð áñð ţĥé þļóţ áþþéáŕš ĥéŕé ŵíţĥ íţš ţíɱéŕ.]",
+      "noviceTitle": "[Ýóú ĥáʋé ñóţ ŵóŕķéð á ĝáŕðéñ ƀéð ýéţ]",
+      "noviceBody": "[Ƒáŕɱíñĝ šķíļļ ĝŕóŵš éʋéŕý ţíɱé ýóú ƀŕíñĝ íñ á çŕóþ. Šóŵ á šééð íñ áñý ĝáŕðéñ ƀéð ţó ƀéĝíñ.]"
     },
     "archetypeTitle": {
       "label": "[Ţíţļé]",
@@ -8106,6 +8140,7 @@ export const en_XA: EnTranslations = {
         "cooldownLockedHerb": "[Ðéþļéţéð ĥéŕƀ ñóðé, ţóóļ ļóçķéð]",
         "station": "[Çŕáƒţíñĝ šţáţíóñ: {name}]",
         "service": "[Šéŕʋíçé: {name}]",
+        "farmPatch": "[Ĝáŕðéñ ƀéðš]",
         "partyMember": "[Þáŕţý ɱéɱƀéŕ: {name}]",
         "deadPartyMember": "[Ðéáð þáŕţý ɱéɱƀéŕ: {name}]",
         "partyMemberGeneric": "[Þáŕţý ɱéɱƀéŕ]",
@@ -17299,6 +17334,7 @@ export const en_XA: EnTranslations = {
     "delveRiteShrineReedInteract": "[Ŕééð Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineSkullInteract": "[Šķúļļ Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "mailboxName": "[Ɱáíļƀóẋ]",
-    "noticeboardName": "[Ñóţíçé Ɓóáŕð]"
+    "noticeboardName": "[Ñóţíçé Ɓóáŕð]",
+    "farmPatchName": "[Ĝáŕðéñ Ɓéðš]"
   }
 };

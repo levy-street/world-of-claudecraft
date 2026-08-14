@@ -64,7 +64,8 @@ export const ja_JP: EnTranslations = {
       "dungeon": "ダンジョン",
       "difficulty": "難易度",
       "name": "名前",
-      "spec": "スペック"
+      "spec": "スペック",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "ノーマル",
@@ -150,6 +151,10 @@ export const ja_JP: EnTranslations = {
       "gather": {
         "label": "採集スキルを付与",
         "description": "採集専門職のスキルを上げます。"
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "テレポート",
@@ -3088,7 +3093,36 @@ export const ja_JP: EnTranslations = {
         "locked": "その支払いに使えるアイテムがロックされています。"
       },
       "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
-      "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。"
+      "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。",
+      "readyLine": "作物が1区画、収穫できるようになった。",
+      "readyLineQty": "作物が{count}区画、収穫できるようになった。",
+      "readyWitheredLine": "作物が1区画、畑で枯れた。",
+      "readyWitheredLineQty": "作物が{count}区画、畑で枯れた。"
+    },
+    "harvestJournal": {
+      "title": "収穫日誌",
+      "close": "閉じる",
+      "listLabel": "作付け済みの作物畑",
+      "growing": "あと{time}で収穫可能",
+      "ready": "収穫可能",
+      "finishing": "まもなく完了",
+      "withered": "枯れた",
+      "remainingDaysHours": "{days}日{hours}時間",
+      "remainingHoursMinutes": "{hours}時間{minutes}分",
+      "remainingMinutesSeconds": "{minutes}分{seconds}秒",
+      "remainingSeconds": "{seconds}秒",
+      "bedLine": "{zone}、作物畑{index}",
+      "bedLineUnknown": "不明な作物畑",
+      "careWatch": "農夫の見回り",
+      "careNone": "追加の手入れなし",
+      "stageSprout": "芽",
+      "stageSeedling": "苗",
+      "stageMaturing": "生育中",
+      "stageRipe": "熟した",
+      "emptyTitle": "作物がありません",
+      "emptyBody": "どの作物畑でも種をまけば、その畑が残り時間とともにここに並びます。",
+      "noviceTitle": "まだ作物畑を耕したことがありません",
+      "noviceBody": "作物を収穫するたびに農耕スキルが上がります。どの作物畑でもよいので、種をまいて始めましょう。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -8106,6 +8140,7 @@ export const ja_JP: EnTranslations = {
         "cooldownLockedHerb": "枯渇した薬草、道具未解放",
         "station": "製作設備：{name}",
         "service": "施設：{name}",
+        "farmPatch": "菜園",
         "partyMember": "パーティメンバー：{name}",
         "deadPartyMember": "死亡したパーティメンバー：{name}",
         "partyMemberGeneric": "パーティメンバー",
@@ -17299,6 +17334,7 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
     "mailboxName": "メールボックス",
-    "noticeboardName": "掲示板"
+    "noticeboardName": "掲示板",
+    "farmPatchName": "菜園"
   }
 };

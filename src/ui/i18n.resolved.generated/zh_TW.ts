@@ -64,7 +64,8 @@ export const zh_TW: EnTranslations = {
       "dungeon": "地城",
       "difficulty": "難度",
       "name": "名稱",
-      "spec": "專精"
+      "spec": "專精",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "普通",
@@ -150,6 +151,10 @@ export const zh_TW: EnTranslations = {
       "gather": {
         "label": "授予採集技能",
         "description": "提高一項採集專業技能。"
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "傳送",
@@ -3088,7 +3093,36 @@ export const zh_TW: EnTranslations = {
         "locked": "有一件可用於支付的物品已被鎖定。"
       },
       "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
-      "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。"
+      "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。",
+      "readyLine": "有一塊作物可以收成了。",
+      "readyLineQty": "有 {count} 塊作物可以收成了。",
+      "readyWitheredLine": "有一塊作物在田畦裡枯萎了。",
+      "readyWitheredLineQty": "有 {count} 塊作物在田畦裡枯萎了。"
+    },
+    "harvestJournal": {
+      "title": "收成日誌",
+      "close": "關閉",
+      "listLabel": "已種植的田畦",
+      "growing": "{time}後成熟",
+      "ready": "可以收成",
+      "finishing": "即將成熟",
+      "withered": "已枯萎",
+      "remainingDaysHours": "{days}天{hours}小時",
+      "remainingHoursMinutes": "{hours}小時{minutes}分",
+      "remainingMinutesSeconds": "{minutes}分{seconds}秒",
+      "remainingSeconds": "{seconds}秒",
+      "bedLine": "{zone}，第{index}號田畦",
+      "bedLineUnknown": "未知田畦",
+      "careWatch": "農夫看護",
+      "careNone": "無額外照料",
+      "stageSprout": "幼芽",
+      "stageSeedling": "幼苗",
+      "stageMaturing": "成長中",
+      "stageRipe": "成熟",
+      "emptyTitle": "尚未種下作物",
+      "emptyBody": "在任意田畦播下種子，這塊田就會帶著計時出現在這裡。",
+      "noviceTitle": "你還沒有打理過田畦",
+      "noviceBody": "每收成一次作物，耕作技能都會提升。在任意田畦播下種子即可開始。"
     },
     "archetypeTitle": {
       "label": "稱號",
@@ -8106,6 +8140,7 @@ export const zh_TW: EnTranslations = {
         "cooldownLockedHerb": "已枯竭的草藥點，工具未解鎖",
         "station": "製作站：{name}",
         "service": "服務：{name}",
+        "farmPatch": "菜畦",
         "partyMember": "隊伍成員：{name}",
         "deadPartyMember": "已死亡的隊伍成員：{name}",
         "partyMemberGeneric": "隊伍成員",
@@ -17299,6 +17334,7 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
     "mailboxName": "郵箱",
-    "noticeboardName": "告示板"
+    "noticeboardName": "告示板",
+    "farmPatchName": "菜畦"
   }
 };

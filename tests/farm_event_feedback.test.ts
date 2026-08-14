@@ -11,7 +11,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // The module reaches the audio facade directly (the src/ui precedent) rather
 // than through FarmFeedbackHost, so the cue arms are pinned through a mocked
 // facade the same way the sibling window suites stub `audio`.
-const audioMock = vi.hoisted(() => ({ farmPlant: vi.fn(), farmHarvest: vi.fn() }));
+const audioMock = vi.hoisted(() => ({
+  farmPlant: vi.fn(),
+  farmHarvest: vi.fn(),
+  farmReady: vi.fn(),
+}));
 vi.mock('../src/game/audio', () => ({ audio: audioMock }));
 
 import type { FarmEvent, FarmFeedbackHost } from '../src/ui/farm_event_feedback';
@@ -24,7 +28,7 @@ beforeEach(() => {
 });
 
 interface Call {
-  fn: 'log' | 'showSelfNote' | 'showError';
+  fn: 'log' | 'showSelfNote' | 'showError' | 'showBanner';
   text: string;
   color?: string;
 }
@@ -37,6 +41,7 @@ function recordingHost(): { host: FarmFeedbackHost; calls: Call[] } {
       log: (text, color) => calls.push({ fn: 'log', text, color }),
       showSelfNote: (text) => calls.push({ fn: 'showSelfNote', text }),
       showError: (text) => calls.push({ fn: 'showError', text }),
+      showBanner: (text) => calls.push({ fn: 'showBanner', text }),
     },
   };
 }
@@ -275,5 +280,97 @@ describe('farm_event_feedback: the cue arms', () => {
     drive({ type: 'farmHusksConverted', pid: 1, husks: 4, compost: 2 });
     expect(audioMock.farmPlant).not.toHaveBeenCalled();
     expect(audioMock.farmHarvest).not.toHaveBeenCalled();
+    expect(audioMock.farmReady).not.toHaveBeenCalled();
+  });
+});
+
+// The ready notice (the ready-notice phase). The sim emits ONE text-free,
+// counts-only farmReady per sweep, so everything about how many surfaces
+// light up, in which register, and which sentence each renders lives in the
+// arm under test rather than in the event.
+describe('farm_event_feedback: the ready notice', () => {
+  const hasDigit = (text: string) => /\d/.test(text);
+
+  it('a single ready plot: one ambient banner, one pale-green line, one cue', () => {
+    const calls = drive({ type: 'farmReady', pid: 1, ready: 1 });
+    expect(calls.map((c) => c.fn)).toEqual(['showBanner', 'log']);
+    expect(calls[1].color).toBe('#c8f7c5');
+    // The banner and the line say the SAME thing: the banner is the glance
+    // and the log is the record, never two different claims about one event.
+    expect(calls[0].text).toBe(calls[1].text);
+    // Real localized copy, not a leaked key, and the singular branch: the
+    // one-plot sentence names no number at all, so a code path that always
+    // reached for the {count} sibling would render "1 crops" and fail here.
+    expect(calls[0].text).not.toContain('hudChrome.');
+    expect(hasDigit(calls[0].text)).toBe(false);
+    expect(audioMock.farmReady).toHaveBeenCalledTimes(1);
+    // Never a harvest sound: nothing was brought in, and borrowing the
+    // harvest cue would tell the player a crop was collected without them.
+    expect(audioMock.farmHarvest).not.toHaveBeenCalled();
+    expect(audioMock.farmPlant).not.toHaveBeenCalled();
+  });
+
+  it('several ready plots take the counted sentence, formatted', () => {
+    const calls = drive({ type: 'farmReady', pid: 1, ready: 4 });
+    expect(calls.map((c) => c.fn)).toEqual(['showBanner', 'log']);
+    expect(calls[1].text).toContain('4');
+    // Decisively the OTHER branch from the arm above: same surfaces, a
+    // different sentence.
+    expect(calls[1].text).not.toBe(drive({ type: 'farmReady', pid: 1, ready: 1 })[1].text);
+  });
+
+  it('a mixed notice reports BOTH outcomes, ready first and withered in the miss register', () => {
+    const calls = drive({ type: 'farmReady', pid: 1, ready: 2, withered: 1 });
+    expect(calls.map((c) => c.fn)).toEqual(['showBanner', 'log', 'log']);
+    // The banner leads with the actionable half; the failed crop is reported
+    // honestly on its own grey line rather than folded into the ready count.
+    expect(calls[0].text).toBe(calls[1].text);
+    expect(calls[1].color).toBe('#c8f7c5');
+    expect(calls[2].color).toBe('#a8a8a8');
+    expect(calls[2].text).not.toBe(calls[1].text);
+    expect(calls[1].text).toContain('2');
+    // The withered line is the SAME sentence a withered-only notice leads
+    // with, cross-checked against that arm rather than against a copy
+    // literal, so the two paths can never drift into different wording.
+    expect(calls[2].text).toBe(drive({ type: 'farmReady', pid: 1, ready: 0, withered: 1 })[0].text);
+    // Still ONE cue for the whole event, however many halves it has.
+    expect(audioMock.farmReady).toHaveBeenCalledTimes(2); // this arm drove twice
+  });
+
+  it('a withered-only notice banners the withered sentence and logs only the grey line', () => {
+    const calls = drive({ type: 'farmReady', pid: 1, ready: 0, withered: 3 });
+    expect(calls.map((c) => c.fn)).toEqual(['showBanner', 'log']);
+    expect(calls[0].text).toBe(calls[1].text);
+    expect(calls[1].color).toBe('#a8a8a8');
+    expect(calls[1].text).toContain('3');
+    // Its own plural split, proven the same way as the ready family's.
+    expect(hasDigit(drive({ type: 'farmReady', pid: 1, ready: 0, withered: 1 })[0].text)).toBe(
+      false,
+    );
+    expect(audioMock.farmReady).toHaveBeenCalledTimes(2); // this arm drove twice
+  });
+
+  it('an all-zero notice says nothing and makes no sound', () => {
+    // Unreachable from this sim (the sweep returns early when nothing
+    // transitioned), so it can only arrive from a stale or foreign server:
+    // an empty banner and a bare "0" line would be worse than silence.
+    expect(drive({ type: 'farmReady', pid: 1, ready: 0 })).toHaveLength(0);
+    expect(drive({ type: 'farmReady', pid: 1, ready: 0, withered: 0 })).toHaveLength(0);
+    expect(audioMock.farmReady).not.toHaveBeenCalled();
+  });
+
+  it('never writes the error or self-note surfaces', () => {
+    // The notice is news, not a refusal and not floating combat text: a
+    // future arm that reached for showError or showSelfNote would be
+    // announcing the same event on a third surface.
+    for (const ev of [
+      { type: 'farmReady', pid: 1, ready: 1 },
+      { type: 'farmReady', pid: 1, ready: 0, withered: 2 },
+      { type: 'farmReady', pid: 1, ready: 2, withered: 2 },
+    ] as const) {
+      const fns = drive(ev).map((c) => c.fn);
+      expect(fns).not.toContain('showError');
+      expect(fns).not.toContain('showSelfNote');
+    }
   });
 });

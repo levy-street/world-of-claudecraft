@@ -111,6 +111,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
+  'this.harvestJournalWindow.render|this.harvestJournalWindow.isOpen',
   // The Reliquary cold window is signature-gated (lastSig); language switch
   // must force render while open so curator rank chrome and shelf labels re-t().
   'this.reliquaryWindow.render|this.reliquaryWindow.isOpen',
@@ -321,6 +322,16 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.professionsWindow.render',
     why: 'the known professions and their skill numbers; render() carries no self-gate',
+  },
+  {
+    file: 'harvest_journal_window.ts',
+    memos: ['paintedSignature'],
+    answer: 'this.harvestJournalWindow.render',
+    why:
+      'every plot row (crop and bed names, stage and status labels, countdown ' +
+      'sentence) plus both empty states; the signature is ids and numbers only, ' +
+      'so a locale flip alone never moves it, and render() is the forced whole ' +
+      'repaint that re-latches it',
   },
   {
     file: 'social_window.ts',
