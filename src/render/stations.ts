@@ -22,11 +22,7 @@ import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, GFX, surfaceMat } from './gfx';
-import {
-  addInstancedParts,
-  type GlbTemplatePart,
-  glbTemplateParts,
-} from './glb_instanced_props';
+import { addInstancedParts, type GlbTemplatePart, glbTemplateParts } from './glb_instanced_props';
 import { type StationPropKind, stationPropPlacements } from './stations_core';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
