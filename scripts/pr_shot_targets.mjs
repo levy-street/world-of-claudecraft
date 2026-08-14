@@ -9035,7 +9035,10 @@ export const TARGETS = [
     key: 'farm-patches',
     label: 'Farming hub garden beds with per-viewer growth stages (Eastbrook patch)',
     when: ['render/farm_patches', 'assets/farm_props', 'content/farm_patches'],
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
     async capture(page) {
       await page.waitForFunction(
         () => {

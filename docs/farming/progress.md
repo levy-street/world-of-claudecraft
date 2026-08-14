@@ -19,7 +19,7 @@
 | Phase 6 (economy hooks) | done | 2026-08-09 | 2026-08-09 |
 | Phase 6b (release sync, v0.38.0 at authoring) | done | 2026-08-13 | 2026-08-13 |
 | Phase 6 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-13 | 2026-08-13 |
-| Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merged, deleted) | 0 BLOCKING across three domain reviews; 5 SHOULD-FIX fixed in-phase |
+| Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merge hash in the Phase 7 notes tail) | 0 BLOCKING across three domain reviews plus qa-checklist; 7 SHOULD-FIX fixed in-phase |
 | Phase 7 QA | not started | | |
 | Phase 8 (Harvest Journal) | not started | | |
 | Phase 8 QA | not started | | |

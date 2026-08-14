@@ -63,6 +63,11 @@ the progress.md Phase 7 section and state.md deviations (ap) through (ax)):
   FarmPatchVisuals.sync(world, dt) with a uniform 0.5s read cadence plus
   event-driven resync, and onFarmEvent(ev, viewerPid) with a local pid
   guard; there is no sync(plots, nowMs) form.
+- Visual verification artifacts: the exporter's contact sheets at
+  docs/screenshots/farming/assets/farm_props/solo-contact.png (all 15
+  props) and mounting-contact.png (stage meshes parented at the bed's
+  Socket_Soil, six combinations); in-world before/after captures at
+  docs/screenshots/farming-phase-07/ (LOW preset, desktop and mobile).
 
 ### Starter Prompt
 
