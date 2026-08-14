@@ -210,7 +210,7 @@ describe('painted weapon inventory icons', () => {
     }
   });
 
-  it('ships 119 distinct opaque 128px paintings within budget', async () => {
+  it('ships 125 distinct opaque 128px paintings within budget', async () => {
     const hashes = new Set<string>();
     for (const id of baseWeapons) {
       const violations: string[] = [];

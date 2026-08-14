@@ -265,12 +265,17 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
 
   it('a KEPT flagged two-hand mainhand survives the pair re-run (the kept-refill disjunct)', () => {
     // The refill exclusion admits kept flagged ids on purpose
-    // (allowedRefill's kept.has disjunct): when a flagged 2H MAINHAND is
-    // kept and a flagged OFFHAND demotes, the pair re-run re-picks the
-    // mainhand, and dropping the disjunct would silently swap the kept 2H
-    // for an unflagged weapon. This is the one shape that executes the
-    // disjunct; without this test deleting it is byte-identical on every
-    // other scenario.
+    // (allowedRefill's kept.has disjunct). Executing the disjunct takes a
+    // three-step shape: the flagged shield demotes through the cap arm and
+    // its refill LANDS (the plain offhand below; with no refill candidate
+    // the offhand just empties and pairIllegal short-circuits on the
+    // undefined offhand, which is exactly how the earlier form of this
+    // test silently skipped the disjunct); the refilled offhand beside the
+    // kept flagged 2H makes the pair illegal; the re-run then re-selects
+    // the mainhand from a pool whose ONLY candidate is the kept flagged
+    // 2H, admitted by nothing but the disjunct. Dropping the disjunct
+    // leaves the mainhand EMPTY and the plain offhand standing, so every
+    // hand assertion below reds.
     const CLS = 'test_bis_cls2';
     const REQ = [CLS] as unknown as ItemDef['requiredClass'];
     const SYNTH: ItemDef[] = [
@@ -315,16 +320,34 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         requiredClass: REQ,
         sellValue: 1,
       } as ItemDef,
+      // Unflagged offhand fodder: scores BELOW the flagged shield (so the
+      // initial fill still picks the shield) but gives the shield's cap
+      // demotion a refill that LANDS, which is what pushes the illegal
+      // 2H-plus-offhand pair into the re-run where the disjunct decides.
+      {
+        id: 'test_bis_plain_offhand',
+        name: 'Test test_bis_plain_offhand',
+        kind: 'armor',
+        slot: 'offhand',
+        shield: true,
+        quality: 'epic',
+        requiredClass: REQ,
+        stats: { sta: 100 },
+        sellValue: 1,
+      } as ItemDef,
     ];
     for (const def of SYNTH) ITEMS[def.id] = def;
     try {
       const picks = bestEpicGearFor(CLS, null);
-      // Kept: the 2H (1200) and the chest (900); the shield (500) demotes.
-      // The pair re-run must RE-SELECT the kept flagged 2H (the disjunct)
-      // and leave the offhand empty against it.
+      // Kept: the 2H (1200) and the chest (900); the shield (500) demotes
+      // and its refill lands the plain offhand, making the pair illegal.
+      // The re-run must RE-SELECT the kept flagged 2H (the disjunct) and
+      // leave the offhand empty against it: the plain offhand refill is
+      // rejected by the displacement filter once the 2H stands again.
       expect(picks.mainhand).toBe('test_bis_mw_2h_kept');
       expect(picks.chest).toBe('test_bis_mw_chest3');
       expect(picks.offhand).toBeUndefined();
+      expect(Object.values(picks)).not.toContain('test_bis_plain_offhand');
       const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
       expect(flagged.sort()).toEqual(['test_bis_mw_2h_kept', 'test_bis_mw_chest3']);
     } finally {

@@ -606,37 +606,66 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
   });
 
   it('a demoted slot falls back to the best unflagged piece, not to empty', () => {
-    // shaman/elemental was the worst offender pre-fix (waist, legs, and feet
-    // all apex). The kept pair is DERIVED, not hand-picked: the cap-highest
-    // scoring flagged candidates under the role's own scorer, so this arm
-    // pins the demotion rule itself rather than an argmax literal that rots
-    // on a retune.
+    // shaman/elemental is the deepest offender: with the phase 09 catalog its
+    // RAW picks are five flagged pieces (waist, feet, legs, neck, and the top
+    // ring), three over the cap. The kept pair is pinned as LITERALS: a
+    // derived expectation would move with the scorer and keep this green
+    // through a roleItemScore ordering regression. The premise loop below is
+    // what reds on a retune, so the failure names the scorer rather than the
+    // fallback logic under test.
     const role = CLASS_ROLES.shaman.find((r) => r.id === 'elemental');
     expect(role, 'shaman elemental role exists').toBeTruthy();
     const kit = bisKitForRole('shaman', role as BoostRole);
-    const flaggedCandidates = ['spiritweld_girdle', 'fenbloom_breeches', 'wardspeaker_sabatons'];
-    const expectedKept = [...flaggedCandidates]
-      .sort(
-        (a, b) =>
-          roleItemScore(role as BoostRole, ITEMS[b]) - roleItemScore(role as BoostRole, ITEMS[a]),
-      )
-      .slice(0, MASTERWROUGHT_EQUIP_CAP);
+    const flaggedCandidates = [
+      'spiritweld_girdle',
+      'wardspeaker_sabatons',
+      'fenbloom_breeches',
+      'wyrmfall_pendant',
+      'prismglass_loop',
+    ];
+    const expectedKept = ['spiritweld_girdle', 'wardspeaker_sabatons'];
+    expect(expectedKept).toHaveLength(MASTERWROUGHT_EQUIP_CAP);
+    // Premise check, not an assumption: the two literals really are the
+    // cap-highest flagged picks under the role's own scorer, so a retune that
+    // reorders the candidates fails HERE with the offending id.
+    const keptFloor = Math.min(
+      ...expectedKept.map((id) => roleItemScore(role as BoostRole, ITEMS[id])),
+    );
+    for (const id of flaggedCandidates) {
+      if (expectedKept.includes(id)) continue;
+      expect(
+        roleItemScore(role as BoostRole, ITEMS[id]),
+        `${id} now scores at or above a kept pick; re-derive the kept pair`,
+      ).toBeLessThan(keptFloor);
+    }
     const worn = Object.values(kit).filter((id) => id && ITEMS[id]?.masterwrought);
     expect(worn.sort()).toEqual([...expectedKept].sort());
-    // The demoted slot (whichever the scorer ranks last) is refilled with a
-    // real, unflagged, shaman-equippable piece rather than left empty.
-    const demotedId = flaggedCandidates.find((id) => !expectedKept.includes(id)) as string;
-    const demotedSlot = ITEMS[demotedId].slot as EquipSlot;
-    expect(kit[demotedSlot], `${demotedSlot} slot still filled`).toBeTruthy();
-    expect(ITEMS[kit[demotedSlot] as string]?.masterwrought, 'refill unflagged').toBeFalsy();
-    expect(canEquipItem('shaman', ITEMS[kit[demotedSlot] as string])).toBe(true);
+    // Every demoted slot is refilled with a real, unflagged, shaman-equippable
+    // piece rather than left empty: the armor slots from the best-unflagged
+    // map, the ring from the scored ring list.
+    for (const demotedId of flaggedCandidates.filter((id) => !expectedKept.includes(id))) {
+      const slot = ITEMS[demotedId].slot as string;
+      const slots: EquipSlot[] = slot === 'ring' ? ['ring1', 'ring2'] : [slot as EquipSlot];
+      for (const demotedSlot of slots) {
+        const refill = ITEMS[kit[demotedSlot] as string];
+        expect(refill, `${demotedSlot} still filled after ${demotedId} demoted`).toBeTruthy();
+        expect(refill?.masterwrought, `${demotedSlot} refill unflagged`).toBeFalsy();
+        expect(canEquipItem('shaman', refill)).toBe(true);
+      }
+    }
   });
 
-  it('the synthetic arms phase 09 will land on: ring refill and the empty fallbacks', () => {
-    // Phase 09 shipped flagged rings and weapons, but none of them is a
-    // top-scored pick for any role (checked when the pin above held at 10),
-    // so these arms are still unreachable through the real bisKitForRole
-    // pool; synthetic input keeps them on executed code either way.
+  it('ring refill and the empty fallbacks: the ring arm is live on real kits, the empties are not', () => {
+    // Synthetic defs keep every arm here deterministic, but only some of them
+    // are synthetic-ONLY. Measured over the whole ITEMS table at phase 09
+    // review, matching the enforcer's own header: the cap FIRES on 9 of the
+    // 16 real role kits, and the RING-REFILL arm below is live in 8 of them
+    // (prismglass_loop is a raw argmax ring pick that never survives
+    // enforcement). The synthetic-only family is the HAND arms in the
+    // describe underneath (mainhand/offhand refill, dual-wield, empty
+    // fallback), because roleItemScore ignores hitRating so no flagged weapon
+    // tops a role's hand pick; the two empty fallbacks below join them, since
+    // they need a slot with no unflagged candidate anywhere.
     const isFlagged = (id: string) => id.startsWith('mw_');
     const scoreOf = (id: string) => ({ mw_chest: 30, mw_waist: 10, mw_ring: 5 })[id] ?? 0;
     // Ring refill: three flagged picks; the ring is the lowest-scored, so it

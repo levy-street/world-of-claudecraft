@@ -6,10 +6,11 @@
 
 import { describe, expect, it } from 'vitest';
 import type { TOOL_EFFECT_IDS } from '../src/sim/content/professions';
-import { APEX_GEAR_RECIPES, TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES, APEX_GEAR_RECIPES, TOOL_EFFECT_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
+import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   NO_TOOL_OWNED,
   normalizeToolEffectSlots,
@@ -504,6 +505,79 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
       Math.ceil(startingDurabilityFor('makers_charm', 'epic') / RECHARGE_CHARGES_PER_MATERIAL) *
         unitValue('arcane_shard'),
     ).toBe(275);
+  });
+
+  it('holds for the apex charm SELF-GATHERED too, with exactly one line of slack', () => {
+    // The block above prices the plain specialized bill. The cheaper bill a
+    // player actually reaches signs it: thorium_ore and ashwood_log are node
+    // yields (NODE_MATERIAL_TABLE), and a rare-or-better roll signs the
+    // grant, so an engineer who mined and cut their own two lines pays the
+    // #1145 reduction on both (max(1, count - 1)) BEFORE the specialization
+    // multiplier. The other two lines have no signed source, which is what
+    // this block pins forward.
+    const recipe = APEX_GEAR_RECIPES.find((row) => row.resultItemId === 'makers_charm');
+    if (!recipe) throw new Error('recipe_makers_charm missing from APEX_GEAR_RECIPES');
+    const bill = (signedIds: readonly string[]): number =>
+      recipe.reagents.reduce((total, reagent) => {
+        const { count } = requiredReagentCountFor(
+          signedIds.includes(reagent.itemId),
+          reagent,
+          { engineering: 125 },
+          'engineering',
+        );
+        return total + count * unitValue(reagent.itemId);
+      }, 0);
+    const worstRecharge =
+      Math.ceil(startingDurabilityFor('makers_charm', 'epic') / RECHARGE_CHARGES_PER_MATERIAL) *
+      unitValue('arcane_shard');
+    expect(worstRecharge).toBe(275);
+    // 2 chassis 90 (unsigned, floor(3 x 0.8)) + 1 core 50 (unsigned) + 2 logs
+    // 120 (4 - 1 = 3, floor(3 x 0.8) = 2) + 1 ore 60 (2 - 1 = 1, floor(0.8)
+    // floored back up to 1) = 320.
+    const selfGathered = bill(['thorium_ore', 'ashwood_log']);
+    expect(selfGathered).toBe(320);
+    expect(
+      selfGathered,
+      'the self-gathered apex bill must still out-cost the worst generic recharge',
+    ).toBeGreaterThan(worstRecharge);
+    // The slack is one line wide. Signing every line composes to EXACTLY the
+    // recharge floor, so the strict bound is gone (a tie, not a win) the day
+    // a signed source for precision_chassis or wyrmfall_core ships. Both are
+    // off the signing paths today, and the absences are asserted below so a
+    // new source has to widen this pin deliberately rather than quietly
+    // flipping the inequality.
+    const allSelfSigned = bill(recipe.reagents.map((r) => r.itemId));
+    expect(allSelfSigned).toBe(275);
+    expect(allSelfSigned).toBe(worstRecharge);
+    // The two shipped ways a held copy comes back signed: a node yield (any
+    // rare-or-better roll signs it) and the #1149 craft stamp, which fires on
+    // a rare-or-better OUTPUT def quality. `poor`/absent normalize to
+    // `common` first, mirroring crafting.ts's defOutputQuality.
+    const admitsSignedSource = (itemId: string): boolean => {
+      const nodeYield = Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
+        Object.values(byZone).some((row) => row.itemId === itemId),
+      );
+      const quality = ITEMS[itemId]?.quality;
+      const outputQuality = quality === undefined || quality === 'poor' ? 'common' : quality;
+      return (
+        nodeYield ||
+        (ALL_RECIPES.some((row) => row.resultItemId === itemId) &&
+          isSignableMaterialRarity(outputQuality))
+      );
+    };
+    // POSITIVE CONTROLS on BOTH arms of that read, or the two absences below
+    // would pass over a predicate that answers false for everything: the two
+    // lines signed above really are node yields, and the recipe's own epic
+    // output really clears the craft stamp's threshold.
+    expect(admitsSignedSource('thorium_ore'), 'the ore line must be node-reachable').toBe(true);
+    expect(admitsSignedSource('ashwood_log'), 'the log line must be node-reachable').toBe(true);
+    expect(admitsSignedSource('makers_charm'), 'the epic output must be craft-signable').toBe(true);
+    for (const itemId of ['precision_chassis', 'wyrmfall_core']) {
+      expect(
+        admitsSignedSource(itemId),
+        `${itemId} must stay off the signing paths, or the apex bound collapses to a tie`,
+      ).toBe(false);
+    }
   });
 
   it('pins the shipped constants so a one-sided retune cannot drift silently', () => {
