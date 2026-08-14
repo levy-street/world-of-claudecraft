@@ -92,6 +92,62 @@ describe('tank crit immunity is keyed on the attacker', () => {
     });
     expect(crits).toBe(0);
   });
+
+  test('a player swinging through meleeSwing can crit a committed tank', () => {
+    // The player white-hit table (combat/auto_attack.ts meleeSwing) never
+    // consults tank crit immunity; this pins that a real player swing crits a
+    // committed tank so the rule can never silently widen past creatures.
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const pid = sim.addPlayer('warrior', 'Defender');
+    sim.setPlayerLevel(20, pid);
+    sim.applyTalents({ spec: 'prot', rows: {} }, pid);
+    const tank = sim.entities.get(pid);
+    const attackerPid = sim.addPlayer('warrior', 'Attacker');
+    sim.setPlayerLevel(20, attackerPid);
+    const attacker = sim.entities.get(attackerPid);
+    expect(tank).toBeDefined();
+    expect(attacker).toBeDefined();
+    if (!tank || !attacker) throw new Error('players missing');
+    expect(attacker.critChance).toBeGreaterThan(0);
+
+    const swings = sim as unknown as {
+      meleeSwing(
+        attacker: Entity,
+        target: Entity,
+        bonus: number,
+        abilityName: string | null,
+        opts: Record<string, never>,
+      ): boolean;
+    };
+    for (let swing = 0; swing < SWINGS; swing++) {
+      tank.maxHp = 1e9;
+      tank.hp = tank.maxHp;
+      swings.meleeSwing(attacker, tank, 0, null, {});
+    }
+    let landed = 0;
+    let crits = 0;
+    for (const event of sim.drainEvents()) {
+      if (
+        event.type === 'damage' &&
+        event.sourceId === attacker.id &&
+        event.targetId === pid &&
+        (event.kind === 'hit' || event.kind === 'block')
+      ) {
+        landed++;
+        if (event.crit) crits++;
+      }
+    }
+    expect(landed).toBeGreaterThan(500);
+    expect(crits).toBeGreaterThan(0);
+    // Sanity band mirroring the pet case: the player's own crit chance drives
+    // the rate, so just require a plausible non-degenerate fraction.
+    expect(crits / landed).toBeLessThan(0.5);
+  });
 });
 
 describe('isCritImmuneTank attacker classification (pure leaf)', () => {
