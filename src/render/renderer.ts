@@ -11222,12 +11222,15 @@ export class Renderer {
       v.visual.setFerocityStage(petFrenzy ? 3 : ferocityStage);
       v.visual.setPresentationScale(hunterPetVisualScale(ferocityStage, petFrenzy));
 
-      // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
-      // props between the hands and the on-back pose (self or a peer)
-      if (e.weaponStowed !== v.weaponStowed) {
-        v.weaponStowed = e.weaponStowed;
-        v.visual.setWeaponStowed(e.weaponStowed);
-      }
+      // The live sheathe toggle (Z key) is diffed further down, folded into the
+      // swim stow overlay, and `v.weaponStowed` has exactly ONE writer for a
+      // reason: two diffs against it FIGHT, because they compute different
+      // targets (the bare sim bit here, the union with `swimming` there). A
+      // swimmer holding a drawn weapon flips the field on every frame, which
+      // replays the sheathe one-shot forever and pins `currentIsOneShot` true,
+      // and that suppresses every base-state fade in CharacterVisual: the
+      // authored strokes never play. tests/weapon_stow_single_writer.test.ts
+      // pins the rule; see the comment on the surviving diff below.
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // A null build leaves the field unset; the shared gate retries after its cooldown.
@@ -11453,6 +11456,9 @@ export class Renderer {
       // drawn, and a peer's weapon rides their back the moment they start
       // swimming without any wire traffic. (This diff sits here, after the swim
       // latch, precisely so both halves are known in the same frame.)
+      // THE ONLY WRITER of `v.weaponStowed` in this loop: a second diff against
+      // the bare sim bit reverts this one every frame and replays the sheathe
+      // gesture forever, which freezes the rig mid-gesture (see above).
       const stowed = e.weaponStowed || swimming;
       if (stowed !== v.weaponStowed) {
         v.weaponStowed = stowed;

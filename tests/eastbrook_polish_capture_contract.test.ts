@@ -168,8 +168,11 @@ interface AttributionTargetFixture {
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after making that extracted policy an explicit provenance
 // leaf. The evidence now follows policy-only changes; no capture was retaken.
+// Re-minted after deleting the duplicate weapon-stow diff from renderer.ts (the
+// swim animation fix): renderer.ts is a provenance leaf, so the composite
+// follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e069626230576fa39ed87eeb94a78cb0ec111156f031fd8063bf2471a99db070';
+  'c4072dfd85c6b8eec47180e3b1eb4ebab0228a7dd00ca1a743aadbeecdc0bd01';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
