@@ -114,6 +114,14 @@ const GATHER_FALLBACK_LOCK_SHACKLE_TOP_WIDTH = 1.4;
 // apart from the round gather dots and the axis-aligned loot/mob squares at
 // minimap scale. Half-diagonal in px.
 const STATION_DIAMOND_RADIUS = 3;
+// Farm-patch sprout, a shade larger than the station diamond so its two leaves
+// stay separable at minimap scale. The ratios below place the crown (where the
+// leaves and stem meet) and each leaf's inner heel; map_window_painter.ts
+// repeats them at its own radius so the two surfaces draw one silhouette.
+const FARM_SPROUT_RADIUS = 3.5;
+const FARM_SPROUT_CROWN = 0.2;
+const FARM_SPROUT_HEEL_X = 0.15;
+const FARM_SPROUT_HEEL_Y = 0.25;
 
 // Party / player arrow triangle geometry (canvas-local, drawn under a rotation).
 const PARTY_ARROW_TIP_X = 6;
@@ -179,6 +187,7 @@ interface MinimapPaintGeometry {
   readonly playerArrowBaseY: number;
   readonly playerArrowOutlineWidth: number;
   readonly stationDiamondRadius: number;
+  readonly farmSproutRadius: number;
   readonly neutralNpcRadius: number;
   readonly neutralNpcOutlineWidth: number;
   readonly neutralNpcInkWidth: number;
@@ -221,6 +230,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     playerArrowBaseY: PLAYER_ARROW_BASE_Y,
     playerArrowOutlineWidth: PLAYER_ARROW_OUTLINE_WIDTH,
     stationDiamondRadius: STATION_DIAMOND_RADIUS,
+    farmSproutRadius: FARM_SPROUT_RADIUS,
     neutralNpcRadius: QUEST_NEUTRAL_RADIUS,
     neutralNpcOutlineWidth: QUEST_FALLBACK_OUTLINE_WIDTH,
     neutralNpcInkWidth: QUEST_FALLBACK_INK_WIDTH,
@@ -258,6 +268,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     playerArrowBaseY: PLAYER_ARROW_BASE_Y * 1.5,
     playerArrowOutlineWidth: 1.5,
     stationDiamondRadius: STATION_DIAMOND_RADIUS * 1.5,
+    farmSproutRadius: FARM_SPROUT_RADIUS * 1.5,
     neutralNpcRadius: QUEST_NEUTRAL_RADIUS * 1.5,
     neutralNpcOutlineWidth: 4,
     neutralNpcInkWidth: 1.75,
@@ -1612,6 +1623,40 @@ export class MinimapPainter {
             ctx.fill();
             ctx.stroke();
           }
+          break;
+        }
+        case 'farm-patch': {
+          // Procedural only this phase: no marker art id exists for a garden
+          // bed, so there is nothing to blit and the sprout is always painted.
+          // Station color, NOT gatherReady: that green means "harvestable right
+          // now" on this surface and the pin carries no readiness or plot state
+          // (the map window painter refuses the same green for the same
+          // reason). A patch is a static service site like a crafting station,
+          // so it takes the station family's color and the two-leaf silhouette
+          // is what tells it apart from the diamond beside it. Tier-identical
+          // (fairness invariant): never preset- or governor-gated.
+          const radius = geometry.farmSproutRadius;
+          const crownY = m.my - radius * FARM_SPROUT_CROWN;
+          const heelX = radius * FARM_SPROUT_HEEL_X;
+          const heelY = m.my + radius * FARM_SPROUT_HEEL_Y;
+          ctx.fillStyle = colors.station;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = geometry.markerOutlineWidth;
+          ctx.beginPath();
+          ctx.moveTo(m.mx, crownY);
+          ctx.lineTo(m.mx - radius, m.my - radius);
+          ctx.lineTo(m.mx - heelX, heelY);
+          ctx.closePath();
+          ctx.moveTo(m.mx, crownY);
+          ctx.lineTo(m.mx + radius, m.my - radius);
+          ctx.lineTo(m.mx + heelX, heelY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(m.mx, crownY);
+          ctx.lineTo(m.mx, m.my + radius);
+          ctx.stroke();
           break;
         }
         case 'gather-node': {

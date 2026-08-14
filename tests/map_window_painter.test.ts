@@ -435,6 +435,7 @@ function mapWorld(): IWorld {
     inventory: [],
     gatheringProficiency: {},
     stationPlacements: [],
+    farmPatches: [],
     civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
@@ -740,6 +741,7 @@ function labelWorld(): IWorld {
     inventory: [],
     gatheringProficiency: {},
     stationPlacements: [],
+    farmPatches: [],
     civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
@@ -949,6 +951,21 @@ function stationTypesLabelWorld(types: readonly (typeof TEST_STATION_TYPES)[numb
 
 function stationLabelWorld(): IWorld {
   return stationTypesLabelWorld(['forge']);
+}
+
+function farmPatchLabelWorld(): IWorld {
+  const world = labelWorld() as unknown as { farmPatches: unknown[] };
+  world.farmPatches = [
+    {
+      id: 'patch_painter',
+      zoneId: LABEL_ZONE.id,
+      tier: 1,
+      x: 18,
+      z: LABEL_ZONE_CZ + 22,
+      beds: [],
+    },
+  ];
+  return world as unknown as IWorld;
 }
 
 function serviceWorldContent() {
@@ -1454,6 +1471,56 @@ describe('map_window_painter: painted stable marker sprites', () => {
       style: 'paint:--color-map-outline',
       lineWidth: 1.5,
       commands: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+    });
+  });
+
+  it('paints the farm-patch sprout procedurally, with no marker-art lookup at all', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.farmPatches).toHaveLength(1);
+    const patch = result.farmPatches[0];
+    expect(patch.patchId).toBe('patch_painter');
+    // The pin has no MapMarkerArtId this phase: the painter must never ask the
+    // art cache for one, and must never blit a sprite for it.
+    expect(markerArt.calls.filter((call) => String(call.id).includes('farm'))).toEqual([]);
+    // Two leaves in ONE filled path (two closed triangles), in the oak green
+    // rather than any gather-node readiness color.
+    const leaves = trace.fills.find(
+      (fill) =>
+        fill.style === 'paint:--color-map-oak' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+    );
+    expect(leaves, 'the farm pin must paint its two-leaf sprout').toBeDefined();
+    // The leaves are keyed off the badge position and the standard radius, and
+    // fan symmetrically to either side of the stem.
+    const radius = 6.5;
+    expect(leaves?.args.slice(0, 6)).toEqual([
+      patch.mx,
+      patch.my - radius * 0.2,
+      patch.mx - radius,
+      patch.my - radius,
+      patch.mx - radius * 0.15,
+      patch.my + radius * 0.25,
+    ]);
+    // The stem is a separate two-point stroke below the crown, outlined like
+    // every other painted landmark.
+    const stem = trace.strokes.find(
+      (stroke) =>
+        stroke.at > (leaves?.at ?? Number.MAX_VALUE) && stroke.commands.join() === 'moveTo,lineTo',
+    );
+    expect(stem).toMatchObject({
+      style: 'paint:--color-map-outline',
+      lineWidth: 1.5,
+      args: [patch.mx, patch.my - radius * 0.2, patch.mx, patch.my + radius],
     });
   });
 

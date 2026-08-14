@@ -159,6 +159,9 @@ export const MAP_STATION_HIT_RADIUS = 10;
 /** Hit radius for a civic-service badge on the zone map. */
 export const MAP_SERVICE_HIT_RADIUS = 10;
 
+/** Hit radius for a farm-patch badge on the zone map. */
+export const MAP_FARM_PATCH_HIT_RADIUS = 10;
+
 /** Navigation paintings are larger than resource/service badges and remain
  * comfortably hoverable across their full keyed silhouette. */
 export const MAP_NAVIGATION_HIT_RADIUS = 15;
@@ -296,6 +299,38 @@ export function stationMarkerAt(
   return best;
 }
 
+/** A farming garden-bed site on the zone map. Patches are STATIC content
+ * positions (the crafting-station doctrine, never entities and never per-viewer
+ * state), so both IWorld hosts project the same badge; the badge can be
+ * displaced a few canvas pixels to keep a nearby quest glyph clear, while
+ * patchId/zoneId remain the authoritative content identity for its tooltip. */
+export interface MapFarmPatchMarker {
+  mx: number;
+  my: number;
+  patchId: string;
+  zoneId: string;
+}
+
+/** The nearest farm-patch badge within its hit radius, or null. */
+export function farmPatchMarkerAt(
+  patches: readonly MapFarmPatchMarker[],
+  mx: number,
+  my: number,
+): MapFarmPatchMarker | null {
+  let best: MapFarmPatchMarker | null = null;
+  let bestD2 = MAP_FARM_PATCH_HIT_RADIUS * MAP_FARM_PATCH_HIT_RADIUS;
+  for (const patch of patches) {
+    const dx = mx - patch.mx;
+    const dy = my - patch.my;
+    const d2 = dx * dx + dy * dy;
+    if (d2 <= bestD2) {
+      bestD2 = d2;
+      best = patch;
+    }
+  }
+  return best;
+}
+
 /** A static mailbox or interactive noticeboard on the zone map. Positions
  * come from the injected active-world services snapshot, never live entities. */
 export interface MapServiceMarker {
@@ -354,14 +389,16 @@ export type MapPointMarkerHit =
   | { kind: 'navigation'; marker: MapNavigationMarker; distance2: number }
   | { kind: 'station'; marker: MapStationMarker; distance2: number }
   | { kind: 'service'; marker: MapServiceMarker; distance2: number }
-  | { kind: 'gather'; marker: MapGatherNodeMarker; distance2: number };
+  | { kind: 'gather'; marker: MapGatherNodeMarker; distance2: number }
+  | { kind: 'farm'; marker: MapFarmPatchMarker; distance2: number };
 
 type MapPointMarker =
   | MapNpcMarker
   | MapNavigationMarker
   | MapStationMarker
   | MapServiceMarker
-  | MapGatherNodeMarker;
+  | MapGatherNodeMarker
+  | MapFarmPatchMarker;
 
 const MAP_POINT_HIT_TIE_PRIORITY: Readonly<Record<MapPointMarkerHit['kind'], number>> = {
   npc: 0,
@@ -369,6 +406,7 @@ const MAP_POINT_HIT_TIE_PRIORITY: Readonly<Record<MapPointMarkerHit['kind'], num
   station: 2,
   service: 3,
   gather: 4,
+  farm: 5,
 };
 
 function mapPointHitBefore(a: MapPointMarkerHit, b: MapPointMarkerHit): boolean {
@@ -443,6 +481,7 @@ export function mapPointMarkerHitsInto(
   services: readonly MapServiceMarker[],
   stations: readonly MapStationMarker[],
   gatherNodes: readonly MapGatherNodeMarker[],
+  farmPatches: readonly MapFarmPatchMarker[],
   mx: number,
   my: number,
   radius: number,
@@ -463,6 +502,7 @@ export function mapPointMarkerHitsInto(
   activeCount = appendMapPointHits(output, activeCount, 'station', stations, mx, my, radius2);
   activeCount = appendMapPointHits(output, activeCount, 'service', services, mx, my, radius2);
   activeCount = appendMapPointHits(output, activeCount, 'gather', gatherNodes, mx, my, radius2);
+  activeCount = appendMapPointHits(output, activeCount, 'farm', farmPatches, mx, my, radius2);
   return activeCount;
 }
 
@@ -475,6 +515,7 @@ export function mapPointMarkerHits(
   services: readonly MapServiceMarker[],
   stations: readonly MapStationMarker[],
   gatherNodes: readonly MapGatherNodeMarker[],
+  farmPatches: readonly MapFarmPatchMarker[],
   mx: number,
   my: number,
   radius: number,
@@ -486,6 +527,7 @@ export function mapPointMarkerHits(
     services,
     stations,
     gatherNodes,
+    farmPatches,
     mx,
     my,
     radius,
@@ -725,6 +767,9 @@ export interface OverworldMapModel {
   stations: MapStationMarker[];
   /** Active-world mailboxes and noticeboards, collision-safe with other landmarks. */
   services: MapServiceMarker[];
+  /** Farming garden-bed sites in the committed zone, on the same collision-safe
+   *  landmark layer. Empty in a zone with no authored patch. */
+  farmPatches: MapFarmPatchMarker[];
   /** Collision-safe route badges and nearby live Rift entrances. */
   navigation: MapNavigationMarker[];
   player: MapPlayerMarker | null;
@@ -1064,6 +1109,34 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     landmarks.push(marker);
   }
 
+  // Farming garden beds (the fifth gathering profession): static content sites
+  // read through IWorld exactly like stations, so a custom-map playtest never
+  // inherits the built-in patch table. A patch anchor is the grid centroid, and
+  // its individual beds project within a few pixels of it at the full-zone
+  // scale, so one badge stands for the whole site. Placed on the shared
+  // landmark layer so later badges clear it deterministically.
+  const farmPatches: MapFarmPatchMarker[] = [];
+  for (const patch of world.farmPatches) {
+    if (patch.zoneId !== zone.id || !inVisibleRegion(patch.x, patch.z)) continue;
+    const projected = toMap(patch.x, patch.z);
+    const placed = placeLandmarkBadge(
+      projected.mx,
+      projected.my,
+      npcs,
+      landmarks,
+      S,
+      landmarkPlacement,
+    );
+    const marker: MapFarmPatchMarker = {
+      mx: placed.mx,
+      my: placed.my,
+      patchId: patch.id,
+      zoneId: patch.zoneId,
+    };
+    farmPatches.push(marker);
+    landmarks.push(marker);
+  }
+
   let player: MapPlayerMarker | null = null;
   if (inZone(p.pos.x, p.pos.z) && inView(p.pos.x, p.pos.z)) {
     const { mx, my } = toMap(p.pos.x, p.pos.z);
@@ -1131,6 +1204,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     gatherNodes,
     stations,
     services,
+    farmPatches,
     navigation,
     player,
     allies,

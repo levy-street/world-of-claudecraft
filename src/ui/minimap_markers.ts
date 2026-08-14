@@ -139,6 +139,15 @@ export function minimapPaintedMarkerClearance(size: number): number {
   return Math.max(0, size) * SQRT_HALF;
 }
 
+/** Painted footprint of a farm-patch pin, in canvas px, standard and compact.
+ * These are local constants rather than MAP_MARKER_SIZES rows because the pin
+ * is PROCEDURAL this phase: it has no MapMarkerArtId, and every size row in
+ * that table belongs to a marker-art family that caches a sprite at exactly
+ * that pixel size. The values match the station family so the two static
+ * landmark pins keep the same clearance from the minimap rim. */
+export const FARM_PATCH_MARKER_SIZE = 16;
+export const FARM_PATCH_MARKER_SIZE_COMPACT = 22;
+
 export function minimapSafeCenterRadius(canvasSize: number, clearance: number): number {
   return Math.max(0, canvasSize / 2 - MINIMAP_CLIP_INSET - Math.max(0, clearance));
 }
@@ -246,7 +255,13 @@ export type MinimapMarker =
   // A crafting station (Professions 2.0): STATIC content positions (never
   // entities, no per-viewer state), so both IWorld hosts produce the same
   // marker. Tier-identical by the fairness invariant: never preset-gated.
-  | { kind: 'station'; mx: number; my: number; stationId: string; type: StationType };
+  | { kind: 'station'; mx: number; my: number; stationId: string; type: StationType }
+  // A farming garden-bed site (the fifth gathering profession): STATIC content
+  // positions on the crafting-station doctrine above, never entities and never
+  // per-viewer state, so both IWorld hosts produce the same marker. The plot
+  // state a player owns on those beds is a separate per-player read and does
+  // not reach this pin. Tier-identical by the fairness invariant.
+  | { kind: 'farm-patch'; mx: number; my: number; patchId: string };
 
 /** Everything the painter draws for one overworld minimap frame: the marker list (in
  *  draw order) plus the committed zone id (the painter localizes the #zone-label). */
@@ -556,6 +571,24 @@ export function createMinimapMarkers(): MinimapMarkers {
           my: half + dz,
           stationId: station.id,
           type: station.type,
+        });
+      }
+
+      // Farming garden beds: the same static-content read as the stations
+      // above, through IWorld so a custom map inherits no built-in patch. The
+      // pin marks the SITE (the patch anchor, its bed grid's centroid), never
+      // an individual bed and never this viewer's plot state, so it is one
+      // marker per patch in range on every host.
+      for (const patch of world.farmPatches) {
+        const dx = -(patch.x - p.pos.x) * pxPerYard;
+        const dz = -(patch.z - p.pos.z) * pxPerYard;
+        const size = compact ? FARM_PATCH_MARKER_SIZE_COMPACT : FARM_PATCH_MARKER_SIZE;
+        if (!centerFits(dx * dx + dz * dz, S, minimapPaintedMarkerClearance(size))) continue;
+        markers.push({
+          kind: 'farm-patch',
+          mx: half + dx,
+          my: half + dz,
+          patchId: patch.id,
         });
       }
 

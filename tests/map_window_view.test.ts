@@ -10,6 +10,7 @@
 // getComputedStyle and are covered by the no-magic-values source guard instead.
 
 import { describe, expect, it } from 'vitest';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
   BUILTIN_WORLD,
   CAMPS,
@@ -40,7 +41,9 @@ import { isNodeToolLockedFor } from '../src/ui/gathering_view';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
   buildOverworldMapModel,
+  farmPatchMarkerAt,
   gatherNodeMarkerAt,
+  MAP_FARM_PATCH_HIT_RADIUS,
   MAP_GATHER_NODE_HIT_RADIUS,
   MAP_LANDMARK_PLACEMENT_BY_PROFILE,
   MAP_LANDMARK_SEPARATION,
@@ -159,6 +162,7 @@ function makeOverworldWorld(
     nodeHarvestableByMe: () => true,
     stationPlacements: STATIONS,
     civicServicePlacements: [],
+    farmPatches: FARM_PATCHES,
   } as unknown as IWorld;
 }
 
@@ -1621,16 +1625,18 @@ describe('zone-map touch point-marker resolution', () => {
     ready: true,
     locked: false,
   };
+  const farm = { mx: 6, my: 0, patchId: 'patch', zoneId: ZONE.id };
 
   it('uses a physical 20px radius and resolves overlapping targets globally by distance', () => {
     expect(MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX).toBe(20);
     expect(
-      mapPointMarkerHits([npc], [navigation], [service], [station], [gather], 0, 0, 20),
+      mapPointMarkerHits([npc], [navigation], [service], [station], [gather], [farm], 0, 0, 20),
     ).toEqual([
       { kind: 'gather', marker: gather, distance2: 0 },
       { kind: 'navigation', marker: navigation, distance2: 4 },
       { kind: 'service', marker: service, distance2: 9 },
       { kind: 'station', marker: station, distance2: 16 },
+      { kind: 'farm', marker: farm, distance2: 36 },
       { kind: 'npc', marker: npc, distance2: 64 },
     ]);
   });
@@ -1642,6 +1648,7 @@ describe('zone-map touch point-marker resolution', () => {
     const tiedStation = { ...station, mx: 5 };
     const tiedService = { ...service, mx: 5 };
     const tiedGather = { ...gather, mx: 5 };
+    const tiedFarm = { ...farm, mx: 5 };
 
     const firstCount = mapPointMarkerHitsInto(
       [tiedNpc],
@@ -1649,18 +1656,20 @@ describe('zone-map touch point-marker resolution', () => {
       [tiedService],
       [tiedStation],
       [tiedGather],
+      [tiedFarm],
       0,
       0,
       5,
       output,
     );
-    expect(firstCount).toBe(5);
+    expect(firstCount).toBe(6);
     expect(output.map((hit) => hit.kind)).toEqual([
       'npc',
       'navigation',
       'station',
       'service',
       'gather',
+      'farm',
     ]);
     const slots = new Set(output);
 
@@ -1670,24 +1679,26 @@ describe('zone-map touch point-marker resolution', () => {
       [{ ...service, mx: 2 }],
       [{ ...station, mx: 1 }],
       [{ ...gather, mx: 0 }],
+      [{ ...farm, mx: 3 }],
       0,
       0,
       5,
       output,
     );
-    expect(secondCount).toBe(5);
+    expect(secondCount).toBe(6);
     expect(new Set(output)).toEqual(slots);
     expect(output.map((hit) => [hit.kind, hit.distance2])).toEqual([
       ['gather', 0],
       ['station', 1],
       ['service', 4],
       ['navigation', 9],
+      ['farm', 9],
       ['npc', 16],
     ]);
 
-    const missCount = mapPointMarkerHitsInto([], [], [], [], [], 0, 0, 5, output);
+    const missCount = mapPointMarkerHitsInto([], [], [], [], [], [], 0, 0, 5, output);
     expect(missCount).toBe(0);
-    expect(output).toHaveLength(5);
+    expect(output).toHaveLength(6);
     expect(new Set(output)).toEqual(slots);
   });
 
@@ -1697,6 +1708,7 @@ describe('zone-map touch point-marker resolution', () => {
     const tiedStation = { ...station, mx: 5 };
     const tiedService = { ...service, mx: 5 };
     const tiedGather = { ...gather, mx: 5 };
+    const tiedFarm = { ...farm, mx: 5 };
     expect(
       mapPointMarkerHits(
         [tiedNpc],
@@ -1704,12 +1716,13 @@ describe('zone-map touch point-marker resolution', () => {
         [tiedService],
         [tiedStation],
         [tiedGather],
+        [tiedFarm],
         0,
         0,
         5,
       ).map((hit) => hit.kind),
-    ).toEqual(['npc', 'navigation', 'station', 'service', 'gather']);
-    expect(mapPointMarkerHits([tiedNpc], [], [], [], [], 0, 0, 4.9)).toEqual([]);
+    ).toEqual(['npc', 'navigation', 'station', 'service', 'gather', 'farm']);
+    expect(mapPointMarkerHits([tiedNpc], [], [], [], [], [], 0, 0, 4.9)).toEqual([]);
   });
 
   it('keeps a forgiving hover target across the full navigation painting', () => {
@@ -1718,6 +1731,7 @@ describe('zone-map touch point-marker resolution', () => {
       mapPointMarkerHits(
         [],
         [navigation],
+        [],
         [],
         [],
         [],
@@ -1816,6 +1830,127 @@ describe('zone-map crafting stations', () => {
           MAP_STATION_NPC_SEPARATION - 1e-6,
         );
       }
+    }
+  });
+});
+
+describe('zone-map farm patches', () => {
+  const EASTBROOK_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_eastbrook');
+
+  it('projects the committed zone patch anchor identically on both hosts', () => {
+    expect(EASTBROOK_PATCH).toBeDefined();
+    if (!EASTBROOK_PATCH) return;
+    const sim = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
+    const client = buildOverworldMapModel(input(makeOverworldWorld('client'), 1));
+    expect(sim.farmPatches).toEqual(client.farmPatches);
+    expect(sim.farmPatches).toHaveLength(1);
+    expect(sim.farmPatches[0]).toMatchObject({
+      patchId: 'patch_eastbrook',
+      zoneId: ZONE.id,
+    });
+    expect(Number.isFinite(sim.farmPatches[0].mx)).toBe(true);
+    expect(Number.isFinite(sim.farmPatches[0].my)).toBe(true);
+  });
+
+  it('reads the active IWorld patch list and filters foreign-zone sites', () => {
+    const world = makeOverworldWorld('sim') as unknown as {
+      farmPatches: Array<{
+        id: string;
+        zoneId: string;
+        tier: number;
+        x: number;
+        z: number;
+        beds: readonly { id: string; x: number; z: number }[];
+      }>;
+    };
+    world.farmPatches = [
+      { id: 'custom_patch', zoneId: ZONE.id, tier: 1, x: 24, z: ZONE_CZ + 24, beds: [] },
+      { id: 'foreign_patch', zoneId: ZONES[1].id, tier: 2, x: 24, z: ZONE_CZ + 24, beds: [] },
+    ];
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(model.farmPatches).toHaveLength(1);
+    expect(model.farmPatches[0]).toMatchObject({ patchId: 'custom_patch', zoneId: ZONE.id });
+  });
+
+  it('draws nothing in a zone whose content authors no patch', () => {
+    const world = makeOverworldWorld('sim') as unknown as { farmPatches: unknown[] };
+    world.farmPatches = [];
+    expect(buildOverworldMapModel(input(world as unknown as IWorld, 1)).farmPatches).toEqual([]);
+  });
+
+  it('hit-tests the nearest painted patch and misses outside its touch radius', () => {
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
+    const marker = model.farmPatches[0];
+    expect(marker).toBeDefined();
+    if (!marker) return;
+    expect(farmPatchMarkerAt(model.farmPatches, marker.mx, marker.my)).toBe(marker);
+    expect(
+      farmPatchMarkerAt(model.farmPatches, marker.mx + MAP_FARM_PATCH_HIT_RADIUS, marker.my),
+    ).toBe(marker);
+    expect(
+      farmPatchMarkerAt(model.farmPatches, marker.mx + MAP_FARM_PATCH_HIT_RADIUS + 0.5, marker.my),
+    ).toBeNull();
+    expect(farmPatchMarkerAt([], marker.mx, marker.my)).toBeNull();
+  });
+
+  it('joins the shared landmark layer, so a patch badge clears every quest glyph', () => {
+    const world = makeOverworldWorld('sim') as unknown as {
+      questState: () => 'available';
+      farmPatches: unknown[];
+    };
+    world.questState = () => 'available';
+    // Park the patch anchor exactly on the quest giver so the allocator has to
+    // displace it; the authored Eastbrook site is nowhere near one.
+    world.farmPatches = [
+      { id: 'patch_on_giver', zoneId: ZONE.id, tier: 1, x: 10, z: ZONE_CZ, beds: [] },
+    ];
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(model.farmPatches).toHaveLength(1);
+    expect(model.npcs.length).toBeGreaterThan(0);
+    const patch = model.farmPatches[0];
+    for (const npc of model.npcs) {
+      expect(Math.hypot(patch.mx - npc.mx, patch.my - npc.my)).toBeGreaterThanOrEqual(
+        MAP_STATION_NPC_SEPARATION - 1e-6,
+      );
+    }
+  });
+
+  it('enters the landmark layer itself, so a second patch clears the first', () => {
+    const world = makeOverworldWorld('sim') as unknown as { farmPatches: unknown[] };
+    // Two sites on the SAME world position: the first keeps its projection and
+    // the second must be displaced, which is only possible if an accepted patch
+    // badge joins the shared landmark list.
+    world.farmPatches = [
+      { id: 'patch_first', zoneId: ZONE.id, tier: 1, x: 40, z: ZONE_CZ + 40, beds: [] },
+      { id: 'patch_second', zoneId: ZONE.id, tier: 2, x: 40, z: ZONE_CZ + 40, beds: [] },
+    ];
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(model.farmPatches.map((patch) => patch.patchId)).toEqual([
+      'patch_first',
+      'patch_second',
+    ]);
+    const [first, second] = model.farmPatches;
+    expect(Math.hypot(first.mx - second.mx, first.my - second.my)).toBeGreaterThanOrEqual(
+      MAP_STATION_NPC_SEPARATION - 1e-6,
+    );
+  });
+
+  it('clears the stations placed before it on the same landmark layer', () => {
+    const world = makeOverworldWorld('sim') as unknown as { farmPatches: unknown[] };
+    // Same world position as the Eastbrook forge (STATIONS[0]).
+    const forge = STATIONS.find((station) => station.id === 'station_eastbrook_forge');
+    expect(forge).toBeDefined();
+    if (!forge) return;
+    world.farmPatches = [
+      { id: 'patch_on_forge', zoneId: ZONE.id, tier: 1, x: forge.pos.x, z: forge.pos.z, beds: [] },
+    ];
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    const patch = model.farmPatches[0];
+    expect(patch).toBeDefined();
+    for (const station of model.stations) {
+      expect(Math.hypot(patch.mx - station.mx, patch.my - station.my)).toBeGreaterThanOrEqual(
+        MAP_STATION_NPC_SEPARATION - 1e-6,
+      );
     }
   });
 });
