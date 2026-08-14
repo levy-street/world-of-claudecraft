@@ -38,10 +38,20 @@ describe('owned-class level 20 balance harness (healer contract)', () => {
       expect(benisonSingle.resourceEnd).toBeGreaterThanOrEqual(250);
       expect(benisonGroup.resourceEnd).toBeGreaterThanOrEqual(250);
       expect(spiritmendGroup.resourceEnd).toBeGreaterThanOrEqual(1_200);
-      expect(doctrineSingle.hps + doctrineSingle.dps).toBeGreaterThanOrEqual(140);
+      // v0.38 set-bonus budget retune re-measure. Doctrine is the cloth healer,
+      // so it carried the caster 2-piece (a flat +20 Spell Power, the single
+      // most over-budget bonus in item_sets.ts at 2.2 epic chest pieces) and
+      // felt its removal hardest: doctrineSingle hps+dps 155.31 -> 137.22 full
+      // and 154.48 -> 139.34 diet; doctrineGroup combined 168.06 -> 109.90 full
+      // and 182.28 -> 115.43 diet. Both floors are re-derived at their original
+      // relative margins. Every other bound in this contract kept large
+      // headroom and is deliberately untouched: the two resourceEnd floors and
+      // the benison/spiritmend hps ratio all still clear by wide margins, and
+      // the emergency-recovery ordering is unaffected.
+      expect(doctrineSingle.hps + doctrineSingle.dps).toBeGreaterThanOrEqual(123);
       expect(
         doctrineGroup.hps + doctrineGroup.dps + doctrineGroup.absorbedDamage / 60,
-      ).toBeGreaterThanOrEqual(band(120, 130));
+      ).toBeGreaterThanOrEqual(band(78, 82));
       expect(doctrineGroup.resourceEnd).toBeGreaterThanOrEqual(150);
       expect(spiritmendSingle.hps).toBeGreaterThan(0);
       // Same owned-class matrix growth as the DPS metric test in

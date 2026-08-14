@@ -38,7 +38,12 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // Warspirit area/single: full actual 1.1494, diet actual 1.0944 (the two
       // retained seeds roll the single-target run high), so the diet band is
       // 1.04 to 1.14 at the same relative margins.
-      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(1.1, 1.04));
+      // v0.38 retune re-measure: 1.1144 full / 1.1247 diet (was 1.1494 /
+      // 1.0944). The ratio itself barely moved, since both halves are the same
+      // Warspirit build, but the full-sweep floor was left with only 1.3 percent
+      // of headroom, which is flake range for a five-seed average. Re-derived at
+      // the original relative margin; the ceiling keeps its own.
+      expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(band(1.06, 1.06));
       expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(band(1.2, 1.14));
       // Vespers area/single: full actual 1.4041, diet actual 1.4475; the diet
       // floor rises to 1.29 with the same relative margin.
@@ -53,7 +58,22 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // Full-sweep ceiling kept at 1.2 (measured 1.1539 that round, was 1.18
       // on the combined tree pre-round). Re-author both sides of this pair
       // when the owned-class stack integrates.
-      expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(band(1.2, 1.22));
+      //
+      // THE ONE CROSS-ARCHETYPE ROW THE v0.38 SET-BONUS RETUNE ACTUALLY MOVED,
+      // and worth reading as a balance statement rather than a re-pin. Warspirit
+      // is mail melee and Vespers is cloth caster, so pricing the set bonuses
+      // against item_budget.ts cut Vespers by about 11 percent and left
+      // Warspirit flat: this ratio rose 1.1539 -> 1.2320 full and 1.1775 ->
+      // 1.2478 diet. The cause is that the caster 2-piece was the most
+      // over-budget bonus in the game (a flat +20 Spell Power, 2.2 epic chest
+      // pieces), so casters were carrying the largest hidden subsidy; post-retune
+      // every archetype sits at the same 18-point budget. Accepted as the
+      // correction rather than compensated for, and the ceiling is re-derived at
+      // its original relative margin. The FLOOR below is deliberately left where
+      // it was: the measurement moved away from it, so it still guards a
+      // Warspirit collapse with more headroom than before, and raising it would
+      // invent a failure mode this change did not test for.
+      expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(band(1.28, 1.29));
       // Full sweep: the grown owned-class matrix ran ~180s under shard load and
       // roughly doubled in the shared lane (run 31288946173 killed it at 240s).
       // Diet: two seeds and the 60 s boss window cut the simulated time 3.2x.

@@ -37,10 +37,18 @@ describe('owned-class level 20 balance harness (Druid bands)', () => {
       // Lane-diet re-measure: moongrove full actual 154.00 (120 s), diet
       // actual 152.33 (60 s); wildfang 176.08 / 179.05. Diet bands re-derived
       // at the same relative margins: 137 to 178 and 168 to 208.
+      //
+      // v0.38 set-bonus budget retune re-measure: moongrove 145.93 full /
+      // 144.38 diet, wildfang 159.47 / 161.98. Only the WILDFANG arm is
+      // re-derived here (both of its bounds, per the convention above), because
+      // it is the one whose floor the retune breached. Moongrove's band still
+      // holds with about 5 percent of headroom, so it is left alone rather than
+      // re-centred: this probe is a gross-regression guard, and re-pinning a
+      // bound that is still doing its job only adds churn.
       expect(moongrove.dps).toBeGreaterThanOrEqual(band(138, 137));
       expect(moongrove.dps).toBeLessThanOrEqual(band(180, 178));
-      expect(wildfang.dps).toBeGreaterThanOrEqual(band(165, 168));
-      expect(wildfang.dps).toBeLessThanOrEqual(band(205, 208));
+      expect(wildfang.dps).toBeGreaterThanOrEqual(band(149, 152));
+      expect(wildfang.dps).toBeLessThanOrEqual(band(186, 188));
     },
     FULL_SWEEP ? 180_000 : 90_000,
   );
