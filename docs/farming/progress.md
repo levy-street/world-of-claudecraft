@@ -1368,7 +1368,9 @@ branch fix/farming-phase-07-render-and-juice deleted).
 
 ### Phase 7 QA (2026-08-14, PASS-WITH-FOLLOWUPS)
 
-Branch fix/farming-phase-07-qa off feature/farming-plan. FOURTEENTH absorb
+Branch fix/farming-phase-07-qa off feature/farming-plan; merged back
+--no-ff as c7fbf839a3 (branch deleted; the absorb merge plus ten QA
+commits). FOURTEENTH absorb
 FIRST (merge 20e9b6a987 of release/v0.38.0 tip 51aa4eab13: 98 commits, 225
 files, roughly 60-file farming intersection, no lockfile move; conflicts
 only the generated pending.ts, regen-resolved, and the accepted-art
