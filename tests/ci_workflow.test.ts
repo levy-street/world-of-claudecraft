@@ -479,8 +479,11 @@ describe('CI workflow parity', () => {
     expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     // Phase 2: pr-gate's test step runs through the selection-aware shard
-    // runner; the runner itself spawns `npm test` (pretest preserved), which
-    // tests/ci_shard_plan.test.ts pins behaviorally.
+    // runner; the entry regenerates the generated artifacts once per job
+    // before its legs (the merged selective leg is a bare vitest-related
+    // invocation with no npm lifecycle), which tests/ci_leg_runner.test.ts
+    // pins at the source level and tests/gate_artifact_skip.test.ts drives
+    // arm by arm.
     expect(prGate).toContain('run: node scripts/ci_shard_test.mjs');
     expect(prGate).not.toContain('run: npm test');
     expect(prChecks).not.toContain('run: npm test');
@@ -862,7 +865,10 @@ describe('CI workflow parity', () => {
       // runner from bound-killing the merge queue, so both halves take the
       // same slow-runner sizing METHOD as release-gate (the same formula over
       // their own healthy job wall, which lands on 30, not on its 35).
-      // Evidence on the ci.yml bound.
+      // Evidence on the ci.yml bound. (The harness pair was split into the
+      // owned_class_balance_* / owned_class_raid_* files on 2026-08-13; the
+      // figures stay as the measured record, and the bounds re-derive from
+      // fresh walls in a follow-up change.)
       ['pr-long-sims-a', 30],
       ['pr-long-sims-b', 30],
       ['browser-gate', 10],
@@ -975,10 +981,10 @@ describe('CI workflow parity', () => {
     // Both test jobs fan the ONE suite across the same N-shard matrix.
     // release-gate keeps the raw `npm test -- --shard` run line (selection
     // never touches a release ref); pr-gate runs the same suite through the
-    // selection-aware shard runner, which spawns `npm test` itself so pretest
-    // still regenerates the i18n artifacts in every shard (the S3 guard, guide
-    // freshness, and the git-subprocess suites need them regardless of which
-    // shard they hash into). Never a bare vitest invocation in the workflow.
+    // selection-aware shard runner, whose entry regenerates the i18n
+    // artifacts once per job before any leg (the S3 guard, guide freshness,
+    // and the git-subprocess suites need them regardless of which shard they
+    // hash into). Never a bare vitest invocation in the workflow YAML.
     // fail-fast stays off so shards pass or fail independently and a red run
     // always reports the whole suite.
     const halfCoreCap =

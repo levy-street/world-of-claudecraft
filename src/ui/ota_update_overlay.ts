@@ -2,8 +2,10 @@
 // while a bundle download runs before the player is in the world, and as the
 // recovery surface for the incompatible-version rejection. Same visual family
 // as the store-update prompt (native_update_prompt.ts): backdrop + panel +
-// title + body + actions, plus a progress bar the gate drives with the
-// plugin's download percent.
+// title + body, plus a progress bar the gate drives with the plugin's
+// download percent. Deliberately offers NO cancel/dismiss action: the update
+// must finish before play, so the gate alone decides when the overlay goes
+// away (apply reload, in-world suppression, or a failed download).
 //
 // Cold, event-driven painter (no driver of its own): it repaints only when
 // the gate reduces an event, and every mutable write is elided against the
@@ -14,10 +16,6 @@ import type { OtaOverlayModel } from '../net/ota_update_gate';
 import { markDialogRoot } from './dialog_root';
 import { formatNumber, t } from './i18n';
 
-export interface OtaOverlayActions {
-  onContinue(): void;
-}
-
 const BACKDROP_ID = 'ota-update-backdrop';
 
 interface OverlayRefs {
@@ -25,15 +23,13 @@ interface OverlayRefs {
   status: HTMLElement;
   bar: HTMLElement;
   fill: HTMLElement;
-  continueBtn: HTMLButtonElement;
 }
 
 let refs: OverlayRefs | null = null;
 let lastStatusText = '';
 let lastPercent = -1;
-let lastContinueShown: boolean | null = null;
 
-function mount(actions: OtaOverlayActions): OverlayRefs {
+function mount(): OverlayRefs {
   const backdrop = document.createElement('div');
   backdrop.id = BACKDROP_ID;
   backdrop.className = 'native-update-backdrop';
@@ -62,27 +58,17 @@ function mount(actions: OtaOverlayActions): OverlayRefs {
   fill.className = 'ota-update-fill';
   bar.appendChild(fill);
 
-  const actionsRow = document.createElement('div');
-  actionsRow.className = 'native-update-actions';
-
-  const continueBtn = document.createElement('button');
-  continueBtn.type = 'button';
-  continueBtn.className = 'btn ota-update-continue';
-  continueBtn.textContent = t('hudChrome.otaUpdate.continueAnyway');
-  continueBtn.addEventListener('click', () => actions.onContinue());
-  actionsRow.appendChild(continueBtn);
-
-  dialog.append(title, status, bar, actionsRow);
+  dialog.append(title, status, bar);
   markDialogRoot(dialog, { labelledBy: 'ota-update-title', modal: true });
   backdrop.appendChild(dialog);
   document.body.appendChild(backdrop);
-  return { backdrop, status, bar, fill, continueBtn };
+  return { backdrop, status, bar, fill };
 }
 
-export function renderOtaUpdateOverlay(model: OtaOverlayModel, actions: OtaOverlayActions): void {
+export function renderOtaUpdateOverlay(model: OtaOverlayModel): void {
   let mounted = false;
   if (!refs || !refs.backdrop.isConnected) {
-    refs = mount(actions);
+    refs = mount();
     mounted = true;
   }
 
@@ -112,19 +98,11 @@ export function renderOtaUpdateOverlay(model: OtaOverlayModel, actions: OtaOverl
     lastPercent = percent;
   }
 
-  if (model.showContinue !== lastContinueShown) {
-    refs.continueBtn.style.display = model.showContinue ? '' : 'none';
-    lastContinueShown = model.showContinue;
-  }
-
   if (mounted) {
-    // Land keyboard focus inside the dialog: on the escape hatch when it is
-    // offered, otherwise on the dialog root itself (tabindex -1 via
-    // markDialogRoot). Deferred a tick like native_update_prompt so the
-    // element is laid out before focus.
-    const target = model.showContinue
-      ? refs.continueBtn
-      : (refs.backdrop.firstElementChild as HTMLElement | null);
+    // Land keyboard focus on the dialog root (tabindex -1 via markDialogRoot);
+    // there is no action to focus. Deferred a tick like native_update_prompt
+    // so the element is laid out before focus.
+    const target = refs.backdrop.firstElementChild as HTMLElement | null;
     window.setTimeout(() => {
       if (refs && refs.backdrop.isConnected) target?.focus();
     }, 0);
@@ -136,5 +114,4 @@ export function hideOtaUpdateOverlay(): void {
   refs = null;
   lastStatusText = '';
   lastPercent = -1;
-  lastContinueShown = null;
 }

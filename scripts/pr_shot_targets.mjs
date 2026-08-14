@@ -5700,6 +5700,35 @@ export const TARGETS = [
     },
   },
   {
+    key: 'ota-update',
+    label: 'Native OTA update overlay',
+    when: ['ui/ota_update_overlay', 'net/ota_update_gate'],
+    variants: [
+      { key: 'downloading', model: { phase: 'downloading', percent: 42, fatal: false } },
+      {
+        key: 'downloading-mobile',
+        model: { phase: 'downloading', percent: 42, fatal: false },
+        mobile: true,
+      },
+      { key: 'incompatible-fatal', model: { phase: 'downloading', percent: 70, fatal: true } },
+    ],
+    // The overlay only mounts on a native shell mid-OTA-download (installOtaUpdateGate
+    // is inert off NATIVE_APP), which a browser capture never is; import the painter
+    // directly (Vite serves /src in dev) and render the model the gate would reduce,
+    // the gpu-notice recipe exactly. The model carries showContinue and the second
+    // argument carries an inert action so the SAME recipe renders the pre-removal
+    // painter during a before/after flip; the current painter ignores both extras.
+    async capture(page, variant) {
+      await page.evaluate(async (model) => {
+        const mod = await import('/src/ui/ota_update_overlay.ts');
+        mod.hideOtaUpdateOverlay();
+        mod.renderOtaUpdateOverlay({ showContinue: true, ...model }, { onContinue: () => {} });
+      }, variant?.model ?? { phase: 'downloading', percent: 42, fatal: false });
+      const open = await pollForSize(page, '#ota-update-backdrop');
+      return open ? { clip: '.ota-update-dialog' } : {};
+    },
+  },
+  {
     key: 'perf-nudge',
     label: 'Performance nudge toast (perf-doctor machine-local causes)',
     when: ['ui/perf_nudge', 'game/perf_nudge'],

@@ -148,7 +148,7 @@ threat handoff after leaving the form (pinned in
 `tests/druid_balance_probe.test.ts`). Groveheart heals from a dedicated
 intellect-leather fixture (the shared agility loadout starves the healer's
 mana pool) and is pinned inside the peer healer envelope on the owned-class
-HPS harness at a shared seed (`tests/owned_class_balance_harness.test.ts`).
+HPS harness at a shared seed (`tests/owned_class_balance_groveheart.test.ts`).
 Groveheart's three-ally throughput sits with the triage healers, well under
 the AoE ceiling of Spiritmend chain healing: a flagged PBE tuning question,
 deliberately not resolved by inventing base heal values here.

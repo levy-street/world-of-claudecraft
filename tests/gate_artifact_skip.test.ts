@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   gateVitestSkipPretestEnv,
+  shouldRunEntryPretest,
   shouldSkipPretest,
   WOC_SKIP_PRETEST,
 } from '../scripts/lib/gate_artifact_skip.mjs';
@@ -24,6 +25,24 @@ describe('shouldSkipPretest', () => {
 
   it('exports the gate vitest overlay as WOC_SKIP_PRETEST=1', () => {
     expect(gateVitestSkipPretestEnv()).toEqual({ [WOC_SKIP_PRETEST]: '1' });
+  });
+});
+
+describe('shouldRunEntryPretest (the CI shard entry decision)', () => {
+  // The three arms of scripts/ci_shard_test.mjs's entry-level pretest,
+  // unit-driven so the always-executed CI branch has executing coverage:
+  // zero legs (a selective lane that owns nothing) must not regenerate,
+  // an inherited skip flag must not regenerate twice, and the normal shape
+  // must regenerate exactly once before any leg.
+  it('runs for a populated plan with no skip flag', () => {
+    expect(shouldRunEntryPretest({ legCount: 1, env: {} })).toBe(true);
+  });
+  it('skips for a zero-leg plan (nothing below reads the artifacts)', () => {
+    expect(shouldRunEntryPretest({ legCount: 0, env: {} })).toBe(false);
+  });
+  it('skips when the flag is already set, exact-string contract', () => {
+    expect(shouldRunEntryPretest({ legCount: 3, env: { WOC_SKIP_PRETEST: '1' } })).toBe(false);
+    expect(shouldRunEntryPretest({ legCount: 3, env: { WOC_SKIP_PRETEST: 'true' } })).toBe(true);
   });
 });
 

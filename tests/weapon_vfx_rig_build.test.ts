@@ -10,6 +10,7 @@
 //   3. the memo is BOUNDED (the C2 memory ratchet): idle derivations past the
 //      idle cap evict and dispose, live wearers pin theirs, and an evicted
 //      derivation rebuilds byte-identically on its next wearer.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { isSharedTexture } from '../src/render/shared_resource';
@@ -23,6 +24,7 @@ import {
   type WeaponVfxSpec,
 } from '../src/render/weapon_vfx';
 import { WEAPON_EMISSIVE_IDLE_CACHE_MAX } from '../src/render/weapon_vfx_emissive_cache_core';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 interface StubCanvas {
   width: number;
@@ -157,6 +159,68 @@ function sourceMap(): THREE.Texture {
 // Order-independent by construction: beforeEach drops the module-level
 // sprite/sky texture memo, so every case below observes a cold build and
 // "did this rig draw a sky canvas" stays a real question in any run order.
+describe('createWeaponVfx point-light visibility ownership', () => {
+  // three counts a light into numPointLights iff it is visible, whatever its
+  // intensity, and every material's program cache key carries that count. A
+  // light born visible on the budgeted world path is therefore counted for the
+  // frames before the point-light budget first rules on it, and the changed
+  // count relinks every material drawn in them: measured as one frame in 5434
+  // sitting at 7 budgeted lights against a pin of 6, each relink a 100 to
+  // 200 ms synchronous stall.
+  it('is born hidden when a budget owns its visibility', () => {
+    const handle = createWeaponVfx(weaponRoot(), EPIC_SPEC, {
+      grounded: false,
+      budgetedLight: true,
+    });
+    expect(handle.light.visible).toBe(false);
+    // Still a real, budget-rankable light: only `visible` is deferred.
+    expect(handle.light.userData.budgetDynamic).toBe(true);
+    expect(handle.light.intensity).toBeGreaterThan(0);
+    handle.dispose();
+  });
+
+  it('keeps lighting immediately for a caller with no budget', () => {
+    // The armoury preview owns its own renderer and scene, so nothing there
+    // ever sets `visible` for it.
+    const preview = createWeaponVfx(weaponRoot(), EPIC_SPEC, { grounded: true });
+    expect(preview.light.visible).toBe(true);
+    preview.dispose();
+
+    const worldDefault = createWeaponVfx(weaponRoot(), EPIC_SPEC, { grounded: false });
+    expect(worldDefault.light.visible).toBe(true);
+    worldDefault.dispose();
+  });
+
+  it('wires the world path to ask for the budgeted light', () => {
+    // The two cases above pin both ARMS of the option; nothing pins that the
+    // world factory actually asks for the budgeted one, and that half is
+    // unreachable from a unit test (createCharacterVisual needs preloaded
+    // GLBs). Drop the flag and every case here stays green while a visible
+    // unranked light rides every entity that spawns holding a rarity weapon.
+    const characters = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/index.ts', import.meta.url), 'utf8'),
+    );
+    const factoryStart = characters.indexOf('export function createCharacterVisual(');
+    expect(factoryStart, 'createCharacterVisual was renamed; re-anchor this pin').toBeGreaterThan(
+      -1,
+    );
+    const construction = characters.indexOf('new CharacterVisual(', factoryStart);
+    const flag = characters.indexOf('visual.budgetedWeaponLight = true;', construction);
+    const returned = characters.indexOf('return visual;', construction);
+    expect(construction).toBeGreaterThan(factoryStart);
+    // Set before the visual escapes the factory: a rig handed out first could
+    // build its weapon vfx with the flag still false.
+    expect(flag).toBeGreaterThan(construction);
+    expect(returned).toBeGreaterThan(flag);
+
+    // And the visual hands that flag to this factory rather than to nothing.
+    const visual = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/visual.ts', import.meta.url), 'utf8'),
+    );
+    expect(visual).toContain('budgetedLight: this.budgetedWeaponLight,');
+  });
+});
+
 describe('createWeaponVfx backdrop construction', () => {
   it('builds no backdrop at all on the world (held) path', () => {
     const root = weaponRoot();

@@ -31,9 +31,20 @@ import { BROWSER_PATH } from './browser_path.mjs';
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
+import {
+  gearedArrivalBotFixture,
+  gearedArrivalFixtureSha256,
+} from './profiler/geared_arrival_fixture.mjs';
 
 const PORT = Number(process.env.BENCH_PORT ?? 5198);
 const WAVES = (process.env.BENCH_WAVES ?? '5,5,5,5').split(',').map(Number);
+if (
+  WAVES.length === 0 ||
+  WAVES.some((size) => !Number.isInteger(size) || size <= 0) ||
+  WAVES.reduce((total, size) => total + size, 0) > 40
+) {
+  throw new Error('BENCH_WAVES must contain positive integers totalling at most 40');
+}
 const LABEL = process.env.BENCH_LABEL ?? 'run';
 const GFX = process.env.BENCH_GFX ?? 'insane';
 const SERVER = process.env.SERVER_URL ?? 'http://localhost:8787';
@@ -54,37 +65,6 @@ const OUT = process.env.BENCH_OUT ?? path.join('tmp', `geared-arrival-${LABEL}-$
 // their wave teleports in.
 const OBSERVER = { x: 0, z: 0 };
 const PEN = { x: -150, z: 150 };
-
-// One archetype per weapon type the skin catalog covers, cycled across bots:
-// a compatible class, a giveable weapon item, and a rotation of owned skins
-// (hero celestial tier first: those carry the heavy VFX rigs).
-const LOADOUTS = [
-  {
-    cls: 'warrior',
-    weapon: 'worn_sword',
-    skins: ['solheim_sword', 'ice_fang_sword', 'cinderbrand_sword', 'guildmark_arming_sword'],
-  },
-  {
-    cls: 'warrior',
-    weapon: 'handaxe',
-    skins: ['skyrender_axe', 'glaciersplit_axe', 'emberbite_axe', 'brasscap_axe'],
-  },
-  {
-    cls: 'paladin',
-    weapon: 'training_mace',
-    skins: ['starfall_mace', 'rimecrusher_mace', 'smoulderfall_mace', 'tempered_flanged_mace'],
-  },
-  {
-    cls: 'rogue',
-    weapon: 'rusty_dagger',
-    skins: ['astravyr_dagger', 'frostbite_dagger', 'ashspark_dagger', 'guildmark_dirk'],
-  },
-  {
-    cls: 'mage',
-    weapon: 'gnarled_staff',
-    skins: ['cosmarch_staff', 'hoarfrost_vigil_staff', 'forgeheart_staff', 'brasscrown_staff'],
-  },
-];
 
 const uniq = Date.now().toString(36);
 const alpha = uniq.replace(/[0-9]/g, (d) => 'abcdefghij'[Number(d)]).slice(-6);
@@ -116,8 +96,9 @@ async function api(pathname, body, token, xff) {
 class Bot {
   constructor(i) {
     this.i = i;
-    this.loadout = LOADOUTS[i % LOADOUTS.length];
-    this.skin = this.loadout.skins[Math.floor(i / LOADOUTS.length) % this.loadout.skins.length];
+    this.fixture = gearedArrivalBotFixture(i);
+    this.loadout = this.fixture;
+    this.skin = this.fixture.skin;
     const li = String(i)
       .split('')
       .map((d) => 'abcdefghij'[+d])
@@ -126,7 +107,7 @@ class Bot {
     this.username = `geared_${uniq}_${i}`;
   }
   async register(db) {
-    const xff = `172.18.${Math.floor(this.i / 254)}.${(this.i % 254) + 1}`;
+    const xff = `172.${16 + (this.i % 16)}.${Math.floor(this.i / 16)}.${(this.i % 250) + 1}`;
     this.xff = xff;
     const reg = await api(
       '/api/register',
@@ -143,6 +124,7 @@ class Bot {
     const row = await db.query('SELECT id FROM accounts WHERE username = $1', [this.username]);
     const accountId = row.rows[0]?.id;
     if (!Number.isInteger(accountId)) throw new Error(`no account id for bot ${this.i}`);
+    this.accountId = accountId;
     await db.query(
       `INSERT INTO account_weapon_cosmetics (account_id, skin_ids)
        VALUES ($1, $2::jsonb)
@@ -151,7 +133,12 @@ class Bot {
     );
     const char = await api(
       '/api/characters',
-      { name: this.name, class: this.loadout.cls },
+      {
+        name: this.name,
+        class: this.loadout.cls,
+        appearance: this.fixture.appearance,
+        helmHidden: this.fixture.helmHidden,
+      },
       this.token,
       xff,
     );
@@ -375,7 +362,7 @@ async function enterObserver(page) {
   await sleep(15000);
 }
 
-async function measureWave(page, waveIndex, waveSize) {
+async function measureWave(page) {
   return page.evaluate(
     async (ms, wantProgramDiff, wantLightAudit) => {
       const g = window.__game;
@@ -506,9 +493,17 @@ async function measureWave(page, waveIndex, waveSize) {
 
 async function main() {
   console.log(`geared arrival bench: label=${LABEL} sha=${headSha} waves=${WAVES.join(',')}`);
-  const db = new pg.Client({ connectionString: DB_URL });
+  const db = new pg.Client({
+    connectionString: DB_URL,
+    connectionTimeoutMillis: 5_000,
+    query_timeout: 15_000,
+    statement_timeout: 15_000,
+    options: '-c lock_timeout=5000',
+    application_name: 'woc_geared_arrival_bench',
+  });
   await db.connect();
   const totalBots = WAVES.reduce((a, b) => a + b, 0);
+  const fixtureSha256 = gearedArrivalFixtureSha256(totalBots);
   const bots = Array.from({ length: totalBots }, (_, i) => new Bot(i));
   console.log(`setting up ${totalBots} geared bots (register, grant skins, join, equip)...`);
   for (const bot of bots) {
@@ -601,7 +596,7 @@ async function main() {
       const arrivals = bots.slice(cursor, cursor + size);
       cursor += size;
       console.log(`wave ${w + 1}/${WAVES.length}: ${size} geared bots arrive`);
-      const pending = measureWave(page, w, size);
+      const pending = measureWave(page);
       await sleep(500);
       for (const bot of arrivals) bot.arrive();
       const result = await pending;
@@ -626,6 +621,7 @@ async function main() {
       dirty,
       gfx: GFX,
       startedAt: stamp,
+      fixtureSha256,
       waves,
       aggregate: {
         worstGapMs: Math.max(...waves.map((w) => w.worstGaps[0] ?? 0)),
@@ -642,6 +638,10 @@ async function main() {
     await browser?.close().catch(() => {});
     vite.kill('SIGTERM');
     for (const bot of bots) bot.close();
+    const usernames = [...bots.map((bot) => bot.username), `gearcam_${uniq}`];
+    await db
+      .query('DELETE FROM accounts WHERE username = ANY($1::text[])', [usernames])
+      .catch((error) => console.warn(`fixture cleanup failed: ${error.message}`));
     await db.end().catch(() => {});
   }
 }

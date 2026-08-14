@@ -209,7 +209,12 @@ function paintMoonPhaseShadow(ctx: CanvasRenderingContext2D, term: MoonTerminato
   // moon lost its phase. With the halo hollowed out this is the only thing
   // lighting that side, so it can be read for what it is.
   ctx.globalCompositeOperation = 'destination-out';
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.972)';
+  // Near-total erase: the shadowed side of a real moon is all but invisible
+  // against the sky, so only the faintest earthshine limb survives. Any more
+  // residual than this and the soft halo behind it fills the dark side back in
+  // as a readable grey disc (what "the shaded half should barely be visible"
+  // reported): the erase has to win decisively over the glow.
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.99)';
   ctx.beginPath();
   // The shadow sweeps a radius PAST the visible disc (R + 5 covers the
   // feathered anti-aliasing rim): the erase is clipped to face pixels, so
@@ -282,14 +287,16 @@ function paintMoonFace(ctx: CanvasRenderingContext2D, term: MoonTerminator | nul
 }
 
 /** Sprite widths in world units at the celestial radius. The halo profile below
- *  is derived from them, so the two cannot drift apart. */
-export const MOON_FACE_SCALE = 38;
-export const MOON_HALO_SCALE = 92;
+ *  is derived from them, so the two cannot drift apart. Sized up from the first
+ *  cut (face 38 / halo 92) so the moon reads as a real body when you look up,
+ *  closer in prominence to the sun without matching its corona. */
+export const MOON_FACE_SCALE = 54;
+export const MOON_HALO_SCALE = 118;
 
 /**
  * Where the moon's limb falls on the HALO sprite, as a fraction of the halo's
- * radius. The halo is drawn concentric with the face but two and a half times
- * wider, so the face only covers its inner third or so.
+ * radius. The halo is drawn concentric with the face but about 2.2 times wider,
+ * so the face covers a bit under half its radius (the limb sits at ~0.42).
  */
 export const MOON_LIMB_IN_HALO = (MOON_FACE_SCALE * (MOON_R / 128)) / MOON_HALO_SCALE;
 
@@ -454,7 +461,7 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
       1,
       THREE.NormalBlending,
       -8,
-      [1.12, 1.15, 1.22],
+      [1.2, 1.24, 1.34],
     ),
   ];
   let lastBucket = -1;
@@ -468,8 +475,11 @@ export function buildCelestialSprites(lowGfx: boolean): CelestialSprites {
       const term = moonTerminator((bucket + 0.5) / MOON_PHASE_BUCKETS);
       paintMoonFace(faceCtx, term);
       faceTex.needsUpdate = true;
-      // the halo follows the lit fraction: a full moon glows, a new one barely
-      moonSprites[0].userData.baseOpacity = 0.3 * (0.2 + 0.8 * term.litFrac);
+      // the halo follows the lit fraction: a full moon glows, a new one barely.
+      // Kept modest on purpose: an additive halo that is too strong bleeds over
+      // the disc and fills the shadowed side back in (the grey-disc bug), so the
+      // glow reads as a soft ring hugging the moon, never a wash across it.
+      moonSprites[0].userData.baseOpacity = 0.4 * (0.15 + 0.85 * term.litFrac);
     },
     setSunWarmth(w: number): void {
       if (w === lastWarmth) return; // constant 0 through the high day: free
