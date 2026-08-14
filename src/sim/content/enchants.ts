@@ -43,7 +43,24 @@
 // everywhere (the arcane_shard premium has to stay a visible step or epics
 // stop being worth disenchanting). Runed sits strictly between the base and
 // Greater values where its slot and axis has both, and never reaches the
-// Greater tier. Post-launch drift is tuned via reagent costs, never by
+// Greater tier. LUCENT (Masterwrought phase 10) has no percentage rule of its
+// own: each apex value continues ITS OWN SLOT LADDER's step, one more rung
+// above that slot's Greater, which is why the tier moves three axes by three
+// different amounts (str +2 on the weapon, agi +1 on the boots, sta +6 on the
+// chest) instead of by one shared figure.
+//
+// ONE axis now sits OUTSIDE the 15-to-25 band above, deliberately and on the
+// record: best-per-slot stamina reaches 33 against the documented 113 sta
+// budget, about 29 percent. That top rung is the Lucent Infusion's chest value
+// (13 over the Greater 7), a skill-125 Perfected-only enchant NO live item can
+// take until phase 12 mints a Perfected copy; excluding it the stack is 27,
+// about 24 percent, back inside the band. So the band still describes the
+// ordinary stack, and the sta line is a KNOWN, deferred exception rather than a
+// number to trim: phase 15 owns re-verifying the envelope against the endgame
+// budgets. tests/enchants_magnitude_invariants.test.ts records the same caveat
+// beside the pin it belongs to.
+//
+// Post-launch drift is tuned via reagent costs, never by
 // re-touching these magnitudes (applied enchants bake their bonus into the
 // item instance, so a magnitude nerf would not retro-apply).
 // tests/enchants_magnitude_invariants.test.ts pins the per-axis stacks and the

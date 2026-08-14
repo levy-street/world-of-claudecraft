@@ -8961,7 +8961,7 @@ export const zh_CN: EnTranslations = {
       "useElixir": "使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。会顶替其他任何同属性的药剂或卷轴。战斗中可用。",
       "useElixirAura": "使用：获得{aura}效果，持续 {minutes} 分钟。会顶替其他任何同类药剂或卷轴。战斗中可用。",
       "flaskOnlyOne": "同时只能有一种药壶效果。饮用另一瓶药壶会顶替当前效果。",
-      "flaskOutranks": "更弱的药剂或卷轴无法顶替它。",
+      "flaskOutranks": "同属性中更弱的药剂或卷轴无法顶替它。",
       "flaskThroughDeath": "该效果在死亡后依然保留，但在登出后消失。",
       "wellFed": "精神饱满：吃完后使你的{stat}提高 {value} 点，持续 {minutes} 分钟。",
       "wellFedAura": "精神饱满：吃完后获得{aura}效果，持续 {minutes} 分钟。",

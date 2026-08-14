@@ -281,9 +281,20 @@ describe('the Lucent skill gates bind at their exact rungs', () => {
 // The MINT-SIDE tripwire. Every arm above proves the Infusion refuses what a
 // player can hold; this proves the premise underneath them, that nothing in
 // production can hand a player a Perfected copy in the first place. Without it
-// the whole file rests on a claim no assertion makes: a single `perfected: true`
-// added anywhere under src/ would quietly turn every refusal above into a
-// statement about a marker the game now mints.
+// the whole file rests on a claim no assertion makes: one line stamping the
+// marker anywhere in the shipped trees would quietly turn every refusal above
+// into a statement about a marker the game now mints.
+//
+// It is an OCCURRENCE ALLOWLIST, not a search for mint shapes, and that is the
+// whole design. Enumerating the ways to write a mint is a losing game: the first
+// version of this guard matched three shapes and a later count found eight more
+// that walked straight past it (a bracket string `inst['perfected']`, a computed
+// key `{ [KEY]: true }`, a template literal, Object.defineProperty, a
+// comment-prefixed line, a colon that wrapped onto the next line, and so on).
+// So the direction is inverted: collect EVERY occurrence of the identifier in
+// the corpus and require each one to match a known-legal class. A mint written
+// in any spelling, including one nobody has thought of, matches no class and
+// fails with its line printed.
 //
 // PHASE 12 REMOVES THIS TEST, in the same change that mints the marker, and that
 // change must also take the eqi wire-visibility decision: the public equipped
@@ -292,82 +303,186 @@ describe('the Lucent skill gates bind at their exact rungs', () => {
 // client and the Apply Enchant picker's worn arm would refuse it while the sim
 // accepted it (src/ui/enchant_apply_view.ts copyMeetsPerfectedGate says the
 // same). Widen the wire or accept the bags-only limit, deliberately.
-describe('nothing in production mints the Perfected marker yet (phase 12 tripwire)', () => {
-  // Written as an assignment shape rather than a bare identifier search, so the
-  // deny-reason string 'not_perfected' and the def flag `requiresPerfected` (no
-  // word boundary before `perfected` in either) are not swept up as mints, and
-  // so the TYPE declaration `perfected?: true` in types.ts stays legal: the `?`
-  // sits between the name and the colon and no write does.
-  const MINT_PATTERNS: Array<[string, RegExp]> = [
-    ['object-literal property', /\bperfected\s*:/],
-    ['direct assignment', /\.perfected\s*=[^=]/],
-    ['shorthand property', /\bperfected\s*[,}]/],
+describe('every `perfected` occurrence in the shipped trees is a READ, never a mint', () => {
+  // The three trees that ship. server/ and headless/ carry no occurrence at all
+  // today, and sweeping them anyway is the point: the marker reaching the
+  // authoritative host or the RL env is exactly the drift worth catching early.
+  const TREES = ['src', 'server', 'headless'] as const;
+
+  // Machine-generated and translator-owned string tables are OUT, stated here
+  // rather than silently filtered. They are regenerated from the catalog below
+  // them, so no code path can live there, while the English prose word
+  // "Perfected" appears in every Latin locale slice: including them would turn
+  // this guard into a rename detector that churns on every i18n:gen. The
+  // hand-authored catalog itself stays IN, covered by the prose class.
+  const EXCLUDED_PREFIXES = ['ui/i18n.resolved.generated/', 'ui/i18n.locales/'];
+
+  /** One legal way the identifier may appear, with the floor proving it was
+   *  really seen. A floor of 0 marks a class that may legitimately empty out
+   *  (prose gets reworded); every load-bearing class carries a real floor. */
+  interface LegalClass {
+    name: string;
+    floor: number;
+    matches: (line: string, file: string) => boolean;
+  }
+
+  // Ordered: the first matching class wins, so a line carrying two legal forms
+  // is counted once. Every class is a READ, a DECLARATION, or player copy.
+  // Nothing here can write the marker onto an instance.
+  const LEGAL_CLASSES: LegalClass[] = [
+    {
+      name: 'the ItemInstancePayload declaration',
+      floor: 1,
+      matches: (line) => /^perfected\?: true;$/.test(line),
+    },
+    {
+      name: 'the EnchantDef requiresPerfected declaration',
+      floor: 1,
+      matches: (line) => /^requiresPerfected\?: true;$/.test(line),
+    },
+    {
+      name: 'the authored requiresPerfected def flag',
+      floor: 1,
+      matches: (line) => /^requiresPerfected: true,$/.test(line),
+    },
+    {
+      name: 'a requiresPerfected def read',
+      floor: 1,
+      matches: (line) => /\.requiresPerfected\b/.test(line),
+    },
+    {
+      name: 'a guard READ of the marker (=== true)',
+      floor: 1,
+      matches: (line) => /\?\.perfected === true/.test(line),
+    },
+    {
+      name: 'the guard functions, declared or called',
+      floor: 1,
+      matches: (line) => /\b(holdsPerfectedTarget|copyMeetsPerfectedGate)\b/.test(line),
+    },
+    {
+      name: "the 'not_perfected' deny reason",
+      floor: 1,
+      matches: (line) => /'not_perfected'/.test(line),
+    },
+    {
+      name: 'the notPerfected toast key',
+      floor: 1,
+      matches: (line) => /\bnotPerfected\b/.test(line),
+    },
+    {
+      name: 'player prose in a hand-authored i18n catalog',
+      floor: 0,
+      matches: (line, file) => file.startsWith('ui/i18n.catalog/') && /Perfected/.test(line),
+    },
   ];
 
-  /** Every mint-shaped line in one source, comments stripped first. */
-  function mintSites(source: string): string[] {
+  /** Every line of `source` carrying the identifier in any case, comments
+   *  stripped, trimmed. A `/* ... *\/` regex is deliberately not used over whole
+   *  source trees (it misfires on string and regex literals); a leading `//`,
+   *  `*` or `/*` is unambiguous line by line, and a mint is never written on a
+   *  line that starts with one. */
+  function occurrences(source: string): string[] {
     const hits: string[] = [];
     for (const raw of source.split('\n')) {
       const line = raw.trim();
-      // Line comments and doc-comment continuations. A `/* ... */` regex is
-      // deliberately not used over a whole source tree: it misfires on string
-      // and regex literals (the elixir_tooltip_view.test.ts note), while a
-      // leading `*` or `//` is unambiguous line by line.
       if (line.startsWith('//') || line.startsWith('*') || line.startsWith('/*')) continue;
-      if (MINT_PATTERNS.some(([, re]) => re.test(line))) hits.push(line);
+      if (/perfected/i.test(line)) hits.push(line);
     }
     return hits;
   }
 
-  it('no src/ path stamps `perfected` on an instance payload', () => {
-    const root = fileURLToPath(new URL('../src', import.meta.url));
-    const files = tsFilesUnder(root);
-    // Floor near the real tree, and a nested path by name: src/ is genuinely
-    // deep, so both together prove the walk recursed rather than reading one
-    // level and passing over a much smaller surface.
-    expect(files.length, 'the src walk found the real tree').toBeGreaterThanOrEqual(500);
-    expect(files.map((f) => f.file)).toContain('sim/professions/enchanting.ts');
+  /** The legal class for one occurrence, or undefined when nothing covers it. */
+  function classify(line: string, file: string): string | undefined {
+    return LEGAL_CLASSES.find((c) => c.matches(line, file))?.name;
+  }
 
-    const mints: string[] = [];
-    const readers: string[] = [];
-    for (const { file, full } of files) {
-      const source = readFileSync(full, 'utf8');
-      for (const line of mintSites(source)) mints.push(`${file}: ${line}`);
-      if (/\.perfected\s*===/.test(source)) readers.push(file);
+  it('classifies every occurrence, and an unclassified one is a mint', () => {
+    const unclassified: string[] = [];
+    const seen = new Map<string, number>();
+    let files = 0;
+    let sawNestedPath = false;
+    for (const tree of TREES) {
+      const root = fileURLToPath(new URL(`../${tree}`, import.meta.url));
+      for (const { file, full } of tsFilesUnder(root)) {
+        if (EXCLUDED_PREFIXES.some((p) => file.startsWith(p))) continue;
+        files += 1;
+        if (file === 'sim/professions/enchanting.ts') sawNestedPath = true;
+        for (const line of occurrences(readFileSync(full, 'utf8'))) {
+          const cls = classify(line, file);
+          if (!cls) unclassified.push(`${tree}/${file}: ${line}`);
+          else seen.set(cls, (seen.get(cls) ?? 0) + 1);
+        }
+      }
     }
+    // The walk really covered the deep trees, not one flat level of each.
+    expect(files, 'the three-tree walk found the real corpus').toBeGreaterThanOrEqual(600);
+    expect(sawNestedPath, 'the walk recursed into src/sim/professions').toBe(true);
+
     expect(
-      mints,
-      'a production path now mints ItemInstancePayload.perfected: if this is phase 12, ' +
-        'delete this whole describe and take the eqi wire-visibility decision with it',
+      unclassified,
+      'an occurrence of `perfected` matches no legal READ class, which is what a MINT looks ' +
+        'like. If this is phase 12, delete this whole describe and take the eqi ' +
+        'wire-visibility decision with it (tests/snapshots.test.ts pins the exclusion).',
     ).toEqual([]);
-    // Non-vacuity over the REAL corpus: the guard scans a tree that genuinely
-    // talks about the marker, so an empty mint list is a refusal rather than a
-    // scan that found no `perfected` at all. Both known readers are gates.
-    expect(readers.sort()).toEqual(['sim/professions/enchanting.ts', 'ui/enchant_apply_view.ts']);
+
+    // Per-class floors: the classification above is only meaningful if the scan
+    // actually met each class in the live tree. Without these an import that
+    // resolved to nothing, or an over-broad class that swallowed everything,
+    // would report zero unclassified lines and pass.
+    for (const legal of LEGAL_CLASSES) {
+      expect(
+        seen.get(legal.name) ?? 0,
+        `class "${legal.name}" was never seen`,
+      ).toBeGreaterThanOrEqual(legal.floor);
+    }
   });
 
-  it('the detector really fires on a mint (positive control for every pattern)', () => {
-    // One synthetic source per shape, so an over-narrowed regex cannot make the
-    // sweep above pass by matching nothing at all.
-    expect(mintSites('const payload = { perfected: true };')).toHaveLength(1);
-    expect(mintSites('inst.perfected = true;')).toHaveLength(1);
-    expect(mintSites('const out = { ...inst, perfected };')).toHaveLength(1);
-    // And the three shapes that must NOT read as mints: the deny reason, the
-    // def flag, the type declaration, and prose about any of them.
-    expect(
-      mintSites(
-        [
-          "  return { ok: false, reason: 'not_perfected' };",
-          '  if (enchant.requiresPerfected) return false;',
-          '  perfected?: true;',
-          '  // perfected: true would be a mint, and this comment is not one',
-          '   * `perfected`, minted by the phase 12 Perfecting stage',
-        ].join('\n'),
-      ),
-    ).toEqual([]);
+  it('an unclassified mint fails in every spelling (positive controls)', () => {
+    // Each of these is a real way to stamp the field. None matches a legal
+    // class, so each must come back unclassified. The bracket string, the
+    // computed key and defineProperty are the three the previous mint-shape
+    // version of this guard walked straight past.
+    const MINTS = [
+      'const payload = { perfected: true };',
+      'inst.perfected = true;',
+      "inst['perfected'] = true;",
+      'const out = { ...inst, perfected };',
+      "Object.defineProperty(inst, 'perfected', { value: true });",
+      "const KEY = 'perfected';",
+      'const out = { [PERFECTED_KEY]: true, perfected: true };',
+      'payload.perfected ??= true;',
+      'inst[`perfected`] = true;',
+    ];
+    for (const mint of MINTS) {
+      expect(classify(mint, 'sim/professions/perfecting.ts'), mint).toBeUndefined();
+      expect(occurrences(mint), mint).toEqual([mint]);
+    }
   });
 
-  it('reads the tree only through the shared walker', () => {
+  it('the legal forms really are classified (negative controls)', () => {
+    const LEGAL: Array<[string, string]> = [
+      ['perfected?: true;', 'sim/types.ts'],
+      ['requiresPerfected?: true;', 'sim/content/enchants.ts'],
+      ['requiresPerfected: true,', 'sim/content/enchants.ts'],
+      ['return !enchant.requiresPerfected || instance?.perfected === true;', 'ui/x.ts'],
+      ["return { ok: false, reason: 'not_perfected' };", 'sim/professions/enchanting.ts'],
+      ["return { key: 'hudChrome.enchanting.notPerfected', sink: 'error' };", 'ui/x.ts'],
+      ['takes hold only on a piece that has been Perfected.', 'ui/i18n.catalog/guide.ts'],
+    ];
+    for (const [line, file] of LEGAL) expect(classify(line, file), line).toBeDefined();
+    // The prose class is PATH-SCOPED: the same sentence in a code file is not
+    // covered by it, so a mint cannot hide behind prose-looking text.
+    expect(
+      classify('takes hold only on a piece that has been Perfected.', 'sim/professions/x.ts'),
+    ).toBeUndefined();
+    // Comment lines are stripped before classification, so prose about a mint
+    // is never itself reported as one.
+    expect(occurrences('  // perfected: true would be a mint, and this is not one')).toEqual([]);
+    expect(occurrences('   * `perfected`, minted by the phase 12 Perfecting stage')).toEqual([]);
+  });
+
+  it('reads the trees only through the shared walker', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 });

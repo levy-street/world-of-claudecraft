@@ -97,14 +97,16 @@ const itemStringsEn = {
       // Flasks (elixir_tooltip_view.ts) append these three rules under the Use
       // line they share with elixirs. All three are the mechanic, not flavor:
       // the use path sheds every other flask aura before applying (one flask at
-      // a time, whatever its stat), it REFUSES a same-stat elixir or scroll
-      // while a flask is worn rather than letting the weaker source overwrite
-      // it, and aurasSurvivingDeath keeps a flask aura through a death that
+      // a time, whatever its stat), it REFUSES an elixir or scroll of THAT
+      // SAME stat while a flask is worn rather than letting the weaker source
+      // overwrite it (the refusal is keyed on the aura family, so a worn flask
+      // never blocks an elixir of a DIFFERENT stat, which is why the line says
+      // so), and aurasSurvivingDeath keeps a flask aura through a death that
       // clears everything else. The death line names its limit too: auras are
       // session state, so the buff really does end at logout, and a tooltip
       // that promised only the death half would be read as promising both.
       flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
-      flaskOutranks: 'A weaker elixir or scroll cannot replace it.',
+      flaskOutranks: 'A weaker elixir or scroll of the same stat cannot replace it.',
       flaskThroughDeath: 'The effect remains through death, but ends when you log out.',
       // Well Fed (elixir_tooltip_view.ts): the buff a finished meal leaves.
       // The "after you finish eating" clause is load-bearing, not padding:

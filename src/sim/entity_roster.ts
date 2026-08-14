@@ -349,8 +349,10 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   // body, or it walks off on its own with no input held (same fix as the graveyard
   // release/revive flow in spirit.ts).
   Object.assign(r.meta.moveInput, emptyMoveInput());
-  // The Keeper's Toll persists through a delve death too (see resurrection.ts); every
-  // other aura clears on respawn.
+  // The Keeper's Toll persists through a delve death too, and so does a FLASK
+  // aura (Masterwrought phase 10: a flask is bought to survive a wipe, so it
+  // survives death wherever death is handled). See resurrection.ts
+  // aurasSurvivingDeath for the full list; every other aura clears on respawn.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
   recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods, r.meta.equipmentInstance);

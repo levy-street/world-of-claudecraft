@@ -254,12 +254,13 @@ function skillMeetsEnchant(enchant: EnchantDef, enchantingSkill: number): boolea
  *  minimization), which does not carry `perfected`. When phase 12 starts
  *  minting the marker it has to decide whether the field reaches that wire, or
  *  an online client will hide a worn Perfected copy the sim would accept. Inert
- *  today (no copy carries the marker in either host). The exclusion itself is
- *  pinned by NAME in tests/snapshots.test.ts (the eqi wire arm equips a copy
- *  stamped `perfected` and asserts the wired payload carries only signer and
- *  rolled), so widening the wire re-opens this decision there; the allowlist
- *  SHAPE that pin rests on is scanned out of server/game.ts in
- *  tests/enchant_apply_view.test.ts. */
+ *  today (no copy carries the marker in either host). The exclusion is pinned by
+ *  NAME in tests/snapshots.test.ts, in the eqi wire suite: it equips a copy
+ *  stamped `perfected` and asserts the wired payload's key set is exactly
+ *  signer and rolled. That is the pin to satisfy when phase 12 revisits this;
+ *  the picker's own suite pins something different and weaker (that the
+ *  server's eqi projection assigns only signer/enchant/rolled), so it would
+ *  catch the widening without ever naming this field. */
 function copyMeetsPerfectedGate(
   enchant: EnchantDef,
   instance: ItemInstancePayload | undefined,

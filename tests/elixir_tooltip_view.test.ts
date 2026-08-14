@@ -195,7 +195,7 @@ describe('elixirTooltipLines', () => {
     // the flask rules on every elixir in the game.
     const FLASK_RULES = [
       '<div class="tt-desc">Only one flask effect at a time. Drinking another flask replaces this one.</div>',
-      '<div class="tt-desc">A weaker elixir or scroll cannot replace it.</div>',
+      '<div class="tt-desc">A weaker elixir or scroll of the same stat cannot replace it.</div>',
       '<div class="tt-desc">The effect remains through death, but ends when you log out.</div>',
     ];
 

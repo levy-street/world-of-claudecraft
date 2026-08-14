@@ -8961,7 +8961,7 @@ export const ko_KR: EnTranslations = {
       "useElixir": "사용: {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 같은 능력치의 다른 비약이나 두루마리를 대체합니다. 전투 중 사용 가능.",
       "useElixirAura": "사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 같은 종류의 다른 비약이나 두루마리를 대체합니다. 전투 중 사용 가능.",
       "flaskOnlyOne": "플라스크 효과는 한 번에 하나만 유지됩니다. 다른 플라스크를 마시면 이 효과를 대체합니다.",
-      "flaskOutranks": "더 약한 비약이나 두루마리로는 대체할 수 없습니다.",
+      "flaskOutranks": "같은 능력치의 더 약한 비약이나 두루마리로는 대체할 수 없습니다.",
       "flaskThroughDeath": "이 효과는 죽어도 유지되지만, 접속을 종료하면 사라집니다.",
       "wellFed": "잘 먹음: 식사를 마치면 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.",
       "wellFedAura": "잘 먹음: 식사를 마치면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.",

@@ -69,6 +69,17 @@ function drainEvents(sim: Sim): SimEvent[] {
   return (sim as any).drainEvents();
 }
 
+/** EVERY placement log line the drained events carry, in order. Matched on the
+ *  verb alone rather than on the expected sentence, so an assertion against it
+ *  pins the whole set: a second, differently worded set-up line fails instead of
+ *  being filtered out of view by the very text the test is checking for. */
+function setUpLines(sim: Sim): string[] {
+  return drainEvents(sim)
+    .filter((ev): ev is Extract<SimEvent, { type: 'log' }> => ev.type === 'log')
+    .map((ev) => ev.text)
+    .filter((text) => /\bset up\b/.test(text));
+}
+
 // A real trainer-taught forge recipe (weaponcrafting rung 0). The premise is
 // re-derived from the live table rather than assumed, so a content change
 // that unbinds it from the forge fails HERE, not as a silent green.
@@ -150,11 +161,10 @@ describe("Master's Field Forge item placement (placeMobileStation ItemUse)", () 
     // A permanent tool: the use never consumes the item.
     expect(sim.countItem(TEST_FORGE_ID, a)).toBe(1);
     // Success is never silent: the one scroll-pattern log line, exactly once
-    // (matched by log.placeStation in src/ui/sim_i18n.ts).
-    const placeLines = drainEvents(sim).filter(
-      (ev) => ev.type === 'log' && ev.text === `You set up ${TEST_FORGE_NAME}.`,
-    );
-    expect(placeLines.length).toBe(1);
+    // (matched by log.placeStation in src/ui/sim_i18n.ts). Pinned as the WHOLE
+    // set of set-up lines rather than a count of matches, so a second, differently
+    // worded placement line cannot ride along unnoticed beside the right one.
+    expect(setUpLines(sim)).toEqual([`You set up ${TEST_FORGE_NAME}.`]);
   });
 
   it('the line carries no article of its own (a "The ..." item never doubles it)', () => {
@@ -168,11 +178,7 @@ describe("Master's Field Forge item placement (placeMobileStation ItemUse)", () 
     drainEvents(sim);
     placeMobileStationFromItem(simCtx(sim), 'cooking', ITEMS.laden_hearth.name, a);
 
-    const lines = drainEvents(sim)
-      .filter((ev): ev is Extract<SimEvent, { type: 'log' }> => ev.type === 'log')
-      .map((ev) => ev.text)
-      .filter((text) => text.includes('set up'));
-    expect(lines).toEqual(['You set up The Laden Hearth.']);
+    expect(setUpLines(sim)).toEqual(['You set up The Laden Hearth.']);
   });
 
   it('placement draws zero rng', () => {

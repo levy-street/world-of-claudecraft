@@ -1169,7 +1169,11 @@ describe('enchant_apply_view: name discriminators (#2466)', () => {
         const nameId = def.heroicOf ?? def.id;
         const name = table.entities?.items?.[nameId]?.name;
         expect(name, `${lang} carries a name for ${nameId}`).toBeTruthy();
-        const key = `${name} ${heroic(def) ? 'heroic' : 'plain'}`;
+        // The separator is written as the ESCAPE, never as a raw NUL byte: a
+        // literal NUL in the source makes this whole file binary to grep, so a
+        // reviewer's plain `grep readFileSync` over it reports nothing, which is
+        // exactly how the eqi-allowlist pin above got called missing once.
+        const key = `${name}\u0000${heroic(def) ? 'heroic' : 'plain'}`;
         byKey.set(key, [...(byKey.get(key) ?? []), def.id]);
         byName.set(name as string, [...(byName.get(name as string) ?? []), def.id]);
       }

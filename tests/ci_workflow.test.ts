@@ -204,10 +204,21 @@ function jobSource(name: string): string {
   return match[0];
 }
 
+/** A `sparse-checkout:` header in ANY YAML block-scalar spelling. The style
+ *  indicator is deliberately open (`|`, `|-`, `|+`, `>`, `>-`, `>+`, and an
+ *  explicit indentation digit): all of them feed actions/checkout the same cone,
+ *  so a drifted sixth copy must not be able to leave this extractor's sight by
+ *  changing chomping style. Matching only `|` is how a divergent block hides. */
+const SPARSE_HEADER_RE = /^sparse-checkout:\s*[|>][-+]?\d?$/;
+
+/** The screenshot exclusion, as its own LINE rather than a substring, so
+ *  surrounding whitespace or a re-indent cannot make a real block invisible. */
+const SCREENSHOT_EXCLUSION_RE = /^\s*!\/docs\/screenshots\/\*\/\s*$/m;
+
 /**
  * Every `sparse-checkout:` block in `source` that carries the docs/screenshots
- * exclusion, extracted WHOLE: the `sparse-checkout: |` header, its indented
- * body, and the `sparse-checkout-cone-mode:` line that closes it.
+ * exclusion, extracted WHOLE: the header, its indented body, and the
+ * `sparse-checkout-cone-mode:` line that closes it.
  *
  * Structural rather than a search for the known literal, which is the whole
  * point: a copy-pasted block someone then edited must still be FOUND, so that
@@ -221,7 +232,7 @@ function screenshotSparseBlocks(source: string): string[] {
   const indentOf = (line: string): number => line.length - line.trimStart().length;
   const blocks: string[] = [];
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].trim() !== 'sparse-checkout: |') continue;
+    if (!SPARSE_HEADER_RE.test(lines[i].trim())) continue;
     const headerIndent = indentOf(lines[i]);
     let end = i;
     while (end + 1 < lines.length) {
@@ -234,7 +245,7 @@ function screenshotSparseBlocks(source: string): string[] {
     if (closer !== undefined && closer.trim().startsWith('sparse-checkout-cone-mode:')) {
       block += `\n${closer}`;
     }
-    if (block.includes('!/docs/screenshots/*/')) blocks.push(block);
+    if (SCREENSHOT_EXCLUSION_RE.test(block)) blocks.push(block);
   }
   return blocks;
 }
@@ -312,14 +323,38 @@ describe('CI workflow parity', () => {
     for (const [i, block] of blocks.entries()) {
       expect(block, `sparse-checkout block ${i + 1} diverged from the one cone`).toBe(SPARSE_CONE);
     }
-    // The extractor's own control: drop one cone line from a copy of the
-    // workflow and the same extraction must report a block that is NOT the
-    // literal. Without this, an extractor that silently returned the literal
-    // (or nothing it could compare) would pass the loop above forever.
-    const mutated = workflow.replace('            /docs/screenshots/wildheart/\n', '');
-    const mutatedBlocks = screenshotSparseBlocks(mutated);
-    expect(mutatedBlocks).toHaveLength(5);
-    expect(mutatedBlocks.every((block) => block === SPARSE_CONE)).toBe(false);
+    // The extractor's own control, and it proves the thing that actually
+    // matters: SIXTH-BLOCK DISCOVERY. Append a synthetic sixth job whose cone
+    // diverged (one subtree dropped) and the extractor must find SIX blocks
+    // with exactly one of them unequal, which is precisely the state a
+    // copy-pasted-then-edited block would leave the workflow in. Mutating one
+    // of the existing five would only prove the extractor reads them.
+    //
+    // The dropped subtree is DERIVED from the parsed cone, never a hard-coded
+    // path: a hard-coded one silently stops mutating anything the day that
+    // subtree is renamed or removed, and the control passes over an unmutated
+    // copy forever.
+    const coneSubtreeLines = SPARSE_CONE.split('\n').filter((line) =>
+      /^\s*\/docs\/screenshots\/[A-Za-z0-9._-]+\/$/.test(line),
+    );
+    expect(coneSubtreeLines.length, 'the cone really lists subtrees to drop').toBeGreaterThan(0);
+    const divergentCone = SPARSE_CONE.split('\n')
+      .filter((line) => line !== coneSubtreeLines[coneSubtreeLines.length - 1])
+      .join('\n');
+    expect(divergentCone).not.toBe(SPARSE_CONE);
+    const withSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${divergentCone}\n`;
+    const sixBlocks = screenshotSparseBlocks(withSixth);
+    expect(sixBlocks, 'a sixth block must be DISCOVERED, not silently skipped').toHaveLength(6);
+    expect(sixBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
+
+    // ...and the same sixth block hiding behind a different block-scalar style
+    // is still discovered, which is what SPARSE_HEADER_RE buys.
+    for (const style of ['|-', '|+', '>', '>-']) {
+      const restyled = divergentCone.replace(/^(\s*sparse-checkout:\s*)\|$/m, `$1${style}`);
+      expect(restyled, `the ${style} rewrite really changed the header`).not.toBe(divergentCone);
+      const styled = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${restyled}\n`;
+      expect(screenshotSparseBlocks(styled), `a ${style} block must be found`).toHaveLength(6);
+    }
     const coneDirs = new Set<string>(
       [...SPARSE_CONE.matchAll(/\/docs\/screenshots\/([A-Za-z0-9._-]+)\//g)].map((m) => m[1]),
     );

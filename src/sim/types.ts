@@ -1202,6 +1202,12 @@ export interface FoodItemDef extends BaseItemDef {
   wellFed?: { aura: string; kind: AuraKind; value: number; duration: number };
   armorType?: never;
   weapon?: never;
+  // Barred for the same reason ScrollItemDef and FlaskItemDef bar it: a `use`
+  // payload resolves in useItem's use-arm chain ABOVE the kind arms, so a food
+  // carrying one would never reach the eating path at all and its wellFed
+  // record would be dead data. The kind was split out to make the eating path's
+  // assumptions type-enforced; this is one of them.
+  use?: never;
 }
 
 // A buff SCROLL: the inscription-crafted alternative source of a battle-elixir
