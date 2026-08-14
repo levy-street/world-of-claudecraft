@@ -1053,6 +1053,9 @@ export const ko_KR: EnTranslations = {
       "rarity_epic": "서사",
       "spec_speed": "+{pct}% 추가 기동력",
       "name_valorsteed": "발러스티드",
+      "name_rolling_log": "데굴데굴 통나무",
+      "name_tavern_barrel": "유쾌한 술통",
+      "name_runaway_mine_cart": "폭주 광차",
       "name_grag_bear": "골리앗 그라그곰",
       "name_stalkglider_snail": "이끼껍질 활공달팽이",
       "name_aether_hover_cycle": "에테르 기사 호버사이클",
@@ -1062,6 +1065,9 @@ export const ko_KR: EnTranslations = {
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "name_drakemaw_raptor": "화산구 랩터",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
+      "desc_rolling_log": "안장을 밧줄로 묶어 둔 쓰러진 통나무입니다. 당신을 태운 채 비탈을 굴러 내려가며 그것을 이동 수단이라 우깁니다.",
+      "desc_tavern_barrel": "끝내 저장고로 돌아가지 못한 빈 술통입니다. 두 번째 인생은 당신을 태우는 일이라고 정한 모양입니다.",
+      "desc_runaway_mine_cart": "레일도 제동 장치도 없고 탈출한 광산도 기억하지 못하는 광석 수레입니다. 그래도 여전히 달리고 있습니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
       "desc_aether_hover_cycle": "낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.",
@@ -12321,6 +12327,15 @@ export const ko_KR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
+      },
+      "reins_rolling_log": {
+        "name": "데굴데굴 통나무의 고삐"
+      },
+      "reins_tavern_barrel": {
+        "name": "유쾌한 술통의 고삐"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "폭주 광차의 고삐"
       },
       "rimefang": {
         "name": "서리엄니"

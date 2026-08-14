@@ -31,6 +31,16 @@ export interface MountVisualSpec {
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
   fx: 'slime' | 'exhaust' | null;
+  /** Radius in world units of a mount that ROLLS rather than glides (the log,
+   *  the barrel). 0 means it does not roll. The renderer turns the mount about
+   *  its local X axis, which lies ACROSS the direction of travel, at omega =
+   *  v / r so the contact patch stays still at any speed (mount_roll_core.ts). */
+  rollRadius: number;
+  /** How the RIDER is posed. 'seated' is every ordinary mount (the sit loop
+   *  reads as riding). 'standing' is the rolling junk mounts: the rider stands
+   *  on top and walks BACKWARDS against the surface, which at 2x body speed is
+   *  exactly what holds them in place on a log rolling forward. */
+  ridePose: 'seated' | 'standing';
 }
 
 const spec = (
@@ -40,6 +50,7 @@ const spec = (
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
   fx: 'slime' | 'exhaust' | null = null,
+  opts: { rollRadius?: number; ridePose?: 'seated' | 'standing' } = {},
 ): MountVisualSpec => ({
   visualKey,
   seat,
@@ -50,6 +61,8 @@ const spec = (
   bobIdle: bob?.idle ?? false,
   bobShape: bob?.shape ?? 'hop',
   fx,
+  rollRadius: opts.rollRadius ?? 0,
+  ridePose: opts.ridePose ?? 'seated',
 });
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
@@ -57,6 +70,49 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // origin and lower than the old Tripo build, so the rider shifts toward the
   // neck and drops a touch
   valorsteed: spec('mount_valorsteed', 2.4, true, undefined, 0.15),
+  // The three junk mounts (log, barrel, cart) are all CLIPLESS Tripo props:
+  // zero animations, so the bob below IS their locomotion, the same way the
+  // snail and the hover cycle work. Each bob is tuned to what the object would
+  // actually do rather than to a shared number: the log and the barrel roll, so
+  // they hop at roughly a revolution's cadence, and the cart rattles faster and
+  // shallower on its four small wheels. None of them bob at rest (no idle):
+  // parked junk sits dead still, which is what sells the gag when a player
+  // dismounts beside it.
+  // Both cylinders lie ACROSS the direction of travel and roll forward under a
+  // rider who stands on top. The seat is therefore the TOP of the cylinder (the
+  // rider's feet rest on the surface) rather than a saddle height, and the
+  // radius is half the model height, which for a log lying down IS its
+  // diameter. The bob is small and fast: a real log bumps as it turns, but a
+  // big bob would fight the roll and read as bucking.
+  rolling_log: spec(
+    'mount_rolling_log',
+    1.4,
+    false,
+    { amp: 0.04, hz: 2.6, shape: 'hop' },
+    0,
+    null,
+    { rollRadius: 0.7, ridePose: 'standing' },
+  ),
+  tavern_barrel: spec(
+    'mount_tavern_barrel',
+    1.5,
+    false,
+    { amp: 0.05, hz: 2.4, shape: 'hop' },
+    0,
+    null,
+    { rollRadius: 0.75, ridePose: 'standing' },
+  ),
+  // The one mount the rider sits INSIDE rather than on: the seat drops to the
+  // tub floor rather than the model top, and shifts back off the lantern post.
+  // It does NOT roll and keeps the seated pose: it runs on wheels, so turning
+  // the whole body would roll the tub and the rider with it.
+  runaway_mine_cart: spec(
+    'mount_runaway_mine_cart',
+    1.15,
+    false,
+    { amp: 0.06, hz: 3, shape: 'hop' },
+    -0.1,
+  ),
   grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
   stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3, 'slime'),
   aether_hover_cycle: spec(

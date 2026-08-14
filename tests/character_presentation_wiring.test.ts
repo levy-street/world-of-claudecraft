@@ -7,6 +7,14 @@ const characterVisual = readFileSync(
   'utf8',
 );
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+// The ridden-mount per-frame drive (off-screen advancement, bob, roll, ambient
+// particles) moved out of renderer.ts into this module; the pins below follow
+// it there rather than being dropped, so the presentation gating it carries
+// still cannot be deleted silently.
+const mountRide = readFileSync(
+  new URL('../src/render/mount_ride_view.ts', import.meta.url),
+  'utf8',
+);
 
 describe('character presentation sleep wiring', () => {
   it('routes hidden cosmetic rigs through bounded off-screen advancement', () => {
@@ -29,7 +37,13 @@ describe('character presentation sleep wiring', () => {
     expect(renderer).toContain(
       'if (runCharacterPresentation) {\n        v.visual.updateWeaponVfx(dt, weaponVfxShedScale(d2, this.appliedBudgetLevels?.vfx ?? 1));\n      }',
     );
-    expect(renderer).toContain('v.mountVisual.advanceOffscreen(dt);');
+    // The mount rig sleeps the same way, one module over: renderer.ts hands the
+    // drive its presentation verdict and mount_ride_view.ts spends it on bounded
+    // advancement instead of a full update.
+    expect(renderer).toContain('present: runCharacterPresentation,');
+    expect(mountRide).toContain(
+      'if (!frame.present) {\n    mountVisual.advanceOffscreen(frame.dt);\n    return view.mountRoll;\n  }',
+    );
   });
 
   it('ticks deferred weapon stow transitions while a rig is off screen', () => {
@@ -58,9 +72,16 @@ describe('character presentation sleep wiring', () => {
     expect(abilityStart).toBeGreaterThan(mountStart);
 
     const mountBlock = renderer.slice(mountStart, abilityStart);
-    expect(mountBlock).toContain('if (runCharacterPresentation) {');
-    expect(mountBlock).toContain('this.vfx.mountSlimeTrail');
-    expect(mountBlock).toContain('this.vfx.mountExhaust');
+    // The mount half is presentation-GATED (a hidden mount emits no particles),
+    // and since the drive moved to mount_ride_view.ts the gate is the `present`
+    // flag renderer.ts passes it: both halves are pinned so neither can be
+    // dropped, and the emitters are pinned where they now live.
+    expect(mountBlock).toContain('present: runCharacterPresentation,');
+    expect(mountRide).toContain('if (!frame.present) {');
+    expect(mountRide).toContain('fxSink.mountSlimeTrail(view.group.position, frame.dt);');
+    expect(mountRide).toContain(
+      'fxSink.mountExhaust(view.group.position, frame.facing, frame.dt, frame.moving);',
+    );
     expect(renderer.slice(abilityStart)).toContain(
       'this.abilityVfx.syncEntity(e, runCharacterPresentation);',
     );

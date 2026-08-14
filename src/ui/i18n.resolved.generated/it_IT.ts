@@ -1053,6 +1053,9 @@ export const it_IT: EnTranslations = {
       "rarity_epic": "Epica",
       "spec_speed": "+{pct}% di mobilità extra",
       "name_valorsteed": "Destriero del Valore",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Orso Grag Golia",
       "name_stalkglider_snail": "Aliante dal Guscio Muschioso",
       "name_aether_hover_cycle": "Aerociclo del Giostratore d’Etere",
@@ -1062,6 +1065,9 @@ export const it_IT: EnTranslations = {
       "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
       "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
@@ -12321,6 +12327,15 @@ export const it_IT: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Redini del Raptor di Drakemaw"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Zanna di Brina"

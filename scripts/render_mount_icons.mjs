@@ -85,6 +85,27 @@ const JOBS = [
     id: 'reins_drakemaw_raptor',
     cfg: { headFwd: 0.95, headUp: 0.82, fill: 0.55, yaw: 0.52, pitch: 0.14 },
   },
+  // The three junk mounts have no head to frame, so they invert the rule the
+  // beasts use: anchor at the model's CENTRE (headFwd 0, headUp ~0.5) and open
+  // fill past 1 so the sphere swallows the whole object. fill is a fraction of
+  // model HEIGHT, so the long flat ones need the most.
+  {
+    // Longest and flattest of the three (3.46 long against 1.4 tall), hence the
+    // widest fill; yawed hard so the saddle and a cut end both read.
+    file: 'rolling_log.glb',
+    id: 'reins_rolling_log',
+    cfg: { headFwd: 0, headUp: 0.5, fill: 2.4, yaw: 0.7, pitch: 0.25 },
+  },
+  {
+    file: 'tavern_barrel.glb',
+    id: 'reins_tavern_barrel',
+    cfg: { headFwd: 0, headUp: 0.5, fill: 1.5, yaw: 0.6, pitch: 0.25 },
+  },
+  {
+    file: 'runaway_mine_cart.glb',
+    id: 'reins_runaway_mine_cart',
+    cfg: { headFwd: 0, headUp: 0.5, fill: 1.6, yaw: 0.6, pitch: 0.28 },
+  },
 ];
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;

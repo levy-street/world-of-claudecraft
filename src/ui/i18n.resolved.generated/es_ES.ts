@@ -1053,6 +1053,9 @@ export const es_ES: EnTranslations = {
       "rarity_epic": "Épica",
       "spec_speed": "+{pct}% de movilidad adicional",
       "name_valorsteed": "Corcel del Valor",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Oso Grag Goliat",
       "name_stalkglider_snail": "Deslizador de Caparazón Musgoso",
       "name_aether_hover_cycle": "Aerocicleta Justadora del Éter",
@@ -1062,6 +1065,9 @@ export const es_ES: EnTranslations = {
       "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
       "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
@@ -12321,6 +12327,15 @@ export const es_ES: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Riendas del Raptor de Drakemaw"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Colmillo de Escarcha"

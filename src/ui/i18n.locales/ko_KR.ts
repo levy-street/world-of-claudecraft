@@ -8351,6 +8351,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
   'entities.items.reins_drakemaw_raptor.name': '화산구 랩터의 고삐',
   'entities.items.reins_thunderstrut_gobbler.name': '천둥활보 대왕 칠면조의 고삐',
+  'entities.items.reins_rolling_log.name': '데굴데굴 통나무의 고삐',
+  'entities.items.reins_tavern_barrel.name': '유쾌한 술통의 고삐',
+  'entities.items.reins_runaway_mine_cart.name': '폭주 광차의 고삐',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -9578,6 +9581,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.',
+  'hudChrome.mounts.name_rolling_log': '데굴데굴 통나무',
+  'hudChrome.mounts.name_tavern_barrel': '유쾌한 술통',
+  'hudChrome.mounts.name_runaway_mine_cart': '폭주 광차',
+  'hudChrome.mounts.desc_rolling_log':
+    '안장을 밧줄로 묶어 둔 쓰러진 통나무입니다. 당신을 태운 채 비탈을 굴러 내려가며 그것을 이동 수단이라 우깁니다.',
+  'hudChrome.mounts.desc_tavern_barrel':
+    '끝내 저장고로 돌아가지 못한 빈 술통입니다. 두 번째 인생은 당신을 태우는 일이라고 정한 모양입니다.',
+  'hudChrome.mounts.desc_runaway_mine_cart':
+    '레일도 제동 장치도 없고 탈출한 광산도 기억하지 못하는 광석 수레입니다. 그래도 여전히 달리고 있습니다.',
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',

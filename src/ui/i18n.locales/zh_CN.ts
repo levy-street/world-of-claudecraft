@@ -8017,6 +8017,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
   'entities.items.reins_drakemaw_raptor.name': '龙喉迅猛龙的缰绳',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆阔步大火鸡的缰绳',
+  'entities.items.reins_rolling_log.name': '滚滚老圆木的缰绳',
+  'entities.items.reins_tavern_barrel.name': '欢乐酒桶的缰绳',
+  'entities.items.reins_runaway_mine_cart.name': '脱缰矿车的缰绳',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -9185,6 +9188,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。',
+  'hudChrome.mounts.name_rolling_log': '滚滚老圆木',
+  'hudChrome.mounts.name_tavern_barrel': '欢乐酒桶',
+  'hudChrome.mounts.name_runaway_mine_cart': '脱缰矿车',
+  'hudChrome.mounts.desc_rolling_log':
+    '一截倒下的树干，用绳子绑上了马鞍。它载着你一路滚下山坡，还把这称作交通工具。',
+  'hudChrome.mounts.desc_tavern_barrel':
+    '一个再没能回到酒窖的空酒桶，它已经认定自己的第二份职业就是驮着你。',
+  'hudChrome.mounts.desc_runaway_mine_cart':
+    '一辆没有轨道、没有刹车的矿车，早已不记得自己逃出的是哪座矿井，却依然一路狂奔。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐骑',
   'hudChrome.mounts.emptyStableHint': '升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。',
   'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。',

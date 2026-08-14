@@ -1053,6 +1053,9 @@ export const tr_TR: EnTranslations = {
       "rarity_epic": "Epik",
       "spec_speed": "+%{pct} ekstra hareket kabiliyeti",
       "name_valorsteed": "Yiğit Küheylan",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Golyat Grag-Ayı",
       "name_stalkglider_snail": "Yosun Kabuklu Süzülgen",
       "name_aether_hover_cycle": "Aether Turnuva Motosikleti",
@@ -1062,6 +1065,9 @@ export const tr_TR: EnTranslations = {
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
       "desc_aether_hover_cycle": "Savaşta hızlı, alçaktan süzülerek hareket etmek için tasarlanmış güçlü bir büyü-teknoloji motosikleti.",
@@ -12321,6 +12327,15 @@ export const tr_TR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Kırağı Dişi"

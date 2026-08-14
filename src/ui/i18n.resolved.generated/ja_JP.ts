@@ -1053,6 +1053,9 @@ export const ja_JP: EnTranslations = {
       "rarity_epic": "エピック",
       "spec_speed": "+{pct}% 移動力上昇",
       "name_valorsteed": "ヴァロースティード",
+      "name_rolling_log": "ころころ丸太",
+      "name_tavern_barrel": "ごきげん酒樽",
+      "name_runaway_mine_cart": "暴走トロッコ",
       "name_grag_bear": "ゴリアテ・グラグベア",
       "name_stalkglider_snail": "モスシェル・ストークグライダー",
       "name_aether_hover_cycle": "エーテルジャウスター・ホバーサイクル",
@@ -1062,6 +1065,9 @@ export const ja_JP: EnTranslations = {
       "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
       "name_drakemaw_raptor": "火口のラプトル",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
+      "desc_rolling_log": "鞍を縄で括りつけた倒木。あなたを乗せて坂を転がり落ち、それを移動手段だと言い張る。",
+      "desc_tavern_barrel": "酒蔵へ帰り着けなかった空の樽。第二の人生はあなたを運ぶことだと決めたらしい。",
+      "desc_runaway_mine_cart": "レールもブレーキもなく、逃げ出した鉱山のことも忘れた鉱石トロッコ。それでもまだ走り続けている。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
       "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
@@ -12321,6 +12327,15 @@ export const ja_JP: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
+      },
+      "reins_rolling_log": {
+        "name": "ころころ丸太の手綱"
+      },
+      "reins_tavern_barrel": {
+        "name": "ごきげん酒樽の手綱"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "暴走トロッコの手綱"
       },
       "rimefang": {
         "name": "霜牙"

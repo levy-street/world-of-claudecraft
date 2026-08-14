@@ -1053,6 +1053,9 @@ export const de_DE: EnTranslations = {
       "rarity_epic": "Episch",
       "spec_speed": "+{pct}% zusätzliche Mobilität",
       "name_valorsteed": "Valorross",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Goliath-Gragbär",
       "name_stalkglider_snail": "Moosschalen-Stielgleiter",
       "name_aether_hover_cycle": "Ätherlanzen-Schwebrad",
@@ -1062,6 +1065,9 @@ export const de_DE: EnTranslations = {
       "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
       "name_drakemaw_raptor": "Drakenrachen-Raptor",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
       "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
@@ -12321,6 +12327,15 @@ export const de_DE: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Zügel des Drakenrachen-Raptors"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Reiffang"

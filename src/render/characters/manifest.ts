@@ -1622,6 +1622,32 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12,
     lazyPreload: true,
   },
+  // The three junk mounts: Tripo-generated props (asset pipeline prop lane),
+  // shipped under the mounts dir so the catalog url convention holds. All are
+  // STATIC like the snail: zero animations and no skin, so they render their
+  // rest pose and the bob in mount_visuals.ts carries the motion. Deliberately
+  // squat against the 2.6 humanoid, which is the joke: these read as things a
+  // player found rather than beasts they tamed. Baked Tripo textures, no tint.
+  mount_rolling_log: {
+    url: `${MOUNTS_DIR}/rolling_log.glb`,
+    height: 1.4,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_tavern_barrel: {
+    url: `${MOUNTS_DIR}/tavern_barrel.glb`,
+    height: 1.5,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  // The tallest of the three, and the only one with a hollow the rider sits in
+  // rather than a back they sit on.
+  mount_runaway_mine_cart: {
+    url: `${MOUNTS_DIR}/runaway_mine_cart.glb`,
+    height: 1.8,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

@@ -1053,6 +1053,9 @@ export const en_XA: EnTranslations = {
       "rarity_epic": "[Éþíç]",
       "spec_speed": "[+{pct}% éẋţŕá ɱóƀíļíţý]",
       "name_valorsteed": "[Ʋáļóŕšţééð]",
+      "name_rolling_log": "[Óļ' Ŕóļļíñ' Ļóĝ]",
+      "name_tavern_barrel": "[Ɓáŕŕéļ óƒ Ļáúĝĥš]",
+      "name_runaway_mine_cart": "[Ŕúñáŵáý Ɱíñé Çáŕţ]",
       "name_grag_bear": "[Ĝóļíáţĥ Ĝŕáĝ-Ɓéáŕ]",
       "name_stalkglider_snail": "[Ɱóšš-Šĥéļļ Šţáļķ-Ĝļíðéŕ]",
       "name_aether_hover_cycle": "[Áéţĥéŕ-Ĵóúšţéŕ Ĥóʋéŕ-Çýçļé]",
@@ -1062,6 +1065,9 @@ export const en_XA: EnTranslations = {
       "name_terrorspark_groundshaker": "[Ţéŕŕóŕšþáŕķ Ĝŕóúñðšĥáķéŕ]",
       "name_drakemaw_raptor": "[Ðŕáķéɱáŵ Ŕáþţóŕ]",
       "desc_valorsteed": "[Á ĥáŕðý, šúŕé-ƒóóţéð šţééð ţĥáţ þŕóʋíðéš éñĥáñçéð ţŕáʋéļ šþééð.]",
+      "desc_rolling_log": "[Á ƒáļļéñ ţŕúñķ ŵíţĥ á šáððļé ŕóþéð ţó íţ, ŵĥíçĥ ŕóļļš ðóŵñĥíļļ ŵíţĥ ýóú áƀóáŕð áñð çáļļš ţĥáţ ţŕáñšþóŕţ.]",
+      "desc_tavern_barrel": "[Áñ éɱþţíéð ķéĝ ţĥáţ ñéʋéŕ ɱáðé íţ ƀáçķ ţó ţĥé çéļļáŕ, áñð ĥáš ðéçíðéð íţš šéçóñð çáŕééŕ íš çáŕŕýíñĝ ýóú.]",
+      "desc_runaway_mine_cart": "[Áñ óŕé çáŕţ ŵíţĥ ñó ŕáíļš, ñó ƀŕáķéš, áñð ñó ɱéɱóŕý óƒ ţĥé ɱíñé íţ éšçáþéð, šţíļļ ĝóíñĝ áñýŵáý.]",
       "desc_grag_bear": "[Á ĥáŕðý, šúŕé-ƒóóţéð ƀéáŕ ţĥáţ þŕóʋíðéš éñĥáñçéð ţŕáʋéļ šþééð.]",
       "desc_stalkglider_snail": "[Á ĥéáŕţý, šļóŵ-ƀúŕñíñĝ šñáíļ ţĥáţ þŕóʋíðéš éñĥáñçéð ţŕáʋéļ šþééð.]",
       "desc_aether_hover_cycle": "[Á þóŵéŕƒúļ ɱáĝíţéçĥ ƀíķé ðéšíĝñéð ƒóŕ šŵíƒţ, ļóŵ-ĥóʋéŕíñĝ çóɱƀáţ ţŕáʋéŕšáļ.]",
@@ -12321,6 +12327,15 @@ export const en_XA: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "[Ŕéíñš óƒ ţĥé Ðŕáķéɱáŵ Ŕáþţóŕ]"
+      },
+      "reins_rolling_log": {
+        "name": "[Ŕéíñš óƒ ţĥé Óļ' Ŕóļļíñ' Ļóĝ]"
+      },
+      "reins_tavern_barrel": {
+        "name": "[Ŕéíñš óƒ ţĥé Ɓáŕŕéļ óƒ Ļáúĝĥš]"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "[Ŕéíñš óƒ ţĥé Ŕúñáŵáý Ɱíñé Çáŕţ]"
       },
       "rimefang": {
         "name": "[Ŕíɱéƒáñĝ]"

@@ -1053,6 +1053,9 @@ export const id_ID: EnTranslations = {
       "rarity_epic": "Epik",
       "spec_speed": "+{pct}% mobilitas ekstra",
       "name_valorsteed": "Valorsteed",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Grag-Bear Raksasa",
       "name_stalkglider_snail": "Stalk-Glider Cangkang Lumut",
       "name_aether_hover_cycle": "Sepeda Melayang Aether-Jouster",
@@ -1062,6 +1065,9 @@ export const id_ID: EnTranslations = {
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
       "desc_aether_hover_cycle": "Sepeda magiteknologi bertenaga besar yang dirancang untuk pergerakan tempur cepat dan melayang rendah.",
@@ -12321,6 +12327,15 @@ export const id_ID: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Taring Beku"

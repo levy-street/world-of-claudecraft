@@ -8373,6 +8373,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'スカイリーチ・ストームフェザーの手綱',
   'entities.items.reins_drakemaw_raptor.name': '火口のラプトルの手綱',
   'entities.items.reins_thunderstrut_gobbler.name': '大七面鳥サンダーストラットの手綱',
+  'entities.items.reins_rolling_log.name': 'ころころ丸太の手綱',
+  'entities.items.reins_tavern_barrel.name': 'ごきげん酒樽の手綱',
+  'entities.items.reins_runaway_mine_cart.name': '暴走トロッコの手綱',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -9596,6 +9599,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。',
+  'hudChrome.mounts.name_rolling_log': 'ころころ丸太',
+  'hudChrome.mounts.name_tavern_barrel': 'ごきげん酒樽',
+  'hudChrome.mounts.name_runaway_mine_cart': '暴走トロッコ',
+  'hudChrome.mounts.desc_rolling_log':
+    '鞍を縄で括りつけた倒木。あなたを乗せて坂を転がり落ち、それを移動手段だと言い張る。',
+  'hudChrome.mounts.desc_tavern_barrel':
+    '酒蔵へ帰り着けなかった空の樽。第二の人生はあなたを運ぶことだと決めたらしい。',
+  'hudChrome.mounts.desc_runaway_mine_cart':
+    'レールもブレーキもなく、逃げ出した鉱山のことも忘れた鉱石トロッコ。それでもまだ走り続けている。',
   'hudChrome.mounts.emptyTitle': 'マウントは未入手',
   'hudChrome.mounts.emptyStableHint':
     'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',

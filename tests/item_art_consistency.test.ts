@@ -333,8 +333,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '76075520f9b9c5fec0a33479345667d2dada96bdc84e4473ca257df8de56b656',
-        acceptedBytes: 107_997,
+        acceptedSha256: '6d774f2c30e70b18fb421ec1a019194365dfdcd8591fa1edb6b222854cab597e',
+        acceptedBytes: 108_300,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -442,16 +442,16 @@ describe('item-art consistency accepted-art provenance', () => {
     }
   });
 
-  it('pins the final 817-item visual audit, Heroic accounting, and evidence digests', () => {
+  it('pins the final 825-item visual audit, Heroic accounting, and evidence digests', () => {
     const verdictPath = `${evidenceDir}/final-item-art-audit-verdict.json`;
     const readme = readFileSync(path.join(repoRoot, evidenceDir, 'README.md'), 'utf8');
     expect(readme).toContain('`final-item-art-audit-verdict.json`');
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(107_997);
+    expect(verdictBytes.length).toBe(108_300);
     expect(sha256(verdictBytes)).toBe(
-      '76075520f9b9c5fec0a33479345667d2dada96bdc84e4473ca257df8de56b656',
+      '6d774f2c30e70b18fb421ec1a019194365dfdcd8591fa1edb6b222854cab597e',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -460,8 +460,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 822,
-      liveItemDefinitions: 837,
+      itemArtFilesReviewed: 825,
+      liveItemDefinitions: 840,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,7 +471,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      822,
+      825,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
     const shippingIds = new Set(
@@ -516,13 +516,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 822,
+      passCount: 825,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 822 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10.',
+        'All 825 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, and the three junk-mount reins icons reviewed on 2026-08-14 (machine checks only: each is rendered from its own mount GLB and composited onto the style-guide vignette ground, so no painted-master style contract is claimed).',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -562,8 +562,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'ea04f7224e4a13e35d098c6a1cc96dbda6b38df43fdff6252d1eae0dfcd98933',
-      bytes: 451_256,
+      sha256: 'bf87b85b2985b421bf301fc8f7ce4505745fcb0fd58bd8c4c02b5de2c8c79613',
+      bytes: 452_856,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
@@ -616,7 +616,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      'acad50b8d261f88630e3ca323322d1522a4cfa0b3ea024111662fbdcda822c89',
+      '0b3abdf6f2ba00649a30798ef8fd8768d5a05d249066d821d873b5b6fea5c5bc',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -626,7 +626,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '17fe7b0b1ca629831283710441306ef01c54b04cc8c26d70bec361439e07c2ff',
+      '13711e916b7c30b99ee6ef09bc16f06de9e7712e3ff2b8e2b5f5b761ec98f357',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -736,7 +736,7 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(39);
+    expect(mapping.entries).toHaveLength(42);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     expect(mapping.generatedBatches).toHaveLength(16);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
@@ -760,8 +760,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(822);
-    expect(new Set(allCurrentOwnerIds).size).toBe(822);
+    expect(allCurrentOwnerIds).toHaveLength(825);
+    expect(new Set(allCurrentOwnerIds).size).toBe(825);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -883,7 +883,7 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(report.assets.every((asset) => asset.issues.length === 0)).toBe(true);
   }, 30_000);
 
-  it('keeps the full 817-icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
+  it('keeps the full 825-icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const ownerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
@@ -897,8 +897,8 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 822) violations.push(`mapping owner count: ${ownerIds.length} != 822`);
-    if (fileIds.length !== 822) violations.push(`shipping WebP count: ${fileIds.length} != 822`);
+    if (ownerIds.length !== 825) violations.push(`mapping owner count: ${ownerIds.length} != 825`);
+    if (fileIds.length !== 825) violations.push(`shipping WebP count: ${fileIds.length} != 825`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

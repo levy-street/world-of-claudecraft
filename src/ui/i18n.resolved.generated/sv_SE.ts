@@ -1053,6 +1053,9 @@ export const sv_SE: EnTranslations = {
       "rarity_epic": "Episk",
       "spec_speed": "+{pct}% extra rörlighet",
       "name_valorsteed": "Tapperhetshästen",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Goliat Grag-björnen",
       "name_stalkglider_snail": "Mosskal-stjälkglidaren",
       "name_aether_hover_cycle": "Etertornerarens svävcykel",
@@ -1062,6 +1065,9 @@ export const sv_SE: EnTranslations = {
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "name_drakemaw_raptor": "Drakgapsraptor",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
       "desc_aether_hover_cycle": "En kraftfull magitech-cykel designad för snabb, lågsvävande förflyttning i strid.",
@@ -12321,6 +12327,15 @@ export const sv_SE: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Rimtand"

@@ -354,7 +354,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // honor pieces and the 3 fishing additions (the koi and both rods):
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the three junk
+    // mounts on the Horizons shelf: 343. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -362,7 +363,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 343, total: 343 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +374,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 314, total: 314 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -383,7 +384,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content: 375 total.
+    // three daggers the v0.36.0 release merge added to live content: 375, plus
+    // the three junk mounts (rolling_log, tavern_barrel, runaway_mine_cart) on
+    // the Horizons mounts shelf: 378 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -394,7 +397,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(378);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2373,7 +2376,17 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // slot stays listed and sourceless until the mount gets a route.
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
+  // rolling_log / tavern_barrel / runaway_mine_cart: the three junk mounts ship
+  // as catalog and visual entries with no route authored yet (owner call), the
+  // same standing as drakemaw_raptor. tests/mounts.test.ts proves no mob table,
+  // heroic table, or rift reins pool awards any of them.
+  horizons_mounts: [
+    'drakemaw_raptor',
+    'terrorspark_groundshaker',
+    'rolling_log',
+    'tavern_barrel',
+    'runaway_mine_cart',
+  ],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -3261,10 +3274,11 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 368 = 375 slots minus the
-    // four retired vault slots minus the two gap mounts minus the pended
+    // excluded. Literal: tighten as rulings land. 368 = 378 slots minus the
+    // four retired vault slots minus the FIVE gap mounts minus the pended
     // masterwork:engineering. It tracks the slot total, so it moved with the
-    // three daggers the v0.36.0 release merge added, keeping the original slack.
+    // three daggers the v0.36.0 release merge added; the three junk mounts add
+    // three slots and three gaps at once, so the floor holds where it was.
     const hinted = RELIC_SLOTS.length - retiredSlots - actuallyUnhinted.size;
     expect(hinted).toBeGreaterThanOrEqual(368);
     // The retired arm stays snug too: exactly the vault's four slots today.
@@ -3325,7 +3339,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three slots content awards no route at all', () => {
+  it('the surviving pending rows are the six slots content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -3339,6 +3353,9 @@ describe('Reliquary source hint coverage', () => {
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
       'terrorspark_groundshaker',
+      'rolling_log',
+      'tavern_barrel',
+      'runaway_mine_cart',
     ]);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no
     // engineering recipe can proc a masterwork (see the gear-capability pin),

@@ -43,11 +43,13 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/renderer.ts',
-    // Lowered after extracting the fire-light adopter, the budget pass, the
-    // stranded-light reparent and the registry prune into
-    // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
-    // lowers the ceiling, never raises it).
-    ceiling: 13700,
+    // Lowered again after extracting the ridden-mount per-frame drive (anim
+    // copy, bob, roll, ambient fx) into src/render/mount_ride_view.ts. The
+    // rolling junk mounts needed new logic here, so the feature paid for itself
+    // by extraction rather than by raising the bar (the ratchet's own rule: an
+    // extraction lowers the ceiling, never raises it). Previously 13700, itself
+    // lowered by the src/render/fire_light_registry.ts extraction.
+    ceiling: 13693,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

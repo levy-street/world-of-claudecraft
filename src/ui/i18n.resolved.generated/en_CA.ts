@@ -1053,6 +1053,9 @@ export const en_CA: EnTranslations = {
       "rarity_epic": "Epic",
       "spec_speed": "+{pct}% extra mobility",
       "name_valorsteed": "Valorsteed",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Goliath Grag-Bear",
       "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
@@ -1062,6 +1065,9 @@ export const en_CA: EnTranslations = {
       "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
@@ -12321,6 +12327,15 @@ export const en_CA: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Rimefang"

@@ -13,6 +13,9 @@
 
 export type MountKey =
   | 'grag_bear'
+  | 'rolling_log'
+  | 'tavern_barrel'
+  | 'runaway_mine_cart'
   | 'stalkglider_snail'
   | 'valorsteed'
   | 'aether_hover_cycle'
@@ -51,6 +54,16 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'common',
     moveSpeedPct: 0.6,
   },
+  // The first of the three junk mounts: a fallen trunk somebody strapped a
+  // saddle to. It takes the horse's card exactly (common, 60%) so the gag is
+  // never a power choice, the same rule the Pet Rock rides on. No acquisition
+  // path yet (owner call), so nothing vendors, drops, or quests it today.
+  rolling_log: {
+    key: 'rolling_log',
+    name: "Ol' Rollin' Log",
+    rarity: 'common',
+    moveSpeedPct: 0.6,
+  },
   // Uncommon tier (70%): the griffin and the toad. These are the five-man heroic
   // drops, so they are the first specials most players collect.
   stormfeather_griffin: {
@@ -78,6 +91,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'rare',
     moveSpeedPct: 0.75,
   },
+  // The tavern keg, rare purely so the junk set spans the card colours the way
+  // the real catalog does. Plain rare-tier 75%, the bear and snail's number, not
+  // a bespoke one. Sourceless like its two siblings.
+  tavern_barrel: {
+    key: 'tavern_barrel',
+    name: 'Barrel of Laughs',
+    rarity: 'rare',
+    moveSpeedPct: 0.75,
+  },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
   // The Terrorspark Groundshaker is developer-only for now and has no
   // player-facing acquisition, and stays LAST in the catalog (the tests pin the
@@ -100,6 +122,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // The runaway ore cart, and the junk set's epic. It lands here rather than at
+  // the tail because the developer tank below is pinned as the catalog's last
+  // entry. Plain epic 80%, no bespoke number; sourceless like its siblings.
+  runaway_mine_cart: {
+    key: 'runaway_mine_cart',
+    name: 'Runaway Mine Cart',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

@@ -8017,6 +8017,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天風暴之羽的韁繩',
   'entities.items.reins_drakemaw_raptor.name': '龍喉迅猛龍的韁繩',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆闊步大火雞的韁繩',
+  'entities.items.reins_rolling_log.name': '滾滾老圓木的韁繩',
+  'entities.items.reins_tavern_barrel.name': '歡樂酒桶的韁繩',
+  'entities.items.reins_runaway_mine_cart.name': '脫韁礦車的韁繩',
   'entities.mobs.drowned_cantor.name': '溺亡誦經者',
   'entities.mobs.reedbound_acolyte.name': '蘆葦縛信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼槍顎獸',
@@ -9184,6 +9187,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。',
+  'hudChrome.mounts.name_rolling_log': '滾滾老圓木',
+  'hudChrome.mounts.name_tavern_barrel': '歡樂酒桶',
+  'hudChrome.mounts.name_runaway_mine_cart': '脫韁礦車',
+  'hudChrome.mounts.desc_rolling_log':
+    '一截倒下的樹幹，用繩子綁上了馬鞍。它載著你一路滾下山坡，還把這稱作交通工具。',
+  'hudChrome.mounts.desc_tavern_barrel':
+    '一個再也沒能回到酒窖的空酒桶，它已經認定自己的第二份職業就是馱著你。',
+  'hudChrome.mounts.desc_runaway_mine_cart':
+    '一輛沒有軌道、沒有煞車的礦車，早已不記得自己逃出的是哪座礦坑，卻依然一路狂奔。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐騎',
   'hudChrome.mounts.emptyStableHint': '升到 20 級，前往高望以西的馬廄，向馬廄總管瑪拉學習騎術。',
   'hudChrome.mounts.emptyDropHint': '較稀有的坐騎由英雄地城首領掉落或完成裂隙獲得。',

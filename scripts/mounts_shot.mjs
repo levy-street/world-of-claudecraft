@@ -65,6 +65,9 @@ await page.evaluate(() => {
   for (const id of [
     'reins_valorsteed',
     'reins_grag_bear',
+    'reins_rolling_log',
+    'reins_tavern_barrel',
+    'reins_runaway_mine_cart',
     'reins_stalkglider_snail',
     'reins_aether_hover_cycle',
     'reins_shadowjump_toad',
@@ -170,5 +173,10 @@ const swapTo = async (key, path) => {
 await swapTo('stormfeather_griffin', 'tmp/mounts_griffin.png');
 await swapTo('thunderstrut_gobbler', 'tmp/mounts_gobbler.png');
 await swapTo('aether_hover_cycle', 'tmp/mounts_hover_cycle.png');
+// The three clipless junk mounts: the shot is the seat check (a rider must sit
+// ON the log and barrel and IN the cart, not float above or sink through).
+await swapTo('rolling_log', 'tmp/mounts_rolling_log.png');
+await swapTo('tavern_barrel', 'tmp/mounts_tavern_barrel.png');
+await swapTo('runaway_mine_cart', 'tmp/mounts_runaway_mine_cart.png');
 
 await browser.close();

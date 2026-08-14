@@ -215,6 +215,11 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
 const CLIPLESS_RIGS = new Set([
   'mount_stalkglider_snail',
   'mount_aether_hover_cycle',
+  // the three junk mounts: Tripo prop-lane GLBs with no animation track, so
+  // their bob in mount_visuals.ts is the whole of their motion
+  'mount_rolling_log',
+  'mount_tavern_barrel',
+  'mount_runaway_mine_cart',
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',

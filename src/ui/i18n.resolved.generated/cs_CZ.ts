@@ -1053,6 +1053,9 @@ export const cs_CZ: EnTranslations = {
       "rarity_epic": "Epické",
       "spec_speed": "+{pct}% pohyblivosti navíc",
       "name_valorsteed": "Udatný oř",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Goliáš, medvěd Grag",
       "name_stalkglider_snail": "Mechoulitý klouzavec",
       "name_aether_hover_cycle": "Vznášecí kolo éterického kolbáře",
@@ -1062,6 +1065,9 @@ export const cs_CZ: EnTranslations = {
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
       "desc_aether_hover_cycle": "Výkonné magitechnické kolo navržené pro rychlý, nízko se vznášející pohyb v boji.",
@@ -12321,6 +12327,15 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Jinovatkový tesák"

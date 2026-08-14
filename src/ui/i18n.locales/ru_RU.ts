@@ -8499,6 +8499,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
   'entities.items.reins_drakemaw_raptor.name': 'Поводья раптора Дрейкмо',
   'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
+  'entities.items.reins_rolling_log.name': 'Поводья Старого катучего бревна',
+  'entities.items.reins_tavern_barrel.name': 'Поводья Бочки веселья',
+  'entities.items.reins_runaway_mine_cart.name': 'Поводья Беглой вагонетки',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -9750,6 +9753,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.',
+  'hudChrome.mounts.name_rolling_log': 'Старое катучее бревно',
+  'hudChrome.mounts.name_tavern_barrel': 'Бочка веселья',
+  'hudChrome.mounts.name_runaway_mine_cart': 'Беглая вагонетка',
+  'hudChrome.mounts.desc_rolling_log':
+    'Поваленный ствол с примотанным седлом, который катится с горы вместе с вами и называет это транспортом.',
+  'hudChrome.mounts.desc_tavern_barrel':
+    'Опустевший бочонок, так и не вернувшийся в погреб и решивший, что его вторая карьера, это возить вас.',
+  'hudChrome.mounts.desc_runaway_mine_cart':
+    'Рудная вагонетка без рельсов, без тормозов и без всякой памяти о шахте, из которой сбежала, и всё равно едет дальше.',
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
   'hudChrome.mounts.emptyStableHint':
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',

@@ -386,6 +386,43 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     buyValue: 100_000, // 10 gold in copper
   },
+  // The three junk-mount reins. Like the Drakemaw Raptor's, these have NO
+  // acquisition path yet (owner call): nothing vendors, drops, or quests them
+  // today, so they ship as catalog and visual entries and tests/mounts.ts pins
+  // that sourcelessness explicitly rather than letting it pass as an accident.
+  // Player reins rules still apply in full: unbound (owning the item IS owning
+  // the mount), no vendor sell, no discard, so a 0-copper sale can never eat
+  // one. Quality tracks each mount's catalog rarity, nothing more.
+  reins_rolling_log: {
+    id: 'reins_rolling_log',
+    name: "Reins of the Ol' Rollin' Log",
+    kind: 'mount',
+    mount: 'rolling_log',
+    quality: 'common',
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  reins_tavern_barrel: {
+    id: 'reins_tavern_barrel',
+    name: 'Reins of the Barrel of Laughs',
+    kind: 'mount',
+    mount: 'tavern_barrel',
+    quality: 'rare',
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  reins_runaway_mine_cart: {
+    id: 'reins_runaway_mine_cart',
+    name: 'Reins of the Runaway Mine Cart',
+    kind: 'mount',
+    mount: 'runaway_mine_cart',
+    quality: 'epic',
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
   // reins item IS owning the mount (src/sim/mounts.ts mountOwned); it stays
   // valid from the bank too, and it transfers like any other unbound item.

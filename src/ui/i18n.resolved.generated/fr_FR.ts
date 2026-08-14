@@ -1053,6 +1053,9 @@ export const fr_FR: EnTranslations = {
       "rarity_epic": "Épique",
       "spec_speed": "+{pct}% de mobilité supplémentaire",
       "name_valorsteed": "Destrier de Bravoure",
+      "name_rolling_log": "Ol' Rollin' Log",
+      "name_tavern_barrel": "Barrel of Laughs",
+      "name_runaway_mine_cart": "Runaway Mine Cart",
       "name_grag_bear": "Ours-Grag Goliath",
       "name_stalkglider_snail": "Glisseur à Coquille Moussue",
       "name_aether_hover_cycle": "Aérocycle du Jouteur d’Éther",
@@ -1062,6 +1065,9 @@ export const fr_FR: EnTranslations = {
       "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
+      "desc_rolling_log": "A fallen trunk with a saddle roped to it, which rolls downhill with you aboard and calls that transport.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
+      "desc_runaway_mine_cart": "An ore cart with no rails, no brakes, and no memory of the mine it escaped, still going anyway.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
       "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
@@ -12321,6 +12327,15 @@ export const fr_FR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
+      },
+      "reins_rolling_log": {
+        "name": "Reins of the Ol' Rollin' Log"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Reins of the Runaway Mine Cart"
       },
       "rimefang": {
         "name": "Croc de givre"

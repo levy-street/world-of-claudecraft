@@ -99,6 +99,26 @@ export const SFX = [
     key: 'mount_run_grag_bear',
     custom: true,
   },
+  // The three junk mounts. No ElevenLabs take: each loop is DERIVED with
+  // ffmpeg from a shipped one, the way the rock mount's grind came off the
+  // boulder roll take. One revolution's bump per loop, cut to each mount's
+  // bob cadence in src/render/mount_visuals.ts.
+  {
+    // foot_wood pitched down into a heavy trunk, with a short rolling tail.
+    key: 'mount_run_rolling_log',
+    custom: true,
+  },
+  {
+    // The same wood lower still, with a resonant boost so the keg rings hollow.
+    key: 'mount_run_tavern_barrel',
+    custom: true,
+  },
+  {
+    // foot_stone pitched up and brightened into an iron wheel, double-tapped
+    // so it rattles rather than thuds.
+    key: 'mount_run_runaway_mine_cart',
+    custom: true,
+  },
   {
     key: 'mount_run_stalkglider_snail',
     custom: true,

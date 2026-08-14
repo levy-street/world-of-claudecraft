@@ -168,8 +168,11 @@ interface AttributionTargetFixture {
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after making that extracted policy an explicit provenance
 // leaf. The evidence now follows policy-only changes; no capture was retaken.
+// Re-minted after extracting the ridden-mount per-frame drive out of
+// renderer.ts into src/render/mount_ride_view.ts for the monolith ratchet. The
+// composite follows the renderer.ts bytes; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e069626230576fa39ed87eeb94a78cb0ec111156f031fd8063bf2471a99db070';
+  'f3d91f596e83061a9c3666218caa51c9d2f25b9141f8cce96161188c213c1e6a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

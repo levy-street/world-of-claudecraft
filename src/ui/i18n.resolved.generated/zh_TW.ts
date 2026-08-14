@@ -1053,6 +1053,9 @@ export const zh_TW: EnTranslations = {
       "rarity_epic": "史詩",
       "spec_speed": "+{pct}% 額外移動力",
       "name_valorsteed": "英勇戰馬",
+      "name_rolling_log": "滾滾老圓木",
+      "name_tavern_barrel": "歡樂酒桶",
+      "name_runaway_mine_cart": "脫韁礦車",
       "name_grag_bear": "歌利亞格拉格巨熊",
       "name_stalkglider_snail": "苔殼滑行蝸牛",
       "name_aether_hover_cycle": "乙太騎士懸浮機車",
@@ -1062,6 +1065,9 @@ export const zh_TW: EnTranslations = {
       "name_terrorspark_groundshaker": "驚雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
+      "desc_rolling_log": "一截倒下的樹幹，用繩子綁上了馬鞍。它載著你一路滾下山坡，還把這稱作交通工具。",
+      "desc_tavern_barrel": "一個再也沒能回到酒窖的空酒桶，它已經認定自己的第二份職業就是馱著你。",
+      "desc_runaway_mine_cart": "一輛沒有軌道、沒有煞車的礦車，早已不記得自己逃出的是哪座礦坑，卻依然一路狂奔。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
@@ -12321,6 +12327,15 @@ export const zh_TW: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
+      },
+      "reins_rolling_log": {
+        "name": "滾滾老圓木的韁繩"
+      },
+      "reins_tavern_barrel": {
+        "name": "歡樂酒桶的韁繩"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "脫韁礦車的韁繩"
       },
       "rimefang": {
         "name": "霜牙"

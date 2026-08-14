@@ -1053,6 +1053,9 @@ export const ru_RU: EnTranslations = {
       "rarity_epic": "Эпический",
       "spec_speed": "+{pct}% к скорости передвижения",
       "name_valorsteed": "Доблестный скакун",
+      "name_rolling_log": "Старое катучее бревно",
+      "name_tavern_barrel": "Бочка веселья",
+      "name_runaway_mine_cart": "Беглая вагонетка",
       "name_grag_bear": "Голиаф Граг-медведь",
       "name_stalkglider_snail": "Мохопанцирный скользень",
       "name_aether_hover_cycle": "Эфирный ховерцикл турнирного бойца",
@@ -1062,6 +1065,9 @@ export const ru_RU: EnTranslations = {
       "name_terrorspark_groundshaker": "Страхоискр, сотрясатель земли",
       "name_drakemaw_raptor": "Раптор Дрейкмо",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
+      "desc_rolling_log": "Поваленный ствол с примотанным седлом, который катится с горы вместе с вами и называет это транспортом.",
+      "desc_tavern_barrel": "Опустевший бочонок, так и не вернувшийся в погреб и решивший, что его вторая карьера, это возить вас.",
+      "desc_runaway_mine_cart": "Рудная вагонетка без рельсов, без тормозов и без всякой памяти о шахте, из которой сбежала, и всё равно едет дальше.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
       "desc_aether_hover_cycle": "Мощный магитех-байк для быстрых боевых рейдов на бреющем ходу.",
@@ -12321,6 +12327,15 @@ export const ru_RU: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Поводья раптора Дрейкмо"
+      },
+      "reins_rolling_log": {
+        "name": "Поводья Старого катучего бревна"
+      },
+      "reins_tavern_barrel": {
+        "name": "Поводья Бочки веселья"
+      },
+      "reins_runaway_mine_cart": {
+        "name": "Поводья Беглой вагонетки"
       },
       "rimefang": {
         "name": "Инеевый клык"
