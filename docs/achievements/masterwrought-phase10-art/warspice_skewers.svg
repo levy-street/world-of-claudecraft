@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Warspice Skewers</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#38271a"/>
+<stop offset="0.55" stop-color="#1d1610"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<radialGradient id="spice" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#ffcf72" stop-opacity="0.6"/>
+<stop offset="0.55" stop-color="#ff7a2a" stop-opacity="0.3"/>
+<stop offset="1" stop-color="#e0561f" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="meat" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#c26a34"/>
+<stop offset="0.5" stop-color="#8a3a1c"/>
+<stop offset="1" stop-color="#41160c"/>
+</linearGradient>
+<linearGradient id="meatB" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#a95526"/>
+<stop offset="0.55" stop-color="#6f2b14"/>
+<stop offset="1" stop-color="#340f08"/>
+</linearGradient>
+<linearGradient id="stick" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f0d5a4"/>
+<stop offset="0.55" stop-color="#b18450"/>
+<stop offset="1" stop-color="#4a3218"/>
+</linearGradient>
+<linearGradient id="tray" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#6e737d"/>
+<stop offset="0.5" stop-color="#3a3e46"/>
+<stop offset="1" stop-color="#15171b"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="256" cy="300" rx="200" ry="140" fill="url(#spice)" filter="url(#soft)"/>
+<ellipse cx="256" cy="424" rx="168" ry="30" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<!-- iron serving tray -->
+<ellipse cx="256" cy="396" rx="164" ry="40" fill="url(#tray)" stroke="#0e0f13" stroke-width="6"/>
+<ellipse cx="256" cy="390" rx="140" ry="30" fill="#1c1e24" stroke="#0e0f13" stroke-width="4"/>
+<path d="M136 380 q40 -24 104 -30" fill="none" stroke="#a7adb8" stroke-width="5" opacity="0.35" stroke-linecap="round"/>
+<!-- three skewers fanned across the tray -->
+<g transform="rotate(-20 256 316)">
+  <path d="M108 322 L404 322" stroke="#2a1a0c" stroke-width="22" stroke-linecap="round"/>
+  <path d="M108 322 L404 322" stroke="url(#stick)" stroke-width="14" stroke-linecap="round"/>
+  <g stroke="#2a1207" stroke-width="5">
+    <rect x="164" y="292" width="62" height="60" rx="16" fill="url(#meat)"/>
+    <rect x="238" y="290" width="64" height="62" rx="16" fill="url(#meatB)"/>
+    <rect x="314" y="292" width="60" height="60" rx="16" fill="url(#meat)"/>
+  </g>
+  <g stroke="#2a1207" stroke-width="6" opacity="0.75" stroke-linecap="round">
+    <path d="M176 306 l38 0 M176 326 l38 0 M176 344 l38 0"/>
+    <path d="M250 304 l40 0 M250 324 l40 0 M250 344 l40 0"/>
+    <path d="M326 306 l36 0 M326 326 l36 0 M326 344 l36 0"/>
+  </g>
+  <g fill="#ffb340" opacity="0.6">
+    <circle cx="196" cy="300" r="5"/>
+    <circle cx="266" cy="340" r="5"/>
+    <circle cx="344" cy="302" r="4.5"/>
+  </g>
+</g>
+<g transform="rotate(-4 256 320)">
+  <path d="M100 336 L412 336" stroke="#2a1a0c" stroke-width="22" stroke-linecap="round"/>
+  <path d="M100 336 L412 336" stroke="url(#stick)" stroke-width="14" stroke-linecap="round"/>
+  <g stroke="#2a1207" stroke-width="5">
+    <rect x="152" y="304" width="66" height="64" rx="17" fill="url(#meatB)"/>
+    <rect x="230" y="302" width="68" height="66" rx="17" fill="url(#meat)"/>
+    <rect x="310" y="304" width="66" height="64" rx="17" fill="url(#meatB)"/>
+  </g>
+  <g stroke="#2a1207" stroke-width="6" opacity="0.75" stroke-linecap="round">
+    <path d="M164 320 l42 0 M164 340 l42 0 M164 358 l42 0"/>
+    <path d="M242 318 l44 0 M242 338 l44 0 M242 358 l44 0"/>
+    <path d="M322 320 l42 0 M322 340 l42 0 M322 358 l42 0"/>
+  </g>
+  <g fill="#ffcf72" opacity="0.65">
+    <circle cx="186" cy="314" r="5"/>
+    <circle cx="262" cy="354" r="5.5"/>
+    <circle cx="340" cy="316" r="5"/>
+  </g>
+</g>
+<g transform="rotate(12 256 336)">
+  <path d="M112 356 L400 356" stroke="#2a1a0c" stroke-width="22" stroke-linecap="round"/>
+  <path d="M112 356 L400 356" stroke="url(#stick)" stroke-width="14" stroke-linecap="round"/>
+  <g stroke="#2a1207" stroke-width="5">
+    <rect x="166" y="326" width="62" height="60" rx="16" fill="url(#meat)"/>
+    <rect x="240" y="324" width="64" height="62" rx="16" fill="url(#meatB)"/>
+    <rect x="316" y="326" width="60" height="60" rx="16" fill="url(#meat)"/>
+  </g>
+  <g stroke="#2a1207" stroke-width="6" opacity="0.75" stroke-linecap="round">
+    <path d="M178 340 l38 0 M178 360 l38 0 M178 378 l38 0"/>
+    <path d="M252 338 l40 0 M252 358 l40 0 M252 378 l40 0"/>
+    <path d="M328 340 l36 0 M328 360 l36 0 M328 378 l36 0"/>
+  </g>
+  <g fill="#ffb340" opacity="0.55">
+    <circle cx="200" cy="336" r="4.5"/>
+    <circle cx="270" cy="374" r="5"/>
+    <circle cx="346" cy="338" r="4.5"/>
+  </g>
+</g>
+<!-- drifting spice motes -->
+<g fill="#ffcf72">
+  <circle cx="150" cy="212" r="4" opacity="0.7"/>
+  <circle cx="366" cy="226" r="3.5" opacity="0.6"/>
+  <circle cx="286" cy="182" r="3" opacity="0.5"/>
+  <circle cx="196" cy="168" r="2.5" opacity="0.45"/>
+</g>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

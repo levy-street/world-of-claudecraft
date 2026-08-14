@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Warboar Flask</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#3a2c1c"/>
+<stop offset="0.55" stop-color="#1e1710"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="canteen" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#6a5439"/>
+<stop offset="0.5" stop-color="#42331f"/>
+<stop offset="1" stop-color="#241a10"/>
+</linearGradient>
+<linearGradient id="amber" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#ffce6a"/>
+<stop offset="0.45" stop-color="#e88a24"/>
+<stop offset="1" stop-color="#8f3c08"/>
+</linearGradient>
+<linearGradient id="tusk" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#f7edd8"/>
+<stop offset="0.55" stop-color="#d3c19c"/>
+<stop offset="1" stop-color="#8a7a58"/>
+</linearGradient>
+<linearGradient id="brass" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f4dc90"/>
+<stop offset="0.55" stop-color="#bb903e"/>
+<stop offset="1" stop-color="#6a4d18"/>
+</linearGradient>
+<linearGradient id="hide" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#6b4a2e"/>
+<stop offset="1" stop-color="#2c1c10"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="182" cy="168" rx="176" ry="146" fill="#7a5220" opacity="0.15" filter="url(#soft)"/>
+<ellipse cx="256" cy="436" rx="146" ry="26" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="432" rx="92" ry="14" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- boar tusks swept up from behind the canteen -->
+<g fill="url(#tusk)" stroke="#241a0e" stroke-width="5" stroke-linejoin="round">
+  <path d="M198 404 C 130 382 88 318 96 214 C 126 292 152 346 236 392 Z"/>
+  <path d="M314 404 C 382 382 424 318 416 214 C 386 292 360 346 276 392 Z"/>
+</g>
+<g fill="none" stroke="#fffaf0" stroke-width="5" opacity="0.45" stroke-linecap="round">
+  <path d="M110 238 C 118 306 146 352 194 384"/>
+  <path d="M402 238 C 394 306 366 352 318 384"/>
+</g>
+<!-- round war canteen -->
+<circle cx="256" cy="318" r="102" fill="url(#canteen)" stroke="#100b06" stroke-width="6"/>
+<circle cx="256" cy="318" r="86" fill="none" stroke="#0f0a05" stroke-width="4" opacity="0.55"/>
+<!-- amber draught filling the lower two thirds -->
+<path d="M166 300 q90 28 180 0 a92 92 0 0 1 -180 0 z" fill="url(#amber)" stroke="#5f2506" stroke-width="3"/>
+<ellipse cx="256" cy="302" rx="86" ry="12" fill="#ffdf9a" opacity="0.45"/>
+<ellipse cx="216" cy="342" rx="26" ry="30" fill="#ffc96a" opacity="0.2" filter="url(#soft4)"/>
+<!-- brass boar-head roundel struck on the face -->
+<circle cx="256" cy="304" r="52" fill="url(#brass)" stroke="#2b1e06" stroke-width="5"/>
+<circle cx="256" cy="304" r="42" fill="#3a2a0c" opacity="0.8"/>
+<path d="M228 292 q28 -22 56 0 q10 22 -6 38 q-22 12 -44 0 q-16 -16 -6 -38 z" fill="url(#brass)" stroke="#2b1e06" stroke-width="4"/>
+<ellipse cx="256" cy="326" rx="15" ry="9" fill="#2b1e06"/>
+<circle cx="243" cy="326" r="3" fill="#f4dc90"/>
+<circle cx="269" cy="326" r="3" fill="#f4dc90"/>
+<g fill="url(#tusk)" stroke="#2b1e06" stroke-width="3">
+  <path d="M232 322 q-14 -6 -12 -22 q10 10 16 16 z"/>
+  <path d="M280 322 q14 -6 12 -22 q-10 10 -16 16 z"/>
+</g>
+<circle cx="238" cy="298" r="5" fill="#1a1204"/>
+<circle cx="274" cy="298" r="5" fill="#1a1204"/>
+<!-- hide harness strap and buckle -->
+<path d="M158 262 q98 -34 196 0 l0 26 q-98 -34 -196 0 z" fill="url(#hide)" stroke="#150d06" stroke-width="4"/>
+<rect x="238" y="252" width="36" height="30" rx="6" fill="url(#brass)" stroke="#2b1e06" stroke-width="4"/>
+<!-- stopper and neck collar -->
+<rect x="226" y="188" width="60" height="34" rx="8" fill="url(#brass)" stroke="#2b1e06" stroke-width="4"/>
+<rect x="232" y="152" width="48" height="42" rx="9" fill="url(#hide)" stroke="#150d06" stroke-width="4"/>
+<path d="M240 168 l32 0" stroke="#c39a63" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+<!-- key-light sheen -->
+<path d="M196 262 a92 92 0 0 0 -26 62" fill="none" stroke="#ffe9c0" stroke-width="7" opacity="0.3" stroke-linecap="round"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

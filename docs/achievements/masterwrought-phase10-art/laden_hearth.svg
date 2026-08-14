@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>The Laden Hearth</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#36271a"/>
+<stop offset="0.55" stop-color="#1c1610"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="stone" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#8a8072"/>
+<stop offset="0.5" stop-color="#4e483f"/>
+<stop offset="1" stop-color="#1f1c18"/>
+</linearGradient>
+<linearGradient id="stoneDeep" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#5f594e"/>
+<stop offset="0.55" stop-color="#332f29"/>
+<stop offset="1" stop-color="#14120f"/>
+</linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f8e6a4"/>
+<stop offset="0.55" stop-color="#c99a3c"/>
+<stop offset="1" stop-color="#6f5014"/>
+</linearGradient>
+<radialGradient id="fire" cx="0.5" cy="0.62" r="0.72">
+<stop offset="0" stop-color="#fff0c0"/>
+<stop offset="0.4" stop-color="#ffab3a"/>
+<stop offset="0.75" stop-color="#ef6a1c"/>
+<stop offset="1" stop-color="#8c2c08"/>
+</radialGradient>
+<radialGradient id="fireGlow" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#ffce80" stop-opacity="0.7"/>
+<stop offset="0.5" stop-color="#ff7a2a" stop-opacity="0.32"/>
+<stop offset="1" stop-color="#c8410f" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="roast" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#c9782f"/>
+<stop offset="0.5" stop-color="#8d4318"/>
+<stop offset="1" stop-color="#41180a"/>
+</linearGradient>
+<linearGradient id="crust" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#f0cd8c"/>
+<stop offset="0.6" stop-color="#b8813a"/>
+<stop offset="1" stop-color="#5d3a10"/>
+</linearGradient>
+<linearGradient id="cheese" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#fbe89c"/>
+<stop offset="0.6" stop-color="#d3ad42"/>
+<stop offset="1" stop-color="#6f5714"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="256" cy="300" rx="196" ry="150" fill="url(#fireGlow)" filter="url(#soft)"/>
+<ellipse cx="256" cy="440" rx="180" ry="30" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<!-- hearth surround: piers, arch, and mantel -->
+<path d="M96 196 q160 -74 320 0 l0 34 q-160 -70 -320 0 z" fill="url(#stone)" stroke="#0f0d0b" stroke-width="6"/>
+<path d="M104 226 l72 0 l0 208 l-72 0 z" fill="url(#stoneDeep)" stroke="#0f0d0b" stroke-width="6"/>
+<path d="M336 226 l72 0 l0 208 l-72 0 z" fill="url(#stoneDeep)" stroke="#0f0d0b" stroke-width="6"/>
+<path d="M176 434 l0 -128 a80 80 0 0 1 160 0 l0 128 z" fill="#120f0c" stroke="#0f0d0b" stroke-width="6"/>
+<g fill="none" stroke="#0f0d0b" stroke-width="5" opacity="0.6">
+  <path d="M104 288 l72 0 M104 350 l72 0 M104 408 l72 0"/>
+  <path d="M336 288 l72 0 M336 350 l72 0 M336 408 l72 0"/>
+</g>
+<g fill="none" stroke="#9d9384" stroke-width="3" opacity="0.3">
+  <path d="M108 284 l64 0 M108 346 l64 0"/>
+  <path d="M340 284 l64 0 M340 346 l64 0"/>
+</g>
+<!-- gilded keystone and mantel trim, the epic register -->
+<path d="M104 196 q152 -70 304 0" fill="none" stroke="url(#gold)" stroke-width="9"/>
+<path d="M232 206 l48 0 l14 40 l-76 0 z" fill="url(#gold)" stroke="#2b1e06" stroke-width="5"/>
+<path d="M246 218 l16 0 l4 18 l-24 0 z" fill="#3d2c08"/>
+<!-- firebed and flames inside the arch -->
+<ellipse cx="256" cy="400" rx="112" ry="34" fill="#ff9a34" opacity="0.4" filter="url(#soft4)"/>
+<ellipse cx="256" cy="404" rx="98" ry="27" fill="url(#fire)"/>
+<path d="M256 302 q46 40 40 68 q-4 32 -40 38 q-36 -6 -40 -38 q-6 -28 40 -68 z" fill="url(#fire)"/>
+<path d="M198 330 q22 24 20 42 q-2 22 -20 30 q-18 -8 -20 -30 q-2 -18 20 -42 z" fill="url(#fire)" opacity="0.9"/>
+<path d="M314 336 q20 22 18 38 q-2 20 -18 28 q-16 -8 -18 -28 q-2 -16 18 -38 z" fill="url(#fire)" opacity="0.9"/>
+<path d="M256 336 q24 26 20 44 q-2 20 -20 26 q-18 -6 -20 -26 q-4 -18 20 -44 z" fill="#fff6d8" opacity="0.9"/>
+<g stroke="#2a1a10" stroke-width="7" stroke-linecap="round">
+  <path d="M188 410 L322 402"/>
+  <path d="M198 424 L316 418"/>
+</g>
+<g fill="#ffb340" opacity="0.75">
+  <circle cx="204" cy="382" r="7"/>
+  <circle cx="308" cy="388" r="6"/>
+  <circle cx="272" cy="414" r="5"/>
+</g>
+<!-- spit roast turning over the fire -->
+<path d="M132 292 L380 292" stroke="#0f0d0b" stroke-width="13" stroke-linecap="round"/>
+<path d="M132 292 L380 292" stroke="#8b919d" stroke-width="7" stroke-linecap="round"/>
+<path d="M368 274 q22 18 0 36" fill="none" stroke="#0f0d0b" stroke-width="11" stroke-linecap="round"/>
+<path d="M368 274 q22 18 0 36" fill="none" stroke="#8b919d" stroke-width="6" stroke-linecap="round"/>
+<path d="M188 292 q68 -52 136 0 q-68 54 -136 0 z" fill="url(#roast)" stroke="#1d0c04" stroke-width="6"/>
+<g fill="none" stroke="#2f1608" stroke-width="5" opacity="0.65" stroke-linecap="round">
+  <path d="M222 268 q6 40 2 42"/>
+  <path d="M262 262 q4 46 0 50"/>
+  <path d="M300 270 q-4 38 -2 40"/>
+</g>
+<path d="M202 278 q54 -32 108 0" fill="none" stroke="#ffd79a" stroke-width="7" opacity="0.7" stroke-linecap="round"/>
+<path d="M206 308 q50 26 100 0" fill="none" stroke="#ff9a34" stroke-width="5" opacity="0.5" stroke-linecap="round"/>
+<!-- laden board across the front: loaves left, cut cheese wheel right -->
+<g stroke="#2a1c08" stroke-width="5">
+  <ellipse cx="146" cy="414" rx="42" ry="25" fill="url(#crust)"/>
+  <ellipse cx="196" cy="422" rx="38" ry="22" fill="url(#crust)"/>
+</g>
+<g fill="none" stroke="#5d3a10" stroke-width="5" opacity="0.8" stroke-linecap="round">
+  <path d="M128 404 l14 -10 M152 402 l14 -10"/>
+  <path d="M182 414 l12 -10 M206 412 l12 -10"/>
+</g>
+<g stroke="#4a3a08" stroke-width="5">
+  <ellipse cx="346" cy="416" rx="44" ry="26" fill="url(#cheese)"/>
+  <path d="M346 416 l40 -14 a44 26 0 0 0 -40 -12 z" fill="#fdf0b4"/>
+</g>
+<path d="M312 406 q30 -14 62 -2" fill="none" stroke="#fdf0b4" stroke-width="5" opacity="0.5" stroke-linecap="round"/>
+<path d="M84 428 l344 0 l0 30 l-344 0 z" fill="url(#stoneDeep)" stroke="#0f0d0b" stroke-width="5"/>
+<path d="M96 436 l300 0" fill="none" stroke="#9d9384" stroke-width="4" opacity="0.3" stroke-linecap="round"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 870,
-    "liveItemDefinitions": 885,
+    "itemArtFilesReviewed": 878,
+    "liveItemDefinitions": 893,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -301,14 +301,15 @@
       "bag": 7,
       "drink": 9,
       "elixir": 4,
-      "food": 21,
+      "flask": 3,
+      "food": 24,
       "held_offhand": 14,
       "junk": 92,
       "mount": 9,
       "potion": 13,
       "quest": 97,
       "scroll": 3,
-      "tool": 49,
+      "tool": 51,
       "ui-backpack": 1,
       "weapon": 125
     },
@@ -391,7 +392,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 870,
+    "passCount": 878,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -679,6 +680,7 @@
       "goldweave_robe",
       "gorraks_cleaver",
       "gorraks_cruel_chopper",
+      "grand_cauldron",
       "graskbreaker_girdle",
       "grave_captain_voss",
       "grave_high_priest_malric",
@@ -799,6 +801,7 @@
       "ironbark_boar_spear",
       "ironbark_log",
       "ironedge_longsword",
+      "ironhusk_flask",
       "ironlink_hauberk",
       "ironlink_legguards",
       "ironlink_spaulders",
@@ -813,6 +816,7 @@
       "kingsbane_last_oath",
       "knight_commanders_greaves",
       "korgaths_chainwraps",
+      "laden_hearth",
       "last_keep_signet",
       "last_step_signet",
       "lesser_healing_potion",
@@ -1016,12 +1020,14 @@
       "roughspun_gloves",
       "royal_seal",
       "runed_bone_shard",
+      "runewater_flask",
       "rusted_censer",
       "rusty_dagger",
       "rusty_hatchet",
       "sablewax_vellum",
       "sableweb_cord",
       "sableweb_slippers",
+      "sageleaf_chowder",
       "saltforged_grips",
       "saltwalker_sandals",
       "sanctum_key_shard",
@@ -1093,6 +1099,7 @@
       "stalkerhide_jerkin",
       "starfall_shard",
       "steel_orange_armor_plate",
+      "stonepot_stew",
       "storm_core",
       "stormbark_mantle",
       "stormbound_crown",
@@ -1210,12 +1217,14 @@
       "voss_sanctified_mace",
       "votive_chain_belt",
       "wanderers_chestguard",
+      "warboar_flask",
       "wardens_oathband",
       "wardens_seal",
       "wardplate_cuirass",
       "wardspeaker_sabatons",
       "wardweave_cowl",
       "warhewn_signet",
+      "warspice_skewers",
       "waterlogged_idol",
       "wayfarers_hood",
       "weathered_ledger_page",
@@ -1268,7 +1277,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 870 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13."
+    "summary": "All 878 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14."
   },
   "nonVisualContentWatch": [
     {
@@ -1425,22 +1434,22 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "e2ff30c7fcf3c3f0be1306cc5223dc0d4b14034b5b6749050698743afd963c36",
-      "bytes": 476973
+      "sha256": "6c3f7975c5425e7f8a69e43c70621a8c6c2a2f4789d76ec46862e76e467ec0f3",
+      "bytes": 481727
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
-    "sheetCount": 216,
+    "sheetCount": 224,
     "sheetModeCounts": {
-      "128-color": 27,
-      "40-color": 27,
-      "28-color": 27,
-      "22-color": 27,
-      "28-grayscale": 27,
-      "64-circle": 27,
-      "small-multiview": 27,
-      "identity": 27
+      "128-color": 28,
+      "40-color": 28,
+      "28-color": 28,
+      "22-color": 28,
+      "28-grayscale": 28,
+      "64-circle": 28,
+      "small-multiview": 28,
+      "identity": 28
     },
-    "sheetSetSha256": "fb42818452fb6d5a9583381203726ab687ddac3b8edf577af59e0b06ce2b6a5b",
+    "sheetSetSha256": "fe6e52b1a59ec44052750e4084900755bca85c9de3da16fb81e32672e1c719ad",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2339,65 +2348,129 @@
         "format": "png"
       },
       {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--128-color.png",
+        "sha256": "aa0856dad308bc6236088575f32418c96454594da038989adbd7c651a5440c84",
+        "bytes": 57793,
+        "width": 1600,
+        "height": 210,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--40-color.png",
+        "sha256": "1d2483de7e246437d0cc66def2420a795dbc5bb3112165ed4fc5b060f1ec9fcf",
+        "bytes": 19496,
+        "width": 1600,
+        "height": 166,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--28-color.png",
+        "sha256": "b7998383f2b9d19c62d723aaf858ec9e0229cc7022893f9da7dc97ffe8bcfc3d",
+        "bytes": 16352,
+        "width": 1600,
+        "height": 210,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--22-color.png",
+        "sha256": "e1ab4cad59619546ad362cbc6bda2be82377b9102fc40aa69e08036647a91901",
+        "bytes": 14136,
+        "width": 1600,
+        "height": 210,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--28-grayscale.png",
+        "sha256": "99aaca8edc427cb44bbba2c491c0efaf247bc0b03c967fe6250ef5e7b61fa0b3",
+        "bytes": 13965,
+        "width": 1600,
+        "height": 210,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--64-circle.png",
+        "sha256": "200eecd91bf4b052fa57fe04bb1c13e3d2bb4ed59ef5e6d193c6a9788c35299c",
+        "bytes": 25576,
+        "width": 1600,
+        "height": 210,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--small-multiview.png",
+        "sha256": "6bc3206282061a69e40aac3a9ec607d18491f6c2bb59d3762d3cd1ca08d6a1d1",
+        "bytes": 50253,
+        "width": 1800,
+        "height": 262,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/flask--p01--identity.png",
+        "sha256": "aca0cde3090e72454f0edc6366c81aa5e212f7d501699de3e768486eeace8e19",
+        "bytes": 63829,
+        "width": 1800,
+        "height": 248,
+        "format": "png"
+      },
+      {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--128-color.png",
-        "sha256": "66b05449b814736d91f55d1d7c52e06eb6f1436308bc45499354c57d3f99924f",
-        "bytes": 817021,
+        "sha256": "c8c7092b162234bc60d37d002f03dd768c58a6bae5a4bcbf4611335c7842eb92",
+        "bytes": 867388,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--40-color.png",
-        "sha256": "cbc77d89fd441d01c12152b770ee1f854b2f0b5ea995106521b1e1d8944a1201",
-        "bytes": 135166,
+        "sha256": "571897ddacee3710b10ed5dc62441ea608692923d07c2b39aa0c3cfaa8ab74e0",
+        "bytes": 148120,
         "width": 1600,
         "height": 410,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--28-color.png",
-        "sha256": "b03cb0d32bda966af4cd087396f706da41b2d61012e80df2f073ed1ecd329d1b",
-        "bytes": 89285,
+        "sha256": "f8d5954825585bd53acea2a830ae3113b7371006522799173e1e7e3faffc5c05",
+        "bytes": 99075,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--22-color.png",
-        "sha256": "0d9421cbe6682df2c2fa3d6be2973748f6b77cd6605463f73224be7e041d6477",
-        "bytes": 68242,
+        "sha256": "8d65e9a61157c9b4c0f584f52e4e8ef96e5c369c8a1e4ef722fca72adc45fc67",
+        "bytes": 76194,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--28-grayscale.png",
-        "sha256": "f0d2b63f639188311c9085bd28b6fcd282d19ddb0d20e2295840c62dacb47985",
-        "bytes": 64506,
+        "sha256": "18ab6f47e41606f541512c1d1743f6be2816115fb8f0c000f3724fd826037b53",
+        "bytes": 71676,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--64-circle.png",
-        "sha256": "8854bf51aaa01663a2da9753426be3717d0c17432fab625c878cb9f0095887e5",
-        "bytes": 246700,
+        "sha256": "668a745978578ba8ba3682b5f671780351ee9c6785bb5aea31155c248e7f7e24",
+        "bytes": 265396,
         "width": 1600,
         "height": 542,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--small-multiview.png",
-        "sha256": "63d004ada8cd11182c36f5cad2f7e24bf673ee93b0ad53b7dcb80f165dae88e9",
-        "bytes": 441839,
+        "sha256": "19f197b7c641035df889bc4646e5deff38d05e545d390bf1b2b3ed61aa9c1923",
+        "bytes": 480008,
         "width": 1800,
         "height": 698,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/food--p01--identity.png",
-        "sha256": "50b9ca9d83f1a227ee8840b9c5eec253bca877df01999c9e1b56ec958a132c99",
-        "bytes": 844539,
+        "sha256": "8e241de0e31864d619f8d2d87a3ab5ecc5473b0fe7058cd33058bfc2fb1c1b44",
+        "bytes": 896367,
         "width": 1800,
         "height": 656,
         "format": "png"
@@ -2916,66 +2989,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--128-color.png",
-        "sha256": "0ca9018f25123d0ea4eee9a7b8459795780c0639502402d95cf3d4de3d8edb46",
-        "bytes": 1544145,
+        "sha256": "984fbbd8a222e62a6e08cb6321ef112f791324701767d8e32badf5a492d1fcfb",
+        "bytes": 1592697,
         "width": 1600,
-        "height": 874,
+        "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--40-color.png",
-        "sha256": "09bd54f87c7f9a6a31dbe0e616d7451d17a275df421a327324aae3e0745b8e89",
-        "bytes": 282884,
+        "sha256": "22a882a18c440dd558716654d025d4ba7561ac0fc0e3492b3b0463c35dd8e010",
+        "bytes": 295050,
         "width": 1600,
-        "height": 654,
+        "height": 776,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-color.png",
-        "sha256": "171a6d19a227a078ed84ec8e9d8c88c9be0ded746f1d2cacd70cced0fc4df3e5",
-        "bytes": 190772,
+        "sha256": "23004390451e1afbd9ffbb2441939552f938a5fc8505afd874d55268bd9070c4",
+        "bytes": 200194,
         "width": 1600,
-        "height": 874,
+        "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--22-color.png",
-        "sha256": "ff0047091426426cfa0873424c0a62770cfe942c7394748960968c573e6f6fca",
-        "bytes": 149088,
+        "sha256": "e31a1903906c11d68b2579f91fed7b17611973f69a8c89368037d0649dc327c8",
+        "bytes": 155997,
         "width": 1600,
-        "height": 874,
+        "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-grayscale.png",
-        "sha256": "b4224e375c655bebb8d27fc182c60279221509a16444eb775445ebbd6fe8589b",
-        "bytes": 137933,
+        "sha256": "4e1bcb20cd85e0589465dc19276bde44886481e1c8cc56d95bd0d4d0537144d8",
+        "bytes": 145519,
         "width": 1600,
-        "height": 874,
+        "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--64-circle.png",
-        "sha256": "434ef2de572c8a491f111b3b07846a19028b812eae6ca052635900f18b86deea",
-        "bytes": 483048,
+        "sha256": "56576db159d5556cf86779e29afe5dc624ecd4bde292cec5174040a30f0b0556",
+        "bytes": 501541,
         "width": 1600,
-        "height": 874,
+        "height": 1040,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--small-multiview.png",
-        "sha256": "71aaa176aeb002b32de6bb3fa0d0e47d8beeccb41b57e8681a2a3e966d137c54",
-        "bytes": 895511,
+        "sha256": "2373bdb860041caca79ff14104c44f1ea07f6ae9804b486002f3c763671d2ced",
+        "bytes": 930104,
         "width": 1800,
-        "height": 1134,
+        "height": 1352,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--identity.png",
-        "sha256": "1ed5246a15280a55dff6467c8feeab3f06805d9549a1ec1187ffd55dd399a7a0",
-        "bytes": 1593931,
+        "sha256": "a97f5b49483022362239a6cd9b65b15f9e56afb2ee5f85100047e6c8df84f8b2",
+        "bytes": 1645635,
         "width": 1800,
-        "height": 1064,
+        "height": 1268,
         "format": "png"
       },
       {
@@ -3171,6 +3244,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "98adcfdac8ed174640dcab03da641693c324016014563c2b05d4b077d2e483b4"
+    "shippingCatalogSha256": "83fff3d8685ea8ac1ea6d470773cf16f03c1e8ce44d9903391ba93bcc3e2b227"
   }
 }

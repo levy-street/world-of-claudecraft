@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Sageleaf Chowder</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#232e2a"/>
+<stop offset="0.55" stop-color="#151a18"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="ware" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#efe7d6"/>
+<stop offset="0.5" stop-color="#b9ae99"/>
+<stop offset="1" stop-color="#57503f"/>
+</linearGradient>
+<linearGradient id="glaze" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#7fc9bd"/>
+<stop offset="0.55" stop-color="#3d8078"/>
+<stop offset="1" stop-color="#194440"/>
+</linearGradient>
+<radialGradient id="chowder" cx="0.4" cy="0.34" r="0.86">
+<stop offset="0" stop-color="#fbf3dc"/>
+<stop offset="0.6" stop-color="#e6d5ab"/>
+<stop offset="1" stop-color="#b79f6f"/>
+</radialGradient>
+<linearGradient id="sage" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#a8d47a"/>
+<stop offset="0.55" stop-color="#6f9f45"/>
+<stop offset="1" stop-color="#2f5320"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="188" cy="180" rx="168" ry="140" fill="#5c6b52" opacity="0.13" filter="url(#soft)"/>
+<ellipse cx="256" cy="414" rx="164" ry="28" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="410" rx="104" ry="16" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- steam wisps -->
+<g fill="none" stroke="#eef4e6" stroke-width="12" opacity="0.2" stroke-linecap="round" filter="url(#soft4)">
+  <path d="M214 244 q-20 -40 6 -70 q22 -26 4 -54"/>
+  <path d="M304 240 q22 -36 -4 -66"/>
+</g>
+<!-- footed base -->
+<path d="M212 372 l88 0 l14 26 l-116 0 z" fill="url(#ware)" stroke="#181510" stroke-width="5"/>
+<ellipse cx="256" cy="398" rx="66" ry="14" fill="url(#ware)" stroke="#181510" stroke-width="5"/>
+<!-- wide shallow bowl -->
+<path d="M118 292 q16 92 138 92 q122 0 138 -92 z" fill="url(#ware)" stroke="#181510" stroke-width="6"/>
+<path d="M132 320 q22 74 124 74 q102 0 124 -74" fill="none" stroke="url(#glaze)" stroke-width="16" opacity="0.85"/>
+<path d="M150 344 q28 32 66 42" fill="none" stroke="#fffaf0" stroke-width="6" opacity="0.35" stroke-linecap="round"/>
+<!-- rim ring -->
+<ellipse cx="256" cy="290" rx="140" ry="40" fill="url(#ware)" stroke="#181510" stroke-width="6"/>
+<ellipse cx="256" cy="288" rx="120" ry="31" fill="#2a2a24" stroke="#181510" stroke-width="4"/>
+<path d="M140 278 q34 -20 78 -25" fill="none" stroke="#fffaf0" stroke-width="6" opacity="0.45" stroke-linecap="round"/>
+<!-- pale chowder surface -->
+<ellipse cx="256" cy="290" rx="113" ry="27" fill="url(#chowder)"/>
+<g fill="#f7efd8" opacity="0.7">
+  <ellipse cx="212" cy="284" rx="26" ry="9"/>
+  <ellipse cx="290" cy="296" rx="22" ry="8"/>
+</g>
+<g fill="#d9c290" opacity="0.8">
+  <ellipse cx="248" cy="300" rx="16" ry="6"/>
+  <ellipse cx="304" cy="282" rx="13" ry="5"/>
+</g>
+<!-- floating sageleaf -->
+<g stroke="#24401a" stroke-width="3">
+  <path d="M196 292 q22 -18 46 -8 q-20 20 -46 8 z" fill="url(#sage)"/>
+  <path d="M262 276 q26 -14 48 0 q-24 16 -48 0 z" fill="url(#sage)"/>
+  <path d="M240 302 q24 -10 44 4 q-24 12 -44 -4 z" fill="url(#sage)"/>
+  <path d="M300 300 q18 -12 36 -4 q-16 14 -36 4 z" fill="url(#sage)"/>
+</g>
+<g fill="none" stroke="#dff3c4" stroke-width="2.5" opacity="0.7" stroke-linecap="round">
+  <path d="M200 290 q20 -8 40 -6"/>
+  <path d="M266 277 q22 -6 42 0"/>
+  <path d="M244 301 q22 -4 38 4"/>
+</g>
+<g fill="#5f8a3c" opacity="0.8">
+  <circle cx="228" cy="272" r="4"/>
+  <circle cx="286" cy="304" r="3.5"/>
+  <circle cx="196" cy="302" r="3"/>
+</g>
+<ellipse cx="224" cy="280" rx="34" ry="10" fill="#ffffff" opacity="0.18" filter="url(#soft4)"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

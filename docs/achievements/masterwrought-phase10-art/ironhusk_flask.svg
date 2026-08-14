@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Ironhusk Flask</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#332a22"/>
+<stop offset="0.55" stop-color="#1a1611"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="glass" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#5b5348"/>
+<stop offset="0.5" stop-color="#39332c"/>
+<stop offset="1" stop-color="#211d18"/>
+</linearGradient>
+<linearGradient id="iron" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#8b8f99"/>
+<stop offset="0.5" stop-color="#4c515b"/>
+<stop offset="1" stop-color="#1c1e24"/>
+</linearGradient>
+<linearGradient id="brew" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#c2542c"/>
+<stop offset="0.5" stop-color="#8d2f18"/>
+<stop offset="1" stop-color="#4a150c"/>
+</linearGradient>
+<linearGradient id="cork" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#7a5a34"/>
+<stop offset="1" stop-color="#3a2a15"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- warm atmosphere on the key side -->
+<ellipse cx="188" cy="176" rx="170" ry="140" fill="#6b4a2c" opacity="0.14" filter="url(#soft)"/>
+<!-- grounded contact shadow -->
+<ellipse cx="256" cy="428" rx="150" ry="28" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="424" rx="96" ry="15" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- squat husk-glass body: wide shoulders, heavy base -->
+<path d="M222 194 h68 v26 q66 34 66 104 a96 96 0 0 1 -192 0 q0 -70 58 -104 z" fill="url(#glass)" stroke="#0f0c09" stroke-width="5"/>
+<!-- deep red-brown draught filling the belly -->
+<path d="M172 288 q84 24 168 0 l0 26 a86 86 0 0 1 -168 0 z" fill="url(#brew)" stroke="#3a1009" stroke-width="3"/>
+<ellipse cx="256" cy="289" rx="82" ry="12" fill="#d9703f" opacity="0.5"/>
+<ellipse cx="222" cy="330" rx="26" ry="34" fill="#e08346" opacity="0.16" filter="url(#soft4)"/>
+<!-- husk grain scored across the upper glass -->
+<g fill="none" stroke="#0e0b08" stroke-width="4" opacity="0.5" stroke-linecap="round">
+  <path d="M196 254 q60 -18 120 0"/>
+  <path d="M182 272 q74 -20 148 0"/>
+  <path d="M208 238 q48 -14 96 0"/>
+</g>
+<g fill="none" stroke="#8e8071" stroke-width="2" opacity="0.4" stroke-linecap="round">
+  <path d="M196 250 q60 -18 120 0"/>
+  <path d="M182 268 q74 -20 148 0"/>
+</g>
+<!-- iron husk bands strapping the flask -->
+<path d="M170 296 q86 26 172 0 l0 34 q-86 26 -172 0 z" fill="url(#iron)" stroke="#0d0e12" stroke-width="4"/>
+<path d="M182 362 q74 24 148 0 l0 30 q-74 24 -148 0 z" fill="url(#iron)" stroke="#0d0e12" stroke-width="4"/>
+<path d="M244 220 l24 0 l0 176 l-24 0 z" fill="url(#iron)" stroke="#0d0e12" stroke-width="4"/>
+<g fill="#c2c7d1" opacity="0.5">
+  <circle cx="196" cy="312" r="5"/>
+  <circle cx="316" cy="312" r="5"/>
+  <circle cx="204" cy="376" r="4.5"/>
+  <circle cx="308" cy="376" r="4.5"/>
+  <circle cx="256" cy="246" r="4.5"/>
+  <circle cx="256" cy="410" r="4.5"/>
+</g>
+<!-- riveted collar and leather-bound stopper -->
+<rect x="212" y="178" width="88" height="28" rx="7" fill="url(#iron)" stroke="#0d0e12" stroke-width="4"/>
+<rect x="228" y="132" width="56" height="50" rx="9" fill="url(#cork)" stroke="#1a1208" stroke-width="4"/>
+<rect x="222" y="120" width="68" height="20" rx="7" fill="url(#iron)" stroke="#0d0e12" stroke-width="4"/>
+<path d="M236 146 l40 0" stroke="#c39a63" stroke-width="4" opacity="0.55" stroke-linecap="round"/>
+<!-- key-light sheen down the left shoulder -->
+<path d="M212 226 a86 96 0 0 0 -22 78" fill="none" stroke="#e6dcc9" stroke-width="7" opacity="0.35" stroke-linecap="round"/>
+<path d="M236 200 l0 -14" stroke="#e6dcc9" stroke-width="4" opacity="0.3" stroke-linecap="round"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

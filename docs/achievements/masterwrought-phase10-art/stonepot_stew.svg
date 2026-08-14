@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Stonepot Stew</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#2e2a26"/>
+<stop offset="0.55" stop-color="#1a1815"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="stone" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#8b857b"/>
+<stop offset="0.5" stop-color="#4d4943"/>
+<stop offset="1" stop-color="#1e1c19"/>
+</linearGradient>
+<linearGradient id="stoneRim" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#a29a8c"/>
+<stop offset="0.6" stop-color="#645e55"/>
+<stop offset="1" stop-color="#2a2723"/>
+</linearGradient>
+<radialGradient id="stew" cx="0.42" cy="0.36" r="0.85">
+<stop offset="0" stop-color="#c07f31"/>
+<stop offset="0.55" stop-color="#8a4d1e"/>
+<stop offset="1" stop-color="#472309"/>
+</radialGradient>
+<linearGradient id="wood" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#c39a63"/>
+<stop offset="0.55" stop-color="#8a6435"/>
+<stop offset="1" stop-color="#3e2a13"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="186" cy="176" rx="168" ry="140" fill="#6b5334" opacity="0.13" filter="url(#soft)"/>
+<ellipse cx="256" cy="432" rx="164" ry="28" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="428" rx="106" ry="16" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- steam wisps curling off the pot -->
+<g fill="none" stroke="#e6ddca" stroke-width="13" opacity="0.22" stroke-linecap="round" filter="url(#soft4)">
+  <path d="M212 250 q-22 -44 8 -78 q26 -30 6 -62"/>
+  <path d="M300 244 q24 -40 -4 -74 q-24 -28 -4 -56"/>
+  <path d="M256 234 q10 -34 -8 -60"/>
+</g>
+<!-- ladle propped in the pot -->
+<g transform="rotate(20 352 268)">
+  <path d="M344 156 l18 0 l-4 132 l-14 0 z" fill="url(#wood)" stroke="#241708" stroke-width="4"/>
+  <ellipse cx="352" cy="300" rx="30" ry="22" fill="url(#wood)" stroke="#241708" stroke-width="4"/>
+  <ellipse cx="352" cy="296" rx="20" ry="13" fill="#5d3312"/>
+</g>
+<!-- stone pot belly -->
+<path d="M148 292 a108 108 0 0 0 216 0 z" fill="url(#stone)" stroke="#100f0d" stroke-width="6"/>
+<!-- chipped stone lugs -->
+<path d="M144 296 q-32 6 -34 34 q22 10 40 -6 z" fill="url(#stoneRim)" stroke="#100f0d" stroke-width="5"/>
+<path d="M368 296 q32 6 34 34 q-22 10 -40 -6 z" fill="url(#stoneRim)" stroke="#100f0d" stroke-width="5"/>
+<!-- chisel facets across the belly -->
+<g fill="none" stroke="#0f0e0c" stroke-width="4" opacity="0.45" stroke-linecap="round">
+  <path d="M186 330 q26 22 22 52"/>
+  <path d="M256 348 q-6 26 4 46"/>
+  <path d="M322 328 q-22 24 -20 52"/>
+</g>
+<g fill="none" stroke="#b3ab9d" stroke-width="3" opacity="0.28" stroke-linecap="round">
+  <path d="M180 326 q26 22 22 52"/>
+  <path d="M318 324 q-22 24 -20 52"/>
+</g>
+<!-- flared rim ring -->
+<ellipse cx="256" cy="288" rx="122" ry="34" fill="url(#stoneRim)" stroke="#100f0d" stroke-width="6"/>
+<ellipse cx="256" cy="284" rx="102" ry="26" fill="#171512" stroke="#0f0e0c" stroke-width="4"/>
+<path d="M144 278 q28 -18 66 -22" fill="none" stroke="#cbc2b1" stroke-width="5" opacity="0.4" stroke-linecap="round"/>
+<!-- hearty stew surface -->
+<ellipse cx="256" cy="286" rx="94" ry="22" fill="url(#stew)"/>
+<g stroke="#3d1d07" stroke-width="3">
+  <ellipse cx="214" cy="282" rx="20" ry="11" fill="#7c4118"/>
+  <ellipse cx="272" cy="290" rx="22" ry="12" fill="#8d4c1c"/>
+  <ellipse cx="304" cy="278" rx="15" ry="9" fill="#d08a2e"/>
+  <ellipse cx="240" cy="296" rx="14" ry="8" fill="#c47b26"/>
+</g>
+<g fill="#6f9440" opacity="0.85">
+  <ellipse cx="196" cy="294" rx="9" ry="5"/>
+  <ellipse cx="290" cy="298" rx="8" ry="4.5"/>
+  <ellipse cx="252" cy="272" rx="7" ry="4"/>
+</g>
+<ellipse cx="226" cy="276" rx="30" ry="9" fill="#ffce80" opacity="0.2" filter="url(#soft4)"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

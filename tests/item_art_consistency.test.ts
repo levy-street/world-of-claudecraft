@@ -333,8 +333,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '9ec5c3007b38744d33567e2e5a66cd9eadbb1b3d7e5a5d385fcbdb0db2bf09b5',
-        acceptedBytes: 114_685,
+        acceptedSha256: '44953dfb5846cfb64a59e41487ad12bc4b8bfa35bcceaf3d63ed8cda87944d17',
+        acceptedBytes: 117_619,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -449,9 +449,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(114_685);
+    expect(verdictBytes.length).toBe(117_619);
     expect(sha256(verdictBytes)).toBe(
-      '9ec5c3007b38744d33567e2e5a66cd9eadbb1b3d7e5a5d385fcbdb0db2bf09b5',
+      '44953dfb5846cfb64a59e41487ad12bc4b8bfa35bcceaf3d63ed8cda87944d17',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -460,8 +460,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 870,
-      liveItemDefinitions: 885,
+      itemArtFilesReviewed: 878,
+      liveItemDefinitions: 893,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,9 +471,12 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      870,
+      878,
     );
-    expect(Object.keys(verdict.auditScope.groups)).toHaveLength(23);
+    // 23 -> 24 at Masterwrought phase 10: the three apex flasks are a new item
+    // kind, and the audit groups by kind, so they form their own census group
+    // (and their own contact-sheet page, below).
+    expect(Object.keys(verdict.auditScope.groups)).toHaveLength(24);
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
         .filter((name) => name.endsWith('.webp'))
@@ -516,13 +519,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 870,
+      passCount: 878,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 870 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13.',
+        'All 878 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -562,26 +565,26 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'e2ff30c7fcf3c3f0be1306cc5223dc0d4b14034b5b6749050698743afd963c36',
-      bytes: 476_973,
+      sha256: '6c3f7975c5425e7f8a69e43c70621a8c6c2a2f4789d76ec46862e76e467ec0f3',
+      bytes: 481_727,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
     );
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
-    expect(verdict.evidence.sheetCount).toBe(216);
+    expect(verdict.evidence.sheetCount).toBe(224);
     expect(verdict.evidence.sheetModeCounts).toEqual({
-      '128-color': 27,
-      '40-color': 27,
-      '28-color': 27,
-      '22-color': 27,
-      '28-grayscale': 27,
-      '64-circle': 27,
-      'small-multiview': 27,
-      identity: 27,
+      '128-color': 28,
+      '40-color': 28,
+      '28-color': 28,
+      '22-color': 28,
+      '28-grayscale': 28,
+      '64-circle': 28,
+      'small-multiview': 28,
+      identity: 28,
     });
-    expect(verdict.evidence.sheets).toHaveLength(216);
-    expect(new Set(verdict.evidence.sheets.map(({ path: sheetPath }) => sheetPath)).size).toBe(216);
+    expect(verdict.evidence.sheets).toHaveLength(224);
+    expect(new Set(verdict.evidence.sheets.map(({ path: sheetPath }) => sheetPath)).size).toBe(224);
     const modesByPage = new Map<string, string[]>();
     for (const sheet of verdict.evidence.sheets) {
       const match = sheet.path.match(
@@ -593,7 +596,7 @@ describe('item-art consistency accepted-art provenance', () => {
       modes.push(match?.[2] ?? '');
       modesByPage.set(page, modes);
     }
-    expect(modesByPage.size).toBe(27);
+    expect(modesByPage.size).toBe(28);
     for (const modes of modesByPage.values()) {
       expect(modes).toEqual([
         '128-color',
@@ -616,7 +619,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      'fb42818452fb6d5a9583381203726ab687ddac3b8edf577af59e0b06ce2b6a5b',
+      'fe6e52b1a59ec44052750e4084900755bca85c9de3da16fb81e32672e1c719ad',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -626,7 +629,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '98adcfdac8ed174640dcab03da641693c324016014563c2b05d4b077d2e483b4',
+      '83fff3d8685ea8ac1ea6d470773cf16f03c1e8ce44d9903391ba93bcc3e2b227',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -741,7 +744,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // (masterwrought-phase09-art, the phase 06 batch pattern), so each has
     // exactly one current owner and the weapon-batch ownership model sees
     // the two weapons.
-    expect(mapping.entries).toHaveLength(71);
+    // 71 -> 79 at Masterwrought phase 10: eight apex consumable and station
+    // icons, back in the per-item entries form because the wave holds no
+    // weapon (only a weapon needs the batch owner the phase 09 note describes).
+    expect(mapping.entries).toHaveLength(79);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     expect(mapping.generatedBatches).toHaveLength(18);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
@@ -768,8 +774,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(870);
-    expect(new Set(allCurrentOwnerIds).size).toBe(870);
+    expect(allCurrentOwnerIds).toHaveLength(878);
+    expect(new Set(allCurrentOwnerIds).size).toBe(878);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -905,8 +911,8 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 870) violations.push(`mapping owner count: ${ownerIds.length} != 870`);
-    if (fileIds.length !== 870) violations.push(`shipping WebP count: ${fileIds.length} != 870`);
+    if (ownerIds.length !== 878) violations.push(`mapping owner count: ${ownerIds.length} != 878`);
+    if (fileIds.length !== 878) violations.push(`shipping WebP count: ${fileIds.length} != 878`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

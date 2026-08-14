@@ -626,6 +626,70 @@
       "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "ironhusk_flask",
+      "name": "Ironhusk Flask",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "warboar_flask",
+      "name": "Warboar Flask",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "runewater_flask",
+      "name": "Runewater Flask",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "stonepot_stew",
+      "name": "Stonepot Stew",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "warspice_skewers",
+      "name": "Warspice Skewers",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "sageleaf_chowder",
+      "name": "Sageleaf Chowder",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "grand_cauldron",
+      "name": "Grand Cauldron",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "laden_hearth",
+      "name": "The Laden Hearth",
+      "sourcePack": "woc_original_svg",
+      "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
     }
   ],
   "generatedBatches": [

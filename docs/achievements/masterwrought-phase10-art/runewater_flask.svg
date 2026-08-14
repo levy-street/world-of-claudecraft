@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Runewater Flask</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#1f2b38"/>
+<stop offset="0.55" stop-color="#12181f"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="glass" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#3d5568"/>
+<stop offset="0.5" stop-color="#24384a"/>
+<stop offset="1" stop-color="#152230"/>
+</linearGradient>
+<linearGradient id="runewater" x1="0" y1="0" x2="0.5" y2="1">
+<stop offset="0" stop-color="#bdf0ff"/>
+<stop offset="0.45" stop-color="#3f9fe8"/>
+<stop offset="1" stop-color="#123f7c"/>
+</linearGradient>
+<radialGradient id="halo" cx="0.5" cy="0.5" r="0.7">
+<stop offset="0" stop-color="#7fd4ff" stop-opacity="0.55"/>
+<stop offset="1" stop-color="#2f7fd6" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="silver" x1="0" y1="0" x2="0.6" y2="1">
+<stop offset="0" stop-color="#e6edf8"/>
+<stop offset="0.55" stop-color="#98a3b5"/>
+<stop offset="1" stop-color="#4a5262"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<!-- cold arcane bloom behind the glass -->
+<ellipse cx="256" cy="316" rx="128" ry="150" fill="url(#halo)" filter="url(#soft)"/>
+<ellipse cx="256" cy="430" rx="132" ry="26" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="426" rx="86" ry="14" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- slender tapered flask -->
+<path d="M232 178 h48 L326 366 q-70 34 -140 0 z" fill="url(#glass)" stroke="#cfe6f5" stroke-width="5" stroke-linejoin="round"/>
+<!-- luminous runewater filling the taper -->
+<path d="M256 258 l-9 0 L206 358 q50 24 100 0 L266 258 z" fill="url(#runewater)" stroke="#0d3564" stroke-width="3"/>
+<path d="M212 262 q44 14 88 0 l0 8 q-44 14 -88 0 z" fill="#bdf0ff" opacity="0.45"/>
+<ellipse cx="256" cy="326" rx="46" ry="34" fill="#9fe4ff" opacity="0.25" filter="url(#soft4)"/>
+<circle cx="238" cy="330" r="7" fill="#eafaff" opacity="0.9" filter="url(#soft4)"/>
+<circle cx="276" cy="308" r="5" fill="#eafaff" opacity="0.75" filter="url(#soft4)"/>
+<circle cx="262" cy="348" r="4" fill="#eafaff" opacity="0.6" filter="url(#soft4)"/>
+<!-- rune etchings scored into the glass -->
+<g fill="none" stroke="#a9ecff" stroke-width="5" opacity="0.85" stroke-linecap="round">
+  <path d="M224 300 l-14 0 M217 292 l0 16"/>
+  <path d="M298 296 l12 8 l-12 8"/>
+  <path d="M240 224 l16 -14 l16 14 l-16 12 z"/>
+  <path d="M228 372 l18 -10 M266 362 l18 10"/>
+</g>
+<!-- filigree collar, clasp, and hanging chain -->
+<path d="M218 168 h76 l-6 26 h-64 z" fill="url(#silver)" stroke="#141a22" stroke-width="4"/>
+<rect x="226" y="132" width="60" height="38" rx="8" fill="url(#silver)" stroke="#141a22" stroke-width="4"/>
+<path d="M214 148 q-22 12 -18 34" fill="none" stroke="#141a22" stroke-width="8" stroke-linecap="round"/>
+<path d="M214 148 q-22 12 -18 34" fill="none" stroke="url(#silver)" stroke-width="4.5" stroke-linecap="round"/>
+<circle cx="256" cy="151" r="9" fill="#3f9fe8" stroke="#141a22" stroke-width="3"/>
+<path d="M236 142 l40 0" stroke="#eff5ff" stroke-width="3" opacity="0.55" stroke-linecap="round"/>
+<!-- glyphs drifting off the mouth -->
+<g fill="none" stroke="#a9ecff" stroke-width="4" opacity="0.7" stroke-linecap="round">
+  <path d="M324 132 l0 22 M314 138 l20 -6"/>
+  <path d="M186 104 l16 0 M194 96 l0 16"/>
+</g>
+<circle cx="340" cy="190" r="4" fill="#bdf0ff" opacity="0.7"/>
+<circle cx="176" cy="150" r="3.5" fill="#bdf0ff" opacity="0.6"/>
+<!-- key-light sheen down the left wall -->
+<path d="M244 196 L216 344" fill="none" stroke="#e9f7ff" stroke-width="7" opacity="0.35" stroke-linecap="round"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>
