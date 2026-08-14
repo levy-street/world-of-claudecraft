@@ -5583,6 +5583,8 @@ function professionsFarmingSession(seed = 1): Scenario {
       'toniced harvest on a probed WINNING yieldSeed: zero draws, bonus picks at base grade',
       'convertHusks: the withered payout batch trades into compost, zero draws',
       'tier-3 harvest (highland_barley at Thornpeak): EXACTLY one draw, the seed-back roll',
+      'ready-notice sweep (Phase 8): a plot left ready across the 1 Hz boundary emits ONE farmReady, zero draws',
+      'notified flag: the noticed plot samples notified true in fplot before its closing harvest',
     ],
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
@@ -5714,6 +5716,37 @@ function professionsFarmingSession(seed = 1): Scenario {
       harvestCrop(sim.ctx, p, meta, BED_T3);
       rec.snapshot('harvested-t3');
       // Drain the barley harvest's queued 0.02 gain into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 8 extension: the READY-NOTICE SWEEP, appended after
+      // every earlier beat so their labels and draw ledger stay
+      // byte-identical. Every beat above harvests a ripened plot in the same
+      // drive step, so the 1 Hz sweep never observes one; this beat is the
+      // scenario's only farmReady, and the emission itself is the pinned
+      // fact: a draw or a repeat here moves the event digest and nothing
+      // else in the suite would see it. ----
+      sim.addItem('vale_wheat_seed', 1, pid);
+      teleport(sim, p, 18.5, 30); // back to the freed northern Eastbrook bed
+      // Ride out the t3 plant's flavor cast remainder (its harvest landed
+      // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // Two draws (the plant pre-roll), the extension's only randomness.
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // The /dev farmgrow equivalence again: ripen in place, survived arm.
+      const noticed = meta.farmPlots.get(BED_READY) as PlotState;
+      noticed.readyAtMs = sim.ctx.lockoutNowMs();
+      noticed.survivalRoll = 0.01;
+      // DO NOT harvest yet: 21 ticks cross at least one % 20 boundary, so
+      // the sweep sees a ready, unnotified plot and emits exactly one
+      // farmReady { ready: 1 } with ZERO draws; the following 20 ticks cross
+      // another boundary and prove the flip silenced it.
+      rec.tick(21);
+      rec.tick(20);
+      rec.snapshot('ready-noticed'); // fplot samples notified: true here
+      // Close the bed out so the scenario still ends with every bed free.
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-noticed');
       rec.tick(8);
     },
   };

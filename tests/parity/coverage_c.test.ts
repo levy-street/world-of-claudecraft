@@ -601,21 +601,32 @@ describe('coverage: each scenario fires its subsystem', () => {
     const pid = (rec.sim as any).playerId as number;
     const meta = (rec.sim as any).players.get(pid);
 
-    // All four plants landed, in drive order, and each started the flavor
+    // All five plants landed, in drive order, and each started the flavor
     // cast. The second one is the load-bearing half of the busy gate (it only
     // lands because the drive waits out the first cast); the third is the
     // knobbed plant on the freed bed; the fourth is the tier-3 barley at the
-    // Thornpeak patch.
+    // Thornpeak patch; the fifth is the Phase 8 ready-notice beat back on the
+    // freed northern bed.
     expect(ev.filter((e) => e.type === 'farmPlanted').map((e) => e.bedId)).toEqual([
       'bed_eastbrook_1',
       'bed_eastbrook_2',
       'bed_eastbrook_1',
       'bed_thornpeak_1',
+      'bed_eastbrook_1',
     ]);
     expect(
       ev.filter((e) => e.type === 'castStart' && e.ability === 'farming'),
       'every plant started the FARMING_CAST_ID flavor cast',
-    ).toHaveLength(4);
+    ).toHaveLength(5);
+
+    // THE READY NOTICE (Phase 8): the fifth plant is left standing across two
+    // 1 Hz boundaries, so the sweep fires EXACTLY once for it: a second event
+    // here means the notified flip stopped silencing the sweep, and zero
+    // means the sweep stopped observing ready plots at all. Counts only, no
+    // withered field on an all-survived notice.
+    expect(ev.filter((e) => e.type === 'farmReady')).toEqual([
+      { type: 'farmReady', pid, ready: 1 },
+    ]);
 
     // THE DRAW LEDGER, the point of this scenario. rng.draws is cumulative
     // from drive start: two draws per plant (the contiguous survival + yield
@@ -637,7 +648,12 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(drawsAt('husks-converted')).toBe(6);
     expect(drawsAt('planted-t3')).toBe(8);
     expect(drawsAt('harvested-t3')).toBe(9);
-    expect(trace.draws).toBe(9);
+    // The Phase 8 ready-notice beat: its plant pre-rolls two more, and then
+    // NOTHING draws through the sweep that emits the notice, the sampled
+    // notified flag, or the closing harvest (tier 1, no seed-back).
+    expect(drawsAt('ready-noticed')).toBe(11);
+    expect(drawsAt('harvested-noticed')).toBe(11);
+    expect(trace.draws).toBe(11);
 
     // The knobbed plant really stored all three paid flags (farmPlanted is
     // knob-free on the wire, so the drive stashes the stored plot's flags).
@@ -649,7 +665,21 @@ describe('coverage: each scenario fires its subsystem', () => {
     // absent and the common harvest keeps the pre-field wire shape. No
     // seedBackCount either: tier 1 never rolls (the omit-zero doctrine).
     const harvested = ev.filter((e) => e.type === 'farmHarvested');
-    expect(harvested).toHaveLength(3);
+    expect(harvested).toHaveLength(4);
+    // The Phase 8 closing harvest: skill sits at 75-and-change by now, so the
+    // yield expansion pays 7 (the recorded truth of the committed golden, a
+    // literal for the drawsAt reason above) with no fine or seed-back fields
+    // on a tier-1 crop.
+    expect(harvested[3]).toEqual({
+      type: 'farmHarvested',
+      pid,
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      itemId: 'vale_wheat',
+      count: 7,
+    });
+    expect('fineItemId' in harvested[3]).toBe(false);
+    expect('seedBackCount' in harvested[3]).toBe(false);
     expect(harvested[0].bedId).toBe('bed_eastbrook_1');
     expect(harvested[0].itemId).toBe('vale_wheat');
     expect(harvested[0].count).toBe(3);
@@ -743,6 +773,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       receiveLine('vale_wheat', 2),
       receiveLine('skysilver_hoe'),
       receiveLine('highland_barley_seed'),
+      receiveLine('vale_wheat_seed'), // the Phase 8 ready-notice beat's seed
     ]);
     const expectedFlagged =
       harvested.reduce(
@@ -756,11 +787,12 @@ describe('coverage: each scenario fires its subsystem', () => {
 
     // The bags agree with every beat: the fee spent 2 of the 5 produce held
     // (3 banked + 2 scaffolding) before the toniced harvest re-paid, the
+    // Phase 8 closing harvest banked its 7 on top (harvested[3] above), the
     // husk batch became the compost back in the bag (1 granted - 1 paid + 1
     // converted), the tonic was consumed, and every seed pouch is empty
     // except the seed-back. Both eastbrook beds and the thornpeak bed are
     // free again (one visit takes the plot out on either outcome).
-    expect(countOf('vale_wheat')).toBe(3 + toniced.count);
+    expect(countOf('vale_wheat')).toBe(3 + toniced.count + 7);
     expect(countOf('withered_husks')).toBe(0);
     expect(countOf('vale_wheat_seed')).toBe(0);
     expect(countOf('compost')).toBe(1);
