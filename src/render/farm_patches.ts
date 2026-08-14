@@ -47,6 +47,11 @@ import {
   resolveFarmPlotVisual,
 } from './farm_patches_core';
 import { surfaceMat } from './gfx';
+import {
+  addInstancedParts,
+  type GlbTemplatePart,
+  glbTemplateParts,
+} from './glb_instanced_props';
 import { setRenderCategory } from './renderer_diagnostics';
 
 /**
@@ -114,56 +119,22 @@ function groundNormal(x: number, z: number, seed: number): THREE.Vector3 {
   return new THREE.Vector3(-(hPX - hNX) / (2 * s), 1, -(hPZ - hNZ) / (2 * s)).normalize();
 }
 
-interface TemplatePart {
-  geo: THREE.BufferGeometry;
-  mat: THREE.Material | THREE.Material[];
-  local: THREE.Matrix4;
-  /** True when this part carries the per-crop accent material. */
-  accent: boolean;
-}
-
 /**
- * The mesh primitives of one authored GLB, height-normalized. Falls back to a
- * single primitive box while the GLB is still loading or absent, the stations
- * idiom: the beds must draw from the first frame, never wait on an asset.
+ * The mesh primitives of one authored farm GLB, height-normalized, via the
+ * shared glb_instanced_props kernel (the stations idiom): a primitive-box
+ * fallback draws from the first frame, never waiting on an asset.
  */
-function templateParts(url: string, targetHeight: number, fallbackColor: number): TemplatePart[] {
-  const loaded = loadedFarmGltf.get(url);
-  if (!loaded) {
-    const h = targetHeight;
-    return [
-      {
-        geo: new THREE.BoxGeometry(h * 2.2, h, h * 2.2),
-        mat: surfaceMat({ color: fallbackColor }),
-        local: new THREE.Matrix4().makeTranslation(0, h / 2, 0),
-        accent: false,
-      },
-    ];
-  }
-  loaded.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(loaded);
-  const rawHeight = box.max.y - box.min.y;
-  const scale = rawHeight > 1e-4 ? targetHeight / rawHeight : 1;
-  const normalize = new THREE.Matrix4()
-    .makeTranslation(0, -box.min.y * scale, 0)
-    .multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
-  const parts: TemplatePart[] = [];
-  loaded.traverse((child) => {
-    if (!(child instanceof THREE.Mesh)) return;
-    const mat = child.material;
-    const named = Array.isArray(mat) ? mat.some(isAccentMaterial) : isAccentMaterial(mat);
-    parts.push({
-      geo: child.geometry,
-      mat,
-      local: new THREE.Matrix4().multiplyMatrices(normalize, child.matrixWorld),
-      accent: named || child.name === FARM_ACCENT_MESH_NAME,
-    });
+function templateParts(
+  url: string,
+  targetHeight: number,
+  fallbackColor: number,
+): GlbTemplatePart[] {
+  return glbTemplateParts(loadedFarmGltf.get(url), targetHeight, {
+    fallbackWidthFactor: 2.2,
+    makeFallbackMat: () => surfaceMat({ color: fallbackColor }),
+    accentMeshName: FARM_ACCENT_MESH_NAME,
+    accentMaterialName: FARM_ACCENT_MATERIAL_NAME,
   });
-  return parts;
-}
-
-function isAccentMaterial(mat: THREE.Material): boolean {
-  return mat.name === FARM_ACCENT_MATERIAL_NAME;
 }
 
 /** The soil socket's LOCAL offset inside a height-normalized bed, or the
@@ -241,13 +212,13 @@ export function buildFarmPatchProps(
       holder.compose(pos, quat, one);
       bedMatrices.push(holder.clone());
     }
-    addInstanced(
+    addInstancedParts(
       group,
       `farmPatches:bed:${patch.id}`,
       templateParts(FARM_BED_MODEL_URL, BED_HEIGHT, 0x8a6a4a),
       bedMatrices,
-      tint.setHex(palette.soil),
       matrix,
+      tint.setHex(palette.soil),
     );
 
     // One compost bin per patch, just outside the west edge of the grid.
@@ -259,43 +230,16 @@ export function buildFarmPatchProps(
     );
     pos.set(bin.x, binY, bin.z);
     holder.compose(pos, binQuat, one);
-    addInstanced(
+    addInstancedParts(
       group,
       `farmPatches:bin:${patch.id}`,
       templateParts(FARM_COMPOST_BIN_MODEL_URL, BIN_HEIGHT, 0x6f5a3e),
       [holder.clone()],
-      tint.setHex(palette.wood),
       matrix,
+      tint.setHex(palette.wood),
     );
   }
   return { group, seats };
-}
-
-function addInstanced(
-  group: THREE.Group,
-  name: string,
-  parts: readonly TemplatePart[],
-  matrices: readonly THREE.Matrix4[],
-  color: THREE.Color,
-  scratch: THREE.Matrix4,
-): void {
-  if (matrices.length === 0) return;
-  for (const part of parts) {
-    const im = new THREE.InstancedMesh(part.geo, part.mat, matrices.length);
-    im.name = name;
-    matrices.forEach((m, i) => {
-      scratch.multiplyMatrices(m, part.local);
-      im.setMatrixAt(i, scratch);
-      im.setColorAt(i, color);
-    });
-    im.instanceMatrix.needsUpdate = true;
-    if (im.instanceColor) im.instanceColor.needsUpdate = true;
-    im.castShadow = true;
-    im.receiveShadow = true;
-    im.computeBoundingBox();
-    im.computeBoundingSphere();
-    group.add(im);
-  }
 }
 
 /** One live plot's crop meshes. Satisfies FarmPlotVisualKey structurally, so
@@ -506,7 +450,7 @@ export class FarmPatchVisuals {
    * Cloning is affordable because there are at most 23 plots, one per bed.
    */
   private plotMaterial(
-    part: TemplatePart,
+    part: GlbTemplatePart,
     visual: FarmPlotVisual,
     damp: number,
     owned: THREE.Material[],
