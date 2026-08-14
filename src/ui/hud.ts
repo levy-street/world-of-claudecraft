@@ -122,7 +122,6 @@ import {
   ENCHANT_CAST_ID,
   type Entity,
   FAERIE_FIRE_ARMOR_PCT,
-  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   type ItemDef,
@@ -189,6 +188,7 @@ import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
+import { castDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -989,46 +989,9 @@ const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
-// Rift boss one-shot mechanic cast IDs: keyed by their authored mechanic name.
-// These appear in the target cast bar when the boss winds up a lethal zone.
-// The lookup prevents falling back to the raw castId string on the HUD.
-const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
-  'abilityUi.cast.rift_frost_execution': true,
-  'abilityUi.cast.rift_frost_strike': true,
-  'abilityUi.cast.rift_ember_execution': true,
-  'abilityUi.cast.rift_ember_strike': true,
-  'abilityUi.cast.rift_venom_execution': true,
-  'abilityUi.cast.rift_venom_strike': true,
-  'abilityUi.cast.rift_necro_execution': true,
-  'abilityUi.cast.rift_necro_strike': true,
-  'abilityUi.cast.rift_brute_execution': true,
-  'abilityUi.cast.rift_brute_strike': true,
-  'abilityUi.cast.rift_arcane_execution': true,
-  'abilityUi.cast.rift_arcane_strike': true,
-  'abilityUi.cast.rift_storm_execution': true,
-  'abilityUi.cast.rift_storm_strike': true,
-  'abilityUi.cast.rift_tide_execution': true,
-  'abilityUi.cast.rift_tide_strike': true,
-};
 const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
-};
-const castDisplayName = (id: string): string => {
-  if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
-  if (id === FARMING_CAST_ID) return t('abilityUi.cast.farming');
-  if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
-  if (id === CRAFT_CAST_ID) return t('abilityUi.cast.crafting');
-  if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
-  if (id === ENCHANT_CAST_ID) return t('abilityUi.cast.enchanting_apply');
-  if (id === SALVAGE_CAST_ID) return t('abilityUi.cast.salvaging');
-  if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
-  if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
-  if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
-  const riftKey = `abilityUi.cast.${id}` as TranslationKey;
-  if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
-  const ability = ABILITIES[id];
-  return ability ? abilityDisplayName(ability) : id;
 };
 
 const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
