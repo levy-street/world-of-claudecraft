@@ -4,19 +4,23 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 6 (economy hooks) done 2026-08-09 (merge 1a26881d0b);
-Phase 6b (the v0.38.0 release sync, the first big-jump mid-phase) done
-2026-08-13; Phase 6 QA is next. Packet authored 2026-08-07 off
-release/v0.36.0; the branch has absorbed release/v0.38.0 through 952c183fc3
-(ELEVENTH absorb, the Phase 6b sync, absorb merge 2c26b6db7b: 1453 commits,
+Current phase: Phase 7 (render and juice) done 2026-08-14; Phase 7 QA is
+next (docs/farming/phase-07-qa.md). Phase 6 QA done 2026-08-13 (merge
+ae695397d1, twelfth absorb 1a5d6fd5b4 of tip b08d79ef91 inside it); the
+THIRTEENTH absorb opened Phase 7 (merge a0d8ddc127 of tip 6ee7f3fd27: 4
+commits, 8 files, one-file intersection at sim.ts, audit clean, no
+lockfile move). Packet authored 2026-08-07 off
+release/v0.36.0; the eleventh absorb was the Phase 6b big-jump sync
+(absorb merge 2c26b6db7b of tip 952c183fc3: 1453 commits,
 2376 files, 117-file farming intersection; headline systems the Reliquary
 facet and catalog, the owned-classes overhaul with warlock pets, the
 Thornhollow Fields battleground, the map marker overhaul, the player item
 lock, civic service anchors, the three.js audit batch, and the monolith
 line-count ratchet tests/monolith_budget.test.ts). Count-pin baselines as of
 the eleventh absorb, all re-recorded from suite runs on the merged tree:
-command_schema 201/214 send/dispatch, IWorld members 327 (88 data, 239
-method), delta keys 87 (fplot stays the branch's own), facet count 34. The farming-only baselines held with zero movement:
+command_schema 201/214 send/dispatch, delta keys 87 (fplot stays the
+branch's own), facet count 34; IWorld members moved to 328 (88 data, 240
+method) in Phase 7 with farmNowMs (deviation (ap)). The farming-only baselines held with zero movement:
 FARM_MATERIAL_ITEM_IDS 27 exact, ITEM_ART_PENDING 39 exact, farming.ts
 silent-loot grant sites 6, blob floor/ceiling pins unchanged. The
 farming_session golden was deliberately re-minted ONCE for the release's
@@ -481,8 +485,13 @@ question does not arise (farming has no station).
 - `src/world_api/farming.ts` (IWorldFarming facet: patch defs, my plots, commands)
 - `src/ui/harvest_journal_view.ts` + `src/ui/harvest_journal_window.ts` (or the
   hud-domain directory form per `src/ui/hud/CLAUDE.md`)
-- `src/render/farm_patches.ts` (beds + crop stage props adapter)
-- `scripts/assets/build_farm_props.mjs` (procedural swap-ready GLBs)
+- `src/render/farm_patches.ts` (beds + crop stage props adapter; Phase 7
+  landed it with its pure core `src/render/farm_patches_core.ts` in
+  RENDER_PURE_CORES)
+- REFINED (Phase 7): the exporter is `scripts/assets/farm_props/` (driver
+  `export_farm_props.mjs` + spec `scripts/assets/specs/farm_props.json`),
+  the live per-asset subdirectory convention; `build_farm_props.mjs` never
+  existed (deviation (as))
 - `docs/design/farming-asset-manifest.json` (the handoff list; survives teardown)
 - `tests/professions_farming*.test.ts`, `tests/farm_patch_placement.test.ts`, a
   `farming_session` parity scenario
@@ -506,6 +515,12 @@ question does not arise (farming has no station).
   FarmPlantKnobs) with no member-count movement; FarmPlantKnobs lives in
   farm_projection.ts and re-exports through the facet and the barrel.
   command_schema counts moved 194/207 to 195/208 (send/dispatch).
+  Phase 7: farmNowMs() as a method member on IWorldFarming (both worlds,
+  client-local derivation, NO wire token; deviation (ap)); parity pins
+  moved 327 to 328 members, 239 to 240 methods (data 88 and facet count 34
+  unchanged; both union-size literals moved with the member count; the
+  parity exhaustion is TYPE-LEVEL, so run tsc as well as the suite when
+  re-syncing these pins).
 - New SimEvents: Phase 4: farmHusksConverted { pid, husks, compost } (text-free,
   pid-scoped; owns both halves of the trade feedback, the compost grant riding
   its hub loot event silent + callerLogs). farmDenied's reason union grew four
@@ -1084,6 +1099,89 @@ question does not arise (farming has no station).
   now assert 'locked', a sixth arm pins the genuine-shortfall polarity (one
   locked produce, fee two: stays no_fee_produce), and the reason-to-line
   distinctness pin covers the new leaf.
+  (ap) IWorldFarming gained farmNowMs(): number in Phase 7, the
+  RaidLockout-template timer read BOTH the facet's clock-base contract and
+  the farm_projection header explicitly deferred to "the first timer
+  surface", which the render phase's stage fractions are. Each world
+  returns its OWN authority clock base fresh per call: Sim delegates to
+  lockoutNowMs() (sim-clock offline and headless, injected Date.now on the
+  server), ClientWorld returns Date.now() (the riftEventMsRemaining
+  precedent: the live server's lockoutNowMs IS Date.now). No wire field, no
+  golden movement; parity pins moved 327 to 328 members, 239 to 240
+  methods. Behaviorally pinned in tests/professions_farming.test.ts (same
+  base as a fresh plant's plantedAtMs; advances with the tick on an
+  uninjected sim), mutation-proven. Consumers derive stage and wet
+  fractions only; withered stays authority-status-only. The packet's
+  stopping rule said surface-before-widening: MAINTAINER READ OWED on this
+  member, argued as the design's own anticipated seam.
+  (aq) The Phase 7 acceptance line "npm run asset:budget green" is AMENDED:
+  the repo-wide budget is pre-existing RED (the image-to-glb skill states
+  it; models/props alone is 12x over its group budget). The honest bar,
+  held and recorded: the 15 farm props moved models/props by exactly
+  +174,844 bytes, no other group moved a byte, and no group that was under
+  its budget crossed. Any future farming asset phase inherits this bar,
+  never the literal green.
+  (ar) farmGrowthStage + FarmGrowthStage MOVED verbatim from
+  professions/farming.ts to professions/farm_projection.ts (its stated
+  design home: wall-clock enters only as the nowMs argument), with
+  re-exports kept in farming.ts. The facet re-exports the TYPE only:
+  tests/architecture.test.ts pins src/world_api as TYPES-ONLY imports from
+  src/sim, so the render core imports the FUNCTION directly from the
+  projection leaf, which the RENDER_PURE_CORES import contract expressly
+  allows. The phase invariant "all farming data enters through the facet"
+  holds for every STATE read (farmPatches, myFarmPlots, farmNowMs); the one
+  stateless pure-function import is the sanctioned exception, commented in
+  both files.
+  (as) The asset exporter lives at scripts/assets/farm_props/ (model.js +
+  export_entry.js + export_farm_props.mjs + source_fingerprint.mjs + spec
+  scripts/assets/specs/farm_props.json), the live per-asset subdirectory
+  convention, NOT the packet's flat scripts/assets/build_farm_props.mjs.
+  model.d.ts rides along (tsconfig has no allowJs; proven load-bearing) and
+  is deliberately OUTSIDE the fingerprint input list, which stays the eight
+  pinned paths. Swap-ready contract: FARM_PROP_CONTRACTS in model.js
+  (deep-frozen, JSON-shaped for docs/design/farming-asset-manifest.json at
+  Phase 13), stamped into each GLB's root extras.
+  (at) Farm beds and compost bins have NO collider and NO ground pad: the
+  gather_nodes/stations precedent, and tests/farm_patch_placement.test.ts
+  already guarantees legal flat ground. Decorative, walkable, non-blocking,
+  per the phase Live-surface note; recorded in the farm_patches.ts banner
+  so it cannot be re-litigated silently. Nothing landed under src/sim/ for
+  this.
+  (au) Crop FAMILIES (grain / rootleaf / gourd), per-crop accent tints, and
+  the four per-hub biome palettes are RENDER-SIDE data in
+  src/render/farm_patches_core.ts: no family column was added to
+  FarmCropDef (a sim-content change would drag the content-obligations
+  train into a render phase). The exhaustiveness pins in
+  tests/farm_patches_core.test.ts run over the LIVE FARM_CROP_IDS and
+  FARM_PATCHES, so a ninth crop or fifth hub reds the suite instead of
+  silently falling back. Crop identity on the shared family meshes comes
+  from the CropAccent/crop_accent tint channel (exporter ships light
+  neutral vertex colors; the renderer multiplies the per-crop accent).
+  (av) src/render/farm_patches.ts is imported EAGERLY by the renderer (the
+  stations precedent), not via the rift lazy-import idiom: the static beds
+  must build in the same lifecycle setup as stationProps, so a dynamic
+  import would resolve from cache and buy nothing. The per-viewer visuals
+  construct after the Vfx exists. Steady state is allocation-free: the
+  adapter reads myFarmPlots at most once per uniform 0.5s (plus an
+  immediate event-driven resync), and the rebuild key is a piecewise field
+  compare (FarmPlotVisualKey), never a minted string. The cadence is
+  wall-clock-uniform and must NEVER become preset- or governor-keyed.
+  (aw) The Phase 7 renderer headroom extraction is the delve interior
+  scheduler (62 lines to src/render/delve_interior_scheduler.ts, commit
+  74d29effe1), ceiling lowered 13708 to 13700: the packet's named candidate
+  diagnosticsBaselineForPrewarm measured 21 real lines (the Explore gap
+  heuristic had lumped in prewarmInitialScene), and updateAmbience reads
+  too much private state to move verbatim. Gap-based span estimates need a
+  body read before an extraction is planned around one.
+  (ax) SFX wiring choices: farm_event_feedback.ts imports the audio facade
+  DIRECTLY (the 19-module src/ui precedent) because routing cues through
+  FarmFeedbackHost would add hud.ts members at 4 lines of ceiling headroom;
+  farmWithered plays the farmHarvest ACTION cue (the same harvest resolving
+  unluckily; the distinct disappointment sting and the farm_ready chime are
+  Phase 8/10 scope); farmDenied and farmHusksConverted stay silent. The
+  placeholder rows ride sfx_prompts.mjs through its UI_SFX_CATALOG import
+  (no hand row there), PLACEHOLDER-marked in ui_sfx.mjs, both at 0 dB so a
+  real recording drops in without a mix re-balance.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the
@@ -1091,8 +1189,9 @@ question does not arise (farming has no station).
   the hidden slots untouched, so it is not a reroll primitive), leaves
   already-settled plots alone, counts only work actually done in its [dev]
   summary, and draws nothing (pinned). /dev gather farming N already works
-  (Phase 1). The /dev GUI row (src/ui/dev_command_view.ts) is a Phase 7
-  deferral. Phases 7 and 8 depend on these for dev-created crops.
+  (Phase 1). The /dev GUI row (src/ui/dev_command_view.ts) was RE-DEFERRED
+  by Phase 7 to Phase 8 (a dev-only UI surface; Phase 8 is the UI phase).
+  Phases 7 and 8 depend on these for dev-created crops.
 - Growth-phase (Phase 3) handoff from the Phase 2 review round, decide these ON
   PURPOSE rather than inherit them. PHASE 3 RESOLUTION (2026-08-08), each item
   below marked here rather than rewritten in place: anchor semantics DONE in
