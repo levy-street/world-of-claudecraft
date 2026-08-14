@@ -383,3 +383,20 @@ never future-PR items, per the delivery contract in `state.md`).
   APEX_CONSUMABLE_RECIPES joins the budget sweep; blob band re-cut around
   10949; 13 mutation probes; five reviewers, zero blocking, all findings
   applied. Full ledger, increment table, and phase 12 carries in state.md.
+- Phase 10 QA release sync (2026-08-14): the final v0.38.0 line (tip
+  70e5416fee, 204 commits) merged as 33d641773f, then the sync fix round on
+  top; the QA audit fan-out itself runs in a fresh session per the cadence.
+  Seventeen conflicts hand-resolved (resurrection.ts unions the release's
+  Cheater-mark survival and clean-slate predicate with the flask clause,
+  behavior byte-identical and newly pinned; portrait trio re-blessed via the
+  full 230-row receipt flow with 241 webps restored to branch bytes over the
+  release CI re-encode; eastbrook seals re-minted; count pins re-set from
+  suite runs after a FOURTH silent composition: IWorld 324, commands
+  200/213). Naming guards green over the v0.38 locale fill. The merged union
+  broke the sim.ts and server/game.ts monolith ceilings; fixed by two
+  verbatim extractions (professions/daily_gate_load.ts, server/
+  interest_policy.ts) with direct suites and lowered ceilings. Premise
+  amendments and the seven-cluster audit record live in state.md "Phase 10
+  QA release sync". ONE deliberate red left standing: tests/bags.test.ts,
+  the release payload-free-bags contract vs the epic sunspun_haversack, a
+  maintainer ruling recorded as RULING WANTED in that record.

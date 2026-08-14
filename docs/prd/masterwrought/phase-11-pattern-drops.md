@@ -36,7 +36,13 @@ STEP 1 - LOAD CONTEXT (Explore agent; do not read planning docs in the main loop
   (the Heroic Quartermaster stock + heroic_mark pricing), the market query/filter seam:
   src/sim/market_query.ts EXISTS on the merged tree and is the filter/sort home
   (implementation-plan.md was right after all; the v0.38.0 sync extended it with a
-  sort passthrough), alongside src/sim/market.ts + src/ui/market_filters.ts +
+  sort passthrough, and the FINAL v0.38.0 sync, merge 33d641773f, grew the seam
+  again: MarketQuery gained a collapseLowest axis with the new sibling
+  src/sim/market_collapse.ts, the facet's staleness compare in
+  src/world_api/market.ts is now SEVEN axes including collapseLowest, and the
+  Sell tab gained the sellPriceItemId lowest-listing price reference; any
+  category/search extension must update the axis compare and compose with the
+  collapse toggle), alongside src/sim/market.ts + src/ui/market_filters.ts +
   src/world_api/market.ts (verify where category/search logic lives and record the
   actual seam in state.md; premise corrected at the v0.38.0 sync, merge fa51741408),
   tests/parity/ (scenario + golden shape), src/sim/CLAUDE.md.

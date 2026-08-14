@@ -76,7 +76,12 @@ Agent 1 (sim module + tests):
     wholesale inv mirror and needs nothing).
   - Narrow the guard's bagged arm from the HOLDING (any copy of the id) to the exact
     copy the apply consumes (the item_copy_ref discipline the disenchant and replace
-    paths follow), or one Perfected copy licenses spending an ordinary one.
+    paths follow), or one Perfected copy licenses spending an ordinary one. The
+    2026-08-14 v0.38.0 sync shipped the exact helper for this:
+    item_copy_ref.newestMatchingSlot, the non-consuming twin of
+    consumeNewestInventoryUnit; peek through it (or selectedInventorySlot), never a
+    bespoke walk, so the guard stays locked to the real selection ctx.removeItem
+    makes.
   - Re-decide the Infusion's slot and stat: chest { sta: 13 } is PROVISIONAL (this
     phase's file names no target), and it currently shares the chest slot with
     enchant_chest_lucent_stamina; the universal refusal makes moving it free until

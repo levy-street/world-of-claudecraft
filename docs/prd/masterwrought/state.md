@@ -1,6 +1,12 @@
 # Masterwrought: cross-phase state
 
-Current phase: 09 BUILT (2026-08-13: the v0.38.0 map-marker sync merged with
+Current phase: 10 BUILT, its QA session's release sync COMPLETE (2026-08-14:
+the final v0.38.0 sync, merge 33d641773f, landed with a seven-cluster audit,
+two monolith extractions, the portrait and eastbrook re-mints, and the count
+pins re-set from suite runs; the phase 10 QA audit fan-out itself runs next in
+a fresh session per the cadence; the Phase 10 ledger below is the phase
+record). Previous header, kept for the trail: 09 BUILT (2026-08-13: the
+v0.38.0 map-marker sync merged with
 a clean four-leg audit, the ten apex defs and recipes landed with art, i18n,
 and wiki regen, party-shared mobile stations shipped on the mobile_station
 seam behind the set-valued activeMobileStationCrafts readout, flagged-hand
@@ -2672,12 +2678,11 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   (PR #3363 / commit 3d1546b34a), so the merged tree still has the
   zero-battleground-seats defect that hotfix fixed; needs a forward-port to
   v0.38.0 (no branch overlap: the branch never touches those popups).
-  (b) scripts/rift_forge_rollback_migration.ts runs a whole-row
-  characters.state UPDATE inside bare BEGIN/COMMIT with no advisory or row
-  locks (plain SELECT, no FOR UPDATE), so running it against live realms can
-  clobber concurrent saves and let online sessions resurrect rolled-back
-  forge state behind the completion marker; deploy playbook should stop
-  realms first or the script should take locks. (c) the vendor partial-sell
+  (b) RESOLVED UPSTREAM (2026-08-14 sync, release commit 94ac061152
+  "fix(db): harden Rift rollback migration"): the script now requires a
+  drained character_leases table, takes an advisory lock, compare-and-swaps
+  every state blob, and makes --realm dry-run-only; do not re-surface as
+  open. (c) the vendor partial-sell
   toast says 'Kept {n} bound copies' even when the spared units were
   player-LOCKED, not bound (items.ts partial-sale summary; release-parent
   code). (d) the release extracted isUpdateDue out of server/game.ts without
@@ -2692,7 +2697,14 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   home; the release extended it with a sort passthrough). Verified INTACT:
   the rolled.quality successor premise (rift forge rollback only rewrites
   rift payload objects and preserves unknown JSONB keys; masterwrought ids
-  stay disjoint), all phase 08 QA prompt claims, R4 (no battleground reward
+  stay disjoint) BUT re-verify at phase 12 against the HARDENED script (the
+  2026-08-14 sync's release rewrite still spreads ...source preserving
+  unknown instance fields on the ACTIVE record, yet its new legacy-shadow
+  arm deletes the whole inert plural equipmentInstances record outright
+  when the singular key is active, so "preserves unknown JSONB keys" is no
+  longer unconditionally true for the legacy key; phase 12 carry 5's
+  migration-safety pass re-verifies rather than inheriting this verdict),
+  all phase 08 QA prompt claims, R4 (no battleground reward
   behavior landed; the proposal test change is a test(perf) world trim).
 - Equip-peek note for phase 12 (audit nit, inert today): equipItem's sub-cap
   quality peek reads the HIGHEST-index copy (equipCandidateQuality) while the
@@ -3194,8 +3206,14 @@ followups fixed in-session, nothing carried as future work.
   raw pick reds the worn-equality, the correct failure for that case).
 - Phase 10 carries, in ADDITION to the addendum above: the professions
   blob band WILL red by design (re-measure around the new settled bytes);
-  renderer.ts has ZERO monolith headroom at 13708 (do not touch it
-  without an extraction); cap TRANSIENCE inherits to the Grand Cauldron /
+  renderer.ts headroom SUPERSEDED at the 2026-08-14 v0.38.0 sync: the
+  release extracted entity_view_policy_core and lowered renderer's ceiling
+  to 13700 with renderer.ts at 13691 (nine lines of headroom; the old
+  zero-headroom-at-13708 claim is stale), while the merged union broke the
+  sim.ts and server/game.ts ceilings instead, fixed at the sync by two
+  extractions (professions/daily_gate_load.ts, sim.ts 12603 under a
+  lowered 12650; server/interest_policy.ts, game.ts 10865 under a lowered
+  10890); cap TRANSIENCE inherits to the Grand Cauldron /
   Laden Hearth family reuse; sweep appends ride the family tables (arm 2
   unions APEX_ARMOR_RECIPES + APEX_GEAR_RECIPES).
 - Phase 11 carries: the makers_charm rollback-runbook line; never a
@@ -3237,8 +3255,16 @@ applied in the fix round or recorded below.
 - Death accounting, decided: flasks survive the real death/resurrect paths
   and battleground deaths (classic-era fidelity: flasks persisted through
   battleground deaths; Protect Yumi likewise does not wipe); the arena and
-  fiesta FULL wipes (e.auras = []) clear flasks deliberately, as instanced
-  minigame resets. WIDENING recorded by the QA gate: the rule actually
+  fiesta wipes clear flasks deliberately, as instanced minigame resets.
+  AMENDED at the 2026-08-14 v0.38.0 sync (merge 33d641773f): the release
+  replaced the bare full wipes (e.auras = []) with a second predicate,
+  resurrection.ts aurasSurvivingCleanSlate, which keeps ONLY the release's
+  new operator-applied Cheater mark, and added that mark as a FIFTH clause
+  of aurasSurvivingDeath beside the flask clause. Flask behavior is
+  unchanged in every arm (the clean slate still drops flasks; pinned by a
+  flask decoy in the clean-slate fixture, tests/resurrection.test.ts), but
+  "full wipe" is no longer the mechanism: both wipe sites route through
+  the predicate now. WIDENING recorded by the QA gate: the rule actually
   keys on every aurasSurvivingDeath call site, which includes the delve
   EJECT (ejectToDelveDoor, not a death); a flask deliberately rides
   through it, correct and consistent, and both call-site comments now
@@ -3421,3 +3447,86 @@ applied in the fix round or recorded below.
   invisible placeable stations. The masterwork:engineering revisit
   trigger stands. Plus, new this phase: the flask logout-persistence
   schema call above.
+
+## Phase 10 QA release sync (2026-08-14, merge 33d641773f; the QA audit itself runs in a follow-up session)
+
+Step 0 of the phase-10-qa prompt, run to completion and then STOPPED at the
+operator's request so the QA fan-out re-runs with fresh context. The branch
+tip after this sync is the sync fix commits on top of merge 33d641773f
+(release/v0.38.0 at 70e5416fee, 204 commits: the cheater-mark seam, CI
+context renames + release minting, the v0.38 locale fill, the market
+collapseLowest + Sell-tab price reference, repo-wide dead-code cleanup).
+
+- CONFLICTS (17): resurrection.ts hand-unioned (see the amended flask
+  death-accounting bullet in the Phase 10 ledger: aurasSurvivingDeath now
+  five clauses with the release's Cheater mark, aurasSurvivingCleanSlate
+  keeps only the mark, flask behavior byte-identical in every arm and the
+  merge-born flask-x-clean-slate composition pinned with a flask decoy in
+  tests/resurrection.test.ts); icons.ts union (well_fed + cheater_mark
+  recipes); ci.yml cones + tests/ci_workflow.test.ts (kept the three
+  masterwrought subtrees, dropped the release-deleted
+  mobile-mount-quick-summon whose last reference died in the cleanup); the
+  two dead shot scripts took the release deletion; eastbrook seals
+  re-minted on the merged tree (remint_polish_provenance.mjs, three pins
+  re-set); portrait trio re-blessed via the FULL 230-row receipt flow.
+- COUNT PINS from suite runs, the composition trap's FOURTH firing (both
+  sides read identical numbers pre-merge again; command_schema constants
+  auto-merged silently, parity narrative at least conflicted): IWorld 324
+  = 86 data + 238 methods (extractEssence AND marketSellPriceCheck),
+  commands 200 send / 213 dispatch; facet-union pins 324.
+- PORTRAIT ENV PING-PONG again (the phase 06 class): the release's CI
+  re-encode moved 242 webps; the local receipt rerender restored branch
+  bytes for 241 and reproduced the release's bytes for tunnel_rat (a real
+  def-change re-bless). Downstream evidence advanced to the local bytes:
+  accepted-art.json kept the branch side + manifest pin 61a89cf1;
+  tests/target_portrait_view.test.ts 18 sha pins; the vale-cup evidence
+  JSON 4 references + its own sha pin in
+  tests/vale_cup_ball_portrait_art.test.ts.
+- NAMING GUARDS (ip_scrub, originality_renames, overlay_ip_scrub) ran
+  GREEN over the v0.38 locale fill: first fill sync with zero reintroduced
+  coins. NEW residue class found by the audit instead: translated
+  DERIVATIVES of the scrubbed Wyrmcult coin survive as values in five
+  Latin game overlays (q_cult_orders/q_necromancers/q_voice_below
+  objective labels: de_DE "Wyrmkult-Eiferer", fr_FR "Zelote du Culte du
+  Wyrm", es/it_IT/pt_BR similar) and five admin overlays
+  (poi.thornpeak_heights.7 "Wyrmkult-Zelte" etc.), pre-existing on BOTH
+  parents (not merge damage; the literal-coin guards are blind to
+  localized derivatives); non-Latin locales likely carry equivalents.
+  QUEUED for the release locale fill / a scrub-guard derivative pass.
+- MONOLITH RATCHET: the merged union broke sim.ts (12676 over 12660) and
+  server/game.ts (10922 over 10900), both parents individually green.
+  Fixed by extraction per the ratchet: professions/daily_gate_load.ts (the
+  wyrmfallDaily/craftDaily/emberWeekAnchor load clamps, verbatim, with a
+  direct suite tests/daily_gate_load.test.ts; sim.ts 12603, ceiling
+  lowered to 12650) and server/interest_policy.ts (the interest radii +
+  the four pure predicates, verbatim apart from one em dash; the three
+  exported radii re-exported from game.ts so importer contracts hold;
+  direct suite tests/interest_policy.test.ts; game.ts 10865, ceiling
+  lowered to 10890; four comment pointers re-aimed).
+- SEVEN-CLUSTER MERGE AUDIT (sim, server+net, ui, render+guide, guard
+  tests, premises, i18n): both-parents byte-identity proven everywhere
+  outside the hand-resolved files; db-mock trap empty; new release
+  RouteDefs (ad_spend, cheater-mark admin) registered with surface rows;
+  injection seams unmoved; guide gate green. Premise amendments applied in
+  this sync (flask bullet, renderer-headroom supersession, release-owned
+  (b) resolved upstream, rolled.quality re-verify note, phase 11 market
+  seam growth, phase 12 newestMatchingSlot pointer, this header).
+- RULING WANTED, the sync's one unresolved blocking find (LEFT RED on
+  purpose in tests/bags.test.ts, "no craftable bag-kind item def is
+  authored at a signable material rarity"): the release's payload-free
+  bags contract (#2837) collides with the branch's epic crafted
+  sunspun_haversack. Release model: crafted rare+ output mints a signer
+  payload (#1149) and the new equipBag guard refuses any bag carrying a
+  payload, so craftable bags must stay below rare (their only bag recipe
+  is uncommon). The branch's apex bag is epic by design (phase 08). No
+  live player can craft it yet (drop-acquisition; patterns land phase 11),
+  but the pin is red now. Options: (a) exempt kind 'bag' from the
+  crafting signer mint and re-scope the pin to "no crafted bag copy
+  carries a payload" (keeps the epic bag, gives up bag signing); (b)
+  demote the bag below rare (breaks the apex line); (c) re-scope the pin
+  only (leaves the runtime equip refusal live: crafted copies would be
+  unequippable, not an option by itself). Maintainer call before the QA
+  fan-out proceeds past validation.
+- ALSO RELEASE-OWNED, new this sync: none beyond the (b) resolution note;
+  (a) queue-pop forward-port still absent from v0.38.0 (verified at
+  70e5416fee), (c) vendor toast and (d) ratchet hygiene stand.
