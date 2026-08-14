@@ -214,9 +214,7 @@ describe('license record', () => {
   // cannot drop the farming set's provenance silently.
   it('CREDITS.md carries the farm prop set row naming every asset', () => {
     const credits = readFileSync(path.join(REPO_ROOT, 'CREDITS.md'), 'utf8');
-    expect(credits).toContain(
-      'Generated farming prop set (`public/models/props/farm_bed.glb`',
-    );
+    expect(credits).toContain('Generated farming prop set (`public/models/props/farm_bed.glb`');
     expect(credits).toContain(
       'produced via `scripts/assets/farm_props` and optimized via `scripts/assets/specs/farm_props.json`',
     );
