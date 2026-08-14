@@ -1053,6 +1053,7 @@ export const da_DK: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "Indlæser din session...",
   "auth.sessionLoadFailed": "Kunne ikke indlæse din session. Tjek forbindelsen og prøv igen.",
   "auth.retry": "Prøv igen",

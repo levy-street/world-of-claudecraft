@@ -1053,6 +1053,7 @@ export const sv_SE: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "Läser in din session...",
   "auth.sessionLoadFailed": "Kunde inte läsa in din session. Kontrollera anslutningen och försök igen.",
   "auth.retry": "Försök igen",

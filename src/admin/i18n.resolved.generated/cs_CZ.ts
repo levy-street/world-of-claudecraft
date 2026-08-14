@@ -1053,6 +1053,7 @@ export const cs_CZ: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "Načítá se tvoje relace...",
   "auth.sessionLoadFailed": "Tvoji relaci se nepodařilo načíst. Zkontroluj připojení a zkus to znovu.",
   "auth.retry": "Zkusit znovu",

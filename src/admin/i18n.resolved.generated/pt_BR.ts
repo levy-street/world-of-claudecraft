@@ -1053,6 +1053,7 @@ export const pt_BR: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "Carregando sua sessão...",
   "auth.sessionLoadFailed": "Não foi possível carregar sua sessão. Verifique a conexão e tente novamente.",
   "auth.retry": "Tentar novamente",

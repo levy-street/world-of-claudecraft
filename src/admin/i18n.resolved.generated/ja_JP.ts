@@ -1053,6 +1053,7 @@ export const ja_JP: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "セッションを読み込み中...",
   "auth.sessionLoadFailed": "セッションを読み込めませんでした。接続を確認して再試行してください。",
   "auth.retry": "再試行",

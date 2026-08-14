@@ -12,6 +12,7 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -110,6 +111,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -208,6 +210,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -306,6 +309,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -405,6 +409,7 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -503,6 +508,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -601,6 +607,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_CN": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -699,6 +706,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_TW": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -797,6 +805,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ko_KR": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -895,6 +904,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ja_JP": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -993,6 +1003,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1091,6 +1102,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1189,6 +1201,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1287,6 +1300,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1385,6 +1399,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1483,6 +1498,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1581,6 +1597,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1679,6 +1696,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1777,6 +1795,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",
@@ -1875,6 +1894,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "error.marketAlertDirection",
+    "error.marketAlertIdRequired",
     "error.marketAlertNotFound",
     "error.marketAlertThreshold",
     "error.marketUnknownItem",

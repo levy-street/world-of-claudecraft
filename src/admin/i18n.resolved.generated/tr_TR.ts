@@ -1053,6 +1053,7 @@ export const tr_TR: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "Oturumunuz yükleniyor...",
   "auth.sessionLoadFailed": "Oturumunuz yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
   "auth.retry": "Tekrar dene",

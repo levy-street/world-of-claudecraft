@@ -1053,6 +1053,7 @@ export const en_XA: AdminTranslations = {
   "error.marketAlertDirection": "[ðíŕéçţíóñ ɱúšţ ƀé ƀéļóŵ óŕ áƀóʋé]",
   "error.marketAlertThreshold": "[ţĥŕéšĥóļðÇóþþéŕ ɱúšţ ƀé á þóšíţíʋé çóþþéŕ áɱóúñţ]",
   "error.marketAlertNotFound": "[áļéŕţ ñóţ ƒóúñð]",
+  "error.marketAlertIdRequired": "[á ʋáļíð áļéŕţ íð íš ŕéɋúíŕéð]",
   "auth.loadingSession": "[Ļóáðíñĝ ýóúŕ šéššíóñ...]",
   "auth.sessionLoadFailed": "[Çóúļð ñóţ ļóáð ýóúŕ šéššíóñ. Çĥéçķ ýóúŕ çóññéçţíóñ áñð ŕéţŕý.]",
   "auth.retry": "[Ŕéţŕý]",

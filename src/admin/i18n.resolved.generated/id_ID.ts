@@ -1053,6 +1053,7 @@ export const id_ID: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "Memuat sesi Anda...",
   "auth.sessionLoadFailed": "Tidak dapat memuat sesi Anda. Periksa koneksi dan coba lagi.",
   "auth.retry": "Coba lagi",

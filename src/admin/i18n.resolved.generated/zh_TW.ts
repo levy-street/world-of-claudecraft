@@ -1053,6 +1053,7 @@ export const zh_TW: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "正在載入你的工作階段...",
   "auth.sessionLoadFailed": "無法載入你的工作階段。請檢查連線後重試。",
   "auth.retry": "重試",

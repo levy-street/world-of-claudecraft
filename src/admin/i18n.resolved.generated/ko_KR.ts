@@ -1053,6 +1053,7 @@ export const ko_KR: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "세션을 불러오는 중...",
   "auth.sessionLoadFailed": "세션을 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.",
   "auth.retry": "다시 시도",

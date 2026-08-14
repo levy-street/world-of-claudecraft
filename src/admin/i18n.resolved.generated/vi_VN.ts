@@ -1053,6 +1053,7 @@ export const vi_VN: AdminTranslations = {
   "error.marketAlertDirection": "direction must be below or above",
   "error.marketAlertThreshold": "thresholdCopper must be a positive copper amount",
   "error.marketAlertNotFound": "alert not found",
+  "error.marketAlertIdRequired": "a valid alert id is required",
   "auth.loadingSession": "Đang tải phiên của bạn...",
   "auth.sessionLoadFailed": "Không tải được phiên của bạn. Kiểm tra kết nối rồi thử lại.",
   "auth.retry": "Thử lại",
