@@ -29,7 +29,7 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import type { ClientWorld } from '../src/net/online';
+import { type ClientWorld, EMPTY_MST_CRAFTS } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import {
   emptyPriestMarkerState,
@@ -5135,6 +5135,23 @@ describe('full self-state snapshot delta fixture', () => {
     expect(outOfRangeSnap.self.mst).toBeNull();
     (client as any).applySnapshot(outOfRangeSnap);
     expect(client.activeMobileStationCrafts).toEqual([]);
+    // The empty transition hands back the ONE shared frozen empty by
+    // identity (EMPTY_MST_CRAFTS, also the pre-first-snapshot default), the
+    // same contract the offline resolver pins for its EMPTY_CRAFTS, so the
+    // empty case never reallocates and a consumer mutation throws in both
+    // worlds.
+    expect(client.activeMobileStationCrafts).toBe(EMPTY_MST_CRAFTS);
+    expect(Object.isFrozen(client.activeMobileStationCrafts)).toBe(true);
+    expect(bareClient(a.pid).activeMobileStationCrafts).toBe(EMPTY_MST_CRAFTS);
+
+    // Drop-malformed wire idiom: the shipped encoder sends null for the
+    // empty set (asserted above) and a non-empty join can never be '', so
+    // an empty STRING mst only reaches the decoder from a buggy or
+    // adversarial server, and it must decode as the empty set rather than
+    // [''] leaking a phantom craft row.
+    (client as any).applySnapshot({ ents: [], keep: [], self: { mst: '' } });
+    expect(client.activeMobileStationCrafts).toEqual([]);
+    expect(client.activeMobileStationCrafts).toBe(EMPTY_MST_CRAFTS);
   });
 
   it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
