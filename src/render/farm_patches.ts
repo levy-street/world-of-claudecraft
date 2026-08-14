@@ -87,6 +87,13 @@ const SOIL_SOCKET_FALLBACK_Y = 0.3;
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
+// RESIDENCY, stated on purpose (the Phase 7 QA deferral): these 15 scenes are
+// retained for the whole session, never released. The templates serve every
+// later plot create and the soil-socket resolve, so releasing them buys
+// nothing back; the loader's own gltfCache redundantly retains the 15 gltf
+// wrappers on top, bounded and accepted (calling releaseGltf in the .then
+// would drop only the wrapper refs and must first prove no other consumer
+// shares these URLs).
 const loadedFarmGltf = new Map<string, THREE.Group>();
 
 if (typeof window !== 'undefined') {
