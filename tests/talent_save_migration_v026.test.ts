@@ -170,7 +170,10 @@ describe('talent production save migrations', () => {
     expect(migrated.loadouts?.[0].alloc).toEqual({ spec: 'feral', rows: {} });
     expect(migrated.loadouts?.[0].bar).toContain('feral_charge');
     expect(migrated.loadouts?.[0].bar).not.toContain('innervate');
-    expect(migrated.loadouts?.[0].bar).not.toContain('frenzied_regeneration');
+    // Savage Mending is no longer a retired row grant: it is a Wildfang spec
+    // ability again, so a feral druid's saved bar legitimately keeps it. The
+    // scrub still strips Lifesap above, which remains row-granted.
+    expect(migrated.loadouts?.[0].bar).toContain('frenzied_regeneration');
     expect(migrated.loadouts?.[0].bar).not.toContain('berserk');
   });
 

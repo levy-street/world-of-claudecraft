@@ -9,16 +9,24 @@ import { sourceFilesUnder } from './helpers/source_files_under';
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 describe('three compileAsync disposal race patch', () => {
-  it('keeps the installed three r165 currentProgram guard applied', () => {
+  it('keeps the installed three currentProgram guard applied', () => {
     // Install-integrity trap: compileAsync polls after a churned material can
     // lose its renderer properties. A three upgrade must re-evaluate the race.
+    // Re-evaluated for the 0.185.1 train: upstream r185 still ships the
+    // unguarded poll, so the guard was re-authored against 0.185.1.
     //
-    // Scope: patches/three@0.165.0.patch covers build/three.module.js ONLY.
-    // build/three.cjs and build/three.module.min.js still carry the race. The
+    // Scope: patches/three@0.185.1.patch covers build/three.module.js ONLY.
+    // build/three.cjs and build/three.module.min.js still carry the race, and
+    // the r185 split added more uncovered bundles: three.core(.min).js (no
+    // WebGLRenderer, but a direct import is a second class-identity copy of
+    // everything three.module.js re-exports), and three.webgpu(.nodes)(.min).js
+    // plus three.tsl(.min).js, whose own compileAsync is unpatched (the
+    // "./webgpu" and "./tsl" export subpaths resolve straight to them). The
     // bundle-scope guard below proves nothing outside node_modules consumes
-    // either one: no CommonJS require('three') (which would resolve the
-    // package's "require" export condition to three.cjs) and no import naming
-    // either bundle directly. three/src IS reachable today
+    // any of them: no CommonJS require('three') (which would resolve the
+    // package's "require" export condition to three.cjs), no import naming an
+    // unpatched bundle directly, and no three/webgpu or three/tsl subpath
+    // import. three/src IS reachable today
     // (tests/shadow_pass_gate_three.test.ts deep-imports
     // three/src/renderers/webgl/WebGLBufferRenderer.js), but that module never
     // reaches WebGLRenderer, so the claim that holds is: every path that
@@ -40,11 +48,11 @@ describe('three compileAsync disposal race patch', () => {
       source.includes(
         'if ( program === undefined ) {\n\n\t\t\t\t\t\t\tmaterials.delete( material );',
       ),
-      'the three r165 compileAsync patch is not applied; re-run pnpm install',
+      'the three compileAsync patch is not applied; re-run pnpm install',
     ).toBe(true);
     expect(
-      source.includes('three r165 compileAsync disposal race'),
-      'the three r165 compileAsync patch marker comment is missing; re-run pnpm install',
+      source.includes('three compileAsync disposal race'),
+      'the three compileAsync patch marker comment is missing; re-run pnpm install',
     ).toBe(true);
   });
 
@@ -123,11 +131,11 @@ describe('three compileAsync disposal race patch', () => {
   });
 
   it('keeps the per-pass program query dedup applied', () => {
-    // Third patch hunk: materials share linked programs through the program
-    // cache, and isReady() only caches a POSITIVE result, so while a shared
-    // program links every material holding it repaid the synchronous
-    // COMPLETION_STATUS_KHR query inside the same pass. The dedup pays one
-    // not-ready verdict per DISTINCT program per pass.
+    // Third patch hunk (ported from the upstream r165 patch): materials share
+    // linked programs through the program cache, and isReady() only caches a
+    // POSITIVE result, so while a shared program links every material holding
+    // it repaid the synchronous COMPLETION_STATUS_KHR query inside the same
+    // pass. The dedup pays one not-ready verdict per DISTINCT program per pass.
     const source = readFileSync(
       new URL('../node_modules/three/build/three.module.js', import.meta.url),
       'utf8',
@@ -169,9 +177,10 @@ describe('three compileAsync disposal race patch', () => {
 
 // The scan half of the scope note above, so the note is enforced rather than
 // trusted: the day a module consumes build/three.cjs (via a bare CommonJS
-// require) or build/three.module.min.js (by naming it), this fails and names
-// the file, with the .patch file untouched and its pnpm-lock content-hash pin
-// intact.
+// require), names any unpatched bundle (three.module.min.js and the r185
+// core/webgpu/tsl family), or imports the three/webgpu or three/tsl export
+// subpaths that resolve to them, this fails and names the file, with the
+// .patch file untouched and its pnpm-lock content-hash pin intact.
 
 /** Roots holding every module this repo runs, tests, or executes as a script. */
 const SCAN_ROOTS = ['src', 'server', 'scripts', 'headless', 'electron', 'tests'];
@@ -183,8 +192,10 @@ const SKIPPED_DIRS = new Set(['node_modules', 'dist']);
 const REQUIRE_REASON =
   'requires the bare three specifier, which resolves to the unpatched build/three.cjs';
 const BUNDLE_REASON = 'names an unpatched three bundle directly';
+const SUBPATH_REASON =
+  'imports a three export subpath (webgpu/tsl) that resolves to an unpatched bundle';
 
-/** The two spellings that reach an UNPATCHED three bundle. Each needle is
+/** The three spellings that reach an UNPATCHED three bundle. Each needle is
  *  call-shaped or quote-anchored, so this guard's own regex literals (tests/
  *  is a scanned root) cannot match themselves: a regex literal's escapes keep
  *  its source text out of its own language, the same self-match reasoning as
@@ -193,10 +204,20 @@ const UNPATCHED_CONSUMERS = [
   // A CommonJS require of the bare specifier resolves the package's "require"
   // export condition to build/three.cjs.
   { needle: /require\s*\(\s*['"]three['"]\s*\)/g, reason: REQUIRE_REASON },
-  // Either unpatched bundle named directly, in any module syntax (static
-  // import, dynamic import(), require, vi.mock): the specifier is always
-  // quoted, so the needle anchors on the quotes.
-  { needle: /['"]three\/build\/three\.(?:cjs|module\.min\.js)['"]/g, reason: BUNDLE_REASON },
+  // Any unpatched bundle named directly, in any module syntax (static import,
+  // dynamic import(), require, vi.mock): the specifier is always quoted, so
+  // the needle anchors on the quotes. r185 split the build, so beyond
+  // three.cjs and three.module.min.js this names the core, webgpu (plus
+  // .nodes) and tsl bundles and their .min siblings.
+  {
+    needle:
+      /['"]three\/build\/three\.(?:cjs|module\.min\.js|core(?:\.min)?\.js|webgpu(?:\.nodes)?(?:\.min)?\.js|tsl(?:\.min)?\.js)['"]/g,
+    reason: BUNDLE_REASON,
+  },
+  // The "./webgpu" and "./tsl" export subpaths reach three.webgpu.js and
+  // three.tsl.js without ever naming a bundle; the closing-quote anchor keeps
+  // three/addons/* and three/src/* imports out of the match.
+  { needle: /['"]three\/(?:webgpu|tsl)['"]/g, reason: SUBPATH_REASON },
 ] as const;
 
 /** Strip block and line comments so prose about a require (the scope note
@@ -246,11 +267,11 @@ function scanForUnpatchedBundleUse(roots: string[], base: string): ThreeBundleSc
 describe('the unpatched three bundles stay unconsumed', () => {
   const scan = scanForUnpatchedBundleUse(SCAN_ROOTS, repoRoot);
 
-  it('finds no bare require of three and no import of three.cjs or three.module.min.js', () => {
+  it('finds no bare require of three, no unpatched bundle import, no webgpu/tsl subpath', () => {
     expect(
       scan.offenders,
       'a module reaches a three bundle the compileAsync patch does not cover: extend ' +
-        'patches/three@0.165.0.patch to that bundle (and update the scope note in this file) ' +
+        'patches/three@0.185.1.patch to that bundle (and update the scope note in this file) ' +
         'before consuming it',
     ).toEqual([]);
   });
@@ -282,6 +303,8 @@ describe('the unpatched three bundles stay unconsumed', () => {
     const bareRequire = `require(${single('three')})`;
     const cjsBundle = single('three/build/' + 'three.cjs');
     const minBundle = double('three/build/' + 'three.module.min.js');
+    const coreBundle = single('three/build/' + 'three.core.js');
+    const webgpuSubpath = double('three/' + 'webgpu');
 
     mkdirSync(join(fixture, 'root', 'nested', 'deeper'), { recursive: true });
     mkdirSync(join(fixture, 'root', 'node_modules'), { recursive: true });
@@ -310,6 +333,19 @@ describe('the unpatched three bundles stay unconsumed', () => {
       join(fixture, 'root', 'nested', 'deeper', 'min_import.mjs'),
       `import ${minBundle};\n`,
     );
+    // The r185 additions: a split-out core bundle named directly, and the
+    // webgpu export subpath that reaches its bundle without naming it.
+    writeFileSync(join(fixture, 'root', 'nested', 'core_bundle.ts'), `import ${coreBundle};\n`);
+    writeFileSync(
+      join(fixture, 'root', 'nested', 'webgpu_subpath.ts'),
+      `import ${webgpuSubpath};\n`,
+    );
+    // The addons subpath is sanctioned (examples/jsm never reaches
+    // WebGLRenderer's compileAsync); the closing-quote anchor must leave it be.
+    writeFileSync(
+      join(fixture, 'root', 'nested', 'addons_clean.ts'),
+      `import ${single('three/addons/' + 'controls/OrbitControls.js')};\n`,
+    );
     writeFileSync(
       join(fixture, 'root', 'nested', 'commented.ts'),
       `// prose about ${bareRequire} stays legal\nexport {};\n`,
@@ -327,19 +363,22 @@ describe('the unpatched three bundles stay unconsumed', () => {
       expect([...found.offenders].sort()).toEqual([
         `root/nested/cjs_bundle.js:1 ${BUNDLE_REASON}`,
         `root/nested/cjs_require.ts:1 ${REQUIRE_REASON}`,
+        `root/nested/core_bundle.ts:1 ${BUNDLE_REASON}`,
         `root/nested/deeper/min_import.mjs:1 ${BUNDLE_REASON}`,
+        `root/nested/webgpu_subpath.ts:1 ${SUBPATH_REASON}`,
         `root/spaced.cjs:1 ${REQUIRE_REASON}`,
       ]);
     });
 
-    it('leaves the bare ESM import, prose, non-source files, node_modules and dist alone', () => {
+    it('leaves the bare ESM import, prose, addons, non-source files, node_modules and dist alone', () => {
       // Per-dimension negatives: each clean plant holds the exemption for
       // exactly its own case. The corpus count pins that the two skipped
-      // DIRECTORIES never entered the walk while the six clean and planted
+      // DIRECTORIES never entered the walk while the nine clean and planted
       // FILES all did (notes.txt is not a source extension).
       expect(found.offenders.some((row) => row.includes('clean.ts'))).toBe(false);
       expect(found.offenders.some((row) => row.includes('commented.ts'))).toBe(false);
-      expect(found.filesScanned).toBe(6);
+      expect(found.offenders.some((row) => row.includes('addons_clean.ts'))).toBe(false);
+      expect(found.filesScanned).toBe(9);
     });
   });
 });

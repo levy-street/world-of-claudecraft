@@ -125,9 +125,12 @@ const idleState = {
 describe('Metamorphosis character integration', () => {
   it('uses a dedicated form without renderer-side scale or material substitution', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    // Built through the shared lazy-form builder, and the one form that asks it
+    // for no compile gate: Metamorphosis grows out of the body it replaces.
     expect(source).toContain(
-      "this.createCharacterVisualWithRetry(e, 'form_metamorph', 'form_metamorph')",
+      "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
     );
+    expect(source).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
     expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
     expect(source).toContain("createCharacterVisual(metamorphEntity, 'form_metamorph')");
     expect(source).toContain('for (const visual of playerPrewarmInstances) visual.dispose();');

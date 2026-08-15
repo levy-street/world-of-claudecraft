@@ -61,7 +61,7 @@ import {
   dist2d,
   type Entity,
 } from '../types';
-import { grantDelveRewards, openDelveSurfaceExit } from './runs';
+import { delveBonusMarksFor, grantDelveRewards, openDelveSurfaceExit } from './runs';
 
 /** Resolve the locked-chest object + run for an acting player, with all the
  * proximity/eligibility guards. Returns null (after emitting an error) on any
@@ -399,8 +399,8 @@ function lockpickSucceed(
     obj.name = 'Opened Chest';
     obj.templateId = 'delve_reward_chest';
   }
-  grantDelveRewards(ctx, run);
-  grantLockpickBonus(ctx, run, grantedTier);
+  const credited = grantDelveRewards(ctx, run);
+  grantLockpickBonus(ctx, run, grantedTier, credited);
   openDelveSurfaceExit(ctx, run);
   ctx.emit({
     type: 'delveChestLoot',
@@ -425,28 +425,33 @@ function lockpickSucceed(
   run.lockpick = null;
 }
 
-/** Loot-tier bonus on top of the base delve chest rewards (marks + copper). */
+/** Loot-tier bonus on top of the base delve chest rewards (marks + copper),
+ * paid to exactly the members grantDelveRewards just credited. */
 function grantLockpickBonus(
   ctx: SimContext,
   run: DelveRun,
   tier: 'premium' | 'medium' | 'low',
+  creditedPids: number[],
 ): void {
   const reward = LOCKPICK_TIER_REWARD[tier];
   const delve = DELVES[run.delveId];
-  const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
   const baseCopper = Math.round((delve.baseRewards.copperMin + delve.baseRewards.copperMax) / 2);
   const bonusCopper = Math.round(baseCopper * (reward.copperMult - 1));
-  for (const pid of members) {
+  for (const pid of creditedPids) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
-    meta.delveMarks += reward.bonusMarks;
+    // Bonus Marks only ride a clear inside the daily window (per member); the
+    // copper bonus and the loot tier are unaffected. See delveBonusMarksFor.
+    const bonusMarks = delveBonusMarksFor(meta, reward.bonusMarks);
+    meta.delveMarks += bonusMarks;
     meta.copper += bonusCopper;
-    // Structured (no prose crosses the sim boundary): the client builds the
-    // localized "spoils" line from the tier token and formats the numbers.
+    // Structured (no prose crosses the sim boundary): the client renders a
+    // tier-token "spoils" line from this event; the marks/copper fields carry
+    // the actually granted amounts for any consumer that does read them.
     ctx.emit({
       type: 'lockpickBonus',
       tier,
-      marks: reward.bonusMarks,
+      marks: bonusMarks,
       copper: bonusCopper,
       pid,
     });

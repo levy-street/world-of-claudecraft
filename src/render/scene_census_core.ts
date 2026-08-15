@@ -29,8 +29,11 @@ export interface SceneCensusChild {
  * What the census needs from the live renderer. Counter contract: the host
  * puts the WebGL counters in manual-reset mode for the duration of the
  * capture (setCountersAutoReset), so `resetCounters` + `render` + `counters`
- * reads one full pipeline pass INCLUDING the shadow pass on every tier
- * (three's auto-reset would otherwise drop shadow draws from the read).
+ * reads exactly one full pipeline pass, shadow pass included, and stays a
+ * clean diff across the consecutive toggle renders (auto-reset would zero
+ * the counters inside every render() of the burst; where the reset lands
+ * relative to the shadow pass moved in r185, but the census never depends on
+ * that ordering while it holds manual mode).
  */
 export interface SceneCensusHost {
   /** Top-level toggleable subtrees. Lights must already be excluded: hiding a

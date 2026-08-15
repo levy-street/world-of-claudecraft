@@ -30,7 +30,7 @@ import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { chatCommandMessage, worldAuthMessage } from './lib/world_auth.mjs';
 import {
   gearedArrivalBotFixture,
   gearedArrivalFixtureSha256,
@@ -168,7 +168,7 @@ class Bot {
   async gearUp() {
     this.cmd({ cmd: 'dev_level', level: 20 });
     await sleep(150);
-    this.ws?.send(JSON.stringify({ t: 'chat', text: `/dev give ${this.loadout.weapon}` }));
+    this.ws?.send(JSON.stringify(chatCommandMessage(`/dev give ${this.loadout.weapon}`)));
     await sleep(250);
     this.cmd({ cmd: 'equip', item: this.loadout.weapon });
     await sleep(250);

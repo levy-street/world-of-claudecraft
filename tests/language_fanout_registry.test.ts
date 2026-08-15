@@ -62,6 +62,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { readMethodCallSites } from './helpers/method_call_sites';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const uiRoot = fileURLToPath(new URL('../src/ui/', import.meta.url));
@@ -73,11 +74,11 @@ const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'ut
 // source only for the text pins further down.
 const scan = readMethodCallSites('src/ui/hud.ts', hudSource, 'Hud', 'refreshLocalizedDynamicUi');
 
-function stripComments(source: string): string {
-  // The `(^|[^:])` capture keeps a `://` in a URL from eating the rest of its
-  // line, the stripper bug this repo already shipped once (#2499).
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-}
+// Comment stripping goes through the shared single-pass helper
+// (tests/helpers/strip_comments.ts): line comments strip in the same pass as
+// block comments, so a bare /* inside a line comment cannot open a phantom
+// block that hides a gated module from the discovery sweep (the src/main.ts
+// hazard class), and the `(^|[^:])` guard keeps `://` URLs intact (#2499).
 
 // --- half 1: the fan-out's arms -------------------------------------------
 

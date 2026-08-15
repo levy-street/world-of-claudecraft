@@ -19,6 +19,7 @@ import {
   MANIFEST_ARTIFACTS,
 } from '../scripts/lib/gate_steps.mjs';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -28,18 +29,14 @@ const detectEntry = readFileSync(
 const ciShardEntry = readFileSync(new URL('../scripts/ci_shard_test.mjs', import.meta.url), 'utf8');
 // Comment-stripped (same idiom as gateCode below): a source-text pin on the
 // entry must not stay green when the pinned call survives only in a comment.
-const ciShardEntryCode = ciShardEntry
-  .replace(/\/\*[\s\S]*?\*\//g, '')
-  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const ciShardEntryCode = stripComments(ciShardEntry);
 const ciShardPlanSource = readFileSync(
   new URL('../scripts/lib/ci_shard_plan.mjs', import.meta.url),
   'utf8',
 );
 // Stripped for the formula weld: the module's docblocks discuss the default
 // in prose, and a weld a comment can satisfy is not a weld.
-const ciShardPlanCode = ciShardPlanSource
-  .replace(/\/\*[\s\S]*?\*\//g, '')
-  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const ciShardPlanCode = stripComments(ciShardPlanSource);
 // ci.yml with full-line YAML comments removed: the worker-trial pins below
 // count KEY occurrences, and a doc comment quoting the env line must neither
 // satisfy a count nor turn it red.
@@ -53,13 +50,15 @@ const preflightCode = readFileSync(
   new URL('../scripts/lib/gate_preflight.mjs', import.meta.url),
   'utf8',
 );
-// gate.mjs with its comments removed, BOTH kinds. A raw-substring pin on a step
-// is not a pin at all: commenting the step out leaves the substring in the file,
+// gate.mjs with its comments removed, BOTH kinds, via the shared single-pass
+// helper (tests/helpers/strip_comments.ts). A raw-substring pin on a step is
+// not a pin at all: commenting the step out leaves the substring in the file,
 // so the assertion stays green while the local gate quietly stops running it.
-// Block comments are stripped first (a `/* ... */` wrapper defeats a line-comment
-// strip just as well), then line comments, leaving anything after `://` alone so
-// a URL inside a string cannot be truncated.
-const gateCode = gate.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+// The single pass consumes each comment exactly once, so a `/* ... */` wrapper
+// cannot defeat the line strip AND a bare /* inside a line comment cannot open
+// a phantom block that swallows the gate's own pin surface; `://` URLs stay
+// intact.
+const gateCode = stripComments(gate);
 // Shared step list (Phase 8): gate.mjs delegates here; pins below use both.
 const gateSteps = buildFullGateSteps(8);
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
@@ -262,6 +261,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-social-v1/',
       '            /docs/screenshots/item-art-consistency-2026-08-09/',
+      '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
@@ -1636,20 +1636,27 @@ describe('CI workflow parity', () => {
     expect(workflow).not.toContain('secrets["');
   });
 
-  it('keeps D11 path-matrix tooling available but unwired after two MISS approaches', () => {
-    // Both LPT and stripe greened with completeness but D11 MISS (ratios 1.59 /
-    // 1.64). Sequencer stays in-tree for a future measured-weight attempt; CI
-    // must not re-wire it without a green D11 probe. Default --shard is back.
-    expect(viteConfig).not.toContain('sequencer: BalancedSequencer');
-    expect(viteConfig).not.toContain("from './scripts/ci_balanced_sequencer.mjs'");
+  it('wires the measured-weight balanced sequencer with its guards intact', () => {
+    // History: LPT and stripe both greened with completeness but MISSED the
+    // D11 bar on STATIC weights (ratios 1.59 / 1.64) and stayed unwired.
+    // Re-wired 2026-08-14 over MEASURED durations (the harvested table in
+    // scripts/ci_shard_weights.generated.json); the review round proved the
+    // measured-scale fallback is load-bearing (raw heuristic units made the
+    // packing worse than contiguous). The wiring itself is behaviorally
+    // pinned in tests/ci_shard_partition.test.ts; this end keeps the
+    // integrity guards welded to it.
+    expect(viteConfig).toContain('sequencer: BalancedSequencer');
+    expect(viteConfig).toContain("from './scripts/ci_balanced_sequencer.mjs'");
     expect(balancedSequencer).toContain('extends BaseSequencer');
     expect(balancedSequencer).toContain('partitionForCi');
-    expect(shardPartition).toContain('export function partitionByStripe');
+    expect(balancedSequencer).toContain('assertPartitionCompleteness');
     expect(shardPartition).toContain('export function partitionByLpt');
     expect(shardPartition).toContain('export function weightForTestFile');
+    expect(shardPartition).toContain('MEASURED_FALLBACK_MS');
     expect(shardPartition).not.toContain("from 'vitest");
-    expect(workflow).toContain('ci_balanced_sequencer.mjs');
-    // Integrity guard kept even with default packs.
+    // An empty pack must stay red, and the workflow's design notes must keep
+    // naming the sequencer so the next reader finds the mechanism.
     expect(viteConfig).toContain('passWithNoTests: false');
+    expect(workflow).toContain('ci_balanced_sequencer.mjs');
   });
 });

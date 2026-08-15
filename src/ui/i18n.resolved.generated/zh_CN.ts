@@ -1372,6 +1372,10 @@ export const zh_CN: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "showPlaytime": "在角色界面显示游戏时长",
+      "forceHighPerfGpu": "使用独立游戏显卡",
+      "forceHighPerfGpuNote": "默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。",
+      "discordPresence": "Discord 游戏状态",
+      "discordPresenceNote": "游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。",
       "showDevBadges": "显示开发者徽章",
       "showOwnNameplate": "显示我的姓名板",
       "showPlayerNameplates": "显示玩家姓名板",
@@ -1744,6 +1748,7 @@ export const zh_CN: EnTranslations = {
       "notEnoughHonor": "荣誉不足。",
       "reasons": {
         "arenaWin": "竞技场胜利",
+        "arenaComplete": "竞技场参战",
         "fiestaKill": "嘉年华击倒",
         "fiestaComplete": "完成嘉年华",
         "fiestaWin": "嘉年华胜利",
@@ -1850,6 +1855,7 @@ export const zh_CN: EnTranslations = {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
     "itemHeroicTag": "[英雄]",
+    "itemHeroicLabel": "英雄",
     "itemSoulbound": "灵魂绑定",
     "itemUniqueEquipped": "装备唯一",
     "itemSet": {
@@ -7862,7 +7868,15 @@ export const zh_CN: EnTranslations = {
       "readyBody": "退出游戏时将自动安装，也可立即重启。",
       "restart": "立即重启",
       "later": "稍后",
-      "dismiss": "关闭"
+      "dismiss": "关闭",
+      "whatsNew": "在浏览器中查看更新内容"
+    },
+    "notify": {
+      "updateReadyTitle": "更新 {version} 已就绪",
+      "updateReadyTitleNoVersion": "更新已就绪",
+      "updateReadyBody": "重启 World of ClaudeCraft 以应用更新。",
+      "partyInviteTitle": "组队邀请",
+      "partyInviteBody": "{name} 邀请你加入队伍。"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7874,6 +7888,7 @@ export const zh_CN: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
+    "bodyDiscreteInactive": "游戏没有使用独立（游戏）显卡，而是运行在节能显卡上，因此性能会下降。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
     "hybridBodyWindows": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。",
     "hybridBodyLinux": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。",
@@ -8242,6 +8257,9 @@ export const zh_CN: EnTranslations = {
       "graphicsReloadNote": "图形质量和地形细节会在重新加载后生效。",
       "reloadNow": "立即重新加载",
       "fullscreen": "全屏",
+      "displayMode": "显示模式",
+      "displayModeBorderless": "无边框全屏",
+      "displayModeWindowed": "窗口",
       "touchLookSpeed": "触屏视角速度",
       "joystickSize": "摇杆大小",
       "buttonSize": "按钮大小",
@@ -9582,6 +9600,7 @@ export const zh_CN: EnTranslations = {
       "cheap_shot": {
         "name": "击腹拳",
         "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。",
+        "descriptionNoStealth": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。奖励 2 个连击点。",
         "specNote_subtlety": "从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。"
       },
       "sap": {
@@ -9794,7 +9813,7 @@ export const zh_CN: EnTranslations = {
       },
       "righteous_fury": {
         "name": "炽燃誓约",
-        "description": "被动地将你的神圣伤害所产生的威胁提高 60%。仅限信仰守卫。"
+        "description": "被动地将你的神圣伤害所产生的威胁提高 30%。仅限信仰守卫。"
       },
       "retribution_aura": {
         "name": "报偿光环",
@@ -9910,7 +9929,7 @@ export const zh_CN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
-        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 30% 护甲，受到的伤害降低 10%，并产生两倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。"
+        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 40% 护甲和 20% 耐力，受到的伤害降低 15%，免疫生物的致命一击，并产生 2.75 倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。"
       },
       "healing_wave": {
         "name": "治愈之水",
@@ -10089,7 +10108,7 @@ export const zh_CN: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形态",
-        "description": "变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
+        "description": "变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
       },
       "maul": {
         "name": "碎骨击",
@@ -10099,6 +10118,10 @@ export const zh_CN: EnTranslations = {
       "growl": {
         "name": "威吓",
         "description": "对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。"
+      },
+      "challenging_roar": {
+        "name": "挑衅咆哮",
+        "description": "发出挑衅的咆哮：10 码内的每个敌人都被嘲讽，其对你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。"
       },
       "cat_form": {
         "name": "狼形态",

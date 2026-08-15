@@ -612,9 +612,14 @@ same file), and each module's header carries its own contract.
   turntable). EVERY player-visible skin string (names, collections, look and lore lines)
   resolves through the runtime locale catalog (`i18n.catalog/armory.ts`, merged into the
   `hudChrome` namespace), never a raw catalog field. `preview_prewarm_core.ts` owns the
-  post-entry prewarm schedule: the paperdoll/armory/portrait prewarms run AFTER the world
+  post-entry prewarm schedule: the paperdoll and portrait prewarms run AFTER the world
   reveal through the renderer's background GPU queue (never awaited behind the loading
-  screen), pause while the owning window is open, and cancel on a graphics rebuild.
+  screen), pause while the owning window is open, and cancel on a graphics rebuild. The
+  Armory catalog is deliberately NOT in that schedule and is warmed nowhere ahead of time:
+  it is built per inspected card, on the click that opens it. Measured, warming it cost
+  every online session about 2.1 to 2.6 s of live-frame hitches for a window only some
+  players open, and the cost was positional rather than per skin, so no gentler schedule
+  existed (`docs/design/armory-preview-warming.md`).
 - **bank_filter.ts** (with **bank_view.ts** / **bank_window.ts**): the bank search/sort
   preserves live `slotIndex` values verbatim, so a filtered row still names the exact wire
   argument for deposit/withdraw.

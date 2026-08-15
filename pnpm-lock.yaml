@@ -19,9 +19,9 @@ overrides:
   undici@7: ^7.29.0
 
 patchedDependencies:
-  three@0.165.0:
-    hash: 5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5
-    path: patches/three@0.165.0.patch
+  three@0.185.1:
+    hash: 7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548
+    path: patches/three@0.185.1.patch
 
 importers:
 
@@ -73,8 +73,8 @@ importers:
         specifier: ^6.8.9
         version: 6.8.9
       n8ao:
-        specifier: ^1.10.1
-        version: 1.10.3(postprocessing@6.36.0(three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5)))(three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5))
+        specifier: ^2.0.0
+        version: 2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548)))(three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548))
       obscenity:
         specifier: ^0.4.6
         version: 0.4.6
@@ -82,14 +82,14 @@ importers:
         specifier: ^8.21.0
         version: 8.22.0
       postprocessing:
-        specifier: 6.36.0
-        version: 6.36.0(three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5))
+        specifier: 6.39.4
+        version: 6.39.4(three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548))
       prom-client:
         specifier: 15.1.3
         version: 15.1.3
       three:
-        specifier: 0.165.0
-        version: 0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5)
+        specifier: 0.185.1
+        version: 0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548)
       tweetnacl:
         specifier: 1.0.3
         version: 1.0.3
@@ -131,8 +131,8 @@ importers:
         specifier: ^8.20.0
         version: 8.20.0
       '@types/three':
-        specifier: ^0.165.0
-        version: 0.165.0
+        specifier: ^0.185.4
+        version: 0.185.4
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
@@ -149,11 +149,11 @@ importers:
         specifier: 4.12.1
         version: 4.12.1
       electron:
-        specifier: ^43.0.0
-        version: 43.1.1
+        specifier: ^43.3.0
+        version: 43.3.0
       electron-builder:
-        specifier: ^26.15.6
-        version: 26.15.6(electron-builder-squirrel-windows@26.15.6)
+        specifier: ^26.15.7
+        version: 26.15.7(electron-builder-squirrel-windows@26.15.7)
       esbuild:
         specifier: ^0.28.1
         version: 0.28.1
@@ -476,6 +476,9 @@ packages:
   '@derhuerst/http-basic@8.2.4':
     resolution: {integrity: sha512-F9rL9k9Xjf5blCz8HsJRO4diy111cayL2vkY2XE4r4t3n0yPXVYy3KD3nJ1qbrSn9743UWSXH4IwuCa/HWlGFw==}
     engines: {node: '>=6.0.0'}
+
+  '@dimforge/rapier3d-compat@0.12.0':
+    resolution: {integrity: sha512-uekIGetywIgopfD97oDL5PfeezkFpNhwlzlaEYNOA0N6ghdsOvh/HYjSMek5Q2O1PYvRSDFcqFVJl4r4ZBwOow==}
 
   '@donmccurdy/caporal@0.0.10':
     resolution: {integrity: sha512-VdaJjOqYFYcDTM5We2x8cL+B+U9UFQvq0iW2ypqEGX31SDf2oYFjEg7INEJorBwJJnFNXV8jXoYGzJyLeYl1EQ==}
@@ -1877,8 +1880,8 @@ packages:
   '@types/table@5.0.0':
     resolution: {integrity: sha512-fQLtGLZXor264zUPWI95WNDsZ3QV43/c0lJpR/h1hhLJumXRmHNsrvBfEzW2YMhb0EWCsn4U6h82IgwsajAuTA==}
 
-  '@types/three@0.165.0':
-    resolution: {integrity: sha512-AJK8JZAFNBF0kBXiAIl5pggYlzAGGA8geVYQXAcPCEDRbyA+oEjkpUBcJJrtNz6IiALwzGexFJGZG2yV3WsYBw==}
+  '@types/three@0.185.4':
+    resolution: {integrity: sha512-gAsBIC07NIFrxjbf7tH2t71c38uulFfk/RFoC7FNBSjMRAQ8J1x/RBvusX0N5PJouaYFJawXQqfCQ0RKUx/1nA==}
 
   '@types/tmp@0.2.6':
     resolution: {integrity: sha512-chhaNf2oKHlRkDGt+tiKE2Z5aJ6qalm7Z9rlLdBwmOiAAf09YQvvoLXjWK4HWPF1xU/fqvMgfNfpVoBscA/tKA==}
@@ -2171,6 +2174,7 @@ packages:
   '@xmldom/xmldom@0.8.13':
     resolution: {integrity: sha512-KRYzxepc14G/CEpEGc3Yn+JKaAeT63smlDr+vjB8jRfgTBBI9wRj/nkQEO+ucV8p8I9bfKLWp37uHgFrbntPvw==}
     engines: {node: '>=10.0.0'}
+    deprecated: this version has critical issues, please update to the latest version
 
   '@xmldom/xmldom@0.9.10':
     resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
@@ -2272,12 +2276,12 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  app-builder-lib@26.15.6:
-    resolution: {integrity: sha512-lN6BliNJLnS2ruBdYd1j1rzd2yl4ZwKqyTtAwVznIkkadOR9cFvRz/tNQ6nd824AobnFZKhcdFrpIGDnr0PRSg==}
+  app-builder-lib@26.15.7:
+    resolution: {integrity: sha512-C7APoYISPExUmrEntNhDpz9Tccb4uWuEDfLaC0WPPc7/pwzz0WZGznCz/ycPfkkzw6tKOalceD8g6TgHmVz1QA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      dmg-builder: 26.15.6
-      electron-builder-squirrel-windows: 26.15.6
+      dmg-builder: 26.15.7
+      electron-builder-squirrel-windows: 26.15.7
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -2760,8 +2764,8 @@ packages:
   dir-compare@4.2.0:
     resolution: {integrity: sha512-2xMCmOoMrdQIPHdsTawECdNPwlVFB9zGcz3kuhmBO6U3oU+UQjsue0i8ayLKpgBcm+hcXPMVSGUN9d+pvJ6+VQ==}
 
-  dmg-builder@26.15.6:
-    resolution: {integrity: sha512-nr5vQxEhM0REomp1qiHbc6V99yrfBZy+wUU56VXADfSOlLj8PdLqsHiRe7b+FbqKesiyv4ax+k1GVwGonYKuCg==}
+  dmg-builder@26.15.7:
+    resolution: {integrity: sha512-rfo1YyAWO0L3cZLKCqKQiLYbW6ZXebRUfK0kWp4oXxO7dDFLrf7alRkWImNuXvZVQhs6Idzy++cwOk8I+xPDhw==}
 
   dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
@@ -2795,11 +2799,11 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-builder-squirrel-windows@26.15.6:
-    resolution: {integrity: sha512-Vgw0bVXtTjZmD3O0Wl1gbo4eiI0Mqp7FQBsFgMR+wNwySiPJ08jadS0PZiSwP2cKCVaEclBHbKeBVTwil+SJfQ==}
+  electron-builder-squirrel-windows@26.15.7:
+    resolution: {integrity: sha512-B4uvn2NzFSuf084udWqugludFull6CRJiWe2dLzMnZLl6G5hdAGk0fsBMGlBSpKjvQCJn8IPc+S7OnJ+GXqwLA==}
 
-  electron-builder@26.15.6:
-    resolution: {integrity: sha512-jxlHRjqYrlTgLVo/aoACGpiki3QFYv8s4f2djsqaEbwTBZ9PcTBK03Tj/HMa65kiE0hdZxxbZdmVFo22eou2wA==}
+  electron-builder@26.15.7:
+    resolution: {integrity: sha512-DBpaNzxsPs1BvEblzFoNriSbzsBqDCy/gseIngeEhYzQG1IxfB7Hvc2tBBVmpWE2BTQGP9J1RrAvDT+Vc/uAxg==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -2817,8 +2821,8 @@ packages:
     resolution: {integrity: sha512-bO3y10YikuUwUuDUQRM4KfwNkKhnpVO7IPdbsrejwN9/AABJzzTQ4GeHwyzNSrVO+tEH3/Np255a3sVZpZDjvg==}
     engines: {node: '>=8.0.0'}
 
-  electron@43.1.1:
-    resolution: {integrity: sha512-I5c5vfuVvaXpWx3IZdwvXgxQW44+e7OP1wXGVQkogLeSFSkUZ6sLCcWV05AdEcs65AO5tAIJJwbp7ixw+LdarA==}
+  electron@43.3.0:
+    resolution: {integrity: sha512-nLlvu0WFjftWsSaTkV2B/c4NDuJBspTyXu8vKSQ6vLvFt8uG3NgN49LLKcXddwX0GqVvAQDhciWp+4xOdTdhew==}
     engines: {node: '>= 22.12.0'}
     hasBin: true
 
@@ -3530,11 +3534,11 @@ packages:
   mdn-data@2.27.1:
     resolution: {integrity: sha512-9Yubnt3e8A0OKwxYSXyhLymGW4sCufcLG6VdiDdUGVkPhpqLxlvP5vl1983gQjJl3tqbrM731mjaZaP68AgosQ==}
 
-  meshoptimizer@0.18.1:
-    resolution: {integrity: sha512-ZhoIoL7TNV4s5B6+rx5mC//fw8/POGyNxS/DZyCJeiZ12ScLfVwRE/GfsxwiTkMYYD5DmK2/JXnEVXqL4rF+Sw==}
-
   meshoptimizer@1.0.1:
     resolution: {integrity: sha512-Vix+QlA1YYT3FwmBBZ+49cE5y/b+pRrcXKqGpS5ouh33d3lSp2PoTpCw19E0cKDFWalembrHnIaZetf27a+W2g==}
+
+  meshoptimizer@1.1.1:
+    resolution: {integrity: sha512-oRFNWJRDA/WTrVj7NWvqa5HqE1t9MYDj2VaWirQCzCCrAd2GHrqR/sQezCxiWATPNlKTcRaPRHPJwIRoPBAp5g==}
 
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
@@ -3623,8 +3627,8 @@ packages:
   multiformats@9.9.0:
     resolution: {integrity: sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==}
 
-  n8ao@1.10.3:
-    resolution: {integrity: sha512-JFRk4WgUAUWO2KdJTqmBT02dP9kG7rE2oQbBy64E9+YwQ3d96KB9QBanqNy/NnYUfUTYU6Z/5OS5t/yLey7+6Q==}
+  n8ao@2.0.0:
+    resolution: {integrity: sha512-7oajUGXk10jJIcjGxOgjRY2X/gy5wiLOY4eOiAfFJ51ljN6Djmsg+j8HMOip+SpqV7OkwzF9VCkDRLluxVlySA==}
     peerDependencies:
       postprocessing: '>=6.30.0'
       three: '>=0.137'
@@ -3933,10 +3937,10 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  postprocessing@6.36.0:
-    resolution: {integrity: sha512-7V2t8Yi+Edh0FybErMdBV3CCJ/tTeNeLh6z+i0VczwZ6HGV3XyRfC8v4Ps9a6tjawcTvatLptQzX8QnDlU8BXw==}
+  postprocessing@6.39.4:
+    resolution: {integrity: sha512-oAS/PjAbc/xT3OzjUrGsorJ4J064XwhVD2t0OwKLP/E8QwDMUJ0oOv6ZI1SYMtLchv4g0ySEx+JcLy92+48vlA==}
     peerDependencies:
-      three: '>= 0.157.0 < 0.168.0'
+      three: '>= 0.168.0 < 0.186.0'
 
   preact@10.24.2:
     resolution: {integrity: sha512-1cSoF0aCC8uaARATfrlz4VCBqE8LwZwRfLgkxJOQwAlQt6ayTmi0D9OF7nXid1POI5SZidFuG9CnlXbDfLqY/Q==}
@@ -4355,8 +4359,8 @@ packages:
   thread-stream@3.2.0:
     resolution: {integrity: sha512-zLBvqpwr4Esa0kRjcrzGU6zL25lePWaCLMx0RQFrmteozIfeNdaMLpG5U7PeHzvlFkAWaRKA9/KVW4F60iB+qw==}
 
-  three@0.165.0:
-    resolution: {integrity: sha512-cc96IlVYGydeceu0e5xq70H8/yoVT/tXBxV/W8A/U6uOq7DXc4/s1Mkmnu6SqoYGhSRWWYFOhVwvq6V0VtbplA==}
+  three@0.185.1:
+    resolution: {integrity: sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg==}
 
   through2@4.0.2:
     resolution: {integrity: sha512-iOqSav00cVxEEICeD7TjLB1sueEL+81Wpzp2bY17uZjZN0pWZPuo4suZ/61VujxmqSGFfgOcNuTZ85QJwNZQpw==}
@@ -5306,6 +5310,8 @@ snapshots:
       concat-stream: 2.0.0
       http-response-object: 3.0.2
       parse-cache-control: 1.0.1
+
+  '@dimforge/rapier3d-compat@0.12.0': {}
 
   '@donmccurdy/caporal@0.0.10':
     dependencies:
@@ -7206,13 +7212,14 @@ snapshots:
 
   '@types/table@5.0.0': {}
 
-  '@types/three@0.165.0':
+  '@types/three@0.185.4':
     dependencies:
+      '@dimforge/rapier3d-compat': 0.12.0
       '@tweenjs/tween.js': 23.1.3
       '@types/stats.js': 0.17.4
       '@types/webxr': 0.5.24
       fflate: 0.8.3
-      meshoptimizer: 0.18.1
+      meshoptimizer: 1.1.1
 
   '@types/tmp@0.2.6': {}
 
@@ -7785,7 +7792,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.2
 
-  app-builder-lib@26.15.6(dmg-builder@26.15.6)(electron-builder-squirrel-windows@26.15.6):
+  app-builder-lib@26.15.7(dmg-builder@26.15.7)(electron-builder-squirrel-windows@26.15.7):
     dependencies:
       '@electron/asar': 3.4.1
       '@electron/fuses': 1.8.0
@@ -7806,11 +7813,11 @@ snapshots:
       chromium-pickle-js: 0.2.0
       ci-info: 4.3.1
       debug: 4.4.3
-      dmg-builder: 26.15.6(electron-builder-squirrel-windows@26.15.6)
+      dmg-builder: 26.15.7(electron-builder-squirrel-windows@26.15.7)
       dotenv: 16.6.1
       dotenv-expand: 11.0.7
       ejs: 3.1.10
-      electron-builder-squirrel-windows: 26.15.6(dmg-builder@26.15.6)
+      electron-builder-squirrel-windows: 26.15.7(dmg-builder@26.15.7)
       electron-publish: 26.15.3
       fs-extra: 10.1.0
       hosted-git-info: 4.1.0
@@ -8287,9 +8294,9 @@ snapshots:
       minimatch: 3.1.5
       p-limit: 3.1.0
 
-  dmg-builder@26.15.6(electron-builder-squirrel-windows@26.15.6):
+  dmg-builder@26.15.7(electron-builder-squirrel-windows@26.15.7):
     dependencies:
-      app-builder-lib: 26.15.6(dmg-builder@26.15.6)(electron-builder-squirrel-windows@26.15.6)
+      app-builder-lib: 26.15.7(dmg-builder@26.15.7)(electron-builder-squirrel-windows@26.15.7)
       builder-util: 26.15.3
       fs-extra: 10.1.0
       js-yaml: 4.3.1
@@ -8325,23 +8332,23 @@ snapshots:
     dependencies:
       jake: 10.9.4
 
-  electron-builder-squirrel-windows@26.15.6(dmg-builder@26.15.6):
+  electron-builder-squirrel-windows@26.15.7(dmg-builder@26.15.7):
     dependencies:
-      app-builder-lib: 26.15.6(dmg-builder@26.15.6)(electron-builder-squirrel-windows@26.15.6)
+      app-builder-lib: 26.15.7(dmg-builder@26.15.7)(electron-builder-squirrel-windows@26.15.7)
       builder-util: 26.15.3
       electron-winstaller: 5.4.0
     transitivePeerDependencies:
       - dmg-builder
       - supports-color
 
-  electron-builder@26.15.6(electron-builder-squirrel-windows@26.15.6):
+  electron-builder@26.15.7(electron-builder-squirrel-windows@26.15.7):
     dependencies:
-      app-builder-lib: 26.15.6(dmg-builder@26.15.6)(electron-builder-squirrel-windows@26.15.6)
+      app-builder-lib: 26.15.7(dmg-builder@26.15.7)(electron-builder-squirrel-windows@26.15.7)
       builder-util: 26.15.3
       builder-util-runtime: 9.7.0
       chalk: 4.1.2
       ci-info: 4.4.0
-      dmg-builder: 26.15.6(electron-builder-squirrel-windows@26.15.6)
+      dmg-builder: 26.15.7(electron-builder-squirrel-windows@26.15.7)
       fs-extra: 10.1.0
       lazy-val: 1.0.5
       simple-update-notifier: 2.0.0
@@ -8391,7 +8398,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@43.1.1:
+  electron@43.3.0:
     dependencies:
       '@electron-internal/extract-zip': 1.0.4
       '@electron/get': 5.0.0
@@ -9127,9 +9134,9 @@ snapshots:
 
   mdn-data@2.27.1: {}
 
-  meshoptimizer@0.18.1: {}
-
   meshoptimizer@1.0.1: {}
+
+  meshoptimizer@1.1.1: {}
 
   micromatch@4.0.8:
     dependencies:
@@ -9194,10 +9201,10 @@ snapshots:
 
   multiformats@9.9.0: {}
 
-  n8ao@1.10.3(postprocessing@6.36.0(three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5)))(three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5)):
+  n8ao@2.0.0(postprocessing@6.39.4(three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548)))(three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548)):
     dependencies:
-      postprocessing: 6.36.0(three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5))
-      three: 0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5)
+      postprocessing: 6.39.4(three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548))
+      three: 0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548)
 
   nanoid@3.3.18: {}
 
@@ -9544,9 +9551,9 @@ snapshots:
       commander: 9.5.0
     optional: true
 
-  postprocessing@6.36.0(three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5)):
+  postprocessing@6.39.4(three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548)):
     dependencies:
-      three: 0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5)
+      three: 0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548)
 
   preact@10.24.2:
     optional: true
@@ -10039,7 +10046,7 @@ snapshots:
     dependencies:
       real-require: 0.2.0
 
-  three@0.165.0(patch_hash=5ec090e6fc189fe29e364974887bc548786582ed6ba4274d6ee6085dd4e1c3d5): {}
+  three@0.185.1(patch_hash=7a1778d53a84c66810fb9b4ec1b1d6f630737b218e088cec98fbf2a4ce4a6548): {}
 
   through2@4.0.2:
     dependencies:

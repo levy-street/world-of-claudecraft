@@ -32,25 +32,47 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(blockEnd).toBeGreaterThan(blockStart);
     const block = source.slice(blockStart, blockEnd);
 
-    for (const form of ['sheepVisual', 'bearVisual', 'catVisual', 'travelVisual']) {
-      const visualAt = block.indexOf(`v.${form} = built;`);
-      expect(visualAt, `${form} assignment`).toBeGreaterThan(-1);
-      const addAt = block.indexOf('v.group.add(built.root)', visualAt);
-      expect(addAt, `${form} group.add`).toBeGreaterThan(visualAt);
-      const pendingAt = block.indexOf('v.formCompilePending = built.root;', addAt);
-      expect(pendingAt, `${form} pending set`).toBeGreaterThan(addAt);
-      const gateAt = block.indexOf('this.gateSwapFlagOnCompile(built.root, () => {', pendingAt);
-      expect(gateAt, `${form} gate call`).toBeGreaterThan(pendingAt);
-      const settleAt = block.indexOf(
-        'v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);',
-        gateAt,
+    // Every form is built by the one shared builder, and the four that must not
+    // pop in half-linked ask it for the gate. Metamorphosis is the deliberate
+    // exception: it grows out of the body it replaces.
+    for (const [form, slot] of [
+      ['sheep', 'sheepVisual'],
+      ['bear', 'bearVisual'],
+      ['cat', 'catVisual'],
+      ['travel', 'travelVisual'],
+    ]) {
+      expect(block, `${slot} gated build`).toContain(
+        `this.buildFormVisual(e, v, 'form_${form}', '${slot}', true)`,
       );
-      expect(settleAt, `${form} settle callback`).toBeGreaterThan(gateAt);
     }
+    expect(block).toContain(
+      "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
+    );
+
+    // ...and the builder still attaches, marks pending, gates, and settles, in
+    // that order, behind the gateCompile arm.
+    const builderStart = source.indexOf('  private buildFormVisual(');
+    expect(builderStart).toBeGreaterThan(-1);
+    const builder = source.slice(builderStart, source.indexOf('\n  private ', builderStart + 10));
+    const assignAt = builder.indexOf('v[slot] = built;');
+    expect(assignAt, 'slot assignment').toBeGreaterThan(-1);
+    const addAt = builder.indexOf('v.group.add(built.root)', assignAt);
+    expect(addAt, 'group.add').toBeGreaterThan(assignAt);
+    const skipAt = builder.indexOf('if (!gateCompile) return;', addAt);
+    expect(skipAt, 'ungated early return').toBeGreaterThan(addAt);
+    const pendingAt = builder.indexOf('v.formCompilePending = built.root;', skipAt);
+    expect(pendingAt, 'pending set').toBeGreaterThan(skipAt);
+    const gateAt = builder.indexOf('this.gateSwapFlagOnCompile(built.root, () => {', pendingAt);
+    expect(gateAt, 'gate call').toBeGreaterThan(pendingAt);
+    const settleAt = builder.indexOf(
+      'v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);',
+      gateAt,
+    );
+    expect(settleAt, 'settle callback').toBeGreaterThan(gateAt);
 
     // Uses the flag shape (gateSwapFlagOnCompile), not the direct-hide shape
     // (gateSwapOnCompile): the visibility lines right below recompute every tick.
-    expect(block).not.toContain('this.gateSwapOnCompile(built.root)');
+    expect(builder).not.toContain('this.gateSwapOnCompile(built.root)');
   });
 
   it('consults the pending token, keyed per form root, in the per-frame visibility recompute', () => {

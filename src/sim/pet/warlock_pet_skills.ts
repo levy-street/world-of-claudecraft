@@ -2,6 +2,7 @@
 // The data lives on MobTemplate; this module owns the movement-authority and
 // boss-immunity boundary for Gloomshade's anti-kite chain.
 
+import { isPullEligible } from '../combat/pull_eligibility';
 import { MOBS } from '../data';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import type { SimContext } from '../sim_context';
@@ -33,7 +34,12 @@ export type PetRangedSkillLauncher = (
 function canChainPull(target: Entity): boolean {
   if (target.kind !== 'mob' || target.ownerId !== null || target.aiState === 'evade') return false;
   const template = MOBS[target.templateId];
-  return template?.boss !== true && template?.ccImmune !== true && target.ccImmune !== true;
+  return (
+    template?.boss !== true &&
+    template?.ccImmune !== true &&
+    target.ccImmune !== true &&
+    isPullEligible(target)
+  );
 }
 
 function useAbyssalChain(ctx: SimContext, pet: Entity, target: Entity): boolean {

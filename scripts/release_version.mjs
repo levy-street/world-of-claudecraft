@@ -19,7 +19,10 @@ const WINDOWS_INSTALLER_RE = /world-of-claudecraft-\d+\.\d+\.\d+-win-x64\.exe/g;
 // must recognize it so it gets rewritten/flagged instead of silently surviving
 // a version bump (issue: legacy Windows links bypass the release guard).
 const LEGACY_WINDOWS_INSTALLER_RE = /world-of-claudecraft-\d+\.\d+\.\d+-win\.exe/g;
-const DESKTOP_VERSION_RE = /export const DESKTOP_VERSION = '(\d+\.\d+\.\d+)';/;
+// src/game/desktop_download.ts is deliberately absent from this script's
+// surfaces: DESKTOP_VERSION derives from package.json at build time through the
+// __APP_VERSION__ define, so nothing there needs rewriting or checking. The
+// static html hrefs below stay release-owned as the no-JS fallback.
 const GAME_VERSION_RE = /(<div\b[^>]*\bid=["']game-version["'][^>]*>)v[^<]*(<\/div>)/;
 const README_VERSION_BADGE_SOURCE = String.raw`img\.shields\.io/badge/version-(\d+\.\d+\.\d+)-blue`;
 
@@ -30,7 +33,6 @@ const PATHS = {
   // so release version surfaces do not rewrite or check a lockfile version field.
   gradle: 'android/app/build.gradle',
   pbxproj: 'ios/App/App.xcodeproj/project.pbxproj',
-  desktopModule: 'src/game/desktop_download.ts',
   htmlFiles: ['index.html', 'play.html'],
   readmeRoot: 'README.md',
   readmeDir: 'docs/i18n',
@@ -102,16 +104,6 @@ export function setDesktopDownloadVersion(html, version, path) {
     .replace(LEGACY_WINDOWS_INSTALLER_RE, `world-of-claudecraft-${normalized}-win-x64.exe`);
 }
 
-export function setDesktopModuleVersion(source, version, path) {
-  if (!DESKTOP_VERSION_RE.test(source)) {
-    throw new Error(`${path} is missing the DESKTOP_VERSION constant`);
-  }
-  return source.replace(
-    DESKTOP_VERSION_RE,
-    `export const DESKTOP_VERSION = '${normalizeVersion(version)}';`,
-  );
-}
-
 export function setGameVersionText(html, version, path) {
   if (!GAME_VERSION_RE.test(html)) {
     throw new Error(`${path} is missing #game-version`);
@@ -140,7 +132,6 @@ export function planReleaseVersion({
   packageJson,
   gradle,
   pbxproj,
-  desktopModule,
   htmlFiles,
   readmeFiles,
 }) {
@@ -163,7 +154,6 @@ export function planReleaseVersion({
     packageJson: setPackageVersion(packageJson, normalized),
     gradle: nativePlan.gradle,
     pbxproj: nativePlan.pbxproj,
-    desktopModule: setDesktopModuleVersion(desktopModule, normalized, PATHS.desktopModule),
     htmlFiles: nextHtmlFiles,
     readmeFiles: nextReadmeFiles,
   };
@@ -192,7 +182,6 @@ export function collectReleaseVersionFailures({
   packageJson,
   gradle,
   pbxproj,
-  desktopModule,
   htmlFiles,
   readmeFiles,
 }) {
@@ -221,13 +210,6 @@ export function collectReleaseVersionFailures({
         `ios/App/App.xcodeproj/project.pbxproj MARKETING_VERSION includes ${staleMarketing}, expected all ${expected}`,
       );
     }
-  }
-
-  const desktopVersion = desktopModule.match(DESKTOP_VERSION_RE)?.[1] ?? null;
-  if (desktopVersion !== expected) {
-    failures.push(
-      `${PATHS.desktopModule} DESKTOP_VERSION is ${desktopVersion}, expected ${expected}`,
-    );
   }
 
   const expectedArtifact = `world-of-claudecraft-${expected}-mac-universal.dmg`;
@@ -288,7 +270,6 @@ function readReleaseFiles() {
     packageJson: readFileSync(resolve(ROOT, PATHS.packageJson), 'utf8'),
     gradle: readFileSync(resolve(ROOT, PATHS.gradle), 'utf8'),
     pbxproj: readFileSync(resolve(ROOT, PATHS.pbxproj), 'utf8'),
-    desktopModule: readFileSync(resolve(ROOT, PATHS.desktopModule), 'utf8'),
     htmlFiles: Object.fromEntries(
       PATHS.htmlFiles.map((path) => [path, readFileSync(resolve(ROOT, path), 'utf8')]),
     ),
@@ -302,7 +283,6 @@ function writeReleaseFiles(plan) {
   writeFileSync(resolve(ROOT, PATHS.packageJson), plan.packageJson);
   writeFileSync(resolve(ROOT, PATHS.gradle), plan.gradle);
   writeFileSync(resolve(ROOT, PATHS.pbxproj), plan.pbxproj);
-  writeFileSync(resolve(ROOT, PATHS.desktopModule), plan.desktopModule);
   for (const [path, html] of Object.entries(plan.htmlFiles)) {
     writeFileSync(resolve(ROOT, path), html);
   }

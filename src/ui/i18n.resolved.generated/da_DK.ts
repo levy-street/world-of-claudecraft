@@ -1372,6 +1372,10 @@ export const da_DK: EnTranslations = {
       "showWalletOnCharacterScreen": "Vis pengepung på karakterskærm",
       "showWalletOnPlayerCard": "Vis pengepung på spillerkort",
       "showPlaytime": "Vis spilletid på karakterskærm",
+      "forceHighPerfGpu": "Brug den dedikerede gaming-GPU",
+      "forceHighPerfGpuNote": "Slået til som standard: skrivebordsappen beder denne computer om dens dedikerede gaming-GPU. Slå dette fra, hvis spillet ikke vil starte, åbner til en sort skærm, eller den bærbares skærm går i sort. Træder i kraft, næste gang spillet starter.",
+      "discordPresence": "Detaljeret Discord-tilstedeværelse",
+      "discordPresenceNote": "Viser den zone, du er i, og hvor længe du har spillet i denne session, som din Discord-aktivitet, og alle, der kan se din Discord-profil, kan se begge dele. Kun zonens navn, din sessionstid og spillet deles, aldrig din karakter, din konto eller hvem du spiller med. Kræver, at Discord-appen kører på denne computer.",
       "showDevBadges": "Vis udviklermærker",
       "showOwnNameplate": "Vis mit navneskilt",
       "showPlayerNameplates": "Vis spillernavneskilte",
@@ -1744,6 +1748,7 @@ export const da_DK: EnTranslations = {
       "notEnoughHonor": "Ikke nok Ære.",
       "reasons": {
         "arenaWin": "Arenasejr",
+        "arenaComplete": "Arenakamp udkæmpet",
         "fiestaKill": "Fiesta-nedlæggelse",
         "fiestaComplete": "Fiesta gennemført",
         "fiestaWin": "Fiesta-sejr",
@@ -1850,6 +1855,7 @@ export const da_DK: EnTranslations = {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
     "itemHeroicTag": "[HEROISK]",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Sjælebundet",
     "itemUniqueEquipped": "Unikt Udrustet",
     "itemSet": {
@@ -7862,7 +7868,15 @@ export const da_DK: EnTranslations = {
       "readyBody": "Den installeres, når du afslutter, eller genstart nu.",
       "restart": "Genstart nu",
       "later": "Senere",
-      "dismiss": "Afvis"
+      "dismiss": "Afvis",
+      "whatsNew": "Se ændringerne i din browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Opdatering {version} er klar",
+      "updateReadyTitleNoVersion": "Opdatering er klar",
+      "updateReadyBody": "Genstart World of ClaudeCraft for at anvende opdateringen.",
+      "partyInviteTitle": "Gruppeinvitation",
+      "partyInviteBody": "{name} inviterede dig til en gruppe."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7874,6 +7888,7 @@ export const da_DK: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Spillet kører uden GPU-acceleration og vil være langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.",
+    "bodyDiscreteInactive": "Spillet bruger ikke den dedikerede (gaming-)GPU og kører i stedet på den strømbesparende GPU, så ydeevnen forringes. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.",
     "bodyWeb": "Spillet kører uden GPU-acceleration og vil være langsomt. Aktiver hardwareacceleration i din browsers indstillinger, opdater dine grafikdrivere og genstart derefter din browser.",
     "hybridBodyWindows": "Denne session kører på den integrerede (strømbesparende) GPU. Hvis denne computer også har en gaming-GPU, skal du indstille din browser til Høj ydeevne under Indstillinger, System, Skærm, Grafik, og derefter genstarte den. Skrivebordsappen vælger selv gaming-GPU'en.",
     "hybridBodyLinux": "Denne session kører på den integrerede (strømbesparende) GPU. Hvis denne computer også har en gaming-GPU, tilbyder din browser eller grafikdriver måske sin egen GPU-valgindstilling, eller din distribution tilbyder måske et GPU-skifteværktøj (såsom PRIME eller optimus-manager). Skrivebordsappen vælger selv gaming-GPU'en.",
@@ -8242,6 +8257,9 @@ export const da_DK: EnTranslations = {
       "graphicsReloadNote": "Grafikkvalitet og terrændetalje træder i kraft efter en genindlæsning.",
       "reloadNow": "Genindlæs nu",
       "fullscreen": "Fuldskærm",
+      "displayMode": "Skærmtilstand",
+      "displayModeBorderless": "Kantløs fuldskærm",
+      "displayModeWindowed": "Vindue",
       "touchLookSpeed": "Berøringskighastighed",
       "joystickSize": "Joystickstørrelse",
       "buttonSize": "Knapstørrelse",
@@ -9582,6 +9600,7 @@ export const da_DK: EnTranslations = {
       "cheap_shot": {
         "name": "Maveslag",
         "description": "Slå målet for {damage} skade og bedøv det i 4 sek. Skal være i snigen. Giver 2 combopoint.",
+        "descriptionNoStealth": "Slå målet for {damage} skade og bedøv det i 4 sek. Giver 2 combopoint.",
         "specNote_subtlety": "Brugt fra Skumringsslør tilføjer dette 1 Tusmørke (maks. 3). Ved 3 Tusmørke kan du bruge den UDEN snigen: den brug koster intet, forbruger alle 3 Tusmørke og starter det 6 sek. lange Skyggesløret."
       },
       "sap": {
@@ -9794,7 +9813,7 @@ export const da_DK: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brændende Ed",
-        "description": "Øger passivt den trussel, jeres Hellige skade skaber, med 60%. Kun Trosvogter."
+        "description": "Øger passivt den trussel, jeres Hellige skade skaber, med 30%. Kun Trosvogter."
       },
       "retribution_aura": {
         "name": "Gengældelsens Aura",
@@ -9910,7 +9929,7 @@ export const da_DK: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet Våben",
-        "description": "Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 30% rustning, tager 10% mindre skade og skaber dobbelt så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek."
+        "description": "Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 40% rustning og 20% udholdenhed, tager 15% mindre skade og er immun over for kritiske træf fra væsner og skaber 2,75 gange så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek."
       },
       "healing_wave": {
         "name": "Lægende Vande",
@@ -10089,7 +10108,7 @@ export const da_DK: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-form",
-        "description": "Forvandl dig til en bjørn: rustning +130%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
+        "description": "Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
       },
       "maul": {
         "name": "Knogleknus",
@@ -10099,6 +10118,10 @@ export const da_DK: EnTranslations = {
       "growl": {
         "name": "Trussel",
         "description": "Knurrer ad målet: din trussel stiger til at matche dets mest forhadte fjende, og det tvinges til at angribe dig i 3 sek. Kun i Bruin-form."
+      },
+      "challenging_roar": {
+        "name": "Rædselsbrøl",
+        "description": "Et rædselsvækkende brøl: alle fjender inden for 10 meter bliver ægget, så deres trussel mod dig stiger til at matche deres mest forhadte fjende, og de tvinges til at angribe dig i 3 sek. Kun i Bruin-form."
       },
       "cat_form": {
         "name": "Ulveform",

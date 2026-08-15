@@ -243,7 +243,7 @@ re-running long-sims-lane files inside that shard's related leg):
 | Lane A | | | (selective: ran only its floor members) | 6.6 |
 | Lane B | | | | 5.2 |
 
-The wall is shard 1, and shard 1 is slow because the sha1-contiguous shard
+The wall is shard 1, and shard 1 is slow because the (since-rebalanced) sha1-contiguous shard
 draw put three of the nine lane files into its slice of the related set,
 including the 13.1-minute harness. With 2 workers, a 788s single file pins
 one worker for 13 minutes no matter what else is in the pack. The next

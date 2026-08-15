@@ -19,6 +19,7 @@ afterEach(() => {
   ktx2InternalsForTest.reset();
   ktx2MipReleaseInternalsForTest.reset();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe('ktx2 transcoder support', () => {
@@ -38,6 +39,7 @@ describe('ktx2 transcoder support', () => {
     // "Missing initialization with .detectSupport".
     expect(loader.workerConfig).toMatchObject({
       astcSupported: false,
+      astcHDRSupported: false,
       etc1Supported: false,
       etc2Supported: false,
       dxtSupported: false,
@@ -76,6 +78,7 @@ describe('ktx2 transcoder support', () => {
       // restores the old always-RGBA fallback goes red on dxt/bptc here.
       expect(loader.workerConfig).toMatchObject({
         astcSupported: false,
+        astcHDRSupported: false,
         etc1Supported: false,
         etc2Supported: false,
         dxtSupported: true,
@@ -109,6 +112,7 @@ describe('ktx2 transcoder support', () => {
       const loader = ktx2Loader();
       expect(loader.workerConfig).toMatchObject({
         astcSupported: false,
+        astcHDRSupported: false,
         etc1Supported: false,
         etc2Supported: false,
         dxtSupported: false,
@@ -172,10 +176,101 @@ describe('ktx2 transcoder support', () => {
     for (const [otherFlag] of FLAG_TO_EXTENSION) {
       expect(config[otherFlag], otherFlag).toBe(otherFlag === flag);
     }
+    // A bare astc extension object with no profile query never claims HDR.
+    expect(config.astcHDRSupported).toBe(false);
+  });
+
+  it('claims astc HDR only when the astc extension lists the hdr profile', () => {
+    // r185's detectSupport answers astcHDRSupported from the astc extension's
+    // own getSupportedProfiles(); the raw probe must give the same answer.
+    const withProfiles = (profiles: string[]) =>
+      ktx2WorkerConfigFromRawContext({
+        getExtension: (name: string) =>
+          name === 'WEBGL_compressed_texture_astc'
+            ? { getSupportedProfiles: () => profiles }
+            : null,
+      });
+    expect(withProfiles(['ldr', 'hdr'])).toMatchObject({
+      astcSupported: true,
+      astcHDRSupported: true,
+    });
+    expect(withProfiles(['ldr'])).toMatchObject({
+      astcSupported: true,
+      astcHDRSupported: false,
+    });
+  });
+
+  it('applies the r185 Linux Mesa emulated-format filter, both polarities', () => {
+    // three r185 disables the likely-emulated astc/etc trio on Linux
+    // non-Android hosts that also expose bptc+dxt (Mesa advertises formats it
+    // software-decompresses); the raw probe must not diverge from the
+    // renderer arm on exactly this host class. navigator is stubbed so the
+    // pin holds on every OS the suite runs on.
+    const allFormats = {
+      getExtension: (name: string) =>
+        name === 'WEBKIT_WEBGL_compressed_texture_pvrtc' ? null : {},
+    };
+    vi.stubGlobal('navigator', {
+      platform: 'Linux x86_64',
+      userAgent: 'Mozilla/5.0 (X11; Linux x86_64) Chrome/126.0',
+    });
+    expect(ktx2WorkerConfigFromRawContext(allFormats)).toMatchObject({
+      astcSupported: false,
+      etc1Supported: false,
+      etc2Supported: false,
+      dxtSupported: true,
+      bptcSupported: true,
+      pvrtcSupported: true,
+    });
+    // Android on Linux keeps its real capability answer, exactly like three.
+    vi.stubGlobal('navigator', {
+      platform: 'Linux armv8l',
+      userAgent: 'Mozilla/5.0 (Linux; Android 14) Chrome/126.0',
+    });
+    expect(ktx2WorkerConfigFromRawContext(allFormats)).toMatchObject({
+      astcSupported: true,
+      etc1Supported: true,
+      etc2Supported: true,
+    });
+    vi.unstubAllGlobals();
+  });
+
+  it('the Mesa filter needs every one of its four format conjuncts, one arm each', () => {
+    // three's guard is astc AND etc2 AND bptc AND dxt; the all-formats arm
+    // above cannot tell a four-conjunct guard from any subset of it, so each
+    // conjunct gets its own missing-format fixture asserting the filter does
+    // NOT fire (the capability answer keeps the formats the host really has).
+    vi.stubGlobal('navigator', {
+      platform: 'Linux x86_64',
+      userAgent: 'Mozilla/5.0 (X11; Linux x86_64) Chrome/126.0',
+    });
+    const MISSING = [
+      'WEBGL_compressed_texture_astc',
+      'WEBGL_compressed_texture_etc',
+      'EXT_texture_compression_bptc',
+      'WEBGL_compressed_texture_s3tc',
+    ] as const;
+    for (const missing of MISSING) {
+      const gl = {
+        getExtension: (name: string) =>
+          name === missing || name === 'WEBKIT_WEBGL_compressed_texture_pvrtc' ? null : {},
+      };
+      const config = ktx2WorkerConfigFromRawContext(gl);
+      // The filter must not fire: every still-present emulation-suspect
+      // format keeps its true answer.
+      expect(config.etc1Supported, `filter fired with ${missing} absent`).toBe(true);
+      if (missing !== 'WEBGL_compressed_texture_astc') {
+        expect(config.astcSupported, `filter fired with ${missing} absent`).toBe(true);
+      }
+      if (missing !== 'WEBGL_compressed_texture_etc') {
+        expect(config.etc2Supported, `filter fired with ${missing} absent`).toBe(true);
+      }
+    }
+    vi.unstubAllGlobals();
   });
 
   it('honors the WebKit-prefixed pvrtc alias, exactly like three detectSupport', () => {
-    // three r165's WebGL arm ORs WEBKIT_WEBGL_compressed_texture_pvrtc into
+    // three r185's WebGL arm ORs WEBKIT_WEBGL_compressed_texture_pvrtc into
     // pvrtcSupported; an old WebKit host exposing only the prefixed name must
     // get the same answer from the raw probe.
     const config = ktx2WorkerConfigFromRawContext({
@@ -197,6 +292,7 @@ describe('ktx2 transcoder support', () => {
     };
     expect(ktx2WorkerConfigFromRawContext(gl)).toEqual({
       astcSupported: false,
+      astcHDRSupported: false,
       etc1Supported: false,
       etc2Supported: true,
       dxtSupported: false,

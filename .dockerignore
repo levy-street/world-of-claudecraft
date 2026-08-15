@@ -21,6 +21,13 @@ scripts/*
 !scripts/rift_forge_rollback_migration.ts
 !scripts/build_sitemap.mjs
 !scripts/browserslist_targets.mjs
+# vite.config.ts imports the vitest sharding sequencer at module scope, so
+# loading the config for a production `vite build` needs it and its two
+# dependencies present. tests/dockerignore_context.test.ts derives this set
+# from the config's own imports and fails if any of it stops reaching the image.
+!scripts/ci_balanced_sequencer.mjs
+!scripts/ci_shard_partition.mjs
+!scripts/ci_shard_weights.generated.json
 !scripts/check_backdrop_survival.mjs
 !scripts/prod_cpu_game_helper.mjs
 !scripts/prod_cpu_profile_client.mjs

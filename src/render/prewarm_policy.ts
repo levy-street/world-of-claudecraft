@@ -295,8 +295,8 @@ export function prewarmSubmitShouldStop(
  * left unpaid, make ordinary first draws stall in live frames (the login
  * storm's blocking reflection and texture-decode hitches). Their resume
  * units run at BOOT_DEBT priority so cosmetic background warming (the
- * char/armory preview lane at BACKGROUND) cannot starve them, which
- * production measured as minutes of unpaid debt after the reveal.
+ * char preview lane at BACKGROUND) cannot starve them, which production
+ * measured as minutes of unpaid debt after the reveal.
  *
  * Deliberately NOT in the set: the per-family VFX warmers
  * (props.ghost-fade-variants, vfx.weapon-skins, vfx.ability-primitives).
@@ -358,6 +358,9 @@ export interface ProgramContentMeshShape {
   morphColorCount?: number;
   /** geometry.attributes.tangent flips vertexTangents. */
   hasTangents?: boolean;
+  /** geometry.attributes.normal flips vertexNormals (a program cache-key bit
+   *  since r185, for every material type). */
+  hasNormals?: boolean;
   /** geometry.attributes.color itemSize (4 flips vertexAlphas); 0 = none. */
   vertexColorItemSize?: number;
   castShadow?: boolean;
@@ -365,13 +368,18 @@ export interface ProgramContentMeshShape {
 
 /**
  * Program-content keys for compile-unit dedupe: one key per material slot,
- * covering the object and geometry bits of three r165's program cache key
+ * covering the object and geometry bits of three r185's program cache key
  * this repo can produce (skinning, instancing and instance colour, batched
- * meshes, morph position/normal/colour presence and counts, tangents, vertex
- * colour item size, shadow casting). Not covered, on purpose: BatchedMesh
- * colour textures (batchingColor) and Points uv presence (pointsUvs), which
- * the repo does not produce on this path; adopt either and this key must
- * learn it. A coarser key elects a stand-in
+ * meshes, morph position/normal/colour presence and counts, tangents, normal
+ * presence, vertex colour item size, shadow casting). Not covered, on
+ * purpose: BatchedMesh colour textures (batchingColor) and Points uv
+ * presence (pointsUvs), which the repo does not produce on this path (adopt
+ * either and this key must learn it); hasPositionAttribute (every drawable
+ * prewarm root carries positions, constant true); reversedDepthBuffer
+ * (renderer-level, never enabled here) and numLightProbeGrids (scene-level,
+ * no grids), constant per session like logarithmicDepthBuffer; and the
+ * material-derived bits (packedNormalMap, decodeVideoTextureEmissive), which
+ * the per-material id axis already separates. A coarser key elects a stand-in
  * whose program variant differs, and every other geometry shape of that
  * material is SKIPPED by the dedupe and relinks synchronously at first draw,
  * which is the stall the compile lane exists to prevent. In-repo fidelity
@@ -386,8 +394,8 @@ export function prewarmProgramContentKeys(
     `${shape.hasInstanceColor ? 'ic' : ''}${shape.isBatchedMesh ? 'b' : ''}` +
     `${shape.hasMorphPositions ? 'P' : ''}p${shape.morphTargetCount ?? 0}` +
     `n${shape.morphNormalCount ?? 0}k${shape.morphColorCount ?? 0}` +
-    `${shape.hasTangents ? 't' : ''}v${shape.vertexColorItemSize ?? 0}` +
-    `${shape.castShadow ? 'c' : ''}`;
+    `${shape.hasTangents ? 't' : ''}${shape.hasNormals ? 'N' : ''}` +
+    `v${shape.vertexColorItemSize ?? 0}${shape.castShadow ? 'c' : ''}`;
   return materialIds.map((id) => `${token}:${id}`);
 }
 

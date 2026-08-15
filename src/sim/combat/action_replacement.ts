@@ -51,5 +51,13 @@ export function replaceResolvedAbility(
     threatMult: replacement.threat?.mult ?? 1,
     castWhileMoving: replacement.castWhileMoving,
     charges: replacement.maxCharges,
+    // A talent that cleared the base's stealth requirement (Cheap Trick on Gut
+    // Punch) applies to this SLOT, not to a single ability id: the player's
+    // choice is unchanged when the button transforms, so carry the cleared
+    // requirement onto the replacement. The sim cast gate and the bar/tooltip
+    // both read this flag, so dropping it would let a transformed action demand
+    // stealth the build already removed. Inert until a stealth-gated ability
+    // replaces into another, but correct by construction.
+    ignoreStealthRequirement: base.ignoreStealthRequirement,
   };
 }

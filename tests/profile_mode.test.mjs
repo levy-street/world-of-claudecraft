@@ -248,6 +248,7 @@ describe('resolveProfileMode', () => {
     });
     expect(repeated).toBe('takeover');
     expect(state.actions).toEqual(['create', 'enter', 'takeover']);
+    expect(globalThis.window.confirm()).toBe(true);
   });
 
   it('accepts an already resumed online world without touching character creation', async () => {

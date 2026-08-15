@@ -240,6 +240,18 @@ describe('Warlock pet signature skills', () => {
     ).toBe(false);
   });
 
+  it('never lets Abyssal Chain drag a fixed practice dummy off its marker', () => {
+    const { sim, pet, target } = rig();
+    const dummyTemplate = Object.values(MOBS).find((template) => template.dummy === true);
+    if (!dummyTemplate) throw new Error('The mob registry has no dummy fixture.');
+    target.templateId = dummyTemplate.id;
+    const dummyPosition = { ...target.pos };
+
+    expect(tryUseWarlockPetSkill(sim.ctx, pet, target, petRangedAttack)).toBe(false);
+    expect(target.pos).toEqual(dummyPosition);
+    expect(pet.petSkillTimer).toBeUndefined();
+  });
+
   it('never pulls a player entity', () => {
     const { sim, pet, target } = rig();
     target.kind = 'player';

@@ -297,9 +297,11 @@ describe('decal geometry', () => {
     for (const name of ['position', 'normal', 'uv', 'skinIndex', 'skinWeight']) {
       expect(geo.getAttribute(name), name).toBeTruthy();
     }
-    expect(geo.morphAttributes.position).toHaveLength(1);
+    // r185 types morphAttributes entries as possibly undefined.
+    const morphPosition = geo.morphAttributes.position ?? [];
+    expect(morphPosition).toHaveLength(1);
     expect(geo.morphTargetsRelative).toBe(true);
-    expect(geo.morphAttributes.position[0].count).toBe(geo.getAttribute('position').count);
+    expect(morphPosition[0].count).toBe(geo.getAttribute('position').count);
     const w = geo.getAttribute('skinWeight');
     for (let i = 0; i < w.count; i++) {
       expect(w.getX(i) + w.getY(i) + w.getZ(i) + w.getW(i)).toBeCloseTo(1, 5);

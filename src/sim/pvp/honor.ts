@@ -10,6 +10,29 @@ export const RANKED_ARENA_WIN_HONOR = {
   '2v2': 50,
 } as const;
 
+// What a ranked bout pays the side that did not win: one third of the bracket's
+// win award, rounded (1v1 pays 8, 2v2 pays 17). A draw pays this to both sides.
+//
+// Ranked arena was the one PvP mode that paid a loss nothing at all, so a player
+// who queued and lost had no path toward Warfare gear except winning: rating is
+// the ladder's answer to a loss, but rating buys nothing. The other two modes
+// already carry the rule this restores, both at the same third (Thornhollow
+// Fields pays 20 against a 60 win, Fiesta pays its 20 completion against a
+// 20 + 40 win), so the share is this repo's own convention rather than a new
+// number, and it stays a DERIVED fraction so retuning a win faucet carries the
+// loss award with it.
+//
+// A third, not more: a win must stay clearly the thing worth playing for, and the
+// gap between the two is the whole incentive to try to win rather than to farm
+// completions. Each pairing pays a player at most one win plus one loss per UTC
+// day (ARENA_REPEAT_DR zeroes the rest on both counters), so two accounts trading
+// wins are capped at exactly what one honest bout against a new opponent pays.
+export const ARENA_LOSS_HONOR_SHARE = 1 / 3;
+export const RANKED_ARENA_LOSS_HONOR = {
+  '1v1': Math.round(RANKED_ARENA_WIN_HONOR['1v1'] * ARENA_LOSS_HONOR_SHARE),
+  '2v2': Math.round(RANKED_ARENA_WIN_HONOR['2v2'] * ARENA_LOSS_HONOR_SHARE),
+} as const;
+
 export const FIESTA_KILL_HONOR = 20;
 export const FIESTA_COMPLETION_HONOR = 20;
 export const FIESTA_WIN_BONUS_HONOR = 40;
@@ -106,9 +129,13 @@ export function normalizeHonorDailyState(value: unknown): HonorArenaDailyState |
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
   const record = value as Record<string, unknown>;
   const bgResults = normalizeCountRecord(record.bgResultsByOpponent);
+  const losses = normalizeCountRecord(record.lossesByOpponent);
   return {
     date: typeof record.date === 'string' ? record.date : '',
     winsByOpponent: normalizeCountRecord(record.winsByOpponent),
+    // Same absent-until-set rule as the battleground counter below: a save
+    // written before ranked losses paid anything round-trips byte-identical.
+    ...(Object.keys(losses).length > 0 ? { lossesByOpponent: losses } : {}),
     fiestaCompletionsByOpponent: normalizeCountRecord(record.fiestaCompletionsByOpponent),
     // Optional: absent (not empty) when there are no results, so pre-Thornhollow Fields
     // saves round-trip byte-identical.
@@ -176,6 +203,9 @@ function dailyWindow(ctx: SimContext, meta: PlayerMeta) {
     daily.date = ctx.resetDay;
     daily.winsByOpponent = {};
     daily.fiestaCompletionsByOpponent = {};
+    // `undefined` rather than `{}` for the same byte-equality reason as the
+    // battleground counter and the first-win flag below.
+    daily.lossesByOpponent = undefined;
     // Back to `undefined` (not `{}`) so an untouched day stays byte-equal in
     // the save blob (the absent-until-first-result rule).
     daily.bgResultsByOpponent = undefined;
@@ -216,24 +246,50 @@ export function honorTeamIdentity(ctx: SimContext, pids: number[]): string {
   return JSON.stringify(members);
 }
 
-export function awardRankedArenaWinHonor(
+/**
+ * One played-out ranked arena result, for the winning side and the losing side
+ * alike. A win pays the bracket faucet; a loss pays RANKED_ARENA_LOSS_HONOR, and
+ * a draw pays that same loss award to both sides (what a drawn Thornhollow
+ * Fields match does, and the only reading that makes a timeout worth playing
+ * out). Forfeits never reach here: the caller pays nothing on a forfeit, which
+ * is also what stops "queue, concede, collect" being the cheapest honor in the
+ * game.
+ *
+ * Wins and losses decay on the SAME ARENA_REPEAT_DR curve but count on separate
+ * per-opponent counters, so the first meeting of a given team each day pays in
+ * full whichever way it goes and every rematch pays nothing. Deliberately not
+ * one shared counter: sharing it would mean a loss silently spends the win award
+ * for the rematch, which punishes exactly the honest player who queues into a
+ * stronger team and comes back.
+ *
+ * The daily taper reads `totalWins` for both outcomes, and only a WIN advances
+ * it: the taper is a cap on the day's arena income, and a player cannot pad it
+ * by losing.
+ */
+export function awardRankedArenaResultHonor(
   ctx: SimContext,
   meta: PlayerMeta,
   format: ArenaFormat,
   opponentTeamKey: string,
+  outcome: 'win' | 'loss' | 'draw',
 ): number {
   if (format !== '1v1' && format !== '2v2') return 0;
   const daily = dailyWindow(ctx, meta);
   const key = `${format}:${opponentTeamKey}`;
-  const repeats = daily.winsByOpponent[key] ?? 0;
+  const won = outcome === 'win';
+  const repeats = won ? (daily.winsByOpponent[key] ?? 0) : (daily.lossesByOpponent?.[key] ?? 0);
+  const base = won ? RANKED_ARENA_WIN_HONOR[format] : RANKED_ARENA_LOSS_HONOR[format];
   const amount = Math.floor(
-    RANKED_ARENA_WIN_HONOR[format] *
-      arenaRepeatHonorMultiplier(repeats) *
-      arenaDailyMultiplier(daily.totalWins),
+    base * arenaRepeatHonorMultiplier(repeats) * arenaDailyMultiplier(daily.totalWins),
   );
-  daily.winsByOpponent[key] = repeats + 1;
-  daily.totalWins++;
-  return grantHonor(ctx, meta, amount, 'arena_win');
+  if (won) {
+    daily.winsByOpponent[key] = repeats + 1;
+    daily.totalWins++;
+  } else {
+    if (!daily.lossesByOpponent) daily.lossesByOpponent = {};
+    daily.lossesByOpponent[key] = repeats + 1;
+  }
+  return grantHonor(ctx, meta, amount, won ? 'arena_win' : 'arena_complete');
 }
 
 /** What one played-out Thornhollow Fields result paid: the ordinary result award

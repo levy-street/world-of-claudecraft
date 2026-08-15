@@ -1,7 +1,7 @@
 // Tank defensive cooldowns, one distinct mechanic per class:
 //   - Paladin Bastion Rite: physical mitigation plus block chance.
 //   - Druid Primal Reflexes: a dodge cooldown (buff_dodge), usable while shapeshifted.
-// Also covers the druid parity buff (Dire Bruin now +20% threat / +15% armor).
+// Also covers the druid parity buff (Dire Bruin now +45% threat / +15% armor).
 import { describe, expect, it } from 'vitest';
 import { TALENTS } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
@@ -389,12 +389,12 @@ describe('Oakhide (druid): armor cooldown usable while shapeshifted', () => {
 });
 
 describe('Druid parity: Dire Bruin threat/armor buff', () => {
-  it('grants +20% threat and +15% armor through the feral spec mastery', () => {
+  it('grants +45% threat and +15% armor through the feral spec mastery', () => {
     // Talents 2.0 retired the feral_choice_bear node; the bear-tank identity
-    // lives on the feral spec mastery, which carries the v0.27 Dire Bruin
-    // retune (threat 20%, armor 15%).
+    // lives on the feral spec mastery; the v0.38 tank threat parity pass
+    // raised the threat side (threat 45%, armor 15%).
     const feral = TALENTS.druid?.specs.find((s) => s.id === 'feral');
-    expect(feral?.mastery.effect.global?.threatPct).toBe(0.2);
+    expect(feral?.mastery.effect.global?.threatPct).toBe(0.45);
     expect(feral?.mastery.effect.stats?.armorPct).toBe(0.15);
   });
 });

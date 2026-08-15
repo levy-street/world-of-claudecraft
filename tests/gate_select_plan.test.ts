@@ -14,11 +14,12 @@ import {
   resolveSelectBase,
 } from '../scripts/lib/gate_discovery.mjs';
 import {
-  buildAlwaysRunArgs,
   buildFullSuiteArgs,
-  buildRelatedArgs,
+  buildSelectiveLegArgs,
   buildSelectPlan,
   classifySelectPaths,
+  FLOOR_SANITY_MIN,
+  planSelectiveLegs,
 } from '../scripts/lib/gate_select_plan.mjs';
 import {
   buildAlwaysRunSet,
@@ -423,26 +424,118 @@ describe('selective gate planning', () => {
 });
 
 describe('selective gate argv', () => {
-  it('builds the always-run leg with an explicit file list', () => {
-    expect(buildAlwaysRunArgs({ files: ['tests/a.test.ts'], workers: 7 })).toEqual([
-      'run',
-      'tests/a.test.ts',
-      '--maxWorkers=7',
+  it('POSIX plans exactly ONE strict merged leg, sources before floor seeds', () => {
+    const legs = planSelectiveLegs({
+      relatedSources: ['src/x.ts'],
+      alwaysRunFiles: ['tests/a.test.ts', 'tests/b.test.ts'],
+      platform: 'darwin',
+    });
+    expect(legs).toEqual([
+      {
+        kind: 'merged-related',
+        files: ['src/x.ts', 'tests/a.test.ts', 'tests/b.test.ts'],
+        strict: true,
+      },
     ]);
-  });
-
-  it('builds the related leg as a subcommand, not a flag', () => {
-    expect(buildRelatedArgs({ sources: ['src/x.ts'], workers: 4 })).toEqual([
+    // The =false spelling is load-bearing: the related subcommand defaults
+    // the flag TRUE via ??=, so a bare flag would let an empty collection
+    // exit 0 on the merge bar.
+    expect(buildSelectiveLegArgs(legs[0], 4)).toEqual([
       'related',
       'src/x.ts',
+      'tests/a.test.ts',
+      'tests/b.test.ts',
       '--run',
-      '--passWithNoTests',
+      '--passWithNoTests=false',
       '--maxWorkers=4',
     ]);
   });
 
-  it('returns null for the related leg when nothing changed', () => {
-    expect(buildRelatedArgs({ sources: [], workers: 4 })).toBeNull();
+  it('win32 keeps the classic two-leg shape (related cannot match seeds there)', () => {
+    // vitest 4.1.10 resolves `related` seeds without slash-normalizing on
+    // win32 while moduleIds are slashed, so a merged leg matches NOTHING;
+    // the floor must stay on `vitest run` chunks with the tolerant related
+    // leg beside it.
+    const floor = Array.from({ length: 400 }, (_, i) => `tests/floor_${i}_long_name.test.ts`);
+    const legs = planSelectiveLegs({
+      relatedSources: ['src/x.ts'],
+      alwaysRunFiles: floor,
+      platform: 'win32',
+    });
+    const floorLegs = legs.filter((l) => l.kind === 'floor-run');
+    expect(floorLegs.length).toBeGreaterThan(1);
+    expect(floorLegs.flatMap((l) => l.files)).toEqual(floor);
+    for (const leg of floorLegs) expect(leg.files.length).toBeGreaterThan(0);
+    expect(buildSelectiveLegArgs(floorLegs[0], 2).slice(0, 1)).toEqual(['run']);
+    const related = legs[legs.length - 1];
+    expect(related.kind).toBe('tolerant-related');
+    expect(buildSelectiveLegArgs(related, 2)).toEqual([
+      'related',
+      'src/x.ts',
+      '--run',
+      '--passWithNoTests',
+      '--maxWorkers=2',
+    ]);
+    // No sources: no related leg at all (the retired null-return arm's heir).
+    const floorOnly = planSelectiveLegs({
+      relatedSources: [],
+      alwaysRunFiles: floor,
+      platform: 'win32',
+    });
+    expect(floorOnly.every((l) => l.kind === 'floor-run')).toBe(true);
+  });
+
+  it('plans the REAL floor as one strict POSIX leg (derived, not hand-picked)', () => {
+    const { alwaysRun } = collectSuiteVisibility({
+      root: REPO_ROOT,
+      readdirSync,
+      readFileSync,
+      join: path.join,
+      relative: path.relative,
+      sep: path.sep,
+    });
+    expect(alwaysRun.length).toBeGreaterThan(FLOOR_SANITY_MIN);
+    const legs = planSelectiveLegs({
+      relatedSources: ['src/sim/sim.ts'],
+      alwaysRunFiles: alwaysRun,
+      platform: 'linux',
+    });
+    expect(legs).toHaveLength(1);
+    expect(legs[0].kind).toBe('merged-related');
+    expect(buildSelectiveLegArgs(legs[0], 8)).toContain('--passWithNoTests=false');
+  });
+
+  it('falls back to the FULL suite when the floor is implausibly small (opt-in)', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/render/nameplates.ts'],
+      alwaysRunFiles: ['tests/a.test.ts'],
+      floorSanityMin: FLOOR_SANITY_MIN,
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('implausibly small');
+  });
+
+  it('chunkFileArgs returns no chunks for an empty input (the caller must guard)', () => {
+    expect(chunkFileArgs({ files: [] })).toEqual([]);
+  });
+
+  it('wires the planner, the sanity floor, and the zero-leg guard at both entrypoints', () => {
+    // Comment-stripped source pins (a commented-out call must not satisfy
+    // them): both live callers build their legs from the shared planner,
+    // gate_select opts into the sanity floor and fails closed on zero legs.
+    for (const entry of ['scripts/gate_select.mjs', 'scripts/gate_shadow.mjs']) {
+      const text = readFileSync(path.join(REPO_ROOT, entry), 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[^:])\/\/.*$/gm, '$1');
+      expect(text, entry).toContain('planSelectiveLegs({');
+      expect(text, entry).toContain('buildSelectiveLegArgs(');
+    }
+    const gateText = readFileSync(path.join(REPO_ROOT, 'scripts/gate_select.mjs'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(gateText).toContain('floorSanityMin: FLOOR_SANITY_MIN');
+    expect(gateText).toContain('legs.length === 0 || liveFloor.length === 0');
+    expect(gateText).toContain('empty selective legs');
   });
 
   it('builds the full-suite fallback with no file filter', () => {
@@ -806,7 +899,7 @@ describe('deleted test files never reach the argv', () => {
   });
 });
 
-describe('argv chunking for the always-run leg', () => {
+describe('argv chunking for the win32 floor legs', () => {
   it('keeps every chunk under the limit and loses no file', () => {
     const files = Array.from({ length: 500 }, (_, i) => `tests/some_fairly_long_name_${i}.test.ts`);
     const chunks = chunkFileArgs({ files, limit: 6000 });

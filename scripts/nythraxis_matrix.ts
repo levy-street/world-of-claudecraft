@@ -90,17 +90,21 @@ const specs = {
         20: 'war_row_sanguine_aura',
       },
     },
+    // Classic prot priority: the signature, Quaking Blow (its attack-speed
+    // slow is also mitigation), then Armor Shear as the refreshable filler
+    // (best threat per rage: full flat, no armor tax), Revenge last for
+    // leftover rage. Reaver Strike is excluded for committed prot
+    // (excludeSpecs), so it is not listed.
     rotation: [
       'defensive_stance',
       'battle_shout',
       'die_by_sword',
       'raised_guard',
       'iron_resolve',
-      'sunder_armor',
       'shield_slam',
       'thunder_clap',
+      'sunder_armor',
       'revenge',
-      'heroic_strike',
     ],
   },
   protectionPaladin: {
@@ -160,8 +164,44 @@ const specs = {
         feral_choice: 1,
       },
       choices: { feral_choice: 'feral_choice_bear' },
+      // Rows sourced from the only production bear tank on the 0.37.1 heroic
+      // dtps boards (wildheart_basin heroic, fight 10634, feral druid).
+      rows: {
+        5: 'dru_r5_improved_wrath',
+        8: 'dru_r8_improved_roots',
+        11: 'dru_r11_improved_mark',
+        14: 'dru_r14_savage_fury',
+        17: 'dru_r17_improved_barkskin',
+        20: 'dru_r20_berserk',
+      },
     },
     rotation: ['demoralizing_roar', 'maul', 'swipe'],
+  },
+  // The shaman has no tank spec: tanking is the Stonebound Weapon imbue posture
+  // inside enhancement (Warspirit). Rows sourced from the production shaman who
+  // tanks the 0.37.1 heroic dtps boards (drowned_temple/gravewyrm_sanctum
+  // heroic, fights 9527/9582, enhancement shaman).
+  stoneboundShaman: {
+    key: 'stonebound_shaman',
+    cls: 'shaman',
+    role: 'bossTank',
+    kind: 'tank',
+    melee: true,
+    talents: {
+      spec: 'enhancement',
+      rows: {
+        5: 'sha_r5_concussion',
+        8: 'sha_r8_shock_efficiency',
+        11: 'sha_r11_ancestral_guidance',
+        14: 'sha_r14_improved_flame_shock',
+        17: 'sha_r17_earthbind',
+        20: 'sha_r20_tidal_waves',
+      },
+    },
+    prepull: ['rockbiter_weapon', 'lightning_shield'],
+    // Production Stonebound tanks weave Arc Bolt between the melee kit's
+    // cooldowns (fights 9527/10634), so the bolt sits last as filler.
+    rotation: ['stormstrike', 'flame_shock', 'earth_shock', 'lightning_bolt'],
   },
   holyPriest: {
     key: 'holy_priest',
@@ -804,19 +844,54 @@ function sharedTankScore(item: ItemDef): number {
   );
 }
 
-function sharedTankCandidates(slot: ItemDef['slot']): ItemDef[] {
+function sharedTankMainhandScore(item: ItemDef): number {
+  const stats = item.stats ?? {};
+  const weaponDps = item.weapon
+    ? (item.weapon.min + item.weapon.max) / 2 / Math.max(0.1, item.weapon.speed)
+    : 0;
+  // Production prot tanks carry the hardest-hitting one-hander they own (the
+  // 0.37.1 boards run gravewyrm_cleaver), so the weapon slot weighs damage
+  // first and stamina second; the stamina-first score was picking a caster
+  // dagger and starving tank threat of its damage component.
+  return weaponDps * 1000 + (stats.sta ?? 0) * 100 + (stats.str ?? 0) * 25;
+}
+
+// The tank kit for ONE class: the best stamina-first item it can actually wear
+// in each slot. Passing no class yields the warrior-and-paladin intersection,
+// which is the shared reference kit reported as `sharedTankGear`.
+//
+// Every boss tank gears through this one rule. It used to be shared-kit for the
+// plate/mail tanks and a generic 8-slot dps-ish score for the druid, which left
+// the bear with no neck, no rings and no offhand (28 stamina of accessories it
+// can wear) and made it read as the smallest pool in the harness purely as a
+// gearing artifact.
+function tankCandidates(slot: ItemDef['slot'], cls?: PlayerClass): ItemDef[] {
+  // A shield is the tank offhand only for classes that can hold one; a druid
+  // tanks with a held offhand instead, so requiring blockValue would silently
+  // drop the slot for it.
+  const wantsShield = cls === undefined || cls === 'warrior' || cls === 'paladin';
   return Object.values(ITEMS)
     .filter(
       (item) =>
         item.slot === slot &&
         !isNythraxisDrop(item) &&
         (item.requiredLevel ?? 1) <= 20 &&
-        canEquipItem('warrior', item) &&
-        canEquipItem('paladin', item) &&
+        (cls === undefined
+          ? canEquipItem('warrior', item) && canEquipItem('paladin', item)
+          : canEquipItem(cls, item)) &&
         (slot !== 'mainhand' || (item.kind === 'weapon' && weaponHand(item) !== 'twohand')) &&
-        (slot !== 'offhand' || (item.blockValue ?? 0) > 0),
+        (slot !== 'offhand' || !wantsShield || (item.blockValue ?? 0) > 0),
     )
-    .sort((a, b) => sharedTankScore(b) - sharedTankScore(a) || a.id.localeCompare(b.id));
+    .sort(
+      (a, b) =>
+        (slot === 'mainhand'
+          ? sharedTankMainhandScore(b) - sharedTankMainhandScore(a)
+          : sharedTankScore(b) - sharedTankScore(a)) || a.id.localeCompare(b.id),
+    );
+}
+
+function sharedTankCandidates(slot: ItemDef['slot']): ItemDef[] {
+  return tankCandidates(slot);
 }
 
 const SHARED_TANK_SINGLE_SLOTS: ItemDef['slot'][] = [
@@ -843,22 +918,41 @@ function sharedTankGearIds(): string[] {
   ];
 }
 
-function equipSharedTankGear(sim: Sim, pid: number): void {
+function equipSharedTankGear(sim: Sim, pid: number, cls: PlayerClass): void {
+  // Every boss tank fills the same twelve slots with the best stamina-first
+  // item its own class can wear. The plate and mail tanks converge on one
+  // identical kit (they share the armor tier); the druid lands on leather with
+  // the same neck and rings, which is the comparison the study wants.
   for (const slot of SHARED_TANK_SINGLE_SLOTS) {
-    const item = sharedTankCandidates(slot)[0];
+    const item = tankCandidates(slot, cls)[0];
     if (!item) continue;
     sim.addItem(item.id, 1, pid);
-    sim.equipItem(item.id, pid);
+    // Equip by explicit slot: a dual-wield-capable tank (the Stonebound
+    // shaman) would otherwise route its mainhand pick into the empty offhand.
+    sim.equipItemToSlot(item.id, slot as EquipSlot, pid);
   }
-  for (const [index, ring] of sharedTankCandidates('ring').slice(0, 2).entries()) {
+  for (const [index, ring] of tankCandidates('ring', cls).slice(0, 2).entries()) {
     sim.addItem(ring.id, 1, pid);
     sim.equipItemToSlot(ring.id, `ring${index + 1}` as EquipSlot, pid);
   }
 }
 
 function equipBest(sim: Sim, pid: number, spec: Spec) {
-  if (spec.kind === 'tank' && (spec.cls === 'warrior' || spec.cls === 'paladin')) {
-    equipSharedTankGear(sim, pid);
+  // Every tank row gears through the one tank rule, boss tank or off-tank, the
+  // druid included (it used to fall through to the generic 8-slot path).
+  if (spec.kind === 'tank') {
+    equipSharedTankGear(sim, pid, spec.cls);
+    if (spec.key === 'stonebound_shaman') {
+      // Production Stonebound tanks dual-wield (gravewyrm_cleaver in both
+      // hands on the 0.37.1 boards); swap the shield for a second one-hander.
+      const offhandWeapon = sharedTankCandidates('mainhand').find((candidate) =>
+        canEquipItem('shaman', candidate),
+      );
+      if (offhandWeapon) {
+        sim.addItem(offhandWeapon.id, 1, pid);
+        sim.equipItemToSlot(offhandWeapon.id, 'offhand' as EquipSlot, pid);
+      }
+    }
     return;
   }
   for (const slot of SLOTS) {
@@ -980,10 +1074,6 @@ function auraActive(entity: Entity, id: string, sourceId?: number): boolean {
   );
 }
 
-function sunderStacks(target: Entity): number {
-  return target.auras.find((a) => a.kind === 'sunder')?.stacks ?? 0;
-}
-
 function shouldTryAbility(caster: Entity, target: Entity, ability: string): boolean {
   const hpPct = caster.maxHp > 0 ? caster.hp / caster.maxHp : 0;
   if (
@@ -1016,7 +1106,9 @@ function shouldTryAbility(caster: Entity, target: Entity, ability: string): bool
     return false;
   if ((ability === 'maul' || ability === 'heroic_strike') && caster.queuedOnSwing === ability)
     return false;
-  if (ability === 'sunder_armor' && sunderStacks(target) >= 5) return false;
+  // Armor Shear at 5 stacks refreshes the debuff for its flat threat, the
+  // classic prot filler; it sits last in the rotation so the signature and
+  // Revenge take the rage first.
   if (ability === 'die_by_sword' && (hpPct > 0.7 || auraActive(caster, 'die_by_sword')))
     return false;
   if (ability === 'raised_guard' && auraActive(caster, 'raised_guard_dr')) return false;
@@ -1142,6 +1234,8 @@ type Result = {
       healingDone: number;
       hps: number;
       damageTaken: number;
+      maxHitTaken: number;
+      bossThreatPeak: number;
       healingTaken: number;
       castsStarted: Record<string, number>;
       attemptedCasts: Record<string, number>;
@@ -1245,6 +1339,7 @@ function runGroup(groupSpecs: Spec[], key: string, seed = 42): Result {
     sim.partyAccept(pid);
   }
   sim.convertPartyToRaid(pids[0]);
+  if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', pids[0]);
   sim.enterDungeon('nythraxis_boss_arena', pids[0]);
   const leader = sim.entities.get(pids[0])!;
   const origin = instanceOrigin(
@@ -1306,6 +1401,8 @@ function runGroup(groupSpecs: Spec[], key: string, seed = 42): Result {
       healingDone: 0,
       hps: 0,
       damageTaken: 0,
+      maxHitTaken: 0,
+      bossThreatPeak: 0,
       healingTaken: 0,
       castsStarted: {},
       attemptedCasts: {},
@@ -1626,6 +1723,7 @@ function runGroup(groupSpecs: Spec[], key: string, seed = 42): Result {
         const targetMetric = actorMetrics.get(event.targetId);
         if (targetMetric) {
           targetMetric.damageTaken += event.amount;
+          targetMetric.maxHitTaken = Math.max(targetMetric.maxHitTaken, event.amount);
           addRecordValue(targetMetric.damageTakenByAbility, event.ability, event.amount);
         }
         if (event.ability === 'Soul Rend') {
@@ -1831,6 +1929,14 @@ function runGroup(groupSpecs: Spec[], key: string, seed = 42): Result {
           metric.startResource = e.resource;
       }
     }
+    if (tick % 20 === 0) {
+      // Once per second, latch each tank candidate's boss-table threat peak so a
+      // tank that dies mid-fight still reports the threat it actually built.
+      for (const pid of tankCandidatePids) {
+        const metric = actorMetrics.get(pid)!;
+        metric.bossThreatPeak = Math.max(metric.bossThreatPeak, boss.threat.get(pid) ?? 0);
+      }
+    }
     if (tick % (20 * 10) === 0) {
       const top = [...boss.threat.entries()]
         .sort((a, b) => b[1] - a[1])
@@ -1958,6 +2064,10 @@ function hashString(value: string): number {
 }
 
 const limit = Number(process.env.MATRIX_LIMIT ?? '96');
+const difficulty = process.env.MATRIX_DIFFICULTY ?? 'normal';
+if (difficulty !== 'normal' && difficulty !== 'heroic') {
+  throw new Error('MATRIX_DIFFICULTY must be normal or heroic');
+}
 const tankMonteCarloRuns = Number(process.env.MATRIX_TANK_MC_RUNS ?? '0');
 if (!Number.isInteger(tankMonteCarloRuns) || tankMonteCarloRuns < 0) {
   throw new Error('MATRIX_TANK_MC_RUNS must be a non-negative integer');
@@ -1973,30 +2083,24 @@ for (const { tank } of tankPlans) {
     for (const dpsSet of dpsCombos) plans.push({ tank, healerSet, dpsSet });
   }
 }
+// All four committed boss tanks run the identical support roster so the Monte
+// Carlo distributions stay comparable across tanks.
 const tankMonteCarloPlans = [
-  {
-    tank: specs.protectionWarrior,
-    healerSet: [specs.holyPriest, specs.disciplinePriest, specs.restorationShaman],
-    dpsSet: [
-      specs.combatRogue,
-      specs.armsWarrior,
-      specs.fireMage,
-      specs.marksmanshipHunter,
-      specs.retributionPaladin,
-    ],
-  },
-  {
-    tank: specs.protectionPaladin,
-    healerSet: [specs.holyPriest, specs.disciplinePriest, specs.restorationShaman],
-    dpsSet: [
-      specs.combatRogue,
-      specs.armsWarrior,
-      specs.fireMage,
-      specs.marksmanshipHunter,
-      specs.retributionPaladin,
-    ],
-  },
-] satisfies { tank: Spec; healerSet: Spec[]; dpsSet: Spec[] }[];
+  specs.protectionWarrior,
+  specs.protectionPaladin,
+  specs.feralDruidTank,
+  specs.stoneboundShaman,
+].map((tank) => ({
+  tank,
+  healerSet: [specs.holyPriest, specs.disciplinePriest, specs.restorationShaman],
+  dpsSet: [
+    specs.combatRogue,
+    specs.armsWarrior,
+    specs.fireMage,
+    specs.marksmanshipHunter,
+    specs.retributionPaladin,
+  ],
+})) satisfies { tank: Spec; healerSet: Spec[]; dpsSet: Spec[] }[];
 const comparedKeys = (process.env.MATRIX_COMPARE_SPECS ?? '')
   .split(',')
   .map((value) => value.trim())
@@ -2063,7 +2167,9 @@ for (const [seedIndex, seed] of runSeeds.entries()) {
     // actually taking Nythraxis' melee swings, invalidating the comparison.
     const offTank = (
       tankMonteCarloRuns > 0
-        ? specs.feralDruidTank
+        ? tank.key === 'feral_druid_tank'
+          ? specs.stoneboundShaman
+          : specs.feralDruidTank
         : tank.key === 'protection_paladin'
           ? specs.protectionWarrior
           : specs.protectionPaladin
@@ -2236,74 +2342,90 @@ function percentile(values: readonly number[], fraction: number): number {
   return sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * fraction))];
 }
 
-const tankMonteCarloSummary = ['protection_warrior', 'protection_paladin'].map((tankKey) => {
-  const samples = results
-    .filter((result) => result.key.startsWith(`${tankKey}|`))
-    .map((result) => {
-      const tank = result.actors[tankKey];
-      const minimumSampledHpPct = tank.dead
-        ? 0
-        : Math.min(1, ...tank.hpSamples.map((sample) => sample.value / tank.maxHp));
-      const healerNetManaConsumed = Object.values(result.actors)
-        .filter((actor) => actor.role === 'healer')
-        .reduce(
-          (total, healer) => total + Math.max(0, healer.startResource - healer.finalResource),
-          0,
-        );
-      const groupDps =
-        Object.values(result.actors).reduce((total, actor) => total + actor.damageDone, 0) /
-        Math.max(0.05, result.seconds);
-      const tankActiveSeconds = Math.max(0.05, tank.deathTime ?? result.seconds);
-      return {
-        killed: result.killed,
-        tankDead: tank.dead,
-        survivalSeconds: tank.deathTime ?? result.seconds,
-        maxHp: tank.maxHp,
-        armor: tank.armor,
-        dps: tank.dps,
-        damageTakenPerSecond: tank.damageTaken / tankActiveSeconds,
-        healingTakenPerSecond: tank.healingTaken / tankActiveSeconds,
-        selfHealingPerSecond: tank.healingDone / tankActiveSeconds,
-        minimumSampledHpPct,
-        finalHpPct: tank.dead ? 0 : tank.finalHp / tank.maxHp,
-        healerNetManaConsumed,
-        groupDps,
-        fightSeconds: result.seconds,
-      };
-    });
-  const survivalTimes = samples.map((sample) => sample.survivalSeconds);
-  const kills = samples.filter((sample) => sample.killed);
-  return {
-    key: tankKey,
-    n: samples.length,
-    killRate: average(samples.map((sample) => Number(sample.killed))),
-    tankDeathRate: average(samples.map((sample) => Number(sample.tankDead))),
-    avgSurvivalSeconds: round1(average(survivalTimes)),
-    p10SurvivalSeconds: round1(percentile(survivalTimes, 0.1)),
-    medianSurvivalSeconds: round1(percentile(survivalTimes, 0.5)),
-    avgKillSeconds:
-      kills.length > 0 ? round1(average(kills.map((sample) => sample.fightSeconds))) : null,
-    avgMaxHp: Math.round(average(samples.map((sample) => sample.maxHp))),
-    avgArmor: Math.round(average(samples.map((sample) => sample.armor))),
-    avgTankDps: round1(average(samples.map((sample) => sample.dps))),
-    avgGroupDps: round1(average(samples.map((sample) => sample.groupDps))),
-    avgDamageTakenPerSecond: round1(average(samples.map((sample) => sample.damageTakenPerSecond))),
-    avgHealingTakenPerSecond: round1(
-      average(samples.map((sample) => sample.healingTakenPerSecond)),
-    ),
-    avgSelfHealingPerSecond: round1(average(samples.map((sample) => sample.selfHealingPerSecond))),
-    avgMinimumSampledHpPct: round1(
-      average(samples.map((sample) => sample.minimumSampledHpPct)) * 100,
-    ),
-    avgFinalHpPct: round1(average(samples.map((sample) => sample.finalHpPct)) * 100),
-    avgHealerNetManaConsumed: Math.round(
-      average(samples.map((sample) => sample.healerNetManaConsumed)),
-    ),
-  };
-});
+const tankMonteCarloSummary = tankMonteCarloPlans
+  .map((plan) => plan.tank.key)
+  .map((tankKey) => {
+    const samples = results
+      .filter((result) => result.key.startsWith(`${tankKey}|`))
+      .map((result) => {
+        const tank = result.actors[tankKey];
+        const minimumSampledHpPct = tank.dead
+          ? 0
+          : Math.min(1, ...tank.hpSamples.map((sample) => sample.value / tank.maxHp));
+        const healerNetManaConsumed = Object.values(result.actors)
+          .filter((actor) => actor.role === 'healer')
+          .reduce(
+            (total, healer) => total + Math.max(0, healer.startResource - healer.finalResource),
+            0,
+          );
+        const groupDps =
+          Object.values(result.actors).reduce((total, actor) => total + actor.damageDone, 0) /
+          Math.max(0.05, result.seconds);
+        const tankActiveSeconds = Math.max(0.05, tank.deathTime ?? result.seconds);
+        return {
+          killed: result.killed,
+          tankDead: tank.dead,
+          survivalSeconds: tank.deathTime ?? result.seconds,
+          maxHp: tank.maxHp,
+          armor: tank.armor,
+          dps: tank.dps,
+          // The harness seeds the boss tank with 1000 opening threat; back it out
+          // so the rate reflects generated threat only.
+          bossThreatPerSecond: Math.max(0, tank.bossThreatPeak - 1000) / tankActiveSeconds,
+          maxHitTaken: tank.maxHitTaken,
+          damageTakenPerSecond: tank.damageTaken / tankActiveSeconds,
+          healingTakenPerSecond: tank.healingTaken / tankActiveSeconds,
+          selfHealingPerSecond: tank.healingDone / tankActiveSeconds,
+          minimumSampledHpPct,
+          finalHpPct: tank.dead ? 0 : tank.finalHp / tank.maxHp,
+          healerNetManaConsumed,
+          groupDps,
+          fightSeconds: result.seconds,
+        };
+      });
+    const survivalTimes = samples.map((sample) => sample.survivalSeconds);
+    const kills = samples.filter((sample) => sample.killed);
+    const avgMaxHp = average(samples.map((sample) => sample.maxHp));
+    const avgDamageTakenPerSecond = average(samples.map((sample) => sample.damageTakenPerSecond));
+    return {
+      key: tankKey,
+      n: samples.length,
+      killRate: average(samples.map((sample) => Number(sample.killed))),
+      tankDeathRate: average(samples.map((sample) => Number(sample.tankDead))),
+      avgSurvivalSeconds: round1(average(survivalTimes)),
+      p10SurvivalSeconds: round1(percentile(survivalTimes, 0.1)),
+      medianSurvivalSeconds: round1(percentile(survivalTimes, 0.5)),
+      avgKillSeconds:
+        kills.length > 0 ? round1(average(kills.map((sample) => sample.fightSeconds))) : null,
+      avgMaxHp: Math.round(avgMaxHp),
+      avgArmor: Math.round(average(samples.map((sample) => sample.armor))),
+      avgBossThreatPerSecond: round1(average(samples.map((sample) => sample.bossThreatPerSecond))),
+      maxHitTaken: Math.round(Math.max(0, ...samples.map((sample) => sample.maxHitTaken))),
+      // The class-balance doc's tank survival column: unhealed pool over intake.
+      poolOverDtpsSeconds:
+        avgDamageTakenPerSecond > 0 ? round1(avgMaxHp / avgDamageTakenPerSecond) : null,
+      avgTankDps: round1(average(samples.map((sample) => sample.dps))),
+      avgGroupDps: round1(average(samples.map((sample) => sample.groupDps))),
+      avgDamageTakenPerSecond: round1(avgDamageTakenPerSecond),
+      avgHealingTakenPerSecond: round1(
+        average(samples.map((sample) => sample.healingTakenPerSecond)),
+      ),
+      avgSelfHealingPerSecond: round1(
+        average(samples.map((sample) => sample.selfHealingPerSecond)),
+      ),
+      avgMinimumSampledHpPct: round1(
+        average(samples.map((sample) => sample.minimumSampledHpPct)) * 100,
+      ),
+      avgFinalHpPct: round1(average(samples.map((sample) => sample.finalHpPct)) * 100),
+      avgHealerNetManaConsumed: Math.round(
+        average(samples.map((sample) => sample.healerNetManaConsumed)),
+      ),
+    };
+  });
 
 const output = {
   attempted,
+  difficulty,
   seeds,
   comparedSpecs: comparedKeys,
   selected: selected.length,
@@ -2418,6 +2540,7 @@ console.log(
     {
       outputPath,
       attempted: output.attempted,
+      difficulty: output.difficulty,
       run: output.run,
       killed: output.killed,
       sharedTankGear: output.sharedTankGear,

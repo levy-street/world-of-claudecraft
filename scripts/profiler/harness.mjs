@@ -303,9 +303,14 @@ export function profilerBrowserLaunchOptions({
  * Enter the profiler character from every supported post-login surface.
  * Repeated tier runs reuse one account and character, so later loads can show
  * Enter World, Take Over, or an already resumed world instead of character
- * creation. The returned action lets the caller track session-only dev state.
+ * creation. Take Over calls window.confirm; this accepts it so a second headed
+ * leg does not block on the native dialog. The returned action lets the caller
+ * track session-only dev state.
  */
 export async function enterOnlineProfilerCharacter(page, { name, cls }) {
+  await page.evaluate(() => {
+    window.confirm = () => true;
+  });
   await page.waitForFunction(
     () =>
       Boolean(window.__game?.world?.player) ||

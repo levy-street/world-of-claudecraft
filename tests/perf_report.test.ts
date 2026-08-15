@@ -764,18 +764,95 @@ describe('perf report ingestion', () => {
       GPU_QUEUE_RAW_MS_MAX,
       GPU_QUEUE_RAW_AGE_MS_MAX,
       GPU_QUEUE_RAW_STALLS_MAX,
+      GPU_QUEUE_RAW_SLOWEST_MAX,
       GPU_QUEUE_RAW_TAILS_MAX,
+      GPU_QUEUE_RAW_LANES_MAX,
+      GPU_QUEUE_RAW_WAITS_MAX,
+      GPU_QUEUE_RAW_WINDOW_MS_MAX,
+      PREWARM_RESUME_ENTRIES_MAX,
+      PREWARM_RESUME_STATUSES,
+      PREWARM_RESUME_LANES,
     } = perfReportInternalsForTest;
+    // The frame-cost fields ride here too. This sanitizer REBUILDS the block
+    // from a fixed key set rather than filtering it, so a client field the
+    // allowlist omits is dropped silently: this round-trip is what catches that.
     const wedged = {
       units: 12,
       totalSyncMs: 240.5,
       worstSyncMs: 88.2,
+      totalFrameGapMs: 910.6,
+      worstFrameGapMs: 604.1,
+      worstUnsharedFrameGapMs: 306.5,
       pending: 6,
       stallCount: 1,
       active: { label: 'wedged-compile', priority: 40, ageMs: 91_000 },
       waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000 }],
       stalls: [{ label: 'wedged-compile', priority: 40, ageMs: 91_000, settled: false }],
-      slowest: [{ label: 'live-view-compile', priority: 30, syncMs: 88.2, wallMs: 120.4 }],
+      slowest: [
+        {
+          label: 'live-view-compile',
+          priority: 30,
+          syncMs: 88.2,
+          wallMs: 120.4,
+          waitMs: 812.7,
+          frameGapMs: 306.5,
+          sharedFrameGap: 1,
+        },
+      ],
+      blockiest: [
+        {
+          label: 'preview:armory:skin',
+          priority: 10,
+          syncMs: 9.4,
+          wallMs: 740.2,
+          waitMs: 0,
+          frameGapMs: 604.1,
+          sharedFrameGap: 2,
+        },
+      ],
+      // The interval arm, and the grant latency it exists to carry: a live-view
+      // unit waiting 812 ms behind a cosmetic lane is the starvation shape the
+      // preview pacing pilot must be judged against, and none of the cumulative
+      // fields above can express it.
+      worstWaitMs: 812.7,
+      longestWaits: [
+        {
+          label: 'live-view-compile',
+          priority: 30,
+          waitMs: 812.7,
+          blockedBy: 'preview:armory:skin',
+          blockedByPriority: 10,
+          waitedOnTailCap: true,
+          tails: ['preview:armory:skin'],
+        },
+      ],
+      recent: {
+        windowMs: 30_000,
+        units: 2,
+        totalSyncMs: 97.6,
+        totalFrameGapMs: 910.6,
+        worstSyncMs: 88.2,
+        worstFrameGapMs: 604.1,
+        worstWaitMs: 812.7,
+        lanes: [
+          {
+            priority: 30,
+            units: 1,
+            worstWaitMs: 812.7,
+            totalWaitMs: 812.7,
+            worstSyncMs: 88.2,
+            worstFrameGapMs: 306.5,
+          },
+          {
+            priority: 10,
+            units: 1,
+            worstWaitMs: 0,
+            totalWaitMs: 0,
+            worstSyncMs: 9.4,
+            worstFrameGapMs: 604.1,
+          },
+        ],
+      },
     };
     const stored = fakeRes();
 
@@ -819,6 +896,36 @@ describe('perf report ingestion', () => {
               settled: 'yes',
             })),
             slowest: 'not-an-array',
+            blockiest: Array.from({ length: 20 }, () => ({
+              label: 'b'.repeat(200),
+              priority: 10,
+              syncMs: 1,
+              wallMs: 1,
+              waitMs: 1,
+              frameGapMs: 1,
+              sharedFrameGap: 1,
+            })),
+            // Sized to overrun every bound (12 > 8 waits, 8 > 4 tails, 100 > 80
+            // label chars) while staying under the request body cap.
+            longestWaits: Array.from({ length: 12 }, () => ({
+              label: 'z'.repeat(100),
+              priority: 9e9,
+              waitMs: 9e12,
+              blockedBy: 42,
+              blockedByPriority: 'nope',
+              waitedOnTailCap: 'yes',
+              tails: Array.from({ length: 8 }, () => 'w'.repeat(100)),
+            })),
+            recent: {
+              windowMs: 9e12,
+              units: -3,
+              worstWaitMs: 9e12,
+              lanes: Array.from({ length: 30 }, (_unused, index) => ({
+                priority: index,
+                units: 9e12,
+                worstWaitMs: 'nope',
+              })),
+            },
           },
         },
       }),
@@ -848,6 +955,137 @@ describe('perf report ingestion', () => {
       label: 'y'.repeat(80),
       priority: -1000,
       ageMs: 0,
+    });
+    // The interval block is rebuilt from a fixed key set like its parent, so a
+    // hostile payload cannot turn the fixed-size lane readout into a list.
+    const hostileRecent = hostileQueue.recent as Record<string, unknown>;
+    expect(hostileRecent.units).toBe(0);
+    // Pinned to the LITERAL as well: comparing the output against the constant
+    // the sanitizer clamps with passes at any value, including one that removes
+    // the bound entirely.
+    expect(GPU_QUEUE_RAW_WINDOW_MS_MAX).toBe(600_000);
+    expect(GPU_QUEUE_RAW_AGE_MS_MAX).toBe(1_800_000);
+    expect(hostileRecent.windowMs).toBe(GPU_QUEUE_RAW_WINDOW_MS_MAX);
+    expect(hostileRecent.worstWaitMs).toBe(GPU_QUEUE_RAW_AGE_MS_MAX);
+    // The wait ranking is bounded and shaped like everything else here. Note
+    // blockedBy is NULLABLE by design: a wait with nothing running points at the
+    // tail cap, and coercing that to a string would invent a culprit.
+    expect(hostileQueue.blockiest).toHaveLength(GPU_QUEUE_RAW_SLOWEST_MAX);
+    expect(GPU_QUEUE_RAW_SLOWEST_MAX).toBe(8);
+    expect(GPU_QUEUE_RAW_WAITS_MAX).toBe(8);
+    expect(hostileQueue.longestWaits).toHaveLength(GPU_QUEUE_RAW_WAITS_MAX);
+    const hostileWait = (hostileQueue.longestWaits as Record<string, unknown>[])[0];
+    expect(hostileWait.label).toBe('z'.repeat(80));
+    expect(hostileWait.waitMs).toBe(GPU_QUEUE_RAW_AGE_MS_MAX);
+    expect(hostileWait.blockedBy).toBeNull();
+    expect(hostileWait.blockedByPriority).toBe(0);
+    expect(hostileWait.waitedOnTailCap).toBe(true);
+    expect(hostileWait.tails).toHaveLength(GPU_QUEUE_RAW_TAILS_MAX);
+    expect(GPU_QUEUE_RAW_LANES_MAX).toBe(8);
+    expect(hostileRecent.lanes).toHaveLength(GPU_QUEUE_RAW_LANES_MAX);
+    expect((hostileRecent.lanes as Record<string, unknown>[])[0].worstWaitMs).toBe(0);
+    // A block missing entirely is still shaped, never absent: a reader that
+    // has to feature-detect the interval arm cannot compare two reports.
+    expect(hostileQueue.worstWaitMs).toBe(0);
+
+    // The resume block, on the NORMAL ingest path. It had no test at all: the
+    // claim "every new field is clamped" was unproven for this whole function,
+    // and its sanitizer was only reachable from the oversized-report fallback,
+    // so a hostile client could store unbounded lists on every ordinary report.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const hostileResume = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'prewarm-resume-hostile',
+        rawSummary: {
+          rendererPrewarmSummary: {
+            manifestPlanned: 30,
+            resume: {
+              status: 'totally-made-up',
+              plannedEntries: 9e9,
+              plannedUnits: -4,
+              startedUnits: 'nope',
+              failedUnits: 9e12,
+              failedUnitIds: Array.from({ length: 40 }, () => 'f'.repeat(400)),
+              entries: Array.from({ length: 40 }, (_unused, index) => ({
+                id: 'e'.repeat(200),
+                lane: index === 0 ? 'debt' : 'invented-lane',
+                planned: 9e12,
+                started: -1,
+                failed: 'many',
+              })),
+            },
+          },
+        },
+      }),
+      hostileResume,
+    );
+    expect(hostileResume.statusCode).toBe(200);
+    const resumeRow = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const storedResume = (
+      (resumeRow.rawSummary as Record<string, Record<string, unknown>>)
+        .rendererPrewarmSummary as Record<string, unknown>
+    ).resume as Record<string, unknown>;
+    expect(PREWARM_RESUME_ENTRIES_MAX).toBe(24);
+    expect(storedResume.entries).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect(storedResume.failedUnitIds).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect((storedResume.failedUnitIds as string[])[0]).toHaveLength(160);
+    // status and lane are enums, so an invented value falls back rather than
+    // storing 16 characters a reader would have to guess the meaning of.
+    expect(storedResume.status).toBe('none');
+    expect(PREWARM_RESUME_STATUSES).toContain('done');
+    const storedEntries = storedResume.entries as Record<string, unknown>[];
+    expect(storedEntries[0]).toMatchObject({ id: 'e'.repeat(80), lane: 'debt' });
+    expect(storedEntries[1].lane).toBe('cosmetic');
+    expect(storedEntries[0].planned).toBe(100_000);
+    expect(storedEntries[0].started).toBe(0);
+    expect(PREWARM_RESUME_LANES).toEqual(['debt', 'cosmetic']);
+
+    // The SAME clamp on the legacy `rendererPrewarm` key. The current client
+    // sends only the summary, but a client older than that change still posts
+    // the live stats object, whose resume block rides a getter, and any token
+    // holder can post the key whatever their client does. Sanitizing only the
+    // summary left the twin as an unclamped way into the same storage.
+    vi.mocked(insertClientPerfReport).mockClear();
+    const legacyTwin = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'prewarm-legacy-twin-hostile',
+        rawSummary: {
+          rendererPrewarm: {
+            manifestPlanned: 30,
+            resume: {
+              status: 'totally-made-up',
+              plannedUnits: 9e12,
+              failedUnitIds: Array.from({ length: 40 }, () => 'f'.repeat(400)),
+              entries: Array.from({ length: 40 }, () => ({
+                id: 'e'.repeat(200),
+                lane: 'invented-lane',
+                planned: 9e12,
+              })),
+            },
+          },
+        },
+      }),
+      legacyTwin,
+    );
+    expect(legacyTwin.statusCode).toBe(200);
+    const twinRow = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    const storedTwin = (
+      (twinRow.rawSummary as Record<string, Record<string, unknown>>).rendererPrewarm as Record<
+        string,
+        unknown
+      >
+    ).resume as Record<string, unknown>;
+    expect(storedTwin.status).toBe('none');
+    expect(storedTwin.plannedUnits).toBe(100_000);
+    expect(storedTwin.entries).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect(storedTwin.failedUnitIds).toHaveLength(PREWARM_RESUME_ENTRIES_MAX);
+    expect((storedTwin.failedUnitIds as string[])[0]).toHaveLength(160);
+    expect((storedTwin.entries as Record<string, unknown>[])[0]).toMatchObject({
+      id: 'e'.repeat(80),
+      lane: 'cosmetic',
+      planned: 100_000,
     });
 
     // A malformed block is dropped rather than stored half-shaped.
