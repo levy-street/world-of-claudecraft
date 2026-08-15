@@ -3,32 +3,32 @@
   "purpose": "Binds every shipped mob portrait to the actual renderer job, model, attachment, tint, renderer, and output bytes.",
   "bootstrapReview": {
     "path": "docs/achievements/placeholder-art-completion-2026-08-09/portrait-manifest-bootstrap-review.md",
-    "bytes": 1532,
-    "sha256": "bfcef01e1be303722e0c3d5414837a61f8fa735c638ef097d08fe4ba6c0a3e31"
+    "bytes": 1510,
+    "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "5220588e61b1fc50b68230dd59ade0327402a948886f8bd92fbb0191fbc9093f",
+  "rendererFingerprint": "c0f5b26060fa8a60a2abf980ddcf93a0e994ab41b862ed4a70cd41ad46209b2a",
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 11242,
-        "sha256": "45df4ba938de3c512a8fd0255aad05417d614eca9bc1b8947ff5a15a4d3bb516"
+        "bytes": 10988,
+        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 8790,
-        "sha256": "917d38140c06b658302748cef680a559b9741ef3dfdf479eee91c7321c31f8ab"
+        "bytes": 8547,
+        "sha256": "8811b612d40a20c55800e2f15ab58ee1580a905fa3a8cf81574cfc6e3853077b"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
-        "bytes": 1392,
-        "sha256": "93038bf1a45a2505484318a726e3ad438459253fc007d4be6dc37c18f13a77d7"
+        "bytes": 1356,
+        "sha256": "ab4f2b23cebeb6e346856786b9d3fe95010b2db058ef0d990bb1ee34847533ed"
       }
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 3846925,
-      "sha256": "0e6245bd54075a23da1b90dc202bf1303baaf861cc3e8322e6917c147b98860d",
+      "sha256": "8806c445efb47a48cd201b0c1e80684af23f9a3f3c95dfce81505a2a95ffc0ec",
       "esbuildVersion": "0.28.1"
     },
     "output": {
