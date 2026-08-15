@@ -171,8 +171,10 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of release/v0.38.0 into the Armory warming branch:
 // both parents move renderer.ts, so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted after extracting Demon Tower rift presentation decisions from
+// renderer.ts for the monolith ratchet. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e42ae5e718a5e9d9d817ecfdd77d8c06e939aa1ef990bb795d13f9d127e067c3';
+  '75ae31fcabda01339756eb82747e250a535e13d52c3691376d2696cccdb609ff';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

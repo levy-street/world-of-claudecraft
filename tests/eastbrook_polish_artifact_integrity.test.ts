@@ -752,10 +752,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
+// Re-minted after extracting Demon Tower rift presentation decisions from
+// renderer.ts for the monolith ratchet. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '0241574492b72cf61a20464a3b2f86af1a9ed4910f00f9b124173e832ce24534';
+  '4b33f621783183f7cc557f6f617d5d225e477c93a6416cfbf68ecff1e53ccc8c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e42ae5e718a5e9d9d817ecfdd77d8c06e939aa1ef990bb795d13f9d127e067c3';
+  '75ae31fcabda01339756eb82747e250a535e13d52c3691376d2696cccdb609ff';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1744,10 +1746,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // branch: the first-order composite follows the merged renderer.ts bytes,
     // then this second-order performance seal follows the swept evidence
     // bytes. No capture was retaken.
+    // Re-minted after extracting Demon Tower rift presentation decisions from
+    // renderer.ts. The performance records changed only in provenance bytes.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('bbcac2f81d5228ab8265425c9da87521012b186f226068879f8c764551d80da6');
+    ).toBe('0072a5da866c665b94fbe47492bdc3a2164d5eb590374cfb5a45462952f9637d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
