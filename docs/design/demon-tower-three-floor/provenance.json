@@ -74,7 +74,10 @@
       "prompt": "Original stylized low-poly monumental Bloodforge entrance for a chibi fantasy MMO raid, one complete connected symmetrical structure: two square black-iron furnace towers joined by a thick horned overhead lintel, broad open walk-through doorway at center, oxidized brass bands and rivets, visible orange fireboxes in both towers, chains and spikes, stable flat bases, front-facing architectural gate, centered isolated, no floor, no scene, no text",
       "conceptTask": "3c5aac4d-6d68-4315-bba0-40f97273735d",
       "modelTask": "7b56a253-f27b-4dde-85e7-9e770d46796e",
-      "supersededTasks": ["818e40b4-3e66-435d-82f3-c17e1fbf202a", "d86d8b23-1746-4e84-a3b3-c6507421711d"],
+      "supersededTasks": [
+        "818e40b4-3e66-435d-82f3-c17e1fbf202a",
+        "d86d8b23-1746-4e84-a3b3-c6507421711d"
+      ],
       "credits": 70,
       "sha256": "74ed1cfa91f60944e586434e6134a073fc9de18211d41d1b19609b69f59fe0be"
     },
