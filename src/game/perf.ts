@@ -1,6 +1,25 @@
+import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
 import type { Renderer } from '../render/renderer';
+import {
+  censusTableLines,
+  type HitchSummary,
+  type SceneCensusReport,
+} from '../render/scene_census_core';
+import {
+  createHeapSawtooth,
+  type HeapFloorTrend,
+  type HeapFloorValley,
+  type HeapSawtoothSummary,
+} from './heap_sawtooth';
+import {
+  createHitchForensics,
+  type HitchForensicsRecord,
+  type HitchForensicsState,
+} from './hitch_forensics';
+import type { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
+import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
 export interface PerfSnapshot {
   seconds: number;
@@ -10,12 +29,27 @@ export interface PerfSnapshot {
   windows: {
     last10s: { seconds: number; frames: number; fps: number; frameMs: PerfSnapshot['frameMs'] };
     last30s: { seconds: number; frames: number; fps: number; frameMs: PerfSnapshot['frameMs'] };
+    // Worst 10 s window since the reporter last drained it (ruling R5):
+    // worst-per-report-interval, so a hitch storm survives the cumulative
+    // dilution and the frame ring's eviction. Null before the first 1 Hz tick.
+    worst10s: WorstWindowSummary | null;
   };
   mainMs: Record<string, { count: number; avg: number; p95: number; max: number }>;
   renderer: ReturnType<Renderer['perfStats']> | null;
   hud: { hotDomWrites: number; hotDomSkippedWrites: number; hotDomSkipRate: number } | null;
   assets: AssetTimingSnapshot;
   network: { connected: boolean; snapInterval: number; lastSnapAge: number; alpha: number } | null;
+  // Always-on aggregate counters (ruling R9), unlike the overlay-gated
+  // `network` block above: null offline, populated online even with the
+  // overlay disabled so every fleet perf report carries them.
+  netPipeline: NetPipelineSummary | null;
+  // Always-on 1 Hz heap sawtooth (ruling R10); null off Chromium.
+  heapSawtooth: HeapSawtoothSummary | null;
+  // Always-on hitch forensics (same ruling family as R10): every ~5 s the
+  // monitor snapshots a compact state vector, and an interval whose worst
+  // frame crossed the hitch threshold stores the DIFF between its two
+  // bracketing snapshots, so a production hitch carries its own diagnosis.
+  hitchForensics: HitchForensicsRecord[];
   input: {
     intents: number;
     lastKind: string;
@@ -54,6 +88,16 @@ export interface PerfSnapshot {
     maxTouchPoints: number;
   };
   devTrace?: DevPerfTrace;
+  /** Last on-demand scene census (the overlay's census button); absent until run. */
+  census?: SceneCensusReport;
+  /** Overlay-gated hitch correlation from the renderer; absent when the overlay is off. */
+  hitches?: HitchSummary;
+}
+
+export interface HitchPerfReport {
+  heapSawtooth: HeapSawtoothSummary | null;
+  heapFloor: HeapFloorTrend | null;
+  heapFloorSeries: readonly HeapFloorValley[];
 }
 
 export type PerfInputDebugState = Record<string, unknown>;
@@ -336,6 +380,13 @@ export function localDevPerfTraceEnabled(): boolean {
 export class PerfMonitor {
   readonly enabled: boolean;
   private overlay: HTMLDivElement | null = null;
+  private overlayText: HTMLDivElement | null = null;
+  private lastCensus: SceneCensusReport | null = null;
+  // Rendered once per census run, not on every 1 Hz overlay repaint.
+  private lastCensusLines: string[] = [];
+  // The census burst runs inside one task, so the following rAF gap is a
+  // self-inflicted long frame; drop that one sample from the statistics.
+  private skipNextFrameSample = false;
   private startedAt = performance.now();
   private lastOverlayAt = 0;
   private frames = 0;
@@ -351,6 +402,14 @@ export class PerfMonitor {
   private lastBucketMs: Record<TimedBucket, number> = { renderer: 0, hud: 0, events: 0, sim: 0 };
   private lastSnapshot: PerfSnapshot | null = null;
   private network: PerfSnapshot['network'] = null;
+  private netPipelineSource: { summary(): NetPipelineSummary } | null = null;
+  private heapSawtooth = createHeapSawtooth({
+    readUsedHeapBytes: () => this.memorySnapshot()?.usedJSHeapSize ?? null,
+    recordFloorSeries: () => this.enabled,
+  });
+  private hitchForensics = createHitchForensics();
+  private lastForensicsAt = 0;
+  private worstWindow = createWorstWindow();
   private inputIntents = 0;
   private lastInputAt = 0;
   private lastInputKind = '';
@@ -366,27 +425,55 @@ export class PerfMonitor {
   private lastLongTaskAt = 0;
   private longTaskObserver: PerformanceObserver | null = null;
   private readonly traceEnabled: boolean;
+  private readonly diagnosticsEnabled: boolean;
+  private diagnosticsPlayable = false;
   private inputDebugProvider: (() => PerfInputDebugState | null) | null = null;
   private devTraceFrames: DevPerfTraceFrame[] = [];
   private devTraceSpans: DevPerfTraceSpan[] = [];
   private devLongTasks: DevLongTaskRecord[] = [];
+  private diagnosticsPanel: PerfDiagnosticsPanel | null = null;
 
   constructor(
     private renderer: Renderer | null,
     private hud: { perfStats(): PerfSnapshot['hud'] } | null = null,
+    private readonly desktopShell = false,
   ) {
     const params = new URLSearchParams(location.search);
     this.traceEnabled = localDevPerfTraceEnabled();
+    this.diagnosticsEnabled = params.has('diagnostics');
     this.enabled =
-      this.traceEnabled || params.has('perf') || localStorage.getItem('woc_perf') === '1';
+      this.traceEnabled ||
+      this.diagnosticsEnabled ||
+      params.has('perf') ||
+      localStorage.getItem('woc_perf') === '1';
     if (this.enabled) {
       this.mountOverlay();
     }
+    if (this.diagnosticsEnabled) {
+      void import('./perf_diagnostics_panel')
+        .then(({ PerfDiagnosticsPanel }) => {
+          const panel = new PerfDiagnosticsPanel({
+            startMeasurement: () => this.reset(),
+            snapshot: () => this.report(),
+            runSceneCensus: () => this.runSceneCensus(),
+            desktopShell: this.desktopShell,
+          });
+          this.diagnosticsPanel = panel;
+          panel.setReady(Boolean(this.renderer));
+          if (this.diagnosticsPlayable) panel.onMonitorReset();
+        })
+        .catch((err: unknown) => {
+          console.warn('Performance diagnostics panel failed to load', err);
+        });
+    }
+    this.renderer?.setHitchLogEnabled(this.enabled);
     this.observeLongTasks();
   }
 
-  setRenderer(renderer: Renderer): void {
+  setRenderer(renderer: Renderer | null): void {
     this.renderer = renderer;
+    renderer?.setHitchLogEnabled(this.enabled);
+    this.diagnosticsPanel?.setReady(Boolean(renderer));
   }
 
   setHud(hud: { perfStats(): PerfSnapshot['hud'] }): void {
@@ -398,6 +485,10 @@ export class PerfMonitor {
   }
 
   frame(dt: number, now = performance.now()): void {
+    if (this.skipNextFrameSample) {
+      this.skipNextFrameSample = false;
+      return;
+    }
     this.frames++;
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
@@ -440,16 +531,27 @@ export class PerfMonitor {
   }
 
   time<T>(bucket: TimedBucket, fn: () => T): T {
-    if (!this.enabled) return fn();
-    const start = performance.now();
+    // Bucket recording is deliberately UNGATED (packet 0, finding 20): the
+    // four mainMs buckets ride in every fleet report, overlay on or off. The
+    // overlay mount, the markInput* chain, and the dev-trace spans (gated
+    // inside recordDevTraceSpan) stay behind their flags.
+    const start = this.startTime();
     try {
       return fn();
     } finally {
-      const ms = performance.now() - start;
-      this.lastBucketMs[bucket] = round(ms);
-      this.buckets[bucket].push(ms);
-      this.recordDevTraceSpan(bucket, start, ms, 'bucket');
+      this.finishTime(bucket, start);
     }
+  }
+
+  startTime(): number {
+    return performance.now();
+  }
+
+  finishTime(bucket: TimedBucket, start: number): void {
+    const ms = performance.now() - start;
+    this.lastBucketMs[bucket] = round(ms);
+    this.buckets[bucket].push(ms);
+    this.recordDevTraceSpan(bucket, start, ms, 'bucket');
   }
 
   trace<T>(name: string, fn: () => T, detail?: Record<string, unknown>): T {
@@ -462,9 +564,70 @@ export class PerfMonitor {
     }
   }
 
+  startTrace(): number {
+    return this.traceEnabled ? performance.now() : 0;
+  }
+
+  finishTrace(
+    name: string,
+    start: number,
+    detailKey1?: string,
+    detailValue1?: unknown,
+    detailKey2?: string,
+    detailValue2?: unknown,
+    detailKey3?: string,
+    detailValue3?: unknown,
+    detailKey4?: string,
+    detailValue4?: unknown,
+  ): void {
+    // Callers pass interned keys and primitive values, so the default disabled
+    // path reaches this return without allocating a detail object or callback.
+    if (!this.traceEnabled) return;
+    let detail: Record<string, unknown> | undefined;
+    if (detailKey1 !== undefined) {
+      detail = { [detailKey1]: detailValue1 };
+      if (detailKey2 !== undefined) detail[detailKey2] = detailValue2;
+      if (detailKey3 !== undefined) detail[detailKey3] = detailValue3;
+      if (detailKey4 !== undefined) detail[detailKey4] = detailValue4;
+    }
+    this.recordDevTraceSpan(name, start, performance.now() - start, 'scope', detail);
+  }
+
   setNetwork(stats: PerfSnapshot['network']): void {
     if (!this.enabled) return;
     this.network = stats;
+  }
+
+  setNetPipelineSource(source: { summary(): NetPipelineSummary } | null): void {
+    // Deliberately NOT gated on this.enabled, unlike setNetwork above: the
+    // fleet story rides always-on aggregate counters (ruling R9); only the
+    // overlay and the dev-trace spans stay gated. Takes the stats SOURCE, not
+    // a built summary: summary() allocates, so snapshot() draws it lazily at
+    // its 1 Hz cadence instead of the caller paying it every animation frame.
+    this.netPipelineSource = source;
+  }
+
+  /**
+   * Reset the worst-10s interval. Only the reporter calls this, and only
+   * after a SUCCESSFUL send (ruling R5), so a failed post never loses the
+   * retained hitch storm; snapshot() itself stays a pure read.
+   */
+  drainWorstWindow(): void {
+    this.worstWindow.drain();
+  }
+
+  /**
+   * Feed an externally timed span into the dev trace on the 'external' span
+   * kind. Dev traces only: a no-op unless perfTrace is active (the internal
+   * recorder gates on traceEnabled), so it costs nothing in the fleet.
+   */
+  recordExternalSpan(
+    name: string,
+    startMs: number,
+    durationMs: number,
+    detail?: Record<string, unknown>,
+  ): void {
+    this.recordDevTraceSpan(name, startMs, durationMs, 'external', detail);
   }
 
   private recordDevTraceSpan(
@@ -514,6 +677,61 @@ export class PerfMonitor {
     } catch {
       this.longTaskObserver = null;
     }
+  }
+
+  /**
+   * The compact state vector the hitch forensics diffs. Scalars only; every
+   * field here is a candidate diagnosis dimension (a views/programs jump reads
+   * as a crowd arrival compiling gear, textures/geometries without programs as
+   * an asset parse/upload, an empty diff as GC/driver/tab contention).
+   */
+  private forensicsState(): HitchForensicsState {
+    const memory = this.memorySnapshot();
+    const state: HitchForensicsState = {
+      heapUsedMb: memory ? Math.round(memory.usedMB) : -1,
+      longTasks: this.longTaskMs.length,
+      longTaskTotalMs: Math.round(this.longTaskTotalMs),
+    };
+    const r = this.renderer?.perfStats() ?? null;
+    if (r) {
+      state.programs = r.programs;
+      state.textures = r.textures;
+      state.geometries = r.geometries;
+      state.calls = r.calls;
+      state.triangles = r.triangles;
+      state.views = r.views;
+      state.gpuQueueUnits = r.gpuQueue.units;
+      state.gpuQueueSyncMs = Math.round(r.gpuQueue.totalSyncMs);
+      // Monotonic on purpose: a unit that never settles moves neither of the
+      // two above, so a hitch bracketing a new stall reads as the queue
+      // wedging rather than as an empty diff.
+      state.gpuQueueStalls = r.gpuQueue.stallCount;
+      // The arm that answers "was a background unit in flight while this frame
+      // was lost": totalSyncMs barely moves for a unit that blocks after its
+      // first await, so without this a hitch bracketing one reads as an empty
+      // diff (which is how 786 hitches came to be filed as unexplained on
+      // 13 August 2026). CUMULATIVE, not the worst-gap max: `diffStates` emits a
+      // key only when the value CHANGES, and a max stops changing after the
+      // first record, so the max would answer once and then go quiet for every
+      // later occurrence. `?? 0` because a stub or an older renderer may not
+      // carry the field, and a NaN here would diff against itself every record.
+      state.gpuQueueFrameGapMs = Math.round(r.gpuQueue.totalFrameGapMs ?? 0);
+      state.effectiveRenderScale = r.effectiveRenderScale;
+      state.budgetMode = r.renderBudget.mode;
+      // Day/night dimension: a hitch cluster that only appears with
+      // nightAmount high (streetlamps lit, more active point lights) reads
+      // differently from the same cluster at noon.
+      state.nightAmount = r.nightAmount;
+      state.activePointLights = r.qualityBuckets.features.activePointLights;
+      const frame = r.lastFrame;
+      if (frame) {
+        state.biome = frame.biome;
+        state.px = Math.round(frame.playerPosition.x);
+        state.pz = Math.round(frame.playerPosition.z);
+        state.activeViews = frame.activeViews;
+      }
+    }
+    return state;
   }
 
   private memorySnapshot(): PerfSnapshot['browser']['memory'] {
@@ -687,15 +905,36 @@ export class PerfMonitor {
   }
 
   tick(now = performance.now()): void {
-    // Production telemetry reports on its own 75 s / 5 min cadence. Without a
-    // visible diagnostic overlay there is nothing to assemble every second:
-    // doing so sorted every history and copied renderer stats for no consumer.
-    if (!this.enabled) return;
     if (this.traceEnabled) this.recordDevTraceFrame(now);
     if (now - this.lastOverlayAt < 1000) return;
     this.lastOverlayAt = now;
+    // 1 Hz heap sample from the UNGATED tick path (ruling R10): the sawtooth
+    // rides in every fleet report, overlay on or off.
+    this.heapSawtooth.sample(now);
+    // 1 Hz worst-10s evaluation, also ungated (ruling R5): snapshot() stays a
+    // pure read of the retained window; only the reporter drains it.
+    this.worstWindow.observe(
+      this.frameWindow.entries().map((entry) => ({ at: entry.at, ms: entry.value })),
+      now,
+    );
+    // Hitch forensics: one compact state snapshot every ~5 s, ungated like the
+    // two trackers above. The state vector is assembled at 0.2 Hz only, so the
+    // no-overlay tick stays as cheap as ruling R9 asked.
+    if (now - this.lastForensicsAt >= 5000) {
+      const sinceBaseline = this.frameWindow.snapshotSince(this.lastForensicsAt);
+      const worstFrameMs = sinceBaseline.values.length ? Math.max(...sinceBaseline.values) : 0;
+      this.hitchForensics.sample(now, worstFrameMs, this.forensicsState());
+      this.lastForensicsAt = now;
+    }
+    // Production telemetry reports on its own 75 s / 5 min cadence. Without a
+    // visible diagnostic overlay there is nothing to ASSEMBLE every second:
+    // doing so sorted every history and copied renderer stats for no consumer.
+    // The two trackers above stay ungated: the fleet report reads them whether
+    // or not the overlay is up.
+    if (!this.enabled) return;
     this.lastSnapshot = this.snapshot(now);
     this.renderOverlay(this.lastSnapshot);
+    this.diagnosticsPanel?.update(this.lastSnapshot);
   }
 
   snapshot(now = performance.now()): PerfSnapshot {
@@ -728,12 +967,16 @@ export class PerfMonitor {
       windows: {
         last10s: windowSummary(10_000),
         last30s: windowSummary(30_000),
+        worst10s: this.worstWindow.current(),
       },
       mainMs: mainMs as PerfSnapshot['mainMs'],
       renderer: this.renderer?.perfStats() ?? null,
       hud: this.hud?.perfStats() ?? null,
       assets: assetTimingSnapshot(),
       network: this.network,
+      netPipeline: this.netPipelineSource?.summary() ?? null,
+      heapSawtooth: this.heapSawtooth.summary(),
+      hitchForensics: this.hitchForensics.records(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,
@@ -773,7 +1016,27 @@ export class PerfMonitor {
         longTasks: this.devTraceLongTasks(),
       };
     }
+    if (this.lastCensus) snapshot.census = this.lastCensus;
+    const hitches = this.renderer?.hitchStats() ?? null;
+    if (hitches) snapshot.hitches = hitches;
     return snapshot;
+  }
+
+  /**
+   * Run the one-shot scene census through the renderer, remember it for the
+   * overlay table and the JSON report, and log it as copyable JSON. On demand
+   * only (the overlay's census button and the capture harness); returns null
+   * before the renderer exists.
+   */
+  runSceneCensus(): SceneCensusReport | null {
+    if (!this.renderer) return null;
+    const report = this.renderer.captureSceneCensus();
+    this.lastCensus = report;
+    this.lastCensusLines = censusTableLines(report);
+    this.skipNextFrameSample = true;
+    console.info('World of Claudecraft scene census:', JSON.stringify(report, null, 2));
+    if (this.enabled) this.renderOverlay(this.lastSnapshot ?? this.snapshot());
+    return report;
   }
 
   private readInputDebug(): PerfInputDebugState | null {
@@ -790,6 +1053,16 @@ export class PerfMonitor {
     return this.lastSnapshot;
   }
 
+  /** Read-only heap evidence for local `?perf` hitch runs, never fleet telemetry. */
+  hitchReport(): HitchPerfReport | null {
+    if (!this.enabled) return null;
+    return {
+      heapSawtooth: this.heapSawtooth.summary(),
+      heapFloor: this.heapSawtooth.floorTrend(),
+      heapFloorSeries: this.heapSawtooth.floorSeries(),
+    };
+  }
+
   copyReport(): void {
     const text = JSON.stringify(this.report(), null, 2);
     void navigator.clipboard?.writeText(text).catch(() => {
@@ -802,8 +1075,16 @@ export class PerfMonitor {
     this.frames = 0;
     this.frameMs.clear();
     this.frameWindow.clear();
+    this.lastCensus = null;
+    this.lastCensusLines = [];
+    this.skipNextFrameSample = false;
     for (const samples of Object.values(this.buckets)) samples.clear();
     this.lastSnapshot = null;
+    this.netPipelineSource = null;
+    this.heapSawtooth.reset();
+    this.hitchForensics.reset();
+    this.lastForensicsAt = 0;
+    this.worstWindow.drain();
     this.inputIntents = 0;
     this.lastInputAt = 0;
     this.lastInputKind = '';
@@ -822,6 +1103,11 @@ export class PerfMonitor {
     this.devTraceFrames = [];
     this.devTraceSpans = [];
     this.devLongTasks = [];
+    if (this.diagnosticsEnabled) {
+      this.diagnosticsPlayable = true;
+      this.renderer?.resetDiagnosticSamples();
+      this.diagnosticsPanel?.onMonitorReset();
+    }
   }
 
   private mountOverlay(): void {
@@ -843,13 +1129,26 @@ export class PerfMonitor {
       'box-shadow:0 8px 28px rgba(0,0,0,0.35)',
     ].join(';');
     this.overlay.title = 'Click to copy a JSON perf report';
-    this.overlay.textContent = 'perf: collecting...';
     this.overlay.addEventListener('click', () => this.copyReport());
+    this.overlayText = document.createElement('div');
+    this.overlayText.textContent = 'perf: collecting...';
+    this.overlay.appendChild(this.overlayText);
+    const censusBtn = document.createElement('div');
+    censusBtn.textContent = '[run scene census]';
+    censusBtn.title =
+      'One-shot per-system draw breakdown (a short burst of extra renders, results in the overlay + console JSON)';
+    censusBtn.style.cssText =
+      'margin-top:6px;cursor:pointer;color:#93c5fd;text-decoration:underline';
+    censusBtn.addEventListener('click', (e: Event) => {
+      e.stopPropagation();
+      this.runSceneCensus();
+    });
+    this.overlay.appendChild(censusBtn);
     document.body.appendChild(this.overlay);
   }
 
   private renderOverlay(s: PerfSnapshot): void {
-    if (!this.overlay) return;
+    if (!this.overlay || !this.overlayText) return;
     const r = s.renderer;
     const hud = s.hud;
     const net = s.network;
@@ -859,7 +1158,12 @@ export class PerfMonitor {
     const rp = r?.phaseMs;
     const lt = s.browser.longTasks;
     const mem = s.browser.memory;
-    this.overlay.textContent = [
+    const h = s.hitches;
+    const hitchLine = h
+      ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
+      : null;
+    const censusLines = this.lastCensusLines;
+    this.overlayText.textContent = [
       `fps ${s.fps}  p95 ${s.frameMs.p95}ms  >50 ${s.frameMs.long50}`,
       `10s fps ${s.windows.last10s.fps}  p95 ${s.windows.last10s.frameMs.p95}ms  >50 ${s.windows.last10s.frameMs.long50}`,
       `longtask ${lt.count}  p95 ${lt.p95}ms  max ${lt.max}ms  heap ${mem ? `${mem.usedMB}/${mem.limitMB}MB` : '-'}`,
@@ -874,11 +1178,13 @@ export class PerfMonitor {
       net
         ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}`
         : 'net offline',
+      ...(hitchLine ? [hitchLine] : []),
+      ...censusLines,
       'click: copy json',
     ].join('\n');
   }
 }
 
-export function createPerfMonitor(renderer: Renderer | null): PerfMonitor {
-  return new PerfMonitor(renderer);
+export function createPerfMonitor(renderer: Renderer | null, desktopShell = false): PerfMonitor {
+  return new PerfMonitor(renderer, null, desktopShell);
 }

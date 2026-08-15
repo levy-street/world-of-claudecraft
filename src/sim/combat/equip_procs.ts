@@ -26,14 +26,21 @@ export function runWeaponProcs(
   wielder: Entity,
   target: Entity,
   trigger: WeaponProcTrigger,
+  weaponItemId?: string | null,
 ): void {
   if (target.dead) return;
+  // Which hand's weapon rolled procs. `undefined` = not specified: fall back to
+  // the mainhand (back-compat for the spell/heal/ranged call sites and every
+  // existing golden). An explicit id rolls THAT hand's weapon; an explicit
+  // `null` means that hand is empty, so nothing procs (an off-hand auto with no
+  // off-hand weapon must NOT roll the mainhand's proc, the old dual-wield bug).
+  //
   // Entity.mainhandItemId stays populated for a worn OVER-LEVEL weapon (so the
   // model keeps rendering) while recalcPlayerStats treats that weapon as inert.
   // Mirror the level gate here so an inert weapon's procs are inert too (the
   // equip gate makes this unreachable today, but a restored save could carry
   // one). All these guards short-circuit BEFORE any rng draw.
-  const id = wielder.mainhandItemId;
+  const id = weaponItemId === undefined ? wielder.mainhandItemId : weaponItemId;
   if (!id) return;
   const item = ITEMS[id];
   if (item?.kind !== 'weapon' || !item.weaponProcs) return;

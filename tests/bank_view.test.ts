@@ -3,6 +3,7 @@ import { bankCapacity } from '../src/sim/bank';
 // Aliased: this file already declares a small synthetic `ITEMS` for the buildBankView
 // tests, so the real merged table (needed for the real-Sim replay) comes in renamed.
 import { ITEMS as REAL_ITEMS } from '../src/sim/data';
+import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, ItemDef, SimEvent } from '../src/sim/types';
 import type { ItemLookup } from '../src/ui/bag_filter';
@@ -291,31 +292,36 @@ describe('ClientWorld-vs-Sim parity', () => {
 // (so a splice never invalidates a later index), the whole-stack-or-skip rule with the
 // `full` flag, and prove the plan replays cleanly against a REAL Sim.
 describe('planDepositAllMaterials: selection and order (synthetic lookup)', () => {
-  // Category comes from THIS lookup; the stacking math inside moveBetweenContainers reads
-  // the live ITEMS table, where these synthetic ids are absent, so each fresh stack needs
-  // one free bank slot (capacity is effectively a slot count here).
+  // Selection is honest-taxonomy set membership on REAL ids (phase 19,
+  // src/sim/material_taxonomy.ts), so the material fixtures are real catalog
+  // ids behind a synthetic lookup (a made-up id can never plan). The stacking
+  // math inside moveBetweenContainers reads the live ITEMS table; every
+  // fixture id here is distinct, so each stack still needs one free bank slot
+  // (capacity is effectively a slot count here).
   const KINDS: Record<string, string> = {
-    m1: 'junk',
-    m2: 'junk',
-    m3: 'tool',
-    m4: 'junk',
+    copper_ore: 'junk',
+    iron_ore: 'junk',
+    rough_hide: 'junk',
+    game_meat: 'junk',
+    simple_fishing_pole: 'tool',
     gear: 'weapon',
     quest1: 'quest',
   };
-  const lookup: ItemLookup = (id) => (KINDS[id] ? ({ kind: KINDS[id] } as ItemDef) : undefined);
+  const lookup: ItemLookup = (id) => (KINDS[id] ? ({ id, kind: KINDS[id] } as ItemDef) : undefined);
 
-  it('plans only materials, descending, each as a whole-stack send', () => {
+  it('plans only materials, descending, each as a whole-stack send; a tool never plans', () => {
     const inv: InvSlot[] = [
       { itemId: 'gear', count: 1 }, // 0 weapon: skip
-      { itemId: 'm1', count: 5 }, // 1 material
+      { itemId: 'copper_ore', count: 5 }, // 1 material
       { itemId: 'quest1', count: 1 }, // 2 quest: skip
-      { itemId: 'm2', count: 3 }, // 3 material
+      { itemId: 'iron_ore', count: 3 }, // 3 material
       { itemId: 'ghost', count: 1 }, // 4 unknown: skip
-      { itemId: 'm3', count: 1 }, // 5 material (tool)
+      { itemId: 'simple_fishing_pole', count: 1 }, // 5 tool: skip (phase 19 narrowing)
+      { itemId: 'rough_hide', count: 2 }, // 6 material
     ];
     const plan = planDepositAllMaterials(inv, [], 24, lookup);
     expect(plan.sends).toEqual([
-      { slot: 5, count: 1 },
+      { slot: 6, count: 2 },
       { slot: 3, count: 3 },
       { slot: 1, count: 5 },
     ]);
@@ -326,20 +332,20 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
   it('never plans a quest item and never mutates the inputs', () => {
     const inv: InvSlot[] = [
       { itemId: 'quest1', count: 2 },
-      { itemId: 'm1', count: 1 },
+      { itemId: 'copper_ore', count: 1 },
     ];
     const bank: InvSlot[] = [];
     const plan = planDepositAllMaterials(inv, bank, 24, lookup);
     expect(plan.sends).toEqual([{ slot: 1, count: 1 }]);
     expect(inv).toEqual([
       { itemId: 'quest1', count: 2 },
-      { itemId: 'm1', count: 1 },
+      { itemId: 'copper_ore', count: 1 },
     ]);
     expect(bank).toEqual([]);
   });
 
   it('plans an instanced material as a whole-stack send', () => {
-    const inv: InvSlot[] = [{ itemId: 'm1', count: 2, instance: { signer: 'X' } }];
+    const inv: InvSlot[] = [{ itemId: 'copper_ore', count: 2, instance: { signer: 'X' } }];
     const plan = planDepositAllMaterials(inv, [], 24, lookup);
     expect(plan.sends).toEqual([{ slot: 0, count: 2 }]);
     expect(plan.full).toBe(false);
@@ -347,10 +353,10 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
 
   it('stops as the bank fills: only the fitting stacks are sent and full is set', () => {
     const inv: InvSlot[] = [
-      { itemId: 'm1', count: 1 },
-      { itemId: 'm2', count: 1 },
-      { itemId: 'm3', count: 1 },
-      { itemId: 'm4', count: 1 },
+      { itemId: 'copper_ore', count: 1 },
+      { itemId: 'iron_ore', count: 1 },
+      { itemId: 'rough_hide', count: 1 },
+      { itemId: 'game_meat', count: 1 },
     ];
     // Two free bank slots for four distinct materials: the two highest indices fit.
     const plan = planDepositAllMaterials(inv, [], 2, lookup);
@@ -374,15 +380,45 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
     });
   });
 
+  it('plans nothing when the bags hold only a tool (not full: nothing was refused for room)', () => {
+    const inv: InvSlot[] = [{ itemId: 'simple_fishing_pole', count: 1 }];
+    expect(planDepositAllMaterials(inv, [], 24, lookup)).toEqual({
+      sends: [],
+      stacks: 0,
+      full: false,
+    });
+  });
+
+  it('the quest belt is live: a quest-kind def is skipped even when its id is in the taxonomy', () => {
+    // Contrived on purpose: no real catalog id is both quest-kind and a set
+    // member (the set filters to kind junk), so this lookup dresses a member
+    // id in a quest kind to prove the plan's own guard acts rather than
+    // free-riding on the taxonomy. The button gate has no such belt by
+    // design: it answers from the taxonomy alone, and the second assertion
+    // pins that asymmetry.
+    const questLookup: ItemLookup = (id) =>
+      id === 'copper_ore' ? ({ id, kind: 'quest' } as ItemDef) : lookup(id);
+    const inv: InvSlot[] = [{ itemId: 'copper_ore', count: 3 }];
+    expect(planDepositAllMaterials(inv, [], 24, questLookup)).toEqual({
+      sends: [],
+      stacks: 0,
+      full: false,
+    });
+    expect(hasDepositableMaterials(inv, questLookup)).toBe(true);
+  });
+
   it('reports the bank already full: nothing sent but full is set', () => {
-    const inv: InvSlot[] = [{ itemId: 'm1', count: 1 }];
+    const inv: InvSlot[] = [{ itemId: 'copper_ore', count: 1 }];
     const plan = planDepositAllMaterials(inv, [{ itemId: 'gear', count: 1 }], 1, lookup);
     expect(plan).toEqual({ sends: [], stacks: 0, full: true });
   });
 
-  it('hasDepositableMaterials is true only when a material stack is present', () => {
-    expect(hasDepositableMaterials([{ itemId: 'm1', count: 1 }], lookup)).toBe(true);
-    expect(hasDepositableMaterials([{ itemId: 'm3', count: 1 }], lookup)).toBe(true);
+  it('hasDepositableMaterials is true only when an honest material stack is present', () => {
+    expect(hasDepositableMaterials([{ itemId: 'copper_ore', count: 1 }], lookup)).toBe(true);
+    // The flip that motivated phase 19: a tool no longer enables the button.
+    expect(hasDepositableMaterials([{ itemId: 'simple_fishing_pole', count: 1 }], lookup)).toBe(
+      false,
+    );
     expect(
       hasDepositableMaterials(
         [
@@ -431,16 +467,20 @@ describe('planDepositAllMaterials: replays cleanly against a real Sim', () => {
     if (!m) throw new Error('missing meta');
     return m;
   }
-  // Distinct real junk/tool ids so each material occupies its own bank slot.
-  const MATS = ['wolf_fang', 'amber_hide', 'spider_leg', 'stag_antler'] as const;
+  // Distinct real honest-material ids (amber_hide and stag_antler, the old
+  // fixtures, are quality-poor grey trash the phase 19 narrowing ruled out) so
+  // each material occupies its own bank slot.
+  const MATS = ['wolf_fang', 'rough_hide', 'spider_leg', 'game_meat'] as const;
   const GEAR = Object.values(REAL_ITEMS)
     .filter((d) => d.kind === 'weapon' || d.kind === 'armor')
     .map((d) => d.id);
 
-  it('confirms the fixtures are real materials (junk/tool), not quest', () => {
+  it('confirms the fixtures are honest materials: in the taxonomy, junk-kind, never poor', () => {
     for (const id of MATS) {
-      const kind = REAL_ITEMS[id]?.kind;
-      expect(kind === 'junk' || kind === 'tool', `${id} is ${kind}`).toBe(true);
+      const def = REAL_ITEMS[id];
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+      expect(def?.kind, `${id} is ${def?.kind}`).toBe('junk');
+      expect(def?.quality, `${id} is quality poor`).not.toBe('poor');
     }
   });
 
@@ -557,5 +597,141 @@ describe('planDepositAllMaterials: replays cleanly against a real Sim', () => {
     // The two that did not fit remain in the bags.
     expect(m.inventory.some((s) => s.itemId === MATS[0])).toBe(true);
     expect(m.inventory.some((s) => s.itemId === MATS[1])).toBe(true);
+  });
+});
+
+// Phase 19 acceptance (docs/design/professions-tuning-packet-review.md): the
+// deposit-all sweep narrows to the honest taxonomy while the sim's per-item
+// self-storage path deliberately does not.
+describe('deposit-all narrows to the honest taxonomy (phase 19)', () => {
+  const BANKER = 'bursar_fernando';
+  function moveToBanker(sim: Sim): void {
+    const p = sim.entities.get(sim.playerId);
+    if (!p) throw new Error('missing player');
+    for (const e of sim.entities.values()) {
+      if (e.kind === 'npc' && e.templateId === BANKER) {
+        p.pos = { ...e.pos };
+        p.prevPos = { ...p.pos };
+        sim.rebucket(p);
+        return;
+      }
+    }
+    throw new Error('banker not spawned');
+  }
+  function metaOf(sim: Sim) {
+    const m = sim.meta(sim.playerId);
+    if (!m) throw new Error('missing meta');
+    return m;
+  }
+  const realLookup = (id: string) => REAL_ITEMS[id];
+
+  // One representative of every included source class...
+  const INCLUDED = [
+    'iron_ore', // node yield
+    'fine_copper_ore', // fine grade
+    'rough_hide', // harvest component
+    'pristine_hide', // pristine specimen
+    'bone_fragments', // salvage return
+    'spider_leg', // mob-drop reagent
+    'arcanite_bar', // vendor staple (Q6: in)
+    'raw_river_perch', // raw fishing catch (junk cooking reagent: in)
+  ] as const;
+  // ...and of every excluded class the settlement ruled on.
+  const EXCLUDED = [
+    'simple_fishing_pole', // gathering implement (kind tool)
+    'gatherers_cache', // charm (kind tool by deliberate authoring)
+    'amber_hide', // grey vendor trash (Q3: out)
+    'guardian_core', // non-poor junk oddment (Q4: out)
+    'boar_hide', // quest item
+    'linen_pouch', // bag item
+    'reins_valorsteed', // mount item
+    'event_skin_token', // cosmetic token (kind tool, use skinSelect)
+    'worn_sword', // equipment (kind weapon)
+  ] as const;
+
+  it('confirms every fixture id is real and classified as intended', () => {
+    // An unknown id is ALSO skipped by the plan, so a typo in EXCLUDED would
+    // pass the exclusion arms vacuously; this arm makes that impossible.
+    for (const id of [...INCLUDED, ...EXCLUDED]) {
+      expect(REAL_ITEMS[id], `${id} has no ITEMS def`).toBeTruthy();
+    }
+    for (const id of INCLUDED) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    for (const id of EXCLUDED) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(false);
+    // Each EXCLUDED fixture must keep representing its ruled class: a content
+    // re-authoring that changed a kind would silently hollow out the replay's
+    // per-class coverage while the behavior assertions stayed green.
+    const EXCLUDED_CLASS: Record<(typeof EXCLUDED)[number], { kind: string; quality?: string }> = {
+      simple_fishing_pole: { kind: 'tool' },
+      gatherers_cache: { kind: 'tool' },
+      amber_hide: { kind: 'junk', quality: 'poor' },
+      guardian_core: { kind: 'junk' },
+      boar_hide: { kind: 'quest' },
+      linen_pouch: { kind: 'bag' },
+      reins_valorsteed: { kind: 'mount' },
+      event_skin_token: { kind: 'tool' },
+      worn_sword: { kind: 'weapon' },
+    };
+    for (const id of EXCLUDED) {
+      const want = EXCLUDED_CLASS[id];
+      expect(REAL_ITEMS[id]?.kind, id).toBe(want.kind);
+      if (want.quality) expect(REAL_ITEMS[id]?.quality, id).toBe(want.quality);
+    }
+  });
+
+  it('plans exactly the included classes and replays against a real Sim with zero errors', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'warrior', autoEquip: false });
+    moveToBanker(sim);
+    const m = metaOf(sim);
+    m.inventory.length = 0;
+    for (const itemId of EXCLUDED) m.inventory.push({ itemId, count: 1 });
+    for (const itemId of INCLUDED) m.inventory.push({ itemId, count: 1 });
+    m.bank.inventory.length = 0;
+    const plan = planDepositAllMaterials(
+      m.inventory,
+      m.bank.inventory,
+      bankCapacity(m.bank),
+      realLookup,
+    );
+    expect(plan.stacks).toBe(INCLUDED.length);
+    expect(plan.full).toBe(false);
+    sim.drainEvents();
+    const errors: SimEvent[] = [];
+    for (const send of plan.sends) {
+      sim.bankDeposit(send.slot, send.count);
+      for (const ev of sim.drainEvents()) if (ev.type === 'error') errors.push(ev);
+    }
+    expect(errors).toEqual([]);
+    expect(m.bank.inventory.map((s) => s.itemId).sort()).toEqual([...INCLUDED].sort());
+    expect(m.inventory.map((s) => s.itemId).sort()).toEqual([...EXCLUDED].sort());
+  });
+
+  it('disables the button over a bag of only excluded classes, enables on one material', () => {
+    const excludedOnly: InvSlot[] = EXCLUDED.map((itemId) => ({ itemId, count: 1 }));
+    expect(hasDepositableMaterials(excludedOnly, realLookup)).toBe(false);
+    expect(
+      hasDepositableMaterials([...excludedOnly, { itemId: 'iron_ore', count: 1 }], realLookup),
+    ).toBe(true);
+  });
+
+  it('a kind-tool item and grey trash still deposit through the per-item path', () => {
+    // The overreach guard: the sim's any-non-quest self-storage behavior is
+    // deliberate and phase 19 must not narrow it; only the SWEEP narrows.
+    const sim = new Sim({ seed: 19, playerClass: 'warrior', autoEquip: false });
+    moveToBanker(sim);
+    const m = metaOf(sim);
+    m.inventory.length = 0;
+    m.inventory.push({ itemId: 'simple_fishing_pole', count: 1 });
+    m.inventory.push({ itemId: 'amber_hide', count: 2 });
+    m.bank.inventory.length = 0;
+    sim.drainEvents();
+    sim.bankDeposit(1, 2); // descending, like the sweep replay
+    sim.bankDeposit(0, 1);
+    const errors = sim.drainEvents().filter((ev) => ev.type === 'error');
+    expect(errors).toEqual([]);
+    expect(m.bank.inventory.map((s) => s.itemId).sort()).toEqual([
+      'amber_hide',
+      'simple_fishing_pole',
+    ]);
+    expect(m.inventory).toEqual([]);
   });
 });

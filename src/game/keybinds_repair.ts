@@ -20,6 +20,17 @@
 // action-bar slots and strafe is dead. Dropping the four keys re-seeds strafe to
 // Q/E and slot10/slot11 to Minus/Equal, the current defaults.
 //
+// The same v0.24.0 window (#1792) also shipped Damage Meters defaulting to
+// KeyZ, so a profile matching the rest of Signature A typically also persisted
+// meters: ['KeyZ', null]. meters now defaults to Shift+KeyH, but the stored
+// KeyZ sticks like the other four, and it is processed before Sheathe/
+// Unsheathe Weapon in BIND_ACTIONS: it claims KeyZ first, so the load-time
+// uniqueness sweep silently evicts sheathe's untouched KeyZ default down to
+// unbound. Signature A therefore also drops meters when it resolves to KeyZ
+// with an empty secondary, re-seeding meters to Shift+KeyH and freeing KeyZ
+// back to sheathe. A meters:KeyZ value seen WITHOUT the rest of the signature
+// is a deliberate remap and is left alone (see the test for that case).
+//
 // Signature B, the targetFriendly/meters KeyH collision: both used to default to
 // KeyH, and the uniqueness sweep handed KeyH to Target Nearest Friendly
 // (Targeting precedes Interface), so the next save() persisted Damage Meters as
@@ -40,6 +51,12 @@ function entryPrimary(v: unknown): string | null {
 // it keeps the current default rather than loading unbound.
 function isEmptyEntry(v: unknown): boolean {
   return Array.isArray(v) && v.every((c) => c === null || c === undefined);
+}
+
+// True when the stored entry is the v0.24.0-window meters shape: primary KeyZ,
+// empty secondary.
+function isStaleMetersKeyZ(v: unknown): boolean {
+  return Array.isArray(v) && v[0] === 'KeyZ' && (v[1] === null || v[1] === undefined);
 }
 
 // True when Target Nearest Friendly resolves to KeyH: either it is absent (so it
@@ -69,6 +86,9 @@ export function repairStoredBindings(obj: StoredBindingsBlob): StoredBindingsBlo
     delete obj.slot11;
     delete obj.strafeLeft;
     delete obj.strafeRight;
+    if (isStaleMetersKeyZ(obj.meters)) {
+      delete obj.meters;
+    }
   }
   // Signature B: meters evicted to empty while targetFriendly still holds KeyH.
   if (isEmptyEntry(obj.meters) && targetFriendlyIsKeyH(obj)) {

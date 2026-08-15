@@ -143,8 +143,11 @@ async function probe(page) {
       programs: info.programs?.length ?? 0,
       textures: info.memory?.textures ?? 0,
       geometries: info.memory?.geometries ?? 0,
-      calls: info.render?.calls ?? 0,
-      triangles: info.render?.triangles ?? 0,
+      // Per-frame counts come from the perfStats surface (rep.renderer): this
+      // script forces ?gfx=ultra, and on composer tiers the raw info counters
+      // are monotonic (autoReset off; the renderer accumulates deltas).
+      calls: rep.renderer?.calls ?? 0,
+      triangles: rep.renderer?.triangles ?? 0,
       tier: rep.renderer?.tier ?? null,
       biome: rep.renderer?.lastFrame?.biome ?? null,
       pos: { x: Math.round(g.sim.player.pos.x), z: Math.round(g.sim.player.pos.z) },
@@ -175,8 +178,10 @@ async function readPrewarm(page) {
       texturesAfter: p.texturesAfter,
       manifestCompleted: p.manifestCompleted,
       manifestPlanned: p.manifestPlanned,
+      manifestPartial: p.manifestPartial,
       manifestTimedOut: p.manifestTimedOut,
       manifestFailed: p.manifestFailed,
+      partialEntryIds: p.partialEntryIds,
       timedOutEntryIds: p.timedOutEntryIds,
       failedEntryIds: p.failedEntryIds,
       entries: (p.manifestEntries ?? []).map((e) => ({
@@ -186,6 +191,8 @@ async function readPrewarm(page) {
         elapsedMs: e.elapsedMs,
         programDelta: e.programDelta,
         textureDelta: e.textureDelta,
+        workDone: e.workDone,
+        workPlanned: e.workPlanned,
         detail: e.detail,
       })),
     };

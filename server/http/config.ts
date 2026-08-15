@@ -89,9 +89,6 @@ export interface Config {
   // Off-by-default community-realm account provisioning. When enabled, the
   // central account insert atomically creates the full level-20 test roster.
   readonly provisionTestAccounts: boolean;
-  // Public-test Rift profile. Strictly validated, read once at boot, and off by
-  // default so a typo cannot silently enable or disable the denser realm policy.
-  readonly communityTestRifts: boolean;
   readonly turnstileSecret: string;
   readonly maxWsPerIpHard: number;
   // The realm player admission cap: the WS handshake (server/ws_auth.ts) refuses a
@@ -111,6 +108,7 @@ export interface Config {
   // keep forever, and the read is deliberately UNTRIMMED, so a whitespace-only
   // value falls to 0, the SAFE side for a destructive delete (keep, never prune).
   readonly dailyRewardEventsRetentionDays: number;
+  readonly unstuckReportRetentionDays: number;
   readonly onlineSamplesRetentionDays: number;
   readonly sitePresenceRetentionDays: number;
   // Play sessions older than this fold into the lifetime rollups and are deleted;
@@ -125,6 +123,35 @@ export interface Config {
   // the business-metrics fact table) to keep. The snapshot reads touch only
   // today and yesterday, so any positive window is read-invisible to them.
   readonly playerActivityRetentionDays: number;
+  // How many days of password_reset_requests / email_change_requests rows to
+  // keep after creation. The per-account supersede DELETE at each create call
+  // only removes a duplicate still-PENDING row (createPasswordResetRequest /
+  // createEmailChangeRequest, server/db.ts); a consumed or abandoned-and-expired
+  // row is untouched there, so these are the only knobs that bound either table.
+  readonly passwordResetRequestRetentionDays: number;
+  readonly emailChangeRequestRetentionDays: number;
+  // How many days of email_log rows (the outbound-email audit trail) to keep.
+  readonly emailLogRetentionDays: number;
+  // How many days of RESOLVED player_reports rows (status 'ignored' or
+  // 'actioned') to keep; an OPEN report is never pruned regardless of age,
+  // since moderationQueue and moderationReportsForAccount only ever surface
+  // status = 'open' rows. 0 keeps resolved reports forever.
+  readonly playerReportRetentionDays: number;
+  // How many days of bug_reports rows to keep. Each row can carry a
+  // screenshot up to ~900 KB, so this table is the fastest-growing of the
+  // report tables. 0 keeps them forever.
+  readonly bugReportRetentionDays: number;
+  // How many days of the chat_violations hard-word incident log to keep. Its
+  // only reader (chatModerationForAccount) is already LIMIT-bounded per
+  // account, so pruning the oldest rows never invalidates a page it can still
+  // return. 0 keeps them forever.
+  readonly chatViolationRetentionDays: number;
+  // How many days of the progression analytics event logs to keep
+  // (level_up_events: one row per ding; ftue_events: new-player quest/death
+  // events, already level-gated at write time). Both follow the untrimmed
+  // 0-keeps-forever retention contract above.
+  readonly levelUpEventsRetentionDays: number;
+  readonly ftueEventsRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -171,6 +198,7 @@ const DEFAULT_MAX_PLAYERS_PER_REALM = 5000;
 const DEFAULT_GITHUB_REPO = 'levy-street/world-of-claudecraft';
 const DEFAULT_GITHUB_TOKEN = '';
 const DEFAULT_CHAT_LOG_RETENTION_DAYS = 90;
+const DEFAULT_UNSTUCK_REPORT_RETENTION_DAYS = 90;
 const DEFAULT_PERF_REPORT_RETENTION_DAYS = 14;
 const DEFAULT_DAILY_REWARD_EVENTS_RETENTION_DAYS = 400;
 const DEFAULT_ONLINE_SAMPLES_RETENTION_DAYS = 90;
@@ -178,6 +206,19 @@ const DEFAULT_SITE_PRESENCE_RETENTION_DAYS = 90;
 const DEFAULT_PLAY_SESSION_RETENTION_DAYS = 180;
 const DEFAULT_ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS = 730;
 const DEFAULT_PLAYER_ACTIVITY_RETENTION_DAYS = 400;
+const DEFAULT_PASSWORD_RESET_REQUEST_RETENTION_DAYS = 30;
+const DEFAULT_EMAIL_CHANGE_REQUEST_RETENTION_DAYS = 30;
+const DEFAULT_EMAIL_LOG_RETENTION_DAYS = 90;
+const DEFAULT_PLAYER_REPORT_RETENTION_DAYS = 180;
+const DEFAULT_BUG_REPORT_RETENTION_DAYS = 90;
+const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
+// level_up_events feeds multi-month friction maps, so it defaults to a year.
+// ftue_events answers a FIRST-SESSION question and has the higher intake
+// (roughly 100-250 rows per new character), so it defaults to a quarter: at
+// the sweep's per-run row budget a long window could otherwise fall behind
+// during a paid-campaign burst.
+const DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS = 365;
+const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 90;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -193,7 +234,6 @@ const REQUIRE_WEB_LOGIN_ENV = 'REQUIRE_WEB_LOGIN';
 const CONTENT_TYPE_ENFORCE_ENV = 'API_CONTENT_TYPE_ENFORCE';
 const ORIGIN_CHECK_ENFORCE_ENV = 'API_ORIGIN_CHECK_ENFORCE';
 const PROVISION_TEST_ACCOUNTS_ENV = 'PROVISION_TEST_ACCOUNTS';
-const COMMUNITY_TEST_RIFTS_ENV = 'COMMUNITY_TEST_RIFTS';
 
 // The recognized boolean-flag vocabulary shared by REQUIRE_WEB_LOGIN and the two
 // API enforce flags (matches web_login_guard.ts / content_type.ts / origin_check.ts:
@@ -314,7 +354,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
   validateBooleanFlag(env, CONTENT_TYPE_ENFORCE_ENV);
   validateBooleanFlag(env, ORIGIN_CHECK_ENFORCE_ENV);
   validateBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV);
-  validateBooleanFlag(env, COMMUNITY_TEST_RIFTS_ENV);
   validatePublicOrigin(env);
   validateRealms(env);
 
@@ -331,7 +370,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     port: numberOr(env.PORT, DEFAULT_PORT),
     allowDevCommands: env.ALLOW_DEV_COMMANDS === ALLOW_DEV_COMMANDS_ON,
     provisionTestAccounts: resolveBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV),
-    communityTestRifts: resolveBooleanFlag(env, COMMUNITY_TEST_RIFTS_ENV),
     turnstileSecret: env.TURNSTILE_SECRET ?? DEFAULT_TURNSTILE_SECRET,
     maxWsPerIpHard: numberOr(env.MAX_WS_PER_IP_HARD, DEFAULT_MAX_WS_PER_IP_HARD),
     // Trimmed so a whitespace-only value reads as unset -> the default, never as
@@ -343,6 +381,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     githubRepo: env.GITHUB_REPO ?? DEFAULT_GITHUB_REPO,
     githubToken: env.GITHUB_TOKEN ?? DEFAULT_GITHUB_TOKEN,
     chatLogRetentionDays: numberOr(env.CHAT_LOG_RETENTION_DAYS, DEFAULT_CHAT_LOG_RETENTION_DAYS),
+    unstuckReportRetentionDays: numberOr(
+      env.UNSTUCK_REPORT_RETENTION_DAYS,
+      DEFAULT_UNSTUCK_REPORT_RETENTION_DAYS,
+    ),
     perfReportRetentionDays: numberOr(
       env.PERF_REPORT_RETENTION_DAYS,
       DEFAULT_PERF_REPORT_RETENTION_DAYS,
@@ -370,6 +412,35 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     playerActivityRetentionDays: numberOr(
       env.PLAYER_ACTIVITY_RETENTION_DAYS,
       DEFAULT_PLAYER_ACTIVITY_RETENTION_DAYS,
+    ),
+    passwordResetRequestRetentionDays: numberOr(
+      env.PASSWORD_RESET_REQUEST_RETENTION_DAYS,
+      DEFAULT_PASSWORD_RESET_REQUEST_RETENTION_DAYS,
+    ),
+    emailChangeRequestRetentionDays: numberOr(
+      env.EMAIL_CHANGE_REQUEST_RETENTION_DAYS,
+      DEFAULT_EMAIL_CHANGE_REQUEST_RETENTION_DAYS,
+    ),
+    emailLogRetentionDays: numberOr(env.EMAIL_LOG_RETENTION_DAYS, DEFAULT_EMAIL_LOG_RETENTION_DAYS),
+    playerReportRetentionDays: numberOr(
+      env.PLAYER_REPORT_RETENTION_DAYS,
+      DEFAULT_PLAYER_REPORT_RETENTION_DAYS,
+    ),
+    bugReportRetentionDays: numberOr(
+      env.BUG_REPORT_RETENTION_DAYS,
+      DEFAULT_BUG_REPORT_RETENTION_DAYS,
+    ),
+    levelUpEventsRetentionDays: numberOr(
+      env.LEVEL_UP_EVENTS_RETENTION_DAYS,
+      DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS,
+    ),
+    ftueEventsRetentionDays: numberOr(
+      env.FTUE_EVENTS_RETENTION_DAYS,
+      DEFAULT_FTUE_EVENTS_RETENTION_DAYS,
+    ),
+    chatViolationRetentionDays: numberOr(
+      env.CHAT_VIOLATION_RETENTION_DAYS,
+      DEFAULT_CHAT_VIOLATION_RETENTION_DAYS,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

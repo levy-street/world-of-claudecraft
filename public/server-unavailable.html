@@ -70,7 +70,9 @@
     }
 
     .eyebrow {
-      margin: 0 0 10px;
+      /* keep the horizontal auto margins from the p rule: its 470px max-width
+         box would otherwise hug the panel's left padding edge off-center */
+      margin: 0 auto 10px;
       color: var(--gold);
       font-size: 12px;
       font-weight: 700;

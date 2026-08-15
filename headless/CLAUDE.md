@@ -34,21 +34,22 @@ header comment of `env_server.ts`; that header is the reference, don't restate i
   5, so 4 decisions/sim-sec @ 20 Hz), then diff `sim.counters` (`RewardCounters`) for reward.
 - **reward** = weighted sum of counter deltas (xp, damageDealt/Taken, kills,
   deaths, quests, levelUps) + `timePenalty`; weights in `DEFAULT_CONFIG.rewards`,
-  overridable per-reset via `config.rewards`.
+  overridable per-reset via `config.rewards`. PLUS owned-pet damage: each tick's
+  returned `SimEvents` fold through `ownedPetDamageForReward` (the pure sibling
+  `reward_credit.ts`) into the damageDealt term, because the player's own session
+  counter excludes damage dealt by controlled mobs.
 - **terminated** = `terminateOnDeath && died`, or `level >= MAX_LEVEL`.
   **truncated** = `maxSteps` reached. `info` = level/xp/hp/kills/etc.
 
 ## Where new logic lands + tests
 - **New validation or framing behavior is its own pure sibling module** (the
-  `protocol.ts` pattern) with a unit test, never more inline code in
-  `env_server.ts`'s command switch or the `Env` class.
+  `protocol.ts` / `reward_credit.ts` pattern) with a unit test, never more inline
+  code in `env_server.ts`'s command switch or the `Env` class.
 - `tests/env_protocol.test.ts` pins the protocol: action bounds, every class
   accepted, identical obs shape across all classes, the line cap. Extend it with
-  any protocol or obs change. Bug fixes are test-first: a failing test that
-  reproduces the bug, then the smallest change that turns it green.
+  any protocol or obs change.
 
 ## Run
-`npm run env` builds and serves on stdio; `npm run bench` benchmarks the same bundle.
 Manual poke: `echo '{"cmd":"info"}' | node dist-env/env_server.cjs`.
 
 ## Never here

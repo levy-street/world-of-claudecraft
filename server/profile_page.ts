@@ -13,6 +13,8 @@ import {
   type CharacterSheet,
   characterSheet,
   type SheetRank,
+  sheetCuratorRankText,
+  sheetRelicRecentText,
   sheetTitleText,
 } from './character_sheet';
 import {
@@ -137,7 +139,7 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   const gameName = escapeHtml(GAME_NAME);
   const arena1 = sheet.arena['1v1'];
   const arenaLine = arena1
-    ? `<li>Arena 1v1: <strong>${arena1.rating}</strong> (${arena1.wins}W / ${arena1.losses}L)</li>`
+    ? `<li>Arena 1v1: <strong>${arena1.rating}</strong> (${arena1.wins}W / ${arena1.losses}L / ${arena1.draws}D)</li>`
     : '';
   const rankLine = sheet.rank
     ? `<li>Realm rank: <strong>#${sheet.rank.rank}</strong> of ${sheet.rank.total}</li>`
@@ -145,6 +147,39 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   const guildLine = sheet.guild
     ? `<li>Guild: <strong>&lt;${escapeHtml(sheet.guild)}&gt;</strong></li>`
     : '';
+  // Labeled Reliquary completion pair + Curator rank (character-scoped), then
+  // the recent-finds strip below. What the page still does NOT publish, now that
+  // the strip does render: no firstFind provenance, no marks set, no per-relic
+  // obtain counts. Only the aggregate pair, the rank, and a capped fail-closed
+  // window on the recent ring. English-by-design like the rest of /c/.
+  const reliqOwned = sheet.reliquary.owned;
+  const reliqTotal = sheet.reliquary.total;
+  const reliqRankEn = sheetCuratorRankText(sheet.reliquary.curatorRank);
+  const reliqRankLine = reliqRankEn
+    ? `<li>Curator: <strong>${escapeHtml(reliqRankEn)}</strong></li>`
+    : `<li>Curator: <strong>Unranked</strong></li>`;
+  const reliqLine = `<li>Reliquary: <strong>${reliqOwned}/${reliqTotal}</strong></li>`;
+  // The capped recent-finds strip. The sheet carries ids + kinds; English names
+  // resolve here, like the Curator rank above, because /c/ is English by
+  // design. sheetRelicRecentText answers null for an id with no live name, so a
+  // content-drifted entry drops out instead of printing a raw relic id, and the
+  // whole line disappears when nothing resolves (a fresh character, or a
+  // ring that drifted away entirely).
+  const recentRelicNames = sheet.reliquary.recent.flatMap((entry) => {
+    const relicName = sheetRelicRecentText(entry);
+    return relicName === null ? [] : [escapeHtml(relicName)];
+  });
+  // Joined with a middle dot, never a comma: catalogued relic names carry
+  // commas of their own (kingsbane_last_oath "Thronebane, Last Oath of
+  // Thornpeak" and voidsong_dirk "Voidsong, Dirk of the Sundered Veil"), so a
+  // comma join would render five finds that read as more. No authored name
+  // contains the middot (the U+00B7 sweep in tests/profile_page.test.ts pins
+  // that), and the inspect card's meta line separates with it for the same
+  // reason.
+  const reliqRecentLine =
+    recentRelicNames.length > 0
+      ? `<li>Recent finds: <strong>${recentRelicNames.join(' · ')}</strong></li>`
+      : '';
   // The selected Book of Deeds title, under the name. sheetTitleText returns
   // null for unset/stale/non-title ids, so the line simply disappears (never
   // a raw deed id, never a crash on an old state blob).
@@ -201,6 +236,9 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
       <li>Zone: <strong>${escapeHtml(sheet.zone)}</strong></li>
       ${guildLine}
       ${rankLine}
+      ${reliqLine}
+      ${reliqRankLine}
+      ${reliqRecentLine}
       ${arenaLine}
     </ul>
     <nav>

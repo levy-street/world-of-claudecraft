@@ -8,6 +8,7 @@ import { BUILTIN_WORLD, MOBS, setActiveWorldContent } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   blockedTowardSpawn,
+  MAX_WANDER_RADIUS,
   recoverFromFlee,
   resetEvadingMob,
   updateMob,
@@ -190,5 +191,49 @@ describe('mob/locomotion: updateMob', () => {
     };
     expect(drive(true)).toBe(drive(false));
     expect(drive(true)).toBeLessThan(5); // the prologue decremented it
+  });
+});
+
+describe('mob/locomotion: idle wander pause (wanderHaste)', () => {
+  // Park a mob ON its wander target so moveToward reports arrival on this very
+  // tick, then read the pause the arrival arm set. offStreamRng mirrors
+  // production (every whelp is off-stream: the template is offStreamIdle and the
+  // egg camps that hatch it are offStream), so the roll comes off the private
+  // per-tick sub-stream seeded from the tick count and the mob id. Two templates
+  // driven with the SAME id on the SAME tick therefore see the SAME roll, and the
+  // only thing that can separate their pauses is wanderHaste.
+  const MOB_ID = 900010;
+  function pauseAfterArrival(templateId: string): number {
+    const sim = makeSim();
+    const seed = (sim as any).cfg.seed;
+    const pos = { x: 500, y: terrainHeight(500, 500, seed), z: 500 };
+    const mob = createMob(MOB_ID, MOBS[templateId], 20, pos) as AnyEntity;
+    (sim as any).addEntity(mob);
+    mob.aiState = 'idle';
+    mob.offStreamRng = true;
+    mob.wanderTarget = { ...mob.pos };
+    mob.wanderTimer = 5; // > 0, so only the arrival arm can set the pause
+    updateMob(ctxOf(sim), mob);
+    return mob.wanderTimer;
+  }
+
+  it('divides the pause on ARRIVAL, not only on the walk-budget timeout', () => {
+    const haste = MOBS.dragonkin_whelp.wanderHaste ?? 1;
+    expect(haste).toBeGreaterThan(1); // the authored restless knob
+    const plain = pauseAfterArrival('dragonkin_broodguard'); // no wanderHaste
+    const restless = pauseAfterArrival('dragonkin_whelp');
+    expect(plain).toBeGreaterThanOrEqual(3); // the undivided 3 to 10s roll
+    expect(plain).toBeLessThanOrEqual(10);
+    expect(restless).toBeCloseTo(plain / haste, 9); // same roll, hasted
+    expect(restless).toBeLessThan(plain); // the skitter (it shipped equal)
+  });
+
+  it('a quick mob never reaches the 30s walk budget', () => {
+    // Why arrival is the only pause site a whelp ever takes: it ambles at
+    // moveSpeed x 0.35, so even the longest hop straight across the wander ring
+    // is over in a few seconds, far inside the 30s budget the timeout arm waits
+    // for. Dividing only that timeout was the same as dividing nothing.
+    const walkSpeed = MOBS.dragonkin_whelp.moveSpeed * 0.35;
+    expect((2 * MAX_WANDER_RADIUS) / walkSpeed).toBeLessThan(30);
   });
 });

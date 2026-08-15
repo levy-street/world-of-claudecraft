@@ -1,10 +1,18 @@
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
+import { crowdBucketLabel } from './crowd_bucket';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
+import { analyzePerfSuggestions } from './perf_doctor';
+import { jitteredPerfReportDelay } from './perf_report_schedule';
 import type { Settings } from './settings';
+import type { WorldTelemetry } from './world_telemetry';
 
 declare const __APP_VERSION__: string;
 declare const __APP_BUILD_ID__: string;
+
+// Bumped to 2 for the packet 0 report dimensions (zone, crowd, views,
+// worst-10s; ruling R6). The server's intIn clamp keeps version-1 clients valid.
+const PERF_REPORT_SCHEMA_VERSION = 2;
 
 const FIRST_REPORT_MS = 75_000;
 const REPEAT_REPORT_MS = 5 * 60_000;
@@ -21,6 +29,14 @@ export interface PerfReporterOptions {
   settings: Settings;
   tokenProvider: () => string | null;
   characterIdProvider: () => number | null;
+  // Zone identity plus the sim entity count for gameplay sessions (rulings R3,
+  // R4); null (or absent, for benchmark harness callers) leaves the payload on
+  // the legacy gameplay label with null crowd numerators.
+  worldTelemetryProvider?: () => WorldTelemetry | null;
+  // True inside the Electron shell, which already forces the discrete GPU
+  // (PR #1991), so the perf-doctor 'integrated-gpu' suggestion never fires
+  // there (ruling R15). Absent (benchmark harness callers) means false.
+  desktopShell?: boolean;
 }
 
 export type PerfReporterSkipReason = 'disabled' | 'hidden' | 'not-ready' | 'no-renderer';
@@ -201,10 +217,27 @@ function rendererPrewarmSummary(
     compileTimedOut: prewarm.compileTimedOut,
     manifestPlanned: prewarm.manifestPlanned,
     manifestCompleted: prewarm.manifestCompleted,
+    manifestPartial: prewarm.manifestPartial,
+    manifestSkipped: prewarm.manifestSkipped,
     manifestTimedOut: prewarm.manifestTimedOut,
     manifestFailed: prewarm.manifestFailed,
+    partialEntryIds: prewarm.partialEntryIds,
     timedOutEntryIds: prewarm.timedOutEntryIds,
     failedEntryIds: prewarm.failedEntryIds,
+    // The other half of "did this entry run": a timed-out entry hands its units
+    // to the resume lane, and until this block existed nothing outside a console
+    // line said whether they ever ran. An entry reported timed-out with
+    // resume.status 'done' and no failures is protected a moment later; the same
+    // entry with 'scheduled' forever, or with failures, is not protected at all.
+    resume: {
+      status: prewarm.resume.status,
+      plannedEntries: prewarm.resume.plannedEntries,
+      plannedUnits: prewarm.resume.plannedUnits,
+      startedUnits: prewarm.resume.startedUnits,
+      failedUnits: prewarm.resume.failedUnits,
+      failedUnitIds: prewarm.resume.failedUnitIds,
+      entries: prewarm.resume.entries,
+    },
     entries: prewarm.manifestEntries.map((entry) => ({
       id: entry.id,
       category: entry.category,
@@ -214,8 +247,127 @@ function rendererPrewarmSummary(
       remainingMsAfter: entry.remainingMsAfter,
       programDelta: entry.programDelta,
       textureDelta: entry.textureDelta,
+      workDone: entry.workDone,
+      workPlanned: entry.workPlanned,
       detail: entry.detail,
     })),
+  };
+}
+
+type RendererGpuQueueSnapshot = NonNullable<PerfSnapshot['renderer']>['gpuQueue'];
+
+// The GPU queue is serial, so one unit that never settles blocks every later
+// unit in every lane while contributing nothing to the completed-unit ring.
+// The running unit and the recorded stalls ride the beacon beside the slowest
+// completed units, so a wedge is a fleet signal instead of local console noise
+// (issue #3167). Bounded like every other raw-summary block; atMs is dropped
+// because a page-relative timestamp carries no fleet meaning.
+const GPU_QUEUE_REPORT_STALLS = 6;
+const GPU_QUEUE_REPORT_SLOWEST = 5;
+// The queue's own tail cap keeps this list tiny; the slice only pins the
+// beacon size against a future cap raise, mirroring the two lists above.
+const GPU_QUEUE_REPORT_TAILS = 4;
+// One row per priority lane. GPU_WORK_PRIORITY has six, and callers pass the
+// constants rather than free numbers, so this only bounds the beacon against a
+// caller inventing its own.
+const GPU_QUEUE_REPORT_LANES = 8;
+// Grant waits, worst first. Same size as the two cost rankings: a starvation
+// report needs a few examples, not the whole leaderboard.
+const GPU_QUEUE_REPORT_WAITS = 5;
+
+function rendererGpuQueueSummary(gpuQueue: RendererGpuQueueSnapshot): Record<string, unknown> {
+  return {
+    units: gpuQueue.units,
+    totalSyncMs: gpuQueue.totalSyncMs,
+    worstSyncMs: gpuQueue.worstSyncMs,
+    // The frame-cost half. syncMs stops at a unit's first await, so a lane that
+    // blocks after one reads as free on the sync numbers alone; these carry what
+    // the live frame actually paid. The cumulative one rides beside the maxima
+    // because a max says nothing about how OFTEN the lane cost a frame.
+    totalFrameGapMs: gpuQueue.totalFrameGapMs,
+    worstFrameGapMs: gpuQueue.worstFrameGapMs,
+    worstUnsharedFrameGapMs: gpuQueue.worstUnsharedFrameGapMs,
+    pending: gpuQueue.pending,
+    stallCount: gpuQueue.stallCount,
+    active: gpuQueue.active
+      ? {
+          label: gpuQueue.active.label,
+          priority: gpuQueue.active.priority,
+          ageMs: gpuQueue.active.ageMs,
+        }
+      : null,
+    // Released compile-gate tails settling off-thread.
+    waitingTails: gpuQueue.waitingTails.slice(0, GPU_QUEUE_REPORT_TAILS).map((tail) => ({
+      label: tail.label,
+      priority: tail.priority,
+      ageMs: tail.ageMs,
+    })),
+    stalls: gpuQueue.stalls.slice(-GPU_QUEUE_REPORT_STALLS).map((stall) => ({
+      label: stall.label,
+      priority: stall.priority,
+      ageMs: stall.ageMs,
+      settled: stall.settled,
+    })),
+    slowest: gpuQueue.slowest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map(reportGpuQueueUnit),
+    // Ranked by frame cost rather than sync slice, so the unit that hurt is in
+    // the beacon even when its sync slice is single-digit milliseconds.
+    blockiest: gpuQueue.blockiest.slice(0, GPU_QUEUE_REPORT_SLOWEST).map(reportGpuQueueUnit),
+    // Worst grant latency session-wide, and the interval arm beside it. Every
+    // other field here is cumulative or a lifetime maximum, so two reports from
+    // one session cannot be differenced into what a pacing change did; `recent`
+    // is the only one that can. Its lane rows are what says whether a cosmetic
+    // lane made an actionable one wait.
+    worstWaitMs: gpuQueue.worstWaitMs,
+    // The waits, each naming what it was behind. `worstWaitMs` alone says a lane
+    // was delayed; only these say by what, and `waitedOnTailCap` is what
+    // separates "waited behind an ordinary holder" from "waited on a released
+    // tail still occupying the cap", which is the mechanism a mis-declared
+    // releaseTail delays a live gate with.
+    longestWaits: gpuQueue.longestWaits.slice(0, GPU_QUEUE_REPORT_WAITS).map((wait) => ({
+      label: wait.label,
+      priority: wait.priority,
+      waitMs: wait.waitMs,
+      blockedBy: wait.blockedBy,
+      blockedByPriority: wait.blockedByPriority,
+      waitedOnTailCap: wait.waitedOnTailCap,
+      tails: wait.tails,
+    })),
+    recent: {
+      windowMs: gpuQueue.recent.windowMs,
+      units: gpuQueue.recent.units,
+      totalSyncMs: gpuQueue.recent.totalSyncMs,
+      totalFrameGapMs: gpuQueue.recent.totalFrameGapMs,
+      worstSyncMs: gpuQueue.recent.worstSyncMs,
+      worstFrameGapMs: gpuQueue.recent.worstFrameGapMs,
+      worstWaitMs: gpuQueue.recent.worstWaitMs,
+      lanes: gpuQueue.recent.lanes.slice(0, GPU_QUEUE_REPORT_LANES),
+    },
+  };
+}
+
+function reportGpuQueueUnit(unit: RendererGpuQueueSnapshot['slowest'][number]): {
+  label: string;
+  priority: number;
+  syncMs: number;
+  wallMs: number;
+  waitMs: number;
+  frameGapMs: number;
+  sharedFrameGap: number;
+} {
+  return {
+    label: unit.label,
+    priority: unit.priority,
+    syncMs: unit.syncMs,
+    wallMs: unit.wallMs,
+    // A ranked unit that also waited a long time for its grant is the shape a
+    // starvation report is made of; without this the two halves live in
+    // different blocks and cannot be read together.
+    waitMs: unit.waitMs,
+    frameGapMs: unit.frameGapMs,
+    // Without this a beacon reader repeats the mistake the metric already made
+    // once: a long released tail shares a gap it did not cause and tops the
+    // ranking on someone else's block.
+    sharedFrameGap: unit.sharedFrameGap,
   };
 }
 
@@ -224,6 +376,8 @@ function payloadFromSnapshot(
   settings: Settings,
   sessionId: string,
   characterId: number | null,
+  worldTelemetry: WorldTelemetry | null = null,
+  desktopShell = false,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
   if (!renderer) return null;
@@ -233,8 +387,25 @@ function payloadFromSnapshot(
   const viewportWidth = Math.max(1, Math.round(window.innerWidth));
   const viewportHeight = Math.max(1, Math.round(window.innerHeight));
   const scenario = scenarioFromUrl();
+  // The benchmark ?perfScenario label keeps priority; gameplay sessions carry
+  // the instance-aware zone id from the provider (rulings R3, R4).
+  const zoneOrScenario =
+    scenario.source === 'benchmark'
+      ? scenario.zoneOrScenario
+      : (worldTelemetry?.zoneId ?? scenario.zoneOrScenario);
+  // Crowd is bucketed on the renderer's activeViews (draw-band scoped, ruling
+  // R3); the raw counts ship beside it. lastFrame is null-guarded: the first
+  // report can land before a rendered frame.
+  const activeViews = renderer.lastFrame?.activeViews ?? null;
+  const visibleViews = renderer.lastFrame?.visibleViews ?? null;
+  // CLIENT-computed perf-doctor suggestion ids (ruling R14): the analyzer runs
+  // over this same snapshot, so the fleet dimension and the player nudge toast
+  // agree on the machine-local diagnosis. Ids only; titles/bodies stay local.
+  const suggestionIds = analyzePerfSuggestions(snapshot, location.search, { desktopShell }).map(
+    (suggestion) => suggestion.id,
+  );
   return {
-    schemaVersion: 1,
+    schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
     buildId: __APP_BUILD_ID__,
     sessionId,
@@ -272,7 +443,13 @@ function payloadFromSnapshot(
     glRenderer: renderer.glRenderer,
     glRendererBucket: gpuBucket(renderer.glRenderer),
     source: scenario.source,
-    zoneOrScenario: scenario.zoneOrScenario,
+    zoneOrScenario,
+    simEntities: worldTelemetry?.simEntities ?? null,
+    activeViews,
+    visibleViews,
+    crowdBucket: crowdBucketLabel(activeViews),
+    worst10sFrameP95Ms: snapshot.windows.worst10s?.frameMs.p95 ?? null,
+    suggestionIds,
     rawSummary: {
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
@@ -284,14 +461,35 @@ function payloadFromSnapshot(
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,
       rendererDiagnostics: renderer.renderDiagnostics,
+      // The summary above is the whole prewarm payload. The live stats object
+      // used to ride along beside it as `rendererPrewarm`, from before the
+      // summary existed; nothing reads it back out of storage, and once its
+      // resume getter started serializing, the report carried two copies of one
+      // block under a 16 KB cap, only one of which the ingest rebuilds from a
+      // fixed key set. Add a field to the summary rather than sending the twin.
       rendererPrewarmSummary: rendererPrewarmSummary(renderer.prewarm),
-      rendererPrewarm: renderer.prewarm,
+      rendererGpuQueue: rendererGpuQueueSummary(renderer.gpuQueue),
       assets: {
         preload: snapshot.assets.preload,
         byType: snapshot.assets.byType,
       },
       input: snapshot.input,
       hud: snapshot.hud,
+      netPipeline: snapshot.netPipeline,
+      heapSawtooth: snapshot.heapSawtooth,
+      // The two top-level longtask fields (longTaskCount, longTaskP95Ms) cannot
+      // corroborate a rare multi-second stall: a single event never moves a
+      // p95. These four ride here (issue #2479) rather than as new top-level
+      // columns, so storing them needs no DDL; the server bounds them on
+      // ingest (server/perf_report.ts).
+      browser: {
+        longTasks: {
+          totalMs: longTasks.totalMs,
+          avg: longTasks.avg,
+          max: longTasks.max,
+          lastAge: longTasks.lastAge,
+        },
+      },
       ...(snapshot.devTrace ? { devTrace: snapshot.devTrace } : {}),
     },
   };
@@ -316,7 +514,11 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   let stopped = false;
   let timer: number | null = null;
   let lastFinalFlushAt = 0;
+  let reportSequence = 0;
   let cleanupDebug = (): void => {};
+
+  const cadenceDelay = (baseMs: number): number =>
+    devTrace ? baseMs : jitteredPerfReportDelay(baseMs, sessionId, reportSequence++);
 
   const schedule = (delay: number): void => {
     if (stopped) return;
@@ -335,7 +537,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
     timer = null;
     if (stopped) return;
     if (!sendOptions.allowHidden && document.visibilityState !== 'visible') {
-      skip('hidden', REPEAT_REPORT_MS);
+      skip('hidden', cadenceDelay(REPEAT_REPORT_MS));
       return;
     }
     const snapshot = options.perf.report();
@@ -351,9 +553,11 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.settings,
       sessionId,
       options.characterIdProvider(),
+      options.worldTelemetryProvider?.() ?? null,
+      options.desktopShell ?? false,
     );
     if (!body) {
-      skip('no-renderer', sendOptions.final ? null : REPEAT_REPORT_MS);
+      skip('no-renderer', sendOptions.final ? null : cadenceDelay(REPEAT_REPORT_MS));
       return;
     }
     const token = options.tokenProvider();
@@ -397,6 +601,10 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         status.successCount++;
         status.lastSuccessAt = Date.now();
         status.lastError = null;
+        // Worst-per-report-interval semantics (ruling R5): the retained worst
+        // 10 s window resets only once its report is stored, so a failed post
+        // carries the storm into the retry instead of losing it.
+        options.perf.drainWorstWindow();
         devTraceLog(status, 'debug', `posted ${status.lastBodyBytes} bytes`);
       })
       .catch((err: unknown) => {
@@ -404,7 +612,9 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         status.lastError = errorText(err);
         devTraceLog(status, 'warn', `post failed: ${status.lastError}`);
       });
-    if (!sendOptions.final) schedule(devTrace ? DEV_TRACE_REPEAT_REPORT_MS : REPEAT_REPORT_MS);
+    if (!sendOptions.final) {
+      schedule(devTrace ? DEV_TRACE_REPEAT_REPORT_MS : cadenceDelay(REPEAT_REPORT_MS));
+    }
   }
 
   function sendNow(): void {
@@ -439,7 +649,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   cleanupDebug = exposeDebug(status, sendNow, stop);
   window.addEventListener('pagehide', flushFinal);
   document.addEventListener('visibilitychange', handleVisibilityChange);
-  schedule(devTrace ? DEV_TRACE_FIRST_REPORT_MS : FIRST_REPORT_MS);
+  schedule(devTrace ? DEV_TRACE_FIRST_REPORT_MS : cadenceDelay(FIRST_REPORT_MS));
   return stop;
 }
 
@@ -449,4 +659,5 @@ export const perfReporterInternalsForTest = {
   gpuBucket,
   viewportBucket,
   payloadFromSnapshot,
+  PERF_REPORT_SCHEMA_VERSION,
 };

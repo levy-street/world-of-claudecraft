@@ -32,6 +32,7 @@ import {
   routes,
   setAccountDbForTests,
 } from '../../server/account';
+import { deleteAccountAttribution } from '../../server/attribution_db';
 import { verifyPassword } from '../../server/auth';
 import {
   type AccountModerationStatus,
@@ -40,6 +41,7 @@ import {
   listCharacters,
   revokeTokensExcept,
   setAccountDeactivated,
+  updatePasswordHash,
 } from '../../server/db';
 import { emailAccountDeleted } from '../../server/email';
 import { compose } from '../../server/http/compose';
@@ -63,11 +65,19 @@ vi.mock('../../server/db', async (importActual) => {
     listCharacters: vi.fn(actual.listCharacters),
     setAccountDeactivated: vi.fn(actual.setAccountDeactivated),
     revokeTokensExcept: vi.fn(actual.revokeTokensExcept),
+    updatePasswordHash: vi.fn(actual.updatePasswordHash),
   };
 });
 vi.mock('../../server/auth', async (importActual) => {
   const actual = await importActual<typeof import('../../server/auth')>();
   return { ...actual, verifyPassword: vi.fn(actual.verifyPassword) };
+});
+// The deactivate handler erases the account_attribution row (privacy: the
+// soft delete never fires the FK CASCADE); fake the SQL boundary so the
+// deactivate suite stays Postgres-free.
+vi.mock('../../server/attribution_db', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/attribution_db')>();
+  return { ...actual, deleteAccountAttribution: vi.fn(async () => {}) };
 });
 vi.mock('../../server/email', async (importActual) => {
   const actual = await importActual<typeof import('../../server/email')>();
@@ -595,6 +605,9 @@ describe('deactivate route: injected hooks + runtime wiring', () => {
     // The self-service delete also emails the account (the side effect the legacy arm
     // fired too), so the deactivate flow is confirmed end to end, not just the hooks.
     expect(vi.mocked(emailAccountDeleted)).toHaveBeenCalledWith(acctRow);
+    // Privacy erasure: the attribution row is deleted explicitly (the soft
+    // delete never fires the FK CASCADE).
+    expect(vi.mocked(deleteAccountAttribution)).toHaveBeenCalledWith(expect.anything(), 7);
   });
 
   it('409s and does NOT disconnect when anyCharacterOnline reports a live session', async () => {
@@ -626,6 +639,45 @@ describe('deactivate route: injected hooks + runtime wiring', () => {
 });
 
 // ---------------------------------------------------------------------------
+// The password route revokes every OTHER token (keeping the caller's own token
+// valid) but disconnects EVERY live WS session for the account unconditionally.
+// An earlier revision tried to also exempt the live session matching the
+// caller's bearer token, but a bearer token is a reusable wire credential, not
+// a per-socket identity: an attacker holding a stolen/shared token could
+// authenticate their own live session with it and be spared by the exact same
+// comparison. This pins the safer, unconditional-kick shape.
+// ---------------------------------------------------------------------------
+
+describe('password route: disconnects every live session, keeps only the caller token valid', () => {
+  const account = { accountId: 7, scope: 'full' as const };
+  const acctRow = { id: 7, username: 'hero', password_hash: 'HASH' } as unknown as Awaited<
+    ReturnType<typeof accountById>
+  >;
+  const callerToken = 'b'.repeat(64);
+
+  it('revokes every other token but disconnects unconditionally (no exception argument)', async () => {
+    vi.mocked(accountById).mockResolvedValue(acctRow);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    vi.mocked(updatePasswordHash).mockResolvedValue(undefined);
+    vi.mocked(revokeTokensExcept).mockResolvedValue(undefined);
+    const disconnectAccount = vi.fn();
+    installRuntime({ disconnectAccount });
+
+    const r = await callHandler('POST', '/api/account/password', {
+      account,
+      headers: { authorization: `Bearer ${callerToken}` },
+      body: { current: 'old-pw', next: 'a-new-password' },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ ok: true });
+    expect(revokeTokensExcept).toHaveBeenCalledWith(7, callerToken);
+    expect(disconnectAccount).toHaveBeenCalledWith(7, expect.any(String));
+    expect(disconnectAccount.mock.calls[0]).toHaveLength(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // The password/logout handlers re-derive the caller token defensively. The guard
 // guarantees a non-null token, but the handler re-guards (tsc-satisfying + mirrors
 // the legacy arm's explicit 401 fallback), so a direct call with no bearer 401s.
@@ -644,5 +696,28 @@ describe('handler defensive callerToken re-guard', () => {
     const r = await callHandler('POST', '/api/account/logout', { account, body: {} });
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ error: 'not authenticated', code: 'auth.required' });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// server/main.ts wiring: the injected configureAccountRuntime callback must
+// forward exactly (id, reason) to the real GameServer.disconnectAccount, with
+// no third "except" argument: disconnectAccount no longer accepts one (see the
+// comment above), so a future arrow reintroducing one would silently do
+// nothing (an unused extra param) rather than fail to compile.
+// ---------------------------------------------------------------------------
+
+describe('server/main.ts wiring: configureAccountRuntime forwards no exception argument', () => {
+  const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+  const codeOnly = src.replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const compactCode = codeOnly.replace(/\s+/g, '');
+
+  it('the account runtime disconnectAccount hook is a plain (id,reason) passthrough', () => {
+    const at = compactCode.indexOf('configureAccountRuntime({');
+    expect(at).toBeGreaterThan(-1);
+    const block = compactCode.slice(at, compactCode.indexOf('});', at) + 3);
+    expect(block).toContain(
+      'disconnectAccount:(id,reason)=>liveGame().disconnectAccount(id,reason)',
+    );
   });
 });

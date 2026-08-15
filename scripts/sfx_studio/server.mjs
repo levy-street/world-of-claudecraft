@@ -454,6 +454,16 @@ export async function startSfxStudio({ port = 5181 } = {}) {
           return streamFile(req, res, join(REPO_ROOT, 'public/favicon.ico'), { immutable: true });
         }
         if (url.pathname === '/three.bundle.js') return send(res, 200, MIME['.js'], threeBundle);
+        if (
+          url.pathname === '/basis/basis_transcoder.js' ||
+          url.pathname === '/basis/basis_transcoder.wasm'
+        ) {
+          // Shipped GLB textures are KTX2; the viewer's KTX2Loader fetches its
+          // transcoder from the same origin, mirroring the game client.
+          return streamFile(req, res, join(REPO_ROOT, 'public', url.pathname.slice(1)), {
+            immutable: true,
+          });
+        }
         if (url.pathname === '/viewer_live.js') return send(res, 200, MIME['.js'], viewer);
         if (url.pathname.startsWith('/audio/')) {
           const key = assertSfxKey(url.pathname.slice('/audio/'.length).replace(/\.mp3$/, ''));

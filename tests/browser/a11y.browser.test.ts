@@ -21,10 +21,13 @@ import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
 import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
+import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
 import { t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
+import { ProfessionsWindow } from '../../src/ui/professions_window';
+import { ReliquaryWindow } from '../../src/ui/reliquary_window';
 import { SocialWindow } from '../../src/ui/social_window';
 import { SpellbookWindow } from '../../src/ui/spellbook_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -195,19 +198,19 @@ describe('axe: talents window', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Arena (#arena-window) - the offline host (dialog role + named title + close).
+// The merged PvP window (#arena-window) - offline hosts of BOTH tab families
+// (dialog role + named title + close). The window opens on the Thornhollow Fields tab.
 // ---------------------------------------------------------------------------
 
-describe('axe: arena window', () => {
-  it('offline host is clean (dialog role, labelled title)', async () => {
-    const root = host('arena-window');
-    root.style.display = 'none';
-    const win = new ArenaWindow(
+describe('axe: pvp window', () => {
+  const makeWin = (root: HTMLElement) =>
+    new ArenaWindow(
       stubDeps({
         root: () => root,
         world: () =>
           ({
             arenaInfo: null,
+            bgInfo: null,
             playerId: 1,
             player: { name: 'Aurelia' },
             partyInfo: null,
@@ -215,7 +218,23 @@ describe('axe: arena window', () => {
         captureFocus: () => null,
       }),
     );
+
+  it('offline Thornhollow Fields tab (the default) is clean (dialog role, labelled title)', async () => {
+    const root = host('arena-window');
+    root.style.display = 'none';
+    const win = makeWin(root);
     win.toggle();
+    expect(root.getAttribute('aria-labelledby')).toBe('arena-title');
+    expect(root.querySelector('#arena-title')).toBeTruthy();
+    await expectClean(root);
+  });
+
+  it('offline arena tab is clean too, after a strip switch', async () => {
+    const root = host('arena-window');
+    root.style.display = 'none';
+    const win = makeWin(root);
+    win.toggle();
+    win.openTab('1v1');
     expect(root.getAttribute('aria-labelledby')).toBe('arena-title');
     expect(root.querySelector('#arena-title')).toBeTruthy();
     await expectClean(root);
@@ -268,7 +287,7 @@ describe('axe: spellbook window', () => {
         // (IWorld always carries a player); level 1 keeps every row locked.
         world: () =>
           ({ cfg: { playerClass: 'warrior' }, known: [], player: { level: 1 } }) as never,
-        barAbilityIds: () => [],
+        barActions: () => [],
         hasFreeSlot: () => true,
         hasFormBars: () => false,
         captureFocus: () => null,
@@ -297,6 +316,7 @@ describe('axe: options menu', () => {
             player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
           }) as never,
         options: () => null,
+        auraOverlays: () => ({ setPlacement: vi.fn() }) as never,
         bugReport: () => null,
         captureFocus: () => null,
       }),
@@ -377,6 +397,7 @@ describe('axe: options menu', () => {
             player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
           }) as never,
         options: () => hooks as never,
+        auraOverlays: () => ({ setPlacement: vi.fn() }) as never,
         bugReport: () => null,
         buildDropdown: () => document.createElement('div'),
         captureFocus: () => null,
@@ -593,10 +614,13 @@ describe('axe: social window', () => {
 // ---------------------------------------------------------------------------
 
 describe('axe: character window', () => {
-  it('paperdoll and populated mount picker are clean and preserve keyboard focus', async () => {
+  it('paperdoll and preview are clean and keep their own accessible names', async () => {
+    // The mount picker used to live in this sheet and this test drove it. Reins are
+    // usable items now (bags / action bar -> useItem), so the sheet has no picker
+    // and no mount rows to focus; what is left to hold is the dialog naming and the
+    // preview's own name, which is what the axe pass below actually protects.
     const root = host('char-window');
     root.style.display = 'none';
-    let selectedMount = 'grag_bear';
     const win = new CharWindow(
       stubDeps({
         root: () => root,
@@ -606,11 +630,7 @@ describe('axe: character window', () => {
             player: { name: 'Aurelia', level: 12, skin: 0, mountKey: '' },
             equipment: {},
             professionsState: { skills: [] },
-            selectedMount: () => selectedMount,
             ownedMounts: () => ['valorsteed', 'grag_bear', 'stalkglider_snail'],
-            selectMount: (key: string) => {
-              selectedMount = key;
-            },
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',
@@ -643,23 +663,10 @@ describe('axe: character window', () => {
     const titleSubtitle = root.querySelector('#char-title .panel-subtitle')?.textContent ?? '';
     expect(previewName).toBe(t('hudChrome.character.modelPreview'));
     expect(previewName).not.toBe(titleSubtitle);
-
-    const selected = root.querySelector<HTMLElement>('[data-mount-key="grag_bear"]');
-    const locked = root.querySelector<HTMLElement>('[data-mount-key="valorsteed"]');
-    const pickable = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
-    expect(selected?.tagName).toBe('DIV');
-    expect(selected?.tabIndex).toBe(0);
-    expect(locked?.tagName).toBe('DIV');
-    expect(locked?.tabIndex).toBe(0);
-    locked?.focus();
-    expect(locked?.dataset.tooltipOpened).toBe('true');
-
-    pickable?.focus();
-    pickable?.click();
-    expect(selectedMount).toBe('stalkglider_snail');
-    const freshSelected = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
-    expect(document.activeElement).toBe(freshSelected);
-    expect(freshSelected?.dataset.tooltipOpened).toBe('true');
+    // The picker is GONE, not merely unpopulated: a stray mount row here would mean
+    // the sheet grew a second way to summon a mount beside the reins item.
+    expect(root.querySelector('[data-mount-key]')).toBeNull();
+    expect(root.querySelector('.mount-picker')).toBeNull();
     await expectClean(root);
   });
 });
@@ -686,13 +693,24 @@ function marketInfo(shape: WorldShape): MarketInfo {
     listings: [listing],
     totalCount: 1,
     filter: 'all',
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
+    sort: 'name',
+    collapseLowest: false,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
     collectionItems: [],
+    collectionSales: [],
+    collectionSalesOmitted: 0,
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,
+    sellPriceItemId: null,
+    sellLowestPrice: null,
   };
   // The sim shape may carry extra server-only fields the view ignores; the client mirror
   // carries only the decoded fields (the offline-only-shape trap catches).
@@ -708,7 +726,12 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
         stubDeps({
           root: () => root,
           world: () =>
-            ({ marketInfo: marketInfo(shape), copper: 0, marketSearch: () => undefined }) as never,
+            ({
+              marketInfo: marketInfo(shape),
+              copper: 0,
+              marketSearch: () => undefined,
+              marketSellPriceCheck: () => undefined,
+            }) as never,
           hideTooltip: () => undefined,
           captureFocus: () => null,
         }),
@@ -718,9 +741,174 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
       expect(root.getAttribute('aria-label')).toBe(t('itemUi.market.title'));
       // The async-results live region is persistent + polite (the lazy-load a11y fix).
       expect(root.querySelector('.mkt-status')?.getAttribute('role')).toBe('status');
+      const groups = root.querySelectorAll<HTMLElement>('[role="group"]');
+      expect(groups).toHaveLength(1);
+      const filters = groups[0];
+      expect(filters.classList.contains('mkt-controls')).toBe(true);
+      expect(filters.getAttribute('aria-label')).toBe(t('itemUi.market.filters'));
+      expect(filters.querySelector('.mkt-search')).toBeTruthy();
+      for (const field of root.querySelectorAll('.mkt-filter')) {
+        expect(field.closest('[role="group"]')).toBe(filters);
+      }
+      expect(root.querySelector('.mkt-filters')?.hasAttribute('role')).toBe(false);
+      await expectClean(root);
+    });
+
+    // Issue 3043: the Sell tab's price-ref line and its off-screen live-region
+    // echo are new markup this suite would otherwise never see (the base fixture
+    // above stages nothing, so buildMarketSell never reaches the 'form' state).
+    it(`Sell tab price reference (a real price) is clean under the ${shape} shape`, async () => {
+      const root = host('market-window');
+      root.style.display = 'none';
+      const win = new MarketWindow(
+        stubDeps({
+          root: () => root,
+          world: () =>
+            ({
+              marketInfo: {
+                ...marketInfo(shape),
+                sellPriceItemId: 'worn_sword',
+                sellLowestPrice: 4200,
+              },
+              inventory: [{ itemId: 'worn_sword', count: 3 }],
+              copper: 0,
+              marketSearch: () => undefined,
+              marketSellPriceCheck: () => undefined,
+              marketList: () => undefined,
+              marketListInstance: () => undefined,
+            }) as never,
+          hideTooltip: () => undefined,
+          captureFocus: () => null,
+        }),
+      );
+      win.open();
+      const tab = root.querySelector<HTMLElement>('[data-tab="sell"]');
+      tab?.click();
+      win.stageSell('worn_sword');
+      const ref = root.querySelector('.mkt-sell-price-ref');
+      expect(ref?.textContent?.length, 'expected the numeric price ref to render').toBeGreaterThan(
+        0,
+      );
+      const status = root.querySelector('.mkt-sell-price-status');
+      expect(status?.getAttribute('role')).toBe('status');
+      expect(status?.getAttribute('aria-live')).toBe('polite');
+      await expectClean(root);
+    });
+
+    it(`Sell tab price reference (no active listings) is clean under the ${shape} shape`, async () => {
+      const root = host('market-window');
+      root.style.display = 'none';
+      const win = new MarketWindow(
+        stubDeps({
+          root: () => root,
+          world: () =>
+            ({
+              marketInfo: {
+                ...marketInfo(shape),
+                sellPriceItemId: 'worn_sword',
+                sellLowestPrice: null,
+              },
+              inventory: [{ itemId: 'worn_sword', count: 3 }],
+              copper: 0,
+              marketSearch: () => undefined,
+              marketSellPriceCheck: () => undefined,
+              marketList: () => undefined,
+              marketListInstance: () => undefined,
+            }) as never,
+          hideTooltip: () => undefined,
+          captureFocus: () => null,
+        }),
+      );
+      win.open();
+      const tab = root.querySelector<HTMLElement>('[data-tab="sell"]');
+      tab?.click();
+      win.stageSell('worn_sword');
+      const ref = root.querySelector('.mkt-sell-price-ref');
+      expect(ref?.textContent).toBe(t('itemUi.market.lowestPriceNone'));
       await expectClean(root);
     });
   }
+});
+
+// Issue #2416 (reconnect ordering): onReconnected() fires synchronously inside
+// the client's `hello` handler, before the resent world's first snapshot has
+// decoded. At that instant world().marketInfo (if any) is still the pre-drop
+// echo, which by construction matches the window's own query (it was pushed
+// and echoed back before the socket died). A drift check that ran right there
+// would always read "no drift" and the resync would never fire, which is
+// exactly why onReconnected() only arms a flag: the real comparison happens
+// later, in refreshIfChanged(), once a genuinely post-reconnect MarketInfo
+// arrives (online.ts nulls the mirror on the `hello` reset so "still pending"
+// is unambiguous).
+describe('market window: reconnect resync ordering (#2416)', () => {
+  it('does not resync against the stale pre-drop echo, but does once a post-reconnect echo arrives', async () => {
+    const root = host('market-window');
+    root.style.display = 'none';
+    const searches: unknown[] = [];
+    // The pre-drop echo: the player narrowed to Armor/Chest/Cloth/Intellect,
+    // pushed that query, and the server echoed it back before the socket
+    // died, so this matches the window's own (about-to-be-set) query exactly.
+    let info: MarketInfo | null = {
+      ...marketInfo('client'),
+      filter: '', // matches the window's default (empty) search box
+      itemType: 'armor',
+      subtype: 'chest',
+      armorClass: 'cloth',
+      primaryStat: 'int',
+    };
+    const win = new MarketWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            get marketInfo() {
+              return info;
+            },
+            copper: 0,
+            marketSearch: (q: unknown) => searches.push(q),
+            marketSellPriceCheck: () => undefined,
+          }) as never,
+        hideTooltip: () => undefined,
+        captureFocus: () => null,
+      }),
+    );
+    win.open();
+    searches.length = 0; // drop the query push open() itself does
+
+    // Mirror the same narrowing onto the window's own client-side filter state
+    // (the controls survive the socket drop untouched).
+    Object.assign(win, {
+      itemTypeFilter: 'armor',
+      subtypeFilter: 'chest',
+      armorClassFilter: 'cloth',
+      primaryStatFilter: 'int',
+    });
+
+    // hello fires: online.ts nulls the mirror in its reset block (marketInfo is
+    // delta-omitted, so without this it would still read the stale pre-drop
+    // echo, which trivially matches the query) BEFORE calling onReconnected(),
+    // which just arms the flag rather than deciding off a possibly-stale value.
+    info = null;
+    (win as unknown as { onReconnected(): void }).onReconnected();
+    (win as unknown as { refreshIfChanged(): void }).refreshIfChanged();
+    expect(searches, 'must keep waiting while marketInfo is null (still pending)').toHaveLength(0);
+
+    // The resent world's first snapshot decodes: the fresh-join session reset
+    // the server-side query back to default, so the echo no longer matches.
+    info = marketInfo('client');
+    (win as unknown as { refreshIfChanged(): void }).refreshIfChanged();
+    expect(searches, 'must resync once the real post-reconnect echo arrives').toHaveLength(1);
+    expect(searches[0]).toMatchObject({
+      itemType: 'armor',
+      subtype: 'chest',
+      armorClass: 'cloth',
+      primaryStat: 'int',
+    });
+
+    // A second refresh with the same (now-matching) info must not re-push again.
+    (win as unknown as { refreshIfChanged(): void }).refreshIfChanged();
+    expect(searches, 'the flag must clear after resolving once').toHaveLength(1);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -841,5 +1029,246 @@ describe('axe: bags discard prompt', () => {
     win.close();
     expect(root.style.display).toBe('none');
     expect(document.activeElement).toBe(opener);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Vendor (#vendor-window) - the R22 advisory turn: requirement rows sell, the
+// sub-line is the sighted advisory, and the combined aria-label is the
+// screen-reader one. Rendered through the real painter with the real styles.
+// ---------------------------------------------------------------------------
+
+describe('axe: vendor window advisory rows', () => {
+  it('advisory and plain rows are clean, and the advisory name folds the requirement', async () => {
+    const root = host('vendor-window');
+    const pick = ITEMS.iron_mining_pick;
+    const bread = Object.values(ITEMS).find((i) => i?.kind === 'food') ?? pick;
+    const view = {
+      goods: [
+        {
+          itemId: bread.id,
+          item: bread,
+          price: { copper: 5, honor: 0 },
+          quantity: 1,
+          affordable: true,
+          requirementUnmet: false,
+        },
+        {
+          itemId: 'iron_mining_pick',
+          item: pick,
+          price: { copper: 120, honor: 0 },
+          quantity: 1,
+          affordable: true,
+          requirementUnmet: true,
+          requirement: { professionId: 'mining' as const, proficiency: 40 },
+        },
+      ],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1 as const,
+    };
+    // A literal vendor NAME: the painter interpolates it into the
+    // goodsTitle key itself, so passing a t() result here would nest the
+    // template and render a literal {name}.
+    renderVendorWindow(root, 'Quartermaster Bree', view, {
+      itemIcon: () => '<img alt="">',
+      moneyHtml: (copper: number) => `<span>${copper}c</span>`,
+      itemTooltip: () => '<div></div>',
+      attachTooltip: () => {},
+      hideTooltip: () => {},
+      onBuy: () => {},
+      onQtyChange: () => {},
+      buyCustomMax: () => 0,
+      onBuyBack: () => {},
+      onSellJunk: () => {},
+      onClose: () => {},
+      sellJunk: { enabled: false, proceeds: 0 },
+    });
+    const rows = root.querySelectorAll<HTMLButtonElement>('.vendor-item');
+    expect(rows.length).toBe(2);
+    const advisory = [...rows].find((r) => r.querySelector('.vi-sub'));
+    expect(advisory).toBeTruthy();
+    // The advisory row SELLS and its accessible name carries what the sighted
+    // sub-line says (an aria-label replaces the content as the name).
+    expect(advisory?.disabled).toBe(false);
+    const sub = advisory?.querySelector('.vi-sub')?.textContent ?? '';
+    expect(sub.length).toBeGreaterThan(0);
+    expect(advisory?.getAttribute('aria-label') ?? '').toContain(sub);
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Professions (#professions-window) - the tool-effect row's interactive chrome
+// (slot/recharge buttons, the R40 "Ask each use" checkbox), rendered through
+// the real window with the real styles. The phase 18 whole-branch review
+// found only the vendor arm covered the packet's new interactive chrome.
+// ---------------------------------------------------------------------------
+
+describe('axe: professions window tool-effect controls', () => {
+  it('slot button, recharge button, and mode checkbox are clean with real names', async () => {
+    const root = host('professions-window');
+    const world = {
+      craftingIdentity: {
+        version: 1,
+        synced: true,
+        craftSkills: {
+          engineering: 0,
+          alchemy: 0,
+          cooking: 30,
+          leatherworking: 0,
+          tailoring: 0,
+          inscription: 0,
+          enchanting: 0,
+          jewelcrafting: 60,
+          weaponcrafting: 25,
+          armorcrafting: 49,
+        },
+        activeArchetype: 'armorcrafting',
+        pairedMajor: 'weaponcrafting',
+        hobbyCraft: 'leatherworking',
+        attunedPairs: ['weaponcrafting+armorcrafting'],
+        switchCount: 2,
+        amendsProgress: 1,
+        amendsRequired: 11,
+      },
+      professionsState: { skills: [{ professionId: 'mining', skill: 30, maxSkill: 300 }] },
+      gatheringProficiency: { mining: 30 },
+      toolEffectSlots: [
+        {
+          professionId: 'mining',
+          effectId: 'gatherers_cache',
+          charges: 12,
+          maxCharges: 30,
+          confirmMode: 'prompt',
+          selfCrafted: true,
+        },
+      ],
+      inventory: [
+        { itemId: 'copper_mining_pick', count: 1 },
+        { itemId: 'artisans_eye', count: 1, instance: { signer: 'Testchar' } },
+      ],
+      player: { name: 'Testchar' },
+    };
+    const win = new ProfessionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+        consumePeek: () => false,
+        itemIcon: () => '<img alt="">',
+        moneyHtml: (copper: number) => `<span>${copper}c</span>`,
+        itemTooltip: () => '',
+      }),
+    );
+    win.open();
+    // The three controls the review named must actually render: a slot
+    // button (a second effect is slottable from bags), the recharge button
+    // on the live slot, and the R40 per-row mode checkbox.
+    const slot = root.querySelector<HTMLButtonElement>('[data-slot-effect]');
+    const recharge = root.querySelector<HTMLButtonElement>('[data-recharge-profession]');
+    const mode = root.querySelector<HTMLInputElement>('[data-slot-mode]');
+    expect(slot).not.toBeNull();
+    expect(recharge).not.toBeNull();
+    expect(mode).not.toBeNull();
+    // The checkbox's accessible name comes from its wrapping label text.
+    expect(mode?.closest('label')?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    // Buttons carry visible text as their accessible names, never bare icons.
+    expect(slot?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    expect(recharge?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The Reliquary (#reliquary-window) - Phase 13 added a search field, a filter
+// chip group, a real ul/li shelf list, and a roving-tabindex relic grid whose
+// cells carry aria-describedby / aria-keyshortcuts. Every one of those is
+// interactive chrome axe can judge, and the grid is the only roving surface in
+// this window family that is NOT a composite role, so it is worth axing
+// directly rather than trusting the source pins.
+// ---------------------------------------------------------------------------
+
+describe('axe: reliquary window search, filters, and relic grid', () => {
+  function reliquaryWorld() {
+    // CAUTION: the stub is handed over through an `as never` cast below, so
+    // tsc cannot flag a missing member here; a new world read in the window
+    // (like the Phase 15 pinKey identity pair) surfaces as a RUNTIME throw in
+    // this suite only. Keep this stub in step with what the window reads.
+    return {
+      // The Phase 15 pin store keys per character (pinKey reads BOTH), so the
+      // stub carries the identity members every real world has.
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'AxeTester' },
+      deedStats: { itemsDiscovered: new Set<string>() },
+      reliquaryMarks: new Set<string>(),
+      reliquaryRecent: [] as string[],
+      reliquaryFirstFind: {},
+      ownedMounts: () => [] as string[],
+      accountCosmetics: { weaponSkinIds: [] as string[] },
+      deedsEarned: new Map<string, number>(),
+      reliquaryPageClearCount: () => undefined,
+      reliquaryCatalogCompletion: () => ({ owned: 0, total: 100 }),
+      reliquaryCuratorRank: () => 0,
+      reliquaryPageCompletion: () => null,
+      reliquaryRarity: () => Promise.resolve(null),
+    };
+  }
+
+  function openReliquary(root: HTMLElement): ReliquaryWindow {
+    const win = new ReliquaryWindow(
+      stubDeps({
+        root: () => root,
+        world: () => reliquaryWorld() as never,
+        consumePeek: () => false,
+        itemIcon: () => '<img alt="">',
+        itemTooltip: () => '',
+      }),
+    );
+    win.open();
+    return win;
+  }
+
+  it('the Overview shelf is clean with a labelled search field', async () => {
+    const root = host('reliquary-window');
+    openReliquary(root);
+    const search = root.querySelector<HTMLInputElement>('.reliquary-search');
+    expect(search).not.toBeNull();
+    // A search input with no visible label needs an accessible one.
+    expect(search?.getAttribute('aria-label')?.trim().length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
+  });
+
+  it('the page grid is clean: one tab stop, described cells, named chips', async () => {
+    const root = host('reliquary-window');
+    openReliquary(root);
+    // Walk to a real page the way a player does, so axe sees the grid, the
+    // filter chip group, and the ul/li shelf structure that produced it.
+    root.querySelector<HTMLElement>('[data-nav="conquerors"]')?.click();
+    const firstPage = root.querySelector<HTMLElement>('[data-page]');
+    expect(firstPage).not.toBeNull();
+    firstPage?.click();
+
+    const grid = root.querySelector('.reliquary-grid');
+    expect(grid).not.toBeNull();
+    const cells = [...root.querySelectorAll<HTMLElement>('[data-cell-id]')];
+    expect(cells.length).toBeGreaterThan(1);
+    // Roving tabindex: exactly one tab stop, and every cell names its keys and
+    // points at the hint it is described by.
+    expect(cells.filter((c) => c.tabIndex === 0)).toHaveLength(1);
+    for (const cell of cells) {
+      expect(cell.getAttribute('aria-label')?.trim().length ?? 0).toBeGreaterThan(0);
+      expect(cell.getAttribute('aria-describedby')).toBe('reliquary-grid-hint');
+    }
+    // The describedby target must actually exist, or axe reports a dangling
+    // reference and a screen reader announces nothing extra.
+    expect(root.querySelector('#reliquary-grid-hint')).not.toBeNull();
+    // Every filter chip carries visible text as its accessible name.
+    const chips = [...root.querySelectorAll<HTMLElement>('[data-filter]')];
+    expect(chips).toHaveLength(3);
+    for (const chip of chips) {
+      expect(chip.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    }
+    await expectClean(root);
   });
 });

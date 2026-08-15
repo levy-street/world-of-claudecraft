@@ -22,15 +22,20 @@ import {
   createPlayerReport,
   createSuspiciousRegistrationReport,
   forceCharacterRename,
+  ignoreReport,
   liftAccountChatMute,
   moderateAccount,
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  prunePlayerReportsBatch,
+  reactivateAccountAudited,
   recordInGameAction,
+  resetChatStrikesAudited,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
   setOnAccountModerated,
+  setOnModerationQueueChanged,
 } from '../server/moderation_db';
 
 const { query, connect } = db;
@@ -284,8 +289,34 @@ describe('moderation report helpers', () => {
       'tone it down',
       new Date(expiresAt),
     ]);
-    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    // Mirrors moderateAccount's ban/suspend arm: a chat mute is punitive, so it
+    // resolves whatever open report led to it in the same transaction.
+    expect(client.query.mock.calls[3][0]).toMatch(/UPDATE player_reports/);
+    expect(client.query.mock.calls[3][1]).toEqual([2, 1, 'tone it down']);
+    expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    expect(client.query.mock.calls).toHaveLength(5);
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves the reported account open reports when muting its chat', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const expiresAt = new Date(Date.now() + 3600_000).toISOString();
+
+    await muteAccountChat({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'chat abuse',
+      expiresAt,
+    });
+
+    const reportUpdateCall = client.query.mock.calls.find((call) =>
+      /UPDATE player_reports/.test(String(call[0])),
+    );
+    if (!reportUpdateCall) throw new Error('player_reports update query not found');
+    expect(reportUpdateCall[0]).toMatch(/status = 'actioned'/);
+    expect(reportUpdateCall[0]).toMatch(/reported_account_id = \$1 AND status = 'open'/);
+    expect(reportUpdateCall[1]).toEqual([2, 1, 'chat abuse']);
   });
 
   it('lifts an active chat mute and writes a dedicated audit action', async () => {
@@ -329,6 +360,90 @@ describe('moderation report helpers', () => {
     expect(client.query.mock.calls[2][0]).toBe('ROLLBACK');
   });
 
+  it('rejects reactivation without a reason', async () => {
+    await expect(
+      reactivateAccountAudited({ accountId: 2, adminAccountId: 1, reason: '   ' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('reactivates an account and writes an audit action in one transaction', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await reactivateAccountAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(client.query.mock.calls[0][0]).toBe('BEGIN');
+    expect(client.query.mock.calls[1][0]).toMatch(/deactivated_at = NULL/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'reactivate', 'appeal accepted', null]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a chat-strikes reset without a reason', async () => {
+    await expect(
+      resetChatStrikesAudited({ accountId: 2, adminAccountId: 1, reason: '' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('resets chat strikes and writes an audit action when the account exists', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 1)) // UPDATE, one row
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(true);
+    expect(client.query.mock.calls[1][0]).toMatch(/chat_strikes = 0/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'chat_strikes_reset',
+      'appeal accepted',
+      null,
+    ]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+  });
+
+  it('skips the audit row and returns false for an unknown account', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 0)) // UPDATE, no rows
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 999,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(false);
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    expect(stmts.some((s) => s.includes('account_moderation_actions'))).toBe(false);
+    expect(stmts).toEqual(['BEGIN', expect.stringMatching(/chat_strikes = 0/), 'COMMIT']);
+  });
+
   it('requires a moderation reason for suspend and ban actions', async () => {
     await expect(
       moderateAccount({
@@ -358,8 +473,35 @@ describe('moderation report helpers', () => {
     expect(client.query.mock.calls[1][1]).toEqual([2, 'appeal accepted']);
     expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
     expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'unban', 'appeal accepted', null]);
-    expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    // unban is a reversal action, symmetric to unsuspend: it must not touch
+    // player_reports, or a fresh, unreviewed report against an already-banned
+    // account gets silently closed the moment an unrelated appeal is granted.
+    expect(client.query.mock.calls.some((call) => /player_reports/.test(String(call[0])))).toBe(
+      false,
+    );
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    expect(client.query.mock.calls).toHaveLength(4);
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a pre-existing open report untouched when unbanning (parity with unsuspend)', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await moderateAccount({
+      accountId: 2,
+      adminAccountId: 1,
+      action: 'unban',
+      reason: 'unrelated appeal granted',
+    });
+
+    // moderateAccount never reads player_reports directly: the only way a report
+    // could be affected is the closing UPDATE, so proving that statement is never
+    // issued proves any pre-existing open report on this account is left as-is.
+    const reportUpdate = client.query.mock.calls.find((call) =>
+      /UPDATE player_reports/.test(String(call[0])),
+    );
+    expect(reportUpdate).toBeUndefined();
   });
 
   it('unsuspends an active suspension and writes a dedicated audit action', async () => {
@@ -946,5 +1088,154 @@ describe('moderation bust hook wiring', () => {
     expect(statements(client)).toContain('COMMIT');
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+// setOnModerationQueueChanged backs the moderation queue's cached base read
+// (server/moderation_queue_cache.ts): every write that changes what that read
+// would return must fire it exactly once, after commit, so the cache never
+// serves a resolved report or a stale account status for a whole TTL window.
+// Kept separate from the onAccountModerated suite above: the two hooks are
+// independent (moderateAccount fires both; muteAccountChat and ignoreReport
+// fire only this one), so a regression in one must never hide inside the
+// other's assertions.
+describe('moderation queue cache bust hook wiring', () => {
+  afterEach(() => {
+    setOnModerationQueueChanged(null);
+  });
+
+  it('fires once, after COMMIT, when moderateAccount bans an account', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await moderateAccount({
+      accountId: 2,
+      adminAccountId: 1,
+      action: 'ban',
+      reason: 'cheating',
+    });
+
+    expect(hook).toHaveBeenCalledTimes(1);
+    expect(client.query.mock.calls.at(-1)?.[0]).toBe('COMMIT');
+  });
+
+  it('fires once when muteAccountChat resolves the account open reports', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await muteAccountChat({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'harassment',
+      expiresAt: '2999-01-01T00:00:00.000Z',
+    });
+
+    expect(hook).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires once when ignoreReport actually resolves an open report', async () => {
+    query.mockResolvedValueOnce(queryResult([], 1));
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await expect(ignoreReport(5, 1, 'not actionable')).resolves.toBe(true);
+
+    expect(hook).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fire when ignoreReport matches no open report', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await expect(ignoreReport(5, 1, 'not actionable')).resolves.toBe(false);
+
+    expect(hook).not.toHaveBeenCalled();
+  });
+
+  it('does not fire when the moderateAccount transaction fails', async () => {
+    const client = clientStub();
+    client.query.mockImplementation(async (text: string) => {
+      if (/UPDATE accounts/.test(text)) throw new Error('boom');
+      return queryResult([]);
+    });
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await expect(
+      moderateAccount({ accountId: 2, adminAccountId: 1, action: 'ban', reason: 'cheating' }),
+    ).rejects.toThrow('boom');
+
+    expect(hook).not.toHaveBeenCalled();
+  });
+
+  it('a throwing hook never turns a committed ban into an error', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    setOnModerationQueueChanged(() => {
+      throw new Error('hook exploded');
+    });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(
+      moderateAccount({ accountId: 2, adminAccountId: 1, action: 'ban', reason: 'cheating' }),
+    ).resolves.toBeUndefined();
+
+    expect(client.query.mock.calls.at(-1)?.[0]).toBe('COMMIT');
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+});
+
+describe('prunePlayerReportsBatch (the retention-sweep primitive)', () => {
+  // Mirrors tests/unstuck_db.test.ts's pruneUnstuckReportsBatch suite: the
+  // sweep owns cadence, budget, and batching, this primitive owns exactly
+  // one bounded delete on the shared pool.
+  it('runs one sibling-shaped bounded delete that excludes open reports', async () => {
+    query.mockResolvedValueOnce(queryResult([], 3));
+
+    await expect(prunePlayerReportsBatch(180, 1000)).resolves.toBe(3);
+
+    expect(connect).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('DELETE FROM player_reports');
+    // An open report must never be eligible: moderationQueue and
+    // moderationReportsForAccount above only ever read status = 'open' rows,
+    // so the exclusion is what keeps a still-visible report from vanishing.
+    expect(sql).toContain("status != 'open'");
+    expect(sql).toContain("created_at < now() - ($1::int * INTERVAL '1 day')");
+    expect(sql).toContain('ORDER BY created_at ASC, id ASC');
+    expect(sql).toContain('LIMIT $2');
+    expect(params).toEqual([180, 1000]);
+  });
+
+  it('keeps forever on zero and negative retention (the destructive-delete safe side)', async () => {
+    await expect(prunePlayerReportsBatch(0, 1000)).resolves.toBe(0);
+    await expect(prunePlayerReportsBatch(-3, 1000)).resolves.toBe(0);
+    await expect(prunePlayerReportsBatch(Number.NaN, 1000)).resolves.toBe(0);
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('normalizes fractional retention days up to one full day, never to zero', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    await prunePlayerReportsBatch(0.5, 1000);
+    expect(query.mock.calls[0][1]).toEqual([1, 1000]);
+  });
+
+  it('floors the batch size at one row (no LIMIT 0 infinite no-op)', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    await prunePlayerReportsBatch(180, 0);
+    expect(query.mock.calls[0][1]).toEqual([180, 1]);
+  });
+
+  it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
+    query.mockResolvedValueOnce(queryResult([], null as unknown as number));
+    await expect(prunePlayerReportsBatch(180, 1000)).resolves.toBe(0);
   });
 });

@@ -1,4 +1,8 @@
-import { computeTalentModifiers, type TalentAllocation } from '../../../sim/content/talents';
+import {
+  computeTalentModifiers,
+  SAVED_LOADOUT_BAR_SLOTS,
+  type TalentAllocation,
+} from '../../../sim/content/talents';
 import { abilitiesKnownAt } from '../../../sim/data';
 import type { AbilityDef, PlayerClass } from '../../../sim/types';
 
@@ -42,9 +46,14 @@ export function attackDragDisposition(
 
 /** One rule for every action-bar entry point: passive abilities are informational only. */
 export function isAbilityActionBarEligible(
-  ability: Pick<AbilityDef, 'passive'> | null | undefined,
+  ability: Pick<AbilityDef, 'passive' | 'hiddenFromPlayer'> | null | undefined,
 ): boolean {
-  return ability !== null && ability !== undefined && ability.passive !== true;
+  return (
+    ability !== null &&
+    ability !== undefined &&
+    ability.passive !== true &&
+    ability.hiddenFromPlayer !== true
+  );
 }
 
 export function sanitizeHotbarAction(
@@ -330,6 +339,23 @@ export function loadoutKnownAbilityIds(
   );
 }
 
+function normalizeLoadoutBarSlots(
+  bar: readonly (string | null)[],
+  slots: number,
+  abilityExists: (id: string) => boolean,
+): readonly (string | null)[] {
+  if (slots !== SAVED_LOADOUT_BAR_SLOTS) return bar;
+  if (bar.length !== slots) return bar;
+  if (bar[0] !== null) return bar;
+  if (bar[slots - 1] !== null) return bar;
+  // Some release-head loadouts were captured with index 0 reserved for the fixed
+  // Attack button. The saved payload is capped at the configurable-slot count,
+  // so that shape has a null first entry and no representable final slot.
+  const shifted = bar.slice(1);
+  if (!shifted.some((id) => typeof id === 'string' && abilityExists(id))) return bar;
+  return shifted;
+}
+
 // Rebuild the bar for a switched talent loadout. A `SavedLoadout.bar` only ever
 // records ability ids (the caller's currentBar mapping strips item shortcuts
 // before saving), so replacing the WHOLE bar from it wipes any potion/food/drink
@@ -342,13 +368,14 @@ export function applyLoadoutBar(
   slots: number,
   abilityExists: (id: string) => boolean,
 ): HotbarAction[] {
+  const normalizedBar = normalizeLoadoutBarSlots(bar, slots, abilityExists);
   return Array.from({ length: slots }, (_, i) => {
     // A pre-third-row loadout contains only 22 entries. Missing tail entries
     // mean the row did not exist when it was saved, not that the player chose
     // to clear it, so preserve the current action there. An explicit null
     // inside the saved span still clears an ability while retaining items.
-    if (i >= bar.length) return current[i] ?? null;
-    const v = bar[i];
+    if (i >= normalizedBar.length) return current[i] ?? null;
+    const v = normalizedBar[i];
     if (typeof v === 'string' && abilityExists(v)) return { type: 'ability' as const, id: v };
     const existing = current[i];
     return existing?.type === 'item' ? existing : null;

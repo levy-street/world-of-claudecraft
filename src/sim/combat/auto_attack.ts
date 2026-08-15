@@ -29,10 +29,12 @@
 
 import { CLASSES, isArenaPos, MOBS } from '../data';
 import { forceDismount } from '../mounts';
+import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { addThreat } from '../threat';
+import { resolveTalentHitMult } from '../talent_hit_mult';
+import { addThreat, hasEscapeStealth } from '../threat';
 import {
   angleTo,
   armorReduction,
@@ -51,11 +53,19 @@ import {
 import { drawWeapon } from '../weapon_stow';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
+import { druidEngineOnLandedStrike } from './druid_engines';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
-import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
+import { baseSwingSpeed, normalizedInstantSpeed, rangedAutoProfile } from './form_swing';
 import { isTravelFormAuraKind } from './forms';
+import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
+import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
+import { applyRequitalAutoAttack } from './paladin_talents';
+import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { rangedShotProfile } from './ranged_shot';
+import { triggerWardCycle } from './shaman_talents';
+import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_warspirit';
+import { blockedMeleeDamage } from './shield_block';
 import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 import { warriorMeleeDefense } from './warrior_hit_table';
@@ -70,6 +80,36 @@ const RANGED_WEAPON_COEFF = 0.6;
 const DUAL_WIELD_WHITE_MISS_PENALTY = 0.1;
 const SUDDEN_DEATH_CHANCE = 0.1;
 const SUDDEN_DEATH_DURATION = 10;
+const OFFHAND_AUTO_ATTACK_DMG_MULT = 0.5;
+
+// WEAPON DAMAGE CONTRACT: `weapon.min/max` is RAW per-swing damage at the weapon's
+// real speed, with the two-hand premium already folded in by itemization. A weapon's
+// power level is `avg / speed`, which is exactly how `item_budget.ts`
+// (`weaponDpsBudget`, `scaleWeaponDamage`) authors it and how
+// `tests/twohand_rebudget.test.ts` pins every two-hander to the curve. A slow weapon
+// therefore ALREADY hits harder per swing, because the author wrote a bigger number.
+//
+// So the swing path must NOT re-derive that. v0.30.0 briefly multiplied the roll by
+// `speed / 2 * TWOHAND_DPS_MULT`, treating min/max as a speed-normalized figure. That
+// double-counted both terms: four weapons authored at an identical 15.0 dps delivered
+// 12.9 / 15.0 / 22.7 / 25.6 dps at speeds 1.7 / 2.0 / 3.0 / 3.4 (only the 2.0 baseline
+// came out right, the signature of a conversion applied to already-converted data), and
+// it silently moved sustained Fury from 147.2 to 186.3 on `scripts/fury_dps_probe.ts`
+// with no warrior change in between. The offhand's classic 50% penalty is the one
+// genuine swing-time adjustment and stays here.
+type AutoAttackHand = 'mainhand' | 'offhand';
+
+function hasDualWieldWhiteMissPenalty(ctx: SimContext, player: Entity, meta: PlayerMeta): boolean {
+  if (!player.dualWielding) return false;
+  // Both Warspirit weapons feed one shared three-hit cadence. Applying the generic
+  // dual-wield penalty here suppresses the specialization's damage and signature
+  // procs twice, especially against higher-level bosses.
+  return meta.cls !== 'shaman' || ctx.playerMods(meta).spec !== 'enhancement';
+}
+
+function autoAttackWeaponDamageMult(hand: AutoAttackHand): number {
+  return hand === 'offhand' ? OFFHAND_AUTO_ATTACK_DMG_MULT : 1;
+}
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -77,6 +117,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;
+  if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   // A target that just DIED (commonly the mob the engaging spell killed) is not a
@@ -87,7 +128,10 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // still-alive snapshot just as quietly. A genuinely invalid target (none, or a
   // friendly) still reports the error.
   if (t?.dead) return;
-  if (!t || !ctx.isHostileTo(p, t)) {
+  // Vanish (hasEscapeStealth) makes the target fully undetectable, same as a
+  // mob that lost line of sight on a stealthed player (mob/targeting.ts): a
+  // fresh engage against it is refused exactly like any other invalid target.
+  if (!t || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
@@ -133,13 +177,18 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
     p.autoAttack = false;
     return;
   }
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+  // A target that slips into Vanish's escape stealth mid-fight must drop the
+  // swing too (issue #2426): the client stops rendering it as targeted, but
+  // without this the swing kept connecting on a target the caster could no
+  // longer see, the same detection the mob AI already honors (mobCanSeeTarget).
+  if (!t || t.dead || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
     p.autoAttack = false;
     return;
   }
@@ -178,12 +227,20 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // logic in Sim.abilityNeedsLineOfSight.
   if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
   ctx.breakGhostWolf(p);
+  const dualWieldWhiteMissPenalty = hasDualWieldWhiteMissPenalty(ctx, p, meta);
 
   if (p.swingTimer <= 0) {
     let bonus = 0;
     let abilityName: string | null = null;
+    let abilityId: string | undefined;
     let threatFlat = 0;
     let threatMult = 1;
+    // The resolved talent/mastery damage multiplier for the queued on-swing
+    // ability (weaponMult, mirroring weaponStrike's own field): meleeSwing
+    // applies it to the WHOLE swing (weapon roll + AP), not just `bonus`, so a
+    // "+X%" mastery/talent reaches the weapon+AP portion of a Heroic Strike /
+    // Raptor Strike style on-next-swing hit too (issue #1803).
+    let weaponMult = 1;
     if (p.queuedOnSwing) {
       const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
       if (queued) {
@@ -200,8 +257,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
           bonus = eff.bonus;
           abilityName = queued.def.name;
+          abilityId = queued.def.id;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
+          weaponMult = resolveTalentHitMult(queued.def, ctx.playerMods(meta)).dmgMult;
         }
       }
       p.queuedOnSwing = null;
@@ -209,9 +268,13 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       delete p.queuedOnSwingCostMultiplier;
     }
     const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
+      autoAttackHand: 'mainhand',
+      abilityId,
       threatFlat,
       threatMult,
-      whiteDualWieldPenalty: p.dualWielding && abilityName === null,
+      weaponMult,
+      whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
+      autoAttack: true,
     });
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
@@ -219,7 +282,9 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const extraAttackPct = ctx.playerMods(meta).global.extraAttackPct;
     if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
       meleeSwing(ctx, p, t, 0, null, {
-        whiteDualWieldPenalty: p.dualWielding,
+        autoAttackHand: 'mainhand',
+        whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
+        autoAttack: true,
       });
     }
     maybeProcBattleTrance(ctx, p, meta, connected);
@@ -236,9 +301,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const offhand = p.offhandWeapon;
     const connected = meleeSwing(ctx, p, t, 0, null, {
       weapon: offhand,
-      weaponMult: 0.5,
+      autoAttackHand: 'offhand',
       apSwingSpeed: offhand.speed,
-      whiteDualWieldPenalty: true,
+      whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
+      autoAttack: true,
     });
     maybeProcBattleTrance(ctx, p, meta, connected);
     maybeProcSuddenDeath(ctx, p, meta, connected);
@@ -362,6 +428,7 @@ export function rangedSwing(
       true,
       !ranged.wand,
     );
+    applyRequitalAutoAttack(ctx, atk, tgt);
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
     if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
@@ -384,6 +451,7 @@ export function meleeSwing(
     cannotBeDodged?: boolean;
     weapon?: WeaponInfo;
     weaponMult?: number;
+    autoAttackHand?: AutoAttackHand;
     apSwingSpeed?: number;
     threatFlat?: number;
     threatMult?: number;
@@ -393,7 +461,22 @@ export function meleeSwing(
     // shared hit table.
     critBonus?: number;
     onDealt?: (amount: number) => void;
+    onEffectiveDamage?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    autoAttack?: boolean;
+    // The casting ability's stable content id, threaded onto the landed-hit
+    // damage event's abilityId field (the weaponStrike path only; a plain
+    // auto-attack swing has no ability and leaves this unset). abilityName
+    // above stays the display label, so a client-side impact-cue lookup
+    // keyed off it silently breaks on the next rename (review finding, PR
+    // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
+    // impact cues unreachable).
+    abilityId?: string | null;
+    // Classic instant-attack normalization (weaponStrike effect `normalized`):
+    // scale the weapon-damage portion to a fixed normalized speed by weapon
+    // class instead of the weapon's real speed. Only meaningful for an ability
+    // swing (autoAttackHand undefined); a real auto attack ignores it.
+    normalizedInstant?: boolean;
   },
 ): boolean {
   const missChance =
@@ -452,12 +535,29 @@ export function meleeSwing(
   }
   const mult = opts.weaponMult ?? 1;
   const weapon = opts.weapon ?? attacker.weapon;
-  const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
+  // An instant special attack that opts into normalization is resolved as if
+  // the weapon swung at its normalized speed: both the weapon-roll portion and
+  // the AP-per-swing contribution use the normalized speed, not the real one.
+  // A real auto attack (autoAttackHand set) never normalizes. Under the raw
+  // per-swing weapon contract (see the header comment) the roll rescale stays
+  // coherent: roll times normSpeed over speed reads as the weapon's authored
+  // dps at the normalized speed, so the special is speed-neutral by design.
+  const normSpeed =
+    opts.normalizedInstant && opts.autoAttackHand === undefined
+      ? normalizedInstantSpeed(weapon)
+      : undefined;
+  const weaponRollMult =
+    opts.autoAttackHand === undefined
+      ? normSpeed !== undefined
+        ? normSpeed / Math.max(0.1, weapon.speed)
+        : 1
+      : autoAttackWeaponDamageMult(opts.autoAttackHand);
+  const apSwingSpeed = opts.apSwingSpeed ?? normSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
   let dmg =
-    (ctx.rng.range(weapon.min, weapon.max) +
+    (ctx.rng.range(weapon.min, weapon.max) * weaponRollMult +
       // Normalize the attack-power contribution to the SAME cadence the swing
       // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
       // AP-per-swing must use that speed too, not the slow staff's, or feral
@@ -477,10 +577,22 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
-    dmg = Math.max(1, dmg - target.blockValue);
+  const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+  if (blocked) {
+    const targetMeta = target.kind === 'player' ? ctx.players.get(target.id) : undefined;
+    const targetSpec = targetMeta ? ctx.playerMods(targetMeta).spec : null;
+    dmg = blockedMeleeDamage(
+      dmg,
+      target.blockValue,
+      target.templateId === 'paladin' && targetSpec === 'protection',
+    );
+    if (targetMeta && targetSpec === 'protection') {
+      grantDevotionFromBlock(target);
+      tryGrantSolarReprisal(ctx, target, 'block');
+    }
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
+  const hpBefore = target.hp;
   const resolvedAmount = ctx.dealDamage(
     attacker,
     target,
@@ -488,14 +600,26 @@ export function meleeSwing(
     crit,
     'physical',
     abilityName,
-    'hit',
+    blocked ? 'block' : 'hit',
     false,
     {
       flat: opts.threatFlat ?? 0,
-      mult: opts.threatMult ?? 1,
+      mult: (opts.threatMult ?? 1) * stoneboundThreatMultiplier(ctx, attacker),
     },
+    true,
+    false,
+    false,
+    // Cue-presentation only on this path: onSpellCrit skips the physical
+    // school, so the id can never newly arm an ability-filtered proc here.
+    opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);
+  opts.onEffectiveDamage?.(Math.max(0, hpBefore - target.hp));
+  if (opts.autoAttack) {
+    applyRequitalAutoAttack(ctx, attacker, target);
+    tryGrantDawnsWrath(ctx, attacker);
+  }
+  druidEngineOnLandedStrike(ctx, attacker, opts.abilityId ?? undefined);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.
@@ -503,7 +627,14 @@ export function meleeSwing(
   // Landed-swing talent responses resolve before the target retaliates or the
   // weapon's on-hit proc fires. This is observable for defensive healing and
   // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
-  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
+  if (attacker.kind === 'player') {
+    if (abilityName === null) advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 1);
+    else if (abilityName === 'Ancestral Strike') {
+      advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 2);
+      triggerWardCycle(ctx, attacker);
+    }
+    onMeleeSwing(ctx, attacker);
+  }
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
@@ -526,7 +657,11 @@ export function meleeSwing(
     }
   }
   // Legendary on-hit weapon procs (e.g. Thronebane's Chain Arc). No-op (no rng
-  // draw) unless the attacker wields a proc weapon with a weaponHit proc.
-  runWeaponProcs(ctx, attacker, target, 'weaponHit');
+  // draw) unless the SWINGING hand's weapon carries a weaponHit proc: an
+  // off-hand swing rolls the OFF-HAND weapon's procs, not the mainhand's (the
+  // dual-wield bug). Ability strikes (autoAttackHand undefined) use the mainhand.
+  const procWeaponId =
+    opts.autoAttackHand === 'offhand' ? attacker.offhandItemId : attacker.mainhandItemId;
+  runWeaponProcs(ctx, attacker, target, 'weaponHit', procWeaponId);
   return true;
 }

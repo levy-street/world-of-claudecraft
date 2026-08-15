@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
   RIFT_EPIC_ITEM_IDS,
-  RIFT_LEGENDARY_ITEM_ID,
+  RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
 import { ITEMS, MOBS } from '../src/sim/data';
+import { occupiesHand } from '../src/sim/equipment_rules';
 import {
   expectedStatBudget,
   itemFromRaid,
@@ -18,6 +19,7 @@ import {
   primaryStatSum,
   RAID_ILVL_BONUS,
   RIFT_CLEAR_LOOT_SOURCE_LEVEL,
+  RIFT_LEGENDARY_LOOT_SOURCE_LEVEL,
   resetItemLevelCache,
 } from '../src/sim/item_level';
 
@@ -313,7 +315,15 @@ describe('item level: every level-20 item is balanced to budget', () => {
     for (const id of Object.keys(ITEMS)) {
       const item = ITEMS[id];
       if (!item.slot || itemSourceLevel(id) !== 20) continue;
-      const hand = item.kind === 'weapon' && item.hand === 'twohand' ? 'twohand' : 'onehand';
+      // The hand dimension is what the item COSTS in hands, which is what its
+      // budget line is priced on: a two-hander takes both, a worn offhand (a
+      // quiver) takes none and so prices below the held offhand it shares a slot
+      // with. Three lines, not two.
+      const hand = !occupiesHand(item)
+        ? 'worn'
+        : item.kind === 'weapon' && item.hand === 'twohand'
+          ? 'twohand'
+          : 'onehand';
       const key = `${itemLevel(item)}:${item.quality}:${item.slot}:${hand}`;
       let sums = groups.get(key);
       if (!sums) {
@@ -343,7 +353,7 @@ describe('item level: purity and determinism', () => {
   });
 });
 
-describe('item level: rift gear is budget-exact (rares ilvl 26, clear-time epics/legendary ilvl 31/35)', () => {
+describe('item level: rift gear is budget-exact (rares ilvl 26, epics ilvl 31, legendaries ilvl 37)', () => {
   it('rift world-drop rares resolve at ilvl 26 with exact budget', () => {
     // Rift mobs have maxLevel 23 (rank retune: max spawn level is 23).
     // Rare quality adds 3, so ilvl = 26.
@@ -377,18 +387,27 @@ describe('item level: rift gear is budget-exact (rares ilvl 26, clear-time epics
     }
   });
 
-  it('rift legendary resolves at ilvl 35 with exact budget', () => {
-    // Legendary quality adds 10, so ilvl = 25 + 10 = 35.
-    const item = ITEMS[RIFT_LEGENDARY_ITEM_ID];
-    expect(item, `${RIFT_LEGENDARY_ITEM_ID} is a real item`).toBeTruthy();
-    expect(itemSourceLevel(RIFT_LEGENDARY_ITEM_ID), `${RIFT_LEGENDARY_ITEM_ID} source`).toBe(
-      RIFT_CLEAR_LOOT_SOURCE_LEVEL,
+  it('every rift legendary resolves at ilvl 37 with exact budget, and is NOT a raid drop', () => {
+    // The S legendaries sit a tier above the clear-time epics, at the raid SOURCE
+    // level (27), so legendary quality's +10 puts them at ilvl 37. Iterated over
+    // the whole pool, not just the first: the S chase is TWO independent rolls,
+    // and a second legendary added off the wrong source level would be the silent
+    // way to slip an over-budget chase item in.
+    expect(RIFT_LEGENDARY_ITEM_IDS.length, 'the S chase is a pair').toBe(2);
+    expect(RIFT_LEGENDARY_LOOT_SOURCE_LEVEL, 'one tier above the clear epics').toBe(
+      RIFT_CLEAR_LOOT_SOURCE_LEVEL + 2,
     );
-    expect(item.quality, `${RIFT_LEGENDARY_ITEM_ID} quality`).toBe('legendary');
-    expect(itemLevel(item), `${RIFT_LEGENDARY_ITEM_ID} ilvl`).toBe(35);
-    expect(primaryStatSum(item), `${RIFT_LEGENDARY_ITEM_ID} stat sum == budget`).toBe(
-      expectedStatBudget(item),
-    );
+    for (const id of RIFT_LEGENDARY_ITEM_IDS) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(itemSourceLevel(id), `${id} source`).toBe(RIFT_LEGENDARY_LOOT_SOURCE_LEVEL);
+      expect(item.quality, `${id} quality`).toBe('legendary');
+      expect(itemLevel(item), `${id} ilvl`).toBe(37);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+      // Sharing the raid SOURCE level must not make it read as raid loot: the two
+      // are separate axes and only the level is borrowed.
+      expect(itemFromRaid(id), `${id} is not a raid drop`).toBe(false);
+    }
   });
 });
 

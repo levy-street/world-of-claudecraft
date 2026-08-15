@@ -406,6 +406,11 @@ The two-half icon system stays; this program raises its finish, it does not repl
   `tests/deed_icons.test.ts`). The compositor's painted-classic rules live in
   `docs/design/icon-system.md`: light from top-left, baked bevel frame, seeded speck noise,
   quality border in CSS outside the bevel.
+  Inventory paintings additionally follow the canonical, versioned
+  `docs/design/item-icon-art-style.md` contract (`woc-item-icon-v1`). It owns item-family
+  composition, approved
+  references, the reusable generation brief, master and shipping rules, small-size review, and
+  provenance for every bag, bank, vendor, equipment, loot, mail, and tooltip item image.
 - **Vector chrome glyphs** (menus, panel controls, status markers): the inline-SVG registry
   in `src/ui/ui_icons.ts` (`svgIcon`, monochrome, `fill: currentColor`). These inherit the
   themed accent from CSS `color` and are the only sanctioned thin-line icons; they serve
@@ -997,7 +1002,11 @@ animation shed; verify both extremes before calling a component done. Guards:
 
 New UI lands as a pure view-core plus thin painter on the `PainterHost` seam, composed by
 `Hud`, per the recipe in `src/ui/CLAUDE.md`; cores register in the `UI_PURE_CORES`
-allowlist in `tests/architecture.test.ts`. Per-frame code writes DOM only through the
+allowlist in `tests/architecture.test.ts`. A `src/ui` module that can be neither (it must
+touch the DOM and is not a painter) is a painter-side helper, a last resort, registered in
+that same file's `UI_PAINTER_HELPERS` for its hard contract or in `UI_DOM_MODULES` when it
+owns browser state; the classification sweep there fails on an unregistered module that
+reaches a host. Per-frame code writes DOM only through the
 elided writers, never reads layout in the hot path, and keeps allocation-light cores.
 Restyling must not regress the standing budget (`tests/painter_host.test.ts`,
 `tests/hud_perf_budget.test.ts` with its committed baseline, `scripts/perf_tour.mjs`).

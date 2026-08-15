@@ -227,6 +227,11 @@ describe('installWindowResize tap safety', () => {
       expect(el.style).toEqual({});
       expect(el.dataset).toEqual({});
       expect(el.classList.contains('window-resizing')).toBe(false);
+      // No explicit size was written, so the window must NOT claim the sized
+      // contract either: .window-sized drops the body's authored viewport cap
+      // (see the resized-window fill block in src/styles/components.css), and a
+      // bare tap doing that would reflow a window nobody actually resized.
+      expect(el.classList.contains('window-sized')).toBe(false);
     } finally {
       restore();
     }
@@ -247,6 +252,23 @@ describe('installWindowResize tap safety', () => {
       fire('pointerup', {});
       expect(el.classList.contains('window-resizing')).toBe(false);
       expect(el.style.width).toBe('430px');
+    } finally {
+      restore();
+    }
+  });
+
+  it('stamps window-sized at engage and keeps it after the drag ends', () => {
+    const { el, fire, restore } = setup();
+    try {
+      fire('pointerdown', { clientX: CORNER.x, clientY: CORNER.y });
+      fire('pointermove', { clientX: CORNER.x + RESIZE_ENGAGE_SLOP, clientY: CORNER.y });
+      expect(el.classList.contains('window-sized')).toBe(true);
+      fire('pointerup', {});
+      // Unlike window-resizing (a live-drag cursor/selection flag), window-sized is
+      // permanent: the inline width/height outlive the drag, so the body has to keep
+      // following the window box for the rest of the session.
+      expect(el.classList.contains('window-sized')).toBe(true);
+      expect(el.classList.contains('window-resizing')).toBe(false);
     } finally {
       restore();
     }

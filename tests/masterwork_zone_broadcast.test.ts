@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Masterwork zone broadcast (Professions 2.0): a masterwork proc in
 // the overworld emits one pid-scoped `masterworkZone` copy per player in the
@@ -49,18 +49,21 @@ import { Hud } from '../src/ui/hud';
 import { t } from '../src/ui/i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
 import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
 // Hunted proc seed, pinned (the professions_masterwork suite idiom: only the
-// pinned literal is committed). With tailoring as the active archetype and
-// skill 200 the single output-side draw procs at 0.14; at this seed, with this
-// exact setup order (three extra players added, then the archetype accept, the
-// skill poke, 3x linen_scrap, 1x spider_leg, then the craft), the first craft
-// procs. Position pokes after setup draw nothing, so both placements below
-// share the identical stream. Spare hunted seeds on record: 26, 31, 38, 55.
-const PROC_SEED = 7;
+// pinned literal is committed), re-recorded after the Eastbrook camp respacing
+// thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
+// sequence. With tailoring as the active archetype and skill 200 the single
+// output-side draw procs at 0.14; at this seed, with this exact setup order
+// (three extra players added, then the archetype accept, the skill poke, 3x
+// linen_scrap, 1x spider_leg, then the craft), the first craft procs. Position
+// pokes after setup draw nothing, so both placements below share the identical
+// stream. Spare hunted seeds on record: 21, 23, 27, 28.
+const PROC_SEED = 2;
 
 // One procced craft with an audience: a bystander in the crafter's zone, a
 // player parked in instance space, and a player moved to a different overworld
@@ -103,7 +106,7 @@ function runScenario(opts?: { crafterInInstanceSpace?: boolean }) {
   rng.setObserver(() => {
     draws++;
   });
-  sim.craftItem(RECIPE_ID, false, crafter);
+  runCraft(sim, RECIPE_ID, false, crafter);
   rng.setObserver(null);
   const events = sim.drainEvents();
   return {
@@ -172,7 +175,9 @@ describe('emit side (Sim.craftItem)', () => {
 // A ClientWorld with no constructor run (the bareClient idiom from
 // tests/masterwork_event_mirror.test.ts): lastMasterwork only exists once the
 // real event-apply path assigns it, so an accidental assignment from the zone
-// copy cannot hide behind an initializer default.
+// copy cannot hide behind an initializer default. Kept bespoke on purpose
+// (issue #2088): the shared tests/helpers/bare_client.ts bareClient() always
+// sets lastMasterwork, which would defeat this liveness point.
 function bareClient(): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   (c as unknown as { eventQueue: SimEvent[] }).eventQueue = [];
@@ -324,6 +329,7 @@ interface MasterworkZoneHudHarness {
     playerId: number;
     craftingIdentity: { synced: boolean };
     craftSkills: Record<string, number>;
+    gatheringProficiency: Record<string, number>;
   };
   renderer: { handleEvent: ReturnType<typeof vi.fn> };
   playEventSfx: ReturnType<typeof vi.fn>;
@@ -344,6 +350,7 @@ function masterworkZoneHud(): MasterworkZoneHudHarness {
     playerId: 9,
     craftingIdentity: { synced: false },
     craftSkills: {},
+    gatheringProficiency: {},
   };
   hud.renderer = { handleEvent: vi.fn() };
   hud.playEventSfx = vi.fn();

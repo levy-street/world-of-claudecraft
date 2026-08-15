@@ -2,7 +2,7 @@
 // deciding when two inventory slots of the same itemId may share a stack.
 // Before this predicate every instanced slot (#1165) sat one-per-slot at count 1;
 // now byte-equal payloads (same signer, same rolled quality/stats/masterwork,
-// same enchant, same boundTo) merge up to the item's stack cap. bags.ts
+// same enchant, same craftedRecipeId, same boundTo) merge up to the item's stack cap. bags.ts
 // countFit/addStacked, Sim.addItemInstance, bank.ts moveBetweenContainers,
 // and trade.ts fitsAfterSwap all consume canStackInstancePayloads below, so
 // the merge rule cannot drift between bags, bank, and trade.
@@ -34,7 +34,7 @@ function structurallyEqual(a: unknown, b: unknown): boolean {
 
 /** True when the two payloads are structurally identical over the full
  *  payload shape (signer, charges, rolled incl. quality/stats/masterwork,
- *  enchant, boundTo, and any persisted extra field). Two absent payloads are
+ *  enchant, craftedRecipeId, boundTo, and any persisted extra field). Two absent payloads are
  *  equal; a payload never equals no payload (a plain stack stays distinct
  *  from every instanced one, in both directions). */
 export function itemInstancePayloadsEqual(
@@ -45,13 +45,17 @@ export function itemInstancePayloadsEqual(
   return structurallyEqual(a, b);
 }
 
-/** False when the payload carries `charges`: charges is the one payload field
- *  with mutate-in-place per-unit semantics, and a counted stack shares ONE
- *  payload object, so charge-bearing payloads stay one-per-slot as a
- *  structural safety (no shipped stackable item carries charges today; this
- *  is a forward guard). An absent payload is trivially mergeable. */
+/** False when the payload carries `charges` or is player-locked: charges is
+ *  the one payload field with mutate-in-place per-unit semantics, and a
+ *  counted stack shares ONE payload object, so charge-bearing payloads stay
+ *  one-per-slot as a structural safety (no shipped stackable item carries
+ *  charges today; this is a forward guard). A locked copy (issue 3042,
+ *  item_lock.ts isItemLocked) stays one-per-slot for a different reason: the
+ *  player locked exactly ONE unit, and merging it into a plain or
+ *  differently-locked stack would silently taint or launder that choice. An
+ *  absent payload is trivially mergeable. */
 export function isMergeableInstancePayload(p: ItemInstancePayload | undefined): boolean {
-  return p?.charges === undefined;
+  return p?.charges === undefined && p?.locked !== true;
 }
 
 /** The single merge predicate every stacking site consumes: both payloads

@@ -3,11 +3,13 @@ import { warriorParryChance } from '../src/sim/combat/warrior_hit_table';
 import { CLASSES } from '../src/sim/content/classes';
 import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import { recalcPlayerStats } from '../src/sim/entity';
+import { COMBAT_SPIRIT_REGEN_FRACTION } from '../src/sim/mana_regen';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, armorReduction, type PlayerClass, type WorldContent } from '../src/sim/types';
 import {
   agiMeleeApPerPoint,
   buildStatTooltip,
+  combatManaPer5s,
   healthFromStamina,
   isManaClass,
   manaFromIntellect,
@@ -209,6 +211,7 @@ describe('class-aware effect selection', () => {
     const spiDruid = buildStatTooltip('spi', inputFor('druid', druid));
     expect(spiDruid.minorForClass).toBe(false);
     expect(effect(spiDruid.effects, 'manaRegen')).toBeDefined();
+    expect(effect(spiDruid.effects, 'manaRegenCombat')).toBeDefined();
   });
 
   it('derived cells carry their notes and no header', () => {
@@ -248,6 +251,16 @@ describe('pure regen / pool helpers', () => {
     expect(restingManaPer5s(30, 20)).toBe(Math.round(Math.round(30 / 3 + 4 + 4) * 2.5)); // 45
     expect(restingManaPer5s(0, 1)).toBe(Math.round(Math.round(0 + 4 + 0) * 2.5)); // 10
   });
+
+  it('combat regen mirrors the sim: round(full * fraction) per tick, then scaled to per-5s', () => {
+    // full per-tick (spi 30, level 20) = round(30/3 + 4 + 4) = 18; combat per-tick =
+    // round(18 * 0.3) = 5; per-5s = round(5 * 2.5) = 13.
+    const combatPerTick = Math.round((30 / 3 + 4 + 4) * COMBAT_SPIRIT_REGEN_FRACTION);
+    expect(combatManaPer5s(30, 20)).toBe(Math.round(combatPerTick * 2.5)); // 23
+    expect(combatManaPer5s(30, 20)).toBeLessThan(restingManaPer5s(30, 20));
+    // Never negative, even with no Spirit at level 1 (the flat floor persists).
+    expect(combatManaPer5s(0, 1)).toBeGreaterThan(0);
+  });
 });
 
 describe('weaponDps', () => {
@@ -282,9 +295,15 @@ describe('effect wiring reconciles each effect kind with its source', () => {
     expect(effVal('warrior', p, 'sta', 'healthRegen')).toBe(restingHealthPer5s(p.stats.sta));
   });
 
-  it('mana classes wire spirit -> manaRegen and intellect -> spellCritPct', () => {
+  it('mana classes wire spirit -> manaRegen (resting) + manaRegenCombat, and intellect -> spellCritPct', () => {
     const p = freshPlayer('mage', 20);
     expect(effVal('mage', p, 'spi', 'manaRegen')).toBe(restingManaPer5s(p.stats.spi, p.level));
+    // Spirit now also shows an in-combat regen line (the "mp5" share), strictly
+    // positive and strictly below the resting line.
+    const combat = effVal('mage', p, 'spi', 'manaRegenCombat');
+    expect(combat).toBe(combatManaPer5s(p.stats.spi, p.level));
+    expect(combat).toBeGreaterThan(0);
+    expect(combat).toBeLessThan(restingManaPer5s(p.stats.spi, p.level));
     // spell crit = 0.05 + int*0.0008 (sim.ts spellCrit); the line shows the int*0.0008 portion as a percent
     expect(effVal('mage', p, 'int', 'spellCritPct')).toBeCloseTo(p.stats.int * 0.0008 * 100, 6);
   });

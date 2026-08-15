@@ -12,9 +12,12 @@
 // resolver, spawn()/halt()/resume() from the 'orb' events, update(dt) once per
 // frame from the same block that ticks the other transient systems (vfx /
 // lightPulses). Per-frame work is allocation-free: geometries are built once
-// and shared; materials and the trail buffer are per orb (they animate) and
-// disposed when the orb expires. Math.random here is fine: this is the
-// renderer, the determinism ban is sim-only.
+// and shared; materials are per-role free lists (mage-heavy fights spawn and
+// expire many orbs in a burst, so a released material is returned to its
+// role's pool and reacquired by the next spawn instead of a fresh
+// new/dispose round trip; a pool disposes past a fixed cap so it stays
+// bounded). The trail buffer stays per orb. Math.random here is fine: this
+// is the renderer, the determinism ban is sim-only.
 
 import * as THREE from 'three';
 import { SCHOOL_COLORS } from './vfx';
@@ -44,6 +47,9 @@ const TRAIL_SIZE = 0.14;
 const TRAIL_SPREAD = 0.45; // spawn scatter around the orb's heart (yards)
 const TRAIL_DRIFT = 0.6; // outward drift speed (yards/s)
 const TRAIL_SINK = 0.5; // downward drift (yards/s), melting snowfall
+// Per-role material pool cap: generous headroom over any plausible concurrent
+// orb count so a pool bounds memory without ever binding in normal play.
+const MAX_POOL_SIZE = 32;
 
 export interface FrozenOrbSpawn {
   sourceId: number;
@@ -91,6 +97,12 @@ export class FrozenOrbFx {
   private shellGeo: THREE.SphereGeometry | null = null;
   private coreGeo: THREE.SphereGeometry | null = null;
   private shardGeo: THREE.TetrahedronGeometry | null = null;
+  // Per-role free lists: a released material is pushed here instead of
+  // disposed, and popped by the next spawn instead of constructed fresh.
+  private readonly shellPool: THREE.MeshStandardMaterial[] = [];
+  private readonly corePool: THREE.MeshBasicMaterial[] = [];
+  private readonly shardPool: THREE.MeshStandardMaterial[] = [];
+  private readonly trailPool: THREE.PointsMaterial[] = [];
 
   constructor(scene: THREE.Scene, groundY: (x: number, z: number) => number) {
     this.scene = scene;
@@ -109,31 +121,10 @@ export class FrozenOrbFx {
     const frost = new THREE.Color(SCHOOL_COLORS.frost);
     // Translucent icy shell: the emissive term keeps it readable in shade and
     // feeds the bloom pass a soft blue halo without an actual light.
-    const shellMat = new THREE.MeshStandardMaterial({
-      color: frost,
-      emissive: frost.clone().multiplyScalar(0.55),
-      roughness: 0.18,
-      metalness: 0,
-      transparent: true,
-      opacity: SHELL_OPACITY,
-      depthWrite: false,
-    });
+    const shellMat = this.acquireShellMat(frost);
     // Bright additive heart, over the bloom threshold so the orb glows.
-    const coreMat = new THREE.MeshBasicMaterial({
-      color: frost.clone().multiplyScalar(1.9),
-      transparent: true,
-      opacity: CORE_OPACITY,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    const shardMat = new THREE.MeshStandardMaterial({
-      color: 0xcfeaff,
-      emissive: frost.clone().multiplyScalar(0.35),
-      roughness: 0.25,
-      metalness: 0,
-      transparent: true,
-      opacity: SHARD_OPACITY,
-    });
+    const coreMat = this.acquireCoreMat(frost);
+    const shardMat = this.acquireShardMat(frost);
 
     const group = new THREE.Group();
     group.add(new THREE.Mesh(this.shellGeo, shellMat));
@@ -172,15 +163,7 @@ export class FrozenOrbFx {
     }
     const trailGeo = new THREE.BufferGeometry();
     trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
-    const trailMat = new THREE.PointsMaterial({
-      color: frost.clone().multiplyScalar(1.7),
-      size: TRAIL_SIZE,
-      transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      sizeAttenuation: true,
-    });
+    const trailMat = this.acquireTrailMat(frost);
     const trail = new THREE.Points(trailGeo, trailMat);
     trail.frustumCulled = false; // world-scattered motes; the pool is tiny
     this.scene.add(trail);
@@ -207,6 +190,84 @@ export class FrozenOrbFx {
       elapsed: 0,
       halted: false,
     });
+  }
+
+  private acquireShellMat(frost: THREE.Color): THREE.MeshStandardMaterial {
+    const pooled = this.shellPool.pop();
+    if (pooled) {
+      pooled.color.set(frost);
+      pooled.emissive.set(frost).multiplyScalar(0.55);
+      pooled.opacity = SHELL_OPACITY;
+      return pooled;
+    }
+    return new THREE.MeshStandardMaterial({
+      color: frost,
+      emissive: frost.clone().multiplyScalar(0.55),
+      roughness: 0.18,
+      metalness: 0,
+      transparent: true,
+      opacity: SHELL_OPACITY,
+      depthWrite: false,
+    });
+  }
+
+  private acquireCoreMat(frost: THREE.Color): THREE.MeshBasicMaterial {
+    const pooled = this.corePool.pop();
+    if (pooled) {
+      pooled.color.set(frost).multiplyScalar(1.9);
+      pooled.opacity = CORE_OPACITY;
+      return pooled;
+    }
+    return new THREE.MeshBasicMaterial({
+      color: frost.clone().multiplyScalar(1.9),
+      transparent: true,
+      opacity: CORE_OPACITY,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+  }
+
+  private acquireShardMat(frost: THREE.Color): THREE.MeshStandardMaterial {
+    const pooled = this.shardPool.pop();
+    if (pooled) {
+      pooled.color.set(0xcfeaff);
+      pooled.emissive.set(frost).multiplyScalar(0.35);
+      pooled.opacity = SHARD_OPACITY;
+      return pooled;
+    }
+    return new THREE.MeshStandardMaterial({
+      color: 0xcfeaff,
+      emissive: frost.clone().multiplyScalar(0.35),
+      roughness: 0.25,
+      metalness: 0,
+      transparent: true,
+      opacity: SHARD_OPACITY,
+    });
+  }
+
+  private acquireTrailMat(frost: THREE.Color): THREE.PointsMaterial {
+    const pooled = this.trailPool.pop();
+    if (pooled) {
+      pooled.color.set(frost).multiplyScalar(1.7);
+      pooled.opacity = 0.85;
+      return pooled;
+    }
+    return new THREE.PointsMaterial({
+      color: frost.clone().multiplyScalar(1.7),
+      size: TRAIL_SIZE,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+  }
+
+  // Return a released material to its role's pool, up to the fixed cap; past
+  // the cap it is disposed like before, so pool memory stays bounded.
+  private release<T extends THREE.Material>(pool: T[], mat: T): void {
+    if (pool.length < MAX_POOL_SIZE) pool.push(mat);
+    else mat.dispose();
   }
 
   /** The orb latched onto an enemy: freeze the drift at the server's real spot. */
@@ -290,10 +351,10 @@ export class FrozenOrbFx {
     const orb = this.orbs[index];
     this.scene.remove(orb.group);
     this.scene.remove(orb.trail);
-    orb.shellMat.dispose();
-    orb.coreMat.dispose();
-    orb.shardMat.dispose();
-    orb.trailMat.dispose();
+    this.release(this.shellPool, orb.shellMat);
+    this.release(this.corePool, orb.coreMat);
+    this.release(this.shardPool, orb.shardMat);
+    this.release(this.trailPool, orb.trailMat);
     orb.trail.geometry.dispose();
     this.orbs.splice(index, 1);
   }

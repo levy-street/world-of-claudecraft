@@ -60,6 +60,7 @@ describe('PartyFrameProjectionCache', () => {
           // actionable rows rather than trusting the entity's aura order.
           aura({ id: 'maintenance', kind: 'buff_ap', value: 2, sourceId: 33 }),
           aura({ id: 'renew', kind: 'hot', value: 20, sourceId: 33 }),
+          aura({ id: 'shaman_mending_current', kind: 'hot', value: 300, sourceId: 33 }),
           aura({ id: 'rend', kind: 'dot', value: 5, sourceId: 99 }),
           aura({
             id: 'temporal_echo',
@@ -94,31 +95,31 @@ describe('PartyFrameProjectionCache', () => {
       { id: 'rend', kind: 'dot', remaining: 10 },
       { id: 'temporal_echo', kind: 'temporal_echo', remaining: 12 },
       { id: 'renew', kind: 'hot', remaining: 10 },
+      { id: 'shaman_mending_current', kind: 'hot', remaining: 10, poolPct: 30 },
       { id: 'hot_0', kind: 'hot', remaining: 10 },
       { id: 'hot_1', kind: 'hot', remaining: 10 },
       { id: 'hot_2', kind: 'hot', remaining: 10 },
       { id: 'hot_3', kind: 'hot', remaining: 10 },
-      { id: 'hot_4', kind: 'hot', remaining: 10 },
     ]);
     expect(forTwentyTwo.members[0].auras).toEqual([
       { id: 'rend', kind: 'dot', remaining: 10 },
       { id: 'temporal_echo', kind: 'temporal_echo', remaining: 23 },
       { id: 'renew', kind: 'hot', remaining: 10 },
+      { id: 'shaman_mending_current', kind: 'hot', remaining: 10, poolPct: 30 },
       { id: 'hot_0', kind: 'hot', remaining: 10 },
       { id: 'hot_1', kind: 'hot', remaining: 10 },
       { id: 'hot_2', kind: 'hot', remaining: 10 },
       { id: 'hot_3', kind: 'hot', remaining: 10 },
-      { id: 'hot_4', kind: 'hot', remaining: 10 },
     ]);
     expect(forThirtyThree.members[0].auras).toEqual([
       { id: 'rend', kind: 'dot', remaining: 10 },
       { id: 'renew', kind: 'hot', remaining: 10 },
+      { id: 'shaman_mending_current', kind: 'hot', remaining: 10, poolPct: 30 },
       { id: 'hot_0', kind: 'hot', remaining: 10 },
       { id: 'hot_1', kind: 'hot', remaining: 10 },
       { id: 'hot_2', kind: 'hot', remaining: 10 },
       { id: 'hot_3', kind: 'hot', remaining: 10 },
       { id: 'hot_4', kind: 'hot', remaining: 10 },
-      { id: 'hot_5', kind: 'hot', remaining: 10 },
     ]);
 
     // A second broadcast can happen without a sim tick. It must rebuild from

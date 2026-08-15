@@ -96,10 +96,16 @@ describe('theme pure core', () => {
       const text = vars['--color-text-light'];
       const muted = vars['--color-text-muted'];
       const accent = vars['--color-accent'];
+      // --color-material-use is the profession-affinity tooltip line: a teal
+      // wash over the repaired accent, itself repaired per preset. The
+      // unrepaired mix sat at 2.45:1 on the Parchment panel edge, so this arm
+      // is the regression pin for the repair.
+      const craft = vars['--color-material-use'];
       for (const bg of [panel, edge]) {
         expect(wcagContrast(text, bg), `${id} text on ${bg}`).toBeGreaterThanOrEqual(4.5);
         expect(wcagContrast(muted, bg), `${id} muted on ${bg}`).toBeGreaterThanOrEqual(3);
         expect(wcagContrast(accent, bg), `${id} accent on ${bg}`).toBeGreaterThanOrEqual(3);
+        expect(wcagContrast(craft, bg), `${id} craft on ${bg}`).toBeGreaterThanOrEqual(3);
       }
     }
   });

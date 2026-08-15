@@ -4,7 +4,9 @@
 // focusFirstInteractive) into a single trap + focus-first + return-to-opener system,
 // so there is one system, not two. It touches document.activeElement and listens on
 // document, so it is intentionally NOT in tests/architecture.test.ts UI_PURE_CORES;
-// the DOM-FREE boundary math it leans on lives in ./focus_order and IS registered.
+// it is registered in that file's UI_DOM_MODULES instead, as a module that owns
+// browser state. The DOM-FREE boundary math it leans on lives in ./focus_order and
+// IS a registered pure core.
 //
 // WHAT THIS OWNS:
 //   - the ONE canonical FOCUSABLE_SELECTOR (lifted from the old Hud helper, never
@@ -74,6 +76,14 @@ export interface FocusTrapHandle {
    * recorded opener (the old restoreFocus behavior).
    */
   release(returnFocus?: boolean): void;
+  /**
+   * The element recorded as this trap's opener (what release() would restore focus
+   * to). Exposed so a successor window opened FROM WITHIN the trapped window (e.g.
+   * quest dialog -> vendor) can hand its own opener chain forward instead of
+   * capturing an element inside the trap's own subtree, which is about to be
+   * hidden and would fail canFocus by the time the successor closes.
+   */
+  opener(): HTMLElement | null;
 }
 
 interface TrapState {
@@ -125,9 +135,12 @@ export class FocusManager {
         }
       }
       const focusables = this.focusablesIn(root);
-      // Skip the close (X) button on open so focus lands on a meaningful control, not the
-      // dismiss affordance; fall back to it only when it is the sole focusable element.
-      const target = focusables.find((el) => !el.matches('[data-close]')) ?? focusables[0];
+      // Skip dismiss and explicitly secondary header actions on open so focus
+      // lands on the window's primary content; keep them in the Tab cycle.
+      const target =
+        focusables.find(
+          (el) => !el.matches('[data-close]') && !el.matches('[data-skip-open-focus]'),
+        ) ?? focusables[0];
       (target ?? root).focus();
     }, 0);
   }
@@ -156,6 +169,7 @@ export class FocusManager {
         if (this.stack.length === 0) this.stopListening();
         if (returnFocus) this.restore(state.opener);
       },
+      opener: () => state.opener,
     };
   }
 

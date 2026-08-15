@@ -51,46 +51,35 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
   const row = $('#char-skin-row') as HTMLElement | null;
   if (!row) return;
   const cls = host.sim.cfg.playerClass;
-  const options = characterAppearanceOptions(cls, host.sim.accountCosmetics.mechChromaIds);
+  // The numbered class chromas are retired (Troy, 2026-08-06): the appearance
+  // customizer composes the body now, so a per-class recolour answers a
+  // question the player already answered on the creation screen. Purchased
+  // MECH chromas stay, together with the unequip control below, because the
+  // mech is a whole replacement body and dropping its row would strand a
+  // wearer inside the cosmetic with no way back to their own character. With
+  // no mech owned the row renders empty and collapses to nothing.
+  const options = characterAppearanceOptions(cls, host.sim.accountCosmetics.mechChromaIds).filter(
+    (option) => option.kind !== 'class',
+  );
   row.innerHTML = '';
   row.style.setProperty('--class-color', classCss(cls));
-  if (options.length <= 1) return;
-  if (options.some((option) => option.kind === 'mech')) void host.preloadMechAssets();
+  if (options.length === 0) return;
+  void host.preloadMechAssets();
   const current = Math.max(0, host.sim.player.skin ?? 0);
   const currentCatalog = host.sim.player.skinCatalog ?? 'class';
   for (const option of options) {
     const labelNumber = formatNumber(option.label, { maximumFractionDigits: 0 });
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = `skin-swatch${option.kind === currentCatalog && option.skin === current ? ' sel' : ''}`;
+    b.className = `skin-swatch${currentCatalog === 'mech' && option.skin === current ? ' sel' : ''}`;
     b.textContent = labelNumber;
     b.setAttribute('role', 'listitem');
-    b.setAttribute(
-      'aria-label',
-      option.kind === 'class'
-        ? t('auth.chromaOption', { n: labelNumber })
-        : mechChromaName(option.chromaId),
-    );
+    b.setAttribute('aria-label', mechChromaName(option.chromaId));
     b.addEventListener('click', () => {
       row.querySelectorAll('.skin-swatch').forEach((x) => {
         x.classList.remove('sel');
       });
       b.classList.add('sel');
-      if (option.kind === 'class') {
-        host.sim.changeSkin(option.skin, 'class');
-        const preview = activeCharacterAppearancePreview(
-          host.sim.cfg.playerClass,
-          option.skin,
-          'class',
-        );
-        host.mountCharPreview(
-          $('#char-model-preview'),
-          host.sim.cfg.playerClass,
-          preview.skin,
-          preview.visualKey,
-        );
-        return;
-      }
       host.sim.changeSkin(option.skin, 'mech');
       void host
         .preloadMechAssets()
@@ -115,13 +104,11 @@ export function paintCharSkinPicker(host: CharSkinPainterHost): void {
         .catch((err) => console.error('failed to load mech cosmetic preview:', err));
       audio.click();
     });
-    if (option.kind === 'mech') {
-      host.attachTooltip(
-        b,
-        () =>
-          `<div class="tt-name">${esc(mechChromaName(option.chromaId))}</div><div class="tt-sub">${esc(t('skinEvent.unlocked'))}</div>`,
-      );
-    }
+    host.attachTooltip(
+      b,
+      () =>
+        `<div class="tt-name">${esc(mechChromaName(option.chromaId))}</div><div class="tt-sub">${esc(t('skinEvent.unlocked'))}</div>`,
+    );
     row.appendChild(b);
   }
   const currentChroma = currentCatalog === 'mech' ? MECH_CHROMAS[current] : null;

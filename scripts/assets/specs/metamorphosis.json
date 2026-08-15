@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/metamorphosis/lich_form.glb",
+      "out": "models/chars/forms/metamorphosis.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Hit", "Death", "Cast"]
+    }
+  ]
+}

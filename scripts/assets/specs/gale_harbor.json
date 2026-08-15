@@ -1,0 +1,160 @@
+{
+  "comment": "The Galecrest's Wickharbor city and harbor set from KayKit Medieval Hexagon Pack (CC0), blue colorway to suit the coastal city (plus red for the lighthouse stripes and ship variety). Sourced from the user's local KayKit collection; hex-tile scale, decor entries carry scale.",
+  "items": [
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_home_A_blue.gltf",
+      "out": "models/biome/hexb_home_a.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_home_B_blue.gltf",
+      "out": "models/biome/hexb_home_b.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_tavern_blue.gltf",
+      "out": "models/biome/hexb_tavern.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_townhall_blue.gltf",
+      "out": "models/biome/hexb_townhall.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_workshop_blue.gltf",
+      "out": "models/biome/hexb_workshop.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_market_blue.gltf",
+      "out": "models/biome/hexb_market.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_docks_blue.gltf",
+      "out": "models/biome/hexb_docks.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_shipyard_blue.gltf",
+      "out": "models/biome/hexb_shipyard.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_stables_blue.gltf",
+      "out": "models/biome/hexb_stables.glb",
+      "type": "static",
+      "maxTex": 512,
+      "dropIslands": {
+        "minTris": 200,
+        "maxDim": 0.8
+      },
+      "comment": "dropIslands strips the three yard horses baked into the merged mesh"
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_tower_base_blue.gltf",
+      "out": "models/biome/hexb_tower_base.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_tower_A_blue.gltf",
+      "out": "models/biome/hexb_tower_a.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tower_A_red.gltf",
+      "out": "models/biome/hexr_tower_a.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_tower_B_blue.gltf",
+      "out": "models/biome/hexb_tower_b.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/units/blue/ship_blue_accent.gltf",
+      "out": "models/biome/hex_ship_blue.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/units/red/ship_red_full.gltf",
+      "out": "models/biome/hex_ship_red.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/units/green/ship_green_full.gltf",
+      "out": "models/biome/hex_ship_green.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/boat.gltf",
+      "out": "models/biome/hex_boat.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/boatrack.gltf",
+      "out": "models/biome/hex_boatrack.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/anchor.gltf",
+      "out": "models/biome/hex_anchor.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/sack.gltf",
+      "out": "models/biome/hex_sack.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/crate_A_big.gltf",
+      "out": "models/biome/hex_crate_big.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/crate_open.gltf",
+      "out": "models/biome/hex_crate_open.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/haybale.gltf",
+      "out": "models/biome/hex_haybale.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/trough.gltf",
+      "out": "models/biome/hex_trough.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/neutral/fence_stone_straight.gltf",
+      "out": "models/biome/hexn_fence_stone.glb",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
+}

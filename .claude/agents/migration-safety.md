@@ -21,10 +21,10 @@ analyze code but never modify files.
 
 - **There is no migrations directory.** The schema is inline SQL applied in order by
   `ensureSchema()` (`server/db.ts`) as separate `client.query(...)` calls, NOT one concatenated
-  batch: `SCHEMA` (`server/db.ts`) first, then the domain schemas it imports (social, oauth,
-  discord, apple_auth, github, ratelimit, maps, user_assets, player_metrics, each an exported
-  `*_SCHEMA` in its `server/<domain>_db.ts`). Read the `ensureSchema()` body for the authoritative order; it is
-  load-bearing both within and across the schemas: a new `ALTER`/`CREATE` must come after the
+  batch: `SCHEMA` (`server/db.ts`) first, then the domain `*_SCHEMA` / `*_SQL` modules it
+  imports. Do NOT work from a memorized module list (it drifts as domains are added): read the
+  `ensureSchema()` body for the authoritative set and order. The order is load-bearing both
+  within and across the schemas: a new `ALTER`/`CREATE` must come after the
   table it depends on, and the domain schemas run after `SCHEMA` so they may `ALTER` or
   FK-reference a table that `SCHEMA` creates (for example `social_db.ts` alters `characters`).
 - The DDL is **re-applied on every boot** by `ensureSchema()`, inside a transaction held
@@ -42,12 +42,17 @@ analyze code but never modify files.
   save) apply to all of them.
 - Saves happen on a ~30s cadence (accumulated inside the sim loop via `AUTOSAVE_SECONDS`, not
   a standalone interval), and also on player leave and on SIGINT/SIGTERM shutdown.
-- `ensureSchema()` also runs a sanctioned post-commit arm on the same dedicated client: after
-  COMMIT it takes the session-level form of the same advisory lock and builds
-  `CREATE INDEX CONCURRENTLY` indexes (player metrics and daily-rewards events, from
-  `server/player_metrics_db.ts` and `server/daily_rewards_schema.ts`), dropping an INVALID
-  carcass from an interrupted build before rebuilding; ordering and lock discipline are pinned
-  by `tests/schema_wiring.test.ts`.
+- The `CREATE INDEX CONCURRENTLY` builds are NOT part of `ensureSchema()`: the exported
+  `runConcurrentIndexMigrations()` (`server/db.ts`) runs AFTER the realm is listening (fired
+  from `server/main.ts`), on its own dedicated client with `SET statement_timeout = 0`, holding
+  the session-level form of the schema advisory lock, and iterates the
+  `CONCURRENT_INDEX_MIGRATIONS` registry in `server/concurrent_indexes.ts` (each entry drops an
+  INVALID carcass from an interrupted build before rebuilding). Failure is loud but NOT fatal:
+  the next boot retries. The deliberate consequence of running after listen: a realm can
+  briefly serve a reader whose index does not exist yet, so a reader that depends on one of
+  these indexes must carry its own query bound (the `GUILD_BANK_LOG_TIMEOUT_MS` pattern)
+  instead of assuming the index. Ordering and lock discipline are pinned by
+  `tests/schema_wiring.test.ts`.
 
 ## Scope Gate - run this FIRST, before reading the schema
 
@@ -60,7 +65,8 @@ that out wastes budget. Gate yourself before reading any file:
 2. You are IN SCOPE if any changed path is `server/db.ts`, any other `server/*_db.ts` (for
    example `social_db.ts`, `oauth_db.ts`, `chat_filter_db.ts`), a dedicated schema module
    such as `server/daily_rewards_schema.ts` (any file exporting DDL that `ensureSchema()`
-   applies), or a file that serializes/deserializes a persisted JSONB blob
+   applies), `server/concurrent_indexes.ts` (the CONCURRENTLY index registry), or a file
+   that serializes/deserializes a persisted JSONB blob
    (`characters.state` in `server/db.ts` / `server/game.ts`; `world_state` / `MarketSave` /
    `MailSave` in `server/db.ts`). A grep of the changed set for `SCHEMA`, `CREATE TABLE`,
    `ALTER TABLE`, `CREATE INDEX`, `characters.state`, `world_state`, or a save/load function
@@ -144,10 +150,14 @@ If a new column is added to an EXISTING table:
   transaction boundary yourself before asserting this check; if the lock or a seed call is not
   where this prompt claims, report the discrepancy rather than assuming.
 - Flag setup work moved outside the lock, or seed logic that would duplicate rows on re-run.
-  Exception: the post-commit `CREATE INDEX CONCURRENTLY` arm is sanctioned (CONCURRENTLY
-  cannot run inside a transaction); flag transaction-external setup work only when it does
-  not follow that pattern (session-level advisory lock held, idempotent `IF NOT EXISTS`
-  build, invalid-index carcass repair).
+  Exception: the post-listen `CREATE INDEX CONCURRENTLY` arm, `runConcurrentIndexMigrations()`,
+  is sanctioned (CONCURRENTLY cannot run inside a transaction); flag transaction-external or
+  post-listen setup work only when it does not follow that pattern (session-level advisory
+  lock held, idempotent `IF NOT EXISTS` build, invalid-index carcass repair, loud non-fatal
+  failure). A NEW concurrent index belongs in the `CONCURRENT_INDEX_MIGRATIONS` registry
+  (`server/concurrent_indexes.ts`), never as an ad-hoc build elsewhere, and any reader that
+  depends on it must carry its own query bound because the realm serves before the build
+  completes.
 
 ### Check 7 - Save Cadence Coverage (WARNING)
 

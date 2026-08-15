@@ -7,7 +7,7 @@
 // canDualWield / canDualWieldTwoHand policy table.
 import { describe, expect, it } from 'vitest';
 import { meleeSwing, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
-import { MOBS } from '../src/sim/data';
+import { CLASSES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -53,6 +53,24 @@ function spawnDummy(sim: AnySim, p: Entity): Entity {
 }
 
 describe('starting hands', () => {
+  it('a fresh paladin starts with a one-handed mace and shield equipped', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'paladin' });
+    const mainhand = ITEMS[CLASSES.paladin.startWeapon];
+    const offhand = ITEMS[CLASSES.paladin.startOffhand ?? ''];
+    expect(mainhand?.kind).toBe('weapon');
+    expect(offhand?.kind).toBe('armor');
+    if (!mainhand || mainhand.kind !== 'weapon') throw new Error('Paladin starter is not a weapon');
+    if (!offhand || offhand.kind !== 'armor' || offhand.slot !== 'offhand') {
+      throw new Error('Paladin starter is not offhand armor');
+    }
+    expect(mainhand.hand).not.toBe('twohand');
+    expect(offhand.shield).toBe(true);
+    expect(sim.equipment.mainhand).toBe('training_mace');
+    expect(sim.equipment.offhand).toBe('eastbrook_buckler');
+    expect(sim.player.mainhandItemId).toBe('training_mace');
+    expect(sim.player.offhandItemId).toBe('eastbrook_buckler');
+  });
+
   it('a fresh warrior starts with a basic shield equipped', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
     expect(sim.equipment.mainhand).toBe('worn_sword');

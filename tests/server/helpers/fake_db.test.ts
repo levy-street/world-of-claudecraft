@@ -35,6 +35,7 @@ function xpRow(name: string, lifetimeXp: number): LifetimeXpLeaderRow {
     lifetimeXp,
     prestigeRank: 0,
     activeTitle: null,
+    guild: null,
   };
 }
 
@@ -118,7 +119,15 @@ describe('FakeLeaderboardDb', () => {
   it('returns seeded arena and guild rows', async () => {
     const db = new FakeLeaderboardDb();
     const arena: ArenaLeaderRow[] = [
-      { name: 'Gladiator', class: 'warrior', level: 60, rating: 2400, wins: 50, losses: 5 },
+      {
+        name: 'Gladiator',
+        class: 'warrior',
+        level: 60,
+        rating: 2400,
+        wins: 50,
+        losses: 5,
+        draws: 0,
+      },
     ];
     const guilds: GuildLeaderRow[] = [
       {

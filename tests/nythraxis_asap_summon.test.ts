@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const HEROIC_ADD_IDS = [
   'nythraxis_heroic_warrior_add',
@@ -39,7 +40,13 @@ describe('heroic Nythraxis raises his court on the phase-2 pillar cast', () => {
     ).length;
 
   it('summons exactly one court after an uninterrupted Deathless Rage, not on engage', () => {
-    const sim = new Sim({ seed: 4, playerClass: 'warrior', autoEquip: true, devCommands: true });
+    const sim = new Sim({
+      seed: 4,
+      playerClass: 'warrior',
+      autoEquip: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     const { st } = heroicBoss(sim, sim.playerId);
     expect(countHeroicAdds(sim)).toBe(0); // phase 1: no court
@@ -48,7 +55,13 @@ describe('heroic Nythraxis raises his court on the phase-2 pillar cast', () => {
   });
 
   it('does NOT stack a second court while the first is still alive', () => {
-    const sim = new Sim({ seed: 4, playerClass: 'warrior', autoEquip: true, devCommands: true });
+    const sim = new Sim({
+      seed: 4,
+      playerClass: 'warrior',
+      autoEquip: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     const { st } = heroicBoss(sim, sim.playerId);
     forcePillarCast(sim, st);
@@ -59,7 +72,13 @@ describe('heroic Nythraxis raises his court on the phase-2 pillar cast', () => {
   });
 
   it('re-summons the court on the next pillar once the previous court has fallen', () => {
-    const sim = new Sim({ seed: 4, playerClass: 'warrior', autoEquip: true, devCommands: true });
+    const sim = new Sim({
+      seed: 4,
+      playerClass: 'warrior',
+      autoEquip: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     const { st } = heroicBoss(sim, sim.playerId);
     forcePillarCast(sim, st);

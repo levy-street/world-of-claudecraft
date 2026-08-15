@@ -2,8 +2,19 @@ import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
+import {
+  collectPrewarmTextures,
+  uploadTexturesInSlices,
+  yieldToMainThread,
+} from '../texture_prewarm';
 import { mechAssetsReady, preloadMechAssets } from './assets';
-import type { WeaponLayoutOverride } from './manifest';
+import { modularVisualKey, VISUALS, type WeaponLayoutOverride } from './manifest';
+import {
+  type ArmorLoadout,
+  type ModularAppearance,
+  type ModularLook,
+  modularBuildSignature,
+} from './modular';
 import {
   appearanceSignature,
   type PreviewAppearance,
@@ -33,6 +44,9 @@ const PREVIEW_ANIM_STATE = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 
@@ -56,6 +70,8 @@ export class CharacterPreview {
   // Identity of the appearance last requested via setAppearance, so an async mech
   // re-apply can bail out if a newer selection superseded it.
   private appearanceSig: string | null = null;
+  /** Look handed to the next modular rebuild (setVisualKey reads it back). */
+  private pendingLook: ModularLook | null = null;
   private clock = new THREE.Clock();
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -73,6 +89,13 @@ export class CharacterPreview {
   // ResizeObserver owns this flag: a preview moved below a display:none window
   // keeps one cheap rAF subscription but performs no animation or WebGL work.
   private renderActive = false;
+  // Set while prewarm() owns the renderer's buffer size for a warmup pass.
+  private prewarming = false;
+  // The latest activation request (from setContainer/the resize observer,
+  // via syncSize) that arrived while prewarming; applied by prewarm's finally
+  // instead of the renderActive it captured at entry, so a window opened or
+  // closed mid-warmup is never clobbered back to a stale snapshot.
+  private pendingActive: boolean | null = null;
   private destroyed = false;
 
   // Drag controls
@@ -187,6 +210,36 @@ export class CharacterPreview {
    *  turntable). The asset must already be loaded — callers preload first.
    *  `weaponOverride` lets a cosmetic body adopt a class hand layout (including
    *  shields and dual wield), matching the in-world render. */
+  /** Show the composed modular body (character creation's live turntable) for
+   *  a class: its modular def carries the class clips and hand layout, and the
+   *  starter weapons default from the class. Any change to gender/hair/brows/
+   *  colour is a geometry or material change on a shared cached variant, so
+   *  this just rebuilds, the variant cache makes a repeat selection nearly
+   *  free. */
+  setModular(
+    app: ModularAppearance,
+    worn: ArmorLoadout = {},
+    cls: PlayerClass = 'warrior',
+    weaponItemId?: string | null,
+    // Both hands default to the class starters (creation, where nothing is
+    // equipped yet). The character sheet passes what is ACTUALLY worn, so the
+    // composed turntable holds the same shield / dual wield the world draws.
+    offhandItemId?: string | null,
+  ): void {
+    if (this.destroyed) return;
+    this.appearanceSig = null;
+    this.pendingLook = { app, worn };
+    const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
+    const offhand =
+      offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
+    this.setVisualKey(modularVisualKey(cls), weapon, null, offhand);
+    // The face/body sliders ride the live body rather than the rebuild
+    // signature (see modularBuildSignature): the creator emits on every `input`
+    // event, so a drag would otherwise dispose and recompose the character per
+    // 5% step. Harmless after a rebuild, which composed with these already.
+    this.currentVisual?.applyModularSliders(app);
+  }
+
   setVisualKey(
     visualKey: string,
     weaponItemId: string | null = null,
@@ -194,7 +247,14 @@ export class CharacterPreview {
     offhandItemId: string | null = null,
   ): void {
     if (this.destroyed) return;
-    const nextSig = JSON.stringify([visualKey, weaponItemId, weaponOverride, offhandItemId]);
+    const look = VISUALS[visualKey]?.modular ? this.pendingLook : null;
+    const nextSig = JSON.stringify([
+      visualKey,
+      weaponItemId,
+      weaponOverride,
+      offhandItemId,
+      look ? modularBuildSignature(look.app, look.worn) : null,
+    ]);
     if (this.currentVisual && this.currentVisualSig === nextSig) return;
     this.closeupCache.clear();
     if (this.currentVisual) {
@@ -215,6 +275,7 @@ export class CharacterPreview {
         weaponItemId,
         weaponOverride,
         offhandItemId,
+        look,
       );
       this.currentVisualSig = nextSig;
       this.characterGroup.add(this.currentVisual.root);
@@ -284,6 +345,13 @@ export class CharacterPreview {
   /** Force the renderer to match the current visible container size. */
   syncSize(): void {
     if (this.destroyed) return;
+    if (this.prewarming) {
+      // prewarm() owns the renderer's buffer size until it finishes; record
+      // the request instead of resizing out from under it, and let prewarm's
+      // finally apply it once the buffer is the live preview's own again.
+      this.pendingActive = this.container.clientWidth > 0 && this.container.clientHeight > 0;
+      return;
+    }
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
     this.renderActive = width > 0 && height > 0;
@@ -307,6 +375,8 @@ export class CharacterPreview {
     const previousSkin = this.currentSkin;
     const wasActive = this.renderActive;
     this.renderActive = false;
+    this.prewarming = true;
+    this.pendingActive = null;
     try {
       this.renderer.setPixelRatio(1);
       this.renderer.setSize(320, 400, false);
@@ -316,10 +386,22 @@ export class CharacterPreview {
       await this.renderer.compileAsync(this.scene, this.camera);
       // A chroma swap rebinds body textures. Upload every class variant now so
       // clicking a skin swatch cannot turn the preview's next rAF into a first-
-      // use texture upload.
+      // use texture upload. The uploads themselves are prepaid in bounded
+      // slices before each draw: a cold skin's render otherwise pays them all
+      // in one synchronous block (128 to 155 ms per paced unit in production).
+      const textures = new Set<THREE.Texture>();
       for (const skin of new Set(skinIndices)) {
+        if (this.destroyed) break;
         this.currentVisual.setSkin(skin);
+        textures.clear();
+        collectPrewarmTextures(this.scene, textures);
+        await uploadTexturesInSlices(this.renderer, textures, {
+          yieldToMain: yieldToMainThread,
+          isCancelled: () => this.destroyed,
+        });
+        if (this.destroyed) break;
         this.renderer.render(this.scene, this.camera);
+        await yieldToMainThread();
       }
     } finally {
       this.currentSkin = previousSkin;
@@ -328,7 +410,16 @@ export class CharacterPreview {
       this.renderer.setSize(Math.max(1, previousSize.x), Math.max(1, previousSize.y), false);
       this.camera.aspect = previousAspect;
       this.camera.updateProjectionMatrix();
-      this.renderActive = wasActive;
+      this.prewarming = false;
+      // setContainer/the resize observer may have arrived mid-prewarm (the
+      // window opened or closed while this buffer was repurposed for
+      // warmup); apply that request instead of the wasActive snapshot
+      // captured at entry, and resync to the real container size rather than
+      // the stale pre-warmup size just restored above.
+      const requestedActive = this.pendingActive;
+      this.pendingActive = null;
+      this.renderActive = requestedActive ?? wasActive;
+      if (requestedActive !== null) this.syncSize();
       this.clock.getDelta();
     }
   }

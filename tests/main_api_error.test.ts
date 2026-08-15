@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Api, ApiError } from '../src/net/online';
 import {
+  isTransientReconnectRejection,
+  isTransientTimeoutRejection,
+} from '../src/net/reconnect_policy';
+import {
   API_ERROR_KEYS,
   technicalErrorMessage,
   userFacingApiError,
@@ -32,6 +36,24 @@ describe('userFacingApiError code-first resolution', () => {
     const err = new ApiError('db write failed 0x9', 409, 'account.username_taken');
     expect(userFacingApiError(err)).toBe(t('apiError.account.username_taken'));
     expect(userFacingApiError(err)).not.toBe('db write failed 0x9');
+  });
+
+  it('localizes Seeker entitlement failures by stable code', () => {
+    const cases = [
+      ['seeker.native_only', 'apiError.seeker.native_only'],
+      ['seeker.attestation_failed', 'apiError.seeker.attestation_failed'],
+      ['seeker.wallet_required', 'apiError.seeker.wallet_required'],
+      ['seeker.genesis_token_required', 'apiError.seeker.genesis_token_required'],
+      ['seeker.genesis_token_claimed', 'apiError.seeker.genesis_token_claimed'],
+      ['seeker.entitlement_required', 'apiError.seeker.entitlement_required'],
+      ['seeker.current_ownership_required', 'apiError.seeker.current_ownership_required'],
+    ] as const;
+
+    for (const [code, key] of cases) {
+      const raw = `raw server detail for ${code}`;
+      expect(userFacingApiError(new ApiError(raw, 403, code))).toBe(t(key));
+      expect(userFacingApiError(new ApiError(raw, 403, code))).not.toBe(raw);
+    }
   });
 
   it('falls back to the prose arm for an un-migrated raw-English error (no code)', () => {
@@ -163,6 +185,25 @@ describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)
     expect(userFacingApiError('too many connections from your network')).toBe(
       t('loading.tooManyConnections'),
     );
+    expect(
+      userFacingApiError(
+        'Game and server versions are incompatible. Reload or update, then try again.',
+      ),
+    ).toBe(t('loading.incompatibleWorldVersion'));
+  });
+
+  it('re-localizes the flood-kick reason and keeps it session-fatal', () => {
+    // 'message rate exceeded' is the dedicated limiter kick literal
+    // (server/msg_rate_limit.ts MSG_RATE_KICK_REASON): its own actionable copy,
+    // distinct from the generic rejection so a flood kick stops masquerading as
+    // the anti-bot kick, which deliberately keeps 'rejected by server'.
+    expect(userFacingApiError('message rate exceeded')).toBe(t('loading.messageRateExceeded'));
+    expect(userFacingApiError('message rate exceeded')).not.toBe(t('loading.connectionRejected'));
+    // Session-fatal by design: an immediately reconnecting flooder re-floods,
+    // so neither transient-rejection helper may match it even mid-reconnect
+    // with a fresh counter.
+    expect(isTransientReconnectRejection('message rate exceeded', 1, 0)).toBe(false);
+    expect(isTransientTimeoutRejection('message rate exceeded', 1, 0)).toBe(false);
   });
 
   it('re-localizes a moderation kick through tServer', () => {

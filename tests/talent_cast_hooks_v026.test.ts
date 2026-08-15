@@ -9,7 +9,7 @@ describe('v0.26 canonical successful-cast hooks', () => {
     // (evasion), an instant self-cast, granting a scoped next_cast_cheap aura.
     const sim = new Sim({ seed: 2603, playerClass: 'rogue', autoEquip: false });
     sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(17, 'rog_r17_improved_evasion')).toBe(true);
+    expect(sim.selectTalentRow(17, 'rog_r17_ghostfoot_gambit')).toBe(true);
 
     sim.castAbility('evasion');
 
@@ -21,6 +21,7 @@ describe('v0.26 canonical successful-cast hooks', () => {
         value: 0.5,
         empowerAbilities: [
           'sinister_strike',
+          'body_blow',
           'backstab',
           'gouge',
           'ambush',

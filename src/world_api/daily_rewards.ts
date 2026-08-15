@@ -57,6 +57,8 @@ export interface DailyRewardEligibilityView {
 }
 
 export interface DailyRewardStatus {
+  /** Defaults to enabled for older/offline implementations; the server always supplies it. */
+  enabled?: boolean;
   day: string;
   resetAt: string;
   prizePoolUsd: number;

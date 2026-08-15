@@ -18,6 +18,7 @@ export const SELF_ONLY_EFFECT_TYPES = new Set<AbilityEffect['type']>([
   'imbue',
   'lifeTap',
   'gainResource',
+  'grantDevotion',
   'selfDamagePctMax',
   'summonDemon',
   'dismissPet',

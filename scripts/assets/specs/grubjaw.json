@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/_Mob_Updates/built/grubjaw.glb",
+      "out": "models/creatures/grubjaw.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": ["Idle", "Walk", "Run", "Punch", "WeaponA", "Death"]
+    }
+  ]
+}

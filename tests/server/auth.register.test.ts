@@ -153,6 +153,13 @@ describe('register handler', () => {
     });
   });
 
+  it('rejects a password over the maximum length with 400 (not the too-short error)', async () => {
+    expect(await runHandler({ username: 'newhero', password: 'a'.repeat(129) })).toEqual({
+      status: 400,
+      body: { error: 'password must be at most 128 chars', code: 'account.password_too_long' },
+    });
+  });
+
   it('rejects a missing or invalid email with 400 before any account read or write', async () => {
     // v0.20.0: email is mandatory at signup (the recovery address), gated after
     // the password check and BEFORE the username lookup.
@@ -293,6 +300,24 @@ describe('register handler', () => {
     expect(out.status).toBe(400);
     expect(emailCalls).toEqual([]);
     expect(emailCreated).toEqual([]);
+  });
+
+  it('captures the signup context (attribution, locale, opt-in) fire-and-forget', async () => {
+    const captures: Array<{
+      id: number;
+      profile: { locale: string | null; marketingOptIn: boolean };
+    }> = [];
+    installDb({
+      captureSignupContext: (id, _req, _body, profile) => {
+        captures.push({ id, profile });
+      },
+    });
+    const out = await runHandler(
+      { username: 'newhero', password: 'secret123', email: 'a@b.co', marketingOptIn: true },
+      { headers: { 'accept-language': 'pt-BR,pt;q=0.9' } },
+    );
+    expect(out.status).toBe(200);
+    expect(captures).toEqual([{ id: 7, profile: { locale: 'pt_BR', marketingOptIn: true } }]);
   });
 
   it('fires the best-effort suspicious-registration report and referral capture', async () => {

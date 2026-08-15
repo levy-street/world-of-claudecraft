@@ -129,6 +129,13 @@ describe('infernal citadel: seed selection', () => {
   // draws but no longer emits an illusion wall into the layout, so the serialized
   // floors changed while every collider, spawn, and object position stayed put
   // (the objective-placement sweep in rift_gen.test.ts pins those directly).
+  // DELIBERATE re-pin (entry clearance): the trash band now starts a full
+  // RIFT_ENTRY_CLEAR_RADIUS past the arrival point so walking into a floor cannot pull
+  // the front pack (tests/rift_entry_clearance.test.ts). packCount is still keyed to the
+  // original band start, so the draw COUNT and therefore the draw ORDER are unchanged:
+  // the same packs are spread across a shorter band. Verified narrow before re-pinning,
+  // by digesting every floor field EXCEPT `spawns` across seeds 1 to 200 on both sides of
+  // the change: that digest is byte-identical, so only spawn positions moved here.
   it('regenerates procedural floors byte-identically to the pre-set-piece baseline', () => {
     // Hand-picked on the base branch, so the seed list itself cannot drift with the
     // set-piece roll.
@@ -144,7 +151,7 @@ describe('infernal citadel: seed selection', () => {
       }
     }
     expect(h.digest('hex')).toBe(
-      '572a8fe4d5a0e7dcd28679ff5bcd4e303f87c0c50c444c3827d15ab84e839145',
+      'c1bdf1d27a9d3a5450c758d7e0aadda33cd9c765ed40e11ed308c3ae8de5db1a',
     );
   });
 });

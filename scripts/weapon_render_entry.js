@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { attachKtx2 } from './lib/ktx2_entry.js';
 
 const DEFAULT_SIZE = 256;
 
@@ -15,7 +16,7 @@ renderer.setPixelRatio(1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
-const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+const loader = attachKtx2(new GLTFLoader().setMeshoptDecoder(MeshoptDecoder), renderer);
 
 // Soft 3-point rig — flat KayKit albedo reads well with a warm key + cool fill.
 function makeLights() {

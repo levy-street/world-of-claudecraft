@@ -171,6 +171,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'skin', // appearance
   'skinCatalog',
   'potionCdRemaining', // derived display copy of potionCooldownUntil (the pinned authority)
+  'firebottleCdRemaining', // derived display copy of PlayerMeta.firebottleReadyAt (the authority)
   'mainhandItemId', // render-only; "the sim never reads it for gameplay"
   'weaponSkinLoadout', // cosmetic weapon-skin selection; never read for gameplay
   'weaponSkinId', // render-only resolved weapon-skin mirror
@@ -186,6 +187,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   // gameplay coverage (like wireRev above).
   'damageHistory',
   'weaponStowed', // Z-key sheathe pose; render-only, no gameplay path reads it
+  'modularAppearance', // authored cosmetic look; the sim never reads it
   // Derived crit core (recalcPlayerStats): a pure function of sampled inputs
   // (gear ratings, talents, auras), like the derived meta fields below.
   'sharedCritBonus',
@@ -194,6 +196,9 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   // never serialized or wired. Its EFFECT (which procs fire) is pinned by the
   // event digest and procState counters.
   'castConsumedEmpower',
+  // In-flight Dawn's Embrace reservation for Radiant Resonance. The observable
+  // cast time, mana spend, aura removal, and heal remain in the parity digest.
+  'castRadiantResonance',
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields
@@ -211,6 +216,7 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'moveInput', // input, not state
   'joinedAt', // session-only clock
   'lastActiveTick', // session-only
+  'craftThrottle', // inert since the Craft Cast System retired the shared throttle; session-only
   'away', // session-only presence
   'lastWhisperFrom', // session-only
   'marketQuery', // session-only browse query (search + filters + page)
@@ -218,6 +224,21 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   // persisted, never sim-mutated. The bonus CAPACITY it explains IS pinned (the
   // sampled meta.bank.bonusSlots), so excluding the rows loses no gameplay net.
   'bankBonusSources',
+  // Server-stamped guild membership (id + rank) behind the Guild Bank's officer
+  // gate; session-only exactly like bankBonusSources (never persisted, never
+  // sim-mutated, always null offline), so sampling it would churn goldens for
+  // no gameplay reason. The book state it authorizes IS sim-owned and testable
+  // directly (Sim.guildBanks).
+  // Re-audited for Phase 2 (the officer gate now READS the stamp): the
+  // exclusion stays correct because the field remains a host-injected
+  // AUTHORIZATION INPUT, not sim-evolved state. Offline it is always null, so
+  // every guild bank op refuses and mutates nothing there (pinned in
+  // tests/guild_bank.test.ts); online only the authoritative server's sim runs
+  // the ops and the client mirrors results via the maybe('guildBank')
+  // snapshot. No cross-host divergence can hide behind the exclusion: the
+  // state the stamp gates (Sim.guildBanks, player copper/inventory) is fully
+  // sampled, so a gate misfire would surface THERE.
+  'guildMembership',
   'known', // derived from class/level/talents
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments

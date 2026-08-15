@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { parseAdminRoute, routeHref, shouldHandleNavigation } from '../../src/admin/navigation';
@@ -14,6 +14,15 @@ describe('admin navigation', () => {
     });
     expect(parseAdminRoute(new URL('https://admin.test/admin?page=accounts'))).toEqual({
       page: 'accounts',
+    });
+    expect(parseAdminRoute(new URL('https://admin.test/admin?page=guilds&guildId=42'))).toEqual({
+      page: 'guilds',
+      guildId: 42,
+    });
+    expect(
+      parseAdminRoute(new URL('https://admin.test/admin?page=guilds&guildId=invalid')),
+    ).toEqual({
+      page: 'guilds',
     });
     expect(parseAdminRoute(new URL('https://admin.test/admin?page=shared-ips'))).toEqual({
       page: 'shared-ips',
@@ -38,6 +47,10 @@ describe('admin navigation', () => {
     expect(routeHref({ page: 'ip', ip: '203.0.113.7' })).toBe(
       '/admin?lang=en&page=ip&ip=203.0.113.7',
     );
+    expect(routeHref({ page: 'guilds', guildId: 42 })).toBe(
+      '/admin?lang=en&page=guilds&guildId=42',
+    );
+    expect(routeHref({ page: 'guilds' })).toBe('/admin?lang=en&page=guilds');
   });
 
   it('supports legacy IP links without an explicit page', () => {

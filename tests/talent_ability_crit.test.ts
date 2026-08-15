@@ -56,7 +56,9 @@ describe('G8: per-ability crit chance', () => {
   });
 
   it('meleeSwing critBonus alone forces a crit when it reaches 100%', () => {
-    const { sim, p } = makeSim('rogue', 12);
+    // Seed hunted (post-merge camp order) so all three swings connect (no
+    // miss/parry; dodge is already off via cannotBeDodged). Spares: 2, 3.
+    const { sim, p } = makeSim('rogue', 12, 1);
     p.critChance = 0; // the ONLY crit source is the per-ability bonus
     const mob = spawnDummy(sim, p, 12);
     const events = capture(sim);

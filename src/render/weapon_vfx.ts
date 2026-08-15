@@ -25,6 +25,16 @@
 // legendary kit (orbit motes, aurora, spin) or vice versa; the escalation ramp
 // is the whole point of the collections.
 import * as THREE from 'three';
+import { isSharedTexture, markSharedTexture } from './shared_resource';
+import {
+  WEAPON_EMISSIVE_IDLE_CACHE_MAX,
+  WeaponEmissiveDerivationCache,
+} from './weapon_vfx_emissive_cache_core';
+import {
+  deriveEmissiveTexels,
+  type WeaponEmissiveTint,
+  weaponEmissiveCacheKey,
+} from './weapon_vfx_emissive_core';
 
 // ---------------------------------------------------------------------------
 // Palettes + tier presets (colors from the Armory Codex swatches)
@@ -2138,12 +2148,114 @@ interface EmissiveRestore {
   roughness: number;
   metalnessMap: THREE.Texture | null;
   roughnessMap: THREE.Texture | null;
+  envMapIntensity: number;
 }
 
 interface EmissiveEntry {
   prev: EmissiveRestore;
   tex: THREE.CanvasTexture | null;
   albedoTex: THREE.CanvasTexture | null;
+  /** The derivation-cache key this entry holds a reference on, or null on the
+   *  flat-tint fallback path (nothing cached, nothing to release). */
+  cacheKey: string | null;
+}
+
+interface DerivedEmissiveTextures {
+  tex: THREE.CanvasTexture;
+  albedoTex: THREE.CanvasTexture;
+}
+
+// One derivation per (source albedo map, resolved emissive spec) per RENDERER.
+// The result is a pure function of that pair, but it used to be recomputed per
+// payload (twice over when a mirrored offhand joins the skin), per wearer and
+// per rebuild: two canvases the size of the GLB albedo, two getImageData
+// readbacks, a per-texel HSL walk (262144 iterations at 512x512) and two fresh
+// texture uploads, all inside the frame a skinned player came into view. The
+// entries are marked shared, so an individual rig tearing down never disposes
+// the textures the next wearer is still drawing with.
+//
+// BOUNDED, not renderer-lifetime: each rig holds a reference for as long as it
+// lives (deriveEmissive acquires, the rig's dispose releases), and the cache
+// evicts only IDLE derivations (every wearer gone) past
+// WEAPON_EMISSIVE_IDLE_CACHE_MAX, least-recently-released first, disposing
+// both textures. The boot prewarm never populates this cache (its host
+// material has no albedo map), so without the bound every cosmetic that ever
+// walked past retained a two-canvas, two-texture pair until teardown (the C2
+// memory ratchet). Eviction is invisible on screen: a live wearer's entry is
+// pinned by its reference count, and an evicted key re-derives byte-identically
+// (pure function of the key). The terminal release path remains
+// disposeWeaponEmissiveCache below, which the renderer calls at teardown.
+const derivedEmissiveCache = new WeaponEmissiveDerivationCache<DerivedEmissiveTextures>(
+  WEAPON_EMISSIVE_IDLE_CACHE_MAX,
+  ({ tex, albedoTex }) => {
+    tex.dispose();
+    albedoTex.dispose();
+  },
+);
+
+/**
+ * Release every memoized derivation (one megabyte-class texture pair per skin).
+ * TERMINAL ONLY: the renderer calls this from its own resource teardown, after
+ * every view (and therefore every rig that borrowed these textures) is gone, so
+ * a WebGL context recycle does not carry the whole set into the next context.
+ * Calling it while rigs are live would leave their materials pointing at
+ * disposed textures.
+ */
+export function disposeWeaponEmissiveCache(): void {
+  for (const { tex, albedoTex } of derivedEmissiveCache.drain()) {
+    tex.dispose();
+    albedoTex.dispose();
+  }
+}
+
+/** Test seam: drop the page-lifetime sprite/sky texture memo so a suite can
+ *  observe a cold build (which canvases a rig actually draws) regardless of
+ *  what an earlier case in the file already cached. */
+export function clearWeaponVfxTextureCacheForTest(): void {
+  for (const texture of texCache.values()) texture.dispose();
+  texCache.clear();
+}
+
+/** Cold-build the emissive + de-baked albedo pair for one source map: the
+ *  canvas plumbing around the pure per-texel core. Callers go through the
+ *  bounded derivedEmissiveCache (deriveEmissive acquires), never call this
+ *  directly, so one build serves every wearer. */
+function buildDerivedEmissiveTextures(
+  source: THREE.Texture,
+  img: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
+  e: WeaponVfxEmissiveSpec,
+  tint: WeaponEmissiveTint,
+): DerivedEmissiveTextures {
+  const w = img.width;
+  const h = img.height;
+  const cv = document.createElement('canvas');
+  cv.width = w;
+  cv.height = h;
+  const cx = cv.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+  cx.drawImage(img, 0, 0, w, h);
+  const data = cx.getImageData(0, 0, w, h);
+  // Second buffer: the DE-BAKED albedo. The generator paints its "glow" right
+  // into the base color, so every texel promoted to emissive is also darkened
+  // in the base map; otherwise lighting + emission double up and the core
+  // clips to a flat white patch instead of glowing.
+  const av = document.createElement('canvas');
+  av.width = w;
+  av.height = h;
+  const ax = av.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
+  ax.drawImage(img, 0, 0, w, h);
+  const adata = ax.getImageData(0, 0, w, h);
+  deriveEmissiveTexels(data.data, adata.data, e, tint);
+  cx.putImageData(data, 0, 0);
+  ax.putImageData(adata, 0, 0);
+  const mkTex = (canvas: HTMLCanvasElement) => {
+    const t = new THREE.CanvasTexture(canvas);
+    t.flipY = false; // match GLTF UV orientation
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = source.wrapS;
+    t.wrapT = source.wrapT;
+    return markSharedTexture(t);
+  };
+  return { tex: mkTex(cv), albedoTex: mkTex(av) };
 }
 
 function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpec): EmissiveEntry {
@@ -2157,95 +2269,42 @@ function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpe
     roughness: mat.roughness,
     metalnessMap: mat.metalnessMap ?? null,
     roughnessMap: mat.roughnessMap ?? null,
+    envMapIntensity: mat.envMapIntensity,
   };
   // Temper the PBR response while the rig owns the material: the generator's
   // metallic map scatters hot metallic texels that explode into blocky glints
-  // under bloom. The codex look is flat-shaded stylized anyway.
+  // under bloom. The codex look is flat-shaded stylized anyway. The metal env
+  // boost from applyWeaponMaterialPolish is neutralized with it (metalness 0
+  // makes it near-inert, but a boosted dielectric still picks up a visible
+  // sheen) and restored on dispose alongside the rest.
   mat.metalness = 0;
   mat.roughness = 1;
   mat.metalnessMap = null;
   mat.roughnessMap = null;
+  mat.envMapIntensity = 1;
   const img = mat.map?.image as HTMLImageElement | HTMLCanvasElement | ImageBitmap | undefined;
-  if (!img?.width) {
+  // A compressed (KTX2) map has a truthy image {width,height} but is not
+  // drawable into a canvas, so it must take the flat-tint fallback. Skin
+  // models with a WEAPON_VFX rig deliberately ship webp for this derivation
+  // (scripts/assets/compress_glb_textures.mjs excludes them); this guard keeps
+  // a future mistakenly-compressed skin subtle instead of throwing mid-frame.
+  const drawable = !(mat.map as { isCompressedTexture?: boolean } | null)?.isCompressedTexture;
+  if (!img?.width || !drawable) {
     mat.emissive = new THREE.Color(e.tint);
     mat.emissiveIntensity = 0.3;
-    return { prev, tex: null, albedoTex: null };
+    return { prev, tex: null, albedoTex: null, cacheKey: null };
   }
-  const w = img.width;
-  const h = img.height;
-  const cv = document.createElement('canvas');
-  cv.width = w;
-  cv.height = h;
-  const cx = cv.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
-  cx.drawImage(img, 0, 0, w, h);
-  const data = cx.getImageData(0, 0, w, h);
-  const d = data.data;
-  // Second buffer: the DE-BAKED albedo. The generator paints its "glow" right
-  // into the base color, so every texel promoted to emissive is also darkened
-  // in the base map; otherwise lighting + emission double up and the core
-  // clips to a flat white patch instead of glowing.
-  const av = document.createElement('canvas');
-  av.width = w;
-  av.height = h;
-  const ax = av.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
-  ax.drawImage(img, 0, 0, w, h);
-  const adata = ax.getImageData(0, 0, w, h);
-  const ad = adata.data;
-  const tint = new THREE.Color(e.tint);
-  for (let i = 0; i < d.length; i += 4) {
-    const r = d[i] / 255;
-    const g = d[i + 1] / 255;
-    const b = d[i + 2] / 255;
-    const mx = Math.max(r, g, b);
-    const mn = Math.min(r, g, b);
-    const l = (mx + mn) / 2;
-    let hue = 0;
-    let s = 0;
-    if (mx !== mn) {
-      const dd = mx - mn;
-      s = dd / (1 - Math.abs(2 * l - 1));
-      if (mx === r) hue = 60 * (((g - b) / dd + 6) % 6);
-      else if (mx === g) hue = 60 * ((b - r) / dd + 2);
-      else hue = 60 * ((r - g) / dd + 4);
-    }
-    let score = 0;
-    if (hue >= e.hue[0] && hue <= e.hue[1] && s >= e.minS && l >= e.minL) {
-      score = Math.min(1, 0.45 + (s - e.minS) * 1.4) * Math.min(1, 0.5 + (l - e.minL) * 1.3);
-    } else if (l >= e.whiteL && (s < 0.14 || (hue >= e.hue[0] && hue <= e.hue[1]))) {
-      score = e.whiteScale * Math.min(1, 0.4 + (l - e.whiteL) * 4);
-    }
-    if (score <= 0.01) {
-      d[i] = d[i + 1] = d[i + 2] = 0;
-    } else {
-      // Graded: source color pushed toward the tier tint, scaled by score.
-      d[i] = Math.round(255 * Math.min(1, (r + (tint.r - r) * 0.62) * score));
-      d[i + 1] = Math.round(255 * Math.min(1, (g + (tint.g - g) * 0.62) * score));
-      d[i + 2] = Math.round(255 * Math.min(1, (b + (tint.b - b) * 0.62) * score));
-      // De-bake: pull the albedo down where the glow now lives.
-      const keep = 1 - 0.72 * score;
-      ad[i] = Math.round(ad[i] * keep);
-      ad[i + 1] = Math.round(ad[i + 1] * keep);
-      ad[i + 2] = Math.round(ad[i + 2] * keep);
-    }
-  }
-  cx.putImageData(data, 0, 0);
-  ax.putImageData(adata, 0, 0);
-  const mkTex = (canvas: HTMLCanvasElement) => {
-    const t = new THREE.CanvasTexture(canvas);
-    t.flipY = false; // match GLTF UV orientation
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.wrapS = (mat.map as THREE.Texture).wrapS;
-    t.wrapT = (mat.map as THREE.Texture).wrapT;
-    return t;
-  };
-  const tex = mkTex(cv);
-  const albedoTex = mkTex(av);
+  const source = mat.map as THREE.Texture;
+  const cacheKey = weaponEmissiveCacheKey(source.uuid, e);
+  const { tex, albedoTex } = derivedEmissiveCache.acquire(cacheKey, () =>
+    buildDerivedEmissiveTextures(source, img, e, new THREE.Color(e.tint)),
+  );
   mat.emissiveMap = tex;
   mat.emissive = new THREE.Color(0xffffff);
   mat.emissiveIntensity = e.intensity;
   mat.map = albedoTex;
   mat.needsUpdate = true;
-  return { prev, tex, albedoTex };
+  return { prev, tex, albedoTex, cacheKey };
 }
 
 // ---------------------------------------------------------------------------
@@ -2475,7 +2534,11 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
       uniform float uTime; uniform float uScale;
       varying float vI;
       void main() {
-        float w = 0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831);
+        // clamp() is load-bearing: GLSL leaves the precision of sin() to the
+        // implementation, so 0.5 + 0.5 * sin(x) is only non-negative in exact
+        // arithmetic. pow() of a negative base is NaN, and one NaN here is a
+        // hard-edged black rectangle once the bloom blurs it.
+        float w = clamp(0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831), 0.0, 1.0);
         vI = pow(w, 9.0);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         gl_PointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z);
@@ -2601,8 +2664,8 @@ function makeAurora(b: THREE.Box3, c: WeaponVfxAurora): VfxPart | null {
         float t = fract(vUv.x * 1.4 - uTime * 0.1);
         float tri = 1.0 - abs(2.0 * t - 1.0);
         vec3 c = tri < 0.5 ? mix(uColA, uColB, tri * 2.0) : mix(uColB, uColC, tri * 2.0 - 1.0);
-        float ends = pow(sin(3.14159 * vUv.x), 0.75);
-        float edge = pow(1.0 - abs(vUv.y * 2.0 - 1.0), 1.6);
+        float ends = pow(max(0.0, sin(3.14159 * vUv.x)), 0.75);
+        float edge = pow(max(0.0, 1.0 - abs(vUv.y * 2.0 - 1.0)), 1.6);
         float shim = 0.72 + 0.28 * sin(uTime * 1.1 + vUv.x * 8.0);
         float a = ends * edge * shim * uOpacity;
         gl_FragColor = vec4(c * a, a);
@@ -2636,7 +2699,13 @@ function makeShell(root: THREE.Object3D, shellSpec: WeaponVfxShellSpec): VfxPart
       uniform vec3 uColor; uniform float uStr; uniform float uPow; uniform float uTime;
       varying vec3 vN; varying vec3 vV;
       void main() {
-        float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), uPow);
+        // max() is load-bearing: abs(dot(...)) of two vectors normalized in
+        // shader overshoots 1.0 by an ulp where they are aligned or
+        // anti-aligned, i.e. where the surface faces the camera head-on, so the
+        // base goes an ulp NEGATIVE there and pow() of a negative base is NaN.
+        // One NaN pixel here becomes a hard-edged black rectangle after the
+        // bloom blur.
+        float f = pow(max(0.0, 1.0 - abs(dot(normalize(vN), normalize(vV)))), uPow);
         float a = f * uStr * (0.85 + 0.15 * sin(uTime * 1.7));
         gl_FragColor = vec4(uColor * a, a);
       }`,
@@ -2649,6 +2718,12 @@ function makeShell(root: THREE.Object3D, shellSpec: WeaponVfxShellSpec): VfxPart
     shell.scale.setScalar(1.015);
     shell.frustumCulled = false;
     shell.userData.__vfx = true;
+    // The shell parents to the host weapon mesh, not the rig group visual.ts
+    // tags, and userData is per object, never inherited. Without its own skip
+    // tag applyMaterials re-owns the shell with a ShaderMaterial clone, so the
+    // rig's per-frame uTime and shed uStr uniform writes land on a material
+    // nothing renders anymore.
+    shell.userData.weaponVfxMesh = true;
     shells.push({ host, shell });
   });
   for (const { host, shell } of shells) host.add(shell);
@@ -2759,7 +2834,42 @@ function makeBackdrop(tier: WeaponVfxTier): VfxScenePart {
 // Returns { group, sceneExtras, light, update(dt), setPixelScale(px),
 // dispose() }. `sceneExtras` (backdrop dome + ground pool) go on the SCENE,
 // not the weapon; pass grounded=false to skip the ground pool (held mode).
+//
+// The backdrop follows `grounded` by default, and that default is a
+// performance fix, not a cosmetic one: the world path never adds `sceneExtras`
+// to any scene, so its dome was built (a 1024x1024 canvas of gradients plus
+// hundreds of individually drawn stars, then a sphere and material thrown
+// away) purely to be discarded, inside the frame a skinned player came into
+// view. The showcase paths that DO mount `sceneExtras` keep it. `backdrop` is
+// separable from `grounded` for the boot prewarm, which wants the ground
+// pool's program without paying for a sky texture nothing will draw.
+// `setBackdropVisible` stays safe to call either way.
 // ---------------------------------------------------------------------------
+
+export interface WeaponVfxCreateOptions {
+  /** Showcase mode: mount the ground light pool under the weapon. */
+  grounded?: boolean;
+  /** Build the sky dome. Defaults to `grounded`: only a caller that mounts
+   *  `sceneExtras` in a scene has anything to draw it into. */
+  backdrop?: boolean;
+  /**
+   * The caller registers this rig's light into a point-light budget that owns
+   * `visible` (the world path). The light is then born HIDDEN, because three
+   * counts a light into numPointLights iff it is visible, intensity included
+   * or not: a light born visible is counted for the frames before the budget
+   * first rules on it, and that changed count relinks every material drawn in
+   * them. Measured: one frame in 5434 sat at 7 budgeted lights against a pin
+   * of 6, and a relink is a 100 to 200 ms stall.
+   *
+   * A caller with no budget (the armoury preview owns its own renderer and
+   * scene) leaves this off and keeps a light that lights immediately.
+   */
+  budgetedLight?: boolean;
+}
+
+/** Scene-census bucket for every weapon-skin VFX rig (the `?perf` overlay's
+ *  `renderCategory`). Diagnostics only: nothing reads it to decide a draw. */
+export const WEAPON_VFX_RENDER_CATEGORY = 'weaponvfx';
 
 export interface WeaponVfxHandle {
   group: THREE.Group;
@@ -2778,7 +2888,11 @@ export interface WeaponVfxHandle {
 export function createWeaponVfx(
   weaponRoot: THREE.Object3D,
   spec: WeaponVfxSpec,
-  { grounded = true }: { grounded?: boolean } = {},
+  {
+    grounded = true,
+    backdrop: withBackdrop = grounded,
+    budgetedLight = false,
+  }: WeaponVfxCreateOptions = {},
 ): WeaponVfxHandle {
   const tier = TIERS[spec.tier];
   const b = localBounds(weaponRoot);
@@ -2786,23 +2900,68 @@ export function createWeaponVfx(
   group.name = 'weapon_vfx';
   const sceneExtras = new THREE.Group();
   sceneExtras.name = 'weapon_vfx_extras';
+  // Diagnostics-only label the `?perf` scene census buckets by (the renderer's
+  // setRenderCategory writes the same key, and the census inherits it down the
+  // subtree). Without it a rig's 6 to 10 additive draws landed in the character
+  // rig's own bucket, so the overlay could not see what a skin actually costs.
+  // NEVER a behaviour or visibility gate.
+  group.userData.renderCategory = WEAPON_VFX_RENDER_CATEGORY;
+  sceneExtras.userData.renderCategory = WEAPON_VFX_RENDER_CATEGORY;
 
   const parts: VfxPart[] = [];
   const emissives: EmissiveEntry[] = [];
   let time = 0;
 
+  // The single owner of the emissive unwind: restore every derived material to
+  // its captured state FIRST (after which no material of this rig references
+  // the shared pair), then drop this rig's cache reference, so a
+  // release-triggered eviction can never dispose a texture a material still
+  // points at. The derived pair is memoized and shared with every other wearer
+  // of this skin: dropping the reference leaves eviction to the bounded cache,
+  // which never touches an entry another wearer still pins (a disposed texture
+  // would leave that weapon unglowing). The unmarked-texture guard keeps a
+  // future rig-OWNED (non-shared) texture releasable. Clearing the array makes
+  // a second run a no-op.
+  const restoreAndReleaseEmissives = () => {
+    for (const { prev, tex, albedoTex, cacheKey } of emissives) {
+      prev.mat.emissiveMap = prev.emissiveMap;
+      prev.mat.map = prev.map;
+      prev.mat.metalness = prev.metalness;
+      prev.mat.roughness = prev.roughness;
+      prev.mat.metalnessMap = prev.metalnessMap;
+      prev.mat.roughnessMap = prev.roughnessMap;
+      prev.mat.envMapIntensity = prev.envMapIntensity;
+      if (prev.emissive) prev.mat.emissive.copy(prev.emissive);
+      prev.mat.emissiveIntensity = prev.emissiveIntensity;
+      prev.mat.needsUpdate = true;
+      if (cacheKey !== null) derivedEmissiveCache.release(cacheKey);
+      if (tex && !isSharedTexture(tex)) tex.dispose();
+      if (albedoTex && !isSharedTexture(albedoTex)) albedoTex.dispose();
+    }
+    emissives.length = 0;
+  };
+
   // 1. Emissive core derived from the painted texture (per unique material).
   const eSpec: WeaponVfxEmissiveSpec = { ...tier.emissive, ...(spec.emissive ?? {}) };
   const seen = new Set<THREE.Material>();
-  weaponRoot.traverse((o) => {
-    const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh || !mesh.material || mesh.userData.__vfx) return;
-    for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
-      if (seen.has(m)) continue;
-      seen.add(m);
-      emissives.push(deriveEmissive(m as THREE.MeshStandardMaterial, eSpec));
-    }
-  });
+  try {
+    weaponRoot.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.material || mesh.userData.__vfx) return;
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        if (seen.has(m)) continue;
+        seen.add(m);
+        emissives.push(deriveEmissive(m as THREE.MeshStandardMaterial, eSpec));
+      }
+    });
+  } catch (error) {
+    // A derivation that throws mid-traverse (a detached ImageBitmap, a tainted
+    // or context-less canvas) must not leave the earlier materials' cache
+    // references pinned forever: a leaked reference silently reverts that skin
+    // to the unbounded ratchet. Unwind what was acquired and rethrow.
+    restoreAndReleaseEmissives();
+    throw error;
+  }
 
   // 2. Fresnel rim shell (the "living magic" silhouette glow).
   const shellSpec: WeaponVfxShellSpec = { ...tier.shell, ...(spec.shell ?? {}) };
@@ -2819,6 +2978,9 @@ export function createWeaponVfx(
   // World-rendered weapon lights move with the held model and drive their own
   // flicker. The renderer still ranks them inside its fixed point-light count.
   light.userData.budgetDynamic = true;
+  // Born hidden on a budgeted path: the budget, not this constructor, decides
+  // whether the light is counted. See budgetedLight in WeaponVfxCreateOptions.
+  if (budgetedLight) light.visible = false;
   light.position.copy(resolvePoint(b, lightSpec.at ?? { yF: 0.7 }));
   group.add(light);
 
@@ -2837,11 +2999,13 @@ export function createWeaponVfx(
     }
   }
 
-  // 5. Scene dressing: backdrop always, ground pool only on the pedestal.
-  const backdrop = makeBackdrop(tier);
-  backdrop.kind = 'backdrop';
-  parts.push(backdrop);
-  sceneExtras.add(backdrop.node);
+  // 5. Scene dressing: both ride sceneExtras, which only a showcase mounts.
+  const backdrop = withBackdrop ? makeBackdrop(tier) : null;
+  if (backdrop) {
+    backdrop.kind = 'backdrop';
+    parts.push(backdrop);
+    sceneExtras.add(backdrop.node);
+  }
   if (grounded) {
     const pool = makePool(tier);
     pool.kind = 'pool';
@@ -2887,6 +3051,11 @@ export function createWeaponVfx(
     }
   };
 
+  // dispose() releases this rig's reference on each shared derivation, so it
+  // must run at most once: a second call would strip a reference another live
+  // wearer of the same skin still depends on.
+  let rigDisposed = false;
+
   return {
     group,
     sceneExtras,
@@ -2899,7 +3068,7 @@ export function createWeaponVfx(
       applyTuning();
     },
     setBackdropVisible(v: boolean) {
-      backdrop.node.visible = v;
+      if (backdrop) backdrop.node.visible = v;
     },
     setPixelScale(devicePxHeight: number) {
       // Device px per world unit at distance 1 for a 35-degree vertical fov.
@@ -2929,6 +3098,8 @@ export function createWeaponVfx(
       light.intensity = lightSpec.intensity * flick * tuning.light;
     },
     dispose() {
+      if (rigDisposed) return;
+      rigDisposed = true;
       weaponRoot.remove(group);
       sceneExtras.parent?.remove(sceneExtras);
       for (const p of parts) {
@@ -2940,19 +3111,65 @@ export function createWeaponVfx(
         }
       }
       for (const m of allMats) m.dispose();
-      for (const { prev, tex, albedoTex } of emissives) {
-        tex?.dispose();
-        albedoTex?.dispose();
-        prev.mat.emissiveMap = prev.emissiveMap;
-        prev.mat.map = prev.map;
-        prev.mat.metalness = prev.metalness;
-        prev.mat.roughness = prev.roughness;
-        prev.mat.metalnessMap = prev.metalnessMap;
-        prev.mat.roughnessMap = prev.roughnessMap;
-        if (prev.emissive) prev.mat.emissive.copy(prev.emissive);
-        prev.mat.emissiveIntensity = prev.emissiveIntensity;
-        prev.mat.needsUpdate = true;
-      }
+      restoreAndReleaseEmissives();
     },
   };
+}
+
+// ---------------------------------------------------------------------------
+// Boot prewarm: link every weapon-VFX program once, behind the loading screen.
+//
+// A weapon skin is worn by other players, so the first sighting is the first
+// time these programs link, and it lands mid-gameplay on whoever walks into
+// view first. The shader sources here carry no spec values (every authored
+// number arrives as a uniform or an attribute), so ONE synthetic rig covering
+// each component family produces the exact program cache keys the live rigs
+// ask for later: motes, drift, twinkles, aurora, shell, the pool, and the two
+// sprite materials of the core flare, plus the shared sprite textures they
+// sample. The sky dome is deliberately NOT warmed: nothing in the world path
+// builds one any more.
+// ---------------------------------------------------------------------------
+
+/** The shared sprite textures every weapon-VFX rig samples, created on first
+ *  ask and cached for the page. Uploading them at boot keeps the first sighting
+ *  of a skin off the synchronous texture-upload path. */
+export function weaponVfxPrewarmTextures(): THREE.Texture[] {
+  return [softDiscTex(), starFlareTex(), noiseTex()];
+}
+
+/**
+ * One hidden rig per REAL catalog spec, for the boot prewarm scene, built
+ * through the exact worn-skin path (grounded: false) so every program cache
+ * key a live arrival can ask for is linked at boot. A single synthetic spec
+ * exercising each component FAMILY was not enough: the first skin sighted in
+ * the world still linked ~108 programs inside one frame (the measured
+ * geared-arrival freeze). Off-screen (y = -1000) and frustum-culling-exempt
+ * like the other prewarm groups; the caller adds it to the scene, lets the
+ * compile entry link it, then removes it (never disposes: disposing a
+ * material releases its linked program, which is the thing being warmed).
+ */
+export function buildWeaponVfxPrewarmGroup(): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'weapon-vfx-program-prewarm';
+  group.position.set(0, -1000, 0); // off-screen; compile ignores position
+  for (const [key, spec] of Object.entries(WEAPON_VFX)) {
+    const host = new THREE.Mesh(
+      new THREE.BoxGeometry(0.1, 1, 0.1),
+      new THREE.MeshStandardMaterial({ color: 0xffffff }),
+    );
+    host.name = `prewarm-skin-host:${key}`;
+    host.frustumCulled = false;
+    const handle = createWeaponVfx(host, spec, { grounded: false });
+    // A visible light would change the scene's light counts, and those counts
+    // are part of every program cache key: one extra point light here and the
+    // whole boot compile warms keys no live frame ever asks for.
+    handle.light.visible = false;
+    // The boot prewarm group is census-tagged 'prewarm' as a whole; keep the
+    // rigs inside that bucket rather than reporting as live skins.
+    handle.group.userData.renderCategory = 'prewarm';
+    handle.sceneExtras.userData.renderCategory = 'prewarm';
+    group.add(host);
+    group.add(handle.sceneExtras);
+  }
+  return group;
 }

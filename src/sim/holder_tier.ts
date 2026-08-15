@@ -41,14 +41,15 @@ export const HOLDER_TIER_DEFS = [
   { index: 18, key: 'sovereign', threshold: WOC_MAX_SUPPLY }, // 100%
 ] as const satisfies readonly HolderTierCore[];
 
-export type HolderTierKey = typeof HOLDER_TIER_DEFS[number]['key'];
+export type HolderTierKey = (typeof HOLDER_TIER_DEFS)[number]['key'];
 
 /**
  * The highest rung a balance qualifies for, or null when there is no connected
  * wallet (balance === null) or the balance is below the first rung (< 1 $WOC).
  */
 export function holderTierForBalance(balance: number | null): HolderTierCore | null {
-  if (balance === null || !Number.isFinite(balance) || balance < HOLDER_TIER_DEFS[0].threshold) return null;
+  if (balance === null || !Number.isFinite(balance) || balance < HOLDER_TIER_DEFS[0].threshold)
+    return null;
   let tier: HolderTierCore | null = null;
   for (const t of HOLDER_TIER_DEFS) {
     if (balance >= t.threshold) tier = t;

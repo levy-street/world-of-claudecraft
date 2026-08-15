@@ -11,11 +11,29 @@ import {
 
 const FRAME_60 = 1 / 60;
 
+describe('wrapAngle as a shortest-signed-angle helper', () => {
+  it('normalizes a delta into (-PI, PI], including across the wrap boundary', () => {
+    // renderer.ts used to carry its own `shortestAngle(from, to)` helper, byte
+    // for byte the same wrap this module already exports (removed in favor of
+    // wrapAngle(to - from)). This is the first direct coverage of wrapAngle, so
+    // pin absolute expected values rather than re-deriving them from a second
+    // reimplementation of the same algorithm.
+    expect(wrapAngle(-6.0)).toBe(0.28318530717958623); // negative, past -PI: wraps up by 2*PI
+    expect(wrapAngle(2 * Math.PI)).toBe(0); // exact positive multiple of 2*PI collapses to 0
+    expect(wrapAngle(1.0)).toBe(1.0); // already inside (-PI, PI]: unchanged
+    expect(wrapAngle(4 * Math.PI)).toBe(0); // large positive multiple of 2*PI collapses to 0
+    expect(wrapAngle(-4 * Math.PI)).toBe(0); // large negative multiple of 2*PI collapses to 0
+    expect(wrapAngle(-2.5)).toBe(-2.5); // already inside (-PI, PI]: unchanged
+  });
+});
+
 describe('approachAngle', () => {
   it('takes the shortest path across the +/-PI wrap', () => {
     // from 3.0 to -3.0 is +0.28 the short way, not -6.0 the long way
     const r = approachAngle(3.0, -3.0, 1);
-    expect(r).toBeCloseTo(-3.0, 5); // within one big step, snaps to target
+    // within one big step, snaps to target: abs(d) <= step returns `target` directly,
+    // so this is bit-identical arithmetic, not a fuzzy comparison.
+    expect(r).toBe(-3.0);
   });
 
   it('clamps a large change to maxStep along the shortest direction', () => {

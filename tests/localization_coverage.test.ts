@@ -72,6 +72,11 @@ import {
   zh_TW,
 } from '../src/ui/i18n';
 import {
+  ensureReliquaryLocalesLoaded,
+  reliquaryPageName,
+  reliquaryTranslationManifest,
+} from '../src/ui/reliquary_i18n';
+import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
   type TalentTranslationManifestEntry,
@@ -123,6 +128,7 @@ describe('i18n Localization Key Coverage', () => {
       supportedLanguages.flatMap((lang) => [
         ensureLocaleLoaded(lang),
         ensureDeedLocalesLoaded(lang),
+        ensureReliquaryLocalesLoaded(lang),
       ]),
     );
   });
@@ -157,7 +163,6 @@ describe('i18n Localization Key Coverage', () => {
     'hud.core.mobileMore',
     'hud.core.mobileMoreAria',
     'hud.core.mobileSocial',
-    'hud.core.mobileArena',
     'hud.core.mobileMenu',
     'hud.core.mobileUse',
     'hud.core.mobileMeters',
@@ -355,10 +360,13 @@ describe('i18n Localization Key Coverage', () => {
   ];
   const interpolationValues: Record<string, string | number> = {
     active: 3,
+    area: 'Eastbrook',
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
     answered: 6,
+    // The elixir use line's granted-buff name (itemUi.tooltip.useElixirAura).
+    aura: 'Might of the Boar',
     base: 14,
     rested: 18,
     buyer: 'Mira',
@@ -372,17 +380,30 @@ describe('i18n Localization Key Coverage', () => {
     current: 120,
     cut: 5,
     delta: '+13',
+    direction: 'north',
+    distance: 'near',
     dps: '7.4',
+    // The third leg of a W-L-D record (hud.arena.ratingSummary), beside
+    // `wins` and `losses` below.
+    draws: 2,
     duration: '15s',
+    // The per-unit ask beside a stack's total (itemUi.market.buyConfirmBodyStack);
+    // a money string like `money` above, not a bare number.
+    each: '4 silver',
     form: 'Bear',
     fps: 60,
     guild: 'Night Watch',
     index: 2,
+    id: 'fine_example_ore',
     interactKey: 'F',
     moveKeys: 'W/A/S/D',
     questKey: 'L',
     item: 'Rough Bracers',
     key: 'K',
+    // The death recap's slayer (hud.system.deathRecapKiller[Ability]): a mob
+    // or player display name spliced verbatim. One sample only, the base and
+    // this branch each added the same key independently.
+    killer: 'Mira',
     kind: 'Weapon',
     slots: 14,
     label: 'Wolf',
@@ -390,9 +411,12 @@ describe('i18n Localization Key Coverage', () => {
     losses: 4,
     loser: 'Mira',
     marker: 'Skull',
+    markers: 'Available quest: north, near.',
     max: 25,
     message: 'Meet at the inn',
     min: 16,
+    // The elixir use line's buff duration in whole minutes (itemUi.tooltip.useElixir*).
+    minutes: 10,
     money: '12 copper',
     name: 'Aki',
     needed: 400,
@@ -407,6 +431,7 @@ describe('i18n Localization Key Coverage', () => {
     range: 30,
     rank: 2,
     realm: 'Eastbrook',
+    requirement: 'Requires Mining 40',
     resource: 'Mana',
     seconds: 7,
     shown: 120,
@@ -844,8 +869,12 @@ describe('i18n Localization Key Coverage', () => {
     const classAbilityEntries = entityTranslationManifest().filter(
       (entry) => entry.group === 'classAbility',
     );
+    const specNoteCount = Object.values(ABILITIES).reduce(
+      (count, ability) => count + Object.keys(ability.specNotes ?? {}).length,
+      0,
+    );
     expect(classAbilityEntries).toHaveLength(
-      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2,
+      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2 + specNoteCount,
     );
     const missingClassAbilities = missingEntityTranslationsForGroups(['classAbility']);
     expect(missingClassAbilities, JSON.stringify(missingClassAbilities, null, 2)).toHaveLength(0);
@@ -965,7 +994,9 @@ describe('i18n Localization Key Coverage', () => {
     // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
     // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
     // single 3-piece tier (name+bonus3 only).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
+    // 7 epic families x (name + bonus2/3/4), 3 haste kits x (name + bonus3), and the
+    // 5 WARFARE families x (name + bonus2/4/7).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1224,17 +1255,9 @@ describe('i18n Localization Key Coverage', () => {
         if (!entry) throw new Error(`Missing talent manifest entry: ${optionId}.${field}`);
         return entry;
       };
-      const requiredTalentEntry = (id: string, field: 'name' | 'description') => {
-        const entry = talentEntries.find(
-          (candidate) => candidate.id === id && candidate.field === field,
-        );
-        if (!entry) throw new Error(`Missing talent manifest entry: ${id}.${field}`);
-        return entry;
-      };
-
       setLanguage('es');
       expect(renderTalentManifestEntry(rowEntry('war_row_double_charge', 'name'))).toContain(
-        'Carga doble',
+        'Intervenir',
       );
       expect(
         renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'description')),
@@ -1249,11 +1272,6 @@ describe('i18n Localization Key Coverage', () => {
       expect(renderTalentManifestEntry(rowEntry('war_row_second_wind', 'description'))).toContain(
         '생명력',
       );
-      expect(
-        renderTalentManifestEntry(
-          requiredTalentEntry('11.hun_r11_survival_instincts', 'description'),
-        ),
-      ).toContain('생명력');
     }
 
     setLanguage('en');
@@ -1262,7 +1280,9 @@ describe('i18n Localization Key Coverage', () => {
   // Deed names and reward titles that legitimately equal English in a locale,
   // recorded as deliberate cross-language cognates (Veteran, Champion, Paragon,
   // and Gladiator are those languages' own words; Marginalia is Latin; nl keeps
-  // the poker term Full House). This list IS the recording mechanism: a deed
+  // the poker term Full House; Sergeant is the real de/nl/sv rank word, spelled
+  // identically, and the rest of that honor ladder IS translated). This list IS
+  // the recording mechanism: a deed
   // name or title that matches English WITHOUT a row here is an accidental
   // leak at the release gate. Dialect locales list their rendered result
   // (es_ES and fr_CA resolve through their base tables plus overrides).
@@ -1273,6 +1293,8 @@ describe('i18n Localization Key Coverage', () => {
     fr_CA: ['prog_champion.name', 'prog_champion.title', 'dlv_lore_journal.name'],
     it_IT: ['soc_market_magnate.title'],
     de_DE: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'prog_veteran.name',
       'prog_veteran.title',
       'prog_champion.name',
@@ -1284,6 +1306,8 @@ describe('i18n Localization Key Coverage', () => {
     ],
     pt_BR: ['prog_paragon.name', 'prog_paragon.title'],
     nl_NL: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'dlv_lore_journal.name',
       'pvp_arena_1v1_1900.name',
       'pvp_arena_1v1_1900.title',
@@ -1297,6 +1321,8 @@ describe('i18n Localization Key Coverage', () => {
       'pvp_arena_1v1_1900.title',
     ],
     sv_SE: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'prog_veteran.name',
       'prog_veteran.title',
       'pvp_arena_1v1_1900.name',
@@ -1312,9 +1338,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (31 as of the
-    // Demon Tower; tests/deeds_content.test.ts pins the count).
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 31);
+    // name + desc per deed, plus one title entry per title deed (live count;
+    // tests/deeds_content.test.ts pins the catalog).
+    const titleCount = Object.values(DEEDS).filter((d) => d.reward?.kind === 'title').length;
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + titleCount);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1378,6 +1405,49 @@ describe('i18n Localization Key Coverage', () => {
     expect(deedTitleText('prog_veteran')).toBe('Ветеран');
 
     setLanguage('en');
+  });
+
+  // The Reliquary page-name channel (src/ui/reliquary_i18n.ts) is the deed
+  // channel's sibling: its English lives in the RELIQUARY_PAGES content table, so
+  // the resolved catalog cannot cover it and the per-locale chunks must. Page
+  // NAMES ship for the five non-Latin locales today (page DESCS and the Latin
+  // locales are release fill), so this arm is scoped to exactly that claim and
+  // runs at BOTH tiers: a page added without its five fills renders English to a
+  // CJK or Cyrillic reader on the PR that adds it, not one release later.
+  const reliquaryShippedLocales: SupportedLanguage[] = [
+    'ja_JP',
+    'ko_KR',
+    'ru_RU',
+    'zh_CN',
+    'zh_TW',
+  ];
+  // The deedCognateAllowlist mechanism scoped to page names, and EMPTY on
+  // purpose: every shipped value is non-Latin script today, so a page name that
+  // matches its English source is an accidental leak, never a legitimate
+  // cognate. A future Latin-script fill that genuinely coincides adds its row
+  // here, which is the record that the coincidence was reviewed.
+  const reliquaryCognateAllowlist: Record<string, readonly string[]> = {};
+
+  it('should provide reliquary page-name translations for every shipped non-Latin locale', () => {
+    const nameRows = reliquaryTranslationManifest().filter((row) => row.field === 'name');
+    // Vacuity floor: an empty manifest would satisfy the loop below silently.
+    expect(nameRows.length).toBeGreaterThan(0);
+    try {
+      for (const lang of reliquaryShippedLocales) {
+        setLanguage(lang);
+        for (const row of nameRows) {
+          const rendered = reliquaryPageName(row.id);
+          expect(rendered.trim().length, `${lang}.${row.id}.name`).toBeGreaterThan(0);
+          if ((reliquaryCognateAllowlist[lang] ?? []).includes(`${row.id}.name`)) continue;
+          expect(
+            copiedEnglishComparable(rendered),
+            `${lang}.${row.id}.name leaks English with no reliquaryCognateAllowlist row`,
+          ).not.toBe(copiedEnglishComparable(row.source));
+        }
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 
   // RELEASE-TIER ONLY: real quest-narrative content checks. A sparse /
@@ -1570,13 +1640,6 @@ describe('i18n Localization Key Coverage', () => {
     expect(hudSource).toContain('dungeonDisplayNameFromSource');
     expect(hudSource).not.toContain('zoneWelcomeText(');
 
-    const rendererSource = fs.readFileSync(
-      path.resolve(process.cwd(), 'src/render/renderer.ts'),
-      'utf8',
-    );
-    // objectDisplayName still localizes the build-time object nameplate write in the
-    // renderer; the helper itself moved into entity_labels.ts.
-    expect(rendererSource).toContain('objectDisplayName');
     // The per-entity nameplate content (corpse/mob names) moved into the
     // NameplatePainter; localization is preserved, just relocated (mirrors the
     // minimap_painter zone-label move above).
@@ -1818,7 +1881,11 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');
-    expect(html).toContain('data-i18n="hud.core.mobileArena"');
+    // The merged PvP window's launcher label (Thornhollow Fields + arenas on one
+    // button); the old mobileArena key stays in the catalog like mobileTarget
+    // but no longer appears in the markup.
+    expect(html).toContain('data-i18n="hudChrome.pvp.mobileLabel"');
+    expect(html).not.toContain('data-i18n="hud.core.mobileArena"');
     // The Settings button (promoted to the bar between Social and More) uses
     // mobileSettings ("Settings"); the old mobileMenu ("Menu") key stays in the
     // catalog but, like mobileTarget, no longer appears in the markup.

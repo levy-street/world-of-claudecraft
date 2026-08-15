@@ -41,6 +41,7 @@ export interface ClaudiumNativePriceResult {
   rail: ClaudiumNativeRail;
   claudium: number | null;
   amountBase: string | null;
+  discountBps: number | null;
   reason?: string;
 }
 
@@ -293,6 +294,7 @@ export async function claudiumNativePrice(
     rail?: ClaudiumNativeRail;
     claudium?: number;
     amountBase?: string | null;
+    discountBps?: number | null;
     reason?: string;
   }>({
     method: 'GET',
@@ -305,6 +307,13 @@ export async function claudiumNativePrice(
         ? data.claudium
         : null,
     amountBase: typeof data?.amountBase === 'string' ? data.amountBase : null,
+    discountBps:
+      typeof data?.discountBps === 'number' &&
+      Number.isInteger(data.discountBps) &&
+      data.discountBps >= 0 &&
+      data.discountBps <= 9000
+        ? data.discountBps
+        : null,
     reason: data?.reason ?? (data ? undefined : 'unavailable'),
   };
 }

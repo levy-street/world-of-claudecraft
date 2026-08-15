@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { describe, expect, it, vi } from 'vitest';
 import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';

@@ -5,12 +5,6 @@ import { summonPet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
 
-function entity(sim: Sim, pid: number): Entity {
-  const e = sim.entities.get(pid);
-  if (!e) throw new Error(`missing entity ${pid}`);
-  return e;
-}
-
 function addDummy(sim: Sim, x = sim.player.pos.x, z = sim.player.pos.z + 4): Entity {
   const mob = createMob((sim as any).nextId++, MOBS.ridge_stalker, 20, {
     x,
@@ -26,57 +20,53 @@ function addDummy(sim: Sim, x = sim.player.pos.x, z = sim.player.pos.z + 4): Ent
 }
 
 describe('signature mechanics v2', () => {
-  it('bestial_wrath grants hunter AP percent and doubles pet damage', () => {
+  it('Howling Rage arms Unleash Beast and extends its frenzy', () => {
     const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('beast_mastery')).toBe(true);
     const hunter = sim.player;
     summonPet(sim.ctx, hunter, 'forest_wolf');
-    const pet = sim.petOf(sim.playerId);
-    if (!pet) throw new Error('expected summoned pet');
+    const target = addDummy(sim);
+    sim.targetEntity(target.id);
 
-    const apBefore = hunter.attackPower;
-    hunter.resource = hunter.maxResource;
     sim.castAbility('bestial_wrath');
 
-    const apAura = hunter.auras.find((a) => a.kind === 'buff_ap_pct' && a.id === 'bestial_wrath');
-    expect(apAura?.value).toBe(20);
-    expect(hunter.attackPower).toBeGreaterThan(apBefore);
-    expect(hunter.attackPower - apBefore).not.toBe(55);
+    expect(hunter.auras.find((aura) => aura.id === 'pack_ferocity')?.stacks).toBe(3);
+    expect(hunter.auras.find((aura) => aura.id === 'howling_rage_empower')?.value).toBe(1.5);
+    expect(sim.resolvedAbility('pack_command')?.def.id).toBe('unleash_beast');
 
-    const petAura = pet.auras.find(
-      (a) => a.kind === 'pet_damage_pct' && a.id === 'bestial_wrath_pet',
-    );
-    expect(petAura?.value).toBe(100);
-    // 2.0 from the Bestial Wrath pet buff x 1.35 from the Packbond mastery (petDmgPct 0.35
-    // at full level-20 mastery strength); the two stack multiplicatively by design.
-    expect((sim as any).petDamageMult(pet)).toBeCloseTo(2.7, 10);
+    const hpBefore = target.hp;
+    sim.castAbility('pack_command');
+
+    expect(target.hp).toBeLessThan(hpBefore);
+    expect(hunter.auras.find((aura) => aura.kind === 'hunter_frenzy')).toMatchObject({
+      remaining: 12,
+      duration: 12,
+    });
+    expect(hunter.auras.some((aura) => aura.id === 'howling_rage_empower')).toBe(false);
   });
 
-  it('trueshot_aura gives same-party allies a percent AP buff instead of flat AP', () => {
+  it('Cold Focus strengthens Measured Shot and discounts Long Draw', () => {
     const sim = new Sim({ seed: 12, playerClass: 'hunter', autoEquip: true });
-    const hunterPid = sim.playerId;
-    const allyPid = sim.addPlayer('warrior', 'Aleph');
-    sim.setPlayerLevel(20, hunterPid);
-    sim.setPlayerLevel(20, allyPid);
-    expect(sim.setSpec('marksmanship', hunterPid)).toBe(true);
-    const hunter = entity(sim, hunterPid);
-    const ally = entity(sim, allyPid);
-    ally.pos = { ...hunter.pos, x: hunter.pos.x + 3 };
-    ally.prevPos = { ...ally.pos };
-    (sim as any).rebucket(ally);
-    sim.partyInvite(allyPid, hunterPid);
-    sim.partyAccept(allyPid);
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('marksmanship')).toBe(true);
 
-    const allyApBefore = ally.attackPower;
-    hunter.resource = hunter.maxResource;
-    sim.castAbility('trueshot_aura', hunterPid);
+    expect(sim.resolvedAbility('measured_shot')?.effects).toContainEqual({
+      type: 'gainResource',
+      amount: 20,
+    });
+    expect(sim.resolvedAbility('aimed_shot')).toMatchObject({ cost: 35, castTime: 2 });
 
-    const aura = ally.auras.find((a) => a.kind === 'buff_ap_pct' && a.id === 'trueshot_aura_ap');
-    expect(aura?.value).toBe(10);
-    expect(aura?.duration).toBe(1800);
-    expect(ally.attackPower).toBe(Math.round(allyApBefore * 1.1));
-    expect(ally.attackPower - allyApBefore).not.toBe(35);
+    sim.castAbility('cold_focus');
+
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'cold_focus', kind: 'hunter_cold_focus', remaining: 12 }),
+    );
+    expect(sim.resolvedAbility('measured_shot')?.effects).toContainEqual({
+      type: 'gainResource',
+      amount: 30,
+    });
+    expect(sim.resolvedAbility('aimed_shot')).toMatchObject({ cost: 26, castTime: 1.4 });
   });
 
   it('hemorrhage applies bleed vulnerability and makes later bleed ticks hit harder', () => {

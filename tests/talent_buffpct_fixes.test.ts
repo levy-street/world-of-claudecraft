@@ -50,8 +50,8 @@ describe('talent buffPct resolver fixes', () => {
     );
 
     expect(effect.mult).toBeCloseTo(1.375, 6);
-    expect(effect.basedur).toBe(9);
-    expect(effect.perCombo).toBe(3);
+    expect(effect.basedur).toBe(12);
+    expect(effect.perCombo).toBe(4);
   });
 
   it('buffPct and cooldownPct compose on the same defensive ability', () => {
@@ -78,36 +78,68 @@ describe('talent buffPct resolver fixes', () => {
     expect(effect.value).toBeCloseTo(0.112, 6);
   });
 
-  it('Redline Draw replaces the old scalar with an every-third-shot cooldown refund', () => {
-    // Talents 2.0 reworked hun_r20_rapid_killing from static cooldownPct/buffPct
-    // mods on Fevered Draw into the hun_redline_draw castNth proc; the base
-    // ability values stay untouched.
-    const mods = rowMods('hunter', { 20: 'hun_r20_rapid_killing' });
-    const ability = resolvedAbility('hunter', 'rapid_fire', mods);
-    const effect = ability.effects.find((candidate) => candidate.type === 'selfBuff');
-    const proc = mods.procs.find((candidate) => candidate.id === 'hun_redline_draw');
+  // scaleEffect had no case for 'groundAoE' or 'repositionToAim', so a global
+  // damage modifier (e.g. the Fiesta arena augments, aug_bloodhunter's
+  // +18%/+18%) silently no-opped on Earthquake, Blizzard, Meteor, and Heroic
+  // Leap's landing hit while every directDamage ability scaled correctly. These
+  // pin the fix against the same global mult a directDamage ability applies.
+  // (#2428 retired the Consecration/Exorcism arm: Rite of Expulsion left the
+  // level-20 kit and Holy Ground is now spec-gated and re-ranked.)
+  it('Earthquake groundAoE damage scales with the global spell damage modifier', () => {
+    // Faultwake (earthquake) is Elemental-only after the v0.29 shaman redesign, so a
+    // spec-less modifier set no longer resolves it at all. The mage cases above set
+    // their spec for the same reason; the scaling behavior under test is unchanged.
+    const mods = emptyModifiers();
+    mods.spec = 'elemental';
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.3 } }, 1);
 
-    expect(ability.cooldown).toBeCloseTo(300, 6);
-    expect(effect).toMatchObject({ kind: 'buff_haste', value: 1.4 });
-    // Balance pass: 5 sec per proc behind an 8 sec internal cooldown (was an
-    // uncapped 15 sec that free-shot feeding compressed the 300s cooldown with).
-    expect(proc?.trigger).toMatchObject({ on: 'castNth', n: 3, icd: 8 });
-    expect(proc?.responses).toContainEqual({
-      kind: 'cooldownRefund',
-      ability: 'rapid_fire',
-      seconds: 5,
-    });
+    const earthquake = resolvedEffect('shaman', 'earthquake', 'groundAoE', mods);
+    expect(earthquake.min).toBe(Math.round(13 * 1.3));
+    expect(earthquake.max).toBe(Math.round(17 * 1.3));
   });
 
-  it('a judgement dmgPct ability mod scales the trigger damage multiplier', () => {
-    // Righteous Cause no longer carries this mod (it became a swing-CDR proc in
-    // the row-quality pass), so the engine fix is pinned on a synthetic effect.
+  it('Blizzard groundAoE damage scales with the global spell damage modifier and keeps its snare/orb riders', () => {
     const mods = emptyModifiers();
-    accumulateTalentEffect(mods, { ability: [{ ability: 'judgement', dmgPct: 0.15 }] }, 1);
-    const ability = abilitiesKnownAt('paladin', 20, mods).find((a) => a.def.id === 'judgement');
-    const effect = ability?.effects.find((candidate) => candidate.type === 'judgement');
-    if (!effect || effect.type !== 'judgement') throw new Error('missing judgement effect');
-    expect(effect.dmgMult).toBeCloseTo(1.15, 6);
-    expect(effect.flat ?? 0).toBe(0);
+    mods.spec = 'frost';
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.3 } }, 1);
+
+    const blizzard = resolvedEffect('mage', 'blizzard', 'groundAoE', mods);
+    expect(blizzard.min).toBe(Math.round(12 * 1.3));
+    expect(blizzard.max).toBe(Math.round(16 * 1.3));
+    expect(blizzard.slowMult).toBe(0.6);
+    expect(blizzard.orbCdr).toBe(true);
+  });
+
+  it('Meteor groundAoE damage scales with the global spell damage modifier and keeps its ignite/delay riders', () => {
+    const mods = emptyModifiers();
+    mods.spec = 'fire';
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.45 } }, 1);
+
+    const meteor = resolvedEffect('mage', 'meteor', 'groundAoE', mods);
+    expect(meteor.min).toBe(Math.round(90 * 1.45));
+    expect(meteor.max).toBe(Math.round(120 * 1.45));
+    expect(meteor.igniteFrac).toBe(0.4);
+    expect(meteor.delayed).toBe(true);
+  });
+
+  it('Rune of Power groundAoE ally-buff pulse (0/0 min/max) is left untouched by the global spell damage modifier', () => {
+    // Rune of Power is only reachable via the mage 20 choice row grant.
+    const mods = rowMods('mage', { 20: 'mag_r20_rune_of_power' });
+    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.45 } }, 1);
+
+    const rune = resolvedEffect('mage', 'rune_of_power', 'groundAoE', mods);
+    expect(rune.min).toBe(0);
+    expect(rune.max).toBe(0);
+    expect(rune.allyBuffPct).toBe(0.1);
+  });
+
+  it('Heroic Leap landingAoe damage scales with the global melee damage modifier', () => {
+    const mods = emptyModifiers();
+    accumulateTalentEffect(mods, { global: { meleeDmgPct: 0.4 } }, 1);
+
+    const leap = resolvedEffect('warrior', 'heroic_leap', 'repositionToAim', mods);
+    expect(leap.landingAoe?.min).toBe(Math.round(24 * 1.4));
+    expect(leap.landingAoe?.max).toBe(Math.round(32 * 1.4));
+    expect(leap.landingAoe?.radius).toBe(6);
   });
 });

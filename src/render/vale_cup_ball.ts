@@ -163,6 +163,11 @@ function shadowTexture(): THREE.CanvasTexture {
 let ballMat: THREE.Material | null = null;
 let shadowMat: THREE.MeshBasicMaterial | null = null;
 
+export function resetValeCupBallProfileCaches(): void {
+  ballMat = null;
+  shadowMat = null;
+}
+
 function sharedBallMaterial(): THREE.Material {
   if (!ballMat) {
     ballMat = GFX.standardMaterials

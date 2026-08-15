@@ -1,7 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet } from '../api';
+  import {
+    readAutoRefreshPreference,
+    writeAutoRefreshPreference,
+  } from '../auto_refresh_preference';
   import { buildCalibrationExport } from '../calibration_export';
+  import AutoRefreshToggle from '../components/AutoRefreshToggle.svelte';
   import BarChart from '../components/BarChart.svelte';
   import Panel from '../components/Panel.svelte';
   import { estimateQuantile, histogramBarPoints } from '../histogram_stats';
@@ -49,10 +54,10 @@
     }
   }
 
-  function changeAutoRefresh(event: Event): void {
-    autoRefresh = (event.currentTarget as HTMLInputElement).checked;
-    localStorage.setItem(AUTO_REFRESH_STORAGE_KEY, autoRefresh ? '1' : '0');
-    if (autoRefresh) void refresh();
+  function changeAutoRefresh(enabled: boolean): void {
+    autoRefresh = enabled;
+    writeAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY, enabled);
+    if (enabled) void refresh();
   }
 
   function downloadJson(): void {
@@ -82,7 +87,7 @@
   });
 
   onMount(() => {
-    autoRefresh = localStorage.getItem(AUTO_REFRESH_STORAGE_KEY) !== '0';
+    autoRefresh = readAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY);
     mounted = true;
     void refresh();
     return () => {
@@ -99,13 +104,11 @@
         <button type="button" disabled={data === null} onclick={downloadJson}>
           {t('calibration.downloadJson')}
         </button>
-        <label class="auto-refresh">
-          <input type="checkbox" checked={autoRefresh} onchange={changeAutoRefresh} />
-          <span class="switch-track" aria-hidden="true"><span></span></span>
-          <span>
-            {t('calibration.autoRefresh', { seconds: LIVE_REFRESH_MS / 1000 })}
-          </span>
-        </label>
+        <AutoRefreshToggle
+          checked={autoRefresh}
+          label={t('calibration.autoRefresh', { seconds: LIVE_REFRESH_MS / 1000 })}
+          onChange={changeAutoRefresh}
+        />
       </div>
     </div>
 
@@ -164,59 +167,6 @@
     flex: none;
     align-items: center;
     gap: 12px;
-  }
-
-  .auto-refresh {
-    position: relative;
-    display: inline-flex;
-    min-height: 40px;
-    flex: none;
-    align-items: center;
-    gap: 8px;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 12px;
-  }
-
-  .auto-refresh input {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-  }
-
-  .switch-track {
-    display: inline-flex;
-    width: 34px;
-    height: 19px;
-    align-items: center;
-    padding: 2px;
-    background: var(--control-bg);
-    border: 1px solid var(--control-border);
-    border-radius: 999px;
-  }
-
-  .switch-track span {
-    width: 13px;
-    height: 13px;
-    background: var(--text-dim);
-    border-radius: 50%;
-    transition: transform 120ms ease, background 120ms ease;
-  }
-
-  .auto-refresh input:checked + .switch-track {
-    background: #17301f;
-    border-color: #348b56;
-  }
-
-  .auto-refresh input:checked + .switch-track span {
-    background: #7bea9f;
-    transform: translateX(15px);
-  }
-
-  .auto-refresh input:focus-visible + .switch-track {
-    outline: 2px solid var(--gold);
-    outline-offset: 2px;
   }
 
   .histograms {

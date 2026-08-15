@@ -137,9 +137,10 @@ export function percentileTierBadgeDataUrl(tier: PercentileTier, px = 128): stri
         `</radialGradient>`
       : '');
 
-  const glow = style.halo > 0
-    ? `<circle cx="32" cy="32" r="31.5" fill="url(#${hid})" opacity="${style.halo}"/>`
-    : '';
+  const glow =
+    style.halo > 0
+      ? `<circle cx="32" cy="32" r="31.5" fill="url(#${hid})" opacity="${style.halo}"/>`
+      : '';
   const rays = style.rays ? sunburstRays(tier.ring) : '';
 
   const svg =

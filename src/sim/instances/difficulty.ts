@@ -55,12 +55,13 @@ export function mobTemplateForDungeonDifficulty(
   const dmgMult =
     tuning.damageMultiplierByMob?.[template.id] ??
     (role?.summonedAdd ? tuning.addDamageMultiplier : tuning.damageMultiplier);
+  const hpMult = tuning.healthMultiplierByMob?.[template.id] ?? tuning.healthMultiplier;
   return {
     ...template,
     minLevel: tuning.level,
     maxLevel: tuning.level,
-    hpBase: template.hpBase * tuning.healthMultiplier,
-    hpPerLevel: template.hpPerLevel * tuning.healthMultiplier,
+    hpBase: template.hpBase * hpMult,
+    hpPerLevel: template.hpPerLevel * hpMult,
     dmgBase: template.dmgBase * dmgMult,
     dmgPerLevel: template.dmgPerLevel * dmgMult,
     armorPerLevel: template.armorPerLevel * tuning.armorMultiplier,
@@ -96,13 +97,20 @@ export function applyDungeonMobTuning(
 ): void {
   if (difficulty !== 'heroic') {
     // Normal retunes: the mob's own melee factor drives its mechanics too, so
-    // an aoePulse/stomp keeps pace with the swing it lands between. Heals from
-    // support mobs keep pace with the doubled health pool.
+    // an aoePulse/stomp keeps pace with the swing it lands between, unless the
+    // tuning carries a mechanicDamageMultiplierByMob override (an avoidable
+    // telegraphed mechanic priced independently of the tank-swing floor).
+    // Heals from support mobs keep pace with the doubled health pool.
     const normal = NORMAL_DUNGEON_TUNING[dungeonId];
     const dmgMult = normal?.damageMultiplierByMob[mob.templateId];
     if (normal && dmgMult !== undefined) {
-      mob.mechanicDamageMult = dmgMult;
+      mob.mechanicDamageMult = normal.mechanicDamageMultiplierByMob?.[mob.templateId] ?? dmgMult;
       mob.mechanicHealMult = normal.healthMultiplier;
+      // A petSpell caster's nuke is rolled from the base table and cannot be
+      // reached by the template transform (melee only) or by
+      // mechanicDamageMult, so it takes its own factor or stays at 1.
+      const ranged = normal.rangedDamageMultiplierByMob?.[mob.templateId];
+      if (ranged !== undefined) mob.rangedDamageMult = ranged;
     }
     return;
   }

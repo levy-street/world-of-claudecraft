@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import type { PerfSnapshot } from '../src/game/perf';
-import { perfReporterInternalsForTest } from '../src/game/perf_reporter';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
+import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
+import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { Settings } from '../src/game/settings';
 
 function installBrowserGlobals(): void {
@@ -101,7 +102,7 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       maxPointLights: 6,
       activePointLights: 6,
       shadowMap: 4096,
-      nativeIosMemoryProfile: false,
+      iosMemoryProfile: false,
     },
   };
 }
@@ -149,7 +150,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         category: 'world',
         priority: 50,
         required: true,
-        status: 'completed',
+        status: 'partial',
         elapsedMs: 120,
         remainingMsAfter: 4200,
         passes: 0,
@@ -159,15 +160,39 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         texturesBefore: 40,
         texturesAfter: 52,
         textureDelta: 12,
+        workDone: 12,
+        workPlanned: 20,
         detail: 'uploaded=12',
       },
     ],
     manifestCompleted: 12,
+    manifestPartial: 1,
     manifestSkipped: 0,
-    manifestTimedOut: 0,
+    manifestTimedOut: 1,
     manifestFailed: 0,
-    timedOutEntryIds: [],
+    partialEntryIds: ['textures.scene'],
+    timedOutEntryIds: ['vfx.weapon-skins'],
     failedEntryIds: [],
+    // The dropped entry's second half. Without this, a report showing
+    // vfx.weapon-skins as timed-out cannot say whether the world-side weapon
+    // protection exists a minute into play or not at all.
+    resume: {
+      status: 'done' as const,
+      plannedEntries: 1,
+      plannedUnits: 3,
+      startedUnits: 3,
+      failedUnits: 1,
+      failedUnitIds: ['vfx.weapon-skins:weapon-skins:compile'],
+      entries: [
+        {
+          id: 'vfx.weapon-skins',
+          lane: 'cosmetic' as const,
+          planned: 3,
+          started: 3,
+          failed: 1,
+        },
+      ],
+    },
     diagnosticsBaseline: null,
   };
 }
@@ -200,6 +225,7 @@ function snapshot(): PerfSnapshot {
     seconds: 80,
     frames: 4800,
     fps: 60,
+    hitchForensics: [],
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
       last10s: {
@@ -214,12 +240,114 @@ function snapshot(): PerfSnapshot {
         fps: 60,
         frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
       },
+      worst10s: null,
     },
     mainMs: { renderer: { count: 1, avg: 5, p95: 5, max: 5 } },
     renderer: {
       graphicsConfigVersion: 16,
       tier: 'high',
+      currentZoneId: 'eastbrook_vale',
       qualityBuckets: qualityBuckets(),
+      gpuQueue: {
+        units: 2,
+        totalSyncMs: 18.4,
+        worstSyncMs: 12.1,
+        // The texture unit is the cheap-looking one that actually cost the
+        // frame: 6.3 ms of sync, 310 ms of lost frame. That inversion is why
+        // the beacon carries both rankings.
+        totalFrameGapMs: 329.2,
+        worstFrameGapMs: 310.5,
+        worstUnsharedFrameGapMs: 18.7,
+        slowest: [
+          {
+            label: 'live-view-compile',
+            priority: 30,
+            syncMs: 12.1,
+            wallMs: 40.2,
+            atMs: 5000,
+            waitMs: 2.4,
+            frameGapMs: 18.7,
+            sharedFrameGap: 1,
+          },
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            syncMs: 6.3,
+            wallMs: 6.3,
+            atMs: 5200,
+            waitMs: 940.5,
+            frameGapMs: 310.5,
+            sharedFrameGap: 2,
+          },
+        ],
+        blockiest: [
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            syncMs: 6.3,
+            wallMs: 6.3,
+            atMs: 5200,
+            waitMs: 940.5,
+            frameGapMs: 310.5,
+            sharedFrameGap: 2,
+          },
+          {
+            label: 'live-view-compile',
+            priority: 30,
+            syncMs: 12.1,
+            wallMs: 40.2,
+            atMs: 5000,
+            waitMs: 2.4,
+            frameGapMs: 18.7,
+            sharedFrameGap: 1,
+          },
+        ],
+        pending: 0,
+        active: null,
+        waitingTails: [],
+        stallCount: 0,
+        stalls: [],
+        worstWaitMs: 940.5,
+        longestWaits: [
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            waitMs: 940.5,
+            blockedBy: 'preview:armory:skin',
+            blockedByPriority: 10,
+            waitedOnTailCap: true,
+            tails: ['preview:armory:skin'],
+          },
+        ],
+        recent: {
+          windowMs: 30000,
+          units: 2,
+          totalSyncMs: 18.4,
+          totalFrameGapMs: 329.2,
+          worstSyncMs: 12.1,
+          worstFrameGapMs: 310.5,
+          worstWaitMs: 940.5,
+          lanes: [
+            {
+              priority: 30,
+              units: 1,
+              worstWaitMs: 2.4,
+              totalWaitMs: 2.4,
+              worstSyncMs: 12.1,
+              worstFrameGapMs: 18.7,
+            },
+            {
+              priority: 10,
+              units: 1,
+              worstWaitMs: 940.5,
+              totalWaitMs: 940.5,
+              worstSyncMs: 6.3,
+              worstFrameGapMs: 310.5,
+            },
+          ],
+        },
+      },
+      nightAmount: 0,
       autoGovernor: true,
       budget: {
         targetFps: 60,
@@ -237,6 +365,7 @@ function snapshot(): PerfSnapshot {
       },
       renderScale: 1,
       effectiveRenderScale: 0.9,
+      shadowCadenceHalfRate: false,
       renderBudget: {
         enabled: true,
         mode: 'stable',
@@ -315,6 +444,8 @@ function snapshot(): PerfSnapshot {
     hud: null,
     assets: { preload: { tasks: 0, waitMs: 0, complete: true }, byType: {}, files: [] },
     network: null,
+    netPipeline: null,
+    heapSawtooth: null,
     input: {
       intents: 0,
       lastKind: '',
@@ -389,18 +520,286 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererPrewarmSummary?: { manifestPlanned?: number } })
         .rendererPrewarmSummary?.manifestPlanned,
     ).toBe(14);
+    // The honest partial signal must survive into the report: a deadline or
+    // prefetch-trimmed entry is 'partial' with its counts, never 'completed'.
     expect(
-      (body.rawSummary as { rendererPrewarmSummary?: { entries?: unknown[] } })
-        .rendererPrewarmSummary?.entries,
-    ).toHaveLength(2);
+      (body.rawSummary as { rendererPrewarmSummary?: { manifestPartial?: number } })
+        .rendererPrewarmSummary?.manifestPartial,
+    ).toBe(1);
     expect(
-      (body.rawSummary as { rendererPrewarm?: { manifestEntries?: unknown[] } }).rendererPrewarm
-        ?.manifestEntries,
-    ).toHaveLength(2);
+      (body.rawSummary as { rendererPrewarmSummary?: { partialEntryIds?: string[] } })
+        .rendererPrewarmSummary?.partialEntryIds,
+    ).toEqual(['textures.scene']);
+    const summaryEntries = (
+      body.rawSummary as {
+        rendererPrewarmSummary?: {
+          entries?: { id?: string; status?: string; workDone?: number; workPlanned?: number }[];
+        };
+      }
+    ).rendererPrewarmSummary?.entries;
+    expect(summaryEntries).toHaveLength(2);
+    expect(summaryEntries?.[1]).toMatchObject({
+      id: 'textures.scene',
+      status: 'partial',
+      workDone: 12,
+      workPlanned: 20,
+    });
+    // The live stats object is NOT sent beside the summary. It was a second
+    // copy of the same block under the ingest's 16 KB cap, and once its resume
+    // getter started serializing, the copy the server rebuilds from a fixed key
+    // set was no longer the only one carrying resume. Nothing reads the twin
+    // back out of storage, so the summary is the whole payload: a new field
+    // belongs in `rendererPrewarmSummary`, never in a restored twin.
+    expect(body.rawSummary as Record<string, unknown>).not.toHaveProperty('rendererPrewarm');
+    // The resume lane's outcome, which is the other half of "did this entry
+    // run". `vfx.weapon-skins` reads timed-out above; only this block says its
+    // units were handed to the lane, and that one of them failed, so the
+    // world-side weapon protection is incomplete rather than merely late.
+    const prewarmSummary = (body.rawSummary as { rendererPrewarmSummary?: Record<string, unknown> })
+      .rendererPrewarmSummary;
+    expect(prewarmSummary?.manifestSkipped).toBe(0);
+    expect(prewarmSummary?.resume).toEqual({
+      status: 'done',
+      plannedEntries: 1,
+      plannedUnits: 3,
+      startedUnits: 3,
+      failedUnits: 1,
+      failedUnitIds: ['vfx.weapon-skins:weapon-skins:compile'],
+      entries: [{ id: 'vfx.weapon-skins', lane: 'cosmetic', planned: 3, started: 3, failed: 1 }],
+    });
     expect(
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,
     ).toBe(420_000);
+  });
+
+  it('carries the four dropped browser longtask fields into raw summary (#2479)', () => {
+    // longTaskCount and longTaskP95Ms already ship as top-level fields; these
+    // four (totalMs, avg, max, lastAge) used to be silently dropped. max is
+    // the independent corroboration of a multi-second stall, so it matters
+    // most, but all four ride together in one raw-summary block.
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+
+    expect(body.longTaskCount).toBe(2);
+    expect(body.longTaskP95Ms).toBe(80);
+    expect(
+      (body.rawSummary as { browser?: { longTasks?: Record<string, number> } }).browser?.longTasks,
+    ).toEqual({ totalMs: 120, avg: 60, max: 80, lastAge: 1000 });
+  });
+
+  it('carries the GPU queue block, active unit included, into raw summary (#3167)', () => {
+    // A settled queue: only completed units, no running one. This is the arm
+    // that used to be the ONLY arm, since a never-settling unit records nothing.
+    const settings = new Settings();
+    const settled = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    const settledQueue = (settled.rawSummary as { rendererGpuQueue?: Record<string, unknown> })
+      .rendererGpuQueue;
+    expect(settledQueue).toMatchObject({
+      units: 2,
+      totalSyncMs: 18.4,
+      worstSyncMs: 12.1,
+      totalFrameGapMs: 329.2,
+      worstFrameGapMs: 310.5,
+      worstUnsharedFrameGapMs: 18.7,
+      pending: 0,
+      stallCount: 0,
+      active: null,
+      stalls: [],
+    });
+    expect(settledQueue?.slowest).toEqual([
+      {
+        label: 'live-view-compile',
+        priority: 30,
+        syncMs: 12.1,
+        wallMs: 40.2,
+        waitMs: 2.4,
+        frameGapMs: 18.7,
+        sharedFrameGap: 1,
+      },
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        syncMs: 6.3,
+        wallMs: 6.3,
+        waitMs: 940.5,
+        frameGapMs: 310.5,
+        sharedFrameGap: 2,
+      },
+    ]);
+    // The interval arm, which is the only one two reports can be differenced
+    // on: everything above it is cumulative or a lifetime maximum. The lane
+    // rows are what say a cosmetic unit made a live-view one wait.
+    expect(settledQueue?.recent).toEqual({
+      windowMs: 30_000,
+      units: 2,
+      totalSyncMs: 18.4,
+      totalFrameGapMs: 329.2,
+      worstSyncMs: 12.1,
+      worstFrameGapMs: 310.5,
+      worstWaitMs: 940.5,
+      lanes: [
+        {
+          priority: 30,
+          units: 1,
+          worstWaitMs: 2.4,
+          totalWaitMs: 2.4,
+          worstSyncMs: 12.1,
+          worstFrameGapMs: 18.7,
+        },
+        {
+          priority: 10,
+          units: 1,
+          worstWaitMs: 940.5,
+          totalWaitMs: 940.5,
+          worstSyncMs: 6.3,
+          worstFrameGapMs: 310.5,
+        },
+      ],
+    });
+    expect(settledQueue?.worstWaitMs).toBe(940.5);
+    // Attribution rides with the wait: the cost lists cannot carry it, because a
+    // unit can wait a long time while costing nothing itself.
+    expect(settledQueue?.longestWaits).toEqual([
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        waitMs: 940.5,
+        blockedBy: 'preview:armory:skin',
+        blockedByPriority: 10,
+        waitedOnTailCap: true,
+        tails: ['preview:armory:skin'],
+      },
+    ]);
+    // The frame-cost ranking inverts the sync ranking, which is the whole point
+    // of shipping both: a sync-ordered beacon would bury the unit that hurt.
+    expect(settledQueue?.blockiest).toEqual([
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        syncMs: 6.3,
+        wallMs: 6.3,
+        waitMs: 940.5,
+        frameGapMs: 310.5,
+        sharedFrameGap: 2,
+      },
+      {
+        label: 'live-view-compile',
+        priority: 30,
+        syncMs: 12.1,
+        wallMs: 40.2,
+        waitMs: 2.4,
+        frameGapMs: 18.7,
+        sharedFrameGap: 1,
+      },
+    ]);
+
+    const snap = snapshot();
+    snap.renderer!.gpuQueue = {
+      units: 2,
+      totalSyncMs: 18.4,
+      worstSyncMs: 12.1,
+      totalFrameGapMs: 0,
+      worstFrameGapMs: 0,
+      worstUnsharedFrameGapMs: 0,
+      slowest: [],
+      blockiest: [],
+      pending: 7,
+      active: { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000 },
+      waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000, atMs: 11_000 }],
+      stallCount: 1,
+      stalls: [
+        { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000, settled: false },
+      ],
+      worstWaitMs: 0,
+      longestWaits: [],
+      recent: {
+        windowMs: 30000,
+        units: 0,
+        totalSyncMs: 0,
+        totalFrameGapMs: 0,
+        worstSyncMs: 0,
+        worstFrameGapMs: 0,
+        worstWaitMs: 0,
+        lanes: [],
+      },
+    };
+    const wedged = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    const wedgedQueue = (wedged.rawSummary as { rendererGpuQueue?: Record<string, unknown> })
+      .rendererGpuQueue;
+    // The wedge is the whole point: units stayed at 2, so only the active unit
+    // and the stall say the queue has been blocked for a minute and a half.
+    expect(wedgedQueue).toMatchObject({
+      units: 2,
+      pending: 7,
+      stallCount: 1,
+      active: { label: 'wedged-compile', priority: 40, ageMs: 91_000 },
+      stalls: [{ label: 'wedged-compile', priority: 40, ageMs: 91_000, settled: false }],
+    });
+    // A released tail rides beside the active unit. Exact equality on purpose:
+    // toMatchObject's subset semantics would pass even if atMs leaked through,
+    // and dropping atMs (page-relative, fleet-meaningless) is the claim.
+    expect((wedgedQueue as { waitingTails?: unknown[] }).waitingTails).toEqual([
+      { label: 'released-gate', priority: 30, ageMs: 5000 },
+    ]);
+  });
+
+  it('carries the always-on net pipeline and heap sawtooth blocks into raw summary', () => {
+    const settings = new Settings();
+    const snap = snapshot();
+    snap.netPipeline = {
+      snapshots: 240,
+      resets: 1,
+      approxBytesTotal: 480_000,
+      entCountTotal: 960,
+      keepCountTotal: 3120,
+      parseMs: { count: 240, p50: 0.4, p95: 1.2, max: 6.5 },
+      applyMs: { count: 240, p50: 0.9, p95: 2.8, max: 11.2 },
+      gapMs: { count: 239, p50: 50, p95: 78, max: 900 },
+      snapshotsPerRaf: { r0: 410, r1: 280, r2: 24, r3plus: 6 },
+    };
+    snap.heapSawtooth = {
+      samples: 60,
+      seconds: 59,
+      gcDropCount: 3,
+      avgDropMb: 38.5,
+      allocRateMbPerSec: 2.1,
+      amplitudeMb: 42,
+      lastUsedMb: 180,
+    };
+
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+
+    const rawSummary = body.rawSummary as {
+      netPipeline?: {
+        snapshots: number;
+        gapMs: { max: number };
+        snapshotsPerRaf: { r3plus: number };
+      };
+      heapSawtooth?: { gcDropCount: number; allocRateMbPerSec: number };
+    };
+    expect(rawSummary.netPipeline?.snapshots).toBe(240);
+    expect(rawSummary.netPipeline?.gapMs.max).toBe(900);
+    expect(rawSummary.netPipeline?.snapshotsPerRaf.r3plus).toBe(6);
+    expect(rawSummary.heapSawtooth?.gcDropCount).toBe(3);
+    expect(rawSummary.heapSawtooth?.allocRateMbPerSec).toBe(2.1);
+  });
+
+  it('keeps offline null net pipeline and heap blocks as nulls in raw summary', () => {
+    const settings = new Settings();
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snapshot(), settings, 's', null)!;
+    expect((body.rawSummary as { netPipeline?: unknown }).netPipeline).toBeNull();
+    expect((body.rawSummary as { heapSawtooth?: unknown }).heapSawtooth).toBeNull();
   });
 
   it('keeps local dev trace frames and long-task correlation in raw summary', () => {
@@ -547,6 +946,333 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererDiagnostics?: { enabled?: boolean } }).rendererDiagnostics
         ?.enabled,
     ).toBe(false);
+  });
+});
+
+describe('perf reporter report dimensions', () => {
+  const { payloadFromSnapshot } = perfReporterInternalsForTest;
+
+  // Only activeViews/visibleViews are read from the renderer frame by the
+  // payload path; the rest of the large frame record is irrelevant here.
+  function lastFrameWith(
+    activeViews: number,
+    visibleViews: number,
+  ): NonNullable<PerfSnapshot['renderer']>['lastFrame'] {
+    return { activeViews, visibleViews } as unknown as NonNullable<
+      PerfSnapshot['renderer']
+    >['lastFrame'];
+  }
+
+  it('emits the provider zone id as zoneOrScenario for gameplay sessions', () => {
+    (globalThis as any).location = { search: '' };
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, {
+      zoneId: 'dungeon:hollow_crypt',
+      simEntities: 33,
+    })!;
+    expect(body.source).toBe('gameplay');
+    expect(body.zoneOrScenario).toBe('dungeon:hollow_crypt');
+    expect(body.simEntities).toBe(33);
+  });
+
+  it('keeps the benchmark perfScenario priority over the provider zone', () => {
+    // installBrowserGlobals sets ?perfScenario=bench_dense_foliage.
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, {
+      zoneId: 'eastbrook_vale',
+      simEntities: 33,
+    })!;
+    expect(body.source).toBe('benchmark');
+    expect(body.zoneOrScenario).toBe('bench_dense_foliage');
+  });
+
+  it('falls back to the gameplay label when the provider is absent or returns null', () => {
+    (globalThis as any).location = { search: '' };
+    const withoutProvider = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(withoutProvider.zoneOrScenario).toBe('gameplay');
+    expect(withoutProvider.simEntities).toBeNull();
+    const nullProvider = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, null)!;
+    expect(nullProvider.zoneOrScenario).toBe('gameplay');
+    expect(nullProvider.simEntities).toBeNull();
+  });
+
+  it('emits the crowd bucket and raw view counts from the renderer frame', () => {
+    const snap = snapshot();
+    snap.renderer!.lastFrame = lastFrameWith(57, 31);
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.activeViews).toBe(57);
+    expect(body.visibleViews).toBe(31);
+    expect(body.crowdBucket).toBe('50-99');
+  });
+
+  it('null-guards a missing renderer frame into unknown crowd and null views', () => {
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(body.activeViews).toBeNull();
+    expect(body.visibleViews).toBeNull();
+    expect(body.crowdBucket).toBe('unknown');
+  });
+
+  it('emits the worst-10s frame p95 from the retained window and null before one exists', () => {
+    const snap = snapshot();
+    snap.windows.worst10s = {
+      atMs: 60_000,
+      seconds: 10,
+      frames: 200,
+      fps: 20,
+      frameMs: { avg: 60, p50: 40, p95: 180.5, p99: 220, max: 260, long50: 80 },
+    };
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.worst10sFrameP95Ms).toBe(180.5);
+    const empty = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(empty.worst10sFrameP95Ms).toBeNull();
+  });
+
+  it('stamps schema version 2 on the payload', () => {
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(body.schemaVersion).toBe(2);
+  });
+});
+
+describe('perf reporter suggestion ids', () => {
+  const { payloadFromSnapshot } = perfReporterInternalsForTest;
+
+  it('emits an empty suggestion list for a healthy session', () => {
+    (globalThis as any).location = { search: '' };
+    const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42)!;
+    expect(body.suggestionIds).toEqual([]);
+  });
+
+  it('emits hardware-acceleration for a software-rendered session', () => {
+    (globalThis as any).location = { search: '' };
+    const snap = snapshot();
+    snap.renderer!.glRenderer = 'Google SwiftShader';
+    const body = payloadFromSnapshot(snap, new Settings(), 'sess1', 42)!;
+    expect(body.suggestionIds).toEqual(['hardware-acceleration']);
+  });
+
+  it('emits integrated-gpu on a bad-frames iGPU session only outside the desktop shell', () => {
+    (globalThis as any).location = { search: '' };
+    const badSnap = (): PerfSnapshot => {
+      const snap = snapshot();
+      snap.renderer!.glRenderer =
+        'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)';
+      snap.windows.last10s = {
+        seconds: 10,
+        frames: 240,
+        fps: 24,
+        frameMs: { avg: 41, p50: 38, p95: 55, p99: 70, max: 120, long50: 12 },
+      };
+      return snap;
+    };
+    const web = payloadFromSnapshot(badSnap(), new Settings(), 'sess1', 42, null, false)!;
+    expect(web.suggestionIds).toEqual(['integrated-gpu']);
+    // Ruling R15: the desktop shell already forces the dGPU, so the same
+    // snapshot reports no machine-local suggestion there.
+    const shell = payloadFromSnapshot(badSnap(), new Settings(), 'sess1', 42, null, true)!;
+    expect(shell.suggestionIds).toEqual([]);
+  });
+});
+
+describe('perf reporter worst-window drain', () => {
+  function installReporterFlowGlobals(fetchImpl: unknown): void {
+    (globalThis as any).location = { search: '' };
+    (globalThis as any).window = {
+      innerWidth: 1440,
+      innerHeight: 900,
+      setTimeout: vi.fn((fn: () => void, ms: number) => setTimeout(fn, ms)),
+      clearTimeout: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    };
+    (globalThis as any).document = {
+      visibilityState: 'visible',
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    };
+    (globalThis as any).sessionStorage = {
+      getItem: () => 'reporter-test-session',
+      setItem: () => {},
+    };
+    (globalThis as any).fetch = fetchImpl;
+  }
+
+  function fakePerf(): { perf: PerfMonitor; drainWorstWindow: ReturnType<typeof vi.fn> } {
+    const drainWorstWindow = vi.fn();
+    const perf = { report: () => snapshot(), drainWorstWindow } as unknown as PerfMonitor;
+    return { perf, drainWorstWindow };
+  }
+
+  function lastScheduledDelay(): number | undefined {
+    return (globalThis as any).window.setTimeout.mock.lastCall?.[1];
+  }
+
+  async function runFirstReport(fetchImpl: unknown): Promise<ReturnType<typeof vi.fn>> {
+    installReporterFlowGlobals(fetchImpl);
+    const { perf, drainWorstWindow } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      const firstDelay = jitteredPerfReportDelay(75_000, 'reporter-test-session', 0);
+      expect(firstDelay).toBeGreaterThan(75_000);
+      await vi.advanceTimersByTimeAsync(75_000);
+      expect(fetchImpl).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(firstDelay - 75_000 - 1);
+      expect(fetchImpl).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+      await Promise.resolve();
+    } finally {
+      stop();
+    }
+    return drainWorstWindow;
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (globalThis as any).fetch;
+    delete (globalThis as any).sessionStorage;
+    delete (globalThis as any).document;
+    delete (globalThis as any).window;
+    delete (globalThis as any).location;
+  });
+
+  it('drains the worst window exactly once after a successful send', async () => {
+    const drain = await runFirstReport(
+      vi.fn(async () => ({ ok: true, status: 204, text: async () => '' })),
+    );
+    expect(drain).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the worst window when the server rejects the report', async () => {
+    const drain = await runFirstReport(
+      vi.fn(async () => ({ ok: false, status: 500, text: async () => 'nope' })),
+    );
+    expect(drain).not.toHaveBeenCalled();
+  });
+
+  it('keeps the worst window when the send fails at the network layer', async () => {
+    const drain = await runFirstReport(vi.fn(async () => Promise.reject(new Error('offline'))));
+    expect(drain).not.toHaveBeenCalled();
+  });
+
+  it('arms the next deterministic sequence after a successful report', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 1),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('advances the jitter sequence when a hidden retry sends no request', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    (globalThis as any).document.visibilityState = 'hidden';
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).not.toHaveBeenCalled();
+      const hiddenRetry = jitteredPerfReportDelay(300_000, 'reporter-test-session', 1);
+      expect(lastScheduledDelay()).toBe(hiddenRetry);
+
+      (globalThis as any).document.visibilityState = 'visible';
+      await vi.advanceTimersByTimeAsync(hiddenRetry);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 2),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('advances the jitter sequence when renderer evidence is not ready', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    let current = snapshot();
+    current.renderer = null;
+    const drainWorstWindow = vi.fn();
+    const perf = {
+      report: () => current,
+      drainWorstWindow,
+    } as unknown as PerfMonitor;
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).not.toHaveBeenCalled();
+      const noRendererRetry = jitteredPerfReportDelay(300_000, 'reporter-test-session', 1);
+      expect(lastScheduledDelay()).toBe(noRendererRetry);
+
+      current = snapshot();
+      await vi.advanceTimersByTimeAsync(noRendererRetry);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 2),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('keeps the local development trace on its fixed fast cadence', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    (globalThis as any).location = {
+      search: '?perfTrace=1',
+      hostname: '127.0.0.1',
+    };
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(9_999);
+      expect(fetchImpl).not.toHaveBeenCalled();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(15_000);
+    } finally {
+      stop();
+    }
   });
 });
 

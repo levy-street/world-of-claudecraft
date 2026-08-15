@@ -4,7 +4,6 @@
     Activity,
     BarPoint,
     LinePoint,
-    LivePlayer,
     OnlineHistory,
     OnlineHistoryRange,
     Overview,
@@ -23,17 +22,18 @@
   import StatCard from '../components/StatCard.svelte';
   import BarChart from '../components/BarChart.svelte';
   import LineChart from '../components/LineChart.svelte';
-  import OnlineTable from '../components/OnlineTable.svelte';
 
-  // Operational overview: live stats and online players (5s), plus activity charts
-  // (60s). Account and character browsers live on their dedicated Players pages.
+  // Operational overview: live server stats (5s) plus activity charts (60s). The
+  // account, character and online-roster browsers live on their dedicated Players
+  // pages.
   const ONLINE_HISTORY_RANGES: OnlineHistoryRange[] = ['24h', '7d', '30d'];
 
   let overview = $state<Overview | null>(null);
-  let online = $state<LivePlayer[]>([]);
   let activity = $state<Activity | null>(null);
   let onlineHistory = $state<OnlineHistory | null>(null);
   let onlineHistoryRange = $state<OnlineHistoryRange>('24h');
+  let liveFailed = $state(false);
+  let activityFailed = $state(false);
 
   const dayLabel = (day: string) => day.slice(5); // YYYY-MM-DD -> MM-DD
   let registrationPoints = $derived<BarPoint[]>((activity?.registrations ?? []).map((p) => ({ label: dayLabel(p.day), value: p.count })));
@@ -62,14 +62,10 @@
 
   async function refreshLive(): Promise<void> {
     try {
-      const [ov, on] = await Promise.all([
-        apiGet<Overview>('/admin/api/overview'),
-        apiGet<{ players: LivePlayer[] }>('/admin/api/online'),
-      ]);
-      overview = ov;
-      online = on.players;
+      overview = await apiGet<Overview>('/admin/api/overview');
+      liveFailed = false;
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) console.error('live refresh failed:', err);
+      if (!auth.handleAuthFailure(err)) liveFailed = true;
     }
   }
 
@@ -81,8 +77,9 @@
       ]);
       activity = nextActivity;
       onlineHistory = nextOnlineHistory;
+      activityFailed = false;
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) console.error('activity refresh failed:', err);
+      if (!auth.handleAuthFailure(err)) activityFailed = true;
     }
   }
 
@@ -102,7 +99,9 @@
 </script>
 
 <section id="stats">
-  {#if overview}
+  {#if liveFailed}
+    <div class="empty">{t('stats.loadFailed')}</div>
+  {:else if overview}
     <StatCard value={fmtNumber(overview.server.online)} label={t('stats.onlineNow')} />
     <StatCard value={fmtNumber(overview.server.onlineAccounts)} label={t('stats.onlineAccounts')} />
     <StatCard value={fmtNumber(overview.siteUsersNow)} label={t('stats.siteUsersNow')} />
@@ -124,41 +123,41 @@
   {/if}
 </section>
 
-<Panel title={t('online.title')} hint={t('online.refreshHint')}>
-  <OnlineTable players={online} />
-</Panel>
-
 <section id="charts">
-  <Panel
-    title={t('charts.onlineHistory', {
-      range: t(`charts.range.${onlineHistory?.range ?? onlineHistoryRange}`),
-    })}
-  >
-    <div class="range-tabs">
-      {#each ONLINE_HISTORY_RANGES as range}
-        <button
-          type="button"
-          class:active={onlineHistoryRange === range}
-          class="range-tab"
-          aria-pressed={onlineHistoryRange === range}
-          onclick={() => selectOnlineHistoryRange(range)}
-        >
-          {t(`charts.range.${range}`)}
-        </button>
-      {/each}
-    </div>
-    <LineChart points={onlinePoints} />
-  </Panel>
-  <Panel title={t('charts.registrations', { days: activity?.days ?? 0 })}>
-    <BarChart points={registrationPoints} />
-  </Panel>
-  <Panel title={t('charts.sessions', { days: activity?.days ?? 0 })}>
-    <BarChart points={sessionPoints} />
-  </Panel>
-  <Panel title={t('charts.classDistribution')}>
-    <BarChart points={classPoints} />
-  </Panel>
-  <Panel title={t('charts.levelDistribution')}>
-    <BarChart points={levelPoints} />
-  </Panel>
+  {#if activityFailed}
+    <div class="empty">{t('charts.loadFailed')}</div>
+  {:else}
+    <Panel
+      title={t('charts.onlineHistory', {
+        range: t(`charts.range.${onlineHistory?.range ?? onlineHistoryRange}`),
+      })}
+    >
+      <div class="range-tabs">
+        {#each ONLINE_HISTORY_RANGES as range}
+          <button
+            type="button"
+            class:active={onlineHistoryRange === range}
+            class="range-tab"
+            aria-pressed={onlineHistoryRange === range}
+            onclick={() => selectOnlineHistoryRange(range)}
+          >
+            {t(`charts.range.${range}`)}
+          </button>
+        {/each}
+      </div>
+      <LineChart points={onlinePoints} />
+    </Panel>
+    <Panel title={t('charts.registrations', { days: activity?.days ?? 0 })}>
+      <BarChart points={registrationPoints} />
+    </Panel>
+    <Panel title={t('charts.sessions', { days: activity?.days ?? 0 })}>
+      <BarChart points={sessionPoints} />
+    </Panel>
+    <Panel title={t('charts.classDistribution')}>
+      <BarChart points={classPoints} />
+    </Panel>
+    <Panel title={t('charts.levelDistribution')}>
+      <BarChart points={levelPoints} />
+    </Panel>
+  {/if}
 </section>

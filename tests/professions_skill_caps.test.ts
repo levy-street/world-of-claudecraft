@@ -143,7 +143,12 @@ describe('at cap, actions still work: only skill gain stops', () => {
     // The professions_masterwork.test.ts fixture recipe: skillReq 0, uncommon
     // def with a stats profile, bump tier 2 inside the pre-attunement rare
     // ceiling, so the proc effect gate stays open on a fresh character.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    // Seed 1, hunted (bounded scan from seed 1; re-recorded whenever a
+    // content commit shifts the construction-time world-gen draw sequence:
+    // 40 after the procedural-dungeons merge, then 40 -> 1 after the v0.35.0
+    // release content commits): the proc lands before the unstackable
+    // vestments outputs fill the bags and deny a craft.
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     const meta = mustMeta(sim, pid);
     meta.craftSkills.tailoring = 125;
@@ -155,9 +160,6 @@ describe('at cap, actions still work: only skill gain stops', () => {
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('homespun_cloth', 3, pid);
       sim.addItem('spool_of_thread', 5, pid);
-      // Harness-only throttle reset: #1301's rolling window caps successful
-      // crafts per minute, which is not what this pin is about.
-      meta.craftThrottle.count = 0;
       const result = resolveCraftForRecipe((sim as any).ctx, pid, recipe);
       expect(result.ok).toBe(true);
       if (result.masterwork) masterworks++;
@@ -173,6 +175,8 @@ describe('at cap, actions still work: only skill gain stops', () => {
   it('a harvest at mining 100 still yields the node material; proficiency stays at cap', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Capped');
+    // #2343: every node harvest needs the matching-profession tool in bags.
+    sim.addItem('copper_mining_pick', 1, pid);
     const meta = mustMeta(sim, pid);
     meta.gatheringProficiency.mining = 100;
     const p = (sim as any).entities.get(pid);
@@ -181,7 +185,7 @@ describe('at cap, actions still work: only skill gain stops', () => {
     p.pos.y = terrainHeight(NODE.pos.x, NODE.pos.z, sim.cfg.seed);
     p.prevPos = { ...p.pos };
 
-    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    expect(sim.harvestNode(NODE.id, undefined, pid)).toBe(true);
     // Complete the gather cast synchronously (the gathering_rhythm idiom).
     p.castingAbility = null;
     p.castRemaining = 0;

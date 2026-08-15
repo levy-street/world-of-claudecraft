@@ -21,10 +21,13 @@ import {
 } from '../src/sim/professions/enchanting';
 import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import { maxSalvageYield, resolveSalvage, salvageYield } from '../src/sim/professions/salvage';
+import type { StationType } from '../src/sim/professions/stations';
+import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const FILLER = 'simple_fishing_pole'; // tool: one per slot, merges with nothing
 const SWORD = 'eastbrook_arming_sword'; // common mainhand weapon
@@ -107,7 +110,7 @@ const qaMwRecipe: ProfessionRecipeRecord = {
 } as ProfessionRecipeRecord;
 
 function makeSim(seed = 11) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
 }
 
 function metaOf(sim: Sim, pid: number) {
@@ -138,6 +141,13 @@ function standAtStation(sim: Sim, pid: number): void {
   const e = sim.ctx.entities.get(pid)!;
   e.pos.x = STATIONS[0].pos.x;
   e.pos.z = STATIONS[0].pos.z;
+}
+
+function standAtStationType(sim: Sim, pid: number, stationType: StationType): void {
+  const station = stationsOfType(STATIONS, stationType)[0];
+  const e = sim.ctx.entities.get(pid)!;
+  e.pos.x = station.pos.x;
+  e.pos.z = station.pos.z;
 }
 
 describe('craft capacity gate (#2350)', () => {
@@ -499,6 +509,53 @@ describe('apply-enchant capacity gate (#2350)', () => {
     expect(sim.countItem('arcane_dust', pid)).toBe(0);
     expect(m.inventory.length).toBe(16);
   });
+
+  // The #2415 replace arm's gate, same #2350/#2139 discipline: the scratch
+  // model consumes the SAME pinned enchanted victim the live path does
+  // (consumeEnchantedVictim on both sides), so the freed slot is modeled and a
+  // full pack still replaces; only a surviving multi-unit victim stack that
+  // frees nothing can genuinely deny.
+  it('replace succeeds with COMPLETELY full bags: the consumed victim frees the home the mint lands in', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const m = setBags(sim, pid, 15);
+    m.inventory.push({
+      itemId: SWORD,
+      count: 1,
+      instance: { enchant: 'enchant_weapon_agility', rolled: { stats: { agi: 2 } } },
+    });
+    m.inventory.push({ itemId: 'arcane_dust', count: 5 }); // exactly the cost: slot frees
+    expect(m.inventory.length).toBe(17); // > the 16-slot budget: zero headroom
+    const result = resolveApplyEnchant(sim.ctx, pid, SWORD, ENCHANT, undefined, true);
+    expect(result.ok).toBe(true);
+    const replaced = m.inventory.find((s) => s.itemId === SWORD);
+    expect(replaced?.instance?.enchant).toBe(ENCHANT);
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+  });
+
+  it('replace denies no_bag_space when the victim leaves a SURVIVING stack and nothing frees a home', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const m = setBags(sim, pid, 14);
+    // A legacy-overstack style slot: two identical enchanted units share one
+    // slot, so consuming one unit frees NOTHING, and the replaced copy (a
+    // different payload) cannot merge back into it.
+    m.inventory.push({
+      itemId: SWORD,
+      count: 2,
+      instance: { enchant: 'enchant_weapon_agility', rolled: { stats: { agi: 2 } } },
+    });
+    m.inventory.push({ itemId: 'arcane_dust', count: 10 }); // 5 remain: keeps its slot
+    const result = resolveApplyEnchant(sim.ctx, pid, SWORD, ENCHANT, undefined, true);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('no_bag_space');
+    // Zero side effects on the deny: stack, reagents, and slots untouched.
+    expect(sim.countItem(SWORD, pid)).toBe(2);
+    expect(sim.countItem('arcane_dust', pid)).toBe(10);
+    expect(m.inventory.length).toBe(16);
+    const stack = m.inventory.find((s) => s.itemId === SWORD);
+    expect(stack?.instance?.enchant).toBe('enchant_weapon_agility');
+  });
 });
 
 describe('unbind split capacity gate (#2350)', () => {
@@ -581,5 +638,56 @@ describe('unbind split capacity gate (#2350)', () => {
     expect(freed?.count).toBe(1);
     expect(freed?.instance?.bindOnTrade).toBe(true);
     expect(m.inventory.length).toBe(16);
+  });
+});
+
+// #2446 review coverage gap: the #1149 signing rule's capacity-gate shape
+// (the `shapes` array in resolveCraftForRecipe) has to model the SAME signed
+// instance the grant arm below it mints, or a stale plain shape passes the
+// gate for an output the grant then cannot fit (addItemInstance applies no
+// cap of its own). A signed instance never tops up a plain stack of the same
+// item (different payload), so a bag whose only free room is a plain stack
+// of the output must deny, exactly the case a regression to the old plain
+// shape would silently pass.
+describe('rare-quality signing composes with the capacity gate (#2446 review coverage)', () => {
+  it('denies a rare-quality resultCount>1 craft when the only room is a same-item PLAIN stack', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // 11 filler slots + 1 plain output stack + 4 reagent slots = 16 (full).
+    const m = setBags(sim, pid, 11);
+    // The plain (unsigned) stack of the craft's own output. The OLD
+    // `recipe.resultCount === 1` gated shape modeled a plain grant here and
+    // found this slot a valid top-up target, so it fit. The signed shape
+    // this PR ships needs its own slot and must deny.
+    m.inventory.push({ itemId: 'anglers_feast_platter', count: 1 });
+    m.copper = 100000;
+    m.knownRecipes.add('recipe_anglers_feast_platter');
+    m.craftSkills.cooking = 50;
+    standAtStationType(sim, pid, 'kitchens');
+    // One extra of each reagent beyond what the recipe consumes, so
+    // consuming the required amount leaves each stack non-empty and the
+    // reagent slots do NOT free up. Otherwise the freed reagent slots would
+    // give the output room regardless of shape, and the test would not
+    // distinguish the old plain shape from the new signed one.
+    for (const [itemId, count] of [
+      ['raw_frostgill_trout', 3],
+      ['raw_bog_eel', 3],
+      ['sunpetal_herb', 2],
+      ['cooking_salt', 3],
+    ] as const) {
+      m.inventory.push({ itemId, count });
+    }
+    expect(bagCapacity(m.bags)).toBe(16);
+    expect(m.inventory.length).toBe(16);
+
+    const result = resolveCraft(sim.ctx, pid, 'recipe_anglers_feast_platter');
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('no_bag_space');
+    // No side effects: the reagents and the pre-existing plain stack survive
+    // untouched, and no output was minted.
+    expect(sim.countItem('anglers_feast_platter', pid)).toBe(1);
+    expect(sim.countItem('raw_frostgill_trout', pid)).toBe(3);
+    expect(m.copper).toBe(100000);
   });
 });

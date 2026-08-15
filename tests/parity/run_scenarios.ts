@@ -115,6 +115,7 @@ export function runParityShard(shard: number): void {
 
 // Shared helpers for the coverage shards (moved verbatim from coverage.test.ts).
 
+// biome-ignore lint/suspicious/noExplicitAny: coverage shards inspect heterogeneous event/entity shapes by design.
 export type Ev = Record<string, any>;
 
 export function run(name: string): Recorder {
@@ -123,6 +124,7 @@ export function run(name: string): Recorder {
   return record(scenario).rec;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: coverage shards intentionally use a loose entity facade.
 export function entities(rec: Recorder): any[] {
-  return [...(rec.sim as any).entities.values()];
+  return [...rec.sim.entities.values()];
 }

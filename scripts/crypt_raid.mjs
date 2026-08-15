@@ -4,6 +4,7 @@
 // boss mechanics and group xp over the real server.
 // Requires the server running with ALLOW_DEV_COMMANDS=1.
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -101,7 +102,7 @@ class Bot {
       this.ws = new WebSocket(`${WS_BASE}/ws`);
       const to = setTimeout(() => reject(new Error('join timeout')), 8000);
       this.ws.on('open', () => {
-        this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId }));
+        this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)));
       });
       this.ws.on('message', (data) => {
         const msg = JSON.parse(String(data));
@@ -287,7 +288,7 @@ async function main() {
           b.cmd({ cmd: 'cast', ability: 'power_word_shield' });
         }
       }
-      // paladin keeps a seal up for judgement
+      // Paladin keeps its melee seal active while using the ranged support hammer.
       if (b.cls === 'paladin' && !(b.self.auras ?? []).some((a) => a.kind === 'imbue')) {
         b.cmd({ cmd: 'cast', ability: 'seal_of_righteousness' });
       }
@@ -317,8 +318,7 @@ async function main() {
           if ((b.self.gcd ?? 0) <= 0 && !b.self.cast) {
             if (b.cls === 'warrior' && (b.self.res ?? 0) >= 15)
               b.cmd({ cmd: 'cast', ability: 'heroic_strike' });
-            if (b.cls === 'paladin' && (b.self.res ?? 0) >= 30)
-              b.cmd({ cmd: 'cast', ability: 'judgement' });
+            if (b.cls === 'paladin') b.cmd({ cmd: 'cast', ability: 'hammer_of_grace' });
             if (b.cls === 'mage' && (b.self.res ?? 0) >= 30)
               b.cmd({ cmd: 'cast', ability: 'fireball' });
             if (b.cls === 'hunter' && (b.self.res ?? 0) >= 25)

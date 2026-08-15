@@ -81,6 +81,10 @@ interface IceMaterials {
 
 let materials: IceMaterials | null = null;
 
+export function resetIceBlockProfileCaches(): void {
+  materials = null;
+}
+
 /** Built after initGfxTier(), so low graphics receives the renderer's Lambert fallback. */
 function iceMaterials(): IceMaterials {
   if (materials) return materials;

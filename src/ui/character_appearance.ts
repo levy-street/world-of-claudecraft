@@ -1,5 +1,5 @@
-import type { PlayerClass, SkinCatalog } from '../sim/types';
 import { MECH_CHROMAS, SKIN_COUNTS } from '../sim/content/skins';
+import type { PlayerClass, SkinCatalog } from '../sim/types';
 
 export type CharacterAppearanceOption =
   | { kind: 'class'; label: number; skin: number }
@@ -21,8 +21,7 @@ export function characterAppearanceOptions(
     label: skin + 1,
     skin,
   }));
-  const mechOptions = MECH_CHROMAS
-    .map((chroma, skin) => ({ chroma, skin }))
+  const mechOptions = MECH_CHROMAS.map((chroma, skin) => ({ chroma, skin }))
     .filter(({ chroma }) => unlockedMechs.has(chroma.id))
     .map(({ chroma, skin }, index) => ({
       kind: 'mech' as const,

@@ -43,7 +43,7 @@ export interface UiEffectsProfile {
 /** The resolved inputs: the static preset label, the effectsQuality slider, and the
  *  effective reduced-motion flag (OS prefers-reduced-motion OR the in-game setting). */
 export interface UiEffectsInput {
-  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'advanced';
+  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'insane' | 'advanced';
   effectsQuality: number;
   reduceMotion: boolean;
 }
@@ -56,6 +56,25 @@ export interface UiEffectsInput {
  */
 export const EFFECTS_QUALITY_LOW_CUTOFF = 0.5;
 
+/** The loading curtain's normal opacity duration, also mirrored in shell.css. */
+export const LOADING_CURTAIN_FADE_MS = 350;
+export const WORLD_ENTRY_GPU_SETTLE_COVER_MS = 1800;
+
+/** Reduced motion removes the curtain synchronously instead of waiting on a visual fade. */
+export function loadingCurtainFadeMs(reduceMotion: boolean): number {
+  return reduceMotion ? 0 : LOADING_CURTAIN_FADE_MS;
+}
+
+export function worldEntryGpuSettleCoverMs(input: {
+  adaptiveBudget: boolean;
+  constrainedMemory: boolean;
+  online: boolean;
+}): number {
+  // An online character is already live on the authoritative server. Do not
+  // hold movement behind a cosmetic GPU-settle cover after the first frame.
+  if (input.online) return 0;
+  return input.adaptiveBudget && !input.constrainedMemory ? WORLD_ENTRY_GPU_SETTLE_COVER_MS : 0;
+}
 /**
  * Resolve the UI effects profile from the static preset label, the effectsQuality
  * slider, and the effective reduced-motion flag. Pure: same input always yields the
@@ -77,12 +96,17 @@ export const EFFECTS_QUALITY_LOW_CUTOFF = 0.5;
  */
 export function resolveUiEffectsProfile(input: UiEffectsInput): UiEffectsProfile {
   const { presetLabel, effectsQuality, reduceMotion } = input;
+  // INSANE is a 3D-render preset only: the HUD effect ladder tops out at
+  // 'ultra' (full effects), so the everything-on render tier stamps the same
+  // data-fx-level the ultra preset does. No HUD cost difference to buy.
   const tier: UiEffectsTier =
     presetLabel === 'advanced'
       ? effectsQuality < EFFECTS_QUALITY_LOW_CUTOFF
         ? 'low'
         : 'ultra'
-      : presetLabel;
+      : presetLabel === 'insane'
+        ? 'ultra'
+        : presetLabel;
 
   const motion: UiEffectsMotion = reduceMotion ? 'none' : 'full';
 

@@ -61,7 +61,10 @@ function input(over: Partial<ArenaViewInput> = {}): ArenaViewInput {
     playerName: 'Me',
     party: null,
     allTime: {},
-    practiceAvailable: false,
+    // Above ARENA_MIN_LEVEL by default so the pre-existing queue-gating suite
+    // below tests party/leader gating, not the level gate; the level-gate
+    // suite overrides this explicitly.
+    playerLevel: 20,
     ...over,
   };
 }
@@ -107,18 +110,14 @@ describe('buildArenaView: bracket resolution + commit', () => {
   it('uses the selected bracket when idle and does not commit it', () => {
     const v = live(buildArenaView(input({ selectedBracket: '2v2' })));
     expect(v.bracket).toBe('2v2');
-    expect(v.commitBracket).toBe(false);
-    expect(v.canSwitchBracket).toBe(true);
   });
 
   it('forces + commits the match bracket regardless of selection', () => {
     const info = makeArenaInfo('sim', {
-      match: { format: 'fiesta', state: 'active', oppName: 'Foe' },
+      match: { format: 'fiesta', state: 'active', oppName: 'Foe', map: 'coliseum' },
     } as Partial<ArenaInfo>);
     const v = live(buildArenaView(input({ info, selectedBracket: '1v1' })));
     expect(v.bracket).toBe('fiesta');
-    expect(v.commitBracket).toBe(true);
-    expect(v.canSwitchBracket).toBe(false);
     expect(v.action).toEqual({ kind: 'in-match', oppName: 'Foe' });
   });
 
@@ -126,23 +125,14 @@ describe('buildArenaView: bracket resolution + commit', () => {
     const info = makeArenaInfo('sim', { queued: true, queueSize: 3, format: '2v2' });
     const v = live(buildArenaView(input({ info, selectedBracket: '1v1' })));
     expect(v.bracket).toBe('2v2');
-    expect(v.commitBracket).toBe(true);
-    expect(v.canSwitchBracket).toBe(false);
     expect(v.action).toEqual({ kind: 'queued', queueSize: 3 });
-    // Locked brackets are the inactive ones while queued.
-    expect(v.brackets.filter((b) => b.locked).map((b) => b.fmt)).toEqual([
-      '1v1',
-      'fiesta',
-      'yumi3',
-      'yumi5',
-    ]);
   });
 });
 
 describe('buildArenaView: queue gating', () => {
   it('disables 1v1 queue while in a party', () => {
     const v = live(buildArenaView(input({ party: party([{ pid: 1 }, { pid: 2 }]) })));
-    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true });
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: false });
   });
 
   it('disables a 2v2 queue for a non-leader of a full party', () => {
@@ -151,7 +141,7 @@ describe('buildArenaView: queue gating', () => {
         input({ selectedBracket: '2v2', playerId: 2, party: party([{ pid: 1 }, { pid: 2 }], 1) }),
       ),
     );
-    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true });
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: false });
     expect(v.party.kind).toBe('members');
   });
 
@@ -161,12 +151,74 @@ describe('buildArenaView: queue gating', () => {
         input({ selectedBracket: '2v2', party: party([{ pid: 1 }, { pid: 2 }, { pid: 3 }]) }),
       ),
     );
-    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true });
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: false });
     expect(v.party.kind).toBe('warn');
   });
 
   it('enables a solo 1v1 queue', () => {
-    expect(live(buildArenaView(input())).action).toEqual({ kind: 'idle', queueDisabled: false });
+    expect(live(buildArenaView(input())).action).toEqual({
+      kind: 'idle',
+      queueDisabled: false,
+      belowMinLevel: false,
+    });
+  });
+});
+
+describe('buildArenaView: ranked minimum-level gate', () => {
+  it('disables a below-level solo 1v1 queue and flags belowMinLevel', () => {
+    const v = live(buildArenaView(input({ playerLevel: 14 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: true });
+  });
+
+  it('disables a below-level solo 2v2 queue and flags belowMinLevel', () => {
+    const v = live(buildArenaView(input({ selectedBracket: '2v2', playerLevel: 1 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: true });
+  });
+
+  it('does not gate Fiesta or Protect Yumi on level (only 1v1/2v2 are ranked)', () => {
+    // Fiesta and Protect Yumi share the same "not 1v1/2v2" branch in
+    // buildArenaView, so exercising Fiesta covers both.
+    const v = live(buildArenaView(input({ selectedBracket: 'fiesta', playerLevel: 1 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: false, belowMinLevel: false });
+  });
+
+  it('re-enables the queue once the character reaches the minimum level', () => {
+    const v = live(buildArenaView(input({ playerLevel: 15 })));
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: false, belowMinLevel: false });
+  });
+
+  it("disables an at-level leader's 2v2 queue when a teammate is below the floor", () => {
+    const v = live(
+      buildArenaView(
+        input({
+          selectedBracket: '2v2',
+          playerId: 1,
+          playerLevel: 20,
+          party: party([
+            { pid: 1, level: 20 },
+            { pid: 2, level: 10 },
+          ]),
+        }),
+      ),
+    );
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: true, belowMinLevel: true });
+  });
+
+  it('does not gate a full-level 2v2 party', () => {
+    const v = live(
+      buildArenaView(
+        input({
+          selectedBracket: '2v2',
+          playerId: 1,
+          playerLevel: 20,
+          party: party([
+            { pid: 1, level: 20 },
+            { pid: 2, level: 20 },
+          ]),
+        }),
+      ),
+    );
+    expect(v.action).toEqual({ kind: 'idle', queueDisabled: false, belowMinLevel: false });
   });
 });
 
@@ -207,18 +259,6 @@ describe('buildArenaView: ladder + all-time rows', () => {
   it('omits the all-time section when the cache has no rows for the bracket', () => {
     expect(live(buildArenaView(input())).allTime).toBeNull();
   });
-
-  it('shows the practice affordance only on Fiesta when the hook is wired', () => {
-    expect(
-      live(buildArenaView(input({ selectedBracket: 'fiesta', practiceAvailable: true }))).practice,
-    ).toBe(true);
-    expect(
-      live(buildArenaView(input({ selectedBracket: 'fiesta', practiceAvailable: false }))).practice,
-    ).toBe(false);
-    expect(
-      live(buildArenaView(input({ selectedBracket: '1v1', practiceAvailable: true }))).practice,
-    ).toBe(false);
-  });
 });
 
 describe('buildArenaView: render-skip signature', () => {
@@ -230,5 +270,89 @@ describe('buildArenaView: render-skip signature', () => {
       buildArenaView(input({ info: makeArenaInfo('sim', { queued: true, queueSize: 1 }) })),
     ).sig;
     expect(changed).not.toBe(a);
+  });
+});
+
+describe('buildArenaView: match map fact (slot-parity arena maps)', () => {
+  const inMatch = (over: object) =>
+    makeArenaInfo('sim', {
+      match: {
+        format: '1v1',
+        state: 'active',
+        oppName: 'Foe',
+        map: 'coliseum',
+        ...over,
+      },
+    } as Partial<ArenaInfo>);
+
+  it('surfaces the bout map for arena-band brackets, by map id', () => {
+    expect(live(buildArenaView(input({ info: inMatch({}) }))).matchMap).toBe('coliseum');
+    expect(live(buildArenaView(input({ info: inMatch({ map: 'drowned_court' }) }))).matchMap).toBe(
+      'drowned_court',
+    );
+    expect(live(buildArenaView(input({ info: inMatch({ format: 'fiesta' }) }))).matchMap).toBe(
+      'coliseum',
+    );
+  });
+
+  it('shows the map from the countdown (queue pop) onward', () => {
+    expect(
+      live(buildArenaView(input({ info: inMatch({ state: 'countdown', map: 'drowned_court' }) })))
+        .matchMap,
+    ).toBe('drowned_court');
+  });
+
+  it('is null outside a match, for yumi brackets, and for a mapless mirror', () => {
+    expect(live(buildArenaView(input())).matchMap).toBeNull();
+    const yumiInfo = inMatch({ format: 'yumi3' });
+    (yumiInfo.ladders as Record<string, unknown>).yumi3 = [];
+    (yumiInfo.standings as Record<string, unknown>).yumi3 = { rating: 1500, wins: 0, losses: 0 };
+    expect(live(buildArenaView(input({ info: yumiInfo }))).matchMap).toBeNull();
+    // an older server's mirrored snapshot without the field stays hidden
+    expect(live(buildArenaView(input({ info: inMatch({ map: undefined }) }))).matchMap).toBeNull();
+  });
+
+  it('the render-skip signature moves when only the map changes', () => {
+    const a = live(buildArenaView(input({ info: inMatch({}) }))).sig;
+    const b = live(buildArenaView(input({ info: inMatch({ map: 'drowned_court' }) }))).sig;
+    expect(a).not.toBe(b);
+  });
+
+  it('reads identically from a ClientWorld-mirror-shaped snapshot', () => {
+    // map is precisely a mirrored field (server -> s.arena -> ClientWorld),
+    // so the client shape is the one that matters for the fact
+    const clientInfo = (over: object) =>
+      makeArenaInfo('client', {
+        match: { format: '1v1', state: 'active', oppName: 'Foe', map: 'coliseum', ...over },
+      } as Partial<ArenaInfo>);
+    expect(
+      live(buildArenaView(input({ info: clientInfo({ map: 'drowned_court' }) }))).matchMap,
+    ).toBe('drowned_court');
+    expect(
+      live(buildArenaView(input({ info: clientInfo({ map: undefined }) }))).matchMap,
+    ).toBeNull();
+  });
+});
+
+describe('an old server that has never heard of draws', () => {
+  // The rolling-deploy property this whole change rests on, and the one thing
+  // nothing here asserted: every fixture in this file already omits `draws`,
+  // which IS the pre-upgrade snapshot shape, so deleting any of the `?? 0`
+  // guards in arena_window_view.ts left the suite green while every record on
+  // screen rendered NaN-NaN-NaN.
+  it('reads a missing standing draws as zero, never NaN', () => {
+    const view = live(buildArenaView(input()));
+    expect('draws' in STANDINGS['1v1'], 'the fixture really is the old shape').toBe(false);
+    expect(view.standing.draws).toBe(0);
+    expect(Number.isNaN(view.standing.draws)).toBe(false);
+  });
+
+  it('reads a missing ladder-row draws as zero, never NaN', () => {
+    const view = live(buildArenaView(input()));
+    expect(view.ladder.length).toBeGreaterThan(0);
+    for (const row of view.ladder) {
+      expect(row.draws, `row ${row.name} defaults rather than carrying undefined`).toBe(0);
+      expect(Number.isNaN(row.draws)).toBe(false);
+    }
   });
 });

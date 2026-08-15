@@ -65,6 +65,7 @@ export const gameStrings = {
   hud: {
     lowMana: 'Low Mana',
     lowEnergy: 'Low Energy',
+    lowFocus: 'Low Focus',
   },
   // Talents & Specializations — UI chrome only (node/spec names are content,
   // rendered directly like ability names). Registered here so the panel routes
@@ -211,7 +212,7 @@ export const gameStringsEs: typeof gameStrings = {
     needXp: 'más EXP de por vida para prestigio',
   },
   settings: { showOverflowXp: 'Mostrar EXP excedente', weather: 'Efectos meteorológicos' },
-  hud: { lowMana: 'Maná bajo', lowEnergy: 'Energía baja' },
+  hud: { lowMana: 'Maná bajo', lowEnergy: 'Energía baja', lowFocus: 'Concentración baja' },
   talents: {
     title: 'Talentos',
     classTab: 'Clase',
@@ -348,7 +349,7 @@ export const gameStringsFrFR: typeof gameStrings = {
     needXp: 'EXP à vie supplémentaire pour le prestige',
   },
   settings: { showOverflowXp: "Afficher l'EXP excédentaire", weather: 'Effets météo' },
-  hud: { lowMana: 'Mana faible', lowEnergy: 'Énergie faible' },
+  hud: { lowMana: 'Mana faible', lowEnergy: 'Énergie faible', lowFocus: 'Concentration faible' },
   talents: {
     title: 'Talents',
     classTab: 'Classe',
@@ -485,7 +486,7 @@ export const gameStringsItIT: typeof gameStrings = {
     needXp: 'PE totali in più per il prestigio',
   },
   settings: { showOverflowXp: 'Mostra PE eccedenti', weather: 'Effetti meteo' },
-  hud: { lowMana: 'Mana basso', lowEnergy: 'Energia bassa' },
+  hud: { lowMana: 'Mana basso', lowEnergy: 'Energia bassa', lowFocus: 'Concentrazione bassa' },
   talents: {
     title: 'Talenti',
     classTab: 'Classe',
@@ -619,7 +620,7 @@ export const gameStringsDeDE: typeof gameStrings = {
     needXp: 'mehr Lebenszeit-EP für Prestige',
   },
   settings: { showOverflowXp: 'Überschuss-EP anzeigen', weather: 'Wettereffekte' },
-  hud: { lowMana: 'Wenig Mana', lowEnergy: 'Wenig Energie' },
+  hud: { lowMana: 'Wenig Mana', lowEnergy: 'Wenig Energie', lowFocus: 'Wenig Fokus' },
   talents: {
     title: 'Talente',
     classTab: 'Klasse',
@@ -753,7 +754,7 @@ export const gameStringsZhCN: typeof gameStrings = {
     needXp: '更多终身经验才可声望晋升',
   },
   settings: { showOverflowXp: '显示溢出经验', weather: '天气效果' },
-  hud: { lowMana: '法力不足', lowEnergy: '能量不足' },
+  hud: { lowMana: '法力不足', lowEnergy: '能量不足', lowFocus: '集中值不足' },
   talents: {
     title: '天赋',
     classTab: '职业',
@@ -882,7 +883,7 @@ export const gameStringsZhTW: typeof gameStrings = {
     needXp: '更多終身經驗才可威望晉升',
   },
   settings: { showOverflowXp: '顯示溢出經驗', weather: '天氣效果' },
-  hud: { lowMana: '法力不足', lowEnergy: '能量不足' },
+  hud: { lowMana: '法力不足', lowEnergy: '能量不足', lowFocus: '集中值不足' },
   talents: {
     title: '天賦',
     classTab: '職業',
@@ -1011,7 +1012,7 @@ export const gameStringsKoKR: typeof gameStrings = {
     needXp: '명예 승급까지 필요한 추가 누적 경험치',
   },
   settings: { showOverflowXp: '초과 경험치 표시', weather: '날씨 효과' },
-  hud: { lowMana: '마나 부족', lowEnergy: '기력 부족' },
+  hud: { lowMana: '마나 부족', lowEnergy: '기력 부족', lowFocus: '집중 부족' },
   talents: {
     title: '특성',
     classTab: '직업',
@@ -1144,7 +1145,7 @@ export const gameStringsJaJP: typeof gameStrings = {
     needXp: '威信までに必要な追加累計経験値',
   },
   settings: { showOverflowXp: '超過経験値を表示', weather: '天候エフェクト' },
-  hud: { lowMana: 'マナ低下', lowEnergy: 'エネルギー低下' },
+  hud: { lowMana: 'マナ低下', lowEnergy: 'エネルギー低下', lowFocus: '集中値低下' },
   talents: {
     title: 'タレント',
     classTab: 'クラス',
@@ -1278,7 +1279,7 @@ export const gameStringsPtBR: typeof gameStrings = {
     needXp: 'mais EXP vitalícia para prestigiar',
   },
   settings: { showOverflowXp: 'Mostrar EXP excedente', weather: 'Efeitos climáticos' },
-  hud: { lowMana: 'Mana baixa', lowEnergy: 'Energia baixa' },
+  hud: { lowMana: 'Mana baixa', lowEnergy: 'Energia baixa', lowFocus: 'Foco baixo' },
   talents: {
     title: 'Talentos',
     classTab: 'Classe',
@@ -1412,7 +1413,7 @@ export const gameStringsRuRU: typeof gameStrings = {
     needXp: 'еще общего опыта до престижа',
   },
   settings: { showOverflowXp: 'Показывать лишний опыт', weather: 'Погодные эффекты' },
-  hud: { lowMana: 'Мало маны', lowEnergy: 'Мало энергии' },
+  hud: { lowMana: 'Мало маны', lowEnergy: 'Мало энергии', lowFocus: 'Мало концентрации' },
   talents: {
     title: 'Таланты',
     classTab: 'Класс',

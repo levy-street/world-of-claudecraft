@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Where the [AI] account tag lands in a chat line. The channel templates are
 // localized prose around two slots ('[General] {name}: {message}'), so a tag

@@ -31,9 +31,21 @@ the cascade); `tests/per_entry_css_wiring.test.ts` pins the flat names and
 completeness is guarded by `tests/css_corpus.test.ts` (the ten-dash
 `/* ---------- name ---------- */` banner manifest; a four-dash fence is NOT a boundary, so
 authoring one silently drops the section from the corpus; corpus = the inline `<style>`
-UNION `src/styles/*.css`), and `tests/css_value_validity.test.ts` globs every module for
+UNION `src/styles/*.css`), and `tests/css_value_validity.test.ts` walks every module for
 malformed declarations (e.g. a stray token after `var()`, which makes the whole declaration
 silently drop in the browser).
+
+## This directory is FLAT, and two guards enforce it
+Every sheet sits at the top level, because that is what ships: the `index.css` barrel, the
+modules it `@import`s, and the two per-entry `.extra.css`. **A subdirectory here hard-fails
+`tests/css_corpus.test.ts` and `tests/mobile_window_coverage.test.ts` at module load**, with
+a message naming the directory, and that is deliberate. Those two guards CREDIT what they
+read (a section still exists; a window has a mobile rule), so a sheet parked in a subfolder,
+which no entry loads, would let a rule that never reaches a browser count as shipping. The
+two guards whose miss would instead be a silent pass, `tests/css_value_validity.test.ts` and
+`tests/focus_visible_guard.test.ts`, walk to any depth. If you have a real reason to nest,
+re-make the decision at those reads (the reasoning is written there) rather than deleting
+the throw (#2499, #2502).
 
 ## Where new CSS lands (the seam) + the mobile-coverage invariant
 - **New feature-window body rules:** a new ten-dash banner section in `components.css`
@@ -49,8 +61,8 @@ silently drop in the browser).
   `translateX(-50%)` drags the window half offscreen; `tests/mobile_window_transform.test.ts`).
   Literal mobile layout values are pinned by `tests/mobile_window_layout.test.ts` and
   `tests/fct_mobile_css.test.ts`.
-- **Bug fixes are test-first:** a failing test that reproduces the bug (the guard tests
-  above take new pins), then the smallest change that turns it green.
+- **Bug fixes are test-first** (root `CLAUDE.md` owns the workflow); the guard tests above
+  are where the new pins land.
 
 ## Token system + NO magic values in painters
 - **Tokens, not literals.** Colors, accents, and tunables live as `--color-*` / `--fx-*`
@@ -58,11 +70,17 @@ silently drop in the browser).
   CSS vars and NEVER hard-codes a hex/px/color in TS; thresholds and cadences (the
   100/250/500ms frame dividers, breakpoints) are named constants. The 2D-CANVAS painters
   (`map`/`minimap`/`delve`) resolve `--color-*` via `getComputedStyle` and CACHE the result
-  (a 2D context can only read a CSS var this way; the minimap caches for the whole session,
-  with a documented hook to invalidate on a future theme/contrast toggle), never per-marker.
+  (a 2D context can only read a CSS var this way), never per-marker. The minimap's vector
+  palette remains session-cached with its documented future invalidation hook. Separately,
+  `MapMarkerArtCache` re-samples its baked-sprite tokens on coalesced theme and forced-colors
+  signals, then re-rasterizes only if a token value changed, never from a painter redraw.
   Documented exceptions: `nameplate_painter` is positioned DOM divs that move pre-existing
-  renderer hex literals verbatim (not tokens); `arena_window` renders DOM from the
-  stylesheet, not canvas. Guarded by the per-painter no-magic source scans (e.g.
+  renderer hex literals verbatim (not tokens); `deed_border_view.ts` is the sanctioned home
+  of the Book of Deeds border accent colors, because the nameplate canvas cannot read a
+  custom property per plate per frame, and the portrait ring receives those same literals
+  through the painter rather than duplicating them in `hud.css`
+  (`tests/deed_border_accent.test.ts` pins the single source); `arena_window` renders DOM
+  from the stylesheet, not canvas. Guarded by the per-painter no-magic source scans (e.g.
   `tests/auras_painter.test.ts`, `tests/minimap_painter.test.ts`,
   `tests/action_bar_painter.test.ts`) and `tests/focus_visible_guard.test.ts`; there is no
   single central no-magic guard, each migrated painter scans its own source.

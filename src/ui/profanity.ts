@@ -20,7 +20,7 @@ const CONFUSABLE_CHARS: Record<string, string> = {
   '!': 'i',
   '|': 'i',
   '@': 'a',
-  '$': 's',
+  $: 's',
   '+': 't',
 };
 

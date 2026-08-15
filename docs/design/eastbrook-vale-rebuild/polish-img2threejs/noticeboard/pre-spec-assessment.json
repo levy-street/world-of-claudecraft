@@ -1,0 +1,197 @@
+{
+  "targetName": "Eastbrook Civic Noticeboard",
+  "sourceImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/front-three-quarter.png",
+  "referenceAdmission": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/reference-admission.json",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "freestanding civic noticeboard",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized hard-surface", "civic furniture", "low-poly"],
+      "structureKind": ["compound object", "open frame", "layered shell", "repeated modules"],
+      "motionPotential": ["static prop", "interaction socket", "future content surface"],
+      "materialFamilies": ["wood", "stone", "painted roof", "metal", "parchment"],
+      "notes": "An original Eastbrook board using a familiar medieval civic archetype without copying a third-party crest, silhouette, writing, or decorative composition."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 3,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 2
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 9,
+        "microFeatureGroups": 17,
+        "materialLayers": 2,
+        "repetitionSystems": 4
+      },
+      "reasoning": [
+        "The broad board silhouette is simple, but its identity depends on twin floor-seated posts, a deep cobalt rain hood, front and rear timber framing, and open ground clearance.",
+        "Repeated shingles, parchment cards, pins, metal corner plates, and stone courses need bounded deterministic systems rather than independent draw calls.",
+        "Rear and grazing views expose the roof brackets, rear rails, board depth, and footing contacts needed for a complete three-dimensional asset.",
+        "Named interaction and content sockets let future wiring target the board without coupling gameplay to mesh order."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "A flat board card would fail the roof depth, rear bracing, post separation, stone seating, and future interaction contract."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "grid-3x3 plus admitted multi-angle cross-check",
+      "targetMinDetails": 12,
+      "inventoryPath": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/detail-inventory.json",
+      "details": [
+        {
+          "id": "roof-course-seams",
+          "kind": "seam",
+          "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/roof-course-seams" }
+        },
+        {
+          "id": "eave-chamfer",
+          "kind": "bevel",
+          "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/eave-chamfer" }
+        },
+        {
+          "id": "post-cap-bevels",
+          "kind": "bevel",
+          "mapsTo": { "type": "component.localFeatures", "ref": "front-frame/post-cap-bevels" }
+        },
+        {
+          "id": "corner-plate-fasteners",
+          "kind": "fastener",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "corner-plates/corner-plate-fasteners"
+          }
+        },
+        {
+          "id": "timber-grain",
+          "kind": "linework",
+          "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/timber-grain" }
+        },
+        {
+          "id": "board-plank-seams",
+          "kind": "groove",
+          "mapsTo": { "type": "component.localFeatures", "ref": "root/board-plank-grooves" }
+        },
+        {
+          "id": "parchment-mottling",
+          "kind": "stain",
+          "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/parchment-mottling" }
+        },
+        {
+          "id": "pin-fasteners",
+          "kind": "fastener",
+          "mapsTo": { "type": "component.localFeatures", "ref": "parchment-system/pin-fasteners" }
+        },
+        {
+          "id": "crest-relief",
+          "kind": "ridge",
+          "mapsTo": { "type": "component.localFeatures", "ref": "crest/abstract-eastbrook-relief" }
+        },
+        {
+          "id": "frame-chamfers",
+          "kind": "bevel",
+          "mapsTo": { "type": "component.localFeatures", "ref": "front-frame/frame-chamfers" }
+        },
+        {
+          "id": "brace-join-seams",
+          "kind": "seam",
+          "mapsTo": { "type": "component.localFeatures", "ref": "roof-braces/brace-join-seams" }
+        },
+        {
+          "id": "footing-joints",
+          "kind": "groove",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "footing-system/footing-joint-grooves"
+          }
+        },
+        {
+          "id": "footing-chamfers",
+          "kind": "bevel",
+          "mapsTo": { "type": "component.localFeatures", "ref": "footing-system/footing-chamfers" }
+        },
+        {
+          "id": "base-cavity-dirt",
+          "kind": "stain",
+          "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/base-cavity-dirt" }
+        },
+        {
+          "id": "rear-frame-seams",
+          "kind": "seam",
+          "mapsTo": { "type": "component.localFeatures", "ref": "rear-frame/rear-frame-seams" }
+        },
+        {
+          "id": "paper-depth-stagger",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "parchment-system/paper-depth-stagger"
+          }
+        }
+      ]
+    },
+    "anatomy": { "applies": false }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready stylization",
+    "definitionOfDone": [
+      "The complete accepted 2.4 by 0.6 by 2.6 yard volume reads as an original Eastbrook civic noticeboard from every admitted angle and beside the 2.6-yard player rig.",
+      "Twin posts, two stone footings, deep cobalt rain hood, timber frame, blank parchment cards, restrained gold hardware, and rear braces survive Low-tier rendering.",
+      "The result stays within the 1,500 triangle target and 2,500 triangle hard ceiling with two merged primitives, two materials, zero embedded textures, and zero animations.",
+      "Named interaction and notice-surface sockets plus a compound collider contract remain stable for future gameplay wiring."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 9,
+      "microFeatureGroups": 12,
+      "materialLayers": 2,
+      "repetitionSystems": 3,
+      "reviewViewpoints": 7
+    },
+    "requiredRepeatedSystems": [
+      "The front roof uses deterministic cobalt shingle courses with bounded row variation.",
+      "Seven blank parchment cards use a fixed asymmetric layout with no readable pseudo-text.",
+      "Pins and corner plates are merged repeated details with no independent draw calls.",
+      "Two stone footing courses use offset joints and remain centered beneath the posts."
+    ],
+    "requiredMaterialLayers": [
+      "One merged surface vertex-color material and one merged hardware material carry independent semantic zones and share the external Eastbrook atlas.",
+      "The board response remains legible without bloom, AO, dynamic shadows, embedded maps, or more than two materials."
+    ],
+    "requiredReviewViewpoints": [
+      "front",
+      "right",
+      "rear",
+      "left",
+      "front-three-quarter",
+      "rear-three-quarter",
+      "grazing",
+      "player-scale",
+      "neutral",
+      "dusk",
+      "mobile-low"
+    ],
+    "blockingFailureModes": [
+      "The prop collapses into a facade card or loses the deep roof and rear bracing.",
+      "Posts or footings float, intersect the board, or create implausible ground seating.",
+      "Parchment contains readable text, tiny pseudo-text, logos, or a recognizable third-party crest.",
+      "The interaction standing point falls inside the collider or behind the board.",
+      "The asset requires embedded PBR maps or exceeds any hard budget.",
+      "A critical feature scores below 0.7 even when the aggregate review score passes."
+    ]
+  }
+}

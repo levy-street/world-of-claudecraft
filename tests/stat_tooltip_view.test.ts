@@ -49,6 +49,7 @@ describe('statEffectText number formatting + key selection', () => {
       'maxMana',
       'healthRegen',
       'manaRegen',
+      'manaRegenCombat',
     ] as const) {
       expect(statEffectText({ kind, value: 24 }, deps)).toBe(
         `hudChrome.statInfo.effects.${kind}(value=24)`,
@@ -144,6 +145,16 @@ describe('statSourceText', () => {
       'hudChrome.statInfo.sources.fromAttribute(stat=itemUi.stats.agi,value=+1.1)',
     );
   });
+
+  it('parry source values keep one decimal, same as dodge', () => {
+    const m = model({ stat: 'parry' });
+    expect(statSourceText({ kind: 'base', value: 5 }, m, deps)).toBe(
+      'hudChrome.statInfo.sources.base(value=5.0)',
+    );
+    expect(statSourceText({ kind: 'attributes', value: 1, fromStat: 'str' }, m, deps)).toBe(
+      'hudChrome.statInfo.sources.fromAttribute(stat=itemUi.stats.str,value=+1.0)',
+    );
+  });
 });
 
 describe('statNoteTexts', () => {
@@ -227,7 +238,7 @@ describe('statTooltipHtml', () => {
     expect(html).toContain('&lt;i&gt;x&lt;/i&gt;&amp;&#39;&quot;');
   });
 
-  it('colors every effect kind tt-green iff it is a gain, tt-stat otherwise (full 12-kind partition)', () => {
+  it('colors every effect kind tt-green iff it is a gain, tt-stat otherwise (full 13-kind partition)', () => {
     // The class decision (GAIN_KINDS) is the one piece of logic the view adds over
     // the model, so pin it for ALL kinds, not just a sample. EXPECTED_GREEN states the
     // contract independently of the source set, so moving any kind across the partition
@@ -243,6 +254,7 @@ describe('statTooltipHtml', () => {
       'spellCritPct',
       'healthRegen',
       'manaRegen',
+      'manaRegenCombat',
       'damageReduction',
       'dpsFromAp',
     ];
@@ -315,6 +327,7 @@ describe('statValueText', () => {
   it('shows one-decimal percents for crit and dodge and both Warfare effects', () => {
     expect(statValueText(model({ stat: 'critChance', statValue: 5.5 }), deps)).toBe('5.5%');
     expect(statValueText(model({ stat: 'dodge', statValue: 5 }), deps)).toBe('5.0%');
+    expect(statValueText(model({ stat: 'parry', statValue: 6 }), deps)).toBe('6.0%');
     expect(
       statValueText(
         model({

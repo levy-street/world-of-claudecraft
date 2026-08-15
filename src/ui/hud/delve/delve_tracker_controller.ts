@@ -30,8 +30,19 @@ export class DelveTrackerController {
 
   constructor(private readonly deps: DelveTrackerControllerDeps) {}
 
-  invalidate(): void {
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Every member of the signature below is an id, a number or a
+   * boolean, so setLanguage alone never moves it and a plain update() from the
+   * fan-out early-returns with the old locale still on screen. Clearing forces
+   * exactly one rebuild, which re-latches the signature in the same call.
+   *
+   * Needs no open check: update() paints only while a delve run exists and
+   * clears the strip when it does not.
+   */
+  relocalize(): void {
     this.lastSignature = '';
+    this.update();
   }
 
   update(): void {

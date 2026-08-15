@@ -1,6 +1,7 @@
 import { COMPANION_UPGRADE_COSTS, DELVES, ITEMS } from '../../../sim/data';
 import type { ItemDef, SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
+import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
@@ -101,6 +102,9 @@ export class DelveBoardController {
             heroicLabel,
             canEnter,
           );
+    // A standalone focus-trapped window (open() arms a FocusTrapHandle):
+    // announce it as a labeled dialog for the focus contract.
+    markDialogRoot(element, { label: t('delveUi.board.title') });
     element.innerHTML =
       `<div class="panel-title"><span>${esc(t('delveUi.board.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="delve-board-name">${esc(delveName)}</div>` +

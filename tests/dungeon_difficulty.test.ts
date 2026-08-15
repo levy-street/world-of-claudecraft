@@ -39,13 +39,12 @@ const SYNTHETIC: MobTemplate = {
 };
 
 describe('heroic tuning data contract', () => {
-  it('covers the six five-player dungeons plus the raid arena, with their final bosses', () => {
+  it('covers the five five-player dungeons plus the raid arena, with their final bosses', () => {
     expect([...HEROIC_DUNGEON_IDS].sort()).toEqual([
       'drowned_temple',
       'gravewyrm_sanctum',
       'hollow_crypt',
       'nythraxis_boss_arena',
-      'orkadia',
       'sunken_bastion',
       'wildheart_basin',
     ]);
@@ -56,7 +55,6 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: 'vael_the_mistcaller',
       drowned_temple: 'ysolei',
       gravewyrm_sanctum: 'korzul_the_gravewyrm',
-      orkadia: 'orkadia_warlord',
       wildheart_basin: 'wildheart_high_priest',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
     });
@@ -75,7 +73,6 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: 1,
       drowned_temple: 1,
       gravewyrm_sanctum: 1,
-      orkadia: 1,
       wildheart_basin: 1,
       nythraxis_boss_arena: 3,
     });
@@ -88,9 +85,10 @@ describe('heroic tuning data contract', () => {
     // level-22 pin, and health is DOUBLED versus the previous calibration
     // (1.9/2.0/2.6/2.0/1.6 became 3.8/4.0/5.2/4.0/3.2). The ladder still
     // inverts because harder dungeons carry bigger base weapon damage.
-    // Boss-summoned add waves are non-elite (no 1.5x swing multiplier), so
-    // their addDamageMultiplier is LARGER than the trash value while landing
-    // the same 500 floor. Exact literals so an accidental retune reddens
+    // Boss-summoned add waves floor well below the mob line (wave pressure,
+    // not extra bosses): the 2026-07 retune halved them to 250, and the v0.30
+    // pass cut another 40% to the 150 floor, so addDamageMultiplier sits far
+    // BELOW the trash value. Exact literals so an accidental retune reddens
     // deliberately; the floors themselves are pinned by
     // tests/heroic_difficulty_floors.test.ts.
     expect(
@@ -101,19 +99,18 @@ describe('heroic tuning data contract', () => {
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [3.8, 20, 10, 1.3],
-      sunken_bastion: [4.0, 18, 32.5, 1.3],
-      drowned_temple: [5.2, 16.5, 30.5, 1.25],
-      gravewyrm_sanctum: [4.0, 15.5, 29, 1.2],
-      orkadia: [4.0, 18, 9, 1.2],
+      hollow_crypt: [3.8, 20, 6, 1.3],
+      sunken_bastion: [4.0, 18, 9.75, 1.3],
+      drowned_temple: [5.2, 16.5, 9.15, 1.25],
+      gravewyrm_sanctum: [4.0, 15.5, 8.55, 1.2],
       wildheart_basin: [4.0, 17.25, 8.625, 1.2],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits; the heroic boss
       // floors at 1200 through the dungeon-wide value while the encounter
-      // add waves (spawned with no summonedAdd role) are held to the 500
-      // line through damageMultiplierByMob, so the raid's
+      // add waves (spawned with no summonedAdd role) are held to the
+      // summoned 250 floor through damageMultiplierByMob, so the raid's
       // addDamageMultiplier stays an inert mirror of damageMultiplier.
-      nythraxis_boss_arena: [3.2, 8.75, 8.75, 1.2],
+      nythraxis_boss_arena: [3.2, 7.25, 7.25, 1.2],
     });
   });
 });
@@ -164,9 +161,9 @@ describe('mobTemplateForDungeonDifficulty', () => {
     const add = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic', {
       summonedAdd: true,
     });
-    // hollow_crypt addDamageMultiplier is 10 (no crypt boss summons, inert).
-    expect(add.dmgBase).toBeCloseTo(200, 10);
-    expect(add.dmgPerLevel).toBeCloseTo(20, 10);
+    // hollow_crypt addDamageMultiplier is 6 (no crypt boss summons, inert).
+    expect(add.dmgBase).toBeCloseTo(120, 10);
+    expect(add.dmgPerLevel).toBeCloseTo(12, 10);
     // Health, armor, level, and the speed floor stay on the dungeon-wide tuning.
     expect(add.hpBase).toBeCloseTo(380, 10);
     expect(add.hpPerLevel).toBeCloseTo(38, 10);

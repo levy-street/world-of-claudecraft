@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // DOM behavioral guard: stale async board responses. The five boards share one
 // .lb-body, so a slow response for an older tab (or page) must be dropped when
@@ -15,9 +15,10 @@ function lbEl(): HTMLElement {
   const el = document.createElement('div');
   el.id = 'leaderboard-window';
   el.className = 'window panel';
-  // The async board render bails unless the window reads as open (display:block);
+  // The async board render bails unless the window reads as open (display:flex, the
+  // flex-column open value the window-fill contract needs);
   // set it so render() completes its error-state paint deterministically.
-  el.style.display = 'block';
+  el.style.display = 'flex';
   return el;
 }
 

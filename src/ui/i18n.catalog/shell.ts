@@ -49,9 +49,13 @@ export const shellStrings = {
       reconnectingNow: 'Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})',
       slowConnection: 'This is taking longer than usual. Check your internet connection.',
       connectionRejected: 'The server closed the connection.',
+      incompatibleWorldVersion:
+        'Game and server versions are incompatible. Reload or update, then try again.',
       realmFull: 'This world is full right now. Please try again in a few minutes.',
       tooManyConnections:
         'Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.',
+      messageRateExceeded:
+        'You were disconnected for sending actions too quickly. Please wait a moment and log back in.',
       tips: {
         classes:
           'Tip: each of the 9 classes plays differently. Try a few before committing to one.',
@@ -67,6 +71,10 @@ export const shellStrings = {
         loadouts:
           'Tip: save more than one talent loadout to swap between builds without spending points twice.',
         pvp: 'Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build.',
+        // The tips rotation renders through a bare t(key) with no values, so no
+        // tip can name a live keybind without going stale when a player rebinds
+        // it. This one used to spell out Shift+X; it now stays chord-free.
+        reliquary: 'Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf.',
       },
     },
     errors: {
@@ -108,16 +116,24 @@ export const shellStrings = {
         crossSiteOrigin: 'Request blocked for security reasons.',
       },
     },
-    // Desktop (Electron) shell surfaces: the auto-update toast rendered by the
+    // Desktop (Electron) shell surfaces: the auto-update card rendered by the
     // renderer (src/ui/desktop_update_toast.ts) and the crash-dialog strings
     // the renderer pushes to the main process (src/game/desktop_shell_strings.ts,
     // mirrored by electron/shell_strings.cjs DEFAULT_SHELL_STRINGS in English).
     desktop: {
       update: {
-        downloading: 'Downloading update {version}...',
-        ready: 'Update {version} is ready. It installs when you quit, or restart now.',
+        // Classic desktop-client voice (Discord / VS Code / Steam style): short
+        // titles, calm bodies, primary action first on the ready card.
+        checkingTitle: 'Checking for updates...',
+        checkingBody: 'New versions download while you play.',
+        uptodateTitle: "You're up to date",
+        downloadingTitle: 'Downloading update {version}...',
+        downloadingBody: 'You can keep playing. It installs when you quit.',
+        readyTitle: 'Update {version} is ready',
+        readyBody: 'Restart to install now, or keep playing and it installs when you quit.',
         restart: 'Restart now',
         later: 'Later',
+        dismiss: 'Dismiss',
       },
       crash: {
         title: 'World of ClaudeCraft',
@@ -137,6 +153,31 @@ export const shellStrings = {
         'The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
       bodyWeb:
         'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
+      // Hybrid-GPU variant (issue #2119): shown at boot when the session is
+      // likely on an integrated GPU on a laptop that also has a discrete one.
+      // Never shown inside the desktop shell (it already forces the discrete
+      // adapter), so the split below is purely by OS.
+      hybridBodyWindows:
+        'This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.',
+      hybridBodyLinux:
+        'This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.',
+      hybridBodyOther:
+        'This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, check your browser and operating system graphics settings to enable it. The desktop app picks the discrete GPU automatically.',
+      dismiss: 'Dismiss',
+    },
+    // Performance nudge (src/ui/perf_nudge_toast.ts): the gpuNotice sibling
+    // shown once mid-session when the client perf-doctor finds a machine-local
+    // cause (packet 0 rulings R14-R16). The integrated-GPU copy is deliberately
+    // conditional: the adapter string cannot prove a discrete GPU exists, only
+    // that the session is not on one (ruling R15). The hardware-acceleration
+    // variants mirror the gpuNotice desktop/web split for the same reason.
+    perfNudge: {
+      integratedGpu:
+        'The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.',
+      hardwareAccelerationDesktop:
+        'The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
+      hardwareAccelerationWeb:
+        'The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
       dismiss: 'Dismiss',
     },
     realm: {
@@ -192,6 +233,12 @@ export const shellStrings = {
       sortName: 'Name',
       sortRecent: 'Recently Played',
       sortPlaytime: 'Playtime',
+      redesign: 'Redesign',
+      redesignHint:
+        'This character predates the new character creator. You get one free redesign; it is used when you save.',
+      redesignTitle: 'Redesign {name}',
+      redesignSave: 'Save New Look',
+      redesignCancel: 'Keep Current Look',
     },
     deleteCharacter: {
       title: 'Delete Character',
@@ -220,6 +267,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        focus: 'Focus',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -420,6 +468,7 @@ export const shellStrings = {
         mana: 'Maná',
         energy: 'Energía',
         rage: 'Ira',
+        focus: 'Concentración',
       },
       roles: {
         warrior: 'Tanque / DPS cuerpo a cuerpo',
@@ -623,6 +672,7 @@ export const shellStrings = {
         mana: 'Maná',
         energy: 'Energía',
         rage: 'Ira',
+        focus: 'Concentración',
       },
       roles: {
         warrior: 'Tanque / DPS cuerpo a cuerpo',
@@ -827,6 +877,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        focus: 'Concentration',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -1031,6 +1082,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        focus: 'Concentration',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -1247,6 +1299,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        focus: 'Focus',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -1449,6 +1502,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energia',
         rage: 'Rabbia',
+        focus: 'Concentrazione',
       },
       roles: {
         warrior: 'Tank / DPS da mischia',
@@ -1653,6 +1707,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energie',
         rage: 'Wut',
+        focus: 'Fokus',
       },
       roles: {
         warrior: 'Tank / Nahkampf-DPS',
@@ -1854,6 +1909,7 @@ export const shellStrings = {
         mana: '法力',
         energy: '能量',
         rage: '怒气',
+        focus: '集中值',
       },
       roles: {
         warrior: '坦克 / 近战 DPS',
@@ -2042,6 +2098,7 @@ export const shellStrings = {
         mana: '法力',
         energy: '能量',
         rage: '怒氣',
+        focus: '集中值',
       },
       roles: {
         warrior: '坦克 / 近戰 DPS',
@@ -2231,6 +2288,7 @@ export const shellStrings = {
         mana: '마나',
         energy: '기력',
         rage: '분노',
+        focus: '집중',
       },
       roles: {
         warrior: '탱커 / 근접 DPS',
@@ -2431,6 +2489,7 @@ export const shellStrings = {
         mana: 'マナ',
         energy: 'エネルギー',
         rage: '怒り',
+        focus: '集中値',
       },
       roles: {
         warrior: 'タンク / 近接DPS',
@@ -2629,6 +2688,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energia',
         rage: 'Raiva',
+        focus: 'Foco',
       },
       roles: {
         warrior: 'Tanque / DPS corpo a corpo',
@@ -2832,6 +2892,7 @@ export const shellStrings = {
         mana: 'Мана',
         energy: 'Энергия',
         rage: 'Ярость',
+        focus: 'Концентрация',
       },
       roles: {
         warrior: 'Танк / ближний DPS',

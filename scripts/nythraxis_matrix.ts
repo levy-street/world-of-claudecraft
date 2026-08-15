@@ -2,11 +2,10 @@ import { writeFileSync } from 'node:fs';
 import {
   defaultBuild,
   type TalentAllocation,
-  talentPointsAtLevel,
   validateAllocation,
 } from '../src/sim/content/talents';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
-import { canEquipItem } from '../src/sim/equipment_rules';
+import { canEquipItem, weaponHand } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -17,6 +16,14 @@ import {
   type PlayerClass,
 } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import {
+  activeDps,
+  benchmarkAllocation,
+  combatElapsed,
+  comparisonPlans,
+  nythraxisDamageBucket,
+  WARLOCK_BENCHMARK_ROWS,
+} from './lib/nythraxis_matrix_core.mjs';
 
 type Role = 'bossTank' | 'offTank' | 'healer' | 'dps';
 type SpecKind = 'physical' | 'caster' | 'healer' | 'tank';
@@ -26,7 +33,16 @@ type Spec = {
   role: Role;
   kind: SpecKind;
   melee: boolean;
-  talents: TalentAllocation;
+  talents: {
+    spec: string | null;
+    rows?: TalentAllocation['rows'];
+    // Kept so older matrix plans remain readable while the runner migrates
+    // them to the current six-row allocation at the boundary.
+    ranks?: Record<string, number>;
+    choices?: Record<string, string>;
+  };
+  // Benchmark overlay on the class default build (warlock benchmark specs).
+  benchmarkRows?: TalentAllocation['rows'];
   prepull?: string[];
   rotation: string[];
   healRotation?: string[];
@@ -65,13 +81,25 @@ const specs = {
         prot_imp_thunder_clap: 2,
       },
       choices: { war_tactical_choice: 'tc_bladed_armor' },
+      rows: {
+        5: 'war_row_double_charge',
+        8: 'war_row_die_by_the_sword',
+        11: 'war_row_storm_bolt',
+        14: 'war_row_blood_offering',
+        17: 'war_row_avatar',
+        20: 'war_row_sanguine_aura',
+      },
     },
     rotation: [
       'defensive_stance',
       'battle_shout',
+      'die_by_sword',
+      'raised_guard',
+      'iron_resolve',
       'sunder_armor',
       'shield_slam',
       'thunder_clap',
+      'revenge',
       'heroic_strike',
     ],
   },
@@ -91,13 +119,29 @@ const specs = {
         prot_imp_righteous_fury: 2,
       },
       choices: { pal_holy_calling: 'pal_calling_guardian' },
+      rows: {
+        5: 'pal_r5_divine_steed',
+        8: 'pal_r8_enduring_protection',
+        11: 'pal_r11_fist_of_justice',
+        14: 'pal_r14_divine_purpose',
+        17: 'pal_r17_extended_dawn',
+        20: 'pal_r20_aura_mastery',
+      },
     },
     rotation: [
-      'righteous_fury',
-      'devotion_aura',
+      'devotion_ward',
+      'lay_on_hands',
+      'divine_protection',
+      'aura_mastery',
+      'bastion_rite',
+      'holy_shield',
+      'veilbound_march',
+      'divine_ascension',
       'consecration',
-      'judgement',
-      'seal_of_righteousness',
+      'vowkeeper_strike',
+      'bastion_sweep',
+      'sunward_disc',
+      'hammer_of_grace',
     ],
   },
   feralDruidTank: {
@@ -400,8 +444,21 @@ const specs = {
       ranks: { wlk_demonic_embrace: 3, wlk_cataclysm: 2, dest_cataclysm: 3, dest_bane: 3 },
       choices: {},
     },
+    benchmarkRows: WARLOCK_BENCHMARK_ROWS,
     prepull: ['demon_skin'],
-    rotation: ['shadowburn', 'immolate', 'corruption', 'curse_of_agony', 'shadow_bolt'],
+    // Ruination's real loop. The previous list still spent globals on Blackrot
+    // and Hex of Anguish, which the specialization can no longer learn, and
+    // never touched Ruin at all, so it measured a Gloom Bolt spammer.
+    rotation: [
+      'summon_infernal',
+      'ruinous_brand',
+      'immolate',
+      'conflagrate',
+      'shadowburn',
+      'chaos_bolt',
+      'life_tap',
+      'shadow_bolt',
+    ],
   },
   afflictionWarlock: {
     key: 'affliction_warlock',
@@ -420,8 +477,22 @@ const specs = {
       },
       choices: { wlk_dark_pact: 'wlk_pact_affliction' },
     },
+    benchmarkRows: WARLOCK_BENCHMARK_ROWS,
     prepull: ['demon_skin'],
-    rotation: ['immolate', 'corruption', 'curse_of_agony', 'drain_life', 'shadow_bolt'],
+    rotation: [
+      'evil_eye',
+      'cursed_accomplice',
+      'hour_of_judgment',
+      'possess_evil_eye',
+      'coven',
+      'hex_of_violence',
+      'vicarious_suffering',
+      'cruel_pact',
+      'sentence',
+      'drain_life',
+      'needle_of_fate',
+      'life_tap',
+    ],
   },
   demonologyWarlock: {
     key: 'demonology_warlock',
@@ -440,8 +511,18 @@ const specs = {
       },
       choices: { wlk_dark_pact: 'wlk_pact_demonology' },
     },
+    benchmarkRows: WARLOCK_BENCHMARK_ROWS,
     prepull: ['demon_skin'],
-    rotation: ['immolate', 'corruption', 'curse_of_agony', 'shadow_bolt'],
+    rotation: [
+      'metamorphosis',
+      'army_of_the_dead',
+      'unholy_command',
+      'raise_bone_mage',
+      'raise_gravewing',
+      'reaping_command',
+      'life_tap',
+      'soul_harvest',
+    ],
   },
   marksmanshipHunter: {
     key: 'marksmanship_hunter',
@@ -512,7 +593,6 @@ const specs = {
         pal_divine_strength: 3,
         pal_benediction: 2,
         ret_benediction: 3,
-        ret_imp_judgement: 2,
         ret_seal_command: 1,
       },
       choices: {},
@@ -520,7 +600,7 @@ const specs = {
     rotation: [
       'blessing_of_might',
       'seal_of_righteousness',
-      'judgement',
+      'final_edict',
       'exorcism',
       'consecration',
     ],
@@ -703,12 +783,89 @@ function statScore(item: ItemDef, spec: Spec): number {
   );
 }
 
+function isNythraxisDrop(item: ItemDef): boolean {
+  return (
+    NYTHRAXIS_DROP_IDS.has(item.id) || (!!item.heroicOf && NYTHRAXIS_DROP_IDS.has(item.heroicOf))
+  );
+}
+
+function sharedTankScore(item: ItemDef): number {
+  const stats = item.stats ?? {};
+  const weaponDps = item.weapon
+    ? (item.weapon.min + item.weapon.max) / 2 / Math.max(0.1, item.weapon.speed)
+    : 0;
+  return (
+    (stats.sta ?? 0) * 1_000 +
+    (stats.armor ?? 0) * 5 +
+    (item.blockValue ?? 0) * 50 +
+    (stats.str ?? 0) * 25 +
+    (stats.agi ?? 0) * 10 +
+    weaponDps
+  );
+}
+
+function sharedTankCandidates(slot: ItemDef['slot']): ItemDef[] {
+  return Object.values(ITEMS)
+    .filter(
+      (item) =>
+        item.slot === slot &&
+        !isNythraxisDrop(item) &&
+        (item.requiredLevel ?? 1) <= 20 &&
+        canEquipItem('warrior', item) &&
+        canEquipItem('paladin', item) &&
+        (slot !== 'mainhand' || (item.kind === 'weapon' && weaponHand(item) !== 'twohand')) &&
+        (slot !== 'offhand' || (item.blockValue ?? 0) > 0),
+    )
+    .sort((a, b) => sharedTankScore(b) - sharedTankScore(a) || a.id.localeCompare(b.id));
+}
+
+const SHARED_TANK_SINGLE_SLOTS: ItemDef['slot'][] = [
+  'mainhand',
+  'offhand',
+  'helmet',
+  'neck',
+  'shoulder',
+  'chest',
+  'waist',
+  'legs',
+  'gloves',
+  'feet',
+];
+
+function sharedTankGearIds(): string[] {
+  return [
+    ...SHARED_TANK_SINGLE_SLOTS.map((slot) => sharedTankCandidates(slot)[0]?.id).filter(
+      (id): id is string => !!id,
+    ),
+    ...sharedTankCandidates('ring')
+      .slice(0, 2)
+      .map((ring) => ring.id),
+  ];
+}
+
+function equipSharedTankGear(sim: Sim, pid: number): void {
+  for (const slot of SHARED_TANK_SINGLE_SLOTS) {
+    const item = sharedTankCandidates(slot)[0];
+    if (!item) continue;
+    sim.addItem(item.id, 1, pid);
+    sim.equipItem(item.id, pid);
+  }
+  for (const [index, ring] of sharedTankCandidates('ring').slice(0, 2).entries()) {
+    sim.addItem(ring.id, 1, pid);
+    sim.equipItemToSlot(ring.id, `ring${index + 1}` as EquipSlot, pid);
+  }
+}
+
 function equipBest(sim: Sim, pid: number, spec: Spec) {
+  if (spec.kind === 'tank' && (spec.cls === 'warrior' || spec.cls === 'paladin')) {
+    equipSharedTankGear(sim, pid);
+    return;
+  }
   for (const slot of SLOTS) {
     const item = Object.values(ITEMS)
       .filter(
         (candidate) =>
-          !NYTHRAXIS_DROP_IDS.has(candidate.id) &&
+          !isNythraxisDrop(candidate) &&
           candidate.slot === slot &&
           (candidate.kind === 'weapon' || candidate.kind === 'armor') &&
           canEquipItem(spec.cls, candidate),
@@ -721,14 +878,23 @@ function equipBest(sim: Sim, pid: number, spec: Spec) {
   }
 }
 
-function ensureTalents(sim: Sim, pid: number, spec: Spec) {
-  const check = validateAllocation(spec.cls, spec.talents, talentPointsAtLevel(20));
+function ensureTalents(sim: Sim, pid: number, spec: Spec): TalentAllocation {
+  const defaults = defaultBuild(spec.cls, 20);
+  // Two plan shapes coexist: an overhauled spec pins its own six-row `rows`
+  // outright, while a benchmark spec supplies `benchmarkRows` as an OVERLAY on
+  // whichever base build applies.
+  const allocation = benchmarkAllocation(
+    { spec: defaults.spec, rows: spec.talents.rows ?? defaults.rows },
+    spec.talents.spec ?? '',
+    spec.benchmarkRows,
+  ) as TalentAllocation;
+  const check = validateAllocation(spec.cls, allocation, 20);
   if (!check.ok) {
-    console.warn(`Invalid talents for ${spec.key}: ${check.reason}`);
+    throw new Error(`Invalid talents for ${spec.key}: ${check.reason}`);
   }
-  if (!sim.applyTalents(spec.talents, pid)) {
-    sim.applyTalents(defaultBuild(spec.cls, talentPointsAtLevel(20)), pid);
-  }
+  if (sim.applyTalents(allocation, pid)) return allocation;
+  sim.applyTalents(defaults, pid);
+  return defaults;
 }
 
 function livingAdds(sim: Sim) {
@@ -743,8 +909,14 @@ function cast(sim: Sim, pid: number, targetId: number, ability: string) {
   p.targetId = targetId;
   const target = sim.entities.get(targetId);
   if (target) face(p, target);
+  const known = sim.meta(pid)?.known.find((entry) => entry.def.id === ability);
+  const aim =
+    target && known?.def.targetMode === 'position'
+      ? { x: target.pos.x, z: target.pos.z }
+      : undefined;
   const before = `${p.castingAbility}|${p.gcdRemaining}|${p.queuedOnSwing}|${p.resource}|${p.auras.length}`;
-  sim.castAbility(ability, pid);
+  if (ability === 'lay_on_hands') sim.castAbilityOn(ability, pid, pid);
+  else sim.castAbility(ability, pid, aim);
   const after = `${p.castingAbility}|${p.gcdRemaining}|${p.queuedOnSwing}|${p.resource}|${p.auras.length}`;
   return before !== after;
 }
@@ -787,13 +959,19 @@ const SELF_BUFF_ABILITIES = new Set([
   'seal_of_righteousness',
   'instant_poison',
   'defensive_stance',
+  'devotion_ward',
   'bear_form',
   'cat_form',
   'barkskin',
   'rockbiter_weapon',
   'demon_skin',
 ]);
-const TARGET_DEBUFF_ABILITIES = new Set(['demoralizing_roar', 'faerie_fire']);
+const TARGET_DEBUFF_ABILITIES = new Set([
+  'demoralizing_roar',
+  'evil_eye',
+  'faerie_fire',
+  'hex_of_violence',
+]);
 const FIVE_COMBO_FINISHERS = new Set(['eviscerate', 'rip', 'rupture', 'ferocious_bite']);
 
 function auraActive(entity: Entity, id: string, sourceId?: number): boolean {
@@ -807,6 +985,27 @@ function sunderStacks(target: Entity): number {
 }
 
 function shouldTryAbility(caster: Entity, target: Entity, ability: string): boolean {
+  const hpPct = caster.maxHp > 0 ? caster.hp / caster.maxHp : 0;
+  if (
+    ability === 'life_tap' &&
+    (caster.resource > caster.maxResource * 0.3 || caster.hp <= caster.maxHp * 0.35)
+  ) {
+    return false;
+  }
+  // Sentence consumes the entire Condemnation pool and its payoff escalates at
+  // the 20, 50, 80 and 100 thresholds, so firing it the moment it becomes legal
+  // would measure a deliberately poor harness rotation. Bank to 80, which is the
+  // intended premium verdict window for this benchmark.
+  if (ability === 'sentence') {
+    const doom = caster.auras.find((aura) => aura.kind === 'affliction_doom')?.stacks ?? 0;
+    if (doom < 80) return false;
+  }
+  if (
+    ability === 'cursed_accomplice' &&
+    caster.auras.some((aura) => aura.kind === 'affliction_accomplice')
+  ) {
+    return false;
+  }
   if (DOT_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
   if (SELF_BUFF_ABILITIES.has(ability) && auraActive(caster, ability)) return false;
   if (TARGET_DEBUFF_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
@@ -818,9 +1017,22 @@ function shouldTryAbility(caster: Entity, target: Entity, ability: string): bool
   if ((ability === 'maul' || ability === 'heroic_strike') && caster.queuedOnSwing === ability)
     return false;
   if (ability === 'sunder_armor' && sunderStacks(target) >= 5) return false;
+  if (ability === 'die_by_sword' && (hpPct > 0.7 || auraActive(caster, 'die_by_sword')))
+    return false;
+  if (ability === 'raised_guard' && auraActive(caster, 'raised_guard_dr')) return false;
+  if (ability === 'iron_resolve' && (caster.resource < 40 || auraActive(caster, 'iron_resolve')))
+    return false;
+  if (ability === 'lay_on_hands' && hpPct > 0.25) return false;
+  if (ability === 'divine_protection' && (hpPct > 0.85 || auraActive(caster, 'divine_protection')))
+    return false;
+  if (ability === 'aura_mastery' && (hpPct > 0.7 || auraActive(caster, 'aura_mastery')))
+    return false;
+  if (ability === 'bastion_rite' && auraActive(caster, 'bastion_rite')) return false;
+  if (ability === 'holy_shield' && auraActive(caster, 'holy_shield')) return false;
   if (
-    ability === 'judgement' &&
-    !caster.auras.some((a) => a.kind === 'imbue' && a.value2 !== undefined)
+    ability === 'divine_ascension' &&
+    ((caster.paladinDevotion?.value ?? 0) < 20 ||
+      (caster.paladinDevotion?.ascensionCharges ?? 0) > 0)
   )
     return false;
   return true;
@@ -857,14 +1069,16 @@ function setupHunterPet(sim: Sim, pid: number) {
   for (let i = 0; i < 20 * 7; i++) sim.tick();
 }
 
-function setupWarlockImp(sim: Sim, pid: number) {
+function setupWarlockPet(sim: Sim, pid: number, spec: Spec) {
   if (sim.petOf(pid)) return;
-  sim.castAbility('summon_imp', pid);
+  sim.castAbility(spec.key === 'demonology_warlock' ? 'raise_graveguard' : 'summon_imp', pid);
   for (let i = 0; i < 20 * 12 && sim.entities.get(pid)?.castingAbility; i++) sim.tick();
 }
 
 type Result = {
+  seed: number;
   key: string;
+  seed: number;
   killed: boolean;
   seconds: number;
   bossHp: number;
@@ -908,20 +1122,30 @@ type Result = {
       playerId: number;
       resourceType: Entity['resourceType'];
       maxHp: number;
+      armor: number;
       maxResource: number;
       startResource: number;
+      equippedItemIds: string[];
+      talentRows: TalentAllocation['rows'];
       finalHp: number;
       finalResource: number;
       dead: boolean;
       deathTime?: number;
       damageDone: number;
+      activeDamageDone: number;
+      bossDamageDone: number;
+      addDamageDone: number;
+      playerDamageDone: number;
+      petDamageDone: number;
       dps: number;
+      activeDps: number;
       healingDone: number;
       hps: number;
       damageTaken: number;
       healingTaken: number;
       castsStarted: Record<string, number>;
       attemptedCasts: Record<string, number>;
+      successfulCasts: Record<string, number>;
       damageDoneByAbility: Record<string, number>;
       damageTakenByAbility: Record<string, number>;
       healingDoneByAbility: Record<string, number>;
@@ -997,18 +1221,24 @@ function secureAddThreat(add: Entity, tankPid: number, lead: number): void {
   }
 }
 
-function runGroup(groupSpecs: Spec[], key: string): Result {
-  const sim = new Sim({ seed: 42, noPlayer: true, playerClass: 'warrior' });
+function runGroup(groupSpecs: Spec[], key: string, seed = 42): Result {
+  const sim = new Sim({ seed, noPlayer: true, playerClass: 'warrior' });
   const pids = groupSpecs.map((spec, i) => sim.addPlayer(spec.cls, `${spec.key}_${i}`));
+  const appliedTalents = new Map<number, TalentAllocation>();
   for (let i = 0; i < pids.length; i++) {
     sim.players.get(pids[i])?.questsDone.add('q_nythraxis_bound_guardian');
     sim.setPlayerLevel(20, pids[i]);
-    ensureTalents(sim, pids[i], groupSpecs[i]);
+    appliedTalents.set(pids[i], ensureTalents(sim, pids[i], groupSpecs[i]));
     equipBest(sim, pids[i], groupSpecs[i]);
   }
   for (let i = 0; i < pids.length; i++) {
     if (groupSpecs[i].cls === 'hunter') setupHunterPet(sim, pids[i]);
-    if (groupSpecs[i].cls === 'warlock') setupWarlockImp(sim, pids[i]);
+    if (groupSpecs[i].cls === 'warlock') setupWarlockPet(sim, pids[i], groupSpecs[i]);
+  }
+  for (const pid of pids) {
+    const player = sim.entities.get(pid)!;
+    player.hp = player.maxHp;
+    player.resource = player.maxResource;
   }
   for (const pid of pids.slice(1)) {
     sim.partyInvite(pid, pids[0]);
@@ -1055,19 +1285,31 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
       playerId: pids[i],
       resourceType: e.resourceType,
       maxHp: e.maxHp,
+      armor: sim.ctx.effectiveArmor(e),
       maxResource: e.maxResource,
       startResource: e.resource,
+      equippedItemIds: Object.values(e.equippedItems)
+        .filter((itemId): itemId is string => typeof itemId === 'string')
+        .sort(),
+      talentRows: appliedTalents.get(pids[i])?.rows ?? {},
       finalHp: e.hp,
       finalResource: e.resource,
       dead: false,
       damageDone: 0,
+      activeDamageDone: 0,
+      bossDamageDone: 0,
+      addDamageDone: 0,
+      playerDamageDone: 0,
+      petDamageDone: 0,
       dps: 0,
+      activeDps: 0,
       healingDone: 0,
       hps: 0,
       damageTaken: 0,
       healingTaken: 0,
       castsStarted: {},
       attemptedCasts: {},
+      successfulCasts: {},
       damageDoneByAbility: {},
       damageTakenByAbility: {},
       healingDoneByAbility: {},
@@ -1083,6 +1325,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
   boss.aiState = 'attack';
   boss.aggroTargetId = pids[0];
   boss.threat.set(pids[0], 1000);
+  const encounterStart = (sim as unknown as { time: number }).time;
 
   const healerPids = pids.filter((_, i) => groupSpecs[i].role === 'healer');
   const tankCandidatePids = pids.filter((_, i) => groupSpecs[i].kind === 'tank');
@@ -1140,7 +1383,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
   };
 
   for (let tick = 0; tick < 20 * 950 && !boss.dead; tick++) {
-    const t = (sim as unknown as { time: number }).time;
+    const t = combatElapsed((sim as unknown as { time: number }).time, encounterStart);
     if (tick % (20 * 5) === 0) {
       for (const pid of pids) {
         const e = sim.entities.get(pid)!;
@@ -1284,7 +1527,10 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
         for (const heal of spec.healRotation ?? []) {
           const metric = actorMetrics.get(hpid)!;
           metric.attemptedCasts[heal] = (metric.attemptedCasts[heal] ?? 0) + 1;
-          if (cast(sim, hpid, target.id, heal)) break;
+          if (cast(sim, hpid, target.id, heal)) {
+            metric.successfulCasts[heal] = (metric.successfulCasts[heal] ?? 0) + 1;
+            break;
+          }
         }
       }
     }
@@ -1316,40 +1562,64 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
       if (shouldRangedAutoFallback(sim, p, target, spec)) continue;
       if (
         spec.key === 'feral_druid_tank' &&
+        pid === activeBossTankPid &&
         target.aggroTargetId !== p.id &&
         shouldTryAbility(p, target, 'growl')
       ) {
         const metric = actorMetrics.get(pid)!;
         metric.attemptedCasts.growl = (metric.attemptedCasts.growl ?? 0) + 1;
-        if (cast(sim, pid, target.id, 'growl')) continue;
+        if (cast(sim, pid, target.id, 'growl')) {
+          metric.successfulCasts.growl = (metric.successfulCasts.growl ?? 0) + 1;
+          continue;
+        }
       }
       for (const ability of spec.rotation) {
         if (!shouldTryAbility(p, target, ability)) continue;
         const metric = actorMetrics.get(pid)!;
         metric.attemptedCasts[ability] = (metric.attemptedCasts[ability] ?? 0) + 1;
-        if (cast(sim, pid, target.id, ability)) break;
+        if (cast(sim, pid, target.id, ability)) {
+          metric.successfulCasts[ability] = (metric.successfulCasts[ability] ?? 0) + 1;
+          break;
+        }
       }
     }
 
     const events = sim.tick();
     for (const event of events) {
-      if (event.type === 'damage' && event.targetId === boss.id && event.kind === 'hit') {
-        const source = sim.entities.get(event.sourceId);
-        const creditId = source?.ownerId ?? event.sourceId;
-        damage.set(creditId, (damage.get(creditId) ?? 0) + event.amount);
-        const metric = actorMetrics.get(creditId);
-        if (metric) {
-          metric.damageDone += event.amount;
-          addRecordValue(metric.damageDoneByAbility, event.ability, event.amount);
+      if (event.type === 'damage' && event.kind === 'hit') {
+        const damageTarget = sim.entities.get(event.targetId);
+        const damageBucket = nythraxisDamageBucket(
+          event.targetId,
+          damageTarget?.templateId,
+          boss.id,
+        );
+        if (damageBucket !== null) {
+          const source = sim.entities.get(event.sourceId);
+          const sourceOwnerId = event.sourceOwnerId ?? source?.ownerId;
+          const creditId = sourceOwnerId ?? event.sourceId;
+          damage.set(creditId, (damage.get(creditId) ?? 0) + event.amount);
+          const metric = actorMetrics.get(creditId);
+          if (metric) {
+            metric.damageDone += event.amount;
+            if (!metric.dead) metric.activeDamageDone += event.amount;
+            if (damageBucket === 'boss') metric.bossDamageDone += event.amount;
+            else metric.addDamageDone += event.amount;
+            if (sourceOwnerId !== null && sourceOwnerId !== undefined) {
+              metric.petDamageDone += event.amount;
+            } else {
+              metric.playerDamageDone += event.amount;
+            }
+            addRecordValue(metric.damageDoneByAbility, event.ability, event.amount);
+          }
+          combatLog.push({
+            time: round1(t),
+            type: damageBucket === 'boss' ? 'damage_boss' : 'damage_add',
+            source: describeEntity(event.sourceId),
+            target: damageBucket === 'boss' ? 'nythraxis' : describeEntity(event.targetId),
+            ability: event.ability ?? 'melee',
+            amount: Math.round(event.amount),
+          });
         }
-        combatLog.push({
-          time: round1(t),
-          type: 'damage_boss',
-          source: describeEntity(event.sourceId),
-          target: 'nythraxis',
-          ability: event.ability ?? 'melee',
-          amount: Math.round(event.amount),
-        });
       }
       if (event.type === 'damage' && event.kind === 'hit' && pids.includes(event.targetId)) {
         const source = sim.entities.get(event.sourceId);
@@ -1600,7 +1870,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
     }
   }
 
-  const seconds = (sim as unknown as { time: number }).time;
+  const seconds = combatElapsed((sim as unknown as { time: number }).time, encounterStart);
   if (boss.dead) breakReason = 'boss_killed';
   bossMetrics.hpEnd = boss.hp;
   bossMetrics.hpPctEnd = boss.hp / boss.maxHp;
@@ -1616,6 +1886,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
     metric.finalResource = e.resource;
     metric.dead = e.dead;
     metric.dps = metric.damageDone / seconds;
+    metric.activeDps = activeDps(metric.activeDamageDone, seconds, metric.deathTime);
     metric.hps = metric.healingDone / seconds;
     metric.oomSeconds = round1(metric.oomSeconds);
     metric.minResource = Math.round(metric.minResource);
@@ -1624,7 +1895,9 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
       finalHp: Math.round(metric.finalHp),
       finalResource: Math.round(metric.finalResource),
       damageDone: Math.round(metric.damageDone),
+      activeDamageDone: Math.round(metric.activeDamageDone),
       dps: round1(metric.dps),
+      activeDps: round1(metric.activeDps),
       healingDone: Math.round(metric.healingDone),
       hps: round1(metric.hps),
       damageTaken: Math.round(metric.damageTaken),
@@ -1637,6 +1910,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
     }
   }
   return {
+    seed,
     key,
     killed: boss.dead,
     seconds,
@@ -1684,31 +1958,119 @@ function hashString(value: string): number {
 }
 
 const limit = Number(process.env.MATRIX_LIMIT ?? '96');
+const tankMonteCarloRuns = Number(process.env.MATRIX_TANK_MC_RUNS ?? '0');
+if (!Number.isInteger(tankMonteCarloRuns) || tankMonteCarloRuns < 0) {
+  throw new Error('MATRIX_TANK_MC_RUNS must be a non-negative integer');
+}
+const seeds = (process.env.MATRIX_SEEDS ?? '42,1337,9001')
+  .split(',')
+  .map((value) => Number(value.trim()))
+  .filter((value) => Number.isInteger(value));
+if (seeds.length < 2) throw new Error('MATRIX_SEEDS must contain at least two integer seeds');
 const plans: { tank: Spec; healerSet: Spec[]; dpsSet: Spec[] }[] = [];
 for (const { tank } of tankPlans) {
   for (const healerSet of healerCombos) {
     for (const dpsSet of dpsCombos) plans.push({ tank, healerSet, dpsSet });
   }
 }
+const tankMonteCarloPlans = [
+  {
+    tank: specs.protectionWarrior,
+    healerSet: [specs.holyPriest, specs.disciplinePriest, specs.restorationShaman],
+    dpsSet: [
+      specs.combatRogue,
+      specs.armsWarrior,
+      specs.fireMage,
+      specs.marksmanshipHunter,
+      specs.retributionPaladin,
+    ],
+  },
+  {
+    tank: specs.protectionPaladin,
+    healerSet: [specs.holyPriest, specs.disciplinePriest, specs.restorationShaman],
+    dpsSet: [
+      specs.combatRogue,
+      specs.armsWarrior,
+      specs.fireMage,
+      specs.marksmanshipHunter,
+      specs.retributionPaladin,
+    ],
+  },
+] satisfies { tank: Spec; healerSet: Spec[]; dpsSet: Spec[] }[];
+const comparedKeys = (process.env.MATRIX_COMPARE_SPECS ?? '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+const specsByKey = new Map(Object.values(specs).map((spec) => [spec.key, spec]));
+function specForKey(key: string): Spec {
+  const spec = specsByKey.get(key);
+  if (!spec) throw new Error(`Unknown MATRIX_COMPARE_SPECS entry: ${key}`);
+  return spec;
+}
+// Three selection modes: the tank Monte Carlo roster, the single-spec comparison
+// plans (MATRIX_COMPARE_SPECS), then the default hash-ordered slice of the matrix.
 const selected =
-  plans.length <= limit
-    ? plans
-    : [...plans].sort((a, b) => hashString(planKey(a)) - hashString(planKey(b))).slice(0, limit);
+  tankMonteCarloRuns > 0
+    ? tankMonteCarloPlans
+    : comparedKeys.length
+      ? comparisonPlans({
+          tanks: tanks.map((spec) => spec.key),
+          healerSets: healerCombos.map((set) => set.map((spec) => spec.key)),
+          dps: dpsSpecs.map((spec) => spec.key),
+          compared: comparedKeys,
+          dpsSlots: 5,
+          limit,
+        }).map((plan) => ({
+          tank: specForKey(plan.tank),
+          healerSet: plan.healerSet.map(specForKey),
+          dpsSet: [...plan.baselineDps.map(specForKey), specForKey(plan.comparedKey)],
+        }))
+      : plans.length <= limit
+        ? plans
+        : [...plans]
+            .sort((a, b) => hashString(planKey(a)) - hashString(planKey(b)))
+            .slice(0, limit);
 const shardCount = Number(process.env.MATRIX_SHARD_COUNT ?? '1');
 const shardIndex = Number(process.env.MATRIX_SHARD_INDEX ?? '0');
 if (!Number.isInteger(shardCount) || shardCount < 1)
   throw new Error('MATRIX_SHARD_COUNT must be a positive integer');
 if (!Number.isInteger(shardIndex) || shardIndex < 0 || shardIndex >= shardCount)
   throw new Error('MATRIX_SHARD_INDEX must be between 0 and MATRIX_SHARD_COUNT - 1');
-const selectedForShard = selected.filter((_, index) => index % shardCount === shardIndex);
-const attempted = plans.length;
+// Standard matrix mode shards plans. Monte Carlo mode shards seed samples so
+// each shard still contains both tank distributions.
+const selectedForShard =
+  tankMonteCarloRuns > 0
+    ? selected
+    : selected.filter((_, index) => index % shardCount === shardIndex);
+// Composed attempt count: base `plans.length`, times this side's MATRIX_SEEDS
+// sample count, with the Monte Carlo roster replacing both in MC mode.
+const attempted =
+  tankMonteCarloRuns > 0
+    ? tankMonteCarloPlans.length * tankMonteCarloRuns
+    : plans.length * seeds.length;
 const results: Result[] = [];
-for (const { tank, healerSet, dpsSet } of selectedForShard) {
-  const offTank = (
-    tank.key === 'protection_paladin' ? specs.protectionWarrior : specs.protectionPaladin
-  ) as Spec;
-  const group = [tank, { ...offTank, role: 'offTank' as Role }, ...healerSet, ...dpsSet];
-  results.push(runGroup(group, planKey({ tank, healerSet, dpsSet })));
+// Monte Carlo mode draws its own 1..N seed samples; standard matrix mode samples
+// every MATRIX_SEEDS seed per plan.
+const runSeeds =
+  tankMonteCarloRuns > 0
+    ? Array.from({ length: tankMonteCarloRuns }, (_, index) => index + 1)
+    : seeds;
+for (const [seedIndex, seed] of runSeeds.entries()) {
+  if (tankMonteCarloRuns > 0 && seedIndex % shardCount !== shardIndex) continue;
+  for (const { tank, healerSet, dpsSet } of selectedForShard) {
+    // Keep the support roster identical in comparative tank simulations. Using the
+    // other candidate as off-tank made its much higher threat change who was
+    // actually taking Nythraxis' melee swings, invalidating the comparison.
+    const offTank = (
+      tankMonteCarloRuns > 0
+        ? specs.feralDruidTank
+        : tank.key === 'protection_paladin'
+          ? specs.protectionWarrior
+          : specs.protectionPaladin
+    ) as Spec;
+    const group = [tank, { ...offTank, role: 'offTank' as Role }, ...healerSet, ...dpsSet];
+    results.push(runGroup(group, planKey({ tank, healerSet, dpsSet }), seed));
+  }
 }
 
 const killed = results.filter((r) => r.killed);
@@ -1729,6 +2091,19 @@ const avgBy = (selector: (r: Result) => string, metric: (r: Result) => number) =
 
 const specDamage = new Map<string, { n: number; damage: number }>();
 const specDps = new Map<string, { n: number; dps: number }>();
+const specActiveDps = new Map<string, { n: number; dps: number }>();
+const specDamageBreakdown = new Map<
+  string,
+  {
+    n: number;
+    playerDamage: number;
+    petDamage: number;
+    bossDamage: number;
+    addDamage: number;
+    combinedDamage: number;
+    lifeTaps: number;
+  }
+>();
 const specHealing = new Map<string, { n: number; healing: number }>();
 const specResources = new Map<
   string,
@@ -1819,6 +2194,29 @@ for (const r of results) {
     dpsRow.n++;
     dpsRow.dps += v / r.seconds;
     specDps.set(k, dpsRow);
+    const activeDpsRow = specActiveDps.get(k) ?? { n: 0, dps: 0 };
+    activeDpsRow.n++;
+    activeDpsRow.dps += r.actors[k]?.activeDps ?? v / r.seconds;
+    specActiveDps.set(k, activeDpsRow);
+  }
+  for (const actor of Object.values(r.actors)) {
+    const row = specDamageBreakdown.get(actor.spec) ?? {
+      n: 0,
+      playerDamage: 0,
+      petDamage: 0,
+      bossDamage: 0,
+      addDamage: 0,
+      combinedDamage: 0,
+      lifeTaps: 0,
+    };
+    row.n++;
+    row.playerDamage += actor.playerDamageDone;
+    row.petDamage += actor.petDamageDone;
+    row.bossDamage += actor.bossDamageDone;
+    row.addDamage += actor.addDamageDone;
+    row.combinedDamage += actor.damageDone;
+    row.lifeTaps += actor.castsStarted.life_tap ?? 0;
+    specDamageBreakdown.set(actor.spec, row);
   }
   for (const [k, v] of Object.entries(r.healing)) {
     const row = specHealing.get(k) ?? { n: 0, healing: 0 };
@@ -1828,9 +2226,90 @@ for (const r of results) {
   }
 }
 
+function average(values: readonly number[]): number {
+  return values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+}
+
+function percentile(values: readonly number[], fraction: number): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * fraction))];
+}
+
+const tankMonteCarloSummary = ['protection_warrior', 'protection_paladin'].map((tankKey) => {
+  const samples = results
+    .filter((result) => result.key.startsWith(`${tankKey}|`))
+    .map((result) => {
+      const tank = result.actors[tankKey];
+      const minimumSampledHpPct = tank.dead
+        ? 0
+        : Math.min(1, ...tank.hpSamples.map((sample) => sample.value / tank.maxHp));
+      const healerNetManaConsumed = Object.values(result.actors)
+        .filter((actor) => actor.role === 'healer')
+        .reduce(
+          (total, healer) => total + Math.max(0, healer.startResource - healer.finalResource),
+          0,
+        );
+      const groupDps =
+        Object.values(result.actors).reduce((total, actor) => total + actor.damageDone, 0) /
+        Math.max(0.05, result.seconds);
+      const tankActiveSeconds = Math.max(0.05, tank.deathTime ?? result.seconds);
+      return {
+        killed: result.killed,
+        tankDead: tank.dead,
+        survivalSeconds: tank.deathTime ?? result.seconds,
+        maxHp: tank.maxHp,
+        armor: tank.armor,
+        dps: tank.dps,
+        damageTakenPerSecond: tank.damageTaken / tankActiveSeconds,
+        healingTakenPerSecond: tank.healingTaken / tankActiveSeconds,
+        selfHealingPerSecond: tank.healingDone / tankActiveSeconds,
+        minimumSampledHpPct,
+        finalHpPct: tank.dead ? 0 : tank.finalHp / tank.maxHp,
+        healerNetManaConsumed,
+        groupDps,
+        fightSeconds: result.seconds,
+      };
+    });
+  const survivalTimes = samples.map((sample) => sample.survivalSeconds);
+  const kills = samples.filter((sample) => sample.killed);
+  return {
+    key: tankKey,
+    n: samples.length,
+    killRate: average(samples.map((sample) => Number(sample.killed))),
+    tankDeathRate: average(samples.map((sample) => Number(sample.tankDead))),
+    avgSurvivalSeconds: round1(average(survivalTimes)),
+    p10SurvivalSeconds: round1(percentile(survivalTimes, 0.1)),
+    medianSurvivalSeconds: round1(percentile(survivalTimes, 0.5)),
+    avgKillSeconds:
+      kills.length > 0 ? round1(average(kills.map((sample) => sample.fightSeconds))) : null,
+    avgMaxHp: Math.round(average(samples.map((sample) => sample.maxHp))),
+    avgArmor: Math.round(average(samples.map((sample) => sample.armor))),
+    avgTankDps: round1(average(samples.map((sample) => sample.dps))),
+    avgGroupDps: round1(average(samples.map((sample) => sample.groupDps))),
+    avgDamageTakenPerSecond: round1(average(samples.map((sample) => sample.damageTakenPerSecond))),
+    avgHealingTakenPerSecond: round1(
+      average(samples.map((sample) => sample.healingTakenPerSecond)),
+    ),
+    avgSelfHealingPerSecond: round1(average(samples.map((sample) => sample.selfHealingPerSecond))),
+    avgMinimumSampledHpPct: round1(
+      average(samples.map((sample) => sample.minimumSampledHpPct)) * 100,
+    ),
+    avgFinalHpPct: round1(average(samples.map((sample) => sample.finalHpPct)) * 100),
+    avgHealerNetManaConsumed: Math.round(
+      average(samples.map((sample) => sample.healerNetManaConsumed)),
+    ),
+  };
+});
+
 const output = {
   attempted,
+  seeds,
+  comparedSpecs: comparedKeys,
   selected: selected.length,
+  tankMonteCarloRuns,
+  sharedTankGear: sharedTankGearIds(),
+  tankMonteCarloSummary,
   shardIndex,
   shardCount,
   run: results.length,
@@ -1856,9 +2335,24 @@ const output = {
   specDps: [...specDps.entries()]
     .map(([key, row]) => ({ key, avgDps: Math.round((row.dps / row.n) * 10) / 10 }))
     .sort((a, b) => b.avgDps - a.avgDps),
+  specActiveDps: [...specActiveDps.entries()]
+    .map(([key, row]) => ({ key, avgDps: Math.round((row.dps / row.n) * 10) / 10 }))
+    .sort((a, b) => b.avgDps - a.avgDps),
   specDamage: [...specDamage.entries()]
     .map(([key, row]) => ({ key, avgDamage: Math.round(row.damage / row.n) }))
     .sort((a, b) => b.avgDamage - a.avgDamage),
+  specDamageBreakdown: [...specDamageBreakdown.entries()]
+    .map(([key, row]) => ({
+      key,
+      n: row.n,
+      avgPlayerDamage: Math.round(row.playerDamage / row.n),
+      avgPetDamage: Math.round(row.petDamage / row.n),
+      avgBossDamage: Math.round(row.bossDamage / row.n),
+      avgAddDamage: Math.round(row.addDamage / row.n),
+      avgCombinedDamage: Math.round(row.combinedDamage / row.n),
+      avgLifeTaps: round1(row.lifeTaps / row.n),
+    }))
+    .sort((a, b) => b.avgCombinedDamage - a.avgCombinedDamage),
   specHealing: [...specHealing.entries()]
     .map(([key, row]) => ({ key, avgHealing: Math.round(row.healing / row.n) }))
     .sort((a, b) => b.avgHealing - a.avgHealing),
@@ -1926,10 +2420,13 @@ console.log(
       attempted: output.attempted,
       run: output.run,
       killed: output.killed,
+      sharedTankGear: output.sharedTankGear,
+      tankMonteCarloSummary: output.tankMonteCarloSummary,
       wipeReasonSummary: output.wipeReasonSummary,
       tankSwapSummary: output.tankSwapSummary,
       mechanicSummary: output.mechanicSummary,
       specDps: output.specDps,
+      specActiveDps: output.specActiveDps,
       resourceSummary: output.resourceSummary,
       deathSummary: output.deathSummary,
     },

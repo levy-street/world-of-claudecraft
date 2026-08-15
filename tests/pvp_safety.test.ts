@@ -319,7 +319,7 @@ describe('PvP control abilities in active duels', () => {
   it('duel stuns land at full duration on every repeat (stun DR exemption)', () => {
     const { sim, aPid, b } = startDuel('paladin', 'warrior', 20);
 
-    // Hammer of Justice at level 20 is rank 2: a 4s instant stun. As with Fear, a
+    // Sundering Gavel is a 3s instant stun. As with Fear, a
     // resisted stun applies nothing and does NOT advance diminishing returns, so
     // retry until it lands to keep the sequence stable against shared-RNG drift.
     const castStun = () => {
@@ -340,10 +340,10 @@ describe('PvP control abilities in active duels', () => {
     // Balance pass (maintainer): player stuns are EXEMPT from PvP diminishing
     // returns (they are short flat durations behind real cooldowns); every
     // repeat lands at full duration. Fear/polymorph/root keep their ladders.
-    expect(castStun()).toBe(4);
-    expect(castStun()).toBe(4);
-    expect(castStun()).toBe(4);
-    expect(castStun()).toBe(4);
+    expect(castStun()).toBe(3);
+    expect(castStun()).toBe(3);
+    expect(castStun()).toBe(3);
+    expect(castStun()).toBe(3);
   });
 
   it('keeps opener and controlled stuns on independent DR chains (#1004)', () => {
@@ -374,14 +374,14 @@ describe('PvP control abilities in active duels', () => {
 
     // The controlled stun is unaffected by the spent opener chain, and with
     // the stun-DR exemption every repeat stays full length.
-    expect(castStun()).toBe(4);
-    expect(castStun()).toBe(4);
-    expect(castStun()).toBe(4);
+    expect(castStun()).toBe(3);
+    expect(castStun()).toBe(3);
+    expect(castStun()).toBe(3);
   });
 
   it('does not diminish PvE stuns: a stun on a mob keeps full duration on repeat', () => {
     // DR is duel/PvP only (player source AND player target). A paladin stunning a
-    // hostile mob must always land the full 4s, no matter how many times in a row.
+    // hostile mob must always land the full 3s, no matter how many times in a row.
     const sim = new Sim({
       seed: 7,
       playerClass: 'paladin' as any,
@@ -424,9 +424,9 @@ describe('PvP control abilities in active duels', () => {
       return dur;
     };
 
-    expect(stunMob()).toBe(4);
-    expect(stunMob()).toBe(4);
-    expect(stunMob()).toBe(4);
-    expect(stunMob()).toBe(4);
+    expect(stunMob()).toBe(3);
+    expect(stunMob()).toBe(3);
+    expect(stunMob()).toBe(3);
+    expect(stunMob()).toBe(3);
   });
 });

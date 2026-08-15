@@ -6,6 +6,7 @@
 
 export const ADMIN_PERMISSIONS = [
   'analytics.read',
+  'analytics.manage',
   'ops_usage.read',
   'ops.perf',
   'accounts.read',
@@ -19,6 +20,7 @@ export const ADMIN_PERMISSIONS = [
   'content.moderate',
   'botdetector.read',
   'botdetector.configure',
+  'guildbank.purge',
   'staff.manage',
 ] as const;
 

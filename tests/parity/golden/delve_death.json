@@ -9,13 +9,13 @@
     "rebucket after delve respawn teleport"
   ],
   "draws": 1,
-  "drawDigest": "bc661a5d",
+  "drawDigest": "368503ad",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 819,
-      "state": "e1d2d2e5",
+      "nextId": 964,
+      "state": "1906bf73",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -36,11 +36,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -52,7 +52,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -70,7 +70,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -90,7 +93,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 814,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -142,12 +145,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 829,
-      "state": "2c7c6e2f",
-      "events": "5a3e5dcc",
+      "nextId": 974,
+      "state": "0e0a54bb",
+      "events": "585732f0",
       "rng": {
         "draws": 1,
-        "digest": "bc661a5d"
+        "digest": "368503ad"
       },
       "label": "delve-first-release",
       "players": [
@@ -164,11 +167,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -180,7 +183,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -199,7 +202,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -219,7 +225,7 @@
           "fallStartY": 2.077747,
           "fiveSecondRule": 99,
           "hp": 93,
-          "id": 814,
+          "id": 959,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -270,12 +276,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 829,
-      "state": "0d74e337",
-      "events": "e825df02",
+      "nextId": 974,
+      "state": "bcc6047f",
+      "events": "5532a61a",
       "rng": {
         "draws": 1,
-        "digest": "bc661a5d"
+        "digest": "368503ad"
       },
       "label": "delve-fail",
       "players": [
@@ -292,11 +298,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -318,7 +324,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -337,8 +343,11 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -355,10 +364,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 2.353205,
+          "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 814,
+          "id": 959,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -377,8 +386,8 @@
           "petMode": "defensive",
           "pos": {
             "x": -5,
-            "y": 2.353205,
-            "z": -56
+            "y": 2.266438,
+            "z": -54.044
           },
           "potionCooldownUntil": -1,
           "resource": 100,
@@ -410,12 +419,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 829,
-      "state": "0d74e337",
+      "nextId": 974,
+      "state": "bcc6047f",
       "events": "741638a5",
       "rng": {
         "draws": 1,
-        "digest": "bc661a5d"
+        "digest": "368503ad"
       },
       "label": "final",
       "players": [
@@ -432,11 +441,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -458,7 +467,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -477,8 +486,11 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -495,10 +507,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 2.353205,
+          "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 814,
+          "id": 959,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -517,8 +529,8 @@
           "petMode": "defensive",
           "pos": {
             "x": -5,
-            "y": 2.353205,
-            "z": -56
+            "y": 2.266438,
+            "z": -54.044
           },
           "potionCooldownUntil": -1,
           "resource": 100,

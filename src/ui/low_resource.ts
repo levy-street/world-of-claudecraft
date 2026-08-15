@@ -7,6 +7,7 @@
 // tested directly, mirroring xp_bar.ts. All display strings route through t().
 
 import type { ResourceType } from '../sim/types';
+import { clamp01 } from './clamp';
 import { t } from './i18n';
 
 export interface LowResourceInput {
@@ -26,16 +27,40 @@ export interface LowResourceView {
 export const LOW_RESOURCE_THRESHOLD = 0.25;
 
 export function lowResourceView(input: LowResourceInput): LowResourceView {
-  const { resource, maxResource, resourceType } = input;
-  const inactive: LowResourceView = { active: false, opacity: 0, pulseSeconds: 0, label: '' };
+  return lowResourceViewInto(
+    { active: false, opacity: 0, pulseSeconds: 0, label: '' },
+    input.resource,
+    input.maxResource,
+    input.resourceType,
+  );
+}
 
-  // Only mana/energy warn; rage and resource-less/degenerate frames are silent.
-  if (maxResource <= 0) return inactive;
-  if (resourceType !== 'mana' && resourceType !== 'energy') return inactive;
+export function lowResourceViewInto(
+  out: LowResourceView,
+  resource: number,
+  maxResource: number,
+  resourceType: ResourceType | null,
+): LowResourceView {
+  // Mana, energy, and Focus warn; rage and resource-less frames are silent.
+  if (
+    maxResource <= 0 ||
+    (resourceType !== 'mana' && resourceType !== 'energy' && resourceType !== 'focus')
+  ) {
+    out.active = false;
+    out.opacity = 0;
+    out.pulseSeconds = 0;
+    out.label = '';
+    return out;
+  }
 
   const frac = clamp01(resource / maxResource);
-  if (frac >= LOW_RESOURCE_THRESHOLD) return inactive;
-
+  if (frac >= LOW_RESOURCE_THRESHOLD) {
+    out.active = false;
+    out.opacity = 0;
+    out.pulseSeconds = 0;
+    out.label = '';
+    return out;
+  }
   // t: 0 at the threshold, 1 at empty.
   const tt = clamp01((LOW_RESOURCE_THRESHOLD - frac) / LOW_RESOURCE_THRESHOLD);
   // Ease the glow in (matches the low-health vignette feel) and keep a floor so
@@ -43,11 +68,15 @@ export function lowResourceView(input: LowResourceInput): LowResourceView {
   const opacity = 0.4 + tt ** 0.8 * 0.55;
   // Breathe slowly when just-low (~1.4s), urgently when near-empty (~0.5s).
   const pulseSeconds = 1.4 - tt * 0.9;
-  const label = resourceType === 'mana' ? t('game.hud.lowMana') : t('game.hud.lowEnergy');
-
-  return { active: true, opacity, pulseSeconds, label };
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
+  const label =
+    resourceType === 'mana'
+      ? t('game.hud.lowMana')
+      : resourceType === 'focus'
+        ? t('game.hud.lowFocus')
+        : t('game.hud.lowEnergy');
+  out.active = true;
+  out.opacity = opacity;
+  out.pulseSeconds = pulseSeconds;
+  out.label = label;
+  return out;
 }

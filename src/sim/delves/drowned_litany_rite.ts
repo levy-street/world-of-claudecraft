@@ -18,7 +18,12 @@ import {
   type RiteShrineKind,
 } from '../types';
 import { RITE_INTENSITY } from './rite_tuning';
-import { collectDelveChestLoot, grantDelveRewards, openDelveSurfaceExit } from './runs';
+import {
+  collectDelveChestLoot,
+  delveBonusMarksFor,
+  grantDelveRewards,
+  openDelveSurfaceExit,
+} from './runs';
 
 const RITE_PLAYBACK_STEP = 0.6; // seconds between sequence lights
 const RITE_REPEAT_GAP = 1.2; // longer dark beat between repeat playbacks
@@ -68,10 +73,16 @@ function emitPartyLog(ctx: SimContext, run: DelveRun, text: string, color: strin
   }
 }
 
-function grantRiteBonus(ctx: SimContext, run: DelveRun, tier: LootTier): void {
+// Paid to exactly the members grantDelveRewards just credited (see
+// delveBonusMarksFor in runs.ts for why the credited list is load-bearing).
+function grantRiteBonus(
+  ctx: SimContext,
+  run: DelveRun,
+  tier: LootTier,
+  creditedPids: number[],
+): void {
   const reward = LOCKPICK_TIER_REWARD[tier];
   const delve = DELVES[run.delveId];
-  const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
   const tierDef = delve.tiers.find((t) => t.id === run.tierId);
   const baseCopper = Math.round(
     ((tierDef?.copperMin ?? delve.baseRewards.copperMin) +
@@ -81,10 +92,13 @@ function grantRiteBonus(ctx: SimContext, run: DelveRun, tier: LootTier): void {
   const bonusCopper = Math.round(baseCopper * (reward.copperMult - 1));
   // The Drowned Litany pays double Marks vs. the Collapsed Reliquary's lockpick
   // chest (delve index 1 vs. 0): a deliberate currency-curve step.
-  const bonusMarks = reward.bonusMarks * 2;
-  for (const pid of members) {
+  const fullBonusMarks = reward.bonusMarks * 2;
+  for (const pid of creditedPids) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
+    // Bonus Marks only ride a clear inside the daily window (per member); the
+    // copper bonus and the loot tier are unaffected. See delveBonusMarksFor.
+    const bonusMarks = delveBonusMarksFor(meta, fullBonusMarks);
     meta.delveMarks += bonusMarks;
     meta.copper += bonusCopper;
     ctx.emit({ type: 'lockpickBonus', tier, marks: bonusMarks, copper: bonusCopper, pid });
@@ -236,8 +250,8 @@ function openDrownedReliquary(
     obj.name = 'Opened Drowned Reliquary';
     obj.templateId = 'delve_drowned_reliquary_open';
   }
-  grantDelveRewards(ctx, run);
-  grantRiteBonus(ctx, run, tier);
+  const credited = grantDelveRewards(ctx, run);
+  grantRiteBonus(ctx, run, tier, credited);
   openDelveSurfaceExit(ctx, run);
   for (const pid of members) {
     ctx.emit({

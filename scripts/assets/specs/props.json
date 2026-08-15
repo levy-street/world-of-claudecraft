@@ -1,47 +1,205 @@
 {
   "items": [
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Fantasy_House_1.glb", "out": "models/props/house_1.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Fantasy_House_2.glb", "out": "models/props/house_2.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Fantasy_House_3.glb", "out": "models/props/house_3.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Blacksmith.glb", "out": "models/props/blacksmith.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Fantasy_Inn.glb", "out": "models/props/inn.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Bell_Tower.glb", "out": "models/props/bell_tower.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Well.glb", "out": "models/props/well.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Market_Stand_1.glb", "out": "models/props/market_stand_1.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Market_Stand_2.glb", "out": "models/props/market_stand_2.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Cart.glb", "out": "models/props/cart.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Fence.glb", "out": "models/props/fence.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Bonfire.glb", "out": "models/props/bonfire.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_village/Rocks.glb", "out": "models/props/ore_rocks.glb", "type": "static" },
+    {
+      "src": "tmp/asset_src/quaternius_village/Fantasy_House_1.glb",
+      "out": "models/props/house_1.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Fantasy_House_2.glb",
+      "out": "models/props/house_2.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Fantasy_House_3.glb",
+      "out": "models/props/house_3.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Blacksmith.glb",
+      "out": "models/props/blacksmith.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Fantasy_Inn.glb",
+      "out": "models/props/inn.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Bell_Tower.glb",
+      "out": "models/props/bell_tower.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Well.glb",
+      "out": "models/props/well.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Market_Stand_1.glb",
+      "out": "models/props/market_stand_1.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Market_Stand_2.glb",
+      "out": "models/props/market_stand_2.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Cart.glb",
+      "out": "models/props/cart.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Fence.glb",
+      "out": "models/props/fence.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Bonfire.glb",
+      "out": "models/props/bonfire.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/quaternius_village/Rocks.glb",
+      "out": "models/props/ore_rocks.glb",
+      "type": "static"
+    },
 
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/tent_detailedOpen.glb", "out": "models/props/tent_open.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/tent_smallOpen.glb", "out": "models/props/tent_small.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_tallA.glb", "out": "models/props/rock_tall_a.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_tallH.glb", "out": "models/props/rock_tall_h.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_largeD.glb", "out": "models/props/rock_large_d.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_largeF.glb", "out": "models/props/rock_large_f.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/mushroom_red.glb", "out": "models/props/mushroom_red.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/mushroom_tan.glb", "out": "models/props/mushroom_tan.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_column.glb", "out": "models/props/column.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_columnDamaged.glb", "out": "models/props/column_broken.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_head.glb", "out": "models/props/statue_head.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_block.glb", "out": "models/props/statue_block.glb", "type": "static" },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/tent_detailedOpen.glb",
+      "out": "models/props/tent_open.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/tent_smallOpen.glb",
+      "out": "models/props/tent_small.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_tallA.glb",
+      "out": "models/props/rock_tall_a.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_tallH.glb",
+      "out": "models/props/rock_tall_h.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_largeD.glb",
+      "out": "models/props/rock_large_d.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/rock_largeF.glb",
+      "out": "models/props/rock_large_f.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/mushroom_red.glb",
+      "out": "models/props/mushroom_red.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/mushroom_tan.glb",
+      "out": "models/props/mushroom_tan.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_column.glb",
+      "out": "models/props/column.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_columnDamaged.glb",
+      "out": "models/props/column_broken.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_head.glb",
+      "out": "models/props/statue_head.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/nature-kit/Models/GLTF format/statue_block.glb",
+      "out": "models/props/statue_block.glb",
+      "type": "static"
+    },
 
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/pirate-kit/Models/GLB format/structure-platform-dock.glb", "out": "models/props/dock_platform.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/pirate-kit/Models/GLB format/boat-row-small.glb", "out": "models/props/rowboat.glb", "type": "static" },
+    {
+      "src": "tmp/asset_src/kenney/pirate-kit/Models/GLB format/structure-platform-dock.glb",
+      "out": "models/props/dock_platform.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/pirate-kit/Models/GLB format/boat-row-small.glb",
+      "out": "models/props/rowboat.glb",
+      "type": "static"
+    },
 
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-round.glb", "out": "models/props/gravestone_round.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-cross.glb", "out": "models/props/gravestone_cross.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-bevel.glb", "out": "models/props/gravestone_bevel.glb", "type": "static" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-decorative.glb", "out": "models/props/gravestone_decorative.glb", "type": "static" },
+    {
+      "src": "tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-round.glb",
+      "out": "models/props/gravestone_round.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-cross.glb",
+      "out": "models/props/gravestone_cross.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-bevel.glb",
+      "out": "models/props/gravestone_bevel.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/kenney/graveyard-kit/Models/GLB format/gravestone-decorative.glb",
+      "out": "models/props/gravestone_decorative.glb",
+      "type": "static"
+    },
 
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/fantasy-town-kit/Models/GLB format/pillar-wood.glb", "out": "models/props/timber_pillar.glb", "type": "static" },
+    {
+      "src": "tmp/asset_src/kenney/fantasy-town-kit/Models/GLB format/pillar-wood.glb",
+      "out": "models/props/timber_pillar.glb",
+      "type": "static"
+    },
 
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_props/extracted/glTF/Crate_Wooden.gltf", "out": "models/props/crate_wooden.glb", "type": "static", "maxTex": 1024 },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_props/extracted/glTF/FarmCrate_Apple.gltf", "out": "models/props/farmcrate_apple.glb", "type": "static", "maxTex": 1024 },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_props/extracted/glTF/Barrel.gltf", "out": "models/props/barrel.glb", "type": "static", "maxTex": 1024 },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_props/extracted/glTF/Anvil.gltf", "out": "models/props/anvil.glb", "type": "static", "maxTex": 1024 },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_props/extracted/glTF/WeaponStand.gltf", "out": "models/props/weapon_stand.glb", "type": "static", "maxTex": 1024 },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/quaternius_props/extracted/glTF/Lantern_Wall.gltf", "out": "models/props/lantern_wall.glb", "type": "static", "maxTex": 1024 }
+    {
+      "src": "tmp/asset_src/quaternius_props/extracted/glTF/Crate_Wooden.gltf",
+      "out": "models/props/crate_wooden.glb",
+      "type": "static",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/quaternius_props/extracted/glTF/FarmCrate_Apple.gltf",
+      "out": "models/props/farmcrate_apple.glb",
+      "type": "static",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/quaternius_props/extracted/glTF/Barrel.gltf",
+      "out": "models/props/barrel.glb",
+      "type": "static",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/quaternius_props/extracted/glTF/Anvil.gltf",
+      "out": "models/props/anvil.glb",
+      "type": "static",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/quaternius_props/extracted/glTF/WeaponStand.gltf",
+      "out": "models/props/weapon_stand.glb",
+      "type": "static",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/quaternius_props/extracted/glTF/Lantern_Wall.gltf",
+      "out": "models/props/lantern_wall.glb",
+      "type": "static",
+      "maxTex": 1024
+    }
   ]
 }

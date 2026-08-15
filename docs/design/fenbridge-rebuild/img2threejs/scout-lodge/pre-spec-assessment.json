@@ -1,0 +1,203 @@
+{
+  "targetName": "Fenbridge Fenwatch Scout Lodge",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/hero.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "exterior-only scout lodge and north-gate patrol post",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized low-poly", "sturdy timber barracks", "swamp watchpost"],
+      "structureKind": [
+        "closed lodge shell",
+        "offset open lookout",
+        "raised porch",
+        "map-and-weapon lean-to"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed scout service socket",
+        "fixed mast streamers"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "teal cloth",
+        "parchment and iron"
+      ],
+      "notes": "The mast streamers are modeled in one fixed wind pose; blank map shapes contain no readable markings."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 13,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The steep lodge roof and offset open lookout with signal mast form a unique multi-height silhouette.",
+        "The right lean-to must expose a blank map table and simplified weapon rack while preserving a clear x=0 entrance approach.",
+        "Streamer curvature, weapon count and tiny map marks vary or are not legible; shipping uses fixed abstract forms."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The lookout and open service lean-to require true depth and negative space rather than facade cards."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "steep-gable",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "steep-front-gable" }
+        },
+        {
+          "id": "open-lookout",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "open-lookout-perch" }
+        },
+        {
+          "id": "lookout-rail",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "lookout-balustrade" }
+        },
+        {
+          "id": "signal-mast",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "signal-mast-crossarm" }
+        },
+        {
+          "id": "teal-streamers",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "fixed-teal-streamers" }
+        },
+        {
+          "id": "map-table",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "sloped-map-table" }
+        },
+        {
+          "id": "blank-map-shapes",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/blank-map-patches"
+          }
+        },
+        {
+          "id": "weapon-rack",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "simple-weapon-rack" }
+        },
+        {
+          "id": "porch-approach",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "centered-porch-steps" }
+        },
+        {
+          "id": "warm-lodge-lights",
+          "kind": "emissive",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-emissive/warm-lodge-glow"
+          }
+        }
+      ]
+    },
+    "anatomy": { "applies": false }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "The 8 by 7.6 by 6.5 yard lodge reads as a north-gate scout post through its open lookout, mast streamers and map/weapon lean-to while the x=0 door and service apron remain clear."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "lodge-silhouette",
+        "name": "Steep lodge and offset lookout",
+        "required": true,
+        "qualityCriteria": ["Open tower, canopy and mast rise distinctly above the gable."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
+      },
+      {
+        "id": "map-service",
+        "name": "Exterior blank map table",
+        "required": true,
+        "qualityCriteria": ["Sloped table remains readable and approachable without text."],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["scout service cue is absent"]
+      },
+      {
+        "id": "patrol-gear",
+        "name": "Simple weapon rack and patrol gear",
+        "required": true,
+        "qualityCriteria": ["Abstract spear and bow silhouettes stay attached under the lean-to."],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["gear becomes detailed or loose clutter"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Teal, timber, parchment, iron and amber separation",
+        "required": true,
+        "qualityCriteria": ["Two-bucket merge preserves service and lookout readability."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["lean-to becomes undifferentiated clutter"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "lookout height and void",
+      "mast and two streamers",
+      "centered x=0 entry",
+      "sloped map table",
+      "simple weapon silhouettes"
+    ],
+    "antiShallowSpecRules": [
+      "Do not replace the open lookout with a solid box.",
+      "Do not turn the lean-to into an interior cutaway."
+    ],
+    "mustNotDo": [
+      "No readable map text.",
+      "No detailed weapons.",
+      "No loose service-apron clutter."
+    ]
+  },
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge scout lodge lookout perch signal mast map table weapon rack procedural low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  }
+}

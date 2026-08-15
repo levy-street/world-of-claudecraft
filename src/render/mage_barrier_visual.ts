@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import { clamp01 } from './num_clamp';
 
 const REFERENCE_CHARACTER_HEIGHT = 1.8;
 const REVEAL_SECONDS = 0.22;
 const BREAK_SECONDS = 0.28;
 const MOTE_COUNT = 12;
 
-export type MageBarrierTheme = 'frost' | 'fire' | 'temporal';
+export type MageBarrierTheme = 'frost' | 'fire' | 'temporal' | 'holy';
 
 export interface MageBarrierState {
   theme: MageBarrierTheme;
@@ -25,15 +26,12 @@ const PALETTES: Record<MageBarrierTheme, BarrierPalette> = {
   frost: { shell: 0x64cfff, rune: 0xc9f3ff, mote: 0xe9fbff },
   fire: { shell: 0xff6b32, rune: 0xffd08a, mote: 0xfff0c2 },
   temporal: { shell: 0x9f6cff, rune: 0x67e8f9, mote: 0xe9d5ff },
+  holy: { shell: 0xf2bd42, rune: 0xffed9b, mote: 0xfff7cf },
 };
 
 const SHELL_GEOMETRY = new THREE.SphereGeometry(0.98, 24, 16);
 const RUNE_GEOMETRY = new THREE.TorusGeometry(0.9, 0.025, 5, 48);
 const MOTE_GEOMETRY = new THREE.OctahedronGeometry(0.055, 0);
-
-function clamp01(value: number): number {
-  return Math.max(0, Math.min(1, value));
-}
 
 function easeOutCubic(t: number): number {
   const u = 1 - t;
@@ -80,7 +78,9 @@ export function mageBarrierStateForAura(
               : aura.school === 'fire'
                 ? 'fire'
                 : 'frost'
-            : null;
+            : aura.id === 'divine_protection'
+              ? 'holy'
+              : null;
   if (!theme) return null;
   if (out) {
     out.theme = theme;
@@ -104,6 +104,7 @@ export class MageBarrierVisual {
   brokeThisFrame = false;
 
   private readonly shellMaterial: THREE.MeshBasicMaterial;
+  private readonly shell: THREE.Mesh;
   private readonly runeMaterial: THREE.MeshBasicMaterial;
   private readonly moteMaterial: THREE.MeshBasicMaterial;
   private readonly runeBands = new THREE.Group();
@@ -139,12 +140,11 @@ export class MageBarrierVisual {
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
     });
-    const shell = new THREE.Mesh(SHELL_GEOMETRY, this.shellMaterial);
-    shell.name = 'mage-barrier-shell';
-    shell.position.y = 1.04;
-    shell.scale.y = 1.12;
-    shell.renderOrder = 10;
-    content.add(shell);
+    this.shell = new THREE.Mesh(SHELL_GEOMETRY, this.shellMaterial);
+    this.shell.name = 'mage-barrier-shell';
+    this.shell.position.y = 1.04;
+    this.shell.renderOrder = 10;
+    content.add(this.shell);
 
     this.runeMaterial = new THREE.MeshBasicMaterial({
       color: palette.rune,
@@ -184,7 +184,14 @@ export class MageBarrierVisual {
     content.add(this.motes);
 
     this.group.add(content);
+    this.applyShape(theme);
     this.updateMotes(0, 1);
+  }
+
+  private applyShape(theme: MageBarrierTheme): void {
+    const holy = theme === 'holy';
+    this.shell.scale.set(holy ? 0.76 : 1, holy ? 1.22 : 1.12, holy ? 0.76 : 1);
+    this.runeBands.scale.set(holy ? 0.8 : 1, 1, holy ? 0.8 : 1);
   }
 
   private applyPalette(theme: MageBarrierTheme): void {
@@ -192,6 +199,7 @@ export class MageBarrierVisual {
     this.shellMaterial.color.setHex(palette.shell);
     this.runeMaterial.color.setHex(palette.rune);
     this.moteMaterial.color.setHex(palette.mote);
+    this.applyShape(theme);
   }
 
   dispose(): void {
@@ -208,7 +216,8 @@ export class MageBarrierVisual {
     for (let i = 0; i < MOTE_COUNT; i++) {
       const phase = (i / MOTE_COUNT + this.elapsed * (0.14 + (i % 3) * 0.015)) % 1;
       const angle = i * 2.39996 + this.elapsed * (0.34 + (i % 2) * 0.08);
-      const radius = 0.79 + Math.sin(i * 1.7 + this.elapsed * 1.4) * 0.08;
+      const radius =
+        (this.theme === 'holy' ? 0.63 : 0.79) + Math.sin(i * 1.7 + this.elapsed * 1.4) * 0.08;
       this.moteDummy.position.set(
         Math.cos(angle) * radius,
         0.22 + phase * 1.66,

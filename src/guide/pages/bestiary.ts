@@ -6,6 +6,7 @@
 // camp and drops elite/boss and summon-only encounter adds, so dungeon and raid encounters
 // never appear here.
 
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t, tOptional } from '../../ui/i18n';
 import { iconDataUrl } from '../../ui/icons';
@@ -15,6 +16,7 @@ import type { GuidePage } from './types';
 import { lead, related } from './ui';
 
 const familyCrest = (family: string): string => iconDataUrl('crest', `family_${family}`, 96);
+const familyCrestId = (family: string): string => `family_${family}`;
 
 function band(c: GuideCreature): string {
   return c.min === c.max
@@ -31,19 +33,22 @@ function creatureFlavor(c: GuideCreature): string {
 }
 
 // Each creature card pairs a pre-rendered still of the creature with its name and level
-// band. The still falls back to the family crest only if a render is somehow absent (the
-// guide.test asset guard makes that a build failure, not a runtime hole).
+// band. The still falls back to the family crest if a render is absent or fails at runtime (the
+// guide.test asset guard makes absence a build failure, not a runtime hole).
 function creatureCard(c: GuideCreature, family: string): string {
   const rare = c.rare
     ? `<span class="guide-badge guide-badge-rare">${esc(t('guide.bestiary.rare'))}</span>`
     : '';
   const img = c.still ?? familyCrest(family);
+  const fallback = ` ${crestImageFallbackAttributes(familyCrestId(family), 96, {
+    decorative: true,
+  })}`;
   // The still IS the subject, so its alt names the creature (via the shared viewer key, the
   // same path embed.ts uses); the crest fallback is decoration (alt="").
   const alt = c.still ? esc(t('guide.viewer.posterAlt', { name: c.name })) : '';
   return `<li class="guide-creature">
     <div class="guide-creature-thumb">
-      <img class="guide-creature-still" src="${esc(img)}" alt="${alt}" width="88" height="88" loading="lazy" decoding="async" />
+      <img class="guide-creature-still" src="${esc(img)}"${fallback} alt="${alt}" width="88" height="88" loading="lazy" decoding="async" />
     </div>
     <div class="guide-creature-info">
       <span class="guide-creature-name">${esc(c.name)}${rare}</span>
@@ -62,7 +67,7 @@ export const bestiary: GuidePage = {
       return `
           <section class="guide-family" id="fam-${esc(f.family)}">
             <div class="guide-family-head">
-              <img class="guide-family-crest" src="${esc(familyCrest(f.family))}" alt="" width="56" height="56" loading="lazy" decoding="async" />
+              <img class="guide-family-crest" src="${esc(familyCrest(f.family))}" ${crestImageFallbackAttributes(familyCrestId(f.family), 96)} alt="" width="56" height="56" loading="lazy" decoding="async" />
               <div>
                 <h2 class="guide-family-name">${esc(t(nameKey))}</h2>
                 <p class="guide-family-desc">${esc(t(descKey))}</p>

@@ -1,0 +1,327 @@
+{
+  "kind": "hitch-gate",
+  "v": 1,
+  "frozen": true,
+  "calibratedAt": "2026-08-09T12:06:33.316Z",
+  "calibrationRuns": 3,
+  "commit": "c375360bdd4f",
+  "calibrationBuildId": "801782218572549f",
+  "preset": "insane",
+  "viewport": "1280x720",
+  "machine": "Apple M4 Pro arm64 24GB",
+  "browserVersion": "Chrome/151.0.7922.76",
+  "browserFlags": [
+    "--user-data-dir=<fresh-temp>",
+    "--window-size=1280,840",
+    "--ignore-gpu-blocklist",
+    "--enable-gpu",
+    "--disable-gpu-vsync",
+    "--disable-frame-rate-limit",
+    "--autoplay-policy=no-user-gesture-required",
+    "--disable-gpu-shader-disk-cache",
+    "--disable-crashpad-for-testing",
+    "--disable-crash-reporter",
+    "--disable-breakpad",
+    "--enable-precise-memory-info",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-background-timer-throttling",
+    "--disable-renderer-backgrounding",
+    "--mute-audio"
+  ],
+  "glRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+  "scenarios": {
+    "cold-zone-entry": {
+      "warmupMs": 3000,
+      "measureMs": 12000,
+      "longFrames": {
+        "kind": "calibrated",
+        "samples": [
+          13,
+          12,
+          14
+        ],
+        "observedRange": 2,
+        "noiseFloor": 0
+      },
+      "worstFrameMs": {
+        "kind": "mission",
+        "samples": [
+          588.2,
+          574.9,
+          576.4
+        ],
+        "target": 100
+      },
+      "pageErrorCount": {
+        "kind": "mission",
+        "samples": [
+          0,
+          0,
+          0
+        ],
+        "target": 0
+      },
+      "allocationRateMbPerSec": {
+        "kind": "calibrated",
+        "samples": [
+          9.02,
+          10.62,
+          9.63
+        ],
+        "observedRange": 1.6,
+        "bound": 12.22
+      }
+    },
+    "crowd-influx": {
+      "warmupMs": 3000,
+      "measureMs": 18000,
+      "longFrames": {
+        "kind": "calibrated",
+        "samples": [
+          1,
+          2,
+          2
+        ],
+        "observedRange": 1,
+        "noiseFloor": 0
+      },
+      "worstFrameMs": {
+        "kind": "mission",
+        "samples": [
+          60.2,
+          60.1,
+          59
+        ],
+        "target": 100
+      },
+      "pageErrorCount": {
+        "kind": "mission",
+        "samples": [
+          0,
+          0,
+          0
+        ],
+        "target": 0
+      },
+      "allocationRateMbPerSec": {
+        "kind": "calibrated",
+        "samples": [
+          6.98,
+          8.82,
+          8.53
+        ],
+        "observedRange": 1.84,
+        "bound": 10.66
+      },
+      "programCompiles": {
+        "kind": "mission",
+        "samples": [
+          71,
+          67,
+          70
+        ],
+        "target": 0
+      }
+    },
+    "cosmetic-churn": {
+      "warmupMs": 5000,
+      "measureMs": 20000,
+      "longFrames": {
+        "kind": "calibrated",
+        "samples": [
+          4,
+          5,
+          4
+        ],
+        "observedRange": 1,
+        "noiseFloor": 0
+      },
+      "worstFrameMs": {
+        "kind": "mission",
+        "samples": [
+          73.2,
+          74.7,
+          79
+        ],
+        "target": 100
+      },
+      "pageErrorCount": {
+        "kind": "mission",
+        "samples": [
+          0,
+          0,
+          0
+        ],
+        "target": 0
+      },
+      "allocationRateMbPerSec": {
+        "kind": "calibrated",
+        "samples": [
+          7.61,
+          8.87,
+          7.8
+        ],
+        "observedRange": 1.26,
+        "bound": 10.13
+      },
+      "programCompiles": {
+        "kind": "mission",
+        "samples": [
+          48,
+          44,
+          47
+        ],
+        "target": 0
+      }
+    },
+    "sky-crossing": {
+      "warmupMs": 3000,
+      "measureMs": 18000,
+      "longFrames": {
+        "kind": "calibrated",
+        "samples": [
+          9,
+          9,
+          10
+        ],
+        "observedRange": 1,
+        "noiseFloor": 0
+      },
+      "worstFrameMs": {
+        "kind": "mission",
+        "samples": [
+          581,
+          574.6,
+          571.8
+        ],
+        "target": 100
+      },
+      "pageErrorCount": {
+        "kind": "mission",
+        "samples": [
+          0,
+          0,
+          0
+        ],
+        "target": 0
+      },
+      "allocationRateMbPerSec": {
+        "kind": "calibrated",
+        "samples": [
+          7.87,
+          3.9,
+          5
+        ],
+        "observedRange": 3.97,
+        "bound": 11.84
+      }
+    },
+    "soak": {
+      "warmupMs": 15000,
+      "measureMs": 600000,
+      "longFrames": {
+        "kind": "calibrated",
+        "samples": [
+          3,
+          3,
+          3
+        ],
+        "observedRange": 0,
+        "noiseFloor": 0
+      },
+      "worstFrameMs": {
+        "kind": "mission",
+        "samples": [
+          79.9,
+          76.8,
+          76.3
+        ],
+        "target": 100
+      },
+      "pageErrorCount": {
+        "kind": "mission",
+        "samples": [
+          0,
+          0,
+          0
+        ],
+        "target": 0
+      },
+      "allocationRateMbPerSec": {
+        "kind": "calibrated",
+        "samples": [
+          3.55,
+          3.91,
+          4.18
+        ],
+        "observedRange": 0.63,
+        "bound": 4.81
+      },
+      "settledHeapDeltaMb": {
+        "kind": "calibrated",
+        "samples": [
+          23.37,
+          23.7,
+          24.57
+        ],
+        "observedRange": 1.2,
+        "relativeSpread": 0.05,
+        "bound": 25.77
+      }
+    },
+    "combat-vfx-burst": {
+      "warmupMs": 3000,
+      "measureMs": 18000,
+      "longFrames": {
+        "kind": "calibrated",
+        "samples": [
+          2,
+          0,
+          2
+        ],
+        "observedRange": 2,
+        "noiseFloor": 2
+      },
+      "worstFrameMs": {
+        "kind": "mission",
+        "samples": [
+          72.2,
+          42.4,
+          92.2
+        ],
+        "target": 100
+      },
+      "pageErrorCount": {
+        "kind": "mission",
+        "samples": [
+          0,
+          0,
+          0
+        ],
+        "target": 0
+      },
+      "allocationRateMbPerSec": {
+        "kind": "calibrated",
+        "samples": [
+          2.85,
+          1.2,
+          2.61
+        ],
+        "observedRange": 1.65,
+        "bound": 4.5
+      }
+    }
+  },
+  "mission": {
+    "maxProgramCompiles": 0,
+    "maxWorstFrameMs": 100,
+    "maxPageErrors": 0,
+    "maxSoakSettledHeapRelativeSpread": 0.35
+  },
+  "missionStraddles": [],
+  "reproducibility": {
+    "sameBuild": true,
+    "noCalibratedVerdictFlaps": true,
+    "missionStraddleCount": 0
+  }
+}

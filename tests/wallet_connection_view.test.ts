@@ -3,7 +3,7 @@ import { resolveWalletCapability } from '../src/net/wallet_capability';
 import { buildWalletConnectionView } from '../src/ui/wallet_connection_view';
 
 describe('wallet host capability', () => {
-  it('enables website and mobile web but not Capacitor native', async () => {
+  it('enables website and mobile web but keeps unknown Capacitor native hosts disabled', async () => {
     await expect(
       resolveWalletCapability({
         disabled: false,
@@ -18,6 +18,54 @@ describe('wallet host capability', () => {
         nativeApp: true,
         desktopApp: false,
         bridge: null,
+      }),
+    ).resolves.toBe(false);
+  });
+
+  it('enables wallet connection only for an MWA-capable Seeker dApp Store build', async () => {
+    await expect(
+      resolveWalletCapability({
+        disabled: false,
+        nativeApp: true,
+        desktopApp: false,
+        bridge: {
+          solanaMobileCapabilities: async () => ({
+            distribution: 'solana-dapp-store',
+            device: 'seeker',
+            mwaAvailable: true,
+          }),
+        },
+      }),
+    ).resolves.toBe(true);
+
+    for (const capabilities of [
+      { distribution: 'google-play', device: 'seeker', mwaAvailable: true },
+      { distribution: 'solana-dapp-store', device: 'other', mwaAvailable: true },
+      { distribution: 'solana-dapp-store', device: 'seeker', mwaAvailable: false },
+      { distribution: 'unknown', device: 'seeker', mwaAvailable: true },
+    ] as const) {
+      await expect(
+        resolveWalletCapability({
+          disabled: false,
+          nativeApp: true,
+          desktopApp: false,
+          bridge: { solanaMobileCapabilities: async () => capabilities },
+        }),
+      ).resolves.toBe(false);
+    }
+  });
+
+  it('fails closed when the native capability bridge throws', async () => {
+    await expect(
+      resolveWalletCapability({
+        disabled: false,
+        nativeApp: true,
+        desktopApp: false,
+        bridge: {
+          solanaMobileCapabilities: async () => {
+            throw new Error('native bridge unavailable');
+          },
+        },
       }),
     ).resolves.toBe(false);
   });

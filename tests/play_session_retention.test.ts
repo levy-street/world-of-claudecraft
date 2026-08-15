@@ -99,8 +99,8 @@ describe('clampPlaySessionRetentionDays', () => {
   it('pins the floor strictly above the 30-day admin activity window', () => {
     expect(PLAY_SESSION_RETENTION_FLOOR_DAYS).toBe(45);
     // The admin dashboard's registrations/sessions charts read a 30-day
-    // play_sessions window (ACTIVITY_WINDOW_DAYS in server/admin.ts); the
-    // floor sits strictly above it so a fold can never delete a row those
+    // play_sessions window (ACTIVITY_WINDOW_DAYS in server/admin_activity_cache.ts);
+    // the floor sits strictly above it so a fold can never delete a row those
     // windows still count.
     expect(PLAY_SESSION_RETENTION_FLOOR_DAYS).toBeGreaterThan(30);
   });

@@ -32,8 +32,17 @@ import {
   WATER_LEVEL,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
+import { cloneGeometryForBake } from './geometry_bake_clone';
 import { GFX, surfaceMat } from './gfx';
+import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
+import {
+  applySurfaceDetail,
+  applyWornStone,
+  detailedSurfaceMat,
+  GREAT_TREE_BARK_DETAIL,
+  isBarkMaterialName,
+} from './worn_stone';
 
 const MUSHROOM_URLS = ['/models/props/mushroom_red.glb', '/models/props/mushroom_tan.glb'];
 const BOULDER_URL = '/models/props/rock_large_d.glb';
@@ -50,7 +59,7 @@ const SEA_ROCK_URLS = [
 // loader cache is immutable, so the scene is cloned before use).
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
 let greatTreeScene: THREE.Group | null = null;
-registerPreload(
+registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
     greatTreeScene = gltf.scene;
   }),
@@ -65,20 +74,14 @@ interface ModelPart {
 }
 const loadedParts = new Map<string, ModelPart[]>();
 for (const url of new Set([...MUSHROOM_URLS, BOULDER_URL, ...SEA_ROCK_URLS])) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(url).then((gltf) => {
       gltf.scene.updateMatrixWorld(true);
       const parts: ModelPart[] = [];
       gltf.scene.traverse((obj) => {
         const mesh = obj as THREE.Mesh;
         if (!mesh.isMesh) return;
-        const src = mesh.geometry;
-        const geo = new THREE.BufferGeometry();
-        for (const name of ['position', 'normal', 'uv']) {
-          const attr = src.getAttribute(name);
-          if (attr) geo.setAttribute(name, attr.clone());
-        }
-        if (src.index) geo.setIndex(src.index.clone());
+        const geo = cloneGeometryForBake(mesh.geometry);
         geo.applyMatrix4(mesh.matrixWorld);
         parts.push({ geometry: geo, material: mesh.material as THREE.Material });
       });
@@ -592,6 +595,14 @@ function blossomGeo(): { trunk: THREE.BufferGeometry; canopy: THREE.BufferGeomet
 export interface RealmFloraView {
   group: THREE.Group;
   glowLights: THREE.PointLight[];
+  /**
+   * Meshes update(time) moves via their OBJECT transform (foam rings, mist
+   * banks). The renderer freezes the whole group after attach, so it must
+   * re-enable matrixAutoUpdate on exactly these (the props.flames idiom), or
+   * the swell and drift are silently inert. The flock is absent on purpose:
+   * it animates through instanceMatrix, which the freeze never touches.
+   */
+  animated: THREE.Object3D[];
   update(time: number): void;
 }
 
@@ -817,9 +828,12 @@ export function buildRealmFlora(seed: number): RealmFloraView {
 
   // --- weeping willows on the lakeshores ---
   const willow = willowGeo();
-  instance(willow.trunk, surfaceMat({ color: WILLOW_BARK, roughness: 0.9 }), spots.willows, {
-    castShadow: true,
-  });
+  instance(
+    willow.trunk,
+    detailedSurfaceMat({ color: WILLOW_BARK, roughness: 0.9 }, 'bark'),
+    spots.willows,
+    { castShadow: true },
+  );
   instance(
     perFaceShade(willow.canopy, 0.12, seed + 621),
     floraMat({ color: WILLOW_LEAF, roughness: 0.85, flatShading: true, vertexColors: true }),
@@ -829,9 +843,12 @@ export function buildRealmFlora(seed: number): RealmFloraView {
 
   // --- blossom trees, two pinks ---
   const blossom = blossomGeo();
-  instance(blossom.trunk, surfaceMat({ color: BLOSSOM_BARK, roughness: 0.9 }), spots.blossoms, {
-    castShadow: true,
-  });
+  instance(
+    blossom.trunk,
+    detailedSurfaceMat({ color: BLOSSOM_BARK, roughness: 0.9 }, 'bark'),
+    spots.blossoms,
+    { castShadow: true },
+  );
   const blossomShaded = perFaceShade(blossom.canopy, 0.15, seed + 631, 0.12);
   for (const variant of [0, 1]) {
     instance(
@@ -858,6 +875,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         const nm = (part.material.name || '').toLowerCase();
         mat.color.set(nm.includes('grass') ? 0x6f7a76 : 0x8a8e93);
       }
+      // untextured kit rock: the worn triplanar layer can run a touch
+      // stronger here without fighting a palette map (the minerock strength)
+      applyWornStone(mat, { strength: 0.6 });
       instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }
   }
@@ -875,6 +895,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         const mat = part.material.clone() as THREE.MeshStandardMaterial;
         if ('color' in mat) mat.color.multiply(new THREE.Color(SEA_STONE));
         if ('roughness' in mat) mat.roughness = 0.95;
+        // sea-worn stone: default subtle strength, mortar grime reads as salt
+        // staining at the waterline
+        applyWornStone(mat);
         instance(part.geometry, mat, rocks, {
           sink: 0.18,
           castShadow: true,
@@ -953,13 +976,10 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       mctx.fillStyle = side;
       mctx.fillRect(0, 0, 128, 32);
       const mistTex = new THREE.CanvasTexture(mistCanvas);
-      for (const [mx, mz, w, hgt, op] of [
-        [-90, 1315, 150, 9, 0.32],
-        [40, 1350, 190, 11, 0.36],
-        [130, 1310, 120, 8, 0.3],
-        [-30, 1408, 240, 14, 0.44],
-        [110, 1420, 170, 12, 0.4],
-      ] as const) {
+      // Placements live in sea_mist_core.ts, where a guard test holds every
+      // bank (drift included) over open water: a bank that crosses land cuts a
+      // hard pale line across the terrain at its z.
+      for (const { x: mx, z: mz, width: w, height: hgt, opacity: op } of SEA_MIST_BANKS) {
         const mist = new THREE.Mesh(
           new THREE.PlaneGeometry(w, hgt),
           new THREE.MeshBasicMaterial({
@@ -994,13 +1014,7 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         rctx.fillStyle = fade;
         rctx.fillRect(0, 0, 32, 128);
         const rayTex = new THREE.CanvasTexture(rayCanvas);
-        for (const [rx, rz, hgt, op, phase] of [
-          [-120, 1340, 42, 0.1, 0],
-          [-45, 1385, 55, 0.13, 1.7],
-          [85, 1360, 48, 0.11, 3.1],
-          [150, 1395, 50, 0.12, 4.4],
-          [10, 1300, 38, 0.09, 5.6],
-        ] as const) {
+        for (const { x: rx, z: rz, height: hgt, opacity: op, phase } of SEA_LIGHT_RAYS) {
           const mat = new THREE.MeshBasicMaterial({
             map: rayTex,
             transparent: true,
@@ -1034,6 +1048,32 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         new THREE.MeshBasicMaterial({ color: 0x4a3f55, side: THREE.DoubleSide }),
         FLOCK_SIZE,
       );
+      // Seed every instance on its time-zero orbit BEFORE the first update():
+      // fresh instance matrices are all-zero, which parks the bounding volume
+      // at the world origin and stretched the group's cull footprint by ~900u
+      // (374x1442 measured), keeping the whole realm's flora drawn from
+      // anywhere in the west column. The seed covers only the starting arc,
+      // not the full orbit the birds trace, so frustum culling is off for
+      // these 11 instances rather than trusting a sphere they leave.
+      flock.frustumCulled = false;
+      {
+        const sm = new THREE.Matrix4();
+        const sq = new THREE.Quaternion();
+        const sup = new THREE.Vector3(0, 1, 0);
+        const sv = new THREE.Vector3();
+        const ssc = new THREE.Vector3(1.4, 1, 1.4);
+        for (let i = 0; i < FLOCK_SIZE; i++) {
+          const ang = -i * 0.18;
+          sv.set(
+            FLOCK_CENTER.x + Math.sin(ang) * (FLOCK_CENTER.r + (i % 3) * 4),
+            FLOCK_CENTER.y,
+            FLOCK_CENTER.z + Math.cos(ang) * (FLOCK_CENTER.r + (i % 3) * 4),
+          );
+          sq.setFromAxisAngle(sup, ang + Math.PI / 2);
+          flock.setMatrixAt(i, sm.compose(sv, sq, ssc));
+        }
+        flock.instanceMatrix.needsUpdate = true;
+      }
       group.add(flock);
     }
   }
@@ -1049,11 +1089,27 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     tree.position.set(tx, terrainHeight(tx, tz, seed) - 0.2, tz);
     tree.scale.setScalar(6.5);
     tree.rotation.y = 0.8;
+    // The loader cache is immutable: clone the trunk material before giving
+    // the giant its coarse landmark bark grain (leaves keep the clean sheet).
+    const barked = new Map<string, THREE.Material>();
+    const barkify = (source: THREE.Material): THREE.Material => {
+      if (!isBarkMaterialName(source.name)) return source;
+      let m = barked.get(source.uuid);
+      if (!m) {
+        m = source.clone();
+        applySurfaceDetail(m as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
+        barked.set(source.uuid, m);
+      }
+      return m;
+    };
     tree.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if (mesh.isMesh) {
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.material = Array.isArray(mesh.material)
+          ? mesh.material.map(barkify)
+          : barkify(mesh.material);
       }
     });
     group.add(tree);
@@ -1078,6 +1134,7 @@ export function buildRealmFlora(seed: number): RealmFloraView {
   return {
     group,
     glowLights,
+    animated: [...seaFoam.map((f) => f.mesh), ...seaDrift.map((b) => b.mesh)],
     update(time: number): void {
       // one gentle shared breath across the glowing materials
       const breathe = 1 + Math.sin(time * 0.9) * 0.16;
@@ -1088,7 +1145,8 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       }
       // mist banks drift, rays breathe, the flock wheels over the sound
       for (const bank of seaDrift) {
-        bank.mesh.position.x = bank.baseX + Math.sin(time * 0.05 * bank.speed) * 22;
+        bank.mesh.position.x =
+          bank.baseX + Math.sin(time * 0.05 * bank.speed) * MIST_DRIFT_AMPLITUDE;
       }
       for (const ray of seaRays) {
         ray.mat.opacity = ray.base * (0.7 + 0.3 * Math.sin(time * 0.4 + ray.phase));

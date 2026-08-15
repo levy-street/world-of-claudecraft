@@ -1,0 +1,172 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/gate-arch-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones",
+  "detailInventory": {
+    "scanMethod": "labeled-turnaround-component-zones",
+    "targetMinDetails": 8,
+    "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+    "details": [
+      {
+        "id": "open-lane-gap",
+        "kind": "contour",
+        "description": "The tall central lane remains completely open and readable.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "gameplay passage",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "clear-travel-lane"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "tapered-jambs",
+        "kind": "contour",
+        "description": "Jambs taper slightly upward from stepped grounded feet.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "portal weight",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "tapered-jamb-pair"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/front.png",
+        "confidence": 0.895
+      },
+      {
+        "id": "roof-upturn",
+        "kind": "ridge",
+        "description": "Teal cap roof kicks upward at both ends.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "Fenbridge skyline",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "upturned-roof-ends"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/side.png",
+        "confidence": 0.89
+      },
+      {
+        "id": "lintel-shadow",
+        "kind": "stain",
+        "description": "A deep value band separates roof cap from the timber lintel.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "depth read",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "deep-lintel-shadow"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/rear.png",
+        "confidence": 0.885
+      },
+      {
+        "id": "paired-horns",
+        "kind": "contour",
+        "description": "A paired curved horn crown breaks the roofline.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "identity cue",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "paired-gate-horns"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/hero.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "teal-lanterns",
+        "kind": "emissive",
+        "description": "Two teal lanterns hang near the upper jambs.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "night readability",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "teal-lantern-pair"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/hero.png",
+        "confidence": 0.875
+      },
+      {
+        "id": "iron-jamb-straps",
+        "kind": "linework",
+        "description": "Dark vertical and transverse iron straps articulate each jamb.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "reinforcement",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "jamb-strap-lines"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/front.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "brass-teal-contrast",
+        "kind": "gloss",
+        "description": "Warm horn brass contrasts with the cool teal fenlight.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "material hierarchy",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "brass-horn-and-teal-glow"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/gate-arch/zones/side.png",
+        "confidence": 0.865
+      }
+    ]
+  },
+  "authoringInstruction": "Complete: every observed detail maps to an authored component.localFeatures or material.localOverrides key in sculpt-spec.json."
+}

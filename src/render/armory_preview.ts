@@ -39,7 +39,6 @@ export interface ArmoryPreviewHandle {
   setSkin(skinId: string | null): void;
   setMode(mode: ArmoryPreviewMode): void;
   setScene(scene: ArmorySceneKey): void;
-  prewarm(skinIds: readonly string[]): Promise<void>;
   dispose(): void;
 }
 
@@ -52,6 +51,9 @@ const IDLE_STATE = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 
@@ -142,9 +144,9 @@ export function createArmoryPreview(
   visual.setWeaponVfxCameraFov(35);
   // The character-mode skin swap is substantially more expensive than the
   // standalone weapon clone: it rebuilds hand attachments, material snapshots
-  // and rarity VFX. Keep one bounded rig per catalogue skin after loading-screen
-  // prewarm, just as weaponRigs below does for the showcase mode. Switching a
-  // card then only reparents an already-built root instead of spending ~30ms in
+  // and rarity VFX. Keep one bounded rig per catalogue skin, just as weaponRigs
+  // below does for the showcase mode, so switching a card only reparents an
+  // already-built root instead of spending ~30ms in
   // CharacterVisual.setWeaponSkin on the click handler.
   const characterRigs = new Map<string, CharacterVisual>([['', visual]]);
 
@@ -192,7 +194,6 @@ export function createArmoryPreview(
   let sceneKey: ArmorySceneKey = 'day';
   let skinId: string | null = null;
   let active = false;
-  let prewarming = false;
   let disposed = false;
   let renderWidth = Math.max(1, container.clientWidth);
   let renderHeight = Math.max(1, container.clientHeight);
@@ -286,7 +287,10 @@ export function createArmoryPreview(
   }
 
   function selectSkin(next: string | null): void {
-    if (disposed || next === skinId) return;
+    // Re-selecting the CURRENT skin is a no-op only while its rig exists: a
+    // streamed skin clicked before its GLB arrived has skinId set but no rig,
+    // and the reselect after arrival is how the weapon finally appears.
+    if (disposed || (next === skinId && (next === null || activeWeaponRig !== null))) return;
     if (activeWeaponRig) activeWeaponRig.root.visible = false;
     skinId = next;
     selectCharacterRig(next);
@@ -297,6 +301,20 @@ export function createArmoryPreview(
     }
     applyScene();
     frameCamera();
+  }
+
+  /** Rebuild the character rigs for a new appearance. */
+  function applyAppearance(next: PreviewAppearance): void {
+    const nextSig = appearanceSignature(next);
+    if (nextSig === appearanceSig) return;
+    appearanceSig = nextSig;
+    currentAppearance = next;
+    for (const rig of characterRigs.values()) rig.dispose();
+    characterRigs.clear();
+    visual = createCharacterRig(skinId);
+    characterRigs.set(skinId ?? '', visual);
+    characterGroup.add(visual.root);
+    visual.setWeaponVfxPixelScale(pixelHeight());
   }
 
   function disposeWeaponRigs(): void {
@@ -321,7 +339,7 @@ export function createArmoryPreview(
   let raf: number | null = null;
   const animate = () => {
     raf = null;
-    if (disposed || !active || prewarming) return;
+    if (disposed || !active) return;
     const dt = Math.min(clock.getDelta(), 0.1);
     if (mode === 'character') {
       characterGroup.rotation.y += dt * 0.45;
@@ -342,11 +360,11 @@ export function createArmoryPreview(
       rig?.vfx?.update(dt);
     }
     composer.render();
-    if (active && !disposed && !prewarming) raf = requestAnimationFrame(animate);
+    if (active && !disposed) raf = requestAnimationFrame(animate);
   };
 
   const resize = () => {
-    if (disposed || prewarming || !active) return;
+    if (disposed || !active) return;
     const w = container.clientWidth;
     const h = container.clientHeight;
     // A parked/hidden stage can briefly report zero during DOM moves. Keep the
@@ -371,7 +389,8 @@ export function createArmoryPreview(
 
   return {
     setActive(next: boolean): void {
-      if (disposed || next === active) return;
+      if (disposed) return;
+      if (next === active) return;
       active = next;
       if (!active) {
         if (raf !== null) cancelAnimationFrame(raf);
@@ -381,110 +400,26 @@ export function createArmoryPreview(
       }
       resize();
       clock.start();
-      if (!prewarming && raf === null) raf = requestAnimationFrame(animate);
+      if (raf === null) raf = requestAnimationFrame(animate);
     },
     setAppearance(next: PreviewAppearance): void {
       if (disposed) return;
-      const nextSig = appearanceSignature(next);
-      if (nextSig === appearanceSig) return;
-      appearanceSig = nextSig;
-      currentAppearance = next;
-      for (const rig of characterRigs.values()) rig.dispose();
-      characterRigs.clear();
-      visual = createCharacterRig(skinId);
-      characterRigs.set(skinId ?? '', visual);
-      characterGroup.add(visual.root);
-      visual.setWeaponVfxPixelScale(pixelHeight());
+      applyAppearance(next);
     },
     setSkin(next: string | null): void {
       selectSkin(next);
     },
     setMode(next: ArmoryPreviewMode): void {
-      if (disposed || next === mode) return;
+      if (disposed) return;
+      if (next === mode) return;
       mode = next;
       applyMode();
     },
     setScene(next: ArmorySceneKey): void {
-      if (disposed || next === sceneKey) return;
+      if (disposed) return;
+      if (next === sceneKey) return;
       sceneKey = next;
       applyScene();
-    },
-    async prewarm(skinIds: readonly string[]): Promise<void> {
-      if (disposed || prewarming) return;
-      const unique = [...new Set(skinIds)].filter((id) => WEAPON_SKINS[id]);
-      if (unique.length === 0) return;
-      const previousSize = new THREE.Vector2();
-      renderer.getSize(previousSize);
-      const previousPixelRatio = renderer.getPixelRatio();
-      const previousAspect = camera.aspect;
-      const previousSkin = skinId;
-      const previousMode = mode;
-      const wasActive = active;
-      // Stop the visible loop while compile/upload owns the context. All work
-      // happens while the game's loading screen is opaque.
-      if (raf !== null) cancelAnimationFrame(raf);
-      raf = null;
-      active = false;
-      clock.stop();
-      prewarming = true;
-      try {
-        renderer.setPixelRatio(1);
-        renderer.setSize(480, 380, false);
-        renderWidth = 480;
-        renderHeight = 380;
-        composer.setPixelRatio(1);
-        composer.setSize(480, 380);
-        camera.aspect = 480 / 380;
-        camera.updateProjectionMatrix();
-        for (const id of unique) {
-          if (disposed) break;
-          selectSkin(id);
-          visual.setWeaponVfxPixelScale(pixelHeight());
-          activeWeaponRig?.vfx?.setPixelScale(pixelHeight());
-
-          // Compile and draw the exact character-mode light/material graph.
-          mode = 'character';
-          applyMode();
-          await renderer.compileAsync(scene, camera);
-          composer.render();
-
-          // Then the exact weapon-only graph (ground pool + showcase VFX).
-          mode = 'weapon';
-          applyMode();
-          await renderer.compileAsync(scene, camera);
-          composer.render();
-
-          // Keep the loading overlay responsive and avoid turning 29 bounded
-          // warmups into one giant main-thread task on browsers whose shader
-          // compiler cannot link fully in parallel.
-          await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
-        }
-      } finally {
-        selectSkin(previousSkin);
-        mode = previousMode;
-        applyMode();
-        renderer.setPixelRatio(previousPixelRatio);
-        renderer.setSize(Math.max(1, previousSize.x), Math.max(1, previousSize.y), false);
-        renderWidth = Math.max(1, previousSize.x);
-        renderHeight = Math.max(1, previousSize.y);
-        composer.setPixelRatio(previousPixelRatio);
-        composer.setSize(Math.max(1, previousSize.x), Math.max(1, previousSize.y));
-        camera.aspect = previousAspect;
-        camera.updateProjectionMatrix();
-        // Restoring the logical size/DPR replaces the composer's render
-        // targets. Force their real GPU allocation while the loading screen is
-        // still opaque; leaving this first draw to setActive() made the first
-        // Armory skin click block for 70-110ms even though every shader and rig
-        // had already been warmed above.
-        composer.render();
-        prewarming = false;
-        active = wasActive;
-        if (active && !disposed) {
-          resize();
-          clock.start();
-          raf = requestAnimationFrame(animate);
-        }
-      }
     },
     dispose(): void {
       if (disposed) return;

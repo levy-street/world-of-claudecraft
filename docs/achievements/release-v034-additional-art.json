@@ -1,0 +1,879 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-v034-additional-art-2026-08-02",
+    "acceptedDate": "2026-08-02",
+    "baseRelease": "release/v0.34.0",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "targetRows": 9,
+    "rasterPaintings": 9,
+    "abilities": 1,
+    "items": 2,
+    "deeds": 6
+  },
+  "targetSets": {
+    "abilities": ["aspect_of_the_monkey"],
+    "items": ["last_keep_signet", "silkspun_satchel"],
+    "deeds": [
+      "chr_farshore_first_cast",
+      "chr_farshore_gatherer",
+      "chr_galecrest_first_cast",
+      "chr_galecrest_gatherer",
+      "chr_willowfen_first_cast",
+      "chr_willowfen_gatherer"
+    ]
+  },
+  "generationContract": {
+    "rasterGenerator": "OpenAI built-in image generation",
+    "oneCallPerDistinctAsset": true,
+    "freshDistinctCompositions": true,
+    "referencePolicy": "Only the exact repository references recorded per asset were supplied, with role, provenance, and license stated truthfully.",
+    "sourceRetention": "Every accepted master and reviewed 512x512 source is retained under the gitignored tmp/imagegen tree inside this worktree.",
+    "reviewPolicy": "The main implementation agent inspected every accepted source and final in family contact sheets at the actual requested display sizes.",
+    "deterministicLocalProcessing": [
+      "Crop, scale, centering, color-space normalization, chroma removal, despill, and encoding only.",
+      "No filter, trace, recolor, compositing of another icon, or external proprietary-game art."
+    ]
+  },
+  "replacements": [
+    {
+      "kind": "ability",
+      "id": "aspect_of_the_monkey",
+      "replacedReason": "The old runtime file was byte-identical to prowl and did not depict the renamed Marten's Guise dodge mechanic.",
+      "retiredSha256": "298aef26a1a4387418902d01256e1f8e69b08ee19993fe82caf6cd9dd2d6c384",
+      "acceptedSha256": "cf43d690eaf22aa9db8162e8c0b4c35f6da9e37206fb0a02ee084103470cf951"
+    },
+    {
+      "kind": "item",
+      "id": "last_keep_signet",
+      "replacedReason": "The old procedural tile was not authored painted inventory art.",
+      "retiredSha256": "c90769f6d7ace5473315bb0916574cd1ae65e8c12f5fa760797e81bc6b3eebf2",
+      "acceptedSha256": "1a85ab48249867835dc20fc76c0ebf8845f3eb12649808faf854bf253e9d9c80"
+    },
+    {
+      "kind": "item",
+      "id": "silkspun_satchel",
+      "replacedReason": "The old file was an explicit hue-shifted linen_pouch placeholder rather than a distinct physical bag design.",
+      "retiredSha256": "c14b3a75233220ff4fc05fec864a287b3a4b2f618a542c0696c5c3d8a108a2ce",
+      "acceptedSha256": "6ba051f23c5d0fbbad63be0cc7ecc573d3123dd611c468012ecb096f7e5fd66e"
+    }
+  ],
+  "contracts": {
+    "ability": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    },
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    },
+    "deed": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "transparent-subject",
+      "geometry": {
+        "alphaThreshold": 8,
+        "minPadding": 7,
+        "maxCenterOffset": 2,
+        "coverageMin": 0.35,
+        "coverageMax": 0.6
+      }
+    }
+  },
+  "assets": [
+    {
+      "kind": "ability",
+      "id": "aspect_of_the_monkey",
+      "runtimeUrl": "/ui/skills/hunter/aspect_of_the_monkey.webp",
+      "acceptedSha256": "cf43d690eaf22aa9db8162e8c0b4c35f6da9e37206fb0a02ee084103470cf951",
+      "acceptedBytes": 3234,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/abilities/hunter/aspect_of_the_monkey.png",
+        "bytes": 2362100,
+        "sha256": "5cc8c862e032a3ba0e725c337de9984806336a6e97fe54902834313e1ea845be",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/release-v034-additions/accepted/abilities/hunter/aspect_of_the_monkey.png",
+        "bytes": 328572,
+        "sha256": "5065fe6b4d4ab0295e6c89d643368a8b20fcb3bd2f1e46f834cb03788a278315",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Marten's Guise",
+      "canonicalGameplayMeaningOrAcquisition": "A level-5 Hunter aspect costing 20 mana that grants 8% dodge for 30 minutes and is exclusive with other aspects.",
+      "intendedVisualSubject": "A lithe pine marten twisting through a near-miss in an S-curve of green-gold nature motion, depicting agility and dodge rather than stealth.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh distinct premium hand-painted dark-fantasy MMORPG Hunter ability icon for Marten's Guise (runtime id aspect_of_the_monkey). Image 1 is the Hunter class brushwork/style reference, Image 2 is the green-gold class palette and creature-composition reference, and Image 3 is a readable creature-action reference. Do not copy any animal, face, sun, ring, or layout from them. Canonical mechanic: a level-5 Nature aspect granting the Hunter 8% dodge for 30 minutes. Paint one anatomically coherent lithe pine marten in a full-body twisting leap, its long flexible torso forming a strong diagonal S-curve as a blurred claw strike or arrow passes just behind it, a clear near-miss that reads as supernatural agility and dodge, not stealth or aggression. Warm chestnut and cream fur, alert dark eyes, restrained green-gold leaf-stream motion, opaque deep forest atmospheric background. One dominant action; focal subject fills 78-86% with equivalent 8-14px safe margin at 128px; perfectly centered visual mass; crisp marten head, forepaws, and tail silhouette at 32px and 48px; deep values and controlled highlights. Must be visually unrelated to the existing golden-eyes Prowl icon. No text, letters, numbers, border, frame, badge, rarity chrome, watermark, modern graphic design, flat glyph, duplicated anatomy, extra animals, human figure, excessive bloom, or crop.",
+        "references": [
+          {
+            "path": "public/ui/skills/hunter/aspect_of_the_hawk.webp",
+            "role": "hunter class style reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/skills/hunter/aspect_of_the_wild.webp",
+            "role": "class palette/composition reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI ability art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/skills/hunter/bestial_wrath.webp",
+            "role": "creature-feature action reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI ability art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Scaled the selected composition deterministically to 452x452 and centered it over its own opaque dark vignette in an exact 512x512 sRGB source to preserve the reviewed safe margin.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_skill_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/abilities/marten-vs-prowl.png",
+        "tmp/imagegen/release-v034-additions/review/abilities/marten-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "class": "hunter",
+      "batch": "release-v034-audit-hunter-ability-2026-08-02"
+    },
+    {
+      "kind": "item",
+      "id": "last_keep_signet",
+      "runtimeUrl": "/ui/items/last_keep_signet.webp",
+      "acceptedSha256": "1a85ab48249867835dc20fc76c0ebf8845f3eb12649808faf854bf253e9d9c80",
+      "acceptedBytes": 2684,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/items/last_keep_signet.png",
+        "bytes": 2259106,
+        "sha256": "59248196a6e372230ed368097d1ff6c82cb732d4d8b814d8e15340db8dc5548c",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/release-v034-additions/accepted/items/last_keep_signet.png",
+        "bytes": 392580,
+        "sha256": "a93e9e8ba4f223e55968d0c8f212a90637a072374d3ce96093992b9d1c8b1861",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Signet of the Last Keep",
+      "canonicalGameplayMeaningOrAcquisition": "A 25-copper keepsake found on the entrance-hall floor of the zero-combat Last Keep, dropped by the garrison that never came home.",
+      "intendedVisualSubject": "One worn antique-gold garrison signet ring with a crenellated keep-gate seal face, candle amber and cold Drakelands patina.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Signet of the Last Keep. Image 1 is a ring composition reference, Image 2 is a dark-fantasy value/style reference, and Image 3 is a metalwork/detail reference; do not copy their gems, emblems, shapes, or aura layouts. Paint one tangible old garrison signet ring, centered in three-quarter view: a weighty worn antique-gold band with dark iron patina, a broad slightly irregular shield-shaped seal face engraved with an abstract crenellated gate and one closed portcullis, no letters or readable heraldry. Add a tiny ember-red wax trace caught in one groove, warm candle-amber key light from upper left, and a restrained cold blue-grey rim suggesting the silent Drakelands hall. It is a poignant floor-found keepsake, not royal treasure: no giant gemstone, spikes, skull, magical aura, or excessive ornament. Opaque charcoal/blue-black atmospheric vignette, strong silhouette at 28px, centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular quality halo, text, watermark, hand, character, scene, crop, or transparent background.",
+        "references": [
+          {
+            "path": "public/ui/items/kings_signet.webp",
+            "role": "ring composition reference",
+            "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+            "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          },
+          {
+            "path": "public/ui/items/last_step_signet.webp",
+            "role": "dark-fantasy style reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/seal_of_the_nine_oaths.webp",
+            "role": "metalwork/detail reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI item art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source with the selected visual center and safe margins preserved.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_item_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/items/items-512.png",
+        "tmp/imagegen/release-v034-additions/review/items/items-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "acquisitionZone": "drakelands",
+      "family": "quest-curio-ring",
+      "batch": "release-v034-audit-item-replacements-2026-08-02"
+    },
+    {
+      "kind": "item",
+      "id": "silkspun_satchel",
+      "runtimeUrl": "/ui/items/silkspun_satchel.webp",
+      "acceptedSha256": "6ba051f23c5d0fbbad63be0cc7ecc573d3123dd611c468012ecb096f7e5fd66e",
+      "acceptedBytes": 2532,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/items/silkspun_satchel.png",
+        "bytes": 2141881,
+        "sha256": "de41a2f4ee29fe26aa2e47f39824809127dbfa41019e99ce52cc75f77be93e4d",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/release-v034-additions/accepted/items/silkspun_satchel.png",
+        "bytes": 361390,
+        "sha256": "9fb9133f66818df3350f2cd4795912d5d5a25062e0fb9b135c03f4153b5d9587",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "alpha": "opaque"
+      },
+      "canonicalDisplayName": "Silkspun Satchel",
+      "canonicalGameplayMeaningOrAcquisition": "A level-15 uncommon 10-slot bag learned from the Tailoring trainer at skill 25 and woven at a loom from 6 Spider Silk, 2 Goldleaf Herb, and 2 Spools of Thread.",
+      "intendedVisualSubject": "One compact crescent-mouthed field satchel of charcoal-violet spider silk with goldleaf embroidery and pale thread bindings, physically distinct from every existing bag.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Silkspun Satchel. Image 1 is a style/material reference for rich project bag rendering, Image 2 is a composition and safe-margin reference only, Image 3 is the spider-silk material reference, and Image 4 is the Goldleaf accent reference. Paint one tangible compact 10-slot tailoring satchel, centered in three-quarter view: a low crescent-mouthed soft field bag with folded charcoal-violet iridescent spider-silk panels, pale hand-bound thread seams, a sturdy asymmetrical flap, a small brass toggle, and restrained round-leaf gold embroidery worked into the fabric. Make its construction and silhouette entirely distinct from both referenced bags and from the current rectangular linen-pouch recolor; no sun emblem, bottles, dangling clutter, or copied strap layout. Opaque blue-black atmospheric vignette, top-left key light, restrained cool rim, strong silhouette at 28px, visual mass centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular halo, text, watermark, mannequin, character, scenery, crop, excessive aura, or transparent background. Rarity comes from workmanship only.",
+        "references": [
+          {
+            "path": "public/ui/items/gravewoven_bag.webp",
+            "role": "style/material reference",
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/wolfhide_satchel.webp",
+            "role": "composition/safe-margin reference",
+            "provenance": "World of ClaudeCraft original bag art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/spider_silk.webp",
+            "role": "material reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/goldleaf_herb.webp",
+            "role": "material/accent reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Normalized deterministically to a reviewed 512x512 opaque sRGB source with the selected visual center and safe margins preserved.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_item_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/items/items-512.png",
+        "tmp/imagegen/release-v034-additions/review/items/items-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "opaque"
+      },
+      "acquisitionZone": "professions",
+      "family": "profession-bag",
+      "batch": "release-v034-audit-item-replacements-2026-08-02"
+    },
+    {
+      "kind": "deed",
+      "id": "chr_farshore_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_farshore_first_cast.webp",
+      "acceptedSha256": "1baeae247fe109b0127344f34843cf444e2643a7f1a3de5bfd787cca65cd5532",
+      "acceptedBytes": 5066,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/deeds/chr_farshore_first_cast.png",
+        "bytes": 1801512,
+        "sha256": "a24fa3ba0511e3b98841a4c9580ef054e3e7bc0deb45d4b0d511dd8c0fba8fc4",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/professions-deeds/chr_farshore_first_cast.png",
+        "bytes": 259350,
+        "sha256": "7639fd1958521fa346ca84cf0df08c905fe4529a7ed935524b069f2c4f7478e8",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "geometry": {
+          "alphaThreshold": 8,
+          "bounds": [57, 56, 454, 455],
+          "visiblePixels": 105914,
+          "coverage": 0.40403,
+          "centerOffset": [0, 0]
+        },
+        "alpha": "transparent-subject"
+      },
+      "canonicalDisplayName": "What the Gulls Know",
+      "canonicalGameplayMeaningOrAcquisition": "Earned by catching any fish from Farshore Isle; the live fallback table yields Raw Mirror Trout, Raw River Perch, or Sunglint Koi.",
+      "intendedVisualSubject": "One koi-bright Sunglint Koi arcing over mere water while exactly two white gulls wheel above.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh, separately composed square master for the World of ClaudeCraft deed What the Gulls Know. Image 1 is the frame/style reference, Image 2 is a first-cast mood/composition reference, and Image 3 is the fish subject reference. Paint a complete centered classic dark-fantasy MMORPG medallion with salt-blackened bronze body, antique-gold double rim, exactly four small cardinal kite points at north/east/south/west, and a deep plum-blue enamel inset. Center one dynamic Sunglint Koi, orange-white and jewel-bright, arcing left-to-right over a dark mere-water splash; above it place exactly two small white gulls wheeling in opposite directions, simple enough to read as birds at 24px. Keep the koi dominant and anatomically coherent, with no second fish, hook, boat, or full seaside scene. Fresh composition. Badge about 78 percent of square, perfectly centered for final alpha near x/y 56-455 at 512. Exterior is perfectly flat uniform #FF00FF with no shadow, glow, reflection, gradient, texture, or stray paint. No text, ribbon, extra frame, diagonal points, crop, watermark, or pseudo-symbols. Readable at 40px and 24px. LOCKED FAMILY GEOMETRY: use four genuinely tiny shallow cardinal kite points, each extending no more than about 2 percent of canvas height beyond the circular body. Total silhouette about 78 percent and circular body about 74 to 75 percent, designed to yield roughly 40 to 43 percent visible alpha coverage after centering into a 512 square with bounds near x/y 56-455. Preserve hand-painted brushwork, clear 24px value grouping, and a uniform removable #FF00FF exterior.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_vale_first_cast.webp",
+            "role": "frame/style reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/deeds/chr_marsh_first_cast.webp",
+            "role": "composition/mood reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/glimmerfin_koi.webp",
+            "role": "subject reference",
+            "provenance": "Licensed CraftPix Premium fishing icon shipped by this project",
+            "license": "CraftPix Premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Removed the perfectly flat #FF00FF exterior locally with the imagegen skill helper using soft matte and despill.",
+        "Restored fully opaque interior pixels beneath a closed and eroded subject mask while preserving the helper-produced soft despilled boundary.",
+        "Normalized and visually centered the result as an exact 512x512 sRGB RGBA source.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_deed_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/deeds/final-512.png",
+        "tmp/imagegen/release-v034-additions/review/deeds/final-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "minPadding": 7,
+          "maxCenterOffset": 2,
+          "coverageMin": 0.35,
+          "coverageMax": 0.6,
+          "alphaBounds": [14, 14, 113, 113],
+          "visiblePixels": 6742
+        }
+      },
+      "batch": "phase-20-zone-profession-deeds-2026-08-02"
+    },
+    {
+      "kind": "deed",
+      "id": "chr_farshore_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_farshore_gatherer.webp",
+      "acceptedSha256": "dee0c0a7d48c7c9bb47416d47922f223fac96c1c949375a55fcc39d75e041cf2",
+      "acceptedBytes": 4920,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/deeds/chr_farshore_gatherer.png",
+        "bytes": 2017306,
+        "sha256": "9bb672d39d1ebe9dc5ce050e9814d100cd731ae041d4cfa2ce082bf8cac898e6",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/professions-deeds/chr_farshore_gatherer.png",
+        "bytes": 264730,
+        "sha256": "eb045e90e6e15e48592d403feec78dbb115d5a5367be22a10f8e09aa411b9e17",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "geometry": {
+          "alphaThreshold": 8,
+          "bounds": [61, 56, 450, 455],
+          "visiblePixels": 108226,
+          "coverage": 0.412849,
+          "centerOffset": [0, 0]
+        },
+        "alpha": "transparent-subject"
+      },
+      "canonicalDisplayName": "Island Provisions",
+      "canonicalGameplayMeaningOrAcquisition": "Earned by harvesting one ore vein, one wood stand, and one herb patch on Farshore Isle.",
+      "intendedVisualSubject": "Grey iron ore, an ash-pale log, and one gold-leaf sprig arranged against salt-washed strand sand and causeway stones.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh, separately composed square master for the World of ClaudeCraft deed Island Provisions. Image 1 is the frame/style reference; use only its medallion language and four-point geometry. Images 2, 3, and 4 are subject references. Paint a complete centered classic dark-fantasy MMORPG medallion with salt-darkened bronze body, antique-gold double rim, exactly four small cardinal kite points at north/east/south/west, and a deep sea-grey enamel inset. Inside, make a rugged low cairn-like arrangement that stays equally readable: a heavy grey iron-ore chunk at lower left, one ash-pale driftwood-like cut log angled up at right, and one delicate round-leaf golden herb sprig arcing above them. Add only a narrow band of pale strand sand, two wet causeway stones, and restrained salt-blue rim light. Fresh physical design and composition, not a hue shift or copy. Badge about 78 percent of square, perfectly centered for final alpha near x/y 56-455 at 512. Exterior is perfectly flat uniform #FF00FF with no shadow, glow, reflection, gradient, texture, or stray paint. No text, ribbon, extra frame, diagonal points, crop, watermark, or pseudo-symbols. Readable at 40px and 24px. LOCKED FAMILY GEOMETRY: use four genuinely tiny shallow cardinal kite points, each extending no more than about 2 percent of canvas height beyond the circular body. Total silhouette about 78 percent and circular body about 74 to 75 percent, designed to yield roughly 40 to 43 percent visible alpha coverage after centering into a 512 square with bounds near x/y 56-455. Preserve hand-painted brushwork, clear 24px value grouping, and a uniform removable #FF00FF exterior.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_vale_gatherer.webp",
+            "role": "frame/style reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/iron_ore.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/ashwood_log.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/goldleaf_herb.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Removed the perfectly flat #FF00FF exterior locally with the imagegen skill helper using soft matte and despill.",
+        "Restored fully opaque interior pixels beneath a closed and eroded subject mask while preserving the helper-produced soft despilled boundary.",
+        "Normalized and visually centered the result as an exact 512x512 sRGB RGBA source.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_deed_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/deeds/final-512.png",
+        "tmp/imagegen/release-v034-additions/review/deeds/final-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "minPadding": 7,
+          "maxCenterOffset": 2,
+          "coverageMin": 0.35,
+          "coverageMax": 0.6,
+          "alphaBounds": [15, 14, 112, 113],
+          "visiblePixels": 6882
+        }
+      },
+      "batch": "phase-20-zone-profession-deeds-2026-08-02"
+    },
+    {
+      "kind": "deed",
+      "id": "chr_galecrest_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_galecrest_first_cast.webp",
+      "acceptedSha256": "b6e746d8fe4b6165c5ebaedc82a3fee17c99971cc68acb87a44eac6662f7a9c1",
+      "acceptedBytes": 4658,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/deeds/chr_galecrest_first_cast.png",
+        "bytes": 1715694,
+        "sha256": "a0ee46e7376b491c4e45e1a29df1ebfe5d8202e56ab0a4c6630ab5f830bd7a7f",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/professions-deeds/chr_galecrest_first_cast.png",
+        "bytes": 296884,
+        "sha256": "873d7c8213f43ba957cba6ce424f2faa427aa95ea1e9694cf8a7061f79e16234",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "geometry": {
+          "alphaThreshold": 8,
+          "bounds": [56, 56, 455, 455],
+          "visiblePixels": 106835,
+          "coverage": 0.407543,
+          "centerOffset": [0, 0]
+        },
+        "alpha": "transparent-subject"
+      },
+      "canonicalDisplayName": "A Line in the Mirror Tarn",
+      "canonicalGameplayMeaningOrAcquisition": "Earned by catching any fish from Galecrest; the live fallback table yields Raw Mirror Trout, Raw River Perch, or Sunglint Koi.",
+      "intendedVisualSubject": "A taut fishing line striking a mirror-still tarn circle with a River Perch just below the surface under a grey downs sky.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh, separately composed square master for the World of ClaudeCraft deed A Line in the Mirror Tarn. Image 1 is the frame/style reference, Image 2 is a first-cast composition/readability reference, and Image 3 is the River Perch subject reference. Paint a complete centered classic dark-fantasy MMORPG medallion with blackened-steel circular body, antique-gold double rim, exactly four small cardinal kite points at north/east/south/west, and a slate storm-blue enamel inset. One taut fishing line descends from the upper-left and pierces one mirror-still silver tarn circle; just below that surface, one golden River Perch turns toward the hook, clear and anatomically coherent. Reflect a narrow grey downs sky and a whisper of wind-bent grass only at the edge. Do not make a giant standalone hook, duplicate fish, or scenic landscape. Fresh composition. Badge about 78 percent of square, perfectly centered for final alpha near x/y 56-455 at 512. Exterior is perfectly flat uniform #FF00FF with no shadow, glow, reflection, gradient, texture, or stray paint. No text, ribbon, extra frame, diagonal points, crop, watermark, or pseudo-symbols. Readable at 40px and 24px. LOCKED FAMILY GEOMETRY: use four genuinely tiny shallow cardinal kite points, each extending no more than about 2 percent of canvas height beyond the circular body. Total silhouette about 78 percent and circular body about 74 to 75 percent, designed to yield roughly 40 to 43 percent visible alpha coverage after centering into a 512 square with bounds near x/y 56-455. Preserve hand-painted brushwork, clear 24px value grouping, and a uniform removable #FF00FF exterior.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_peaks_glimmer_cast.webp",
+            "role": "frame/style reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/deeds/chr_vale_first_cast.webp",
+            "role": "composition reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/raw_river_perch.webp",
+            "role": "subject reference",
+            "provenance": "Licensed CraftPix Premium fishing icon shipped by this project",
+            "license": "CraftPix Premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Removed the perfectly flat #FF00FF exterior locally with the imagegen skill helper using soft matte and despill.",
+        "Restored fully opaque interior pixels beneath a closed and eroded subject mask while preserving the helper-produced soft despilled boundary.",
+        "Normalized and visually centered the result as an exact 512x512 sRGB RGBA source.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_deed_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/deeds/final-512.png",
+        "tmp/imagegen/release-v034-additions/review/deeds/final-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "minPadding": 7,
+          "maxCenterOffset": 2,
+          "coverageMin": 0.35,
+          "coverageMax": 0.6,
+          "alphaBounds": [14, 14, 113, 113],
+          "visiblePixels": 6784
+        }
+      },
+      "batch": "phase-20-zone-profession-deeds-2026-08-02"
+    },
+    {
+      "kind": "deed",
+      "id": "chr_galecrest_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_galecrest_gatherer.webp",
+      "acceptedSha256": "3b4bad02cb69e7aaa905e51b99e8e1b714fa6632714b27c9b5ca299ce7019181",
+      "acceptedBytes": 4734,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/deeds/chr_galecrest_gatherer.png",
+        "bytes": 2000109,
+        "sha256": "8294cd5a47df34f12bbfdce1213f93b058461b54dfb9d7aa576e42fd641721c7",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/professions-deeds/chr_galecrest_gatherer.png",
+        "bytes": 265960,
+        "sha256": "a3f37798a7a919f6cbed6a97bd1dacc19f739e0ce31121c3f8eacbecb2958d1f",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "geometry": {
+          "alphaThreshold": 8,
+          "bounds": [61, 56, 450, 455],
+          "visiblePixels": 108771,
+          "coverage": 0.414928,
+          "centerOffset": [0, 0]
+        },
+        "alpha": "transparent-subject"
+      },
+      "canonicalDisplayName": "Harvest on the Headland",
+      "canonicalGameplayMeaningOrAcquisition": "Earned by harvesting one ore vein, one wood stand, and one herb patch in Galecrest.",
+      "intendedVisualSubject": "A windswept resource triad on grey-green headland grass with a low dry-stone wall hint.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh, separately composed square master for the World of ClaudeCraft deed Harvest on the Headland. Image 1 is the frame/style reference; use only its medallion language and four-point geometry. Images 2, 3, and 4 are subject references for the ore, log, and flower. Paint a centered classic dark-fantasy MMORPG medallion with blackened-steel body, antique-gold double rim, exactly four small cardinal kite points at north/east/south/west, and a storm-grey enamel inset. Inside, stage the three resources in a windswept diagonal rather than a neat triangle: violet-banded dark ore high at windward left, a pale weathered log crossing low through the center, and one golden five-petal Sunpetal leaning sharply to the right. Add grey-green headland grass, a tiny low dry-stone-wall hint, and one controlled storm-blue edge light. Keep all three resources equally readable and physically distinct. Fresh composition, not a copy or recolor. Badge about 78 percent of square, perfectly centered for final alpha near x/y 56-455 at 512. Exterior is perfectly flat uniform #FF00FF with no shadow, glow, reflection, gradient, texture, or stray paint. No text, ribbon, extra frame, diagonal points, crop, watermark, or pseudo-symbols. Readable at 40px and 24px. LOCKED FAMILY GEOMETRY: use four genuinely tiny shallow cardinal kite points, each extending no more than about 2 percent of canvas height beyond the circular body. Total silhouette about 78 percent and circular body about 74 to 75 percent, designed to yield roughly 40 to 43 percent visible alpha coverage after centering into a 512 square with bounds near x/y 56-455. Preserve hand-painted brushwork, clear 24px value grouping, and a uniform removable #FF00FF exterior.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_peaks_gatherer.webp",
+            "role": "frame/style reference",
+            "provenance": "World of ClaudeCraft project-generated OpenAI deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/thorium_ore.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/elderwood_log.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/sunpetal_herb.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Removed the perfectly flat #FF00FF exterior locally with the imagegen skill helper using soft matte and despill.",
+        "Restored fully opaque interior pixels beneath a closed and eroded subject mask while preserving the helper-produced soft despilled boundary.",
+        "Normalized and visually centered the result as an exact 512x512 sRGB RGBA source.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_deed_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/deeds/final-512.png",
+        "tmp/imagegen/release-v034-additions/review/deeds/final-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "minPadding": 7,
+          "maxCenterOffset": 2,
+          "coverageMin": 0.35,
+          "coverageMax": 0.6,
+          "alphaBounds": [15, 14, 112, 113],
+          "visiblePixels": 6916
+        }
+      },
+      "batch": "phase-20-zone-profession-deeds-2026-08-02"
+    },
+    {
+      "kind": "deed",
+      "id": "chr_willowfen_first_cast",
+      "runtimeUrl": "/ui/deeds/chr_willowfen_first_cast.webp",
+      "acceptedSha256": "982691f4319d0f8220ddc3e32338e63c374a534eb57241f956e2d26d5c754b6e",
+      "acceptedBytes": 4906,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/deeds/chr_willowfen_first_cast.png",
+        "bytes": 1886026,
+        "sha256": "91f608176df6d2c253cd1e17e247b5d569f7b8eea46b4dd53ef04b8d576dc560",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/professions-deeds/chr_willowfen_first_cast.png",
+        "bytes": 252483,
+        "sha256": "c7962314662382ea253b3b6df2707a8f876353e533e64004796fe60359424602",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "geometry": {
+          "alphaThreshold": 8,
+          "bounds": [63, 56, 448, 455],
+          "visiblePixels": 110683,
+          "coverage": 0.422222,
+          "centerOffset": [0, 0]
+        },
+        "alpha": "transparent-subject"
+      },
+      "canonicalDisplayName": "Ripples in the Lilymoors",
+      "canonicalGameplayMeaningOrAcquisition": "Earned by catching any fish from Willowfen; the live fallback table yields Raw Mirror Trout, Raw River Perch, or Sunglint Koi.",
+      "intendedVisualSubject": "One silver Mirror Trout rising through a lily-pad ring under warm lantern light and restrained fen mist.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh, separately composed square master for the World of ClaudeCraft deed Ripples in the Lilymoors. Image 1 is the frame/style reference, Image 2 is a composition/readability reference for a first-cast crest, and Image 3 is the fish subject reference; do not reproduce their exact layouts. Paint a complete centered classic dark-fantasy MMORPG medallion with a blackened-bronze circular body, antique-gold double rim, exactly four small cardinal kite points at north/east/south/west, and a dark teal enamel inset. Center one coherent action: a graceful silver Mirror Trout rising diagonally through a circular opening in broad lily pads, its blue markings catching one restrained warm lantern highlight from the upper left, with small ripples and thin fen mist. Keep the fish unmistakable and anatomically coherent; no extra fish, hook, human hand, or scenic diorama. Badge occupies about 78 percent of the square and stays perfectly centered for a final alpha target near x/y 56-455 at 512. Exterior must be one perfectly uniform #FF00FF chroma field with no shadow, reflection, glow, gradient, texture, or stray paint. No text, letters, ribbon, extra frame, diagonal points, crop, watermark, pseudo-symbols, or exterior lighting. Readable at 40px and 24px. GEOMETRY CORRECTION FOR THIS ACCEPTANCE ATTEMPT: make the four cardinal kite points genuinely tiny and shallow, each extending no more than about 2 percent of canvas height beyond the circular body. The total silhouette should occupy about 78 percent of the canvas, while the circular medal body itself occupies about 74 to 75 percent, yielding roughly 42 percent visible alpha coverage after centering into a 512 square with total bounds near x/y 56-455. Do not create long compass spikes. Preserve painterly brushwork rather than glossy photoreal rendering. The exterior should be a sampleable uniform RGB #FF00FF field.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_marsh_first_cast.webp",
+            "role": "frame/style reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/deeds/chr_vale_first_cast.webp",
+            "role": "composition reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/raw_mirror_trout.webp",
+            "role": "subject reference",
+            "provenance": "Licensed CraftPix Premium fishing icon shipped by this project",
+            "license": "CraftPix Premium royalty-free commercial license, non-transferable"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Removed the perfectly flat #FF00FF exterior locally with the imagegen skill helper using soft matte and despill.",
+        "Restored fully opaque interior pixels beneath a closed and eroded subject mask while preserving the helper-produced soft despilled boundary.",
+        "Normalized and visually centered the result as an exact 512x512 sRGB RGBA source.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_deed_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/deeds/final-512.png",
+        "tmp/imagegen/release-v034-additions/review/deeds/final-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "minPadding": 7,
+          "maxCenterOffset": 2,
+          "coverageMin": 0.35,
+          "coverageMax": 0.6,
+          "alphaBounds": [15, 14, 112, 113],
+          "visiblePixels": 7039
+        }
+      },
+      "batch": "phase-20-zone-profession-deeds-2026-08-02"
+    },
+    {
+      "kind": "deed",
+      "id": "chr_willowfen_gatherer",
+      "runtimeUrl": "/ui/deeds/chr_willowfen_gatherer.webp",
+      "acceptedSha256": "20d0b22e95ce0b5e96f16042e6575e2b008d1fda68eb857d5866540b4f848d37",
+      "acceptedBytes": 5056,
+      "master": {
+        "path": "tmp/imagegen/release-v034-additions/masters/deeds/chr_willowfen_gatherer.png",
+        "bytes": 1938213,
+        "sha256": "cba3e93ba806da58bd763a79ef80261d51b05549ed1faff25dab6f5443e2805b",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colourspace": "srgb"
+      },
+      "source": {
+        "path": "tmp/imagegen/professions-deeds/chr_willowfen_gatherer.png",
+        "bytes": 264690,
+        "sha256": "c1763c6375e90252dc8f650209082369f66e834017ad2f7cfdf3dbfb5f864912",
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colourspace": "srgb",
+        "geometry": {
+          "alphaThreshold": 8,
+          "bounds": [58, 56, 453, 455],
+          "visiblePixels": 107915,
+          "coverage": 0.411663,
+          "centerOffset": [0, 0]
+        },
+        "alpha": "transparent-subject"
+      },
+      "canonicalDisplayName": "Fenland Bounty",
+      "canonicalGameplayMeaningOrAcquisition": "Earned by harvesting one ore vein, one wood stand, and one herb patch in Willowfen.",
+      "intendedVisualSubject": "An equally readable triad of violet-banded ore, a pale willow log, and one five-petal Sunpetal bloom above dark fen water and reed silhouettes.",
+      "generation": {
+        "source": "OpenAI built-in image generation",
+        "owner": "World of ClaudeCraft",
+        "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "prompt": "Create one fresh, separately composed square master for the World of ClaudeCraft deed Fenland Bounty. Image 1 is the frame/style reference; use only its painted medallion language and four-point geometry, not its internal composition. Images 2, 3, and 4 are subject references for the ore, log, and flower. Paint a complete centered classic dark-fantasy MMORPG medallion with a blackened-bronze circular body, antique-gold double rim, exactly four small cardinal kite points at north/east/south/west, and a dark blue-green enamel inset. Inside, arrange an equally readable triangular triad: one jagged charcoal ore piece with restrained violet mineral bands at left, one pale freshly cut willow log sweeping across the lower right, and one distinct five-petal golden Sunpetal bloom rising at top center. Add only sparse willowfen reeds and a sliver of dark reflective fen water behind them. Fresh physical arrangement and silhouette, not a copy or recolor of any reference. Badge occupies about 78 percent of the square and stays perfectly centered for a final alpha target near x/y 56-455 at 512. Exterior must be one perfectly uniform #FF00FF chroma field with no shadow, reflection, glow, gradient, texture, or stray paint. No text, letters, ribbon, extra frame, diagonal points, crop, watermark, pseudo-symbols, or exterior lighting. Readable at 40px and 24px. ACCEPTANCE CORRECTIONS: the Sunpetal must have exactly FIVE and only five broad countable petals in a simple radial blossom; no hidden, split, overlapping, or sixth petal. Make the four cardinal kite points genuinely tiny and shallow, each extending no more than about 2 percent of canvas height beyond the circular body. Total silhouette about 78 percent, circular body about 74 to 75 percent, roughly 42 percent final alpha coverage. Preserve hand-painted brushwork. Uniform removable #FF00FF exterior.",
+        "references": [
+          {
+            "path": "public/ui/deeds/chr_marsh_gatherer.webp",
+            "role": "frame/style reference",
+            "provenance": "World of ClaudeCraft maintainer-commissioned bespoke deed art",
+            "license": "World of ClaudeCraft project asset, rights reserved"
+          },
+          {
+            "path": "public/ui/items/thorium_ore.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/elderwood_log.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          },
+          {
+            "path": "public/ui/items/sunpetal_herb.webp",
+            "role": "subject reference",
+            "provenance": "World of ClaudeCraft original professions art",
+            "license": "World of ClaudeCraft project-owned original art"
+          }
+        ]
+      },
+      "processing": [
+        "Copied the accepted image-generation master into the worktree.",
+        "Removed the perfectly flat #FF00FF exterior locally with the imagegen skill helper using soft matte and despill.",
+        "Restored fully opaque interior pixels beneath a closed and eroded subject mask while preserving the helper-produced soft despilled boundary.",
+        "Normalized and visually centered the result as an exact 512x512 sRGB RGBA source.",
+        "Encoded deterministically to exact 128x128 WebP through scripts/convert_deed_icons_webp.mjs at requested quality 82 with the hard 15 KiB gate."
+      ],
+      "reviewEvidence": [
+        "tmp/imagegen/release-v034-additions/review/deeds/final-512.png",
+        "tmp/imagegen/release-v034-additions/review/deeds/final-small.png"
+      ],
+      "validationStatus": "accepted, integrated, source and shipping visually inspected; final gate pending",
+      "expected": {
+        "width": 128,
+        "height": 128,
+        "maxBytes": 15360,
+        "alpha": "transparent-subject",
+        "geometry": {
+          "alphaThreshold": 8,
+          "minPadding": 7,
+          "maxCenterOffset": 2,
+          "coverageMin": 0.35,
+          "coverageMax": 0.6,
+          "alphaBounds": [14, 14, 113, 113],
+          "visiblePixels": 6865
+        }
+      },
+      "batch": "phase-20-zone-profession-deeds-2026-08-02"
+    }
+  ]
+}

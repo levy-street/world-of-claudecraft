@@ -76,3 +76,43 @@ describe('dev quest completion commands', () => {
     expect(meta.questLog.has('q_bandits')).toBe(false);
   });
 });
+
+// D8: the cheat tops a collect objective up to its required count, and it has
+// to count the same grades the real credit path counts (quest_credit.ts).
+// Otherwise it mints plain copies on top of a bag that already satisfies the
+// objective, and the player's own tracker and the cheat disagree about what
+// "satisfied" means.
+describe('dev collect satisfier spans material grades', () => {
+  it('spends the fine copies it already holds instead of minting plain ones', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Aleph');
+    const meta = sim.meta(pid)!;
+    sim.tick();
+    // q_prof_workorder_forge collects copper_ore x8, an eastbrook material, so
+    // this is the bag of a player who out-tooled the zone.
+    for (let i = 0; i < 8; i++) sim.addItem('fine_copper_ore', 1, pid);
+
+    // completeQuestForDev auto-accepts, tops the objective up, then turns in.
+    expect(sim.completeQuestForDev('q_prof_workorder_forge', pid)).toBe(true);
+    expect(meta.questsDone.has('q_prof_workorder_forge')).toBe(true);
+
+    // The decisive pair. Grade-aware: the satisfier saw the objective already
+    // covered, minted nothing, and the turn-in spent the fine copies. Blind to
+    // grades: it would have minted 8 plain, base-first consumption would have
+    // spent THOSE, and the 8 fine copies would still be sitting here.
+    expect(sim.countItem('fine_copper_ore', pid)).toBe(0);
+    expect(sim.countItem('copper_ore', pid)).toBe(0);
+  });
+
+  it('still tops up when the bag holds neither grade', () => {
+    // The control: the satisfier is not simply inert. Without this the case
+    // above would pass on a cheat that had stopped granting anything at all.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Aleph');
+    const meta = sim.meta(pid)!;
+    sim.tick();
+
+    expect(sim.completeQuestForDev('q_prof_workorder_forge', pid)).toBe(true);
+    expect(meta.questsDone.has('q_prof_workorder_forge')).toBe(true);
+  });
+});

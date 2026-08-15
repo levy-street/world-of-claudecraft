@@ -1,16 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ARRIVAL_NEIGHBOR_STREAM_RADIUS,
   distanceSqToZone,
-  fogFarForPreparedZones,
   INITIAL_SKY_PREWARM_RADIUS,
-  MAX_OUTDOOR_FOG_FAR,
-  MIN_OUTDOOR_FOG_FAR,
-  UNPREPARED_ZONE_FOG_GUARD,
   ZONE_STREAM_RECHECK_DISTANCE,
   zoneEntryPoint,
   zonesWithinStreamingHorizon,
 } from '../src/render/zone_streaming';
 import { ZONES, zoneAt } from '../src/sim/data';
+
+// The outdoor fog clamp itself moved to chunk_residency_core (it keys off the
+// nearest unbuilt CHUNK now, not the nearest unprepared zone rectangle), so its
+// behaviour is pinned in tests/chunk_residency.test.ts. What stays here is the
+// zone policy that is still live: which zones to stream, and in what order.
 
 describe('renderer zone-streaming horizon', () => {
   it('keeps a zero-radius query scoped to the containing zone', () => {
@@ -93,44 +95,49 @@ describe('renderer zone-streaming horizon', () => {
   });
 });
 
-describe('renderer zone-residency fog', () => {
-  const eastbrookOnly = new Set(['eastbrook_vale']);
-
-  it('clamps ahead of the nearest unprepared zone at the Eastbrook spawn', () => {
-    // Farshore sits 178 yd from (2, -2) and is the closest unprepared zone,
-    // so the fog is held at 178 - guard = 170 no matter what was requested.
-    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 2, -2, 500)).toBe(170);
-    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 2, -2, 900)).toBe(170);
-  });
-
-  it('contracts before Farshore can enter the visible envelope', () => {
-    const farshore = ZONES.find((zone) => zone.id === 'farshore_isle');
-    if (!farshore) throw new Error('expected Farshore in built-in zones');
-    expect(distanceSqToZone(farshore, 60, 0)).toBe(120 * 120);
-    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 60, 0, 500)).toBe(
-      120 - UNPREPARED_ZONE_FOG_GUARD,
+describe('teleport-arrival neighbourhood', () => {
+  it('reaches every neighbour that would clamp a Drakelands portal landing', () => {
+    // A realm portal into the Drakelands lands on the zone's western margin:
+    // the Frostveil rectangle is 37 yd away and the Wraithwood 51 yd. Preparing
+    // only the destination there left the player looking at a 45-yard wall of
+    // ember haze (measured: still clamped after 198 s).
+    const landing = { x: 217, z: 1871 };
+    expect(zoneAt(landing.x, landing.z).id).toBe('drakelands');
+    const arrival = zonesWithinStreamingHorizon(
+      ZONES,
+      landing.x,
+      landing.z,
+      ARRIVAL_NEIGHBOR_STREAM_RADIUS,
     );
-    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 100, 0, 500)).toBe(
-      80 - UNPREPARED_ZONE_FOG_GUARD,
+    expect([...arrival.map((zone) => zone.id)].sort()).toEqual([
+      'drakelands',
+      'frostveil',
+      'wraithwood',
+    ]);
+  });
+
+  it('reaches the Mirefen border from a Thornpeak south-edge login', () => {
+    // Reported live: logging in at (-2, 580) put the player 40 yd from the
+    // Mirefen rectangle, and the peaks preset's 850-yard vista sat at the
+    // 45-yard floor for about a minute.
+    const login = { x: -2, z: 580 };
+    expect(zoneAt(login.x, login.z).id).toBe('thornpeak_heights');
+    const arrival = zonesWithinStreamingHorizon(
+      ZONES,
+      login.x,
+      login.z,
+      ARRIVAL_NEIGHBOR_STREAM_RADIUS,
     );
+    expect([...arrival.map((zone) => zone.id)].sort()).toEqual([
+      'mirefen_marsh',
+      'thornpeak_heights',
+    ]);
   });
 
-  it('never exposes an unloaded boundary at point-blank range', () => {
-    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 179, 0, 500)).toBe(MIN_OUTDOOR_FOG_FAR);
-  });
-
-  it('opens the view to the full request after the destination becomes resident', () => {
-    const withFarshore = new Set(['eastbrook_vale', 'farshore_isle']);
-    // The next unprepared zone is farther than the request, so the biome
-    // preset wins outright once the crossing target is resident.
-    expect(fogFarForPreparedZones(ZONES, withFarshore, 179, 0, 170)).toBe(170);
-  });
-
-  it('caps every request at the rendering envelope even with the world resident', () => {
-    const all = new Set(ZONES.map((zone) => zone.id));
-    expect(fogFarForPreparedZones(ZONES, all, 0, 0, MAX_OUTDOOR_FOG_FAR + 500)).toBe(
-      MAX_OUTDOOR_FOG_FAR,
-    );
-    expect(fogFarForPreparedZones(ZONES, all, 0, 0, 80)).toBe(80);
+  it('streams nothing extra for a landing in the middle of a rectangle', () => {
+    // The Eastbrook hearthstone: no other rectangle is within the radius, so
+    // the common arrival pays exactly what it paid before.
+    const arrival = zonesWithinStreamingHorizon(ZONES, 0, 0, ARRIVAL_NEIGHBOR_STREAM_RADIUS);
+    expect(arrival.map((zone) => zone.id)).toEqual(['eastbrook_vale']);
   });
 });

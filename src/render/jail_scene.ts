@@ -7,11 +7,13 @@
 import * as THREE from 'three';
 import { JAIL_CAGE_HALF, JAIL_CENTER, JAIL_GATE, JAIL_OUTER_HALF } from '../sim/jail';
 import { groundHeight } from '../sim/world';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { buildDungeonPropMesh, ensureDungeonAssets, loadKitModules } from './dungeon';
-import { GFX } from './gfx';
+import { EMISSIVE_LIGHT, GFX } from './gfx';
+import { residentSceneMayReachRenderVolumes, type ScenerySphere } from './resident_scenery_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { radialGlowTexture } from './textures';
+import { applySurfaceDetail } from './worn_stone';
 
 // Kit modules the dungeon interiors do not load; fetched on demand alongside
 // ensureDungeonAssets() and served through the same registry.
@@ -30,7 +32,7 @@ export function ensureJailAssets(): Promise<void> {
 
 // Same boot-preload fold as the dungeon kit: the renderer builds the jail
 // synchronously right after assetsReady(), so the modules must be resolved.
-if (typeof window !== 'undefined') registerPreload(ensureJailAssets());
+if (typeof window !== 'undefined') registerDeferredPreload(() => ensureJailAssets());
 
 const MODULE_SCALE = 2; // KayKit walls are 4u tall/long -> 8u here (dungeon.ts convention)
 const MODULE_LEN = 4 * MODULE_SCALE;
@@ -244,7 +246,7 @@ function placeGateArch(p: JailPlacements): void {
   p.add('arch', JAIL_CAGE_HALF, 0, GATE_Z, Math.PI / 2, GATE_ARCH_SCALE);
 }
 
-function addModeratorGate(group: THREE.Group): void {
+function addModeratorGate(group: THREE.Group, glowLights: THREE.PointLight[]): void {
   const swirlGeo = new THREE.CircleGeometry(1.7, 24);
   const swirlMat = new THREE.MeshBasicMaterial({
     map: radialGlowTexture(),
@@ -272,7 +274,12 @@ function addModeratorGate(group: THREE.Group): void {
   // occlusion), so the gate glows from either side of the bars.
   const light = new THREE.PointLight(0x86b4ff, 9, 24, 2);
   light.position.set(JAIL_CAGE_HALF, 6, GATE_Z);
+  // The budget flickers a ranked fire light around userData.baseIntensity
+  // (defaulting to 11), so the authored 9 has to be stated or adoption would
+  // quietly brighten the gate and give it a torch cadence.
+  light.userData.baseIntensity = 9;
   group.add(light);
+  glowLights.push(light);
   const glowGeo = new THREE.CircleGeometry(4.4, 20).rotateX(-Math.PI / 2);
   const glowMat = new THREE.MeshBasicMaterial({
     map: radialGlowTexture(),
@@ -349,7 +356,7 @@ function placeTorches(group: THREE.Group, p: JailPlacements): void {
   const flameMat = new THREE.MeshLambertMaterial({
     color: FLAME_COLOR,
     emissive: FLAME_EMISSIVE,
-    emissiveIntensity: 2.2,
+    emissiveIntensity: EMISSIVE_LIGHT,
     transparent: true,
     opacity: 0.92,
   });
@@ -400,6 +407,10 @@ function addBackdrop(group: THREE.Group): void {
 // immutable per the loader cache rule).
 const displayMats = new Map<THREE.Material, THREE.Material>();
 
+export function resetJailSceneProfileCaches(): void {
+  displayMats.clear();
+}
+
 function displayMaterial(src: THREE.Material): THREE.Material {
   let mat = displayMats.get(src);
   if (mat) return mat;
@@ -412,6 +423,9 @@ function displayMaterial(src: THREE.Material): THREE.Material {
     std.vertexColors = false;
     std.metalness = 0;
     std.roughness = Math.max(0.85, std.roughness);
+    // Same triplanar stone layer the dungeon interiors give the shared pack
+    // materials, so the jail's kit stone matches the crypt next door.
+    applySurfaceDetail(std, 'stone');
     mat = std;
   }
   displayMats.set(src, mat);
@@ -436,7 +450,19 @@ function emit(group: THREE.Group, p: JailPlacements): void {
   }
 }
 
-export function buildJailScene(seed: number): THREE.Group {
+export interface JailSceneView {
+  group: THREE.Group;
+  /** Point lights this scene owns, for the renderer's constant point-light
+   *  budget. They MUST be adopted: `updateVisibility` below toggles the whole
+   *  group every frame, after the frame's budget pass, so an unbudgeted light
+   *  in here changes numPointLights whenever the jail enters camera range and
+   *  relinks every material drawn in that frame. */
+  glowLights: THREE.PointLight[];
+  updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void;
+}
+
+export function buildJailScene(seed: number): JailSceneView {
+  const glowLights: THREE.PointLight[] = [];
   const group = new THREE.Group();
   group.name = 'jail_scene';
   group.position.set(
@@ -454,7 +480,7 @@ export function buildJailScene(seed: number): THREE.Group {
   placeAisleProps(p);
   placeTorches(group, p);
   emit(group, p);
-  addModeratorGate(group);
+  addModeratorGate(group, glowLights);
   addFilthStains(group);
   addBackdrop(group);
   freezeStaticMatrices(group);
@@ -463,5 +489,36 @@ export function buildJailScene(seed: number): THREE.Group {
   group.traverse((o) => {
     if (o.userData.jailPortalSpin) o.matrixAutoUpdate = true;
   });
-  return group;
+  const sphere = new THREE.Box3().setFromObject(group).getBoundingSphere(new THREE.Sphere());
+  const bounds: ScenerySphere = {
+    x: sphere.center.x,
+    y: sphere.center.y,
+    z: sphere.center.z,
+    radius: sphere.radius,
+  };
+  return {
+    group,
+    glowLights,
+    updateVisibility(camera: THREE.PerspectiveCamera, sun: THREE.DirectionalLight): void {
+      const halfHeight = camera.far * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const colorRange = Math.hypot(camera.far, halfHeight, halfHeight * camera.aspect);
+      let shadowRange = 0;
+      if (sun.castShadow) {
+        const shadowCamera = sun.shadow.camera;
+        shadowRange = Math.hypot(
+          shadowCamera.far,
+          Math.max(Math.abs(shadowCamera.left), Math.abs(shadowCamera.right)),
+          Math.max(Math.abs(shadowCamera.top), Math.abs(shadowCamera.bottom)),
+        );
+      }
+      group.visible = residentSceneMayReachRenderVolumes(
+        bounds,
+        camera.position,
+        colorRange,
+        sun.castShadow,
+        sun.position,
+        shadowRange,
+      );
+    },
+  };
 }

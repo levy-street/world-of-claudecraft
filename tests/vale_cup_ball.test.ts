@@ -21,6 +21,7 @@ import {
 } from '../src/sim/vale_cup_ball';
 import {
   GOAL_DEPTH,
+  GOAL_HEIGHT,
   GOAL_LINE_EAST_X,
   GOAL_LINE_WEST_X,
   GOAL_Z_MAX,
@@ -148,6 +149,46 @@ describe('goal plane crossing', () => {
     const b = ball({ x: GOAL_LINE_WEST_X + VC_BALL_RADIUS + 0.05, z: GOAL_Z_MIN - 0.2, vx: -12 });
     expect(stepBallPhysics(b, GROUND)).toBe(null);
     expect(b.vx).toBeGreaterThan(0);
+  });
+});
+
+describe('goal frame (over-the-bar shots stay in play)', () => {
+  it('a ball crossing the west line between the posts ABOVE the bar does not score and banks back in', () => {
+    // Airborne above the crossbar (y > GOAL_HEIGHT): an over-charged, ballooned shot.
+    const b = ball({ x: GOAL_LINE_WEST_X + 0.3, z: PITCH_CENTER.z, y: GOAL_HEIGHT + 1, vx: -12 });
+    const goal = stepBallPhysics(b, GROUND);
+    expect(goal).toBe(null); // still not a goal: over the bar
+    expect(b.vx).toBeGreaterThan(0); // banked back east, into play
+    expect(b.x).toBeGreaterThanOrEqual(GOAL_LINE_WEST_X); // did not escape through the mouth
+  });
+
+  it('a ball crossing the east line between the posts ABOVE the bar does not score and banks back in', () => {
+    const b = ball({ x: GOAL_LINE_EAST_X - 0.3, z: PITCH_CENTER.z, y: GOAL_HEIGHT + 1, vx: 12 });
+    const goal = stepBallPhysics(b, GROUND);
+    expect(goal).toBe(null);
+    expect(b.vx).toBeLessThan(0); // banked back west, into play
+    expect(b.x).toBeLessThanOrEqual(GOAL_LINE_EAST_X); // did not escape through the mouth
+  });
+
+  it('an over-the-bar shot banks off the frame and never escapes while airborne', () => {
+    // Near the east goal and above the crossbar, moving toward the mouth: it must
+    // reflect off the frame (vx flips west) and stay inside the pitch, never score.
+    const b = ball({ x: PITCH.xMax - 6, z: PITCH_CENTER.z, y: GOAL_HEIGHT + 1.5, vx: 18, vy: 3 });
+    let reflected = false;
+    for (let i = 0; i < 30; i++) {
+      const prevVx = b.vx;
+      const goal = stepBallPhysics(b, GROUND);
+      expect(goal).toBe(null); // over the bar: never a goal
+      if (prevVx > 0 && b.vx < 0) reflected = true;
+      expect(b.x).toBeGreaterThanOrEqual(PITCH.xMin);
+      expect(b.x).toBeLessThanOrEqual(PITCH.xMax);
+    }
+    expect(reflected).toBe(true); // it actually hit the frame and came back in
+  });
+
+  it('a low shot between the posts still scores (the frame does not steal goals)', () => {
+    const b = ball({ x: GOAL_LINE_EAST_X - 0.3, z: PITCH_CENTER.z, y: GROUND, vx: 12 });
+    expect(stepBallPhysics(b, GROUND)).toBe('A');
   });
 });
 

@@ -18,8 +18,6 @@ export const PET_ACTION_ICONS = {
   aggressive: 'pet_aggressive',
 } as const;
 
-export type PetActionIconKey = keyof typeof PET_ACTION_ICONS;
-
 // Pure decision for the hunter Feed Pet button's disabled state. Previously
 // the button always looked identically clickable, but clicking it with no
 // eligible food just popped an error toast, and there was no way to tell in
@@ -34,6 +32,52 @@ export type PetFeedDisabledReasonKey =
 export interface PetFeedButtonState {
   disabled: boolean;
   reasonKey: PetFeedDisabledReasonKey | null;
+}
+
+export interface PetSpecialButtonState {
+  iconId: string;
+  labelKey: 'hud.pet.abyssalChain' | 'hud.pet.felbolt';
+  titleKey: 'hud.pet.abyssalChainTitle' | 'hud.pet.felboltTitle';
+  descKey: 'hud.pet.abyssalChainDesc' | 'hud.pet.felboltDesc';
+  cooldown: number;
+  autocast: boolean;
+}
+
+/** Pure pet-bar projection for template-authored Warlock abilities. The HUD
+ *  receives only localization keys and display state, while combat remains in
+ *  the server-authoritative pet-skill module. */
+export function petSpecialButtonState(
+  template:
+    | {
+        petChainPull?: { ability: string };
+        petRanged?: { ability?: string; active?: { cooldown: number } };
+      }
+    | undefined,
+  timer: number | undefined,
+  autocast: boolean | undefined,
+): PetSpecialButtonState | null {
+  const cooldown = Math.ceil(Math.max(0, timer ?? 0));
+  if (template?.petChainPull) {
+    return {
+      iconId: template.petChainPull.ability,
+      labelKey: 'hud.pet.abyssalChain',
+      titleKey: 'hud.pet.abyssalChainTitle',
+      descKey: 'hud.pet.abyssalChainDesc',
+      cooldown,
+      autocast: autocast === true,
+    };
+  }
+  if (template?.petRanged?.active && template.petRanged.ability === 'emberkin_felbolt') {
+    return {
+      iconId: template.petRanged.ability,
+      labelKey: 'hud.pet.felbolt',
+      titleKey: 'hud.pet.felboltTitle',
+      descKey: 'hud.pet.felboltDesc',
+      cooldown,
+      autocast: autocast === true,
+    };
+  }
+  return null;
 }
 
 /**

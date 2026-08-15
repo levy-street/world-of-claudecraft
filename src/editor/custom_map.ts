@@ -1,9 +1,11 @@
+import { WORLD_SEED } from '../sim/world_seed';
 // The CustomMap document: the editor's canonical, serializable map. The type and
 // its sanitizer live in src/sim/map_doc.ts (shared with the server, which
 // validates uploaded documents with the SAME code); this module adapts the
 // document to the editor's live editing model and projects it onto the engine's
 // WorldContent for play-test. Pure: no DOM, Vitest-importable.
 
+import { clonePropsWithoutEastbrookLayout } from '../sim/custom_world_props';
 import { BUILTIN_WORLD, PLAYER_START } from '../sim/data';
 import {
   collideRadiusFor,
@@ -28,9 +30,20 @@ export type CustomMapMeta = MapDocMeta;
 // here; serialization casts back to the mutable MapDoc shape.
 export type CustomMap = Omit<MapDoc, 'content'> & { content: ZoneContent };
 
-// The game's fixed offline seed; a fresh map defaults to it so its built-in
-// derived terrain matches what the editor previews (mirrors DEFAULT_PLAYTEST_SEED).
-const DEFAULT_SEED = 20061;
+// CustomMap and MapDoc describe the SAME on-wire document: only the static
+// type of `content` differs (CustomMap's ZoneContent is readonly so the
+// editor can share live table references with the marker model; MapDoc's
+// MapDocContent is mutable, the shape the shared sanitizer/serializer and the
+// server expect). The unsafe cast that bridges the two lives here, ONCE, so
+// every save/serialize call site asks for the shared shape by name instead of
+// re-deriving `map as unknown as MapDoc` inline.
+export function toMapDoc(map: CustomMap): MapDoc {
+  return map as unknown as MapDoc;
+}
+
+// The shipped world seed; a fresh map defaults to it so its built-in derived
+// terrain matches what the editor previews (mirrors DEFAULT_PLAYTEST_SEED).
+const DEFAULT_SEED = WORLD_SEED;
 
 function deepClone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
@@ -97,8 +110,9 @@ export function customMapFromContent(
   return map;
 }
 
-// Project a CustomMap onto the engine's WorldContent for play-testing. Props
-// come from the built-in world (the editor does not author them yet); free
+// Project a CustomMap onto the engine's WorldContent for play-testing. The
+// editor does not author structured ZoneProps yet, so custom worlds retain an
+// independent clone of reusable built-in props outside Eastbrook. Free
 // placements carry their collide footprint so the Sim's colliders and the
 // renderer read the SAME records.
 export function customMapToWorldContent(map: CustomMap): WorldContent {
@@ -109,7 +123,7 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     npcs: deepClone(map.content.npcs as WorldContent['npcs']),
     groundObjects: deepClone(map.content.objects as WorldContent['groundObjects']),
     roads: deepClone((map.content.roads ?? BUILTIN_WORLD.roads) as WorldContent['roads']),
-    props: deepClone(BUILTIN_WORLD.props),
+    props: clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props),
     playerStart: { x: start.x, z: start.z },
     terrainEdits: deepClone(map.terrainEdits),
     placements: placementsToPlayAssets(map.placements),

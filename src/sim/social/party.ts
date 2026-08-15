@@ -16,16 +16,23 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
-// from sim.ts with the only code that reads them; do NOT inline new numbers.
+// from sim.ts with the code that reads them; do NOT inline new numbers.
 const PARTY_MAX = 5;
 const RAID_MIN = 5;
-const RAID_MAX = 10;
+// The largest roster any group can hold, enforced at every join site below
+// (partyInvite, partyAccept, and the Dungeon Finder formation seam). The one cap
+// with a reader outside this file: it is also the honest ceiling on how many
+// players a client-supplied group-wide pid list can name, so server/game.ts
+// imports it to bound the masterAssign wire case (#2524). Raising it widens that
+// wire bound too, which is the intent.
+export const RAID_MAX = 10;
 const RAID_GROUP_MAX = 5;
 
 // One indivisible Dungeon Finder unit as the formation seam receives it: a
@@ -526,6 +533,11 @@ export class PartyMachine {
   removeFromParty(pid: number, verb: string): void {
     const party = this.partyOf(pid);
     if (!party) return;
+    // Revoke any pending master-loot curate-phase assign authority the departing
+    // pid holds: a kick or a voluntary leave must not let a former member keep
+    // resolving/assigning a roll for a group they are no longer in, even though
+    // they stay connected (see revokeMasterLooterAuthority).
+    revokeMasterLooterAuthority(this.ctx, pid);
     const beforeLooter = effectiveMasterLooter(
       party.lootStrategies.master,
       party.leader,
@@ -550,6 +562,12 @@ export class PartyMachine {
     if (party.members.length <= 1) {
       for (const mPid of party.members) {
         this.partyByPid.delete(mPid);
+        // The members left behind lose their group too, so any curate-phase roll
+        // they still master is orphaned: without this it would sit invisible to
+        // activeLootRolls (which skips masterLooter !== undefined) for the full
+        // 300s master timeout, and the only way out would be the read-side gate
+        // in assignMasterLoot. Convert it to need/greed immediately instead.
+        revokeMasterLooterAuthority(this.ctx, mPid);
         this.ctx.emit({ type: 'log', text: 'Your party has disbanded.', color: '#aaf', pid: mPid });
       }
       this.parties.delete(party.id);
@@ -570,6 +588,5 @@ export class PartyMachine {
       }
     }
     this.announceLooterShift(party, beforeLooter);
-    if (party.raid) this.normalizeRaidGroups(party);
   }
 }

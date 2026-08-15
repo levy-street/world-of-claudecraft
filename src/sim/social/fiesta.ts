@@ -20,6 +20,10 @@
 // unchanged. `playerMods` and `fiestaMatchInfo` STAY on Sim (read by ~13 recalc
 // sites / the presentation surface); this module consumes playerMods via ctx.
 
+import { cleanupPaladinAegis } from '../combat/paladin_aegis';
+import { stripSunGodVerdicts } from '../combat/paladin_sun_verdict';
+import { stripPaladinDevotionsFromSource } from '../combat/paladin_support';
+import { emitRainOfFireStop } from '../combat/warlock_meteor_events';
 import {
   AUGMENTS_BY_ID,
   type AugmentDef,
@@ -38,9 +42,10 @@ import {
 } from '../content/talents';
 import { abilitiesKnownAt, arenaOrigin } from '../data';
 import * as deedsMod from '../deeds';
-import { ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from '../dungeon_layout';
+import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
 import { awardFiestaKillHonor } from '../pvp';
+import { aurasSurvivingCleanSlate } from '../resurrection';
 import { Rng } from '../rng';
 import type { ArenaMatch, FiestaPowerup, FiestaState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -61,7 +66,7 @@ export const FIESTA_RESPAWN_PER_MINUTE = 1.5; // and the bout dragging on length
 export const FIESTA_RESPAWN_MAX = 14; // cap so it never feels hopeless
 export const FIESTA_RING_CX = 0; // ring centre (instance-local) — the arena dais
 export const FIESTA_RING_CZ = 2;
-export const FIESTA_RING_START = 22; // radius covering both teams' spawns
+export const FIESTA_RING_START = 26; // radius covering the pit's full z extent and both teams' spawns
 export const FIESTA_RING_MIN = 6; // fully-closed radius
 export const FIESTA_RING_DPS_PCT = 0.06; // max-hp fraction per second taken outside the ring
 export const FIESTA_RING_SHRINK_RATE = 0.6; // yards/s the radius eases toward its target
@@ -108,6 +113,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
   const m: TalentModifiers = {
     spec: base.spec,
     role: base.role,
+    selected: { ...base.selected },
     stats: { ...base.stats },
     global: { ...base.global },
     abilities: {},
@@ -162,6 +168,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           buffPct: 0,
           castWhileMoving: false,
           damagePushbackImmune: false,
+          ignoreStealthRequirement: false,
           bonusCharges: 0,
           addEffects: [],
         };
@@ -294,10 +301,16 @@ export function fiestaRespawnTime(deaths: number, elapsed: number): number {
 export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | null): void {
   e.dead = true;
   e.hp = 0;
+  cleanupPaladinAegis(ctx, e.id);
+  stripSunGodVerdicts(ctx, e.id);
+  stripPaladinDevotionsFromSource(ctx, e.id);
   // Fiesta is a clean-slate minigame with its own timed revive: it intentionally strips
-  // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths.
-  e.auras = [];
+  // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths. The
+  // one exception is the operator-applied Cheater mark, which is account state rather
+  // than a carried buff: dying in a minigame must not shed a sanction (resurrection.ts).
+  e.auras = aurasSurvivingCleanSlate(e.auras);
   e.ccDr.clear();
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;
@@ -305,8 +318,22 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   // Hidden per-cast state ends with the cast it belongs to (the
   // parity samplers rely on inert values outside a live cast).
   e.gatherCastNodeId = '';
+  e.gatherCastToolRarity = '';
+  e.gatherCastEffectConfirmed = false;
+  e.craftCastRecipeId = '';
+  e.craftCastCommission = false;
+  e.craftCastBatchRemaining = 0;
+  e.craftCastBatchTotal = 0;
+  e.enchantCastItemId = '';
+  e.enchantCastBagSlot = 0;
+  e.enchantCastEnchantId = '';
+  e.enchantCastEquipSlot = '';
+  e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
+  e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
+  e.fishCastZoneId = '';
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
@@ -415,7 +442,10 @@ export function fiestaRevive(ctx: SimContext, match: ArenaMatch, e: Entity): voi
   const team = ctx.arenaTeamOf(match, e.id);
   if (!team) return;
   const origin = arenaOrigin(match.slot);
-  const spawns = team === 'A' ? ARENA_SPAWNS_A_2v2 : ARENA_SPAWNS_B_2v2;
+  // Fiesta is pinned to even (Coliseum) slots, so this always resolves the
+  // Coliseum spawns; the per-slot lookup keeps it correct regardless.
+  const map = arenaMapForSlot(match.slot);
+  const spawns = team === 'A' ? map.spawnsA2v2 : map.spawnsB2v2;
   const teamPids = team === 'A' ? match.teamA : match.teamB;
   const idx = Math.max(0, teamPids.indexOf(e.id));
   arenaMod.placeInArena(ctx, e, origin, spawns[idx] ?? spawns[0]);

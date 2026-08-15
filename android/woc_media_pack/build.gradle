@@ -1,0 +1,21 @@
+// Play Asset Delivery install-time pack carrying the heavy, immutable web
+// assets (public/media and public/audio) so the BASE module stays under
+// Google Play's 500 MB compressed-download ceiling (docs/mobile-store-release.md,
+// "Keeping the Play build under the size cap"). Install-time packs are
+// delivered with the install and merge into the app's AssetManager, which is
+// exactly how Capacitor serves the web tree (AndroidProtocolHandler ->
+// context.getAssets()), so the WebView sees one unchanged public/ tree.
+//
+// The assets under src/main/assets/ are NOT checked in. The
+// relocateHeavyWebAssets Gradle task in app/build.gradle derives their location
+// for each build: bundle builds move public/media and public/audio from the app
+// base into this install-time pack, while APK builds ensure those directories
+// live in the app base, restoring them from the pack after a bundle build.
+apply plugin: 'com.android.asset-pack'
+
+assetPack {
+    packName = "woc_media_pack"
+    dynamicDelivery {
+        deliveryType = "install-time"
+    }
+}

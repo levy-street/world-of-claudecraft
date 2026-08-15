@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Sztandar w dłoni',
+    desc: 'Przechwyć flagę na Polach Ciernistej Kotliny.',
+  },
+  pvp_bg_first_win: {
+    name: 'Kotlina się broni',
+    desc: 'Wygraj bitwę na Polach Ciernistej Kotliny.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Strażnik Kotliny',
+    desc: 'Wygraj 25 bitew na Polach Ciernistej Kotliny.',
+    title: 'Chorąży',
+  },
+  pvp_bg_captures_100: {
+    name: 'Sto Sztandarów',
+    desc: 'Przechwyć 100 flag na Polach Ciernistej Kotliny w ciągu swojej kariery.',
+  },
+  dgn_rift: {
+    name: 'Wędrowiec Szczelin',
+    desc: 'Oczyść Szczelinę, pokonując jej bossa piętra.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Władca Szczelin',
+    desc: 'Oczyść Szczelinę rangi S, najtrudniejszy poziom, jaki może wygenerować portal Szczeliny.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Łamacz szyków',
+    desc: 'Zdobądź 10 000 Honoru w ciągu całej kariery. Wydawanie go nigdy nie kosztuje cię rangi.',
+    title: 'Łamacz szyków',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Pustoszyciel pól',
+    desc: 'Zdobądź 40 000 Honoru w ciągu całej kariery, mając za sobą sezon prawdziwej wojny.',
+    title: 'Pustoszyciel pól',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Ukoronowany wojną',
+    desc: 'Zdobądź 150 000 Honoru w ciągu całej kariery. Rzadkość na każdym królestwie, i tak powinno być.',
+    title: 'Ukoronowany wojną',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Pogromca Wylęgu',
+    desc: 'Zgładź Władcę Wylęgu Smoczej Paszczy pośród jego jaj, przez ryk, rozcinający cios i ogień.',
+  },
+  chr_maw_matriarch: {
+    name: 'Niebo Milknie',
+    desc: 'Zgładź Cindraleth, Matriarchinię Paszczy, w jej kraterowym gnieździe nad Smoczą Paszczą.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Zbiory na tarasach',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol we Frostveilu.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Pierwszy lod na jeziorze',
+    desc: 'Zlow rybe w wodach Frostveilu.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Zbiory Amberfallu',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Amberfallu.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Polow z wielkich mokradel',
+    desc: 'Zlow rybe w wodach Amberfallu.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Sniace zbiory',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Nightbloomie.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Kragi na ksiezycowej studni',
+    desc: 'Zlow rybe w wodach Nightbloomu.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Zbiory pod koronami',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Wraithwoodzie.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Rzut w lustrzanej zatoce',
+    desc: 'Zlow rybe w wodach Wraithwoodu.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Zbiory na palmowej plazy',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Palmreachu.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Rzut w szafirowej lagunie',
+    desc: 'Zlow rybe w wodach Palmreachu.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Dar parteru',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Evergardenie.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Rzut na platkowym stawie',
+    desc: 'Zlow rybe w wodach Evergardenu.',
+  },
   pvp_card_duel_first_win: {
     name: 'Zasady Domu',
     desc: 'Wygraj Pojedynek Karciany u Mistrza Kart.',
@@ -801,5 +897,129 @@ export const table: DeedLocaleTable = {
   soc_salvage_50: {
     name: 'Dziedziniec Rozbieraczy',
     desc: 'Odzyskaj 50 sztuk ekwipunku, rozkładając je na surowce.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Kotlina Odgryza Się',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroiczna: Kotlina Dzikiego Serca',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca na heroicznym poziomie trudności.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Plon z wyżyn',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wyżynach Ciernistego Szczytu.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Żarłok, doliczony',
+    desc: 'Zabij Robakopaszczego Żarłoka, czwartą osławioną zgrozę Trzęsawiska Mokrzawia pominiętą w pierwszym rachunku.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Więcej imion wyrytych w skale',
+    desc: 'Zabij Starego Skalnopaszczego i Odłamkowładcę Kazzixa, dwie kolejne osławione zgrozy Wyżyn Ciernistego Szczytu pominięte w pierwszym rachunku.',
+  },
+  chr_gleamstag: {
+    name: 'Legenda, która nigdy nie uderzała pierwsza',
+    desc: 'Zabij Lśniącego Jelenia, rzadkiego i płochliwego elitarnego przeciwnika, który atakuje tylko osaczony.',
+  },
+  chr_hollow_rares: {
+    name: 'Stado pamięta',
+    desc: 'Zabij Starego Szpikoskorupa i Aurelhorna, Pierwszego ze Stada, dwóch wędrownych rzadkich bossów Zasłoniętej Kotliny.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Obfitość mokradeł',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wierzbowych Mokradłach.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Kręgi na Liliowych Wrzosowiskach',
+    desc: 'Złów rybę w wodach Wierzbowych Mokradeł.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Zbiory na przylądku',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wichrowym Grzbiecie.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Żyłka w Lustrzanym Jeziorku',
+    desc: 'Złów rybę w wodach Wichrowego Grzbietu.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Wyspiarskie zapasy',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Dalekim Wybrzeżu.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Co wiedzą mewy',
+    desc: 'Złów rybę w wodach Dalekiego Wybrzeża.',
+  },
+  prog_engineering_rare: {
+    name: 'Precyzyjna inżynieria',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Inżynierii.',
+  },
+  prog_alchemy_rare: {
+    name: 'Rzadki rocznik',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Alchemii.',
+  },
+  prog_cooking_rare: {
+    name: 'Danie do zapamiętania',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Gotowaniu.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Precyzyjne garbowanie',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Garbarstwie.',
+  },
+  prog_tailoring_rare: {
+    name: 'Mistrzowski ścieg',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Krawiectwie.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Hartowane na połysk',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Broni.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Opancerzone do perfekcji',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Pancerzy.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Strażnik Łupów',
+    desc: 'Osiągnij rangę Kustosza 2 w Relikwiarzu (10 wyjątkowych skatalogowanych relikwii).',
+    title: 'Strażnik Łupów',
+  },
+  col_reliquary_rank_3: {
+    name: 'Katalogista',
+    desc: 'Osiągnij rangę Kustosza 3 w Relikwiarzu (25 wyjątkowych skatalogowanych relikwii).',
+    title: 'Katalogista',
+  },
+  col_reliquary_rank_4: {
+    name: 'Arcykustosz',
+    desc: 'Osiągnij rangę Kustosza 4 w Relikwiarzu (50 wyjątkowych skatalogowanych relikwii).',
+    title: 'Arcykustosz',
+  },
+  col_reliquary_rank_5: {
+    name: 'Wieczne Łupy',
+    desc: 'Osiągnij rangę Kustosza 5 w Relikwiarzu (100 wyjątkowych skatalogowanych relikwii).',
+  },
+  col_reliquary_complete: {
+    name: 'Wielki Relikwiarz',
+    desc: 'Skataloguj w Relikwiarzu każdą relikwię, którą postać może zachować. Późniejszy rozrost katalogu nigdy ci tego nie odbierze.',
+    title: 'Kustosz Skarbca',
+  },
+  col_reliquary_conquerors: {
+    name: 'Półka Zdobywców',
+    desc: 'Skataloguj każdą relikwię z półki Zdobywcy w Relikwiarzu. Późniejszy rozrost katalogu nigdy ci tego nie odbierze.',
+    title: 'Łamacz Skarbca',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminowany',
+    desc: 'Iluminuj w Relikwiarzu kartę Heroiczny: Rajd Nythraxis.',
+    title: 'Światło Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminowany',
+    desc: 'Iluminuj w Relikwiarzu kartę Thunzharr, Budzący się Szczyt.',
+    title: 'Światło Thunzharru',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Sanktuarium iluminowane',
+    desc: 'Iluminuj w Relikwiarzu kartę Heroiczne: Sanktuarium Grobowego Żmija.',
+    title: 'Światło Sanktuarium',
   },
 };

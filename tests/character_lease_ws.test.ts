@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // the two character-lease functions, so the handshake drives with no live
 // database and no module mock: the lease fns are vi.fn spies on the deps object.
 import { createWsAuth } from '../server/ws_auth';
+import { ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
 
 const ALREADY_IN_WORLD = 'character already in world';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -15,7 +16,11 @@ function fakeWs() {
     sent,
     closes,
     ws: {
+      // OPEN mirrors the real ws instance constant beside readyState: the
+      // mid-handshake death re-check compares the two, and a fixture with
+      // readyState but no OPEN reads as died-mid-handshake on every join.
       readyState: 1,
+      OPEN: 1,
       send: (p: string) => sent.push(JSON.parse(p)),
       close: (code?: number, reason?: string) => closes.push({ code, reason }),
       on: () => {},
@@ -23,7 +28,8 @@ function fakeWs() {
   };
 }
 
-const authFrame = (character: number) => JSON.stringify({ t: 'auth', token: 'tok', character });
+const authFrame = (character: number) =>
+  JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character });
 const fakeReq = () => ({}) as any;
 
 // Build a full WsAuthDeps bag whose cheap checks all pass, so a handshake reaches
@@ -60,6 +66,13 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     hasSessionForCharacter: hasSessionSpy,
     join: joinSpy,
     clients: { size: 1 },
+    // Consumed by the mid-handshake death re-check on a socket that died
+    // during the awaits; a live-socket fixture never reaches it.
+    socketClosed: vi.fn(() => true),
+    beginGeneralChatRateLimitHydration: vi.fn(() => ({
+      resolve: (policy: unknown) => policy,
+      release: vi.fn(),
+    })),
   };
   const deps: any = {
     game,
@@ -82,7 +95,17 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     releaseCharacterLease: releaseSpy,
     bankBonusForAccount: bankBonusSpy,
   };
-  return { deps, game, joinSpy, hasSessionSpy, acquireSpy, releaseSpy, bankBonusSpy, session };
+  return {
+    deps,
+    game,
+    joinSpy,
+    hasSessionSpy,
+    acquireSpy,
+    releaseSpy,
+    bankBonusSpy,
+    session,
+    character,
+  };
 }
 
 beforeEach(() => {
@@ -154,6 +177,45 @@ describe('ws auth character load lease', () => {
     expect(sent).not.toContainEqual({ t: 'error', error: ALREADY_IN_WORLD });
     // A successful join owns the lease; leave() releases it, not the handshake.
     expect(releaseSpy).not.toHaveBeenCalled();
+  });
+
+  it('reloads after the lease and joins with the refreshed state', async () => {
+    const { deps, character, joinSpy, acquireSpy } = makeDeps();
+    const staleCharacter = { ...character, state: { marker: 'before-migration' } };
+    const refreshedCharacter = { ...character, state: { marker: 'after-migration' } };
+    const getCharacterSpy = vi
+      .fn()
+      .mockResolvedValueOnce(staleCharacter)
+      .mockResolvedValueOnce(refreshedCharacter);
+    deps.getCharacter = getCharacterSpy;
+    const { ws } = fakeWs();
+
+    await createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq());
+
+    expect(getCharacterSpy).toHaveBeenCalledTimes(2);
+    expect(acquireSpy.mock.invocationCallOrder[0]).toBeLessThan(
+      getCharacterSpy.mock.invocationCallOrder[1],
+    );
+    expect(joinSpy).toHaveBeenCalledTimes(1);
+    expect(joinSpy.mock.calls[0][5]).toEqual({ marker: 'after-migration' });
+  });
+
+  it('releases the acquired lease when the post-lease reload rejects', async () => {
+    const { deps, character, joinSpy, acquireSpy, releaseSpy } = makeDeps();
+    deps.getCharacter = vi
+      .fn()
+      .mockResolvedValueOnce(character)
+      .mockRejectedValueOnce(new Error('reload failed'));
+    const { ws } = fakeWs();
+
+    await expect(
+      createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq()),
+    ).rejects.toThrow('reload failed');
+
+    const nonce = acquireSpy.mock.calls[0][2];
+    expect(releaseSpy).toHaveBeenCalledTimes(1);
+    expect(releaseSpy).toHaveBeenCalledWith(character.id, nonce);
+    expect(joinSpy).not.toHaveBeenCalled();
   });
 
   it('awaits a nonce-fenced release when join refuses and no session owns it', async () => {

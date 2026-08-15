@@ -18,7 +18,7 @@
 // as a bug (a veteran refinement). Completion or
 // attunement retires it; nothing else does.
 
-import type { QuestState } from '../../../sim/types';
+import type { QuestState, StationDef } from '../../../sim/types';
 import { isStationMasterNpc } from '../vendor/train_view';
 
 /** The professions onboarding quest the hint row points at (zone1.ts). */
@@ -33,8 +33,11 @@ export const GUILD_LETTER_SPOKESMAN_NPC_ID = 'smith_haldren';
 /** True for the NPCs whose gossip dialog carries the hint row: the letter's
  *  spokesman plus every resident station master (template id, never an
  *  entity id). */
-export function isProfessionMasterNpc(templateId: string): boolean {
-  return templateId === GUILD_LETTER_SPOKESMAN_NPC_ID || isStationMasterNpc(templateId);
+export function isProfessionMasterNpc(
+  templateId: string,
+  stations: readonly StationDef[],
+): boolean {
+  return templateId === GUILD_LETTER_SPOKESMAN_NPC_ID || isStationMasterNpc(templateId, stations);
 }
 
 /** Whether the hint row renders for this NPC given the viewer's q_prof_intro
@@ -45,6 +48,7 @@ export function professionIntroHintVisible(
   templateId: string,
   introState: QuestState,
   hasAnyAttunement: boolean,
+  stations: readonly StationDef[],
 ): boolean {
-  return isProfessionMasterNpc(templateId) && introState !== 'done' && !hasAnyAttunement;
+  return isProfessionMasterNpc(templateId, stations) && introState !== 'done' && !hasAnyAttunement;
 }

@@ -29,10 +29,17 @@
 
 import { DEMON_TOWER_SEED, DEMON_TOWER_THEME_NAME } from '../content/rift/demon_tower';
 import { MOBS, riftInstanceOrigin } from '../data';
-import { bumpDeedStat } from '../deeds';
 import { createGroundObject, createMob } from '../entity';
 import type { SimContext } from '../sim_context';
-import { RIFT_RANK_BASE_LEVEL, riftHeroicTemplate } from './ranks';
+import {
+  RIFT_HEROIC_MIN_MOVE_SPEED,
+  RIFT_RANK_BASE_LEVEL,
+  type RiftRankTuning,
+  type RiftSpawnRole,
+  riftRankTemplate,
+  riftRoleDamageMultiplier,
+  riftRoleHealthMultiplier,
+} from './ranks';
 import {
   DEMON_TOWER_FLOOR_COUNT,
   DEMON_TOWER_MAX_LIVE_DEMONS,
@@ -44,6 +51,20 @@ import type { RiftInstance } from './types';
 
 /** The floor plan's puzzle kind that marks an instance as a tower floor. */
 export const DEMON_TOWER_PUZZLE_KIND = 'demon_waves';
+
+/** Adapt the tower-local floor curve to the shared rank transform contract. */
+export function demonTowerRankTuning(floorIndex: number): RiftRankTuning {
+  const tuning = demonTowerFloorTuning(floorIndex);
+  return {
+    healthMultiplier: tuning.healthMultiplier,
+    damageMultiplier: tuning.damageMultiplier,
+    bossHealthMultiplier: tuning.healthMultiplier,
+    bossDamageMultiplier: tuning.damageMultiplier,
+    addDamageMultiplier: tuning.addDamageMultiplier,
+    armorMultiplier: tuning.armorMultiplier,
+    minMoveSpeed: RIFT_HEROIC_MIN_MOVE_SPEED,
+  };
+}
 
 /** Where the tower stands: the eastern reach of Thornpeak Heights (zone 3, the
  * endgame zone, z 540..900), clear of the authored points of interest so the
@@ -109,11 +130,11 @@ function towerBossAlive(ctx: SimContext, inst: RiftInstance): boolean {
 
 /**
  * Spawn one demon for the tower. The stat transform is the SHARED
- * `riftHeroicTemplate` (the tower's per-floor tuning is structurally the same
- * four multipliers a heroic rank uses), so there is one scaling implementation in
- * the codebase rather than a second copy that can drift. What differs is where
- * the multipliers come from: how high the raid has climbed, not which rank of
- * portal it walked through.
+ * `riftRankTemplate`, so there is one scaling implementation in the codebase
+ * rather than a second copy that can drift. What differs is where the
+ * multipliers come from: how high the raid has climbed, not which rank of portal
+ * it walked through. Tower bosses deliberately use the same stat curve as its
+ * trash; their authored base templates provide the boss baseline.
  */
 function spawnTowerDemon(
   ctx: SimContext,
@@ -127,18 +148,20 @@ function spawnTowerDemon(
   const template = MOBS[templateId];
   if (!template) return null;
   const tuning = demonTowerFloorTuning(inst.floorIndex);
+  const rankTuning = demonTowerRankTuning(inst.floorIndex);
+  const role: RiftSpawnRole = asBoss ? 'boss' : 'trash';
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const mob = createMob(
     ctx.nextId++,
-    riftHeroicTemplate(template, tuning),
+    riftRankTemplate(template, rankTuning, role),
     level,
     ctx.groundPos(origin.x + x, origin.z + z),
   );
   // Mechanic damage/heal numbers are read from the base MOBS table at fire time,
   // so the template transform above cannot reach them; these per-entity
   // multipliers apply on top.
-  mob.mechanicDamageMult = tuning.damageMultiplier;
-  mob.mechanicHealMult = tuning.healthMultiplier;
+  mob.mechanicDamageMult = riftRoleDamageMultiplier(rankTuning, role);
+  mob.mechanicHealMult = riftRoleHealthMultiplier(rankTuning, role);
   if (asBoss) mob.riftMechanicLimit = tuning.mechanicLimit;
   mob.facing = Math.PI;
   mob.prevFacing = mob.facing;
@@ -242,8 +265,8 @@ export function updateDemonTower(
   for (const pid of playerIds) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
-    bumpDeedStat(ctx, meta, 'demonTowerFloorsCleared', 1);
-    if (summit) bumpDeedStat(ctx, meta, 'demonTowerClears', 1);
+    ctx.bumpDeedStat(meta, 'demonTowerFloorsCleared', 1);
+    if (summit) ctx.bumpDeedStat(meta, 'demonTowerClears', 1);
   }
   for (const pid of playerIds) {
     if (summit) {

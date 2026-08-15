@@ -5,8 +5,9 @@ import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
 import { generateDecorations, groundHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-export const SEED = 20061;
+export const SEED = WORLD_SEED;
 
 export const RITUAL_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,

@@ -66,6 +66,18 @@ export const ACHIEVEMENT_MAP: Record<string, string> = {
   col_seven_regalia: 'ACH_SEVEN_REGALIA',
   col_all_slots: 'ACH_ALL_SLOTS',
   col_glimmerfin: 'ACH_GLIMMERFIN',
+  // Phase 18 Reliquary rewards ladder: the Curator rank milestones plus the
+  // completion / Illumination deeds join the mirror. Registration of these
+  // ACH names in Steamworks App Admin is a maintainer release task.
+  col_reliquary_rank_2: 'ACH_RELIQUARY_RANK_2',
+  col_reliquary_rank_3: 'ACH_RELIQUARY_RANK_3',
+  col_reliquary_rank_4: 'ACH_RELIQUARY_RANK_4',
+  col_reliquary_rank_5: 'ACH_RELIQUARY_RANK_5',
+  col_reliquary_complete: 'ACH_RELIQUARY_COMPLETE',
+  col_reliquary_conquerors: 'ACH_RELIQUARY_CONQUERORS',
+  col_reliquary_illum_nythraxis_heroic: 'ACH_RELIQUARY_ILLUM_NYTHRAXIS_HEROIC',
+  col_reliquary_illum_thunzharr: 'ACH_RELIQUARY_ILLUM_THUNZHARR',
+  col_reliquary_illum_gravewyrm_heroic: 'ACH_RELIQUARY_ILLUM_GRAVEWYRM_HEROIC',
   pvp_arena_1v1_1750: 'ACH_ARENA_1V1_1750',
   pvp_arena_1v1_1900: 'ACH_ARENA_1V1_1900',
   pvp_arena_2v2_1900: 'ACH_ARENA_2V2_1900',

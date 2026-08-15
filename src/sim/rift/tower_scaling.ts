@@ -6,18 +6,14 @@
 // is guaranteed by construction rather than by a hand-maintained table somebody
 // can typo into a flat step (pinned by tests/demon_tower_scaling.test.ts).
 //
-// Where the anchors come from: floor 1 sits at the untuned rift baseline (x1.0,
-// the C-rank stat line) and floor 10 lands beyond the S-rank heroic rung, so the
-// climb spans the whole existing rift difficulty ladder and then goes past its
-// top. Reference points in rift/ranks.ts RIFT_HEROIC_TUNING: A is hp x1.9 /
-// damage x1.6, heroic S is hp x5.0 / damage x4.0. The steps below put floor 5
-// just past A and floor 10 past heroic S on BOTH axes.
+// Floor 1 anchors the tower-local curve at x1.0. The remaining floors compound
+// from that authored baseline rather than borrowing the independently balanced
+// heroic-rift rank table. Keeping those curves separate means a release can
+// retune ordinary rifts without silently changing this ten-floor raid.
 //
-// The tower is TEN-player raid content while the heroic rift ladder is tuned for
-// five, so the health curve deliberately outruns the damage curve: double the
-// raid is double the damage output, and the summit has to survive it. Floor 10
-// lands near 2x heroic S health but only ~1.2x its damage, because a one-shot
-// wall is not difficulty, it is a coin flip.
+// The tower is TEN-player raid content, so the health curve deliberately
+// outruns the damage curve: double the raid is double the damage output, and the
+// summit has to survive it without turning incoming damage into a one-shot wall.
 //
 // Pure leaf: no SimContext, no rng, no state. A Vitest imports it directly.
 

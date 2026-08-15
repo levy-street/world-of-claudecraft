@@ -1,0 +1,483 @@
+[
+  {
+    "name": "01-east-hill-yawhalfpi",
+    "pos": {
+      "x": 300,
+      "y": 4.3,
+      "z": 100
+    },
+    "fog": {
+      "near": 5999.999996386415,
+      "far": 6400
+    },
+    "n": 421,
+    "calls": 347,
+    "tris": 2827812,
+    "foliage": {
+      "visibleBuckets": 145,
+      "visibleDraws": 145,
+      "visibleTris": 2857772,
+      "visByLod": {
+        "core": 47,
+        "near-fill": 46,
+        "rock": 14,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 47,
+        "near-fill": 46,
+        "rock": 14,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 1192476,
+        "near-fill": 971979,
+        "rock": 155412,
+        "shadow": 402481,
+        "dressing": 123878,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "02-east-hill-yaw3halfpi",
+    "pos": {
+      "x": 300,
+      "y": 4.3,
+      "z": 100
+    },
+    "fog": {
+      "near": 5999.9999999373085,
+      "far": 6400
+    },
+    "n": 421,
+    "calls": 653,
+    "tris": 7030068,
+    "foliage": {
+      "visibleBuckets": 112,
+      "visibleDraws": 112,
+      "visibleTris": 2289518,
+      "visByLod": {
+        "rock": 14,
+        "core": 30,
+        "near-fill": 30,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "rock": 14,
+        "core": 30,
+        "near-fill": 30,
+        "shadow": 22,
+        "dressing": 13,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "rock": 155412,
+        "core": 841692,
+        "near-fill": 754509,
+        "shadow": 402481,
+        "dressing": 123878,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "03-vale-forest",
+    "pos": {
+      "x": -40,
+      "y": 2.5,
+      "z": 60
+    },
+    "fog": {
+      "near": 5999.999999999963,
+      "far": 6400
+    },
+    "n": 339,
+    "calls": 880,
+    "tris": 8030558,
+    "foliage": {
+      "visibleBuckets": 155,
+      "visibleDraws": 155,
+      "visibleTris": 3064565,
+      "visByLod": {
+        "core": 52,
+        "near-fill": 50,
+        "shadow": 21,
+        "rock": 12,
+        "dressing": 17,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 52,
+        "near-fill": 50,
+        "shadow": 21,
+        "rock": 12,
+        "dressing": 17,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 1371425,
+        "near-fill": 1129056,
+        "shadow": 292409,
+        "rock": 119680,
+        "dressing": 140449,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "04-cliff-south-vista",
+    "pos": {
+      "x": 0,
+      "y": 9.8,
+      "z": 615
+    },
+    "fog": {
+      "near": 5999.9999999999745,
+      "far": 6400
+    },
+    "n": 333,
+    "calls": 775,
+    "tris": 11713332,
+    "foliage": {
+      "visibleBuckets": 198,
+      "visibleDraws": 198,
+      "visibleTris": 4662311,
+      "visByLod": {
+        "core": 66,
+        "near-fill": 68,
+        "rock": 27,
+        "shadow": 16,
+        "dressing": 18,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 66,
+        "near-fill": 68,
+        "rock": 27,
+        "shadow": 16,
+        "dressing": 18,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 1799354,
+        "near-fill": 1610913,
+        "rock": 315068,
+        "shadow": 406032,
+        "dressing": 519398,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "05-cliff-southwest",
+    "pos": {
+      "x": 0,
+      "y": 9.8,
+      "z": 615
+    },
+    "fog": {
+      "near": 5999.999999999978,
+      "far": 6400
+    },
+    "n": 299,
+    "calls": 861,
+    "tris": 9141718,
+    "foliage": {
+      "visibleBuckets": 190,
+      "visibleDraws": 190,
+      "visibleTris": 4524985,
+      "visByLod": {
+        "core": 66,
+        "near-fill": 68,
+        "rock": 27,
+        "shadow": 8,
+        "dressing": 18,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 66,
+        "near-fill": 68,
+        "rock": 27,
+        "shadow": 8,
+        "dressing": 18,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 1799354,
+        "near-fill": 1610913,
+        "rock": 315068,
+        "shadow": 268706,
+        "dressing": 519398,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "06-north-at-ridge",
+    "pos": {
+      "x": 0,
+      "y": 4.1,
+      "z": 560
+    },
+    "fog": {
+      "near": 5999.99999999998,
+      "far": 6400
+    },
+    "n": 318,
+    "calls": 963,
+    "tris": 12322042,
+    "foliage": {
+      "visibleBuckets": 200,
+      "visibleDraws": 200,
+      "visibleTris": 4886676,
+      "visByLod": {
+        "core": 74,
+        "near-fill": 76,
+        "rock": 23,
+        "dressing": 24,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 74,
+        "near-fill": 76,
+        "rock": 23,
+        "dressing": 24,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 2121344,
+        "near-fill": 1902938,
+        "rock": 276032,
+        "dressing": 574816,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "07-murk-north",
+    "pos": {
+      "x": 0,
+      "y": 1.2,
+      "z": 300
+    },
+    "fog": {
+      "near": 5999.999999999982,
+      "far": 6400
+    },
+    "n": 320,
+    "calls": 1072,
+    "tris": 15272300,
+    "foliage": {
+      "visibleBuckets": 187,
+      "visibleDraws": 187,
+      "visibleTris": 4387360,
+      "visByLod": {
+        "core": 68,
+        "near-fill": 67,
+        "rock": 20,
+        "shadow": 14,
+        "dressing": 15,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 68,
+        "near-fill": 67,
+        "rock": 20,
+        "shadow": 14,
+        "dressing": 15,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 2004105,
+        "near-fill": 1684633,
+        "rock": 236674,
+        "shadow": 260091,
+        "dressing": 190311,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "08-gale-yawhalfpi",
+    "pos": {
+      "x": 420,
+      "y": 2.5,
+      "z": 360
+    },
+    "fog": {
+      "near": 5999.999999999985,
+      "far": 6400
+    },
+    "n": 421,
+    "calls": 356,
+    "tris": 2414719,
+    "foliage": {
+      "visibleBuckets": 140,
+      "visibleDraws": 140,
+      "visibleTris": 2655199,
+      "visByLod": {
+        "core": 40,
+        "near-fill": 42,
+        "rock": 13,
+        "shadow": 28,
+        "dressing": 14,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 40,
+        "near-fill": 42,
+        "rock": 13,
+        "shadow": 28,
+        "dressing": 14,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 913149,
+        "near-fill": 832714,
+        "rock": 159918,
+        "shadow": 512068,
+        "dressing": 225804,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "09-gale-yaw3halfpi",
+    "pos": {
+      "x": 420,
+      "y": 2.5,
+      "z": 360
+    },
+    "fog": {
+      "near": 5999.999999999987,
+      "far": 6400
+    },
+    "n": 376,
+    "calls": 948,
+    "tris": 7856407,
+    "foliage": {
+      "visibleBuckets": 107,
+      "visibleDraws": 107,
+      "visibleTris": 2205542,
+      "visByLod": {
+        "core": 34,
+        "near-fill": 34,
+        "rock": 13,
+        "shadow": 14,
+        "dressing": 9,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "core": 34,
+        "near-fill": 34,
+        "rock": 13,
+        "shadow": 14,
+        "dressing": 9,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "core": 857740,
+        "near-fill": 737801,
+        "rock": 159918,
+        "shadow": 251977,
+        "dressing": 186560,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "10-garden-north",
+    "pos": {
+      "x": 320,
+      "y": 2,
+      "z": 810
+    },
+    "fog": {
+      "near": 5999.999999999989,
+      "far": 6400
+    },
+    "n": 412,
+    "calls": 676,
+    "tris": 7110902,
+    "foliage": {
+      "visibleBuckets": 130,
+      "visibleDraws": 130,
+      "visibleTris": 2425423,
+      "visByLod": {
+        "rock": 21,
+        "core": 35,
+        "near-fill": 37,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "rock": 21,
+        "core": 35,
+        "near-fill": 37,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "rock": 269076,
+        "core": 745544,
+        "near-fill": 696379,
+        "shadow": 229732,
+        "dressing": 473146,
+        "impostor": 11546
+      }
+    }
+  },
+  {
+    "name": "11-garden-south",
+    "pos": {
+      "x": 320,
+      "y": 2,
+      "z": 810
+    },
+    "fog": {
+      "near": 5999.99999999999,
+      "far": 6400
+    },
+    "n": 389,
+    "calls": 689,
+    "tris": 7622441,
+    "foliage": {
+      "visibleBuckets": 146,
+      "visibleDraws": 146,
+      "visibleTris": 2778013,
+      "visByLod": {
+        "rock": 21,
+        "core": 43,
+        "near-fill": 45,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 3
+      },
+      "drawsByLod": {
+        "rock": 21,
+        "core": 43,
+        "near-fill": 45,
+        "shadow": 19,
+        "dressing": 15,
+        "impostor": 3
+      },
+      "trisByLod": {
+        "rock": 269076,
+        "core": 924979,
+        "near-fill": 869534,
+        "shadow": 229732,
+        "dressing": 473146,
+        "impostor": 11546
+      }
+    }
+  }
+]

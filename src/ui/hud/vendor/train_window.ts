@@ -16,6 +16,7 @@ import { craftNameText } from '../../char_window';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { formatMoney, formatNumber, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
@@ -56,8 +57,19 @@ export function renderTrainWindow(
   // A standalone trapping window (the mailbox shape), not the vendor's docked
   // bags pairing: announce it as a labeled dialog for the focus contract.
   markDialogRoot(el, { label: t('hudChrome.training.title', { name: masterName }) });
+  // Inventory and purse deltas repaint this window uninitiated (#2931), so
+  // carry keyboard focus across the wipe per the focus-across-a-REBUILD
+  // contract (the vendor_window idiom): the exact control when it survived
+  // enabled, else outward ladder neighbors, else the close button.
+  const focused = focusedWithin(el);
+  const focusKey = focused?.dataset.focusKey ?? null;
+  const focusedSlot = focused?.classList.contains('train-teachable')
+    ? [...el.querySelectorAll<HTMLButtonElement>('button.train-teachable')].indexOf(
+        focused as HTMLButtonElement,
+      )
+    : -1;
   const scrollTop = el.scrollTop;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.training.title', { name: masterName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.training.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.training.title', { name: masterName }))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.training.close'))}">${svgIcon('close')}</button></div>`;
 
   if (view.rows.length === 0) {
     const empty = document.createElement('div');
@@ -101,6 +113,10 @@ export function renderTrainWindow(
       // and the reason a rapid second click can never re-send the command.
       const pending = row.pending === true;
       button.disabled = pending || !row.affordable;
+      // Its own focus key so the restore ladder can find the same recipe row
+      // across a rebuild (locked rows and known divs are never focusable, so
+      // only teachable rows and the close button carry keys).
+      button.dataset.focusKey = `learn:${row.recipeId}`;
       const fee = feeLabel(row);
       button.setAttribute(
         'aria-label',
@@ -146,4 +162,25 @@ export function renderTrainWindow(
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';
   el.scrollTop = scrollTop;
+  // Restore focus LAST (a bare focus() may scroll the row into view, which
+  // must win over the raw scroll restore for a keyboard player; with no
+  // captured key, mouse users keep their exact scroll). Matched by dataset
+  // equality rather than an attribute selector: the keys embed recipe ids
+  // and this needs no CSS.escape (the vendor_window precedent).
+  if (focusKey) {
+    const keyed = [...el.querySelectorAll<HTMLButtonElement>('[data-focus-key]')];
+    const exact = keyed.find((b) => b.dataset.focusKey === focusKey);
+    // The same-slot ladder: the row's own slot first (after a removal it
+    // holds the next recipe), then outward neighbors, before the close fallback.
+    const ladder = [...el.querySelectorAll<HTMLButtonElement>('button.train-teachable')];
+    const slot = focusedSlot >= 0 ? Math.min(focusedSlot, ladder.length - 1) : -1;
+    const neighbors: (HTMLButtonElement | undefined)[] = [];
+    if (slot >= 0) {
+      for (let step = 0; step < ladder.length; step++) {
+        if (ladder[slot + step]) neighbors.push(ladder[slot + step]);
+        if (step > 0 && ladder[slot - step]) neighbors.push(ladder[slot - step]);
+      }
+    }
+    restoreFirstEnabled([exact, ...neighbors, keyed.find((b) => b.dataset.focusKey === 'close')]);
+  }
 }

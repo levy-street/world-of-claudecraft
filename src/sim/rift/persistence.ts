@@ -5,7 +5,7 @@
 import { ZONES, zoneAt } from '../data';
 import type { SimContext } from '../sim_context';
 import type { RiftTier } from '../types';
-import { RIFT_TIER_INFO, restoreNaturalRiftPortal } from './portals';
+import { RIFT_PORTAL_RETRY_DELAY, RIFT_TIER_INFO, restoreNaturalRiftPortal } from './portals';
 import { generateRiftPlan } from './rift_gen';
 import type {
   RiftAssetPipelineState,
@@ -50,11 +50,6 @@ export interface RiftWorldSavedEvent {
     duration: number;
     clearedAtMs: number;
   };
-}
-
-export interface LoadRiftWorldStateOptions {
-  /** Reject malformed state instead of tolerating it as an empty/partial save. */
-  strict?: boolean;
 }
 
 function finite(value: unknown, fallback = 0): number {
@@ -129,63 +124,13 @@ function validSavedEvent(input: unknown): input is RiftWorldSavedEvent {
   return Number.isFinite(event.seed) && Number.isFinite(event.baseLevel);
 }
 
-function validStrictSavedState(save: Partial<RiftWorldStateV1>): save is RiftWorldStateV1 {
-  if (
-    save.version !== 1 ||
-    !Number.isFinite(save.savedAtMs) ||
-    !Number.isInteger(save.spawnCount) ||
-    finite(save.spawnCount, -1) < 0 ||
-    !Number.isFinite(save.nextPortalAtMs) ||
-    !Array.isArray(save.events) ||
-    save.events.length > MAX_SAVED_EVENTS
-  ) {
-    return false;
-  }
-
-  const seen = new Set<string>();
-  for (const event of save.events) {
-    if (
-      !validSavedEvent(event) ||
-      seen.has(event.eventId) ||
-      !Number.isFinite(event.openedAtMs) ||
-      !Number.isFinite(event.expiresAtMs) ||
-      typeof event.contentId !== 'string' ||
-      typeof event.contentHash !== 'string'
-    ) {
-      return false;
-    }
-    seen.add(event.eventId);
-  }
-  return true;
-}
-
-/** Load defensively from JSONB. Returns the number of reconstructed open portals. */
-export function loadRiftWorldState(
-  ctx: SimContext,
-  input: unknown,
-  nowMs: number,
-  options: LoadRiftWorldStateOptions = {},
-): number {
-  if (input === null) return 0;
-  if (!input || typeof input !== 'object' || Array.isArray(input)) {
-    if (options.strict) throw new Error('unsupported or malformed shared Rift state');
-    return 0;
-  }
+/** Load defensively from JSONB. Returns the number of reconstructed open portals.
+ * Always tolerant: malformed or unsupported input reads as an empty save (the
+ * strict mode existed only for the retired COMMUNITY_TEST_RIFTS boot path). */
+export function loadRiftWorldState(ctx: SimContext, input: unknown, nowMs: number): number {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return 0;
   const save = input as Partial<RiftWorldStateV1>;
-  if (
-    options.strict
-      ? !validStrictSavedState(save)
-      : save.version !== 1 || !Array.isArray(save.events)
-  ) {
-    if (options.strict) throw new Error('unsupported or malformed shared Rift state');
-    return 0;
-  }
-  // The strict predicate above narrows only its ternary arm. Repeat the cheap
-  // shape guard so TypeScript and the tolerant path share one concrete array.
-  if (!Array.isArray(save.events)) {
-    if (options.strict) throw new Error('unsupported or malformed shared Rift state');
-    return 0;
-  }
+  if (save.version !== 1 || !Array.isArray(save.events)) return 0;
   const savedEvents = save.events;
 
   for (const portal of [...ctx.naturalRiftPortals]) {
@@ -277,7 +222,12 @@ export function loadRiftWorldState(
 
   const maxOrdinal = ctx.riftEvents.reduce((max, event) => Math.max(max, event.ordinal + 1), 0);
   ctx.riftPortalSpawnCount = Math.max(maxOrdinal, Math.max(0, Math.round(finite(save.spawnCount))));
+  // nextPortalAtMs predates the rotation policy, when it was the 2-4 h natural
+  // spawn deadline; today it is only the placement-failure backoff. Clamp so
+  // the first boot after the upgrade (or any oversized persisted value) can
+  // never gate every zone's spawns for hours.
   const nextAtMs = finite(save.nextPortalAtMs, nowMs);
-  ctx.riftPortalNextAt = ctx.time + Math.max(0, nextAtMs - nowMs) / 1000;
+  ctx.riftPortalNextAt =
+    ctx.time + Math.min(RIFT_PORTAL_RETRY_DELAY, Math.max(0, nextAtMs - nowMs) / 1000);
   return ctx.naturalRiftPortals.length;
 }

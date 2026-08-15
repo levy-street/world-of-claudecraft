@@ -17,6 +17,10 @@ const WINNING_WARRIOR_KIT = [
   'raging_gale',
   'raised_guard',
   'pummel',
+  // Seething Fury: restored to the plain kit after the v2 talent integration
+  // orphaned it (the v1 war_berserker_rage grant was deleted, nothing re-homed
+  // the ability, and abilitiesKnownAt could never return it).
+  'berserker_rage',
   'execute',
   'furious_mending',
   'iron_resolve',

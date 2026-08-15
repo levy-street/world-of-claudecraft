@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <title>Reliquary crown launcher icon source</title>
+  <!-- Reliquary crown, chrome launcher style: pale gold + warm bronze + cream,
+       thick dark outline, top-left light. The title serves the a11y lint on
+       this SOURCE file only; the shipped asset is the keyed WebP. -->
+  <defs>
+    <clipPath id="bodyClip">
+      <path d="M24 82
+               L20 38 L38 56 L50 26 L64 50 L78 26 L90 56 L108 38 L104 82
+               Q64 70 24 82 Z"/>
+    </clipPath>
+    <clipPath id="bandClip">
+      <path d="M22 80 Q64 68 106 80 L106 96 Q64 108 22 96 Z"/>
+    </clipPath>
+  </defs>
+  <g stroke="#1a0f08" stroke-width="3.5" stroke-linejoin="round">
+    <!-- back rim of the band (slight perspective) -->
+    <path d="M24 78 Q64 66 104 78 L104 92 Q64 104 24 92 Z" fill="#785828"/>
+    <!-- crown body: five peaks, center tallest -->
+    <path d="M24 82
+             L20 38 L38 56 L50 26 L64 50 L78 26 L90 56 L108 38 L104 82
+             Q64 70 24 82 Z" fill="#e0b848"/>
+  </g>
+  <!-- body shading, clipped inside the silhouette -->
+  <g stroke="none" clip-path="url(#bodyClip)">
+    <!-- lit left half -->
+    <path d="M18 30 L52 22 L66 52 L60 84 L22 84 Z" fill="#ecc858" opacity="0.95"/>
+    <!-- bright facets top-left of the lit peaks -->
+    <path d="M50 26 L57 40 L50 56 L44 40 Z" fill="#f8e0a0" opacity="0.9"/>
+    <path d="M20 38 L32 51 L28 62 L22 56 Z" fill="#f8e0a0" opacity="0.8"/>
+    <path d="M64 50 L70 38 L74 46 L68 58 Z" fill="#f0d070" opacity="0.7"/>
+    <!-- shadow right third -->
+    <path d="M78 24 L92 58 L108 36 L106 86 L74 86 L70 52 Z" fill="#b88838" opacity="0.9"/>
+    <path d="M96 50 L108 38 L106 86 L92 84 Z" fill="#a07028" opacity="0.8"/>
+    <!-- valley inner shadows: right flank of each V -->
+    <path d="M38 56 L50 28 L46 58 Z" fill="#c09838" opacity="0.8"/>
+    <path d="M64 50 L78 28 L74 56 Z" fill="#c09838" opacity="0.8"/>
+    <path d="M90 56 L106 40 L98 62 Z" fill="#906820" opacity="0.7"/>
+    <!-- soft base shadow where body meets band -->
+    <path d="M20 72 Q64 58 108 72 L108 86 Q64 72 20 86 Z" fill="#a07828" opacity="0.55"/>
+  </g>
+  <!-- front band -->
+  <path d="M22 80 Q64 68 106 80 L106 96 Q64 108 22 96 Z" fill="#886828"
+        stroke="#1a0f08" stroke-width="3.5" stroke-linejoin="round"/>
+  <g stroke="none" clip-path="url(#bandClip)">
+    <!-- band top lit edge -->
+    <path d="M22 80 Q64 68 106 80 L106 85 Q64 74 22 85 Z" fill="#b08838" opacity="0.9"/>
+    <!-- band lit left -->
+    <path d="M22 78 L48 74 L48 100 L22 98 Z" fill="#a07c30" opacity="0.6"/>
+    <!-- band shadow right + bottom lip -->
+    <path d="M70 74 L106 78 L106 98 L70 108 Z" fill="#684828" opacity="0.75"/>
+    <path d="M22 92 Q64 104 106 92 L106 98 Q64 110 22 98 Z" fill="#503818" opacity="0.8"/>
+  </g>
+  <!-- peak balls, talents-gold style -->
+  <g stroke="#1a0f08" stroke-width="3">
+    <circle cx="20" cy="36" r="7" fill="#e8c858"/>
+    <circle cx="50" cy="24" r="7" fill="#e8c858"/>
+    <circle cx="78" cy="24" r="7" fill="#e0b848"/>
+    <circle cx="108" cy="36" r="7" fill="#d8a838"/>
+    <circle cx="64" cy="16" r="9" fill="#e8c858"/>
+  </g>
+  <g stroke="none">
+    <circle cx="17.5" cy="33.5" r="2.6" fill="#f8f0d0"/>
+    <circle cx="47.5" cy="21.5" r="2.6" fill="#f8f0d0"/>
+    <circle cx="75.5" cy="21.5" r="2.4" fill="#f8e8b8" opacity="0.9"/>
+    <circle cx="105.5" cy="33.5" r="2.2" fill="#f0d888" opacity="0.85"/>
+    <circle cx="61" cy="13" r="3.2" fill="#f8f8e8"/>
+    <path d="M23 40 A7 7 0 0 1 15 34 A7 7 0 0 0 23 40 Z" fill="#b88838" opacity="0.7"/>
+    <path d="M111 40 A7 7 0 0 1 103 34 A7 7 0 0 0 111 40 Z" fill="#906820" opacity="0.8"/>
+    <path d="M67 21 A9 9 0 0 1 57 13 A9 9 0 0 0 67 21 Z" fill="#b88838" opacity="0.7"/>
+  </g>
+  <!-- band jewels: center ruby in a gold bezel + two cream side stones -->
+  <g stroke="#1a0f08" stroke-width="3">
+    <rect x="54" y="78" width="20" height="20" rx="4" transform="rotate(45 64 88)" fill="#c8a040"/>
+    <rect x="57.5" y="81.5" width="13" height="13" rx="2.5" transform="rotate(45 64 88)"
+          fill="#c83030" stroke-width="2.4"/>
+    <circle cx="38" cy="87" r="5.5" fill="#f8e8b8"/>
+    <circle cx="90" cy="87" r="5.5" fill="#f8e8b8"/>
+  </g>
+  <g stroke="none">
+    <path d="M60.5 84.5 L64 81 L66 83 L61.5 87.5 Z" fill="#f8b0a0" opacity="0.95"/>
+    <path d="M67 93 L70.5 88.5 L69.5 93.5 Z" fill="#801818" opacity="0.9"/>
+    <circle cx="36.5" cy="85.5" r="1.8" fill="#ffffff" opacity="0.9"/>
+    <circle cx="88.5" cy="85.5" r="1.6" fill="#ffffff" opacity="0.85"/>
+    <path d="M40 91 A5.5 5.5 0 0 1 34 87 A5.5 5.5 0 0 0 40 91 Z" fill="#b89878" opacity="0.8"/>
+    <path d="M92 91 A5.5 5.5 0 0 1 86 87 A5.5 5.5 0 0 0 92 91 Z" fill="#a88868" opacity="0.85"/>
+  </g>
+</svg>

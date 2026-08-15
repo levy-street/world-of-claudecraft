@@ -10,15 +10,16 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { SPORT_KITS, VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
-import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
-import type { Sim } from '../src/sim/sim';
+import { DUNGEON_X_THRESHOLD, GATHER_NODES } from '../src/sim/data';
+import type { DuelState, PlayerMeta, Sim, TradeSession } from '../src/sim/sim';
 import {
   VC_DESERTER_LOCKOUT,
   VC_GOLDEN_CAP,
   VC_MATCH_DURATION,
+  type VcMatch,
   vcupPackTeams,
 } from '../src/sim/social/vale_cup';
-import type { SimEvent } from '../src/sim/types';
+import { CRAFT_CAST_ID, type Entity, isNonSpellCast, type SimEvent } from '../src/sim/types';
 import {
   GOAL_LINE_EAST_X,
   GOAL_LINE_WEST_X,
@@ -43,13 +44,48 @@ import {
 // sim suites use (climb_slope, sim, dungeons).
 vi.setConfig({ testTimeout: 30000 });
 
+function must<T>(value: T | null | undefined, label: string): T {
+  if (value == null) throw new Error(label);
+  return value;
+}
+
+function entity(sim: Sim, id: number): Entity {
+  return must(sim.entities.get(id), `missing entity ${id}`);
+}
+
+function _cupInfo(sim: Sim, id: number) {
+  return must(sim.cupInfoFor(id), `missing cup info ${id}`);
+}
+
+function currentMatch(sim: Sim): VcMatch {
+  return must(sim.vcup.match, 'missing Vale Cup match');
+}
+
+function matchBall(match: VcMatch) {
+  return must(match.ball, 'missing Vale Cup ball');
+}
+
+function playerMeta(sim: Sim, id: number): PlayerMeta {
+  return must(sim.players.get(id), `missing player meta ${id}`);
+}
+
+function eventOf<T extends SimEvent['type']>(
+  events: SimEvent[],
+  type: T,
+): Extract<SimEvent, { type: T }> {
+  return must(
+    events.find((event): event is Extract<SimEvent, { type: T }> => event.type === type),
+    `missing ${type} event`,
+  );
+}
+
 describe('Vale Cup: possession gate (must be on the ball to play it)', () => {
   // Stage a resting ball near the east goal, park the opponent in a far corner
   // so it cannot trap, and return the live match + ball for a strike attempt.
   function stageRestingBall(sim: Sim, a: number, b: number) {
     const match = startBout(sim, a, b);
     teleport(sim, b, PITCH.xMin + 1, PITCH.zMin + 1);
-    const ball = match.ball!;
+    const ball = must(match.ball, 'missing Vale Cup ball');
     ball.x = GOAL_LINE_EAST_X - 6;
     ball.z = PITCH_CENTER.z;
     ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
@@ -70,7 +106,7 @@ describe('Vale Cup: possession gate (must be on the ball to play it)', () => {
     // Stand ~24yd off the ball: inside the old sport_shoot.range (34) that let a
     // shot fire from anywhere, but well outside actual possession.
     teleport(sim, a, ball.x - 24, ball.z);
-    sim.entities.get(a)!.facing = Math.PI / 2;
+    entity(sim, a).facing = Math.PI / 2;
     sim.castAbility('sport_shoot', a, aimAtGoal);
     expect(ballSpeed(ball)).toBe(0); // no possession, no launch
   });
@@ -81,7 +117,7 @@ describe('Vale Cup: possession gate (must be on the ball to play it)', () => {
     const b = addAt(sim, 'mage', 'Bet', 2, -40);
     const { ball } = stageRestingBall(sim, a, b);
     teleport(sim, a, ball.x - 16, ball.z); // inside sport_kick(18)/sport_pass(42) range
-    sim.entities.get(a)!.facing = Math.PI / 2;
+    entity(sim, a).facing = Math.PI / 2;
     sim.castAbility('sport_kick', a, aimAtGoal);
     expect(ballSpeed(ball)).toBe(0);
     sim.castAbility('sport_pass', a, aimAtGoal);
@@ -94,7 +130,7 @@ describe('Vale Cup: possession gate (must be on the ball to play it)', () => {
     const b = addAt(sim, 'mage', 'Bet', 2, -40);
     const { ball } = stageRestingBall(sim, a, b);
     teleport(sim, a, ball.x - 2, ball.z); // on the ball (within VC_POSSESSION_RADIUS)
-    sim.entities.get(a)!.facing = Math.PI / 2;
+    entity(sim, a).facing = Math.PI / 2;
     sim.castAbility('sport_shoot', a, aimAtGoal);
     expect(ballSpeed(ball)).toBeGreaterThan(0); // struck: the shot launches
   });
@@ -104,7 +140,7 @@ describe('Vale Cup: queue guards', () => {
   it('rejects a dead, instanced, dueling-free litany with the arena literals', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Aleph');
-    const e = sim.entities.get(a)!;
+    const e = entity(sim, a);
     e.dead = true;
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     expect(errorsOf(sim.drainEvents())).toContain('You cannot queue for the arena while dead.');
@@ -112,6 +148,27 @@ describe('Vale Cup: queue guards', () => {
     teleport(sim, a, DUNGEON_X_THRESHOLD + 50, -40);
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     expect(errorsOf(sim.drainEvents())).toContain('You cannot queue from inside an instance.');
+  });
+
+  it('prunes a queued player who walked into a dungeon/instance mid-queue (issue #1600 x-band recheck)', () => {
+    // The join-time instance guard only blocks queuing FROM inside an instance
+    // (see the test above). Once queued, matchmaking itself must recheck the
+    // guard every pass, mirroring the sibling arena 1v1/2v2/fiesta queues
+    // (arena.ts matchmakeArena1v1 / pruneTeamQueue), or a player who wanders
+    // into a dungeon mid-queue stays a valid candidate and gets teleported
+    // out of the instance onto the pitch, fully restored, when the pitch pops.
+    const sim = makeWorld();
+    const inside = addAt(sim, 'warrior', 'Inside');
+    const outside = addAt(sim, 'mage', 'Outside', 4, -40);
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, inside);
+    sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, outside);
+    // Move the queued player past the instance x-band WITHOUT enterDungeon, so
+    // the entry-dequeue path does not mask the matchmaking prune under test.
+    teleport(sim, inside, DUNGEON_X_THRESHOLD + 50, -40);
+    sim.tick();
+    expect(sim.vcup.match).toBeNull(); // no match: the pack lost its second body
+    expect(sim.cupInfoFor(inside)?.queued).toBe(false); // pruned
+    expect(sim.cupInfoFor(outside)?.queued).toBe(true); // the honest queuer waits
   });
 
   it('rejects a missing banner nation', () => {
@@ -124,11 +181,20 @@ describe('Vale Cup: queue guards', () => {
   it('rejects dueling and mid-trade queuers with the arena literals', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Aleph');
-    (sim as any).duels.set(a, { a, b: -1, state: 'active' });
+    const duel: DuelState = { a, b: -1, state: 'active', timer: 0 };
+    sim.duels.set(a, duel);
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     expect(errorsOf(sim.drainEvents())).toContain('You cannot queue while dueling.');
-    (sim as any).duels.delete(a);
-    (sim as any).trades.set(a, {});
+    sim.duels.delete(a);
+    const trade: TradeSession = {
+      a,
+      b: -1,
+      offerA: { items: [], copper: 0 },
+      offerB: { items: [], copper: 0 },
+      acceptedA: false,
+      acceptedB: false,
+    };
+    sim.trades.set(a, trade);
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     expect(errorsOf(sim.drainEvents())).toContain('Finish your trade before queueing.');
   });
@@ -166,7 +232,7 @@ describe('Vale Cup: queue guards', () => {
     sim.vcup.deserters.set('aleph', sim.time + 120);
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     expect(errorsOf(sim.drainEvents())).toContain('The Groundskeeper remembers. Come back later.');
-    expect(sim.cupInfoFor(a)!.deserterFor).toBeGreaterThan(0);
+    expect(sim.cupInfoFor(a)?.deserterFor).toBeGreaterThan(0);
   });
 
   it('re-queueing the same bracket re-emits the position; another bracket errors', () => {
@@ -176,7 +242,7 @@ describe('Vale Cup: queue guards', () => {
     sim.drainEvents();
     sim.vcupQueueJoin(3, 'vale', 'striker', false, a);
     const again = sim.drainEvents();
-    expect(again.some((e) => e.type === 'vcupQueued' && (e as any).position === 1)).toBe(true);
+    expect(again.some((e) => e.type === 'vcupQueued' && e.position === 1)).toBe(true);
     sim.vcupQueueJoin(2, 'vale', 'allrounder', false, a);
     const err = errorsOf(sim.drainEvents());
     expect(err.some((t) => t.startsWith('You are already in the Vale Cup 3v3 queue.'))).toBe(true);
@@ -186,12 +252,12 @@ describe('Vale Cup: queue guards', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Aleph');
     sim.vcupQueueJoin(3, 'vale', 'striker', false, a);
-    expect(sim.cupInfoFor(a)!.role).toBe('striker');
+    expect(sim.cupInfoFor(a)?.role).toBe('striker');
     sim.vcupSetRole('keeper', a);
-    expect(sim.cupInfoFor(a)!.role).toBe('keeper');
+    expect(sim.cupInfoFor(a)?.role).toBe('keeper');
     sim.vcupQueueLeave(a);
     sim.vcupQueueJoin(2, 'vale', 'keeper', false, a);
-    expect(sim.cupInfoFor(a)!.role).toBe('allrounder');
+    expect(sim.cupInfoFor(a)?.role).toBe('allrounder');
   });
 });
 
@@ -202,16 +268,16 @@ describe('Vale Cup: matchmaking and packing', () => {
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     sim.tick();
     expect(sim.vcup.match).toBe(null);
-    expect(sim.cupInfoFor(a)!.queued).toBe(true);
-    expect(sim.cupInfoFor(a)!.queueSizes[1]).toBe(1);
+    expect(sim.cupInfoFor(a)?.queued).toBe(true);
+    expect(sim.cupInfoFor(a)?.queueSizes[1]).toBe(1);
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
     sim.tick();
     expect(sim.vcup.match).toBeTruthy();
-    expect(sim.vcup.match!.rated).toBe(true);
-    expect(sim.cupInfoFor(a)!.queued).toBe(false);
-    expect(sim.cupInfoFor(a)!.match!.team).toBe('A');
-    expect(sim.cupInfoFor(b)!.match!.team).toBe('B');
+    expect(sim.vcup.match?.rated).toBe(true);
+    expect(sim.cupInfoFor(a)?.queued).toBe(false);
+    expect(sim.cupInfoFor(a)?.match?.team).toBe('A');
+    expect(sim.cupInfoFor(b)?.match?.team).toBe('B');
   });
 
   it('packs a premade against solos in a 2v2 (first-fit, queue order)', () => {
@@ -227,7 +293,7 @@ describe('Vale Cup: matchmaking and packing', () => {
     sim.vcupQueueJoin(2, 'thornpeak', 'allrounder', false, s1);
     sim.vcupQueueJoin(2, 'ogre', 'allrounder', false, s2);
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     expect(match).toBeTruthy();
     expect(match.teamA).toEqual([a1, a2]);
     expect(match.teamB).toEqual([s1, s2]);
@@ -246,12 +312,12 @@ describe('Vale Cup: matchmaking and packing', () => {
     });
     // 5v5 from ten solos: five per side, queue order.
     const solos = Array.from({ length: 10 }, (_, i) => unit(i, 100 + i));
-    const five = vcupPackTeams(solos, 5)!;
+    const five = must(vcupPackTeams(solos, 5), 'missing 5v5 pack');
     expect(five.a.flatMap((u) => u.pids)).toEqual([100, 101, 102, 103, 104]);
     expect(five.b.flatMap((u) => u.pids)).toEqual([105, 106, 107, 108, 109]);
     // 3v3 from a trio, a duo, and solos: the duo cannot join the full trio side.
     const mixed = [unit(0, 1, 2, 3), unit(1, 4, 5), unit(2, 6), unit(3, 7)];
-    const three = vcupPackTeams(mixed, 3)!;
+    const three = must(vcupPackTeams(mixed, 3), 'missing 3v3 pack');
     expect(three.a.flatMap((u) => u.pids)).toEqual([1, 2, 3]);
     expect(three.b.flatMap((u) => u.pids)).toEqual([4, 5, 6]);
     // Not enough bodies: no match.
@@ -276,15 +342,15 @@ describe('Vale Cup: matchmaking and packing', () => {
     sim.vcupQueueJoin(1, 'ogre', 'allrounder', false, c);
     sim.vcupQueueJoin(1, 'thornpeak', 'allrounder', false, d);
     // Free the pitch and let matchmaking choose.
-    (bout as any).scoreA = 1;
-    (bout as any).clock = VC_MATCH_DURATION;
+    bout.scoreA = 1;
+    bout.clock = VC_MATCH_DURATION;
     tickUntil(sim, () => sim.vcup.match === null, 20 * 20);
     tickUntil(sim, () => sim.vcup.match !== null, 20 * 2);
-    const next = sim.vcup.match!;
+    const next = currentMatch(sim);
     expect(next.bracket).toBe(3); // the older 3v3 gets the pitch, not the young 1v1
     expect(next.teamA.concat(next.teamB).sort()).toEqual([...trio].sort());
     // The 1v1 pair is still queued, waiting their turn.
-    expect(sim.cupInfoFor(c)!.queued).toBe(true);
+    expect(sim.cupInfoFor(c)?.queued).toBe(true);
   });
 
   it('the away side plays the inverted palette when both pick the same banner', () => {
@@ -294,7 +360,7 @@ describe('Vale Cup: matchmaking and packing', () => {
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, b);
     sim.tick();
-    expect(sim.vcup.match!.awayPalette).toBe(true);
+    expect(sim.vcup.match?.awayPalette).toBe(true);
   });
 
   it('autofills a keeper on each 3v3 side when every human picked outfield', () => {
@@ -305,7 +371,7 @@ describe('Vale Cup: matchmaking and packing', () => {
     );
     for (const pid of pids) sim.vcupQueueJoin(3, 'vale', 'striker', false, pid);
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     expect(match).toBeTruthy();
     // Exactly one keeper per side, and it is the last-listed seat (never seat 0).
     for (const team of [match.teamA, match.teamB]) {
@@ -326,7 +392,7 @@ describe('Vale Cup: matchmaking and packing', () => {
     sim.vcupQueueJoin(3, 'mirefen', 'striker', false, pids[4]);
     sim.vcupQueueJoin(3, 'mirefen', 'sweeper', false, pids[5]);
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     for (const team of [match.teamA, match.teamB]) {
       expect(team.filter((pid) => match.roles[pid] === 'keeper').length).toBe(1);
     }
@@ -337,7 +403,7 @@ describe('Vale Cup: matchmaking and packing', () => {
     const pids = Array.from({ length: 4 }, (_, i) => addAt(sim, 'warrior', `R${i}`, i * 2, -40));
     for (const pid of pids) sim.vcupQueueJoin(2, 'vale', 'allrounder', false, pid);
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     for (const pid of [...match.teamA, ...match.teamB]) {
       expect(match.roles[pid]).toBe('allrounder');
     }
@@ -353,13 +419,13 @@ describe('Vale Cup: match lifecycle', () => {
     sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
     const found = sim.tick();
     expect(found.filter((e) => e.type === 'vcupFound').length).toBe(2);
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     // The match opens on the pre-match briefing; readying up starts the whistle.
     expect(match.phase).toBe('briefing');
     // Fighters stand on the pitch in their own halves; the sport kit is live.
-    const ae = sim.entities.get(a)!;
+    const ae = entity(sim, a);
     expect(isOnPitch(ae.pos.x, ae.pos.z)).toBe(true);
-    expect(sim.players.get(a)!.known.map((k) => k.def.id)).toEqual([...SPORT_KITS.allrounder]);
+    expect(sim.players.get(a)?.known.map((k) => k.def.id)).toEqual([...SPORT_KITS.allrounder]);
     // No ball during the briefing/whistle; kickoff spawns it at the center spot.
     expect(match.ball).toBe(null);
     readyAll(sim);
@@ -367,13 +433,13 @@ describe('Vale Cup: match lifecycle', () => {
     expect(match.phase).toBe('countdown');
     const kickoffEvents = tickUntil(sim, () => match.phase === 'active', 20 * 4);
     expect(kickoffEvents.some((e) => e.type === 'vcupKickoff')).toBe(true);
-    const ballE = sim.entities.get(match.ball!.entityId)!;
+    const ballE = entity(sim, matchBall(match).entityId);
     expect(ballE.templateId).toBe(VALE_CUP_BALL_TEMPLATE_ID);
     expect(ballE.hostile).toBe(false);
     expect(ballE.pos.x).toBeCloseTo(PITCH_CENTER.x, 3);
 
     // DRIBBLE: the kickoff taker runs east through the ball and carries it.
-    const am = sim.players.get(a)!;
+    const am = playerMeta(sim, a);
     am.moveInput.forward = true;
     for (let i = 0; i < 20; i++) sim.tick();
     am.moveInput.forward = false;
@@ -383,13 +449,13 @@ describe('Vale Cup: match lifecycle', () => {
     // shot from the center spot would not reach) and boot it in for team A.
     // Park the lone opponent in a corner so their body cannot trap the shot.
     teleport(sim, b, PITCH.xMin + 1, PITCH.zMin + 1);
-    match.ball!.x = GOAL_LINE_EAST_X - 6;
-    match.ball!.z = PITCH_CENTER.z;
+    matchBall(match).x = GOAL_LINE_EAST_X - 6;
+    matchBall(match).z = PITCH_CENTER.z;
     teleport(sim, a, GOAL_LINE_EAST_X - 8, PITCH_CENTER.z);
-    sim.entities.get(a)!.facing = Math.PI / 2;
+    entity(sim, a).facing = Math.PI / 2;
     sim.castAbility('sport_shoot', a, { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z });
     const goalEvents = tickUntil(sim, () => match.phase === 'goal', 20 * 8);
-    const goal = goalEvents.find((e) => e.type === 'vcupGoal') as any;
+    const goal = eventOf(goalEvents, 'vcupGoal');
     expect(goal).toBeTruthy();
     expect(goal.team).toBe('A');
     expect(goal.scorerName).toBe('Aleph');
@@ -398,16 +464,16 @@ describe('Vale Cup: match lifecycle', () => {
 
     // Celebrate 4s, then the kickoff reset: ball back at the center spot.
     tickUntil(sim, () => match.phase === 'active', 20 * 6);
-    expect(match.ball!.x).toBeCloseTo(PITCH_CENTER.x, 3);
+    expect(match.ball?.x).toBeCloseTo(PITCH_CENTER.x, 3);
 
     // First to 5 ends it early: repeat the move four more times, each staged at
     // the east goal (opponent parked in the far corner out of the shot lane).
     for (let g = 0; g < 4; g++) {
       teleport(sim, b, PITCH.xMin + 1, PITCH.zMin + 1);
-      match.ball!.x = GOAL_LINE_EAST_X - 6;
-      match.ball!.z = PITCH_CENTER.z;
+      matchBall(match).x = GOAL_LINE_EAST_X - 6;
+      matchBall(match).z = PITCH_CENTER.z;
       teleport(sim, a, GOAL_LINE_EAST_X - 8, PITCH_CENTER.z);
-      sim.entities.get(a)!.facing = Math.PI / 2;
+      entity(sim, a).facing = Math.PI / 2;
       sim.castAbility('sport_shoot', a, { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z });
       tickUntil(sim, () => match.phase === 'goal', 20 * 10);
       tickUntil(sim, () => match.phase !== 'goal', 20 * 6);
@@ -415,16 +481,16 @@ describe('Vale Cup: match lifecycle', () => {
     expect(match.scoreA).toBe(5);
     expect(match.phase).toBe('over');
     expect(match.ended).toBe(true);
-    expect(sim.players.get(a)!.vcupWins).toBe(1);
-    expect(sim.players.get(b)!.vcupLosses).toBe(1);
+    expect(sim.players.get(a)?.vcupWins).toBe(1);
+    expect(sim.players.get(b)?.vcupLosses).toBe(1);
 
     // Aftermath: everyone goes home, the ball despawns, the slot frees.
-    const ballId = match.ball!.entityId;
+    const ballId = matchBall(match).entityId;
     tickUntil(sim, () => sim.vcup.match === null, 20 * 10);
     expect(sim.entities.get(ballId)).toBeUndefined();
-    expect(sim.entities.get(a)!.pos.x).toBeCloseTo(0, 1);
-    expect(sim.entities.get(a)!.pos.z).toBeCloseTo(-40, 1);
-    expect(sim.cupInfoFor(a)!.board[0]).toEqual({ name: 'Aleph', wins: 1 });
+    expect(sim.entities.get(a)?.pos.x).toBeCloseTo(0, 1);
+    expect(sim.entities.get(a)?.pos.z).toBeCloseTo(-40, 1);
+    expect(sim.cupInfoFor(a)?.board[0]).toEqual({ name: 'Aleph', wins: 1 });
   });
 
   it('credits no scorer on an own goal the other side never touched in', () => {
@@ -437,18 +503,18 @@ describe('Vale Cup: match lifecycle', () => {
     // send it in. (Shoot always aims at the ENEMY goal, so an own goal is staged.)
     teleport(sim, a, PITCH.xMax - 2, PITCH.zMax - 2);
     teleport(sim, b, PITCH.xMax - 2, PITCH.zMin + 2);
-    match.ball!.x = GOAL_LINE_WEST_X + 4;
-    match.ball!.z = PITCH_CENTER.z;
-    match.ball!.y = groundHeight(match.ball!.x, match.ball!.z, sim.cfg.seed);
-    match.ball!.vx = -20;
-    match.ball!.vy = 0;
-    match.ball!.vz = 0;
-    match.ball!.lastTouchPid = a;
-    match.ball!.lastTouchTeam = 'A';
-    match.ball!.lastKickPid = a;
-    match.ball!.lastKickTeam = 'A';
+    matchBall(match).x = GOAL_LINE_WEST_X + 4;
+    matchBall(match).z = PITCH_CENTER.z;
+    matchBall(match).y = groundHeight(matchBall(match).x, matchBall(match).z, sim.cfg.seed);
+    matchBall(match).vx = -20;
+    matchBall(match).vy = 0;
+    matchBall(match).vz = 0;
+    matchBall(match).lastTouchPid = a;
+    matchBall(match).lastTouchTeam = 'A';
+    matchBall(match).lastKickPid = a;
+    matchBall(match).lastKickTeam = 'A';
     const events = tickUntil(sim, () => match.phase === 'goal', 20 * 8);
-    const goal = events.find((e) => e.type === 'vcupGoal') as any;
+    const goal = eventOf(events, 'vcupGoal');
     expect(goal.team).toBe('B');
     expect(match.scoreB).toBe(1);
     expect(goal.scorerName).toBe(''); // no confident scorer: nameless banner
@@ -459,17 +525,17 @@ describe('Vale Cup: match lifecycle', () => {
     const a = addAt(sim, 'warrior', 'Aleph');
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     const match = startBout(sim, a, b);
-    (match as any).clock = VC_MATCH_DURATION - 0.05;
+    match.clock = VC_MATCH_DURATION - 0.05;
     const goldenEvents = tickUntil(sim, () => match.phase === 'golden', 20 * 2);
     expect(goldenEvents.some((e) => e.type === 'vcupGolden')).toBe(true);
     expect(match.golden).toBe(true);
     expect(match.kickoffTeam).toBe('B');
-    (match as any).goldenClock = VC_GOLDEN_CAP - 0.05;
+    match.goldenClock = VC_GOLDEN_CAP - 0.05;
     const endEvents = tickUntil(sim, () => match.phase === 'over', 20 * 2);
-    const end = endEvents.find((e) => e.type === 'vcupEnd') as any;
+    const end = eventOf(endEvents, 'vcupEnd');
     expect(end.winner).toBe(null);
-    expect(sim.players.get(a)!.vcupDraws).toBe(1);
-    expect(sim.players.get(b)!.vcupDraws).toBe(1);
+    expect(sim.players.get(a)?.vcupDraws).toBe(1);
+    expect(sim.players.get(b)?.vcupDraws).toBe(1);
   });
 
   it('a golden goal wins immediately after the celebrate', () => {
@@ -477,20 +543,153 @@ describe('Vale Cup: match lifecycle', () => {
     const a = addAt(sim, 'warrior', 'Aleph');
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     const match = startBout(sim, a, b);
-    (match as any).clock = VC_MATCH_DURATION - 0.05;
+    match.clock = VC_MATCH_DURATION - 0.05;
     tickUntil(sim, () => match.phase === 'golden', 20 * 2);
     // Clear the lone opponent out of the shot lane (their body would trap it),
     // then stage the golden goal at the east mouth (the pitch is wide).
     teleport(sim, b, PITCH.xMin + 1, PITCH.zMin + 1);
-    match.ball!.x = GOAL_LINE_EAST_X - 6;
-    match.ball!.z = PITCH_CENTER.z;
+    matchBall(match).x = GOAL_LINE_EAST_X - 6;
+    matchBall(match).z = PITCH_CENTER.z;
     teleport(sim, a, GOAL_LINE_EAST_X - 8, PITCH_CENTER.z);
-    sim.entities.get(a)!.facing = Math.PI / 2;
+    entity(sim, a).facing = Math.PI / 2;
     sim.castAbility('sport_shoot', a, { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z });
     tickUntil(sim, () => match.phase === 'over', 20 * 12);
     expect(match.phase).toBe('over');
-    expect(sim.players.get(a)!.vcupWins).toBe(1);
-    expect(sim.players.get(b)!.vcupLosses).toBe(1);
+    expect(sim.players.get(a)?.vcupWins).toBe(1);
+    expect(sim.players.get(b)?.vcupLosses).toBe(1);
+  });
+});
+
+describe('Vale Cup: teardown does not grant a free full HP/resource/cooldown restore', () => {
+  it('teardownCupMatch restores pre-match HP, resource, and cooldowns instead of full-healing', () => {
+    const sim = makeWorld();
+    // A mage (mana resource): the in-match clean slate tops mana to max, so a
+    // drained pool restoring is a meaningful assertion (rage clean-slates to 0
+    // either way).
+    const a = addAt(sim, 'mage', 'Aleph');
+    const b = addAt(sim, 'warrior', 'Bet', 4, -40);
+    const ae = entity(sim, a);
+    expect(ae.maxHp).toBeGreaterThan(0);
+
+    // The fighter walks in wounded, low on mana, with an ability on cooldown.
+    ae.hp = Math.floor(ae.maxHp * 0.4);
+    ae.resource = Math.floor(ae.maxResource * 0.3);
+    ae.cooldowns.set('charge', 9);
+    const woundedHp = ae.hp;
+    const drainedResource = ae.resource;
+
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
+    sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
+    sim.tick(); // forms the match: valeCupStandardize's clean slate takes over
+    const match = currentMatch(sim);
+    expect(match.phase).toBe('briefing');
+
+    // The pre-match snapshot captured exactly what the fighter carried in (the
+    // cooldown ticks down by one DT on the same tick the match forms, so it
+    // reads the snapshot back rather than the un-decayed literal).
+    expect(match.preMatchPools).toBeDefined();
+    const pools = match.preMatchPools?.get(a);
+    expect(pools).toBeDefined();
+    if (!pools) return;
+    expect(pools.hp).toBe(woundedHp);
+    expect(pools.resource).toBe(drainedResource);
+    const preCooldown = pools.cooldowns.get('charge');
+    expect(preCooldown).toBeLessThanOrEqual(9);
+    expect(preCooldown).toBeGreaterThan(8.9);
+
+    // The in-match clean slate still stands: full HP/resource, cooldowns cleared.
+    expect(ae.hp).toBe(ae.maxHp);
+    expect(ae.resource).toBe(ae.maxResource);
+    expect(ae.cooldowns.size).toBe(0);
+
+    // Ready up, play the whistle through to an active bout, then force a
+    // quick, uneven result and run the aftermath out to teardown.
+    readyAll(sim);
+    tickUntil(sim, () => match.phase === 'active', 20 * 6);
+    match.scoreA = 1;
+    match.clock = VC_MATCH_DURATION;
+    tickUntil(sim, () => sim.vcup.match === null, 20 * 20);
+
+    // The fighter is handed back EXACTLY what they walked in with: no free
+    // heal, no free mana, no free cooldown reset.
+    expect(ae.hp).toBe(woundedHp);
+    expect(ae.hp).toBeLessThan(ae.maxHp);
+    expect(ae.resource).toBe(drainedResource);
+    expect(ae.cooldowns.get('charge')).toBe(preCooldown);
+  });
+
+  it('the exploit: repeatedly entering and tearing down a match cannot be farmed as a free heal/mana reset', () => {
+    const sim = makeWorld();
+    // A mage again: mana clean-slates to full mid-match, so restoring a
+    // deliberately drained pool is a meaningful (not vacuously-zero) check.
+    const a = addAt(sim, 'mage', 'Aleph');
+    const b = addAt(sim, 'warrior', 'Bet', 4, -40);
+    const ae = entity(sim, a);
+
+    // Run one full queue -> ready -> active -> teardown cycle, wounding the
+    // fighter to a given fraction of max HP/resource beforehand, and return
+    // what it was wounded to.
+    const runOneCycle = (frac: number): { hp: number; resource: number } => {
+      ae.hp = Math.floor(ae.maxHp * frac);
+      ae.resource = Math.floor(ae.maxResource * frac);
+      const wounded = { hp: ae.hp, resource: ae.resource };
+      sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
+      sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
+      sim.tick();
+      const match = currentMatch(sim);
+      readyAll(sim);
+      tickUntil(sim, () => match.phase === 'active', 20 * 6);
+      match.scoreA = 1;
+      match.clock = VC_MATCH_DURATION;
+      tickUntil(sim, () => sim.vcup.match === null, 20 * 20);
+      return wounded;
+    };
+
+    // A first bout: leaving it does not top the fighter off.
+    const wounded1 = runOneCycle(0.5);
+    expect(ae.hp).toBe(wounded1.hp);
+    expect(ae.hp).toBeLessThan(ae.maxHp);
+    expect(ae.resource).toBe(wounded1.resource);
+    expect(ae.resource).toBeLessThan(ae.maxResource);
+
+    // A second, independent bout right after: still no free restore, proving
+    // the exploit is not a one-time snapshot bug but genuinely un-farmable.
+    const wounded2 = runOneCycle(0.2);
+    expect(ae.hp).toBe(wounded2.hp);
+    expect(ae.hp).toBeLessThan(ae.maxHp);
+    expect(ae.resource).toBe(wounded2.resource);
+    expect(ae.resource).toBeLessThan(ae.maxResource);
+  });
+
+  it('vcupPracticeStart (the instant solo bot practice) is covered by the same restore', () => {
+    // A mage: mana clean-slates to full mid-match, so restoring a drained pool
+    // is a meaningful check (rage clean-slates to 0 either way).
+    const sim = makeWorld({ seed: 7, playerClass: 'mage', playerName: 'Solo', noPlayer: false });
+    const pe = entity(sim, sim.primaryId);
+    pe.hp = Math.floor(pe.maxHp * 0.35);
+    pe.resource = Math.floor(pe.maxResource * 0.1);
+    const wounded = pe.hp;
+    const drained = pe.resource;
+
+    sim.vcupPracticeStart(1);
+    const match = sim.vcup.practices[0];
+    expect(match.preMatchPools?.get(sim.primaryId)?.hp).toBe(wounded);
+    expect(match.preMatchPools?.get(sim.primaryId)?.resource).toBe(drained);
+
+    // In-match clean slate: full HP/resource while the practice bout runs.
+    expect(pe.hp).toBe(pe.maxHp);
+    expect(pe.resource).toBe(pe.maxResource);
+
+    readyAll(sim);
+    tickUntil(sim, () => match.phase === 'active', 20 * 6);
+    match.scoreA = 1;
+    match.clock = VC_MATCH_DURATION;
+    tickUntil(sim, () => sim.vcup.practices.length === 0, 20 * 20);
+
+    // Practice is instant, repeatable, and free to enter (vale_cup_bots.ts): if
+    // it granted a full restore this would be an infinite heal/mana loop.
+    expect(pe.hp).toBe(wounded);
+    expect(pe.resource).toBe(drained);
   });
 });
 
@@ -505,19 +704,19 @@ describe('Vale Cup: sport moves', () => {
     const match = startBout(sim, a, b);
     teleport(sim, b, PITCH.xMin + 1, PITCH.zMin + 1); // opponent far away
     const ballX = GOAL_LINE_EAST_X - outYd;
-    match.ball!.x = ballX;
-    match.ball!.z = PITCH_CENTER.z;
-    match.ball!.y = groundHeight(ballX, PITCH_CENTER.z, sim.cfg.seed);
-    match.ball!.vx = 0;
-    match.ball!.vy = 0;
-    match.ball!.vz = 0;
-    match.ball!.holderPid = null;
+    matchBall(match).x = ballX;
+    matchBall(match).z = PITCH_CENTER.z;
+    matchBall(match).y = groundHeight(ballX, PITCH_CENTER.z, sim.cfg.seed);
+    matchBall(match).vx = 0;
+    matchBall(match).vy = 0;
+    matchBall(match).vz = 0;
+    matchBall(match).holderPid = null;
     teleport(sim, a, ballX - 1.5, PITCH_CENTER.z);
-    sim.entities.get(a)!.facing = Math.PI / 2; // face east at the goal
-    (match as any).kickoffGraceUntil = 0; // past the whistle grace
+    entity(sim, a).facing = Math.PI / 2; // face east at the goal
+    match.kickoffGraceUntil = 0; // past the whistle grace
     // Aim distance encodes charge: charge*range from the shooter.
     const r = charge * 34;
-    const ae = sim.entities.get(a)!;
+    const ae = entity(sim, a);
     sim.castAbility('sport_shoot', a, {
       x: ae.pos.x + Math.sin(ae.facing) * r,
       z: ae.pos.z + Math.cos(ae.facing) * r,
@@ -525,8 +724,8 @@ describe('Vale Cup: sport moves', () => {
     let scored = false;
     let maxY = 0;
     for (let i = 0; i < 20 * 4 && !scored; i++) {
-      const gy = groundHeight(match.ball!.x, match.ball!.z, sim.cfg.seed);
-      maxY = Math.max(maxY, match.ball!.y - gy);
+      const gy = groundHeight(matchBall(match).x, matchBall(match).z, sim.cfg.seed);
+      maxY = Math.max(maxY, matchBall(match).y - gy);
       for (const e of sim.tick()) if (e.type === 'vcupGoal') scored = true;
     }
     return { scored, maxY };
@@ -546,8 +745,8 @@ describe('Vale Cup: sport moves', () => {
     const a = addAt(sim, 'warrior', 'Aleph');
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     startBout(sim, a, b);
-    const ae = sim.entities.get(a)!;
-    const be = sim.entities.get(b)!;
+    const ae = entity(sim, a);
+    const be = entity(sim, b);
     teleport(sim, a, PITCH_CENTER.x - 3, PITCH_CENTER.z + 3);
     teleport(sim, b, PITCH_CENTER.x + 1, PITCH_CENTER.z + 3);
     // The no-damage truce: a raw damage call between fighters cannot hurt.
@@ -570,7 +769,7 @@ describe('Vale Cup: sport moves', () => {
     sim.vcupQueueJoin(2, 'ogre', 'allrounder', false, s1);
     sim.vcupQueueJoin(2, 'coliseum', 'allrounder', false, s2);
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     expect(match.teamA).toEqual([a1, a2]);
     readyAll(sim);
     tickUntil(sim, () => match.phase === 'active', 20 * 6);
@@ -586,7 +785,7 @@ describe('Vale Cup: sport moves', () => {
     teleport(sim, a2, PITCH_CENTER.x, PITCH_CENTER.z + 12);
     teleport(sim, s1, PITCH.xMin + 2, PITCH_CENTER.z);
     teleport(sim, s2, PITCH.xMin + 2, PITCH_CENTER.z + 2);
-    const ball = match.ball!;
+    const ball = matchBall(match);
     ball.x = PITCH_CENTER.x;
     ball.z = PITCH_CENTER.z;
     ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
@@ -595,7 +794,7 @@ describe('Vale Cup: sport moves', () => {
     ball.vz = 0;
     ball.holderPid = null;
     match.kickoffGraceUntil = 0; // past the whistle grace so the pass is full weight
-    sim.entities.get(a1)!.targetId = a2; // select the teammate (tab/click)
+    entity(sim, a1).targetId = a2; // select the teammate (tab/click)
     // Aim deliberately points elsewhere: a targeted pass ignores it and finds the mate.
     sim.castAbility('sport_pass', a1, { x: PITCH_CENTER.x, z: PITCH_CENTER.z });
     expect(ball.vz).toBeGreaterThan(4); // heads north toward the mate, at real pace
@@ -610,7 +809,7 @@ describe('Vale Cup: sport moves', () => {
     teleport(sim, a2, PITCH_CENTER.x + 14, PITCH_CENTER.z); // mate to the EAST
     teleport(sim, s1, PITCH.xMin + 2, PITCH_CENTER.z);
     teleport(sim, s2, PITCH.xMin + 2, PITCH_CENTER.z + 2);
-    const ball = match.ball!;
+    const ball = matchBall(match);
     ball.x = PITCH_CENTER.x;
     ball.z = PITCH_CENTER.z;
     ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
@@ -619,7 +818,7 @@ describe('Vale Cup: sport moves', () => {
     ball.vz = 0;
     ball.holderPid = null;
     match.kickoffGraceUntil = 0;
-    sim.entities.get(a1)!.targetId = null; // nobody selected
+    entity(sim, a1).targetId = null; // nobody selected
     sim.castAbility('sport_pass', a1, { x: PITCH_CENTER.x + 10, z: PITCH_CENTER.z }); // aim east
     expect(ball.vx).toBeGreaterThan(4); // rolled east toward the only mate on that line
     expect(Math.abs(ball.vz)).toBeLessThan(Math.abs(ball.vx));
@@ -642,12 +841,12 @@ describe('Vale Cup: sport moves', () => {
       );
     }
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     expect(match.roles[pids[3]]).toBe('keeper');
     readyAll(sim);
     tickUntil(sim, () => match.phase === 'active', 20 * 6);
     const keeper = pids[3];
-    const ke = sim.entities.get(keeper)!;
+    const ke = entity(sim, keeper);
     // Clear every OTHER fighter out to the corners so only the keeper stands in
     // the shot lane (body control now lets any fighter trap a shot in flight).
     for (const p of pids) {
@@ -656,7 +855,7 @@ describe('Vale Cup: sport moves', () => {
     }
     teleport(sim, keeper, GOAL_LINE_EAST_X - 2, PITCH_CENTER.z);
     // A shot crossing the box toward the east goal, fast enough to be a save.
-    const ball = match.ball!;
+    const ball = matchBall(match);
     ball.x = ke.pos.x - 2.5;
     ball.z = ke.pos.z;
     ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
@@ -664,9 +863,7 @@ describe('Vale Cup: sport moves', () => {
     ball.vz = 0;
     const events = tickUntil(sim, () => ball.holderPid !== null, 10);
     expect(ball.holderPid).toBe(keeper);
-    expect(events.some((e) => e.type === 'vcupSave' && (e as any).keeperName === 'Fighter3')).toBe(
-      true,
-    );
+    expect(events.some((e) => e.type === 'vcupSave' && e.keeperName === 'Fighter3')).toBe(true);
     // The held ball is unkickable by others...
     const striker = pids[0];
     teleport(sim, striker, ke.pos.x - 2, ke.pos.z);
@@ -703,7 +900,7 @@ describe('Vale Cup: sport moves', () => {
     // The enemy keeper stands set on its goal line before the first touch.
     const keeperPid = match.teamB[0];
     expect(match.roles[keeperPid]).toBe('keeper');
-    const keeperE = sim.entities.get(keeperPid)!;
+    const keeperE = entity(sim, keeperPid);
     expect(Math.abs(keeperE.pos.x - goalX)).toBeLessThan(2);
     // I take the kickoff and immediately shoot straight at the goal mouth.
     sim.castAbility('sport_shoot', sim.primaryId, { x: goalX, z: centerZ });
@@ -720,21 +917,21 @@ describe('Vale Cup: sport moves', () => {
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     // Briefing is live; the kit is already swapped so the overlay can show it.
     expect(match.phase).toBe('briefing');
-    expect(sim.cupInfoFor(a)!.match!.phase).toBe('briefing');
-    expect(sim.cupInfoFor(a)!.match!.briefingLeft).toBeGreaterThan(0);
-    expect(sim.cupInfoFor(a)!.match!.iAmReady).toBe(false);
+    expect(sim.cupInfoFor(a)?.match?.phase).toBe('briefing');
+    expect(sim.cupInfoFor(a)?.match?.briefingLeft).toBeGreaterThan(0);
+    expect(sim.cupInfoFor(a)?.match?.iAmReady).toBe(false);
     // One fighter readying is not enough; the other still holds the whistle.
     sim.vcupReady(a);
     sim.tick();
-    expect(sim.vcup.match!.phase).toBe('briefing');
-    expect(sim.cupInfoFor(a)!.match!.iAmReady).toBe(true);
+    expect(sim.vcup.match?.phase).toBe('briefing');
+    expect(sim.cupInfoFor(a)?.match?.iAmReady).toBe(true);
     // Both ready -> the countdown starts on the next tick.
     sim.vcupReady(b);
     sim.tick();
-    expect(sim.vcup.match!.phase).toBe('countdown');
+    expect(sim.vcup.match?.phase).toBe('countdown');
   });
 
   it('auto-readies at the briefing timer when a fighter never readies', () => {
@@ -744,7 +941,7 @@ describe('Vale Cup: sport moves', () => {
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
     sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
     sim.tick();
-    const match = sim.vcup.match!;
+    const match = currentMatch(sim);
     // Nobody readies: the briefing times out and the match proceeds anyway.
     tickUntil(sim, () => match.phase !== 'briefing', 20 * 31);
     expect(match.phase).not.toBe('briefing');
@@ -755,8 +952,8 @@ describe('Vale Cup: sport moves', () => {
     const a = addAt(sim, 'warrior', 'Aleph');
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     const match = startBout(sim, a, b);
-    const ae = sim.entities.get(a)!;
-    const ball = match.ball!;
+    const ae = entity(sim, a);
+    const ball = matchBall(match);
     // Long boot at a far aim (>= the ability reach): near full power.
     teleport(sim, a, PITCH_CENTER.x - 2, PITCH_CENTER.z);
     ball.x = PITCH_CENTER.x;
@@ -790,8 +987,8 @@ describe('Vale Cup: sport moves', () => {
     const a = addAt(sim, 'warrior', 'Aleph');
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     const match = startBout(sim, a, b);
-    const ae = sim.entities.get(a)!;
-    const be = sim.entities.get(b)!;
+    const ae = entity(sim, a);
+    const be = entity(sim, b);
     // Stack both fighters on the exact same spot mid-pitch.
     teleport(sim, a, PITCH_CENTER.x, PITCH_CENTER.z + 4);
     teleport(sim, b, PITCH_CENTER.x, PITCH_CENTER.z + 4);
@@ -836,22 +1033,22 @@ describe('Vale Cup: desertion', () => {
     const a = addAt(sim, 'warrior', 'Aleph');
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     const match = startBout(sim, a, b);
-    const bMeta = sim.players.get(b)!;
+    const bMeta = playerMeta(sim, b);
     sim.removePlayer(b); // disconnect mid-match
     expect(match.benched.has(b)).toBe(true);
     expect(bMeta.vcupLosses).toBe(1);
     expect(sim.vcup.deserters.get('bet')).toBeGreaterThan(sim.time);
     // Team B has nobody left: team A wins by forfeit.
     tickUntil(sim, () => match.phase === 'over', 20 * 2);
-    expect(sim.players.get(a)!.vcupWins).toBe(1);
+    expect(sim.players.get(a)?.vcupWins).toBe(1);
     // A same-named rejoin is still locked out of the queue.
     tickUntil(sim, () => sim.vcup.match === null, 20 * 10);
     const b2 = addAt(sim, 'mage', 'Bet', 4, -40);
     sim.drainEvents();
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, b2);
     expect(errorsOf(sim.drainEvents())).toContain('The Groundskeeper remembers. Come back later.');
-    expect(sim.cupInfoFor(b2)!.deserterFor).toBeGreaterThan(0);
-    expect(sim.cupInfoFor(b2)!.deserterFor).toBeLessThanOrEqual(VC_DESERTER_LOCKOUT);
+    expect(sim.cupInfoFor(b2)?.deserterFor).toBeGreaterThan(0);
+    expect(sim.cupInfoFor(b2)?.deserterFor).toBeLessThanOrEqual(VC_DESERTER_LOCKOUT);
   });
 
   it('vcupResolveDesertion is idempotent (the server calls it before the leave save)', () => {
@@ -859,7 +1056,7 @@ describe('Vale Cup: desertion', () => {
     const a = addAt(sim, 'warrior', 'Aleph');
     const b = addAt(sim, 'mage', 'Bet', 4, -40);
     startBout(sim, a, b);
-    const bMeta = sim.players.get(b)!;
+    const bMeta = playerMeta(sim, b);
     sim.vcupResolveDesertion(b);
     sim.vcupResolveDesertion(b);
     sim.removePlayer(b); // calls it a third time
@@ -876,19 +1073,235 @@ describe('Vale Cup: the pitch is closed during a match', () => {
     // Idle pitch: a walk-up can stand right on the center spot.
     teleport(sim, spec, PITCH_CENTER.x, PITCH_CENTER.z);
     sim.tick();
-    let e = sim.entities.get(spec)!;
+    let e = entity(sim, spec);
     expect(isOnPitch(e.pos.x, e.pos.z)).toBe(true);
     // Match on: the same walk-up mid-pitch is ejected off to the touchline.
     startBout(sim, a, b);
     teleport(sim, spec, PITCH_CENTER.x, PITCH_CENTER.z);
     sim.tick();
-    e = sim.entities.get(spec)!;
+    e = entity(sim, spec);
     expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
     // ...and repeatedly trying to walk back in keeps them out (barrier holds).
     for (let i = 0; i < 5; i++) {
       teleport(sim, spec, PITCH_CENTER.x, PITCH_CENTER.z);
       sim.tick();
-      expect(isOnPitch(sim.entities.get(spec)!.pos.x, sim.entities.get(spec)!.pos.z)).toBe(false);
+      const spectator = entity(sim, spec);
+      expect(isOnPitch(spectator.pos.x, spectator.pos.z)).toBe(false);
     }
+  });
+});
+
+describe('the pitch police and live profession sessions', () => {
+  // Both arms below used to lean on herb_eastbrook_4 standing at (23,-99),
+  // INSIDE the pitch, so a real harvest could be started on the playing
+  // surface. That placement was the defect tests/gather_node_placement.test.ts
+  // now forbids outright (no node inside SOWFIELD_EXCLUDE), and the patch
+  // moved to the meadow above the ground. The behavior these arms guard is
+  // unchanged and still reachable: every non-spell cast counts (isNonSpellCast
+  // covers crafting, salvage, enchanting and tool recharge as well as
+  // gathering and fishing), and none of those needs a world node under the
+  // player's feet, so a bystander really can be mid-session on the pitch.
+  const NODE = GATHER_NODES.find((n) => n.id === 'herb_eastbrook_4');
+  if (!NODE) throw new Error('missing herb_eastbrook_4');
+
+  it('the goal-reset kickoff placement ends a FIGHTER live gather session', () => {
+    // Fighters are skipped by the pitch police, so this arm is about the
+    // PLACEMENT rather than the eject: a gather cast started during the goal
+    // celebrate must not ride the kickoff teleport (the golden-goal and
+    // goal-reset placements arrive with no arena reset, unlike match start and
+    // teardown). Where the fighter wandered off to does not matter, so this
+    // stays a real harvest at the real node.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Kicker');
+    const b = addAt(sim, 'mage', 'Keeper');
+    const match = startBout(sim, a, b);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue;
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    sim.addItem('gathering_sickle', 1, a);
+    teleport(sim, a, NODE.pos.x, NODE.pos.z);
+    expect(sim.harvestNode(NODE.id, undefined, a)).toBe(true);
+    const e = sim.entities.get(a);
+    if (!e) throw new Error('missing fighter');
+    expect(e.castingAbility).not.toBeNull();
+    // The premise the old fixture got for free: the fighter is NOT on the
+    // pitch, so the placement below is the only thing that can move them.
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
+
+    // Force the goal-reset arm: the goal phase expiring with no pending
+    // winner runs placeCupFighters straight into the kickoff placement.
+    match.phase = 'goal';
+    match.timer = 0.01;
+    match.pendingWinner = undefined;
+    sim.tick();
+
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(true);
+    expect(e.castingAbility).toBeNull();
+    expect(e.gatherCastNodeId).toBe('');
+  });
+
+  it('sweeping a bystander off the live pitch ends their profession session', () => {
+    // This arm DOES need the bystander standing on the playing surface, and
+    // no gather node may sit there any more, so the session is a crafting
+    // cast: placed by direct field assignment, the same precedent
+    // tests/professions_session_teardown.test.ts uses for paths whose
+    // precondition is a spot with no water or nodes. What is under test is
+    // unchanged: policePitch's eject is a hard teleport, and it must not carry
+    // a live non-spell cast with it.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Kicker');
+    const b = addAt(sim, 'mage', 'Keeper');
+    startBout(sim, a, b);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue; // mob damage would cancel for the wrong reason
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    const c = sim.addPlayer('warrior', 'Crafter');
+    teleport(sim, c, PITCH_CENTER.x, PITCH_CENTER.z);
+    const e = sim.entities.get(c);
+    if (!e) throw new Error('missing crafter');
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(true);
+    e.castingAbility = CRAFT_CAST_ID;
+    e.castTotal = 3;
+    e.castRemaining = 3;
+    expect(isNonSpellCast(e.castingAbility)).toBe(true);
+
+    sim.tick();
+
+    // Ejected past the boards, and the session ended with the teleport.
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
+    expect(e.castingAbility).toBeNull();
+    expect(e.castRemaining).toBe(0);
+  });
+});
+
+describe('Vale Cup: skill deeds unlock through a real match (issue #2767)', () => {
+  // deeds_sites_pin.test.ts pins onCupGoalForDeeds / onCupSaveForDeeds /
+  // onCupStandingForDeeds against a structural CupMatchForDeeds, called directly.
+  // This test drives one real rated 3v3 match through the actual sim tick loop
+  // (queue, matchmake, kickoff, three goals, a keeper save, full time) and
+  // asserts all three skill deeds unlock through the PRODUCTION call sites in
+  // src/sim/social/vale_cup.ts, pinning the whole match-to-deed path the issue
+  // reported as silently ungated (rated only, 3v3+ only for the keeper deeds,
+  // a hard-enough shot for a save) end to end.
+  it('a rated 3v3 match awards Hat Trick Hero, Safe Hands, and Nothing Gets Past Me', () => {
+    const sim = makeWorld();
+    const classes = ['warrior', 'mage', 'rogue', 'priest', 'paladin', 'shaman'] as const;
+    const names = ['Scorer', 'Keeper', 'Filler', 'OppKeeper', 'OppStriker', 'OppFiller'];
+    const roles = ['striker', 'keeper', 'sweeper', 'keeper', 'striker', 'sweeper'] as const;
+    const pids = names.map((name, i) => addAt(sim, classes[i], name, i * 2, -40));
+    // Six solos, bracket 3: first three queuers seat team A, next three team B
+    // (vcupPackTeams fills team A first; same fill order as the "keeper role"
+    // grip test above).
+    for (let i = 0; i < 6; i++) {
+      sim.vcupQueueJoin(3, i < 3 ? 'vale' : 'coliseum', roles[i], false, pids[i]);
+    }
+    sim.tick();
+    const match = currentMatch(sim);
+    expect(match.rated).toBe(true); // matchmakeValeCup always starts a RATED match
+    expect(match.bracket).toBe(3); // the keeper deeds' silent 3v3+ gate
+    expect(match.teamA).toEqual([pids[0], pids[1], pids[2]]);
+    expect(match.teamB).toEqual([pids[3], pids[4], pids[5]]);
+    const scorer = pids[0];
+    const keeper = pids[1];
+    expect(match.roles[keeper]).toBe('keeper');
+    readyAll(sim);
+    tickUntil(sim, () => match.phase === 'active', 20 * 6);
+    expect(match.phase).toBe('active');
+
+    const scorerMeta = playerMeta(sim, scorer);
+    const keeperMeta = playerMeta(sim, keeper);
+
+    // Park every fighter but the shooter clear of the east goal mouth, then
+    // stage a kickable ball for team A (mirrors the "first to 5" scoring drill
+    // earlier in this file, scaled to a full 3v3 roster).
+    function stageEastGoal() {
+      for (const p of pids) {
+        if (p === scorer) continue;
+        teleport(sim, p, PITCH.xMin + 1, PITCH.zMin + 1);
+      }
+      teleport(sim, scorer, GOAL_LINE_EAST_X - 8, PITCH_CENTER.z);
+      entity(sim, scorer).facing = Math.PI / 2;
+      const ball = matchBall(match);
+      ball.x = GOAL_LINE_EAST_X - 6;
+      ball.z = PITCH_CENTER.z;
+      ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
+      ball.vx = 0;
+      ball.vy = 0;
+      ball.vz = 0;
+      ball.holderPid = null;
+    }
+
+    // GOALS 1-3: Hat Trick Hero needs three goals by the SAME scorer inside one
+    // rated 3v3+ match.
+    for (let g = 1; g <= 3; g++) {
+      stageEastGoal();
+      sim.castAbility('sport_shoot', scorer, { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z });
+      const events = tickUntil(sim, () => match.phase === 'goal', 20 * 8);
+      const goal = eventOf(events, 'vcupGoal');
+      expect(goal, `goal ${g}`).toBeTruthy();
+      expect(goal.team).toBe('A');
+      expect(goal.scorerName).toBe('Scorer');
+      expect(match.scoreA).toBe(g);
+      tickUntil(sim, () => match.phase !== 'goal', 20 * 6);
+    }
+    expect(match.phase).toBe('active');
+    expect(scorerMeta.deedsEarned.has('pvp_vcup_hat_trick')).toBe(true);
+
+    // SAVE: a shot moving at the keeper hard enough to threaten the west goal
+    // (team A's own goal) sticks in the grip. Stages the ball directly, the
+    // same way the "keeper role" grip test above does (a moving inbound ball
+    // inside the box), so the real updateBallContacts -> gripBall ->
+    // onCupSaveForDeeds path runs rather than calling the helper in isolation.
+    const keeperEntity = entity(sim, keeper);
+    for (const p of pids) {
+      if (p === keeper) continue;
+      teleport(sim, p, PITCH.xMax - 1, PITCH.zMax - 1);
+    }
+    teleport(sim, keeper, GOAL_LINE_WEST_X + 2, PITCH_CENTER.z);
+    const ball = matchBall(match);
+    ball.x = keeperEntity.pos.x + 2.5;
+    ball.z = keeperEntity.pos.z;
+    ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
+    ball.vx = -16; // inbound toward the WEST goal, above VC_SAVE_SHOT_SPEED
+    ball.vz = 0;
+    ball.holderPid = null;
+    const saveEvents = tickUntil(sim, () => ball.holderPid !== null, 10);
+    expect(ball.holderPid).toBe(keeper);
+    expect(saveEvents.some((e) => e.type === 'vcupSave' && e.keeperName === 'Keeper')).toBe(true);
+    expect(keeperMeta.deedsEarned.has('pvp_vcup_first_save')).toBe(true);
+    expect(match.scoreB).toBe(0); // a save, not a concession: the clean sheet lives
+
+    // GOALS 4-5: push team A on to the score cap (5) so the match ends with
+    // team A winning 5-0, the "conceded nothing" half of Nothing Gets Past Me.
+    for (let g = 4; g <= 5; g++) {
+      stageEastGoal();
+      sim.castAbility('sport_shoot', scorer, { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z });
+      tickUntil(sim, () => match.phase === 'goal', 20 * 8);
+      tickUntil(sim, () => match.phase !== 'goal', 20 * 6);
+    }
+    expect(match.scoreA).toBe(5);
+    expect(match.scoreB).toBe(0);
+    expect(match.ended).toBe(true);
+    expect(match.phase).toBe('over');
+    expect(scorerMeta.vcupWins).toBe(1);
+    expect(keeperMeta.vcupWins).toBe(1);
+    // Nothing Gets Past Me: the winning, seated KEEPER with a clean sheet.
+    expect(keeperMeta.deedsEarned.has('pvp_vcup_clean_sheet')).toBe(true);
+    // All three skill deeds landed their Renown (5 + 25, plus first_save's 5
+    // stacks on the keeper; the scorer separately banks first_goal + hat_trick).
+    expect(keeperMeta.renown).toBeGreaterThanOrEqual(30);
+    expect(scorerMeta.renown).toBeGreaterThanOrEqual(25);
   });
 });

@@ -1,5 +1,6 @@
 import {
   ALL_CLASSES,
+  ALL_EQUIP_SLOTS,
   type ArmorItemDef,
   type ArmorType,
   type EquipSlot,
@@ -79,6 +80,93 @@ export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
   return item.slot === slot;
 }
 
+// Every legendary item is unique-equipped: a character wears at most one copy
+// of a given legendary at a time. Derived from quality rather than a per-item
+// flag so a new legendary can never forget to opt in.
+export function isUniqueEquipped(item: ItemDef): boolean {
+  return item.quality === 'legendary';
+}
+
+// The uniqueness KEY. A heroic upgrade variant (content/heroic_variants.ts,
+// `heroicOf`) is the same item at a higher tier, so it shares its base item's
+// family: Thronebane plus heroic Thronebane is still two Thronebanes, both
+// firing their procs, which is exactly what the rule exists to stop.
+export function uniqueEquipFamily(item: ItemDef): string {
+  return item.heroicOf ?? item.id;
+}
+
+// The worn slot that would break the unique-equipped rule if `item` were
+// equipped now, or null when the equip is legal. `ignoreSlots` names the slots
+// this equip empties or overwrites (the target slot itself, plus a slot the
+// swap displaces, e.g. the offhand a two-hander benches), which therefore
+// cannot conflict with the incoming copy. `lookup` resolves a worn id to its
+// def (the sim passes ITEMS; injected so this leaf stays data-free).
+export function uniqueEquipConflictSlot(
+  item: ItemDef,
+  equipment: Partial<Record<EquipSlot, string>>,
+  lookup: (id: string) => ItemDef | undefined,
+  ignoreSlots: readonly EquipSlot[],
+): EquipSlot | null {
+  if (!isUniqueEquipped(item)) return null;
+  const family = uniqueEquipFamily(item);
+  for (const slot of ALL_EQUIP_SLOTS) {
+    if (ignoreSlots.includes(slot)) continue;
+    const wornId = equipment[slot];
+    if (!wornId) continue;
+    const worn = lookup(wornId);
+    if (!worn || !isUniqueEquipped(worn)) continue;
+    if (uniqueEquipFamily(worn) === family) return slot;
+  }
+  return null;
+}
+
+// Does this item take up a HAND, as opposed to merely filling the offhand slot?
+// Everything held does: weapons, shields, and the caster orbs and tomes. An item
+// WORN on the offhand slot does not, a quiver being the case that forced the
+// distinction (it hangs on the back; the hunter's ranger.glb has always drawn it
+// there rather than in a fist). This is the question the two-hand exclusion below
+// actually means to ask, so a worn offhand is outside that rule rather than an
+// exception to it, and any future worn offhand inherits the behavior.
+export function occupiesHand(item: ItemDef): boolean {
+  return item.kind !== 'held_offhand' || item.occupiesHand !== false;
+}
+
+// The slot an equip into `slot` empties as a side effect (the two-hand/offhand
+// exclusion): equipping into the offhand benches a worn two-hand mainhand, and
+// equipping a two-hander into the mainhand benches the offhand. The rule exists
+// because a two-hander uses both hands, so it only binds items that need a hand:
+// a worn offhand (occupiesHand false) coexists with a two-hander in either
+// direction. Fury's Titan Grip exemption is weapon-only: a valid Fury pair may
+// contain one or two two-handers, so nothing is displaced. `lookup` resolves an
+// equipped id to its def (the sim passes ITEMS; kept injected so this leaf stays
+// data-free). This is THE displacement rule equipItem applies; the paperdoll drop
+// feedback mirrors it so the two can never disagree.
+export function displacedSlotForEquip(
+  item: ItemDef,
+  slot: EquipSlot,
+  equipment: Partial<Record<EquipSlot, string>>,
+  lookup: (id: string) => ItemDef | undefined,
+  cls: PlayerClass,
+  spec?: string | null,
+): EquipSlot | null {
+  if (slot === 'offhand') {
+    if (!occupiesHand(item)) return null;
+    const mainhand = equipment.mainhand ? lookup(equipment.mainhand) : undefined;
+    const titanPair = item.kind === 'weapon' && canDualWieldTwoHand(cls, spec);
+    if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand' && !titanPair) {
+      return 'mainhand';
+    }
+    return null;
+  }
+  if (slot === 'mainhand' && item.kind === 'weapon' && weaponHand(item) === 'twohand') {
+    const offhand = equipment.offhand ? lookup(equipment.offhand) : undefined;
+    if (offhand && !occupiesHand(offhand)) return null;
+    const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(cls, spec);
+    if (equipment.offhand && !titanPair) return 'offhand';
+  }
+  return null;
+}
+
 export function maxArmorTypeForClass(cls: PlayerClass): ArmorType {
   if (MAIL_CLASSES.has(cls)) return 'mail';
   if (LEATHER_CLASSES.has(cls)) return 'leather';
@@ -111,7 +199,11 @@ export function classesThatCanEquipArmorType(armorType: ArmorType): PlayerClass[
 }
 
 export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
-  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
+  return (
+    cls === 'rogue' ||
+    (cls === 'warrior' && spec === 'fury') ||
+    (cls === 'shaman' && spec === 'enhancement')
+  );
 }
 
 export function canDualWieldTwoHand(cls: PlayerClass, spec?: string | null): boolean {

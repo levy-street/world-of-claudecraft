@@ -1,0 +1,18 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/Kolbolds/built/kobold.glb",
+      "out": "models/creatures/kobold.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "HitRecieve", "Death"]
+    },
+    {
+      "src": "tmp/asset_src/Kolbolds/built/grix.glb",
+      "out": "models/creatures/grix.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Death"]
+    }
+  ]
+}

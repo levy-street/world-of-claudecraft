@@ -35,6 +35,8 @@ function makeMatch(
   return {
     id: 9,
     phase: 'briefing',
+    rated: true,
+    practice: false,
     countdown: 0,
     timeLeft: 360,
     golden: false,
@@ -304,9 +306,49 @@ describe('vale_cup_briefing_view', () => {
     expect(role.sig).not.toBe(base.sig);
   });
 
+  it('carries the rated flag and rebuilds the skeleton when it differs (issue 2767)', () => {
+    const rated = buildVcupBriefingView(makeCupInfo('sim', { match: makeMatch() }));
+    expect(rated.rated).toBe(true);
+    expect(rated.practice).toBe(false);
+    const unrated = buildVcupBriefingView(
+      makeCupInfo('sim', { match: makeMatch({ rated: false }) }),
+    );
+    expect(unrated.rated).toBe(false);
+    // Structural: an unrated bout adds the note row to the rules panel, so the
+    // skeleton sig must move with the flag.
+    expect(unrated.sig).not.toBe(rated.sig);
+    // A practice bout renders different note copy than a backfilled one, so
+    // the practice flag is structural too.
+    const practice = buildVcupBriefingView(
+      makeCupInfo('sim', { match: makeMatch({ rated: false, practice: true }) }),
+    );
+    expect(practice.rated).toBe(false);
+    expect(practice.practice).toBe(true);
+    expect(practice.sig).not.toBe(unrated.sig);
+  });
+
+  it('fails safe across version skew: absent flags read rated, non-practice', () => {
+    // An older server readout without the fields must never claim a rated bout
+    // is unrated (or practice): strip them as a stale wire object would.
+    const m = makeMatch() as unknown as Record<string, unknown>;
+    delete m.rated;
+    delete m.practice;
+    const view = buildVcupBriefingView(
+      makeCupInfo('client', { match: m as unknown as ReturnType<typeof makeMatch> }),
+    );
+    expect(view.rated).toBe(true);
+    expect(view.practice).toBe(false);
+  });
+
   it('renders identically from Sim-shaped and mirror-shaped stubs', () => {
     const over: Partial<CupInfo> = {
-      match: makeMatch({ awayPalette: true, nationB: 'thornpeak', iAmReady: true }),
+      match: makeMatch({
+        awayPalette: true,
+        nationB: 'thornpeak',
+        iAmReady: true,
+        rated: false,
+        practice: true,
+      }),
     };
     expect(buildVcupBriefingView(makeCupInfo('sim', over))).toEqual(
       buildVcupBriefingView(makeCupInfo('client', over)),

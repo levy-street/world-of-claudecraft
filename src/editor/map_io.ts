@@ -10,8 +10,7 @@
 // resolve: a stale tab keeps its own optimistic version and gets the server
 // 409 instead of silently overwriting another tab's save.
 
-import type { MapDoc } from '../sim/map_doc';
-import type { CustomMap } from './custom_map';
+import { type CustomMap, toMapDoc } from './custom_map';
 import * as net from './net';
 import {
   type KeyValueStore,
@@ -105,7 +104,7 @@ export class MapIO {
    * version_conflict the app resolves via Save As Copy).
    */
   async saveServer(map: CustomMap): Promise<ServerLink> {
-    const doc = map as unknown as MapDoc;
+    const doc = toMapDoc(map);
     const link = this.linkFor(map.meta.id);
     if (!link) {
       const created = await net.createMap(map.meta.name, doc);
@@ -121,7 +120,7 @@ export class MapIO {
 
   /** Create a NEW server map from this document (Save As Copy after a 409). */
   async saveServerAsCopy(map: CustomMap): Promise<ServerLink> {
-    const created = await net.createMap(map.meta.name, map as unknown as MapDoc);
+    const created = await net.createMap(map.meta.name, toMapDoc(map));
     const next = { serverId: created.id, version: created.version };
     this.setLink(map.meta.id, next);
     return next;

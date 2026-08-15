@@ -16,6 +16,10 @@ import type { CupInfo } from '../src/world_api';
 
 // A ClientWorld without the WebSocket plumbing, to drive applySnapshot and the
 // cmd() send path directly (mirrors tests/snapshots.test.ts `bareClient`).
+// Kept bespoke on purpose (issue #2088): this fixture wires a live `ws` mock
+// and returns the {client, sent} pair for the command-send assertions below,
+// unlike the shared tests/helpers/bare_client.ts bareClient(), which is the
+// default for a new suite that just needs a bare ClientWorld.
 function bareClient(pid: number): { client: ClientWorld; sent: any[] } {
   const c: any = Object.create(ClientWorld.prototype);
   c.cfg = { seed: 20061, playerClass: 'warrior' };

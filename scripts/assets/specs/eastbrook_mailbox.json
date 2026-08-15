@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/eastbrook_mailbox/eastbrook_mailbox-final.glb",
+      "out": "models/props/mailbox_pillar.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

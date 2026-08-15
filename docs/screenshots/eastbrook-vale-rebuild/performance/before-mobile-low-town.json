@@ -1,0 +1,2996 @@
+{
+  "schemaVersion": 2,
+  "capturedAt": "2026-07-24T07:03:36.735Z",
+  "captureScope": "town",
+  "gameUrl": "http://127.0.0.1:5183",
+  "shotPrefix": "before",
+  "source": {
+    "comparison": "pr-2356-head",
+    "revision": "9b7fdd5de0ebae1fb39eba4c0885938aac9a5523",
+    "fingerprint": null
+  },
+  "expectedArmoury": true,
+  "expectedTown": false,
+  "profile": "mobile-low",
+  "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+  "coldStart": {
+    "navigationAndBootMs": 6157,
+    "bootSettleMs": 2000,
+    "preloadWaitMs": 0.5,
+    "preload": {
+      "tasks": 263,
+      "waitMs": 0.5,
+      "complete": true
+    },
+    "rendererPrewarm": {
+      "elapsedMs": 690.7,
+      "maxMs": 5000,
+      "createdViews": 2,
+      "candidateViews": 48,
+      "renderPasses": 8,
+      "programsBefore": 0,
+      "programsAfter": 79,
+      "texturesBefore": 0,
+      "texturesAfter": 100,
+      "textureUploads": 97,
+      "compileMode": "async",
+      "compileMs": 150.6,
+      "compileTimedOut": false,
+      "timedOut": false,
+      "remainingMs": 4309.2,
+      "budgetUsedRatio": 0.14,
+      "createdViewTypes": [
+        "player:warrior",
+        "object:dungeon_door"
+      ],
+      "manifestPlanned": 17,
+      "manifestEntries": [
+        {
+          "id": "views.required",
+          "category": "views",
+          "priority": 10,
+          "required": true,
+          "status": "completed",
+          "elapsedMs": 3.6,
+          "remainingMsAfter": 4995.9,
+          "passes": 0,
+          "programsBefore": 0,
+          "programsAfter": 3,
+          "programDelta": 3,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "created=2"
+        },
+        {
+          "id": "views.nearby",
+          "category": "views",
+          "priority": 20,
+          "required": true,
+          "status": "completed",
+          "elapsedMs": 0.5,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "created=2;candidates=48"
+        },
+        {
+          "id": "props.dungeon-doors",
+          "category": "objects",
+          "priority": 30,
+          "required": true,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "interiors.materials",
+          "category": "objects",
+          "priority": 32,
+          "required": false,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "entities.player-archetypes",
+          "category": "entities",
+          "priority": 34,
+          "required": true,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "entities.mob-archetypes",
+          "category": "entities",
+          "priority": 35,
+          "required": true,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "entities.npc-archetypes",
+          "category": "entities",
+          "priority": 36,
+          "required": true,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "objects.quest-archetypes",
+          "category": "objects",
+          "priority": 40,
+          "required": true,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "props.material-variants",
+          "category": "props",
+          "priority": 45,
+          "required": true,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "foliage.materials",
+          "category": "props",
+          "priority": 46,
+          "required": false,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4993.5,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 0,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "textures.scene",
+          "category": "world",
+          "priority": 50,
+          "required": true,
+          "status": "completed",
+          "elapsedMs": 324.9,
+          "remainingMsAfter": 4668.4,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 0,
+          "texturesAfter": 97,
+          "textureDelta": 97,
+          "detail": "uploaded=97"
+        },
+        {
+          "id": "vfx.atlas",
+          "category": "vfx",
+          "priority": 60,
+          "required": false,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4668.3,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 3,
+          "programDelta": 0,
+          "texturesBefore": 97,
+          "texturesAfter": 97,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "programs.compile",
+          "category": "world",
+          "priority": 80,
+          "required": true,
+          "status": "completed",
+          "elapsedMs": 150.9,
+          "remainingMsAfter": 4510.1,
+          "passes": 0,
+          "programsBefore": 3,
+          "programsAfter": 45,
+          "programDelta": 42,
+          "texturesBefore": 97,
+          "texturesAfter": 97,
+          "textureDelta": 0,
+          "detail": "mode=async;timedOut=false"
+        },
+        {
+          "id": "world.initial-frame",
+          "category": "world",
+          "priority": 70,
+          "required": true,
+          "status": "completed",
+          "elapsedMs": 177.6,
+          "remainingMsAfter": 4326.8,
+          "passes": 1,
+          "programsBefore": 45,
+          "programsAfter": 79,
+          "programDelta": 34,
+          "texturesBefore": 97,
+          "texturesAfter": 100,
+          "textureDelta": 3
+        },
+        {
+          "id": "sky.biome-variants",
+          "category": "sky",
+          "priority": 90,
+          "required": false,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4326.8,
+          "passes": 1,
+          "programsBefore": 79,
+          "programsAfter": 79,
+          "programDelta": 0,
+          "texturesBefore": 100,
+          "texturesAfter": 100,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        },
+        {
+          "id": "render.settle-passes",
+          "category": "world",
+          "priority": 100,
+          "required": false,
+          "status": "completed",
+          "elapsedMs": 12.1,
+          "remainingMsAfter": 4309.3,
+          "passes": 8,
+          "programsBefore": 79,
+          "programsAfter": 79,
+          "programDelta": 0,
+          "texturesBefore": 100,
+          "texturesAfter": 100,
+          "textureDelta": 0,
+          "detail": "passes=8"
+        },
+        {
+          "id": "diagnostics.baseline",
+          "category": "diagnostics",
+          "priority": 110,
+          "required": false,
+          "status": "skipped",
+          "elapsedMs": 0,
+          "remainingMsAfter": 4309.3,
+          "passes": 8,
+          "programsBefore": 79,
+          "programsAfter": 79,
+          "programDelta": 0,
+          "texturesBefore": 100,
+          "texturesAfter": 100,
+          "textureDelta": 0,
+          "detail": "constrained-minimal"
+        }
+      ],
+      "manifestCompleted": 6,
+      "manifestSkipped": 11,
+      "manifestTimedOut": 0,
+      "manifestFailed": 0,
+      "timedOutEntryIds": [],
+      "failedEntryIds": [],
+      "diagnosticsBaseline": null
+    }
+  },
+  "sample": {
+    "phase": "warmed",
+    "warmupMs": 800,
+    "sampleMs": 2400,
+    "repeats": 2
+  },
+  "gl": {
+    "vendor": "Google Inc. (Apple)",
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Max, Unspecified Version)"
+  },
+  "settings": {
+    "cameraSpeed": 0.7,
+    "sfxVolume": 0.8,
+    "musicVolume": 0.8,
+    "voiceVolume": 0.9,
+    "brightness": 1,
+    "graphicsPreset": 1,
+    "browserEffects": 0,
+    "terrainDetail": 0,
+    "foliageDensity": 0,
+    "effectsQuality": 0,
+    "shadowQuality": 0,
+    "cameraFov": 60,
+    "renderScale": 1,
+    "fullscreen": 1,
+    "showOverflowXp": 1,
+    "clickToMove": 0,
+    "clickToMoveButton": 0,
+    "interfaceMode": 0,
+    "touchLookSpeed": 1,
+    "touchOpacity": 1,
+    "weather": 1,
+    "joystickScale": 1,
+    "actionButtonScale": 1,
+    "joystickDeadzone": 0.22,
+    "gamepadStickDeadzone": 0.18,
+    "gamepadCameraSpeed": 2.4,
+    "gamepadVibration": 1,
+    "tooltipScale": 1,
+    "chatFontScale": 1,
+    "chatOpacity": 1,
+    "fctScale": 1,
+    "hudOpacity": 1,
+    "uiScale": 1,
+    "playerFrameScale": 1,
+    "targetFrameScale": 1,
+    "partyFrameStyle": 0,
+    "partyFrameScale": 1,
+    "partyFrameWidth": 170,
+    "partyFrameHeight": 42,
+    "partyFrameSpacing": 4,
+    "partyFrameColumns": 1,
+    "partyFrameHealthText": 1,
+    "partyFrameSort": 0,
+    "mouseCamera": false,
+    "lockCursorOnRotate": true,
+    "gamepadEnabled": true,
+    "gamepadInvertY": false,
+    "leftHandedTouch": false,
+    "mobileCameraJoystick": false,
+    "filterProfanity": true,
+    "attackMove": false,
+    "touchInvertLook": false,
+    "startAttackOnAbilityUse": true,
+    "showAttackButton": true,
+    "walkByAutoloot": false,
+    "groundReticle": true,
+    "aurasOnPlayerFrame": false,
+    "mouseoverCast": true,
+    "partyFrameShowResource": true,
+    "partyFrameShowAbsorbs": true,
+    "partyFrameShowAuras": true,
+    "partyFrameShowSelf": false,
+    "reduceMotion": true,
+    "highContrastText": false,
+    "frostedPanels": false,
+    "compactChat": false,
+    "showFps": false,
+    "showWalletOnCharacterScreen": true,
+    "showWalletOnPlayerCard": true,
+    "showDevBadges": true,
+    "showOwnNameplate": true,
+    "showPlayerNameplates": true,
+    "invertLookY": false,
+    "voiceEnabled": true,
+    "footstepSfx": false,
+    "interfaceSfx": true,
+    "clickFeedback": true,
+    "landingHighContrast": false,
+    "questTrackerCollapsed": false,
+    "deedTrackerCollapsed": false,
+    "showItemLevel": false,
+    "showSecondaryActionBar": false,
+    "showThirdActionBar": false,
+    "showTargetOfTarget": false,
+    "showDailyRewardsChest": true,
+    "graphicsDefaultApplied": true
+  },
+  "initialResources": {
+    "calls": 403,
+    "triangles": 1034502,
+    "geometries": 296,
+    "textures": 134,
+    "programs": 91,
+    "contextLost": 0,
+    "contextRestored": 0
+  },
+  "scenarios": [
+    {
+      "name": "main-gate",
+      "view": "gate-approach",
+      "world": {
+        "seed": 20061,
+        "lot": {
+          "kind": "inn",
+          "landmark": "eastbrook_grand_armoury",
+          "x": 17.5,
+          "z": -5.5,
+          "w": 13,
+          "d": 9,
+          "rot": -1.5707963267948966
+        },
+        "player": {
+          "x": 8,
+          "y": 1.5,
+          "z": 2,
+          "facing": 1.5707963267948966
+        },
+        "camera": {
+          "x": -32,
+          "y": 7,
+          "z": -32
+        },
+        "target": {
+          "x": 0,
+          "y": 3,
+          "z": -1.5
+        }
+      },
+      "settle": {
+        "requestedMs": 1400,
+        "observedMs": 1402
+      },
+      "sequence": [
+        {
+          "label": "town-baseline-total-shadow-on-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 554,
+            "shadowDraws": 0,
+            "triangles": 1279674,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 556,
+            "shadowDraws": 0,
+            "triangles": 1287071,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 2.3
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 135,
+            "programs": 127,
+            "heapUsedMb": 346.87
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 135,
+            "programs": 127,
+            "heapUsedMb": 360.54
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.8,
+            "p99Ms": 10.2,
+            "maxMs": 10.4,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 2
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.1,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.8,
+            "p99Ms": 10.2,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.7,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.8,
+            "frameP99": 10.2,
+            "frameMax": 10.4,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 556,
+            "triangles": 1282386,
+            "programs": 127,
+            "textures": 135,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.37,
+            "phaseWorldMs": 0.11,
+            "phaseSubmitMs": 1.91,
+            "phaseTotalMs": 2.51,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 349.5,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-on-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 556,
+            "shadowDraws": 0,
+            "triangles": 1282386,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 558,
+            "shadowDraws": 0,
+            "triangles": 1289783,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 2.4
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 135,
+            "programs": 128,
+            "heapUsedMb": 349.08
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 361.82
+          },
+          "rafFrameInterval": {
+            "samples": 289,
+            "meanMs": 8.33,
+            "p95Ms": 9.7,
+            "p99Ms": 10.2,
+            "maxMs": 10.4,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 2.1
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 289,
+            "seconds": 2.41,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.4,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.7,
+            "p99Ms": 10.2,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.67,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.7,
+            "frameP99": 10.2,
+            "frameMax": 10.4,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 558,
+            "triangles": 1289783,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.37,
+            "phaseWorldMs": 0.1,
+            "phaseSubmitMs": 1.82,
+            "phaseTotalMs": 2.39,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 356.7,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 405,
+            "shadowDraws": 0,
+            "triangles": 1037214,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 405,
+            "shadowDraws": 0,
+            "triangles": 1037214,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 2.1
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.81
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 362.44
+          },
+          "rafFrameInterval": {
+            "samples": 289,
+            "meanMs": 8.33,
+            "p95Ms": 10,
+            "p99Ms": 10.3,
+            "maxMs": 10.4,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.8
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 289,
+            "seconds": 2.41,
+            "fpsMean": 120.1,
+            "fpsMedian": 120.5,
+            "fpsLow1": 96.8,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 10,
+            "p99Ms": 10.3,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.77,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.5,
+            "frameP95": 10,
+            "frameP99": 10.3,
+            "frameMax": 10.4,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 405,
+            "triangles": 1037214,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.36,
+            "phaseWorldMs": 0.1,
+            "phaseSubmitMs": 1.68,
+            "phaseTotalMs": 2.23,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 331.9,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 405,
+            "shadowDraws": 0,
+            "triangles": 1037214,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 405,
+            "shadowDraws": 0,
+            "triangles": 1037214,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 2
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 333.73
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.27
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 10.1,
+            "p99Ms": 10.4,
+            "maxMs": 10.4,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.8
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 96.2,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 10.1,
+            "p99Ms": 10.4,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.76,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 10.1,
+            "frameP99": 10.4,
+            "frameMax": 10.4,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 405,
+            "triangles": 1037214,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.55,
+            "phaseTotalMs": 2.09,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 331.6,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        }
+      ],
+      "conditions": {
+        "baselineTotalShadowOn": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 555,
+            "shadowDraws": 0,
+            "triangles": 1281030,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 558,
+            "shadowDraws": 0,
+            "triangles": 1289783,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 2.4
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 135,
+            "programs": 127.5,
+            "heapUsedMb": 347.98
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 361.82
+          },
+          "rafFrameIntervalStats": {
+            "frames": 577,
+            "seconds": 4.81,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.2,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.7,
+            "p99Ms": 10.2,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.68,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.8
+        },
+        "baselineTotalShadowOff": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 405,
+            "shadowDraws": 0,
+            "triangles": 1037214,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 405,
+            "shadowDraws": 0,
+            "triangles": 1037214,
+            "lines": 0,
+            "points": 4126,
+            "cpuSubmitMs": 2.1
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 340.77
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 362.44
+          },
+          "rafFrameIntervalStats": {
+            "frames": 577,
+            "seconds": 4.81,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 96.3,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 10.1,
+            "p99Ms": 10.3,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.77,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.5
+        }
+      },
+      "sampledDeltas": null,
+      "directRenderAttribution": null,
+      "deltas": null
+    },
+    {
+      "name": "elevated",
+      "view": "elevated-overview",
+      "world": {
+        "seed": 20061,
+        "lot": {
+          "kind": "inn",
+          "landmark": "eastbrook_grand_armoury",
+          "x": 17.5,
+          "z": -5.5,
+          "w": 13,
+          "d": 9,
+          "rot": -1.5707963267948966
+        },
+        "player": {
+          "x": 8,
+          "y": 1.5,
+          "z": 2,
+          "facing": 1.5707963267948966
+        },
+        "camera": {
+          "x": -31,
+          "y": 28,
+          "z": -36
+        },
+        "target": {
+          "x": 0,
+          "y": 2.5,
+          "z": -1.5
+        }
+      },
+      "settle": {
+        "requestedMs": 1400,
+        "observedMs": 1402
+      },
+      "sequence": [
+        {
+          "label": "town-baseline-total-shadow-on-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 571,
+            "shadowDraws": 0,
+            "triangles": 1385241,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 571,
+            "shadowDraws": 0,
+            "triangles": 1385241,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.4
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 333.71
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.49
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 10,
+            "p99Ms": 10.3,
+            "maxMs": 10.4,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 2.1
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 96.8,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 10,
+            "p99Ms": 10.3,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.82,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 10,
+            "frameP99": 10.3,
+            "frameMax": 10.4,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 571,
+            "triangles": 1385241,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.1,
+            "phaseSubmitMs": 1.71,
+            "phaseTotalMs": 2.25,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 327.3,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-on-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 568,
+            "shadowDraws": 0,
+            "triangles": 1375861,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 571,
+            "shadowDraws": 0,
+            "triangles": 1385241,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.3
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 334.85
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.97
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 10,
+            "p99Ms": 10.3,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 2
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.1,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 10,
+            "p99Ms": 10.3,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.83,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 10,
+            "frameP99": 10.3,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 568,
+            "triangles": 1375861,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.83,
+            "phaseTotalMs": 2.38,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 324,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 415,
+            "shadowDraws": 0,
+            "triangles": 1123292,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 415,
+            "shadowDraws": 0,
+            "triangles": 1123292,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 333.95
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 346.71
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.6,
+            "p99Ms": 10.2,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.7
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.7,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.6,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.68,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120.1,
+            "fps10s": 120.4,
+            "frameP95": 9.6,
+            "frameP99": 10.2,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 415,
+            "triangles": 1123292,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.66,
+            "phaseTotalMs": 2.21,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 327.4,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 415,
+            "shadowDraws": 0,
+            "triangles": 1123292,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 415,
+            "shadowDraws": 0,
+            "triangles": 1123292,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.9
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 333.93
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.43
+          },
+          "rafFrameInterval": {
+            "samples": 289,
+            "meanMs": 8.34,
+            "p95Ms": 9.7,
+            "p99Ms": 10,
+            "maxMs": 10.4,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.7
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 289,
+            "seconds": 2.41,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.7,
+            "fpsLow01": 96.2,
+            "meanMs": 8.34,
+            "p50Ms": 8.3,
+            "p95Ms": 9.7,
+            "p99Ms": 10,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.68,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.7,
+            "frameP99": 10,
+            "frameMax": 10.4,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 415,
+            "triangles": 1123292,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 42,
+            "foliageTris": 644782,
+            "phaseEntitiesMs": 0.34,
+            "phaseWorldMs": 0.1,
+            "phaseSubmitMs": 1.53,
+            "phaseTotalMs": 2.07,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 328.7,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        }
+      ],
+      "conditions": {
+        "baselineTotalShadowOn": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 569.5,
+            "shadowDraws": 0,
+            "triangles": 1380551,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 571,
+            "shadowDraws": 0,
+            "triangles": 1385241,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.4
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 334.28
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.97
+          },
+          "rafFrameIntervalStats": {
+            "frames": 576,
+            "seconds": 4.8,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 96.9,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 10,
+            "p99Ms": 10.3,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.83,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.8
+        },
+        "baselineTotalShadowOff": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 415,
+            "shadowDraws": 0,
+            "triangles": 1123292,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 415,
+            "shadowDraws": 0,
+            "triangles": 1123292,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 333.94
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.43
+          },
+          "rafFrameIntervalStats": {
+            "frames": 577,
+            "seconds": 4.81,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.4,
+            "fpsLow01": 96.2,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.7,
+            "p99Ms": 10.2,
+            "p999Ms": 10.4,
+            "maxMs": 10.4,
+            "stdevMs": 0.68,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.5
+        }
+      },
+      "sampledDeltas": null,
+      "directRenderAttribution": null,
+      "deltas": null
+    },
+    {
+      "name": "central",
+      "view": "central-square",
+      "world": {
+        "seed": 20061,
+        "lot": {
+          "kind": "inn",
+          "landmark": "eastbrook_grand_armoury",
+          "x": 17.5,
+          "z": -5.5,
+          "w": 13,
+          "d": 9,
+          "rot": -1.5707963267948966
+        },
+        "player": {
+          "x": 8,
+          "y": 1.5,
+          "z": 2,
+          "facing": 1.5707963267948966
+        },
+        "camera": {
+          "x": -20,
+          "y": 8,
+          "z": -18
+        },
+        "target": {
+          "x": 0,
+          "y": 2.5,
+          "z": 5.5
+        }
+      },
+      "settle": {
+        "requestedMs": 1400,
+        "observedMs": 1402
+      },
+      "sequence": [
+        {
+          "label": "town-baseline-total-shadow-on-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 589,
+            "shadowDraws": 0,
+            "triangles": 1571273,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 589,
+            "shadowDraws": 0,
+            "triangles": 1571273,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.4
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 334.95
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.46
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.4,
+            "p99Ms": 10.2,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 2.1
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.7,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.4,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.5,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.4,
+            "frameP99": 10.2,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 589,
+            "triangles": 1571273,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 55,
+            "foliageTris": 914308,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.72,
+            "phaseTotalMs": 2.25,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 340,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-on-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 589,
+            "shadowDraws": 0,
+            "triangles": 1571273,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 589,
+            "shadowDraws": 0,
+            "triangles": 1571273,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.3
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 334
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 346.87
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.4,
+            "p99Ms": 10,
+            "maxMs": 10.2,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 2.1
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 98.7,
+            "fpsLow01": 98,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.4,
+            "p99Ms": 10,
+            "p999Ms": 10.2,
+            "maxMs": 10.2,
+            "stdevMs": 0.53,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.4,
+            "frameP99": 10,
+            "frameMax": 10.2,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 589,
+            "triangles": 1571273,
+            "programs": 128,
+            "textures": 136,
+            "views": 51,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 55,
+            "foliageTris": 914308,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.85,
+            "phaseTotalMs": 2.39,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 326.7,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 436,
+            "shadowDraws": 0,
+            "triangles": 1318704,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 436,
+            "shadowDraws": 0,
+            "triangles": 1318704,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.1
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 333.48
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.41
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.6,
+            "p99Ms": 10.2,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.8
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.4,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.6,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.59,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 119.9,
+            "fps10s": 120.4,
+            "frameP95": 9.6,
+            "frameP99": 10.2,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 436,
+            "triangles": 1318704,
+            "programs": 128,
+            "textures": 136,
+            "views": 52,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 55,
+            "foliageTris": 914308,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.1,
+            "phaseSubmitMs": 1.69,
+            "phaseTotalMs": 2.24,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 335.1,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 436,
+            "shadowDraws": 0,
+            "triangles": 1318704,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 436,
+            "shadowDraws": 0,
+            "triangles": 1318704,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 334.07
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.49
+          },
+          "rafFrameInterval": {
+            "samples": 289,
+            "meanMs": 8.33,
+            "p95Ms": 9.8,
+            "p99Ms": 10.2,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.8
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 289,
+            "seconds": 2.41,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.7,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.8,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.64,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.8,
+            "frameP99": 10.2,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 436,
+            "triangles": 1318704,
+            "programs": 128,
+            "textures": 136,
+            "views": 52,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 55,
+            "foliageTris": 914308,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.55,
+            "phaseTotalMs": 2.09,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 329.5,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        }
+      ],
+      "conditions": {
+        "baselineTotalShadowOn": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 589,
+            "shadowDraws": 0,
+            "triangles": 1571273,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "renderWorst": {
+            "calls": 589,
+            "shadowDraws": 0,
+            "triangles": 1571273,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.4
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 334.48
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.46
+          },
+          "rafFrameIntervalStats": {
+            "frames": 576,
+            "seconds": 4.8,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.9,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.4,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.51,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.8
+        },
+        "baselineTotalShadowOff": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 436,
+            "shadowDraws": 0,
+            "triangles": 1318704,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.5
+          },
+          "renderWorst": {
+            "calls": 436,
+            "shadowDraws": 0,
+            "triangles": 1318704,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.1
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 333.78
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 128,
+            "heapUsedMb": 347.49
+          },
+          "rafFrameIntervalStats": {
+            "frames": 577,
+            "seconds": 4.81,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.6,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.7,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.61,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.5
+        }
+      },
+      "sampledDeltas": null,
+      "directRenderAttribution": null,
+      "deltas": null
+    },
+    {
+      "name": "armoury-facing",
+      "view": "armoury-relation",
+      "world": {
+        "seed": 20061,
+        "lot": {
+          "kind": "inn",
+          "landmark": "eastbrook_grand_armoury",
+          "x": 17.5,
+          "z": -5.5,
+          "w": 13,
+          "d": 9,
+          "rot": -1.5707963267948966
+        },
+        "player": {
+          "x": 8,
+          "y": 1.5,
+          "z": 2,
+          "facing": 1.5707963267948966
+        },
+        "camera": {
+          "x": 34,
+          "y": 15,
+          "z": 25
+        },
+        "target": {
+          "x": 10,
+          "y": 4,
+          "z": -2
+        }
+      },
+      "settle": {
+        "requestedMs": 1400,
+        "observedMs": 1401
+      },
+      "sequence": [
+        {
+          "label": "town-baseline-total-shadow-on-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 477,
+            "shadowDraws": 0,
+            "triangles": 1079137,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.6
+          },
+          "renderWorst": {
+            "calls": 481,
+            "shadowDraws": 0,
+            "triangles": 1084561,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.2
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 333.65
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 347.85
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.5,
+            "p99Ms": 10.3,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.9
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.1,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.5,
+            "p99Ms": 10.3,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.59,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.5,
+            "frameP99": 10.3,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 479,
+            "triangles": 1077164,
+            "programs": 132,
+            "textures": 136,
+            "views": 52,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 62,
+            "foliageTris": 964515,
+            "phaseEntitiesMs": 0.36,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.73,
+            "phaseTotalMs": 2.28,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 332.1,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-on-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": true
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": true,
+            "sunCastShadow": true
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 481,
+            "shadowDraws": 0,
+            "triangles": 1084561,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.6
+          },
+          "renderWorst": {
+            "calls": 482,
+            "shadowDraws": 0,
+            "triangles": 1091229,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.2
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 334.63
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 347.79
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.3,
+            "p99Ms": 10.2,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.9
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.7,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.3,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.49,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.3,
+            "frameP99": 10.2,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 482,
+            "triangles": 1091229,
+            "programs": 132,
+            "textures": 136,
+            "views": 52,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 62,
+            "foliageTris": 964515,
+            "phaseEntitiesMs": 0.36,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.66,
+            "phaseTotalMs": 2.2,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 343,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-1",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 328,
+            "shadowDraws": 0,
+            "triangles": 831992,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.4
+          },
+          "renderWorst": {
+            "calls": 328,
+            "shadowDraws": 0,
+            "triangles": 831992,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 334.12
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 347.01
+          },
+          "rafFrameInterval": {
+            "samples": 289,
+            "meanMs": 8.33,
+            "p95Ms": 9.8,
+            "p99Ms": 10.2,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.6
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 289,
+            "seconds": 2.41,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.7,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.8,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.7,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.8,
+            "frameP99": 10.2,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 328,
+            "triangles": 831992,
+            "programs": 132,
+            "textures": 136,
+            "views": 52,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 62,
+            "foliageTris": 964515,
+            "phaseEntitiesMs": 0.35,
+            "phaseWorldMs": 0.09,
+            "phaseSubmitMs": 1.52,
+            "phaseTotalMs": 2.06,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 336.1,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        },
+        {
+          "label": "town-baseline-total-shadow-off-2",
+          "targetName": "eastbrookTownRebuild",
+          "targetChildMeshes": 0,
+          "drawStats": null,
+          "requested": {
+            "rootVisible": null,
+            "shadowEnabled": false
+          },
+          "observed": {
+            "rootName": "eastbrookTownRebuild",
+            "rootPresent": false,
+            "rootVisible": null,
+            "shadowMapEnabled": false,
+            "sunCastShadow": false
+          },
+          "timingBasis": "CPU and requestAnimationFrame timing only; GPU timing was not measured",
+          "renderMedian": {
+            "calls": 328,
+            "shadowDraws": 0,
+            "triangles": 831992,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.4
+          },
+          "renderWorst": {
+            "calls": 328,
+            "shadowDraws": 0,
+            "triangles": 831992,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 333.65
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 347.75
+          },
+          "rafFrameInterval": {
+            "samples": 288,
+            "meanMs": 8.33,
+            "p95Ms": 9.7,
+            "p99Ms": 10.1,
+            "maxMs": 10.3,
+            "long50": 0
+          },
+          "longTasks": {
+            "count": 0,
+            "p95Ms": 0,
+            "maxMs": 0
+          },
+          "rendererCpu": {
+            "worldP95Ms": 0.2,
+            "submitP95Ms": 1.6
+          },
+          "inputToVisibleP95Ms": null,
+          "context": {
+            "lost": 0,
+            "restored": 0
+          },
+          "assetFailures": [],
+          "rafFrameIntervalStats": {
+            "frames": 288,
+            "seconds": 2.4,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 98,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.7,
+            "p99Ms": 10.1,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.66,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "perfReportSummary": {
+            "fps": 120,
+            "fps10s": 120.4,
+            "frameP95": 9.7,
+            "frameP99": 10.1,
+            "frameMax": 10.3,
+            "long50": 0,
+            "tier": "low",
+            "renderScale": 0.85,
+            "calls": 327,
+            "triangles": 830422,
+            "programs": 132,
+            "textures": 136,
+            "views": 52,
+            "entities": null,
+            "grassTufts": 2642,
+            "foliageDraws": 62,
+            "foliageTris": 964515,
+            "phaseEntitiesMs": 0.34,
+            "phaseWorldMs": 0.1,
+            "phaseSubmitMs": 1.38,
+            "phaseTotalMs": 1.92,
+            "mainSimMs": 0,
+            "mainRendererMs": 0,
+            "mainHudMs": 0,
+            "longTaskCount": 0,
+            "longTaskP95": 0,
+            "longTaskMax": 0,
+            "heapUsedMb": 339.5,
+            "heapLimitMb": 4192,
+            "budgetMode": "disabled",
+            "budgetReason": "disabled",
+            "budgetPressure": 0,
+            "autoGovernor": false
+          }
+        }
+      ],
+      "conditions": {
+        "baselineTotalShadowOn": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 479,
+            "shadowDraws": 0,
+            "triangles": 1081849,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.6
+          },
+          "renderWorst": {
+            "calls": 482,
+            "shadowDraws": 0,
+            "triangles": 1091229,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 2.2
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 334.14
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 347.85
+          },
+          "rafFrameIntervalStats": {
+            "frames": 576,
+            "seconds": 4.8,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.4,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.4,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.54,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.6
+        },
+        "baselineTotalShadowOff": {
+          "blocks": 2,
+          "renderMedian": {
+            "calls": 328,
+            "shadowDraws": 0,
+            "triangles": 831992,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.4
+          },
+          "renderWorst": {
+            "calls": 328,
+            "shadowDraws": 0,
+            "triangles": 831992,
+            "lines": 0,
+            "points": 4154,
+            "cpuSubmitMs": 1.8
+          },
+          "resourcesMedian": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 333.89
+          },
+          "resourcesWorst": {
+            "geometries": 296,
+            "textures": 136,
+            "programs": 132,
+            "heapUsedMb": 347.75
+          },
+          "rafFrameIntervalStats": {
+            "frames": 577,
+            "seconds": 4.81,
+            "fpsMean": 120,
+            "fpsMedian": 120.5,
+            "fpsLow1": 97.7,
+            "fpsLow01": 97.1,
+            "meanMs": 8.33,
+            "p50Ms": 8.3,
+            "p95Ms": 9.8,
+            "p99Ms": 10.2,
+            "p999Ms": 10.3,
+            "maxMs": 10.3,
+            "stdevMs": 0.68,
+            "jankPct": 0,
+            "long50": 0,
+            "stutter100": 0
+          },
+          "cpuSubmitMsMedian": 1.4
+        }
+      },
+      "sampledDeltas": null,
+      "directRenderAttribution": null,
+      "deltas": null
+    }
+  ],
+  "assetFailures": [],
+  "captureDiagnostics": {
+    "pageErrors": [],
+    "consoleErrors": [],
+    "ignoredConsoleErrors": [
+      "Failed to load resource: the server responded with a status of 502 (Bad Gateway) [matched /api/site-presence]",
+      "Failed to load resource: the server responded with a status of 502 (Bad Gateway) [matched /api/project-stats]",
+      "Failed to fetch project stats: ApiError: request failed (502)",
+      "Failed to load resource: the server responded with a status of 502 (Bad Gateway) [matched /api/site-presence]"
+    ],
+    "expectedFailures": [
+      "/api/site-presence",
+      "/api/project-stats",
+      "/api/site-presence"
+    ],
+    "assetFailures": []
+  }
+}

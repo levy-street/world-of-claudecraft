@@ -876,12 +876,15 @@ describe('server/main.ts shutdown drains the mirror queue', () => {
   // sweep that lets a replacement process reload the same characters.
   const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
 
-  it('awaits stopSteamMirror(5000) after deedRecordsIdle and before the lease sweep', () => {
+  it('awaits the concurrent storefront stop (5s deadline) after deedRecordsIdle and before the lease sweep', () => {
     // The bounded-deadline shutdown, pinned to the 5s literal: a stuck upstream
-    // must never hang the process shutdown.
-    expect(src).toContain('await stopSteamMirror(5000);');
+    // must never hang the process shutdown. The one-statement Promise.all pin
+    // also guarantees Steam and Epic drain CONCURRENTLY under one shared
+    // wall-clock budget, never serialized behind each other.
+    const stopAll = 'await Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)]);';
+    expect(src).toContain(stopAll);
     const deedIdle = src.indexOf('await deedRecordsIdle();');
-    const stopMirror = src.indexOf('await stopSteamMirror(5000);');
+    const stopMirror = src.indexOf(stopAll);
     const leaseSweep = src.indexOf('releaseAllCharacterLeases(');
     expect(deedIdle).toBeGreaterThan(-1);
     expect(stopMirror).toBeGreaterThan(deedIdle);

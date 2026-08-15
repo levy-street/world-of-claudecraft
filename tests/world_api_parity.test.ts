@@ -40,6 +40,7 @@ import { OVERHEAD_EMOTE_IDS, type PlayerClass } from '../src/sim/types';
 // type-only to pin each facet's runtime member array to its interface key-set below.
 import type { IWorldActionBar } from '../src/world_api/action_bar';
 import type { IWorldBank } from '../src/world_api/bank';
+import type { IWorldBattleground } from '../src/world_api/battleground';
 import type { IWorldCardMinigame } from '../src/world_api/card_minigame';
 import type { IWorldChat } from '../src/world_api/chat';
 // The overhead-emote runtime surface the chat facet derives locally (see the
@@ -56,6 +57,7 @@ import type { IWorldDuelArena } from '../src/world_api/duel_arena';
 import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
+import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
 import type { IWorldLoot } from '../src/world_api/loot';
@@ -67,6 +69,7 @@ import type { IWorldPet } from '../src/world_api/pet';
 import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
+import type { IWorldReliquary } from '../src/world_api/reliquary';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
@@ -103,15 +106,18 @@ export const IWORLD_MEMBERS = [
   { name: 'prestigeRank', kind: 'data' },
   { name: 'unlockedMilestones', kind: 'data' },
   { name: 'restedXp', kind: 'data' },
+  { name: 'playtimeSeconds', kind: 'data' },
   { name: 'craftSkills', kind: 'data' },
   { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
+  { name: 'activeConsecrations', kind: 'data' },
   { name: 'activeFrostRings', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
+  { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -120,8 +126,10 @@ export const IWORLD_MEMBERS = [
   { name: 'cancelAura', kind: 'method' },
   { name: 'targetEntity', kind: 'method' },
   { name: 'tabTarget', kind: 'method' },
+  { name: 'tabTargetPrev', kind: 'method' },
   { name: 'targetNearestFriendly', kind: 'method' },
   { name: 'friendlyTabTarget', kind: 'method' },
+  { name: 'setStopAutoAttackOnTargetSwitch', kind: 'method' },
   { name: 'startAutoAttack', kind: 'method' },
   { name: 'stopAutoAttack', kind: 'method' },
   { name: 'interact', kind: 'method' },
@@ -131,8 +139,10 @@ export const IWORLD_MEMBERS = [
   { name: 'submitLootRoll', kind: 'method' },
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
   { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
+  { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
+  { name: 'civicServicePlacements', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
@@ -142,9 +152,11 @@ export const IWORLD_MEMBERS = [
   { name: 'equipItem', kind: 'method' },
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
+  { name: 'sortInventory', kind: 'method' },
   { name: 'unequipItem', kind: 'method' },
   { name: 'useItem', kind: 'method' },
   { name: 'discardItem', kind: 'method' },
+  { name: 'setItemLocked', kind: 'method' },
   { name: 'buyItem', kind: 'method' },
   { name: 'sellItem', kind: 'method' },
   { name: 'sellAllJunk', kind: 'method' },
@@ -159,6 +171,7 @@ export const IWORLD_MEMBERS = [
   { name: 'unequipMechChroma', kind: 'method' },
   { name: 'changeWeaponSkin', kind: 'method' },
   { name: 'toggleWeaponStow', kind: 'method' },
+  { name: 'setHelmHidden', kind: 'method' },
   { name: 'unstuck', kind: 'method' },
   { name: 'releaseSpirit', kind: 'method' },
   { name: 'resurrectAtCorpse', kind: 'method' },
@@ -171,9 +184,12 @@ export const IWORLD_MEMBERS = [
   { name: 'revivePet', kind: 'method' },
   { name: 'petAttack', kind: 'method' },
   { name: 'petWaterJet', kind: 'method' },
+  { name: 'petSpecialCommandsSupported', kind: 'data' },
+  { name: 'petSpecial', kind: 'method' },
   { name: 'petTaunt', kind: 'method' },
   { name: 'setPetAutoTaunt', kind: 'method' },
   { name: 'setPetAutoWaterJet', kind: 'method' },
+  { name: 'setPetAutoSpecial', kind: 'method' },
   { name: 'feedPet', kind: 'method' },
   { name: 'healPet', kind: 'method' },
   { name: 'setPetMode', kind: 'method' },
@@ -184,6 +200,8 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaInfo', kind: 'data' },
   { name: 'honor', kind: 'data' },
   { name: 'lifetimeHonor', kind: 'data' },
+  // --- Thornhollow Fields battleground (IWorldBattleground) ---
+  { name: 'bgInfo', kind: 'data' },
   { name: 'cardMinigameInfo', kind: 'data' },
   { name: 'joinCardDuelQueue', kind: 'method' },
   { name: 'leaveCardDuelQueue', kind: 'method' },
@@ -191,6 +209,7 @@ export const IWORLD_MEMBERS = [
   { name: 'forfeitCardDuel', kind: 'method' },
   { name: 'cupInfo', kind: 'data' },
   { name: 'marketInfo', kind: 'data' },
+  { name: 'marketCollectPending', kind: 'data' },
   // --- party / raid commands + marker read ---
   { name: 'partyInvite', kind: 'method' },
   { name: 'partyAccept', kind: 'method' },
@@ -216,6 +235,7 @@ export const IWORLD_MEMBERS = [
   { name: 'duelAccept', kind: 'method' },
   { name: 'duelDecline', kind: 'method' },
   { name: 'realm', kind: 'data' },
+  { name: 'accountAdmin', kind: 'data' },
   { name: 'socialInfo', kind: 'data' },
   // --- social graph commands + async search ---
   { name: 'friendAdd', kind: 'method' },
@@ -236,6 +256,7 @@ export const IWORLD_MEMBERS = [
   { name: 'guildDisband', kind: 'method' },
   { name: 'guildEventCreate', kind: 'method' },
   { name: 'guildEventRemove', kind: 'method' },
+  { name: 'guildSetMotd', kind: 'method' },
   { name: 'searchCharacters', kind: 'method' }, // async (1/2)
   { name: 'characterProfile', kind: 'method' }, // async
   // Operator-set account flair, by name. A pure LOCAL read (the flair rides the entity
@@ -245,6 +266,11 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaQueueJoin', kind: 'method' },
   { name: 'arenaQueueLeave', kind: 'method' },
   { name: 'arenaAugmentPick', kind: 'method' },
+  // --- Thornhollow Fields battleground (IWorldBattleground) ---
+  { name: 'bgQueueJoin', kind: 'method' },
+  { name: 'bgQueueLeave', kind: 'method' },
+  { name: 'bgRespond', kind: 'method' },
+  { name: 'bgFlagAction', kind: 'method' },
   // --- the Vale Cup boarball minigame (IWorldValeCup) ---
   { name: 'vcupQueueJoin', kind: 'method' },
   { name: 'vcupQueueLeave', kind: 'method' },
@@ -254,7 +280,9 @@ export const IWORLD_MEMBERS = [
   { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
+  { name: 'marketSellPriceCheck', kind: 'method' },
   { name: 'marketList', kind: 'method' },
+  { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
   { name: 'marketCancel', kind: 'method' },
   { name: 'marketCollect', kind: 'method' },
@@ -270,6 +298,15 @@ export const IWORLD_MEMBERS = [
   { name: 'bankDeposit', kind: 'method' },
   { name: 'bankWithdraw', kind: 'method' },
   { name: 'bankBuySlots', kind: 'method' },
+  // --- guild bank: officer-plus proximity-gated read + gold/item/buy commands
+  //     (Phase 1 stubs in both worlds; the wire lands in Phase 2) ---
+  { name: 'guildBankInfo', kind: 'data' },
+  { name: 'guildBankDepositGold', kind: 'method' },
+  { name: 'guildBankWithdrawGold', kind: 'method' },
+  { name: 'guildBankDeposit', kind: 'method' },
+  { name: 'guildBankWithdraw', kind: 'method' },
+  { name: 'guildBankBuySlots', kind: 'method' },
+  { name: 'guildBankLog', kind: 'method' },
   // --- dungeons + delves commands and reads ---
   { name: 'enterDungeon', kind: 'method' },
   { name: 'leaveDungeon', kind: 'method' },
@@ -291,8 +328,10 @@ export const IWORLD_MEMBERS = [
   { name: 'companionUpgrades', kind: 'data' },
   { name: 'delveDaily', kind: 'data' },
   { name: 'professionsState', kind: 'data' },
+  { name: 'stationPlacements', kind: 'data' },
   { name: 'craftingIdentity', kind: 'data' },
   { name: 'nodeHarvestableByMe', kind: 'method' }, // read-returning
+  { name: 'nodeRespawnSeconds', kind: 'method' }, // read-returning (countdown of the same timer)
   { name: 'harvestNode', kind: 'method' },
   { name: 'recipeList', kind: 'data' },
   { name: 'lastCraftResult', kind: 'data' },
@@ -312,10 +351,23 @@ export const IWORLD_MEMBERS = [
   { name: 'lastSalvageResult', kind: 'data' },
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
+  // Commission order board (issue #1298).
+  { name: 'commissionOrders', kind: 'data' },
+  { name: 'openCommissionOrder', kind: 'method' },
+  { name: 'cancelCommissionOrder', kind: 'method' },
+  { name: 'acceptCommissionOrder', kind: 'method' },
+  { name: 'deliverCommissionOrder', kind: 'method' },
+  // Tool effect slotting: one read row per gathering profession that has a
+  // slotted effect, the command that installs one (consuming a crafted charm
+  // copy), and the recharge command (the R39/R30 refill).
+  { name: 'toolEffectSlots', kind: 'data' },
+  { name: 'slotToolEffect', kind: 'method' },
+  { name: 'rechargeToolEffect', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
-  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
+  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
+  { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
@@ -343,10 +395,8 @@ export const IWORLD_MEMBERS = [
   { name: 'switchLoadout', kind: 'method' },
   { name: 'deleteLoadout', kind: 'method' },
   // --- rideable ground mounts (IWorldMounts) ---
-  { name: 'selectedMount', kind: 'method' }, // read-returning
   { name: 'ownedMounts', kind: 'method' }, // read-returning
   { name: 'ridingTrained', kind: 'method' }, // read-returning
-  { name: 'selectMount', kind: 'method' },
   { name: 'toggleMounted', kind: 'method' },
   // --- riding skill purchase (IWorldMounts) ---
   { name: 'learnRiding', kind: 'method' },
@@ -369,15 +419,29 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonFinderApply', kind: 'method' },
   { name: 'dungeonFinderApplyCancel', kind: 'method' },
   { name: 'dungeonFinderApplicationRespond', kind: 'method' },
-  // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title reads + the
-  // title selection command ---
+  // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
+  // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
   { name: 'deedStats', kind: 'data' },
   { name: 'renown', kind: 'data' },
   { name: 'activeTitle', kind: 'data' },
   { name: 'setActiveTitle', kind: 'method' },
+  { name: 'activeBorder', kind: 'data' },
+  { name: 'setActiveBorder', kind: 'method' },
   { name: 'deedsRarity', kind: 'method' },
+  { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
+  // --- The Reliquary (IWorldReliquary): sparse firstFind / marks / recent +
+  // pure completion helpers (item ownership still rides deedStats) ---
+  { name: 'reliquaryFirstFind', kind: 'data' },
+  { name: 'reliquaryMarks', kind: 'data' },
+  { name: 'reliquaryRecent', kind: 'data' },
+  { name: 'reliquaryObtainCounts', kind: 'data' },
+  { name: 'reliquaryPageCompletion', kind: 'method' },
+  { name: 'reliquaryCatalogCompletion', kind: 'method' },
+  { name: 'reliquaryCuratorRank', kind: 'method' },
+  { name: 'reliquaryPageClearCount', kind: 'method' },
+  { name: 'reliquaryRarity', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
@@ -487,10 +551,64 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), the commissions unbindItem command, and the
-    // Rift + mounts surface.
-    expect(IWORLD_MEMBERS.length).toBe(272);
-    expect(DATA_MEMBERS.length).toBe(70);
-    expect(METHOD_MEMBERS.length).toBe(202);
+    // Rift + mounts surface. The v0.31.0 base merge added the release's three new
+    // members on top of the branch's 272; making reins usable items then removed
+    // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
+    // activeMasterLootRolls, leaving 274; the packet's slotted tool effects add
+    // toolEffectSlots (data) and slotToolEffect (method) for 276, the
+    // acquisition craft's recharge command (rechargeToolEffect) makes 277,
+    // and the UX pass's node respawn countdown read (nodeRespawnSeconds)
+    // makes 278; the v0.33.0 sync merges bring the rift floor timer HUD's
+    // riftEventMsRemaining, the instance-payload pipes' marketListInstance,
+    // and reactive aura timing's reactiveAbilityWindowRemaining (all
+    // methods) for 281; the v0.34.0 sync removes the renderer-only
+    // riftCollisionToken (data) with third-person camera collision,
+    // leaving 280; a later v0.34.0 sync re-adds riftCollisionToken (data)
+    // so client-side swept-landing and click-to-move pathing can treat
+    // rift walls as solid, leaving 281. The Guild Bank foundation adds the six
+    // IWorldGuildBank members (guildBankInfo, one data read, plus five
+    // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
+    // (guildBankLog, a method because reading it is what requests the cold
+    // payload on demand: it has no snapshot key), leaving 288. Thornhollow
+    // Fields adds the four battleground facet members on top of that base:
+    // the bgInfo data member plus the bgQueueJoin / bgQueueLeave / bgFlagAction
+    // commands, leaving 292. The stop-auto-attack-on-target-switch setting
+    // adds setStopAutoAttackOnTargetSwitch (method), leaving 293. This
+    // branch's commission order board (issue #1298) adds commissionOrders
+    // (data) plus openCommissionOrder/cancelCommissionOrder/
+    // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
+    // The v0.36.0 base's paperdoll helmet-visibility eye adds setHelmHidden
+    // (IWorldCosmetics, a method), leaving 300. The bag clean-up button adds
+    // sortInventory (IWorldInventory, a method), leaving 301. The character
+    // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
+    // data), leaving 302. The battleground queue-pop confirmation adds
+    // bgRespond (IWorldBattleground, a method), leaving 303. The release's
+    // class-overhauls wave then adds activeConsecrations and
+    // petSpecialCommandsSupported (data) plus the pet signature-skill command
+    // and the autocast toggle (methods), leaving 307 on pure release.
+    // The Reliquary facet adds nine members (4 data + 5 methods, the fifth
+    // method being the Phase 22 reliquaryRarity), leaving 317. The fourth data
+    // member is reliquaryObtainCounts, the Phase 17 per-relic obtain tally.
+    // The Phase 19 nameplate border adds the IWorldDeeds pair activeBorder
+    // (data) + setActiveBorder (method), leaving 319. This branch's backward
+    // target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a method),
+    // leaving 320. The player item lock (issue #3042) adds setItemLocked
+    // (IWorldInventory, a method), leaving 321. Civic service anchors add
+    // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
+    // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
+    // method), leaving 323.
+    //
+    // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
+    // it independently every cycle. Twice git merged identical numbers with no
+    // conflict while the real total was one higher; twice the sides differed so
+    // the conflict was at least visible. A counter each branch can increment is
+    // a silent off-by-one at merge time, and the data/method split can disagree
+    // even when the total agrees. Only running the suite says what these
+    // numbers really are; never reconcile them by arithmetic in the diff (the
+    // numbers below were set from a suite run, not from this narrative).
+    expect(IWORLD_MEMBERS.length).toBe(323);
+    expect(DATA_MEMBERS.length).toBe(86);
+    expect(METHOD_MEMBERS.length).toBe(237);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -503,13 +621,18 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
+      'accountAdmin',
       'accountCosmetics',
       'accountFlair',
+      'activeBorder',
+      'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
@@ -528,12 +651,18 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bankDeposit',
       'bankInfo',
       'bankWithdraw',
+      'bgFlagAction',
+      'bgInfo',
+      'bgQueueJoin',
+      'bgQueueLeave',
+      'bgRespond',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
+      'cancelCommissionOrder',
       'cardMinigameInfo',
       'castAbility',
       'castAbilityAt',
@@ -544,9 +673,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'changeWeaponSkin',
       'characterProfile',
       'chat',
+      'civicServicePlacements',
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
+      'commissionOrders',
       'companionState',
       'companionUpgrade',
       'companionUpgrades',
@@ -564,7 +695,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'deedsEarned',
       'deedsLeaderboard',
       'deedsRarity',
+      'deedsRecent',
       'deleteLoadout',
+      'deliverCommissionOrder',
       'delveBuyShopItem',
       'delveDaily',
       'delveInteract',
@@ -607,6 +740,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendlyTabTarget',
       'gatheringProficiency',
       'guildAccept',
+      'guildBankBuySlots',
+      'guildBankDeposit',
+      'guildBankDepositGold',
+      'guildBankInfo',
+      'guildBankLog',
+      'guildBankWithdraw',
+      'guildBankWithdrawGold',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -618,6 +758,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildLeaderboard',
       'guildLeave',
       'guildPromote',
+      'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
       'harvestNode',
@@ -659,9 +800,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketBuy',
       'marketCancel',
       'marketCollect',
+      'marketCollectPending',
       'marketInfo',
       'marketList',
+      'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -671,6 +815,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'nodeRespawnSeconds',
+      'openCommissionOrder',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -680,6 +826,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
+      'petSpecialCommandsSupported',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -688,6 +836,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'playEmote',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestige',
       'prestigeRank',
       'professionsState',
@@ -695,11 +844,22 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
       'realm',
+      'rechargeToolEffect',
       'recipeList',
       'releaseEmpoweredAbility',
       'releaseSpirit',
+      'reliquaryCatalogCompletion',
+      'reliquaryCuratorRank',
+      'reliquaryFirstFind',
+      'reliquaryMarks',
+      'reliquaryObtainCounts',
+      'reliquaryPageClearCount',
+      'reliquaryPageCompletion',
+      'reliquaryRarity',
+      'reliquaryRecent',
       'renamePet',
       'renown',
       'reportTelemetry',
@@ -712,33 +872,41 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ridingTrained',
       'riftBossDeathZones',
       'riftCollisionToken',
+      'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
-      'selectMount',
       'selectTalentRow',
-      'selectedMount',
       'sellAllJunk',
       'sellItem',
+      'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
+      'setItemLocked',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
       'setSpec',
+      'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
+      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'talentRole',
@@ -748,6 +916,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'targetNearestFriendly',
       'toggleMounted',
       'toggleWeaponStow',
+      'toolEffectSlots',
       'townFocus',
       'tradeAccept',
       'tradeCancel',
@@ -778,7 +947,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   it('the sorted data-kind set is exactly the pinned contract', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
+      'accountAdmin',
       'accountCosmetics',
+      'activeBorder',
+      'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
       'activeMobileStationCraft',
@@ -789,8 +961,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bagCapacity',
       'bags',
       'bankInfo',
+      'bgInfo',
       'cardMinigameInfo',
       'cfg',
+      'civicServicePlacements',
+      'commissionOrders',
       'companionState',
       'companionUpgrades',
       'copper',
@@ -809,6 +984,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'equipmentInstances',
       'gatheringProficiency',
+      'guildBankInfo',
       'hobbyCraft',
       'honor',
       'inventory',
@@ -824,25 +1000,34 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lockpickState',
       'mailInfo',
       'mailUnread',
+      'marketCollectPending',
       'marketInfo',
       'moveInput',
       'partyInfo',
+      'petSpecialCommandsSupported',
       'player',
       'playerId',
+      'playtimeSeconds',
       'prestigeRank',
       'professionsState',
       'questLog',
       'questsDone',
       'realm',
       'recipeList',
+      'reliquaryFirstFind',
+      'reliquaryMarks',
+      'reliquaryObtainCounts',
+      'reliquaryRecent',
       'renown',
       'restedXp',
       'riftCollisionToken',
       'riftFloor',
       'socialInfo',
+      'stationPlacements',
       'talentRole',
       'talentSpec',
       'talents',
+      'toolEffectSlots',
       'townFocus',
       'tradeInfo',
       'unlockedMilestones',
@@ -855,10 +1040,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
       'accountFlair',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
@@ -869,12 +1056,17 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bankBuySlots',
       'bankDeposit',
       'bankWithdraw',
+      'bgFlagAction',
+      'bgQueueJoin',
+      'bgQueueLeave',
+      'bgRespond',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
+      'cancelCommissionOrder',
       'castAbility',
       'castAbilityAt',
       'castAbilityBySlot',
@@ -895,7 +1087,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dailyRewards',
       'deedsLeaderboard',
       'deedsRarity',
+      'deedsRecent',
       'deleteLoadout',
+      'deliverCommissionOrder',
       'delveBuyShopItem',
       'delveInteract',
       'delveRiteChoose',
@@ -928,6 +1122,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendRemove',
       'friendlyTabTarget',
       'guildAccept',
+      'guildBankBuySlots',
+      'guildBankDeposit',
+      'guildBankDepositGold',
+      'guildBankLog',
+      'guildBankWithdraw',
+      'guildBankWithdrawGold',
       'guildCreate',
       'guildDecline',
       'guildDemote',
@@ -939,6 +1139,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildLeaderboard',
       'guildLeave',
       'guildPromote',
+      'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
       'harvestNode',
@@ -966,7 +1167,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCancel',
       'marketCollect',
       'marketList',
+      'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -975,6 +1178,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInventoryItem',
       'moveRaidMember',
       'nodeHarvestableByMe',
+      'nodeRespawnSeconds',
+      'openCommissionOrder',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -983,6 +1188,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -992,9 +1198,16 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'questState',
       'raidLockouts',
+      'reactiveAbilityWindowRemaining',
       'readyCheckRespond',
+      'rechargeToolEffect',
       'releaseEmpoweredAbility',
       'releaseSpirit',
+      'reliquaryCatalogCompletion',
+      'reliquaryCuratorRank',
+      'reliquaryPageClearCount',
+      'reliquaryPageCompletion',
+      'reliquaryRarity',
       'renamePet',
       'reportTelemetry',
       'respec',
@@ -1004,31 +1217,38 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
+      'riftEventMsRemaining',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
-      'selectMount',
       'selectTalentRow',
-      'selectedMount',
       'sellAllJunk',
       'sellItem',
+      'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
+      'setItemLocked',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
       'setSpec',
+      'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'slotToolEffect',
       'socketRiftGem',
+      'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
+      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'targetEntity',
@@ -1120,6 +1340,7 @@ const FACET_ENTITY_ROSTER = [
   'player',
   'moveInput',
   'realm',
+  'accountAdmin',
 ] as const satisfies readonly (keyof IWorldEntityRoster)[];
 type _ExhaustEntityRoster = AssertNever<
   Exclude<keyof IWorldEntityRoster, (typeof FACET_ENTITY_ROSTER)[number]>
@@ -1127,8 +1348,10 @@ type _ExhaustEntityRoster = AssertNever<
 
 const FACET_COMBAT = [
   'known',
+  'activeConsecrations',
   'activeFrostRings',
   'activeTemporalHourglasses',
+  'reactiveAbilityWindowRemaining',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1148,14 +1371,17 @@ type _ExhaustCombat = AssertNever<Exclude<keyof IWorldCombat, (typeof FACET_COMB
 const FACET_TARGETING = [
   'targetEntity',
   'tabTarget',
+  'tabTargetPrev',
   'targetNearestFriendly',
   'friendlyTabTarget',
+  'setStopAutoAttackOnTargetSwitch',
 ] as const satisfies readonly (keyof IWorldTargeting)[];
 type _ExhaustTargeting = AssertNever<
   Exclude<keyof IWorldTargeting, (typeof FACET_TARGETING)[number]>
 >;
 
 const FACET_INTERACTION = [
+  'civicServicePlacements',
   'interact',
   'lootCorpse',
   'harvestCorpse',
@@ -1172,6 +1398,7 @@ const FACET_LOOT = [
   'submitLootRoll',
   'activeLootRolls',
   'lootRollGroupStatus',
+  'activeMasterLootRolls',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -1186,9 +1413,11 @@ const FACET_INVENTORY = [
   'equipItem',
   'equipItemToSlot',
   'moveInventoryItem',
+  'sortInventory',
   'unequipItem',
   'useItem',
   'discardItem',
+  'setItemLocked',
   'buyItem',
   'sellItem',
   'sellAllJunk',
@@ -1210,6 +1439,7 @@ const FACET_COSMETICS = [
   'unequipMechChroma',
   'changeWeaponSkin',
   'toggleWeaponStow',
+  'setHelmHidden',
 ] as const satisfies readonly (keyof IWorldCosmetics)[];
 type _ExhaustCosmetics = AssertNever<
   Exclude<keyof IWorldCosmetics, (typeof FACET_COSMETICS)[number]>
@@ -1232,6 +1462,7 @@ const FACET_PROGRESSION_XP = [
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
+  'playtimeSeconds',
   'craftSkills',
   'gatheringProficiency',
   'leaderboard',
@@ -1265,10 +1496,13 @@ const FACET_PET = [
   'renamePet',
   'revivePet',
   'petAttack',
+  'petSpecialCommandsSupported',
+  'petSpecial',
   'petWaterJet',
   'petTaunt',
   'setPetAutoTaunt',
   'setPetAutoWaterJet',
+  'setPetAutoSpecial',
   'feedPet',
   'healPet',
   'setPetMode',
@@ -1324,6 +1558,17 @@ type _ExhaustDuelArena = AssertNever<
   Exclude<keyof IWorldDuelArena, (typeof FACET_DUEL_ARENA)[number]>
 >;
 
+const FACET_BATTLEGROUND = [
+  'bgInfo',
+  'bgQueueJoin',
+  'bgQueueLeave',
+  'bgRespond',
+  'bgFlagAction',
+] as const satisfies readonly (keyof IWorldBattleground)[];
+type _ExhaustBattleground = AssertNever<
+  Exclude<keyof IWorldBattleground, (typeof FACET_BATTLEGROUND)[number]>
+>;
+
 const FACET_CARD_MINIGAME = [
   'cardMinigameInfo',
   'joinCardDuelQueue',
@@ -1355,6 +1600,7 @@ const FACET_SOCIAL_GRAPH = [
   'guildDisband',
   'guildEventCreate',
   'guildEventRemove',
+  'guildSetMotd',
   'searchCharacters',
   'characterProfile',
   'accountFlair',
@@ -1365,8 +1611,11 @@ type _ExhaustSocialGraph = AssertNever<
 
 const FACET_MARKET = [
   'marketInfo',
+  'marketCollectPending',
   'marketSearch',
+  'marketSellPriceCheck',
   'marketList',
+  'marketListInstance',
   'marketBuy',
   'marketCancel',
   'marketCollect',
@@ -1391,13 +1640,27 @@ const FACET_BANK = [
 ] as const satisfies readonly (keyof IWorldBank)[];
 type _ExhaustBank = AssertNever<Exclude<keyof IWorldBank, (typeof FACET_BANK)[number]>>;
 
+const FACET_GUILD_BANK = [
+  'guildBankInfo',
+  'guildBankDepositGold',
+  'guildBankWithdrawGold',
+  'guildBankDeposit',
+  'guildBankWithdraw',
+  'guildBankBuySlots',
+  'guildBankLog',
+] as const satisfies readonly (keyof IWorldGuildBank)[];
+type _ExhaustGuildBank = AssertNever<
+  Exclude<keyof IWorldGuildBank, (typeof FACET_GUILD_BANK)[number]>
+>;
+
 const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
-  'riftCollisionToken',
   'riftFloor',
+  'riftCollisionToken',
   'riftBossDeathZones',
+  'riftEventMsRemaining',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
@@ -1452,10 +1715,8 @@ const FACET_VALE_CUP = [
 type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VALE_CUP)[number]>>;
 
 const FACET_MOUNTS = [
-  'selectedMount',
   'ownedMounts',
   'ridingTrained',
-  'selectMount',
   'toggleMounted',
   'learnRiding',
   'mountTrainBegin',
@@ -1484,8 +1745,10 @@ type _ExhaustDungeonFinder = AssertNever<
 
 const FACET_PROFESSIONS = [
   'professionsState',
+  'stationPlacements',
   'craftingIdentity',
   'nodeHarvestableByMe',
+  'nodeRespawnSeconds',
   'harvestNode',
   'recipeList',
   'lastCraftResult',
@@ -1503,6 +1766,14 @@ const FACET_PROFESSIONS = [
   'lastEnchantResult',
   'lastSalvageResult',
   'unbindItem',
+  'commissionOrders',
+  'openCommissionOrder',
+  'cancelCommissionOrder',
+  'acceptCommissionOrder',
+  'deliverCommissionOrder',
+  'toolEffectSlots',
+  'slotToolEffect',
+  'rechargeToolEffect',
 ] as const satisfies readonly (keyof IWorldProfessions)[];
 type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
@@ -1514,10 +1785,28 @@ const FACET_DEEDS = [
   'renown',
   'activeTitle',
   'setActiveTitle',
+  'activeBorder',
+  'setActiveBorder',
   'deedsRarity',
+  'deedsRecent',
   'deedsLeaderboard',
 ] as const satisfies readonly (keyof IWorldDeeds)[];
 type _ExhaustDeeds = AssertNever<Exclude<keyof IWorldDeeds, (typeof FACET_DEEDS)[number]>>;
+
+const FACET_RELIQUARY = [
+  'reliquaryFirstFind',
+  'reliquaryMarks',
+  'reliquaryRecent',
+  'reliquaryObtainCounts',
+  'reliquaryPageCompletion',
+  'reliquaryCatalogCompletion',
+  'reliquaryCuratorRank',
+  'reliquaryPageClearCount',
+  'reliquaryRarity',
+] as const satisfies readonly (keyof IWorldReliquary)[];
+type _ExhaustReliquary = AssertNever<
+  Exclude<keyof IWorldReliquary, (typeof FACET_RELIQUARY)[number]>
+>;
 
 const FACET_ACTION_BAR = [
   'saveActionBarLayout',
@@ -1544,11 +1833,13 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   trade: FACET_TRADE,
   chat: FACET_CHAT,
   duelArena: FACET_DUEL_ARENA,
+  battleground: FACET_BATTLEGROUND,
   cardMinigame: FACET_CARD_MINIGAME,
   socialGraph: FACET_SOCIAL_GRAPH,
   market: FACET_MARKET,
   mail: FACET_MAIL,
   bank: FACET_BANK,
+  guildBank: FACET_GUILD_BANK,
   dungeons: FACET_DUNGEONS,
   delves: FACET_DELVES,
   dailyRewards: FACET_DAILY_REWARDS,
@@ -1558,12 +1849,15 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   mounts: FACET_MOUNTS,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
+  reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(30);
+    // +1 battleground facet (Thornhollow Fields) on the release line; +1
+    // Reliquary facet on this branch: 33 total.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1591,8 +1885,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(272);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(272);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

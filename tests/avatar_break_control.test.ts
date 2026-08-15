@@ -62,6 +62,25 @@ const hasAura = (p: Entity, id: string) => p.auras.some((a) => a.id === id);
 const hasAvatarBuff = (p: Entity) => p.auras.some((a) => a.kind === 'buff_avatar');
 
 describe('Avatar breaks enemy control (usableWhileControlled + source-scoped break)', () => {
+  it('activates at level 17 by immediately clearing fear and preserving the damage buff', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(17);
+    expect(sim.selectTalentRow(17, 'war_row_avatar')).toBe(true);
+    sim.tick();
+    const p = sim.player;
+    const mob = addTrashMob(sim);
+    p.resource = p.maxResource;
+    p.gcdRemaining = 0;
+    p.auras.push(control('level_17_fear', 'incapacitate', mob.id));
+
+    sim.castAbility('avatar');
+
+    expect(hasAura(p, 'level_17_fear')).toBe(false);
+    expect(p.auras).toContainEqual(
+      expect.objectContaining({ id: 'avatar', kind: 'buff_avatar', value: 0.2 }),
+    );
+  });
+
   it('breaks a trash-mob fear (incapacitate) when cast while feared', () => {
     const { sim, p } = rigWarrior();
     const mob = addTrashMob(sim);

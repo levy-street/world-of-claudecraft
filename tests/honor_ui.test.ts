@@ -32,3 +32,17 @@ describe('Honor and ranked Arena chat feedback', () => {
     expect(handler).not.toContain('this.combatLog(arenaResultLine');
   });
 });
+
+describe('prestige event repaints an already-open character sheet (issue #2137)', () => {
+  it('the prestige event case calls renderCharIfOpen, same as the honor case', () => {
+    const start = hud.indexOf("case 'prestige':");
+    const end = hud.indexOf("case 'deedUnlocked':", start);
+    const handler = hud.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    // Without this, an already-open character sheet keeps showing the stale
+    // prestige rank until something unrelated triggers a repaint (closing
+    // and reopening the window), which is the bug reported in #2137.
+    expect(handler).toContain('this.renderCharIfOpen()');
+  });
+});

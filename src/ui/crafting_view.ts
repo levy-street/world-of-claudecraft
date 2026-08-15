@@ -11,15 +11,25 @@
 // DOM-free and i18n-free so tests/crafting_view.test.ts can drive it directly.
 
 import { ALL_RECIPES } from '../sim/content/recipes';
+import { countUnlockedInSlots } from '../sim/item_lock';
 import { craftSkillGainMultiplier } from '../sim/professions/archetype';
 import {
   type ComboEligibilityReason,
   comboEligibility,
 } from '../sim/professions/combo_eligibility';
 import { isCommissionEligible } from '../sim/professions/commission';
-import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
+import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
+import {
+  countAcrossGrades,
+  materialGradeIds,
+  planGradeRemoval,
+} from '../sim/professions/material_grades';
+import { type StationType, stationsOfType } from '../sim/professions/stations';
+import { trainingStationTypeFor } from '../sim/professions/training';
+import type { ProfessionRecipeRecord } from '../sim/professions/types';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
-import type { InvSlot, ItemDef } from '../sim/types';
+import type { InvSlot, ItemDef, StationDef } from '../sim/types';
+import { recipeDurationSec } from './craft_cast_view';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
 
 export interface RecipeDefLike {
@@ -59,6 +69,12 @@ export interface CraftingReagentRow {
   have: number;
   /** True when the player holds at least `required` of this reagent. */
   satisfied: boolean;
+  /** Units of the FINE grade this craft would consume because base stock
+   *  runs short (the UX pass): resolved through the sim's own
+   *  planGradeRemoval (base drains first, D8), so the warning and the spend
+   *  can never disagree. 0 when the base covers the bill, and 0 while the
+   *  row is unsatisfied (an uncraftable recipe warns about nothing). */
+  fineSubstituted: number;
 }
 
 export interface CraftingRecipeRow {
@@ -99,6 +115,10 @@ export interface CraftingRecipeRow {
    *  flag would be ignored). The painter renders the per-craft checkbox only
    *  on these rows; the server re-validates eligibility on craft. */
   commissionEligible: boolean;
+  /** Expected craft-cast duration in sim seconds (Craft Cast System Phase 2).
+   *  Content table via craftCastDurationSec; actionable info, identical on
+   *  every graphics preset (duration chip is never tier-gated). */
+  durationSec: number;
 }
 
 export interface CraftingView {
@@ -112,11 +132,19 @@ export interface CraftingIdentityLike {
   hobbyCraft: string | null;
 }
 
+// Lock-aware (issue 3042): a player-locked reagent copy is not spendable, so
+// it must never count toward "you have enough" here either, or the Craft
+// button would light up green for a craft the sim then refuses. The same
+// count the sim's own hasRecipeMaterials/resolveCraftForRecipe gate on
+// (src/sim/item_lock.ts countUnlockedInSlots), so the two can never disagree
+// about whether a recipe is craftable.
 function countInInventory(inventory: readonly InvSlot[], itemId: string): number {
-  let n = 0;
-  for (const slot of inventory) if (slot.itemId === itemId) n += slot.count;
-  return n;
+  return countUnlockedInSlots(inventory, itemId);
 }
+
+/** The two per-item inventory facts a reagent row needs (see the memo in
+ *  buildCraftingView). */
+type ReagentFacts = { have: number; selfSigned: boolean };
 
 /**
  * Build the structured crafting view from raw inputs: the recipe content list,
@@ -127,7 +155,10 @@ function countInInventory(inventory: readonly InvSlot[], itemId: string): number
  * currently in range of (station-bound recipes: physical stations
  * plus the own active mobile station, precomputed once per repaint by the
  * HUD via stations.ts inRangeStationTypes; defaults to empty, i.e. out of
- * range of everything, so station-free callers need not pass it). Read-only:
+ * range of everything, so station-free callers need not pass it), and the
+ * local player's name (the #1145 self-signed reduction: defaults to null,
+ * meaning the self-signed check never matches; the #1134 specialization
+ * discount still applies from craftSkills either way). Read-only:
  * never mutates any of its inputs.
  */
 export function buildCraftingView(
@@ -142,19 +173,76 @@ export function buildCraftingView(
     hobbyCraft: null,
   },
   inRangeStations: ReadonlySet<StationType> = new Set(),
+  playerName: string | null = null,
 ): CraftingView {
   // One mutable copy for the sim-side pure functions (their CraftSkills
   // parameter is mutable-typed); they never write it, this is typing only.
   const skills = { ...craftSkills };
+  // Every known recipe is rowed on each rebuild and recipes share reagents
+  // (a craft's recipes pull from the same ore/flux pool), so the two
+  // O(inventory) probes per reagent (stack count plus the #1145 self-signed
+  // check) memoize per itemId. Only the per-ITEM facts are cached, never the
+  // required count (that also depends on the recipe: its professionId and
+  // this reagent's listed count), and the cache lives only for this one
+  // build, so a rebuild re-reads the live inventory through the same
+  // single-surface helpers.
+  const reagentFacts = new Map<string, ReagentFacts>();
+  const factsFor = (itemId: string): ReagentFacts => {
+    let facts = reagentFacts.get(itemId);
+    if (!facts) {
+      facts = {
+        // Counted across the reagent's material grades, exactly as the sim's
+        // hasRecipeMaterials does (D8, professions/material_grades.ts). A fine
+        // grade satisfies a requirement for its base, so counting the declared
+        // id alone would grey the Craft button out for a craft the sim would
+        // perform: eastbrook_vale is all tier-1 veins, so any tier-2 tool stops
+        // the plain grade dropping and every recipe naming it would go
+        // unbuildable through the window while resolveCraft accepted it.
+        have: countAcrossGrades(itemId, (gradeId) => countInInventory(inventory, gradeId)),
+        selfSigned:
+          playerName !== null &&
+          materialGradeIds(itemId).some((gradeId) =>
+            holdsSelfSignedInstance(inventory, playerName, gradeId),
+          ),
+      };
+      reagentFacts.set(itemId, facts);
+    }
+    return facts;
+  };
   const rows: CraftingRecipeRow[] = recipes.map((recipe) => {
     const reagentRows: CraftingReagentRow[] = recipe.reagents.map((reagent) => {
-      const have = countInInventory(inventory, reagent.itemId);
+      const { have, selfSigned } = factsFor(reagent.itemId);
+      // The requirement the sim actually charges: the SAME shared
+      // requiredReagentCountFor the resolver's availability check and
+      // consumption use (crafting.ts, #1134 specialization discount composed
+      // with the #1145 self-signed reduction), fed the same grade-spanning
+      // self-signed fact the sim feeds it, so the displayed count and the
+      // Craft gate can never diverge from what a craft consumes.
+      const required = requiredReagentCountFor(
+        selfSigned,
+        reagent,
+        skills,
+        recipe.professionId,
+      ).count;
+      // The substitution signal (the UX pass): what the craft would take
+      // from the FINE grade because base stock ran short, read off the SAME
+      // plan the sim spends (planGradeRemoval drains the base first), so a
+      // silent 2x-value substitution becomes a stated one.
+      const satisfied = have >= required;
+      const fineSubstituted = satisfied
+        ? planGradeRemoval(reagent.itemId, required, (gradeId) =>
+            countInInventory(inventory, gradeId),
+          )
+            .filter((take) => take.itemId !== reagent.itemId)
+            .reduce((sum, take) => sum + take.count, 0)
+        : 0;
       return {
         itemId: reagent.itemId,
         item: items[reagent.itemId],
-        required: reagent.count,
+        required,
         have,
-        satisfied: have >= reagent.count,
+        satisfied,
+        fineSubstituted,
       };
     });
     const combo = recipe.comboRequirement;
@@ -210,6 +298,7 @@ export function buildCraftingView(
       difficulty,
       station,
       commissionEligible: isCommissionEligible(items[recipe.resultItemId]),
+      durationSec: recipeDurationSec(recipe),
       craftable:
         reagentRows.every((r) => r.satisfied) &&
         eligibility?.ok !== false &&
@@ -217,6 +306,57 @@ export function buildCraftingView(
     };
   });
   return { recipes: rows };
+}
+
+// Every item id any recipe consumes, derived ONCE from static content. Both
+// hosts serve ALL_RECIPES verbatim as IWorld#recipeList (src/sim/sim.ts,
+// src/net/online.ts), and reagent ids are authored literals, so this set can
+// never miss a reagent the window might row.
+// Grades included: three of the nine fine grades (the eastbrook ones) are
+// reagents in NO recipe, so a declared-id-only set would let a player gather
+// them all afternoon without the open window ever re-converging, which is the
+// #2375 failure mode this signature exists to close.
+const REAGENT_ITEM_IDS: ReadonlySet<string> = new Set(
+  ALL_RECIPES.flatMap((recipe) =>
+    recipe.reagents.flatMap((reagent) => materialGradeIds(reagent.itemId)),
+  ),
+);
+
+/**
+ * Compact signature of every bag fact buildCraftingView above reads, so an
+ * OPEN crafting window can converge on an inventory change without repainting
+ * per frame (issue #2375: buying, looting, or trading for the last reagent
+ * left the Craft button disabled until the window was closed and reopened).
+ *
+ * The window is a cold painter, so the HUD diffs this the same way it diffs
+ * stationTypesSignature for the station-range edge. Two properties earn their
+ * keep here:
+ *  - COMPLETE. Per reagent id it carries the summed stack count (the only
+ *    input to countInInventory, and therefore to `have`, `satisfied`, and the
+ *    Craft gate) plus whether the VIEWER signed any stack of it, the one
+ *    instance fact the #1145 self-signed quantity reduction asks about
+ *    (holdsSelfSignedInstance). Those two are the whole of what the view reads
+ *    off the bag: money and free bag slots are server-side deny reasons, not
+ *    terms in `craftable`. If either ever enters the gate, it belongs here too.
+ *  - QUIET. Non-reagent items are skipped and ids are emitted sorted, so
+ *    looting a grey, rearranging the bags, or a stranger-signed stack changing
+ *    hands never repaints the window under the player.
+ */
+export function craftingReagentSig(
+  inventory: readonly InvSlot[],
+  playerName: string | null,
+): string {
+  const totals = new Map<string, number>();
+  const selfSigned = new Set<string>();
+  for (const slot of inventory) {
+    if (!REAGENT_ITEM_IDS.has(slot.itemId)) continue;
+    totals.set(slot.itemId, (totals.get(slot.itemId) ?? 0) + slot.count);
+    if (playerName !== null && slot.instance?.signer === playerName) selfSigned.add(slot.itemId);
+  }
+  let sig = '';
+  for (const itemId of [...totals.keys()].sort())
+    sig += `${itemId}:${totals.get(itemId)}:${selfSigned.has(itemId) ? 1 : 0}|`;
+  return sig;
 }
 
 // ---------------------------------------------------------------------------
@@ -264,6 +404,23 @@ export function resolveSelectedCraft(
   return tabs.length > 0 ? tabs[0].professionId : null;
 }
 
+/** True when `craftId` would own a tab for this viewer: at least one recipe
+ *  of that craft is known (craftingTabs' membership rule, restated through
+ *  the SHARED isRecipeKnownForViewer predicate without building the view).
+ *  The gossip Crafting shortcut checks this before persisting its pre-select
+ *  so it never clobbers the saved tab preference (issue #2347) with a craft
+ *  the window cannot show; resolveSelectedCraft still guards the render. */
+export function craftOwnsTab(
+  recipes: readonly ProfessionRecipeRecord[],
+  knownRecipes: readonly string[],
+  craftId: string,
+): boolean {
+  const known = new Set(knownRecipes);
+  return recipes.some(
+    (recipe) => recipe.professionId === craftId && isRecipeKnownForViewer(recipe, known),
+  );
+}
+
 /** One craft's "learnable at a master" pointer: the station type that serves it
  *  and the resident master's NPC template id (the painter localizes the master
  *  name through entity i18n and the station name through the station-name
@@ -275,29 +432,37 @@ export interface CraftLearnHint {
 
 /**
  * Crafts that have at least one trainer-taught recipe the viewer has NOT
- * learned, mapped to the station type serving that craft (stationTypeForCraft)
- * and the resident master (the station registry). Drives the crafting window's
+ * learned, mapped to that recipe's teaching home (trainingStationTypeFor:
+ * the recipe's own stationType, else the station serving its craft) and the
+ * resident master (the station registry). Drives the crafting window's
  * per-section "learnable at a master" discoverability hint: a section renders
  * the hint iff its craft is in this map.
  *
  * Uses the SHARED isRecipeKnownForViewer predicate (train_view.ts), never a
  * second knownness rule, so the hint can never disagree with the train ladder
- * or the crafting window's known-recipe filter. A craft with no physical
- * station (or no seated master) is never hinted: trainer recipes only exist for
- * stationed crafts, and there would be no master to point at. Read-only over
+ * or the crafting window's known-recipe filter. A recipe with no resolvable
+ * teaching home (no stationType and an unstationed craft) is never hinted:
+ * there would be no master to point at. Read-only over
  * static content plus the viewer's mirrored known set (both hosts carry
  * knownRecipes on cprof, so no new IWorld member is needed).
  */
-export function craftLearnHints(knownRecipes: readonly string[]): Map<string, CraftLearnHint> {
+export function craftLearnHints(
+  knownRecipes: readonly string[],
+  stations: readonly StationDef[],
+): Map<string, CraftLearnHint> {
   const known = new Set(knownRecipes);
   const hints = new Map<string, CraftLearnHint>();
   for (const recipe of ALL_RECIPES) {
     if (hints.has(recipe.professionId)) continue;
     if (!recipe.acquisition?.includes('trainer')) continue;
     if (isRecipeKnownForViewer(recipe, known)) continue;
-    const stationType = stationTypeForCraft(recipe.professionId);
+    // The recipe's own teaching home (its stationType, else its craft's
+    // station), shared with resolveTrain and the trainer list: an
+    // enchanting-home charm recipe hints at the toolworks master who
+    // actually teaches it, not at a station its craft does not have.
+    const stationType = trainingStationTypeFor(recipe);
     if (!stationType) continue;
-    const station = stationsOfType(stationType)[0];
+    const station = stationsOfType(stations, stationType)[0];
     if (!station) continue;
     hints.set(recipe.professionId, { stationType, masterNpcId: station.masterNpcId });
   }

@@ -2,7 +2,8 @@
 //
 // The carried "FB lesson": a visible :focus-visible ring must NEVER be
 // animated, blurred, transitioned, or filtered away. This Node guard scans the extracted
-// stylesheets (src/styles/*.css) and asserts, for every :focus-visible rule block, that the
+// stylesheets (every .css under src/styles, at any depth) and asserts, for every
+// :focus-visible rule block, that the
 // block declares no transition / animation / filter / backdrop-filter / blur (which would
 // fade, slide, or smear the ring), and that no rule anywhere animates the `outline` property
 // from a base rule (which would animate the ring indirectly). It also pins, for
@@ -20,9 +21,13 @@
 // via npm run test:browser): it keyboard-focuses each shell control and asserts a present,
 // steady focus indicator (box-shadow, outline, or border-color), complementing this scan.
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { cssTreeUnder } from './helpers/css_tree_under';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 
 const STYLES_DIR = fileURLToPath(new URL('../src/styles/', import.meta.url));
 
@@ -31,11 +36,19 @@ function stripComments(css: string): string {
   return css.replace(/\/\*[\s\S]*?\*\//g, '');
 }
 
-function cssFiles(): { name: string; css: string }[] {
-  return readdirSync(STYLES_DIR)
-    .filter((f) => f.endsWith('.css'))
-    .sort()
-    .map((name) => ({ name, css: stripComments(readFileSync(STYLES_DIR + name, 'utf8')) }));
+// Every stylesheet the a11y scan covers, at ANY depth (helpers/css_tree_under.ts).
+// The single-level read this replaces would have stopped enforcing the steady-ring
+// rule for whatever landed in a subdirectory, with no failure and no diff to notice
+// it by (#2502): a miss here is a silent pass, so depth is the safe direction, and
+// a sheet that never ships cannot false-GREEN a scan that only looks for offenders.
+// The root is a parameter so the recursion case can drive this exact reader over a
+// fixture tree; src/styles is flat today, so nothing over the real tree can tell a
+// recursive walk from a single-level one.
+function cssFiles(root = STYLES_DIR): { name: string; css: string }[] {
+  return cssTreeUnder(root).files.map(({ file, full }) => ({
+    name: file,
+    css: stripComments(readFileSync(full, 'utf8')),
+  }));
 }
 
 // Every :focus-visible rule block in a stylesheet, as { selector, body } pairs. The
@@ -87,6 +100,22 @@ const RING_TRANSITION = /transition(?:-property)?\s*:[^;}]*\b(outline|all)\b/i;
 const RING_ANIMATION = /\banimation\s*:/i;
 const BLUR_FN = /\bblur\s*\(/i;
 
+// Every :focus-visible block in `sheets` whose drawn ring is moved, smeared, or faded.
+// Named so the recursion case can run the real offender scan over a fixture tree
+// instead of re-deriving a weaker version of it.
+function unsteadyRingOffenders(sheets: { name: string; css: string }[]): string[] {
+  const offenders: string[] = [];
+  for (const { name, css } of sheets) {
+    for (const { selector, body } of focusVisibleBlocks(css)) {
+      if (!drawsOutlineRing(body)) continue; // outline:none emphasis has no ring to destroy
+      if (RING_TRANSITION.test(body) || RING_ANIMATION.test(body) || BLUR_FN.test(body)) {
+        offenders.push(`${name}: ${selector} { ${body.trim().replace(/\s+/g, ' ')} }`);
+      }
+    }
+  }
+  return offenders;
+}
+
 describe(':focus-visible ring is steady and visible (the FB lesson)', () => {
   const files = cssFiles();
 
@@ -95,19 +124,47 @@ describe(':focus-visible ring is steady and visible (the FB lesson)', () => {
     // There are dozens of :focus-visible rules across the chrome; pin a floor so an
     // accidental rename/refactor that stops matching is caught instead of passing empty.
     expect(total).toBeGreaterThan(10);
+    // And a floor on the FILES, near the real count (10: the index.css barrel, the 7
+    // it @imports, and the two per-entry .extra.css). The block floor above cannot
+    // tell a full scan from one that lost a sheet or a whole subtree, since
+    // components.css alone clears it.
+    expect(files.length).toBeGreaterThanOrEqual(10);
   });
 
   it('never animates / blurs / transitions the drawn outline ring on any :focus-visible block', () => {
-    const offenders: string[] = [];
-    for (const { name, css } of files) {
-      for (const { selector, body } of focusVisibleBlocks(css)) {
-        if (!drawsOutlineRing(body)) continue; // outline:none emphasis has no ring to destroy
-        if (RING_TRANSITION.test(body) || RING_ANIMATION.test(body) || BLUR_FN.test(body)) {
-          offenders.push(`${name}: ${selector} { ${body.trim().replace(/\s+/g, ' ')} }`);
-        }
-      }
-    }
+    const offenders = unsteadyRingOffenders(files);
     expect(offenders, `animated/blurred focus rings:\n${offenders.join('\n')}`).toEqual([]);
+  });
+
+  it('reads src/styles through the shared walker, with no flat reader beside it', () => {
+    // The fixture below pins the READER; this pins that nothing else in the file
+    // opens the directory, which no assertion over today's flat tree could tell.
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['css_tree_under']);
+  });
+
+  it("scans a stylesheet in a SUBDIRECTORY, through this guard's own reader", () => {
+    // The recursion pin, driving cssFiles + the real offender scan rather than the
+    // shared walk (helpers/css_tree_under.test.ts owns that): a reader that recursed
+    // and then filtered back to the top level would fail here.
+    const root = mkdtempSync(path.join(tmpdir(), 'woc-focus-visible-guard-'));
+    try {
+      mkdirSync(path.join(root, 'nested', 'deeper'), { recursive: true });
+      writeFileSync(
+        path.join(root, 'steady.css'),
+        '.a:focus-visible { outline: 2px solid red; }\n',
+      );
+      writeFileSync(
+        path.join(root, 'nested', 'deeper', 'sunk.css'),
+        '.b:focus-visible { outline: 2px solid red; animation: pulse 1s infinite; }\n',
+      );
+      expect(cssFiles(root).map((f) => f.name)).toEqual(['nested/deeper/sunk.css', 'steady.css']);
+      // The nested sheet reaches the real assertion, and the flat sibling stays clean,
+      // so this fails for the depth rather than for scanning anything at all.
+      expect(unsteadyRingOffenders(cssFiles(root))).toHaveLength(1);
+      expect(unsteadyRingOffenders(cssFiles(root))[0]).toContain('nested/deeper/sunk.css');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 
   it('never transitions the outline property from a base rule (indirect ring animation)', () => {

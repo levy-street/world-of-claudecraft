@@ -24,8 +24,10 @@ const {
   withCspHeader,
   ALLOWED_PERMISSIONS,
 } = require('./shell_guards.cjs');
+const { rangeContentType, rangedFileResponse } = require('./media_range.cjs');
 const { resolveDesktopConfig, walletConnectionSupported } = require('./desktop_config.cjs');
 const { createSteamShell } = require('./steam.cjs');
+const { createEpicShell } = require('./epic.cjs');
 const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
 const {
   MAX_FORWARDED_ERRORS,
@@ -205,11 +207,27 @@ function registerAppProtocol() {
     if (!fs.existsSync(filePath) || !fileInside(distDir, filePath)) {
       return notFound();
     }
+    // Chromium's media stack requests <audio>/<video> sources with a Range header
+    // and rejects a plain 200 re-wrap as a format error, which left every streamed
+    // music cue silent in the shipped shell. Serve those as proper 206 slices (or
+    // a 416 for a past-EOF range) via electron/media_range.cjs; a null (non-media
+    // file, malformed range, unreadable file) falls through to the full response.
+    const rangeValue = request.headers.get('range');
+    if (rangeValue) {
+      const ranged = await rangedFileResponse(filePath, rangeValue, {
+        'Content-Security-Policy': csp,
+      });
+      if (ranged) return ranged;
+    }
     // Every served path (asset or the SPA index.html fallback) gets the CSP header;
     // net.fetch's own Response has immutable headers, so withCspHeader builds a fresh
-    // one that preserves the body, status, statusText, and Content-Type.
+    // one that preserves the body, status, statusText, and Content-Type. Media files
+    // also advertise Accept-Ranges here, so range support is visible to a client
+    // that probes the full response before sending its first ranged request.
     const response = await net.fetch(pathToFileURL(filePath).toString());
-    return withCspHeader(response, csp);
+    const full = withCspHeader(response, csp);
+    if (rangeContentType(filePath)) full.headers.set('Accept-Ranges', 'bytes');
+    return full;
   });
 }
 
@@ -461,6 +479,41 @@ ipcMain.handle('desktop-steam-link-settled', (event) => {
 ipcMain.handle('desktop-steam-capability', (event) => {
   if (!trustedSender(event)) return false;
   return steamShell.enabled;
+});
+
+// Epic link proofs (electron/epic.cjs). Inert on website/steam builds: the
+// shell only touches the injectable EOS adapter when the distribution stamp
+// says 'epic' (or the unpackaged WOC_EPIC_DEV=1 dev loop), and getLinkProof()
+// answers null on every failure path instead of throwing across IPC. Missing
+// native degrades to the launcher exchange-code argv path, then null;
+// capability still reports true on the epic channel so the UI can offer Link.
+const epicShell = createEpicShell({
+  distribution: desktopConfig.distribution,
+  packagedMetadata,
+  env: process.env,
+  isPackaged: app.isPackaged,
+  log,
+});
+
+ipcMain.handle('desktop-epic-link-proof', async (event) => {
+  if (!trustedSender(event)) return null;
+  return await epicShell.getLinkProof();
+});
+
+// The renderer signals that an Epic link attempt has settled (POST
+// /api/epic/link resolved or rejected) so any cancelable adapter handle can
+// be released promptly. Idempotent; inert when no live handle exists.
+ipcMain.handle('desktop-epic-link-settled', (event) => {
+  if (!trustedSender(event)) return null;
+  epicShell.cancelLinkProof();
+  return null;
+});
+
+// Whether this shell can mint Epic link proofs at all (epic distribution or
+// the unpackaged WOC_EPIC_DEV loop). Computed without loading EOS native.
+ipcMain.handle('desktop-epic-capability', (event) => {
+  if (!trustedSender(event)) return false;
+  return epicShell.enabled;
 });
 
 // WalletConnect is available in the website-distributed desktop shell but is

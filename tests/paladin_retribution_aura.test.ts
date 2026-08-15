@@ -2,9 +2,9 @@
 // is up, any enemy that lands a melee swing on the paladin takes flat Holy damage
 // back — the player-side analogue of innate mob "spiked hide" (see mob_thorns).
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { createMob } from '../src/sim/entity';
 import { ABILITIES, CLASSES, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 function makePaladin() {
@@ -40,14 +40,19 @@ function connectMobSwings(sim: Sim, mob: Entity, target: Entity, n: number) {
 }
 
 describe('paladin Retribution Aura', () => {
-  it('is a holy, zero-cost self-buff learned at level 16', () => {
-    const def = ABILITIES['retribution_aura'];
+  it('is a holy, zero-cost permanent party aura learned at level 7', () => {
+    const def = ABILITIES.retribution_aura;
     expect(def.class).toBe('paladin');
-    expect(def.learnLevel).toBe(16);
+    expect(def.learnLevel).toBe(7);
     expect(def.cost).toBe(0);
     expect(def.school).toBe('holy');
-    expect(def.effects[0]).toMatchObject({ type: 'selfBuff', kind: 'thorns' });
-    expect(CLASSES['paladin'].abilities).toContain('retribution_aura');
+    expect(def.effects[0]).toMatchObject({
+      type: 'buffTarget',
+      kind: 'thorns',
+      party: true,
+      permanent: true,
+    });
+    expect(CLASSES.paladin.abilities).toContain('retribution_aura');
   });
 
   it('reflects flat Holy damage onto a melee attacker while active', () => {

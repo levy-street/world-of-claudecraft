@@ -56,9 +56,9 @@ describe('desktopDownloadUrl', () => {
     );
   });
 
-  it('builds the combined Windows NSIS installer URL', () => {
+  it('builds the x64 Windows NSIS installer URL (issue 2013: per-arch installers)', () => {
     expect(desktopDownloadUrl('win')).toBe(
-      `https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-${DESKTOP_VERSION}-win.exe`,
+      `https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-${DESKTOP_VERSION}-win-x64.exe`,
     );
   });
 

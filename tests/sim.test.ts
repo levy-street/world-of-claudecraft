@@ -185,7 +185,7 @@ describe('movement directions', () => {
     expect(sim.player.pos.z).toBeCloseTo(zAfterForward, 1);
   });
 
-  it('preserves launch momentum while airborne', () => {
+  it('keeps launch momentum while airborne and steers with air control', () => {
     const sim = makeScopedSim(EMPTY_TEST_WORLD, 'warrior');
     teleportTo(sim, 0, -40);
     sim.player.facing = 0;
@@ -193,13 +193,21 @@ describe('movement directions', () => {
     sim.moveInput.jump = true;
     sim.tick();
     expect(sim.player.onGround).toBe(false);
+    // Every key released mid-air: the launch velocity carries unchanged.
     sim.moveInput.forward = false;
-    sim.moveInput.strafeRight = true;
+    sim.moveInput.jump = false;
     const xAtLaunch = sim.player.pos.x;
     const zAtLaunch = sim.player.pos.z;
-    for (let i = 0; i < 4; i++) sim.tick();
+    sim.tick();
     expect(sim.player.pos.z).toBeGreaterThan(zAtLaunch);
-    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(0.05);
+    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(1e-9);
+    // A held strafe now steers the arc (air control) while the forward
+    // momentum still carries: rightward drift is -x at facing 0.
+    sim.moveInput.strafeRight = true;
+    const zBeforeSteer = sim.player.pos.z;
+    for (let i = 0; i < 4; i++) sim.tick();
+    expect(sim.player.pos.z).toBeGreaterThan(zBeforeSteer);
+    expect(sim.player.pos.x).toBeLessThan(xAtLaunch - 0.2);
   });
 
   it('walks down a walkable slope without going airborne', () => {
@@ -874,5 +882,17 @@ describe('friendly targeting (#133)', () => {
     sim.tick();
     sim.friendlyTabTarget();
     expect(sim.player.targetId).toBe(77);
+  });
+});
+
+describe('action bar layout restore (IWorldActionBar, offline arm)', () => {
+  // IWorldActionBar.takeActionBarLayoutRestore is documented as one-shot at
+  // world entry: consumed once, subsequent calls return undefined. ClientWorld
+  // honors this by nulling out its stored decision; the offline Sim must match.
+  it('returns the resolved value once, then undefined on every later call', () => {
+    const sim = makeSim();
+    expect(sim.takeActionBarLayoutRestore()).toEqual({ source: 'noop' });
+    expect(sim.takeActionBarLayoutRestore()).toBeUndefined();
+    expect(sim.takeActionBarLayoutRestore()).toBeUndefined();
   });
 });

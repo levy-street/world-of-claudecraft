@@ -7,7 +7,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { gatherNodeToolGateFor, gatherNodeTooltipHtml } from '../src/ui/gather_node_tooltip';
+import {
+  gatherNodeToolGateFor,
+  gatherNodeTooltipHtml,
+} from '../src/ui/gather_node_tooltip_controller';
 import type { GatherNodeTooltipModel } from '../src/ui/gathering_view';
 import { hasTranslation } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
@@ -38,16 +41,65 @@ describe('gatherNodeTooltipHtml', () => {
     expect(html).not.toContain('tt-red');
   });
 
-  it('a tier-1 node renders NO requirement line (the bare-hands floor makes it false)', () => {
-    const html = gatherNodeTooltipHtml(model({ tier: 1, locked: false }));
-    expect(html).not.toContain('Requires');
-    expect(html).toContain('<div class="tt-title">Ore Vein</div>');
+  it('a wield shortfall outranks the tier line: the hover names the counter (R22)', () => {
+    // The player carries a covering pick and only Mining is short: the tier
+    // sentence would name a requirement they meet, so the wield line renders
+    // instead, red, with the smallest counter that unlocks something owned.
+    const html = gatherNodeTooltipHtml(model({ wieldSkill: 40 }));
+    expect(html).toContain(
+      '<div class="tt-red">You need Mining 40 to swing the pick already in your bags.</div>',
+    );
+    expect(html).not.toContain('Requires a tier 2 mining pick');
+    // The shortfall only speaks while the node is actually locked.
+    const unlocked = gatherNodeTooltipHtml(model({ locked: false, wieldSkill: 40 }));
+    expect(unlocked).toContain('<div class="tt-sub">Requires a tier 2 mining pick</div>');
+  });
+
+  it('a tier-1 node renders the tierless base-tool requirement line (#2343: bare hands never gather)', () => {
+    // Locked (no pick owned): the tierless line renders red.
+    const locked = gatherNodeTooltipHtml(model({ tier: 1, locked: true }));
+    expect(locked).toContain('<div class="tt-red">Requires a mining pick</div>');
+    expect(locked).toContain('<div class="tt-title">Ore Vein</div>');
+    // Owning the pick turns the same line neutral, never drops it.
+    const tooled = gatherNodeTooltipHtml(model({ tier: 1, locked: false }));
+    expect(tooled).toContain('<div class="tt-sub">Requires a mining pick</div>');
+    expect(tooled).not.toContain('tt-red');
   });
 
   it('the cooldown state renders the respawning line without the ready green', () => {
     const html = gatherNodeTooltipHtml(model({ state: 'cooldown' }));
     expect(html).toContain('Respawning');
     expect(html).not.toContain('tt-green');
+  });
+
+  it('a locked cooldown reports both the tool requirement and respawn state', () => {
+    const html = gatherNodeTooltipHtml(model({ locked: true, state: 'cooldown' }));
+    expect(html).toContain('<div class="tt-red">Requires a tier 2 mining pick</div>');
+    expect(html).toContain('<div class="tt-sub">Respawning</div>');
+  });
+
+  it('a cooldown with respawnSeconds renders the live countdown, m:ss, ceiled', () => {
+    const html = gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 226.4 }));
+    // 226.4 ceils to 227 = 3:47; the untimed word must NOT also render.
+    expect(html).toContain('Respawns in 3:47');
+    expect(html).not.toContain('>Respawning<');
+    // Sub-minute remainders keep the two-digit seconds token.
+    expect(gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 8 }))).toContain(
+      'Respawns in 0:08',
+    );
+    // A live timer never reads 0:00 while the node still refuses.
+    expect(gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 0.2 }))).toContain(
+      'Respawns in 0:01',
+    );
+  });
+
+  it('the fine-grade preview line renders green exactly when the model carries it true', () => {
+    const on = gatherNodeTooltipHtml(model({ locked: false, fineUpgrade: true }));
+    expect(on).toContain('<div class="tt-green">Your tool refines this yield to fine grade.</div>');
+    const off = gatherNodeTooltipHtml(model({ locked: false, fineUpgrade: false }));
+    expect(off).not.toContain('fine grade');
+    const absent = gatherNodeTooltipHtml(model({ locked: false }));
+    expect(absent).not.toContain('fine grade');
   });
 
   it('each node family resolves its own name key', () => {
@@ -63,6 +115,9 @@ describe('gatherNodeTooltipHtml', () => {
       'hudChrome.gathering.nodeName.wood',
       'hudChrome.gathering.nodeName.herb',
       'hudChrome.gathering.tierRequired.mining',
+      'hudChrome.gathering.requiresTool.mining',
+      'hudChrome.gathering.requiresTool.logging',
+      'hudChrome.gathering.requiresTool.herbalism',
       'hudChrome.gathering.stateReady',
       'hudChrome.gathering.stateCooldown',
     ] as const) {
@@ -72,30 +127,62 @@ describe('gatherNodeTooltipHtml', () => {
 });
 
 describe('gatherNodeToolGateFor', () => {
-  function worldWith(inventory: { itemId: string; count: number }[]): IWorld {
-    return { inventory } as unknown as IWorld;
+  function worldWith(
+    inventory: { itemId: string; count: number }[],
+    proficiency: Record<string, number> = {},
+  ): IWorld {
+    // The plain counter map the wield-filtered scan reads (R22).
+    return { inventory, gatheringProficiency: proficiency } as unknown as IWorld;
   }
 
   it('resolves the viewer tier from bags and bakes the localized denial line per family', () => {
-    const gate = gatherNodeToolGateFor(worldWith([{ itemId: 'iron_mining_pick', count: 1 }]), {
-      type: 'ore',
-      tier: 3,
-    });
+    // The pick is WIELDED here (mining 40, R22), so the shortfall is purely
+    // the tier: the tiered line renders. The wield shortfall has its own arm
+    // below.
+    const gate = gatherNodeToolGateFor(
+      worldWith([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 40 }),
+      {
+        type: 'ore',
+        tier: 3,
+      },
+    );
     expect(gate).toEqual({
       nodeTier: 3,
       viewerToolTier: 2,
       unmetText: 'You need a tier 3 mining pick to harvest this vein.',
     });
-    // Bare hands floor to 1, and the wood/herb families word their own lines.
+    // The R22 wield arm: the same pick with the counter short composes the
+    // wield line naming the smallest requirement that unlocks something
+    // already carried, exactly the line the sim's own denial would render.
+    expect(
+      gatherNodeToolGateFor(worldWith([{ itemId: 'iron_mining_pick', count: 1 }]), {
+        type: 'ore',
+        tier: 2,
+      }),
+    ).toEqual({
+      nodeTier: 2,
+      viewerToolTier: 0,
+      unmetText: 'You need Mining 40 to swing the pick already in your bags.',
+    });
+    // Empty bags read as no tool owned (0, #2343: no bare-hands floor), and
+    // the wood/herb families word their own tiered lines.
     expect(gatherNodeToolGateFor(worldWith([]), { type: 'wood', tier: 2 })).toEqual({
       nodeTier: 2,
-      viewerToolTier: 1,
+      viewerToolTier: 0,
       unmetText: 'You need a tier 2 logging axe to fell this stand.',
     });
     expect(gatherNodeToolGateFor(worldWith([]), { type: 'herb', tier: 2 })).toEqual({
       nodeTier: 2,
-      viewerToolTier: 1,
+      viewerToolTier: 0,
       unmetText: 'You need a tier 2 herbalism sickle to gather this patch.',
+    });
+  });
+
+  it('a tier-1 node with empty bags gates on the tierless base-tool line (#2343)', () => {
+    expect(gatherNodeToolGateFor(worldWith([]), { type: 'ore', tier: 1 })).toEqual({
+      nodeTier: 1,
+      viewerToolTier: 0,
+      unmetText: 'You need a mining pick to harvest this vein.',
     });
   });
 });
@@ -105,11 +192,41 @@ describe('hud gatherDenied case stays an error toast only (source pin)', () => {
   const caseStart = source.indexOf("case 'gatherDenied'");
   const block = source.slice(caseStart, source.indexOf('break;', caseStart));
 
-  it('maps surface + professionId through the pure key mapper into showError', () => {
+  it('maps surface + professionId + requiredTier + wieldProficiency through the pure key mapper into showError', () => {
     expect(caseStart).toBeGreaterThan(-1);
     expect(block).toContain('this.showError(');
-    expect(block).toContain('gatherDeniedLineKey(ev.surface, ev.professionId)');
+    // Comment-stripped THEN whitespace- and trailing-comma-normalized: the
+    // case's own comment names all four fields, so an unstripped scrape
+    // could be satisfied by prose with the argument removed; and the
+    // four-argument call is long enough for the formatter to wrap
+    // one-per-line with a dangling comma.
+    const strippedBlock = block
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '$1')
+      .replace(/\s+/g, '')
+      .replace(/,\)/g, ')');
+    expect(strippedBlock).toContain(
+      'gatherDeniedLineKey(ev.surface,ev.professionId,ev.requiredTier,ev.wieldProficiency)',
+    );
     expect(block).toContain('formatNumber(ev.requiredTier');
+    expect(block).toContain('formatNumber(ev.wieldProficiency ?? 0');
+  });
+
+  it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {
+    expect(block).not.toContain('this.log(');
+    expect(block).not.toContain('audio.');
+  });
+});
+
+describe('hud gatherToolNoNode case mirrors the gatherDenied toast-only pattern (source pin)', () => {
+  const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  const caseStart = source.indexOf("case 'gatherToolNoNode'");
+  const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+
+  it('maps the professionId through the pure key mapper into showError', () => {
+    expect(caseStart).toBeGreaterThan(-1);
+    expect(block).toContain('this.showError(');
+    expect(block).toContain('gatherToolNoNodeKey(ev.professionId)');
   });
 
   it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {
@@ -135,15 +252,34 @@ describe('hud gatherDowngrade case mirrors the gatherDenied toast-only pattern (
   });
 });
 
-describe('minimap painter locked tint (source pin)', () => {
-  it('the locked tint replaces the state COLOR while both state arms keep their silhouette', () => {
-    // Fairness-adjacent composition pin: the painter must pick the locked
-    // color inside BOTH the ready and cooldown branches (silhouette kept),
-    // never collapse the two states into one locked draw.
-    const painter = readFileSync(path.resolve(process.cwd(), 'src/ui/minimap_painter.ts'), 'utf8');
-    const readyArm = painter.indexOf('m.locked ? colors.gatherLocked : colors.gatherReady');
-    const cooldownArm = painter.indexOf('m.locked ? colors.gatherLocked : colors.gatherCooldown');
-    expect(readyArm).toBeGreaterThan(-1);
-    expect(cooldownArm).toBeGreaterThan(readyArm);
+describe('minimap painter gathering-state precedence (source pin)', () => {
+  it('routes independent cooldown and lock facts through cached sprite variants', () => {
+    // Fairness-adjacent composition pin: the four state combinations each own
+    // a raster key, and the combined cooldown + locked state keeps both cues.
+    // The loaded hot path stays one full-alpha blit with no diagonal strike.
+    const painter = readFileSync(path.resolve(process.cwd(), 'src/ui/minimap_painter.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const caseStart = painter.indexOf("case 'gather-node'");
+    const caseEnd = painter.indexOf('\n          break;', caseStart);
+    expect(caseStart).toBeGreaterThan(-1);
+    expect(caseEnd).toBeGreaterThan(caseStart);
+    const block = painter.slice(caseStart, caseEnd);
+    for (const size of [
+      'minimapGatherReady',
+      'minimapGatherReadyLocked',
+      'minimapGatherCooldown',
+      'minimapGatherCooldownLocked',
+    ]) {
+      expect(block).toContain(`'${size}`);
+    }
+    expect(block).toContain('ctx.drawImage(sprite');
+    expect(block).toContain('if (!m.ready)');
+    expect(block).toContain('drawGatherCooldownFallbackArc(');
+    expect(block).toContain('if (m.locked)');
+    expect(block).toContain('drawGatherLockFallback(');
+    expect(block).not.toContain('ctx.globalAlpha');
+    expect(block).not.toContain('ctx.moveTo');
+    expect(block).not.toContain('ctx.lineTo');
   });
 });

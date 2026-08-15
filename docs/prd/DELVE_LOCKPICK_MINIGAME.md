@@ -69,11 +69,18 @@ lockpickEngage(objectId, ante, pid)   validate proximity / not looted / attemptA
                                        generate lock (seed = run.seed ^ (objectId * 0x9e3779b1) >>> 0), open session
                                        emit { type: 'lockpickSession', … pid }   // fogged view only
 lockpickAction(sessionId, action, pid) one step; emit { type: 'lockpickStep', … pid }
-  … on SUCCESS:                   grantDelveRewards(run) using the tier-keyed loot table;
+  … on SUCCESS (solved):          grantDelveRewards(run) using the tier-keyed loot table,
+                                 full ante tier, Bountiful Coffer/deed eligible;
                                  state.open = true; attemptAvailable = false;
                                  openDelveSurfaceExit(run); emit lockpickEnd
-  … on FAILED (lives→0):          attemptAvailable = false (chest lost; re-clear delve);
-                                 emit lockpickEnd
+  … on tries exhausted (lives→0): grantDelveRewards(run) capped at the LOW consolation
+                                 tier (solved = false: no Bountiful Coffer, no
+                                 flawless-solve deed); state.open = true;
+                                 attemptAvailable = false; openDelveSurfaceExit(run);
+                                 emit lockpickEnd (issue #2585: the boss is already
+                                 dead by the time the chest spawns, so the run's clear
+                                 credit and the chest are never lost, only the top loot
+                                 tier and coffer/deed eligibility)
 ```
 
 `'reward_chest'` stays in the codebase as the legacy/fallback chest so we can
@@ -229,12 +236,16 @@ then get implemented in both `Sim` and `ClientWorld`.
 **No schema migration.** Lock attempts are per-run and never cross runs, so:
 - The live `LockSession` is **in-memory only** on `meta.lockpick` (like other
   transient combat state) — torn down on end/disconnect.
-- The "fail → must re-clear the delve" gate is the in-memory
-  `DelveRun.objectState[id].attemptAvailable`, set true on boss-defeat / chest
-  spawn and false on SUCCESS *or* FAILED.
+- `DelveRun.objectState[id].attemptAvailable` is the in-memory gate for a
+  *second* pick attempt on the same chest: true on boss-defeat / chest spawn,
+  false once the chest resolves, whether by a solved pick or by tries running
+  out. There is no re-clear gate: a tries-exhausted pick still opens the chest
+  at the low consolation tier and keeps the run's clear credit (issue #2585),
+  so the delve is never lost or forced to re-clear over the lockpick outcome.
 - Nothing new persists to `characters.state` JSONB. (`delveClears` etc. already
   record the *clear*; the chest outcome doesn't need to survive a relog because an
-  abandoned run's live state is gone anyway and the delve must be re-cleared.)
+  abandoned run's live state is gone anyway and the delve's clear credit was
+  already granted on boss-defeat.)
 
 ---
 
@@ -258,10 +269,14 @@ terminal-state actions rejected; one live session per (player, chest).
 
 ## 4. State machine
 
-Unchanged from source PRD §8. Mapped to real teardown hooks: `ABANDONED` fires
-from the existing `leavePlayer` / leave-delve / zone-out paths nulling
-`meta.lockpick`. Default: `ABANDONED` **preserves** `attemptAvailable`;
-`SUCCESS`/`FAILED` consume it.
+Mapped to real teardown hooks: `ABANDONED` fires from the existing
+`leavePlayer` / leave-delve / zone-out paths nulling `meta.lockpick`. Default:
+`ABANDONED` **preserves** `attemptAvailable`, so the player can re-engage.
+`SUCCESS` (a solved pick) and a tries-exhausted resolution both consume
+`attemptAvailable` and both grant the chest (issue #2585): a solved pick grants
+the full ante tier and is Bountiful Coffer/deed eligible, a tries-exhausted
+resolution grants only the low consolation tier and is never coffer or deed
+eligible. There is no terminal `FAILED` state that loses the chest.
 
 ---
 
@@ -280,8 +295,9 @@ internals via `(sim as any)`, assert on `SimEvent[]` from `tick()`" pattern.
   `tests/dungeons_command.test.ts` / `delves.test.ts`: enter the reliquary finale,
   kill boss, spawn `'locked_chest'`, `lockpickEngage` at each ante, drive
   `lockpickAction` through a known-solvable path → assert loot granted exactly
-  once at the right tier, `attemptAvailable` flips correctly, ante-1 slip ⇒ FAILED
-  ⇒ re-engage rejected, abandon preserves the attempt. Determinism assertion
+  once at the right tier, `attemptAvailable` flips correctly, ante-1 slip ⇒ tries
+  exhausted ⇒ chest still opens at the low consolation tier (no coffer/deed) ⇒
+  re-engage rejected, abandon preserves the attempt. Determinism assertion
   (same seed twice ⇒ same result).
 - **Fog boundary** (server-ish) — assert no out-of-window cell is ever present in
   any emitted `lockpickSession`/`lockpickStep` payload (serialize and scan).
@@ -290,7 +306,8 @@ internals via `(sim as any)`, assert on `SimEvent[]` from `tick()`" pattern.
   `sim_i18n.ts`) resolves any English. New UI strings go in `en` first, then all
   14 locales (see §6).
 - **E2E (stretch, `scripts/*.mjs`)** — engage→flawless→premium; one-slip→continue
-  →medium; ante-1 slip→fail→locked-out; disconnect→abandoned→re-engage. Needs
+  →medium; ante-1 slip→tries exhausted→low consolation grant; disconnect
+  →abandoned→re-engage. Needs
   `npm run dev` + `npm run server` (+ `ALLOW_DEV_COMMANDS=1` to teleport/clear in
   dev only).
 
@@ -307,8 +324,9 @@ printed list). For this feature:
   them under a `lockpick.*` namespace in `en` first, then translate to every
   locale). The board itself is symbols/cells, not text — but the ante labels,
   tier names, margin descriptions ("flawless required" / "1 slip" / "2 slips"),
-  slip/success/fail toasts, and the "this lock won't budge — re-clear the delve"
-  diegetic message are all keys.
+  slip toasts, and the flawless-solve / tries-exhausted end-of-attempt messages
+  are all keys (a tries-exhausted attempt still resolves to a low-consolation
+  loot toast, never a "re-clear the delve" message: see §2.6/§4).
 - **The sim/server emit zero prose** — only the structured `lockpick*` events
   (§2.1). That keeps `src/sim/` language-agnostic and means there's no English to
   re-localize through `sim_i18n.ts`. If any English string *does* leak from the
@@ -350,7 +368,9 @@ exposes; add Mirefen/Thornpeak presets when those delves ship.
    tiers module. Premium is skill-gated, not a harder board. Flip later if
    telemetry shows the ante mix is degenerate.
 2. **ABANDONED preserves or burns the attempt?** → **Preserves** (disconnect-
-   friendly). The whole delve must still be re-cleared after a *FAILED*.
+   friendly). Tries running out is not a re-clear gate either (issue #2585): the
+   chest still opens at the low consolation tier, so the delve is never
+   re-cleared over the lockpick outcome.
 3. **Ante chosen once, or re-pickable after re-engage?** → **Re-pickable** on
    re-engage (since abandon preserves the attempt; you anted nothing).
 4. **Lockpicking skill / Skeleton Key item?** → **Out of v1.** Difficulty = delve
@@ -420,7 +440,8 @@ before ordering #1/#2 so the new chest matches the reliquary's material palette.
 - Determinism: same `(seed, tier)` ⇒ identical lock; same input sequence ⇒
   identical outcome (asserted in tests).
 - Manual: ante selector → board → flawless solve → premium loot, exit opens;
-  ante-1 slip → chest locked out until delve re-clear; disconnect mid-run →
+  ante-1 slip → tries exhausted → chest still opens at the low consolation
+  tier, no Bountiful Coffer or flawless-solve deed; disconnect mid-run →
   attempt preserved.
 - Per `CLAUDE.md` Opus workflow: a fresh review subagent diffs the change for
   correctness/requirement gaps (fog never leaks full board; client never computes

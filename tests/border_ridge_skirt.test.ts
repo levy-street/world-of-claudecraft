@@ -33,9 +33,15 @@ describe('border ridge tails end without a step', () => {
     // lines (the Frostveil's terraced benches, coast headlands), so the sweep
     // stays inside the classic rolling country where the bug manifested: the
     // vale/marsh/peaks bands plus the sealed Hollow wall's skirts. The
-    // assertion is the movement gate's own refusal condition: a rise steeper
+    // check is the movement gate's own refusal condition: a rise steeper
     // than PLAYER_MAX_CLIMB_SLOPE over one tick of run, straight across the
-    // line, where the ridge tail's profile itself is nearly flat.
+    // line. The bug's signature was that CUTOFF LINE itself: a coherent
+    // invisible cliff running the whole window edge, refusing the step at
+    // (nearly) every position along it. The natural-relief terrain
+    // legitimately crosses these lines with organic crags at scattered
+    // points (Thornpeak's uplands are genuinely craggy now), so the
+    // assertion is on the per-line steep FRACTION, far below the wall-like
+    // coherence the bug produced and far above organic scatter.
     const offenders: string[] = [];
     const inStripCountry = (x: number, z: number) => Math.abs(x) <= 204 && z >= -170 && z <= 963;
     // a point standing inside another edge's ridge window is on a real
@@ -57,6 +63,8 @@ describe('border ridge tails end without a step', () => {
           const line = edge.at + side * cut;
           const lo = edge.lo - 20;
           const hi = edge.hi + 20;
+          let eligible = 0;
+          let steep = 0;
           for (let along = lo; along <= hi; along += 3) {
             const a =
               edge.kind === 'h' ? [along, line - TICK_RUN / 2] : [line - TICK_RUN / 2, along];
@@ -64,26 +72,38 @@ describe('border ridge tails end without a step', () => {
               edge.kind === 'h' ? [along, line + TICK_RUN / 2] : [line + TICK_RUN / 2, along];
             if (!inStripCountry(a[0], a[1]) || !inStripCountry(b[0], b[1])) continue;
             if (onAnotherWall(a[0], a[1], edge) || onAnotherWall(b[0], b[1], edge)) continue;
+            eligible++;
             const rise = Math.abs(groundHeight(b[0], b[1], SEED) - groundHeight(a[0], a[1], SEED));
-            if (rise / TICK_RUN > PLAYER_MAX_CLIMB_SLOPE) {
-              offenders.push(
-                `${edge.kind}@${edge.at} cut ${side * cut} along ${along}: slope ${(rise / TICK_RUN).toFixed(2)}`,
-              );
-            }
+            if (rise / TICK_RUN > PLAYER_MAX_CLIMB_SLOPE) steep++;
+          }
+          // the cutoff-line bug refused the step at essentially every
+          // eligible position; organic crag crossings measure a few percent
+          if (eligible >= 20 && steep / eligible > 0.2) {
+            offenders.push(
+              `${edge.kind}@${edge.at} cut ${side * cut}: ${steep}/${eligible} steep along the line`,
+            );
           }
         }
       }
     }
-    expect(offenders, offenders.slice(0, 12).join('\n')).toEqual([]);
+    expect(offenders, offenders.join('\n')).toEqual([]);
   });
 
   it('the reported Thornpeak line at x = -102 is walkable again', () => {
-    // the exact repro: walking west across x = -102 anywhere along the zone
+    // The exact repro line: walking west across x = -102 along the zone. The
+    // bug was a coherent invisible cliff spanning the WHOLE line (the 3 sigma
+    // cutoff of the x = -180 edge); Thornpeak's craggy uplands now cross it
+    // with real, visible rock at scattered points, so the pin is that no
+    // wall-like fraction of the line refuses the step.
+    let steep = 0;
+    let total = 0;
     for (let z = 560; z <= 890; z += 2) {
       const east = groundHeight(-101.9, z, SEED);
       const west = groundHeight(-102.1, z, SEED);
       const slope = Math.abs(west - east) / 0.2;
-      expect(slope, `step across x=-102 at z=${z}`).toBeLessThanOrEqual(PLAYER_MAX_CLIMB_SLOPE);
+      total++;
+      if (slope > PLAYER_MAX_CLIMB_SLOPE) steep++;
     }
+    expect(steep / total, `${steep}/${total} steep steps across x=-102`).toBeLessThanOrEqual(0.2);
   });
 });

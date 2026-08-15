@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 818,
+      "nextId": 963,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 820,
-      "state": "0ecf5094",
-      "events": "0b7b44a9",
+      "nextId": 965,
+      "state": "ffa25e53",
+      "events": "4e6e0930",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -49,11 +49,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -66,7 +66,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 818,
+          "entityId": 963,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -84,7 +84,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -102,11 +105,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -119,7 +122,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 819,
+          "entityId": 964,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -140,7 +143,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -159,7 +165,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 818
+              "sourceId": 963
             }
           ],
           "blockChance": 0.05,
@@ -169,10 +175,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.183546,
+          "fallStartY": -0.205393,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 818,
+          "id": 963,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -185,7 +191,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": -0.183546,
+            "y": -0.205393,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -219,10 +225,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -0.366437,
+          "fallStartY": -0.409401,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 819,
+          "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -234,7 +240,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": -0.366437,
+            "y": -0.409401,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -266,8 +272,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 820,
-      "state": "0ecf5094",
+      "nextId": 965,
+      "state": "ffa25e53",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -287,11 +293,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -304,7 +310,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 818,
+          "entityId": 963,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -322,7 +328,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -340,11 +349,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -357,7 +366,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 819,
+          "entityId": 964,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -378,7 +387,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -397,7 +409,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 818
+              "sourceId": 963
             }
           ],
           "blockChance": 0.05,
@@ -407,10 +419,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.183546,
+          "fallStartY": -0.205393,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 818,
+          "id": 963,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -423,7 +435,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": -0.183546,
+            "y": -0.205393,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -457,10 +469,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -0.366437,
+          "fallStartY": -0.409401,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 819,
+          "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -472,7 +484,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": -0.366437,
+            "y": -0.409401,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -504,9 +516,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 820,
-      "state": "a514ad78",
-      "events": "41c38a77",
+      "nextId": 965,
+      "state": "ace5f159",
+      "events": "1accf9fb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -525,11 +537,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -544,7 +556,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 818,
+          "entityId": 963,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -562,7 +574,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -580,11 +595,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -599,7 +614,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 819,
+          "entityId": 964,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -620,7 +635,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -639,7 +657,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 818
+              "sourceId": 963
             }
           ],
           "blockChance": 0.05,
@@ -649,10 +667,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.183546,
+          "fallStartY": -0.205393,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 818,
+          "id": 963,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -665,7 +683,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": -0.183546,
+            "y": -0.205393,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -699,10 +717,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -0.366437,
+          "fallStartY": -0.409401,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 819,
+          "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -714,7 +732,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": -0.366437,
+            "y": -0.409401,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -746,9 +764,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 820,
-      "state": "0447dc30",
-      "events": "5684e0bd",
+      "nextId": 965,
+      "state": "ada9d4d9",
+      "events": "3ca10c4e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -767,11 +785,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -786,7 +804,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 818,
+          "entityId": 963,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -804,7 +822,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -822,11 +843,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -841,7 +862,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 819,
+          "entityId": 964,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -877,7 +898,10 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -896,7 +920,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 818
+              "sourceId": 963
             }
           ],
           "blockChance": 0.05,
@@ -906,10 +930,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.183546,
+          "fallStartY": -0.205393,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 818,
+          "id": 963,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -922,7 +946,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": -0.183546,
+            "y": -0.205393,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -956,10 +980,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -0.366437,
+          "fallStartY": -0.409401,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 819,
+          "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -971,7 +995,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": -0.366437,
+            "y": -0.409401,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1003,9 +1027,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 820,
-      "state": "a514ad78",
-      "events": "c973bc47",
+      "nextId": 965,
+      "state": "ace5f159",
+      "events": "4d7ffa90",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1024,11 +1048,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1043,7 +1067,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 818,
+          "entityId": 963,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1061,7 +1085,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1079,11 +1106,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1098,7 +1125,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 819,
+          "entityId": 964,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1119,7 +1146,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1138,7 +1168,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 818
+              "sourceId": 963
             }
           ],
           "blockChance": 0.05,
@@ -1148,10 +1178,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.183546,
+          "fallStartY": -0.205393,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 818,
+          "id": 963,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1164,7 +1194,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": -0.183546,
+            "y": -0.205393,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1198,10 +1228,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -0.366437,
+          "fallStartY": -0.409401,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 819,
+          "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1213,7 +1243,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": -0.366437,
+            "y": -0.409401,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1245,9 +1275,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 820,
-      "state": "b3a2c29c",
-      "events": "2f72f360",
+      "nextId": 965,
+      "state": "bfdd3a33",
+      "events": "b4cceec0",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1266,11 +1296,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1291,7 +1321,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 818,
+          "entityId": 963,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1309,8 +1339,11 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -1328,11 +1361,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "partiesJoined": 1
@@ -1353,7 +1386,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 819,
+          "entityId": 964,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1374,8 +1407,11 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -1394,7 +1430,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 818
+              "sourceId": 963
             }
           ],
           "blockChance": 0.05,
@@ -1404,10 +1440,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.183546,
+          "fallStartY": -0.205393,
           "fiveSecondRule": 99.1,
           "hp": 100,
-          "id": 818,
+          "id": 963,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1420,7 +1456,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": -0.183546,
+            "y": -0.205393,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1454,10 +1490,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -0.366437,
+          "fallStartY": -0.409401,
           "fiveSecondRule": 99.1,
           "hp": 54,
-          "id": 819,
+          "id": 964,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1469,7 +1505,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": -0.366437,
+            "y": -0.409401,
             "z": 20
           },
           "potionCooldownUntil": -1,

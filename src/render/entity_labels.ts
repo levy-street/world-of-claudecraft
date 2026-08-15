@@ -20,6 +20,12 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'mailbox') {
     return t('worldContent.mailboxName');
   }
+  if (entity.templateId === 'noticeboard_eastbrook') {
+    return t('worldContent.noticeboardName');
+  }
+  if (entity.templateId === 'soulwell') {
+    return tEntity({ kind: 'ability', id: 'soulwell', field: 'name' });
+  }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
   }

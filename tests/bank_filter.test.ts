@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
-import type { BagFilterState } from '../src/ui/bag_filter';
+import { BAG_CATEGORIES, type BagFilterState } from '../src/ui/bag_filter';
 import { filterBankSlots } from '../src/ui/bank_filter';
 import type { BankSlotModel } from '../src/ui/bank_view';
 
@@ -24,6 +24,13 @@ const ITEMS: Record<string, ItemDef> = {
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', quality: 'common' },
+  // A REAL catalog id: the material chip is honest-taxonomy set membership
+  // (src/sim/material_taxonomy.ts), so a synthetic id can never match it.
+  iron_ore: { id: 'iron_ore', name: 'Iron Ore', kind: 'junk', quality: 'common' },
+  // Its REAL fine grade plus a REAL material whose name interleaves the two,
+  // for the grade-family tiebreak arms (mirrors the bag_filter fixtures).
+  fine_iron_ore: { id: 'fine_iron_ore', name: 'Fine Iron Ore', kind: 'junk', quality: 'common' },
+  goldleaf_herb: { id: 'goldleaf_herb', name: 'Goldleaf Herb', kind: 'junk', quality: 'common' },
   keystone: { id: 'keystone', name: 'Crypt Keystone', kind: 'quest', quality: 'common' },
   relic: { id: 'relic', name: 'Ancient Relic', kind: 'armor', slot: 'chest', quality: 'legendary' },
 } as unknown as Record<string, ItemDef>;
@@ -41,6 +48,7 @@ const LOCALIZED: Record<string, string> = {
   rod: 'Hengel',
   keystone: 'Sleutelsteen',
   relic: 'Relikwie',
+  iron_ore: 'Ysterets',
 };
 const nameOf = (id: string): string => LOCALIZED[id] ?? id;
 
@@ -92,9 +100,21 @@ describe('filterBankSlots: category', () => {
     );
   });
 
-  it('keeps junk and tools as materials', () => {
-    expect(ids(filterBankSlots(MODELS, lookup, state({ category: 'material' }), nameOf))).toEqual([
-      'pelt',
+  it('keeps only honest materials: grey junk and tools no longer match the chip', () => {
+    // The material chip narrowed from junk-or-tool to the derived taxonomy
+    // (phase 19): only the real material matches; the grey pelt and the rod
+    // fall out of MODELS entirely, and the rod moves to the tool chip below.
+    const models: BankSlotModel[] = [
+      { slotIndex: 4, itemId: 'iron_ore', count: 2, showCount: true, qualityKey: 'common' },
+      ...MODELS,
+    ];
+    expect(ids(filterBankSlots(models, lookup, state({ category: 'material' }), nameOf))).toEqual([
+      'iron_ore',
+    ]);
+  });
+
+  it('keeps only tools under the tool chip (the displaced implements)', () => {
+    expect(ids(filterBankSlots(MODELS, lookup, state({ category: 'tool' }), nameOf))).toEqual([
       'rod',
     ]);
   });
@@ -124,9 +144,7 @@ describe('filterBankSlots: search matches the LOCALIZED name, not item.name', ()
 
   it('combines search with a category', () => {
     expect(
-      ids(
-        filterBankSlots(MODELS, lookup, state({ category: 'material', search: 'hengel' }), nameOf),
-      ),
+      ids(filterBankSlots(MODELS, lookup, state({ category: 'tool', search: 'hengel' }), nameOf)),
     ).toEqual(['rod']);
   });
 
@@ -138,10 +156,12 @@ describe('filterBankSlots: search matches the LOCALIZED name, not item.name', ()
 });
 
 describe('filterBankSlots: sorting preserves slotIndex', () => {
-  it('sorts by quality descending (legendary first), ties keep insertion order', () => {
+  it('sorts by quality descending (legendary first), ties on the clean-up ladder', () => {
+    // Within the common band the canonical ladder orders potion, rod, keystone
+    // (consumable, tool, quest), matching the bags' quality view.
     const out = filterBankSlots(MODELS, lookup, state({ sort: 'quality' }), nameOf);
-    expect(ids(out)).toEqual(['relic', 'helm', 'blade', 'potion', 'keystone', 'rod', 'pelt']);
-    expect(indices(out)).toEqual([7, 3, 2, 5, 8, 1, 0]);
+    expect(ids(out)).toEqual(['relic', 'helm', 'blade', 'potion', 'rod', 'keystone', 'pelt']);
+    expect(indices(out)).toEqual([7, 3, 2, 5, 1, 8, 0]);
   });
 
   it('sorts by the LOCALIZED name (order differs from the English item.name)', () => {
@@ -152,6 +172,44 @@ describe('filterBankSlots: sorting preserves slotIndex', () => {
     // A sort on the English item.name would instead lead with 'Ancient Relic' (relic),
     // so this order proves the name-sort uses nameOf.
     expect(ids(out)[0]).not.toBe('relic');
+  });
+
+  it('keeps every stack of an item adjacent in the quality view, slotIndex intact', () => {
+    // Three scattered stacks of one id: the ladder tiebreak must seat them
+    // together (fuller first) while each row keeps its ORIGINAL slotIndex
+    // (the wire argument a click acts on).
+    const scattered: BankSlotModel[] = [
+      { slotIndex: 10, itemId: 'iron_ore', count: 7, showCount: true, qualityKey: 'common' },
+      ...MODELS,
+      { slotIndex: 11, itemId: 'iron_ore', count: 20, showCount: true, qualityKey: 'common' },
+    ];
+    const out = filterBankSlots(scattered, lookup, state({ sort: 'quality' }), nameOf);
+    const orePositions = out.map((m, i) => ({ m, i })).filter(({ m }) => m.itemId === 'iron_ore');
+    expect(orePositions).toHaveLength(2);
+    expect(orePositions[1].i - orePositions[0].i).toBe(1);
+    expect(orePositions.map(({ m }) => m.count)).toEqual([20, 7]);
+    expect(orePositions.map(({ m }) => m.slotIndex)).toEqual([11, 10]);
+  });
+
+  it('seats a fine grade beside its base past an interleaving name (quality view)', () => {
+    const grades: BankSlotModel[] = [
+      { slotIndex: 12, itemId: 'iron_ore', count: 9, showCount: true, qualityKey: 'common' },
+      { slotIndex: 13, itemId: 'goldleaf_herb', count: 4, showCount: true, qualityKey: 'common' },
+      { slotIndex: 14, itemId: 'fine_iron_ore', count: 3, showCount: true, qualityKey: 'common' },
+    ];
+    const out = filterBankSlots(grades, lookup, state({ sort: 'quality' }), nameOf);
+    expect(ids(out)).toEqual(['goldleaf_herb', 'fine_iron_ore', 'iron_ore']);
+    expect(indices(out)).toEqual([13, 14, 12]);
+  });
+
+  it('breaks a same-localized-name tie in the name view with the ladder', () => {
+    const twin: BankSlotModel[] = [
+      { slotIndex: 15, itemId: 'iron_ore', count: 7, showCount: true, qualityKey: 'common' },
+      { slotIndex: 16, itemId: 'iron_ore', count: 20, showCount: true, qualityKey: 'common' },
+    ];
+    const out = filterBankSlots(twin, lookup, state({ sort: 'name' }), nameOf);
+    expect(out.map((m) => m.count)).toEqual([20, 7]);
+    expect(indices(out)).toEqual([16, 15]);
   });
 
   it('carries slotIndex through a combined category + sort', () => {
@@ -173,14 +231,66 @@ describe('filterBankSlots: sorting preserves slotIndex', () => {
 });
 
 describe('filterBankSlots: unknown ids', () => {
-  it('excludes a dormant unknown-id slot from every view (mirrors the bag filter)', () => {
-    const withGhost: BankSlotModel[] = [
-      ...MODELS,
-      { slotIndex: 9, itemId: 'ghost', count: 1, showCount: false, qualityKey: 'common' },
-    ];
-    expect(ids(filterBankSlots(withGhost, lookup, state(), nameOf))).not.toContain('ghost');
-    // Unknown ids carry no name, so a nonempty search never surfaces them either.
+  // Bank contents are server truth, so a stale bundle can hold ids it
+  // predates (R34). The everything view keeps such a slot visible (its
+  // slotIndex intact, since withdraw acts on it); chips and searches still
+  // exclude it, mirroring the bag filter.
+  const withGhost: BankSlotModel[] = [
+    { slotIndex: 9, itemId: 'ghost', count: 1, showCount: false, qualityKey: 'common' },
+    ...MODELS,
+  ];
+
+  it('keeps an unknown-id slot visible in the everything view, slotIndex intact', () => {
+    const out = filterBankSlots(withGhost, lookup, state(), nameOf);
+    expect(ids(out)).toEqual([
+      'ghost',
+      'potion',
+      'blade',
+      'keystone',
+      'pelt',
+      'relic',
+      'helm',
+      'rod',
+    ]);
+    expect(indices(out)[0]).toBe(9);
+  });
+
+  it('excludes an unknown-id slot from every category chip and from search', () => {
+    for (const category of BAG_CATEGORIES) {
+      if (category === 'all') continue;
+      expect(
+        ids(filterBankSlots(withGhost, lookup, state({ category }), nameOf)),
+        category,
+      ).not.toContain('ghost');
+    }
+    // The injected resolver falls back to the raw id, but search is a NAME
+    // match: a query equal to the id must not surface the slot.
     expect(filterBankSlots(withGhost, lookup, state({ search: 'ghost' }), nameOf)).toEqual([]);
+  });
+
+  it('ranks an unknown-id slot below poor in the quality sort, never a throw', () => {
+    // Prepended above, so landing LAST proves ranking, not stable-order luck;
+    // before the guard this sort dereferenced the missing def through a
+    // non-null assertion.
+    const out = filterBankSlots(withGhost, lookup, state({ sort: 'quality' }), nameOf);
+    expect(ids(out)[out.length - 1]).toBe('ghost');
+    expect(ids(out).indexOf('pelt')).toBeLessThan(ids(out).indexOf('ghost'));
+  });
+
+  it('name-sorts an unknown-id slot by what the resolver returns for it (the raw id)', () => {
+    const out = filterBankSlots(withGhost, lookup, state({ sort: 'name' }), nameOf);
+    // Localized order with 'ghost' (raw id) collated in: Aardhelm, Bontvel,
+    // ghost, Hengel, Mirakel, Relikwie, Sleutelsteen, Zwaard.
+    expect(ids(out)).toEqual([
+      'helm',
+      'pelt',
+      'ghost',
+      'rod',
+      'potion',
+      'relic',
+      'keystone',
+      'blade',
+    ]);
   });
 });
 

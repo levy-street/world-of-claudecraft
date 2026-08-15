@@ -36,6 +36,57 @@ function survivingIds(
   return out;
 }
 
+// This module is pure spatial GATHERING: the wide band only makes a band cell's
+// shared query a superset, so a battleground viewer's candidate list can reach
+// the far end of the field. WHO actually survives out there is decided by the
+// caller's per-viewer cutoff, and inside the band that cutoff is team-aware
+// (server/game.ts bgWideInterestApplies: own team plus non-player entities, an
+// enemy player back at the open-world radii). Those arms are pinned end to end
+// in tests/battleground_wire.test.ts; keep this file team-agnostic.
+describe('interest_candidates: the wide-band arm', () => {
+  const WIDE = 320; // matches the server's BG_MATCH_DROP_RADIUS
+  const BAND_X = 16400; // inside the battleground band
+  const wideBand = { radius: WIDE, covers: (x: number) => x >= 16000 && x < 20000 };
+
+  it('a band anchor cell queries at the wide radius (a 236yd peer is in the list)', () => {
+    const grid = new SpatialGrid(CELL);
+    const anchor = mkEntity(1, BAND_X, -1500);
+    const far = mkEntity(2, BAND_X, -1500 + 236); // flag-to-flag distance
+    grid.insert(anchor);
+    grid.insert(far);
+    const shared = buildSharedInterestCandidates(grid, [{ sessionId: 1, anchor }], BASE, wideBand);
+    const ids = new Set(shared.forSession(1).map((e) => e.id));
+    expect(ids.has(2)).toBe(true);
+    // and the widened list is still a SUPERSET of the exact wide cutoff
+    expect(survivingIds(shared.forSession(1), anchor.pos.x, anchor.pos.z, WIDE).has(2)).toBe(true);
+  });
+
+  it('a non-band anchor cell stays at the base radius even when the band is live', () => {
+    const grid = new SpatialGrid(CELL);
+    const anchor = mkEntity(1, 480, 480); // open world
+    const near = mkEntity(2, 480 + 129, 480); // inside BASE
+    const beyond = mkEntity(3, 480 + 236, 480); // far outside the padded base query
+    grid.insert(anchor);
+    grid.insert(near);
+    grid.insert(beyond);
+    const shared = buildSharedInterestCandidates(grid, [{ sessionId: 1, anchor }], BASE, wideBand);
+    const ids = new Set(shared.forSession(1).map((e) => e.id));
+    expect(ids.has(2)).toBe(true);
+    expect(ids.has(3)).toBe(false);
+  });
+
+  it('omitting the wide band keeps the historical base-radius behavior everywhere', () => {
+    const grid = new SpatialGrid(CELL);
+    const anchor = mkEntity(1, BAND_X, -1500);
+    const far = mkEntity(2, BAND_X, -1500 + 236);
+    grid.insert(anchor);
+    grid.insert(far);
+    const shared = buildSharedInterestCandidates(grid, [{ sessionId: 1, anchor }], BASE);
+    const ids = new Set(shared.forSession(1).map((e) => e.id));
+    expect(ids.has(2)).toBe(false);
+  });
+});
+
 describe('interest_candidates', () => {
   it('sharedQueryRadius adds half the cell diagonal to the base radius', () => {
     expect(sharedQueryRadius(130, 32)).toBeCloseTo(130 + (32 * Math.SQRT2) / 2);

@@ -11,6 +11,9 @@ import {
 } from '../src/ui/hud/quest/prof_intro_hint_core';
 import { questStrings } from '../src/ui/i18n.catalog/quests';
 
+const hintVisible = (templateId: string, state: QuestState, attuned: boolean) =>
+  professionIntroHintVisible(templateId, state, attuned, STATIONS);
+
 // The letter-to-Haldren dead-end hint row: a
 // profession master's gossip dialog shows one non-interactive line pointing at
 // the q_prof_intro giver until the viewer has completed the intro. These arms
@@ -19,9 +22,7 @@ import { questStrings } from '../src/ui/i18n.catalog/quests';
 // key the row renders.
 describe('profession intro hint row', () => {
   it('shows for Smith Haldren before q_prof_intro is completed', () => {
-    expect(professionIntroHintVisible(GUILD_LETTER_SPOKESMAN_NPC_ID, 'available', false)).toBe(
-      true,
-    );
+    expect(hintVisible(GUILD_LETTER_SPOKESMAN_NPC_ID, 'available', false)).toBe(true);
     expect(GUILD_LETTER_SPOKESMAN_NPC_ID).toBe('smith_haldren');
   });
 
@@ -30,30 +31,29 @@ describe('profession intro hint row', () => {
     // is Haldren, but the shared dialog builder covers all masters.
     expect(STATIONS.length).toBe(6);
     for (const station of STATIONS) {
-      expect(isProfessionMasterNpc(station.masterNpcId), station.masterNpcId).toBe(true);
-      expect(
-        professionIntroHintVisible(station.masterNpcId, 'available', false),
-        station.masterNpcId,
-      ).toBe(true);
+      expect(isProfessionMasterNpc(station.masterNpcId, STATIONS), station.masterNpcId).toBe(true);
+      expect(hintVisible(station.masterNpcId, 'available', false), station.masterNpcId).toBe(true);
     }
+  });
+
+  it('does not recognize a built-in station master when the active world has no stations', () => {
+    expect(isProfessionMasterNpc('forgemistress_darva', [])).toBe(false);
+    expect(professionIntroHintVisible('forgemistress_darva', 'available', false, [])).toBe(false);
   });
 
   it('stays visible while the intro is active or ready (pinned semantics)', () => {
     // Chosen semantics: only completion retires the row; while the intro is
     // merely accepted (active) or awaiting turn-in (ready) it still points
     // home to Foreman Odell, who is both giver and turn-in.
-    expect(professionIntroHintVisible('smith_haldren', 'active', false)).toBe(true);
-    expect(professionIntroHintVisible('smith_haldren', 'ready', false)).toBe(true);
-    expect(professionIntroHintVisible('smith_haldren', 'unavailable', false)).toBe(true);
+    expect(hintVisible('smith_haldren', 'active', false)).toBe(true);
+    expect(hintVisible('smith_haldren', 'ready', false)).toBe(true);
+    expect(hintVisible('smith_haldren', 'unavailable', false)).toBe(true);
   });
 
   it('hides after q_prof_intro is completed', () => {
-    expect(professionIntroHintVisible('smith_haldren', 'done', false)).toBe(false);
+    expect(hintVisible('smith_haldren', 'done', false)).toBe(false);
     for (const station of STATIONS) {
-      expect(
-        professionIntroHintVisible(station.masterNpcId, 'done', false),
-        station.masterNpcId,
-      ).toBe(false);
+      expect(hintVisible(station.masterNpcId, 'done', false), station.masterNpcId).toBe(false);
     }
   });
 
@@ -62,17 +62,17 @@ describe('profession intro hint row', () => {
     // found the guild: a permanent "go meet the guild" line would read as a
     // bug. Attunement alone retires the row in every remaining state.
     for (const state of ['unavailable', 'available', 'active', 'ready'] as const) {
-      expect(professionIntroHintVisible('smith_haldren', state, true), state).toBe(false);
+      expect(hintVisible('smith_haldren', state, true), state).toBe(false);
     }
     // The refinement never resurrects the row post-completion either.
-    expect(professionIntroHintVisible('smith_haldren', 'done', true)).toBe(false);
+    expect(hintVisible('smith_haldren', 'done', true)).toBe(false);
   });
 
   it('never shows for a non-master NPC in any quest state', () => {
     const states: QuestState[] = ['unavailable', 'available', 'active', 'ready', 'done'];
     for (const state of states) {
-      expect(professionIntroHintVisible('marshal_redbrook', state, false), state).toBe(false);
-      expect(professionIntroHintVisible('foreman_odell', state, false), state).toBe(false);
+      expect(hintVisible('marshal_redbrook', state, false), state).toBe(false);
+      expect(hintVisible('foreman_odell', state, false), state).toBe(false);
     }
   });
 

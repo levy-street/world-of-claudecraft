@@ -69,4 +69,23 @@ describe('chunked DataTexture upload', () => {
     expect(beforeChunk).toHaveBeenCalledOnce();
     expect(initTexture).toHaveBeenCalledOnce();
   });
+
+  it('awaits an injected per-chunk GPU scheduler', async () => {
+    const texture = new THREE.Texture();
+    const initTexture = vi.fn();
+    let release!: () => void;
+    const uploadChunk = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const upload = uploadDataTextureInChunks({ initTexture }, texture, { uploadChunk });
+
+    await Promise.resolve();
+    expect(uploadChunk).toHaveBeenCalledWith(texture);
+    expect(initTexture).not.toHaveBeenCalled();
+    release();
+    await expect(upload).resolves.toBe(1);
+  });
 });

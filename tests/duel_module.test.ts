@@ -69,18 +69,24 @@ describe('duel module: endDuel resolution', () => {
     expect(end).toBeTruthy();
     expect(end.winnerName).toBe('Aleph');
     expect(end.loserName).toBe('Bet');
-    expect(sim.duels.has(a)).toBe(false);
-    expect(sim.duels.has(b)).toBe(false);
+    // endDuel() marks the entry ended (endedTick) but defers the actual
+    // ctx.duels delete to updateDuels()'s tick-tail purge, so a same-tick
+    // reciprocal lethal hit can still find and clamp it; duelFor() is the
+    // purge-order-independent way to observe "the duel has ended" from
+    // outside duel.ts.
+    expect(duel.duelFor(sim.ctx, a)).toBeNull();
+    expect(duel.duelFor(sim.ctx, b)).toBeNull();
   });
 
   it('a draw resolution (null winner) ends the bout with no duelEnd, just a notice', () => {
-    const { sim, d } = seatedDuel();
+    const { sim, a, b, d } = seatedDuel();
     sim.drainEvents();
     duel.endDuel(sim.ctx, d, null);
     const ev = sim.drainEvents();
     expect(ev.some((e: any) => e.type === 'duelEnd')).toBe(false);
     const endedLogs = ev.filter((e: any) => e.type === 'log' && e.text === 'The duel has ended.');
     expect(endedLogs.length).toBe(2); // one to each combatant
-    expect(sim.duels.size).toBe(0);
+    expect(duel.duelFor(sim.ctx, a)).toBeNull();
+    expect(duel.duelFor(sim.ctx, b)).toBeNull();
   });
 });

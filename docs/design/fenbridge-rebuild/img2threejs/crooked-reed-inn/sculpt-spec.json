@@ -1,0 +1,1858 @@
+{
+  "targetName": "Fenbridge Crooked Reed Inn",
+  "targetId": "fenbridge-crooked-reed-inn",
+  "schemaVersion": "2.1",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/hero.png",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js exterior building",
+    "geometryTerms": [
+      "silhouette",
+      "assembled solid",
+      "extruded profile",
+      "ridge",
+      "eave",
+      "negative space"
+    ],
+    "materialTerms": ["albedo", "roughness", "normal response", "ambient occlusion", "emissive"],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "environment light",
+      "contact shadow",
+      "ACES tone mapping"
+    ],
+    "descriptionRule": "Use object-space dimensions and observable exterior construction; never invent an interior."
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "raised exterior-only marsh inn and provision house",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized low-poly", "crooked timber construction", "swamp vernacular"],
+      "structureKind": [
+        "closed timber shell",
+        "raised porch",
+        "layered roof",
+        "attached service facade"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed service sockets",
+        "nonblocking attached clutter"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "rope and reeds",
+        "warm glass"
+      ],
+      "notes": "Geometry is reconstructed from the four admitted crops; the rejected whole-sheet mask is not used."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 12,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The broad raised body, deep porch and bent roof are co-equal macro forms.",
+        "The side counter, reed sign, dormer, chimney and attached fishing clutter provide the service read.",
+        "Hidden roof underside and sign thickness use conservative inferred geometry."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Multi-angle service geometry and porch negative space must remain explicit before the final two-bucket merge."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "bent-roof-ridge",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "bent-ridge-profile"
+          }
+        },
+        {
+          "id": "layered-teal-eaves",
+          "kind": "ridge",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "layered-eave-courses"
+          }
+        },
+        {
+          "id": "raised-porch-undercroft",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "open-piling-undercroft"
+          }
+        },
+        {
+          "id": "rope-rail-net",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rope-rail-and-net"
+          }
+        },
+        {
+          "id": "provision-rain-awning",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "counter-rain-awning"
+          }
+        },
+        {
+          "id": "hanging-reed-bundle",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "reed-bundle-sign"
+          }
+        },
+        {
+          "id": "dormer-window-grid",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "dormer-window-grid"
+          }
+        },
+        {
+          "id": "chimney-masonry-courses",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "chimney-cap-courses"
+          }
+        },
+        {
+          "id": "wet-timber-grain",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/wet-timber-grain"
+          }
+        },
+        {
+          "id": "warm-window-glow",
+          "kind": "emissive",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-emissive/amber-window-glow"
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false
+    }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "A floor-seated 9 by 8.8 by 8 yard shell reads as the Crooked Reed Inn from all four views and preserves the clear local x=-2.8 porch entrance/service approach."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "inn-silhouette",
+        "name": "Raised broad inn and bent roof",
+        "required": true,
+        "qualityCriteria": ["Broad width, lifted floor, chimney and bent ridge remain legible."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
+      },
+      {
+        "id": "porch-system",
+        "name": "Deep porch and clear entrance",
+        "required": true,
+        "qualityCriteria": [
+          "Posts, steps, undercroft and rope rail create real depth without blocking entry."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["porch collapses into facade trim"]
+      },
+      {
+        "id": "provision-service",
+        "name": "Provision counter and rain awning",
+        "required": true,
+        "qualityCriteria": ["Counter remains attached and readable from the civic-facing side."],
+        "evidenceRefs": ["side", "hero"],
+        "failureModes": ["service identity is absent"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Swamp material and warm-light separation",
+        "required": true,
+        "qualityCriteria": ["Timber, stone, teal roof, rope and amber glazing remain distinct."],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["semantic colors flatten"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "bent ridge silhouette",
+      "porch undercroft",
+      "counter awning depth",
+      "reed sign placement",
+      "material separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not replace the bent roof with a straight generic gable.",
+      "Keep all service clutter attached and exterior."
+    ],
+    "mustNotDo": ["No interior.", "No readable sign.", "No detached player-lane clutter."]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "raised broad silhouette",
+      "bent teal roof",
+      "deep porch",
+      "provision counter",
+      "reed sign"
+    ],
+    "niceToHave": ["fixed barrel and crate arrangement", "restrained rope sag"],
+    "reviewViewpoints": ["front", "left-side", "rear", "front-three-quarter"]
+  },
+  "coordinateFrame": {
+    "front": "+Z",
+    "up": "+Y",
+    "right": "+X",
+    "units": "world-yards",
+    "scaleReference": "native bounds 9 x 8.8 x 8"
+  },
+  "assumptions": [
+    "The approved output is a stylized approximation, not photogrammetry.",
+    "The unseen roof underside and reed-bundle back use simple watertight depth.",
+    "Barrel, crate and rope counts are fixed to a representative arrangement where generated views disagree."
+  ],
+  "silhouette": {
+    "boundingShape": "broad two-level timber mass raised above a deep porch beneath a tall sagging teal gable",
+    "aspectRatios": [
+      "width:height about 1.02",
+      "depth:width about 0.89",
+      "porch depth:building depth about 0.2"
+    ],
+    "symmetry": "near-symmetric main shell with asymmetric chimney, sign and service counter",
+    "dominantCurves": ["shallow concave ridge", "upturned eave tips", "sagging rope rails"],
+    "negativeSpaces": [
+      "open porch undercroft",
+      "gaps between porch posts",
+      "counter opening beneath awning"
+    ],
+    "landmarks": [
+      "left chimney",
+      "central dormer",
+      "full-width porch",
+      "hanging reed bundle",
+      "side provision awning"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/front.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["porch depth", "offset entrance", "dormer", "chimney", "reed sign"],
+      "confidence": 0.96
+    },
+    {
+      "id": "side",
+      "view": "left-side",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/side.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["provision counter", "rain awning", "building depth", "rear porch rail"],
+      "confidence": 0.93
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/rear.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["rear wall bays", "raised piling base", "rear windows", "roof depth"],
+      "confidence": 0.94
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/hero.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["complete volume", "attached clutter", "roof curvature", "porch approach"],
+      "confidence": 0.97
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "building-shell",
+      "name": "Raised timber inn shell and piling base",
+      "level": "macro",
+      "role": "building-shell",
+      "importance": 1,
+      "confidence": 0.97,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The visible body is a closed collection of planar timber wall bays seated above stone and piling blocks.",
+      "parent": null,
+      "dimensions": {
+        "width": 8.6,
+        "height": 5.25,
+        "depth": 7.2,
+        "units": "yards",
+        "confidence": 0.94
+      },
+      "transform": {
+        "position": [0, 2.8, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "open-piling-undercroft",
+          "type": "contour",
+          "geometryEffect": "raised porch and shell on alternating stone-capped posts with visible gaps",
+          "placement": "full lower perimeter",
+          "confidence": 0.95
+        },
+        {
+          "id": "vertical-wall-bays",
+          "type": "seam",
+          "geometryEffect": "timber posts divide dark vertical plank wall panels",
+          "placement": "front, side and rear walls",
+          "confidence": 0.93
+        }
+      ],
+      "evidenceRefs": ["front", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(78, 86, 80, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "roof-system",
+      "name": "Bent teal roof, dormer and chimney",
+      "level": "macro",
+      "role": "roof-shell",
+      "importance": 1,
+      "confidence": 0.94,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The roof is a layered faceted shell with a shallow concave ridge, projecting eaves and separate masonry chimney.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 8.8,
+        "height": 3.5,
+        "depth": 7.5,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [0, 5.25, -0.1],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "bent-ridge-profile",
+          "type": "contour",
+          "geometryEffect": "three faceted roof bands create a low center and kicked tips",
+          "placement": "ridge and both gable edges",
+          "confidence": 0.9
+        },
+        {
+          "id": "layered-eave-courses",
+          "type": "ridge",
+          "geometryEffect": "stepped teal courses project beyond a dark timber fascia",
+          "placement": "front and rear eaves",
+          "confidence": 0.93
+        },
+        {
+          "id": "dormer-window-grid",
+          "type": "linework",
+          "geometryEffect": "central gabled dormer with chunky amber pane grid",
+          "placement": "front roof slope",
+          "confidence": 0.97
+        },
+        {
+          "id": "chimney-cap-courses",
+          "type": "seam",
+          "geometryEffect": "wide stacked dark-stone chimney with projecting cap",
+          "placement": "left rear roof",
+          "confidence": 0.96
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(46, 52, 49, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.86
+      }
+    },
+    {
+      "id": "porch-system",
+      "name": "Full-width porch, posts, steps and rope rail",
+      "level": "meso",
+      "role": "porch-system",
+      "importance": 0.98,
+      "confidence": 0.97,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Deck boards, posts, steps and rails are discrete rigid construction members with intentional open gaps.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 8.8,
+        "height": 2.4,
+        "depth": 1.7,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [0, 1.4, 3.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "rope-rail-and-net",
+          "type": "linework",
+          "geometryEffect": "faceted rope spans and one shallow half-torus net sag",
+          "placement": "front rail between posts",
+          "confidence": 0.91
+        },
+        {
+          "id": "offset-entry-steps",
+          "type": "contour",
+          "geometryEffect": "four broad stone steps align exactly to the entrance at local x=-2.8",
+          "placement": "front-left porch bay",
+          "confidence": 1
+        }
+      ],
+      "evidenceRefs": ["front", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(82, 59, 41, 1)",
+        "secondaryAlbedo": "rgba(141, 118, 80, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "provision-counter",
+      "name": "Exterior provision counter and canvas rain awning",
+      "level": "meso",
+      "role": "service-facade",
+      "importance": 0.92,
+      "confidence": 0.92,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The counter, backboard and shallow cloth plane are attached facade volumes rather than an accessible interior.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 2.3,
+        "height": 2.9,
+        "depth": 1.2,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [2.7, 1.8, 3.9],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "counter-rain-awning",
+          "type": "contour",
+          "geometryEffect": "teal sloped canopy projects above a closed timber sales counter",
+          "placement": "front-right service bay",
+          "confidence": 0.94
+        },
+        {
+          "id": "counter-cargo-bays",
+          "type": "seam",
+          "geometryEffect": "attached barrel and crate silhouettes frame but do not block the counter",
+          "placement": "counter outer corners",
+          "confidence": 0.86
+        }
+      ],
+      "evidenceRefs": ["side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(39, 106, 111, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.8
+      }
+    },
+    {
+      "id": "reed-sign",
+      "name": "Hanging reed-bundle sign and timber gallows",
+      "level": "meso",
+      "role": "identity-marker",
+      "importance": 0.86,
+      "confidence": 0.86,
+      "primitive": "instanced-cluster",
+      "topologyClass": "fiber-strand",
+      "topologyRationale": "The sign is a bound cluster of repeated tapered reeds suspended from a short rigid gallows.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 1.4,
+        "height": 2.1,
+        "depth": 0.6,
+        "units": "yards",
+        "confidence": 0.78
+      },
+      "transform": {
+        "position": [-4.0, 3.2, 3.6],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "reed-bundle-sign",
+          "type": "contour",
+          "geometryEffect": "six tapered reed slats gather under two rope bands with no text or emblem",
+          "placement": "outer porch corner",
+          "confidence": 0.88
+        }
+      ],
+      "evidenceRefs": ["front", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(141, 118, 80, 1)",
+        "secondaryAlbedo": "rgba(82, 59, 41, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.82
+      }
+    },
+    {
+      "id": "facade-lighting",
+      "name": "Amber facade windows and lantern pair",
+      "level": "meso",
+      "role": "lighting-landmarks",
+      "importance": 0.84,
+      "confidence": 0.97,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Warm panes and lantern cages are shallow repeated facade relief backed by emissive geometry.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 8,
+        "height": 3.1,
+        "depth": 0.25,
+        "units": "yards",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [0, 2.5, 3.62],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-emissive",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "amber-pane-grid",
+          "type": "emissive",
+          "geometryEffect": "warm inset panes remain divided by dark timber muntins",
+          "placement": "front, rear and dormer windows",
+          "confidence": 0.97
+        }
+      ],
+      "evidenceRefs": ["front", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(255, 164, 58, 1)",
+        "secondaryAlbedo": "rgba(255, 221, 119, 1)",
+        "materialClass": "glass",
+        "materialClassConfidence": 0.88
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "fenbridge-opaque",
+      "name": "Merged Fenbridge opaque vertex-color material",
+      "type": "standard-with-low-lambert-path",
+      "shaderModel": "MeshStandardMaterial on Standard/Ultra; semantic vertex-color Lambert-compatible Low path",
+      "baseColor": "#FFFFFF",
+      "albedo": {
+        "dominant": "semantic COLOR_0",
+        "secondary": ["dark timber", "damp stone", "teal shingles", "rope", "canvas"],
+        "samplingNotes": "Reference values define semantic families; baked studio highlights are not copied."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#4E5650", "#176269", "#8D7650", "#276A6F"],
+        "pattern": "bounded semantic vertex-color regions",
+        "amplitude": 0.1
+      },
+      "roughness": {
+        "base": 0.84,
+        "variation": 0.18,
+        "map": "independent shared Fenbridge roughness atlas"
+      },
+      "metalness": {
+        "base": 0.04,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "independent shared Fenbridge normal atlas",
+        "strength": 0.18
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.22,
+        "contactShadowBias": 0.34
+      },
+      "localOverrides": [
+        {
+          "id": "wet-timber-grain",
+          "region": "wall boards, porch members and trim",
+          "pattern": "axial low-frequency grain with darker lower damp band",
+          "roughness": 0.86,
+          "evidenceRefs": ["front", "hero"]
+        },
+        {
+          "id": "teal-roof-edge-wear",
+          "region": "eave course crests and ridge tips",
+          "pattern": "restrained lighter exposed facets",
+          "roughness": 0.72,
+          "evidenceRefs": ["front", "hero"]
+        },
+        {
+          "id": "stone-contact-damp",
+          "region": "foundation and chimney joints",
+          "pattern": "cavity-biased darkening",
+          "roughness": 0.91,
+          "evidenceRefs": ["front", "rear"]
+        }
+      ]
+    },
+    {
+      "id": "fenbridge-emissive",
+      "name": "Merged Fenbridge warm emissive material",
+      "type": "standard-emissive",
+      "shaderModel": "MeshStandardMaterial emissive bucket",
+      "baseColor": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#FFDD77"],
+        "samplingNotes": "Restrained amber panes, no punctual lights embedded."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77"],
+        "pattern": "pane-center value lift",
+        "amplitude": 0.08
+      },
+      "roughness": {
+        "base": 0.3,
+        "variation": 0.06,
+        "map": "independent scalar policy"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "none; pane relief is geometry",
+        "strength": 0.01
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.08,
+        "contactShadowBias": 0.18
+      },
+      "localOverrides": [
+        {
+          "id": "amber-window-glow",
+          "region": "window panes and lantern cores",
+          "emissiveColor": "#FFB14A",
+          "emissiveIntensity": 1.2,
+          "roughness": 0.28,
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "porch-post-and-rail-system",
+      "componentRef": "porch-system",
+      "method": "fixed repeated primitives merged by semantic bucket",
+      "countMax": 14,
+      "distribution": "full front porch perimeter",
+      "buildsGeometry": true,
+      "geometry": "box posts plus faceted rope spans",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    },
+    {
+      "id": "window-grid-system",
+      "componentRef": "facade-lighting",
+      "method": "fixed shallow pane and muntin modules",
+      "countMax": 7,
+      "distribution": "front, rear and dormer",
+      "buildsGeometry": true,
+      "geometry": "arched panes with crossbars",
+      "drawCallPolicy": "opaque frame plus emissive pane merge"
+    },
+    {
+      "id": "roof-course-system",
+      "componentRef": "roof-system",
+      "method": "three bounded faceted roof bands",
+      "count": 3,
+      "distribution": "front and rear slopes",
+      "buildsGeometry": true,
+      "geometry": "offset roof shells",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    }
+  ],
+  "lookDevTargets": {
+    "qualityPriority": "game-ready-reference-informed",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "acceptedLimitation": "studio-lit concept pixels provide material-family evidence, not exact inverse-rendered maps"
+      }
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "environment light",
+        "exposure",
+        "ACES tone mapping",
+        "contact shadow"
+      ],
+      "mustAvoid": ["ambient-only lighting", "baked highlights treated as albedo"]
+    },
+    "screenshotReview": [
+      "Compare fixed front and hero silhouettes.",
+      "Check porch negative space at player scale.",
+      "Check teal roof, timber and amber separation on Low and Ultra."
+    ]
+  },
+  "lightingFromPhoto": [
+    "Neutral upper-left key light reveals roof courses without copying baked highlights; exposure 1.0 with ACES tone mapping.",
+    "Soft frontal fill preserves dark timber construction and amber-pane separation.",
+    "Neutral environment rim plus floor contact shadow proves porch-pile seating and counter depth."
+  ],
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.7,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Review only identity-defining grouped systems from the same comparison pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "wrong bent-roof silhouette",
+      "missing porch depth",
+      "counter or reed sign not exterior-readable"
+    ],
+    "codeRefineTriggers": [
+      "model diverges from a sound component contract",
+      "triangle ceiling exceeded"
+    ],
+    "stopCriteria": [
+      "all critical features score at least 0.70",
+      "new reference required for unresolved hidden geometry"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "repo preview renderer",
+      "fallbackCapture": "browser screenshot",
+      "minimumEvidence": "reference, render, comparison sheet and feature scores",
+      "reviewPairRule": "match each admitted crop to the same camera",
+      "acceptanceAuthority": "agent visual review"
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "crooked-inn-silhouette",
+      "name": "Broad raised body, bent teal roof, chimney and dormer",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["building-shell", "roof-system"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "deep-porch-approach",
+      "name": "Deep porch, open undercroft, rope rail and local x=-2.8 entrance steps",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["porch-system"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "provision-service-read",
+      "name": "Attached provision counter and teal rain awning",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["provision-counter"],
+      "evidenceRefs": ["side", "hero"]
+    },
+    {
+      "id": "reed-sign-landmark",
+      "name": "Unreadable bound-reed hanging sign",
+      "tier": "critical",
+      "passIds": ["form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["reed-sign"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "swamp-material-read",
+      "name": "Dark timber, damp stone, teal roof and amber window separation",
+      "tier": "critical",
+      "passIds": ["material-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["building-shell", "roof-system", "facade-lighting"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "fixed-attached-clutter",
+      "name": "Barrels, crates, net and rope remain attached and bounded",
+      "tier": "important",
+      "passIds": ["form-refinement", "interaction-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["porch-system", "provision-counter"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Exterior-only model stays within 5,200 triangles and 350 KiB",
+      "tier": "important",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["building-shell"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Lock native bounds and macro silhouette.",
+      "componentRefs": ["building-shell", "roof-system"],
+      "acceptance": ["Raised broad silhouette and bent roof match front and hero crops."]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build porch and service hierarchy.",
+      "componentRefs": ["porch-system", "provision-counter", "reed-sign"],
+      "acceptance": ["All exterior systems are attached and the central approach remains clear."]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Add observed roof, rope, dormer, sign and cargo geometry.",
+      "componentRefs": ["roof-system", "porch-system", "reed-sign", "facade-lighting"],
+      "acceptance": ["Every inventoried component detail has implemented geometry."]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Apply semantic colors and two-bucket material response.",
+      "componentRefs": ["building-shell", "roof-system", "facade-lighting"],
+      "acceptance": ["Low and Ultra retain timber, stone, roof and amber separation."]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Verify clear porch, service apron and runtime-owned collision intent.",
+      "componentRefs": ["porch-system", "provision-counter"],
+      "acceptance": ["No attached clutter blocks the standing points or steps."]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Merge and verify shipping budgets.",
+      "componentRefs": ["building-shell"],
+      "acceptance": ["At most two primitives, no interior, at most 5,200 triangles and 350 KiB."]
+    }
+  ],
+  "sculptPipeline": {
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "passGateMode": "locked-sequential",
+    "nextRequiredEvidence": [],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed"
+  },
+  "actionReadiness": {
+    "contract": "Static exterior hierarchy with stable service and entrance sockets; gameplay collision remains runtime-owned.",
+    "defaultRigType": "static-town-asset",
+    "rootMotionNode": "building-shell",
+    "requiredComponentFields": ["semantic id", "parent", "native transform"],
+    "transformChannels": ["root translate", "root rotate", "visibility", "material state"],
+    "authoringRules": ["No detachable clutter.", "No shipping collision mesh."],
+    "destructionPolicy": {
+      "defaultBreakable": false
+    }
+  },
+  "performanceBudget": {
+    "targetTriangles": 4000,
+    "hardTriangleCeiling": 5200,
+    "hardByteCeiling": 358400,
+    "maxShippingPrimitives": 2,
+    "texturePolicy": "three shared external Fenbridge support maps; no embedded raster texture"
+  },
+  "proceduralStrategy": [
+    "Build a closed timber shell and raised porch from boxes.",
+    "Approximate the bent roof with bounded faceted roof bands and kicked trim.",
+    "Use fixed repeated primitives for posts, rails, windows and reeds.",
+    "Merge all opaque and emissive geometry into the two shipping buckets."
+  ],
+  "risks": [
+    "Whole-sheet fragmentation makes only isolated crops authoritative.",
+    "Generated views disagree on small clutter counts; the fixed shipping arrangement is intentionally representative.",
+    "The material recipe is reference-informed and stylized, not exact inverse rendering."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Crooked Reed Inn stylized exterior timber inn porch procedural building low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  },
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:19.000418+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.048014+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.093970+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.140337+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.191269+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:19.000418+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for crooked_reed_inn.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.048014+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for crooked_reed_inn.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.093970+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for crooked_reed_inn.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.140337+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for crooked_reed_inn.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.191269+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.77,
+        "componentStructure": 0.83,
+        "formDetail": 0.81,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "crooked-inn-silhouette",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed broad raised body, bent teal roof, chimney and dormer at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deep-porch-approach",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed deep porch, open undercroft, rope rail and local x=-2.8 entrance steps at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "provision-service-read",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed attached provision counter and teal rain awning at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "reed-sign-landmark",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed unreadable bound-reed hanging sign at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "swamp-material-read",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed dark timber, damp stone, teal roof and amber window separation at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-attached-clutter",
+          "visible": true,
+          "score": 0.8,
+          "notes": "Independent visual audit passed barrels, crates, net and rope remain attached and bounded at 0.80 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,200 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for crooked_reed_inn.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.226076+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for crooked_reed_inn.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/crooked_reed_inn-comparison.png"
+      ]
+    }
+  ]
+}

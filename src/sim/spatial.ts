@@ -6,6 +6,7 @@ import type { Entity } from './types';
 
 // shifts negative cell coordinates into the positive range before packing
 const OFFSET = 32768;
+const MAX_LINEAR_EXISTENCE_SCAN = 32;
 
 export class SpatialGrid {
   private cells = new Map<number, Entity[]>();
@@ -93,5 +94,45 @@ export class SpatialGrid {
         }
       }
     }
+  }
+
+  // Return as soon as any entity is found within `radius`. Keep this separate
+  // from forEachInRadius so hot-path existence checks do not allocate a closure
+  // or keep walking occupied cells after the answer is known.
+  hasInRadius(x: number, z: number, radius: number): boolean {
+    const cs = this.cellSize;
+    const minCx = Math.floor((x - radius - 1) / cs) + OFFSET;
+    const maxCx = Math.floor((x + radius + 1) / cs) + OFFSET;
+    const minCz = Math.floor((z - radius - 1) / cs) + OFFSET;
+    const maxCz = Math.floor((z + radius + 1) / cs) + OFFSET;
+    const r2 = radius * radius;
+    const queryCellCount = (maxCx - minCx + 1) * (maxCz - minCz + 1);
+
+    // Hash lookups across a broad empty window cost more than checking a tiny
+    // roster directly. Keep that linear path bounded so large grids retain
+    // spatial-query scaling while small grids avoid dozens of empty Map.gets.
+    if (this.where.size <= Math.min(MAX_LINEAR_EXISTENCE_SCAN, queryCellCount)) {
+      for (const list of this.cells.values()) {
+        for (const e of list) {
+          const dx = e.pos.x - x;
+          const dz = e.pos.z - z;
+          if (dx * dx + dz * dz <= r2) return true;
+        }
+      }
+      return false;
+    }
+
+    for (let cx = minCx; cx <= maxCx; cx++) {
+      for (let cz = minCz; cz <= maxCz; cz++) {
+        const list = this.cells.get(cx * 65536 + cz);
+        if (!list) continue;
+        for (const e of list) {
+          const dx = e.pos.x - x;
+          const dz = e.pos.z - z;
+          if (dx * dx + dz * dz <= r2) return true;
+        }
+      }
+    }
+    return false;
   }
 }

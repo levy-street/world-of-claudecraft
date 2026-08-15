@@ -35,7 +35,10 @@ export function clampUiScale(raw: unknown): number {
  * unknowns as they come from the DOM / localStorage, so callers can unit-test
  * the precedence without a browser.
  */
-export function resolveUiScale(cssVar: string | null | undefined, persistedJson: string | null | undefined): number {
+export function resolveUiScale(
+  cssVar: string | null | undefined,
+  persistedJson: string | null | undefined,
+): number {
   const fromCss = cssVar != null && cssVar.trim() !== '' ? Number(cssVar) : NaN;
   if (Number.isFinite(fromCss)) return clampUiScale(fromCss);
   if (persistedJson) {

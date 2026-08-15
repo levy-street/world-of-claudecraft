@@ -14,8 +14,11 @@ import {
   demonTowerArenaPolygon,
   isDemonTowerSeed,
 } from '../src/sim/content/rift/demon_tower';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { riftRankTemplate } from '../src/sim/rift/ranks';
 import { generateRiftFloor, generateRiftPlan, riftFloorCount } from '../src/sim/rift/rift_gen';
+import { demonTowerRankTuning } from '../src/sim/rift/tower';
 import {
   DEMON_TOWER_FLOOR_COUNT,
   demonTowerArenaRadius,
@@ -34,12 +37,13 @@ const TOWER_WORLD: WorldContent = {
   groundObjects: [],
 };
 
-function makeSim() {
+function makeSim(riftPortals = false) {
   const sim = new Sim({
     seed: 4242,
     playerClass: 'warrior',
     autoEquip: true,
     devCommands: true,
+    riftPortals,
     world: TOWER_WORLD,
   });
   sim.setPlayerLevel(20);
@@ -263,6 +267,40 @@ describe('demon tower: a live run', () => {
     expect(inst.bossId).toBeNull();
     expect(inst.puzzleSolved).toBe(false);
 
+    // Summoned boss adds must inherit this floor's Tower curve, not the S-rank
+    // portal table. v0.38.0 retuned S independently, so confusing the two makes
+    // these adds several times deadlier without touching Tower tuning.
+    if (!boss) throw new Error('gatekeeper did not spawn');
+    const summon = sim as unknown as {
+      spawnBossAdds(entity: typeof boss, mobId: string, count: number): void;
+    };
+    summon.spawnBossAdds(boss, 'tower_imp', 1);
+    const addId = boss.summonedIds.at(-1);
+    const add = addId === undefined ? undefined : sim.entities.get(addId);
+    expect(add).toBeTruthy();
+    const rankTuning = demonTowerRankTuning(inst.floorIndex);
+    const expected = createMob(
+      -1,
+      riftRankTemplate(MOBS.tower_imp, rankTuning, 'add'),
+      boss.level,
+      add?.pos ?? boss.pos,
+    );
+    expect({
+      maxHp: add?.maxHp,
+      weapon: add?.weapon,
+      armor: add?.stats.armor,
+      moveSpeed: add?.moveSpeed,
+      mechanicDamageMult: add?.mechanicDamageMult,
+      mechanicHealMult: add?.mechanicHealMult,
+    }).toEqual({
+      maxHp: expected.maxHp,
+      weapon: expected.weapon,
+      armor: expected.stats.armor,
+      moveSpeed: expected.moveSpeed,
+      mechanicDamageMult: rankTuning.addDamageMultiplier,
+      mechanicHealMult: rankTuning.healthMultiplier,
+    });
+
     killLiveDemons(sim, inst);
     tickAlive(sim, SWEEP);
     expect(inst.puzzleSolved).toBe(true);
@@ -270,8 +308,14 @@ describe('demon tower: a live run', () => {
   });
 
   it('climbs all ten floors and the summit boss claims the run', () => {
-    const sim = makeSim();
-    sim.enterRift(DEMON_TOWER_SEED, 20, sim.player.id);
+    const sim = makeSim(true);
+    sim.tick();
+    const door = [...sim.entities.values()].find(
+      (e) => e.templateId === 'rift_portal' && e.riftSeed === DEMON_TOWER_SEED,
+    );
+    expect(door).toBeTruthy();
+    sim.player.pos = { ...door!.pos };
+    sim.tick();
     const inst = towerInstance(sim);
 
     for (let k = 0; k < DEMON_TOWER_FLOOR_COUNT - 1; k++) {
@@ -299,5 +343,8 @@ describe('demon tower: a live run', () => {
     tickAlive(sim, SWEEP);
     expect(inst.bossDiedAtTick).not.toBeNull();
     expect(inst.exitId).not.toBeNull();
+    // A natural/dev rift seals its entry after a clear. The tower is a permanent
+    // landmark and must remain available for the next raid.
+    expect(sim.entities.get(door!.id)).toBe(door);
   });
 });

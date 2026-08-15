@@ -19,6 +19,12 @@
 export function bindDialogKeyActivation(root: HTMLElement): void {
   root.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
+    // Ignore OS key REPEAT. The row that opens a confirm dialog is itself
+    // activated on keydown (hud.ts bindContextMenuActions), and the dialog
+    // auto-focuses OK, so a held Enter would repeat straight through onto the
+    // accept button and confirm a destroy the player never got to read. Only
+    // the first press of a key can activate.
+    if (e.repeat) return;
     const active = root.ownerDocument.activeElement;
     if (!(active instanceof HTMLElement) || !root.contains(active)) return;
     if (!active.matches('button, [role="button"]')) return;

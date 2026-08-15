@@ -107,7 +107,7 @@
   .warning {
     padding: 9px 11px;
     color: var(--text-dim);
-    background: #14131a;
+    background: var(--surface-inset);
     border-left: 2px solid var(--gold-dim);
     border-radius: 3px;
     font-size: 12px;

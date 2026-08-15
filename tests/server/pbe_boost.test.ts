@@ -36,12 +36,32 @@ import {
 } from '../../server/pbe_boost';
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
-import { ITEMS, QUESTS } from '../../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, QUESTS } from '../../src/sim/data';
 import { canEquipItem, canEquipItemInSlot, isShieldItem } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
-import { type EquipSlot, type PlayerClass, xpToReachLevel } from '../../src/sim/types';
+import {
+  type EquipSlot,
+  type PlayerClass,
+  type WorldContent,
+  xpToReachLevel,
+} from '../../src/sim/types';
+
+// The Sim instances this file constructs directly (round-trip loads and the
+// world-join top-up tests) only ever touch the player entity: equip/level/quest
+// cheats and a fresh-load re-serialize. None of them walk up to an ambient mob,
+// NPC, or ground object, so the full built-in world's camps/npcs/groundObjects
+// are pure spawn-time cost here. Mirrors the EMPTY_TEST_WORLD pattern in
+// tests/sim_shared.ts, defined locally per the gate-perf batch's isolation rule
+// (every other file in this batch is edited in parallel; this file must not
+// import from a shared fixture module another task may also be touching).
+const PBE_BOOST_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 // Deterministic stand-in for crypto.randomInt so name/skin tests are stable.
 // Uses the HIGH bits of the LCG state: the low bits have tiny periods and
@@ -198,7 +218,13 @@ describe('buildBoostedCharacterState', () => {
   it('round-trips through a fresh Sim load (the server login path shape)', () => {
     const state = buildBoostedCharacterState('mage', 'Pbetestmage', 1);
     const revived = JSON.parse(JSON.stringify(state)) as CharacterState;
-    const sim = new Sim({ seed: 99, playerClass: 'mage', playerName: 'unused', noPlayer: true });
+    const sim = new Sim({
+      seed: 99,
+      playerClass: 'mage',
+      playerName: 'unused',
+      noPlayer: true,
+      world: PBE_BOOST_TEST_WORLD,
+    });
     const pid = sim.addPlayer('mage', 'Pbetestmage', { state: revived });
     const reloaded = sim.serializeCharacter(pid);
     expect(reloaded?.level).toBe(BOOST_LEVEL);
@@ -211,7 +237,12 @@ describe('applyBoostKitToPlayer (world-join top-up)', () => {
   it('re-kits an existing PvP-geared character: BiS worn, old gear kept, once only', () => {
     // The 2026-07-21 playtest shape: a pre-boost character at the cap wearing
     // honor gear with no boost stamp.
-    const sim = new Sim({ seed: 41, playerClass: 'warrior', playerName: 'Pvptester' });
+    const sim = new Sim({
+      seed: 41,
+      playerClass: 'warrior',
+      playerName: 'Pvptester',
+      world: PBE_BOOST_TEST_WORLD,
+    });
     const pid = sim.playerId;
     sim.setPlayerLevel(BOOST_LEVEL, pid);
     const pvpPiece = Object.values(WARFARE_ITEMS).find(
@@ -243,7 +274,12 @@ describe('applyBoostKitToPlayer (world-join top-up)', () => {
   });
 
   it('swaps a smaller equipped bag for the boost bag and keeps it', () => {
-    const sim = new Sim({ seed: 43, playerClass: 'rogue', playerName: 'Bagtester' });
+    const sim = new Sim({
+      seed: 43,
+      playerClass: 'rogue',
+      playerName: 'Bagtester',
+      world: PBE_BOOST_TEST_WORLD,
+    });
     const pid = sim.playerId;
     sim.setPlayerLevel(BOOST_LEVEL, pid);
     const bagId = bestBoostBag();
@@ -264,7 +300,12 @@ describe('applyBoostKitToPlayer (world-join top-up)', () => {
   });
 
   it('levels a low-level character to the boost level', () => {
-    const sim = new Sim({ seed: 47, playerClass: 'mage', playerName: 'Lowtester' });
+    const sim = new Sim({
+      seed: 47,
+      playerClass: 'mage',
+      playerName: 'Lowtester',
+      world: PBE_BOOST_TEST_WORLD,
+    });
     const pid = sim.playerId;
     expect(sim.entities.get(pid)!.level).toBeLessThan(BOOST_LEVEL);
     expect(applyBoostKitToPlayer(sim, pid)).toBe(true);
@@ -434,7 +475,13 @@ describe('Nythraxis attunement', () => {
   it('attunement survives the server login round-trip (the raid door reads questsDone)', () => {
     const state = buildBoostedCharacterState('warlock', 'Pbetestdoor', 0);
     const revived = JSON.parse(JSON.stringify(state)) as CharacterState;
-    const sim = new Sim({ seed: 7, playerClass: 'warlock', playerName: 'unused', noPlayer: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warlock',
+      playerName: 'unused',
+      noPlayer: true,
+      world: PBE_BOOST_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warlock', 'Pbetestdoor', { state: revived });
     // canEnterNythraxisRaid (src/sim/instances/dungeons.ts) gates on exactly
     // this quest id in the loaded meta.

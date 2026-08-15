@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { GUILD_MODERATION_ACTIONS } from '../../server/admin_db';
 import { MODERATION_ACTIONS } from '../../server/moderation_db';
 import { t } from '../../src/admin/i18n';
 import { en } from '../../src/admin/i18n.en';
@@ -27,6 +28,24 @@ describe('moderation action labels', () => {
     expect(MODERATION_ACTIONS.length).toBeGreaterThan(15);
   });
 
+  it('labels EVERY GUILD action kind too (the realm-wide history bucket)', () => {
+    // The guild arm is a SECOND closed set (server/admin_db.ts
+    // GUILD_MODERATION_ACTIONS), written into guild_moderation_actions and
+    // surfaced only by the realm-wide page. It used to be one kind stamped as a
+    // SQL literal; the dormant-slot bank purge made it two, and a guild kind
+    // with no label renders as the unlabelled "Other action" exactly like an
+    // account kind would.
+    const unlabelled = GUILD_MODERATION_ACTIONS.filter(
+      (action) => moderationActionLabel(action) === UNKNOWN,
+    );
+    expect(unlabelled, 'guild action kinds missing an admin label').toEqual([]);
+    expect(moderationActionLabel('guild_bank_purge')).toBe(
+      t('moderationHistory.actionGuildBankPurge'),
+    );
+    // sanity: the list is actually being read, not an empty import
+    expect(GUILD_MODERATION_ACTIONS.length).toBeGreaterThan(1);
+  });
+
   it('resolves every label key against the admin catalog (t() would otherwise throw)', () => {
     for (const [action, key] of Object.entries(MODERATION_ACTION_LABEL_KEYS)) {
       expect(Object.keys(en), `${action} -> ${key}`).toContain(key);
@@ -38,6 +57,13 @@ describe('moderation action labels', () => {
     expect(moderationActionLabel('set_streamer')).toBe(t('moderationHistory.actionSetStreamer'));
     expect(moderationActionVariant('set_ai')).toBe('neutral');
     expect(moderationActionVariant('set_streamer')).toBe('neutral');
+  });
+
+  it('labels the General chat policy audit action as neutral', () => {
+    expect(moderationActionLabel('general_chat_rate_limit')).toBe(
+      t('moderationHistory.actionGeneralChatRateLimit'),
+    );
+    expect(moderationActionVariant('general_chat_rate_limit')).toBe('neutral');
   });
 
   it('labels the ip-block history kinds, which only the realm-wide page surfaces', () => {

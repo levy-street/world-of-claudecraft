@@ -11,12 +11,40 @@ import {
   LEASH_DISTANCE,
   steadyAngleTo,
 } from '../types';
+import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
+import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
+import { chaseStalledUnreachable } from './reachability';
+import { resetRiftMechanicWindups } from './rift_escape_window';
 import { retargetMob, updateMobTarget } from './targeting';
 
 export type MobCombatProfileResult = 'done' | 'runAttackMechanics';
 
 type EngagedTickHook = () => void;
+
+// Drop the pull and walk home: the shared evade entry used by the leash breaks
+// and the unreachable-target stall. The evade arm in locomotion.ts handles the
+// walk, the immunity lives in combat/damage.ts, and resetEvadingMob heals to
+// full on arrival. Any in-flight cast dies with the pull: the bar would
+// otherwise freeze on an immune mob walking home, and a committed ranged
+// windup (rangedWindupReleaseTick is an ABSOLUTE tick) would fire instantly
+// on the next pull's first in-range tick.
+function startEvadeHome(mob: Entity): void {
+  mob.aiState = 'evade';
+  mob.aggroTargetId = null;
+  clearThreat(mob);
+  mob.leashAnchor = null;
+  clearChainPullInbound(mob);
+  // A frozen windup must not detonate mid-walk-home (its ring is long gone);
+  // the full evade reset on arrival clears the rest of the mechanic state.
+  resetRiftMechanicWindups(mob);
+  mob.castingAbility = null;
+  mob.castTotal = 0;
+  mob.castRemaining = 0;
+  mob.castTargetId = null;
+  mob.channeling = false;
+  mob.rangedWindupReleaseTick = null;
+}
 
 export function mobCombatProfile(mob: Entity): MobCombatProfile {
   return combatProfileForMob(mob.templateId, mob.scale);
@@ -62,22 +90,57 @@ export function updateMobCombatProfile(
   if (ctx.maybeFlee(mob, target)) return 'done';
 
   if (profile.canLeash) {
+    // The hard tether measures from the SPAWN, never the refreshing anchor,
+    // and ignores the flee-recovery grace: past it the mob goes home, however
+    // the fight has been dragged. Checked before the soft leash so a tethered
+    // mob can never be walked out one anchor-refresh at a time.
+    const hardLeash = MOBS[mob.templateId]?.hardLeashRadius;
+    if (hardLeash !== undefined && dist2d(mob.pos, mob.spawnPos) > hardLeash) {
+      startEvadeHome(mob);
+      return 'done';
+    }
     const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
     const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
     if (mob.fleeReturnTimer > 0) {
       mob.fleeReturnTimer = Math.max(0, mob.fleeReturnTimer - DT);
       if (dist2d(mob.pos, leashAnchor) <= leash - 1) mob.fleeReturnTimer = 0;
     }
-    if (dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0) {
-      mob.aiState = 'evade';
-      mob.aggroTargetId = null;
-      clearThreat(mob);
-      mob.leashAnchor = null;
+    // A chain-pulled mob answering the call from the far end of the instance
+    // starts OUTSIDE its own leash sphere by design (the pull anchors it on the
+    // puller), so the soft leash is suspended until it arrives. Evaluated
+    // unconditionally, like the flee grace above: the call is what SPENDS the
+    // grace on the arrival tick, so short-circuiting it past the distance test
+    // would leave an arrived mob permanently unleashed. It holds nothing else,
+    // so the hard tether above and the stall postlude below still apply. See
+    // mob/chain_pull_transit.ts.
+    const inTransit = chainPullTransitHoldsLeash(mob, leashAnchor, leash);
+    if (dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0 && !inTransit) {
+      startEvadeHome(mob);
       return 'done';
     }
   }
 
   onEngagedTick?.();
+
+  // Dragonkin engage shout: the brood bellows BEFORE it walks. Fires once per
+  // pull (shoutFired resets on evade/respawn with the other pull state); for
+  // the shout window the mob stands rooted facing its target, not moving and
+  // not swinging (the player's cue to pre-position), while the broodlords'
+  // shout also cracks the surrounding eggs awake and wards their hatchlings
+  // (mob/dragonkin_brood.ts).
+  const shout = MOBS[mob.templateId]?.engageShout;
+  if (shout) {
+    if (!mob.shoutFired) {
+      mob.shoutFired = true;
+      mob.shoutIntroUntil = ctx.time + shout.rootSeconds;
+      dragonkinEngageShout(ctx, mob, shout);
+    }
+    if (mob.shoutIntroUntil !== undefined && ctx.time < mob.shoutIntroUntil) {
+      mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
+      mob.aiState = 'attack';
+      return 'done';
+    }
+  }
 
   // A channelHeal caster (Malric, the Nythraxis spirit healer) is a HEALER, not a
   // bruiser: it holds a standoff near its protectee (the boss) and channels a
@@ -87,10 +150,30 @@ export function updateMobCombatProfile(
   const healHold = updateHealerHold(ctx, mob);
   if (healHold) return healHold;
 
+  // The unreachable-target stall runs as a POSTLUDE, after the combat arm has
+  // moved the mob, so "did it move this tick" is measurable. States that must
+  // not accumulate never reach it: CC early-returns and charge dashes own their
+  // tick upstream in updateMob, a holding healer returned above, and canLeash
+  // opts an encounter out entirely (same gate as the leash prelude).
   const spell = MOBS[mob.templateId]?.petSpell;
-  if (spell) return updateCasterCombat(ctx, mob, target, profile, spell);
+  const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
+  if (spell) {
+    const result = updateCasterCombat(ctx, mob, target, profile, spell);
+    if (profile.canLeash && chaseStalledUnreachable(ctx, mob, target, spell.range, chaseSpeed)) {
+      startEvadeHome(mob);
+      return 'done';
+    }
+    return result;
+  }
 
   updatePursuitProfileCombat(ctx, mob, target, profile);
+  if (
+    profile.canLeash &&
+    chaseStalledUnreachable(ctx, mob, target, profile.meleeRange, chaseSpeed)
+  ) {
+    startEvadeHome(mob);
+    return 'done';
+  }
   return mob.aiState === 'attack' ? 'runAttackMechanics' : 'done';
 }
 

@@ -11,14 +11,23 @@
 //                      (difficulty ≥ 2) run.
 //
 // Pricing intent (the Collapsed Reliquary is the ENTRY-tier delve):
-//   Marks income is ~3 Marks/day for a Normal-only player and ~6-8 for a
-//   dedicated Heroic runner (see `delveMarkPayout` in sim.ts). Prices here are
-//   deliberately STEEP relative to that income, the reward gear is a clear
-//   upgrade over the silver-vendor armor of the same tier (Smith Haldren's
-//   commons: chainmail vest 60 armor, leather jerkin 40, robe 22, trousers 24),
-//   so each piece is uncommon-or-rare quality with stat bonuses on top. A casual
-//   player kits out over ~2-3 weeks; the Heroic signature rares are a multi-week
-//   goal each.
+//   Marks income rides the daily window: the first 3 clears of the day (a
+//   single tally shared across delves) pay full base Marks (1 Normal / 2
+//   Heroic; the Drowned Litany doubles both) PLUS any earned chest/rite bonus;
+//   every later clear pays a diminished base only, with no bonus Marks (see
+//   `delveMarkPayout` and `delveBonusMarksFor` in src/sim/delves/runs.ts).
+//   That puts a Normal-only player here around 3-9 Marks/day by lockpick
+//   skill (the chest's loot tier sets the bonus), and a flawless Heroic runner
+//   at 12 in-window; the Litany's 2x lifts those bands to 18 flawless Normal
+//   and 24 flawless Heroic. Past the window a grinder still drips diminished
+//   BASE Marks per clear without bound (Heroic 1, doubled at the Litany), so
+//   this is a bounded full-rate window plus a slow drip, not a hard daily
+//   cap. Prices are deliberately STEEP relative to that income, the reward
+//   gear is a clear upgrade over the silver-vendor armor of the same tier
+//   (Smith Haldren's commons: chainmail vest 60 armor, leather jerkin 40,
+//   robe 22, trousers 24), so each piece is uncommon-or-rare quality with
+//   stat bonuses on top. A casual player kits out over ~2-3 weeks; the Heroic
+//   signature rares are a multi-week goal each.
 //
 //   FORWARD DESIGN: later delves are tuned to cost FAR more Marks (and reward
 //   far more Marks per clear), so this tier's prices are the floor of a long
@@ -66,6 +75,65 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // -- signature rares require a Heroic completion (multi-week goals) --
   { itemId: 'sister_nhalia_choir_plate', marks: 56, gate: 'heroicClear' },
   { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
+  // -- the crafted top-tier gathering tools, as a NON-CRAFTER's route to them --
+  //
+  // These eight are the tier-4 and tier-5 picks, axes, sickles and rods that
+  // otherwise only an engineer at a toolworks can produce (recipes.ts
+  // TOOL_RECIPES and ROD_RECIPES). A player who never took a crafting
+  // profession had no path to the top of the tool ladder at all; this is that
+  // path, priced in Marks rather than in a profession.
+  //
+  // NO NEW PRICE RUNGS AND NO NEW GATES. Both rows reuse this shop's existing
+  // top two: tier 4 sits on the helm's rung (24 Marks behind three clears, the
+  // "commitment" step) and tier 5 on the signature-rare rung (56 behind a
+  // Heroic clear, the multi-week goal). That is deliberate rather than
+  // convenient, because the Litany's whole price ladder is pinned as a straight
+  // 2x of the Collapsed Reliquary's tiers (tests/delve_shop.test.ts), and a
+  // bespoke tool price would either break that relationship or force an
+  // invented mirror row into the entry delve where a top tool does not belong.
+  //
+  // They land HERE rather than on the Heroic Quartermaster's counter, which was
+  // the other candidate: HEROIC_VENDOR_ITEMS (content/heroic_vendor.ts) is a
+  // self-contained ItemDef registry that never reads ITEMS, so a tool row there
+  // means a duplicate def of an item that already exists, and its stock is
+  // budget-enforced level-20 jewelry (tests/item_level.test.ts) whose stated
+  // identity is being the game's only source of necks and rings. A stat-less
+  // tool fits neither. A DelveShopEntry's itemId resolves into ITEMS directly,
+  // and delveShopGateUnlocked below is already shared by the authoritative buy
+  // and the client's lock badge, so these rows need no new gate logic anywhere.
+  //
+  // This does NOT weaken the tools' never-sold rule, it sharpens it: the claim
+  // is that no counter sells them FOR COPPER, and Marks are a delve currency
+  // earned by running the delve. The guards in tests/professions_tools.test.ts
+  // and tests/professions_rod_recipes.test.ts assert exactly that, and were
+  // widened to sweep this table (and the heroic vendor's) rather than only
+  // NPCS[*].vendorItems, which would have let these rows through in silence.
+  //
+  // These rows carry NO proficiency requirement, and that is the SETTLED
+  // answer (maintainer ruling, 2026-08-14), no longer an open question: under
+  // R22 every tool purchase gate in the game is advisory, and enforcement
+  // lives at the harvest via the wield gate (professions/wield_gate.ts, tiers
+  // 4/5 at gathering 85/100), which a Marks-bought land tool meets or waits on
+  // exactly like a crafted one. The item tooltip prints the same
+  // "Requires {craft} N" line the copper counters show
+  // (tests/gather_tool_tooltip.test.ts), so the buyer is warned before
+  // spending. The clears gate is what paces these rows; rods stay wield-exempt
+  // under R22 and are paced by the water-tier gate instead.
+  //
+  // RE-CHECK TRIGGER: these prices assume a world whose highest shipped node
+  // and fishing-water tier is 3, where a tier-4/5 tool opens no content and
+  // its value is fine-grade minting, cast speed, and comfort. The patch that
+  // ships the first tier-4 node or water (the post-level-20 zone expansion)
+  // turns these into ACCESS items: re-derive both Marks prices and the wield
+  // table in that SAME change, not after.
+  { itemId: 'thorium_mining_pick', marks: 24, gate: 'clears:3' },
+  { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
+  { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },
+  { itemId: 'stormreel_fishing_rod', marks: 24, gate: 'clears:3' },
+  { itemId: 'arcanite_mining_pick', marks: 56, gate: 'heroicClear' },
+  { itemId: 'elderwood_axe', marks: 56, gate: 'heroicClear' },
+  { itemId: 'sunpetal_sickle', marks: 56, gate: 'heroicClear' },
+  { itemId: 'tidewrought_fishing_rod', marks: 56, gate: 'heroicClear' },
 ];
 
 // Per-delve shop stock, keyed by DelveDef.id. New delves register their stock

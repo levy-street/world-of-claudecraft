@@ -8,6 +8,7 @@
 // Sim layer: no DOM/Three imports. This file is types only.
 
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
+import type { CombatExitMemory } from '../instance_exit_memory';
 import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, RiftTier } from '../types';
 
@@ -93,16 +94,6 @@ export interface RiftEvent {
     duration: number;
     clearedAt: number;
   } | null;
-}
-
-/** The whole wire/persistence footprint of a rift instance. Both hosts turn this
- * into identical content via rift_gen. `origin` is the instance-space anchor the
- * floor's local coordinates are offset by (see rift/runs.ts). */
-export interface RiftDescriptor {
-  seed: number;
-  baseLevel: number;
-  floorIndex: number;
-  origin: { x: number; z: number };
 }
 
 /** One placed creature, instance-local. `color`/`scale` are per-run re-grades of
@@ -280,6 +271,12 @@ export interface RiftInstance {
   startedAt: number;
   finishedAt: number | null;
   outcome: RiftInstanceOutcome;
+  /** True once the run is SPOILED: any mob killed, or the off-path cache
+   * plundered. A progressed run never recycles and binds its members WoW-raid
+   * style (enterRift routes them back and never into a sibling instance).
+   * Survives descent (floor teardown must not erase progress); reset only when
+   * the slot itself is freed. */
+  progressed: boolean;
   /** Snapshot of the event artifact at entry. Never changes mid-race. */
   upgrade: RiftUpgradeManifest | null;
   seed: number;
@@ -365,7 +362,13 @@ export interface RiftInstance {
    * deathZoneStrike mechanics). Each zone starts with a `remaining` fuse equal
    * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
    * Cleared on boss death or floor reset. */
-  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number }>;
+  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number; total: number }>;
+  /** Recently-exited-mid-combat memory (issue #2653): a player who left this run
+   * through the beacon/exit while a mob was actively fighting them has their
+   * dropped threat snapshotted here for a short window. Re-entering before it
+   * lapses resumes the fight instead of granting a free, unengaged reset
+   * (rift/runs.ts). Session state, cleared with the claim. */
+  combatExitMemory: CombatExitMemory;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

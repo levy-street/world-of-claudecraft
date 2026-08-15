@@ -59,6 +59,13 @@ const GM_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
+import {
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_LAYOUT_VERSION,
+  PET_SPECIAL_WIRE_VERSION,
+  STABLE_TIMER_WIRE_VERSION,
+} from '../src/world_api';
+
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   const req: any = new EventEmitter();
   req.headers = headers;
@@ -84,6 +91,15 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 }
 
 describe('websocket authentication', () => {
+  it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(6);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-6');
+    // The previous layout-gated server accepts only `auth-world-4`, so the new
+    // client discriminator must remain necessarily unrecognizable to it.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-4');
+  });
+
   it('keeps bearer tokens out of the websocket URL', () => {
     const url = buildWebSocketUrl('https:', 'worldofclaudecraft.com');
 
@@ -92,22 +108,25 @@ describe('websocket authentication', () => {
   });
 
   it('sends credentials as an auth message instead of query params', () => {
+    expect(PET_SPECIAL_WIRE_VERSION).toBe(1);
     expect(buildWebSocketAuthMessage('a'.repeat(64), 42)).toEqual({
-      t: 'auth',
+      t: ONLINE_WORLD_AUTH_TYPE,
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
-      timerWire: 2,
+      timerWire: STABLE_TIMER_WIRE_VERSION,
+      petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
   });
 
   it('carries the client seed when one is supplied', () => {
     expect(buildWebSocketAuthMessage('a'.repeat(64), 42, 'seed-123')).toEqual({
-      t: 'auth',
+      t: ONLINE_WORLD_AUTH_TYPE,
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: 'seed-123',
-      timerWire: 2,
+      timerWire: STABLE_TIMER_WIRE_VERSION,
+      petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
   });
 });

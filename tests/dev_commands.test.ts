@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function devSim(seed = 42): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: EMPTY_TEST_WORLD,
+  });
 }
 
 function devSpawns(sim: Sim, ownerId = sim.playerId) {
@@ -46,7 +53,13 @@ describe('dev commands', () => {
   });
 
   it('despawns only mobs created by the requesting developer', () => {
-    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const alpha = sim.addPlayer('warrior', 'Alpha');
     const beta = sim.addPlayer('mage', 'Beta');
     sim.chat('/dev spawn forest_wolf 2', alpha);
@@ -67,7 +80,13 @@ describe('dev commands', () => {
   });
 
   it('clears every player target and owned spawn when its developer leaves', () => {
-    const sim = new Sim({ seed: 15, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 15,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const alpha = sim.addPlayer('warrior', 'Alpha');
     const beta = sim.addPlayer('mage', 'Beta');
     sim.chat('/dev spawn forest_wolf 2', alpha);
@@ -155,7 +174,12 @@ describe('dev commands', () => {
   });
 
   it('is inert when dev commands are disabled', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
     const beforeIds = [...sim.entities.keys()];
 
     sim.chat('/dev spawn forest_wolf 4');
@@ -164,5 +188,121 @@ describe('dev commands', () => {
     expect([...sim.entities.keys()]).toEqual(beforeIds);
     expect(sim.player.level).toBe(1);
     expect(devSpawns(sim)).toEqual([]);
+  });
+});
+
+describe('/dev bg (Thornhollow Fields force-start)', () => {
+  it('force-starts a short-handed match from whoever is queued, no bots', () => {
+    const sim = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const a = sim.addPlayer('warrior', 'Alpha');
+    const b = sim.addPlayer('mage', 'Beta');
+    const c = sim.addPlayer('priest', 'Gamma');
+    for (const p of [a, b, c]) {
+      sim.entities.get(p)!.level = 20; // the queue floor; /dev bg itself bypasses it
+      sim.bgQueueJoin(p);
+    }
+
+    sim.chat('/dev bg', a);
+
+    const match = sim.bgMatchFor(a);
+    expect(match).toBeTruthy();
+    if (!match) throw new Error('missing match');
+    expect(match.teams[0].length + match.teams[1].length).toBe(3);
+    expect(match.teams[0].length).toBeGreaterThan(0);
+    expect(match.teams[1].length).toBeGreaterThan(0);
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+  });
+
+  it('queues the caller and pads with one dev bot for a solo walk-around, drawing zero rng', () => {
+    const sim = devSim();
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+
+    sim.chat('/dev bg');
+
+    const match = sim.bgMatchFor(sim.playerId);
+    expect(match).toBeTruthy();
+    if (!match) throw new Error('missing match');
+    const pids = [...match.teams[0], ...match.teams[1]];
+    expect(pids).toHaveLength(2);
+    const botPid = pids.find((p) => p !== sim.playerId);
+    expect(botPid).toBeDefined();
+    expect(sim.players.get(botPid ?? -1)?.isDevBot).toBe(true);
+    // exactly ONE draw: the power-rune opening face rolled at match start
+    // (startBgMatch); queueing, padding, and team-splitting draw nothing.
+    expect(draws).toBe(1);
+  });
+
+  it('errors on a repeat call from inside the match', () => {
+    const sim = devSim();
+    sim.chat('/dev bg');
+    expect(sim.bgMatchFor(sim.playerId)).toBeTruthy();
+    sim.tick();
+
+    sim.chat('/dev bg');
+
+    const errors = sim
+      .tick()
+      .filter((e) => e.type === 'error' && e.pid === sim.playerId)
+      .map((e) => (e.type === 'error' ? e.text : ''));
+    expect(errors).toContain('[dev] You are already in a battleground.');
+  });
+
+  it('a refused queue join (not the party leader) starts nothing and leaks no bot', () => {
+    const sim = devSim();
+    // A dead caller used to be the refusal this pinned. Dying no longer cancels
+    // a queue, so the bail-before-padding path is exercised through a refusal
+    // that survives: only a party's leader may commit it to the queue.
+    const leader = sim.addPlayer('priest', 'Leader');
+    sim.partyInvite(sim.playerId, leader);
+    sim.partyAccept(sim.playerId);
+    expect(sim.partyOf(sim.playerId)!.leader).not.toBe(sim.playerId);
+
+    sim.chat('/dev bg');
+
+    expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+  });
+
+  it('force-starts for a dead caller, who is seated alive', () => {
+    const sim = devSim();
+    sim.player.hp = 0;
+    sim.player.dead = true;
+
+    sim.chat('/dev bg');
+
+    expect(sim.bgMatchFor(sim.playerId), 'dying must not cancel the queue').toBeTruthy();
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.ghost).toBe(false);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('reuses an idle leftover dev bot instead of spawning another', () => {
+    const sim = devSim();
+    sim.chat('/dev bot Riftbot');
+    const botCountBefore = [...sim.players.values()].filter((m) => m.isDevBot).length;
+    expect(botCountBefore).toBe(1);
+
+    sim.chat('/dev bg');
+
+    expect(sim.bgMatchFor(sim.playerId)).toBeTruthy();
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(1);
+  });
+
+  it('is inert without devCommands', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
+    sim.chat('/dev bg');
+    expect(sim.bgMatchFor(sim.playerId)).toBeNull();
   });
 });

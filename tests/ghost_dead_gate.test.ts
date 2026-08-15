@@ -14,11 +14,20 @@
 // alive/released-ghost saves load exactly as before.
 
 import { describe, expect, it } from 'vitest';
+import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { DUNGEON_X_THRESHOLD, QUESTS, SPIRIT_HEALER_NPC_ID } from '../src/sim/data';
+import { placeMobileStationForPlayer } from '../src/sim/professions/mobile_station';
+import { createRiftGearInstance } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import { SPIRIT_HEALER_RANGE } from '../src/sim/spirit';
 import { dist2d, type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import {
+  runApplyEnchant,
+  runCraft,
+  runDisenchant,
+  runSalvage,
+} from './helpers/enchant_family_cast';
 
 type AnyEntity = Entity & Record<string, any>;
 type AnySim = Sim & Record<string, any>;
@@ -192,6 +201,174 @@ for (const mode of ['unreleased', 'ghost'] as const) {
   });
 }
 
+// Part A2: the profession-action command family (craftItem / salvageItem /
+// disenchantItem / applyEnchant / trainRecipe / unbindItem /
+// placeMobileStation, plus the rift forge trio) refuses a dead player the
+// same way. These commands surface outcomes through their own result events
+// (craftResult and friends), emitted unconditionally by their Sim wrappers,
+// so the dead gate (src/sim/dead_gate.ts) must fire BEFORE the resolver:
+// the decisive assertion in each test is "zero result events plus exactly
+// one while-dead error line", because ANY resolver outcome, success or
+// denial, would have emitted the family's result event.
+for (const mode of ['unreleased', 'ghost'] as const) {
+  describe(`dead-gate: profession actions refused for a ${mode} dead player`, () => {
+    function resultEvents(events: SimEvent[], type: string): SimEvent[] {
+      return events.filter((ev) => ev.type === type);
+    }
+
+    it('craftItem is refused (the cooking-while-dead repro) and consumes nothing', () => {
+      const sim = makeSim();
+      sim.addItem('spider_leg', 2);
+      // Alive baseline first: the same recipe at the same spot succeeds
+      // (tough jerky is common-tier cooking, no station, grandfathered), so
+      // the dead denial below can only be the gate.
+      sim.drainEvents();
+      runCraft(sim, 'recipe_tough_jerky');
+      const aliveEvents = sim.drainEvents();
+      expect(
+        resultEvents(aliveEvents, 'craftResult').filter((ev: any) => ev.ok === true).length,
+      ).toBe(1);
+      expect(deadErrors(aliveEvents)).toBe(0);
+      expect(sim.countItem('tough_jerky')).toBe(1);
+      makeDead(sim, mode);
+      sim.drainEvents();
+      runCraft(sim, 'recipe_tough_jerky');
+      const events = sim.drainEvents();
+      expect(deadErrors(events)).toBe(1);
+      expect(resultEvents(events, 'craftResult').length).toBe(0);
+      expect(sim.countItem('tough_jerky')).toBe(1); // nothing new crafted
+      expect(sim.countItem('spider_leg')).toBe(1); // no reagent consumed
+    });
+
+    for (const [label, type, act] of [
+      ['salvageItem', 'salvageResult', (sim: AnySim) => runSalvage(sim, 'linen_scrap')],
+      ['disenchantItem', 'disenchantResult', (sim: AnySim) => runDisenchant(sim, 'linen_scrap')],
+      [
+        'applyEnchant',
+        'enchantResult',
+        (sim: AnySim) => runApplyEnchant(sim, 'linen_scrap', 'not_an_enchant'),
+      ],
+      ['trainRecipe', 'trainResult', (sim: AnySim) => sim.trainRecipe('recipe_tough_jerky')],
+      ['unbindItem', 'unbindResult', (sim: AnySim) => sim.unbindItem('linen_scrap')],
+    ] as const) {
+      it(`${label} is refused before the resolver (no ${type} event)`, () => {
+        const sim = makeSim();
+        // Alive control: the same call reaches the resolver and emits the
+        // family result event (as a denial; the args are junk on purpose),
+        // with no while-dead error line.
+        sim.drainEvents();
+        act(sim);
+        const aliveEvents = sim.drainEvents();
+        expect(resultEvents(aliveEvents, type).length).toBe(1);
+        expect(deadErrors(aliveEvents)).toBe(0);
+        makeDead(sim, mode);
+        sim.drainEvents();
+        act(sim);
+        const events = sim.drainEvents();
+        expect(deadErrors(events)).toBe(1);
+        expect(resultEvents(events, type).length).toBe(0);
+      });
+    }
+
+    it('placeMobileStation is refused and the previous station is untouched', () => {
+      const sim = makeSim();
+      const meta = (sim as any).players.get(sim.playerId);
+      meta.craftSkills.cooking = 75; // specialized: placement would succeed
+      // Alive control: placement succeeds with no while-dead error, so the
+      // dead denial below can only be the gate.
+      sim.drainEvents();
+      sim.placeMobileStation('cooking');
+      const aliveEvents = sim.drainEvents();
+      expect(deadErrors(aliveEvents)).toBe(0);
+      const placed = meta.mobileStation;
+      expect(placed).toBeTruthy();
+      const placedAtTick = placed.placedAtTick;
+      makeDead(sim, mode);
+      sim.drainEvents();
+      sim.placeMobileStation('cooking');
+      expect(deadErrors(sim.drainEvents())).toBe(1);
+      expect(meta.mobileStation).toBe(placed); // no replacement placed
+      expect(meta.mobileStation.placedAtTick).toBe(placedAtTick);
+      // The gate lives INSIDE placeMobileStationForPlayer, so the direct
+      // call the `/dev mobilestation` cheat makes is refused identically
+      // (the wrapper is not the only entry point for this command).
+      sim.drainEvents();
+      expect(placeMobileStationForPlayer((sim as any).ctx, 'cooking', sim.playerId)).toBe(
+        undefined,
+      );
+      expect(deadErrors(sim.drainEvents())).toBe(1);
+    });
+
+    it('the rift forge trio is refused and spends no essence', () => {
+      const sim = makeSim();
+      sim.setPlayerLevel(20);
+      const gear = createRiftGearInstance('rift-dead-gate', 'S', 'warrior', sim.player.id);
+      sim.addItemInstance(gear.itemId, gear.instance);
+      sim.addItem(RIFT_ESSENCE_ITEM_ID, 20);
+      sim.addItem(RIFT_GEM_IDS[0], 1);
+      // Alive baseline: the first upgrade lands and spends essence.
+      expect(sim.upgradeRiftItem(gear.itemId).ok).toBe(true);
+      const essenceAfterUpgrade = sim.countItem(RIFT_ESSENCE_ITEM_ID);
+      expect(essenceAfterUpgrade).toBeLessThan(20);
+      makeDead(sim, mode);
+      sim.drainEvents();
+      expect(sim.upgradeRiftItem(gear.itemId).reason).toBe('dead');
+      expect(sim.enchantRiftItem(gear.itemId, 'critRating').reason).toBe('dead');
+      expect(sim.socketRiftGem(gear.itemId, RIFT_GEM_IDS[0]).reason).toBe('dead');
+      const events = sim.drainEvents();
+      expect(deadErrors(events)).toBe(3);
+      expect(resultEvents(events, 'riftForgeResult').length).toBe(0);
+      expect(sim.countItem(RIFT_ESSENCE_ITEM_ID)).toBe(essenceAfterUpgrade);
+      const slot = sim.inventory.find((s: any) => s.itemId === gear.itemId);
+      expect(slot?.instance?.rift).toEqual(expect.objectContaining({ upgradeLevel: 1, gems: [] }));
+    });
+  });
+}
+
+// The explicit-pid arm is the one the authoritative server always uses
+// (server/game.ts passes the sender's pid into every profession command), so
+// pin that the gate resolves the TARGET player, routes the refusal to that
+// player alone, and leaves everyone else able to act.
+describe('dead-gate: profession actions with an explicit pid (the server arm)', () => {
+  it('a dead second player is refused by pid and the alive primary still crafts', () => {
+    const sim = makeSim();
+    const pidB = sim.addPlayer('mage', 'Bea');
+    sim.addItem('spider_leg', 1);
+    sim.addItem('spider_leg', 1, pidB);
+    const b = (sim as any).entities.get(pidB) as AnyEntity;
+    b.hp = 0;
+    b.dead = true;
+    sim.drainEvents();
+    runCraft(sim, 'recipe_tough_jerky', false, pidB);
+    const events = sim.drainEvents();
+    expect(
+      events.filter((ev: any) => ev.type === 'error' && ev.text === DEAD_ERROR && ev.pid === pidB)
+        .length,
+    ).toBe(1);
+    expect(deadErrors(events)).toBe(1); // and no copy routed anywhere else
+    expect(events.filter((ev) => ev.type === 'craftResult').length).toBe(0);
+    expect(sim.countItem('tough_jerky', pidB)).toBe(0);
+    // The alive primary is unaffected by B's refusal and crafts normally.
+    runCraft(sim, 'recipe_tough_jerky');
+    const aliveEvents = sim.drainEvents();
+    expect(
+      aliveEvents.filter((ev: any) => ev.type === 'craftResult' && ev.ok === true).length,
+    ).toBe(1);
+    expect(sim.countItem('tough_jerky')).toBe(1);
+  });
+
+  it('an unresolvable pid does not trip the gate (the documented false arm)', () => {
+    const sim = makeSim();
+    // The PRIMARY is dead, so a gate that ignored the target pid and fell
+    // back to resolving the primary would fire here: zero while-dead errors
+    // proves both the false arm and that the gate keys on the TARGET pid.
+    makeDead(sim, 'ghost');
+    sim.drainEvents();
+    runCraft(sim, 'recipe_tough_jerky', false, 999999);
+    expect(deadErrors(sim.drainEvents())).toBe(0);
+  });
+});
+
 describe('dead-gate: Spirit Healer exceptions for a ghost', () => {
   it('interact at the graveyard (angel in reach) emits no while-dead error', () => {
     const sim = makeSim();
@@ -243,28 +420,43 @@ describe('dead-gate: Spirit Healer exceptions for a ghost', () => {
     const mailbox = [...sim.entities.values()].find(
       (e: AnyEntity) => e.templateId === 'mailbox',
     ) as AnyEntity;
-    sim.postOffice.mail.push({
-      id: 4242,
-      recipientKey: meta.name,
-      recipientName: meta.name,
-      senderName: 'Postmaster',
-      kind: 'system',
-      subject: 'Coin',
-      body: '',
-      copper: 50,
-      items: [],
-      deliverAt: 0,
-      expiresAt: Infinity,
-      read: false,
-      announced: false,
-    });
+    // Seed through the tracked booking path (sendLetter), never a direct
+    // book push: the bucketed reads (MailIndex) cannot see an untracked
+    // letter, which would make this refusal vacuous (the take would refuse
+    // dead or alive because the letter is invisible, not because of the
+    // dead gate).
+    sim.postOffice.sendLetter(
+      sim.postOffice.mailKeyFor(meta),
+      meta.name,
+      {
+        letterId: 'qa_dead_gate_coin',
+        senderName: 'Postmaster',
+        subject: 'Coin',
+        body: '',
+        copper: 50,
+        delaySeconds: 0,
+      },
+      'system',
+    );
+    sim.tick();
+    const letterId = sim.postOffice.mail.find((m: any) => m.letterId === 'qa_dead_gate_coin')!.id;
     teleport(sim, p, mailbox.pos.x + 1, mailbox.pos.z);
     makeDead(sim, 'ghost');
     const before = meta.copper;
-    sim.mailTake(4242);
+    sim.mailTake(letterId);
     expect(meta.copper).toBe(before);
-    const letter = sim.postOffice.mail.find((m: any) => m.id === 4242)!;
+    const letter = sim.postOffice.mail.find((m: any) => m.id === letterId)!;
     expect(letter.copper).toBe(50); // still attached
+
+    // Alive control: the SAME take collects once alive again, proving the
+    // refusal above was the dead gate and not an unreachable letter.
+    p.dead = false;
+    p.ghost = false;
+    p.hp = 1;
+    teleport(sim, p, mailbox.pos.x + 1, mailbox.pos.z);
+    sim.mailTake(letterId);
+    expect(meta.copper).toBe(before + 50);
+    expect(sim.postOffice.mail.find((m: any) => m.id === letterId)!.copper).toBe(0);
   });
 
   it('bank commands are silently refused while dead (the market/mail idiom)', () => {
@@ -355,6 +547,41 @@ describe('auto-release-on-logout: save/load of a dead-unreleased character', () 
     // the spirit rises OUTSIDE, at an overworld graveyard with an angel
     expect(e2.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
     expect(healerInRange(sim2, e2.pos, SPIRIT_HEALER_RANGE)).toBe(true);
+  });
+
+  it('a released-ghost save inside a live dungeon claim recomputes corpseInstanceId on relog', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    sim.enterDungeon('hollow_crypt');
+    expect(p.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+    // Die deeper inside the instance, then release: the normal death path
+    // (spirit.ts releasePlayerSpirit) stamps corpseInstanceId from the live
+    // claim so a fallen party member's corpse still counts for loot/XP.
+    p.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + 30 };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    p.hp = 0;
+    p.dead = true;
+    sim.releaseSpirit();
+    const inst = (sim.instances as any[]).find(
+      (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,
+    );
+    expect(p.corpseInstanceId).toBe(inst.exitId);
+
+    // A relog within the SAME server session (the common case: the process
+    // does not restart, so the party's instance claim is still live) must not
+    // lose the corpse's instance binding, or a reconnecting downed member is
+    // permanently excluded from loot/XP/Heroic Mark credit for that corpse.
+    const state = sim.serializeCharacter(sim.playerId)!;
+    sim.removePlayer(sim.playerId);
+    const pid2 = sim.addPlayer('warrior', 'Reloger', { state });
+    const e2 = sim.entities.get(pid2) as AnyEntity;
+
+    expect(e2.dead).toBe(true);
+    expect(e2.ghost).toBe(true);
+    expect(e2.corpsePos).toBeTruthy();
+    expect(e2.corpseInstanceId).toBe(inst.exitId);
   });
 
   it('an alive save still loads alive and unchanged', () => {

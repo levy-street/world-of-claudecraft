@@ -240,6 +240,7 @@ function nativeSnapshot(): ClaudiumSnapshot {
   return {
     balance: 500,
     skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+    wocDiscountBps: 5000,
     nativeRails: { sol: true, usdc: true, woc: true },
     walletBalances: {
       solLamports: '1000000000',
@@ -298,6 +299,7 @@ describe('ClaudiumWindow refresh stability', () => {
     expect(html).toContain('src="/claudium/icons/solana-icon.webp"');
     expect(html).toContain('src="/claudium/icons/usdc-icon.webp"');
     expect(html).toContain('USDC: 12.35');
+    expect(html).toContain('50% off');
 
     root.body.rail('usdc').click();
     expect(root.body.innerHTML).toContain('4.99 USDC');
@@ -306,6 +308,25 @@ describe('ClaudiumWindow refresh stability', () => {
     root.body.sku().click();
     await flushMicrotasks();
     expect(buys).toEqual([{ rail: 'usdc', sku: 'claudium_500' }]);
+  });
+
+  it('renders the current service-provided $WOC discount instead of a bundled percentage', async () => {
+    vi.stubGlobal('document', fakeDocument);
+    const root = new FakeRoot();
+    root.style.display = 'block';
+    const window = new ClaudiumWindow({
+      root: () => asHtml(root),
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      snapshot: () => Promise.resolve({ ...nativeSnapshot(), wocDiscountBps: 2000 }),
+      buy: () => Promise.resolve(),
+    });
+
+    await window.render();
+
+    expect(root.body.innerHTML).toContain('20% off');
+    expect(root.body.innerHTML).not.toContain('50% off');
   });
 
   it('renders the wallet connection card and routes its action from the Claudium panel', async () => {

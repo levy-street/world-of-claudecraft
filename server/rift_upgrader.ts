@@ -263,6 +263,8 @@ interface PendingResult {
 
 /** One in-flight request at a time plus a rolling hourly cap. Promise callbacks
  * only enqueue host data; all sim mutation occurs in drain() at a tick boundary. */
+const RIFT_UPGRADE_QUEUE_CAP = 32;
+
 export class RiftUpgradeCoordinator {
   private readonly client: RiftUpgraderClient | null;
   private readonly maxRequestsPerHour: number;
@@ -288,6 +290,19 @@ export class RiftUpgradeCoordinator {
       ) {
         continue;
       }
+      // Bounded queue (the no-unbounded-table rule): arrivals above the
+      // hourly request cap otherwise grow this forever on a fast-refill
+      // realm (a community realm refills every 60s against a default cap of
+      // 4/hr). The check runs BEFORE seen/markPending, refusing the NEWEST
+      // arrival outright: shifting an already-queued event would strand it
+      // in 'pending' forever (the intake filter admits only
+      // heuristic/fallback, `seen` blocks a re-queue, and rift_assets
+      // refuses generation while pending). A refused arrival keeps its
+      // heuristic status and simply retries on a later observe pass. The
+      // dedupe set clears with the queue's own bound so a long-lived
+      // process cannot grow it without limit either.
+      if (this.queued.length >= RIFT_UPGRADE_QUEUE_CAP) continue;
+      if (this.seen.size > 4096) this.seen.clear();
       this.seen.add(event.eventId);
       this.queued.push(event);
       markRiftUpgradePending(ctx, event.eventId);
@@ -322,7 +337,10 @@ export class RiftUpgradeCoordinator {
       .upgrade(draft)
       .then((value) => this.results.push({ eventId: event.eventId, value }))
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'unknown failure';
+        // Bounded: a JSON.parse failure quotes the response body's first
+        // bytes in its message, and an upstream that echoes request detail
+        // must not get a free channel into the server log.
+        const message = (error instanceof Error ? error.message : 'unknown failure').slice(0, 200);
         console.warn(`[rift-upgrader] ${event.eventId} fell back: ${message}`);
         this.results.push({ eventId: event.eventId, value: null });
       })

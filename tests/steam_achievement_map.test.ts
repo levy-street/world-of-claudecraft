@@ -4,15 +4,27 @@
 // scramble, drop, or rename an entry.
 import { describe, expect, it } from 'vitest';
 import { ACHIEVEMENT_MAP, MAX_STEAM_ACHIEVEMENTS } from '../server/steam/achievement_map';
-import { DEEDS } from '../src/sim/content/deeds';
+import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 
 const ACH_NAME_RE = /^ACH_[A-Z0-9_]+$/;
 
 describe('Steam achievement map', () => {
-  it('has exactly the 75 registered entries (68 launch + 4 catalog refresh + 3 professions marquee)', () => {
+  it('has exactly the 84 registered entries (68 launch + 4 catalog refresh + 3 professions marquee + 9 reliquary ladder)', () => {
     // The three Professions 2.0 marquee deeds
-    // (prog_guildsworn, prog_masterwright, prog_master_angler) join the map.
-    expect(Object.keys(ACHIEVEMENT_MAP).length).toBe(75);
+    // (prog_guildsworn, prog_masterwright, prog_master_angler) and the nine
+    // Phase 18 Reliquary ladder deeds (four Curator ranks, completion, shelf,
+    // three Illuminations) join the map.
+    expect(Object.keys(ACHIEVEMENT_MAP).length).toBe(84);
+  });
+
+  it('covers the whole Reliquary ladder: every col_reliquary_* deed in DEED_ORDER is mapped', () => {
+    // Derived from the real catalog, not a hardcoded list: a tenth ladder
+    // deed added to DEEDS without a mirror entry fails here by name.
+    const ladder = DEED_ORDER.filter((id) => /^col_reliquary_/.test(id));
+    expect(ladder.length).toBeGreaterThanOrEqual(9);
+    for (const deedId of ladder) {
+      expect(ACHIEVEMENT_MAP[deedId], deedId).toBeDefined();
+    }
   });
 
   it('stays within the App Admin cap', () => {
@@ -64,7 +76,7 @@ describe('Steam achievement map', () => {
     expect(ACHIEVEMENT_MAP.prog_guildsworn).toBe('ACH_GUILDSWORN');
   });
 
-  it('pins the full 75-entry registered map as a literal (permanent Steam API names)', () => {
+  it('pins the full 84-entry registered map as a literal (permanent Steam API names)', () => {
     // ACH names are permanent once shipped; a bulk regeneration that swapped two
     // deed-to-ACH mappings would keep the count, the shape, and the uniqueness
     // checks above all green. Only a literal snapshot of every pair catches it.
@@ -119,6 +131,15 @@ describe('Steam achievement map', () => {
       col_seven_regalia: 'ACH_SEVEN_REGALIA',
       col_all_slots: 'ACH_ALL_SLOTS',
       col_glimmerfin: 'ACH_GLIMMERFIN',
+      col_reliquary_rank_2: 'ACH_RELIQUARY_RANK_2',
+      col_reliquary_rank_3: 'ACH_RELIQUARY_RANK_3',
+      col_reliquary_rank_4: 'ACH_RELIQUARY_RANK_4',
+      col_reliquary_rank_5: 'ACH_RELIQUARY_RANK_5',
+      col_reliquary_complete: 'ACH_RELIQUARY_COMPLETE',
+      col_reliquary_conquerors: 'ACH_RELIQUARY_CONQUERORS',
+      col_reliquary_illum_nythraxis_heroic: 'ACH_RELIQUARY_ILLUM_NYTHRAXIS_HEROIC',
+      col_reliquary_illum_thunzharr: 'ACH_RELIQUARY_ILLUM_THUNZHARR',
+      col_reliquary_illum_gravewyrm_heroic: 'ACH_RELIQUARY_ILLUM_GRAVEWYRM_HEROIC',
       pvp_arena_1v1_1750: 'ACH_ARENA_1V1_1750',
       pvp_arena_1v1_1900: 'ACH_ARENA_1V1_1900',
       pvp_arena_2v2_1900: 'ACH_ARENA_2V2_1900',

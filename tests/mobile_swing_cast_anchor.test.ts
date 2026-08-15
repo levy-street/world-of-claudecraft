@@ -11,6 +11,13 @@ import { describe, expect, it } from 'vitest';
 // landscape tiers. The painter-level behaviour is covered by
 // tests/swing_timer_painter.test.ts and tests/cast_bar_painter.test.ts; this file
 // only guards the mobile CSS seat + width-match.
+//
+// The selector-group patterns below deliberately allow the group to CONTINUE past
+// #swingbar (`[^{]*` before the brace) rather than requiring the bars to be its last
+// members: the pet health strip shares this same bottom-centre column and joins each
+// nudge group. What is pinned is that the bars are grouped WITH the frame's nudge and
+// carry its exact value, which is the contract issue 1577 (6) is about; who else rides
+// along is not. tests/client_shell.test.ts pins the strip's own membership.
 
 const mobileCss = readFileSync(
   new URL('../src/styles/hud.mobile.css', import.meta.url),
@@ -99,7 +106,36 @@ describe('mobile swing/cast bar anchoring (issue 1577 (6))', () => {
     // both bars must share that same seat or they drift off the frame edge, so
     // they are grouped with the frame in one selector list (issue 1577 (6)).
     expect(
-      /hud-mobile-compact #castbar,[\s\S]{0,80}hud-mobile-compact #swingbar \{/.test(mobileCss),
+      /hud-mobile-compact #castbar,[\s\S]{0,80}hud-mobile-compact #swingbar[^{]*\{/.test(mobileCss),
+    ).toBe(true);
+  });
+
+  it('mirrors the compact-tier frame nudge to the right in left-handed mode', () => {
+    // Left-handed mode mirrors Jump (and the whole action ring) to the left side,
+    // so the frame's Jump-dodging nudge must flip sign too, or it drifts into the
+    // mirrored Jump crescent instead of away from it.
+    expect(
+      /hud-mobile-compact\.mobile-left-handed #player-frame \{\s*left: calc\(50% \+ 15px\);/.test(
+        mobileCss,
+      ),
+    ).toBe(true);
+    expect(
+      /hud-mobile-compact\.mobile-left-handed #castbar,\s*body\.mobile-touch\.hud-mobile-compact\.mobile-left-handed #swingbar[^{]*\{\s*left: calc\(50% \+ 15px\);/.test(
+        mobileCss,
+      ),
+    ).toBe(true);
+  });
+
+  it('mirrors the narrow landscape-gated frame nudge to the right in left-handed mode', () => {
+    const landscapeStart = mobileCss.indexOf('max-width: 800px) and (orientation: landscape)');
+    expect(landscapeStart).toBeGreaterThan(-1);
+    const landscapeEnd = mobileCss.indexOf('/* Tablet:', landscapeStart);
+    expect(landscapeEnd).toBeGreaterThan(landscapeStart);
+    const landscapeBlock = mobileCss.slice(landscapeStart, landscapeEnd);
+    expect(
+      /hud-mobile-compact\.mobile-left-handed #player-frame,\s*body\.mobile-touch\.hud-mobile-compact\.mobile-left-handed #castbar,\s*body\.mobile-touch\.hud-mobile-compact\.mobile-left-handed #swingbar[^{]*\{\s*left: calc\(50% \+ 44px\);/.test(
+        landscapeBlock,
+      ),
     ).toBe(true);
   });
 });

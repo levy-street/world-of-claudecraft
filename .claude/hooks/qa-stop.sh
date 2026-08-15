@@ -2,8 +2,9 @@
 # QA stop-gate for World of ClaudeCraft.
 #
 # Runs at the end of EVERY Claude Code turn (the Stop hook). It deliberately does only
-# instant, near-zero-cost checks on the working tree's added lines (the unstaged tracked
-# diff plus untracked text files), so it never slows the edit loop. It NEVER runs tsc, vitest, biome, or the LLM review:
+# instant, near-zero-cost checks on the working tree's uncommitted added lines (the
+# tracked diff against HEAD, staged AND unstaged, plus untracked text files), so it never
+# slows the edit loop. It NEVER runs tsc, vitest, biome, or the LLM review:
 #   - a Stop hook fires on every turn, so heavy checks here would tax every iteration;
 #   - a hook is a shell command and cannot spawn the QA agent anyway.
 # The heavier deterministic floor (tsc, guard tests, biome) runs once per push in
@@ -13,12 +14,16 @@
 # What it blocks on (all hard project invariants from CLAUDE.md, all detectable instantly):
 #   - em dash, en dash, or emoji anywhere in code, comments, or docs;
 #   - a stray ".only(" in a test, which silently disables the rest of that suite;
-#   - a leftover "debugger" statement.
+#   - a leftover "debugger" statement;
+#   - a Math.random / Date.now / performance.now call added under src/sim/ (the
+#     determinism invariant; tests/architecture.test.ts is the deep guard, this is the
+#     instant tripwire; lines that START as comments are skipped).
 # On a hit it asks Claude to fix those exact lines before finishing. Otherwise it is silent.
 #
 # This script is checked in and runs on every contributor's machine. It is intentionally
 # small, dependency-light (bash + git + perl, all already required to work on this repo),
-# reads only `git diff`, writes nothing, and makes no network calls. See .claude/hooks/README.md.
+# reads only `git diff`, the untracked files git reports, and its own stdin; writes
+# nothing, and makes no network calls. See .claude/hooks/README.md.
 set -uo pipefail
 
 input=$(cat)
@@ -35,12 +40,15 @@ command -v perl >/dev/null 2>&1 || exit 0
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 
 # Added lines in this working tree, across source and docs, excluding locale overlays
-# (native punctuation such as a real em dash is legitimate there) and generated bundles.
+# and the Russian doc mirrors (native punctuation such as a real em dash is legitimate
+# there; keep this set identical to the copy-scan exclusions in .githooks/pre-push) and
+# generated bundles.
 pathspec=(
   .
   ':(exclude)src/ui/i18n.locales'
   ':(exclude)src/ui/i18n.resolved.generated'
   ':(exclude)src/admin/i18n.resolved.generated'
+  ':(exclude)docs/i18n/*.ru_RU.md'
   ':(exclude)*.lock'
   ':(exclude)package-lock.json'
 )
@@ -49,9 +57,9 @@ pathspec=(
 # all-added, so a brand-new file is scanned too. Untracked files are limited to text
 # extensions to skip binaries.
 stream=$(
-  git diff -U0 --no-color -- "${pathspec[@]}" 2>/dev/null
+  git diff HEAD -U0 --no-color -- "${pathspec[@]}" 2>/dev/null
   git ls-files --others --exclude-standard -- "${pathspec[@]}" 2>/dev/null \
-    | grep -Ei '\.(ts|tsx|js|mjs|cjs|json|md|css|html|ya?ml|sh)$' \
+    | grep -Ei '\.(ts|tsx|mts|cts|js|mjs|cjs|json|md|css|html|ya?ml|sh|svelte|toml|txt)$' \
     | while IFS= read -r f; do
         [ -f "$f" ] || continue
         printf '+++ b/%s\n' "$f"
@@ -78,6 +86,9 @@ out=$(printf '%s' "$stream" | perl -CSD -e '
       $cat = "stray .only( disables the suite";
     } elsif ($file =~ /\.(ts|tsx|js|mjs|cjs)$/ && $c =~ /^\s*debugger\s*;?\s*$/) {
       $cat = "leftover debugger";
+    } elsif ($file =~ m{^src/sim/.*\.ts$} && $c !~ m{^\s*(?://|\*|/\*)}
+             && $c =~ /\b(?:Math\.random|Date\.now|performance\.now)\s*\(/) {
+      $cat = "wall-clock or Math.random in sim code (use Rng and sim time)";
     }
     next unless $cat;
     my $snip = $c; $snip =~ s/^\s+//; $snip =~ s/\s+$//; $snip = substr($snip, 0, 80);
@@ -88,7 +99,8 @@ out=$(printf '%s' "$stream" | perl -CSD -e '
   my $n = scalar @hits;
   my $body = "QA stop-gate blocked: $n line(s) this change added violate a hard project invariant. "
     . "Fix every one before finishing (no em dashes, en dashes, or emojis anywhere; no stray .only() that "
-    . "disables a test suite; no leftover debugger statement):";
+    . "disables a test suite; no leftover debugger statement; no Math.random/Date.now/performance.now "
+    . "in src/sim, use Rng and sim time):";
   $body .= "\n- $_" for @hits;
   $body =~ s/([\\"])/\\$1/g;
   $body =~ s/([\x00-\x1f])/sprintf("\\u%04x", ord($1))/ge;

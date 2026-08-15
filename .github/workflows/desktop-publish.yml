@@ -7,10 +7,13 @@ name: Desktop publish
 #   - macOS: signed + notarized universal dmg + zip + blockmap, SHA256SUMS-mac,
 #     and latest-mac.yml. Requires the Apple signing secrets; the job refuses
 #     to publish an ad-hoc build.
-#   - Windows: the Azure-Key-Vault-signed universal NSIS installer (one exe
-#     covering x64 + arm64) + its blockmap + the per-arch zips,
-#     SHA256SUMS-windows, and latest.yml. Requires the Azure Key Vault signing
-#     secrets; the job refuses to publish an unsigned build.
+#   - Windows: the Azure-Key-Vault-signed per-arch NSIS installers (one
+#     win-x64.exe and one win-arm64.exe, build.nsis.buildUniversalInstaller:
+#     false, issue 2013) + their blockmaps + the per-arch zips,
+#     SHA256SUMS-windows, and latest.yml (both installers list in the SAME
+#     feed file; Windows update-info filenames carry no arch suffix). Requires
+#     the Azure Key Vault signing secrets; the job refuses to publish an
+#     unsigned build.
 # The full runbook, including the one-time R2, Apple, and Azure provisioning
 # these jobs depend on, is docs/desktop-release.md ("Publishing from CI").
 #
@@ -98,14 +101,34 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
+
+      # electron-builder downloads Electron itself plus its packaging tools
+      # into this cache directory on every build; a cold run redownloads tens
+      # to hundreds of MB before packaging even starts. Keyed on the
+      # lockfile since the Electron/electron-builder versions live in
+      # package.json devDependencies, which the lockfile fingerprints.
+      - name: Cache electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+          key: electron-builder-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            electron-builder-${{ runner.os }}-
 
       # Full website-channel build: vite client bundle baked for production,
       # then electron-builder producing the Linux arch matrix from
@@ -231,14 +254,34 @@ jobs:
             exit 1
           fi
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
+
+      # electron-builder downloads Electron itself plus its packaging tools
+      # into this cache directory on every build; a cold run redownloads tens
+      # to hundreds of MB before packaging even starts. Keyed on the
+      # lockfile since the Electron/electron-builder versions live in
+      # package.json devDependencies, which the lockfile fingerprints.
+      - name: Cache electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: electron-builder-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            electron-builder-${{ runner.os }}-
 
       # CSC_LINK is the base64 .p12 (electron-builder consumes it directly);
       # the App Store Connect API key must be a file on disk, so the .p8
@@ -376,14 +419,45 @@ jobs:
             exit 1
           fi
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
+
+      # electron-builder downloads Electron itself plus its packaging
+      # helper binaries (winCodeSign, nsis, etc) into these two folders on
+      # first use; without caching, every publish run re-downloads the
+      # same files even though the versions are pinned by pnpm-lock.yaml
+      # and rarely change between runs.
+      - name: Cache electron and electron-builder downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.LOCALAPPDATA }}\electron\Cache
+            ${{ env.LOCALAPPDATA }}\electron-builder\Cache
+          key: ${{ runner.os }}-electron-builder-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-builder-
+
+      # dotnet tool install --global resolves and restores AzureSignTool
+      # through the local NuGet global-packages folder; caching it avoids
+      # re-downloading the tool and its dependencies on every run. The
+      # install step below pins no explicit version, so there is no
+      # version to key on: the key is a fixed string.
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-azuresigntool
 
       # The sign hook shells out to the AzureSignTool dotnet global tool; the
       # runner's dotnet tools directory is already on PATH.
@@ -391,11 +465,13 @@ jobs:
         run: dotnet tool install --global AzureSignTool
 
       # Full website-channel build: the Windows target matrix from
-      # package.json "build" is nsis + zip for x64 + arm64, and with no nsis
-      # block electron-builder's buildUniversalInstaller default emits ONE
-      # combined installer covering both arches, plus latest.yml. Every
-      # signable file (the installer, the app exe inside the per-arch zips,
-      # the uninstaller) is signed by the hook as electron-builder emits it.
+      # package.json "build" is nsis + zip for x64 + arm64, and
+      # nsis.buildUniversalInstaller: false makes electron-builder emit a
+      # SEPARATE installer per arch (win-x64.exe, win-arm64.exe) instead of
+      # one dual-arch exe, both listed in the same latest.yml (issue 2013).
+      # Every signable file (each installer, the app exe inside the per-arch
+      # zips, the uninstaller) is signed by the hook as electron-builder
+      # emits it.
       - name: Build signed Windows desktop artifacts
         env:
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -441,10 +517,10 @@ jobs:
           cat SHA256SUMS-windows
 
       # Unlike the linux/mac jobs this does NOT pin literal filenames: the
-      # universal-NSIS installer name is defined by what electron-builder
-      # emitted into latest.yml (docs/desktop-release.md), so the feed is the
-      # source of truth and every file it references must exist, carry this
-      # release's version, and (for the installer) have its blockmap. A
+      # per-arch installer names are defined by what electron-builder emitted
+      # into latest.yml (docs/desktop-release.md), so the feed is the source
+      # of truth and every file it references (both arches) must exist, carry
+      # this release's version, and (for each installer) have its blockmap. A
       # dev*.yml misbake fails here instead of publishing. Runs on dry runs
       # too, so a rehearsal proves the same contract a release relies on.
       - name: Verify expected artifacts

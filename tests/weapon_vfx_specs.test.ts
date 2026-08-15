@@ -22,6 +22,22 @@ describe('WEAPON_VFX specs', () => {
     }
   });
 
+  it('keeps every shell power strictly positive, on the tier and on any override', () => {
+    // The rim shell raises its fresnel term to this exponent. Since the domain
+    // guard landed, that base reaches EXACTLY 0.0 on the silhouette instead of a
+    // tiny epsilon, and pow(0.0, y) is undefined for y <= 0 the same way a
+    // negative base is: it would NaN a whole rim band into the bloom, which is
+    // the black rectangle this pair of pins exists to keep shut. See
+    // tests/shader_pow_domain.test.ts for the base half.
+    for (const [name, tier] of Object.entries(TIERS)) {
+      expect(tier.shell.power, `tier ${name}: shell.power must be > 0`).toBeGreaterThan(0);
+    }
+    for (const [key, spec] of Object.entries(WEAPON_VFX)) {
+      if (spec.shell?.power === undefined) continue;
+      expect(spec.shell.power, `${key}: shell.power override must be > 0`).toBeGreaterThan(0);
+    }
+  });
+
   it('uses only known fx component kinds', () => {
     for (const [key, spec] of Object.entries(WEAPON_VFX)) {
       expect(spec.fx.length, `${key}: empty fx array`).toBeGreaterThan(0);

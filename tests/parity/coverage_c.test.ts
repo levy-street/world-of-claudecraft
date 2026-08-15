@@ -10,6 +10,9 @@
 // entities helpers live in run_scenarios.ts.
 
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../../src/sim/data';
+import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
+import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
 import { SCENARIOS } from './scenarios';
@@ -74,7 +77,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'death')).toBe(true);
   });
 
-  it('c4b_effect_dispatch: runEffects fans across sunder/aoe/finisher/judgement/fear/groundAoE/summon/form', () => {
+  it('c4b_effect_dispatch: runEffects fans across sunder/aoe/finisher/fear/groundAoE/summon/form', () => {
     const rec = run('c4b_effect_dispatch');
     const ev = rec.allEvents as Ev[];
     const ents = entities(rec);
@@ -106,7 +109,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       ev.some((e) => e.type === 'damage' && e.sourceId === rogue && e.school === 'physical'),
     ).toBe(true);
     expect(ev.some((e) => e.type === 'comboPoint' && e.pid === rogue && e.points === 0)).toBe(true);
-    // paladin judgement: a holy damage from the paladin (the Seal unleashed).
+    // paladin consecration: holy damage came from the Paladin.
     const paladin = rec.notes.paladinId as number;
     expect(
       ev.some((e) => e.type === 'damage' && e.sourceId === paladin && e.school === 'holy'),
@@ -292,20 +295,28 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
   }, 90_000);
 
-  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+  it('warrior_row_capstones: intervene, thresholded fear, victory rush heal, bladestorm ticks', () => {
     const rec = run('warrior_row_capstones');
     const sim = rec.sim as any;
     const pid = sim.playerId;
     const ev = rec.allEvents as Ev[];
-    expect(rec.notes.chargeSpent).toBe(2);
-    expect(rec.notes.chargeRecharging).toBe(true);
-    const feared = entities(rec).find((e) =>
-      e.auras?.some((a: any) => a.id === 'fear_incap'),
-    ) as any;
-    expect(feared).toBeTruthy();
-    const fear = feared.auras.find((a: any) => a.id === 'fear_incap');
-    expect(fear.breaksOnDamage).toBe(true);
-    expect(fear.breakThreshold).toBeGreaterThan(0);
+    // The hostile Onrush keeps both side effects...
+    expect(rec.notes.onrushRage).toBe(true);
+    expect(rec.notes.onrushInCombat).toBe(true);
+    // ...and the friendly Intervene takes neither, while shielding the ally.
+    expect(rec.notes.interveneShield).toBe(50);
+    expect(rec.notes.interveneClosed).toBe(true);
+    expect(rec.notes.interveneRage).toBe(0);
+    expect(rec.notes.interveneInCombat).toBe(false);
+    expect(rec.notes.interveneAutoAttack).toBe(false);
+    // Read at APPLY, not from end-of-run state: the legs after the shout run over
+    // five seconds, so anything shorter than the old 8 sec fear has expired by the
+    // end and an end-state lookup quietly finds nothing to assert.
+    expect(rec.notes.fearApplied).toBe(true);
+    expect(rec.notes.fearDuration).toBe(4);
+    expect(rec.notes.fearBreaksOnDamage).toBe(true);
+    // Lingering Dread's soak, 10% of the wolf's max health.
+    expect(rec.notes.fearBreakThreshold).toBeGreaterThan(0);
     expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
       true,
     );
@@ -404,5 +415,228 @@ describe('coverage: each scenario fires its subsystem', () => {
     const signedUnits = signed.reduce((n: number, s: any) => n + s.count, 0);
     expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
     expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
+  });
+  it('druid_engines: all three live buttons arm and their payoffs fire', () => {
+    const rec = run('druid_engines');
+    expect(rec.notes.moonlashArmed).toBe(true);
+    expect(rec.notes.sunlanceArmed).toBe(true);
+    expect(rec.notes.redharvestArmed).toBe(true);
+    expect(rec.notes.marrowbreakArmed).toBe(true);
+    expect(rec.notes.overbloomArmed).toBe(true);
+    const abilities = (rec.allEvents as Ev[])
+      .filter((event) => event.type === 'damage' || event.type === 'heal2')
+      .map((event) => event.ability);
+    expect(abilities).toContain('Moonsurge');
+    expect(abilities).toContain('Sunwake');
+    expect(abilities).toContain('Redharvest');
+    expect(abilities).toContain('Marrowbreak');
+    expect(abilities).toContain('Overbloom');
+  });
+
+  it('priest_codex: all three baseline loops fire and respec cleanup completes', () => {
+    const rec = run('priest_codex');
+    const ev = rec.allEvents as Ev[];
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Doctrine')).toBe(true);
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Seraphic Vigil')).toBe(
+      true,
+    );
+    expect(ev.some((event) => event.type === 'heal2' && event.ability === 'Choirmend')).toBe(true);
+    expect(
+      ev.some((event) => event.type === 'heal2' && event.ability === 'Sunburst Canticle'),
+    ).toBe(true);
+    expect(ev.some((event) => event.type === 'damage' && event.ability === 'Effigy Echo')).toBe(
+      true,
+    );
+    expect(
+      ev.some((event) => event.type === 'damage' && event.ability === 'Tithefiend Strike'),
+    ).toBe(true);
+    expect(rec.notes.guardianId).not.toBeNull();
+    expect(rec.notes.bankBeforeMindfracture).toBe(0);
+    expect(rec.notes.bankAfterMindfracture).toBe(1);
+    expect(rec.notes.mindfractureEchoTargets).toEqual(rec.notes.expectedEchoTargets);
+    expect(rec.notes.foreignOwnerIsolated).toBe(true);
+    expect(rec.notes.manaAfterGuardian).toBeGreaterThan(rec.notes.manaAfterSummon as number);
+    expect(rec.notes.respecSucceeded).toBe(true);
+    expect(rec.notes.cleanupComplete).toBe(true);
+  });
+
+  // This block exists because its absence is what let the scenario rot. Its
+  // stand point for step 1 was an inlined coordinate; the v0.32.0 merge moved
+  // ore_mirefen_t2 and the harvest became a "Too far away." denial, faithfully
+  // recorded in the golden as 0 draws at the fine-grade frame and 4 total where
+  // three granted harvests are 6. The gate stayed green the whole time, because
+  // nothing here asserted the fine-grade arm actually fires.
+  it('professions_gather_fine: all three harvests grant, and only the full-grade vein upgrades', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_gather_fine')!);
+    const ev = rec.allEvents as Ev[];
+
+    // Three granted harvests, in drive order, each carrying the grade its vein
+    // and tool resolve to: fine at the full-grade vein (tier-3 pick strictly
+    // above iron's rung 2), plain at the zone's tier-1 vein (the vein is below
+    // the rung, so no tool upgrades it), plain at the herb patch (the tier-2
+    // sickle only MATCHES goldleaf's rung, and the pick is the wrong
+    // profession).
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers).toHaveLength(3);
+    expect(gathers.map((e) => [e.nodeId, e.itemId])).toEqual([
+      ['ore_mirefen_t2', 'fine_iron_ore'],
+      ['ore_mirefen_1', 'iron_ore'],
+      ['herb_mirefen_t2', 'goldleaf_herb'],
+    ]);
+
+    // No harvest was refused for standing in the wrong place: the exact
+    // regression this block guards, and the reason step 1's stand point is
+    // derived from the node instead of inlined.
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Too far away.')).toBe(false);
+
+    // Two draws per granted harvest and no more: six total, with the
+    // fine-grade arm spending its own two (it spent ZERO while stale).
+    const fine = trace.frames.find((f) => f.label === 'fine-grade-at-full-tier-vein');
+    expect(fine, 'missing the fine-grade checkpoint frame').toBeTruthy();
+    expect(fine!.rng.draws).toBe(2);
+    expect(trace.draws).toBe(6);
+  });
+
+  it('professions_tool_effect_slot: draw-free mint, the quantity bonus fires, and one charge settles', () => {
+    const { trace, rec } = record(
+      SCENARIOS.find((s) => s.name === 'professions_tool_effect_slot')!,
+    );
+    const ev = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId as number;
+    const meta = (rec.sim as any).players.get(pid);
+
+    // Two mints landed on the slot action (the 'always' mint plus the R40
+    // prompt re-slot), both for this player's mining profession, and both
+    // consumed charm copies are gone from the bags.
+    const slotted = ev.filter((e) => e.type === 'toolEffectResult' && e.action === 'slot');
+    expect(slotted).toHaveLength(2);
+    for (const s of slotted) {
+      expect(s.ok).toBe(true);
+      expect(s.professionId).toBe('mining');
+      expect(s.effectId).toBe('gatherers_cache');
+      expect(s.pid).toBe(pid);
+    }
+    expect(meta.inventory.some((s: any) => s.itemId === 'gatherers_cache')).toBe(false);
+    // Draw-free in every arm: the whole mint stands at zero draws.
+    const minted = trace.frames.find((f) => f.label === 'effect-slotted');
+    expect(minted, 'missing the mint checkpoint frame').toBeTruthy();
+    expect(minted!.rng.draws).toBe(0);
+
+    // Three granted harvests, in drive order: the 'always' bonus harvest,
+    // the R40 UNCONFIRMED prompt use (base quantity, the fail-safe), and
+    // the CONFIRMED prompt use (+1 fires). gatherResult carries no effect
+    // flag, so each +1 is read off the granted qty against the shipped
+    // yield table for the SAME rolled rarity (the same-draw base the R42
+    // settle compares against).
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers.map((g) => g.nodeId)).toEqual([
+      'ore_mirefen_t2',
+      'ore_mirefen_1',
+      'ore_mirefen_t2b',
+    ]);
+    const qtyByRarity: Record<string, number> = {
+      common: 1,
+      uncommon: 2,
+      rare: 2,
+      epic: 3,
+      legendary: 4,
+    };
+    const baseOf = (g: Ev): number => qtyByRarity[g.rarity] * (g.rareEvent ? 5 : 1);
+    expect(gathers[0].professionId).toBe('mining');
+    expect(gathers[0].qty).toBe(baseOf(gathers[0]) + 1);
+    expect(gathers[1].qty).toBe(baseOf(gathers[1]));
+    expect(gathers[2].qty).toBe(baseOf(gathers[2]) + 1);
+    // A 30-charge slot never empties here, so the last-charge flag stays
+    // ABSENT from every event (the additive-optional wire contract).
+    expect(gathers.every((g) => !('effectDepleted' in g))).toBe(true);
+
+    // The draw ledger, cumulative per checkpoint (rng.draws counts from
+    // drive start): every granted harvest is exactly two draws and nothing
+    // else draws, so the R40 consent gate adds NO draw on either of its
+    // arms and both mints stay draw-free (the prompt re-slot checkpoint
+    // sits at the same count as the harvest before it).
+    const drawsAt = (label: string): number => {
+      const frame = trace.frames.find((f) => f.label === label);
+      expect(frame, `missing the ${label} checkpoint frame`).toBeTruthy();
+      return frame?.rng.draws ?? -1;
+    };
+    expect(drawsAt('harvest-with-effect-applied')).toBe(2);
+    expect(drawsAt('prompt-mode-reslotted')).toBe(2);
+    expect(drawsAt('prompt-unconfirmed-skips-whole')).toBe(4);
+    expect(drawsAt('prompt-confirmed-fires-and-spends')).toBe(6);
+    expect(
+      ev.some(
+        (e) => e.type === 'error' && e.text === 'This resource node has not respawned for you yet.',
+      ),
+    ).toBe(true);
+    expect(trace.draws).toBe(6);
+
+    // The R42 charge settle, pinned where the golden records it: the final
+    // checkpoint's sampled slot row. One bonus-bearing harvest spent exactly
+    // one charge, so durability sits strictly below the slot's own ceiling.
+    // The ceiling is an absolute pin, not a self-comparison: 20 base charges
+    // for the cache plus one rarity rung for the uncommon tier-3 pick, and the
+    // R47 use-time ratchet leaves it there because that pick was already the
+    // best tool owned at mint time.
+    const finalFrame = trace.frames.find((f) => f.label === 'final');
+    expect(finalFrame, 'missing the final checkpoint frame').toBeTruthy();
+    const slot = (finalFrame!.players?.[0] as any)?.toolEffectSlots?.mining;
+    expect(slot, 'the final checkpoint sampled no mining tool-effect slot').toBeTruthy();
+    expect(slot.effectId).toBe('gatherers_cache');
+    // The R40 re-slot carried the prompt mode onto the live row, and only
+    // the CONFIRMED use spent from the fresh 30: the unconfirmed one kept
+    // its charge (the fail-safe), so exactly one charge is gone.
+    expect(slot.confirmMode).toBe('prompt');
+    // The self-signed charm's signer became the slot's original-crafter identity.
+    expect(slot.craftedBy).toBe(meta.name);
+    expect(slot.maxDurability).toBe(30);
+    expect(slot.durability).toBeLessThan(slot.maxDurability);
+    expect(slot.durability).toBe(29);
+  });
+
+  it('rift_boss_floor: stretched S fuse spawns, detonates, and boss death clears the pending zone', () => {
+    const rec = run('rift_boss_floor');
+    const ev = rec.allEvents as Ev[];
+    const n = rec.notes as Record<string, unknown>;
+    // The driver fired twice: the driven fuse plus the pre-death zone.
+    const spawns = ev.filter((e) => e.type === 'riftDeathZoneSpawn');
+    expect(spawns.length).toBeGreaterThanOrEqual(2);
+    // The first fuse carries the S tempo (0.7) times the capped 50%-slow
+    // stretch (2x) over Venom Pool's authored castTime: both arms really ran.
+    expect((spawns[0] as { durationSecs?: number }).durationSecs).toBeCloseTo(
+      MOBS.rift_boss_venom.deathZoneCast!.castTime * RIFT_S_ZONE_TEMPO * RIFT_IMPAIRED_FUSE_CAP,
+      5,
+    );
+    // The fuse ran out: the detonation telegraph line fired.
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && typeof e.text === 'string' && e.text.includes('Venom Pool'),
+      ),
+    ).toBe(true);
+    // Boss death cancelled the pending zone and told online mirrors.
+    expect(ev.some((e) => e.type === 'riftDeathZoneClear')).toBe(true);
+    // The escape window was genuinely open while the guard fought, and the
+    // guard's web never landed inside it (riftControlSuppressed fired).
+    expect(n.windowOpenDuringGuardFight).toBe(true);
+    expect(n.playerRootedInWindow).toBe(false);
+  });
+
+  it('idle_mob_distance_culling: advances the near mob, freezes the far mob, and keeps passive rolls off the shared stream', () => {
+    const scenario = SCENARIOS.find((item) => item.name === 'idle_mob_distance_culling');
+    expect(scenario, 'missing the idle-mob culling parity scenario').toBeTruthy();
+    if (!scenario) return;
+
+    const { trace, rec } = record(scenario);
+    expect(rec.sim.cfg.idleMobTickRadius).toBe(100);
+    const near = rec.sim.entities.get(rec.notes.nearMobId as number);
+    const far = rec.sim.entities.get(rec.notes.farMobId as number);
+    expect(near, 'near boundary probe disappeared').toBeTruthy();
+    expect(far, 'far boundary probe disappeared').toBeTruthy();
+    if (!near || !far) return;
+    expect(Math.hypot(near.pos.x - near.spawnPos.x, near.pos.z - near.spawnPos.z)).toBeGreaterThan(
+      0.1,
+    );
+    expect({ x: far.pos.x, z: far.pos.z }).toEqual({ x: far.spawnPos.x, z: far.spawnPos.z });
+    expect(trace.draws).toBe(0);
   });
 });

@@ -65,7 +65,10 @@ describe('planJoin (pure decision core)', () => {
 
   it('resumes the same character when its held session is linkdead and same-account', () => {
     expect(
-      planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: true, left: false } }),
+      planJoin({
+        ...base,
+        sameCharacter: { accountId: 7, linkdead: true, left: false, escrowQuarantined: false },
+      }),
     ).toEqual({
       action: 'resume',
     });
@@ -73,7 +76,10 @@ describe('planJoin (pure decision core)', () => {
 
   it('rejects the same character while its session socket is still live', () => {
     expect(
-      planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: false, left: false } }),
+      planJoin({
+        ...base,
+        sameCharacter: { accountId: 7, linkdead: false, left: false, escrowQuarantined: false },
+      }),
     ).toEqual({
       action: 'reject',
       error: 'character already in world',
@@ -88,7 +94,10 @@ describe('planJoin (pure decision core)', () => {
     // Reject with the transient conflict error instead; the client's reconnect
     // policy retries it, and the retry lands on the fresh-acquire arm.
     expect(
-      planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: true, left: true } }),
+      planJoin({
+        ...base,
+        sameCharacter: { accountId: 7, linkdead: true, left: true, escrowQuarantined: false },
+      }),
     ).toEqual({
       action: 'reject',
       error: 'character already in world',
@@ -97,7 +106,10 @@ describe('planJoin (pure decision core)', () => {
 
   it('rejects a linkdead session owned by a different account (takeover stays explicit)', () => {
     expect(
-      planJoin({ ...base, sameCharacter: { accountId: 8, linkdead: true, left: false } }),
+      planJoin({
+        ...base,
+        sameCharacter: { accountId: 8, linkdead: true, left: false, escrowQuarantined: false },
+      }),
     ).toEqual({
       action: 'reject',
       error: 'character already in world',
@@ -238,6 +250,35 @@ describe('linkdead grace lifecycle', () => {
     expect(server.socketClosed(session, ws)).toBe(false);
     expect(session.linkdead).toBe(false);
     expect(server.clients.size).toBe(0);
+  });
+
+  it('disconnectAccount kicks every live session for the account unconditionally, even one authenticated with the same stolen bearer token', async () => {
+    const server = new GameServer();
+    const wsVictim = fakeWs();
+    const wsAttacker = fakeWs();
+    // Both sessions join as GM (isGm=true): MAX_ACTIVE_SESSIONS_PER_ACCOUNT caps an
+    // account at one LIVE session, and GMs are the one exemption, which is the
+    // simplest way to get two simultaneous live sessions for one account in this
+    // test. A bearer token is a reusable wire credential, not a per-socket identity,
+    // so an attacker holding a stolen/shared token can authenticate their own live
+    // session with it; disconnectAccount must not spare either session by token
+    // equality (a prior revision did exactly that, and it could just as easily have
+    // spared the attacker's session instead of the victim's own).
+    const victimSession = expectJoined(
+      server.join(wsVictim, 11, 101, 'Victim', 'warrior', null, true),
+    );
+    const attackerSession = expectJoined(
+      server.join(wsAttacker, 11, 102, 'Attacker', 'warrior', null, true),
+    );
+
+    server.disconnectAccount(11, 'credential change');
+    await vi.waitFor(() => {
+      expect(victimSession.left).toBe(true);
+      expect(attackerSession.left).toBe(true);
+    });
+
+    expect(server.clients.has(victimSession.pid)).toBe(false);
+    expect(server.clients.has(attackerSession.pid)).toBe(false);
   });
 
   it('fully logs the character out when the grace window expires', async () => {
@@ -432,7 +473,7 @@ describe('reconnect policy (client-side conflict tolerance)', () => {
     const plan = planJoin({
       accountId: 7,
       isGm: false,
-      sameCharacter: { accountId: 7, linkdead: false, left: false },
+      sameCharacter: { accountId: 7, linkdead: false, left: false, escrowQuarantined: false },
       liveOtherSessions: 0,
       maxPerAccount: 1,
     });
@@ -572,5 +613,25 @@ describe('deliberate logout skips linkdead grace', () => {
     const fresh = expectJoined(server.join(fakeWs(), 11, 101, 'Loggedout', 'warrior', null));
     expect(fresh.characterId).toBe(101);
     expect(fresh.left).toBe(false);
+  });
+});
+
+describe('planJoin: an escrow-quarantined session is never resumed', () => {
+  // A quarantined session's live state was abandoned: saveCharacter returns
+  // early for it, forever. Resuming it inside the linkdead grace would hand
+  // the player a session that plays normally and persists NOTHING, with no
+  // error and no signal, which is silent unbounded data loss. The refusal is
+  // transient by contract: the client's reconnect policy retries and lands on
+  // a fresh join that loads the durable row, which is what the rollback wants.
+  const base = { accountId: 7, isGm: false, liveOtherSessions: 0, maxPerAccount: 2 };
+  it('refuses the resume it would otherwise allow', () => {
+    const view = { accountId: 7, linkdead: true, left: false };
+    expect(planJoin({ ...base, sameCharacter: { ...view, escrowQuarantined: false } })).toEqual({
+      action: 'resume',
+    });
+    expect(planJoin({ ...base, sameCharacter: { ...view, escrowQuarantined: true } })).toEqual({
+      action: 'reject',
+      error: 'character already in world',
+    });
   });
 });

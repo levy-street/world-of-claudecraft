@@ -26,7 +26,6 @@
 //
 // `src/sim`-pure: sibling sim modules + the SimContext seam only.
 
-import { ABILITIES } from '../data';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
@@ -110,6 +109,34 @@ export function fireGuaranteedCrit(
   if (abilityId === 'scorch' && target && target.hp <= target.maxHp * SCORCH_EXECUTE_HP)
     return true;
   return false;
+}
+
+/** Phoenix Trance restokes the bank (designer rule 2026-07-25): casting it
+ *  instantly FINISHES the Cinderfall charge that is currently recharging, so
+ *  a mid-fight Trance window always opens with at least one guaranteed crit
+ *  to dump on the slow 30s recharge. Completing the running timer (instead
+ *  of conjuring a bonus charge) advances the bank's schedule without growing
+ *  it, so fight-long throughput stays inside the sustained parity band (a
+ *  plain +1 grant measured 1.27x the frost comparator at 60s/120s, over the
+ *  1.25 gate). No-op at a full bank (the pre-pull case: the charge state
+ *  does not even exist until the first press) and for anyone outside the
+ *  fire spec. Plain charge-state math; draws no rng. */
+export function combustionRestokesCinderfall(ctx: SimContext, p: Entity, abilityId: string): void {
+  if (abilityId !== 'combustion') return;
+  if (!fireSpecMods(ctx, p)) return;
+  const bank = p.abilityCharges?.fire_blast;
+  if (!bank || bank.charges >= bank.maxCharges) return; // bank already full
+  bank.charges += 1;
+  // The soonest-running recharge just completed early: retire ITS timer
+  // (parallel per-charge model, sorted soonest-first) and re-mirror the
+  // empty-bank cooldown swirl, exactly as a natural completion would.
+  if (bank.recharges?.length) {
+    bank.recharges.shift();
+    bank.recharge = bank.recharges[0] ?? 0;
+  } else {
+    bank.recharge = 0;
+  }
+  if (bank.charges > 0) p.cooldowns.delete('fire_blast');
 }
 
 /** Hot Streak: two consecutive BUILDER crits arm a free, instant Pyroblast or
@@ -246,14 +273,29 @@ export function fireMageCauterize(
 }
 
 /** Bank a burn on the target over IGNITE_DURATION, STACKING into the running
- *  Ignite (per-tick value grows, clock refreshes). The caller computes the
- *  burn from RESOLVED damage; draws no rng. */
+ *  Ignite. Balance 2026-07-24 (live 27s raid parse): a re-bank FOLDS the
+ *  unpaid remainder forward into the fresh 6s window instead of re-extending
+ *  the whole accumulated per-tick for free. The old refresh paid a steady
+ *  crit stream far more than the stated 40%-over-6s contract (the measured
+ *  overpay was ~2x on the reported fight, the biggest single slice of the
+ *  fire outlier). Total payout now equals the sum of the banked burns, order
+ *  and cadence independent. The caller computes the burn from RESOLVED
+ *  damage; draws no rng. */
 export function applyIgnite(ctx: SimContext, source: Entity, target: Entity, burn: number): void {
   if (burn <= 0 || target.dead) return;
-  const perTick = Math.max(1, Math.round(burn / (IGNITE_DURATION / IGNITE_INTERVAL)));
+  const spreadTicks = IGNITE_DURATION / IGNITE_INTERVAL;
+  const perTick = Math.max(1, Math.round(burn / spreadTicks));
   const existing = target.auras.find((a) => a.id === 'ignite' && a.sourceId === source.id);
   if (existing) {
-    existing.value += perTick;
+    // Ticks this aura would still fire on its current clock (updateAuras
+    // fires at tickTimer, tickTimer + interval, ... while remaining > 0).
+    const timer = existing.tickTimer ?? existing.tickInterval ?? IGNITE_INTERVAL;
+    const ticksLeft =
+      existing.remaining >= timer
+        ? Math.floor((existing.remaining - timer) / IGNITE_INTERVAL) + 1
+        : 0;
+    const outstanding = existing.value * ticksLeft;
+    existing.value = Math.max(1, Math.round((outstanding + burn) / spreadTicks));
     existing.remaining = IGNITE_DURATION;
     existing.duration = IGNITE_DURATION;
     return;
@@ -262,6 +304,9 @@ export function applyIgnite(ctx: SimContext, source: Entity, target: Entity, bur
     id: 'ignite',
     name: 'Ignite',
     kind: 'dot',
+    // The bank copies RESOLVED damage: its ticks must not pick up the
+    // source-output multipliers a second time (dealDamage alreadyFinal).
+    finalDamage: true,
     value: perTick,
     remaining: IGNITE_DURATION,
     duration: IGNITE_DURATION,
@@ -289,9 +334,4 @@ export function igniteOnCrit(
   const mods = fireSpecMods(ctx, source);
   if (!mods || mods.global.ignitionPct <= 0) return;
   applyIgnite(ctx, source, target, Math.round(amount * mods.global.ignitionPct));
-}
-
-/** Does this ability id name a mage ability (used by tests and tooling). */
-export function isFireSpender(abilityId: string): boolean {
-  return HOT_STREAK_SPENDERS.includes(abilityId) && ABILITIES[abilityId] !== undefined;
 }

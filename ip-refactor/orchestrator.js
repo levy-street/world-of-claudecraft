@@ -15,12 +15,12 @@ export const meta = {
 //   must be committed on feature/ip-pivot BEFORE this orchestrator runs. Tracks apply the LOCKED
 //   NAME-MAP; if it is not LOCKED, every slice STOPS.
 
-const BASE = '/Users/reubenhorne/Documents/code/world-of-claudecraft/world-of-claudecraft' // feature/ip-pivot (integration target)
-const VOCAB_WT = '/Users/reubenhorne/Documents/code/world-of-claudecraft/wt-ip-vocab'       // track/ip-vocab
-const CREAT_WT = '/Users/reubenhorne/Documents/code/world-of-claudecraft/wt-ip-creatures'   // track/ip-creatures
-const WORLD_WT = '/Users/reubenhorne/Documents/code/world-of-claudecraft/wt-ip-world'       // track/ip-world
-const TEXT_WT  = '/Users/reubenhorne/Documents/code/world-of-claudecraft/wt-ip-text'        // track/ip-text
-const PKT = '/Users/reubenhorne/Documents/code/woc-refactor/ip-refactor'
+const BASE = 'world-of-claudecraft/world-of-claudecraft' // feature/ip-pivot (integration target)
+const VOCAB_WT = 'world-of-claudecraft/wt-ip-vocab'       // track/ip-vocab
+const CREAT_WT = 'world-of-claudecraft/wt-ip-creatures'   // track/ip-creatures
+const WORLD_WT = 'world-of-claudecraft/wt-ip-world'       // track/ip-world
+const TEXT_WT  = 'world-of-claudecraft/wt-ip-text'        // track/ip-text
+const PKT = 'woc-refactor/ip-refactor'
 const WM = `${PKT}/02-WORKING-MEMORY.md`
 
 // The regen that EVERY rename slice runs after its English edits (deterministic, idempotent).

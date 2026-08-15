@@ -27,13 +27,22 @@ const entrySource = `
   export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt } from './src/sim/data.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
+  export { DELVE_SHOPS } from './src/sim/content/delves/shop.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
+  export { RELIQUARY_PAGES } from './src/sim/content/reliquary.ts';
+  export { MOUNTS } from './src/sim/content/mounts.ts';
+  export { WEAPON_SKINS } from './src/sim/content/weapon_skins.ts';
+  export { armorySkinStrings } from './src/ui/i18n.catalog/armory.ts';
+  export { guideStrings } from './src/ui/i18n.catalog/guide.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
   export {
     CRAFT_RING, STATIONS, STATION_TYPE_BY_CRAFT, STATION_RADIUS, PERK_THRESHOLDS,
-    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_THROTTLE_WINDOW_SECONDS,
-    CRAFT_THROTTLE_MAX_PER_WINDOW, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
+    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_CAST_DURATION_FIELD_SEC,
+    CRAFT_CAST_DURATION_SKILL_25_SEC, CRAFT_CAST_DURATION_SKILL_50_SEC,
+    CRAFT_CAST_DURATION_SKILL_75_SEC, CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+    ENCHANT_FAMILY_CAST_DURATION_SEC, TOOL_RECHARGE_CAST_DURATION_SEC,
+    CRAFT_BATCH_MAX, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
   } from './src/sim/content/professions.ts';
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
@@ -42,6 +51,7 @@ const entrySource = `
   export {
     TIER_SKILL_STEP, tierForSkill, REDUCED_TIER_MULTIPLIER, MINIMAL_TIER_MULTIPLIER,
   } from './src/sim/professions/wheel.ts';
+  export { WIELD_REQUIREMENT_BY_TIER } from './src/sim/professions/wield_gate.ts';
   export { TRAINING_FEE_BY_TIER, trainingFeeFor } from './src/sim/professions/training.ts';
   export {
     NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE, GATHER_CAST_BASE_SEC, GATHER_CAST_FLOOR_SEC,
@@ -102,9 +112,15 @@ const {
   NPCS,
   DELVE_COMPANIONS,
   DELVE_AFFIXES,
+  DELVE_SHOPS,
   DEEDS,
   DEED_ORDER,
   DEED_IMAGE_IDS,
+  RELIQUARY_PAGES,
+  MOUNTS,
+  WEAPON_SKINS,
+  armorySkinStrings,
+  guideStrings,
   VISUALS,
   visualKeyFor,
   FISHING_SESSION_CAP_SEC,
@@ -116,8 +132,14 @@ const {
   STATION_RADIUS,
   PERK_THRESHOLDS,
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
+  CRAFT_CAST_DURATION_FIELD_SEC,
+  CRAFT_CAST_DURATION_SKILL_25_SEC,
+  CRAFT_CAST_DURATION_SKILL_50_SEC,
+  CRAFT_CAST_DURATION_SKILL_75_SEC,
+  CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+  ENCHANT_FAMILY_CAST_DURATION_SEC,
+  TOOL_RECHARGE_CAST_DURATION_SEC,
+  CRAFT_BATCH_MAX,
   GATHERING_PROFESSIONS,
   GATHERING_PROFESSION_IDS,
   ALL_RECIPES,
@@ -126,6 +148,7 @@ const {
   FISHING_TABLES_BY_BAND,
   FISHING_RARE_ID,
   TIER_SKILL_STEP,
+  WIELD_REQUIREMENT_BY_TIER,
   tierForSkill,
   REDUCED_TIER_MULTIPLIER,
   MINIMAL_TIER_MULTIPLIER,
@@ -212,12 +235,19 @@ function tintFor(visualKey, entityColor) {
   if (!def || def.tint === undefined) return null;
   return def.tint === 'entity' ? entityColor : def.tint;
 }
+// The manifest's tint strength for a tinted model, resolved with the same fallback
+// modelKeyFor bakes onto MODELS[visualKey], so a figure's own record and its model spec
+// never disagree. Baked onto the figure alongside tint/still and threaded into
+// stillUrl/stillKey so a tintStrength-only manifest edit (no tint color change) mints a
+// new still key: the old committed WebP orphans and the new one is missing until someone
+// regenerates, which is the self-detection this module exists for (see still_key.mjs).
+function tintStrengthFor(visualKey) {
+  const def = VISUALS[visualKey];
+  if (!def || def.tint === undefined) return undefined;
+  return def.tintStrength ?? 0.4;
+}
 const playerVisualKey = (id) => visualKeyFor({ kind: 'player', templateId: id });
 const mobVisualKey = (id) => visualKeyFor({ kind: 'mob', templateId: id });
-
-// How many early, spoiler-safe abilities lead the "signature kit". The full kit
-// (allAbilities) follows so every class icon is showcased.
-const SIGNATURE_COUNT = 6;
 
 const classes = ALL_CLASSES.map((id) => {
   const def = CLASSES[id];
@@ -231,11 +261,15 @@ const classes = ALL_CLASSES.map((id) => {
     signature: s.signature,
   }));
   const roles = ROLE_ORDER.filter((r) => specs.some((s) => s.role === r));
-  const kit = def.abilities ?? [];
+  const kit = (def.abilities ?? []).filter((abilityId) => {
+    const ability = ABILITIES[abilityId];
+    return ability && ability.hiddenFromPlayer !== true;
+  });
   // The class preview uses the same model + white tint the in-game character creator does.
   const vk = playerVisualKey(id);
   const tint = tintFor(vk, 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   return {
     id,
@@ -243,11 +277,17 @@ const classes = ALL_CLASSES.map((id) => {
     resource: def.resourceType,
     roles,
     specs,
-    signatureAbilities: kit.slice(0, SIGNATURE_COUNT).map(abilityRef),
+    signatureAbilities: kit
+      .filter((abilityId) => guideStrings.abilityHook[abilityId] !== undefined)
+      .slice(0, 6)
+      .map(abilityRef),
     abilities: kit.map(abilityRef),
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -304,11 +344,15 @@ const druidForms = DRUID_FORM_KEYS.map((vk) => {
   if (!model) throw new Error(`druid form visual missing from the manifest: ${vk}`);
   const tint = tintFor(vk, 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   return {
     id: vk,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -317,13 +361,17 @@ const warlockPets = Object.values(WARLOCK_PET_MOBS).map((p) => {
   const vk = mobVisualKey(p.id);
   const tint = tintFor(vk, p.color ?? 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   return {
     id: p.id,
     name: p.name,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -333,9 +381,7 @@ const FAMILY_ORDER = [
   'beast',
   'spider',
   'mudfin',
-  'murloc',
   'burrower',
-  'kobold',
   'humanoid',
   'troll',
   'ogre',
@@ -366,6 +412,7 @@ for (const [id, m] of Object.entries(MOBS)) {
   const vk = mobVisualKey(id);
   const tint = tintFor(vk, m.color ?? 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   famMap[m.family] ??= new Map();
   famMap[m.family].set(m.name, {
@@ -376,7 +423,10 @@ for (const [id, m] of Object.entries(MOBS)) {
     templateId: id,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   });
   publishedMobIds.add(id);
 }
@@ -464,6 +514,120 @@ const deeds = DEED_ORDER.map((id) => DEEDS[id])
     ...(d.reward?.kind === 'border' ? { rewardBorder: true } : {}),
     ...(DEED_IMAGE_IDS.has(d.id) ? { crest: `/ui/deeds/${d.id}.webp` } : {}),
   }));
+
+// The Reliquary catalog, spoiler-safe: page names, shelf, and relic display
+// names only. No clear counts, firstFind, ownership, or drop sources. Names
+// bake English proper nouns from the sim (GUIDE_DEEDS pattern); no player
+// progress can reach this table.
+// Profession mark find labels mirror hudChrome.reliquary.markFind English
+// (chrome, not sim content); keep in lockstep when those keys change.
+const RELIQUARY_MARK_GUIDE_NAMES = {
+  'masterwork:first': 'First Masterwork',
+  'masterwork:weaponcrafting': 'Weaponcrafting Masterwork',
+  'masterwork:armorcrafting': 'Armorcrafting Masterwork',
+  'masterwork:tailoring': 'Tailoring Masterwork',
+  'masterwork:leatherworking': 'Leatherworking Masterwork',
+  'masterwork:engineering': 'Engineering Masterwork',
+  'gather_event:pristine_vein': 'Pristine Vein',
+  'gather_event:ancient_heartwood': 'Ancient Heartwood',
+  'gather_event:moonlit_bloom': 'Moonlit Bloom',
+  'gather_event:perfect_specimen': 'Perfect Specimen',
+  // Rares of the Realm kill proofs (Phase 21). Rare display names are legal in
+  // the generated file: the wiki spoiler scan bans only boss-flagged MOBS names
+  // (tests/guide.test.ts), none of the 19 rares carries `boss`, and the public
+  // bestiary policy withholds elites from the CREATURE list, not their names.
+  'slain:old_greyjaw': 'Slain: Old Greyjaw',
+  'slain:mogger': 'Slain: Mogger',
+  'slain:grix_the_tunnelking': 'Slain: Grix the Tunnelking',
+  'slain:captain_verlan': 'Slain: Captain Verlan',
+  'slain:wraithbinder_maldrec': 'Slain: Wraithbinder Maldrec',
+  'slain:mirejaw_the_ravenous': 'Slain: Mirejaw the Ravenous',
+  'slain:sloomtooth_the_drowned': 'Slain: Sloomtooth the Drowned',
+  'slain:sister_nhalia': 'Slain: Sister Nhalia',
+  'slain:grubjaw': 'Slain: Grubjaw the Glutton',
+  'slain:ironvein_foreman': 'Slain: Ironvein Foreman',
+  'slain:brutok_skullsmasher': 'Slain: Brutok Skullsmasher',
+  'slain:voskar_emberwing': 'Slain: Voskar the Emberwing',
+  'slain:marrowlord_varkas': 'Slain: Marrowlord Varkas',
+  'slain:old_cragmaw': 'Slain: Old Cragmaw',
+  'slain:shardlord_kazzix': 'Slain: Shardlord Kazzix',
+  'slain:gleamstag': 'Slain: The Gleamstag',
+  'slain:old_marrowshell': 'Slain: Old Marrowshell',
+  'slain:aurelhorn': 'Slain: Aurelhorn, First of the Herd',
+  'slain:drakemaw_broodlord': 'Slain: Drakemaw Broodlord',
+};
+
+function reliquaryRelicName(relic) {
+  if (relic.kind === 'item') {
+    const def = ITEMS[relic.itemId];
+    if (!def) throw new Error(`reliquary wiki emit: unknown item ${relic.itemId}`);
+    return def.name;
+  }
+  if (relic.kind === 'mark') {
+    // hasOwn, not a bare index: the sibling server table is a Map for the
+    // same reason (an Object.prototype key like 'constructor' must fail the
+    // build loudly, never emit a garbage name).
+    const name = Object.hasOwn(RELIQUARY_MARK_GUIDE_NAMES, relic.markId)
+      ? RELIQUARY_MARK_GUIDE_NAMES[relic.markId]
+      : undefined;
+    if (!name) throw new Error(`reliquary wiki emit: unknown mark ${relic.markId}`);
+    return name;
+  }
+  if (relic.kind === 'mount') {
+    const def = MOUNTS[relic.mountId];
+    if (!def) throw new Error(`reliquary wiki emit: unknown mount ${relic.mountId}`);
+    return def.name;
+  }
+  if (relic.kind === 'weapon_skin') {
+    if (!WEAPON_SKINS[relic.skinId]) {
+      throw new Error(`reliquary wiki emit: unknown weapon skin ${relic.skinId}`);
+    }
+    const copy = armorySkinStrings[relic.skinId];
+    if (!copy?.name) {
+      throw new Error(`reliquary wiki emit: missing English name for skin ${relic.skinId}`);
+    }
+    return copy.name;
+  }
+  if (relic.kind === 'title') {
+    const def = DEEDS[relic.deedId];
+    // Same structural hidden filter the deeds arm above applies, at the one other place a
+    // deed's prose can reach the wiki: a hidden deed's title text IS the secret's reward,
+    // so a title relic pointing at one fails the build instead of publishing it.
+    if (def?.hidden) {
+      throw new Error(`reliquary wiki emit: title relic ${relic.deedId} references a hidden deed`);
+    }
+    const reward = def?.reward;
+    if (reward?.kind !== 'title') {
+      throw new Error(`reliquary wiki emit: title relic ${relic.deedId} has no title reward`);
+    }
+    return reward.text;
+  }
+  throw new Error(`reliquary wiki emit: unknown relic kind`);
+}
+
+// Wiki page titles must not re-publish raid/world-boss proper names that the
+// bestiary deliberately withholds (tests/guide.test.ts boss-name scan). In-game
+// Reliquary keeps the full page name; the public wiki uses a safe label.
+const RELIQUARY_WIKI_PAGE_NAME = {
+  conquerors_thunzharr: 'The Waking Peak (World Boss)',
+};
+
+const reliquary = RELIQUARY_PAGES.map((page) => ({
+  id: page.id,
+  shelf: page.shelf,
+  name: RELIQUARY_WIKI_PAGE_NAME[page.id] ?? page.name,
+  // Rule 7 (docs/design/reliquary.md) reaches the wiki too: a page outside
+  // completion must be LABELED, not indistinguishable from a winnable page,
+  // or a reader chases retired items and mutually exclusive bands. Emitted
+  // only when set so the common page shape stays lean.
+  ...(page.excludeFromCompletion !== undefined
+    ? { excludeFromCompletion: page.excludeFromCompletion }
+    : {}),
+  relics: page.relics.map((r) => ({
+    kind: r.kind,
+    name: reliquaryRelicName(r),
+  })),
+}));
 
 // ---------------------------------------------------------------- professions
 // Professions 2.0 (wiki arm). TRANSPARENCY POLICY:
@@ -609,10 +773,34 @@ const craftedByCraft = (itemId) => {
   const recipe = ALL_RECIPES.find((r) => r.resultItemId === itemId);
   return recipe ? recipe.professionId : null;
 };
-const toolRow = (itemId, tier) => {
+// The Delve Marks price, for a tool a delve counter stocks. Without this the
+// Source column reads "Crafted (Engineering)" for the eight top tools while the
+// prose directly above the table promises a Marks route, which is the table
+// contradicting its own page.
+const marksRowFor = (itemId) => {
+  for (const entries of Object.values(DELVE_SHOPS)) {
+    const row = entries.find((e) => e.itemId === itemId);
+    if (row) return row;
+  }
+  return null;
+};
+const marksPriceFor = (itemId) => marksRowFor(itemId)?.marks ?? null;
+// The delve counter's unlock gate for a Marks-priced tool row, flattened for
+// the table cell: how many total clears, or a Heroic clear (shop.ts
+// DelveShopGate). An 'available' row emits neither.
+const marksGateFor = (itemId) => {
+  const gate = marksRowFor(itemId)?.gate;
+  if (gate === 'heroicClear') return { marksHeroicClear: true };
+  const clears = typeof gate === 'string' ? /^clears:(\d+)$/.exec(gate) : null;
+  return clears ? { marksClears: Number(clears[1]) } : {};
+};
+const toolRow = (itemId, tier, professionId) => {
   const def = ITEMS[itemId];
   const vendors = toolVendors(itemId);
   const craftedBy = craftedByCraft(itemId);
+  // R22: land tools above tier 1 carry a wield requirement; rods are the
+  // structural exemption and every rod row omits the field.
+  const wieldReq = professionId === 'fishing' ? 0 : (WIELD_REQUIREMENT_BY_TIER[tier] ?? 0);
   return {
     name: def.name,
     tier,
@@ -620,23 +808,28 @@ const toolRow = (itemId, tier) => {
     priceCopper: def.buyValue ?? null,
     vendors,
     ...(craftedBy ? { craftedBy } : {}),
+    ...(marksPriceFor(itemId) !== null ? { priceMarks: marksPriceFor(itemId) } : {}),
+    ...marksGateFor(itemId),
+    ...(wieldReq > 0 ? { wieldProficiency: wieldReq } : {}),
   };
 };
 const toolLadderFor = (professionId) => {
   const rows = [];
   // The simple pole is the fishing ladder's tier-1 rung (use type 'fishing'
-  // resolves to the bare-hands tier-1 floor, professions/tools.ts).
-  if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1));
+  // resolves to effective tier 1 and satisfies the #2343 implement gate,
+  // professions/tools.ts).
+  if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1, professionId));
   for (const [id, def] of Object.entries(ITEMS)) {
     if (def.use?.type === 'gatherTool' && def.use.professionId === professionId) {
-      rows.push(toolRow(id, def.use.tier));
+      rows.push(toolRow(id, def.use.tier, professionId));
     }
   }
   return rows.sort((a, b) => a.tier - b.tier);
 };
 
 // Node lists per zone: count, node tier (which IS the required tool tier;
-// tier 1 is the bare-hands floor), and the zone's material.
+// every tier requires its tool, tier 1 included, #2343), and the zone's
+// material.
 const nodeRowsFor = (professionId) => {
   const byKey = new Map();
   for (const node of GATHER_NODES) {
@@ -822,9 +1015,17 @@ const workOrders = Object.values(QUESTS)
   });
 const profEconomy = {
   craftFeeCopperPerBudgetPoint: CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  actionThrottle: {
-    windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
-    maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
+  // Craft Cast System: the exact cast-pace numbers the transparency policy
+  // publishes (the retired actionThrottle block's successor).
+  castPace: {
+    fieldSec: CRAFT_CAST_DURATION_FIELD_SEC,
+    skill25Sec: CRAFT_CAST_DURATION_SKILL_25_SEC,
+    skill50Sec: CRAFT_CAST_DURATION_SKILL_50_SEC,
+    skill75Sec: CRAFT_CAST_DURATION_SKILL_75_SEC,
+    comboSec: CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+    enchantFamilySec: ENCHANT_FAMILY_CAST_DURATION_SEC,
+    rechargeSec: TOOL_RECHARGE_CAST_DURATION_SEC,
+    batchMax: CRAFT_BATCH_MAX,
   },
   marketCutPct: pct(MARKET_CUT),
   listingDepositCopper: MARKET_LISTING_DEPOSIT_COPPER,
@@ -860,7 +1061,7 @@ const header = `// GENERATED by scripts/wiki/build_content.mjs from src/sim/cont
 // live through src/ui/talent_i18n.ts. No balance numbers or instanced spoilers here.
 
 export type GuideRole = 'tank' | 'healer' | 'dps';
-export type GuideResource = 'rage' | 'mana' | 'energy';
+export type GuideResource = 'rage' | 'mana' | 'energy' | 'focus';
 
 export interface GuideAbilityRef { id: string; name: string; }
 export interface GuideClassSpec { id: string; name: string; role: GuideRole; signature: string; }
@@ -892,6 +1093,10 @@ export interface GuideClassInfo {
   abilities: GuideAbilityRef[];
   model: string;
   tint?: string;
+  /** Manifest tint strength (0..1) for this figure's model, when tinted. Feeds the still's
+   *  filename identity (still_key.mjs) alongside model/tint; the live viewer reads its own
+   *  copy off GuideModelSpec.tintStrength, so this is not consumed for rendering. */
+  tintStrength?: number;
   /** Pre-rendered transparent still (public/guide-stills/), the default poster. */
   still?: string;
 }
@@ -918,13 +1123,13 @@ export interface GuideDungeon {
   name?: string;
 }
 
-export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; still?: string; }
+export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
 // Druid shapeshift forms. Unnamed on purpose: the gallery labels them with guide.models.form*
 // keys so the names localize like the rest of the picker chrome.
-export interface GuideDruidForm { id: string; model: string; tint?: string; still?: string; }
+export interface GuideDruidForm { id: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
-export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; still?: string; }
+export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 export interface GuideFamily { family: string; creatures: GuideCreature[]; }
 
 export interface GuideDelveKeeper { name: string; title: string; }
@@ -957,6 +1162,20 @@ export interface GuideDeed {
   rewardBorder?: true;
   /** Painted crest URL under /ui/deeds, present only when committed art backs this deed. */
   crest?: string;
+}
+
+/** Spoiler-safe Reliquary page: names only, no personal progress or sources. */
+export interface GuideReliquaryRelic {
+  kind: 'item' | 'mark' | 'mount' | 'weapon_skin' | 'title';
+  name: string;
+}
+export interface GuideReliquaryPage {
+  id: string;
+  shelf: 'conquerors' | 'professions' | 'horizons';
+  name: string;
+  /** Outside-completion reason (rule 7): present only on labeled pages. */
+  excludeFromCompletion?: 'retired' | 'personal';
+  relics: GuideReliquaryRelic[];
 }
 
 // ---------------------------------------------------------------- professions
@@ -1016,6 +1235,18 @@ export interface GuideProfTool {
   priceCopper: number | null;
   vendors: { name: string; hub: string }[];
   craftedBy?: string;
+  /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
+  priceMarks?: number;
+  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N').
+   *  Consumed today by the tests/guide.test.ts gate pin only: the source
+   *  cell keeps the count as an English literal until the deferred locale
+   *  re-fill adds a {clears} token (R64, the packet review doc). */
+  marksClears?: number;
+  /** True when the Marks row unlocks after a Heroic clear. */
+  marksHeroicClear?: boolean;
+  /** R22 wield requirement (proficiency in the tool's own trade) for land
+   *  tools above tier 1. Absent for tier 1 and for every fishing rod. */
+  wieldProficiency?: number;
 }
 
 export interface GuideProfNodeRow {
@@ -1106,7 +1337,16 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
+  castPace: {
+    fieldSec: number;
+    skill25Sec: number;
+    skill50Sec: number;
+    skill75Sec: number;
+    comboSec: number;
+    enchantFamilySec: number;
+    rechargeSec: number;
+    batchMax: number;
+  };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];
@@ -1137,6 +1377,7 @@ writeFileSync(
     `\nexport const GUIDE_FAMILIES: GuideFamily[] = ${JSON.stringify(families, null, 2)};\n`,
     `\nexport const GUIDE_DELVES: GuideDelve[] = ${JSON.stringify(delves, null, 2)};\n`,
     `\nexport const GUIDE_DEEDS: GuideDeed[] = ${JSON.stringify(deeds, null, 2)};\n`,
+    `\nexport const GUIDE_RELIQUARY: GuideReliquaryPage[] = ${JSON.stringify(reliquary, null, 2)};\n`,
     `\nexport const GUIDE_PROF_RING: GuideProfRingCraft[] = ${JSON.stringify(profRing, null, 2)};\n`,
     `\nexport const GUIDE_PROF_ARCHETYPES: GuideProfArchetype[] = ${JSON.stringify(profArchetypes, null, 2)};\n`,
     `\nexport const GUIDE_PROF_CRAFTS: GuideProfCraft[] = ${JSON.stringify(profCrafts, null, 2)};\n`,
@@ -1152,5 +1393,5 @@ writeFileSync(
 );
 // eslint-disable-next-line no-console
 console.log(
-  `generated src/guide/content.generated.ts (${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${druidForms.length} druid forms, ${families.length} families, ${delves.length} delves, ${deeds.length} deeds, ${profCrafts.length} crafts, ${profGathering.length} gathering professions, ${Object.keys(MODELS).length} models)`,
+  `generated src/guide/content.generated.ts (${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${druidForms.length} druid forms, ${families.length} families, ${delves.length} delves, ${deeds.length} deeds, ${reliquary.length} reliquary pages, ${profCrafts.length} crafts, ${profGathering.length} gathering professions, ${Object.keys(MODELS).length} models)`,
 );

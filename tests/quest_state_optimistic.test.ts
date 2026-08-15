@@ -163,6 +163,39 @@ describe('optimisticQuestState (cadence + attunement busy gate)', () => {
     ).toBe('available');
   });
 
+  it('gates the hobby switch while an attunement is active in the mirrored log', () => {
+    // The gate spans BOTH completionEffect types, so the online mirror hides
+    // the hobby quest for exactly as long as the server would refuse the
+    // accept. The archetype state passed here is attuned, so the hobby quest
+    // has a legal target and only the busy gate can be hiding it.
+    const attuned = {
+      ...emptyArchetypeState(),
+      activeArchetype: 'weaponcrafting',
+      pairedMajor: 'armorcrafting',
+      hobbyCraft: 'leatherworking',
+      attunedPairs: ['weaponcrafting+armorcrafting'],
+    };
+    const questsDone = new Set<string>(['q_prof_intro']);
+    const busyLog = new Map<string, QuestProgress>([
+      ['q_prof_amends_smith', { questId: 'q_prof_amends_smith', counts: [0], state: 'active' }],
+    ]);
+
+    expect(
+      optimisticQuestState('q_prof_hobby_switch', busyLog, questsDone, noPending(), 5, attuned),
+    ).toBe('unavailable');
+    // Positive control: with nothing in flight the same state offers it.
+    expect(
+      optimisticQuestState(
+        'q_prof_hobby_switch',
+        new Map<string, QuestProgress>(),
+        questsDone,
+        noPending(),
+        5,
+        attuned,
+      ),
+    ).toBe('available');
+  });
+
   it('shows a ready work order with a pending turn-in as active until the cadence mirrors', () => {
     // The reconciliation window: the turn-in command is in flight, so the quest
     // is still in the mirrored questLog as 'ready' and the server-armed cadence

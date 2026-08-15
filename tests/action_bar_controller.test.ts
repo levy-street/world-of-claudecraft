@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
 import {
   ACTION_BAR_ABILITY_SLOTS,
@@ -25,6 +26,8 @@ class MemoryStorage {
 
 interface MutableState {
   known: string[];
+  level: number;
+  spec: string | null;
   auras: string[];
   sportTeam: number | null | undefined;
   showAttackButton: boolean;
@@ -51,6 +54,8 @@ function makeHarness(
 ): Harness {
   const state: MutableState = {
     known: [...known],
+    level: 20,
+    spec: null,
     auras: [],
     sportTeam: undefined,
     showAttackButton: true,
@@ -59,6 +64,8 @@ function makeHarness(
     storage,
     playerClass,
     playerName: 'ActionbarTester',
+    playerLevel: () => state.level,
+    talentSpec: () => state.spec,
     knownAbilityIds: () => state.known,
     hasAura: (kind) => state.auras.includes(kind),
     isInSportMatch: () => state.sportTeam !== undefined && state.sportTeam !== null,
@@ -71,6 +78,27 @@ function makeHarness(
 describe('ActionBarController form persistence', () => {
   it('keeps the public bar contract at one attack slot plus 33 configurable slots', () => {
     expect(ACTION_BAR_ABILITY_SLOTS).toBe(33);
+  });
+
+  it('keeps Paladin auras on their choice row and auto-places standalone long buffs', () => {
+    const { controller } = makeHarness(
+      'paladin',
+      [
+        'devotion_ward',
+        'radiant_devotion',
+        'dawn_devotion',
+        'grace_devotion',
+        'retribution_aura',
+        'solar_step',
+      ],
+      bar(),
+    );
+
+    controller.syncKnownAbilities();
+
+    expect(controller.actions).toEqual(
+      bar('radiant_devotion', 'dawn_devotion', 'grace_devotion', 'solar_step'),
+    );
   });
 
   it('extends a saved two-row bar with an empty third row without losing bindings', () => {
@@ -87,6 +115,61 @@ describe('ActionBarController form persistence', () => {
     expect(controller.actions).toHaveLength(33);
     expect(controller.actions[0]).toEqual({ type: 'ability', id: 'sunder_armor' });
     expect(controller.actions.slice(22)).toEqual(Array.from({ length: 11 }, () => null));
+  });
+
+  it('repairs a pre-overhaul Warlock bar with the active specialization kit', () => {
+    const storage = new MemoryStorage();
+    storage.setItem(
+      'woc_hotbar_warlock_ActionbarTester',
+      JSON.stringify(bar('corruption', 'curse_of_agony', 'searing_pain', 'summon_doomguard')),
+    );
+    const known = [
+      'shadow_bolt',
+      'life_tap',
+      'demon_skin',
+      'umbral_anchor',
+      'conflagrate',
+      'chaos_bolt',
+      'shadowburn',
+      'ruinous_brand',
+      'rain_of_fire',
+      'summon_infernal',
+    ];
+    const { controller } = makeHarness('warlock', known, bar(), storage);
+
+    controller.init();
+    controller.syncKnownAbilities();
+
+    const abilityIds = controller.actions.flatMap((action) =>
+      action?.type === 'ability' ? [action.id] : [],
+    );
+    expect(abilityIds).toEqual(expect.arrayContaining(known));
+    expect(abilityIds).not.toEqual(
+      expect.arrayContaining(['corruption', 'curse_of_agony', 'searing_pain', 'summon_doomguard']),
+    );
+  });
+
+  it('preserves an item id this bundle predates through load and save (R34)', () => {
+    // The layout is per-character SERVER state and the save is a wholesale
+    // overwrite: nulling an unresolvable slot at parse used to DESTROY the
+    // binding for every device the moment any ordinary save fired (a form
+    // switch, a level-up auto-place). The unknown slot rides through as an
+    // inert item action; the known-but-ineligible strip stays.
+    const storage = new MemoryStorage();
+    const stored = bar();
+    stored[0] = { type: 'item', id: 'ghost_tool_from_v33' };
+    stored[1] = { type: 'item', id: 'baked_bread' };
+    stored[2] = { type: 'item', id: 'wolf_fang' }; // known, NOT a hotbar kind
+    storage.setItem('woc_hotbar_warrior_ActionbarTester', JSON.stringify(stored));
+    const { controller } = makeHarness('warrior', [], bar(), storage);
+    controller.init();
+    expect(controller.actions[0]).toEqual({ type: 'item', id: 'ghost_tool_from_v33' });
+    expect(controller.actions[1]).toEqual({ type: 'item', id: 'baked_bread' });
+    expect(controller.actions[2]).toBeNull();
+    controller.saveActions();
+    const roundTrip = JSON.parse(storage.getItem('woc_hotbar_warrior_ActionbarTester') ?? '[]');
+    expect(roundTrip[0]).toEqual({ type: 'item', id: 'ghost_tool_from_v33' });
+    expect(roundTrip[2]).toBeNull();
   });
 
   it('persists the last third-row slot independently across Druid forms and reloads', () => {
@@ -339,6 +422,135 @@ describe('ActionBarController form persistence', () => {
 
     expect(harness.controller.actions).toEqual(bar('prowl'));
   });
+
+  it('keeps a switched loadout layout until the target talent abilities arrive', () => {
+    const harness = makeHarness('mage', ['frostbolt', 'ice_lance'], bar('frostbolt', 'ice_lance'));
+    const fireLayout = bar();
+    fireLayout[5] = { type: 'ability', id: 'pyroblast' };
+    fireLayout[10] = { type: 'ability', id: 'fireball_form' };
+    const fireKnown = new Set(['fireball', 'pyroblast', 'fireball_form']);
+
+    harness.controller.replaceActionsForLoadout(fireLayout, fireKnown);
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions[5]).toEqual({ type: 'ability', id: 'pyroblast' });
+    expect(harness.controller.actions[10]).toEqual({ type: 'ability', id: 'fireball_form' });
+
+    harness.state.known = [...fireKnown];
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(fireLayout);
+  });
+});
+
+describe('ActionBarController owned-class level 20 defaults', () => {
+  const beastMasteryKnown = [
+    'arcane_shot',
+    'pack_command',
+    'counter_shot',
+    'trailbreak',
+    'wildheart',
+  ];
+  const marksmanshipKnown = [
+    'arcane_shot',
+    'measured_shot',
+    'aimed_shot',
+    'rapid_fire',
+    'counter_shot',
+    'trailbreak',
+    'wildheart',
+  ];
+
+  it('seeds a new level 20 character in the designed priority order', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(
+      bar('pack_command', 'arcane_shot', 'counter_shot', 'trailbreak', 'wildheart'),
+    );
+  });
+
+  it('replaces an untouched generated bar when the character changes spec', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+
+    harness.state.spec = 'marksmanship';
+    harness.state.known = marksmanshipKnown;
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(
+      bar(
+        'measured_shot',
+        'aimed_shot',
+        'rapid_fire',
+        'arcane_shot',
+        'counter_shot',
+        'trailbreak',
+        'wildheart',
+      ),
+    );
+  });
+
+  it('preserves a customized bar through a spec change while removing invalid abilities', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+    harness.controller.replaceActions(
+      bar('arcane_shot', 'pack_command', 'wildheart', 'counter_shot', 'trailbreak'),
+    );
+    harness.controller.saveActions();
+
+    harness.state.spec = 'marksmanship';
+    harness.state.known = marksmanshipKnown;
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions.slice(0, 7)).toEqual([
+      { type: 'ability', id: 'arcane_shot' },
+      { type: 'ability', id: 'measured_shot' },
+      { type: 'ability', id: 'wildheart' },
+      { type: 'ability', id: 'counter_shot' },
+      { type: 'ability', id: 'trailbreak' },
+      { type: 'ability', id: 'aimed_shot' },
+      { type: 'ability', id: 'rapid_fire' },
+    ]);
+    expect(harness.controller.actions.some((action) => action?.id === 'pack_command')).toBe(false);
+  });
+
+  it('does not overwrite a stored custom or intentionally empty bar', () => {
+    for (const storedBar of [bar('arcane_shot', 'pack_command'), bar()]) {
+      const storage = new MemoryStorage();
+      storage.setItem('woc_hotbar_hunter_ActionbarTester', JSON.stringify(storedBar));
+      const harness = makeHarness('hunter', beastMasteryKnown, bar(), storage);
+      harness.state.spec = 'beast_mastery';
+
+      harness.controller.init();
+      harness.controller.syncKnownAbilities();
+
+      expect(harness.controller.actions).toEqual(storedBar);
+    }
+  });
+
+  it('upgrades the untouched learned-order bar when the character reaches level 20', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+    harness.state.level = 19;
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+    expect(harness.controller.actions).toEqual(bar(...beastMasteryKnown));
+
+    harness.state.level = 20;
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(
+      bar('pack_command', 'arcane_shot', 'counter_shot', 'trailbreak', 'wildheart'),
+    );
+  });
 });
 
 describe('ActionBarController attack slot', () => {
@@ -440,6 +652,18 @@ describe('ActionBarController: passives never occupy an action slot', () => {
     expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('sunder_armor'));
   });
 
+  it('migrates removed Paladin abilities out of a persisted bar without moving valid slots', () => {
+    const storage = new MemoryStorage();
+    const key = 'woc_hotbar_paladin_ActionbarTester';
+    storage.setItem(key, JSON.stringify(bar('holy_light', 'flash_of_light')));
+    const { controller } = makeHarness('paladin', ['holy_light', 'flash_of_light'], bar(), storage);
+
+    controller.init();
+
+    expect(controller.actions).toEqual(bar('holy_light'));
+    expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('holy_light'));
+  });
+
   it('rejects direct slot 0 assignment of a passive', () => {
     const { controller } = makeHarness('warrior', ['measured_fury'], bar());
 
@@ -480,6 +704,8 @@ describe('ActionBarController persistence seam', () => {
       storage,
       playerClass: 'warrior',
       playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => null,
       knownAbilityIds: () => ['heroic_strike', 'sunder_armor'],
       hasAura: () => false,
       isInSportMatch: () => false,
@@ -521,6 +747,8 @@ describe('ActionBarController persistence seam', () => {
       storage,
       playerClass: 'warrior',
       playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => null,
       knownAbilityIds: () => ['heroic_strike'],
       hasAura: () => false,
       isInSportMatch: () => false,
@@ -534,5 +762,47 @@ describe('ActionBarController persistence seam', () => {
       type: 'ability',
       id: 'heroic_strike',
     });
+  });
+});
+
+describe('isHotbarItemId: gathering implements are placeable (#2343)', () => {
+  it('admits every gathering implement shape alongside the consumable kinds', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    // Gathering tools (picks/axes/sickles) and the tiered rods are gatherTool
+    // items; the simple pole rides the pre-existing use.type 'fishing' arm.
+    expect(controller.isHotbarItemId('copper_mining_pick')).toBe(true);
+    expect(controller.isHotbarItemId('silverstream_fishing_rod')).toBe(true);
+    expect(controller.isHotbarItemId('simple_fishing_pole')).toBe(true);
+    // Regression companions: the consumable arms and the non-usable negative.
+    expect(controller.isHotbarItemId('lesser_healing_potion')).toBe(true);
+    expect(controller.isHotbarItemId('copper_ore')).toBe(false);
+  });
+});
+
+describe('isHotbarItemId: reins are placeable now that mounts are items', () => {
+  // The mounts-as-items pivot made every reins item usable through the same
+  // useItem dispatch a potion rides (src/sim/items.ts, kind 'mount' ->
+  // summonMountItem), and that arm's own comment states reins are used from
+  // "bags or an action-bar slot". isHotbarItemId was never widened to match, so
+  // the bag drag never wrote a hotbar payload and the bar could not accept it.
+  it('admits every kind:mount reins item in the shipped content tables', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    const reins = Object.keys(ITEMS).filter((id) => ITEMS[id]?.kind === 'mount');
+    // Guard the guard: if the content tables ever stop shipping mounts this test
+    // must fail loudly rather than vacuously pass on an empty list.
+    expect(reins.length).toBeGreaterThan(0);
+    for (const id of reins) {
+      expect(controller.isHotbarItemId(id), `${id} should be hotbar placeable`).toBe(true);
+    }
+  });
+
+  it('routes a reins drag through the assignable-action path like a potion', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    // isAssignableAction is what the drop target consults; a reins action must
+    // survive it exactly as a potion action does.
+    expect(controller.isAssignableAction({ type: 'item', id: 'reins_valorsteed' })).toBe(true);
+    expect(controller.isAssignableAction({ type: 'item', id: 'lesser_healing_potion' })).toBe(true);
+    // A non-usable material still must not be assignable.
+    expect(controller.isAssignableAction({ type: 'item', id: 'copper_ore' })).toBe(false);
   });
 });

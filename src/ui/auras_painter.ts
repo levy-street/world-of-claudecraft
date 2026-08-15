@@ -42,6 +42,11 @@ const CANCELABLE_CLASS = 'cancelable';
 // stylesheet renders it larger so your dots/hots read at a glance among other
 // casters'. Toggled per frame so a recycled node never keeps stale prominence.
 const OWN_CLASS = 'own';
+// Marks an aura in its final seconds (auras_view isAuraExpiring): the stylesheet
+// blinks the icon so an expiring DoT/buff reads at a glance, with a steady
+// brightness fallback under prefers-reduced-motion. Toggled per frame so a
+// recycled node never keeps a stale blink.
+const EXPIRING_CLASS = 'expiring';
 // Carries the debuff's magic school so the stylesheet tints the border per school
 // (WoW-style poison/magic/curse reads); '' on a buff, so no school selector matches.
 const SCHOOL_ATTR = 'data-school';
@@ -61,18 +66,32 @@ const DUP_KEY_SEP = '#';
 // appended the badge only when stacks > 1).
 const STACKS_SHOWN = '';
 const STACKS_HIDDEN = 'none';
+const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
+  'divine_ascension',
+  'shaman_thunder_charges',
+  'shaman_warspirit_cadence',
+  'moontide',
+  'old_blood',
+  'verdance',
+]);
 
 /** What the pool needs from the Hud: the icon-URL resolver, the tooltip renderer, and
  *  the tooltip-attach helper. All injected so a Node test drives the pool without the
  *  icon/i18n runtime. */
 export interface AurasPainterDeps {
-  /** Resolve an icon key to a CSS background-image value (host: `url(${iconDataUrl(
-   *  'aura', iconKey)})`). Called only when an aura's icon key changes. */
+  /** Resolve an icon key to a CSS background-image value. The HUD layers a
+   *  worker-cached procedural or painted safety fallback beneath static ability
+   *  art without composing on this frame path. Called only when an aura's icon
+   *  key changes. */
   resolveIconUrl(iconKey: string): string;
   /** Render the tooltip HTML from the LIVE aura name + remaining (host: the
    *  tt-title/tt-sub markup with esc + tPlural). Called lazily on hover, reading the
-   *  pooled record's current fields. */
-  renderTooltip(name: string, remaining: number, effectHtml: string): string;
+   *  pooled record's current fields. `toggle` marks a MODE aura (a form, a stance,
+   *  stealth, Ghost Wolf, the carried flag): the host omits the seconds-remaining
+   *  line for it, because the long finite duration the sim backs those with is
+   *  scaffolding, not information, and printing it is the same lie the suppressed
+   *  countdown label avoids. */
+  renderTooltip(name: string, remaining: number, effectHtml: string, toggle: boolean): string;
   /** Attach a lazily-built tooltip to a node (host: Hud.attachTooltip). Called ONCE per
    *  pooled node; the closure reads the live record. */
   attachTooltip(el: HTMLElement, html: () => string): void;
@@ -103,6 +122,10 @@ interface PooledAura {
   /** The one-line effect summary HTML (or '' when the aura has no descriptor), read live
    *  by the tooltip closure alongside name/remaining. */
   effectHtml: string;
+  /** Whether the aura this node currently shows is a MODE (no countdown anywhere),
+   *  read live by the tooltip closure so a recycled node never keeps the previous
+   *  aura's answer. */
+  toggle: boolean;
   /** The last icon key written, so the expensive data-URL resolve + write fire only on
    *  change. null until the first paint (never equals a real key). */
   lastIconKey: string | null;
@@ -169,7 +192,14 @@ export class AurasPainter {
     let rendered = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      if (!s.isDebuff && rendered >= cap) continue; // shed buff overflow; never a debuff
+      // Never a debuff, never an id on the always-visible list (Divine Ascension
+      // joined it from #2428), and never an ACTIONABLE buff (`alwaysRender`,
+      // auras_view NEVER_SHED_IDS): the budget rests on buffs being cosmetic; an
+      // aura whose icon IS the affordance is not, and the carried-flag buff is
+      // applied at the pickup so it sorts LAST and a flat first-N cap would shed
+      // it first.
+      if (!s.isDebuff && !s.alwaysRender && rendered >= cap && !ALWAYS_VISIBLE_AURA_IDS.has(s.key))
+        continue;
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a
@@ -195,6 +225,7 @@ export class AurasPainter {
       rec.auraId = s.key;
       rec.cancelable = s.cancelable;
       rec.effectHtml = s.effectHtml;
+      rec.toggle = s.toggle;
       rec.seen = this.frame;
       // Cancel affordance: only when this painter has an attachCancel dep (the player buff bar)
       // and the view marked the aura as cancelable. Read live by the contextmenu closure.
@@ -214,6 +245,7 @@ export class AurasPainter {
       this.writers.setAttr(rec.el, SCHOOL_ATTR, s.school);
       this.writers.toggleClass(rec.el, CANCELABLE_CLASS, rec.cancelable);
       this.writers.toggleClass(rec.el, OWN_CLASS, s.own);
+      this.writers.toggleClass(rec.el, EXPIRING_CLASS, s.expiring);
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';
       this.writers.setDisplay(rec.stacks, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);
@@ -257,11 +289,12 @@ export class AurasPainter {
       name: '',
       remaining: 0,
       effectHtml: '',
+      toggle: false,
       lastIconKey: null,
       seen: 0,
     };
     this.deps.attachTooltip(el, () =>
-      this.deps.renderTooltip(rec.name, rec.remaining, rec.effectHtml),
+      this.deps.renderTooltip(rec.name, rec.remaining, rec.effectHtml, rec.toggle),
     );
     // Right-click-cancel: attached ONCE per pooled node via the injected helper (the
     // buff-bar painter only). The closure reads the live record so a recycled node cancels

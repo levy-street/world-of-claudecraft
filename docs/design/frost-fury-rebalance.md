@@ -219,6 +219,41 @@ Do not add a Fury-only offhand stat suppression or reduce the generic offhand wh
 after this hotfix. Those approaches duplicate the game-wide item correction and the explicit
 Titan's Grip tradeoff.
 
+### The v0.30.0 white-damage regression, and why the probe is the guard
+
+The hotfix above left `scripts/fury_dps_probe.ts` behind so later changes could be measured
+against its balance point. Nothing ran it for three releases. Re-run on the same fixture, the
+v0.27.1 tree reports 147.2 sustained DPS and the tree three releases later reports 186.3, with
+no warrior content change in between. White damage carried the whole gap, and it kept widening
+after that: the same probe on the v0.36.0 tree reports 192.9. Those figures are dated on
+purpose. The drift, not any one of them, is the finding.
+
+The cause was a contract mismatch rather than a tuning decision. Item content authors
+`weapon.min/max` as RAW per-swing damage at the weapon's real speed, with the two-hand premium
+already folded in: `item_budget.ts` (`weaponDpsBudget`, `scaleWeaponDamage`) writes it that way
+and `tests/twohand_rebudget.test.ts` pins every two-hander to `avg / speed`. The v0.30.0 swing
+path treated the same numbers as a speed-normalized figure and multiplied the roll again by
+`speed / 2` and `TWOHAND_DPS_MULT`, counting both terms twice.
+
+The decisive measurement is budget neutrality, and it needs no view about intent. Four weapons
+authored at an identical 15.0 dps delivered 12.9 / 15.0 / 22.7 / 25.6 dps at speeds
+1.7 / 2.0 / 3.0 / 3.4. Only the 2.0 baseline came out right, which is what a conversion applied
+to already-converted data looks like. Fast-weapon classes were quietly under budget for the same
+reason two-handers were over it.
+
+Two consequences worth carrying forward:
+
+- A weapon-damage change is a CROSS-CLASS change even when it presents as a warrior problem.
+  This one moved every melee auto-attacker, in both directions, sorted only by weapon speed.
+- Restoring the contract also restored the Titan's Grip tradeoff. While the double-count stood,
+  dual-2H beat dual-1H on white despite carrying the explicit 12 percent physical penalty, so
+  the penalty this document treats as the dual-wield cost was not actually being paid.
+
+The lasting guard is the contract, not the number: `tests/combat_auto_attack.test.ts` now pins
+that equal authored dps delivers equal white dps at any speed, and that the swing path re-applies
+neither the speed term nor `TWOHAND_DPS_MULT`. Run the probe on both trees for any later
+coefficient round, per the change protocol in `docs/design/spell-balance-framework.md`.
+
 ### Fury complexity follow-up
 
 Balance correction and action-bar correction are separate phases. The recurring damage loop can

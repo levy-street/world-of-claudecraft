@@ -1,4 +1,4 @@
-import { apiUrl, NATIVE_APP } from './online';
+import { apiUrl, NATIVE_APP } from '../client_origin';
 
 export interface NativeAttestationProof {
   platform: 'android' | 'ios';

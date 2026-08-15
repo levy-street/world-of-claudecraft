@@ -5,13 +5,9 @@ import {
   insertUnstuckReport,
   listUnstuckHotspots,
   listUnstuckReports,
-  pruneUnstuckReports,
+  pruneUnstuckReportsBatch,
   UNSTUCK_HOTSPOT_BUCKET_YARDS,
   UNSTUCK_INSERT_QUERY_TIMEOUT_MS,
-  UNSTUCK_REPORT_PRUNE_ADVISORY_KEY,
-  UNSTUCK_REPORT_PRUNE_BATCH_SIZE,
-  UNSTUCK_REPORT_PRUNE_MAX_BATCHES,
-  UNSTUCK_REPORT_RETENTION_DAYS,
   UNSTUCK_SCHEMA,
 } from '../server/unstuck_db';
 
@@ -83,7 +79,17 @@ describe('UNSTUCK_SCHEMA', () => {
       /outcome IN \('cancelled', 'failed'\)[\s\S]*destination_raw_x IS NULL/,
     );
     expect(UNSTUCK_SCHEMA).toContain('unstuck_reports_created');
-    expect(UNSTUCK_SCHEMA.match(/CREATE INDEX IF NOT EXISTS/g)).toHaveLength(4);
+    // Six since the v0.32.0 merge: the release's four plus the two partial
+    // FK indexes (character_id, account_id) that keep every character or
+    // account delete's ON DELETE SET NULL off a whole-table seq scan
+    // (chat_logs_character is the precedent).
+    expect(UNSTUCK_SCHEMA).toContain('unstuck_reports_character');
+    expect(UNSTUCK_SCHEMA).toContain('unstuck_reports_account');
+    expect(UNSTUCK_SCHEMA).toMatch(
+      /unstuck_reports\(character_id\) WHERE character_id IS NOT NULL/,
+    );
+    expect(UNSTUCK_SCHEMA).toMatch(/unstuck_reports\(account_id\) WHERE account_id IS NOT NULL/);
+    expect(UNSTUCK_SCHEMA.match(/CREATE INDEX IF NOT EXISTS/g)).toHaveLength(6);
     expect(UNSTUCK_SCHEMA).not.toMatch(/(?:^|;)\s*(?:DROP|TRUNCATE|DELETE\s+FROM|UPDATE)\b/i);
   });
 
@@ -229,68 +235,64 @@ describe('insertUnstuckReport', () => {
   });
 });
 
-describe('pruneUnstuckReports', () => {
-  it('holds one advisory lock while draining global batches through a partial final batch', async () => {
-    pruneQuery
-      .mockResolvedValueOnce({ rows: [{ acquired: true }], rowCount: 1 })
-      .mockResolvedValueOnce({ rows: [], rowCount: UNSTUCK_REPORT_PRUNE_BATCH_SIZE })
-      .mockResolvedValueOnce({ rows: [], rowCount: 17 })
-      .mockResolvedValueOnce({ rows: [{ pg_advisory_unlock: true }], rowCount: 1 });
+describe('pruneUnstuckReportsBatch (the retention-sweep primitive)', () => {
+  // The sweep owns cadence, budget, and batching; the primitive owns exactly
+  // one bounded delete on the shared pool. These arms mirror
+  // tests/db_retention_prune.test.ts for the sibling primitives, and each
+  // kills a real body-only mutation a source pin cannot see.
+  it('runs one sibling-shaped bounded delete on the shared pool', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 7 });
 
-    await expect(pruneUnstuckReports(pool)).resolves.toBe(UNSTUCK_REPORT_PRUNE_BATCH_SIZE + 17);
+    await expect(pruneUnstuckReportsBatch(pool, 90, 1000)).resolves.toBe(7);
 
-    expect(connect).toHaveBeenCalledTimes(1);
-    expect(pruneQuery.mock.calls[0]).toEqual([
-      'SELECT pg_try_advisory_lock($1::int) AS acquired',
-      [UNSTUCK_REPORT_PRUNE_ADVISORY_KEY],
-    ]);
-    const deleteCalls = pruneQuery.mock.calls.filter(([sql]) =>
-      String(sql).includes('DELETE FROM unstuck_reports'),
-    );
-    expect(deleteCalls).toHaveLength(2);
-    const [sql, params] = deleteCalls[0];
-    expect(UNSTUCK_REPORT_RETENTION_DAYS).toBe(90);
-    expect(sql).toContain('FROM unstuck_reports');
+    expect(connect).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('DELETE FROM unstuck_reports');
     expect(sql).toContain("created_at < now() - ($1::int * INTERVAL '1 day')");
     expect(sql).toContain('ORDER BY created_at ASC, id ASC');
-    expect(sql).not.toContain('WHERE resolved_at <');
     expect(sql).toContain('LIMIT $2');
-    expect(sql).toContain('FOR UPDATE SKIP LOCKED');
-    expect(sql).toContain('DELETE FROM unstuck_reports AS r');
+    // The sweep's short-batch-means-caught-up verdict forbids lock skipping:
+    // a batch faked short by a concurrent character delete would end the
+    // table's retention for the whole UTC day.
+    expect(sql).not.toContain('SKIP LOCKED');
+    expect(sql).not.toContain('advisory');
     expect(sql).not.toMatch(/\brealm\b/);
-    expect(params).toEqual([UNSTUCK_REPORT_RETENTION_DAYS, UNSTUCK_REPORT_PRUNE_BATCH_SIZE]);
-    expect(pruneQuery.mock.calls.at(-1)).toEqual([
-      'SELECT pg_advisory_unlock($1::int)',
-      [UNSTUCK_REPORT_PRUNE_ADVISORY_KEY],
-    ]);
-    expect(release).toHaveBeenCalledWith(undefined);
+    expect(params).toEqual([90, 1000]);
     expect(UNSTUCK_SCHEMA).not.toMatch(/DELETE FROM unstuck_reports/i);
   });
 
-  it('stops at the named operational batch cap even while every batch is full', async () => {
-    pruneQuery.mockImplementation(async (sql: string) => {
-      if (sql.includes('pg_try_advisory_lock')) return { rows: [{ acquired: true }], rowCount: 1 };
-      if (sql.includes('pg_advisory_unlock'))
-        return { rows: [{ pg_advisory_unlock: true }], rowCount: 1 };
-      return { rows: [], rowCount: UNSTUCK_REPORT_PRUNE_BATCH_SIZE };
-    });
-
-    await expect(pruneUnstuckReports(pool)).resolves.toBe(
-      UNSTUCK_REPORT_PRUNE_BATCH_SIZE * UNSTUCK_REPORT_PRUNE_MAX_BATCHES,
-    );
-    expect(
-      pruneQuery.mock.calls.filter(([sql]) => String(sql).includes('DELETE FROM unstuck_reports')),
-    ).toHaveLength(UNSTUCK_REPORT_PRUNE_MAX_BATCHES);
-    expect(release).toHaveBeenCalledTimes(1);
+  it('keeps forever on zero and negative retention (the destructive-delete safe side)', async () => {
+    await expect(pruneUnstuckReportsBatch(pool, 0, 1000)).resolves.toBe(0);
+    await expect(pruneUnstuckReportsBatch(pool, -3, 1000)).resolves.toBe(0);
+    await expect(pruneUnstuckReportsBatch(pool, Number.NaN, 1000)).resolves.toBe(0);
+    expect(query).not.toHaveBeenCalled();
   });
 
-  it('does no delete work when another process owns the advisory lock', async () => {
-    pruneQuery.mockResolvedValueOnce({ rows: [{ acquired: false }], rowCount: 1 });
+  it('normalizes fractional retention days UP to one full day, never to zero', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await pruneUnstuckReportsBatch(pool, 0.5, 1000);
+    expect(query.mock.calls[0][1]).toEqual([1, 1000]);
+  });
 
-    await expect(pruneUnstuckReports(pool)).resolves.toBe(0);
+  it('floors the batch size at one row (no LIMIT 0 infinite no-op)', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await pruneUnstuckReportsBatch(pool, 90, 0);
+    expect(query.mock.calls[0][1]).toEqual([90, 1]);
+  });
 
-    expect(pruneQuery).toHaveBeenCalledTimes(1);
-    expect(release).toHaveBeenCalledWith(undefined);
+  it('floors fractional and negative batch sizes the same way', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await pruneUnstuckReportsBatch(pool, 90, 0.4);
+    expect(query.mock.calls[0][1]).toEqual([90, 1]);
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await pruneUnstuckReportsBatch(pool, 90, -25);
+    expect(query.mock.calls[1][1]).toEqual([90, 1]);
+  });
+
+  it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: null });
+    await expect(pruneUnstuckReportsBatch(pool, 90, 1000)).resolves.toBe(0);
   });
 });
 

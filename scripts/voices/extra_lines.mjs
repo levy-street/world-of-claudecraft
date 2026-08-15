@@ -1,7 +1,13 @@
-// Extra voiced lines that don't live on an NpcDef/QuestDef — dynamic encounter
-// dialogue emitted as chat 'yell' events (currently the Nythraxis raid from
-// PR #665, src/sim/sim.ts `nythraxisSay`). gen_npc_lines.mjs synthesizes these
-// alongside the greeting/quest lines.
+// Hand-authored voiced lines that don't live on any content record: dynamic
+// encounter dialogue emitted as chat 'yell' events (currently the Nythraxis raid
+// from PR #665, src/sim/encounters/nythraxis.ts). gen_npc_lines.mjs synthesizes
+// these alongside the greeting/quest lines.
+//
+// Escort-quest barks are ALSO yell-channel lines, but they live on EscortDef
+// records (startText/successText/failText), so gen_npc_lines.mjs derives them
+// straight from the content bundle using `yellKey` below. Do not copy them here:
+// a duplicated literal would silently stop matching when the content text is
+// reworded, and the clip would go quiet.
 //
 // `voiceNpc` is the voice folder/id the line is spoken in (must exist in
 // scripts/voices/voice_ids.json). Brother Aldric reuses his existing voice.
@@ -10,11 +16,14 @@
 // derivation in src/ui/hud.ts (yellVoiceKey) so playback can look the clip up
 // from the live event text.
 export function yellKey(text) {
-  return 'yell__' + text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .slice(0, 60);
+  return (
+    'yell__' +
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 60)
+  );
 }
 
 const N = (text) => ({ key: yellKey(text), voiceNpc: 'nythraxis', text });

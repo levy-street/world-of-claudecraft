@@ -106,7 +106,7 @@ describe('lockpick, engage + ante→tier', () => {
 });
 
 describe('lockpick, failure & abandon', () => {
-  it('ante 1, one slip → FAILED, chest lost, re-engage rejected until re-clear', () => {
+  it('ante 1, one slip -> tries exhausted, chest still opens but only at the LOW consolation tier (issue #2585)', () => {
     const sim = makeSim();
     const run = enterFinale(sim);
     killBoss(sim, run);
@@ -134,14 +134,20 @@ describe('lockpick, failure & abandon', () => {
       guard++;
     }
     const events = flush(sim);
+    // Running out of tries no longer jams the final delve chest: the boss is
+    // already dead, so the chest still opens and the run keeps its clear
+    // credit. This was NOT a solve though, so the grant is capped at the base
+    // `low` tier rather than the Premium ante's loot tier, so idling/failing
+    // out a high ante is never better than actually solving the lock.
     expect(
-      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'fail'),
+      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'success'),
     ).toBeDefined();
     expect(run.lockpick).toBeNull();
-    expect(run.objectState[chestId].attemptAvailable).toBe(false);
-    expect(run.objectState[chestId].looted).toBeFalsy();
+    expect(run.objectState[chestId].attemptAvailable).toBe(false); // consumed by the grant
+    expect(run.objectState[chestId].looted).toBe(true);
+    expect(run.objectState[chestId].lootedTier).toBe('low');
 
-    // Re-engage is rejected (jammed).
+    // Re-engage is rejected (already looted, not jammed).
     sim.lockpickEngage(chestId, 1);
     expect(run.lockpick).toBeNull();
   });
@@ -287,13 +293,15 @@ describe('lockpick, tries (easy 3 / medium 2 / hard 1)', () => {
     expect(step.tries).toBe(1);
     expect(run.lockpick).not.toBeNull();
 
-    // Third failure → out of tries → FAILED, chest jammed.
+    // Third failure → out of tries → the chest still opens (guaranteed grant,
+    // issue #2585) instead of jamming.
     events = forceFail(sim, run);
     expect(
-      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'fail'),
+      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'success'),
     ).toBeDefined();
     expect(run.lockpick).toBeNull();
-    expect(run.objectState[chestId].attemptAvailable).toBe(false);
+    expect(run.objectState[chestId].attemptAvailable).toBe(false); // consumed by the grant
+    expect(run.objectState[chestId].looted).toBe(true);
   });
 
   it('a retry can still be solved to claim the cache', () => {
@@ -324,11 +332,12 @@ describe('lockpick, tries (easy 3 / medium 2 / hard 1)', () => {
     expect(step.result).toBe('retry');
     expect(step.tries).toBe(1);
     expect(run.lockpick).not.toBeNull();
-    // A second timeout exhausts the last try → fail.
+    // A second timeout exhausts the last try → the chest still opens
+    // (guaranteed grant, issue #2585) instead of jamming.
     run.lockpick!.stepDeadlineTick = 0;
     const ev2 = flush(sim);
     expect(
-      ev2.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'fail'),
+      ev2.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'success'),
     ).toBeDefined();
     expect(run.lockpick).toBeNull();
   });

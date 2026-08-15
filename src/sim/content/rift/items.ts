@@ -11,8 +11,10 @@ export const RIFT_GEAR_ITEM_IDS = [
 ] as const;
 
 /** The clear-time gear ladder above the rares: epics that only a B+ final-boss
- * kill can shed (guaranteed on A, doubled-chance on S) and the one legendary
- * chase item S-rank clears roll for. Granted by rift/progression.ts
+ * kill can shed (B already GUARANTEES one, so A does not raise the floor; S
+ * adds an independent 35 percent roll for a SECOND epic, which is a separate
+ * draw rather than a doubled chance) and the legendary chase items S-rank
+ * clears roll for. Granted by rift/progression.ts
  * addRiftClearGearLoot at the moment the clear completes, NEVER from static
  * loot tables, so a C-rank farm can never mint epics and the payout cadence is
  * bound by the ranked portal spawns (the economy stays sane). */
@@ -21,8 +23,14 @@ export const RIFT_EPIC_ITEM_IDS = [
   'stormsunder_hood',
   'voidweave_mantle',
   'abysswrought_band',
+  'rimefang',
 ] as const;
-export const RIFT_LEGENDARY_ITEM_ID = 'heart_of_the_rift';
+/** The S-rank chase items. Each rolls its OWN independent chance in
+ *  addRiftClearGearLoot rather than being picked from this pool, so a clear that
+ *  beats both rolls sheds both. One is class-neutral jewelry, the other a caster
+ *  main-hand, so the pair covers every archetype without either being a
+ *  consolation prize for the other. */
+export const RIFT_LEGENDARY_ITEM_IDS = ['heart_of_the_rift', 'voidsong_dirk'] as const;
 
 /** The world-drop rares each rift environment can shed: one signature piece per
  * procedural theme plus the two Infernal Citadel pieces. Trash carries a slim
@@ -46,6 +54,10 @@ const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // p
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
+// CASTER above is the CLOTH ARMOR group (shaman and paladin wear mail/plate, so
+// they are correctly absent). It is NOT the weapon group: weapons are
+// proficiency-based, and equipment_rules.ts CASTER_WEAPON_CLASSES additionally
+// admits shaman and paladin. Never reach for CASTER on a weapon.
 
 // Combat-rating allowance for the ilvl-31 clear-time epics: one rating per piece.
 // Armor pieces follow the heroic ilvl-31 floor (ARMOR_RATING = 40 in heroic_loot.ts).
@@ -57,6 +69,38 @@ const RIFT_JEWELRY_RATING = 25; // 25 rating, matches heroic quartermaster jewel
 /** Static shells. The non-fungible payload carries each drop's source, power,
  * upgrades, enchantment, sockets, gems, and rolled bonus stats. */
 export const RIFT_ITEMS: Record<string, ItemDef> = {
+  // Rogue dagger (Rift epic, B+ clear). A frost-bolt on-hit gives the fast
+  // dagger a proc that actually helps a DPS rogue: an attack-speed chill would
+  // not (it slows the target's swing, useless to a rogue; A/B-confirmed).
+  rimefang: {
+    id: 'rimefang',
+    name: 'Rimefang',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    weapon: { min: 19, max: 31, speed: 1.6, dagger: true },
+    // ilvl-31 mainhand budget (22), on the same ~12:7 agi:sta identity the
+    // dungeon daggers carry.
+    stats: { agi: 14, sta: 8 },
+    // The clear-time allowance (one rating per ilvl-31 piece, see the constants
+    // above): an agility dagger takes crit per the agi-to-crit pattern the
+    // rating ladder pins, at the same 40-rating floor the armor pieces mirror.
+    critRating: RIFT_ARMOR_RATING,
+    sellValue: 9000,
+    requiredClass: ['rogue', 'hunter'],
+    requiredLevel: 20,
+    weaponProcs: [
+      {
+        id: 'rimefang_frostbite',
+        name: 'Frostbite',
+        trigger: 'weaponHit',
+        chance: 0.08,
+        effects: [
+          { kind: 'chainArc', school: 'frost', damage: 20, jumps: 0, falloff: 0.6, radius: 8 },
+        ],
+      },
+    ],
+  },
   rift_essence: {
     id: 'rift_essence',
     name: 'Rift Essence',
@@ -336,7 +380,67 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'neck',
     quality: 'legendary',
     requiredLevel: 20,
-    stats: { sta: 12, str: 6, agi: 6, int: 6 },
+    stats: { sta: 14, str: 6, agi: 6, int: 6 },
     sellValue: 50000,
+  },
+  // The caster half of the S-rank chase. Deliberately a DAGGER: the only other
+  // spell-facing legendary is a two-handed staff (deathless_heartwood), so this
+  // is the first main-hand option for a caster who wants an offhand, and it does
+  // not touch any melee dps ladder. Rolls on its own independent 0.3%, so an S
+  // clear can shed both legendaries.
+  //
+  // Stats are the ilvl-37 legendary main-hand budget exactly (49 = 37 * 0.7 *
+  // SLOT_STAT_MULT.mainhand * QUALITY_STAT_MULT.legendary), weighted to
+  // Intellect for throughput with Spirit behind it, matching how the Heartwood
+  // staff splits.
+  //
+  // The weapon LINE is deliberately weak (15-25 at 1.8 = ~11.1 dps, the ilvl-20
+  // rare-dagger band) even though the item is ilvl 37. This is a spell focus, not
+  // a fighting knife: a caster's damage comes off the primary-stat block, which is
+  // at full ilvl-37 legendary budget, so the low dps costs its intended owners
+  // essentially nothing. It exists to keep MELEE classes away. The item carries no
+  // class lock (see below), so the weapon line is the only thing standing between a
+  // rogue and the best Craven Thrust weapon in the game, and it has to be decisive:
+  // every EPIC dagger starts at 14.4 dps / 30 max, so this sits a full tier under
+  // the floor rather than just under the ceiling. Pinned by tests/rift_loot_pools.
+  // Carries NO combat ratings by design, like heart_of_the_rift: rift chase
+  // items differentiate on the primary-stat block (tests/combat_rating.test.ts).
+  voidsong_dirk: {
+    id: 'voidsong_dirk',
+    name: 'Voidsong, Dirk of the Sundered Veil',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'legendary',
+    requiredLevel: 20,
+    // dagger: true keeps the skin and the gameplay notion of "dagger" in step
+    // (tests/weapon_skins.test.ts). With no class lock a rogue MAY equip this and
+    // it does count for Craven Thrust / Ambush (weaponStrike + requiresBehind);
+    // the weak damage line is what makes that a downgrade rather than a lure.
+    weapon: { min: 15, max: 25, speed: 1.8, dagger: true },
+    stats: { int: 19, spi: 17, sta: 13 },
+    // NO requiredClass, deliberately: a class lock is a nerf, and the stat line
+    // already decides who wants this (19 int / 17 spi / 0 agi / 0 str). A paladin
+    // or shaman healer has a real case for it, which the cloth-armor CASTER group
+    // would have wrongly denied. A warrior may equip it and simply never will.
+    // The melee incentive is removed by the weak weapon line above, NOT by a rule.
+    sellValue: 50000,
+    weaponProcs: [
+      {
+        id: 'voidsong_echo',
+        name: 'Voidsong',
+        trigger: 'spellDamage',
+        chance: 0.15,
+        effects: [
+          {
+            kind: 'dot',
+            name: 'Voidsong',
+            school: 'shadow',
+            perTick: 12,
+            interval: 2,
+            duration: 8,
+          },
+        ],
+      },
+    ],
   },
 };

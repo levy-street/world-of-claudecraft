@@ -124,7 +124,6 @@
         account={detail.account}
         chat={detail.chat}
         onSubmit={submitPending}
-        onReset={() => direct(`/admin/api/moderation/accounts/${accountId}/reset-strikes`)}
       />
     {/if}
 

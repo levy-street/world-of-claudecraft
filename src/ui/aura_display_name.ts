@@ -9,3 +9,7 @@ export function auraDisplayNameFromSource(name: string): string {
   if (viaTitle !== name) return viaTitle;
   return localizeSimAuraName(name) ?? name;
 }
+
+export function auraDisplayNameForHud(name: string, localizedAbilityName: string | null): string {
+  return localizeSimAuraName(name) ?? localizedAbilityName ?? auraDisplayNameFromSource(name);
+}

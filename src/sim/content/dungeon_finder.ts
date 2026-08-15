@@ -121,7 +121,7 @@ const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
   { mobId: 'korgath_the_bound', mechanics: ['shuddering_stomp', 'enrage'] },
   { mobId: 'grand_necromancer_velkhar', mechanics: ['summons_adds'] },
-  { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['necrotic_shockwave', 'enrage'] },
+  { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['grave_inferno', 'enrage'] },
 ];
 
 const NYTHRAXIS_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
@@ -149,6 +149,26 @@ const NYTHRAXIS_RAID_ENCOUNTERS: readonly FinderEncounter[] = [
     mobId: 'nythraxis_scourge_of_thornpeak',
     final: true,
     mechanics: ['gravebreaker', 'raise_fallen', 'soul_rend', 'deathless_rage', 'wardstones'],
+  },
+];
+
+// The heroic tier adds Dread Curse (a stacking tank-swap vulnerability, see
+// src/sim/encounters/nythraxis.ts updateNythraxisDreadCurse) on top of the
+// normal-tier mechanics above. Its own array, not a mutation of the shared
+// normal-tier list, so the normal-tier preview never carries a heroic-only
+// mechanic.
+const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'nythraxis_scourge_of_thornpeak',
+    final: true,
+    mechanics: [
+      'gravebreaker',
+      'raise_fallen',
+      'soul_rend',
+      'deathless_rage',
+      'wardstones',
+      'dread_curse',
+    ],
   },
 ];
 
@@ -307,7 +327,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: TEN_RAID,
     autoQueue: true,
     entranceDungeonId: 'nythraxis_crypt',
-    encounters: NYTHRAXIS_RAID_ENCOUNTERS,
+    encounters: NYTHRAXIS_RAID_ENCOUNTERS_HEROIC,
     attunementQuestId: 'q_nythraxis_bound_guardian',
     lockout: 'daily',
   },

@@ -36,9 +36,21 @@ describe('updateEventPayload (renderer-facing whitelist)', () => {
     });
   });
 
+  it('sends checking/not-available as bare notifications', () => {
+    expect(updateEventPayload('checking')).toEqual({ type: 'checking' });
+    expect(updateEventPayload('not-available', { version: '0.19.0' })).toEqual({
+      type: 'not-available',
+    });
+  });
+
+  it('sends error with NO message: a failed check is never user-facing text', () => {
+    expect(updateEventPayload('error', new Error('secret /tmp/path'))).toEqual({ type: 'error' });
+  });
+
   it('returns null for event types the renderer does not need', () => {
+    // The electron-updater EVENT name; updater.cjs forwards it as 'checking'.
     expect(updateEventPayload('checking-for-update', {})).toBeNull();
-    expect(updateEventPayload('error', new Error('x'))).toBeNull();
+    expect(updateEventPayload('update-cancelled', {})).toBeNull();
   });
 });
 

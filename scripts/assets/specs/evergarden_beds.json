@@ -1,0 +1,26 @@
+{
+  "comment": "The Evergarden's modeled flower beds (maintainer-authored generated models, siblings to the evergarden_maze set): two ornamental square beds and one round bed, replacing the procedural parterre plantings. Dense source meshes, so they route through build_foliage for weld+simplify, then a second error-unbounded resimplify pass (same recipe as the maze hedges).",
+  "items": [
+    {
+      "src": "ornamental+garden+v1+3d+model.glb",
+      "out": "models/props/flower_bed_square_a.glb",
+      "type": "static",
+      "maxTex": 1024,
+      "simplify": 0.001
+    },
+    {
+      "src": "ornamental+garden+v2+3d+model.glb",
+      "out": "models/props/flower_bed_square_b.glb",
+      "type": "static",
+      "maxTex": 1024,
+      "simplify": 0.001
+    },
+    {
+      "src": "round+flower+garden+small+3d+model.glb",
+      "out": "models/props/flower_bed_round.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.001
+    }
+  ]
+}

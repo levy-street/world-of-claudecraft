@@ -12,6 +12,8 @@
 // back next frame, so the core stays allocation-light (a single returned object,
 // or the shared HIDDEN constant when the bar is off).
 
+import { clamp01 } from './clamp';
+
 // Epsilon for detecting the swing reset edge: the timer jumping UP past the last
 // value means a fresh swing began, so the full interval is recovered.
 const SWING_EDGE_EPSILON = 1e-4;
@@ -79,8 +81,4 @@ export function swingTimerState(
     nextPeriod: period,
     nextTimer: swingTimer,
   };
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
 }

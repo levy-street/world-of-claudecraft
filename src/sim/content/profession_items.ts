@@ -49,6 +49,20 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
+  sharp_claw: {
+    id: 'sharp_claw',
+    name: 'Sharp Claw',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 5,
+  },
+  curved_tusk: {
+    id: 'curved_tusk',
+    name: 'Curved Tusk',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 5,
+  },
 
   // --- Pristine specimens (HARVEST_COMPONENT_SPECIMENS) --------------------
   // The signed jackpot a rare-or-better corpse-harvest rarity roll grants IN
@@ -75,6 +89,21 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 30,
+  },
+  // claw joins hide/silk/venomSac/meat with a specimen: fen_troll (claw, tusk)
+  // and old_greyjaw (hide, fang, claw) would otherwise carry TWO
+  // specimen-less families on one corpse (fang+claw, or claw+tusk), which
+  // breaks the capacity pre-gate's one-specimen-less-family-per-corpse
+  // premise (tests/corpse_harvest_sim.test.ts, "no corpse tags two
+  // specimen-less harvest families together"). tusk stays specimen-less,
+  // same as fang/cloth: it never shares a corpse with another specimen-less
+  // family once claw has its own.
+  pristine_claw: {
+    id: 'pristine_claw',
+    name: 'Pristine Claw',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 25,
   },
   prime_cut: {
     id: 'prime_cut',
@@ -191,8 +220,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'uncommon',
-    weapon: { min: 5, max: 9, speed: 1.8, dagger: true },
-    stats: { agi: 4, sta: 2 },
+    // Retuned: the old 5-9@1.8 (3.9 dps) was less than half a Lv15 craft's
+    // weapon budget; 16-24@1.8 (11.1 dps) puts it in line with its tier.
+    weapon: { min: 16, max: 24, speed: 1.8, dagger: true },
+    stats: { agi: 5, sta: 2 },
     sellValue: 45,
   },
   thorium_warblade: {
@@ -601,11 +632,14 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // at skillReq 0/25/50, apothecary-bound at alchemist_verane. Potions reuse the
   // vendor potionHp/potionMana machinery (instant, in-combat, shared cooldown);
   // elixirs reuse the elixir_of_the_bear shape (a temporary buff_sta aura on
-  // use). Every consumable sits inside the existing ceilings: heal <= 280
-  // (healing_potion), mana <= 360 (mana_potion), elixir buff_sta <= 12 for <=
-  // 900s (elixir_of_the_bear). The three elixir aura display names are localized
-  // client-side through the sim_i18n aura matcher (AURA_NAME_KEY), the same path
-  // as 'Might of the Bear'. Never vendor-stocked (no buyValue).
+  // use). Every rung strictly EXCEEDS its vendor-tier equivalent in items.ts
+  // (minor/lesser/healing_potion, minor/lesser/mana_potion; #1608 retuned that
+  // ladder, so this one moved in lockstep to stay a strict upgrade): heal <= 335
+  // (healing_potion's 320 + headroom), mana <= 425 (mana_potion's 410 +
+  // headroom), elixir buff_sta <= 12 for <= 900s (elixir_of_the_bear). The three
+  // elixir aura display names are localized client-side through the sim_i18n
+  // aura matcher (AURA_NAME_KEY), the same path as 'Might of the Bear'. Never
+  // vendor-stocked (no buyValue).
   silverleaf_healing_draught: {
     id: 'silverleaf_healing_draught',
     name: 'Sheenleaf Healing Draught',
@@ -659,7 +693,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sunpetal Healing Draught',
     kind: 'potion',
     quality: 'rare',
-    potionHp: 280,
+    potionHp: 335,
     sellValue: 32,
   },
   sunpetal_mana_draught: {
@@ -667,7 +701,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sunpetal Mana Draught',
     kind: 'potion',
     quality: 'rare',
-    potionMana: 360,
+    potionMana: 425,
     sellValue: 32,
   },
   elixir_of_the_serpent: {

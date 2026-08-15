@@ -1,7 +1,7 @@
 // Pure sculpt-tool math for the map editor: the Smooth and Flatten level-stamp
-// builders and the Erase hit tests. No DOM, no Three, no i18n; the terrain
-// sampler is injected so a Vitest drives these with a synthetic heightfield
-// (tests/editor_stamp_core.test.ts).
+// builders, the Erase hit tests, and the Select-mode placement pick test. No
+// DOM, no Three, no i18n; the terrain sampler is injected so a Vitest drives
+// these with a synthetic heightfield (tests/editor_stamp_core.test.ts).
 //
 // Level-stamp semantics (src/sim/world.ts applyEditLayer): a stamp with
 // mode 'level' pulls the height toward the absolute height `delta`, weighted by
@@ -115,6 +115,56 @@ export function erasePlacementIndex(
     const dz = z - p.z;
     const d2 = dx * dx + dz * dz;
     if (d2 <= bestD2) {
+      best = i;
+      bestD2 = d2;
+    }
+  }
+  return best;
+}
+
+// Select-mode placement picking (2D top-down view): screen-space forgiveness
+// (px) so a small placement stays clickable however far the view is zoomed
+// out, and a scale multiplier mirroring the 3D viewport's pickPlacement
+// (src/editor/3d/viewport.ts), which widens its own pick radius to
+// `scale * 2` around whichever placement anchor the raycast lands nearest.
+export const PLACEMENT_PICK_SLOP_PX = 8;
+export const PLACEMENT_PICK_SCALE_MULT = 2;
+/** Mirrors pickPlacement's no-raycast-hit floor (yards). */
+export const PLACEMENT_PICK_MIN_RADIUS = 1.5;
+
+/**
+ * Select-mode pick radius for one placement (world yards): the largest of a
+ * fixed floor, the current zoom's screen-space forgiveness converted to
+ * yards, and the placement's own scale (mirroring the 3D formula).
+ */
+export function placementPickRadius(scale: number, pxPerYard: number): number {
+  const forgiveness = PLACEMENT_PICK_SLOP_PX / Math.max(0.01, pxPerYard);
+  return Math.max(PLACEMENT_PICK_MIN_RADIUS, forgiveness, (scale || 1) * PLACEMENT_PICK_SCALE_MULT);
+}
+
+/**
+ * Select-mode hit test for placements: the index of the NEAREST placement
+ * whose own scale-and-zoom-aware radius (`placementPickRadius`) contains the
+ * click point, or -1. Unlike `erasePlacementIndex` (the Erase tool's single
+ * uniform brush radius), each placement gets its own radius here, so a big
+ * scaled-up prop stays as easy to click as it looks and a small one at low
+ * zoom does not vanish to a couple of world-yard pixels.
+ */
+export function pickPlacementIndex(
+  placements: readonly AssetPlacement[],
+  x: number,
+  z: number,
+  pxPerYard: number,
+): number {
+  let best = -1;
+  let bestD2 = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < placements.length; i++) {
+    const p = placements[i];
+    const dx = x - p.x;
+    const dz = z - p.z;
+    const d2 = dx * dx + dz * dz;
+    const r = placementPickRadius(p.scale, pxPerYard);
+    if (d2 <= r * r && d2 < bestD2) {
       best = i;
       bestD2 = d2;
     }

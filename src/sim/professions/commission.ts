@@ -35,7 +35,7 @@ import { bagCapacity, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, type ItemDef } from '../types';
+import { cloneItemInstancePayload, type ItemDef, type StationDef } from '../types';
 import { MASTERWORK_QUALITY_LADDER } from './masterwork';
 import { isAtAnyStation } from './stations';
 
@@ -126,6 +126,7 @@ function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
  * 7. otherwise ok, with the fee to charge.
  */
 export function resolveUnbind(
+  stations: readonly StationDef[],
   meta: PlayerMeta | undefined,
   pos: { x: number; z: number } | undefined,
   itemId: string,
@@ -140,7 +141,7 @@ export function resolveUnbind(
   if (!meta || boundIdx === -1) {
     return { ok: false, itemId, reason: 'unbind_not_bound', fee };
   }
-  if (!pos || !isAtAnyStation(pos)) {
+  if (!pos || !isAtAnyStation(stations, pos)) {
     return { ok: false, itemId, reason: 'unbind_out_of_range', fee };
   }
   const boundSlot = meta.inventory[boundIdx];
@@ -176,7 +177,7 @@ export function unbindItem(ctx: SimContext, itemId: string, pid?: number): Unbin
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, fee: 0 };
   const meta = r.meta;
-  const result = resolveUnbind(meta, r.e.pos, itemId);
+  const result = resolveUnbind(ctx.stationPlacements, meta, r.e.pos, itemId);
   if (!result.ok) return result;
   const slotIdx = firstBoundSlotIndex(meta, itemId);
   const slot = meta.inventory[slotIdx];
@@ -193,7 +194,25 @@ export function unbindItem(ctx: SimContext, itemId: string, pid?: number): Unbin
     slot.count -= 1;
     const freed = cloneItemInstancePayload(instance);
     delete freed.boundTo;
-    ctx.addItemInstance(itemId, freed, meta.entityId);
+    // silent + callerLogs (#2430, #2458). This peel is an internal stack
+    // split, not an acquisition: the player already held every copy, so the
+    // hub's "You receive:" line here was the same falsehood the apply-enchant
+    // re-mint printed, stacked on top of the unbindResult line the client
+    // already logs (hudChrome.unbind.unbound, documented there as the ONE
+    // success surface: no toast, no sound cue). `silent` stands the hub's
+    // generic ding down for the same reason the line goes: the single-copy arm
+    // above clears boundTo in place and never reaches the hub at all, so
+    // leaving the cue on made ONE action sound different purely by how many
+    // byte-equal copies happened to share a slot. Unbind owning the cue means
+    // owning it as SILENCE (the trainResult single-surface rule), not as a cue
+    // of its own.
+    // movement: an internal stack split of copies the player already held (the
+    // same fact silent + callerLogs encode), so it never counts as an obtain.
+    ctx.addItemInstance(itemId, freed, meta.entityId, 1, {
+      silent: true,
+      callerLogs: true,
+      movement: true,
+    });
   }
   return result;
 }

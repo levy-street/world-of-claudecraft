@@ -22,6 +22,11 @@ export const TALENT_ABILITIES_V2_B = {
     id: 'voidfeast',
     name: 'Voidfeast',
     class: 'warlock',
+    // RETIRED by the three-spec overhaul (PR #2742): the row-8 option that
+    // granted it was consciously repurposed into Abyssal Gag (spell_lock) and
+    // no other grant exists. The def stays, hidden, so persisted action bars
+    // can identify and discard it (the same contract death_coil above uses).
+    hiddenFromPlayer: true,
     learnLevel: 8,
     cost: 35,
     castTime: 0,
@@ -38,6 +43,74 @@ export const TALENT_ABILITIES_V2_B = {
     ],
     description:
       'Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health. Only usable when there is an effect to devour.',
+  },
+  sacrilegious_march: {
+    id: 'sacrilegious_march',
+    name: 'Sacrilegious March',
+    class: 'warlock',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      {
+        type: 'selfBuff',
+        kind: 'buff_speed',
+        value: 1.35,
+        duration: 3600,
+        healthDrainPctMax: 0.02,
+        disableBelowHpPct: 0.2,
+      },
+    ],
+    description:
+      'Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health.',
+  },
+  dark_pact: {
+    id: 'dark_pact',
+    name: 'Sanguine Covenant',
+    class: 'warlock',
+    learnLevel: 11,
+    cost: 0,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfDamagePctCurrent', pct: 0.1 },
+      { type: 'selfAbsorbPctMax', pct: 0.3, duration: 8 },
+    ],
+    description:
+      'Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec.',
+  },
+  abyssal_rift: {
+    id: 'abyssal_rift',
+    name: 'Abyssal Rift',
+    class: 'warlock',
+    learnLevel: 20,
+    cost: 100,
+    castTime: 0,
+    cooldown: 90,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [
+      {
+        type: 'aoeDamage',
+        min: 110,
+        max: 130,
+        radius: 8,
+        pullToCenter: true,
+        stunSec: 2,
+      },
+    ],
+    description:
+      'Tears open a rift at the selected location, pulling enemies within 8 yd to its center, dealing $d Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun.',
   },
   howl_of_terror: {
     id: 'howl_of_terror',
@@ -72,6 +145,12 @@ export const TALENT_ABILITIES_V2_B = {
     id: 'death_coil',
     name: 'Morrowlash',
     class: 'warlock',
+    // RETIRED by the three-spec overhaul (PR #2742): the row-17 option that
+    // granted it was consciously repurposed into Grand Malediction (the
+    // signature-cooldown talent) and no other grant exists. The def stays,
+    // hidden, so persisted action bars can identify and discard it (the same
+    // contract PALADIN_LEGACY_ABILITY_IDS uses).
+    hiddenFromPlayer: true,
     learnLevel: 10,
     cost: 70,
     castTime: 0,
@@ -91,15 +170,19 @@ export const TALENT_ABILITIES_V2_B = {
     id: 'chaos_bolt',
     name: 'Ruinbolt',
     class: 'warlock',
-    learnLevel: 10,
-    cost: 95,
+    learnLevel: 5,
+    cost: 65,
+    ruinCost: 3,
     castTime: 2.5,
-    cooldown: 12,
+    cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 128, max: 156 }],
-    description: 'Hurls a bolt of chaotic fire for $d Fire damage. (Warlock talent)',
+    specs: ['destruction'],
+    projectileFx: 'heavyBolt',
+    effects: [{ type: 'directDamage', min: 192, max: 235 }],
+    description:
+      'Spends 3 Wrack to hurl a heavy bolt of chaotic fire for $d Fire damage. Desolation shortens its cast by 30%.',
   },
 
   typhoon: {
@@ -119,6 +202,7 @@ export const TALENT_ABILITIES_V2_B = {
   },
   innervate: {
     id: 'innervate',
+    tooltipOmitEffectLines: true,
     name: 'Lifesap',
     class: 'druid',
     learnLevel: 10,
@@ -150,6 +234,7 @@ export const TALENT_ABILITIES_V2_B = {
   },
   berserk: {
     id: 'berserk',
+    tooltipOmitEffectLines: true,
     name: 'Red Haze',
     class: 'druid',
     learnLevel: 10,

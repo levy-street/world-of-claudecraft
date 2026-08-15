@@ -4,6 +4,7 @@
 // uploaded GLB assets lives here; the rules live in user_assets.ts.
 
 import type { Pool } from 'pg';
+import { recordContentModerationAction } from './content_moderation_db';
 import type { AssetStatus, UserAssetRecord, UserAssetsDb } from './user_assets';
 
 export const USER_ASSETS_SCHEMA = `
@@ -157,5 +158,41 @@ export class PgUserAssetsDb implements UserAssetsDb {
       [id, status],
     );
     return (res.rowCount ?? 0) > 0;
+  }
+
+  // Admin moderation write: the status UPDATE and the content_moderation_actions
+  // audit row land in the SAME transaction (mirrors addBlockedIp in
+  // ip_block_db.ts), so the log can never drift from the row it describes.
+  async adminSetStatus(
+    id: number,
+    status: AssetStatus,
+    audit: { adminAccountId: number; reason: string },
+  ): Promise<boolean> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const res = await client.query(
+        'UPDATE user_assets SET status = $2 WHERE id = $1 RETURNING account_id',
+        [id, status],
+      );
+      const done = (res.rowCount ?? 0) > 0;
+      if (done) {
+        await recordContentModerationAction(client, {
+          resourceKind: 'user_asset',
+          resourceId: id,
+          ownerAccountId: res.rows[0]?.account_id ?? null,
+          adminAccountId: audit.adminAccountId,
+          action: status === 'blocked' ? 'block' : 'unblock',
+          reason: audit.reason,
+        });
+      }
+      await client.query('COMMIT');
+      return done;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 }

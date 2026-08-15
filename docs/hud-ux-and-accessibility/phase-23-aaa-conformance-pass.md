@@ -35,7 +35,7 @@ STEP 0 - PRE-FLIGHT (do all of this before writing any code)
    that the refactor's HudContext + tokens are stable. If any prerequisite is not landed,
    STOP and surface (an AAA audit against half-instrumented surfaces produces a false
    gap list). This phase adds NO new surfaces; it tightens existing ones.
-3. MEMORY SCAN. Read /Users/fernando/.claude/projects/-Users-fernando-Documents-world-of-claudecraft/memory/MEMORY.md
+3. MEMORY SCAN. Read project MEMORY.md (path redacted)
    and the notes it indexes for: hud, i18n, shared-worktree-commit-care,
    never-push-to-fork, no-em-dashes-or-emojis, live-site-and-test-creds. Honor all of
    them (push branches/PRs to origin levy-street, never the FernandoX7 fork; no em dashes

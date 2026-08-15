@@ -9,6 +9,25 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+<!-- Theme FOUC guard (mirrors the stored-locale preload pattern in index.html /
+     play.html / guide.html): stamp the stored theme preference on <html> before
+     any CSS paints, so a returning light-mode operator never sees a flash of the
+     dark default. Reads ONLY the admin theme's localStorage key
+     (src/admin/theme.ts's THEME_STORAGE_KEY; tests/admin/theme.test.ts pins the
+     two literals stay in sync). state/theme.svelte.ts re-applies the same
+     attribute once the app boots and on every toggle. -->
+<script>
+  (() => {
+    try {
+      if (localStorage.getItem('claudecraft_admin_theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    } catch {
+      // No storage access: fall through to the dark default.
+    }
+  })();
+</script>
 </head>
 <body>
   <div id="app"></div>

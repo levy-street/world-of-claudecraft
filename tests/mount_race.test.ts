@@ -19,14 +19,28 @@ import {
   STABLE_PASTURE,
 } from '../src/sim/content/mounts';
 import { ZONE3_PROPS } from '../src/sim/content/zone3';
-import { PROPS } from '../src/sim/data';
+import { BUILTIN_WORLD, PROPS } from '../src/sim/data';
 import { MOUNT_RACE_COUNTDOWN_TICKS, MOUNT_RACE_TIME_LIMIT_TICKS } from '../src/sim/mount_race';
 import { MOUNT_TRAIN_FEE_COPPER } from '../src/sim/mounts_training';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-const makeSim = (seed = 1) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+// Every case here drives the Highwatch show-jumping race entirely through
+// player position, mount state, and race-session commands (mount_race.ts and
+// mounts_training.ts both document that they draw no rng and touch no camp,
+// npc, or ground-object content). None of the ambient overworld roster is
+// ever read, so building the full 11-zone BUILTIN_WORLD for every Sim in this
+// file is pure overhead: strip it to the bare content tables.
+const MOUNT_RACE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+const makeSim = (seed = 1) =>
+  new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: MOUNT_RACE_TEST_WORLD });
 
 type RaceEvent<T extends SimEvent['type']> = Extract<SimEvent, { type: T }>;
 function findEv<T extends SimEvent['type']>(events: SimEvent[], type: T): RaceEvent<T> | undefined {
@@ -50,7 +64,8 @@ function mountUp(sim: Sim, pid: number): void {
   sim.addItem('reins_valorsteed', 1, pid);
   // Summon in the north pasture so the summon lock never overlaps a ride.
   teleport(sim, pid, STABLE_PASTURE.xMin + 2, STABLE_PASTURE.zMin + 2);
-  sim.toggleMountFor(pid);
+  // Reins are usable items: summoning is a use, not a keybind toggle.
+  sim.useItem('reins_valorsteed', pid);
   const e = sim.entities.get(pid)!;
   for (let i = 0; i < 80 && e.mountKey === ''; i++) sim.tick();
   expect(e.mountKey).toBe('valorsteed');
@@ -121,7 +136,7 @@ describe('MOUNT_RACE_COURSE geometry contract', () => {
       expect(g.z).toBeLessThan(STABLE_PADDOCK.divider.z - 4);
     }
     expect(MOUNT_RACE_COURSE.jumps.length).toBe(7);
-    expect(MOUNT_RACE_COURSE.arch.x).toBe(114);
+    expect(MOUNT_RACE_COURSE.arch.x).toBe(390);
     expect(isOnMountRaceStartPlatform(MOUNT_RACE_START_PLATFORM)).toBe(true);
     expect(MOUNT_RACE_START_PLATFORM.x).toBeLessThan(MOUNT_RACE_COURSE.arch.x);
     expect(MOUNT_RACE_START_PLATFORM.size).toBe(8);
@@ -431,14 +446,20 @@ describe('losing a race', () => {
     expect(raceOf(sim, sim.playerId)).toBeNull();
     // Remount and start again: a brand-new race id.
     const e = sim.entities.get(sim.playerId)!;
-    sim.toggleMounted();
+    sim.useItem('reins_valorsteed');
     for (let i = 0; i < 80 && e.mountKey === ''; i++) sim.tick();
     const armed = startRace(sim, sim.playerId);
     expect(armed.some((ev) => ev.type === 'mountRaceStart')).toBe(true);
   });
 
   it('leaving the game mid-race discards the session with the player', () => {
-    const sim = new Sim({ seed: 5, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const sim = new Sim({
+      seed: 5,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+      world: MOUNT_RACE_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Rider');
     mountUp(sim, pid);
     startRace(sim, pid);
@@ -452,7 +473,13 @@ describe('losing a race', () => {
 
 describe('per-player isolation (the online concurrency requirement)', () => {
   it('two riders race the same course at once with independent timers and progress', () => {
-    const sim = new Sim({ seed: 9, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const sim = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+      world: MOUNT_RACE_TEST_WORLD,
+    });
     const a = sim.addPlayer('warrior', 'RiderA');
     const b = sim.addPlayer('mage', 'RiderB');
     mountUp(sim, a);

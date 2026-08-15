@@ -22,7 +22,12 @@
 import { MOBS } from '../data';
 import { combatProfileForMob } from '../mob_combat';
 import type { SimContext } from '../sim_context';
-import { addThreat, MELEE_SWITCH_MULT, RANGED_SWITCH_MULT } from '../threat';
+import {
+  addThreat,
+  canDetectStealthedTarget,
+  MELEE_SWITCH_MULT,
+  RANGED_SWITCH_MULT,
+} from '../threat';
 import type { Entity } from '../types';
 import { DT, dist2d, MELEE_RANGE } from '../types';
 
@@ -32,6 +37,18 @@ const TRIVIAL_LEVEL_GAP = 10;
 const NYTHRAXIS_HEROIC_ROGUE_ADD_ID = 'nythraxis_heroic_rogue_add';
 const VOSS_TARGET_SHUFFLE_SECONDS = 3;
 const VOSS_FRONTLINE_CLASSES = new Set(['warrior', 'rogue', 'hunter']);
+const MAX_AGGRO_RADIUS = 20;
+
+function mobCanSeeTarget(ctx: SimContext, mob: Entity, target: Entity): boolean {
+  if (target.kind !== 'player') return true;
+  const template = MOBS[mob.templateId];
+  const baseRadius =
+    Math.max(
+      4,
+      Math.min(MAX_AGGRO_RADIUS, (template?.aggroRadius ?? 0) + (mob.level - target.level) * 1.5),
+    ) * ctx.delveDetectMult(target);
+  return canDetectStealthedTarget(mob, target, baseRadius);
+}
 
 // When a mob's target dies/leaves it swings to its next-highest-threat
 // attacker. With no living threat left, it evades home instead of grabbing a
@@ -76,7 +93,7 @@ export function highestThreatTarget(ctx: SimContext, mob: Entity): Entity | null
   for (const [id, t] of mob.threat) {
     counters.threatEntryVisits++;
     const e = ctx.entities.get(id);
-    if (!e || e.dead) {
+    if (!e || e.dead || !mobCanSeeTarget(ctx, mob, e)) {
       mob.threat.delete(id);
       continue;
     }
@@ -109,14 +126,14 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
   if (mob.forcedTargetTimer > 0) {
     mob.forcedTargetTimer -= DT;
     const forced = mob.forcedTargetId !== null ? ctx.entities.get(mob.forcedTargetId) : null;
-    if (forced && !forced.dead) {
+    if (forced && !forced.dead && mobCanSeeTarget(ctx, mob, forced)) {
       mob.aggroTargetId = forced.id;
       return;
     }
   }
   if (mob.forcedTargetTimer <= 0) mob.forcedTargetId = null;
   const cur = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
-  if (!cur || cur.dead) {
+  if (!cur || cur.dead || !mobCanSeeTarget(ctx, mob, cur)) {
     const next = highestThreatTarget(ctx, mob);
     if (next) mob.aggroTargetId = next.id;
     return;
@@ -138,7 +155,7 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
     counters.threatEntryVisits++;
     if (id === cur.id || t <= bestT) continue;
     const e = ctx.entities.get(id);
-    if (!e || e.dead) {
+    if (!e || e.dead || !mobCanSeeTarget(ctx, mob, e)) {
       mob.threat.delete(id);
       continue;
     }

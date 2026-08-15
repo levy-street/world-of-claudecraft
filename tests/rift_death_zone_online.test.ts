@@ -63,7 +63,10 @@ function moveTo(server: GameServer, pid: number, x: number, z: number): void {
 }
 
 // Build a bare ClientWorld whose field initialisers have run (the same idiom
-// used by world_api_parity.test.ts and raid_lockout_world.test.ts).
+// used by world_api_parity.test.ts and raid_lockout_world.test.ts). Kept
+// bespoke on purpose (issue #2088): this suite wants the truly bare prototype,
+// unlike the shared tests/helpers/bare_client.ts bareClient(), which is the
+// default for a new suite that needs the fully-defaulted fields instead.
 function bareClient(): ClientWorld {
   return Object.create(ClientWorld.prototype) as ClientWorld;
 }
@@ -147,6 +150,9 @@ describe('rift boss death zone wire mirror', () => {
     expect(z.remaining, 'remaining has not dropped more than elapsed').toBeGreaterThan(
       DURATION_SECS - elapsed - 0.05,
     );
+    // The full fuse rides alongside so the renderer can draw elapsed progress
+    // (the timer sweep) instead of an undated countdown; it never counts down.
+    expect(z.total, 'total mirrors the spawn durationSecs verbatim').toBe(DURATION_SECS);
   });
 
   it('ClientWorld.riftBossDeathZones() drops zones whose remaining has reached zero', () => {
@@ -157,6 +163,19 @@ describe('rift boss death zone wire mirror', () => {
       { x: 5, z: 5, radius: 8, expiresAtMs: performance.now() - 1000 },
     ];
     expect(client.riftBossDeathZones(), 'expired zone is omitted').toHaveLength(0);
+  });
+
+  it('riftDeathZoneClear drops every mirrored zone mid-fuse (sim cancelled it)', () => {
+    const client = bareClient();
+    const privateClient = client as any;
+    // A live zone with most of its fuse left: the sim cancelled it (boss died,
+    // evaded, or the floor tore down), so the mirror must not keep strobing a
+    // phantom detonation for the remaining seconds.
+    privateClient.activeBossDeathZones = [
+      { x: 5, z: 5, radius: 8, expiresAtMs: performance.now() + 5000, totalSecs: 5 },
+    ];
+    privateClient.applyRiftDeathZoneClearEvent({ type: 'riftDeathZoneClear', pid: 1 });
+    expect(client.riftBossDeathZones(), 'cancelled zones drop immediately').toHaveLength(0);
   });
 
   it('riftState(active:false) clears all active death zones on exit', () => {

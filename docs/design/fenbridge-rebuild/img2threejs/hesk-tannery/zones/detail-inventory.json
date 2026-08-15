@@ -1,0 +1,125 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones",
+  "detailInventory": {
+    "scanMethod": "four admitted component-zone crops with hero cross-check",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "asymmetric-workshop-awning",
+        "kind": "contour",
+        "description": "Tall roofed workshop occupies the left while a much lower open lean-to projects on the right.",
+        "region": { "x": 0.02, "y": 0.05, "width": 0.96, "height": 0.75, "units": "normalized" },
+        "scale": "macro",
+        "affects": "primary silhouette",
+        "mapsTo": { "type": "component.localFeatures", "ref": "open-right-work-bay" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/front.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "raised-dry-apron",
+        "kind": "contour",
+        "description": "One continuous timber work deck is raised on short piles and approached by centered steps.",
+        "region": { "x": 0.02, "y": 0.69, "width": 0.96, "height": 0.27, "units": "normalized" },
+        "scale": "macro",
+        "affects": "grounding and station approach",
+        "mapsTo": { "type": "component.localFeatures", "ref": "piled-dry-apron" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/hero.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "roof-smokestack",
+        "kind": "seam",
+        "description": "A broad dark masonry smokestack with stepped courses interrupts the teal roof near center-left.",
+        "region": { "x": 0.35, "y": 0, "width": 0.18, "height": 0.39, "units": "normalized" },
+        "scale": "meso",
+        "affects": "workshop skyline",
+        "mapsTo": { "type": "component.localFeatures", "ref": "smokestack-courses" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "hide-frame-pair",
+        "kind": "contour",
+        "description": "Two rectangular timber frames hold clean four-lobed cured-hide panels under the open awning.",
+        "region": { "x": 0.55, "y": 0.43, "width": 0.36, "height": 0.34, "units": "normalized" },
+        "scale": "meso",
+        "affects": "tannery identity",
+        "mapsTo": { "type": "component.localFeatures", "ref": "stretched-hide-pair" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/front.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "hide-lacing",
+        "kind": "linework",
+        "description": "Short diagonal ties visually connect each hide edge to its surrounding frame.",
+        "region": { "x": 0.55, "y": 0.45, "width": 0.35, "height": 0.3, "units": "normalized" },
+        "scale": "micro",
+        "affects": "frame attachment read",
+        "mapsTo": { "type": "component.localFeatures", "ref": "hide-frame-lacing" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/side.png",
+        "confidence": 0.84
+      },
+      {
+        "id": "shallow-vat",
+        "kind": "contour",
+        "description": "A broad low round timber vat with a thick rim sits at the outer front of the work bay.",
+        "region": { "x": 0.76, "y": 0.67, "width": 0.2, "height": 0.22, "units": "normalized" },
+        "scale": "meso",
+        "affects": "station cue",
+        "mapsTo": { "type": "component.localFeatures", "ref": "shallow-tanning-vat" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/hero.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "vat-water",
+        "kind": "gloss",
+        "description": "The vat contains a flat pale blue-gray water surface below its timber rim.",
+        "region": { "x": 0.78, "y": 0.7, "width": 0.16, "height": 0.09, "units": "normalized" },
+        "scale": "micro",
+        "affects": "wet material response",
+        "mapsTo": { "type": "material.localOverrides", "ref": "fenbridge-opaque/vat-water-sheen" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/hero.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "drainage-trough",
+        "kind": "groove",
+        "description": "A shallow linear drain run leaves the work apron without crossing the centered door steps.",
+        "region": { "x": 0.46, "y": 0.8, "width": 0.42, "height": 0.12, "units": "normalized" },
+        "scale": "meso",
+        "affects": "functional exterior cue",
+        "mapsTo": { "type": "component.localFeatures", "ref": "front-drainage-trough" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/front.png",
+        "confidence": 0.76
+      },
+      {
+        "id": "workbench-tools",
+        "kind": "linework",
+        "description": "A left exterior bench supports abstract hooks, small pots and rolled leather silhouettes.",
+        "region": { "x": 0.05, "y": 0.52, "width": 0.28, "height": 0.3, "units": "normalized" },
+        "scale": "meso",
+        "affects": "craft context",
+        "mapsTo": { "type": "component.localFeatures", "ref": "bench-hook-and-roll-system" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/front.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "cured-hide-matte",
+        "kind": "stain",
+        "description": "Hide panels are warm tan with darker restrained perimeter mottling and no anatomical marks.",
+        "region": { "x": 0.55, "y": 0.46, "width": 0.35, "height": 0.28, "units": "normalized" },
+        "scale": "micro",
+        "affects": "clean cured-hide response",
+        "mapsTo": { "type": "material.localOverrides", "ref": "fenbridge-opaque/cured-hide-matte" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/hero.png",
+        "confidence": 0.9
+      }
+    ]
+  },
+  "uncertainty": [
+    "Drain routing is partly occluded; the shipping trough is a short exterior run that avoids the central approach.",
+    "Hook, pot and leather-roll counts vary by view and are fixed deterministically.",
+    "Hide outlines are abstract non-anatomical panels; no gore is inferred or modeled."
+  ]
+}

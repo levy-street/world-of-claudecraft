@@ -7,7 +7,9 @@
 import { describe, expect, it } from 'vitest';
 import { DELVE_MODULES, DELVES } from '../src/sim/data';
 import {
+  DELVE_DAILY_FULL_CLEARS,
   DELVE_IMPLEMENTED_AFFIXES,
+  delveBonusMarksFor,
   delveMarkPayout,
   delveShopGateMet,
   pickDelveModules,
@@ -117,15 +119,42 @@ describe('delveMarkPayout', () => {
   });
 });
 
+describe('delveBonusMarksFor', () => {
+  // Callers run AFTER grantDelveClearTo incremented markClears for the clear the
+  // bonus rides, so a post-increment tally of 1..3 means "this clear was one of
+  // the day's first three" and 4+ means the window was already spent.
+  const meta = (markClears: number) => ({
+    delveDaily: { date: '', firstClearXp: new Set<string>(), markClears },
+  });
+
+  it('the base and bonus windows share ONE tuning constant, pinned at 3', () => {
+    expect(DELVE_DAILY_FULL_CLEARS).toBe(3);
+  });
+
+  it('pays the full bonus while the clear rode the daily window, the 3rd clear included', () => {
+    // A tally of 0 is unreachable today (the granters only run on a credited
+    // clear, which increments first), but the intended answer is "in-window".
+    expect(delveBonusMarksFor(meta(0), 2)).toBe(2);
+    expect(delveBonusMarksFor(meta(1), 2)).toBe(2);
+    expect(delveBonusMarksFor(meta(2), 4)).toBe(4);
+    expect(delveBonusMarksFor(meta(3), 4)).toBe(4);
+  });
+
+  it('pays zero bonus Marks on every later clear of the day', () => {
+    expect(delveBonusMarksFor(meta(4), 2)).toBe(0);
+    expect(delveBonusMarksFor(meta(9), 4)).toBe(0);
+  });
+});
+
 describe('refreshDelveDaily', () => {
   const meta = (date: string): PlayerMeta =>
     ({
       delveDaily: { date, firstClearXp: new Set(['x']), markClears: 4 },
     }) as unknown as PlayerMeta;
 
-  it('rolls over to a fresh window on a new UTC day', () => {
+  it('rolls over to a fresh window on a new reset day', () => {
     const m = meta('2099-01-01');
-    refreshDelveDaily({ utcDay: '2099-01-02' } as unknown as SimContext, m);
+    refreshDelveDaily({ resetDay: '2099-01-02' } as unknown as SimContext, m);
     expect(m.delveDaily.date).toBe('2099-01-02');
     expect(m.delveDaily.firstClearXp.size).toBe(0);
     expect(m.delveDaily.markClears).toBe(0);
@@ -133,10 +162,10 @@ describe('refreshDelveDaily', () => {
 
   it('is a no-op on the same day or when the day is unknown', () => {
     const same = meta('2099-01-01');
-    refreshDelveDaily({ utcDay: '2099-01-01' } as unknown as SimContext, same);
+    refreshDelveDaily({ resetDay: '2099-01-01' } as unknown as SimContext, same);
     expect(same.delveDaily.markClears).toBe(4);
     const unknown = meta('2099-01-01');
-    refreshDelveDaily({ utcDay: '' } as unknown as SimContext, unknown);
+    refreshDelveDaily({ resetDay: '' } as unknown as SimContext, unknown);
     expect(unknown.delveDaily.date).toBe('2099-01-01');
     expect(unknown.delveDaily.markClears).toBe(4);
   });

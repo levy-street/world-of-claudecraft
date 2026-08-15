@@ -4,7 +4,6 @@
 // import from (same reason as move_input.ts); kept free of Math.random/Date.now
 // so the sim-purity backstop (tests/architecture.test.ts) stays green.
 
-
 function hashCyrb53(str: string, salt = 0): string {
   let h1 = 0xdeadbeef ^ salt;
   let h2 = 0x41c6ce57 ^ salt;
@@ -25,6 +24,11 @@ export function signChallenge(nonce: string, response: string, seed: string): st
   return hashCyrb53(JSON.stringify([nonce, response, seed]));
 }
 
-export function verifyChallenge(nonce: string, response: string, sig: string, seed: string): boolean {
+export function verifyChallenge(
+  nonce: string,
+  response: string,
+  sig: string,
+  seed: string,
+): boolean {
   return signChallenge(nonce, response, seed) === sig;
 }

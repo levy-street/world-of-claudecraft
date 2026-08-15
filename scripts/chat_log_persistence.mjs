@@ -3,6 +3,7 @@
 // commands are not persisted.
 import { Client as PgClient } from 'pg';
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -58,9 +59,7 @@ class Client {
           this.events.push(...msg.list);
         }
       });
-      this.ws.on('open', () =>
-        this.ws.send(JSON.stringify({ t: 'auth', token, character: characterId })),
-      );
+      this.ws.on('open', () => this.ws.send(JSON.stringify(worldAuthMessage(token, characterId))));
       this.ws.on('error', reject);
     });
   }

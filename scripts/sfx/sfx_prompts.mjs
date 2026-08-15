@@ -120,6 +120,29 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'mount_run_terrorspark_groundshaker_start',
+    custom: true,
+  },
+  {
+    // The sustain take of the windup/loop/winddown set: driven through
+    // Sfx.loop() at runtime (see mountEngine in src/game/sfx.ts), not
+    // playAt, so the manifest's own `loop` flag must say so too, even
+    // though nothing reads it at runtime today.
+    key: 'mount_run_terrorspark_groundshaker',
+    custom: true,
+    loop: true,
+  },
+  {
+    // The Drakemaw Raptor's sprint: the gobbler's two-legged gallop donor,
+    // pitched down in sfx_speed_map.json so the heavier raptor reads deeper.
+    key: 'mount_run_drakemaw_raptor',
+    custom: true,
+  },
+  {
+    key: 'mount_run_terrorspark_groundshaker_stop',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,
@@ -247,6 +270,24 @@ export const SFX = [
     duration: 1.3,
     prompt:
       "A human warrior's final pained death cry as he collapses to the ground. Single death cry fading out.",
+  },
+  {
+    key: 'player_eat_food',
+    custom: true,
+    duration: 2.2,
+    prompt: 'A person taking a bite of food and chewing. Single bite, no music.',
+  },
+  {
+    key: 'player_drink_water',
+    custom: true,
+    duration: 1.7,
+    prompt: 'A person drinking water from a waterskin, swallowing. Single gulp, no music.',
+  },
+  {
+    key: 'player_drink_potion',
+    custom: true,
+    duration: 1.0,
+    prompt: 'A person uncorking a small vial and quaffing a potion in one gulp. No music.',
   },
 
   // --- Spell casts (looping while channeling) ------------------------------
@@ -389,6 +430,139 @@ export const SFX = [
     duration: 0.9,
     prompt:
       'An expanding magical nova shockwave bursting outward in all directions. Single burst, no music.',
+  },
+  {
+    key: 'fear_shout',
+    custom: true,
+  },
+  {
+    key: 'fear',
+    custom: true,
+  },
+  {
+    key: 'intimidating_shout',
+    custom: true,
+  },
+  {
+    key: 'battle_shout',
+    custom: true,
+  },
+  {
+    key: 'demoralizing_shout',
+    custom: true,
+  },
+  {
+    key: 'emboldening_roar',
+    custom: true,
+  },
+  {
+    key: 'defiant_bellow',
+    custom: true,
+  },
+  {
+    key: 'rallying_cry',
+    custom: true,
+  },
+  {
+    key: 'ice_block',
+    custom: true,
+  },
+  {
+    key: 'frost_nova',
+    custom: true,
+  },
+  {
+    key: 'hammer_of_justice',
+    custom: true,
+  },
+  {
+    key: 'entangling_roots',
+    custom: true,
+  },
+  {
+    key: 'blind',
+    custom: true,
+  },
+  {
+    key: 'cloak_of_shadows',
+    custom: true,
+  },
+  {
+    key: 'scorch',
+    custom: true,
+  },
+  {
+    key: 'pyroblast',
+    custom: true,
+  },
+  {
+    key: 'meteor',
+    custom: true,
+  },
+  {
+    key: 'flamestrike',
+    custom: true,
+  },
+  {
+    key: 'frozen_orb',
+    custom: true,
+  },
+  {
+    key: 'glacial_spike',
+    custom: true,
+  },
+  {
+    key: 'blizzard',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'blink',
+    custom: true,
+  },
+  {
+    key: 'arcane_blast',
+    custom: true,
+  },
+  {
+    key: 'shadowstep',
+    custom: true,
+  },
+  {
+    key: 'cheap_shot',
+    custom: true,
+  },
+  {
+    key: 'ambush',
+    custom: true,
+  },
+  {
+    key: 'backstab',
+    custom: true,
+  },
+  {
+    key: 'garrote',
+    custom: true,
+  },
+  {
+    key: 'sap',
+    custom: true,
+  },
+  {
+    key: 'sinister_strike',
+    custom: true,
+  },
+  {
+    key: 'eviscerate',
+    custom: true,
+  },
+  {
+    key: 'stealth',
+    custom: true,
+  },
+  {
+    key: 'vanish',
+    custom: true,
   },
 
   // --- Heals & auras --------------------------------------------------------
@@ -756,6 +930,83 @@ export const SFX = [
   { key: 'ui_card_reveal', custom: true },
   { key: 'ui_card_round_push', custom: true },
   { key: 'ui_card_shuffle', custom: true },
+
+  // --- Fishing (custom recordings, replacing the retired synth placeholders
+  // in scripts/sfx/ui_sfx.mjs) --------------------------------------------
+  // fishBite is the one gameplay-timing cue of the family (it opens the live
+  // reel window, audio.ts's ungated play() arm); fishCast/fishReel are
+  // feedback notifications. Multi-take (no-repeat-random picker).
+  { key: 'ui_fish_cast', custom: true },
+  { key: 'ui_fish_bite', custom: true },
+  { key: 'ui_fish_reel', custom: true },
+
+  // --- Gathering node harvests (custom recordings, not ElevenLabs) ----------
+  // One cue per GatherNodeType ('ore'/'wood'/'herb', src/sim/types.ts), fired
+  // from the gatherResult sim event. Multi-take (no-repeat-random picker).
+  { key: 'ui_gather_ore', custom: true },
+  { key: 'ui_gather_wood', custom: true },
+  { key: 'ui_gather_herb', custom: true },
+
+  // --- Gathering tool-out cue, per node type (custom recordings) -----------
+  // Fires at gather CAST START (audio.gatherCast(nodeType)), a "pulling the
+  // tool out" beat for the cast bar's anticipation window; distinct from the
+  // completion cue above. Falls back to the flat ui_gather_cast placeholder
+  // (scripts/sfx/ui_sfx.mjs) when no node type is known. Multi-take.
+  { key: 'ui_gather_cast_ore', custom: true },
+  { key: 'ui_gather_cast_wood', custom: true },
+  { key: 'ui_gather_cast_herb', custom: true },
+
+  // Rare-or-better gather stinger: layers ALONGSIDE the ui_gather_<nodeType>
+  // cue above, one tier per rolled MaterialRarity (common/uncommon get none).
+  { key: 'ui_gather_rare', custom: true },
+  { key: 'ui_gather_epic', custom: true },
+  { key: 'ui_gather_legendary', custom: true },
+
+  // --- Crafting completion, per craft family (custom recordings) -----------
+  // One cue per CRAFT_RING entry (src/sim/content/professions.ts), fired from
+  // the craftResult sim event keyed off recipeId's craft family.
+  { key: 'ui_craft_engineering', custom: true },
+  { key: 'ui_craft_alchemy', custom: true },
+  { key: 'ui_craft_cooking', custom: true },
+  { key: 'ui_craft_leatherworking', custom: true },
+  { key: 'ui_craft_tailoring', custom: true },
+  { key: 'ui_craft_inscription', custom: true },
+  { key: 'ui_craft_enchanting', custom: true },
+  { key: 'ui_craft_jewelcrafting', custom: true },
+  { key: 'ui_craft_weaponcrafting', custom: true },
+  { key: 'ui_craft_armorcrafting', custom: true },
+
+  // Masterwork proc (custom recording): layers ALONGSIDE the ui_craft_<family>
+  // cue above on a masterwork craft, not a replacement for it (Jamie's
+  // explicit design call, 2026-07-18).
+  { key: 'ui_masterwork', custom: true },
+
+  // Disenchant proc (custom recording): the enchanting profession's own
+  // action, separate from the craftByFamily set above since disenchant does
+  // not go through the recipe/craftResult path (src/sim/professions/
+  // enchanting.ts disenchantItem). Triggered from the bag item action menu
+  // (src/ui/bag_item_action_menu.ts).
+  { key: 'ui_craft_disenchant', custom: true },
+
+  // Salvage proc (custom recording): the enchanting profession's ungated
+  // break-any-item-for-generic-materials action (src/sim/professions/
+  // salvage.ts), separate from disenchant's rare+ arcane-materials path.
+  { key: 'ui_craft_salvage', custom: true },
+
+  // --- Rift mechanics (custom recordings, src/sim/rift/) --------------------
+  // World-anchored one-shots and point-source loops for the procedural Rift
+  // dungeon's headline floor mechanics (src/sim/rift/runs.ts, portals.ts),
+  // played via the spellfxAt world event's optional sfxKey override.
+  { key: 'rift_portal_spawn', custom: true }, // a natural rift portal opening in the world
+  { key: 'rift_portal_enter', custom: true }, // stepping through into the instance
+  { key: 'rift_portal_drone', custom: true, loop: true }, // point-source loop near an open, unentered portal
+  { key: 'rift_gate_grind', custom: true }, // the rift gate mechanic's portcullis grinding open
+  { key: 'rift_boulder_impact', custom: true }, // the rolling-lane hazard bowling over a player
+  { key: 'rift_boulder_roll', custom: true, loop: true }, // point-source loop near an active rolling-lane hazard
+  { key: 'rift_ice_start', custom: true }, // launching onto the ice-slide zone
+  { key: 'rift_ice_glide', custom: true, loop: true }, // point-source loop for a player currently gliding
+  { key: 'rift_ice_stop', custom: true }, // skidding to a halt off the ice
+  { key: 'rift_lava_tick', custom: true }, // the 1 Hz lava/blackwater hazard burn tick
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

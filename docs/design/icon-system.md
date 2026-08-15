@@ -1,6 +1,6 @@
 # Procedural Icon System — Design Spec for World of Claudecraft
 
-Everything below is implementable without further design decisions. Sources read: `/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/src/sim/data.ts`, `src/sim/types.ts`, `src/ui/hud.ts`, `index.html`.
+Everything below is implementable without further design decisions. Sources read: `src/sim/data.ts`, `src/sim/types.ts`, `src/ui/hud.ts`, `index.html`.
 
 ---
 
@@ -259,11 +259,14 @@ Signature: `(ctx: CanvasRenderingContext2D, pal: IconPalette) => void`, ctx pre-
 | sprint | earth | boot | leather | motion |
 
 **Paladin**
+The visible v0.30 kit uses the curated WebP artwork listed in
+`public/ui/skills/paladin/mapping.json`. The recipes below are procedural fallbacks and include
+legacy IDs retained for save compatibility; they are not a current ability inventory.
+
 | seal_of_righteousness | holy | sigil_rune, sunburst@big | holyGold | glow |
 |---|---|---|---|---|
 | holy_light | holy | sunburst | holyGold | glow, sparkle |
 | devotion_aura | holy | shield, sunburst@tl | holyGold | — |
-| judgement | holy | mace, sunburst@big | gold | glow |
 | blessing_of_might | holy | fist, sunburst@tl | gold | — |
 | divine_protection | holy | shield | silverWhite | glow |
 | hammer_of_justice | holy | mace | gold | arcs |

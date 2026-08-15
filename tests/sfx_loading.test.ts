@@ -27,7 +27,10 @@ interface SfxInternals {
   loading: Map<string, Promise<AudioBuffer | null>>;
   failedLoads: Set<string>;
   clips: Record<string, SfxEntry>;
-  pendingLoops: Map<string, { key: string; target: number; x?: number; y?: number; z?: number }>;
+  pendingLoops: Map<
+    string,
+    { key: string; target: number; x?: number; y?: number; z?: number; immediate?: boolean }
+  >;
 }
 
 const BUFFER = { duration: 0.5 } as AudioBuffer;
@@ -365,6 +368,11 @@ describe('sampled SFX loading', () => {
       x: 8,
       y: 9,
       z: 10,
+      // The pending entry carries the caller's immediate flag now, so a loop
+      // resumed after its buffer resolves still snaps to target gain instead
+      // of falling back to a fade-in; an ordinary loop like this one stores
+      // the default false rather than leaving it absent.
+      immediate: false,
     });
 
     gate.resolve(response());

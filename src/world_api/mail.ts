@@ -19,12 +19,15 @@ export interface MailMessageView {
   subject: string;
   body: string;
   copper: number; // attached coin still waiting in the letter
+  /** Attachment stacks. An instanced parcel's `instance` here is the DISPLAY
+   *  projection (signer/enchant/rolled, the market browse-row trim); the full
+   *  payload arrives with mailTake. */
   items: InvSlot[]; // attached parcels still waiting in the letter
   read: boolean;
 }
 
 export interface MailInfo {
-  messages: MailMessageView[]; // newest first, capped to one wire window
+  messages: MailMessageView[]; // newest first, all delivered letters in the box
   totalCount: number; // all delivered letters in the box
   unread: number;
   postage: number; // copper cost per sent letter

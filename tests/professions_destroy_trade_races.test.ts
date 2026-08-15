@@ -5,6 +5,7 @@
 // Every scenario asserts CONSERVATION: total copies across both players plus
 // destructions balances exactly; no dupe, no double-destroy, coherent lastX.
 import { describe, expect, it, vi } from 'vitest';
+import { completeEnchantFamilyCast } from './helpers/enchant_family_cast';
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
@@ -69,7 +70,27 @@ function placeAt(server: GameServer, pid: number, pos: { x: number; z: number })
 }
 
 function routeTick(server: GameServer): void {
+  // Profession destroy commands are cast-paced: flush every player's cast after
+  // the command tick so race pins still see a completed destroy.
   (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
+  for (const pid of server.sim.players.keys()) {
+    completeEnchantFamilyCast(server.sim as never, pid);
+  }
+  (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
+}
+
+// Tick and route WITHOUT flushing casts: the arm where a race lands while the
+// destroy cast is still running, rather than after it has already resolved.
+function tickCastLive(server: GameServer): void {
+  (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
+}
+
+function castingAbilityOf(server: GameServer, pid: number): string | null {
+  const entity = (
+    server.sim as unknown as { entities: Map<number, { castingAbility: string | null }> }
+  ).entities.get(pid);
+  if (!entity) throw new Error(`no entity for pid ${pid}`);
+  return entity.castingAbility;
 }
 
 function cmd(server: GameServer, session: ClientSession, body: Record<string, unknown>): void {
@@ -133,8 +154,10 @@ describe('race: disenchant vs concurrent trade of the same copy', () => {
     openTrade(p);
     cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 1 }] });
     cmd(p.server, p.a, { cmd: 'trade_confirm' });
-    // A destroys the offered copy BEFORE B's confirm lands, all in one tick.
+    // Cast-paced destroy: complete the disenchant cast BEFORE B's confirm so the
+    // offered copy is gone when the trade revalidates (instant-destroy race).
     cmd(p.server, p.a, { cmd: 'disenchant_item', item: SWORD });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 
@@ -208,13 +231,52 @@ describe('race: disenchant vs concurrent trade of the same copy', () => {
     expect(totalOf(p.server, SWORD, [p.a.pid, p.b.pid])).toBe(1);
   });
 
+  it('the trade lands WHILE the disenchant cast runs: the completion denies not_held', () => {
+    // The cast-paced arm the tests above deliberately skip past: the destroy
+    // is admitted and running, the copy is still in A's bags (a cast consumes
+    // nothing at start), and the trade swaps it away before the cast finishes.
+    const p = pairUp(709);
+    p.server.sim.addItem(SWORD, 1, p.a.pid);
+    openTrade(p);
+    cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 1 }] });
+    cmd(p.server, p.a, { cmd: 'trade_confirm' });
+    cmd(p.server, p.a, { cmd: 'disenchant_item', item: SWORD });
+    tickCastLive(p.server);
+    // The cast really is mid-flight, and nothing has been consumed yet.
+    expect(castingAbilityOf(p.server, p.a.pid)).toBe('disenchanting');
+    expect(p.server.sim.countItem(SWORD, p.a.pid)).toBe(1);
+    expect(eventsFor(p.fcA.sent, 'disenchantResult')).toHaveLength(0);
+
+    cmd(p.server, p.b, { cmd: 'trade_confirm' });
+    tickCastLive(p.server);
+    expect(p.server.sim.countItem(SWORD, p.b.pid)).toBe(1);
+
+    // Now let the still-running cast finish against bags that no longer hold it.
+    completeEnchantFamilyCast(p.server.sim as never, p.a.pid);
+    tickCastLive(p.server);
+
+    const denc = eventsFor(p.fcA.sent, 'disenchantResult');
+    expect(denc).toHaveLength(1);
+    expect((denc[0] as { ok?: boolean }).ok).toBe(false);
+    expect((denc[0] as { reason?: string }).reason).toBe('not_held');
+    expect(p.server.sim.lastDisenchantResultFor(p.a.pid)?.reason).toBe('not_held');
+    // No material minted for the destroy that never happened, and conservation
+    // holds: one copy existed, one copy survives, with B.
+    expect(p.server.sim.countItem(DUST, p.a.pid)).toBe(0);
+    expect(p.server.sim.countItem(SWORD, p.a.pid)).toBe(0);
+    expect(totalOf(p.server, SWORD, [p.a.pid, p.b.pid])).toBe(1);
+  });
+
   it('partial-stock variant: offer 2, destroy 1 mid-trade; the confirm cannot deliver the ghost copy', () => {
     const p = pairUp(707);
     p.server.sim.addItem(SWORD, 2, p.a.pid);
     openTrade(p);
     cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 2 }] });
     cmd(p.server, p.a, { cmd: 'trade_confirm' });
+    // Cast-paced destroy: complete the disenchant before B confirms so stock
+    // drops under the offer (same race as instant-destroy mid-trade).
     cmd(p.server, p.a, { cmd: 'disenchant_item', item: SWORD });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 
@@ -240,6 +302,7 @@ describe('race: salvage vs concurrent trade of the same copy', () => {
     cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 1 }] });
     cmd(p.server, p.a, { cmd: 'trade_confirm' });
     cmd(p.server, p.a, { cmd: 'salvage_item', item: SWORD });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 
@@ -266,6 +329,8 @@ describe('race: salvage vs concurrent trade of the same copy', () => {
 
     const salv = eventsFor(p.fcA.sent, 'salvageResult');
     expect(salv).toHaveLength(1);
+    // Trade already moved the only copy to B: late salvage is not_held (no
+    // concurrent cast here; busy applies only when a cast is already running).
     expect((salv[0] as { reason?: string }).reason).toBe('not_held');
     expect(p.server.sim.lastSalvageResultFor(p.a.pid)?.reason).toBe('not_held');
     expect(p.server.sim.countItem(BONE, p.a.pid)).toBe(boneBefore);
@@ -284,7 +349,9 @@ describe('race: salvage vs concurrent trade of the same copy', () => {
     const salv = eventsFor(p.fcA.sent, 'salvageResult');
     expect((denc[0] as { ok?: boolean }).ok).toBe(true);
     expect((salv[0] as { ok?: boolean; reason?: string }).ok).toBe(false);
-    expect((salv[0] as { reason?: string }).reason).toBe('not_held');
+    // Cast pacing: the second destroy in the same tick is busy (one non-spell cast at a time),
+    // not not_held (instant-destroy era).
+    expect((salv[0] as { reason?: string }).reason).toBe('busy');
     expect(p.server.sim.countItem(DUST, p.a.pid)).toBeGreaterThan(0);
     expect(p.server.sim.countItem(BONE, p.a.pid)).toBe(0);
     expect(p.server.sim.countItem(SWORD, p.a.pid)).toBe(0);
@@ -371,6 +438,7 @@ describe('race: apply_enchant vs concurrent trade of the target copy', () => {
     // The enchant transforms the offered copy into an instanced enchanted copy
     // of the SAME item id (count stays 1) before B's confirm.
     cmd(p.server, p.a, { cmd: 'apply_enchant', item: SWORD, enchant: WEAPON_ENCHANT });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 

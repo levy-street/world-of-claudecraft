@@ -14,8 +14,13 @@ import {
   valeLandness,
   WATER_LEVEL,
 } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 1337; // matches the fixed client seed in src/main.ts
+// The SHIPPED world seed (src/sim/world_seed.ts, mandated for geometry
+// tests): this file long pinned 1337 under a comment claiming it matched
+// the fixed client seed, but every shipping host seeds WORLD_SEED, so the
+// dry-road and elevation pins were proving a world nobody plays.
+const SEED = WORLD_SEED;
 
 describe('Farshore zone registration', () => {
   it('is a rectangle in the starter sea beside the vale', () => {

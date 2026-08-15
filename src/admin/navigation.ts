@@ -6,7 +6,10 @@ export interface AdminNavigation {
   back: (event: MouseEvent) => void;
 }
 
-export type AdminRoute = { page: AdminPage } | { page: 'ip'; ip: string };
+export type AdminRoute =
+  | { page: Exclude<AdminPage, 'guilds'> }
+  | { page: 'guilds'; guildId?: number }
+  | { page: 'ip'; ip: string };
 
 const NAVIGATION_CONTEXT = Symbol('admin-navigation');
 
@@ -24,8 +27,15 @@ export function parseAdminRoute(url: URL): AdminRoute {
   const page = url.searchParams.get('page');
   const ip = url.searchParams.get('ip')?.trim();
   if (page === 'ip' && ip) return { page: 'ip', ip };
+  if (page === 'guilds') {
+    const rawGuildId = url.searchParams.get('guildId');
+    const guildId = rawGuildId === null ? undefined : Number(rawGuildId);
+    return Number.isSafeInteger(guildId) && (guildId ?? 0) > 0
+      ? { page: 'guilds', guildId }
+      : { page: 'guilds' };
+  }
   if (PAGES.some((candidate) => candidate.id === page)) {
-    return { page: page as AdminPage };
+    return { page: page as Exclude<AdminPage, 'guilds'> };
   }
   // Backward compatibility for IP links created before page became explicit.
   if (page === null && ip) return { page: 'ip', ip };
@@ -41,6 +51,11 @@ export function routeHref(route: AdminRoute): string {
   url.searchParams.set('page', route.page);
   if (route.page === 'ip') url.searchParams.set('ip', route.ip);
   else url.searchParams.delete('ip');
+  if (route.page === 'guilds' && route.guildId !== undefined) {
+    url.searchParams.set('guildId', String(route.guildId));
+  } else {
+    url.searchParams.delete('guildId');
+  }
   return `${url.pathname}${url.search}${url.hash}`;
 }
 

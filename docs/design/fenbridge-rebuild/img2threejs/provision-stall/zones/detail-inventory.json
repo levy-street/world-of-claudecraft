@@ -1,0 +1,172 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/provision-stall-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones",
+  "detailInventory": {
+    "scanMethod": "labeled-turnaround-component-zones",
+    "targetMinDetails": 8,
+    "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+    "details": [
+      {
+        "id": "counter-edge-wear",
+        "kind": "bevel",
+        "description": "Bright worn bevel along the customer counter edge.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "material roughness and edge readability",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "worn-counter-edges"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "teal-scalloped-valance",
+        "kind": "contour",
+        "description": "Teal canopy terminates in a shallow scalloped front valance.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "front silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "scalloped-canopy-edge"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/front.png",
+        "confidence": 0.895
+      },
+      {
+        "id": "canopy-ridge-crease",
+        "kind": "ridge",
+        "description": "A centered ridge and slight cloth sag break the canopy plane.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "roof volume",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "center-ridge-sag"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/side.png",
+        "confidence": 0.89
+      },
+      {
+        "id": "four-post-spacing",
+        "kind": "linework",
+        "description": "Four dark posts form a legible frame around the vendor opening.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "structural rhythm",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "four-post-rhythm"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/rear.png",
+        "confidence": 0.885
+      },
+      {
+        "id": "stepped-baskets",
+        "kind": "contour",
+        "description": "Baskets and crates step up behind the front lip.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "display depth",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "stepped-basket-line"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/hero.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "produce-color-breakup",
+        "kind": "gloss",
+        "description": "Warm produce and cool bottle accents punctuate the neutral food display.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "material separation",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "bottle-gloss-and-produce-color"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/hero.png",
+        "confidence": 0.875
+      },
+      {
+        "id": "bread-loaf-row",
+        "kind": "ridge",
+        "description": "Rounded bread loaves create a repeating warm ridge.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "identity detail",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "bread-loaves"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/front.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "rear-sack-profile",
+        "kind": "contour",
+        "description": "A hanging sack and reserve crates keep the vendor side stocked.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "rear-view completeness",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "hanging-sack"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/provision-stall/zones/rear.png",
+        "confidence": 0.865
+      }
+    ]
+  },
+  "authoringInstruction": "Complete: every observed detail maps to an authored component.localFeatures or material.localOverrides key in sculpt-spec.json."
+}

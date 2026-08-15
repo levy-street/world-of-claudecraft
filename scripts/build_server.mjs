@@ -30,4 +30,14 @@ await esbuild.build({
   alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
 });
 
+await esbuild.build({
+  entryPoints: ['scripts/migrate_rift_forge_rollback.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['pg-native'],
+  outfile: 'dist-server/migrate_rift_forge_rollback.cjs',
+  alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
+});
+
 console.log(`[build:server] bot detector: ${usePrivate ? 'private' : 'stub (no-op)'}`);

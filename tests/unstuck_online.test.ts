@@ -84,6 +84,7 @@ function armUnstuck(server: GameServer, session: ClientSession): void {
     area: { kind: 'overworld', id: 'eastbrook_vale' },
     damageTaken: meta.counters.damageTaken,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
+    startedDead: player.dead || player.ghost,
   };
   player.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS);
 }
@@ -111,7 +112,7 @@ describe('online unstuck command wiring', () => {
     const event: SimEvent = {
       type: 'unstuck',
       phase: 'completed',
-      reason: 'nearest_graveyard',
+      reason: 'moved_to_graveyard',
       pid: 7,
       area: { kind: 'overworld', id: 'world' },
       origin: { x: 1, y: 2, z: 3, localX: 1, localZ: 3 },
@@ -143,6 +144,44 @@ describe('online unstuck command wiring', () => {
 
     expect(unstuck).toHaveBeenNthCalledWith(1, session.pid);
     expect(unstuck).toHaveBeenNthCalledWith(2, session.pid);
+  });
+
+  it('the slash alias pays the command lane (a drained lane refuses it)', () => {
+    // The alias rides the chat case, which the top-of-dispatch command-lane
+    // draw classifies as 'chat', and it deliberately sits ahead of the chat
+    // token bucket so a muted player can still recover. Without its own
+    // command-lane draw it reached the sim with ZERO tokens drawn on any
+    // lane (the release-merge audit's finding): pin that a drained command
+    // lane refuses the alias exactly as it refuses the dedicated command.
+    const server = new GameServer();
+    const { session } = join(server);
+    const unstuck = vi.spyOn(server.sim, 'unstuck').mockReturnValue(true);
+    const lanes = session.msgLanes as unknown as {
+      commandTokens: number;
+      lastRefillSec: number;
+    };
+    lanes.commandTokens = 0;
+    lanes.lastRefillSec = Date.now() / 1000 + 3600; // no refill within the test
+    send(server, session, { cmd: 'chat', text: '/unstuck' });
+    expect(unstuck).not.toHaveBeenCalled();
+  });
+
+  it('a drained CHAT lane still permits the alias (the muted-recovery claim, token half)', () => {
+    // The mute half is pinned above; this is the token-bucket half of "a
+    // muted or chat-flooded player can still recover": the alias sits ahead
+    // of the chat lane and the chat ladder, drawing only the command lane,
+    // so drying chat must not strand a stuck player.
+    const server = new GameServer();
+    const { session } = join(server);
+    const unstuck = vi.spyOn(server.sim, 'unstuck').mockReturnValue(true);
+    const lanes = session.msgLanes as unknown as {
+      chatTokens: number;
+      lastRefillSec: number;
+    };
+    lanes.chatTokens = 0;
+    lanes.lastRefillSec = Date.now() / 1000 + 3600;
+    send(server, session, { cmd: 'chat', text: '/unstuck' });
+    expect(unstuck).toHaveBeenCalledWith(session.pid);
   });
 
   it('returns structured localized blockers for spectating and jailed Settings use', () => {

@@ -40,7 +40,11 @@ export function emptyCraftSkills(): CraftSkills {
  *  disturbing any in-range value already present (additive back-compat: an older
  *  save with fewer or zero craft keys loads cleanly at 0 for the missing ones).
  *  A loaded value above the craft's enforced content cap clamps DOWN
- *  to it (the load-time arm of the maxSkill cap). */
+ *  to it (the load-time arm of the maxSkill cap). CAP-RAISE CAVEAT: the clamp
+ *  makes a cap raise rollback-destructive (an old binary clamps raised values
+ *  on load and persists the loss on its first save); whoever raises a cap must
+ *  ship the mechanical fix with it. See the shared "rollback erases newer
+ *  fields" note in docs/design/professions-tuning-packet.md. */
 export function normalizeCraftSkills(
   saved: Record<string, number> | undefined | null,
 ): CraftSkills {

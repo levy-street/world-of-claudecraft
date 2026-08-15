@@ -13,6 +13,7 @@ export const CHAT_TAB_CHANNELS = [
   'say',
   'yell',
   'party',
+  'battleground',
   'general',
   'world',
   'lfg',
@@ -58,6 +59,7 @@ const CHANNEL_SEND_PREFIX: Record<ChatTabChannel, string> = {
   say: '/say ',
   yell: '/y ',
   party: '/p ',
+  battleground: '/bg ',
   general: '/general ',
   world: '/world ',
   lfg: '/lfg ',
@@ -82,6 +84,7 @@ export const CHANNEL_LABEL_KEYS: Record<ChatTabChannel, TranslationKey> = {
   say: 'hud.core.chatChannels.names.say',
   yell: 'hud.core.chatChannels.names.yell',
   party: 'hud.core.chatChannels.names.party',
+  battleground: 'hud.core.chatChannels.names.battleground',
   general: 'hud.core.chatChannels.names.general',
   world: 'hud.core.chatChannels.names.world',
   lfg: 'hud.core.chatChannels.names.lfg',
@@ -111,6 +114,14 @@ const CHAT_CHANNEL_COLORS: Record<ChatColorChannel, string> = {
   say: '#f0ead8',
   yell: '#ff5040',
   party: '#7fd4ff',
+  // Deliberately warm, not green or blue: both of those are GROUP colours here
+  // (party, guild, lfg), and this is the one channel that also reaches the
+  // people trying to kill you. Your own team already talks in party-blue,
+  // since the match welds each side into a party. Separated from world's
+  // softer #ff9d5c by saturation; the nearest hue is emote, which never
+  // collides in practice because emotes render bare and this carries a
+  // [Battleground] prefix.
+  battleground: '#ff8c1a',
   general: '#ffc864',
   world: '#ff9d5c',
   lfg: '#5cd6a0',
@@ -181,6 +192,7 @@ export function sentLineChannel(line: string): ChatTabChannel | null {
   if (text.startsWith('!')) return null;
   if (!text.startsWith('/')) return 'say';
   if (/^\/p(arty)?\s/i.test(text)) return 'party';
+  if (/^\/bg\s/i.test(text)) return 'battleground';
   if (/^\/y(ell)?\s/i.test(text)) return 'yell';
   if (/^\/s(ay)?\s/i.test(text)) return 'say';
   if (/^\/gu(ild)?\s/i.test(text)) return 'guild';
@@ -246,4 +258,48 @@ export function parseChatTabs(raw: string | null): ChatOpenTab[] {
 
 export function serializeChatTabs(tabs: ChatOpenTab[]): string {
   return JSON.stringify(tabs);
+}
+
+// Reorder an open-tab list by moving `moved` to sit immediately before `before`
+// (dragging a tab onto a sibling), or to the end of the list when `before` is
+// null (dragging onto the "+" add button) or equal to `moved` itself (dropped
+// on its own position). Every no-op, including one where the computed order
+// happens to match the input (dragging a tab onto the neighbor it already
+// sits before, or dropping the last tab on "+"), returns the ORIGINAL `tabs`
+// reference, not just an equal-looking copy, so a caller can compare by
+// reference to decide whether anything actually needs a rerender/persist.
+// Defensive like the rest of this module: an unknown `moved` id, or a
+// `before` id no longer in the list (a stale drag target from a tab that
+// closed mid-gesture), is one more such no-op.
+export function reorderChatTabs(
+  tabs: ChatOpenTab[],
+  moved: ChatOpenTab,
+  before: ChatOpenTab | null,
+): ChatOpenTab[] {
+  if (!tabs.includes(moved)) return tabs;
+  if (before !== null && (before === moved || !tabs.includes(before))) return tabs;
+  const rest = tabs.filter((tab) => tab !== moved);
+  let next: ChatOpenTab[];
+  if (before === null) {
+    next = [...rest, moved];
+  } else {
+    const index = rest.indexOf(before);
+    next = [...rest.slice(0, index), moved, ...rest.slice(index)];
+  }
+  return next.every((tab, i) => tab === tabs[i]) ? tabs : next;
+}
+
+// Swap `moved` with its immediate left (`step: -1`) or right (`step: 1`)
+// neighbor: the keyboard-accessible non-drag reorder path (Alt+ArrowLeft /
+// Alt+ArrowRight on a focused tab), which reaches the same persisted order as
+// a drag. A no-op (returns the input unchanged) at either edge of the list or
+// for an id the list does not contain.
+export function stepChatTab(tabs: ChatOpenTab[], moved: ChatOpenTab, step: -1 | 1): ChatOpenTab[] {
+  const index = tabs.indexOf(moved);
+  if (index < 0) return tabs;
+  const target = index + step;
+  if (target < 0 || target >= tabs.length) return tabs;
+  const next = [...tabs];
+  [next[index], next[target]] = [next[target], next[index]];
+  return next;
 }

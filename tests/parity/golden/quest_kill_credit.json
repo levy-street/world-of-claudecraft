@@ -10,13 +10,13 @@
     "turnInQuest (xp + copper reward)"
   ],
   "draws": 40,
-  "drawDigest": "0512bbe6",
+  "drawDigest": "73f698f7",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 819,
-      "state": "9213e3c7",
+      "nextId": 964,
+      "state": "b7e2dc0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -37,11 +37,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -72,7 +72,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -91,7 +94,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 814
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -104,7 +107,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 814,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -148,9 +151,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 819,
-      "state": "646f4d81",
-      "events": "2b70b2c9",
+      "nextId": 964,
+      "state": "b24b6f12",
+      "events": "65a4cf51",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -170,11 +173,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -187,7 +190,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -221,7 +224,10 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -240,7 +246,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 814
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -253,7 +259,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 814,
+          "id": 959,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -265,9 +271,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -297,12 +303,12 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 827,
-      "state": "93a8b593",
-      "events": "6e4f8aa1",
+      "nextId": 972,
+      "state": "4aba4742",
+      "events": "0ce93a3d",
       "rng": {
         "draws": 40,
-        "digest": "0512bbe6"
+        "digest": "73f698f7"
       },
       "label": "quest-ready",
       "players": [
@@ -319,6 +325,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -327,7 +334,6 @@
             "questProgress": 8
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 8432,
@@ -365,7 +371,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -399,8 +405,11 @@
             ]
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -419,7 +428,7 @@
               "name": "Battle Stance",
               "remaining": 3599.6,
               "school": "physical",
-              "sourceId": 814
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -432,7 +441,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 814,
+          "id": 959,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -445,9 +454,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -477,12 +486,12 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 827,
-      "state": "3ee9831e",
-      "events": "b20bc2e7",
+      "nextId": 972,
+      "state": "aaac809f",
+      "events": "d6b1e3df",
       "rng": {
         "draws": 40,
-        "digest": "0512bbe6"
+        "digest": "73f698f7"
       },
       "label": "quest-turned-in",
       "players": [
@@ -499,6 +508,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 75,
@@ -510,7 +520,6 @@
             "xpGained": 250
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 8432,
@@ -548,7 +557,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -570,8 +579,11 @@
             "q_wolves"
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -591,7 +603,7 @@
               "name": "Battle Stance",
               "remaining": 3599.6,
               "school": "physical",
-              "sourceId": 814
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -604,7 +616,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 814,
+          "id": 959,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -617,9 +629,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -649,12 +661,12 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 827,
-      "state": "0c61e869",
+      "nextId": 972,
+      "state": "e5916cd6",
       "events": "741638a5",
       "rng": {
         "draws": 40,
-        "digest": "0512bbe6"
+        "digest": "73f698f7"
       },
       "label": "final",
       "players": [
@@ -671,6 +683,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 75,
@@ -682,7 +695,6 @@
             "xpGained": 250
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 8432,
@@ -720,7 +732,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 814,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -742,8 +754,11 @@
             "q_wolves"
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -763,7 +778,7 @@
               "name": "Battle Stance",
               "remaining": 3599.5,
               "school": "physical",
-              "sourceId": 814
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -776,7 +791,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 814,
+          "id": 959,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -789,9 +804,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4,
+            "x": 4.5,
             "y": 1.5,
-            "z": 6
+            "z": 5.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

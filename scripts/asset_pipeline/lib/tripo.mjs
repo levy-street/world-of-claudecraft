@@ -27,6 +27,7 @@ export const RIG_MODEL_ALL = 'v2.5-20260210'; // all rig types, small preset set
 const MAX_RETRIES = 5;
 const POLL_INTERVAL_MS = 2000;
 const DEFAULT_TASK_TIMEOUT_MS = 15 * 60 * 1000;
+const DEFAULT_REQUEST_TIMEOUT_MS = 30_000;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -34,11 +35,29 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  *  `idempotent: false` (task-creating POSTs) retries only rate/concurrency
  *  429s, never 5xx: a 5xx after server-side creation would double-create a
  *  PAID task. Failed creations are safe to re-run manually (job resume). */
-async function request(path, { method = 'GET', body, form, idempotent = method === 'GET' } = {}) {
+async function request(
+  path,
+  {
+    method = 'GET',
+    body,
+    form,
+    idempotent = method === 'GET',
+    timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
+    maxRetries = MAX_RETRIES,
+  } = {},
+) {
   const url = `${TRIPO_BASE}${path}`;
+  const attempts = Number.isFinite(maxRetries)
+    ? Math.max(1, Math.min(MAX_RETRIES, Math.floor(maxRetries)))
+    : MAX_RETRIES;
   let lastErr;
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
     let res;
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(new Error(`${method} ${path} timed out after ${timeoutMs}ms`)),
+      timeoutMs,
+    );
     try {
       res = await fetch(url, {
         method,
@@ -47,17 +66,25 @@ async function request(path, { method = 'GET', body, form, idempotent = method =
           ...(body ? { 'Content-Type': 'application/json' } : {}),
         },
         body: form ?? (body ? JSON.stringify(body) : undefined),
+        signal: controller.signal,
       });
     } catch (err) {
+      const requestError = controller.signal.aborted
+        ? new Error(`${method} ${path} timed out after ${timeoutMs}ms`)
+        : err;
       // Network error. For a non-idempotent (task-creating) POST the request
       // may have reached the server, so retrying could double-create a paid
       // task: fail instead and let the job-ledger resume path recover.
       if (!idempotent) {
+        if (controller.signal.aborted) throw requestError;
         throw new Error(`${method} ${path} network error (not retried, task may exist): ${err}`);
       }
-      lastErr = err;
+      lastErr = requestError;
+      if (attempt + 1 >= attempts) break;
       await sleep(1000 * 2 ** attempt);
       continue;
+    } finally {
+      clearTimeout(timeout);
     }
     const text = await res.text();
     let json;
@@ -88,12 +115,13 @@ async function request(path, { method = 'GET', body, form, idempotent = method =
             ? Math.max(1000, resetAt * 1000 - Date.now())
             : 1000 * 2 ** attempt;
       lastErr = new Error(msg);
+      if (attempt + 1 >= attempts) break;
       await sleep(Math.min(waitMs, 30_000));
       continue;
     }
     throw new Error(msg);
   }
-  throw new Error(`Tripo request failed after ${MAX_RETRIES} attempts: ${lastErr?.message}`);
+  throw new Error(`Tripo request failed after ${attempts} attempts: ${lastErr?.message}`);
 }
 
 export async function balance() {
@@ -102,8 +130,8 @@ export async function balance() {
 
 /** Fetch one task's detail (status, credits_consumed, output). Used by the QA
  *  cost report to price each recorded task id. */
-export async function getTask(taskId) {
-  return request(`/tasks/${taskId}`);
+export async function getTask(taskId, { timeoutMs, maxRetries } = {}) {
+  return request(`/tasks/${taskId}`, { timeoutMs, maxRetries });
 }
 
 /** Upload a local image or model file; returns a file_token string. */

@@ -490,7 +490,26 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
-    aoePulse: { min: 30, max: 42, radius: 14, every: 8, name: 'Necrotic Shockwave' },
+    // Grave Inferno (2026-07): the old Necrotic Shockwave aoePulse hit every
+    // melee for an unavoidable, unmitigated 570-798 each 8s. Replaced by a
+    // Geddon-style stationary channel: 8s rooted, no melee, four escalating
+    // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
+    // Moving out at the windup eats the small first pulse or nothing.
+    // The 50% hp gate (2026-07-26) guarantees the channel fires once per kill
+    // on BOTH difficulties: a group out-pacing the 30s cadence used to skip
+    // the mechanic entirely. One gate only, and it lands before the 30% enrage
+    // so the burn phase never stacks on enraged melee.
+    infernoChannel: {
+      every: 30,
+      duration: 8,
+      pulses: 4,
+      min: 7,
+      max: 9,
+      radius: 14,
+      name: 'Grave Inferno',
+      school: 'fire',
+      atHpPct: [0.5],
+    },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       { copper: 50000, chance: 1 },
@@ -513,6 +532,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'wildgrowth_leggings', chance: 0.05, rollGroup: 'korzul_bonus' },
       { itemId: 'grovewardens_grips', chance: 0.05, rollGroup: 'korzul_bonus' },
       { itemId: 'verdant_walkers', chance: 0.05, rollGroup: 'korzul_bonus' },
+      // korzul_bonus deliberately sums below 1 (some kills yield no bonus
+      // piece), so the quiver takes its 0.05 from that slack at the same
+      // per-class rate as every other piece here, diluting none of them.
+      { itemId: 'gravewyrm_bone_quiver', chance: 0.05, rollGroup: 'korzul_bonus' },
     ],
     scale: 1.8,
     color: 0x3d5c45,
@@ -622,7 +645,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 3.4,
     attackSpeed: 2.0,
     armorPerLevel: 16,
-    moveSpeed: 11,
+    moveSpeed: 8,
     aggroRadius: 14,
     ignoreTaunt: true,
     loot: [],
@@ -655,7 +678,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 22,
     // Each nythraxis_drop_* rollGroup is exclusive (one partitioned rng draw per
     // group) and sums to exactly 1.00. The offhand/two-hander epics ride the
-    // existing four groups, one per group, with the set-piece chances rebalanced.
+    // existing four groups, with the set-piece chances rebalanced; group 3 is
+    // the offhand group and carries two (the caster orb and the hunter quiver).
     loot: [
       { copper: 150000, chance: 1 },
       { itemId: 'deathless_heartwood', chance: 0.03, rollGroup: 'nythraxis_drop_1' },
@@ -674,13 +698,19 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
       { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
       { itemId: 'stormcallers_spaulders', chance: 0.14, rollGroup: 'nythraxis_drop_2' },
-      { itemId: 'wraithfire_orb', chance: 0.16, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'crownforged_dreadhelm', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_cowl', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'stormcallers_crown', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'nighttalon_shoulderguards', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
-      { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      // Group 3 is the offhand group and now carries both offhand epics, the
+      // caster orb and the hunter quiver, at an equal 0.14. The group is
+      // exclusive and must sum to exactly 1, so seating an eighth entry is the
+      // one place a quiver costs existing drops: the two offhands come down from
+      // 0.16 and the six shared set pieces from 0.14 to 0.12.
+      { itemId: 'wraithfire_orb', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'direfang_quiver', chance: 0.14, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'crownforged_dreadhelm', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_crown', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_cowl', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'stormcallers_crown', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'nighttalon_shoulderguards', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
+      { itemId: 'soulflame_mantle', chance: 0.12, rollGroup: 'nythraxis_drop_3' },
       { itemId: 'direfang_greatblade', chance: 0.16, rollGroup: 'nythraxis_drop_4' },
       { itemId: 'soulflame_mantle', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
       { itemId: 'crownforged_warspaulders', chance: 0.14, rollGroup: 'nythraxis_drop_4' },
@@ -777,6 +807,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     exitOffset: { x: 0, z: -6 },
     spawns: CRYPT_SPAWN_LIST,
     interior: 'crypt',
+    tombDressing: 'coffins',
     suggestedPlayers: 5,
     enterText: 'You descend into the Hollow Crypt...',
     leaveText: 'You climb back into daylight.',
@@ -790,6 +821,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     exitOffset: { x: 0, z: -6 },
     spawns: BASTION_SPAWN_LIST,
     interior: 'crypt',
+    tombDressing: 'cargo',
     suggestedPlayers: 5,
     enterText: 'You wade down into the Sunken Bastion...',
     leaveText: 'You climb out of the drowning dark.',
@@ -839,9 +871,41 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       },
     ],
     interior: 'crypt',
+    tombDressing: 'coffins',
     suggestedPlayers: 1,
     enterText: 'You cross the threshold of the Abandoned Crypt.',
     leaveText: 'You return to the cold air of Thornpeak.',
+  },
+  the_last_keep: {
+    id: 'the_last_keep',
+    name: 'The Last Keep',
+    // Overflow band: indexes 0..7 are taken (temple 3, orkadia 6, wildheart 7),
+    // so the keep claims 8 (instanceOrigin: DUNGEON_OVERFLOW_X_BASE + 600).
+    index: 8,
+    // On the ward terrace at the keep's west front: clear of the keep's
+    // decor collider (r 8.5 at 421,2003), of both ward step tops, and of
+    // the terrace mid-walk, so neither the leave-drop (z - 4) nor casual
+    // foot traffic clips a collider or the 2yd door trigger (castle_layout)
+    doorPos: { x: 413.5, z: 2016.5 },
+    // Arrival just inside the entrance hall's south end, 4yd north of the exit
+    // portal so zoning in never lands inside the exit's 2yd door trigger.
+    entry: { x: 0, z: -5 },
+    exitOffset: { x: 0, z: -9 },
+    // Zero combat, zero loot by design: the keep is a place to walk, not a
+    // fight (the zero-spawn Nythraxis attunement crypt is the precedent). It is
+    // deliberately absent from FINDER_ACTIVITIES, so the Dungeon Finder never
+    // queues a group into an empty instance (orkadia/wildheart precedent: the
+    // finder catalogue is explicit, not derived from DUNGEONS).
+    spawns: [],
+    objects: [
+      // the hall's keepsake: a signet dropped by the garrison that never
+      // came home, on the entrance hall floor east of the door
+      { itemId: 'last_keep_signet', name: 'Signet of the Last Keep', x: 4, z: 0 },
+    ],
+    interior: 'lastkeep',
+    suggestedPlayers: 1,
+    enterText: 'You step into the cold, silent halls of the Last Keep.',
+    leaveText: 'You pull the keep door shut and step back into the Drakelands wind.',
   },
   nythraxis_boss_arena: {
     id: 'nythraxis_boss_arena',
@@ -862,6 +926,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       { itemId: 'bastion_ward_stone', name: 'Threshold Wardstone', x: 0, z: 63 },
     ],
     interior: 'nythraxis',
+    tombDressing: 'coffins',
     suggestedPlayers: 10,
     enterText: 'You pass through the sealed royal door.',
     leaveText: 'You return to the cold air of Thornpeak.',

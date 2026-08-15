@@ -4,27 +4,45 @@
 // draw call consumes) plus source pins on the guarded draw site and the data
 // build-site fill; the untitled byte-identical guarantee IS the null return
 // (nothing extra ever draws when it is null).
+//
+// #3125: the title used to share the y=158 realm baseline (starting past the
+// measured realm-line width), which heavily ellipsized or dropped a long
+// title. It now gets its OWN row (TITLE_BASELINE in card_layout.ts) so it
+// can never collide with the realm line regardless of either string's
+// length; cardTitleLayout no longer takes a realm-width argument.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { cardTitleLayout } from '../src/ui/hud/player_card/player_card';
+import {
+  cardTitleLayout,
+  HEADER_RIGHT_EDGE,
+  HEADER_X,
+  TITLE_BASELINE,
+} from '../src/ui/hud/player_card/card_layout';
 
 describe('cardTitleLayout (the pure title-line gate)', () => {
   it('returns null for absent, empty, and whitespace titles (untitled cards draw nothing)', () => {
-    expect(cardTitleLayout(undefined, 200)).toBeNull();
-    expect(cardTitleLayout('', 200)).toBeNull();
-    expect(cardTitleLayout('   ', 200)).toBeNull();
+    expect(cardTitleLayout(undefined)).toBeNull();
+    expect(cardTitleLayout('')).toBeNull();
+    expect(cardTitleLayout('   ')).toBeNull();
   });
 
-  it('places the title on the realm baseline, past the measured realm line', () => {
-    const line = cardTitleLayout('the Resplendent', 200.4)!;
-    // x = header column (478) + ceil(realm width) + 16; clamped left of 1018.
-    expect(line).toEqual({ text: 'the Resplendent', x: 478 + 201 + 16, y: 158, maxW: 1018 - 695 });
+  it('places the title on its own row, at the header column, full header width', () => {
+    const line = cardTitleLayout('the Resplendent')!;
+    expect(line).toEqual({
+      text: 'the Resplendent',
+      x: HEADER_X,
+      y: TITLE_BASELINE,
+      maxW: HEADER_RIGHT_EDGE - HEADER_X,
+    });
   });
 
-  it('skips the line entirely when the realm text leaves too little room to read', () => {
-    // maxW = 1018 - (478 + ceil(w) + 16) < 40 => null, never a clipped smear.
-    expect(cardTitleLayout('the Resplendent', 485)).toBeNull();
-    expect(cardTitleLayout('the Resplendent', 484)).not.toBeNull();
+  it('a long title still gets the full header width regardless of the realm line length', () => {
+    // The whole point of #3125: an extreme realm string can no longer starve
+    // the title of room, since the two no longer share a baseline.
+    const short = cardTitleLayout('the Resplendent')!;
+    const long = cardTitleLayout('the Truly Exceptionally Resplendent and Undying')!;
+    expect(short.maxW).toBe(long.maxW);
+    expect(short.y).toBe(long.y);
   });
 
   it('the compositor guards its ONE title draw call on this gate (source pin)', () => {
@@ -39,7 +57,7 @@ describe('cardTitleLayout (the pure title-line gate)', () => {
       'fillTextClamped(ctx, titleLine.text, titleLine.x, titleLine.y, titleLine.maxW);',
     );
     // Exactly one consumer: no second, unguarded title draw can appear.
-    expect(src.split('cardTitleLayout(').length - 1).toBe(2); // the export + the one call
+    expect(src.split('cardTitleLayout(').length - 1).toBe(1);
   });
 
   it('the data builder resolves the deed id to display text and omits it when empty', () => {

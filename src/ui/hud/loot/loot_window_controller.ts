@@ -5,7 +5,9 @@ import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
+import { knownItemDef } from '../../known_item';
 import { svgIcon } from '../../ui_icons';
+import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { corpseHarvestView } from './corpse_harvest_view';
 import { renderCorpseHarvestPicker } from './corpse_harvest_window';
 
@@ -54,7 +56,7 @@ export class LootWindowController {
     const world = this.deps.world();
     const mob = world.entities.get(mobId);
     if (!mob) return;
-    const { componentTags, harvestable, visibleItems, hasLoot, canOpen } =
+    const { componentTags, harvestable, visibleItems, visibleCopper, hasLoot, canOpen } =
       this.deps.corpseAvailability(mob);
     if (!canOpen) return;
 
@@ -62,8 +64,10 @@ export class LootWindowController {
     this.mobId = mobId;
     this.chestId = null;
     let html = this.titleHtml(this.deps.entityName(mob));
-    if (mob.loot && mob.loot.copper > 0) {
-      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(mob.loot.copper)}</span></div>`;
+    // visibleCopper, not mob.loot.copper: coin is shared (tap-owned) loot, so
+    // the popup must not advertise a stranger's copper the take would deny.
+    if (visibleCopper > 0) {
+      html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(visibleCopper)}</span></div>`;
     }
     html += visibleItems.map((stack) => this.itemRowHtml(stack)).join('');
     this.deps.element.innerHTML = html;
@@ -94,10 +98,21 @@ export class LootWindowController {
         attachTooltip: (element, html) => this.deps.attachTooltip(element, html),
       });
     }
-    const hint = this.deps.document.createElement('div');
-    hint.className = 'town-focus-hint';
-    hint.textContent = t('hudChrome.loot.unifiedPressHint');
-    this.deps.element.appendChild(hint);
+    // Only where the sentence is TRUE. It says the interact key "loots and
+    // harvests in one press, using your town focus", which is a claim about a
+    // harvest half this corpse may not have: it was appended unconditionally, so
+    // every one of the 101 untagged templates promised a harvest that does not
+    // exist, and #2513 would have added fen_troll to that list right after
+    // removing its picker. Gated rather than reworded because the sentence is
+    // correct as written wherever a harvest is actually on offer, and a
+    // loot-only corpse needs no hint at all (the press does the one obvious
+    // thing). Both arms are pinned in tests/loot_window_controller.test.ts.
+    if (harvestable) {
+      const hint = this.deps.document.createElement('div');
+      hint.className = 'town-focus-hint';
+      hint.textContent = t('hudChrome.loot.unifiedPressHint');
+      this.deps.element.appendChild(hint);
+    }
     this.bindClose();
     this.deps.element.style.display = 'block';
     if (this.deps.document.body.classList.contains('mobile-touch')) {
@@ -155,18 +170,31 @@ export class LootWindowController {
   }
 
   private itemRowHtml(stack: LootWindowItemStack): string {
-    const item = ITEMS[stack.itemId];
+    // Stale-client guard (R34): corpse and chest loot lists are server truth,
+    // so a bundle one deploy behind can be handed an id with no local def. An
+    // unguarded deref here used to throw before this popup's innerHTML was
+    // assigned, leaving the corpse un-lootable (and, on the chest arm, the
+    // throw aborted the rest of that frame's event batch).
+    const item: ItemDef | undefined = knownItemDef(ITEMS, stack.itemId);
     const count =
       stack.count > 1
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
         : '';
-    return `<div class="loot-item" data-item="${stack.itemId}">${this.deps.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${count}</span></div>`;
+    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}<span style="font-size:12px">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
   }
 
   private attachItemTooltips(): void {
     this.deps.element.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
       const itemId = row.dataset.item ?? '';
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[itemId]));
+      const item: ItemDef | undefined = knownItemDef(ITEMS, itemId);
+      // An unknown id gets the same minimal tooltip its bag and bank
+      // siblings render (raw id plus the unknown sub-line), never the
+      // def-derived body.
+      this.deps.attachTooltip(row, () =>
+        item
+          ? this.deps.itemTooltip(item)
+          : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
+      );
     });
   }
 

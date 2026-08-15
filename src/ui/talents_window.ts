@@ -32,6 +32,7 @@ import {
   type TalentSpecIconRef,
   talentIconDataUrl,
   talentRowOptionIconRef,
+  talentSpecIconCssBackground,
   talentSpecIconRef,
 } from './talent_icons';
 import { buildTalentsView, type TalentSpecVM, type TalentsView } from './talents_view';
@@ -62,10 +63,14 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   applyTalents(allocation: TalentAllocation): void;
   respec(): void;
   currentBar(): (string | null)[];
-  saveLoadout(name: string, bar: (string | null)[], alloc: TalentAllocation): void;
-  switchLoadout(index: number): void;
+  saveLoadout(
+    name: string,
+    bar: (string | null)[],
+    alloc: TalentAllocation,
+    captureGear?: boolean,
+  ): void;
+  switchLoadout(index: number, bar: (string | null)[], alloc: TalentAllocation): void;
   deleteLoadout(index: number): void;
-  applyLoadoutBar(bar: (string | null)[], alloc: TalentAllocation): void;
   // Shared HUD chrome components.
   inputDialog(opts: {
     title: string;
@@ -103,13 +108,11 @@ function signatureName(abilityId: string): string {
 }
 
 function specIconHtml(ref: TalentSpecIconRef): string {
-  if (ref.kind === 'image') {
-    return `<span class="ts-icon ts-icon-art" style="background-image:url(${esc(ref.url)})" aria-hidden="true"></span>`;
+  if (ref.kind === 'text') {
+    return `<span class="ts-icon" aria-hidden="true">${esc(ref.text)}</span>`;
   }
-  if (ref.kind !== 'text') {
-    return `<span class="ts-icon ts-icon-art" style="background-image:url(${iconDataUrl(ref.kind, ref.id)})" aria-hidden="true"></span>`;
-  }
-  return `<span class="ts-icon" aria-hidden="true">${esc(ref.text)}</span>`;
+  const background = talentSpecIconCssBackground(ref);
+  return `<span class="ts-icon ts-icon-art" style="background-image:${esc(background ?? '')}" aria-hidden="true"></span>`;
 }
 
 export class TalentsWindow {
@@ -329,6 +332,13 @@ export class TalentsWindow {
   }
 
   private paintRowsTab(body: HTMLElement, view: TalentsView): void {
+    if (!view.hasRows) {
+      body.innerHTML =
+        `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>` +
+        `<b>${t('game.talents.comingSoonTitle')}</b>` +
+        `<span>${t('game.talents.comingSoonBody')}</span></div>`;
+      return;
+    }
     const wrap = document.createElement('div');
     wrap.className = 'tal-rows';
     const soon = t('hudChrome.talentRows.comingSoon');
@@ -443,7 +453,11 @@ export class TalentsWindow {
     const loadouts = this.deps.loadouts();
     const activeIndex = this.deps.activeLoadout();
 
-    const saveCurrent = (name: string): void => {
+    // `captureGear` is threaded rather than read from a checkbox: the shared
+    // inputDialog carries no checkbox, and extending it for one caller would change
+    // a component every other dialog uses. Two explicit menu entries also read more
+    // clearly than a hidden tick box on a name prompt.
+    const saveCurrent = (name: string, captureGear = false): void => {
       const clean = name.trim();
       if (!clean) return;
       const allocation = this.deps.currentAllocation();
@@ -451,17 +465,17 @@ export class TalentsWindow {
         this.deps.showError(t('game.talents.buildInvalid'));
         return;
       }
-      this.deps.saveLoadout(clean, this.deps.currentBar(), allocation);
+      this.deps.saveLoadout(clean, this.deps.currentBar(), allocation, captureGear);
       this.refreshFromAuthority();
     };
-    const promptNewBuild = (): void => {
+    const promptNewBuild = (captureGear = false): void => {
       this.deps.inputDialog({
         title: t('game.talents.saveBuildAs'),
         label: t('game.talents.namePrompt'),
         value: t('hudChrome.talents.defaultBuildName', { n: this.deps.loadouts().length + 1 }),
         okText: t('game.talents.save'),
         selectText: true,
-        onOk: saveCurrent,
+        onOk: (name) => saveCurrent(name, captureGear),
       });
     };
 
@@ -498,8 +512,7 @@ export class TalentsWindow {
         cls: 'tal-lo-pick',
         onPick: () => {
           this.closeLoadoutMenu(root);
-          this.deps.switchLoadout(index);
-          this.deps.applyLoadoutBar(loadout.bar, loadout.alloc);
+          this.deps.switchLoadout(index, loadout.bar, loadout.alloc);
           this.refreshFromAuthority();
         },
       });
@@ -548,6 +561,18 @@ export class TalentsWindow {
         onPick: () => {
           this.closeLoadoutMenu(root);
           promptNewBuild();
+        },
+      }),
+    );
+    // The gear arm. Separate entry rather than a modifier on the one above, so
+    // "this saves my gear too" is visible before the click rather than after.
+    menu.appendChild(
+      item(t('hudChrome.talents.newBuildWithGear'), {
+        cls: 'tal-lo-new',
+        disabled: !view.valid,
+        onPick: () => {
+          this.closeLoadoutMenu(root);
+          promptNewBuild(true);
         },
       }),
     );

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "assetId": "eastbrook-noticeboard",
+  "sourceSheet": {
+    "path": "docs/screenshots/eastbrook-vale-rebuild/polish/turnarounds/noticeboard.png",
+    "sha256": "002a7adcff9780a55d91c261fb39693b6a0e8c35272caa29ded8ee57cdb6232e",
+    "width": 1536,
+    "height": 1024,
+    "admission": "conditional",
+    "permittedUse": "palette, scale, component hierarchy, and source provenance only",
+    "limitation": "multi-panel generated sheet; isolated admitted crops are the comparison references"
+  },
+  "semanticSuitability": {
+    "verdict": "pass",
+    "reasoning": [
+      "One complete freestanding noticeboard is isolated in every crop.",
+      "Front, side, rear, three-quarter, and grazing views expose roof depth and rear bracing.",
+      "Board, parchment, timber, stone, cobalt roof, and gold zones are separable.",
+      "The structure is reproducible as deterministic low-poly assembled solids and thin cards."
+    ],
+    "knownInference": "Individual parchment silhouettes vary slightly across panels; the front view locks the canonical arrangement."
+  },
+  "admittedViews": [
+    {
+      "id": "front",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/front.png",
+      "sha256": "3c40a431948ff6fe5ab92390f6e2cbba732c4c56e16e3fed38ec85d37d3e85f5",
+      "width": 480,
+      "height": 500,
+      "foregroundCoverage": 0.5541,
+      "largestComponentFraction": 1.0,
+      "pHash": "12573137318356019606",
+      "verdict": "pass"
+    },
+    {
+      "id": "right",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/right.png",
+      "sha256": "6f39b72650201088bca51500bb582a7a2bde3cefac7bf960f8b6521e6146bfc3",
+      "width": 240,
+      "height": 500,
+      "foregroundCoverage": 0.2516,
+      "largestComponentFraction": 1.0,
+      "pHash": "12956183860811222116",
+      "verdict": "pass"
+    },
+    {
+      "id": "rear",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/rear.png",
+      "sha256": "acb53f128f63bc91fec2ccf8bf6240802e8daeabbf9fe1c07420e88c2c16b62c",
+      "width": 480,
+      "height": 500,
+      "foregroundCoverage": 0.5931,
+      "largestComponentFraction": 1.0,
+      "pHash": "18332066804442456470",
+      "verdict": "pass"
+    },
+    {
+      "id": "left",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/left.png",
+      "sha256": "0655266f98a3715341131f97065e3d8671d7e79de98356f8db154a0c80682fe4",
+      "width": 336,
+      "height": 500,
+      "foregroundCoverage": 0.1675,
+      "largestComponentFraction": 1.0,
+      "pHash": "12918184765531907814",
+      "verdict": "pass"
+    },
+    {
+      "id": "front-three-quarter",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/front-three-quarter.png",
+      "sha256": "a35b8c4e38e8f8607f0b2a243ca2c4686c1627c8975139f032dcfa399843698d",
+      "width": 380,
+      "height": 524,
+      "foregroundCoverage": 0.4354,
+      "largestComponentFraction": 0.9794,
+      "pHash": "13725992581949776233",
+      "verdict": "pass"
+    },
+    {
+      "id": "rear-three-quarter",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/rear-three-quarter.png",
+      "sha256": "e8c60730d0447e5db0cca2274d5914127eb39583c7099f949d812240d9ec5f63",
+      "width": 400,
+      "height": 524,
+      "foregroundCoverage": 0.4272,
+      "largestComponentFraction": 0.9937,
+      "pHash": "12624945229762583092",
+      "verdict": "pass"
+    },
+    {
+      "id": "grazing",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/noticeboard/admitted-views/grazing.png",
+      "sha256": "56e67ac6de69482f348c42eaf9ccbf0e13182fc0bd60e5919d6aa3e2c468ab71",
+      "width": 436,
+      "height": 524,
+      "foregroundCoverage": 0.4963,
+      "largestComponentFraction": 1.0,
+      "pHash": "12357244895597639206",
+      "verdict": "pass"
+    }
+  ],
+  "rejectionRules": [
+    "Reject a future replacement with a changed SHA unless it is re-admitted and visually inspected.",
+    "Reject cropped views that omit a footing, roof edge, board face, or rear brace.",
+    "Reject duplicate angles that do not add independent depth evidence.",
+    "Reject readable text, watermarks, or copied third-party crests and compositions."
+  ]
+}

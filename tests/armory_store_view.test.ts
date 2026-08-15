@@ -13,6 +13,7 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      skinCatalog: 'class',
     });
     expect(sections.map((s) => s.rarity)).toEqual(['legendary', 'epic', 'rare', 'uncommon']);
     expect(sections.map((s) => s.collection)).toEqual([
@@ -36,6 +37,7 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      skinCatalog: 'class',
     });
     const ice = sections.flatMap((s) => s.rows).find((r) => r.skin.id === 'ice_fang_sword');
     expect(ice?.purchasable).toBe(true);
@@ -49,6 +51,7 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      skinCatalog: 'class',
     });
     const solheim = sections.flatMap((s) => s.rows).find((r) => r.skin.id === 'solheim_sword');
     expect(solheim?.affordable).toBe(false);
@@ -63,6 +66,7 @@ describe('buildArmorySections', () => {
       },
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      skinCatalog: 'class',
     });
     const rows = sections.flatMap((s) => s.rows);
     const ice = rows.find((r) => r.skin.id === 'ice_fang_sword');
@@ -85,6 +89,7 @@ describe('buildArmorySections', () => {
       cosmetics: owned,
       cls: 'warrior',
       mainhandItemId: 'rusty_hatchet',
+      skinCatalog: 'class',
     }).flatMap((s) => s.rows);
     expect(asWarrior.find((r) => r.skin.id === 'glaciersplit_axe')?.canApplyNow).toBe(true);
     expect(asWarrior.find((r) => r.skin.id === 'winterbite')?.canApplyNow).toBe(false);
@@ -92,9 +97,29 @@ describe('buildArmorySections', () => {
       cosmetics: owned,
       cls: 'hunter',
       mainhandItemId: 'rusty_hatchet',
+      skinCatalog: 'class',
     }).flatMap((s) => s.rows);
     expect(asHunter.find((r) => r.skin.id === 'glaciersplit_axe')?.canApplyNow).toBe(false);
     expect(asHunter.find((r) => r.skin.id === 'winterbite')?.canApplyNow).toBe(true);
+  });
+
+  it('opens the melee skin to a hunter wearing the mech body, which shows the weapon', () => {
+    const owned = {
+      weaponSkinIds: ['glaciersplit_axe', 'winterbite'],
+      weaponSkinLoadout: {},
+    };
+    const inSuit = buildArmorySections(0, [], {
+      cosmetics: owned,
+      cls: 'hunter',
+      mainhandItemId: 'rusty_hatchet',
+      skinCatalog: 'mech',
+    }).flatMap((s) => s.rows);
+    // The axe becomes applicable (it was not on the class rig, one test above),
+    // and the bow stays applicable: the suit adds a look, never removes one.
+    expect(inSuit.find((r) => r.skin.id === 'glaciersplit_axe')?.canApplyNow).toBe(true);
+    expect(inSuit.find((r) => r.skin.id === 'winterbite')?.canApplyNow).toBe(true);
+    // Still gated on the equipped weapon: a sword skin needs a sword.
+    expect(inSuit.find((r) => r.skin.id === 'ice_fang_sword')?.canApplyNow).toBe(false);
   });
 
   it('threads the eligible-class chips onto every row', () => {
@@ -102,12 +127,22 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      skinCatalog: 'class',
     }).flatMap((s) => s.rows);
     expect(rows.every((r) => r.eligibleClasses.length > 0)).toBe(true);
     const bow = rows.find((r) => r.skin.weaponType === 'bow');
     expect(bow?.eligibleClasses).toEqual(['hunter']);
     const sword = rows.find((r) => r.skin.weaponType === 'sword');
     expect(sword?.eligibleClasses).toContain('warrior');
-    expect(sword?.eligibleClasses).not.toContain('hunter');
+    // Hunters can equip a sword and the mech body renders it, so the chip says
+    // so; the per-body gate is canApplyNow, not this list.
+    expect(sword?.eligibleClasses).toContain('hunter');
+    // Ranged stays hunter-exclusive: it replaces the hunter rig's fixed attach,
+    // which no other class has.
+    const crossbow = rows.find((r) => r.skin.weaponType === 'crossbow');
+    expect(crossbow?.eligibleClasses).toEqual(['hunter']);
+    // And a type hunters cannot equip still omits them.
+    const wand = rows.find((r) => r.skin.weaponType === 'wand');
+    expect(wand?.eligibleClasses).not.toContain('hunter');
   });
 });

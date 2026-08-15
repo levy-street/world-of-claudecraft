@@ -6,9 +6,11 @@
 // before saving. Talks only to the /api/wizard/* endpoints (serveLibrary); the
 // actual Tripo work runs server-side in the pipeline CLI.
 //
-// Self-contained: injects its own button + modal + styles, and exposes
+// Injects its own button + modal + styles, and exposes
 // window.WizardUI.onDetail(asset) so the grid can add the per-asset Regenerate
 // button. No build step, no framework (matches viewer_live.js).
+
+import { wizardFailureMessage, wizardResumeState } from '/wizard_status.mjs';
 
 const LANES = [
   { id: 'creature', label: 'Creature / mob', animated: true },
@@ -419,7 +421,10 @@ class Wizard {
     s.jobId = r.jobId;
     // Land on the model-review screen so the imported mesh can be re-textured with
     // the pipeline (Repaint texture) before finishing + saving into the game.
-    this.pollUntilIdle(() => this.renderModelReview());
+    this.pollUntilIdle(
+      () => this.renderModelReview(),
+      () => this.renderPrompt(),
+    );
   }
 
   // Decide whether the prompt-screen "Generate model" starts fresh or resumes.
@@ -464,7 +469,10 @@ class Wizard {
     });
     if (r.error) return this.renderError(r.error, () => this.renderPrompt());
     s.jobId = r.jobId;
-    this.pollUntilIdle(() => this.renderModelReview());
+    this.pollUntilIdle(
+      () => this.renderModelReview(),
+      () => this.renderPrompt(),
+    );
   }
 
   renderModelReview() {
@@ -557,7 +565,10 @@ class Wizard {
       options: s.options,
     });
     if (r.error) return this.renderError(r.error, () => this.renderModelReview());
-    this.pollUntilIdle(() => this.renderModelReview());
+    this.pollUntilIdle(
+      () => this.renderModelReview(),
+      () => this.renderModelReview(),
+    );
   }
 
   async startFinish(regen) {
@@ -578,7 +589,10 @@ class Wizard {
       regenerateAnimations: regen,
     });
     if (r.error) return this.renderError(r.error, () => this.renderModelReview());
-    this.pollUntilIdle(() => this.renderFinalReview());
+    this.pollUntilIdle(
+      () => this.renderFinalReview(),
+      () => this.renderModelReview(),
+    );
   }
 
   renderFinalReview() {
@@ -645,9 +659,16 @@ class Wizard {
       'save',
       'Saving the asset into the game (copying the model, wiring credits)...',
     );
-    const r = await api('/api/wizard/apply', { lane: s.lane, jobId: s.jobId });
+    const r = await api('/api/wizard/apply', {
+      lane: s.lane,
+      jobId: s.jobId,
+      options: s.options,
+    });
     if (r.error) return this.renderError(r.error, () => this.renderFinalReview());
-    this.pollUntilIdle(() => this.renderDone());
+    this.pollUntilIdle(
+      () => this.renderDone(),
+      () => this.renderFinalReview(),
+    );
   }
 
   renderDone() {
@@ -901,7 +922,7 @@ class Wizard {
   }
 
   // Poll status until no child is running, refreshing the log box live, then run cb.
-  async pollUntilIdle(cb) {
+  async pollUntilIdle(cb, back) {
     this.polling = true;
     const jobId = this.state.jobId;
     for (;;) {
@@ -912,11 +933,30 @@ class Wizard {
       if (!st.running) break;
       await sleep(1500);
     }
-    if (this.polling) cb();
+    if (!this.polling) return;
+    const failure = wizardFailureMessage(this._status);
+    if (failure) return this.renderError(failure, back);
+    cb();
   }
 
   // Per-asset actions injected into the open detail inspector: save a finished
   // generated job into the game (idempotent --apply, no credits) and regenerate.
+  async resumeJob(jobId) {
+    const status = await api(`/api/wizard/status?job=${encodeURIComponent(jobId)}`);
+    const state = wizardResumeState(status);
+    if (!state) {
+      alert('This generation job cannot be resumed.');
+      return;
+    }
+    this.state = state;
+    this._status = status;
+    this.open();
+    const failure = wizardFailureMessage(status);
+    if (failure) return this.renderError(failure, () => this.renderPrompt());
+    if (status.finalGlb) return this.renderFinalReview();
+    this.renderModelReview();
+  }
+
   onDetail(asset) {
     const lane = laneOf(asset);
     const inspector = document.getElementById('inspector');
@@ -947,7 +987,8 @@ class Wizard {
     // A finished generated job (its built GLB is present) can be saved straight
     // into the game via an idempotent --apply, no re-running the wizard. A weapon
     // already registered as a VAR_* variant (asset.weaponKey) is shown as in-game.
-    const built = asset.kind === 'job' && !!asset.repoGlb;
+    const built = asset.kind === 'job' && asset.job?.finished && !!asset.repoGlb;
+    const resumable = asset.kind === 'job' && !asset.job?.finished && !!asset.repoGlb;
     const applied = asset.kind === 'job' && !!asset.weaponKey;
     if (applied) {
       row.append(el('span', { class: 'wz-sub' }, 'In game'), regenBtn);
@@ -958,6 +999,19 @@ class Wizard {
         this.applyFromDetail({ lane, jobId, name: asset.name }, [saveBtn, regenBtn], statusEl),
       );
       row.append(saveBtn, regenBtn, statusEl);
+    } else if (resumable) {
+      const resumeBtn = el(
+        'button',
+        {
+          class: 'wz-btn primary',
+          onclick: () => {
+            document.getElementById('overlay')?.classList.remove('open');
+            this.resumeJob(jobId);
+          },
+        },
+        'Resume creation',
+      );
+      row.append(resumeBtn, regenBtn);
     } else {
       row.append(regenBtn);
     }

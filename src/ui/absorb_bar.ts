@@ -9,6 +9,7 @@
 // math can be snapshot tested directly (mirrors xp_bar.ts).
 
 import type { Aura } from '../sim/types';
+import { clamp01 } from './clamp';
 
 export interface AbsorbBarInput {
   hp: number;
@@ -35,6 +36,23 @@ export function absorbTotal(auras: Aura[]): number {
 }
 
 export function absorbBarView(input: AbsorbBarInput): AbsorbBarView {
+  return absorbBarViewInto(
+    {
+      total: 0,
+      fillFrac: 0,
+      startFrac: 0,
+      sizeFrac: 0,
+      overshield: false,
+    },
+    input,
+  );
+}
+
+/**
+ * Fill a caller-owned view. HUD unit frames use this path so resolving shields
+ * does not allocate a short-lived object every animation frame.
+ */
+export function absorbBarViewInto(out: AbsorbBarView, input: AbsorbBarInput): AbsorbBarView {
   const max = Math.max(1, input.maxHp);
   const hp = Math.max(0, input.hp);
   const hpFrac = clamp01(hp / max);
@@ -43,9 +61,10 @@ export function absorbBarView(input: AbsorbBarInput): AbsorbBarView {
   const sizeFrac = total > 0 ? clamp01(total / max) : 0;
   const overshield = total > 0 && hp + total >= max;
   const startFrac = overshield ? clamp01(1 - sizeFrac) : hpFrac;
-  return { total, fillFrac, startFrac, sizeFrac, overshield };
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
+  out.total = total;
+  out.fillFrac = fillFrac;
+  out.startFrac = startFrac;
+  out.sizeFrac = sizeFrac;
+  out.overshield = overshield;
+  return out;
 }

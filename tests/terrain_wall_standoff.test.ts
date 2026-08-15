@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { terrainSteepnessAt, terrainWallStandoff, terrainWallStandoffPass } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // terrainWallStandoff pushes a player's body off nearby steep terrain in a
 // single ring-sample-and-nudge pass, capped at one body radius. In a CONCAVE
@@ -18,7 +19,7 @@ import { terrainSteepnessAt, terrainWallStandoff, terrainWallStandoffPass } from
 // everywhere: iterating the standoff push converges strictly further than a
 // single pass in a genuine concave pocket, and never regresses an
 // already-fine position.
-const SEED = 20061; // the fixed production seed (src/main.ts, server/game.ts)
+const SEED = WORLD_SEED; // the one shipped world seed (src/sim/world_seed.ts)
 const R = PLAYER_BODY_RADIUS;
 const SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 
@@ -38,7 +39,7 @@ function singlePass(x: number, z: number): { x: number; z: number } {
 // large single-pass shortfall that iteration closes; this world's terrain
 // generation is content-driven and shifts pockets around, so this pin is
 // re-derived whenever terrain content changes invalidate the previous one.
-const PIN = { x: 328, z: 980 }; // steepOnce ~5.59, steepIterated ~0.12 at SEED 20061 (re-derived: the no-stuck terrain graded the prior pocket away)
+const PIN = { x: -232, z: 452 }; // steepOnce ~4.59, steepIterated ~0.02 at SEED 20061 (re-derived: the prior pocket was a Great Maze terrain wall corner, and the maze walls are modeled now, its lawn flat)
 const CORNER_ORIGINS = [
   { x: WORLD_MAX_X, z: WORLD_MIN_Z, sx: -1, sz: 1 },
   { x: WORLD_MAX_X, z: WORLD_MAX_Z, sx: -1, sz: -1 },

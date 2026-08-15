@@ -24,10 +24,11 @@ interface WorldState {
   deedsEarned: Map<string, string>;
   renown: number;
   activeTitle: string | null;
+  activeBorder: string | null;
 }
 
 function baseState(): WorldState {
-  return { deedsEarned: new Map(), renown: 0, activeTitle: null };
+  return { deedsEarned: new Map(), renown: 0, activeTitle: null, activeBorder: null };
 }
 
 function makeWindow(state: WorldState): { w: DeedsWindow; el: HTMLElement } {
@@ -44,8 +45,13 @@ function makeWindow(state: WorldState): { w: DeedsWindow; el: HTMLElement } {
         renown: state.renown,
         activeTitle: state.activeTitle,
         deedsRarity: async () => null,
+        deedsRecent: async () => null,
         setActiveTitle: (id: string | null) => {
           state.activeTitle = id;
+        },
+        activeBorder: state.activeBorder,
+        setActiveBorder: (id: string | null) => {
+          state.activeBorder = id;
         },
         cfg: { playerClass: 'warrior' },
         player: { name: 'Hero' },
@@ -105,6 +111,21 @@ describe('DeedsWindow: focus survives rebuilds', () => {
     const fresh = el.querySelector<HTMLElement>('[data-filter="earned"]');
     expect(fresh).not.toBe(before);
     expect(fresh?.getAttribute('aria-pressed')).toBe('true');
+    expect(document.activeElement).toBe(fresh);
+  });
+
+  it('keeps focus on a recent-strip jump button across an unrelated rebuild', () => {
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    const { w, el } = makeWindow(state);
+    const before = el.querySelector<HTMLElement>('[data-recent="prog_first_steps"]');
+    expect(before).not.toBeNull();
+    before?.focus();
+    // A rebuild NOT driven by the button itself (a data refresh): focus must
+    // land on the role-equivalent fresh button, not fall back to Close.
+    w.render();
+    const fresh = el.querySelector<HTMLElement>('[data-recent="prog_first_steps"]');
+    expect(fresh).not.toBe(before);
     expect(document.activeElement).toBe(fresh);
   });
 
@@ -190,6 +211,10 @@ describe('refocusSelector', () => {
     const sel = refocusSelector(weird);
     expect(sel).toBe('[data-title="a\\"b\\\\c"]:not([disabled])');
     expect(host.querySelector(sel as string)).toBe(weird);
+
+    const recent = document.createElement('button');
+    recent.setAttribute('data-recent', 'prog_first_steps');
+    expect(refocusSelector(recent)).toBe('[data-recent="prog_first_steps"]:not([disabled])');
 
     expect(refocusSelector(null)).toBeNull();
     expect(refocusSelector(document.createElement('button'))).toBeNull();

@@ -15,11 +15,11 @@
 //      byte-identically inside an InvSlot, and an absurd persisted count on an
 //      armed instanced stack load-clamps through the SHARED bags.ts
 //      instancedCountCap ceiling (no bespoke bypass for the new payload shape).
-//   3+4. Online throttled-deny surfacing + cross-action attribution over a live
-//      GameServer: the shared 10-per-60s window (action_throttle.ts) is spent by
-//      mixed real actions, and the (MAX+1)th action denies over the wire with
-//      ITS OWN event type / reason 'throttled', never a sibling action's event,
-//      consuming nothing.
+//   3+4. Online concurrent-cast busy deny + cross-action attribution over a live
+//      GameServer (Craft Cast System Phase 5 retired the shared throttle): a
+//      second profession action while one cast is live denies with ITS OWN
+//      event type / reason 'busy', never a sibling action's event, consuming
+//      nothing.
 //
 // These arms deliberately do NOT duplicate the shipped suites: the offline
 // resolver/yield/trade-lock semantics, the single-client online routing of a
@@ -50,12 +50,13 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { instancedCountCap } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
-import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
+import type { InvSlot, SimEvent } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
+import { completeEnchantFamilyCast } from './helpers/enchant_family_cast';
 
 // A common one-hand weapon: disenchants to arcane_dust (sub-rare, no typed
 // secondary) and salvages to bone_fragments. Both actions draw the shared
@@ -118,6 +119,12 @@ function routeTick(server: GameServer): void {
   (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
 }
 
+/** Complete a running profession cast on the server sim and route its events. */
+function flushProfessionCast(server: GameServer, pid: number): void {
+  completeEnchantFamilyCast(server.sim as never, pid);
+  routeTick(server);
+}
+
 function broadcast(server: GameServer): void {
   (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
 }
@@ -152,57 +159,6 @@ function tradeSessionFor(
   return (server.sim as unknown as { ctx: { trades: Map<number, any> } }).ctx.trades.get(pid);
 }
 
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the tests/snapshots.test.ts bareClient shape).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
-}
-
 function applySnap(client: ClientWorld, snap: unknown): void {
   (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
 }
@@ -221,11 +177,13 @@ describe('online bind-on-trade arc (two sessions, live GameServer)', () => {
     placeAt(server, b.pid, FIELD_B);
 
     // A disenchants two rares -> two armed, unstamped resonant_steel copies that
-    // stack into one slot of count 2 (byte-equal payloads).
+    // stack into one slot of count 2 (byte-equal payloads). Cast-paced: flush
+    // each cast before starting the next (concurrent start is busy).
     server.sim.addItem(RARE_WEAPON, 2, a.pid);
     cmd(server, a, { cmd: 'disenchant_item', item: RARE_WEAPON });
+    flushProfessionCast(server, a.pid);
     cmd(server, a, { cmd: 'disenchant_item', item: RARE_WEAPON });
-    routeTick(server);
+    flushProfessionCast(server, a.pid);
     const aStack = serverInv(server, a.pid).find((s) => s.itemId === SECONDARY);
     expect(aStack?.count).toBe(2);
     expect(aStack?.instance?.bindOnTrade).toBe(true);
@@ -365,78 +323,64 @@ describe('bindOnTrade persistence round-trip (serialize -> JSONB -> load)', () =
 });
 
 // ---------------------------------------------------------------------------
-// Arms 3 + 4: online throttled-deny surfacing and cross-action attribution.
-// The shared window (action_throttle.ts) is burned by REAL mixed actions over a
-// live GameServer; no sim.tick runs during the burn, so sim.time (and the
-// window) never advances until the deny is observed.
+// Arms 3 + 4: online concurrent-cast busy deny and cross-action attribution.
+// Craft Cast System Phase 5: cast duration paces; a second action while a cast
+// is live denies with reason 'busy' on that action's own event type.
 // ---------------------------------------------------------------------------
-describe('online shared-throttle deny surfacing (live GameServer)', () => {
-  it('a throttled disenchant surfaces reason "throttled" over the event AND the denc delta, consuming nothing', () => {
+describe('online concurrent-cast busy deny surfacing (live GameServer)', () => {
+  it('a busy disenchant surfaces reason "busy" over the event AND the denc delta, consuming nothing', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const st = joinServer(server, fc, 611, 'Windowed');
     placeAt(server, st.pid, FIELD_A);
-    // 11 copies: 10 to burn the shared window via a genuine MIX (5 salvage + 5
-    // disenchant), 1 left for the throttled attempt.
-    server.sim.addItem(COMMON_WEAPON, CRAFT_THROTTLE_MAX_PER_WINDOW + 1, st.pid);
+    server.sim.addItem(COMMON_WEAPON, 2, st.pid);
 
-    const half = CRAFT_THROTTLE_MAX_PER_WINDOW / 2;
-    for (let i = 0; i < half; i++) cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW - half; i++)
-      cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON });
-    // The window is now spent by mixed action types. Capture the pre-deny stock.
+    // Start a salvage cast (holds the non-spell cast slot).
+    cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
     const weaponsBefore = server.sim.countItem(COMMON_WEAPON, st.pid);
     const dustBefore = server.sim.countItem(DUST, st.pid);
-    expect(weaponsBefore).toBe(1);
+    expect(weaponsBefore).toBe(2);
 
     cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON });
     routeTick(server);
 
-    // Immediacy arm: the pid-scoped disenchantResult carries reason 'throttled'.
     const denc = eventsFor(fc.sent, 'disenchantResult');
-    const throttled = denc[denc.length - 1];
-    if (throttled?.type !== 'disenchantResult') throw new Error('expected disenchantResult');
-    expect(throttled.ok).toBe(false);
-    expect(throttled.reason).toBe('throttled');
-    expect(throttled.pid).toBe(st.pid);
+    const busy = denc[denc.length - 1];
+    if (busy?.type !== 'disenchantResult') throw new Error('expected disenchantResult');
+    expect(busy.ok).toBe(false);
+    expect(busy.reason).toBe('busy');
+    expect(busy.pid).toBe(st.pid);
 
-    // Convergence arm: the denc self-delta mirrors the throttled stash, and a
-    // real ClientWorld decodes it onto lastDisenchantResult.
     broadcast(server);
     const snap = lastSnap(fc.sent);
     if (!snap) throw new Error('no snapshot');
     const stash = server.sim.lastDisenchantResultFor(st.pid);
-    expect(stash?.reason).toBe('throttled');
+    expect(stash?.reason).toBe('busy');
     expect(snap.self.denc).toEqual(stash);
     const client = bareClient(st.pid);
     applySnap(client, snap);
     expect(client.lastDisenchantResult).toEqual(stash);
 
-    // The throttled attempt consumed nothing and granted nothing.
     expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(weaponsBefore);
     expect(server.sim.countItem(DUST, st.pid)).toBe(dustBefore);
   });
 
-  it('a throttled salvage after disenchant spends denies with salvageResult, NEVER a disenchantResult', () => {
+  it('a busy salvage after a live disenchant denies with salvageResult, NEVER a disenchantResult', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const st = joinServer(server, fc, 612, 'Attributed');
     placeAt(server, st.pid, FIELD_A);
-    // 11 copies: 10 disenchants spend the shared window, 1 left to salvage.
-    server.sim.addItem(COMMON_WEAPON, CRAFT_THROTTLE_MAX_PER_WINDOW + 1, st.pid);
+    server.sim.addItem(COMMON_WEAPON, 2, st.pid);
 
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW; i++)
-      cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON });
-    routeTick(server); // drain the burn's disenchantResult events
+    cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON });
+    routeTick(server);
     const lastDencBefore = server.sim.lastDisenchantResultFor(st.pid);
-    expect(lastDencBefore?.ok).toBe(true); // the burn ended on a success
+    // Start may leave lastDisenchantResult unset until complete; busy path sets
+    // salvageResult only. Capture mark after the first command's events.
     const mark = fc.sent.length;
     const weaponsBefore = server.sim.countItem(COMMON_WEAPON, st.pid);
-    expect(weaponsBefore).toBe(1);
+    expect(weaponsBefore).toBe(2);
 
-    // The (MAX+1)th action is a SALVAGE: it sees the window spent by disenchants
-    // (the window is genuinely shared across action types) and denies with its
-    // OWN event type.
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
     routeTick(server);
 
@@ -444,13 +388,10 @@ describe('online shared-throttle deny surfacing (live GameServer)', () => {
     expect(newSalv).toHaveLength(1);
     if (newSalv[0].type !== 'salvageResult') throw new Error('expected salvageResult');
     expect(newSalv[0].ok).toBe(false);
-    expect(newSalv[0].reason).toBe('throttled');
-    // Discrimination: the throttled salvage emitted NO disenchantResult, and it
-    // did not overwrite the disenchant stash either.
+    expect(newSalv[0].reason).toBe('busy');
     expect(eventsFor(fc.sent, 'disenchantResult', mark)).toEqual([]);
     expect(server.sim.lastDisenchantResultFor(st.pid)).toEqual(lastDencBefore);
-    expect(server.sim.lastSalvageResultFor(st.pid)?.reason).toBe('throttled');
-    // Nothing consumed by the throttled attempt.
+    expect(server.sim.lastSalvageResultFor(st.pid)?.reason).toBe('busy');
     expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(weaponsBefore);
   });
 });

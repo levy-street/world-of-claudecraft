@@ -14,6 +14,8 @@ export interface PartyMemberAura {
   neg?: 1;
   /** Whole seconds remaining. Optional for compatibility with older snapshots. */
   remaining?: number;
+  /** Remaining Mending Current as a whole percent of this member's maximum health. */
+  poolPct?: number;
 }
 
 export interface PartyMemberInfo {

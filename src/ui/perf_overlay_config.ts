@@ -8,7 +8,10 @@
 // try/catch-guarded localStorage (so it imports cleanly under Vitest/jsdom).
 
 import {
-  defaultMetricsMap, METRIC_REGISTRY, PERF_COLOR_THEMES, type PerfMetricKey,
+  defaultMetricsMap,
+  METRIC_REGISTRY,
+  PERF_COLOR_THEMES,
+  type PerfMetricKey,
 } from './perf_overlay_model';
 
 export interface PerfOverlayConfig {
@@ -34,8 +37,9 @@ export interface PerfOverlayConfig {
 }
 
 /** A partial update: top-level fields are optional and `metrics` may be sparse. */
-export type PerfOverlayPatch =
-  Partial<Omit<PerfOverlayConfig, 'metrics'>> & { metrics?: Partial<Record<PerfMetricKey, boolean>> };
+export type PerfOverlayPatch = Partial<Omit<PerfOverlayConfig, 'metrics'>> & {
+  metrics?: Partial<Record<PerfMetricKey, boolean>>;
+};
 
 const STORE_KEY = 'woc_perf_overlay';
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
@@ -77,7 +81,10 @@ function boolOr(v: unknown, fallback: boolean): boolean {
 }
 
 /** Coerce arbitrary stored/patched data into a valid config (clamped + filtered). */
-export function sanitizePerfOverlayConfig(raw: unknown, base = defaultPerfOverlayConfig()): PerfOverlayConfig {
+export function sanitizePerfOverlayConfig(
+  raw: unknown,
+  base = defaultPerfOverlayConfig(),
+): PerfOverlayConfig {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const metrics = { ...base.metrics };
   const rawMetrics = r.metrics;
@@ -111,12 +118,20 @@ export class PerfOverlayConfigStore {
 
   private load(): PerfOverlayConfig {
     let stored: unknown = null;
-    try { stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null'); } catch { /* corrupt / unavailable */ }
+    try {
+      stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null');
+    } catch {
+      /* corrupt / unavailable */
+    }
     return sanitizePerfOverlayConfig(stored);
   }
 
   private save(): void {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(this.cfg)); } catch { /* storage unavailable */ }
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(this.cfg));
+    } catch {
+      /* storage unavailable */
+    }
   }
 
   /** A defensive copy — callers must go through patch() to persist a change. */

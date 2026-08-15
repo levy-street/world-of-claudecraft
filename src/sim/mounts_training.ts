@@ -6,9 +6,10 @@
 // FINISHING the course passes the lesson and credits its quest objective
 // (mountTrainingRaceFinished, called from src/sim/mount_race.ts). Marla takes the
 // steed back afterward (an instant force-dismount; the player never keeps the
-// unowned mount), and turning in q_riding_lessons at her grants reins_valorsteed
-// (the first Valorsteed reins, sold for 10g). Dismounting or leaving the paddock
-// abandons the attempt (re-entrant: the player can start another race).
+// unowned mount). Turning in q_riding_lessons awards gold and XP only (its
+// itemRewards is empty); the reins_valorsteed themselves are a separate 10g
+// purchase from Marla's vendor stock afterwards. Dismounting or leaving the
+// paddock abandons the attempt (re-entrant: the player can start another race).
 //
 // The legacy mount_train_begin command remains append-only compatible, but no
 // current HUD button sends it. The session lives directly on PlayerMeta.mountTraining. The NPC
@@ -28,7 +29,13 @@ import { QUESTS } from './data';
 import { forceDismount, forceTrainingMount } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type MountTrainingSession } from './types';
+import {
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  isNonSpellCast,
+  type MountTrainingSession,
+} from './types';
 
 // --- tuning (change numbers here, not inline) -------------------------------
 export const MOUNT_TRAIN_MIN_LEVEL = 20;
@@ -139,6 +146,14 @@ export function prepareRidingLessonRace(ctx: SimContext, meta: PlayerMeta, e: En
   }
   if (e.inCombat) {
     ctx.error(meta.entityId, "You can't do that while in combat.");
+    return false;
+  }
+  // The profession-cast interlock's fourth route: the race start mounts the
+  // lesson steed INSTANTLY (forceTrainingMount), so a live gather or fishing
+  // cast refuses here exactly as the reins click refuses through useItem's
+  // busy guard. Draw-free, before any session state is written.
+  if (isNonSpellCast(e.castingAbility)) {
+    ctx.error(meta.entityId, 'You are busy.');
     return false;
   }
   // The lesson itself is free: the only riding purchase is the 80g skill at

@@ -15,19 +15,131 @@
 // This module is the DECISION layer (Three/DOM-free, deterministic, unit-tested);
 // renderer.ts is the thin consumer that runs the manifest the policy describes.
 
+import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
+
 /** Manifest entries a constrained device still runs; everything else is skipped. */
 export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.required',
+  'views.landmarks',
+  'views.persistent-portals',
   'views.nearby',
+  'world.settle-state',
   'textures.scene',
   'programs.compile',
   'world.initial-frame',
   'render.settle-passes',
 ];
 
+/**
+ * Entries the minimal manifest still SKIPS at entry but whose explicit resume
+ * units run afterwards, in the same bounded background lane a deadline-dropped
+ * entry uses. This is the constrained-device answer to warm-up work that is too
+ * expensive for the entry window yet guaranteed to be needed seconds later: the
+ * ability-VFX impact sheets are procedurally drawn canvases whose first use is
+ * the first spell impact of that school, i.e. mid-combat.
+ *
+ * Membership is an opt-in per entry, never a blanket rule: everything else the
+ * minimal manifest skips is skipped for GPU-footprint reasons (the phone-class
+ * per-process memory ceiling) and must stay skipped. An id here is by
+ * construction NOT in CONSTRAINED_PREWARM_KEEP.
+ */
+export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
+
+/** Whole-scene GPU submits that can synchronously link every visible program
+ * when KHR_parallel_shader_compile is unavailable. They cannot be interrupted
+ * once WebGL enters the driver, so omit them to preserve the entry hard limit.
+ * world.settle-state joins them: its lazy world builds (and a woken water
+ * height-field's real submits) have no internal deadline on a profile whose
+ * whole point is bounded main-thread slices. The cost of skipping it is that
+ * textures.scene (which still runs here) collects against pre-settle state,
+ * an accepted residual misalignment: this profile also skips the compile
+ * monolith and the initial frame, the two consumers the alignment mostly
+ * serves. */
+export const BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE: readonly string[] = [
+  'world.settle-state',
+  'world.initial-frame',
+  'programs.compile-submit',
+  'programs.compile',
+  'programs.budget-variants',
+  'sky.current-zone',
+  'render.settle-passes',
+];
+
 export const CONSTRAINED_TEXTURE_BATCH_SIZE = 4;
 export const CONSTRAINED_TEXTURE_MAX_MS = 1200;
 export const CONSTRAINED_ENTRY_VIEW_RAMP_MS = 300;
+export const NEARBY_LANDMARK_STREAM_RADIUS = 16;
+
+export interface MandatoryLandmarkCandidate {
+  kind: string;
+  templateId: string | null;
+  pos: { x: number; z: number };
+}
+
+export interface MandatoryLandmarkPartition<T> {
+  /** Service landmarks actionable from the current entry position. */
+  mandatory: T[];
+  /** Every other candidate, including remote service landmarks. */
+  ordinary: T[];
+}
+
+function authoredLandmarkInteractionRadius(templateId: string | null): number | null {
+  if (templateId === EASTBROOK_LAYOUT.services.mailbox.templateId) {
+    return EASTBROOK_LAYOUT.services.mailbox.interactionRadius;
+  }
+  if (templateId === EASTBROOK_LAYOUT.services.noticeboard.templateId) {
+    return EASTBROOK_LAYOUT.services.noticeboard.interactionRadius;
+  }
+  return null;
+}
+
+/** Runtime-streaming fallback priority. Entry readiness uses the mandatory
+ * radius-aware partition below and never relies on this ordinary queue rank. */
+export function interactionLandmarkViewPriority(
+  templateId: string | null,
+  distanceSq: number,
+): number | null {
+  if (authoredLandmarkInteractionRadius(templateId) === null) return null;
+  // A readable service landmark already inside the immediate town view should
+  // stream before the NPC backlog after entry. Farther landmarks retain their
+  // ordinary rank, so this never turns into whole-world eager instantiation.
+  return distanceSq <= NEARBY_LANDMARK_STREAM_RADIUS * NEARBY_LANDMARK_STREAM_RADIUS ? 0.5 : 1.5;
+}
+
+/**
+ * Separate actionable service landmarks from the ordinary entry backlog. Only the
+ * authored interaction radii qualify: recognizing a template never instantiates its
+ * view when the player entered elsewhere in the world.
+ */
+export function partitionMandatoryLandmarkCandidates<T extends MandatoryLandmarkCandidate>(
+  candidates: Iterable<T>,
+  origin: { x: number; z: number },
+): MandatoryLandmarkPartition<T> {
+  const mandatory: T[] = [];
+  const ordinary: T[] = [];
+  for (const candidate of candidates) {
+    const radius = authoredLandmarkInteractionRadius(candidate.templateId);
+    const dx = candidate.pos.x - origin.x;
+    const dz = candidate.pos.z - origin.z;
+    if (candidate.kind === 'object' && radius !== null && dx * dx + dz * dz <= radius * radius) {
+      mandatory.push(candidate);
+    } else ordinary.push(candidate);
+  }
+  return { mandatory, ordinary };
+}
+
+/** A landmark is entry-ready only after its real view exists and its bounded
+ * async-compile gate has cleared. No-parallel-compile views begin cleared. */
+export function mandatoryLandmarkViewsReady<T extends { compilePending: boolean }>(
+  mandatoryIds: readonly number[],
+  views: ReadonlyMap<number, T>,
+): boolean {
+  for (const id of mandatoryIds) {
+    const view = views.get(id);
+    if (!view || view.compilePending) return false;
+  }
+  return true;
+}
 
 export interface PrewarmPolicyInput {
   /** GFX.constrainedMemory: the phone-class memory-ceiling profile is active. */
@@ -36,6 +148,8 @@ export interface PrewarmPolicyInput {
   asyncCompileSupported: boolean;
   /** LOW_GFX: the Lambert/no-shadow tier (its own smaller view budget already). */
   lowGfx: boolean;
+  /** Keep desktop Insane's full manifest behind the entry cover instead of resuming it live. */
+  finishFullManifestBeforeReveal: boolean;
   /** Desktop defaults, injected so the constants stay owned by renderer.ts. */
   defaultMaxMs: number;
   constrainedMaxMs: number;
@@ -61,18 +175,379 @@ export interface PrewarmPolicy {
   compileBeforeFirstFrame: boolean;
   /** Skip the monolithic programs.compile block entirely. */
   skipMonolithCompile: boolean;
+  /** Omit uninterruptible whole-scene submits when shader linking is synchronous. */
+  skipFullScenePasses: boolean;
   /** Restrict the manifest to CONSTRAINED_PREWARM_KEEP. */
   minimalManifest: boolean;
   /** Textures initialized before yielding the event loop; 0 uses the synchronous desktop path. */
   textureBatchSize: number;
   /** Maximum wall-clock time for the bounded constrained texture pass. */
   textureMaxMs: number;
+  /** Ignore the soft manifest deadline so expensive work cannot spill into first live frames. */
+  finishFullManifestBeforeReveal: boolean;
+}
+
+/**
+ * What a manifest entry actually got done before a deadline (or a pending
+ * asset prefetch) stopped it. `trimmed` is the load-bearing bit: it means the
+ * entry deliberately stopped or deferred with planned work remaining, so the
+ * summary must never call it completed. The counts are informational context
+ * for the perf report; entries whose remaining work is unknowable (a scan cut
+ * short mid-iteration) may report done without planned.
+ */
+export interface PrewarmEntryProgress {
+  done?: number;
+  planned?: number;
+  trimmed: boolean;
+}
+
+/**
+ * The honest status for an entry whose run() returned without throwing. A
+ * deadline-trimmed or prefetch-deferred entry is 'partial', never 'completed':
+ * the historical bug was entities.player-archetypes hitting its build deadline
+ * having built ZERO visuals and still reporting completed, which made the boot
+ * starvation invisible in every prewarm summary.
+ */
+export function resolvePrewarmEntryStatus(
+  progress: PrewarmEntryProgress | null | undefined,
+): 'completed' | 'partial' {
+  return progress?.trimmed ? 'partial' : 'completed';
+}
+
+/**
+ * How long the sky manifest entry may wait inline for the decoupled HDRI
+ * prefetch (fetch + worker decode, started at prewarm begin) before deferring
+ * the remaining uploads to the background lane. The tail entries
+ * (world.initial-frame, programs.compile) are deadlineExempt on the async
+ * desktop arm and start regardless; what the reserve actually buys is
+ * submission-and-link time for the compile lane behind the cover: a slow
+ * network must never starve that window the way the old inline await did
+ * (measured 11.5s of a 12s boot budget).
+ * finishFullManifestBeforeReveal (desktop Insane) waits without bound: that
+ * profile's contract is a complete manifest behind the loading cover, and its
+ * runEntry ignores the soft deadline anyway.
+ */
+export function skyAssetInlineWaitMs(input: {
+  nowMs: number;
+  deadlineMs: number;
+  reserveMs: number;
+  finishFullManifestBeforeReveal: boolean;
+}): number {
+  if (input.finishFullManifestBeforeReveal) return Number.POSITIVE_INFINITY;
+  return Math.max(0, input.deadlineMs - Math.max(0, input.reserveMs) - input.nowMs);
+}
+
+export interface SkyBiomePartition<T> {
+  /** Biomes whose decoded assets are already resident and can upload inline. */
+  resident: T[];
+  /** Biomes still in flight; their uploads join the background lane on arrival. */
+  missing: T[];
+}
+
+/** Split the initial sky biomes by decoded-asset residency at entry time. */
+export function partitionResidentSkyBiomes<T>(
+  biomes: readonly T[],
+  isResident: (biome: T) => boolean,
+): SkyBiomePartition<T> {
+  const resident: T[] = [];
+  const missing: T[] = [];
+  for (const biome of biomes) {
+    if (isResident(biome)) resident.push(biome);
+    else missing.push(biome);
+  }
+  return { resident, missing };
+}
+
+/** True when a soft-deadline manifest entry should resume after world reveal. */
+export function prewarmEntryShouldDefer(
+  entryStartedMs: number,
+  deadlineMs: number,
+  hardDeadlineMs: number,
+  deadlineExempt: boolean,
+  finishFullManifestBeforeReveal: boolean,
+): boolean {
+  if (entryStartedMs >= hardDeadlineMs) return true;
+  return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
+}
+
+/**
+ * True when the compile-submit loop must stop submitting units and leave the
+ * remainder to the compile entry or the resume lane. Each unit's compileAsync
+ * prologue is synchronous main-thread work, and one uninterrupted loop
+ * measured 22 s in production against the 15 s hard deadline, which dropped
+ * every entry behind it, the deadline-exempt debt payers included
+ * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively, and
+ * the Insane finish-full-manifest arm keeps submitting without bound: its
+ * contract is a complete manifest behind the cover.
+ */
+export function prewarmSubmitShouldStop(
+  nowMs: number,
+  gpuSubmitDeadlineMs: number,
+  finishFullManifestBeforeReveal: boolean,
+): boolean {
+  if (finishFullManifestBeforeReveal) return false;
+  return nowMs >= gpuSubmitDeadlineMs;
+}
+
+/**
+ * Manifest entries whose dropped remainder is the BULK link/upload debt of
+ * the INITIAL SCENE: hundreds of programs and whole-scene textures that,
+ * left unpaid, make ordinary first draws stall in live frames (the login
+ * storm's blocking reflection and texture-decode hitches). Their resume
+ * units run at BOOT_DEBT priority so cosmetic background warming (the
+ * char preview lane at BACKGROUND) cannot starve them, which production
+ * measured as minutes of unpaid debt after the reveal.
+ *
+ * Deliberately NOT in the set: the per-family VFX warmers
+ * (props.ghost-fade-variants, vfx.weapon-skins, vfx.ability-primitives).
+ * They also carry compile/upload units, but a handful per family whose first
+ * use is a specific event (a school's first impact, a skin's first draw),
+ * not the ambient scene: they stay on the cosmetic BOOT_RESUME arm below
+ * the preview lane, the pre-change behavior.
+ * `programs.compile-submit` here names the SYNTHETIC dropped entry the
+ * deferred-submit hand-off pushes (the manifest entry of that id declares no
+ * resumeUnits, so no other resume entry can carry it).
+ */
+const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
+  'programs.compile',
+  'programs.compile-submit',
+  'textures.scene',
+  'surface-detail.textures',
+]);
+
+/** True when a dropped entry's resume units are hitch-causing debt. */
+export function prewarmResumeIsDebt(entryId: string): boolean {
+  return PREWARM_DEBT_RESUME_IDS.has(entryId);
+}
+
+/**
+ * Stable debt-first ordering for the dropped-entry resume lane. The lane is
+ * strictly serial in array order (resumeDroppedPrewarmEntries), so the
+ * BOOT_DEBT queue priority alone cannot reorder it: in manifest order the
+ * cosmetic entries, which resume at BOOT_RESUME below the preview lane, sit
+ * ahead of the link/upload debt and the debt drains last, the production
+ * starvation this family exists to fix. Relative order inside each class is
+ * preserved.
+ */
+export function orderPrewarmResumeEntries<T extends { id: string }>(entries: readonly T[]): T[] {
+  const debt: T[] = [];
+  const cosmetic: T[] = [];
+  for (const entry of entries) {
+    (prewarmResumeIsDebt(entry.id) ? debt : cosmetic).push(entry);
+  }
+  return [...debt, ...cosmetic];
+}
+
+/** The mesh-shape bits three folds into a program's cache key, structurally
+ * typed so this decision layer stays Three-free. */
+export interface ProgramContentMeshShape {
+  isSkinnedMesh?: boolean;
+  isInstancedMesh?: boolean;
+  /** An instanceColor buffer flips USE_INSTANCING_COLOR into the key. */
+  hasInstanceColor?: boolean;
+  isBatchedMesh?: boolean;
+  /** morphAttributes.position PRESENT: three defines USE_MORPHTARGETS on
+   *  presence, even for an empty array, so present-with-zero and absent are
+   *  distinct variants. */
+  hasMorphPositions?: boolean;
+  /** The EXACT morph target count: three keys morphTargetsCount, so a
+   *  boolean here hid variants (a morphs=2 and a morphs=6 mesh relinked at
+   *  draw time against a morphs=4 stand-in). */
+  morphTargetCount?: number;
+  morphNormalCount?: number;
+  morphColorCount?: number;
+  /** geometry.attributes.tangent flips vertexTangents. */
+  hasTangents?: boolean;
+  /** geometry.attributes.color itemSize (4 flips vertexAlphas); 0 = none. */
+  vertexColorItemSize?: number;
+  castShadow?: boolean;
+}
+
+/**
+ * Program-content keys for compile-unit dedupe: one key per material slot,
+ * covering the object and geometry bits of three r165's program cache key
+ * this repo can produce (skinning, instancing and instance colour, batched
+ * meshes, morph position/normal/colour presence and counts, tangents, vertex
+ * colour item size, shadow casting). Not covered, on purpose: BatchedMesh
+ * colour textures (batchingColor) and Points uv presence (pointsUvs), which
+ * the repo does not produce on this path; adopt either and this key must
+ * learn it. A coarser key elects a stand-in
+ * whose program variant differs, and every other geometry shape of that
+ * material is SKIPPED by the dedupe and relinks synchronously at first draw,
+ * which is the stall the compile lane exists to prevent. In-repo fidelity
+ * precedent: occluderGhostVariantKey (occluder_ghost_prewarm.ts).
+ */
+export function prewarmProgramContentKeys(
+  shape: ProgramContentMeshShape,
+  materialIds: readonly string[],
+): string[] {
+  const token =
+    `${shape.isSkinnedMesh ? 's' : 'm'}${shape.isInstancedMesh ? 'i' : ''}` +
+    `${shape.hasInstanceColor ? 'ic' : ''}${shape.isBatchedMesh ? 'b' : ''}` +
+    `${shape.hasMorphPositions ? 'P' : ''}p${shape.morphTargetCount ?? 0}` +
+    `n${shape.morphNormalCount ?? 0}k${shape.morphColorCount ?? 0}` +
+    `${shape.hasTangents ? 't' : ''}v${shape.vertexColorItemSize ?? 0}` +
+    `${shape.castShadow ? 'c' : ''}`;
+  return materialIds.map((id) => `${token}:${id}`);
+}
+
+/** The material half of a program-content key. A program SIGNATURE, not the
+ * material uuid: distinct GLB materials by the hundred share the same linked
+ * program (same type, same shader hooks, same map-presence defines), and an
+ * uuid key kept ~2,725 compile roots alive for ~500 unique programs, so the
+ * mass submission paid ~5,450 compileAsync prologues (~2.3 ms each, a
+ * measured 12.4 s behind the loading cover). The signature folds exactly the
+ * inputs three keys program defines on that the mesh-shape token does not
+ * already carry: material type, hook identity (customProgramCacheKey, whose
+ * three default is onBeforeCompile source), custom vertex/fragment source,
+ * defines, the texture-channel presence bits, blending/alpha-test, vertex
+ * colors, flat shading, fog opt-out and side. An imperfect signature is
+ * fail-soft: world.initial-frame's own
+ * guaranteed submit (its start is bounded ahead of the hard deadline by
+ * prewarmCompileAwaitDeadline) links any residue behind the loading cover
+ * there, instead of at first live draw. */
+export function materialProgramSignature(material: {
+  type?: string;
+  customProgramCacheKey?: () => string;
+  vertexShader?: string;
+  fragmentShader?: string;
+  defines?: Record<string, unknown>;
+  map?: unknown;
+  normalMap?: unknown;
+  bumpMap?: unknown;
+  roughnessMap?: unknown;
+  metalnessMap?: unknown;
+  aoMap?: unknown;
+  emissiveMap?: unknown;
+  alphaMap?: unknown;
+  envMap?: unknown;
+  lightMap?: unknown;
+  displacementMap?: unknown;
+  specularMap?: unknown;
+  gradientMap?: unknown;
+  transparent?: boolean;
+  alphaTest?: number;
+  vertexColors?: boolean;
+  flatShading?: boolean;
+  fog?: boolean;
+  side?: number;
+}): string {
+  const bit = (value: unknown): string => (value ? '1' : '0');
+  const source = (value: string | undefined): string =>
+    value === undefined ? '' : `${value.length}:${value}`;
+  const hook =
+    typeof material.customProgramCacheKey === 'function' ? material.customProgramCacheKey() : '';
+  const defineEntries = Object.entries(material.defines ?? {});
+  const defines = defineEntries.length > 0 ? JSON.stringify(defineEntries) : '';
+  return [
+    material.type ?? '',
+    hook,
+    source(material.vertexShader),
+    source(material.fragmentShader),
+    defines,
+    bit(material.map),
+    bit(material.normalMap),
+    bit(material.bumpMap),
+    bit(material.roughnessMap),
+    bit(material.metalnessMap),
+    bit(material.aoMap),
+    bit(material.emissiveMap),
+    bit(material.alphaMap),
+    bit(material.envMap),
+    bit(material.lightMap),
+    bit(material.displacementMap),
+    bit(material.specularMap),
+    bit(material.gradientMap),
+    bit(material.transparent),
+    bit((material.alphaTest ?? 0) > 0),
+    bit(material.vertexColors),
+    bit(material.flatShading),
+    bit(material.fog !== false),
+    String(material.side ?? 0),
+  ].join('|');
+}
+
+/** Which compile groups ONE submission call collects, and which of them it
+ * may mark as covered afterwards. The two rules that earn this a pure,
+ * pinned home:
+ * - A group whose THREE.Group does not EXIST yet must not be collected and,
+ *   crucially, must not be MARKED: marking it would make every later
+ *   submission skip it forever, and its programs would link synchronously
+ *   inside world.initial-frame (the Mirefen landmark group stages two
+ *   entries after the early submission).
+ * - A group in `recollect` (the live scene) is collected on every eligible
+ *   call and never marked: content keeps arriving between the early
+ *   submission and the compile entry (world.settle-state builds terrain and
+ *   water lazily), and the caller's shared dedupe store makes a
+ *   re-collection resubmit only what is genuinely new. */
+export function planCompileSubmission(input: {
+  groups: readonly { id: string; exists: boolean }[];
+  submitted: ReadonlySet<string>;
+  late: ReadonlySet<string>;
+  recollect: ReadonlySet<string>;
+  includeLate: boolean;
+}): { collect: string[]; mark: string[] } {
+  const collect: string[] = [];
+  const mark: string[] = [];
+  for (const { id, exists } of input.groups) {
+    if (!exists) continue;
+    if (!input.includeLate && input.late.has(id)) continue;
+    if (input.submitted.has(id)) continue;
+    collect.push(id);
+    if (!input.recollect.has(id)) mark.push(id);
+  }
+  return { collect, mark };
+}
+
+/** Where the programs.compile entry's await-all must give up waiting so
+ * world.initial-frame (which compileBeforeFirstFrame reorders to run
+ * immediately after this entry) always STARTS before the hard deadline.
+ * prewarmEntryShouldDefer defers ANY entry, even a deadlineExempt one, the
+ * instant its start time reaches hardDeadlineMs, so an unbounded await here
+ * risked pushing world.initial-frame's own start past that wall: the entry
+ * would then be skipped outright (it has no resumeUnits) and the initial
+ * scene's programs would link at first LIVE draw instead, the exact stall
+ * class this lane exists to prevent. reserveMs is the room the initial
+ * frame's own submit needs to start and run before the wall; it does not
+ * bound the compile itself, which keeps linking off-thread after a timeout
+ * (resubmitting in-flight compileAsync calls would double-submit them).
+ * Mirrors prewarmBuildDeadline's reserve, one pipeline stage later. */
+export function prewarmCompileAwaitDeadline(hardDeadlineMs: number, reserveMs: number): number {
+  return hardDeadlineMs - Math.max(0, reserveMs);
+}
+
+/** Build cutoff paired with the entry policy. Full Insane prewarm may use the
+ * soft-deadline reserve, but it still stops at the independent hard deadline. */
+export function prewarmBuildDeadline(
+  deadlineMs: number,
+  hardDeadlineMs: number,
+  reserveMs: number,
+  finishFullManifestBeforeReveal: boolean,
+): number {
+  return Math.min(
+    hardDeadlineMs,
+    finishFullManifestBeforeReveal ? hardDeadlineMs : deadlineMs - Math.max(0, reserveMs),
+  );
+}
+
+/** Run temporary prewarm state under a guaranteed behavioral restore. */
+export async function withRestoredPrewarmState<T, R>(
+  capture: () => T,
+  restore: (state: T) => void,
+  work: () => R | Promise<R>,
+): Promise<R> {
+  const original = capture();
+  try {
+    return await work();
+  } finally {
+    restore(original);
+  }
 }
 
 /**
  * Resolve every prewarm knob from the device profile. The constrained arms are the
- * watchdog + memory fix; the unconstrained arm reproduces the historical desktop
- * behavior exactly (full manifest, generous budgets, no reordering).
+ * watchdog + memory fix. The unconstrained arm keeps the full desktop manifest and
+ * budgets, while parallel compile is moved ahead of the first whole-scene submit.
  */
 export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
   const { constrainedMemory, asyncCompileSupported, lowGfx } = input;
@@ -84,11 +559,13 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       maxViews: baseMaxViews,
       yieldBetweenEntries: false,
       linkPassPerEntry: false,
-      compileBeforeFirstFrame: false,
-      skipMonolithCompile: false,
+      compileBeforeFirstFrame: asyncCompileSupported,
+      skipMonolithCompile: !asyncCompileSupported,
+      skipFullScenePasses: !asyncCompileSupported,
       minimalManifest: false,
       textureBatchSize: 0,
       textureMaxMs: 0,
+      finishFullManifestBeforeReveal: input.finishFullManifestBeforeReveal,
     };
   }
   return {
@@ -100,15 +577,19 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     // empty local world. The rest stream in via the per-frame view-create budget.
     maxViews: Math.min(baseMaxViews, input.maxViewsConstrained),
     yieldBetweenEntries: true,
-    // Without parallel compile the monolith is one giant synchronous block, so link
-    // group-by-group per entry instead. With it, the async compile entry links
-    // off-thread and per-entry passes only starve the manifest.
-    linkPassPerEntry: !asyncCompileSupported,
+    // A full-scene render is itself the synchronous shader-link monolith when the
+    // extension is absent. Never enter that uninterruptible driver call inside the
+    // loading gate; first-sight compile gates handle later streamed views instead.
+    linkPassPerEntry: false,
     compileBeforeFirstFrame: asyncCompileSupported,
     skipMonolithCompile: !asyncCompileSupported,
+    skipFullScenePasses: !asyncCompileSupported,
     minimalManifest: true,
     textureBatchSize: CONSTRAINED_TEXTURE_BATCH_SIZE,
     textureMaxMs: CONSTRAINED_TEXTURE_MAX_MS,
+    // Never extend the loading gate on the constrained WebKit profile: its
+    // smaller manifest and hard deadline are process-survival requirements.
+    finishFullManifestBeforeReveal: false,
   };
 }
 
@@ -137,8 +618,24 @@ export function remainingPrewarmViewBudget(maxViews: number, createdViews: numbe
 
 /** True when this manifest entry runs under the given policy. */
 export function prewarmEntryRuns(id: string, policy: PrewarmPolicy): boolean {
+  if (
+    policy.skipFullScenePasses &&
+    BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE.includes(id)
+  ) {
+    return false;
+  }
   if (!policy.minimalManifest) return true;
   return CONSTRAINED_PREWARM_KEEP.includes(id);
+}
+
+/**
+ * True when a minimal-manifest skip should still hand this entry's explicit
+ * units to the background resume lane. Only meaningful for an entry
+ * prewarmEntryRuns already rejected, so the unconstrained arm is always false.
+ */
+export function prewarmEntryResumesAfterSkip(id: string, policy: PrewarmPolicy): boolean {
+  if (!policy.minimalManifest) return false;
+  return CONSTRAINED_PREWARM_RESUME.includes(id);
 }
 
 /**

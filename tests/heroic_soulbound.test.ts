@@ -104,6 +104,56 @@ describe('soulbound: heroic_mark is bound', () => {
     expect(sim.countItem('heroic_mark', sender)).toBe(1);
   });
 
+  it('the migration keys the return by the STABLE sender id when the row carries one', () => {
+    // A #2450-era row has senderKey: keying the migrated return by the
+    // display name would expose it to a future holder of a freed name (the
+    // minted letter is system mail with attachments, which never expires),
+    // so the stable id must win whenever it exists.
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sender = sim.addPlayer('warrior', 'Alice', { characterId: 641 });
+    sim.addPlayer('mage', 'Bob', { characterId: 642 });
+    const legacySave: MailSave = {
+      mail: [
+        {
+          id: 81,
+          recipientKey: '642',
+          recipientName: 'Bob',
+          senderName: 'Alice',
+          senderKey: '641',
+          kind: 'player',
+          subject: 'Keyed heroic parcel',
+          body: '',
+          copper: 0,
+          items: [{ itemId: 'heroic_mark', count: 2 }],
+          deliverIn: 0,
+          secondsLeft: -1,
+          read: false,
+        },
+      ],
+      nextMailId: 82,
+    };
+
+    sim.loadMail(legacySave);
+    const minted = (
+      sim.postOffice as unknown as {
+        mail: { subject: string; recipientKey: string; items: { itemId: string }[] }[];
+      }
+    ).mail.find(
+      (m) => m.items.length > 0 && m.subject === 'Keyed heroic parcel' && m.recipientKey !== '642',
+    );
+    if (!minted) throw new Error('migration letter missing');
+    expect(minted.recipientKey).toBe('641');
+    // And the sender really can claim it through their stable key.
+    const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
+    const senderEntity = sim.entities.get(sender);
+    if (!box || !senderEntity) throw new Error('missing mail test entity');
+    senderEntity.pos = { ...box.pos };
+    senderEntity.prevPos = { ...senderEntity.pos };
+    sim.rebucket(senderEntity);
+    const senderMail = sim.mailInfoFor(sender)?.messages ?? [];
+    expect(senderMail.some((m) => m.items.some((i) => i.itemId === 'heroic_mark'))).toBe(true);
+  });
+
   it('returns a persisted pre-soulbound Heroic Mark parcel to its sender on load', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const sender = sim.addPlayer('warrior', 'Alice');
@@ -158,9 +208,10 @@ describe('soulbound: heroic_mark is bound', () => {
     const hasItem = (messages: typeof senderMail, itemId: string): boolean =>
       messages.some((message) => message.items.some((item) => item.itemId === itemId));
 
-    // MailSave persists only senderName, so the safe recovery route is the
-    // sender's name-keyed mailbox. The recipient must never be able to claim the
-    // newly soulbound parcel, while an ordinary legacy parcel stays addressed.
+    // This legacy row predates senderKey entirely, so the ONLY recovery
+    // route is the sender's name-keyed mailbox. The recipient must never be
+    // able to claim the newly soulbound parcel, while an ordinary legacy
+    // parcel stays addressed.
     expect({
       heroicReturnedToSender: hasItem(senderMail, 'heroic_mark'),
       heroicStillWithRecipient: hasItem(recipientMail, 'heroic_mark'),

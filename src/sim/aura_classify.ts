@@ -11,6 +11,7 @@ import type { Aura, AuraKind } from './types';
 // the various combat penalties (silence/disarm/blind/lockout/expose/...).
 export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'dot',
+  'forced_move',
   'slow',
   'root',
   'stun',
@@ -34,9 +35,20 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'tongues',
   'cost_tax',
   'heal_absorb',
+  'ruinous_brand',
+  'duskfire_claim',
   'critvuln',
   'sated', // shared Bloodlust / Temporal Acceleration exhaustion lockout
   'cauterize_fatigue', // Cauterize's 5 min "already saved you" lockout
+  'sun_verdict',
+  'affliction_eye',
+  'affliction_eye_secondary',
+  'affliction_fate_threads',
+  'affliction_violence',
+  'necromancy_harvest_mark',
+  // Cosmetic and mechanically inert (value 0, no stat fold): listed here only so
+  // the countdown sorts into the debuff bar rather than sitting among the buffs.
+  'cheater_mark',
 ]);
 
 // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
@@ -45,15 +57,34 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
   return DEBUFF_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
 }
 
+// The one rule for "may a player counter take this aura off at all", ahead of any
+// question of school or polarity. Two aura classes answer no: encounter-authored
+// unbreakable control (the script owns its release) and `undispellable` penalties
+// (the recovery sicknesses, which only their own timer clears). Every removal path a
+// player can drive routes through here so the answer cannot drift between them: the
+// dispel executor and its requiresDispellable cast gate (isDispellableAura below),
+// the cleanseSelf executor (combat/effect_dispatch.ts), and the right-click buff
+// cancel (combat/aura_cancel.ts).
+export function isPlayerRemovableAura(
+  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'undispellable'>,
+): boolean {
+  return !isUnbreakableControlAura(aura) && aura.undispellable !== true;
+}
+
 // The dispel eligibility rule, shared by the dispel executor and the
-// requiresDispellable cast gate so the two can never drift: magic-school only,
-// and the cast's direction picks the polarity (an OFFENSIVE dispel strips a
-// benefit off an enemy; a friendly one strips a harmful effect off an ally).
+// requiresDispellable cast gate so the two can never drift: player-removable and
+// magic-school only, and the cast's direction picks the polarity (an OFFENSIVE dispel
+// strips a benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
-  aura: Pick<Aura, 'kind' | 'value' | 'school' | 'unbreakableControl'>,
+  aura: Pick<Aura, 'kind' | 'value' | 'school'> &
+    Partial<Pick<Aura, 'id' | 'unbreakableControl' | 'undispellable' | 'permanent'>>,
   offensive: boolean,
 ): boolean {
-  if (isUnbreakableControlAura(aura)) return false;
+  // Ascension is a player-owned resource state surfaced as an aura for HUD clarity,
+  // not a transferable magic buff. Letting dispel/steal remove only the synthetic
+  // icon would leave its charges active invisibly (or copy a mechanically inert icon).
+  if (aura.id === 'divine_ascension' || aura.permanent) return false;
+  if (!isPlayerRemovableAura(aura)) return false;
   if (aura.school === 'physical') return false;
   const harmful = isDebuffAura(aura.kind, aura.value);
   return offensive ? !harmful : harmful;
@@ -61,6 +92,7 @@ export function isDispellableAura(
 
 const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'temporal_echo',
+  'beacon_of_light',
   'hot',
   'absorb',
   'cast_shield',
@@ -72,7 +104,26 @@ const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
 
 // Evasion and Deterrence share buff_dodge with long-lived maintenance buffs, so
 // their stable ability ids distinguish the major defensives from passive upkeep.
-const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set(['evasion', 'deterrence']);
+const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set([
+  'evasion',
+  'deterrence',
+  'priest_doctrine',
+]);
+
+// Kinds a party/raid frame never shows, ahead of the debuff arm that would
+// otherwise pull them in and sort them tier 0 in partyAuraPriority
+// (combat/chronomancy.ts). A raid frame caps the auras it draws, so anything
+// listed here would push a real dispellable debuff off a healer's frame:
+//  - 'sated': the Bloodlust exhaustion lockout, which no healer acts on.
+//  - 'cheater_mark': the operator-applied sanction. It is deliberately
+//    power-neutral (src/sim/moderation/CLAUDE.md), and costing the marked
+//    player's healer a raid-frame slot is exactly the kind of information
+//    handicap that rule forbids. Its render surfaces are the nameplate and the
+//    target frame, which is where the tag is meant to be read.
+const PARTY_FRAME_EXCLUDED_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'sated',
+  'cheater_mark',
+]);
 
 /** Effects worth surfacing on a compact party/raid frame. Generic maintenance
  * buffs, forms, stances, and personal damage procs remain on the normal aura UI. */
@@ -82,7 +133,7 @@ export function isPartyFrameRelevantAura(aura: {
   value?: number;
   neg?: 1;
 }): boolean {
-  if (aura.kind === 'sated') return false;
+  if (PARTY_FRAME_EXCLUDED_KINDS.has(aura.kind)) return false;
   const value = aura.neg ? -1 : (aura.value ?? 1);
   return (
     isDebuffAura(aura.kind, value) ||

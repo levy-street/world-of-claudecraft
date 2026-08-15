@@ -1,358 +1,358 @@
 {
- "items": [
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_large.gltf.glb",
-   "out": "models/dungeon/floor_tile_large.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_large_rocks.gltf.glb",
-   "out": "models/dungeon/floor_tile_large_rocks.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_dirt_large.gltf.glb",
-   "out": "models/dungeon/floor_dirt_large.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_dirt_large_rocky.gltf.glb",
-   "out": "models/dungeon/floor_dirt_large_rocky.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small.gltf.glb",
-   "out": "models/dungeon/floor_tile_small.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_broken_A.gltf.glb",
-   "out": "models/dungeon/floor_tile_small_broken_A.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_broken_B.gltf.glb",
-   "out": "models/dungeon/floor_tile_small_broken_B.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_weeds_A.gltf.glb",
-   "out": "models/dungeon/floor_tile_small_weeds_A.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_weeds_B.gltf.glb",
-   "out": "models/dungeon/floor_tile_small_weeds_B.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_decorated.gltf.glb",
-   "out": "models/dungeon/floor_tile_small_decorated.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_grate.gltf.glb",
-   "out": "models/dungeon/floor_tile_grate.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_foundation_allsides.gltf.glb",
-   "out": "models/dungeon/floor_foundation_allsides.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall.gltf.glb",
-   "out": "models/dungeon/wall.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_cracked.gltf.glb",
-   "out": "models/dungeon/wall_cracked.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_pillar.gltf.glb",
-   "out": "models/dungeon/wall_pillar.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_arched.gltf.glb",
-   "out": "models/dungeon/wall_arched.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_archedwindow_gated.gltf.glb",
-   "out": "models/dungeon/wall_archedwindow_gated.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_gated.gltf.glb",
-   "out": "models/dungeon/wall_gated.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/pillar.gltf.glb",
-   "out": "models/dungeon/pillar.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/pillar_decorated.gltf.glb",
-   "out": "models/dungeon/pillar_decorated.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/torch_mounted.gltf.glb",
-   "out": "models/dungeon/torch_mounted.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_white.gltf.glb",
-   "out": "models/dungeon/banner_white.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_thin_white.gltf.glb",
-   "out": "models/dungeon/banner_thin_white.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_blue.gltf.glb",
-   "out": "models/dungeon/banner_blue.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_shield_blue.gltf.glb",
-   "out": "models/dungeon/banner_shield_blue.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_triple_blue.gltf.glb",
-   "out": "models/dungeon/banner_triple_blue.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_green.gltf.glb",
-   "out": "models/dungeon/banner_green.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_patternC_green.gltf.glb",
-   "out": "models/dungeon/banner_patternC_green.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_triple_green.gltf.glb",
-   "out": "models/dungeon/banner_triple_green.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/chest.glb",
-   "out": "models/dungeon/chest.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/chest_gold.glb",
-   "out": "models/dungeon/chest_gold.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/coin_stack_medium.gltf.glb",
-   "out": "models/dungeon/coin_stack_medium.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/barrel_large.gltf.glb",
-   "out": "models/dungeon/barrel_large.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/barrel_small_stack.gltf.glb",
-   "out": "models/dungeon/barrel_small_stack.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/keg.gltf.glb",
-   "out": "models/dungeon/keg.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/crates_stacked.gltf.glb",
-   "out": "models/dungeon/crates_stacked.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/box_stacked.gltf.glb",
-   "out": "models/dungeon/box_stacked.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/box_small.gltf.glb",
-   "out": "models/dungeon/box_small.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/table_long_broken.gltf.glb",
-   "out": "models/dungeon/table_long_broken.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/sword_shield.gltf.glb",
-   "out": "models/dungeon/sword_shield.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/sword_shield_broken.gltf.glb",
-   "out": "models/dungeon/sword_shield_broken.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/rubble_half.gltf.glb",
-   "out": "models/dungeon/rubble_half.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/candle_lit.gltf.glb",
-   "out": "models/dungeon/candle_lit.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/candle_triple.gltf.glb",
-   "out": "models/dungeon/candle_triple.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/trunk_large_A.gltf.glb",
-   "out": "models/dungeon/trunk_large_A.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/coffin.gltf",
-   "out": "models/dungeon/coffin.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/coffin_decorated.gltf",
-   "out": "models/dungeon/coffin_decorated.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/grave_B.gltf",
-   "out": "models/dungeon/grave_B.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/gravestone.gltf",
-   "out": "models/dungeon/gravestone.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/gravemarker_A.gltf",
-   "out": "models/dungeon/gravemarker_A.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/ribcage.gltf",
-   "out": "models/dungeon/ribcage.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/bone_A.gltf",
-   "out": "models/dungeon/bone_A.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/bone_B.gltf",
-   "out": "models/dungeon/bone_B.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/skull.gltf",
-   "out": "models/dungeon/skull.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/skull_candle.gltf",
-   "out": "models/dungeon/skull_candle.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/shrine.gltf",
-   "out": "models/dungeon/shrine.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/shrine_candles.gltf",
-   "out": "models/dungeon/shrine_candles.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/plaque_candles.gltf",
-   "out": "models/dungeon/plaque_candles.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/arch.gltf",
-   "out": "models/dungeon/arch.glb",
-   "type": "static",
-   "maxTex": 512
-  }
- ]
+  "items": [
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_large.gltf.glb",
+      "out": "models/dungeon/floor_tile_large.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_large_rocks.gltf.glb",
+      "out": "models/dungeon/floor_tile_large_rocks.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_dirt_large.gltf.glb",
+      "out": "models/dungeon/floor_dirt_large.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_dirt_large_rocky.gltf.glb",
+      "out": "models/dungeon/floor_dirt_large_rocky.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small.gltf.glb",
+      "out": "models/dungeon/floor_tile_small.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_broken_A.gltf.glb",
+      "out": "models/dungeon/floor_tile_small_broken_A.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_broken_B.gltf.glb",
+      "out": "models/dungeon/floor_tile_small_broken_B.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_weeds_A.gltf.glb",
+      "out": "models/dungeon/floor_tile_small_weeds_A.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_weeds_B.gltf.glb",
+      "out": "models/dungeon/floor_tile_small_weeds_B.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_small_decorated.gltf.glb",
+      "out": "models/dungeon/floor_tile_small_decorated.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_tile_grate.gltf.glb",
+      "out": "models/dungeon/floor_tile_grate.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/floor_foundation_allsides.gltf.glb",
+      "out": "models/dungeon/floor_foundation_allsides.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall.gltf.glb",
+      "out": "models/dungeon/wall.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_cracked.gltf.glb",
+      "out": "models/dungeon/wall_cracked.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_pillar.gltf.glb",
+      "out": "models/dungeon/wall_pillar.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_arched.gltf.glb",
+      "out": "models/dungeon/wall_arched.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_archedwindow_gated.gltf.glb",
+      "out": "models/dungeon/wall_archedwindow_gated.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/wall_gated.gltf.glb",
+      "out": "models/dungeon/wall_gated.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/pillar.gltf.glb",
+      "out": "models/dungeon/pillar.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/pillar_decorated.gltf.glb",
+      "out": "models/dungeon/pillar_decorated.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/torch_mounted.gltf.glb",
+      "out": "models/dungeon/torch_mounted.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_white.gltf.glb",
+      "out": "models/dungeon/banner_white.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_thin_white.gltf.glb",
+      "out": "models/dungeon/banner_thin_white.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_blue.gltf.glb",
+      "out": "models/dungeon/banner_blue.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_shield_blue.gltf.glb",
+      "out": "models/dungeon/banner_shield_blue.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_triple_blue.gltf.glb",
+      "out": "models/dungeon/banner_triple_blue.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_green.gltf.glb",
+      "out": "models/dungeon/banner_green.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_patternC_green.gltf.glb",
+      "out": "models/dungeon/banner_patternC_green.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/banner_triple_green.gltf.glb",
+      "out": "models/dungeon/banner_triple_green.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/chest.glb",
+      "out": "models/dungeon/chest.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/chest_gold.glb",
+      "out": "models/dungeon/chest_gold.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/coin_stack_medium.gltf.glb",
+      "out": "models/dungeon/coin_stack_medium.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/barrel_large.gltf.glb",
+      "out": "models/dungeon/barrel_large.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/barrel_small_stack.gltf.glb",
+      "out": "models/dungeon/barrel_small_stack.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/keg.gltf.glb",
+      "out": "models/dungeon/keg.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/crates_stacked.gltf.glb",
+      "out": "models/dungeon/crates_stacked.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/box_stacked.gltf.glb",
+      "out": "models/dungeon/box_stacked.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/box_small.gltf.glb",
+      "out": "models/dungeon/box_small.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/table_long_broken.gltf.glb",
+      "out": "models/dungeon/table_long_broken.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/sword_shield.gltf.glb",
+      "out": "models/dungeon/sword_shield.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/sword_shield_broken.gltf.glb",
+      "out": "models/dungeon/sword_shield_broken.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/rubble_half.gltf.glb",
+      "out": "models/dungeon/rubble_half.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/candle_lit.gltf.glb",
+      "out": "models/dungeon/candle_lit.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/candle_triple.gltf.glb",
+      "out": "models/dungeon/candle_triple.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Dungeon-Remastered-1.0/addons/kaykit_dungeon_remastered/Assets/gltf/trunk_large_A.gltf.glb",
+      "out": "models/dungeon/trunk_large_A.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/coffin.gltf",
+      "out": "models/dungeon/coffin.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/coffin_decorated.gltf",
+      "out": "models/dungeon/coffin_decorated.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/grave_B.gltf",
+      "out": "models/dungeon/grave_B.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/gravestone.gltf",
+      "out": "models/dungeon/gravestone.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/gravemarker_A.gltf",
+      "out": "models/dungeon/gravemarker_A.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/ribcage.gltf",
+      "out": "models/dungeon/ribcage.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/bone_A.gltf",
+      "out": "models/dungeon/bone_A.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/bone_B.gltf",
+      "out": "models/dungeon/bone_B.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/skull.gltf",
+      "out": "models/dungeon/skull.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/skull_candle.gltf",
+      "out": "models/dungeon/skull_candle.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/shrine.gltf",
+      "out": "models/dungeon/shrine.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/shrine_candles.gltf",
+      "out": "models/dungeon/shrine_candles.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/plaque_candles.gltf",
+      "out": "models/dungeon/plaque_candles.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Halloween-Bits-1.0/addons/kaykit_halloween_bits/Assets/gltf/arch.gltf",
+      "out": "models/dungeon/arch.glb",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
 }

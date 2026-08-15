@@ -30,11 +30,38 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (card_queue_join/leave, play_card, card_forfeit), Professions 2.0's
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
-// Maker's Bond unbind service), and the Rift + mounts surface (rift and
-// forge commands, learn_riding, mount selection).
-const EXPECTED_SEND_COUNT = 173;
-const EXPECTED_DISPATCH_COUNT = 184;
-const EXPECTED_DISPATCH_ONLY_COUNT = 11;
+// Maker's Bond unbind service), the Rift + mounts surface (rift and
+// forge commands, learn_riding, mount selection), market_list_instance
+// (the instance-payload market pipe), the commission order board
+// (issue #1298: open/cancel/accept/deliver_commission_order), the
+// profiler-only dev_profiler_invulnerable dispatch token, slot_tool_effect
+// (attach a catalog effect to one gathering profession's tool, keyed per
+// profession rather than per tool item because the live harvest path
+// resolves a tier and never a tool), recharge_tool_effect (the acquisition
+// craft), the guild_bank_* cluster (Guild Bank Phase 2) plus guild_bank_log
+// (the activity log's on-demand READ request; its answer comes back on its own
+// one-shot 'gbanklog' frame, not the snapshot), the battleground surface
+// (bg_queue/bg_leave/bg_flag sends plus the dev-only bg_queue force start),
+// stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358),
+// the controlled Warlock pet's signature-skill command and autocast toggle
+// (+2 send/dispatch from the class-overhauls integration), set_helm as a
+// send + dispatch pair (the paperdoll helmet-visibility eye; helmHidden
+// persists per character like weaponStowed), inv_sort as a send + dispatch
+// pair (the one-shot bag clean-up; no payload, the sim re-derives the whole
+// arrangement deterministically), and bg_respond as a send + dispatch pair
+// (the release's battleground queue-pop confirmation).
+// The Reliquary packet's nameplate border adds deed_set_border as a send +
+// dispatch pair, the exact sibling of deed_set_title, and this branch adds
+// tabPrev as a send + dispatch pair (the backward half of the Tab target
+// cycle, Shift+Tab by default; no payload, the sim walks the same ordered
+// list in reverse). NOTE (merge trap): both
+// sides of every v0.36.0 sync bump these counts independently, and git has
+// auto-merged identical numbers before while the real total was higher; the
+// merged tree carries BOTH sides' pairs. Only the suite says what they really
+// are, and the numbers below were set from a run, not from this narrative.
+const EXPECTED_SEND_COUNT = 199;
+const EXPECTED_DISPATCH_COUNT = 212;
+const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

@@ -1,39 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { terrainHeight } from '../src/sim/world';
+import type { Entity } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 function makeSim(seed = 42) {
   return new Sim({ seed, playerClass: 'mage', autoEquip: true });
 }
 
-function nearestMob(sim: Sim) {
+// An idle hostile mob `dz` yards in front of the player, targeted and faced. Staged in
+// the collider-free open-field lane: the ability under test is what matters here, and a
+// live overworld mob couples the assertion to whatever fences and props the authored
+// world happens to place on the firing line (which is a Line of sight cast refusal, not
+// a Pyrelance regression).
+function spawnDummy(sim: Sim, dz = 15): Entity {
   const p = sim.player;
-  let best: any = null,
-    bestD = Infinity;
-  for (const e of sim.entities.values()) {
-    if (e.kind !== 'mob' || e.dead) continue;
-    const d = Math.hypot(p.pos.x - e.pos.x, p.pos.z - e.pos.z);
-    if (d < bestD) {
-      bestD = d;
-      best = e;
-    }
-  }
-  return best;
-}
-
-function teleportTo(sim: Sim, x: number, z: number) {
-  const p = sim.player;
-  p.pos.x = x;
-  p.pos.z = z;
-  p.pos.y = terrainHeight(x, z, sim.cfg.seed);
-  p.prevPos = { ...p.pos };
-  p.vx = 0;
-  p.vz = 0;
-  p.vy = 0;
-  p.onGround = true;
-  p.fallStartY = p.pos.y;
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, 5, {
+    x: p.pos.x,
+    y: p.pos.y,
+    z: p.pos.z + dz,
+  });
+  mob.hostile = true;
+  mob.aiState = 'idle';
+  sim.addEntity(mob);
+  p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
+  sim.targetEntity(mob.id);
+  return mob;
 }
 
 describe('Pyroblast (mage)', () => {
@@ -65,10 +60,8 @@ describe('Pyroblast (mage)', () => {
     const sim = makeSim();
     sim.setPlayerLevel(20);
     expect(sim.setSpec('fire')).toBe(true);
-    const wolf = nearestMob(sim);
-    teleportTo(sim, wolf.pos.x + 15, wolf.pos.z);
-    sim.targetEntity(wolf.id);
-    sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
+    placePlayerInOpenField(sim);
+    const wolf = spawnDummy(sim);
     sim.player.resource = sim.player.maxResource;
     const hpBefore = wolf.hp;
     sim.castAbility('pyroblast');

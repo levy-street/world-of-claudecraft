@@ -107,6 +107,10 @@ export const ERROR_CODES = deepFreeze({
   'character.taken_over': { params: [] },
   // identity: "this character must be renamed before entering the world."
   'character.rename_required': { params: [] },
+  // identity: "invalid appearance"
+  'character.invalid_appearance': { params: [] },
+  // identity: "appearance reroll is not available for this character"
+  'character.reroll_unavailable': { params: [] },
 
   // moderation: enforcement states set by a moderator.
   // identity: "this account is suspended until {date}."
@@ -190,8 +194,48 @@ export const ERROR_CODES = deepFreeze({
   'steam.account_taken': { params: [] },
   // The Steam Web API could not be reached or answered garbage (503).
   'steam.upstream': { params: [] },
+
+  // --- Epic link family codes (server/epic/). The whole surface is
+  // env-gated: with EPIC_ENABLED unset every route answers epic.disabled.
+  // Linking is cosmetic-mirror only; login with Epic does not exist. ---
+
+  // The Epic surface is not enabled on this server (feature-off 503).
+  'epic.disabled': { params: [] },
+  // The link proof failed shape or upstream verification (400).
+  'epic.invalid_token': { params: [] },
+  // The proof verified but the Epic account is blocked upstream (403).
+  'epic.banned': { params: [] },
+  // This account already has a linked Epic account (409).
+  'epic.already_linked': { params: [] },
+  // That Epic account is linked to a different account (409).
+  'epic.account_taken': { params: [] },
+  // The Epic / EOS upstream could not be reached or is not provisioned (503).
+  'epic.upstream': { params: [] },
   // wallet: the desktop browser handoff was malformed, expired, or mismatched.
   'wallet.handoff_invalid': { params: [] },
+  'ota_updates.invalid_input': { params: [] },
+  // seeker: native distribution, attestation, wallet, token, and entitlement failures.
+  'seeker.native_only': { params: [] },
+  'seeker.attestation_failed': { params: [] },
+  'seeker.solana_artifact_required': { params: [] },
+  'seeker.wallet_required': { params: [] },
+  'seeker.genesis_token_required': { params: [] },
+  'seeker.genesis_token_claimed': { params: [] },
+  'seeker.entitlement_required': { params: [] },
+  'seeker.current_ownership_required': { params: [] },
+
+  // --- cheater_mark: the operator-applied public Cheater tag (src/sim/moderation/,
+  // server/cheater_mark_api.ts). The tag is cosmetic-only, so every code here is
+  // about WHO may be branded and for HOW LONG, never a gameplay effect. ---
+
+  // The target account is an operator, and an operator cannot be branded (400).
+  'cheater_mark.admin_target': { params: [] },
+  // The audited reason was absent or blank on either arm (400).
+  'cheater_mark.reason_required': { params: [] },
+  // The played-second budget did not normalize to a positive number (400).
+  'cheater_mark.invalid_duration': { params: [] },
+  // A lift was asked for on an account that is not wearing the tag (409).
+  'cheater_mark.not_marked': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

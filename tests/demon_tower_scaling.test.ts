@@ -1,11 +1,10 @@
 // The Demon Tower's design promise is "ten floors, each more impossible than the
 // last". That promise is testable, and this file is where it is enforced: every
-// difficulty axis must STRICTLY increase floor over floor, the summit must clear
-// the existing top rung of the rift ladder (heroic S), and the arena must
-// tighten as you climb. A future tuning pass that flattens a step fails here.
+// difficulty axis must STRICTLY increase floor over floor, the authored tower
+// anchors must remain stable, and the arena must tighten as you climb. A future
+// tuning pass that flattens or accidentally inherits a rift-rank retune fails here.
 
 import { describe, expect, it } from 'vitest';
-import { RIFT_HEROIC_TUNING } from '../src/sim/rift/ranks';
 import {
   clampTowerFloorIndex,
   DEMON_TOWER_FLOOR_COUNT,
@@ -45,12 +44,12 @@ describe('demon tower scaling: the escalation is real', () => {
     }
   });
 
-  it('summit exceeds heroic S on both health and damage, the previous top rung', () => {
+  it('preserves the authored summit multipliers', () => {
     const summit = demonTowerFloorTuning(DEMON_TOWER_FLOOR_COUNT - 1);
-    const s = RIFT_HEROIC_TUNING.S;
-    expect(s).toBeDefined();
-    expect(summit.healthMultiplier).toBeGreaterThan(s!.healthMultiplier);
-    expect(summit.damageMultiplier).toBeGreaterThan(s!.damageMultiplier);
+    expect(summit.healthMultiplier).toBe(10.6045);
+    expect(summit.damageMultiplier).toBe(4.7854);
+    expect(summit.addDamageMultiplier).toBe(2.3579);
+    expect(summit.armorMultiplier).toBe(1.999);
   });
 
   it('health outruns damage, so the summit is a wall and not a one-shot', () => {
@@ -58,11 +57,10 @@ describe('demon tower scaling: the escalation is real', () => {
     expect(summit.healthMultiplier).toBeGreaterThan(summit.damageMultiplier * 2);
   });
 
-  it('mid-tower (floor 5) has passed A rank', () => {
+  it('preserves the authored mid-tower anchors', () => {
     const mid = demonTowerFloorTuning(4);
-    const a = RIFT_HEROIC_TUNING.A;
-    expect(mid.healthMultiplier).toBeGreaterThan(a!.healthMultiplier);
-    expect(mid.damageMultiplier).toBeGreaterThan(a!.damageMultiplier);
+    expect(mid.healthMultiplier).toBe(2.8561);
+    expect(mid.damageMultiplier).toBe(2.0053);
   });
 
   it('waves and pack size grow but never breach the live-demon cap', () => {

@@ -7,6 +7,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { AbilityDef, Aura, Entity, PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -19,7 +20,9 @@ function harness(sim: Sim): TestSim {
 }
 
 function makeSim(cls: PlayerClass, level = 20, seed = 77): { sim: TestSim; p: Entity } {
-  const sim = harness(new Sim({ seed, playerClass: cls, autoEquip: true }));
+  const sim = harness(
+    new Sim({ seed, playerClass: cls, autoEquip: true, world: EMPTY_TEST_WORLD }),
+  );
   sim.setPlayerLevel(level);
   const p = sim.player;
   p.resource = p.maxResource;
@@ -366,7 +369,20 @@ describe('talent primitive P3: empower next', () => {
     // so the free charge must not be consumed at cast start or the player would
     // pay full price anyway. Regression for the start-consume bug.
     const { sim, p } = makeSim('mage');
-    spawnTarget(sim, p);
+    // A STATIONARY target: a wandering wolf can stroll behind the market
+    // furniture during the cast plus flight, and this test is about the
+    // billing, not about town sight lines.
+    const dummy = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 4,
+    });
+    dummy.maxHp = 50000;
+    dummy.hp = 50000;
+    dummy.hostile = true;
+    sim.addEntity(dummy);
+    p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
+    sim.targetEntity(dummy.id, p.id);
     p.resource = 0;
     p.auras.push(aura('next_cast_free'));
 
@@ -478,6 +494,7 @@ describe('talent primitive P2: cast while moving', () => {
       buffPct: 0,
       castWhileMoving: true,
       damagePushbackImmune: false,
+      ignoreStealthRequirement: false,
       bonusCharges: 0,
       addEffects: [],
     };
@@ -557,6 +574,7 @@ describe('talent primitives P4/P5', () => {
       buffPct: 0,
       castWhileMoving: false,
       damagePushbackImmune: false,
+      ignoreStealthRequirement: false,
       bonusCharges: 0,
       addEffects: [added],
     };

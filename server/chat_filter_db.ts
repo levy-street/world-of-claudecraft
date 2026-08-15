@@ -237,6 +237,30 @@ export async function recordChatViolation(input: {
   );
 }
 
+// Batched retention prune for chat_violations (the retention-sweep primitive,
+// mirrors pruneUnstuckReportsBatch in unstuck_db.ts). The hard-word incident
+// log's only reader is chatModerationForAccount below, already LIMIT-bounded
+// (defaults to 25, capped at 100 rows) per account, so pruning the oldest
+// rows never invalidates a page it can still return. retentionDays <= 0 keeps
+// rows forever (the safe default); the interval floors to one whole day.
+export async function pruneChatViolationsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM chat_violations
+      WHERE id IN (
+        SELECT id FROM chat_violations
+         WHERE created_at < now() - ($1::int * INTERVAL '1 day')
+         ORDER BY created_at ASC, id ASC
+         LIMIT $2)`,
+    [days, Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
 // ---- Admin: per-account chat moderation view + manual actions ---------------
 
 export interface ChatViolationRow {

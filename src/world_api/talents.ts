@@ -13,7 +13,14 @@ export interface IWorldTalents {
   respec(): void;
   setSpec(specId: string | null): void;
   selectTalentRow(level: TalentRowLevel, optionId: string | null): void;
-  saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void;
+  /** `captureGear` stores the worn set on the loadout (src/sim/loadout_gear.ts).
+   *  Opt-in and last, so an existing caller keeps its arity and its behavior. */
+  saveLoadout(
+    name: string,
+    bar: (string | null)[],
+    alloc?: TalentAllocation,
+    captureGear?: boolean,
+  ): void;
   switchLoadout(index: number): void;
   deleteLoadout(index: number): void;
 }

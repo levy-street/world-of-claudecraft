@@ -1,6 +1,20 @@
+import type { RespecPaymentTier } from '../sim/professions/focus';
+
 export type WorldInteractionOutcome = boolean | Promise<boolean>;
 
+/** A stable authored civic interaction point exposed to presentation without
+ * relying on the live entity interest radius. */
+export type CivicServiceKind = 'mailbox' | 'noticeboard';
+
+export interface CivicServicePlacement {
+  readonly kind: CivicServiceKind;
+  readonly x: number;
+  readonly z: number;
+}
+
 export interface IWorldInteraction {
+  /** The civic services that this world actually spawned. */
+  readonly civicServicePlacements: readonly CivicServicePlacement[];
   interact(): void;
   lootCorpse(id: number): WorldInteractionOutcome;
   autoLoot(id: number): void;
@@ -14,8 +28,10 @@ export interface IWorldInteraction {
   // #1143: the caller's persistent town focus allocation (component type ->
   // points spent). Empty when unset.
   townFocus: Record<string, number>;
-  // Sets the persistent town focus allocation. Rejected (out of town,
-  // malformed, over the point budget) server-side; the previous allocation is
+  // Sets the persistent town focus allocation, charged at the #1144 re-spec
+  // cost model's chosen payment tier (professions/focus.ts computeRespecCost).
+  // Rejected (out of town, malformed, over the point budget, or the tier's
+  // coin/material cost unaffordable) server-side; the previous allocation is
   // kept and a toast is shown.
-  setTownFocus(allocation: Record<string, number>): void;
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void;
 }

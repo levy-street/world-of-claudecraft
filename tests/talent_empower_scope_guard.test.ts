@@ -41,9 +41,14 @@ describe('talent empowerNext scoping', () => {
         scan(`${cls} spec ${spec.id} mastery`, procsInEffect(spec.mastery.effect));
       }
     }
-    // The scan must actually cover the proc surface: a refactor that moves the
-    // rows out from under ROW_TREES should redden this, not silently pass.
-    expect(scanned).toBeGreaterThan(20);
+    // Pin the approved v0.29 proc surface exactly (hunter, shaman, priest,
+    // and the rogue row redesign together). A deliberate proc addition or
+    // removal must update this sentinel, while a refactor that drops rows
+    // from ROW_TREES cannot silently weaken the scoping audit.
+    // 7 to 6: the shaman tooltip-clarity pass re-themed sha_r5_concussion from
+    // Fault Line (a next-shock-free empowerNext proc) to Wolfstep (an instant
+    // Shadewolf ability effect), deliberately retiring that proc.
+    expect(scanned).toBe(4);
     expect(offenders).toEqual([]);
   });
 });

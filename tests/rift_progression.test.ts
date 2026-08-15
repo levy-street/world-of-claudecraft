@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { createRiftGearInstance, riftSalvageYield } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
+import { runSalvage } from './helpers/enchant_family_cast';
 
 describe('Rift gear progression', () => {
   it('upgrades, enchants, sockets, equips, and persists one non-fungible drop', () => {
@@ -63,7 +64,7 @@ describe('Rift gear progression', () => {
     gear.instance.rift.upgradeLevel = 2;
     const expected = riftSalvageYield(gear.instance);
     sim.addItemInstance(gear.itemId, gear.instance);
-    sim.salvageItem(gear.itemId);
+    runSalvage(sim, gear.itemId);
     expect(sim.lastSalvageResult).toEqual(
       expect.objectContaining({
         ok: true,
@@ -85,7 +86,7 @@ describe('Rift gear progression', () => {
     // inspect the older upgraded payload and then consume this different copy.
     sim.addItem(gear.itemId, 1);
 
-    sim.salvageItem(gear.itemId);
+    runSalvage(sim, gear.itemId);
 
     expect(sim.lastSalvageResult?.materialItemId).not.toBe(RIFT_ESSENCE_ITEM_ID);
     expect(sim.countItem(RIFT_ESSENCE_ITEM_ID)).toBe(0);

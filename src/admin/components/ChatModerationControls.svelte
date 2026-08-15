@@ -8,8 +8,10 @@
     chatMuteHours,
     liftChatMute,
     type PendingAction,
+    resetChatStrikes,
   } from '../moderation_actions';
   import Badge from './Badge.svelte';
+  import GeneralChatRateLimitControls from './GeneralChatRateLimitControls.svelte';
   import ModerationActionPrompt from './ModerationActionPrompt.svelte';
 
   type Target = Pick<
@@ -20,20 +22,20 @@
     | 'chatMutedUntil'
     | 'chatMuteReason'
     | 'chatStrikes'
+    | 'generalChatRateLimit'
   >;
   type SelectedAction =
     | { kind: 'mute'; hours: number; label: string }
     | { kind: 'mute-custom'; label: string }
-    | { kind: 'lift'; label: string };
+    | { kind: 'lift'; label: string }
+    | { kind: 'reset'; label: string };
 
   let {
     target,
     onSubmit,
-    onReset,
   }: {
     target: Target;
     onSubmit: (pending: PendingAction) => boolean | Promise<boolean>;
-    onReset: () => void | Promise<void>;
   } = $props();
 
   let selected = $state<SelectedAction | null>(null);
@@ -63,6 +65,8 @@
       built = chatMuteCustom(target.id, values.expiry, values.reason);
     } else if (action.kind === 'lift') {
       built = liftChatMute(target.id, values.reason);
+    } else if (action.kind === 'reset') {
+      built = resetChatStrikes(target.id, values.reason);
     } else {
       built = chatMuteHours(target.id, action.hours, values.reason);
     }
@@ -124,8 +128,17 @@
     </button>
   {/if}
   {#if target.chatStrikes > 0}
-    <button onclick={onReset}>{t('chatMod.resetChatStrikes')}</button>
+    <button
+      onclick={() =>
+        (selected = {
+          kind: 'reset',
+          label: t('chatMod.resetChatStrikes'),
+        })}
+    >
+      {t('chatMod.resetChatStrikes')}
+    </button>
   {/if}
+  <GeneralChatRateLimitControls {target} {onSubmit} />
 </section>
 
 {#if selected}
@@ -136,7 +149,9 @@
         ? t('dialog.confirmCustomChatMute')
         : action.kind === 'lift'
           ? t('dialog.confirmChatUnmute')
-          : t('dialog.confirmChatMute')}
+          : action.kind === 'reset'
+            ? t('dialog.confirmResetChatStrikes')
+            : t('dialog.confirmChatMute')}
       rows={rowsFor(action)}
       showExpiry={action.kind === 'mute-custom'}
       onConfirm={confirm}

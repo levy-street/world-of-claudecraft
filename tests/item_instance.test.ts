@@ -528,11 +528,14 @@ describe('identical-payload stacking (Professions 2.0)', () => {
     sim.addItemInstance('wolf_fang', { ...payload, rolled: { ...payload.rolled } }, sim.playerId);
     sim.addItemInstance('wolf_fang', { ...payload, rolled: { ...payload.rolled } }, sim.playerId);
     const [consumed] = sim.removeEnchantableItem('wolf_fang', 1, sim.playerId);
-    expect(consumed).toEqual({ signer: 'Ana', rolled: { masterwork: true, stats: { str: 1 } } });
+    expect(consumed).toEqual({
+      instance: { signer: 'Ana', rolled: { masterwork: true, stats: { str: 1 } } },
+      craftedRecipeId: undefined,
+    });
     // The enchant path mutates the payload it gets back; the surviving stack's
     // shared payload must stay untouched.
-    consumed.enchant = 'enchant_weapon_might';
-    consumed.rolled!.stats!.str = 99;
+    consumed.instance!.enchant = 'enchant_weapon_might';
+    consumed.instance!.rolled!.stats!.str = 99;
     const survivor = sim.meta(sim.playerId)!.inventory.find((s) => s.itemId === 'wolf_fang')!;
     expect(survivor.count).toBe(1);
     expect(survivor.instance).toEqual({

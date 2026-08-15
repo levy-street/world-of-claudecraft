@@ -20,11 +20,18 @@ import {
   normalizeFinderSelection,
 } from '../src/sim/social/dungeon_finder';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const FIVE = { tank: 1, healer: 1, dps: 3 };
 const TEN = { tank: 2, healer: 2, dps: 6 };
 
-const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+// This suite drives player/party/queue state (Dungeon Finder queueing,
+// role assignment, the premade board) through a real multi-player Sim; it
+// never spawns, fights, loots, or otherwise reaches for a camp, npc, or
+// ground object, so the ambient built-in world is unnecessary overhead
+// (subsystem-world pattern, docs/local-gate-perf/baselines.md Phase 9).
+const makeSim = (seed = 42) =>
+  new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
 
 function specIdFor(cls: PlayerClass, role: Role): string {
   const specs = TALENTS[cls]?.specs ?? [];
@@ -168,6 +175,22 @@ describe('finder catalogue metadata', () => {
       expect(a.lockout, a.id).toBe(daily ? 'daily' : 'none');
     }
   });
+
+  it('the heroic Nythraxis raid preview carries Dread Curse; the normal tier does not', () => {
+    // Regression: NYTHRAXIS_RAID_ENCOUNTERS used to be shared between the
+    // normal and heroic FinderActivity entries, so the heroic-only Dread
+    // Curse tank-swap mechanic (src/sim/encounters/nythraxis.ts
+    // updateNythraxisDreadCurse) never appeared in the finder's mechanics
+    // preview. The heroic entry now carries its own encounter array.
+    const normal = finderActivity('nythraxis_boss_arena_normal');
+    const heroic = finderActivity('nythraxis_boss_arena_heroic');
+    expect(normal?.encounters.flatMap((e) => e.mechanics)).not.toContain('dread_curse');
+    expect(heroic?.encounters.flatMap((e) => e.mechanics)).toContain('dread_curse');
+    // Heroic keeps every normal-tier mechanic on top of the addition.
+    const normalMechanics = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
+    const heroicMechanics = heroic?.encounters.flatMap((e) => e.mechanics) ?? [];
+    for (const m of normalMechanics) expect(heroicMechanics).toContain(m);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -195,6 +218,7 @@ describe('compatibleFinderRoles', () => {
     expect(compatibleFinderRoles('warrior', 5, 'tank')).toEqual(['tank']);
     expect(compatibleFinderRoles('warrior', 10, 'tank')).toEqual(['tank']);
     expect(compatibleFinderRoles('druid', 20, 'healer')).toEqual(['healer']);
+    expect(compatibleFinderRoles('druid', 20, 'tank')).toEqual(['tank', 'dps']);
     expect(compatibleFinderRoles('mage', 20, 'dps')).toEqual(['dps']);
   });
 
@@ -891,7 +915,8 @@ describe('premade board', () => {
 // ---------------------------------------------------------------------------
 
 describe('/dev lfg seeding', () => {
-  const makeDevSim = () => new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+  const makeDevSim = () =>
+    new Sim({ seed: 42, playerClass: 'warrior', devCommands: true, world: EMPTY_TEST_WORLD });
 
   it('queue mode spawns the complementary bots so my join pops a proposal', () => {
     const sim = makeDevSim();
@@ -948,7 +973,7 @@ describe('/dev lfg seeding', () => {
     sim.chat('/dev lfg');
     tickAll(sim, 1);
     expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
-    const prod = new Sim({ seed: 42, playerClass: 'warrior' });
+    const prod = new Sim({ seed: 42, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     prod.setPlayerLevel(8);
     prod.setSpec(specIdFor('warrior', 'tank'));
     prod.dungeonFinderSetRoles(['tank']);

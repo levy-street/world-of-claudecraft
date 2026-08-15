@@ -51,6 +51,7 @@ export class MovableFrame {
     btn.type = 'button';
     btn.className = 'tf-move-btn';
     btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
     cfg.frame.appendChild(btn);
     this.btn = btn;
     this.refreshBtn();
@@ -59,6 +60,7 @@ export class MovableFrame {
       ev.stopPropagation();
       this.setUnlocked(!this.unlocked);
     });
+    btn.addEventListener('keydown', (ev) => this.onKeyMove(ev));
 
     // touch-action:none (so a drag is not stolen by browser panning) is scoped to
     // the unlocked state in CSS (.unitframe.tf-unlocked), never applied while
@@ -176,6 +178,31 @@ export class MovableFrame {
     if (!g || g.pointerId !== ev.pointerId) return;
     this.gesture = null;
     document.body.classList.remove(this.cfg.draggingBodyClass);
+    this.persistPos();
+  }
+
+  // Once unlocked, arrow keys provide the same persisted positioning path as a
+  // pointer drag. This keeps the move toggle useful to keyboard-only players;
+  // Shift gives a one-pixel fine adjustment instead of the default ten pixels.
+  private onKeyMove(ev: KeyboardEvent): void {
+    if (!this.unlocked || this.cfg.isMobileLayout()) return;
+    const directions: Partial<Record<string, TargetFramePos>> = {
+      ArrowLeft: { left: -1, top: 0 },
+      ArrowRight: { left: 1, top: 0 },
+      ArrowUp: { left: 0, top: -1 },
+      ArrowDown: { left: 0, top: 1 },
+    };
+    const direction = directions[ev.key];
+    if (!direction) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    this.ensurePos();
+    const step = ev.shiftKey ? 1 : 10;
+    this.pos = {
+      left: (this.pos?.left ?? 0) + direction.left * step,
+      top: (this.pos?.top ?? 0) + direction.top * step,
+    };
+    this.applyPos();
     this.persistPos();
   }
 

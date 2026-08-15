@@ -3,6 +3,8 @@
 // or DOM here so the curves are unit-testable in isolation; the renderer is the
 // thin consumer that maps these scalars onto meshes (see renderer.ts).
 
+import { clamp01 } from './num_clamp';
+
 // Total on-screen lifetime of one marker, in seconds. Short and snappy so it
 // reads as immediate feedback, not a lingering decal.
 export const CLICK_MARKER_LIFETIME = 0.5;
@@ -37,10 +39,6 @@ const HIDDEN: ClickMarkerAnim = {
 function easeOutCubic(t: number): number {
   const u = 1 - t;
   return 1 - u * u * u;
-}
-
-function clamp01(v: number): number {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
 }
 
 // Given how long a marker has been alive, return the scalars that drive it.

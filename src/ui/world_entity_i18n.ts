@@ -101,6 +101,12 @@ const MOB_IDS = [
   'deepfen_spearjaw',
   'mirefen_widowling',
   'spider_egg_sac',
+  // Quest-dedupe pass (zones 1 to 3): the Broodmother clutch and the new elites.
+  'spider_egg',
+  'widow_hatchling',
+  'drowned_warlord',
+  'brakka_wallbreaker',
+  'threnos_first_voice',
   'grave_silt_bulwark',
   'sump_troll_devourer',
   'choir_thrall',
@@ -166,6 +172,10 @@ const MOB_IDS = [
   'ashbone_warcaller',
   'dune_troll',
   'cindraleth_maw_matriarch',
+  'dragonkin_egg',
+  'dragonkin_whelp',
+  'dragonkin_broodguard',
+  'drakemaw_broodlord',
   'gilded_stag',
   'gloam_fox',
   'orchard_treant',
@@ -194,10 +204,13 @@ const MOB_IDS = [
   'topiary_stag',
   'topiary_wolf',
   'hedge_gnome',
+  'hedge_knight',
   'the_topiary_bull',
   'moor_ram',
   'gale_wisp',
   'shoal_scuttler',
+  'downs_bandit',
+  'wreck_thief',
   'the_wreck_warden',
   'drowned_deckhand',
   'riftspawn',
@@ -210,8 +223,7 @@ const MOB_IDS = [
   'rift_pact_acolyte',
   'rift_boss_ritualist',
   'rift_boss_pitlord',
-  // The Demon Tower (src/sim/content/rift/tower_mobs.ts): the eight wave demons
-  // plus the two bosses.
+  // The Demon Tower roster (src/sim/content/rift/tower_mobs.ts).
   'tower_imp',
   'tower_hellhound',
   'tower_pact_reaver',
@@ -232,15 +244,7 @@ const MOB_IDS = [
   'tower_void_sentinel',
   'tower_boss_flesh_shaper',
   'tower_boss_ash_tyrant',
-  // The Orkadia orc war-camp dungeon (src/sim/content/orkadia.ts).
-  'orkadia_grunt',
-  'orkadia_marauder',
-  'orkadia_axethrower',
-  'orkadia_fel_shaman',
-  'orkadia_beast_handler',
-  'orkadia_siege_brute',
-  'orkadia_banner_captain',
-  'orkadia_warlord',
+  // The Wildheart Basin jungle dungeon (src/sim/content/wildheart.ts).
   'wildheart_stalker',
   'wildheart_ravager',
   'wildheart_hexcaller',
@@ -270,6 +274,7 @@ const NPC_IDS = [
   'armorer_hode',
   'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'fury', // Honor Quartermaster and WARFARE vendor (Eastbrook, zone 1)
+  'warmarshal_draven_kole', // Master of the Warfare Stores, the WARFARE vendor (Highwatch, zone 3)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
@@ -368,6 +373,7 @@ const QUEST_IDS = [
   'q_hollow',
   'q_sexton',
   'q_gravecallers_trail',
+  'q_divine_tome',
   'q_bandits',
   'q_ringleader',
   'q_fenbridge_muster',
@@ -383,6 +389,7 @@ const QUEST_IDS = [
   'q_drowned',
   'q_drowned_censers',
   'q_no_rest',
+  'q_rite_of_redemption',
   'q_trolls',
   'q_troll_fetishes',
   'q_grubjaw',
@@ -583,8 +590,8 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
-  'orkadia',
   'wildheart_basin',
+  'the_last_keep',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter
@@ -677,6 +684,7 @@ type WorldEntityTranslations = {
     delveRiteShrineReedInteract: string;
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
+    noticeboardName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -798,6 +806,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineReedInteract: 'Reed Shrine: Press F to touch it',
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
+      noticeboardName: 'Notice Board',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

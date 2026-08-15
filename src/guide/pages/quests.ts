@@ -1,15 +1,17 @@
-// Quests: how the quest loop works, the kinds of objective you meet, and a spoiler-safe
-// telling of the main-story saga as a trail north (no endings, no boss names), plus the
-// optional side-chains.
+// Quests: how the quest loop works, why an NPC may have nothing for you yet, the kinds of
+// objective you meet (including escort runs), the Card Master's Card Duel as the one NPC
+// errand that is not a quest at all, and a spoiler-safe telling of the main-story saga as a
+// trail north (no endings, no boss names), plus the optional side-chains.
 
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
-import { lead, loreBeat, related } from './ui';
+import { lead, loreBeat, related, sectionPair } from './ui';
 
 const STEPS = [
   ['guide.questsPage.acceptTitle', 'guide.questsPage.acceptBody'],
+  ['guide.questsPage.availableTitle', 'guide.questsPage.availableBody'],
   ['guide.questsPage.objectivesTitle', 'guide.questsPage.objectivesBody'],
   ['guide.questsPage.turninTitle', 'guide.questsPage.turninBody'],
   ['guide.questsPage.partyTitle', 'guide.questsPage.partyBody'],
@@ -20,6 +22,7 @@ const TYPES = [
   ['guide.questsPage.typeSlayTitle', 'guide.questsPage.typeSlayBody'],
   ['guide.questsPage.typeGatherTitle', 'guide.questsPage.typeGatherBody'],
   ['guide.questsPage.typeInteractTitle', 'guide.questsPage.typeInteractBody'],
+  ['guide.questsPage.typeEscortTitle', 'guide.questsPage.typeEscortBody'],
   ['guide.questsPage.typeMusterTitle', 'guide.questsPage.typeMusterBody'],
   ['guide.questsPage.typeGroupTitle', 'guide.questsPage.typeGroupBody'],
 ] as const;
@@ -59,6 +62,8 @@ export const quests: GuidePage = {
           <p>${esc(t('guide.questsPage.typesBody'))}</p>
           <div class="guide-beat-grid">${types}</div>
         </section>
+
+        ${sectionPair('guide.questsPage.cardMasterTitle', 'guide.questsPage.cardMasterBody')}
 
         <section class="guide-block">
           <h2>${esc(t('guide.questsPage.storyTitle'))}</h2>

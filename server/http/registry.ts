@@ -22,21 +22,27 @@
 // loader.
 
 import { routes as accountRoutes } from '../account';
+import { routes as adSpendRoutes } from '../ad_spend';
 import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
 import { routes as authRoutes } from '../auth_routes';
+import { routes as battlegroundRoutes } from '../battleground';
 import { routes as characterRoutes } from '../characters';
 import { routes as claudiumRoutes } from '../claudium';
 import { routes as dailyRewardRoutes } from '../daily_rewards';
 import { routes as deedsRoutes } from '../deeds';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
 import { routes as discordRoutes } from '../discord';
+import { routes as epicRoutes } from '../epic';
 import { routes as githubRoutes } from '../github';
 import { routes as internalRoutes } from '../internal';
 import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
 import { routes as oauthRoutes } from '../oauth';
+import { routes as otaUpdatesRoutes } from '../ota_updates';
+import { routes as reliquaryRoutes } from '../reliquary';
 import { routes as reportsRoutes } from '../reports';
+import { routes as seekerEntitlementRoutes } from '../seeker_entitlement';
 import { routes as steamRoutes } from '../steam';
 import { routes as userAssetsRoutes } from '../user_assets_routes';
 import { routes as walletRoutes } from '../wallet';
@@ -120,6 +126,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...accountRoutes,
   ...walletRoutes,
   ...reportsRoutes,
+  ...seekerEntitlementRoutes,
   ...discordRoutes,
   ...githubRoutes,
   ...desktopLoginRoutes,
@@ -132,6 +139,11 @@ export const apiRoutes: readonly RouteDef[] = [
   ...internalRoutes,
   ...deedsRoutes,
   ...steamRoutes,
+  ...battlegroundRoutes,
+  ...epicRoutes,
+  ...otaUpdatesRoutes,
+  ...reliquaryRoutes,
+  ...adSpendRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];
 

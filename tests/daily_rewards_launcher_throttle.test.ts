@@ -33,6 +33,8 @@ describe('Daily Rewards launcher throttle wiring', () => {
     expect(launcherBody).not.toContain('60_000');
     expect(launcherBody).not.toContain('300_000');
     expect(hudSource).toContain("from './daily_rewards_launcher_core'");
+    expect(launcherBody).toContain('this.mobileDailyRewardsButtonEl');
+    expect(launcherBody).not.toContain('if (!this.showDailyRewardsChestButton()) return');
     // The launcher-side stamp is what makes the closed-idle poll actually
     // slow: without it the core predicate compares against a stamp only
     // onStatus refreshes, and an idle-closed client fetches every slowHud
