@@ -165,6 +165,18 @@ describe('demon tower scene core', () => {
     expect(glow, 'high-tier lava glow').toBeDefined();
     expect(glow?.material.color.getHex()).toBe(0x5f3425);
     expect(glow?.position.y).toBeLessThanOrEqual(0.016);
+    glow?.geometry.computeBoundingBox();
+    const bounds = glow?.geometry.boundingBox;
+    const glowRadiusX = bounds ? ((bounds.max.x - bounds.min.x) * (glow?.scale.x ?? 0)) / 2 : 0;
+    const glowRadiusZ = bounds ? ((bounds.max.z - bounds.min.z) * (glow?.scale.z ?? 0)) / 2 : 0;
+    expect(glowRadiusX, 'lava glow follows the narrow hazard axis').toBeCloseTo(
+      (floor.hazards[0].rx ?? floor.hazards[0].r) * 1.15,
+      2,
+    );
+    expect(glowRadiusZ, 'lava glow follows the long hazard axis').toBeCloseTo(
+      (floor.hazards[0].rz ?? floor.hazards[0].r) * 1.15,
+      2,
+    );
   });
 
   it('gives each floor a unique backdrop, palette and ring grammar', () => {

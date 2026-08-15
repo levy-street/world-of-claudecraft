@@ -77,6 +77,8 @@ const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
 const DUNGEON_LIGHT_Y = 6.4;
 const DUNGEON_LIGHT_INTENSITY = 46;
 const DUNGEON_LIGHT_DISTANCE = 34;
+const FLOOR_GLOW_DECAL_RADIUS = 6.6;
+const HAZARD_GLOW_OVERSCAN = 1.15;
 
 const MODULE_SCALE = 2; // KayKit walls are 4u tall/long -> 8u at our room scale
 const FLOOR_CELL = 4; // kit floor tiles are 4x4 at MODULE_SCALE 1
@@ -1122,7 +1124,21 @@ export class DungeonInteriors {
       rim.renderOrder = 2;
       rim.userData.riftHazard = 'rim';
       group.add(rim);
-      this.addTorchGlow(group, h.x, h.z, pal.glow, pal.glowY + y0, Math.max(rx, rz) * 0.6);
+      const glow = this.addTorchGlow(
+        group,
+        h.x,
+        h.z,
+        pal.glow,
+        pal.glowY + y0,
+        style === 'tower_lava' ? 1 : Math.max(rx, rz) * 0.6,
+      );
+      if (glow && style === 'tower_lava') {
+        glow.scale.set(
+          (rx * HAZARD_GLOW_OVERSCAN) / FLOOR_GLOW_DECAL_RADIUS,
+          1,
+          (rz * HAZARD_GLOW_OVERSCAN) / FLOOR_GLOW_DECAL_RADIUS,
+        );
+      }
     }
   }
 
@@ -2202,9 +2218,11 @@ export class DungeonInteriors {
     colorHex: number,
     y = 0.07,
     scale = 1,
-  ): void {
-    if (this.lowGfx) return;
-    this.glowDecalGeo ??= new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2);
+  ): THREE.Mesh | null {
+    if (this.lowGfx) return null;
+    this.glowDecalGeo ??= new THREE.CircleGeometry(FLOOR_GLOW_DECAL_RADIUS, 20).rotateX(
+      -Math.PI / 2,
+    );
     this.glowDecalTex ??= radialGlowTexture();
     let mat = this.glowDecalMats.get(colorHex);
     if (!mat) {
@@ -2223,6 +2241,7 @@ export class DungeonInteriors {
     glow.scale.setScalar(scale);
     glow.renderOrder = 1; // after the floor it floats over
     group.add(glow);
+    return glow;
   }
 
   /** A real, budgeted light plus its baked floor pool for the authored citadel.
