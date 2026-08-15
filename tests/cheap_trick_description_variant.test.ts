@@ -9,7 +9,7 @@
 // src/sim/data.ts, stay untouched (no portrait re-bless), and a normal rogue's
 // description is unchanged.
 
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { ABILITIES } from '../src/sim/data';
@@ -19,11 +19,26 @@ import { ensureLocaleLoaded, isPendingTranslation, setLanguage } from '../src/ui
 
 const VARIANT_KEY = 'entities.abilities.cheap_shot.descriptionNoStealth';
 
-// A locale that ships the variant (M16 fills it in this change) and one that does
-// not yet (the release-time fill pass owns it), so both arms of the fallback are
-// driven by REAL catalog state rather than a stubbed table.
+// A locale that ships the variant, and one standing in for a locale that has not
+// translated it yet.
 const FILLED_LOCALE = 'ja_JP';
 const PENDING_LOCALE = 'de_DE';
+
+// The pending arm cannot ride real catalog state. A release fill drives the
+// registry to zero pending BY DESIGN, so any locale pinned here as "not yet
+// translated" flips the moment that fill lands (de_DE did, in the v0.38.0 fill),
+// and the fallback this suite exists for would then go unproven for good. Pin the
+// pending set itself instead: PENDING_SETS is built once, at i18n module load,
+// from this generated module, so a synthetic entry drives isPendingTranslation
+// (and through it tEntityOptional) down the exact production path. Only
+// PENDING_LOCALE carries the variant key, so the FILLED_LOCALE arm still reads
+// real catalog state.
+vi.mock('../src/ui/i18n.resolved.generated/pending', () => ({
+  pending: { de_DE: ['entities.abilities.cheap_shot.descriptionNoStealth'] } as Record<
+    string,
+    readonly string[]
+  >,
+}));
 
 /** Gut Punch as the real talent bake produces it: the row-11 option is selected
  *  through the live allocation, never a hand-built modifier bag. */
