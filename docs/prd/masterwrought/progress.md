@@ -425,5 +425,7 @@ never future-PR items, per the delivery contract in `state.md`).
   falls back to English in every locale), and three release-owned notes
   recorded (Savage Mending overlay reword staleness, graphics-plan three
   target, the shard-weight coverage ratchet at 96.39 percent). Both ruling
-  reds hold their exact recorded shape. Full record: state.md "Phase 10 QA
-  release sync, second pass".
+  reds hold their exact recorded shape. Gate at the sync tip: full suite
+  2838 files / 39546 passed with ONLY the two ruling reds failing, browser
+  129 passed, typecheck and every build green, tree clean. Full record:
+  state.md "Phase 10 QA release sync, second pass".

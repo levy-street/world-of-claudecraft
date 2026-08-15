@@ -3690,5 +3690,17 @@ find the branch current.
   rogue band: assassination 170.383 under the 180 floor, byte-identical to
   the recorded 170.38, combat/subtlety unchanged) and NO third red; the
   druid/threat/arena changes did not move the rogue fight numbers.
-- GATE at the sync tip: recorded in the progress row and the session
-  report (gate_select on the committed tree, GATE_MAX_WORKERS=5).
+- GATE at the sync tip 876024395f (gate_select on the committed tree,
+  GATE_MAX_WORKERS=5, mode=full because the merge is a broad change): the
+  artifact steps (i18n + wiki + sfx regen and freshness, sfx and media
+  manifest regen, trackedness, freshness), the malware scan, and biome on
+  changed files all PASSED; the full vitest step ran to completion, 2838
+  files, 39546 passed, 2 failed, and BOTH failures are the two deliberate
+  ruling reds above (bags sunspun_haversack, rogue assassination 170.383),
+  no third red and no contention timeouts even beside a concurrent
+  session's 8-worker gate; gate_select stops at its first red step, so the
+  remaining three steps were run by hand on the same tip: browser
+  regressions 19 files / 129 passed, typecheck + env/server/bot builds 5/5
+  tasks green, client bundle build green; the tree stayed clean after
+  every step. Verdict: PASS apart from the two RULING-WANTED reds, the
+  same shape as the first sync.
