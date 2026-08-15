@@ -11,3 +11,8 @@ src/ui/i18n.catalog/translation_keys.generated.ts linguist-generated
 # Windows batch scripts keep their CRLF endings: exempt from text conversion so an
 # LF-normalized checkout (core.autocrlf=input) neither flags nor rewrites them.
 *.bat -text
+
+# Radiance HDR files are binary even though their header contains newlines.
+# Without this rule, core.autocrlf mutates those bytes on Windows and makes the
+# generated media-manifest hashes disagree with Linux CI.
+*.hdr -text
