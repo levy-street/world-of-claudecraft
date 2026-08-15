@@ -301,7 +301,7 @@ describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
 
     // Kit integrity: deathZoneStrike is the S-rank capstone at index 3.
     expect(
-      MOBS['rift_boss_necro'].rankMechanics?.indexOf('deathZoneStrike'),
+      MOBS.rift_boss_necro.rankMechanics?.indexOf('deathZoneStrike'),
       'deathZoneStrike is at index 3',
     ).toBe(3);
   });

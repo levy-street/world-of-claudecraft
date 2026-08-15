@@ -5564,14 +5564,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Tower Initiate",
     "category": "dungeon",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_demon_tower_initiate.webp"
   },
   {
     "id": "dgn_demon_tower_ascendant",
     "name": "Tower Ascendant",
     "category": "dungeon",
     "renown": 25,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_demon_tower_ascendant.webp"
   },
   {
     "id": "dgn_demon_tower_unbound",
@@ -5579,7 +5581,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 50,
     "feat": false,
-    "rewardTitle": "the Tower Unbound"
+    "rewardTitle": "the Tower Unbound",
+    "crest": "/ui/deeds/dgn_demon_tower_unbound.webp"
   }
 ];
 
@@ -6789,6 +6792,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Light of the Sanctum"
+      },
+      {
+        "kind": "title",
+        "name": "the Tower Unbound"
       }
     ]
   },

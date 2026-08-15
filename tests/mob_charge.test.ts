@@ -162,9 +162,7 @@ describe('charge template coverage (data contract)', () => {
       .filter((t) => t.charge)
       .map((t) => t.id)
       .sort();
-    expect(allWithCharge).toEqual(
-      [...SHARED_CHARGE_TEMPLATE_IDS, 'tower_boss_ash_tyrant'].sort(),
-    );
+    expect(allWithCharge).toEqual([...SHARED_CHARGE_TEMPLATE_IDS, 'tower_boss_ash_tyrant'].sort());
     for (const id of NO_CHARGE_TEMPLATE_IDS) {
       expect(MOBS[id], `${id} exists`).toBeTruthy();
       expect(MOBS[id]?.charge, `${id} must not charge`).toBeUndefined();
