@@ -12,6 +12,21 @@ sprouts through the static-marker family, NOT the semantics core; the linkdead
 transient-notice loss and the unsharded sweep are recorded acceptances to
 verify as ledgered, not re-litigate blind.
 
+SYNC NOTE (2026-08-15): the SIXTEENTH absorb (release/v0.39.0 tip d2d1a8ad5c,
+merge eaaf07f658 on fix/farming-sync-v0.39.0, merged --no-ff into
+feature/farming-plan) landed AFTER the Phase 8 merge 0f4bd59145 and is
+EXCLUDED from this QA's diff; it carries its own completed audit (4-lane
+release-merge-audit, cross-platform-sync, qa-checklist, all clean; record in
+progress.md). Numbers this QA should use over the starter prompt's:
+release absorbed through v0.39.0 d2d1a8ad5c (Three.js is now 0.185.1);
+monolith headroom is hud.ts 0, renderer.ts 0, sim.ts 1, src/main.ts 2,
+server/game.ts 104, so ANY QA fix touching hud.ts or renderer.ts must be
+extraction-first from the outset; count baselines unchanged (202/215,
+IWorld 329 = 88 + 241, delta keys 87, golden 50a2e54c). Ignore the "GATE
+EXIT marker" phrase below: no such marker exists; judge gates by
+"[gate:select] FAIL at" / "[gate] FAIL" / "[gate:select] PASS: all N steps
+green" alone.
+
 Independent verification of Phase 8 in a fresh session. The emphasis is honesty and
 restraint: the countdown must be correct under a skewed client clock, the login notice
 must fire exactly once for a ready crop on a fresh session, the online sweep must emit

@@ -4,9 +4,44 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 7 QA done 2026-08-14 (PASS-WITH-FOLLOWUPS, merged
---no-ff from fix/farming-phase-07-qa; next is Phase 8, Harvest Journal
-and ready notices, docs/farming/phase-08-harvest-journal.md); the
+Current phase: Phase 8 done 2026-08-14 (merged --no-ff as 0f4bd59145 from
+fix/farming-phase-08-harvest-journal; next is Phase 8 QA,
+docs/farming/phase-08-qa.md). The SIXTEENTH absorb ran 2026-08-15 as its
+own mid-phase sync BEFORE Phase 8 QA (the D22 minor-version rule; branch
+fix/farming-sync-v0.39.0, merge eaaf07f658 of release/v0.39.0 tip
+d2d1a8ad5c: 320 commits, 555 files, 74-file farming intersection;
+headline systems the Three.js 0.165.0 to 0.185.1 bump with the renamed
+compileAsync patch, the desktop-client-update program PR 3406, the
+market-house redesign PR 3376, the gate_select merged-leg rework PR 3394
+with FAIL/PASS markers unchanged, the CI shard rebalance to
+measured-weight LPT, arena loss honor, and the Grix respawn window plus
+cat-form swing normalization with release-side golden re-records and two
+new parity scenarios appended AFTER farming_session). Two heal commits:
+1f97379ae6 (the lockfile-seal rule fired again: byte-level restamp of
+both sourceFingerprint stamp sites in all fifteen farm GLBs, sizes held,
+sha pins re-recorded, render assets manifest regen; plus the Eastbrook
+polish re-mint, both parents having moved renderer.ts) and ebf3104859
+(fingerprint-only portrait manifest re-mint per the (al) checklist,
+registry row re-pointed). Count baselines all HELD with zero movement
+(commands 202/215, IWorld 329 = 88 data + 241 method, delta keys 87,
+farming golden 50a2e54c unchanged, ZERO golden moves this sync).
+MONOLITH headroom after the absorb: hud.ts 0 lines (19433/19433),
+renderer.ts 0 (13725/13725, the exact merged count between the parent
+pins 13700 and 13754), sim.ts 1 (12659/12660), src/main.ts 2
+(11488/11490), server/game.ts 104 (10796/10900): hud and renderer sit AT
+their ceilings, so ANY line growth reds the ratchet and extraction-first
+is mandatory from Phase 8 QA onward. Release-arm structure note: the
+release split Hud.update at a paint cut ("if (!paint) return;"); code
+below it runs only on painted frames, so farming timers, audio, and
+state machines belong ABOVE the cut (handleFarmEvent rides handleEvents,
+verified unaffected). Reviews: 4-lane release-merge-audit zero BLOCKING,
+cross-platform-sync SIGNED-OFF (patch-id-verbatim on every
+parity-critical file), qa-checklist READY. Two known contention flakes
+recorded, both proven green standalone whole-file and filtered:
+professions_farming ("plants, spends the seed") and
+language_fanout_registry (the relocalize caller arm). Prior: Phase 7 QA
+done 2026-08-14 (PASS-WITH-FOLLOWUPS, merged --no-ff from
+fix/farming-phase-07-qa); the
 FOURTEENTH absorb opened the QA round (merge
 20e9b6a987 of tip 51aa4eab13: 98 commits, 225 files, roughly 60-file
 farming intersection, no lockfile move; the only conflicts were the
@@ -53,12 +88,15 @@ in Phase 8 for the appended ready-notice beat (isolated commit; md5 is now
 (v036 artwork overhaul, rift boss parity scenario, Evergarden east-edge
 terrain); the ninth 6e1ead1fea opened Phase 5 QA; the eighth 5819c005a7
 opened Phase 5 with the lockfile-driven seal re-mint. NOTE for any farming
-GLB work (Phase 7 props, Phase 13 art): fingerprints must be minted against
-the pnpm-lock.yaml the ELEVENTH absorb brought (the v0.38.0 lockfile), or
-the asset suites red; the eleventh absorb itself needed NO seal re-mint
-because the merge took the release's lockfile byte-identical and the release
-delta carried its own coherent re-minted seals (all 8 suites green,
-verified).
+GLB work (Phase 13 art): fingerprints must be minted against the
+pnpm-lock.yaml the SIXTEENTH absorb brought (the v0.39.0 lockfile carrying
+the three-0.185.1 bump; re-pointed at the sixteenth absorb from the
+eleventh's v0.38.0 lockfile, which that absorb had left operative), or the
+asset suites red. History: the eleventh absorb needed NO seal re-mint (the
+merge took the release's lockfile byte-identical and the release delta
+carried its own coherent seals); the fifteenth and sixteenth both moved the
+lockfile and both fired the branch-only farm-props re-mint (the release can
+never re-mint a branch-only seal).
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
 
@@ -490,7 +528,7 @@ question does not arise (farming has no station).
   a mobile screenshot script against a phone viewport.
 - Phase end: `node scripts/gate_select.mjs` (the fast pre-merge gate);
   `npm run gate` for the deep check. Known environmental red: the armory browser
-  pixel test; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code, and PR CI
+  pixel test; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL at", the full gate "[gate] FAIL"; the pass line is "[gate:select] PASS: all N steps green"), never trust a piped exit code, and PR CI
   is the arbiter. Since the fourteenth absorb (PR 3386) the gate carries a
   MANIFEST-FRESHNESS family: it regenerates and diffs
   src/game/sfx_manifest.generated.ts, src/guide/content.generated.ts, and
@@ -1095,6 +1133,24 @@ question does not arise (farming has no station).
   tests/suite_duration_budget.test.ts (a declared per-suite duration
   ratchet); any future farming phase adding a slow suite declares its
   budget there in the same change.
+  SIXTEENTH ABSORB (2026-08-15, the v0.39.0 sync): the checklist held
+  exactly as written AGAIN: the portrait manifest re-minted
+  fingerprint-only (rendererFingerprint plus bundle digest moved with the
+  r185 renderer, adopted receipt-free by the bookkeeping path), the
+  accepted-art registry row re-pointed, and item_art_audit --verify-only
+  reported machineChecksPassed true with no verdict refresh needed. The
+  farm-props lockfile-seal rule fired a second time and the 8420f0bd8d
+  recipe held with one SHARPENING worth keeping: the shipping GLBs carry
+  the sourceFingerprint stamp TWICE (asset.extras and the document-root
+  extras), and a NodeIO read-write cycle re-encodes the meshopt payloads
+  (the write throws without a registered encoder and would move bytes
+  with one), so the size-preserving restamp is a raw byte-level
+  replacement of BOTH 64-hex occurrences per file, asserted at count two
+  and unchanged length. A NOTE from the sync's premise lane, not
+  release-caused: several phase-file Close lines cite a "GATE EXIT"
+  marker that has never existed in the scripts; judge gates by the
+  FAIL/PASS lines alone (the validation matrix row above was corrected at
+  this sync; phase-file sweeps are left to their own sessions).
   (am) The farming_session parity golden was deliberately re-minted at the
   v0.38.0 sync (commit ddb718b95e), the ONE golden move of the phase and the
   mirror of D23's own recipe: the release samples the new Reliquary block
@@ -1124,16 +1180,22 @@ question does not arise (farming has no station).
   farming change at all; healed by extraction a3b5ea431b: both
   HEAVY_SELF policy sets moved whole to server/heavy_self.ts and the
   castDisplayName mapper with its rift key table to
-  src/ui/cast_display_name.ts). Post-heal headroom 2026-08-14: hud.ts
-  31 lines (19459/19490), server/game.ts 118 (10782/10900), sim.ts 15
-  (12645/12660), renderer.ts 21 (13679/13700). Every future phase
-  touching a ratcheted coordinator works extraction-first: land the new
-  logic as a sibling module from the start.
+  src/ui/cast_display_name.ts). Post-heal headroom 2026-08-14 was hud.ts
+  31 lines, server/game.ts 118, sim.ts 15, renderer.ts 21; SUPERSEDED at
+  the SIXTEENTH absorb (2026-08-15, the v0.39.0 sync): hud.ts 0
+  (19433/19433), renderer.ts 0 (13725/13725), sim.ts 1 (12659/12660),
+  src/main.ts 2 (11488/11490), server/game.ts 104 (10796/10900). hud.ts
+  and renderer.ts now sit AT exact-count ceilings (the release re-pinned
+  hud at its own merged count; the absorb pinned renderer at the merged
+  count per the ratchet merge rule), so there is NO margin: a single
+  added line in either file reds tests/monolith_budget.test.ts. Every
+  future phase touching a ratcheted coordinator works extraction-first,
+  and plans the extraction BEFORE the phase starts, not during it.
   Ceiling raises stay a maintainer decision. The ceilings were deliberately
   NOT lowered after these extractions (the root CLAUDE.md lower-after-
-  extraction rule): the values are the release's own mints and the
-  extractions land just under them, so lowering to exact-current would fight
-  the table's stated authoring style (current size plus margin) and any
+  extraction rule): the "current size plus margin" authoring-style
+  rationale now applies only to sim.ts, main.ts, and the server files;
+  hud.ts and renderer.ts are exact-count pins with zero margin, and any
   re-pin is the maintainer's call at feature review; the QA reviewer
   concurred. WATCH ITEM: the snapshots delta-key scrape's source list is
   now a hand-maintained two-file constant (game.ts +

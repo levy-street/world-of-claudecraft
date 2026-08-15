@@ -1565,6 +1565,50 @@ after-map-pins-desktop.png and after-map-pins-mobile.png (the zone map),
 and before-professions-entry-desktop.png to
 after-professions-entry-desktop.png (the entry button).
 
+### Phase 8 QA pre-flight: the v0.39.0 release sync (sixteenth absorb)
+Ran 2026-08-15 as its own mid-phase per the D22 minor-version rule, BEFORE
+Phase 8 QA (user instruction: sync only, QA re-runs in a fresh session).
+Branch fix/farming-sync-v0.39.0 off feature/farming-plan; merge eaaf07f658
+absorbed origin/release/v0.39.0 tip d2d1a8ad5c (320 commits, 555 files,
+74-file farming intersection; release/v0.38.0 is fully contained in v0.39.0).
+Headline systems: Three.js 0.165.0 to 0.185.1 (repo compileAsync patch
+renamed and carried; farming render files verified lookAt-free and
+version-defensive; farm impact bounded to cosmetic warm-timing), the
+desktop-client-update program (PR 3406), the market-house redesign (PR 3376),
+the gate_select merged-leg rework (PR 3394; FAIL/PASS markers unchanged; the
+full-suite fallback still fires for this branch via the tests/helpers/
+trigger), the CI shard rebalance to measured-weight LPT (new farming suites
+ride the neutral fallback until scripts/ci_shard_weights_harvest.mjs re-runs;
+unreachable while D22 keeps farming off CI, deferred to go-public), arena
+loss honor, Grix respawn window, and cat-form swing normalization (two new
+parity scenarios appended after farming_session; release-side goldens
+re-recorded upstream). Nine conflicts resolved by doctrine: renderer.ts
+(release encounterPrewarm import kept, delve-kit import dropped to the
+branch's delve_interior_scheduler extraction), pr_shot_targets.mjs (both
+appended target blocks whole), monolith_budget (renderer ceiling = exact
+merged count 13725 between parent pins 13700/13754), the four Eastbrook
+polish evidence JSONs plus both pin suites (release side taken, then
+re-minted through remint_polish_provenance.mjs on the merged tree). Heals:
+1f97379ae6 (farm-props seal: byte-level restamp of both stamp sites in all
+15 GLBs, sizes held, sha pins re-recorded, assets manifest regen; Eastbrook
+literals re-pinned), ebf3104859 (portrait manifest fingerprint-only re-mint,
+registry re-pointed). Validation on the merged tree: tsc green; full parity
+216 passed with farming_session golden 50a2e54c UNCHANGED (zero golden
+moves); world_api_parity/snapshots/command_schema/monolith green with all
+count baselines held (202/215, 329 = 88 + 241, delta keys 87); the farming
+battery green; i18n:gen and wiki:content byte-identical; ci:changed exit 0;
+all seal suites green; Three contract suites green. Reviews: 4-lane
+release-merge-audit ZERO BLOCKING (overlaps CLEAN with line-set proof;
+db-mock NOTE is release-authored debt; two premise SHOULD-FIXes corrected in
+state.md this sync), cross-platform-sync SIGNED-OFF (patch-id-verbatim on
+every parity-critical file; scenarios.ts a true union with no shared mutable
+fixture state), qa-checklist READY (0 FAIL; the two SHOULD-FIXes are the
+zero-headroom warning, ledgered at (an), and the shard-weight deferral
+above). Known contention flakes proven green standalone (whole-file and
+filtered): professions_farming "plants, spends the seed" and
+language_fanout_registry's relocalize-caller arm. Gate record: see the sync
+close-out in the Notes below the Phase 8 record.
+
 ### Phase 9
 (not started)
 
