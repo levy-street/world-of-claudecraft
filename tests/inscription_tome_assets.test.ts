@@ -19,11 +19,12 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 // tests/held_weapon_models.test.ts.
 
 const REPO_ROOT = path.join(__dirname, '..');
-// Re-pinned for the phase 07 merge of release/v0.37.0: the release bumped the
-// three@0.165.0 patch hash in pnpm-lock.yaml, a pinned input of this family's
-// source fingerprint, so the extras stamps and hashes were re-minted via
-// scripts/assets/remint_lockfile_fingerprints.mjs. Geometry is unchanged
-// (bytes, triangles, and bounds pins did not move).
+// pnpm-lock.yaml is a pinned input of this family's source fingerprint, so
+// every release lockfile bump re-mints the extras stamps and hashes via
+// scripts/assets/remint_lockfile_fingerprints.mjs with the geometry unchanged
+// (bytes, triangles, and bounds pins never move): first for the v0.37.0
+// three@0.165.0 patch-hash bump, then v0.38.0, and most recently for the
+// v0.39.0 merge's Three.js r165 to r185 bump (patches/three@0.185.1.patch).
 const SOURCE_FINGERPRINT = 'deb1daf1a08a07bc17a8565ad376e9865b0274ad4a671d2fa62d55f9571ad519';
 
 interface TomePin {

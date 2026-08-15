@@ -224,8 +224,10 @@ describe('nythraxis hitch bench helpers', () => {
     expect(layout).toContain(
       `entry: { x: ${NYTHRAXIS_ARENA_ENTRY_LOCAL.x}, z: ${NYTHRAXIS_ARENA_ENTRY_LOCAL.z} }`,
     );
-    const server = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
-    expect(server).toContain(`const INTEREST_RADIUS = ${MOB_INTEREST_RADIUS}`);
+    // The radius lives in the interest-policy leaf the broadcast pass consumes
+    // (server/interest_policy.ts), so the bench script's copy is pinned there.
+    const policy = readFileSync(new URL('../server/interest_policy.ts', import.meta.url), 'utf8');
+    expect(policy).toContain(`const INTEREST_RADIUS = ${MOB_INTEREST_RADIUS}`);
   });
 
   it('stands the observer on the live Aldric spawn and keeps that distance pinned to the encounter', () => {
