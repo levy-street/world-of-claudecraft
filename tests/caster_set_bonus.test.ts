@@ -1,10 +1,17 @@
-// Caster tier-set 2-piece: grants +20 spell power (mirroring the +40 attack power
+// Caster tier-set 2-piece: grants Intellect (mirroring the Strength and Agility
 // the melee 2-sets give) AND 100% cast-pushback immunity: damage taken never
 // delays the wearer's cast timer (castPushbackReduction 1 makes pushbackCast a
 // no-op). It is NOT physical knockback resistance; that entity stat still works
 // (the applyKnockback suite below pins it) but no shipped set grants it.
+//
+// The tier grants the ATTRIBUTE, not flat Spell Power, for the same reason the
+// melee sets stopped granting flat attack power: a derived grant bypasses the
+// budget the attribute would have been priced by. Spell Power costs two budget
+// points per point at SPELL_POWER_PER_INT, so the old flat +20 priced this one
+// tier at more than two epic chest pieces. tests/set_bonus_budget.test.ts owns
+// that rule; this file pins that recalcPlayerStats folds the tier at all.
 import { describe, expect, it } from 'vitest';
-import { aggregateSetBonuses, SET_NECROMANCERS } from '../src/sim/content/item_sets';
+import { aggregateSetBonuses, SET_INT_2PC, SET_NECROMANCERS } from '../src/sim/content/item_sets';
 import { MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -20,27 +27,30 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 }
 
 describe('caster set 2-piece bonus', () => {
-  it('grants +20 spell power and 100% cast-pushback immunity at 2 pieces', () => {
+  it('grants Intellect and 100% cast-pushback immunity at 2 pieces', () => {
     const two = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 2 }));
-    expect(two.sp).toBe(20);
+    expect(two.int).toBe(SET_INT_2PC);
+    expect(two.sp).toBe(0); // the attribute, never flat Spell Power
     expect(two.castPushbackReduction).toBe(1);
     expect(two.knockbackResistance).toBe(0); // spell pushback, never physical knockback
     // one piece: no 2-piece bonus yet
     const one = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 1 }));
-    expect(one.sp).toBe(0);
+    expect(one.int).toBe(0);
     expect(one.castPushbackReduction).toBe(0);
   });
 
-  it('folds the +20 spell power into the wearer, on top of gear', () => {
+  it('folds the 2-piece Intellect into the wearer, on top of gear', () => {
     const eq = { chest: 'necromancers_starshroud', feet: 'necromancers_soulsteps' };
     const withSet = statsFor('mage', 20, eq);
+    const onePiece = statsFor('mage', 20, { chest: 'necromancers_starshroud' });
     expect(withSet.castPushbackReduction).toBe(1);
     // Neither piece carries flat spell power, so the wearer's spell power is
-    // exactly the int-derived term plus the 2-piece flat +20 (an integer, so it
-    // commutes with the rounding); a one-piece wearer has no flat term at all.
-    // Together these pin that recalcPlayerStats actually folds the set bonus.
-    expect(withSet.spellPower).toBe(Math.round(withSet.stats.int * SPELL_POWER_PER_INT) + 20);
-    const onePiece = statsFor('mage', 20, { chest: 'necromancers_starshroud' });
+    // exactly the int-derived term, and the set Intellect is already inside
+    // stats.int. Pinning BOTH the Intellect delta and the derived spell power is
+    // what proves recalcPlayerStats folded the set bonus rather than the items:
+    // the two-piece wearer carries the second item's 8 Intellect plus the tier.
+    expect(withSet.stats.int).toBe(onePiece.stats.int + 8 + SET_INT_2PC);
+    expect(withSet.spellPower).toBe(Math.round(withSet.stats.int * SPELL_POWER_PER_INT));
     expect(onePiece.spellPower).toBe(Math.round(onePiece.stats.int * SPELL_POWER_PER_INT));
   });
 });

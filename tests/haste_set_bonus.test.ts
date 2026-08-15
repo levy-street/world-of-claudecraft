@@ -1,8 +1,10 @@
 // Haste from item-set bonuses: the aggregated `haste` stat in aggregateSetBonuses,
 // its derivation in recalcPlayerStats (one stat drives meleeHaste/rangedHaste/
 // spellHaste), and the three application sites (spell cast time, channel duration,
-// melee swing, ranged auto-shot). Haste enters the game ONLY through set bonuses:
-// the tier-2 3-piece bonuses and the three leveling haste kits.
+// melee swing, ranged auto-shot). Set bonuses are the bulk of the haste supply:
+// the tier-2 3-piece bonuses and the three leveling haste kits, plus the small
+// hasteRating allocations a few heroic epics carry. The kits deliberately pay a
+// tier UNDER the raid sets; tests/set_bonus_budget.test.ts prices that ladder.
 import { describe, expect, it } from 'vitest';
 import { updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import {
@@ -13,6 +15,8 @@ import {
   SET_GREYJAW_STALKER,
   SET_HASTE_3PC,
   SET_HASTE_3PC_RATING,
+  SET_HASTE_KIT,
+  SET_HASTE_KIT_RATING,
   SET_NIGHTTALON,
   SET_VALE_ARCANIST,
 } from '../src/sim/content/item_sets';
@@ -71,7 +75,11 @@ describe('haste kit definitions (leveling sets in the ITEM_SETS framework)', () 
       const set = ITEM_SETS[setId];
       expect(set.bonuses.length).toBe(1);
       expect(set.bonuses[0].pieces).toBe(3);
-      expect(set.bonuses[0].effect.hasteRating).toBe(SET_HASTE_3PC_RATING);
+      // The kits pay a tier UNDER the raid sets: their members are level-1 world
+      // drops and starter quest rewards, so paying them the raid rating let a
+      // level-8 character match a fully raid-geared one on haste.
+      expect(set.bonuses[0].effect.hasteRating).toBe(SET_HASTE_KIT_RATING);
+      expect(SET_HASTE_KIT_RATING).toBeLessThan(SET_HASTE_3PC_RATING);
     }
   });
 
@@ -95,7 +103,7 @@ describe('aggregated haste (pure resolver)', () => {
     const two = aggregateSetBonuses(new Map([[SET_VALE_ARCANIST, 2]]));
     expect(two.hasteRating).toBe(0);
     const three = aggregateSetBonuses(new Map([[SET_VALE_ARCANIST, 3]]));
-    expect(three.hasteRating).toBe(SET_HASTE_3PC_RATING);
+    expect(three.hasteRating).toBe(SET_HASTE_KIT_RATING);
   });
 
   it('every tier-2 3-piece bonus includes haste; tier-1 bonuses do not', () => {
@@ -120,9 +128,9 @@ describe('set-bonus haste derivation (recalcPlayerStats)', () => {
     expect(p.spellHaste).toBe(0);
     expect(p.meleeHaste).toBe(0);
     recalcPlayerStats(p, 'mage', equipmentOf([a, b, c]), undefined, {});
-    expect(p.spellHaste).toBe(SET_HASTE_3PC);
-    expect(p.meleeHaste).toBe(SET_HASTE_3PC);
-    expect(p.rangedHaste).toBe(SET_HASTE_3PC);
+    expect(p.spellHaste).toBe(SET_HASTE_KIT);
+    expect(p.meleeHaste).toBe(SET_HASTE_KIT);
+    expect(p.rangedHaste).toBe(SET_HASTE_KIT);
   });
 
   it('the tier-2 Nighttalon 3-piece adds haste on top of its agi/crit bonus', () => {

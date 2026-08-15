@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveSpellHit, spellResistChance } from '../src/sim/combat/spell_resist';
-import { aggregateSetBonuses } from '../src/sim/content/item_sets';
+import { aggregateSetBonuses, SET_HIT_4PC_RATING } from '../src/sim/content/item_sets';
 import { FURY_STOCK } from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { itemLevel } from '../src/sim/item_level';
@@ -114,11 +114,11 @@ describe('combat ratings', () => {
     expect(swingMissChance(mob, player)).toBeLessThanOrEqual(0.2); // MOB_VS_PLAYER cap, unchanged
   });
 
-  it('the weak T2 bleed 4-set bonuses now also grant hit rating', () => {
+  it('the weak T2 bleed 4-set bonuses also grant hit rating', () => {
     const crownforged = aggregateSetBonuses(new Map([['crownforged', 4]]));
     const nighttalon = aggregateSetBonuses(new Map([['nighttalon', 4]]));
-    expect(crownforged.hitRating).toBe(60);
-    expect(nighttalon.hitRating).toBe(60);
+    expect(crownforged.hitRating).toBe(SET_HIT_4PC_RATING);
+    expect(nighttalon.hitRating).toBe(SET_HIT_4PC_RATING);
   });
 
   it('the heroic marks jewelry carries one combat rating each', async () => {

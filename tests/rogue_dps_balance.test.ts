@@ -60,14 +60,22 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     expect(repeat).toEqual(first);
 
     // Accepted three-seed measurements on this fixture are approximately
-    // 203 Combat, 186 Assassination, and 179 Subtlety. The bounds protect the
+    // 182 Combat, 165 Assassination, and 159 Subtlety. The bounds protect the
     // player outcome while leaving a small deterministic tuning margin.
-    expect(first.combat).toBeGreaterThanOrEqual(195);
-    expect(first.combat).toBeLessThanOrEqual(205);
-    expect(first.assassination).toBeGreaterThanOrEqual(180);
-    expect(first.assassination).toBeLessThanOrEqual(195);
-    expect(first.subtlety).toBeGreaterThanOrEqual(170);
-    expect(first.subtlety).toBeLessThanOrEqual(185);
+    //
+    // Re-zeroed by the v0.38 set-bonus budget retune (was 203 / 186 / 179 with
+    // bands 195-205, 180-195, 170-185). This fixture wears the BiS epic kit, so
+    // it carried the off-budget set bonuses in full; every spec fell by about
+    // 10 percent when those were priced against item_budget.ts, and all three
+    // fell TOGETHER, so the sibling ordering the next assertion pins is intact.
+    // Each bound keeps its original relative margin against the new measurement
+    // rather than being widened, which the determinism pin above makes safe.
+    expect(first.combat).toBeGreaterThanOrEqual(175);
+    expect(first.combat).toBeLessThanOrEqual(185);
+    expect(first.assassination).toBeGreaterThanOrEqual(160);
+    expect(first.assassination).toBeLessThanOrEqual(173);
+    expect(first.subtlety).toBeGreaterThanOrEqual(151);
+    expect(first.subtlety).toBeLessThanOrEqual(164);
     expect(first.combat).toBeGreaterThan(first.assassination);
     expect(first.assassination).toBeGreaterThan(first.subtlety);
   }, 30_000);

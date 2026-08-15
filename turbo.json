@@ -104,13 +104,13 @@
   "tasks": {
     "i18n:gen": {
       "inputs": [
-        "src/ui/i18n.catalog/**",
-        "src/ui/i18n.locales/**",
-        "src/ui/i18n.ts",
+        "src/ui/**",
+        "src/sim/**",
         "src/admin/i18n.en.ts",
         "src/admin/i18n.locales/**",
         "src/admin/i18n.ts",
         "scripts/i18n_*.mjs",
+        "scripts/lib/write_module_dir.mjs",
         "package.json"
       ],
       "outputs": [
