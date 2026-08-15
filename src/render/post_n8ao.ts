@@ -60,7 +60,7 @@ function replacePinned(source: string, from: string, to: string, expected: numbe
   const count = source.split(from).length - 1;
   if (count !== expected) {
     throw new Error(
-      `Pinned n8ao 1.10.3 shader changed at "${from}" (${count}, expected ${expected})`,
+      `Pinned n8ao 2.0.0 shader changed at "${from}" (${count}, expected ${expected})`,
     );
   }
   return source.split(from).join(to);
@@ -120,7 +120,9 @@ function specializeStaticEvaluation(material: ShaderMaterial): void {
     '  vec3 computeNormal(vec3 worldPos, float c0, vec2 vUv) {',
     1,
   );
-  shader = replacePinned(shader, '    float c0 = 1.0 - texelFetch(sceneDepth, p, 0).x;\n', '', 1);
+  // n8ao 2.0.0 removed computeNormal's #ifdef REVERSEDEPTH arm (the
+  // "1.0 - texelFetch" spelling), so only the plain c0 declaration remains
+  // to delete. We never enable three's reversed depth buffer.
   shader = replacePinned(shader, '    float c0 = texelFetch(sceneDepth, p, 0).x;\n', '', 1);
   shader = replacePinned(
     shader,

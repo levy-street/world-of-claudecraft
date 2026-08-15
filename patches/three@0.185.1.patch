@@ -1,8 +1,8 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..b7e839fae96c7848a5558c67952f259e95c23c54 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..c5f80acc0cdb4450832999e2f8ce7d70cde0a447 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
-@@ -29301,21 +29301,80 @@ class WebGLRenderer {
+@@ -17487,21 +17487,81 @@ class WebGLRenderer {
  
  			return new Promise( ( resolve ) => {
  
@@ -51,10 +51,11 @@ index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..b7e839fae96c7848a5558c67952f259e
  						const program = materialProperties.currentProgram;
  
 -						if ( program.isReady() ) {
-+						// World of ClaudeCraft: three r165 compileAsync disposal race.
-+						// If churn releases renderer properties during this timer poll,
-+						// no program remains to wait for. Removing the material avoids the
-+						// isReady TypeError and lets the promise settle. Recheck on upgrade.
++						// World of ClaudeCraft: three compileAsync disposal race (r165, still
++						// present in r185). If churn releases renderer properties during this
++						// timer poll, no program remains to wait for. Removing the material
++						// avoids the isReady TypeError and lets the promise settle. Recheck on
++						// upgrade.
 +						if ( program === undefined ) {
  
 -							// remove any programs that report they're ready to use from the list
@@ -87,7 +88,7 @@ index fcf5e09d8ada1f25b9c3218ce9ce65e67fb54eb5..b7e839fae96c7848a5558c67952f259e
  
  					// once the list of compiling materials is empty, call the callback
  
-@@ -29326,9 +29385,19 @@ class WebGLRenderer {
+@@ -17512,9 +17572,19 @@ class WebGLRenderer {
  
  					}
  

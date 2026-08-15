@@ -261,12 +261,18 @@ describe('post-entry mob-body streaming (every iOS WebKit host)', () => {
   });
 
   it('degrades a not-yet-resident skin in the Armory display-model path', () => {
-    // weaponSkinDisplayModel feeds the store preview (prewarm loops every skin
-    // id microseconds after the stream pass starts): a non-resident streamed
-    // skin returns null (the rig treats it as unavailable) instead of letting
-    // resolvedGltf throw away the whole warmup or escape a click handler.
+    // weaponSkinDisplayModel feeds the store preview. The catalog is no longer
+    // warmed ahead of time (docs/design/armory-preview-warming.md), so this now
+    // guards the CLICK path: a non-resident streamed skin returns null, which
+    // the rig treats as unavailable, instead of letting resolvedGltf escape an
+    // ArmoryInspect click handler. Note the weapon rig retries on the reselect
+    // once the GLB lands; the character rig cache does not, which is a separate
+    // pre-existing defect recorded in the handoff notes.
     expect(assetsSource).toContain('if (residentOrEnsure(url) === null) return null;');
-    // The preview recovers on reselect: same-skin no-op only while a rig exists.
+    // Only the WEAPON preview recovers on reselect (same-skin no-op is guarded
+    // on the rig existing). The character rig cache has no such retry, so a card
+    // opened before its GLB lands keeps a rig wearing the base weapon: a
+    // separate pre-existing defect, recorded in the handoff notes.
     const previewSource = readFileSync(
       new URL('../src/render/armory_preview.ts', import.meta.url),
       'utf8',

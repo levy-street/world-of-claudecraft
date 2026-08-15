@@ -102,7 +102,7 @@ describe('Shaman v0.29 state lifecycle', () => {
       sourceId: sim.player.id,
       school: 'fire',
     });
-    expect(effectiveArmor(sim, sim.player)).toBeCloseTo(Math.round(baseArmor * 1.3), 5);
+    expect(effectiveArmor(sim, sim.player)).toBeCloseTo(Math.round(baseArmor * 1.4), 5);
     expect(sim.player.auras.some((aura) => aura.id === STONEBOUND_WARD_SMOOTH_ID)).toBe(true);
 
     expect(sim.setSpec('restoration')).toBe(true);

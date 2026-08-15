@@ -184,12 +184,16 @@ export function configureTightBoneTextures(root: THREE.Object3D): BoneTextureLay
     }
     const boneCount = skeleton.bones.length;
     if (boneCount === 0) continue;
+    // r185 types boneMatrices nullable; an uninitialized skeleton has no
+    // palette to crop, so skip it whole rather than bake a zeroed texture.
+    const sourceMatrices = skeleton.boneMatrices;
+    if (sourceMatrices === null) continue;
     const width = stockBoneTextureSize(boneCount);
     const height = Math.ceil((boneCount * 4) / width);
     stats.texelsBefore += width * width;
     stats.texelsAfter += width * height;
     const boneMatrices = new Float32Array(width * height * 4);
-    boneMatrices.set(skeleton.boneMatrices);
+    boneMatrices.set(sourceMatrices);
     const texture = new THREE.DataTexture(
       boneMatrices,
       width,

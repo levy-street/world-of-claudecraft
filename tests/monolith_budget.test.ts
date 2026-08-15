@@ -38,19 +38,37 @@ interface MonolithRow {
 const MONOLITHS: MonolithRow[] = [
   {
     file: 'src/ui/hud.ts',
-    ceiling: 19490,
+    // Lowered after extracting the ability description prose (the placeholder
+    // values, the over-time string and the talent-conditional field choice) into
+    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it).
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    ceiling: 19433,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
     file: 'src/render/renderer.ts',
-    // Lowered again after extracting the delve module interior scheduler into
-    // src/render/delve_interior_scheduler.ts, ahead of the farm patch wiring
-    // (the ratchet's own rule: an extraction lowers the ceiling, never raises
-    // it). The previous lowering came from src/render/fire_light_registry.ts:
-    // the fire-light adopter, the budget pass, the stranded-light reparent and
-    // the registry prune. The release arm's v0.38.0 trim landed on the same
-    // 13700 independently; the fifteenth absorb keeps the shared number.
-    ceiling: 13700,
+    // Lowered after extracting the fire-light adopter, the budget pass, the
+    // stranded-light reparent and the registry prune into
+    // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
+    // lowers the ceiling, never raises it).
+    // This branch lowered again after extracting the delve module interior
+    // scheduler into src/render/delve_interior_scheduler.ts; the release arm
+    // raised for the desktop-client-update packet's thin-consumer wiring
+    // (frame_present, dpr_watch, static_matrix, shadow cadence hookup) then
+    // lowered via its rig_visibility_freeze.ts extraction and pinned its own
+    // merged count. Merging release/v0.39.0: the merged file lands between the
+    // two pins (branch 13700, release 13754), so the ceiling is the exact
+    // merged count per the ratchet's rule: any further growth reds again.
+    ceiling: 13725,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

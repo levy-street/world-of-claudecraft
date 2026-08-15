@@ -29,8 +29,20 @@ describe('market_window: no magic values', () => {
     );
   });
 
-  it('routes the unranked quality fallback through a CSS token, not a hex literal', () => {
-    expect(painter).toContain("const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)'");
+  it('routes the item-name quality color through the market_name_color resolver (CSS tokens), not a hex literal', () => {
+    // The name color (including the unranked fallback) lives in market_name_color.ts
+    // as CSS custom properties, so the painter holds no color literal. The resolver's
+    // own tests pin that every quality maps to a var(--mkt-name-*) token.
+    expect(painter).toContain("import { marketNameColor } from './market_name_color';");
+    expect(painter).toContain('const qColor = marketNameColor(item.quality);');
+    const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
+    expect(core).toContain('var(--mkt-name-');
+    // The CODE must carry no color literal (tokens only); the header comment may
+    // cite the shipped hex values it lifts away from, so strip line comments first.
+    const coreCode = core.replace(/\/\/.*$/gm, '');
+    expect(coreCode, 'the resolver must not carry a raw hex in code').not.toMatch(
+      /#[0-9a-fA-F]{3,8}\b/,
+    );
   });
 
   it('names the coin-conversion constants instead of bare 10000 / 100', () => {
@@ -385,21 +397,28 @@ describe('market_window: behavior preserved through the core', () => {
 
 describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
   it('resolves the badge from the shared armor-type resolver, not a second classification', () => {
-    expect(painter).toContain("import { marketArmorBadge } from './market_armor_badge';");
+    expect(painter).toContain(
+      "import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';",
+    );
     expect(painter).toContain('const armorBadge = marketArmorBadge(item);');
   });
 
   it('shows no mark on non-armor rows (weapons, bags, materials) instead of an empty badge', () => {
     const badgeAssign = painter.slice(
-      painter.indexOf('const armorBadge = marketArmorBadge(item);'),
+      painter.indexOf('const badge = armorBadge'),
       painter.indexOf('row.innerHTML ='),
     );
-    expect(badgeAssign).toContain('const badge = armorBadge');
-    expect(badgeAssign).toMatch(/:\s*'';\s*$/);
+    // The badge is the pips symbol when armor, and the empty string otherwise,
+    // so a weapon/bag/material row paints no armor mark at all.
+    expect(badgeAssign).toContain('marketArmorPips(armorBadge.armorType');
+    expect(badgeAssign).toMatch(/:\s*'';/);
   });
 
-  it('escapes the localized armor-type label before it reaches innerHTML', () => {
-    expect(painter).toContain('esc(t(armorBadge.labelKey))');
+  it('passes the escaped localized armor-type label into the pip symbol', () => {
+    // The word no longer renders as visible text (the visible cue is the pip
+    // symbol), but the escaped localized label is still handed to marketArmorPips
+    // as the chip's accessible name, so the vocabulary and the escaping are intact.
+    expect(painter).toContain('marketArmorPips(armorBadge.armorType, esc(t(armorBadge.labelKey)))');
   });
 
   it('reuses the tooltip slot-line vocabulary (hudChrome.itemArmorType), not the filter-menu one', () => {
@@ -411,12 +430,23 @@ describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
     expect(core).toContain("from '../sim/equipment_rules'");
   });
 
-  it('is not color-only: the badge always carries real text, distinguished further by a border/background class per type', () => {
+  it('is not color-only: the cue is a countable pip symbol, distinguished by a per-type class, and still carries the word for assistive tech', () => {
+    // The distinction survives with color removed because the pip COUNT differs
+    // per armor type; color is only a bonus channel. The localized word rides the
+    // symbol's aria-label/title rather than rendering as visible text.
+    const core = readFileSync(new URL('../src/ui/market_armor_badge.ts', import.meta.url), 'utf8');
+    expect(core).toContain('role="img"');
+    expect(core).toContain('aria-label="${label}"');
+    expect(core).toContain('aria-hidden="true"'); // the pips themselves are decorative
+    // per-armor-type pip counts (the non-color carrier): cloth 1, leather 2, mail 3
+    expect(core).toMatch(/cloth:\s*1/);
+    expect(core).toMatch(/leather:\s*2/);
+    expect(core).toMatch(/mail:\s*3/);
     for (const cls of [
-      'mkt-armor-badge',
-      'mkt-armor-badge--cloth',
-      'mkt-armor-badge--leather',
-      'mkt-armor-badge--mail',
+      'mkt-armor-pips',
+      'mkt-armor-pips--cloth',
+      'mkt-armor-pips--leather',
+      'mkt-armor-pips--mail',
     ]) {
       expect(componentsCss, `components.css must define .${cls}`).toContain(`.${cls}`);
     }

@@ -21,6 +21,7 @@ import {
   registerDeferredPreload,
   registerPreload,
 } from '../src/render/assets/preload';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
@@ -290,9 +291,7 @@ describe('no world module fetches at import', () => {
       if (repoRel.endsWith('assets/preload.ts') || EAGER_ALLOWED.has(repoRel)) continue;
       // Strip comments first: this guard polices CODE, not prose that happens to
       // name the eager function while explaining the lanes.
-      const code = readFileSync(full, 'utf8')
-        .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/^[ \t]*\/\/.*$/gm, '');
+      const code = stripComments(readFileSync(full, 'utf8'));
       // Match the call, not the identifier inside registerDeferredPreload.
       if (/(?<!Deferred)\bregisterPreload\s*\(/.test(code)) offenders.push(repoRel);
     }

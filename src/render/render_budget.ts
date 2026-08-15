@@ -74,17 +74,22 @@ export interface RenderBudgetGovernorOptions {
 }
 
 const CAPS_BY_TIER: Record<GfxTier, RenderBudgetCaps> = {
+  // Low must stay monotonically lighter than medium on every axis: it used to carry
+  // LOOSER caps and HIGHER quality floors than medium, so a player who dropped from
+  // medium to low got a heavier frame. Targets/urgents are medium x 0.9 rounded to
+  // clean values, and the four floors mirror low's band minima in GFX_BUCKET_BANDS
+  // (which now equal medium's), so low can always shed at least as far as medium.
   low: {
-    targetCalls: 560,
-    urgentCalls: 760,
-    targetTriangles: 2_200_000,
-    urgentTriangles: 3_000_000,
-    targetGrassTufts: 5_600,
-    urgentGrassTufts: 7_600,
-    minGrassLevel: 0.62,
-    minFoliageLevel: 0.68,
-    minVfxLevel: 0.84,
-    minLightingLevel: 0.78,
+    targetCalls: 380,
+    urgentCalls: 560,
+    targetTriangles: 1_600_000,
+    urgentTriangles: 2_350_000,
+    targetGrassTufts: 3_400,
+    urgentGrassTufts: 4_900,
+    minGrassLevel: 0.5,
+    minFoliageLevel: 0.5,
+    minVfxLevel: 0.58,
+    minLightingLevel: 0.45,
   },
   medium: {
     targetCalls: 420,
@@ -466,12 +471,26 @@ export class RenderBudgetGovernor {
       return this.state(out);
     }
 
+    // Measured headroom, the gate on ALL recovery: every clause is a real cost
+    // reading, never inferred from wall cadence.
     const canRecover =
       (this.externalFrameCap || this.frameMsEma <= this.budget.recoverFrameMs) &&
       totalMs <= this.budget.recoverFrameMs &&
       submitMs <= Math.max(8, this.budget.recoverFrameMs * 0.7) &&
       rawSubmitMs <= SUBMIT_STALL_RECOVERY_CEILING_MS &&
-      this.stallPressure < 0.5 &&
+      this.stallPressure < 0.5;
+    // Scene-density headroom, the gate on the climb ABOVE baseline only. Raising a
+    // bucket past its baseline widens the drawn ring and grows these very counters,
+    // so gating the return TO baseline on them lets the ladder close its own gate
+    // and strand the buckets it has not restored yet (resolution recovers last).
+    // Deliberate: dense frames no longer reset stableSeconds, so one frame under
+    // the line at a fire slot permits one enrich step. The rate bound is the
+    // stableSeconds reset on each fired step plus the recoverStableSeconds
+    // recharge (the 1.5x cooldown is shorter on every tier and never binds);
+    // the at-slot re-check only picks WHICH frame may fire, so repeated dips
+    // can walk quality to the band maxima at one step per recharge window.
+    // Only degrade() ever lowers quality.
+    const canEnrich =
       sample.calls <= this.caps.targetCalls * 0.9 &&
       sample.triangles <= this.caps.targetTriangles * 0.9 &&
       sample.grassVisibleTufts <= this.caps.targetGrassTufts * 0.9;
@@ -479,7 +498,7 @@ export class RenderBudgetGovernor {
     if (canRecover) {
       this.stableSeconds += sample.dt;
       if (this.stableSeconds >= this.budget.recoverStableSeconds && this.cooldownSeconds <= 0) {
-        const changed = this.recover(maxRenderScale);
+        const changed = this.recover(maxRenderScale, canEnrich);
         if (changed) {
           this.mode = 'recovering';
           this.reason = 'recover';
@@ -571,16 +590,20 @@ export class RenderBudgetGovernor {
     return changed;
   }
 
-  private recover(maxRenderScale: number): boolean {
+  /** Phase A restores what pressure took, quality buckets before render scale, and runs on
+   * measured headroom alone. Phase B climbs past the baselines and additionally needs scene
+   * density under the draw caps. Returning false claims nothing: no cooldown, no mode change. */
+  private recover(maxRenderScale: number, allowAboveBaseline: boolean): boolean {
     if (this.raiseLevel('grass', this.bands.grass.baseline, 0.08)) return true;
     if (this.raiseLevel('lighting', this.bands.lighting.baseline, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.baseline, 0.08)) return true;
     if (this.raiseLevel('foliage', this.bands.foliage.baseline, 0.08)) return true;
+    if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
+    if (!allowAboveBaseline) return false;
     if (this.raiseLevel('foliage', this.bands.foliage.max, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.max, 0.08)) return true;
     if (this.raiseLevel('grass', this.bands.grass.max, 0.06)) return true;
     if (this.raiseLevel('lighting', this.bands.lighting.max, 0.05)) return true;
-    if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
     return false;
   }
 }

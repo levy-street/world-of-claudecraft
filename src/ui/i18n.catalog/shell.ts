@@ -134,6 +134,20 @@ export const shellStrings = {
         restart: 'Restart now',
         later: 'Later',
         dismiss: 'Dismiss',
+        whatsNew: 'See what changed in your browser',
+      },
+      // OS notifications the shell posts while the player is away from the
+      // window (src/game/desktop_notifications.ts). Title and body cross the
+      // bridge already rendered: the main process has no i18n runtime.
+      notify: {
+        updateReadyTitle: 'Update {version} is ready',
+        // The versionless arm (a 'downloaded' event carrying no version, which
+        // the update core deliberately supports): rendering '' through the
+        // {version} slot above would read "Update  is ready".
+        updateReadyTitleNoVersion: 'Update is ready',
+        updateReadyBody: 'Restart World of ClaudeCraft to apply the update.',
+        partyInviteTitle: 'Party invite',
+        partyInviteBody: '{name} invited you to a party.',
       },
       crash: {
         title: 'World of ClaudeCraft',
@@ -151,6 +165,8 @@ export const shellStrings = {
     gpuNotice: {
       bodyDesktop:
         'The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
+      bodyDiscreteInactive:
+        'The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
       bodyWeb:
         'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
       // Hybrid-GPU variant (issue #2119): shown at boot when the session is

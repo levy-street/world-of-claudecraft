@@ -51,7 +51,7 @@
 // old two-leg overlap re-runs are gone by construction.
 
 import { isRelayablePath } from './ci_test_select.mjs';
-import { classifySelectPaths } from './gate_select_plan.mjs';
+import { classifySelectPaths, FLOOR_SANITY_MIN } from './gate_select_plan.mjs';
 
 /**
  * Guard suites the repo treats as invariants: they run on every selective
@@ -188,7 +188,7 @@ export function collectedLaneFiles({ testFiles, exists, suites = CI_LONG_SUITES 
  * the full suite. Mirrors the >300 sanity floor tests/gate_select_plan.test.ts
  * pins over the real suite (well above 500 as of Phase 2).
  */
-export const FLOOR_SANITY_MIN = 300;
+export { FLOOR_SANITY_MIN };
 
 /**
  * Parse `--shard=i/N` argv form. Returns null when absent or malformed; the

@@ -31,7 +31,7 @@ import {
   restoreMatchPet,
   snapshotMatchPet,
 } from '../pet/pet_match_return';
-import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
+import { awardFiestaCompletionHonor, awardRankedArenaResultHonor, honorTeamIdentity } from '../pvp';
 import { aurasSurvivingCleanSlate, SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -1206,9 +1206,19 @@ export function endArenaMatch(
         ));
         // Rating (addArenaResult above) and Deeds (onArenaMatchEndForDeeds below)
         // are deliberately forfeit-inclusive; Honor is not, mirroring Fiesta's
-        // completion-honor guard a few lines down.
-        if (won === true && reason !== 'forfeit')
-          awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
+        // completion-honor guard a few lines down. Every played-out result pays,
+        // win or not: the loss and draw share is the award module's call
+        // (RANKED_ARENA_LOSS_HONOR), so this call site stays a plain report of
+        // what happened.
+        if (reason !== 'forfeit') {
+          awardRankedArenaResultHonor(
+            ctx,
+            meta,
+            match.format,
+            opponentTeamKey,
+            won === true ? 'win' : won === null ? 'draw' : 'loss',
+          );
+        }
       } else {
         ratingBefore = ratingAfter = arenaStanding(meta, match.format).rating;
         if (match.fiesta && !match.practice && reason !== 'forfeit') {

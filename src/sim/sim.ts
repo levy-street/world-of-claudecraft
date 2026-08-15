@@ -4122,6 +4122,13 @@ export class Sim {
             honorArenaDaily: {
               date: meta.honorArenaDaily.date,
               winsByOpponent: { ...meta.honorArenaDaily.winsByOpponent },
+              // Optional ranked-loss DR window, on the same absent-when-empty
+              // rule as the battleground one below: a day with no paying loss
+              // writes nothing, so pre-loss-award saves stay byte-equal.
+              ...(meta.honorArenaDaily.lossesByOpponent &&
+              Object.keys(meta.honorArenaDaily.lossesByOpponent).length > 0
+                ? { lossesByOpponent: { ...meta.honorArenaDaily.lossesByOpponent } }
+                : {}),
               fiestaCompletionsByOpponent: {
                 ...meta.honorArenaDaily.fiestaCompletionsByOpponent,
               },
@@ -11963,10 +11970,6 @@ export class Sim {
 
   private grantDelveClearTo(run: DelveRun, delve: DelveDef, meta: PlayerMeta, pid: number): void {
     runsMod.grantDelveClearTo(this.ctx, run, delve, meta, pid);
-  }
-
-  private grantDelveRewards(run: DelveRun): void {
-    runsMod.grantDelveRewards(this.ctx, run);
   }
 
   private openDelveSurfaceExit(run: DelveRun): void {

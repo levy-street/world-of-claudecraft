@@ -310,7 +310,7 @@ describe('renderer wiring', () => {
     // Clearing a skin builds no rig, so it stays synchronous, and cancels any
     // queued apply first.
     expect(diff).toContain('this.weaponSkinApplies.cancel(id)');
-    expect(diff).toContain('this.applyWeaponSkin(v, null)');
+    expect(diff).toContain('this.applyWeaponSkin(v, null, e.kind)');
     // The chain that used to freeze the frame is gone from the diff entirely,
     // and so is the latch that would have suppressed the retry.
     expect(diff).not.toContain('setWeaponSkin(e.weaponSkinId)');

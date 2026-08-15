@@ -138,7 +138,7 @@ describe('Eastbrook civic beacon shader animation', () => {
       expect(shader.vertexShader).toContain('objectNormal = mix(');
       expect(shader.vertexShader).toContain('transformed = mix(');
       expect(shader.fragmentShader).toContain('1.0 + sin(uTime * 1.3) * 0.08');
-      expect(shader.fragmentShader).toContain('totalEmissiveRadiance *= vColor;');
+      expect(shader.fragmentShader).toContain('totalEmissiveRadiance *= vColor.rgb;');
       expect(shader.fragmentShader).toContain('totalEmissiveRadiance *= eastbrookCivicGlow;');
       expect(material.customProgramCacheKey()).toContain('eastbrook-civic-beacon-v1');
     },

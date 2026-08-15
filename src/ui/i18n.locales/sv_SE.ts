@@ -4115,7 +4115,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform.',
   'entities.abilities.bear_charge.name': 'Bruinrusning',
   'entities.abilities.bear_form.description':
-    'Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
+    'Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.bear_form.name': 'Bruinform',
   'entities.abilities.berserker_rage.description':
     'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
@@ -4353,10 +4353,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa.',
   'entities.abilities.revive_pet.name': 'Lappa ihop',
-  'entities.abilities.righteous_fury.description': 'Ökar passivt hotet som er Heliga skada alstrar med 60%. Endast Trosväktare.',
+  'entities.abilities.righteous_fury.description': 'Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare.',
   'entities.abilities.righteous_fury.name': 'Brinnande ed',
   'entities.abilities.rip.name': 'Blodsspricka',
-  'entities.abilities.rockbiter_weapon.description': 'Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 30% rustning, tar 10% mindre skada och alstrar dubbelt så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek.',
+  'entities.abilities.rockbiter_weapon.description': 'Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 40% rustning och 20% uthållighet, tar 15% mindre skada och är immun mot kritiska träffar från varelser och alstrar 2,75 gånger så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek.',
   'entities.abilities.rockbiter_weapon.name': 'Stenbundet vapen',
   'entities.abilities.rupture.name': 'Förblöda',
   'entities.abilities.sap.description':
@@ -10278,6 +10278,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Det gick inte att logga in med Apple. Försök igen.',
   'hudChrome.auth.appleLoginCta': 'Fortsätt med Apple',
   'hudChrome.dailyRewards.reason.banned': 'Du är avstängd från dagliga belöningar. Orsak: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroisk',
   'hudChrome.itemHeroicTag': '[HEROISK]',
   'hudChrome.itemSoulbound': 'Själabunden',
   'hudChrome.keybinds.categoryPet': 'Djur',
@@ -10649,6 +10650,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Heder',
   'hudChrome.warfare.honorGain': 'Du får {amount} Heder ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Inte tillräckligt med heder.',
+  'hudChrome.warfare.reasons.arenaComplete': 'arenamatch utkämpad',
   'hudChrome.warfare.reasons.arenaWin': 'Arenaseger',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta avklarad',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-nedtagning',
@@ -13200,4 +13202,26 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Den utseendekoden kommer från en nyare spelversion.',
   'auth.designCodeErrMalformed': 'Den utseendekoden är skadad. Kopiera hela koden och försök igen.',
   'hudChrome.nameplate.cheaterTag': '< Fuskare >',
+  'hud.options.displayMode': 'Visningsläge',
+  'hud.options.displayModeBorderless': 'Kantlös helskärm',
+  'hud.options.displayModeWindowed': 'Fönsterläge',
+  'hudChrome.options.discordPresence': 'Discord-aktivitet',
+  'hudChrome.options.discordPresenceNote':
+    'Visar zonen du befinner dig i och hur länge du har spelat den här sessionen som din Discord-aktivitet, och alla som kan se din Discord-profil kan se båda. Endast zonnamnet, din sessionstid och spelet delas, aldrig din karaktär, ditt konto eller vem du spelar med. Kräver att Discord-appen körs på den här datorn.',
+  'hudChrome.options.forceHighPerfGpu': 'Använd det separata spelgrafikkortet',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'På som standard: skrivbordsappen begär datorns separata spelgrafikkort. Stäng av det här om spelet inte startar, öppnas med en svart skärm, eller om den bärbara datorns skärm blir svart. Träder i kraft nästa gång spelet startar.',
+  'desktop.notify.partyInviteBody': '{name} bjöd in dig till en grupp.',
+  'desktop.notify.partyInviteTitle': 'Gruppinbjudan',
+  'desktop.notify.updateReadyBody': 'Starta om World of ClaudeCraft för att tillämpa uppdateringen.',
+  'desktop.notify.updateReadyTitle': 'Uppdatering {version} är klar',
+  'desktop.notify.updateReadyTitleNoVersion': 'Uppdatering är klar',
+  'desktop.update.whatsNew': 'Se vad som har ändrats i din webbläsare',
+  'entities.abilities.challenging_roar.description':
+    'Ett olycksbådande vrål: varje fiende inom 10 meter eggas, dess hot mot dig stiger till nivån hos dess mest hatade fiende, och den tvingas anfalla dig i 3 sek. Endast i Bruinform.',
+  'entities.abilities.challenging_roar.name': 'Olycksbådande vrål',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Ger 2 kombopoäng.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Spelet använder inte det separata (spel-)grafikkortet och körs i stället på det strömsparande grafikkortet, vilket försämrar prestandan. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
 };

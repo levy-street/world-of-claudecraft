@@ -415,9 +415,10 @@ jobs:
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
   # instead of their sum. pr-gate additionally fans the suite across an 8-shard
-  # matrix (vitest --shard=i/8: sha1-contiguous file packs). D11 path-matrix
-  # follow-on tried LPT and stripe sequencers (scripts/ci_balanced_sequencer.mjs);
-  # both missed D11 and are unwired. Wall time is the slowest shard. Locally
+  # matrix (vitest --shard=i/8, packed by scripts/ci_balanced_sequencer.mjs:
+  # LPT over measured per-file durations since 2026-08-14; the D11-era LPT
+  # and stripe missed the bar on static weights and default sha1-contiguous
+  # packing ran until then). Wall time is the slowest shard. Locally
   # `npm run gate` (scripts/gate.mjs) runs the SAME combined step list serially
   # with ONE full unsharded vitest run by design (bounded workers); keep that
   # script's step list in sync when adding or removing a step in either job.
@@ -458,7 +459,7 @@ jobs:
     # scripts/lib/test_visibility.mjs), and a diff deep in the sim import
     # graph stacks the expensive sim suites on top of it: 917 collected
     # files on PR #3342 against 782 on a comparable net-only PR, so the
-    # floor plus about 135 sim-heavy files, which the sha1-contiguous packs
+    # floor plus about 135 sim-heavy files, which contiguous hash packing could
     # can concentrate in one shard. On 2026-08-12 shard 1 of PR #3342 was
     # bound-killed at a 20.25
     # minute wall on two attempts, both with the test step at 19.0 minutes
@@ -510,10 +511,14 @@ jobs:
     # test-step kill, and never fires on merge_group at all, so this bound
     # is the only thing that ends a hung test step, the rerun is manual,
     # and a false kill blocks a REQUIRED check outright, which is why the
-    # base stays the conservative one. Candidate follow-up recorded in the
-    # program notes: shard 4 is the worst shard in every sampled selective
-    # run, so the sha1-contiguous packing concentrates cost and a packing
-    # rebalance could lower this bound honestly.
+    # base stays the conservative one. The packing rebalance that follow-up
+    # asked for LANDED 2026-08-14 (measured-weight LPT via the balanced
+    # sequencer; under sha1-contiguous packing shard 4 was the worst shard
+    # in every sampled selective run). 37 deliberately survives the change:
+    # re-derive only from healthy selective walls MEASURED on the new
+    # packing, never from the simulation (the review round showed a
+    # simulated 9.79m flat pack against a real 11.21m when one modeling
+    # assumption was wrong).
     timeout-minutes: 37
     runs-on: ubuntu-latest
 
@@ -569,6 +574,7 @@ jobs:
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/market-house-redesign/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
@@ -783,6 +789,7 @@ jobs:
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/market-house-redesign/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
@@ -879,6 +886,7 @@ jobs:
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/market-house-redesign/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
@@ -1042,11 +1050,12 @@ jobs:
     # pr-gate hands its CI_LONG_SUITES files to
     # the lane pair, and release-gate deliberately does not
     # (scripts/lib/ci_shard_plan.mjs states that ruling), so a release shard
-    # can draw several multi-minute harnesses at once. Default vitest --shard
-    # is sha1-contiguous (vite.config.ts records that the balanced sequencers
-    # were measured and left unwired), so WHICH shard draws them moves with any
-    # change to the collected file set; sizing this bound for the healthy
-    # median is what made it fragile.
+    # can draw several multi-minute harnesses at once. Since 2026-08-14 the
+    # balanced sequencer (vite.config.ts) packs shards by MEASURED durations,
+    # which spreads those harnesses; the bound predates that and stays sized
+    # for the contiguous worst until a measured release wall justifies
+    # re-deriving it, because sizing for the healthy median is what made it
+    # fragile before.
     #
     # 20 was sized from a 14.63 minute healthy worst case (run 31117143257).
     # That premise died on 2026-08-11 at b160a1ba18, where shard 1 drew FOUR
@@ -1137,6 +1146,7 @@ jobs:
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/market-house-redesign/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
@@ -1231,6 +1241,7 @@ jobs:
             /docs/screenshots/guild-bank-tab/
             /docs/screenshots/guild-social-v1/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/market-house-redesign/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/

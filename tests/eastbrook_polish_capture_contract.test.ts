@@ -171,11 +171,30 @@ interface AttributionTargetFixture {
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after making that extracted policy an explicit provenance
 // leaf. The evidence now follows policy-only changes; no capture was retaken.
+// Re-minted for the merge of release/v0.38.0 into the Armory warming branch:
+// both parents move renderer.ts, so the merged tree mints a value matching
+// neither parent. No capture was retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): renderer.ts moves
+// again, so the composite follows its bytes. No capture was retaken.
+// Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
+// lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
+// capture was retaken.
 // Re-minted for the fifteenth farming absorb (release/v0.38.0 tip merged into
 // the phase branch): both parents move renderer.ts, so the merged tree mints
 // a value matching neither parent. No capture was retaken.
+// Re-minted for the sixteenth farming absorb (release/v0.39.0 tip merged into
+// the sync branch): both parents move renderer.ts again, so the merged tree
+// mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '885266cc0dc9ad7963784721ecbb25d5d16a95237371957e359f43f5b65f4b05';
+  'bbcfe52bf6cd3de9184b9594983981dafa1a59bc13def69fef424e0b75bc0f3d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

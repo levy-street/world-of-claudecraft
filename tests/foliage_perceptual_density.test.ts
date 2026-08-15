@@ -43,10 +43,16 @@ describe('streamed grass perceptual density', () => {
     // first update (builds continue while budget remains), giving this
     // suite the fully built window its assertions were written against.
     const grass = foliageGrassInternalsForTest.buildGrassRing(parent, 20_061, () => 0);
-    const px = 15;
-    const pz = 45;
+    // A chunk-grid corner (GRASS_CHUNK_SIZE is 48), so whole chunks land in the
+    // ring band past the protected radius instead of being quantized to either
+    // side of it, and the camera rides the player so the ring projects small
+    // enough to thin. Off a corner the 48-unit grid leaves the band empty and the
+    // only density change left is the cull shell, which is alignment, not
+    // perception.
+    const px = 48;
+    const pz = 48;
     for (let frame = 0; frame < 64; frame++) {
-      grass.update(px, pz, 8, 6, 40, 623.54, 1 / 60);
+      grass.update(px, pz, px, 6, pz, 623.54, 1 / 60);
     }
     // The density and immutability assertions below stand on a fully built
     // streamed window: nothing may still be queued or mid-build here.
@@ -90,11 +96,29 @@ describe('streamed grass perceptual density', () => {
     };
     const submittedAt720p = meshes.reduce((sum, mesh) => sum + mesh.count, 0);
     const submittedByFamilyAt720p = submittedByFamily();
-    expect(submittedAt720p / fullTotal).toBeGreaterThan(0.7);
-    expect(submittedAt720p / fullTotal).toBeLessThan(0.9);
+    // Derivation of the band, at plain low (grassRadius 72, quality 1 at rest, so
+    // activeRadius 72 and the protected radius 0.85 x 72 = 61.2):
+    //   - chunks inside 61.2 keep every instance (the protected clause returns 1),
+    //     which is most of the field and holds the ratio high;
+    //   - the ring chunks past 61.2 blend toward the projected fraction. With the
+    //     camera at the player they sit near 68 units out, so projected size is
+    //     0.72 x 623.54 / 68 = 6.6 px, inside the smoothstep(6, 10) window, and
+    //     their keep fraction lands near 0.71 (0.55 floor blended by projection);
+    //   - no chunk sits past the cull radius here, so nothing is culled to zero.
+    // The measured aggregate is 0.94, from real thinning only. Loss of thinning
+    // drives it to 1.0 and over-aggressive thinning drives it under the floor.
+    expect(submittedAt720p / fullTotal).toBeGreaterThan(0.88);
+    expect(submittedAt720p / fullTotal).toBeLessThan(0.97);
     for (const family of families) {
       expect(submittedByFamilyAt720p[family]).toBeLessThan(fullByFamily[family]);
     }
+    // The decisive one: only genuine perceptual thinning yields a PARTIAL visible
+    // chunk. The cull clause yields exactly 0 and the protected clause yields
+    // exactly fullCount, so neither can produce this.
+    const partiallyThinned = meshes.filter(
+      (mesh) => mesh.visible && mesh.count > 0 && mesh.count < fullCount(mesh),
+    );
+    expect(partiallyThinned.length).toBeGreaterThan(0);
 
     const nearMeshes = meshes.filter((mesh) => {
       const matrices = mesh.instanceMatrix.array as Float32Array;
@@ -117,7 +141,7 @@ describe('streamed grass perceptual density', () => {
     const colorSnapshots = meshes.map((mesh) => Array.from(mesh.instanceColor?.array ?? []));
 
     for (let frame = 0; frame < 30; frame++) {
-      grass.update(px, pz, 8, 6, 40, 320, 1 / 60);
+      grass.update(px, pz, px, 6, pz, 320, 1 / 60);
     }
     const submittedAtSmallProjection = meshes.reduce((sum, mesh) => sum + mesh.count, 0);
     const submittedByFamilyAtSmallProjection = submittedByFamily();

@@ -43,7 +43,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  chunkFileArgs,
   collectSuiteVisibility,
   filterExisting,
   listChangedPaths,
@@ -52,10 +51,11 @@ import {
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
 import { runGatePreflights } from './lib/gate_preflight.mjs';
 import {
-  buildAlwaysRunArgs,
   buildFullSuiteArgs,
-  buildRelatedArgs,
+  buildSelectiveLegArgs,
   buildSelectPlan,
+  FLOOR_SANITY_MIN,
+  planSelectiveLegs,
 } from './lib/gate_select_plan.mjs';
 import {
   buildFullGateSteps,
@@ -156,6 +156,9 @@ const plan = buildSelectPlan({
   // unprovable: regeneration recreates it untracked, invisible to the
   // freshness diff), so the planner needs a live existence probe.
   exists: (f) => existsSync(path.join(repoRoot, f)),
+  // The live callers opt into the floor sanity fallback the CI arm has
+  // always had: a collapsed visibility walk must widen, never shrink.
+  floorSanityMin: FLOOR_SANITY_MIN,
 });
 
 console.log('[gate:select] full gate step list, selective vitest step');
@@ -184,36 +187,46 @@ if (plan.mode === 'full') {
     args: [...buildFullSuiteArgs({ workers })],
   });
 } else {
-  // Chunked: with shell:true on win32, ~500 paths in one argv exceeds cmd.exe's
-  // 8191-character command line and the leg cannot launch at all.
-  // git diff reports deletions, so a deleted test would put a dead path in the
-  // argv; a chunk of only dead paths exits 1 with "No test files found".
-  const runnable = filterExisting({
+  // Legs come from the pure platform-split planner (POSIX: one strict
+  // merged related invocation; win32: the classic two-leg shape, because
+  // vitest's `related` does not slash-normalize seed paths there and a
+  // merged leg would match nothing). Deletions are filtered per set first
+  // (git diff reports them, and a dead path selects nothing for itself).
+  const liveSources = filterExisting({
+    files: plan.relatedSources,
+    exists: (f) => existsSync(path.join(repoRoot, f)),
+  });
+  const liveFloor = filterExisting({
     files: plan.alwaysRunFiles,
     exists: (f) => existsSync(path.join(repoRoot, f)),
   });
-  const chunks = chunkFileArgs({ files: runnable });
-  chunks.forEach((files, i) => {
-    vitestSteps.push({
-      name:
-        chunks.length === 1
-          ? `vitest (always-run, ${runnable.length} files)`
-          : `vitest (always-run ${i + 1}/${chunks.length}, ${files.length} files)`,
-      cmd: vitestBin,
-      args: [...buildAlwaysRunArgs({ files, workers })],
-      hint: 'these tests reach outside the module graph, so they run on every selective gate',
-    });
+  const legs = planSelectiveLegs({
+    relatedSources: liveSources,
+    alwaysRunFiles: liveFloor,
+    platform: process.platform,
   });
-  const relatedArgs = buildRelatedArgs({ sources: plan.relatedSources, workers });
-  if (relatedArgs) {
+  if (legs.length === 0 || liveFloor.length === 0) {
+    // Zero legs or an empty floor here means classification collapsed under
+    // the planner's feet; fail toward the full suite, never a silent PASS.
     vitestSteps.push({
-      // "path(s)", not "changed source file(s)": the list is the union of
-      // changed sources AND fed-through generated i18n artifacts, and the
-      // plan.reason line above counts those separately.
-      name: `vitest (related over ${plan.relatedSources.length} path(s))`,
+      name: 'vitest (full suite, empty selective legs)',
       cmd: vitestBin,
-      args: [...relatedArgs],
+      args: [...buildFullSuiteArgs({ workers })],
     });
+  } else {
+    for (const leg of legs) {
+      vitestSteps.push({
+        name:
+          leg.kind === 'merged-related'
+            ? `vitest (merged related: ${liveSources.length} path(s) + ${liveFloor.length} floor seeds)`
+            : leg.kind === 'floor-run'
+              ? `vitest (floor ${leg.index}/${leg.of}, ${leg.files.length} files)`
+              : `vitest (related over ${leg.files.length} path(s))`,
+        cmd: vitestBin,
+        args: [...buildSelectiveLegArgs(leg, workers)],
+        hint: 'floor seeds always run; related walks the import graph from the changed paths',
+      });
+    }
   }
 }
 

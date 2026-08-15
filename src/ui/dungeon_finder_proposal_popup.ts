@@ -6,10 +6,20 @@
 // buttons are tab-reachable and localized.
 //
 // Perf contract: closed it does zero work (hud.update() gates on isOpen; it
-// only OPENS from the dfProposal SimEvent). While open it polls the finder
+// only ARMS from the dfProposal SimEvent). While open it polls the finder
 // snapshot at the mediumHud cadence, rebuilds DOM only when the structural
 // signature changes, refreshes the countdown text slot in place, and closes
 // itself the moment the proposal resolves (formed, declined, or expired).
+//
+// Arrival order, the reason show() arms instead of opening outright: online,
+// the dfProposal event rides the events frame while the proposal state rides
+// the `df` self snapshot at its own 2 Hz cadence, so at show() time
+// `dungeonFinderInfo.proposal` may trail the event by up to half a second
+// (the battleground twin pins the shared ordering in
+// tests/battleground_pop_wire_order.test.ts). Reading that gap as "proposal
+// resolved" and closing is the queue-pop outage shape: while armed the root
+// stays hidden but isOpen reports true so hud.update keeps polling until the
+// snapshot lands, bounded by OFFER_SNAPSHOT_GRACE_POLLS.
 
 import { audio } from '../game/audio';
 import type { IWorld } from '../world_api';
@@ -24,33 +34,37 @@ export interface DungeonFinderProposalPopupDeps {
   world(): IWorld;
 }
 
+/**
+ * MediumHud polls (about 4 Hz) an armed popup waits for the proposal snapshot
+ * before giving up: about five seconds, comfortably past the `df` key's 2 Hz
+ * worst case. The bound only exists so a proposal that died before its first
+ * snapshot cannot hold an invisible armed popup forever.
+ */
+export const OFFER_SNAPSHOT_GRACE_POLLS = 20;
+
 export class DungeonFinderProposalPopup {
   private lastSig = '';
   private lastRemainingText = '';
+  /** Polls left to wait for the proposal snapshot after show(); 0 = not armed. */
+  private pendingPolls = 0;
 
   constructor(private readonly deps: DungeonFinderProposalPopupDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.pendingPolls > 0 || this.deps.root().style.display === 'block';
   }
 
-  // Opened from the dfProposal SimEvent (hud.handleEvents), with the prompt cue.
+  // Armed from the dfProposal SimEvent (hud.handleEvents), with the prompt
+  // cue. The DOM opens on the first render that can read the proposal.
   show(): void {
-    if (!this.isOpen) {
-      const root = this.deps.root();
-      // The popup deliberately never steals focus (the player may be fighting), so
-      // a screen reader would otherwise miss the whole 30-second answer window:
-      // role=alert announces the prompt where it stands, without moving focus.
-      root.setAttribute('role', 'alert');
-      root.setAttribute('aria-live', 'assertive');
-      root.style.display = 'block';
-      audio.duelChallenge();
-    }
+    if (!this.isOpen) audio.duelChallenge();
+    this.pendingPolls = OFFER_SNAPSHOT_GRACE_POLLS;
     this.lastSig = '';
     this.render();
   }
 
   close(): void {
+    this.pendingPolls = 0;
     const el = this.deps.root();
     if (el.style.display !== 'block') return;
     el.style.display = 'none';
@@ -60,7 +74,9 @@ export class DungeonFinderProposalPopup {
   }
 
   relocalize(): void {
-    if (!this.isOpen) return;
+    // Displayed, not isOpen: an armed popup has no painted text to re-localize,
+    // and running render() from here would burn one of its grace polls.
+    if (this.deps.root().style.display !== 'block') return;
     this.lastSig = '';
     this.render();
   }
@@ -69,10 +85,29 @@ export class DungeonFinderProposalPopup {
     if (!this.isOpen) return;
     const view = buildFinderProposalPopupView(this.deps.world().dungeonFinderInfo);
     if (!view) {
+      if (this.pendingPolls > 0) {
+        // Armed: the proposal rode the events frame but its snapshot has not
+        // landed yet. Wait it out (bounded) rather than reading the gap as a
+        // resolved proposal; close() when the bound runs dry.
+        this.pendingPolls--;
+        if (this.pendingPolls === 0) this.close();
+        return;
+      }
       this.close();
       return;
     }
     const el = this.deps.root();
+    if (el.style.display !== 'block') {
+      // First readable proposal: take the DOM open here rather than in
+      // show(), so the role=alert announcement carries a real prompt instead
+      // of an empty box. The popup deliberately never steals focus (the
+      // player may be fighting): role=alert announces the prompt where it
+      // stands, without moving focus.
+      el.setAttribute('role', 'alert');
+      el.setAttribute('aria-live', 'assertive');
+      el.style.display = 'block';
+    }
+    this.pendingPolls = 0;
     if (view.sig !== this.lastSig) {
       this.lastSig = view.sig;
       this.lastRemainingText = '';

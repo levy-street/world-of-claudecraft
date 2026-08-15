@@ -1,5 +1,6 @@
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity } from '../types';
+import { catFlatSwingAdderMult } from './form_swing';
 
 export const AURA_MASTERY_AURA_ID = 'aura_mastery';
 export const PERPETUAL_SUN_GENERATION_AURA_ID = 'perpetual_sun_generation';
@@ -36,6 +37,10 @@ export function applyRequitalAutoAttack(ctx: SimContext, attacker: Entity, targe
     damage += masteredPaladinAuraValue(attacker, aura.id, aura.value);
   }
   if (damage <= 0) return;
+  // A flat per-landed-swing source: a Wolf Form attacker swings at the fixed
+  // fast cat cadence, so the value is rescaled by the cadence ratio
+  // (form_swing.ts) to keep Requital's damage per second unchanged.
+  damage = Math.max(1, Math.round(damage * catFlatSwingAdderMult(attacker)));
   ctx.dealDamage(
     attacker,
     target,

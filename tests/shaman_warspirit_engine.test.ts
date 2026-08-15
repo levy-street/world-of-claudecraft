@@ -7,6 +7,7 @@ import {
   onStormcastConsumed,
   STONEBOUND_ARMOR_ID,
   STONEBOUND_DR_ID,
+  STONEBOUND_STAMINA_ID,
   STORMCAST_CHEAP_ID,
   STORMCAST_ID,
   STORMSURGE_READY_ID,
@@ -91,10 +92,22 @@ describe('Warspirit engine', () => {
 
   it('makes Stonebound exclusive, respects taunt immunity, and cleans every rider', () => {
     const { sim, shaman, target } = setup();
+    const casterFormMaxHp = shaman.maxHp;
     applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
     expect(warspiritPosture(shaman)).toBe('stonebound');
-    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_ARMOR_ID)?.value).toBe(30);
-    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBe(0.1);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_ARMOR_ID)?.value).toBe(40);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_STAMINA_ID)?.value).toBe(20);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBe(0.15);
+    // Stonebound Vigor is a real health component: the stamina percent must
+    // raise the pool, and swapping to Galeheart must shed it with the rest of
+    // the posture riders.
+    sim.ctx.recalcPlayer(shaman);
+    expect(shaman.maxHp).toBeGreaterThan(casterFormMaxHp);
+    applyWarspiritPosture(sim.ctx, shaman, 'galeheart');
+    expect(shaman.auras.some((aura) => aura.id === STONEBOUND_STAMINA_ID)).toBe(false);
+    sim.ctx.recalcPlayer(shaman);
+    expect(shaman.maxHp).toBe(casterFormMaxHp);
+    applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
     applyStoneboundJolt(sim.ctx, shaman, target);
     expect(target.forcedTargetId).toBeNull();
 
@@ -106,6 +119,7 @@ describe('Warspirit engine', () => {
 
     clearWarspiritState(sim.ctx, shaman);
     expect(warspiritPosture(shaman)).toBeNull();
+    expect(shaman.auras.some((aura) => aura.id === STONEBOUND_STAMINA_ID)).toBe(false);
     expect(target.forcedTargetId).toBeNull();
     expect(target.forcedTargetTimer).toBe(0);
     expect(wolf.forcedTargetId).toBeNull();

@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { sourceFilesUnder } from './helpers/source_files_under';
+import { stripComments } from './helpers/strip_comments';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const scriptsRoot = join(repoRoot, 'scripts');
@@ -29,9 +30,7 @@ describe('scripts/ and tests/ Windows path safety', () => {
         // prose (above) naming the trap, or any future file that documents
         // it too. The line-comment strip keeps a `://` in a URL from eating
         // the rest of its line (same technique as scan_guard_self_audit.ts).
-        const code = readFileSync(file.full, 'utf8')
-          .replace(/\/\*[\s\S]*?\*\//g, '')
-          .replace(/(^|[^:])\/\/.*$/gm, '$1');
+        const code = stripComments(readFileSync(file.full, 'utf8'));
         return banned.test(code);
       })
       .map((file) => relative(repoRoot, file.full));

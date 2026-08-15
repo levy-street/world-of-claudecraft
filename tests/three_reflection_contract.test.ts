@@ -8,7 +8,7 @@ import {
 
 // The GPU hitch reflection attribution (scripts/profiler/gpu_hitch_metrics.mjs)
 // classifies every ACTIVE_UNIFORMS query by what the program's link had already
-// done. That classification is only meaningful while three r165 keeps the cycle
+// done. That classification is only meaningful while three r185 keeps the cycle
 // below, so the cycle is pinned here rather than assumed.
 //
 // Same shape as tests/three_compile_async_patch.test.ts: plain includes over the
@@ -21,21 +21,26 @@ const source = readFileSync(
 
 function section(startMarker: string, endMarker: string): string {
   const start = source.indexOf(startMarker);
-  expect(start, `three r165 no longer contains ${startMarker}`).toBeGreaterThan(-1);
+  expect(start, `three r185 no longer contains ${startMarker}`).toBeGreaterThan(-1);
   const end = source.indexOf(endMarker, start);
-  expect(end, `three r165 no longer contains ${endMarker} after ${startMarker}`).toBeGreaterThan(
+  expect(end, `three r185 no longer contains ${endMarker} after ${startMarker}`).toBeGreaterThan(
     start,
   );
   return source.slice(start, end);
 }
 
-describe('three r165 program reflection contract', () => {
+describe('three r185 program reflection contract', () => {
   it('is reading the revision every message in this file names', () => {
-    // Every failure below says "r165". Nothing else here asserts the revision,
+    // Every failure below says "r185". Nothing else here asserts the revision,
     // so a three bump that happens to keep these marker strings would leave the
     // whole file passing while its messages, and the reasoning behind the
     // analyzer's classification, silently referred to the wrong release.
-    expect(THREE.REVISION).toBe('165');
+    //
+    // This branch note: the suite landed upstream against three 0.165.0; this
+    // branch runs the 0.185.1 train (patched compileAsync included), and every
+    // contract below holds unchanged on the r185 build, so the premise was
+    // re-pointed wholesale at the phase 7 QA base merge rather than skipped.
+    expect(THREE.REVISION).toBe('185');
   });
 
   it('resolves readiness through COMPLETION_STATUS_KHR without reflecting', () => {
@@ -45,12 +50,12 @@ describe('three r165 program reflection contract', () => {
     const isReady = section('this.isReady = function () {', 'this.destroy = function () {');
     expect(
       isReady.includes('gl.getProgramParameter( program, COMPLETION_STATUS_KHR )'),
-      'three r165 isReady no longer queries COMPLETION_STATUS_KHR',
+      'three r185 isReady no longer queries COMPLETION_STATUS_KHR',
     ).toBe(true);
     for (const forbidden of ['onFirstUse', 'ACTIVE_UNIFORMS', 'cachedUniforms']) {
       expect(
         isReady.includes(forbidden),
-        `three r165 isReady now touches ${forbidden}; compileAsync settling would imply reflection`,
+        `three r185 isReady now touches ${forbidden}; compileAsync settling would imply reflection`,
       ).toBe(false);
     }
   });
@@ -59,25 +64,25 @@ describe('three r165 program reflection contract', () => {
     const onFirstUse = section('function onFirstUse( self ) {', '// set up caching for uniform');
     expect(
       onFirstUse.includes('cachedUniforms = new WebGLUniforms( gl, program );'),
-      'three r165 onFirstUse no longer builds the uniform cache',
+      'three r185 onFirstUse no longer builds the uniform cache',
     ).toBe(true);
     expect(
       onFirstUse.includes('cachedAttributes = fetchAttributeLocations( gl, program );'),
-      'three r165 onFirstUse no longer builds the attribute cache',
+      'three r185 onFirstUse no longer builds the attribute cache',
     ).toBe(true);
 
     const getUniforms = section('this.getUniforms = function () {', 'this.getAttributes');
     expect(
       getUniforms.includes('if ( cachedUniforms === undefined ) {') &&
         getUniforms.includes('onFirstUse( this );'),
-      'three r165 getUniforms no longer triggers onFirstUse on a cold cache',
+      'three r185 getUniforms no longer triggers onFirstUse on a cold cache',
     ).toBe(true);
 
     const getAttributes = section('this.getAttributes = function () {', 'let programReady');
     expect(
       getAttributes.includes('if ( cachedAttributes === undefined ) {') &&
         getAttributes.includes('onFirstUse( this );'),
-      'three r165 getAttributes no longer triggers onFirstUse on a cold cache',
+      'three r185 getAttributes no longer triggers onFirstUse on a cold cache',
     ).toBe(true);
   });
 
@@ -88,14 +93,14 @@ describe('three r165 program reflection contract', () => {
       section('class WebGLUniforms {', 'setValue( gl, name, value').includes(
         'gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS )',
       ),
-      'three r165 WebGLUniforms no longer enumerates through ACTIVE_UNIFORMS',
+      'three r185 WebGLUniforms no longer enumerates through ACTIVE_UNIFORMS',
     ).toBe(true);
     expect(
       section(
         'function fetchAttributeLocations( gl, program ) {',
         'function filterEmptyLine',
       ).includes('gl.getProgramParameter( program, gl.ACTIVE_ATTRIBUTES )'),
-      'three r165 fetchAttributeLocations no longer enumerates through ACTIVE_ATTRIBUTES',
+      'three r185 fetchAttributeLocations no longer enumerates through ACTIVE_ATTRIBUTES',
     ).toBe(true);
   });
 
@@ -107,7 +112,7 @@ describe('three r165 program reflection contract', () => {
     const onFirstUse = section('function onFirstUse( self ) {', '// set up caching for uniform');
     expect(
       onFirstUse.includes('if ( renderer.debug.checkShaderErrors ) {'),
-      'three r165 onFirstUse no longer gates its info-log queries on checkShaderErrors',
+      'three r185 onFirstUse no longer gates its info-log queries on checkShaderErrors',
     ).toBe(true);
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     expect(
@@ -169,13 +174,13 @@ describe('three r165 program reflection contract', () => {
     // renderBufferDirect, so both call sites must keep going through it.
     expect(
       source.includes('renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial'),
-      'three r165 WebGLShadowMap no longer draws through renderBufferDirect with a null scene',
+      'three r185 WebGLShadowMap no longer draws through renderBufferDirect with a null scene',
     ).toBe(true);
     expect(
       source.includes(
         '_this.renderBufferDirect( camera, scene, geometry, material, object, group );',
       ),
-      'three r165 no longer dispatches the main pass through the renderer instance property',
+      'three r185 no longer dispatches the main pass through the renderer instance property',
     ).toBe(true);
   });
 });

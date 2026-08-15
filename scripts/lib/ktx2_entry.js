@@ -16,9 +16,13 @@ export function attachKtx2(loader, renderer) {
   const injected = typeof window !== 'undefined' ? window.__KTX2_TRANSCODER__ : undefined;
   if (injected) {
     THREE.Cache.enabled = true;
-    THREE.Cache.add('/basis/basis_transcoder.js', injected.jsText);
+    // three r185 FileLoader namespaces its cache entries as 'file:' + the
+    // manager-resolved url (r165 used the raw url), so the pre-seed must use
+    // the same keys or the loader falls through to a network fetch the blank
+    // setContent pages cannot serve.
+    THREE.Cache.add('file:/basis/basis_transcoder.js', injected.jsText);
     const bytes = Uint8Array.from(atob(injected.wasmB64), (c) => c.charCodeAt(0));
-    THREE.Cache.add('/basis/basis_transcoder.wasm', bytes.buffer);
+    THREE.Cache.add('file:/basis/basis_transcoder.wasm', bytes.buffer);
   }
   const ktx2 = new KTX2Loader().setTranscoderPath('/basis/');
   ktx2.detectSupport(renderer);

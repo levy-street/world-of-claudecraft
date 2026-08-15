@@ -5831,7 +5831,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Consagra el suelo bajo tus pies durante 9 s e inflige {damage} de daño Sagrado con gran amenaza cada segundo. El primer impacto genera 1 de Devoción. Los Guardianes de la Fe reciben un 10% menos de daño mientras permanecen dentro. Ascensión aumenta su daño.',
   'entities.abilities.righteous_fury.name': 'Juramento Ardiente',
-  'entities.abilities.righteous_fury.description': 'Aumenta pasivamente en un 60% la amenaza generada por tu daño Sagrado. Solo Guardián de fe.',
+  'entities.abilities.righteous_fury.description': 'Aumenta pasivamente en un 30% la amenaza generada por tu daño Sagrado. Solo Guardián de fe.',
   'entities.abilities.retribution_aura.name': 'Aura de Represalia',
   'entities.abilities.retribution_aura.description':
     'Te rodea a ti y a tu grupo de energía sagrada hasta la muerte o su reemplazo. Los enemigos que golpeen cuerpo a cuerpo a un aliado afectado reciben {buff} de daño Sagrado, y los aliados afectados infligen {buff} de daño Sagrado adicional con sus ataques automáticos.',
@@ -5886,7 +5886,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': 'Arco Eléctrico',
   'entities.abilities.lightning_bolt.description': 'Inflige {damage} de daño de Naturaleza. El daño aumenta con el poder con hechizos. Elemental: un impacto otorga 1 de Trueno.',
   'entities.abilities.rockbiter_weapon.name': 'Arma Pétrea',
-  'entities.abilities.rockbiter_weapon.description': 'Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño adicional. Mejora gana además un 30% de armadura, sufre un 10% menos de daño y genera el doble de amenaza. Sacudida Terrestre obliga a su objetivo a atacarte durante 3 s, y Égida de Truenos otorga un 10% de reducción de daño durante 3 s.',
+  'entities.abilities.rockbiter_weapon.description': 'Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño adicional. Mejora gana además un 40% de armadura y un 20% de Aguante, sufre un 15% menos de daño y es inmune a los golpes críticos de las criaturas y genera 2,75 veces más amenaza. Sacudida Terrestre obliga a su objetivo a atacarte durante 3 s, y Égida de Truenos otorga un 10% de reducción de daño durante 3 s.',
   'entities.abilities.healing_wave.name': 'Aguas Reparadoras',
   'entities.abilities.healing_wave.description': 'Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos. Restauración: guarda un 50% de la sanación completa antes del exceso como Corriente Sanadora durante 12 s, hasta un 30% de la salud máxima del objetivo.',
   'entities.abilities.earth_shock.name': 'Sacudida Terrestre',
@@ -5949,7 +5949,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Enraíza al objetivo en el sitio durante hasta 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Cambias a forma de oso: armadura +130%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
+    'Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
   'entities.abilities.maul.name': 'Rompehuesos',
   'entities.abilities.growl.name': 'Amenazar',
   'entities.abilities.growl.description':
@@ -10720,6 +10720,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Continuar con Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Tienes prohibido participar en las Recompensas diarias. Motivo: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroico',
   'hudChrome.itemHeroicTag': '[HEROICO]',
   'hudChrome.itemSoulbound': 'Ligado al alma',
   'hudChrome.keybinds.categoryPet': 'Mascota',
@@ -11147,6 +11148,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} de Honor',
   'hudChrome.warfare.honorGain': 'Obtienes {amount} de Honor ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'No tienes suficiente Honor.',
+  'hudChrome.warfare.reasons.arenaComplete': 'combate en la arena disputado',
   'hudChrome.warfare.reasons.arenaWin': 'Victoria en la arena',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta completada',
   'hudChrome.warfare.reasons.fiestaKill': 'Derribo en Fiesta',
@@ -13410,4 +13412,26 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Ese código de apariencia proviene de una versión más reciente del juego.',
   'auth.designCodeErrMalformed': 'Ese código de apariencia está dañado. Copia el código completo e inténtalo de nuevo.',
   'hudChrome.nameplate.cheaterTag': '< Tramposo >',
+  'hud.options.displayMode': 'Modo de pantalla',
+  'hud.options.displayModeBorderless': 'Pantalla completa sin bordes',
+  'hud.options.displayModeWindowed': 'Ventana',
+  'hudChrome.options.discordPresence': 'Presencia enriquecida de Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Muestra la zona en la que estás y cuánto llevas jugando esta sesión como tu actividad de Discord, y cualquiera que pueda ver tu perfil de Discord puede ver ambos datos. Solo se comparten el nombre de la zona, tu tiempo de sesión y el juego, nunca tu personaje, tu cuenta ni con quién estás jugando. Necesita que la aplicación de Discord esté abierta en este equipo.',
+  'hudChrome.options.forceHighPerfGpu': 'Usar la GPU dedicada para videojuegos',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Activado de forma predeterminada: la aplicación de escritorio le pide a este equipo su GPU dedicada para videojuegos. Desactívalo si el juego no inicia, se abre con una pantalla en negro, o la pantalla del portátil se queda en blanco. Se aplica la próxima vez que inicies el juego.',
+  'desktop.notify.partyInviteBody': '{name} te invitó a un grupo.',
+  'desktop.notify.partyInviteTitle': 'Invitación de grupo',
+  'desktop.notify.updateReadyBody': 'Reinicia World of ClaudeCraft para aplicar la actualización.',
+  'desktop.notify.updateReadyTitle': 'La actualización {version} está lista',
+  'desktop.notify.updateReadyTitleNoVersion': 'La actualización está lista',
+  'desktop.update.whatsNew': 'Ver qué cambió en tu navegador',
+  'entities.abilities.challenging_roar.description':
+    'Un rugido funesto: todos los enemigos en un radio de 10 m son provocados, su amenaza hacia ti sube hasta igualar la de su enemigo más odiado, y quedan obligados a atacarte durante 3 s. Solo en Forma de Bruin.',
+  'entities.abilities.challenging_roar.name': 'Rugido Funesto',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Otorga 2 puntos de combo.',
+  'gpuNotice.bodyDiscreteInactive':
+    'El juego no está usando la GPU dedicada para videojuegos y se está ejecutando en la GPU integrada (de ahorro de energía), así que el rendimiento se verá afectado. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
 };

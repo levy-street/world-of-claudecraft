@@ -1372,6 +1372,10 @@ export const ko_KR: EnTranslations = {
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
       "showPlaytime": "캐릭터 화면에 플레이 시간 표시",
+      "forceHighPerfGpu": "전용 게이밍 GPU 사용",
+      "forceHighPerfGpuNote": "기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.",
+      "discordPresence": "Discord 리치 프레즌스",
+      "discordPresenceNote": "플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.",
       "showDevBadges": "개발자 배지 표시",
       "showOwnNameplate": "내 이름표 표시",
       "showPlayerNameplates": "플레이어 이름표 표시",
@@ -1744,6 +1748,7 @@ export const ko_KR: EnTranslations = {
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
+        "arenaComplete": "투기장 참전",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
@@ -1850,6 +1855,7 @@ export const ko_KR: EnTranslations = {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
     "itemHeroicTag": "[영웅]",
+    "itemHeroicLabel": "영웅",
     "itemSoulbound": "귀속",
     "itemUniqueEquipped": "착용 시 고유",
     "itemSet": {
@@ -7862,7 +7868,15 @@ export const ko_KR: EnTranslations = {
       "readyBody": "게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
       "restart": "지금 다시 시작",
       "later": "나중에",
-      "dismiss": "닫기"
+      "dismiss": "닫기",
+      "whatsNew": "변경 사항을 브라우저에서 보기"
+    },
+    "notify": {
+      "updateReadyTitle": "업데이트 {version} 준비 완료",
+      "updateReadyTitleNoVersion": "업데이트 준비 완료",
+      "updateReadyBody": "업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.",
+      "partyInviteTitle": "파티 초대",
+      "partyInviteBody": "{name}님이 파티에 초대했습니다."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7874,6 +7888,7 @@ export const ko_KR: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
+    "bodyDiscreteInactive": "게임이 전용(게이밍) GPU를 사용하지 않고 절전형 GPU에서 실행되고 있어 성능이 떨어집니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
     "bodyWeb": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.",
     "hybridBodyWindows": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 고성능으로 설정한 다음 다시 시작하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
     "hybridBodyLinux": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저나 그래픽 드라이버에 자체 GPU 선택 설정이 있거나 배포판에 GPU 전환 도구(PRIME 또는 optimus-manager 등)가 있을 수 있습니다. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
@@ -8242,6 +8257,9 @@ export const ko_KR: EnTranslations = {
       "graphicsReloadNote": "그래픽 품질과 지형 세부 묘사는 새로고침 후 적용됩니다.",
       "reloadNow": "지금 새로고침",
       "fullscreen": "전체 화면",
+      "displayMode": "디스플레이 모드",
+      "displayModeBorderless": "테두리 없는 전체 화면",
+      "displayModeWindowed": "창 모드",
       "touchLookSpeed": "터치 시점 속도",
       "joystickSize": "조이스틱 크기",
       "buttonSize": "버튼 크기",
@@ -9582,6 +9600,7 @@ export const ko_KR: EnTranslations = {
       "cheap_shot": {
         "name": "명치 가격",
         "description": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.",
+        "descriptionNoStealth": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 연계 점수 2점을 얻습니다.",
         "specNote_subtlety": "황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다."
       },
       "sap": {
@@ -9794,7 +9813,7 @@ export const ko_KR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "불타는 맹세",
-        "description": "신성 피해가 만드는 위협 수준을 지속적으로 60% 높입니다. 신앙수호자 전용."
+        "description": "신성 피해가 만드는 위협 수준을 지속적으로 30% 높입니다. 신앙수호자 전용."
       },
       "retribution_aura": {
         "name": "응보의 오라",
@@ -9910,7 +9929,7 @@ export const ko_KR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
-        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 30% 얻고, 받는 피해가 10% 줄며, 위협 수준을 두 배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
+        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 40%, 체력을 20% 얻고, 받는 피해가 15% 줄며, 야수의 치명타에 면역이 되며, 위협 수준을 2.75배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
       },
       "healing_wave": {
         "name": "치유의 물결",
@@ -10089,7 +10108,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_form": {
         "name": "큰곰 변신",
-        "description": "곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "description": "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
         "name": "뼈 분쇄",
@@ -10099,6 +10118,10 @@ export const ko_KR: EnTranslations = {
       "growl": {
         "name": "위협",
         "description": "대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
+      },
+      "challenging_roar": {
+        "name": "위압의 포효",
+        "description": "위압적으로 포효합니다. 10미터 내의 모든 적이 도발되어 자신에 대한 위협 수준이 그 적이 가장 증오하는 대상과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
       },
       "cat_form": {
         "name": "늑대 변신",

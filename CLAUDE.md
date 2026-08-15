@@ -56,8 +56,9 @@ the nested `npm run` forms below are the package.json script names.
 - `npm run server`: esbuild-bundle + run the authoritative server on :8787.
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
 - `node scripts/gate_select.mjs`: **the pre-merge gate.** Same step list as `npm run gate`
-  (nothing dropped) with one substitution: the full vitest run becomes an always-run set
-  plus `vitest related`. Roughly 3x faster; falls back to the full suite for any change it
+  (nothing dropped) with one substitution: the full vitest run becomes ONE merged
+  `vitest related` invocation (the always-run floor rides it as self-selecting seeds,
+  same form as the CI shards). Roughly 3x faster; falls back to the full suite for any change it
   cannot reason about. See `docs/qa-gate.md`.
 - `npm run gate`: the full CI-equivalent gate, still the deeper check (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, the real-browser
