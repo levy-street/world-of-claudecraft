@@ -66,7 +66,13 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after folding the five near-identical lazy form-visual
     // builds into buildFormVisual, which paid for the review's prewarm re-queue
     // sites (form rigs, the base-visual replace, both held-weapon swaps).
-    ceiling: 13661,
+    // Lowered again after the Goblin Rocket Sled merge: the mount-visual
+    // teardown had three near-identical copies (live swap, dismount, view
+    // disposal), now releaseMountVisual/releaseMountFx in
+    // src/render/mount_visual_lifecycle.ts. The merged file landed 3 lines over
+    // the inherited ceiling and bought the room back by extraction, per the
+    // ratchet's rule, rather than raising the number.
+    ceiling: 13652,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

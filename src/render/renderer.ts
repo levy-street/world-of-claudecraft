@@ -354,6 +354,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { releaseMountFx, releaseMountVisual } from './mount_visual_lifecycle';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -10377,8 +10378,7 @@ export class Renderer {
       this.lightRankDirty = true;
     }
     this.nameplatePainter.remove(id);
-    v.goblinRocketSledFx?.dispose();
-    v.goblinRocketSledFx = null;
+    releaseMountFx(v);
     const idx = this.clickTargets.indexOf(v.clickTarget);
     if (idx >= 0) this.clickTargets.splice(idx, 1);
     if (v.visual) {
@@ -11246,14 +11246,7 @@ export class Renderer {
       const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
       if (mountSpec && v.mountVisualKey !== mountSpec.visualKey) {
-        v.goblinRocketSledFx?.dispose();
-        v.goblinRocketSledFx = null;
-        if (v.mountVisual) {
-          v.group.remove(v.mountVisual.root);
-          v.mountVisual.dispose();
-          v.mountVisual = null;
-        }
-        v.mountVisualKey = '';
+        releaseMountVisual(v);
         if (mountAssetsReady(mountSpec.visualKey)) {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
@@ -11274,12 +11267,7 @@ export class Renderer {
           );
         }
       } else if (!mountSpec && v.mountVisual) {
-        v.goblinRocketSledFx?.dispose();
-        v.goblinRocketSledFx = null;
-        v.group.remove(v.mountVisual.root);
-        v.mountVisual.dispose();
-        v.mountVisual = null;
-        v.mountVisualKey = '';
+        releaseMountVisual(v);
       }
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
       v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
