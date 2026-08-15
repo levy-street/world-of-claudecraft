@@ -1556,6 +1556,14 @@ describe('rift ranks: budget escape and citadel exemption', () => {
         zone: 'deathZoneStrike',
         minCastTime: 5.0,
       },
+      // Demon Tower summit: no movement-impairing CC is active during the
+      // escape window, so the authored 2.4s fuse clears its 9yd radius.
+      {
+        id: 'tower_boss_demon_lord',
+        ccMult: 1,
+        zone: 'deathZoneCast',
+        minCastTime: 2.4,
+      },
     ];
     for (const { id, ccMult, zone, minCastTime, stunDuration } of cases) {
       const tmpl = MOBS[id] as unknown as Record<string, { castTime: number; radius: number }>;

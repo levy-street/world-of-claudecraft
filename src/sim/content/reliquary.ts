@@ -424,6 +424,7 @@ export const RELIQUARY_HORIZON_TITLES = [
   'col_reliquary_illum_nythraxis_heroic',
   'col_reliquary_illum_thunzharr',
   'col_reliquary_illum_gravewyrm_heroic',
+  'dgn_demon_tower_unbound',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -726,8 +727,9 @@ export const RELIQUARY_HEROIC_GEAR = {
 // the theme boss's fat roll first, then its trash's slim ones in mobs.ts
 // table order. graskbreaker_girdle has one trash carrier (the Warcamp theme
 // shares rift_marrow_troll with Boneyard, whose loot stays bonelord_mantle),
-// pactbound_vestments spans both citadel bosses plus both citadel trash, and
-// pitlords_cleaver is the pit lord's alone.
+// pactbound_vestments spans both citadel bosses, both citadel trash, and the
+// three Demon Tower bosses that carry it. pitlords_cleaver comes from the pit
+// lord plus the two Tower bosses whose static loot carries it.
 const RIFT_RARE_SOURCES = {
   hoarfrost_edge: [
     fromBoss('rift_boss_frost'),
@@ -770,8 +772,15 @@ const RIFT_RARE_SOURCES = {
     fromBoss('rift_boss_pitlord'),
     fromBoss('rift_hellguard'),
     fromBoss('rift_pact_acolyte'),
+    fromBoss('tower_boss_flesh_shaper'),
+    fromBoss('tower_boss_gatekeeper'),
+    fromBoss('tower_boss_demon_lord'),
   ],
-  pitlords_cleaver: fromBoss('rift_boss_pitlord'),
+  pitlords_cleaver: [
+    fromBoss('rift_boss_pitlord'),
+    fromBoss('tower_boss_ash_tyrant'),
+    fromBoss('tower_boss_demon_lord'),
+  ],
 } as const satisfies Record<(typeof RIFT_RARE_ITEM_IDS)[number], ReliquarySourceHints>;
 
 // ---------------------------------------------------------------------------

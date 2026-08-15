@@ -22,9 +22,9 @@ const SEED = 61234;
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
-// The nine heroic warrior/guard melee templates that carry the charge, and the
+// The nine heroic warrior/guard melee templates that carry the shared charge, and the
 // exact record they all share (anti-kite band 5..30yd, 12s cooldown, 0.5s stun).
-const CHARGE_TEMPLATE_IDS = [
+const SHARED_CHARGE_TEMPLATE_IDS = [
   'crypt_shambler',
   'sexton_marrow',
   'bastion_revenant',
@@ -35,13 +35,20 @@ const CHARGE_TEMPLATE_IDS = [
   'drowned_templeguard',
   'pearlguard_sentinel',
 ] as const;
-const CHARGE_RECORD = {
+const SHARED_CHARGE_RECORD = {
   minRange: 5,
   maxRange: 30,
   cooldown: 12,
   stunDuration: 0.5,
   name: 'Onrush',
   school: 'physical',
+} as const;
+const TOWER_CHARGE_RECORD = {
+  minRange: 9,
+  maxRange: 26,
+  cooldown: 11,
+  stunDuration: 1.2,
+  name: 'Molten Rush',
 } as const;
 // Deliberately excluded: casters/acolytes, beasts/spiders/dragonkin, the ogre,
 // all bosses, and every Nythraxis raid mob (keeps the raid parity golden
@@ -143,18 +150,21 @@ const testRoot = (sourceId: number): Aura => ({
 });
 
 describe('charge template coverage (data contract)', () => {
-  it('exactly the nine warrior/guard melee templates carry the shared charge record', () => {
-    for (const id of CHARGE_TEMPLATE_IDS) {
-      expect(MOBS[id]?.charge, `${id} carries charge`).toEqual(CHARGE_RECORD);
+  it('pins the nine shared charges plus the Ash Tyrant bespoke charge', () => {
+    for (const id of SHARED_CHARGE_TEMPLATE_IDS) {
+      expect(MOBS[id]?.charge, `${id} carries charge`).toEqual(SHARED_CHARGE_RECORD);
     }
-    // Global scan: no template outside the nine may carry a charge (bosses and
+    expect(MOBS.tower_boss_ash_tyrant.charge).toEqual(TOWER_CHARGE_RECORD);
+    // Global scan: no template outside these ten may carry a charge (other bosses and
     // every Nythraxis raid mob stay charge-free so the raid parity golden and
     // the boss-mechanic draw order are untouched).
     const allWithCharge = Object.values(MOBS)
       .filter((t) => t.charge)
       .map((t) => t.id)
       .sort();
-    expect(allWithCharge).toEqual([...CHARGE_TEMPLATE_IDS].sort());
+    expect(allWithCharge).toEqual(
+      [...SHARED_CHARGE_TEMPLATE_IDS, 'tower_boss_ash_tyrant'].sort(),
+    );
     for (const id of NO_CHARGE_TEMPLATE_IDS) {
       expect(MOBS[id], `${id} exists`).toBeTruthy();
       expect(MOBS[id]?.charge, `${id} must not charge`).toBeUndefined();

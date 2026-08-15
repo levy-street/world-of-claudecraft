@@ -250,6 +250,7 @@ describe('CI workflow parity', () => {
       '            !/docs/screenshots/*/',
       '            /docs/screenshots/admin-cheater-mark/',
       '            /docs/screenshots/admin-guild-bank-panel/',
+      '            /docs/screenshots/demon-tower/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
       '            /docs/screenshots/far-foliage-impostors/',

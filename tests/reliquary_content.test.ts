@@ -354,7 +354,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // honor pieces and the 3 fishing additions (the koi and both rods):
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils), plus the Tower Unbound title:
+    // 341. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -362,7 +363,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 341, total: 341 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +374,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 312, total: 312 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -383,7 +384,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content: 375 total.
+    // three daggers the v0.36.0 release merge added to live content and the
+    // Tower Unbound title: 376 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -394,7 +396,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(376);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2477,12 +2479,12 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   horizons_mounts: 10,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
-  // rows: 36 + the four Phase 18 completion-ladder titles.
-  horizons_titles: 40,
-  // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
-  // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
-  // doors. The rift_first_clear activity left with the bands.
-  conquerors_the_rift: 29,
+  // rows: 36 + the four Phase 18 completion-ladder titles + Tower Unbound.
+  horizons_titles: 41,
+  // 33 = 31 distinct rift mobs across the ten rare multi-hints (eight theme
+  // bosses + both citadel bosses + 17 trash carriers + four Tower bosses),
+  // plus the B and S rank doors. The rift_first_clear activity left with the bands.
+  conquerors_the_rift: 33,
   // The one first-clear activity door, on all three bands (Phase 21).
   horizons_riftbound: 1,
   // 24 = the 19 rares plus the 5 zones they camp across (vale, marsh, peaks,
