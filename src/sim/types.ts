@@ -4526,9 +4526,8 @@ export interface Entity extends ClientMirroredEntityFields {
   // mechanicDamageMult can reach it. Without this a petSpell caster is immune
   // to dungeon tuning, and since a caster stands and casts instead of meleeing
   // (mob/combat_profile.ts updateCasterCombat) that is its ENTIRE damage
-  // output. Set from NormalDungeonTuning.rangedDamageMultiplierByMob;
-  // undefined = 1 (untuned, and every heroic spawn, which keeps its shipped
-  // calibration).
+  // output. Set from NormalDungeonTuning.rangedDamageMultiplierByMob or the
+  // Demon Tower's floor-role tuning; undefined = 1 for untuned spawns.
   rangedDamageMult?: number;
   // Entity-level CC/snare immunity, the per-spawn twin of the MobTemplate
   // ccImmune/slowImmune flags (which are read from the base MOBS table, so a

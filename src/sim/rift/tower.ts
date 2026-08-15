@@ -157,10 +157,10 @@ function spawnTowerDemon(
     level,
     ctx.groundPos(origin.x + x, origin.z + z),
   );
-  // Mechanic damage/heal numbers are read from the base MOBS table at fire time,
-  // so the template transform above cannot reach them; these per-entity
+  // Mechanic and petSpell numbers are read from the base MOBS table at fire
+  // time, so the template transform above cannot reach them; these per-entity
   // multipliers apply on top.
-  mob.mechanicDamageMult = riftRoleDamageMultiplier(rankTuning, role);
+  mob.rangedDamageMult = mob.mechanicDamageMult = riftRoleDamageMultiplier(rankTuning, role);
   mob.mechanicHealMult = riftRoleHealthMultiplier(rankTuning, role);
   if (asBoss) {
     mob.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;

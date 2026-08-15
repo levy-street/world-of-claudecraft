@@ -76,8 +76,9 @@ export const DEMON_TOWER_FLOORS = [
         { templateId: 'tower_cinder_crawler', count: 2 },
       ],
       [
-        { templateId: 'tower_hellhound', count: 4 },
+        { templateId: 'tower_hellhound', count: 3 },
         { templateId: 'tower_pact_reaver', count: 2 },
+        { templateId: 'tower_imp', count: 1 },
       ],
       [
         { templateId: 'tower_brimstone_zealot', count: 3 },
@@ -125,8 +126,9 @@ export const DEMON_TOWER_FLOORS = [
     },
     waves: [
       [
-        { templateId: 'tower_gloom_bat', count: 4 },
+        { templateId: 'tower_gloom_bat', count: 3 },
         { templateId: 'tower_bone_acolyte', count: 3 },
+        { templateId: 'tower_soulbinder', count: 1 },
       ],
       [
         { templateId: 'tower_shade_dancer', count: 3 },
@@ -139,7 +141,8 @@ export const DEMON_TOWER_FLOORS = [
       ],
       [
         { templateId: 'tower_void_sentinel', count: 2 },
-        { templateId: 'tower_bone_acolyte', count: 3 },
+        { templateId: 'tower_bone_acolyte', count: 2 },
+        { templateId: 'tower_soulbinder', count: 1 },
       ],
     ],
     bossId: 'tower_boss_flesh_shaper',
@@ -178,13 +181,15 @@ export const DEMON_TOWER_FLOORS = [
     },
     waves: [
       [
-        { templateId: 'tower_abyss_knight', count: 3 },
+        { templateId: 'tower_abyss_knight', count: 2 },
         { templateId: 'tower_dread_harbinger', count: 2 },
+        { templateId: 'tower_soulbinder', count: 1 },
       ],
       [
         { templateId: 'tower_void_sentinel', count: 2 },
         { templateId: 'tower_blood_matron', count: 2 },
-        { templateId: 'tower_shade_dancer', count: 2 },
+        { templateId: 'tower_shade_dancer', count: 1 },
+        { templateId: 'tower_soulbinder', count: 1 },
       ],
       [
         { templateId: 'tower_dread_harbinger', count: 3 },
@@ -192,8 +197,9 @@ export const DEMON_TOWER_FLOORS = [
       ],
       [{ templateId: 'tower_boss_gatekeeper', count: 1, lieutenant: true }],
       [
-        { templateId: 'tower_abyss_knight', count: 2 },
+        { templateId: 'tower_abyss_knight', count: 1 },
         { templateId: 'tower_void_sentinel', count: 2 },
+        { templateId: 'tower_soulbinder', count: 1 },
       ],
     ],
     bossId: 'tower_boss_demon_lord',

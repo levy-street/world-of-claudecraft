@@ -8096,8 +8096,8 @@ export class Sim {
         this.enterCombat(pet, target);
       } else {
         // rangedDamageMult is the instance-tuning factor for a HOSTILE petSpell
-        // caster (undefined, so 1, for every player pet and every untuned or
-        // heroic spawn). Applied after the rng draw like the mechanic
+        // caster (undefined, so 1, for every player pet and every untuned
+        // spawn). Applied after the rng draw like the mechanic
         // multipliers, so the shared draw order is unchanged.
         const dmg = Math.round(
           this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
@@ -8656,7 +8656,7 @@ export class Sim {
       const add = createMob(this.nextId++, addTemplate, level, pos);
       applyDungeonMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
       if (riftTuning) {
-        add.mechanicDamageMult = riftTuning.addDamageMultiplier;
+        add.rangedDamageMult = add.mechanicDamageMult = riftTuning.addDamageMultiplier;
         add.mechanicHealMult = riftTuning.healthMultiplier;
       }
       // The add is anchored where it ERUPTED (createMob already set spawnPos to the

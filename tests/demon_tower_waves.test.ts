@@ -9,6 +9,7 @@ import {
   demonTowerEntry,
   demonTowerHazards,
 } from '../src/sim/content/rift/demon_tower';
+import { MOBS } from '../src/sim/data';
 import { DEMON_TOWER_FLOORS } from '../src/sim/rift/tower_floors';
 import {
   DEMON_TOWER_CORE_RADIUS,
@@ -177,6 +178,52 @@ describe('demon tower waves', () => {
       ];
       expect(demonTowerRosterWindow(k)).toEqual(expected);
       for (const id of expected) expect(roster.has(id) || id === DEMON_TOWER_GATEKEEPER).toBe(true);
+    }
+  });
+
+  it('mixes a real ranged caster into every ordinary wave on all three floors', () => {
+    expect({
+      tower_imp: MOBS.tower_imp.petSpell,
+      tower_flame_herald: MOBS.tower_flame_herald.petSpell,
+      tower_soulbinder: MOBS.tower_soulbinder.petSpell,
+    }).toEqual({
+      tower_imp: {
+        name: 'Cinderbolt',
+        school: 'fire',
+        min: 9,
+        max: 13,
+        range: 24,
+        every: 2.4,
+        windup: 0.55,
+      },
+      tower_flame_herald: {
+        name: 'Flame Lance',
+        school: 'fire',
+        min: 14,
+        max: 20,
+        range: 26,
+        every: 2.8,
+        windup: 0.7,
+      },
+      tower_soulbinder: {
+        name: 'Soul Bolt',
+        school: 'shadow',
+        min: 13,
+        max: 19,
+        range: 27,
+        every: 3,
+        windup: 0.75,
+      },
+    });
+
+    for (const [floorIndex, floor] of DEMON_TOWER_FLOORS.entries()) {
+      for (const [waveIndex, wave] of floor.waves.entries()) {
+        if (wave.every((member) => 'lieutenant' in member && member.lieutenant)) continue;
+        expect(
+          wave.some((member) => MOBS[member.templateId]?.petSpell !== undefined),
+          `floor ${floorIndex + 1} wave ${waveIndex + 1} needs a ranged caster`,
+        ).toBe(true);
+      }
     }
   });
 

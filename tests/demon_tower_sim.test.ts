@@ -199,6 +199,52 @@ describe('demon tower: a live run', () => {
     expect(inst.descentOpen).toBe(false);
   });
 
+  it('keeps a live Tower caster at range and starts its projectile windup', () => {
+    const sim = makeSim();
+    sim.enterRift(DEMON_TOWER_SEED, 20, sim.player.id);
+    const inst = towerInstance(sim);
+    tickAlive(sim, SWEEP);
+    const imp = inst.towerWaveMobIds
+      .map((id) => sim.entities.get(id))
+      .find((mob) => mob?.templateId === 'tower_imp');
+    if (!imp) throw new Error('the Bloodforge opening wave needs its ranged imp');
+
+    sim.player.pos = { x: imp.pos.x, y: imp.pos.y, z: imp.pos.z - 18 };
+    sim.player.prevPos = { ...sim.player.pos };
+    imp.aiState = 'attack';
+    imp.aggroTargetId = sim.player.id;
+    imp.threat.set(sim.player.id, 100);
+    imp.swingTimer = 0;
+    const before = { ...imp.pos };
+
+    (sim as unknown as { updateMob(mob: typeof imp): void }).updateMob(imp);
+
+    expect(imp.pos).toEqual(before);
+    expect(imp.aiState).toBe('attack');
+    expect(imp.rangedWindupReleaseTick).not.toBeNull();
+    expect(imp.rangedDamageMult).toBe(1);
+
+    sim.drainEvents();
+    imp.rangedWindupReleaseTick = 0;
+    (sim as unknown as { updateMob(mob: typeof imp): void }).updateMob(imp);
+    expect(sim.drainEvents()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'spellfx',
+          sourceId: imp.id,
+          targetId: sim.player.id,
+          fx: 'projectile',
+        }),
+        expect.objectContaining({
+          type: 'damage',
+          sourceId: imp.id,
+          targetId: sim.player.id,
+          ability: 'Cinderbolt',
+        }),
+      ]),
+    );
+  });
+
   it('opens the ascent only once every wave of the floor is dead', () => {
     const sim = makeSim();
     sim.enterRift(DEMON_TOWER_SEED, 20, sim.player.id);
@@ -303,6 +349,7 @@ describe('demon tower: a live run', () => {
       weapon: add?.weapon,
       armor: add?.stats.armor,
       moveSpeed: add?.moveSpeed,
+      rangedDamageMult: add?.rangedDamageMult,
       mechanicDamageMult: add?.mechanicDamageMult,
       mechanicHealMult: add?.mechanicHealMult,
     }).toEqual({
@@ -310,6 +357,7 @@ describe('demon tower: a live run', () => {
       weapon: expected.weapon,
       armor: expected.stats.armor,
       moveSpeed: expected.moveSpeed,
+      rangedDamageMult: rankTuning.addDamageMultiplier,
       mechanicDamageMult: rankTuning.addDamageMultiplier,
       mechanicHealMult: rankTuning.healthMultiplier,
     });
