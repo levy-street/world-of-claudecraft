@@ -1739,6 +1739,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughHonor": "Yeterli Onur yok.",
       "reasons": {
         "arenaWin": "Arena zaferi",
+        "arenaComplete": "Arena müsabakası yapıldı",
         "fiestaKill": "Fiesta avlaması",
         "fiestaComplete": "Fiesta tamamlandı",
         "fiestaWin": "Fiesta zaferi",
@@ -1845,7 +1846,7 @@ export const tr_TR: EnTranslations = {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
     "itemHeroicTag": "[KAHRAMANCA]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Ruha Bağlı",
     "itemUniqueEquipped": "Eşsiz Kuşanım",
     "itemSet": {
@@ -9719,7 +9720,7 @@ export const tr_TR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Yanan Yemin",
-        "description": "Kutsal hasarının ürettiği tehdidi pasif olarak %60 artırır. Yalnızca İnanç muhafızı."
+        "description": "Kutsal hasarının ürettiği tehdidi pasif olarak %30 artırır. Yalnızca İnanç muhafızı."
       },
       "retribution_aura": {
         "name": "Karşılık Aurası",
@@ -9835,7 +9836,7 @@ export const tr_TR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
-        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %30 zırh kazanır, %10 daha az hasar alır ve iki katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
+        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır ve yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
       },
       "healing_wave": {
         "name": "Onaran Sular",
@@ -10014,7 +10015,7 @@ export const tr_TR: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Formu",
-        "description": "Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
       },
       "maul": {
         "name": "Kemik Kıran",
@@ -10024,6 +10025,10 @@ export const tr_TR: EnTranslations = {
       "growl": {
         "name": "Gözdağı",
         "description": "Hedefe hırlar: tehdidin onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Kurt Formu",

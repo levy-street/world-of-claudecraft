@@ -16,7 +16,7 @@ describe('Nythraxis matrix DPS rotations', () => {
     expect(dotSetMatch?.[1]).not.toContain("'pyroblast'");
   });
 
-  it('executes both tank distributions in one Monte Carlo shard with shared gear and chosen talents', () => {
+  it('executes all four tank distributions in one Monte Carlo shard with shared gear and chosen talents', () => {
     const outputDirectory = mkdtempSync(join(tmpdir(), 'nythraxis-matrix-test-'));
     const outputPath = join(outputDirectory, 'result.json');
     try {
@@ -33,7 +33,7 @@ describe('Nythraxis matrix DPS rotations', () => {
             MATRIX_OUTPUT_PATH: outputPath,
           },
           stdio: 'pipe',
-          timeout: 300_000,
+          timeout: 480_000,
         },
       );
 
@@ -53,8 +53,8 @@ describe('Nythraxis matrix DPS rotations', () => {
           >;
         }>;
       };
-      expect(report.run).toBe(2);
-      expect(report.runs.map((run) => run.seed)).toEqual([1, 1]);
+      expect(report.run).toBe(4);
+      expect(report.runs.map((run) => run.seed)).toEqual([1, 1, 1, 1]);
 
       const expectedRows = {
         protection_warrior: {
@@ -73,25 +73,56 @@ describe('Nythraxis matrix DPS rotations', () => {
           17: 'pal_r17_extended_dawn',
           20: 'pal_r20_aura_mastery',
         },
+        feral_druid_tank: {
+          5: 'dru_r5_improved_wrath',
+          8: 'dru_r8_improved_roots',
+          11: 'dru_r11_improved_mark',
+          14: 'dru_r14_savage_fury',
+          17: 'dru_r17_improved_barkskin',
+          20: 'dru_r20_berserk',
+        },
+        stonebound_shaman: {
+          5: 'sha_r5_concussion',
+          8: 'sha_r8_shock_efficiency',
+          11: 'sha_r11_ancestral_guidance',
+          14: 'sha_r14_improved_flame_shock',
+          17: 'sha_r17_earthbind',
+          20: 'sha_r20_tidal_waves',
+        },
       } as const;
+      // Each plan runs its boss tank with the shared support roster and the
+      // hybrid off-tank (feral bear, or the Stonebound shaman under the bear's
+      // own plan so no actor key repeats).
+      const supportKeys = [
+        'holy_priest',
+        'discipline_priest',
+        'restoration_shaman',
+        'combat_rogue',
+        'arms_warrior',
+        'fire_mage',
+        'marksmanship_hunter',
+        'retribution_paladin',
+      ];
       for (const run of report.runs) {
         const tankKey = run.key.split('|')[0] as keyof typeof expectedRows;
         const tank = run.actors[tankKey];
-        expect(tank.equippedItemIds).toEqual([...report.sharedTankGear].sort());
+        if (tankKey === 'protection_warrior' || tankKey === 'protection_paladin') {
+          expect(tank.equippedItemIds).toEqual([...report.sharedTankGear].sort());
+        }
+        if (tankKey === 'stonebound_shaman') {
+          // The Stonebound tank draws from the same shared tank lists but each
+          // slot falls back to the best shaman-equippable candidate, so the kit
+          // overlaps the warrior/paladin kit rather than matching it exactly.
+          const shared = new Set(report.sharedTankGear);
+          const overlap = tank.equippedItemIds.filter((id) => shared.has(id)).length;
+          expect(overlap).toBeGreaterThanOrEqual(9);
+          expect(tank.equippedItemIds.length).toBeGreaterThanOrEqual(11);
+        }
         expect(tank.talentRows).toEqual(expectedRows[tankKey]);
+        const offTankKey =
+          tankKey === 'feral_druid_tank' ? 'stonebound_shaman' : 'feral_druid_tank';
         expect(Object.keys(run.actors).sort()).toEqual(
-          [
-            tankKey,
-            'feral_druid_tank',
-            'holy_priest',
-            'discipline_priest',
-            'restoration_shaman',
-            'combat_rogue',
-            'arms_warrior',
-            'fire_mage',
-            'marksmanship_hunter',
-            'retribution_paladin',
-          ].sort(),
+          [tankKey, offTankKey, ...supportKeys].sort(),
         );
       }
       expect(report.runs[0].actors.protection_warrior.successfulCasts.raised_guard).toBeGreaterThan(
@@ -101,6 +132,10 @@ describe('Nythraxis matrix DPS rotations', () => {
         report.runs[1].actors.protection_paladin.successfulCasts.divine_protection,
       ).toBeGreaterThan(0);
       expect(report.runs[1].actors.protection_paladin.successfulCasts.holy_shield).toBeGreaterThan(
+        0,
+      );
+      expect(report.runs[2].actors.feral_druid_tank.successfulCasts.maul).toBeGreaterThan(0);
+      expect(report.runs[3].actors.stonebound_shaman.successfulCasts.stormstrike).toBeGreaterThan(
         0,
       );
 
@@ -118,27 +153,30 @@ describe('Nythraxis matrix DPS rotations', () => {
             MATRIX_OUTPUT_PATH: secondShardPath,
           },
           stdio: 'pipe',
-          timeout: 300_000,
+          timeout: 480_000,
         },
       );
       const secondShard = JSON.parse(readFileSync(secondShardPath, 'utf8')) as {
         run: number;
         runs: Array<{ seed: number; key: string }>;
       };
-      expect(secondShard.run).toBe(2);
-      expect(secondShard.runs.map((run) => run.seed)).toEqual([2, 2]);
+      expect(secondShard.run).toBe(4);
+      expect(secondShard.runs.map((run) => run.seed)).toEqual([2, 2, 2, 2]);
       expect(secondShard.runs.map((run) => run.key.split('|')[0])).toEqual([
         'protection_warrior',
         'protection_paladin',
+        'feral_druid_tank',
+        'stonebound_shaman',
       ]);
     } finally {
       rmSync(outputDirectory, { recursive: true, force: true });
     }
-    // Two tsx child runs at ~60s each on the finalized kits solo; the
-    // long-sims lane's slowest observed runner (run 31290316610,
-    // workers=2) killed a child at the old 120s bound mid-shard, so both
-    // child timeouts and this budget carry lane-contention margin.
-  }, 720_000);
+    // Two tsx child runs, each now four Monte Carlo fights (~120s solo since
+    // the bear and Stonebound plans joined); the long-sims lane's slowest
+    // observed runner (run 31290316610, workers=2) killed a child at the old
+    // 120s bound mid-shard, so both child timeouts and this budget carry
+    // lane-contention margin.
+  }, 1_200_000);
 
   it('moves long caster buffs to prepull instead of recurring combat priority', () => {
     expect(source).toContain("prepull: ['arcane_intellect']");

@@ -4293,7 +4293,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina.',
   'entities.abilities.bear_charge.name': 'Szarża Bruina',
   'entities.abilities.bear_form.description':
-    'Zmień postać w niedźwiedzia: pancerz +130%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego.',
+    'Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego.',
   'entities.abilities.bear_form.name': 'Postać Bruina',
   'entities.abilities.berserker_rage.description':
     'Wpadnij w kipiącą furię, generując 20 wściekłości. (Talent wojownika)',
@@ -4532,10 +4532,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia.',
   'entities.abilities.revive_pet.name': 'Opatrzenie',
-  'entities.abilities.righteous_fury.description': 'Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 60%. Tylko Strażnik wiary.',
+  'entities.abilities.righteous_fury.description': 'Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 30%. Tylko Strażnik wiary.',
   'entities.abilities.righteous_fury.name': 'Płonąca przysięga',
   'entities.abilities.rip.name': 'Krwawa szczelina',
-  'entities.abilities.rockbiter_weapon.description': 'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 30% pancerza, otrzymuje o 10% mniej obrażeń i generuje dwukrotnie większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s.',
+  'entities.abilities.rockbiter_weapon.description': 'Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń i jest odporny na trafienia krytyczne od stworzeń i generuje 2,75 razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s.',
   'entities.abilities.rockbiter_weapon.name': 'Oręż kamiennych okowów',
   'entities.abilities.rupture.name': 'Wykrwawienie',
   'entities.abilities.sap.description':
@@ -10471,6 +10471,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Kontynuuj przez Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Masz zakaz udziału w codziennych nagrodach. Powód: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroiczny',
   'hudChrome.itemHeroicTag': '[HEROICZNY]',
   'hudChrome.itemSoulbound': 'Związany z duszą',
   'hudChrome.keybinds.categoryPet': 'Zwierzę',
@@ -10843,6 +10844,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Honor',
   'hudChrome.warfare.honorGain': 'Otrzymujesz {amount} Honor ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Za mało Honoru.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Stoczono pojedynek na arenie',
   'hudChrome.warfare.reasons.arenaWin': 'Zwycięstwo na arenie',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta zakończona',
   'hudChrome.warfare.reasons.fiestaKill': 'Upadek Fiesty',

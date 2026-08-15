@@ -871,6 +871,14 @@ duty, but the conversion is not enough. As a primary healer it does not function
 
 # Tanks
 
+> **v0.38 RETUNE (2026-08-15):** the threat and survivability numbers in this
+> section describe the pre-v0.38 tree and motivated the tank balance pass. The
+> 3.6x threat gap and the Stonebound heroic one-shot below are FIXED: heroic
+> threat now reads warrior 276 / paladin 296 / bear 316 / Stonebound 255, the
+> bear owns the largest raw pool (2746, the biggest of the four), and no tank
+> is one-shot by the biggest observed heroic hit. Current tables and the constant-by-constant record live
+> in `docs/nythraxis-class-balance-monte-carlo.md` (the v0.38 addendum).
+
 Unhealed, against boss melee only. No Gravebreaker, no adds. Health is re-pinned
 each tick so the window always completes; "survival" is the pool divided by
 measured intake.

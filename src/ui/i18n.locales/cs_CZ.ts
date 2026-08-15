@@ -6081,6 +6081,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emoteEditor.title': 'Emoty',
   'hudChrome.emoteWheel.edit': 'Upravit',
   'hudChrome.emoteWheel.label': 'Emoty',
+  'hudChrome.itemHeroicLabel': 'Hrdinský',
   'hudChrome.itemHeroicTag': '[HRDINSKÉ]',
   'hudChrome.itemSoulbound': 'Vázáno na duši',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
@@ -6564,7 +6565,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.name': 'Železný řev',
   'entities.abilities.bear_charge.name': 'Medvědí výpad',
   'entities.abilities.bear_form.description':
-    'Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele.',
+    'Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele.',
   'entities.abilities.bear_form.name': 'Medvědí podoba',
   'entities.abilities.berserker_rage.description':
     'Vstoupíš do vroucí zuřivosti a získáš 20 vzteku. (Talent válečníka)',
@@ -6797,10 +6798,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví.',
   'entities.abilities.revive_pet.name': 'Ošetření',
-  'entities.abilities.righteous_fury.description': 'Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 60 %. Pouze Strážce víry.',
+  'entities.abilities.righteous_fury.description': 'Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 30 %. Pouze Strážce víry.',
   'entities.abilities.righteous_fury.name': 'Hořící přísaha',
   'entities.abilities.rip.name': 'Krvavá trhlina',
-  'entities.abilities.rockbiter_weapon.description': 'Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 30 % zbroje, utrpí o 10 % nižší poškození a vytváří dvojnásobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s.',
+  'entities.abilities.rockbiter_weapon.description': 'Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 40 % zbroje a 20 % výdrže, utrpí o 15 % nižší poškození a je odolný vůči kritickým zásahům od nestvůr a vytváří 2,75násobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s.',
   'entities.abilities.rockbiter_weapon.name': 'Zbraň spoutaná kamenem',
   'entities.abilities.rupture.name': 'Vykrvácení',
   'entities.abilities.sap.description':
@@ -10705,6 +10706,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} cti',
   'hudChrome.warfare.honorGain': 'Získáváš {amount} cti ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Nemáš dost cti.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Odehrán souboj v aréně',
   'hudChrome.warfare.reasons.arenaWin': 'Vítězství v aréně',
   'hudChrome.warfare.reasons.fiestaComplete': 'Dokončení Fiesty',
   'hudChrome.warfare.reasons.fiestaKill': 'Vyřazení ve Fiestě',

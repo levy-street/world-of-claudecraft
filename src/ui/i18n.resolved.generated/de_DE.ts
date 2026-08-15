@@ -1739,6 +1739,7 @@ export const de_DE: EnTranslations = {
       "notEnoughHonor": "Nicht genug Ehre.",
       "reasons": {
         "arenaWin": "Arenasieg",
+        "arenaComplete": "Arenakampf ausgetragen",
         "fiestaKill": "Fiesta-Ausschaltung",
         "fiestaComplete": "Fiesta abgeschlossen",
         "fiestaWin": "Fiesta-Sieg",
@@ -1845,7 +1846,7 @@ export const de_DE: EnTranslations = {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern in der ganzen Welt zu chatten."
     },
     "itemHeroicTag": "[HEROISCH]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroisch",
     "itemSoulbound": "Seelengebunden",
     "itemUniqueEquipped": "Einzigartig (ausgerüstet)",
     "itemSet": {
@@ -9719,7 +9720,7 @@ export const de_DE: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brennender Eid",
-        "description": "Erhöht passiv die durch euren Heiligschaden erzeugte Bedrohung um 60%. Nur für Glaubenswächter."
+        "description": "Erhöht passiv die durch euren Heiligschaden erzeugte Bedrohung um 30%. Nur für Glaubenswächter."
       },
       "retribution_aura": {
         "name": "Aura der Vergeltung",
@@ -9835,7 +9836,7 @@ export const de_DE: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound-Waffe",
-        "description": "Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Schaden. Verstärkung gewinnt zudem 30% Rüstung, erleidet 10% weniger Schaden und erzeugt doppelt so viel Bedrohung. Erdstoß zwingt sein Ziel, euch 3 Sek. lang anzugreifen, und Donnerschild gewährt 3 Sek. lang 10% Schadensminderung."
+        "description": "Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Schaden. Verstärkung gewinnt zudem 40% Rüstung und 20% Ausdauer, erleidet 15% weniger Schaden und ist immun gegen kritische Treffer von Kreaturen und erzeugt das 2,75-Fache an Bedrohung. Erdstoß zwingt sein Ziel, euch 3 Sek. lang anzugreifen, und Donnerschild gewährt 3 Sek. lang 10% Schadensminderung."
       },
       "healing_wave": {
         "name": "Heilende Wasser",
@@ -10014,7 +10015,7 @@ export const de_DE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-Gestalt",
-        "description": "Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren."
+        "description": "Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren."
       },
       "maul": {
         "name": "Knochenmalmer",
@@ -10024,6 +10025,10 @@ export const de_DE: EnTranslations = {
       "growl": {
         "name": "Bedrohen",
         "description": "Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bruin Form."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wolfsgestalt",

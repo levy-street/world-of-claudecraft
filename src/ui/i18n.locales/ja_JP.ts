@@ -976,6 +976,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '名誉が足りません。',
   'hudChrome.warfare.reasons.arenaWin': 'アリーナ勝利',
+  'hudChrome.warfare.reasons.arenaComplete': 'アリーナ参戦',
   'hudChrome.warfare.reasons.fiestaKill': 'フィエスタ撃破',
   'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
   'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
@@ -3068,7 +3069,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': '聖なる大地',
   'entities.abilities.consecration.description': '足元の地を9秒間清め、毎秒{damage}の神聖ダメージを高い脅威度とともに与えます。最初の一撃は献身を1生みます。信仰の守護者はその中に立つ間、受けるダメージが10%減ります。昇天はそのダメージを高めます。',
   'entities.abilities.righteous_fury.name': 'バーニングオース',
-  'entities.abilities.righteous_fury.description': '神聖ダメージが生む脅威度を常時60%高めます。信仰の守護者専用。',
+  'entities.abilities.righteous_fury.description': '神聖ダメージが生む脅威度を常時30%高めます。信仰の守護者専用。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
   'entities.abilities.retribution_aura.description': '死亡するか置き換えられるまで、自身とパーティを神聖なる力で包む。影響下の味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響下の味方の通常攻撃は{buff}の神聖ダメージを追加で与える。自身の砦の献身と置き換わる。他のパラディンが報復のオーラを唱えた場合、重複せず更新される。',
   'entities.abilities.tame_beast.name': '野生の絆',
@@ -3121,7 +3122,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': '電弧の矢',
   'entities.abilities.lightning_bolt.description': '{damage}の自然ダメージを与えます。ダメージは呪文威力とともに上がります。エレメンタル：命中すると雷が1得られます。',
   'entities.abilities.rockbiter_weapon.name': '石縛の武器',
-  'entities.abilities.rockbiter_weapon.description': '武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を30%得て、受けるダメージが10%減り、脅威度を二倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。',
+  'entities.abilities.rockbiter_weapon.description': '武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を40%、体力を20%得て、受けるダメージが15%減り、クリーチャーからのクリティカルヒットを無効化し、脅威度を2.75倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。',
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。回復：過剰回復になる前に満額回復の50%を12秒間、癒しの流れとして蓄えます。上限は対象の最大体力の30%です。',
   'entities.abilities.chain_heal.name': '連なる癒し',
@@ -3190,10 +3191,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '対象を最大12秒間その場に根付かせます。',
   'entities.abilities.bear_form.name': 'ブルーインフォーム',
   'entities.abilities.bear_form.description':
-    '熊に変身します。アーマー +130%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
+    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
   'entities.abilities.maul.description':
     '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。',
+  'entities.abilities.challenging_roar.description':
+    '威圧的に咆哮します。10ヤード以内のすべての敵が挑発され、あなたへの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。',
+  'entities.abilities.challenging_roar.name': '威圧の咆哮',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。',

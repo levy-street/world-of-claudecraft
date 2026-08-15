@@ -143,6 +143,7 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['shaman_pyrebrand_mastery', 'rockbiter_weapon'],
   ['shaman_stonebound_armor', 'rockbiter_weapon'],
   ['shaman_stonebound_dr', 'rockbiter_weapon'],
+  ['shaman_stonebound_stamina', 'rockbiter_weapon'],
   ['shaman_stonebound_unleash_guard', 'unleash_weapon'],
   ['shaman_stonebound_ward_smooth', 'lightning_shield'],
   ['shaman_stoneward', 'stoneward'],

@@ -1739,6 +1739,7 @@ export const da_DK: EnTranslations = {
       "notEnoughHonor": "Ikke nok Ære.",
       "reasons": {
         "arenaWin": "Arenasejr",
+        "arenaComplete": "Arenakamp udkæmpet",
         "fiestaKill": "Fiesta-nedlæggelse",
         "fiestaComplete": "Fiesta gennemført",
         "fiestaWin": "Fiesta-sejr",
@@ -1845,7 +1846,7 @@ export const da_DK: EnTranslations = {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
     "itemHeroicTag": "[HEROISK]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Sjælebundet",
     "itemUniqueEquipped": "Unikt Udrustet",
     "itemSet": {
@@ -9719,7 +9720,7 @@ export const da_DK: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brændende Ed",
-        "description": "Øger passivt den trussel, jeres Hellige skade skaber, med 60%. Kun Trosvogter."
+        "description": "Øger passivt den trussel, jeres Hellige skade skaber, med 30%. Kun Trosvogter."
       },
       "retribution_aura": {
         "name": "Gengældelsens Aura",
@@ -9835,7 +9836,7 @@ export const da_DK: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet Våben",
-        "description": "Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 30% rustning, tager 10% mindre skade og skaber dobbelt så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek."
+        "description": "Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 40% rustning og 20% udholdenhed, tager 15% mindre skade og er immun over for kritiske træf fra væsner og skaber 2,75 gange så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek."
       },
       "healing_wave": {
         "name": "Lægende Vande",
@@ -10014,7 +10015,7 @@ export const da_DK: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-form",
-        "description": "Forvandl dig til en bjørn: rustning +130%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
+        "description": "Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
       },
       "maul": {
         "name": "Knogleknus",
@@ -10024,6 +10025,10 @@ export const da_DK: EnTranslations = {
       "growl": {
         "name": "Trussel",
         "description": "Knurrer ad målet: din trussel stiger til at matche dets mest forhadte fjende, og det tvinges til at angribe dig i 3 sek. Kun i Bruin-form."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Ulveform",

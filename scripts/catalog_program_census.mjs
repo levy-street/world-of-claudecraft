@@ -25,7 +25,7 @@ import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { chatCommandMessage, worldAuthMessage } from './lib/world_auth.mjs';
 
 const PORT = Number(process.env.BENCH_PORT ?? 5198);
 const GFX = process.env.BENCH_GFX ?? 'insane';
@@ -154,7 +154,7 @@ class Bot {
     this.ws?.send(JSON.stringify({ t: 'cmd', ...payload }));
   }
   chat(text) {
-    this.ws?.send(JSON.stringify({ t: 'chat', text }));
+    this.ws?.send(JSON.stringify(chatCommandMessage(text)));
   }
   teleportNear(index) {
     const a = index * 2.39996;

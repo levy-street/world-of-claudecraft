@@ -1739,6 +1739,7 @@ export const pl_PL: EnTranslations = {
       "notEnoughHonor": "Za mało Honoru.",
       "reasons": {
         "arenaWin": "Zwycięstwo na arenie",
+        "arenaComplete": "Stoczono pojedynek na arenie",
         "fiestaKill": "Upadek Fiesty",
         "fiestaComplete": "Fiesta zakończona",
         "fiestaWin": "Zwycięstwo Fiesty",
@@ -1845,7 +1846,7 @@ export const pl_PL: EnTranslations = {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
     "itemHeroicTag": "[HEROICZNY]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroiczny",
     "itemSoulbound": "Związany z duszą",
     "itemUniqueEquipped": "Unikatowo zakładany",
     "itemSet": {
@@ -9719,7 +9720,7 @@ export const pl_PL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Płonąca przysięga",
-        "description": "Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 60%. Tylko Strażnik wiary."
+        "description": "Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 30%. Tylko Strażnik wiary."
       },
       "retribution_aura": {
         "name": "Aura odpłaty",
@@ -9835,7 +9836,7 @@ export const pl_PL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Oręż kamiennych okowów",
-        "description": "Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 30% pancerza, otrzymuje o 10% mniej obrażeń i generuje dwukrotnie większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s."
+        "description": "Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń i jest odporny na trafienia krytyczne od stworzeń i generuje 2,75 razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s."
       },
       "healing_wave": {
         "name": "Kojące wody",
@@ -10014,7 +10015,7 @@ export const pl_PL: EnTranslations = {
       },
       "bear_form": {
         "name": "Postać Bruina",
-        "description": "Zmień postać w niedźwiedzia: pancerz +130%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
+        "description": "Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "maul": {
         "name": "Kruszenie kości",
@@ -10024,6 +10025,10 @@ export const pl_PL: EnTranslations = {
       "growl": {
         "name": "Groźba",
         "description": "Warczy na cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Postać wilka",

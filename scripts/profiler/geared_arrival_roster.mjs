@@ -6,7 +6,7 @@ import { randomBytes } from 'node:crypto';
 import pg from 'pg';
 import WebSocket from 'ws';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from '../lib/loopback_guard.mjs';
-import { worldAuthMessage } from '../lib/world_auth.mjs';
+import { chatCommandMessage, worldAuthMessage } from '../lib/world_auth.mjs';
 import { gearedArrivalBotFixture, gearedArrivalFixtureSha256 } from './geared_arrival_fixture.mjs';
 
 export const GEARED_ARRIVAL_OBSERVER = Object.freeze({ x: 0, z: 0 });
@@ -133,7 +133,7 @@ class GearedArrivalBot {
   async equip() {
     this.command({ cmd: 'dev_level', level: 20 });
     await sleep(150);
-    this.socket.send(JSON.stringify({ t: 'chat', text: `/dev give ${this.fixture.weapon}` }));
+    this.socket.send(JSON.stringify(chatCommandMessage(`/dev give ${this.fixture.weapon}`)));
     await sleep(250);
     this.command({ cmd: 'equip', item: this.fixture.weapon });
     await sleep(250);

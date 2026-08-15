@@ -1739,6 +1739,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughHonor": "榮譽不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
+        "arenaComplete": "競技場參戰",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
         "fiestaWin": "嘉年華勝利",
@@ -9719,7 +9720,7 @@ export const zh_TW: EnTranslations = {
       },
       "righteous_fury": {
         "name": "燃燒誓言",
-        "description": "被動地將你的神聖傷害所產生的威脅提高 60%。僅限信仰守衛。"
+        "description": "被動地將你的神聖傷害所產生的威脅提高 30%。僅限信仰守衛。"
       },
       "retribution_aura": {
         "name": "報償光環",
@@ -9835,7 +9836,7 @@ export const zh_TW: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "縛石武器",
-        "description": "為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 30% 護甲，受到的傷害降低 10%，並產生兩倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。"
+        "description": "為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 40% 護甲和 20% 耐力，受到的傷害降低 15%，免疫生物的致命一擊，並產生 2.75 倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。"
       },
       "healing_wave": {
         "name": "療癒之水",
@@ -10014,7 +10015,7 @@ export const zh_TW: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形態",
-        "description": "變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
+        "description": "變形為熊：護甲 +110%，最大生命值 +30%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
       },
       "maul": {
         "name": "碎骨擊",
@@ -10024,6 +10025,10 @@ export const zh_TW: EnTranslations = {
       "growl": {
         "name": "威嚇",
         "description": "對目標低吼：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。"
+      },
+      "challenging_roar": {
+        "name": "挑釁咆哮",
+        "description": "發出挑釁的咆哮：10 碼內的每個敵人都被嘲諷，其對你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。"
       },
       "cat_form": {
         "name": "狼形態",

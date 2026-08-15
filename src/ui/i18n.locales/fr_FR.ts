@@ -2877,6 +2877,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} points d’honneur',
   'hudChrome.warfare.honorGain': 'Vous gagnez {amount} points d’honneur ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Vous n’avez pas assez d’honneur.',
+  'hudChrome.warfare.reasons.arenaComplete': 'combat en arène mené',
   'hudChrome.warfare.reasons.arenaWin': 'Victoire en arène',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta terminée',
   'hudChrome.warfare.reasons.fiestaKill': 'Élimination en Fiesta',
@@ -6231,7 +6232,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Consacre le sol pendant 9 s et inflige {damage} points de dégâts Sacrés chaque seconde. Les Gardiens de la foi y subissent 10% de dégâts en moins.',
   'entities.abilities.righteous_fury.name': 'Serment ardent',
-  'entities.abilities.righteous_fury.description': 'Augmente passivement de 60% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement.',
+  'entities.abilities.righteous_fury.description': 'Augmente passivement de 30% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement.',
   'entities.abilities.retribution_aura.name': 'Aura de représailles',
   'entities.abilities.retribution_aura.description':
     "Vous entoure, vous et votre groupe, d'énergie sacrée jusqu'à la mort ou au remplacement. Les ennemis qui frappent un allié affecté en mêlée subissent {buff} points de dégâts Sacrés, et les alliés affectés infligent {buff} points de dégâts Sacrés supplémentaires avec leurs attaques automatiques.",
@@ -6286,7 +6287,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': "Éclair d'arc",
   'entities.abilities.lightning_bolt.description': 'Inflige {damage} points de dégâts de Nature. Les dégâts augmentent avec la puissance des sorts. Élémentaire : un coup au but accorde 1 Tonnerre.',
   'entities.abilities.rockbiter_weapon.name': 'Arme Stonebound',
-  'entities.abilities.rockbiter_weapon.description': "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 30% d'armure, subit 10% de dégâts en moins et génère deux fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s.",
+  'entities.abilities.rockbiter_weapon.description': "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 40% d'armure et 20% d'Endurance, subit 15% de dégâts en moins et est insensible aux coups critiques des créatures et génère 2,75 fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s.",
   'entities.abilities.healing_wave.name': 'Eaux guérisseuses',
   'entities.abilities.healing_wave.description': "Rend {damage} points de vie à une cible alliée. Les soins augmentent avec la puissance des sorts. Restauration : conserve 50% du soin complet avant surplus sous forme de Courant de guérison pendant 12 s, jusqu'à 30% des points de vie maximum de la cible.",
   'entities.abilities.earth_shock.name': 'Secousse tellurique',
@@ -6349,7 +6350,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Enracine la cible sur place pendant un maximum de 12 s.',
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
-    "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
+    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.maul.name': 'Brise-os',
   'entities.abilities.growl.name': 'Menacer',
   'entities.abilities.growl.description':
@@ -11126,6 +11127,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Continuer avec Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Vous êtes exclu des Récompenses quotidiennes. Motif : {reason}',
+  'hudChrome.itemHeroicLabel': 'Héroïque',
   'hudChrome.itemHeroicTag': '[HÉROÏQUE]',
   'hudChrome.itemSoulbound': 'Lié à l’âme',
   'hudChrome.keybinds.categoryPet': 'Familier',

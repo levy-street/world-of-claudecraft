@@ -374,7 +374,7 @@ describe('the character overlay caches and the arena walls clone through the hoo
   }
 
   it('routes every CharacterVisual overlay-material cache through cloneMaterialWithHooks', () => {
-    // These seven caches clone the rig's LIVE material, which on a dyed player
+    // These six caches clone the rig's LIVE material, which on a dyed player
     // carries the armour-dye hook plus the rim glow and worn-detail layers. A
     // bare clone() drops all three: the set reverts to its base atlas colours
     // and links a second program the frame the effect turns on.
@@ -386,7 +386,6 @@ describe('the character overlay caches and the arena walls clone through the hoo
       'ferocityMaterial',
       'runeTintMaterial',
       'ghostMaterial',
-      'soulRendMaterial',
       'shadowformMaterial',
       'moonkinMaterial',
       'ascensionMaterial',
@@ -398,6 +397,15 @@ describe('the character overlay caches and the arena walls clone through the hoo
       );
       expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
     }
+    const soulRend = methodSource(visual, '  private soulRendMaterial(');
+    expect(soulRend).toContain('applySoulRendOverlay(material)');
+    expect(soulRend).not.toContain('.clone(');
+    const overlay = readFileSync(
+      new URL('../src/render/characters/soul_rend_overlay.ts', import.meta.url),
+      'utf8',
+    );
+    expect(overlay).toContain('cloneMaterialWithHooks(material)');
+    expect(overlay).not.toContain('.clone(');
   });
 
   it('clones the hideable arena wall material through cloneMaterialWithHooks', () => {

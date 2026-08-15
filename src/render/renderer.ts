@@ -12,7 +12,6 @@ import {
   arenaOrigin,
   BG_SLOT_COUNT,
   battlegroundOrigin,
-  CAMPS,
   CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
@@ -328,6 +327,7 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
+import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
@@ -637,6 +637,7 @@ import {
   isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
 } from './zone_feature_visibility_core';
+import { zonePrewarmTemplateIds } from './zone_prewarm_templates_core';
 import {
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
@@ -4908,6 +4909,34 @@ export class Renderer {
     return visual;
   }
 
+  /** Build one lazy FORM rig into its view slot. A null build leaves the slot
+   *  unset; the shared gate retries after its cooldown. A freshly built form
+   *  root is exactly a brand-new rig's materials linking for the first time
+   *  (same as a race/mech base-visual swap), so it is gated the same way instead
+   *  of freezing the frame the form lands on (#2571). Metamorphosis is the one
+   *  form that does not gate: it grows out of the body it replaces. */
+  private buildFormVisual(
+    e: Entity,
+    v: EntityView,
+    formKey: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+    slot: 'sheepVisual' | 'bearVisual' | 'catVisual' | 'travelVisual' | 'metamorphVisual',
+    gateCompile: boolean,
+  ): void {
+    const built = this.createCharacterVisualWithRetry(e, formKey, formKey);
+    if (!built) return;
+    v[slot] = built;
+    v.group.add(built.root); // group.scale already carries e.scale
+    // The encounter mark lands on whichever body is ACTIVE, and a form rig keys
+    // its own Soul Rend programs (other meshes, other skinning): it cannot
+    // inherit the base rig's warmed variant.
+    encounterPrewarm.queueLiveSoulRendPrewarm(this, built, null, e.kind);
+    if (!gateCompile) return;
+    v.formCompilePending = built.root;
+    this.gateSwapFlagOnCompile(built.root, () => {
+      v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
+    });
+  }
+
   private prewarmWorldFrame(dt: number): void {
     const p = this.sim.player;
     this.time += dt;
@@ -5165,27 +5194,7 @@ export class Renderer {
   }
 
   private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {
-    const ids = new Set<string>();
-    // Static content is authoritative here: online clients only receive nearby
-    // entities, so a just-crossed zone may not have delivered its first snapshot
-    // by the time the transition prewarm starts.
-    if (kind === 'mob') {
-      for (const camp of CAMPS) {
-        if (zoneAt(camp.center.x, camp.center.z).id === zone.id) ids.add(camp.mobId);
-      }
-    } else {
-      for (const npc of Object.values(NPCS)) {
-        if (!npc.dynamic && zoneAt(npc.pos.x, npc.pos.z).id === zone.id) ids.add(npc.id);
-      }
-    }
-    // Dynamic/event content has no static camp record. Union whatever the sim
-    // already knows without making correctness depend on snapshot timing.
-    for (const entity of this.sim.entities.values()) {
-      if (entity.kind !== kind || !entity.templateId || entity.pos.x > DUNGEON_X_THRESHOLD)
-        continue;
-      if (zoneAt(entity.pos.x, entity.pos.z).id === zone.id) ids.add(entity.templateId);
-    }
-    return [...ids].sort();
+    return zonePrewarmTemplateIds(zone.id, kind, this.sim.entities.values());
   }
 
   private buildEntityPrewarmGroup(zone: ZoneDef): {
@@ -8849,6 +8858,7 @@ export class Renderer {
       tiltOnProp: false,
     });
     const view = this.views.get(e.id);
+    if (visual && view) encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, view, e.kind);
     // Never gate the player's OWN view: it must be on screen immediately, its
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
@@ -9070,6 +9080,10 @@ export class Renderer {
     v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
     v.group.add(next.root);
     this.reconcileViewLights(v);
+    // The replacement rig is COLD: its Soul Rend clones are not the disposed
+    // rig's, so the encounter prewarm has to warm it like a body that just
+    // arrived (v carries the look `next` was built holding).
+    encounterPrewarm.queueLiveSoulRendPrewarm(this, next, v, e.kind);
     // A live base-visual replace (race/mech toggle) is exactly a brand-new
     // rig's materials linking for the first time; gate it the same as a
     // gear swap rather than freezing the frame it lands on (#2571).
@@ -9106,12 +9120,13 @@ export class Renderer {
   /** Apply (or clear) a weapon-skin cosmetic on one view and latch it. The
    *  latch is written HERE, never at enqueue time, so a queued application
    *  that never ran is retried by the next frame's diff. */
-  private applyWeaponSkin(v: EntityView, skinId: string | null): void {
+  private applyWeaponSkin(v: EntityView, skinId: string | null, kind: string): void {
     if (!v.visual) return;
     v.weaponSkinId = skinId;
     const changed = v.visual.setWeaponSkin(skinId);
     if (changed) for (const node of changed) this.gateSwapOnCompile(node);
     this.reconcileViewLights(v);
+    encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, kind);
   }
 
   /** Spend this frame's weapon-skin application budget, nearest wearer first.
@@ -9128,7 +9143,8 @@ export class Renderer {
     );
     for (const entry of due) {
       const view = this.views.get(entry.viewId);
-      if (view) this.applyWeaponSkin(view, entry.skinId);
+      const kind = this.sim.entities.get(entry.viewId)?.kind ?? '';
+      if (view) this.applyWeaponSkin(view, entry.skinId, kind);
     }
   }
 
@@ -9316,6 +9332,7 @@ export class Renderer {
     oz: number,
     opts?: Parameters<DungeonInteriors['buildInterior']>[3],
   ): void {
+    encounterPrewarm.startInteriorEncounterPrewarm(interior, this);
     void this.ensureDungeons()
       .buildInterior(interior, ox, oz, opts)
       .catch((err) => {
@@ -9806,6 +9823,7 @@ export class Renderer {
       inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
         ? dungeonAt(px)?.interior
         : null;
+    encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null);
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
@@ -11171,11 +11189,16 @@ export class Renderer {
       // Gated per newly attached payload: nothing else in this loop drives its own
       // .visible, so first-sight materials link off-thread instead of freezing the
       // frame the gear lands on (#2571).
+      // Both held swaps re-run finishWeaponAttach, which re-snapshots the
+      // original-material map with the new weapon's meshes, so the encounter
+      // mark's warmed clones no longer describe this body: re-queue on the new
+      // held look (the identity carries it, so a sheathe toggle warms nothing).
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
         const changed = v.visual.setWeapon(e.mainhandItemId);
         if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
+        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
       }
 
       if (e.offhandItemId !== v.offhandItemId) {
@@ -11183,6 +11206,7 @@ export class Renderer {
         const changed = v.visual.setOffhand(e.offhandItemId);
         if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
+        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
       }
 
       // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
@@ -11199,7 +11223,7 @@ export class Renderer {
       if (e.weaponSkinId !== v.weaponSkinId) {
         if (e.weaponSkinId === null) {
           this.weaponSkinApplies.cancel(id);
-          this.applyWeaponSkin(v, null);
+          this.applyWeaponSkin(v, null, e.kind);
         } else {
           this.weaponSkinApplies.enqueue(id, e.weaponSkinId);
         }
@@ -11221,60 +11245,15 @@ export class Renderer {
       }
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
-      // A null build leaves the field unset; the shared gate retries after its cooldown.
-      // A freshly built form root is exactly a brand-new rig's materials linking for
-      // the first time (same as a race/mech base-visual swap), so it is gated the
-      // same way instead of freezing the frame the form lands on (#2571).
-      if (polyed && !v.sheepVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_sheep', 'form_sheep');
-        if (built) {
-          v.sheepVisual = built;
-          v.group.add(built.root); // group.scale already carries e.scale
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
-      }
-      if (bear && !v.bearVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_bear', 'form_bear');
-        if (built) {
-          v.bearVisual = built;
-          v.group.add(built.root);
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
-      }
-      if (cat && !v.catVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_cat', 'form_cat');
-        if (built) {
-          v.catVisual = built;
-          v.group.add(built.root);
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
-      }
+      // (build, compile gate and encounter prewarm all live in buildFormVisual)
+      if (polyed && !v.sheepVisual) this.buildFormVisual(e, v, 'form_sheep', 'sheepVisual', true);
+      if (bear && !v.bearVisual) this.buildFormVisual(e, v, 'form_bear', 'bearVisual', true);
+      if (cat && !v.catVisual) this.buildFormVisual(e, v, 'form_cat', 'catVisual', true);
       if (travel && !v.travelVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_travel', 'form_travel');
-        if (built) {
-          v.travelVisual = built;
-          v.group.add(built.root);
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
+        this.buildFormVisual(e, v, 'form_travel', 'travelVisual', true);
       }
       if (metamorphForm && !v.metamorphVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_metamorph', 'form_metamorph');
-        if (built) {
-          v.metamorphVisual = built;
-          v.group.add(built.root);
-        }
+        this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false);
       }
       const formReadyMask = characterFormReadyMask(
         v.sheepVisual,

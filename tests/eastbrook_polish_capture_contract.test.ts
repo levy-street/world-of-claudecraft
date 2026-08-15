@@ -171,8 +171,18 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of release/v0.38.0 into the Armory warming branch:
 // both parents move renderer.ts, so the merged tree mints a value matching
 // neither parent. No capture was retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): renderer.ts moves
+// again, so the composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e42ae5e718a5e9d9d817ecfdd77d8c06e939aa1ef990bb795d13f9d127e067c3';
+  '190dbccc03436cbe5598543c4da77f0d63de08158cbf9100f5249d04d5bf251f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

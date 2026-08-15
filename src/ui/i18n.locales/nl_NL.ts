@@ -4374,7 +4374,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Bereik 8-25 m. Alleen in Bruingedaante.',
   'entities.abilities.bear_charge.name': 'Bruin-stormloop',
   'entities.abilities.bear_form.description':
-    'Verander in een beer: pantser +130%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
+    'Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
   'entities.abilities.bear_form.name': 'Bruingedaante',
   'entities.abilities.berserker_rage.description':
     'Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)',
@@ -4616,10 +4616,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Lapt je huisdier op. Als het leeft, herstelt het in totaal {overTime} gezondheid gedurende 12 sec., met elke 3 sec. een tik. Als het dood is, wordt het met 35% gezondheid tot leven gewekt.',
   'entities.abilities.revive_pet.name': 'Oplappen',
-  'entities.abilities.righteous_fury.description': 'Verhoogt passief de dreiging die uw Heilige schade opwekt met 60%. Alleen Geloofswachter.',
+  'entities.abilities.righteous_fury.description': 'Verhoogt passief de dreiging die uw Heilige schade opwekt met 30%. Alleen Geloofswachter.',
   'entities.abilities.righteous_fury.name': 'Brandende Eed',
   'entities.abilities.rip.name': 'Bloedscheur',
-  'entities.abilities.rockbiter_weapon.description': 'Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 30% pantser, krijgt 10% minder schade en wekt tweemaal zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering.',
+  'entities.abilities.rockbiter_weapon.description': 'Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 40% pantser en 20% Uithouding, krijgt 15% minder schade en is immuun voor kritieke treffers van wezens en wekt 2,75 keer zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering.',
   'entities.abilities.rockbiter_weapon.name': 'Steengebonden Wapen',
   'entities.abilities.rupture.name': 'Doodbloeden',
   'entities.abilities.sap.description':
@@ -10410,6 +10410,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Ga verder met Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroïsch',
   'hudChrome.itemHeroicTag': '[HELDHAFTIG]',
   'hudChrome.itemSoulbound': 'Zielsgebonden',
   'hudChrome.keybinds.categoryPet': 'Huisdier',
@@ -10713,6 +10714,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Eer',
   'hudChrome.warfare.honorGain': 'Je krijgt {amount} eer ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Niet genoeg eer.',
+  'hudChrome.warfare.reasons.arenaComplete': 'arenagevecht uitgevochten',
   'hudChrome.warfare.reasons.arenaWin': 'Arena-overwinning',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta voltooid',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-uitschakeling',

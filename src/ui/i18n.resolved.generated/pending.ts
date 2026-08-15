@@ -10,69 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "es_ES": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "fr_FR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "fr_CA": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "de_DE": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "nl_NL": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "pl_PL": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "id_ID": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "tr_TR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "sv_SE": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "vi_VN": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ],
   "da_DK": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
-    "hudChrome.itemHeroicLabel"
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth"
   ]
 };

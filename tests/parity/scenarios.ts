@@ -4964,6 +4964,7 @@ function shamanEngines(): Scenario {
       'class:shaman (Thundercall, Warspirit, Spiritmend)',
       'Thundercall Arc Bolt build and Earthen Jolt vent',
       'Warspirit dual-wield cadence and Stormcast state',
+      'Stonebound posture riders (armor, Vigor stamina, guard) and the Earthen Jolt compel',
       'Spiritmend Tidecall deposit and Cascading Mend consumption',
       'Shaman spec state in deterministic headless snapshots',
     ],
@@ -5019,6 +5020,20 @@ function shamanEngines(): Scenario {
       warspirit.offhandSwingTimer = 0;
       rec.tick(80);
       rec.snapshot('warspirit-cadence');
+
+      // Stonebound posture: the tank arm of Warspirit. Applies the armor,
+      // Vigor stamina, and guard riders, then vents an Earthen Jolt whose
+      // Stonebound arm compels the target, so the posture sits under the
+      // draw-order detector (v0.38 tank retune).
+      warspirit.resource = warspirit.maxResource;
+      warspirit.gcdRemaining = 0;
+      sim.castAbility('rockbiter_weapon', warspirit.id);
+      rec.tick(2);
+      warspirit.resource = warspirit.maxResource;
+      warspirit.gcdRemaining = 0;
+      sim.castAbility('earth_shock', warspirit.id);
+      rec.tick(40);
+      rec.snapshot('stonebound-posture');
 
       teleport(sim, spiritmend, ally.pos.x, ally.pos.z - 2);
       ally.hp = Math.round(ally.maxHp * 0.35);

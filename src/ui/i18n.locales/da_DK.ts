@@ -4121,7 +4121,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde. Kun i Bruin-form.',
   'entities.abilities.bear_charge.name': 'Bruin-storm',
   'entities.abilities.bear_form.description':
-    'Forvandl dig til en bjørn: rustning +130%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform.',
+    'Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform.',
   'entities.abilities.bear_form.name': 'Bruin-form',
   'entities.abilities.berserker_rage.description':
     'Gå i et sydende raseri, og generér 20 raseri. (Krigertalent)',
@@ -4359,10 +4359,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred.',
   'entities.abilities.revive_pet.name': 'Lappe sammen',
-  'entities.abilities.righteous_fury.description': 'Øger passivt den trussel, jeres Hellige skade skaber, med 60%. Kun Trosvogter.',
+  'entities.abilities.righteous_fury.description': 'Øger passivt den trussel, jeres Hellige skade skaber, med 30%. Kun Trosvogter.',
   'entities.abilities.righteous_fury.name': 'Brændende Ed',
   'entities.abilities.rip.name': 'Blodrevne',
-  'entities.abilities.rockbiter_weapon.description': 'Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 30% rustning, tager 10% mindre skade og skaber dobbelt så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek.',
+  'entities.abilities.rockbiter_weapon.description': 'Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 40% rustning og 20% udholdenhed, tager 15% mindre skade og er immun over for kritiske træf fra væsner og skaber 2,75 gange så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek.',
   'entities.abilities.rockbiter_weapon.name': 'Stenbundet Våben',
   'entities.abilities.rupture.name': 'Forblødning',
   'entities.abilities.sap.description':
@@ -10331,6 +10331,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Fortsæt med Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Du er udelukket fra daglige belønninger. Årsag: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroisk',
   'hudChrome.itemHeroicTag': '[HEROISK]',
   'hudChrome.itemSoulbound': 'Sjælebundet',
   'hudChrome.keybinds.categoryPet': 'Kæledyr',
@@ -10631,6 +10632,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Ære',
   'hudChrome.warfare.honorGain': 'Du opnår {amount} Ære ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Ikke nok Ære.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Arenakamp udkæmpet',
   'hudChrome.warfare.reasons.arenaWin': 'Arenasejr',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta gennemført',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-nedlæggelse',

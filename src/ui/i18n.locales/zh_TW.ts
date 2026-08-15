@@ -949,6 +949,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '你獲得了 {amount} 點榮譽（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '榮譽不足。',
   'hudChrome.warfare.reasons.arenaWin': '競技場勝利',
+  'hudChrome.warfare.reasons.arenaComplete': '競技場參戰',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年華擊倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年華',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年華勝利',
@@ -2944,7 +2945,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': '聖化之地',
   'entities.abilities.consecration.description': '淨化你腳下的土地，持續 9 秒，每秒造成 {damage} 點神聖傷害並產生高額威脅。首次命中產生 1 點虔誠。信仰守衛站在其中時受到的傷害降低 10%。昇華會提高其傷害。',
   'entities.abilities.righteous_fury.name': '燃燒誓言',
-  'entities.abilities.righteous_fury.description': '被動地將你的神聖傷害所產生的威脅提高 60%。僅限信仰守衛。',
+  'entities.abilities.righteous_fury.description': '被動地將你的神聖傷害所產生的威脅提高 30%。僅限信仰守衛。',
   'entities.abilities.retribution_aura.name': '報償光環',
   'entities.abilities.retribution_aura.description':
     '以神聖能量環繞你和隊伍成員，直到死亡或被替換。近戰攻擊受影響盟友的敵人將受到{buff}點神聖傷害，受影響的盟友普通攻擊額外造成{buff}點神聖傷害。替換你自己的壁壘堅定。另一名聖騎士施放報償光環時將刷新而非疊加。',
@@ -2999,7 +3000,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': '電弧箭',
   'entities.abilities.lightning_bolt.description': '造成 {damage} 點自然傷害。傷害隨法術強度提升。元素：命中可給予 1 點雷霆。',
   'entities.abilities.rockbiter_weapon.name': '縛石武器',
-  'entities.abilities.rockbiter_weapon.description': '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 30% 護甲，受到的傷害降低 10%，並產生兩倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。',
+  'entities.abilities.rockbiter_weapon.description': '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 40% 護甲和 20% 耐力，受到的傷害降低 15%，免疫生物的致命一擊，並產生 2.75 倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。',
   'entities.abilities.healing_wave.name': '療癒之水',
   'entities.abilities.healing_wave.description': '治療一個友方目標 {damage} 點生命。治療量隨法術強度提升。恢復：將完整治療量的 50% 在過量治療之前存為治癒湧流，持續 12 秒，至多為目標最大生命值的 30%。',
   'entities.abilities.chain_heal.name': '層疊治癒',
@@ -3064,10 +3065,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '將目標纏繞在原地，最多持續 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形態',
   'entities.abilities.bear_form.description':
-    '變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。',
+    '變形為熊：護甲 +110%，最大生命值 +30%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。',
   'entities.abilities.maul.name': '碎骨擊',
   'entities.abilities.maul.description':
     '一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。在你的下一次揮擊時觸發。僅限巨熊形態。',
+  'entities.abilities.challenging_roar.description':
+    '發出挑釁的咆哮：10 碼內的每個敵人都被嘲諷，其對你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',
+  'entities.abilities.challenging_roar.name': '挑釁咆哮',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '對目標低吼：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。',

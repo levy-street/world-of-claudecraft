@@ -1739,6 +1739,7 @@ export const fr_CA: EnTranslations = {
       "notEnoughHonor": "Vous n’avez pas assez d’honneur.",
       "reasons": {
         "arenaWin": "Victoire en arène",
+        "arenaComplete": "combat en arène mené",
         "fiestaKill": "Élimination en Fiesta",
         "fiestaComplete": "Fiesta terminée",
         "fiestaWin": "Victoire en Fiesta",
@@ -1845,7 +1846,7 @@ export const fr_CA: EnTranslations = {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
     },
     "itemHeroicTag": "[HÉROÏQUE]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Héroïque",
     "itemSoulbound": "Lié à l’âme",
     "itemUniqueEquipped": "Unique-équipé",
     "itemSet": {
@@ -9719,7 +9720,7 @@ export const fr_CA: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Serment ardent",
-        "description": "Augmente passivement de 60% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
+        "description": "Augmente passivement de 30% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
       },
       "retribution_aura": {
         "name": "Aura de représailles",
@@ -9835,7 +9836,7 @@ export const fr_CA: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arme Stonebound",
-        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 30% d'armure, subit 10% de dégâts en moins et génère deux fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
+        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 40% d'armure et 20% d'Endurance, subit 15% de dégâts en moins et est insensible aux coups critiques des créatures et génère 2,75 fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
       },
       "healing_wave": {
         "name": "Eaux guérisseuses",
@@ -10014,7 +10015,7 @@ export const fr_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Forme de Bruin",
-        "description": "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
+        "description": "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
       },
       "maul": {
         "name": "Brise-os",
@@ -10024,6 +10025,10 @@ export const fr_CA: EnTranslations = {
       "growl": {
         "name": "Menacer",
         "description": "Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Forme de loup",

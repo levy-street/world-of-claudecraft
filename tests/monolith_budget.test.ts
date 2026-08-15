@@ -59,7 +59,14 @@ const MONOLITHS: MonolithRow[] = [
     // Merging release/v0.38.0: both sides had pinned their own size (13699 here,
     // 13700 there), and the merged file is smaller than either, so the ceiling
     // follows it down rather than inheriting a parent's slack.
-    ceiling: 13682,
+    // Lowered again after extracting the zone prewarm's template selection into
+    // src/render/zone_prewarm_templates_core.ts, which paid for the encounter
+    // prewarm's five call-site lines: the ratchet's rule is that a file over its
+    // ceiling buys the room back by extraction, never by raising the number.
+    // Lowered again after folding the five near-identical lazy form-visual
+    // builds into buildFormVisual, which paid for the review's prewarm re-queue
+    // sites (form rigs, the base-visual replace, both held-weapon swaps).
+    ceiling: 13661,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
