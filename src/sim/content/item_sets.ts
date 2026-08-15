@@ -342,10 +342,13 @@ const WARFARE_EMBERWARD: SetProc = {
 
 // The 2- and 4-piece tiers are identical across all five families; only the
 // capstone signature differs. The 4-piece wording says crowd control "cast on
-// you by hostile players" rather than "from hostile players" on purpose: control
-// applied by a player's PET is entity kind 'mob' and takes the non-hostile-pair
-// early return in Sim.diminishedCrowdControlDuration, so it is not reduced and
-// the looser wording would be false.
+// you by hostile players": since the DR funnel resolves a player-owned minion
+// to its owner (resolveCrowdControlSource in stun_dr.ts), control applied by a
+// hostile player's pet or summon counts as cast by that player and IS reduced,
+// so the wording covers minion control too. (Historically pet control was
+// entity kind 'mob', took the non-hostile-pair early return in
+// diminishedCrowdControlDuration, and escaped the reduction; the ownership
+// resolution closed that loophole.)
 function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[] {
   return [
     {
