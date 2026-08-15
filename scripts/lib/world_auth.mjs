@@ -14,3 +14,13 @@ export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
 export function worldAuthMessage(token, character) {
   return { t: ONLINE_WORLD_AUTH_TYPE, token, character };
 }
+
+// Chat, and every "/dev ..." cheat that rides it, is a COMMAND, not a frame
+// type: the server's `case 'chat'` sits in the cmd switch (server/game.ts), so
+// a top-level { t: 'chat' } frame matches nothing and is dropped in silence,
+// leaving the script believing its bots were levelled, geared or god-moded.
+// The live client sends `this.cmd({ cmd: 'chat', text })` (src/net/online.ts);
+// Node clients speak the same shape through here.
+export function chatCommandMessage(text) {
+  return { t: 'cmd', cmd: 'chat', text };
+}

@@ -1522,12 +1522,20 @@ export function handleDeath(
     e.corpseTimer = CORPSE_DURATION;
     // Respawn cadence is the zone's, not one flat world timer: the policy leaf
     // reads the mob's SPAWN point so a corpse dragged across a border still
-    // returns on its home band's schedule. Draws no rng.
+    // returns on its home band's schedule. Draws rng ONLY for a template with an
+    // authored respawnWindow (Grix the Tunnelking), so the parity draw order is
+    // unchanged for every fixed-schedule death. The closure is allocated only
+    // for those templates: nearly every death would discard it.
     // A run-scoped mob (an escort ambush wave) was never placed by a camp, so it
     // has no home to return to and never respawns in place; its run drops it.
     e.respawnTimer = e.runScoped
       ? Number.POSITIVE_INFINITY
-      : resolveRespawnSeconds(template, e.spawnPos, ctx.cfg.respawnSeconds);
+      : resolveRespawnSeconds(
+          template,
+          e.spawnPos,
+          ctx.cfg.respawnSeconds,
+          template?.respawnWindow ? (min, max) => ctx.rng.range(min, max) : null,
+        );
     // A fixed respawn also caps corpse decay so the mob returns on schedule whether
     // or not its loot was looted (training dummy: 10s).
     if (template?.respawnSeconds !== undefined) {

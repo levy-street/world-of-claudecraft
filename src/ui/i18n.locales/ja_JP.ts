@@ -976,6 +976,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '名誉が足りません。',
   'hudChrome.warfare.reasons.arenaWin': 'アリーナ勝利',
+  'hudChrome.warfare.reasons.arenaComplete': 'アリーナ参戦',
   'hudChrome.warfare.reasons.fiestaKill': 'フィエスタ撃破',
   'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
   'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
@@ -1302,6 +1303,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'キャラクター画面にウォレットを表示',
   'hudChrome.options.showPlaytime': 'キャラクター画面にプレイ時間を表示',
   'hudChrome.options.showWalletOnPlayerCard': 'プレイヤーカードにウォレットを表示',
+  'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
+  'hudChrome.options.discordPresenceNote':
+    'プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',
   'hudChrome.options.showDevBadges': '開発者バッジを表示',
   'hudChrome.options.showOwnNameplate': '自分のネームプレートを表示',
   'hudChrome.options.showPlayerNameplates': 'プレイヤーのネームプレートを表示',
@@ -2071,6 +2078,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '視点反転（タッチ）',
   'hud.options.graphicsReloadNote': 'グラフィック品質と地形の詳細は再読み込み後に適用されます。',
   'hud.options.reloadNow': '今すぐ再読み込み',
+  'hud.options.displayMode': '表示モード',
+  'hud.options.displayModeBorderless': 'ボーダーレスフルスクリーン',
+  'hud.options.displayModeWindowed': 'ウィンドウ',
   'hud.options.fullscreen': 'フルスクリーン',
   'hud.options.touchLookSpeed': 'タッチ視点速度',
   'hud.options.joystickSize': 'ジョイスティックの大きさ',
@@ -3068,7 +3078,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': '聖なる大地',
   'entities.abilities.consecration.description': '足元の地を9秒間清め、毎秒{damage}の神聖ダメージを高い脅威度とともに与えます。最初の一撃は献身を1生みます。信仰の守護者はその中に立つ間、受けるダメージが10%減ります。昇天はそのダメージを高めます。',
   'entities.abilities.righteous_fury.name': 'バーニングオース',
-  'entities.abilities.righteous_fury.description': '神聖ダメージが生む脅威度を常時60%高めます。信仰の守護者専用。',
+  'entities.abilities.righteous_fury.description': '神聖ダメージが生む脅威度を常時30%高めます。信仰の守護者専用。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
   'entities.abilities.retribution_aura.description': '死亡するか置き換えられるまで、自身とパーティを神聖なる力で包む。影響下の味方を近接攻撃した敵は{buff}の神聖ダメージを受け、影響下の味方の通常攻撃は{buff}の神聖ダメージを追加で与える。自身の砦の献身と置き換わる。他のパラディンが報復のオーラを唱えた場合、重複せず更新される。',
   'entities.abilities.tame_beast.name': '野生の絆',
@@ -3121,7 +3131,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': '電弧の矢',
   'entities.abilities.lightning_bolt.description': '{damage}の自然ダメージを与えます。ダメージは呪文威力とともに上がります。エレメンタル：命中すると雷が1得られます。',
   'entities.abilities.rockbiter_weapon.name': '石縛の武器',
-  'entities.abilities.rockbiter_weapon.description': '武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を30%得て、受けるダメージが10%減り、脅威度を二倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。',
+  'entities.abilities.rockbiter_weapon.description': '武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を40%、体力を20%得て、受けるダメージが15%減り、クリーチャーからのクリティカルヒットを無効化し、脅威度を2.75倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。',
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方の対象を{damage}回復します。回復量は呪文威力とともに上がります。回復：過剰回復になる前に満額回復の50%を12秒間、癒しの流れとして蓄えます。上限は対象の最大体力の30%です。',
   'entities.abilities.chain_heal.name': '連なる癒し',
@@ -3190,10 +3200,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '対象を最大12秒間その場に根付かせます。',
   'entities.abilities.bear_form.name': 'ブルーインフォーム',
   'entities.abilities.bear_form.description':
-    '熊に変身します。アーマー +130%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
+    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
   'entities.abilities.maul.description':
     '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。',
+  'entities.abilities.challenging_roar.description':
+    '威圧的に咆哮します。10ヤード以内のすべての敵が挑発され、あなたへの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。',
+  'entities.abilities.challenging_roar.name': '威圧の咆哮',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。',
@@ -7831,6 +7844,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '今すぐ再起動',
   'desktop.update.later': '後で',
   'desktop.update.dismiss': '閉じる',
+  'desktop.update.whatsNew': '変更内容をブラウザで見る',
+  'desktop.notify.updateReadyTitle': 'アップデート {version} の準備ができました',
+  'desktop.notify.updateReadyTitleNoVersion': 'アップデートの準備ができました',
+  'desktop.notify.updateReadyBody': 'アップデートを適用するには World of ClaudeCraft を再起動してください。',
+  'desktop.notify.partyInviteTitle': 'パーティ招待',
+  'desktop.notify.partyInviteBody': '{name}があなたをパーティに招待しています。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
   'desktop.crash.reload': '再読み込み',
@@ -7838,6 +7857,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
+  'gpuNotice.bodyDiscreteInactive':
+    'ゲームが専用（ゲーミング）GPUを使用しておらず、省電力GPUで動作しているため、パフォーマンスが低下します。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
   'gpuNotice.bodyWeb':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。',
   'gpuNotice.hybridBodyWindows':

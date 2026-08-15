@@ -7982,6 +7982,20 @@
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
   }
+  .desktop-update-whats-new {
+    display: inline-block;
+    margin-top: var(--spacing-sm);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+  .desktop-update-whats-new[hidden] {
+    display: none;
+  }
+  .desktop-update-whats-new:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+  }
   .desktop-update-actions {
     display: flex;
     gap: var(--spacing-sm);
@@ -8065,6 +8079,11 @@
     .desktop-update-close {
       min-height: 40px;
       min-width: 40px;
+    }
+    .desktop-update-whats-new {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
     }
     .desktop-update-title {
       padding-right: 44px;
@@ -8158,10 +8177,16 @@
   /* ---------- performance nudge toast ---------- */
   /* Owned by src/ui/perf_nudge_toast.ts: the one-time machine-local performance
      nudge (packet 0 rulings R14-R16), a SIBLING of the software rendering
-     notice above with the same visual language. It sits one slot BELOW the
-     gpu-notice slot so the stack can never overlap; the two toasts are mutually
-     exclusive by construction (the nudge's software arm is suppressed when the
-     boot notice showed), but the fixed slot keeps a defensive ordering anyway. */
+     notice above with the same visual language. It sits one slot below the
+     gpu-notice TOP, but the 56px offset only clears a one-line notice: every
+     gpu-notice body wraps taller at the 440px cap (98px in English, 114px in
+     ru_RU, phase 3 QA measurement), so the two must not show together. Today
+     they cannot: the notice shows at boot, before the nudge's first 30 s
+     check, or not at all, because the shell re-pushes its verdict only on a
+     did-finish-load reload, which resets the page and the nudge with it. Any
+     future mid-session verdict push (gpu-info-update or similar) must add a
+     supersede or stacking story here first; see the phase 3 QA notes in
+     docs/desktop-client-update/progress.md. */
   #perf-nudge {
     position: fixed;
     /* Same safe-area handling as #gpu-notice: clear of a notch on mobile

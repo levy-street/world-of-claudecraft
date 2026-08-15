@@ -100,6 +100,10 @@ export type OrbitDna = NonNullable<AbilityVfxBuffSpec['o']>;
 const MAX_ORBITS_PER_ENTITY = 3;
 const MAX_ORBIT_BANDS = 24;
 const MAX_ORBIT_SPRITES = 8;
+// The buff-swirl decoration motes vanish below this governed vfx level. Every
+// tier's vfx floor must stay ABOVE it (tests/vfx_mote_floor.test.ts): a floor
+// at or under the gate would silently extinguish the motes at full degradation.
+export const MOTE_QUALITY_GATE = 0.5;
 // Windup ceremonies are a few overlay sprites each; a busy hub full of casters
 // should keep them all. The local player is additionally guaranteed a slot
 // (windup's priority flag evicts the oldest other entry when saturated).
@@ -1881,7 +1885,7 @@ export class AbilityVfxFx implements SequencerHost {
           );
         }
       }
-    } else if (this.qualityLevel >= 0.5) {
+    } else if (this.qualityLevel >= MOTE_QUALITY_GATE) {
       const motes = style === 'vortex' ? 4 : 2;
       const reach = style === 'vortex' ? 1.9 : 0.9;
       for (let k = 0; k < motes; k++) {

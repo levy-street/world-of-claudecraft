@@ -19,6 +19,7 @@ import {
   MANIFEST_ARTIFACTS,
 } from '../scripts/lib/gate_steps.mjs';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -28,18 +29,14 @@ const detectEntry = readFileSync(
 const ciShardEntry = readFileSync(new URL('../scripts/ci_shard_test.mjs', import.meta.url), 'utf8');
 // Comment-stripped (same idiom as gateCode below): a source-text pin on the
 // entry must not stay green when the pinned call survives only in a comment.
-const ciShardEntryCode = ciShardEntry
-  .replace(/\/\*[\s\S]*?\*\//g, '')
-  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const ciShardEntryCode = stripComments(ciShardEntry);
 const ciShardPlanSource = readFileSync(
   new URL('../scripts/lib/ci_shard_plan.mjs', import.meta.url),
   'utf8',
 );
 // Stripped for the formula weld: the module's docblocks discuss the default
 // in prose, and a weld a comment can satisfy is not a weld.
-const ciShardPlanCode = ciShardPlanSource
-  .replace(/\/\*[\s\S]*?\*\//g, '')
-  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const ciShardPlanCode = stripComments(ciShardPlanSource);
 // ci.yml with full-line YAML comments removed: the worker-trial pins below
 // count KEY occurrences, and a doc comment quoting the env line must neither
 // satisfy a count nor turn it red.
@@ -53,13 +50,15 @@ const preflightCode = readFileSync(
   new URL('../scripts/lib/gate_preflight.mjs', import.meta.url),
   'utf8',
 );
-// gate.mjs with its comments removed, BOTH kinds. A raw-substring pin on a step
-// is not a pin at all: commenting the step out leaves the substring in the file,
+// gate.mjs with its comments removed, BOTH kinds, via the shared single-pass
+// helper (tests/helpers/strip_comments.ts). A raw-substring pin on a step is
+// not a pin at all: commenting the step out leaves the substring in the file,
 // so the assertion stays green while the local gate quietly stops running it.
-// Block comments are stripped first (a `/* ... */` wrapper defeats a line-comment
-// strip just as well), then line comments, leaving anything after `://` alone so
-// a URL inside a string cannot be truncated.
-const gateCode = gate.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+// The single pass consumes each comment exactly once, so a `/* ... */` wrapper
+// cannot defeat the line strip AND a bare /* inside a line comment cannot open
+// a phantom block that swallows the gate's own pin surface; `://` URLs stay
+// intact.
+const gateCode = stripComments(gate);
 // Shared step list (Phase 8): gate.mjs delegates here; pins below use both.
 const gateSteps = buildFullGateSteps(8);
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');

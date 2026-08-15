@@ -218,6 +218,11 @@ const hudStringsEn = {
       graphicsReloadNote: 'Graphics Quality and Terrain Detail apply after a reload.',
       reloadNow: 'Reload Now',
       fullscreen: 'Fullscreen',
+      // Desktop shell only: the shell owns the window, so it offers real window
+      // modes where the browser build offers the Fullscreen toggle above.
+      displayMode: 'Display Mode',
+      displayModeBorderless: 'Borderless Fullscreen',
+      displayModeWindowed: 'Windowed',
       touchLookSpeed: 'Touch Look Speed',
       joystickSize: 'Joystick Size',
       buttonSize: 'Button Size',

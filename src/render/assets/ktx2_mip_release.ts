@@ -9,8 +9,9 @@
 // copy of the SOURCE bytes (captured by ktx2_support before the transcode
 // worker detaches them) plus a re-transcode on context loss.
 //
-// The three r165 contract this module is written against
-// (WebGLTextures.uploadTexture):
+// The three upload contract this module is written against
+// (WebGLTextures.uploadTexture; authored on r165, every premise re-verified
+// against the installed r185 source in phase 6 QA of the desktop train):
 // - `texture.onUpdate(texture)` fires after a completed GPU upload: the exact
 //   moment the CPU mip copies stop being needed on the happy path.
 // - A fresh context re-uploads from `texture.mipmaps`: `mipmaps[0].width`

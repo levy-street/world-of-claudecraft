@@ -41,6 +41,24 @@ describe('fused output and grade shader', () => {
     expect(shader).toContain('vec2 inputUv = min(vUv * uInputUvRect.xy, uInputUvRect.zw);');
   });
 
+  it('only calls tonemapping functions the installed three chunk defines', () => {
+    // The shader includes <tonemapping_pars_fragment> and picks one arm by
+    // define; a dormant arm naming a function three renamed (r185 dropped
+    // OptimizedCineonToneMapping for CineonToneMapping) only explodes when
+    // that arm's define is set at runtime, so pin every referenced name
+    // against the installed chunk source here instead.
+    const chunk = THREE.ShaderChunk.tonemapping_pars_fragment;
+    const called = new Set(
+      [...OUTPUT_GRADE_FRAGMENT_SHADER.matchAll(/(\w+ToneMapping)\(/g)].map((m) => m[1]),
+    );
+    expect(called.size).toBeGreaterThanOrEqual(6);
+    for (const name of called) {
+      expect(chunk, `${name} missing from three's tonemapping chunk`).toContain(
+        `vec3 ${name}( vec3 color )`,
+      );
+    }
+  });
+
   it('propagates exposure and selects the same ACES and sRGB defines as OutputPass', () => {
     const time = { value: 17 };
     const bloomTexture = new THREE.Texture();

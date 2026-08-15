@@ -17,7 +17,7 @@ export const GEARED_ARRIVAL_LOADOUTS = Object.freeze([
   }),
   Object.freeze({
     cls: 'warrior',
-    weapon: 'handaxe',
+    weapon: 'rusty_hatchet',
     skins: Object.freeze(['skyrender_axe', 'glaciersplit_axe', 'emberbite_axe', 'brasscap_axe']),
   }),
   Object.freeze({

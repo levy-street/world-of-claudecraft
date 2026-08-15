@@ -3,14 +3,15 @@
 // reader see only the final fullscreen pass (1 call / 1 triangle; confirmed
 // live on high and ultra, packet 0 phase 01).
 //
-// Version-pinned three behavior this module compensates for (three r165,
+// Version-pinned three behavior this module compensates for (three r185,
 // WebGLRenderer.render): when info.autoReset is true, render() calls
-// info.reset() after WebGLShadowMap.render and before the scene pass, so the
-// counters only ever hold the most recent pass (and even single-pass tiers
-// exclude shadow draws). WebGLInfo.reset() zeroes render.calls/triangles/
-// points/lines only; info.memory and info.programs are never reset. The
-// renderer flips info.autoReset to false only when a post chain is active,
-// letting the counters run monotonically across all
+// info.reset() at the top of the pass, BEFORE WebGLShadowMap.render (r165
+// reset after the shadow pass, so single-pass tiers used to exclude shadow
+// draws; since r185 they include them, matching this module's deltas), and
+// the counters only ever hold the most recent pass. WebGLInfo.reset() zeroes
+// render.calls/triangles/points/lines only; info.memory and info.programs
+// are never reset. The renderer flips info.autoReset to false only when a
+// post chain is active, letting the counters run monotonically across all
 // passes; this core turns consecutive reads into per-frame deltas.
 //
 // Pure core contract: no three import (structural counters only), no DOM, no

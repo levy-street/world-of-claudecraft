@@ -10,7 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -30,11 +29,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_rot_hulk.name",
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
-    "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.mobs.tower_void_sentinel.name"
   ],
   "es_ES": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -54,11 +51,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_rot_hulk.name",
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
-    "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel"
+    "entities.mobs.tower_void_sentinel.name"
   ],
   "fr_FR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -79,7 +74,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -93,7 +87,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "fr_CA": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -114,7 +107,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -129,7 +121,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -150,7 +141,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -164,7 +154,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "de_DE": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -185,7 +174,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -203,7 +191,6 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -224,7 +211,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -239,7 +225,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -260,7 +245,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -274,7 +258,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "nl_NL": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -295,7 +278,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -309,7 +291,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "pl_PL": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -330,7 +311,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -344,7 +324,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "id_ID": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -365,7 +344,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -379,7 +357,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "tr_TR": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -400,7 +377,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -414,7 +390,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "sv_SE": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -435,7 +410,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -449,7 +423,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "vi_VN": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -470,7 +443,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
@@ -484,7 +456,6 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "da_DK": [
-    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -505,7 +476,6 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
     "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",

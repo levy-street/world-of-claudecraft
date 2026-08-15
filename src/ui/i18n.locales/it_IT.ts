@@ -5773,7 +5773,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Consacra il terreno per 9 sec e infligge {damage} danni Sacri ogni secondo. I Guardiani della Fede subiscono il 10% di danni in meno al suo interno.',
   'entities.abilities.righteous_fury.name': 'Giuramento Ardente',
-  'entities.abilities.righteous_fury.description': 'Aumenta passivamente del 60% la minaccia generata dai vostri danni Sacri. Solo Custode della fede.',
+  'entities.abilities.righteous_fury.description': 'Aumenta passivamente del 30% la minaccia generata dai vostri danni Sacri. Solo Custode della fede.',
   'entities.abilities.retribution_aura.name': 'Aura della Rivalsa',
   'entities.abilities.retribution_aura.description':
     'Avvolge te e il tuo gruppo in energia sacra fino alla morte o alla sostituzione. I nemici che colpiscono in mischia un alleato interessato subiscono {buff} danni Sacri, e gli alleati interessati infliggono {buff} danni Sacri aggiuntivi con gli attacchi automatici.',
@@ -5829,7 +5829,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': 'Dardo Folgorante',
   'entities.abilities.lightning_bolt.description': 'Infligge {damage} danni da Natura. Il danno aumenta con il Potere Magico. Elementale: un colpo a segno concede 1 Tuono.',
   'entities.abilities.rockbiter_weapon.name': 'Arma Legapietra',
-  'entities.abilities.rockbiter_weapon.description': 'Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni aggiuntivi. Potenziamento guadagna inoltre il 30% di armatura, subisce il 10% di danni in meno e genera il doppio della minaccia. Scossa Tellurica costringe il proprio bersaglio ad attaccarvi per 3 sec, e Barriera di Tuono concede il 10% di riduzione del danno per 3 sec.',
+  'entities.abilities.rockbiter_weapon.description': 'Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni aggiuntivi. Potenziamento guadagna inoltre il 40% di armatura e il 20% di Costituzione, subisce il 15% di danni in meno e è immune ai colpi critici delle creature e genera 2,75 volte la minaccia. Scossa Tellurica costringe il proprio bersaglio ad attaccarvi per 3 sec, e Barriera di Tuono concede il 10% di riduzione del danno per 3 sec.',
   'entities.abilities.healing_wave.name': 'Acque Risananti',
   'entities.abilities.healing_wave.description': "Cura un bersaglio alleato di {damage}. La cura aumenta con il Potere Magico. Ripristino: conserva il 50% della cura piena prima dell'eccesso come Corrente Curativa per 12 sec, fino al 30% della salute massima del bersaglio.",
   'entities.abilities.earth_shock.name': 'Scossa Tellurica',
@@ -5892,7 +5892,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Radica il bersaglio sul posto per un massimo di 12 s.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
-    "Mutamenti in orso: armatura +130%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
+    "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
   'entities.abilities.growl.name': 'Intimidazione',
   'entities.abilities.growl.description':
@@ -10674,6 +10674,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Continua con Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Sei escluso dalle Ricompense giornaliere. Motivo: {reason}',
+  'hudChrome.itemHeroicLabel': 'Eroico',
   'hudChrome.itemHeroicTag': '[EROICO]',
   'hudChrome.itemSoulbound': 'Vincolato all’anima',
   'hudChrome.keybinds.categoryPet': 'Famiglio',
@@ -11071,6 +11072,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Onore',
   'hudChrome.warfare.honorGain': 'Ottieni {amount} Onore ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Onore insufficiente.',
+  'hudChrome.warfare.reasons.arenaComplete': "incontro nell'arena disputato",
   'hudChrome.warfare.reasons.arenaWin': "Vittoria nell'Arena",
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta completata',
   'hudChrome.warfare.reasons.fiestaKill': 'Abbattimento della Fiesta',
@@ -13417,4 +13419,26 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Questo codice dell\'aspetto proviene da una versione più recente del gioco.',
   'auth.designCodeErrMalformed': 'Questo codice dell\'aspetto è danneggiato. Copia il codice completo e riprova.',
   'hudChrome.nameplate.cheaterTag': '< Baro >',
+  'hud.options.displayMode': 'Modalità schermo',
+  'hud.options.displayModeBorderless': 'Schermo intero senza bordi',
+  'hud.options.displayModeWindowed': 'Finestra',
+  'hudChrome.options.discordPresence': 'Presenza avanzata di Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Mostra la zona in cui ti trovi e da quanto tempo stai giocando in questa sessione come tua attività su Discord, e chiunque possa vedere il tuo profilo Discord può vedere entrambe le informazioni. Vengono condivisi solo il nome della zona, il tempo di sessione e il gioco: mai il tuo personaggio, il tuo account o con chi stai giocando. Richiede che l\'app Discord sia in esecuzione su questo computer.',
+  'hudChrome.options.forceHighPerfGpu': 'Usa la GPU dedicata per il gioco',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Attivo per impostazione predefinita: l\'app desktop chiede a questo computer la sua GPU dedicata per il gioco. Disattivalo se il gioco non si avvia, si apre con una schermata nera, oppure lo schermo del laptop si spegne. Ha effetto al prossimo avvio del gioco.',
+  'desktop.notify.partyInviteBody': '{name} ti ha invitato a unirti al suo gruppo.',
+  'desktop.notify.partyInviteTitle': 'Invito al gruppo',
+  'desktop.notify.updateReadyBody': 'Riavvia World of ClaudeCraft per applicare l\'aggiornamento.',
+  'desktop.notify.updateReadyTitle': 'L\'aggiornamento {version} è pronto',
+  'desktop.notify.updateReadyTitleNoVersion': 'L\'aggiornamento è pronto',
+  'desktop.update.whatsNew': 'Vedi le novità nel browser',
+  'entities.abilities.challenging_roar.description':
+    'Un ruggito funesto: ogni nemico entro 10 metri viene provocato, la sua minaccia verso di te sale fino a eguagliare quella del suo nemico più odiato, ed è costretto ad attaccarti per 3 sec. Solo in Forma di Bruin.',
+  'entities.abilities.challenging_roar.name': 'Ruggito Funesto',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Colpisci il bersaglio per {damage} danni, stordendolo per 4 sec. Conferisce 2 punti combo.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Il gioco non sta usando la GPU dedicata (per il gioco) e sta girando invece sulla GPU a risparmio energetico, quindi le prestazioni ne risentiranno. Aggiorna i driver grafici, poi riavvia il gioco. Su Windows, imposta anche il gioco su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica.',
 };

@@ -44,9 +44,11 @@ export interface ChunkedTextureUploadOptions {
 /**
  * Upload a DataTexture one bounded set of rows at a time when update ranges are
  * available. Three's updateRanges allocate the texture once, then issue
- * texSubImage2D only for selected rows. Pinned r165 lacks this API and must use
- * one valid full upload; beforeChunk still paces its start, and uploadChunk lets
- * the renderer serialize that indivisible call with other WebGL work.
+ * texSubImage2D only for selected rows. The installed three (0.185) ships the
+ * range API natively, so plain DataTextures take the bounded path; the
+ * single-upload arm remains for hosts or stubs without it, where beforeChunk
+ * still paces the start and uploadChunk lets the renderer serialize that
+ * indivisible call with other WebGL work.
  */
 export async function uploadDataTextureInChunks(
   target: TextureUploadTarget,
@@ -83,9 +85,9 @@ export async function uploadDataTextureInChunks(
   );
   const rowsPerChunk = Math.max(1, Math.floor(maxChunkBytes / rowBytes));
 
-  // Three r165, pinned by the v0.28 release, predates texture update ranges.
-  // Preserve a valid upload there and retain bounded uploads when the active
-  // Three version exposes the range API.
+  // Every three from the 0.185 train onward exposes texture update ranges
+  // natively (r165, pinned through v0.35, predated them); keep the one valid
+  // full upload for any texture or host without the range API.
   if (!supportsUpdateRanges(dataTexture)) {
     await options.beforeChunk?.();
     await uploadChunk(dataTexture);

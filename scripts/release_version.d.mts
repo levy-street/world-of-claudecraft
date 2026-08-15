@@ -7,8 +7,6 @@ export function setPackageVersion(packageJson: string, version: string): string;
 
 export function setDesktopDownloadVersion(html: string, version: string, path: string): string;
 
-export function setDesktopModuleVersion(source: string, version: string, path: string): string;
-
 export function setGameVersionText(html: string, version: string, path: string): string;
 
 export function setReadmeVersionBadge(markdown: string, version: string, path: string): string;
@@ -18,14 +16,12 @@ export function planReleaseVersion(input: {
   packageJson: string;
   gradle: string;
   pbxproj: string;
-  desktopModule: string;
   htmlFiles: Record<string, string>;
   readmeFiles: Record<string, string>;
 }): {
   packageJson: string;
   gradle: string;
   pbxproj: string;
-  desktopModule: string;
   htmlFiles: Record<string, string>;
   readmeFiles: Record<string, string>;
 };
@@ -35,7 +31,6 @@ export function collectReleaseVersionFailures(input: {
   packageJson: string;
   gradle: string;
   pbxproj: string;
-  desktopModule: string;
   htmlFiles: Record<string, string>;
   readmeFiles: Record<string, string>;
 }): string[];

@@ -181,7 +181,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     // wherever its summoner stood when the wave erupted (a kited boss hatches
     // adds far from any camp, e.g. Grix dragged to the Eastbrook town square),
     // and the only other cleanup is despawnSummonedAdds on the summoner's own
-    // respawn, hours away for a rare. The corpse keeps its full loot window.
+    // respawn, which for a long-cadence rare (the six-hour Voskar Emberwing)
+    // can be hours away. The corpse keeps its full loot window.
     if (!isInstanceMob && mob.summonedAdd) {
       if (mob.corpseTimer <= 0) ctx.dropEntity(mob.id);
       return;

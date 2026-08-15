@@ -1367,6 +1367,10 @@ export const es_ES: EnTranslations = {
       "showWalletOnCharacterScreen": "Mostrar cartera en la pantalla de personajes",
       "showWalletOnPlayerCard": "Mostrar cartera en la tarjeta de jugador",
       "showPlaytime": "Mostrar tiempo jugado en la pantalla de personajes",
+      "forceHighPerfGpu": "Usar la GPU dedicada para videojuegos",
+      "forceHighPerfGpuNote": "Activado de forma predeterminada: la aplicación de escritorio le pide a este equipo su GPU dedicada para videojuegos. Desactívalo si el juego no inicia, se abre con una pantalla en negro, o la pantalla del portátil se queda en blanco. Se aplica la próxima vez que inicies el juego.",
+      "discordPresence": "Presencia enriquecida de Discord",
+      "discordPresenceNote": "Muestra la zona en la que estás y cuánto llevas jugando esta sesión como tu actividad de Discord, y cualquiera que pueda ver tu perfil de Discord puede ver ambos datos. Solo se comparten el nombre de la zona, tu tiempo de sesión y el juego, nunca tu personaje, tu cuenta ni con quién estás jugando. Necesita que la aplicación de Discord esté abierta en este equipo.",
       "showDevBadges": "Mostrar insignias de desarrollador",
       "showOwnNameplate": "Mostrar mi placa de nombre",
       "showPlayerNameplates": "Mostrar placas de nombre de jugador",
@@ -1739,6 +1743,7 @@ export const es_ES: EnTranslations = {
       "notEnoughHonor": "No tienes suficiente Honor.",
       "reasons": {
         "arenaWin": "Victoria en la arena",
+        "arenaComplete": "combate en la arena disputado",
         "fiestaKill": "Derribo en Fiesta",
         "fiestaComplete": "Fiesta completada",
         "fiestaWin": "Victoria en Fiesta",
@@ -1845,7 +1850,7 @@ export const es_ES: EnTranslations = {
       "joinChannels": "Consejo: escribe /join world o /join lfg para chatear con jugadores de todas partes del mundo."
     },
     "itemHeroicTag": "[HEROICO]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroico",
     "itemSoulbound": "Ligado al alma",
     "itemUniqueEquipped": "Único al equipar",
     "itemSet": {
@@ -7793,7 +7798,15 @@ export const es_ES: EnTranslations = {
       "readyBody": "Se instala al salir, o reinicia ahora.",
       "restart": "Reiniciar ahora",
       "later": "Más tarde",
-      "dismiss": "Descartar"
+      "dismiss": "Descartar",
+      "whatsNew": "Ver qué cambió en tu navegador"
+    },
+    "notify": {
+      "updateReadyTitle": "La actualización {version} está lista",
+      "updateReadyTitleNoVersion": "La actualización está lista",
+      "updateReadyBody": "Reinicia World of ClaudeCraft para aplicar la actualización.",
+      "partyInviteTitle": "Invitación de grupo",
+      "partyInviteBody": "{name} te invitó a un grupo."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7818,7 @@ export const es_ES: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.",
+    "bodyDiscreteInactive": "El juego no está usando la GPU dedicada para videojuegos y se está ejecutando en la GPU integrada (de ahorro de energía), así que el rendimiento se verá afectado. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.",
     "bodyWeb": "El juego se ejecuta sin aceleración de GPU y será lento. Activa la aceleración de hardware en los ajustes del navegador, actualiza los controladores de gráficos y reinicia el navegador.",
     "hybridBodyWindows": "Esta sesión se está renderizando en la GPU integrada (de ahorro de energía). Si este equipo también tiene una GPU dedicada para videojuegos, configura tu navegador en Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos y reinícialo. La aplicación de escritorio elige la GPU dedicada automáticamente.",
     "hybridBodyLinux": "Esta sesión se está renderizando en la GPU integrada (de ahorro de energía). Si este equipo también tiene una GPU dedicada para videojuegos, tu navegador o el controlador de gráficos puede ofrecer su propio ajuste de selección de GPU, o tu distribución puede ofrecer una herramienta de cambio de GPU (como PRIME u optimus-manager). La aplicación de escritorio elige la GPU dedicada automáticamente.",
@@ -8172,6 +8186,9 @@ export const es_ES: EnTranslations = {
       "graphicsReloadNote": "La calidad gráfica y el detalle del terreno se aplican al recargar.",
       "reloadNow": "Recargar ahora",
       "fullscreen": "Pantalla completa",
+      "displayMode": "Modo de pantalla",
+      "displayModeBorderless": "Pantalla completa sin bordes",
+      "displayModeWindowed": "Ventana",
       "touchLookSpeed": "Velocidad de cámara táctil",
       "joystickSize": "Tamaño del joystick",
       "buttonSize": "Tamaño de botones",
@@ -9511,7 +9528,7 @@ export const es_ES: EnTranslations = {
       "cheap_shot": {
         "name": "Golpe al Vientre",
         "description": "Golpea al objetivo por {damage} de daño, aturdiéndolo durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Otorga 2 puntos de combo.",
         "specNote_subtlety": "Usado desde el Velo Crepuscular, esto añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarlo SIN sigilo: ese uso no cuesta nada, gasta los 3 de Penumbra e inicia el velo de sombras de 6 s."
       },
       "sap": {
@@ -9724,7 +9741,7 @@ export const es_ES: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Juramento Ardiente",
-        "description": "Aumenta pasivamente en un 60% la amenaza generada por tu daño Sagrado. Solo Guardián de fe."
+        "description": "Aumenta pasivamente en un 30% la amenaza generada por tu daño Sagrado. Solo Guardián de fe."
       },
       "retribution_aura": {
         "name": "Aura de Represalia",
@@ -9840,7 +9857,7 @@ export const es_ES: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
-        "description": "Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño adicional. Mejora gana además un 30% de armadura, sufre un 10% menos de daño y genera el doble de amenaza. Sacudida Terrestre obliga a su objetivo a atacarte durante 3 s, y Égida de Truenos otorga un 10% de reducción de daño durante 3 s."
+        "description": "Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño adicional. Mejora gana además un 40% de armadura y un 20% de Aguante, sufre un 15% menos de daño y es inmune a los golpes críticos de las criaturas y genera 2,75 veces más amenaza. Sacudida Terrestre obliga a su objetivo a atacarte durante 3 s, y Égida de Truenos otorga un 10% de reducción de daño durante 3 s."
       },
       "healing_wave": {
         "name": "Aguas Reparadoras",
@@ -10019,7 +10036,7 @@ export const es_ES: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +130%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",
@@ -10029,6 +10046,10 @@ export const es_ES: EnTranslations = {
       "growl": {
         "name": "Amenazar",
         "description": "Gruñe al objetivo: tu amenaza sube hasta igualar la de su enemigo más odiado y queda obligado a atacarte durante 3 s. Solo en forma de Bruin."
+      },
+      "challenging_roar": {
+        "name": "Rugido Funesto",
+        "description": "Un rugido funesto: todos los enemigos en un radio de 10 m son provocados, su amenaza hacia ti sube hasta igualar la de su enemigo más odiado, y quedan obligados a atacarte durante 3 s. Solo en Forma de Bruin."
       },
       "cat_form": {
         "name": "Forma de lobo",

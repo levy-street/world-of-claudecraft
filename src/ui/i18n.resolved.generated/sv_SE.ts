@@ -1367,6 +1367,10 @@ export const sv_SE: EnTranslations = {
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showPlaytime": "Visa tid spelad på karaktärsskärmen",
+      "forceHighPerfGpu": "Använd det separata spelgrafikkortet",
+      "forceHighPerfGpuNote": "På som standard: skrivbordsappen begär datorns separata spelgrafikkort. Stäng av det här om spelet inte startar, öppnas med en svart skärm, eller om den bärbara datorns skärm blir svart. Träder i kraft nästa gång spelet startar.",
+      "discordPresence": "Discord-aktivitet",
+      "discordPresenceNote": "Visar zonen du befinner dig i och hur länge du har spelat den här sessionen som din Discord-aktivitet, och alla som kan se din Discord-profil kan se båda. Endast zonnamnet, din sessionstid och spelet delas, aldrig din karaktär, ditt konto eller vem du spelar med. Kräver att Discord-appen körs på den här datorn.",
       "showDevBadges": "Visa utvecklarmärken",
       "showOwnNameplate": "Visa min namnskylt",
       "showPlayerNameplates": "Visa spelares namnskyltar",
@@ -1739,6 +1743,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "reasons": {
         "arenaWin": "Arenaseger",
+        "arenaComplete": "arenamatch utkämpad",
         "fiestaKill": "Fiesta-nedtagning",
         "fiestaComplete": "Fiesta avklarad",
         "fiestaWin": "Fiesta-seger",
@@ -1845,7 +1850,7 @@ export const sv_SE: EnTranslations = {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
     "itemHeroicTag": "[HEROISK]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",
     "itemUniqueEquipped": "Unikt utrustad",
     "itemSet": {
@@ -7793,7 +7798,15 @@ export const sv_SE: EnTranslations = {
       "readyBody": "Den installeras när du avslutar, eller starta om nu.",
       "restart": "Starta om nu",
       "later": "Senare",
-      "dismiss": "Stäng"
+      "dismiss": "Stäng",
+      "whatsNew": "Se vad som har ändrats i din webbläsare"
+    },
+    "notify": {
+      "updateReadyTitle": "Uppdatering {version} är klar",
+      "updateReadyTitleNoVersion": "Uppdatering är klar",
+      "updateReadyBody": "Starta om World of ClaudeCraft för att tillämpa uppdateringen.",
+      "partyInviteTitle": "Gruppinbjudan",
+      "partyInviteBody": "{name} bjöd in dig till en grupp."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7818,7 @@ export const sv_SE: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
+    "bodyDiscreteInactive": "Spelet använder inte det separata (spel-)grafikkortet och körs i stället på det strömsparande grafikkortet, vilket försämrar prestandan. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
     "bodyWeb": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.",
     "hybridBodyWindows": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort, ställ in din webbläsare på Höga prestanda under Inställningar > System > Bildskärm > Grafik, och starta sedan om den. Skrivbordsappen väljer det separata grafikkortet automatiskt.",
     "hybridBodyLinux": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort kan din webbläsare eller grafikdrivrutin erbjuda en egen inställning för val av grafikkort, eller så kan din distribution erbjuda ett verktyg för att växla grafikkort (till exempel PRIME eller optimus-manager). Skrivbordsappen väljer det separata grafikkortet automatiskt.",
@@ -8172,6 +8186,9 @@ export const sv_SE: EnTranslations = {
       "graphicsReloadNote": "Grafikkvalitet och terrängdetalj tillämpas efter en omladdning.",
       "reloadNow": "Ladda om nu",
       "fullscreen": "Helskärm",
+      "displayMode": "Visningsläge",
+      "displayModeBorderless": "Kantlös helskärm",
+      "displayModeWindowed": "Fönsterläge",
       "touchLookSpeed": "Pekblickens hastighet",
       "joystickSize": "Styrspakens storlek",
       "buttonSize": "Knappstorlek",
@@ -9511,7 +9528,7 @@ export const sv_SE: EnTranslations = {
       "cheap_shot": {
         "name": "Magslag",
         "description": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Ger 2 kombopoäng.",
         "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan."
       },
       "sap": {
@@ -9724,7 +9741,7 @@ export const sv_SE: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brinnande ed",
-        "description": "Ökar passivt hotet som er Heliga skada alstrar med 60%. Endast Trosväktare."
+        "description": "Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare."
       },
       "retribution_aura": {
         "name": "Vedergällningsaura",
@@ -9840,7 +9857,7 @@ export const sv_SE: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet vapen",
-        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 30% rustning, tar 10% mindre skada och alstrar dubbelt så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
+        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 40% rustning och 20% uthållighet, tar 15% mindre skada och är immun mot kritiska träffar från varelser och alstrar 2,75 gånger så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
       },
       "healing_wave": {
         "name": "Lagande vatten",
@@ -10019,7 +10036,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
@@ -10029,6 +10046,10 @@ export const sv_SE: EnTranslations = {
       "growl": {
         "name": "Hota",
         "description": "Morrar åt målet: ditt hot stiger till nivån hos dess mest hatade fiende och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
+      },
+      "challenging_roar": {
+        "name": "Olycksbådande vrål",
+        "description": "Ett olycksbådande vrål: varje fiende inom 10 meter eggas, dess hot mot dig stiger till nivån hos dess mest hatade fiende, och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
       },
       "cat_form": {
         "name": "Vargform",

@@ -9,10 +9,20 @@
 // role=alert instead of moving focus.
 //
 // Perf contract: closed it does zero work (hud.update() gates on isOpen; it only
-// OPENS from the bgProposed SimEvent). While open it polls the battleground
+// ARMS from the bgProposed SimEvent). While open it polls the battleground
 // snapshot at the mediumHud cadence, rebuilds DOM only when the structural
 // signature changes, refreshes the countdown text slot in place, and closes
 // itself the moment the offer resolves (seated, declined, or lapsed).
+//
+// Arrival order, the reason show() arms instead of opening outright: online,
+// the bgProposed event rides the events frame while the offer state rides the
+// next `bg` self snapshot, so at show() time `bgInfo.proposal` may not have
+// arrived yet (tests/battleground_pop_wire_order.test.ts pins the ordering).
+// Reading that gap as "offer resolved" and closing is the v0.36.0 queue-pop
+// outage: the popup never showed, silence counted as a decline, and no match
+// could seat. While armed the root stays hidden (there is nothing truthful to
+// paint) but isOpen reports true so hud.update keeps polling until the
+// snapshot lands, bounded by OFFER_SNAPSHOT_GRACE_POLLS.
 
 import { audio } from '../../../game/audio';
 import type { IWorld } from '../../../world_api';
@@ -26,6 +36,15 @@ export interface BgProposalPopupDeps {
   world(): IWorld;
 }
 
+/**
+ * MediumHud polls (about 4 Hz) an armed popup waits for the offer snapshot
+ * before giving up: about five seconds. The snapshot normally lands within a
+ * frame of the event (the server resets the bg readout throttle as it
+ * delivers bgProposed); the bound only exists so an offer that died before
+ * its first snapshot cannot hold an invisible armed popup forever.
+ */
+export const OFFER_SNAPSHOT_GRACE_POLLS = 20;
+
 function num(v: number): string {
   return formatNumber(v, { maximumFractionDigits: 0, useGrouping: false });
 }
@@ -33,29 +52,26 @@ function num(v: number): string {
 export class BgProposalPopup {
   private lastSig = '';
   private lastRemainingText = '';
+  /** Polls left to wait for the offer snapshot after show(); 0 = not armed. */
+  private pendingPolls = 0;
 
   constructor(private readonly deps: BgProposalPopupDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.pendingPolls > 0 || this.deps.root().style.display === 'block';
   }
 
-  /** Opened from the bgProposed SimEvent (hud.handleEvents), with the cue. */
+  /** Armed from the bgProposed SimEvent (hud.handleEvents), with the cue. The
+   *  DOM opens on the first render that can read the offer (see header). */
   show(): void {
-    if (!this.isOpen) {
-      const root = this.deps.root();
-      // A screen reader would otherwise miss the whole 30 second answer window,
-      // since the prompt never moves focus.
-      root.setAttribute('role', 'alert');
-      root.setAttribute('aria-live', 'assertive');
-      root.style.display = 'block';
-      audio.duelChallenge();
-    }
+    if (!this.isOpen) audio.duelChallenge();
+    this.pendingPolls = OFFER_SNAPSHOT_GRACE_POLLS;
     this.lastSig = '';
     this.render();
   }
 
   close(): void {
+    this.pendingPolls = 0;
     const el = this.deps.root();
     if (el.style.display !== 'block') return;
     el.style.display = 'none';
@@ -65,7 +81,9 @@ export class BgProposalPopup {
   }
 
   relocalize(): void {
-    if (!this.isOpen) return;
+    // Displayed, not isOpen: an armed popup has no painted text to re-localize,
+    // and running render() from here would burn one of its grace polls.
+    if (this.deps.root().style.display !== 'block') return;
     this.lastSig = '';
     this.render();
   }
@@ -74,12 +92,30 @@ export class BgProposalPopup {
     if (!this.isOpen) return;
     const view = buildBgProposalPopupView(this.deps.world().bgInfo);
     if (!view) {
+      if (this.pendingPolls > 0) {
+        // Armed: the offer rode the events frame but its snapshot has not
+        // landed yet. Wait it out (bounded) rather than reading the gap as a
+        // resolved offer; close() when the bound runs dry.
+        this.pendingPolls--;
+        if (this.pendingPolls === 0) this.close();
+        return;
+      }
       // The offer resolved (seated, declined, or lapsed): the snapshot dropping
       // it is the close signal, so no event needs to carry one.
       this.close();
       return;
     }
     const el = this.deps.root();
+    if (el.style.display !== 'block') {
+      // First readable offer: take the DOM open here rather than in show(),
+      // so the role=alert announcement carries a real prompt instead of an
+      // empty box. A screen reader would otherwise miss the whole 30 second
+      // answer window, since the prompt never moves focus.
+      el.setAttribute('role', 'alert');
+      el.setAttribute('aria-live', 'assertive');
+      el.style.display = 'block';
+    }
+    this.pendingPolls = 0;
     if (view.sig !== this.lastSig) {
       this.lastSig = view.sig;
       this.lastRemainingText = '';

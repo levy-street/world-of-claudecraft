@@ -4,7 +4,6 @@ import {
   inferExpectedReleaseVersion,
   planReleaseVersion,
   setDesktopDownloadVersion,
-  setDesktopModuleVersion,
   setGameVersionText,
   setPackageVersion,
   setReadmeVersionBadge,
@@ -41,9 +40,6 @@ const INDEX_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/worl
 const PLAY_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-mac-universal.dmg">Download</a>
 <a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-win-x64.exe">Download</a>
 <div id="game-version">v0.10</div>`;
-
-const DESKTOP_TS = `export const DESKTOP_VERSION = '0.20.0';
-const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';`;
 
 // A page migrated before the per-arch cutover (or hand-edited afterward) can still
 // carry the legacy combined-installer filename ("-win.exe", no arch suffix).
@@ -136,12 +132,6 @@ describe('release version transforms', () => {
     expect(out).not.toContain('AppImage');
   });
 
-  it('updates DESKTOP_VERSION in the desktop download module', () => {
-    const out = setDesktopModuleVersion(DESKTOP_TS, '0.21.0', 'src/game/desktop_download.ts');
-    expect(out).toContain("export const DESKTOP_VERSION = '0.21.0';");
-    expect(out).not.toContain('0.20.0');
-  });
-
   it('updates README version badges', () => {
     const out = setReadmeVersionBadge(README_MD, '0.21.0', 'README.md');
     expect(out).toContain('version-0.21.0-blue');
@@ -151,12 +141,6 @@ describe('release version transforms', () => {
   it('fails loudly when a README has no version badge', () => {
     expect(() => setReadmeVersionBadge('# World of ClaudeCraft', '0.21.0', 'README.md')).toThrow(
       /version badge/,
-    );
-  });
-
-  it('fails loudly when the module has no DESKTOP_VERSION constant', () => {
-    expect(() => setDesktopModuleVersion('const x = 1;', '0.21.0', 'desktop_download.ts')).toThrow(
-      /DESKTOP_VERSION/,
     );
   });
 
@@ -173,7 +157,6 @@ describe('planReleaseVersion', () => {
       packageJson: PACKAGE_JSON,
       gradle: GRADLE,
       pbxproj: PBXPROJ,
-      desktopModule: DESKTOP_TS,
       htmlFiles: {
         'index.html': INDEX_HTML,
         'play.html': PLAY_HTML,
@@ -193,7 +176,6 @@ describe('planReleaseVersion', () => {
     expect(plan.htmlFiles['index.html']).toContain('world-of-claudecraft-0.21.0-win-x64.exe');
     expect(plan.htmlFiles['play.html']).toContain('world-of-claudecraft-0.21.0-win-x64.exe');
     expect(plan.htmlFiles['play.html']).toContain('<div id="game-version">v0.21.0</div>');
-    expect(plan.desktopModule).toContain("export const DESKTOP_VERSION = '0.21.0';");
     expect(plan.readmeFiles['README.md']).toContain('version-0.21.0-blue');
   });
 });
@@ -205,7 +187,6 @@ describe('collectReleaseVersionFailures', () => {
       packageJson: PACKAGE_JSON,
       gradle: GRADLE,
       pbxproj: PBXPROJ,
-      desktopModule: DESKTOP_TS,
       htmlFiles: {
         'index.html': INDEX_HTML,
         'play.html': '<div class="coming-soon-badge">Coming Soon...</div>',
@@ -223,7 +204,6 @@ describe('collectReleaseVersionFailures', () => {
         'index.html game-version is v0.10, expected v0.21.0',
         'index.html has a stale Linux desktop download URL, expected 0.21.0',
         'index.html has a stale Windows desktop download URL, expected 0.21.0',
-        'src/game/desktop_download.ts DESKTOP_VERSION is 0.20.0, expected 0.21.0',
         'play.html is missing the macOS desktop download URL for 0.21.0',
         'play.html still contains Coming Soon in the download panel',
         'README.md version badge includes 0.20.0, expected all 0.21.0',
@@ -237,7 +217,6 @@ describe('collectReleaseVersionFailures', () => {
       packageJson: PACKAGE_JSON,
       gradle: GRADLE,
       pbxproj: PBXPROJ,
-      desktopModule: DESKTOP_TS,
       htmlFiles: {
         'play.html': PLAY_HTML,
       },
@@ -255,7 +234,6 @@ describe('collectReleaseVersionFailures', () => {
       packageJson: PACKAGE_JSON,
       gradle: GRADLE,
       pbxproj: PBXPROJ,
-      desktopModule: DESKTOP_TS,
       htmlFiles: {
         'index.html': setGameVersionText(LEGACY_WINDOWS_HTML, '0.21.0', 'index.html').replace(
           'world-of-claudecraft-0.20.0-mac-universal.dmg',

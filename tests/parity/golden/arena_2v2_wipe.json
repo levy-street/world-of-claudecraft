@@ -1165,8 +1165,8 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 967,
-      "state": "26fca97c",
-      "events": "d16bc573",
+      "state": "9532353e",
+      "events": "322d46ae",
       "rng": {
         "draws": 538,
         "digest": "989640f4"
@@ -1434,12 +1434,21 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 17,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "lossesByOpponent": {
+              "2v2:[\"name:aleph\",\"name:bet\"]": 1
+            },
+            "winsByOpponent": {}
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 17,
           "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
@@ -1522,6 +1531,14 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 17,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "lossesByOpponent": {
+              "2v2:[\"name:aleph\",\"name:bet\"]": 1
+            },
+            "winsByOpponent": {}
+          },
           "inventory": [
             {
               "count": 5,
@@ -1532,6 +1549,7 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeHonor": 17,
           "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
@@ -1770,7 +1788,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "b2fa4536",
+      "state": "9c5e7b98",
       "events": "741638a5",
       "rng": {
         "draws": 754,
@@ -1781,7 +1799,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "3b7c43c0",
+      "state": "4bf7be82",
       "events": "741638a5",
       "rng": {
         "draws": 1029,
@@ -1792,7 +1810,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 967,
-      "state": "3e88f86f",
+      "state": "f4393c39",
       "events": "741638a5",
       "rng": {
         "draws": 1349,
@@ -1803,7 +1821,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 967,
-      "state": "4e16decb",
+      "state": "7f85ffc5",
       "events": "741638a5",
       "rng": {
         "draws": 1668,
@@ -1814,7 +1832,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 967,
-      "state": "98a49cf0",
+      "state": "0303bbe6",
       "events": "de7d14f9",
       "rng": {
         "draws": 1860,
@@ -1825,7 +1843,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 967,
-      "state": "730f0ed9",
+      "state": "ad58a89f",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -2103,12 +2121,21 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 17,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "lossesByOpponent": {
+              "2v2:[\"name:aleph\",\"name:bet\"]": 1
+            },
+            "winsByOpponent": {}
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 17,
           "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
@@ -2194,6 +2221,14 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 17,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "lossesByOpponent": {
+              "2v2:[\"name:aleph\",\"name:bet\"]": 1
+            },
+            "winsByOpponent": {}
+          },
           "inventory": [
             {
               "count": 5,
@@ -2204,6 +2239,7 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeHonor": 17,
           "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
@@ -2447,7 +2483,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 967,
-      "state": "730f0ed9",
+      "state": "ad58a89f",
       "events": "741638a5",
       "rng": {
         "draws": 2000,
@@ -2725,12 +2761,21 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 17,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "lossesByOpponent": {
+              "2v2:[\"name:aleph\",\"name:bet\"]": 1
+            },
+            "winsByOpponent": {}
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 17,
           "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
@@ -2816,6 +2861,14 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 17,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "lossesByOpponent": {
+              "2v2:[\"name:aleph\",\"name:bet\"]": 1
+            },
+            "winsByOpponent": {}
+          },
           "inventory": [
             {
               "count": 5,
@@ -2826,6 +2879,7 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeHonor": 17,
           "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},

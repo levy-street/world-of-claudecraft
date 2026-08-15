@@ -986,6 +986,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': 'Вы получаете {amount} очк. чести ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Недостаточно чести.',
   'hudChrome.warfare.reasons.arenaWin': 'Победа на арене',
+  'hudChrome.warfare.reasons.arenaComplete': 'Бой на арене',
   'hudChrome.warfare.reasons.fiestaKill': 'Устранение на Фиесте',
   'hudChrome.warfare.reasons.fiestaComplete': 'Завершение Фиесты',
   'hudChrome.warfare.reasons.fiestaWin': 'Победа на Фиесте',
@@ -1320,6 +1321,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Показывать кошелек на экране персонажей',
   'hudChrome.options.showPlaytime': 'Показывать время в игре на экране персонажей',
   'hudChrome.options.showWalletOnPlayerCard': 'Показывать кошелек на карточке игрока',
+  'hudChrome.options.forceHighPerfGpu': 'Использовать дискретную игровую видеокарту',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Включено по умолчанию: настольное приложение запрашивает у компьютера дискретную игровую видеокарту. Отключите, если игра не запускается, показывает черный экран или экран ноутбука гаснет. Настройка применится при следующем запуске игры.',
+  'hudChrome.options.discordPresence': 'Статус в Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Показывает зону, в которой вы находитесь, и время этой игровой сессии как вашу активность в Discord, и это видит любой, кому доступен ваш профиль Discord. Передаются только название зоны, время сессии и название игры, но никогда ваш персонаж, ваша учетная запись или те, с кем вы играете. Требуется запущенное приложение Discord на этом компьютере.',
   'hudChrome.options.showDevBadges': 'Показывать значки разработчика',
   'hudChrome.options.showOwnNameplate': 'Показывать свою табличку с именем',
   'hudChrome.options.showPlayerNameplates': 'Показывать таблички с именами игроков',
@@ -2097,6 +2104,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.options.graphicsReloadNote':
     'Качество графики и детализация местности применяются после перезагрузки.',
   'hud.options.reloadNow': 'Перезагрузить сейчас',
+  'hud.options.displayMode': 'Режим отображения',
+  'hud.options.displayModeBorderless': 'Полноэкранный без рамки',
+  'hud.options.displayModeWindowed': 'Оконный',
   'hud.options.fullscreen': 'Полный экран',
   'hud.options.touchLookSpeed': 'Скорость обзора (касание)',
   'hud.options.joystickSize': 'Размер джойстика',
@@ -3093,7 +3103,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': 'Святая земля',
   'entities.abilities.consecration.description': 'Освящает землю под вами на 9 сек., нанося {damage} светлого урона с высокой угрозой каждую секунду. Первое попадание даёт 1 Преданность. Стражи веры получают на 10% меньше урона, пока стоят внутри. Вознесение повышает его урон.',
   'entities.abilities.righteous_fury.name': 'Пылающая клятва',
-  'entities.abilities.righteous_fury.description': 'Пассивно повышает угрозу, создаваемую вашим светлым уроном, на 60%. Только Страж веры.',
+  'entities.abilities.righteous_fury.description': 'Пассивно повышает угрозу, создаваемую вашим светлым уроном, на 30%. Только Страж веры.',
   'entities.abilities.retribution_aura.name': 'Аура возмездия',
   'entities.abilities.retribution_aura.description': 'Окружает вас и вашу группу святой энергией до смерти или замены. Враги, атакующие затронутых союзников в ближнем бою, получают {buff} ед. урона от светлой магии, а затронутые союзники наносят дополнительно {buff} ед. урона от светлой магии автоатаками. Заменяет вашу собственную Стойкость бастиона. Повторное применение Ауры воздаяния другим паладином обновляет её, а не суммирует.',
   'entities.abilities.tame_beast.name': 'Дикие узы',
@@ -3146,7 +3156,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': 'Дуговая стрела',
   'entities.abilities.lightning_bolt.description': 'Наносит {damage} урона от природы. Урон растёт с силой заклинаний. Стихии: попадание даёт 1 Гром.',
   'entities.abilities.rockbiter_weapon.name': 'Оружие каменных уз',
-  'entities.abilities.rockbiter_weapon.description': 'Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона. Совершенствование вдобавок получает 30% брони, принимает на 10% меньше урона и создаёт вдвое больше угрозы. Земной толчок вынуждает свою цель атаковать вас 3 сек., а Громовой оберег даёт 10% снижения урона на 3 сек.',
+  'entities.abilities.rockbiter_weapon.description': 'Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона. Совершенствование вдобавок получает 40% брони и 20% выносливости, принимает на 15% меньше урона и невосприимчив к критическим ударам существ и создаёт в 2,75 раза больше угрозы. Земной толчок вынуждает свою цель атаковать вас 3 сек., а Громовой оберег даёт 10% снижения урона на 3 сек.',
   'entities.abilities.healing_wave.name': 'Целебные воды',
   'entities.abilities.healing_wave.description': 'Исцеляет союзную цель на {damage}. Исцеление растёт с силой заклинаний. Исцеление: сохраняет 50% полного исцеления до перелечивания как Целительный поток на 12 сек., до 30% от максимального здоровья цели.',
   'entities.abilities.chain_heal.name': 'Каскадное исцеление',
@@ -3216,10 +3226,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оплетает цель корнями на месте на срок до 12 сек.',
   'entities.abilities.bear_form.name': 'Облик бурого',
   'entities.abilities.bear_form.description':
-    'Вы принимаете облик медведя: броня +130%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
+    'Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
+  'entities.abilities.challenging_roar.description':
+    'Грозный рев: каждый враг в пределах 10 м получает провокацию, его угроза к вам повышается до уровня самого ненавистного ему врага, и он вынужден атаковать вас 3 сек. Только в облике бурого.',
+  'entities.abilities.challenging_roar.name': 'Грозный рев',
   'entities.abilities.growl.name': 'Устрашение',
   'entities.abilities.growl.description':
     'Рычит на цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек. Только в облике бурого.',
@@ -7947,6 +7960,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': 'Перезапустить сейчас',
   'desktop.update.later': 'Позже',
   'desktop.update.dismiss': 'Закрыть',
+  'desktop.update.whatsNew': 'Посмотреть изменения в браузере',
+  'desktop.notify.updateReadyTitle': 'Обновление {version} готово',
+  'desktop.notify.updateReadyTitleNoVersion': 'Обновление готово',
+  'desktop.notify.updateReadyBody': 'Перезапустите World of ClaudeCraft, чтобы применить обновление.',
+  'desktop.notify.partyInviteTitle': 'Приглашение в группу',
+  'desktop.notify.partyInviteBody': '{name} приглашает вас в группу.',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'Игровой экран перестал отвечать. Перезагрузить его?',
   'desktop.crash.reload': 'Перезагрузить',
@@ -7955,6 +7974,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
   'gpuNotice.bodyDesktop':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Игра не использует дискретную (игровую) видеокарту и работает на энергосберегающем графическом процессоре, поэтому производительность будет ниже. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
   'gpuNotice.bodyWeb':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.',
   'gpuNotice.hybridBodyWindows':

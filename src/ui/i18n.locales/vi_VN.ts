@@ -2545,6 +2545,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Tiếp Tục với Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}',
+  'hudChrome.itemHeroicLabel': 'Anh Hùng',
   'hudChrome.itemHeroicTag': '[ANH HÙNG]',
   'hudChrome.itemSoulbound': 'Ràng Buộc Linh Hồn',
   'hudChrome.keybinds.categoryPet': 'Thú Cưng',
@@ -4201,7 +4202,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bear_charge.name': 'Cú Lao Bruin',
   'entities.abilities.bear_form.description':
-    'Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
+    'Biến hình thành gấu: giáp +110%, máu tối đa +30%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
   'entities.abilities.bear_form.name': 'Hình Bruin',
   'entities.abilities.berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
@@ -4440,10 +4441,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu.',
   'entities.abilities.revive_pet.name': 'Băng Bó',
-  'entities.abilities.righteous_fury.description': 'Bị động tăng 60% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin.',
+  'entities.abilities.righteous_fury.description': 'Bị động tăng 30% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin.',
   'entities.abilities.righteous_fury.name': 'Lời Thề Rực Cháy',
   'entities.abilities.rip.name': 'Vết Nứt Máu',
-  'entities.abilities.rockbiter_weapon.description': 'Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 30% giáp, chịu ít hơn 10% sát thương và tạo ra gấp đôi mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây.',
+  'entities.abilities.rockbiter_weapon.description': 'Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 40% giáp và 20% Thể Lực, chịu ít hơn 15% sát thương và miễn nhiễm với đòn chí mạng từ quái vật và tạo ra gấp 2,75 lần mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây.',
   'entities.abilities.rockbiter_weapon.name': 'Vũ Khí Khắc Đá',
   'entities.abilities.rupture.name': 'Rỉ Máu Chí Tử',
   'entities.abilities.sap.description':
@@ -10553,6 +10554,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Danh dự',
   'hudChrome.warfare.honorGain': 'Bạn nhận được Danh dự {amount} ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Không đủ danh dự.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Đã đấu trận đấu trường',
   'hudChrome.warfare.reasons.arenaWin': 'Chiến thắng đấu trường',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta đã hoàn thành',
   'hudChrome.warfare.reasons.fiestaKill': 'Hạ gục trong Fiesta',
@@ -12988,4 +12990,26 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Mã ngoại hình đó đến từ phiên bản trò chơi mới hơn.',
   'auth.designCodeErrMalformed': 'Mã ngoại hình đó bị hỏng. Hãy sao chép toàn bộ mã rồi thử lại.',
   'hudChrome.nameplate.cheaterTag': '< Kẻ Gian Lận >',
+  'hud.options.displayMode': 'Chế Độ Hiển Thị',
+  'hud.options.displayModeBorderless': 'Toàn Màn Hình Không Viền',
+  'hud.options.displayModeWindowed': 'Cửa Sổ',
+  'hudChrome.options.discordPresence': 'Hoạt Động Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Hiển thị vùng bạn đang ở và thời gian bạn đã chơi trong phiên chơi này dưới dạng hoạt động Discord của bạn, và bất kỳ ai xem được hồ sơ Discord của bạn đều thấy được cả hai. Chỉ tên vùng, thời gian phiên chơi của bạn, và tên trò chơi được chia sẻ, không bao giờ là nhân vật, tài khoản, hay những ai bạn đang chơi cùng. Cần ứng dụng Discord đang chạy trên máy tính này.',
+  'hudChrome.options.forceHighPerfGpu': 'Dùng Card Đồ Họa Chơi Game',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Mặc định bật: ứng dụng máy tính yêu cầu máy này dùng card đồ họa chơi game của nó. Hãy tắt tùy chọn này nếu trò chơi không khởi động được, mở ra màn hình đen, hoặc màn hình laptop bị tối đen. Có hiệu lực vào lần khởi động trò chơi tiếp theo.',
+  'desktop.notify.partyInviteBody': '{name} đã mời bạn gia nhập tổ đội của họ.',
+  'desktop.notify.partyInviteTitle': 'Lời mời tổ đội',
+  'desktop.notify.updateReadyBody': 'Khởi động lại World of ClaudeCraft để áp dụng bản cập nhật.',
+  'desktop.notify.updateReadyTitle': 'Bản cập nhật {version} đã sẵn sàng',
+  'desktop.notify.updateReadyTitleNoVersion': 'Bản cập nhật đã sẵn sàng',
+  'desktop.update.whatsNew': 'Xem những gì đã thay đổi trong trình duyệt của bạn',
+  'entities.abilities.challenging_roar.description':
+    'Một tiếng gầm hiểm độc: mọi kẻ địch trong vòng 10 thước bị khiêu khích, mối đe dọa của chúng đối với bạn tăng lên ngang bằng kẻ địch mà chúng căm ghét nhất, và chúng bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form.',
+  'entities.abilities.challenging_roar.name': 'Tiếng Gầm Hiểm Độc',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Nhận 2 điểm liên hoàn.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Trò chơi hiện không dùng card đồ họa chơi game mà đang chạy trên GPU tích hợp (tiết kiệm điện), nên hiệu năng sẽ giảm sút. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, cũng hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.',
 };

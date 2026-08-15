@@ -40,9 +40,19 @@ import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/c
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
+import { setDisplayChangeTarget } from './game/desktop_display_change';
+import {
+  desktopDisplayModeSupported,
+  pushDesktopDisplayMode,
+  syncDesktopDisplayModeSetting,
+} from './game/desktop_display_mode_sync';
 import { initDesktopDownload } from './game/desktop_download';
+import { pushDesktopGpuPref, syncDesktopGpuPrefSetting } from './game/desktop_gpu_pref_sync';
+import { desktopNotifyOnSimEvents } from './game/desktop_notifications';
+import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
+import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -60,6 +70,7 @@ import {
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { GamepadManager } from './game/gamepad';
+import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
@@ -129,6 +140,7 @@ import { padReelItemId } from './game/pad_reel';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
+import { presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -157,6 +169,7 @@ import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
+import { createZoneWarmTracker } from './game/zone_warm_tracker';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -501,6 +514,20 @@ if (NATIVE_APP) document.body.classList.add('mobile-touch');
 // Electron shell integration: push t()-localized crash-dialog strings to the
 // main process and render the auto-update toast (no-op without the bridge).
 if (DESKTOP_APP) initDesktopShellIntegration();
+// Reflect the shell's STORED GPU preference into the local setting, so the
+// desktop-only options row shows what the next launch will do rather than a
+// local guess. Writes nothing without the bridge method (older shell, browser).
+// The store is resolved by the factory AFTER the bridge answers: a snapshot
+// taken before the round trip would rewrite the whole settings blob over any
+// write that landed while it was in flight. And when a fast entry path has
+// already built startGame's long-lived store, the factory answers with THAT
+// instance instead of a fresh snapshot: a fresh one would land the reflection
+// only in localStorage, where the live store's next unrelated save() (a
+// whole-blob rewrite) would silently revert it.
+let liveSettings: Settings | null = null;
+const settingsForShellReflection = (): Settings => liveSettings ?? new Settings();
+if (DESKTOP_APP) void syncDesktopGpuPrefSetting(desktopBridge(), settingsForShellReflection);
+if (DESKTOP_APP) void syncDesktopDisplayModeSetting(desktopBridge(), settingsForShellReflection);
 // Free every WebGL context (game renderer, character preview, portrait rig) when
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
@@ -994,6 +1021,8 @@ function exitBrowserFullscreen(): void {
 
 function requestPreferredFullscreen(): void {
   if (NATIVE_APP) return;
+  // The shell's own display mode owns the window (older shells fail the check).
+  if (desktopDisplayModeSupported(desktopBridge())) return;
   if (useTouchInterface()) {
     requestMobileFullscreenLandscape();
     return;
@@ -1192,6 +1221,10 @@ async function startGame(
   // hoisting them ahead of mountGameUi is safe; everything DOM-bound (canvas
   // lookups, the context-lost listeners) stays below, after the template mounts.
   const settings = new Settings();
+  // Publish the long-lived store for the boot-time shell reflections
+  // (settingsForShellReflection): a bridge read resolving after this line
+  // writes into THIS instance rather than a doomed parallel snapshot.
+  liveSettings = settings;
   // "Stop Auto-Attack on Target Switch" (issue #1358) is authoritative on the
   // sim, so a stored player preference must be re-pushed on every world entry
   // (offline sim or online server), not just when the Options toggle changes.
@@ -2290,6 +2323,7 @@ async function startGame(
       ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
+    onActivity: createGamepadActivityNotifier(desktopBridge()),
   });
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
@@ -2547,6 +2581,18 @@ async function startGame(
       hud.renderCharIfOpen();
       return;
     }
+    if (key === 'forceHighPerfGpu') {
+      // The push owns the inversion (the shell stores the opt-out) and swallows
+      // a failed write; the shell applies it at its next launch, so nothing in
+      // the running session changes.
+      pushDesktopGpuPref(desktopBridge(), settings.set('forceHighPerfGpu', !!value));
+      return;
+    }
+    if (key === 'discordPresence') {
+      // Same polarity on both sides: the shell drops its RPC connection on false.
+      pushDiscordPresenceEnabled(desktopBridge(), settings.set('discordPresence', !!value));
+      return;
+    }
     if (key === 'showDevBadges') {
       renderer.showDevBadges = settings.set('showDevBadges', !!value);
       return;
@@ -2626,6 +2672,9 @@ async function startGame(
         break;
       case 'fullscreen':
         v >= 0.5 ? requestPreferredFullscreen() : exitBrowserFullscreen();
+        break;
+      case 'displayMode':
+        pushDesktopDisplayMode(desktopBridge(), v >= 0.5 ? 'borderless' : 'windowed');
         break;
       case 'clickToMove':
         if (v < 0.5) input.clearClickMove();
@@ -3727,30 +3776,33 @@ async function startGame(
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
 
-  let lastWarmCheckX = Number.NaN;
-  let lastWarmCheckZ = Number.NaN;
-  // Rift-band exit tracking. Leaving the instance band teleports back into an
-  // overworld zone that is usually still RESIDENT, so the ready-bail below
-  // would skip the loading screen entirely and drop the player inside the
-  // residency fog clamp while the surrounding zones stream back in: a tight
-  // teal fog wall easing open over seconds that reads as "standing in water".
-  // A rift exit therefore always takes the blocking path, and it streams a
-  // WIDER arrival neighbourhood than an ordinary teleport: the rift band sits
-  // outside the overworld entirely, so the whole ring around the exit point
-  // may have been evicted rather than just the border the player lands next
-  // to (ARRIVAL_NEIGHBOR_STREAM_RADIUS covers that ordinary case).
-  let lastWarmInRiftBand = false;
+  // Displacement and rift-band-exit tracking (src/game/zone_warm_tracker.ts
+  // owns the state and the hidden-freeze semantics). Rift-exit background: the
+  // instance band teleports back into an overworld zone that is usually still
+  // RESIDENT, so the ready-bail below would skip the loading screen entirely
+  // and drop the player inside the residency fog clamp while the surrounding
+  // zones stream back in: a tight teal fog wall easing open over seconds that
+  // reads as "standing in water". A rift exit therefore always takes the
+  // blocking path, and it streams a WIDER arrival neighbourhood than an
+  // ordinary teleport: the rift band sits outside the overworld entirely, so
+  // the whole ring around the exit point may have been evicted rather than
+  // just the border the player lands next to (ARRIVAL_NEIGHBOR_STREAM_RADIUS
+  // covers that ordinary case).
+  const warmTracker = createZoneWarmTracker(isRiftPos);
   const RIFT_EXIT_STREAM_RADIUS = 240;
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
-    const displacement = Number.isFinite(lastWarmCheckX)
-      ? Math.hypot(player.pos.x - lastWarmCheckX, player.pos.z - lastWarmCheckZ)
-      : 0;
-    lastWarmCheckX = player.pos.x;
-    lastWarmCheckZ = player.pos.z;
-    const wasInRiftBand = lastWarmInRiftBand;
-    lastWarmInRiftBand = isRiftPos(player.pos.x);
-    const riftExit = wasInRiftBand && !lastWarmInRiftBand;
+    // A hidden desktop shell must not pay zone-warm GPU work for a view
+    // nobody sees (the presentation gate stops render, not this lane, and
+    // this is its heaviest recurring producer). The tracker freezes whole
+    // while hidden, so the reveal frame computes the accumulated displacement
+    // as if the transition just happened; a rift crossing keeps its exit edge
+    // unless it entered AND left the band inside the hidden span (no rift
+    // session was rendered then, so no eviction happened, and the
+    // displacement arms cover that reveal; see zone_warm_tracker.ts).
+    const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());
+    if (!warm) return;
+    const { displacement, riftExit } = warm;
     if (zoneWarmup) return;
     if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
@@ -4206,9 +4258,19 @@ async function startGame(
   };
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
 
+  // Reused across frames: the rAF hot path must not allocate (the frame
+  // allocation guard polices the loop body), and the gate reads it
+  // synchronously before returning a shared frozen decision.
+  const gateInput = { hidden: false, desktopApp: DESKTOP_APP, graphicsRebuildPaused: false };
   function frame(now: number): void {
     requestAnimationFrame(frame);
-    if (graphicsRebuildPaused) {
+    // The desktop shell keeps rAF running while hidden (backgroundThrottling is
+    // off), so document.hidden never flips there and the shell push is the only
+    // truthful hidden signal.
+    gateInput.hidden = document.hidden || desktopPresentationHidden();
+    gateInput.graphicsRebuildPaused = graphicsRebuildPaused;
+    const gate = presentationGate(gateInput);
+    if (!gate.tick) {
       last = now;
       acc = 0;
       return;
@@ -4217,9 +4279,23 @@ async function startGame(
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
-    perf.frame(frameDt);
-    syncPerfOverlay(frameDt, now);
-    syncOverlayDiagnostics();
+    // Not sampling a renderless frame reproduces the web hidden-tab shape (rAF
+    // pauses there, so hidden frames never reach the sampler, and the reporter
+    // is gated on this same shell signal via its shellHidden option below): the
+    // fleet beacon keeps its meaning, where sampling these would fake a healthy
+    // fps and p95. The switch extends that shape to EVERY per-frame sample: a
+    // web hidden tab fills no sim/events bucket either, so the hidden desktop
+    // frame must not grow a hidden-only ring population (phase 4 QA F10). The
+    // tick-level fleet trackers stay behind gate.render for the same parity:
+    // their rulings made them independent of the woc_perf opt-in, not of
+    // visibility, and no web hidden tab ever ran them.
+    perf.setFrameSampling(gate.render);
+    if (gate.render) perf.frame(frameDt);
+    else perf.noteHiddenPresentSkip();
+    if (gate.paint) {
+      syncPerfOverlay(frameDt, now);
+      syncOverlayDiagnostics();
+    }
 
     // Freeze movement while the game menu is up, during the first-spawn intro,
     // the camera prompt, and through the race countdown. The sim independently
@@ -4332,6 +4408,8 @@ async function startGame(
           perf.finishTime('sim', simStart);
         }
         const eventsLength = events.length;
+        desktopNotifyOnSimEvents(events, offlineSim.playerId);
+        desktopPresenceOnFrame(offlineSim);
         const eventsStart = perf.startTime();
         traceStart = perf.startTrace();
         try {
@@ -4376,17 +4454,21 @@ async function startGame(
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
-      syncGroundAimReticle();
+      // Cursor-driven renderer state: no cursor reaches a hidden window,
+      // and the reticle is only consumed by the skipped draw (phase 4 QA F7).
+      if (gate.render) syncGroundAimReticle();
       perf.setNetwork(null);
       const offlineRenderFacing =
         visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
         movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
-      const rendererStart = perf.startTime();
+      // A hidden frame skips the draw, so timing it would dilute the renderer
+      // bucket with work that never happened.
+      const rendererStart = gate.render ? perf.startTime() : 0;
       traceStart = perf.startTrace();
       try {
-        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null);
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, gate.render);
       } finally {
         perf.finishTrace(
           'renderer.sync',
@@ -4398,25 +4480,35 @@ async function startGame(
           'alpha',
           offlineAlpha,
         );
-        perf.finishTime('renderer', rendererStart);
+        if (gate.render) perf.finishTime('renderer', rendererStart);
       }
-      traceStart = perf.startTrace();
-      try {
-        updateClickMoveMarker();
-      } finally {
-        perf.finishTrace('ui.clickMoveMarker', traceStart);
+      // Click-driven renderer marker: no clicks reach a hidden window, and the
+      // marker is only consumed by the skipped draw (phase 4 QA F7).
+      if (gate.render) {
+        traceStart = perf.startTrace();
+        try {
+          updateClickMoveMarker();
+        } finally {
+          perf.finishTrace('ui.clickMoveMarker', traceStart);
+        }
       }
-      perf.markInputVisible(performance.now());
+      if (gate.render) perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-      const hudStart = perf.startTime();
-      traceStart = perf.startTrace();
-      try {
-        hud.update();
-      } finally {
-        perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
-        perf.finishTime('hud', hudStart);
-      }
-      perf.tick(now);
+      if (gate.paint) {
+        const hudStart = perf.startTime();
+        traceStart = perf.startTrace();
+        try {
+          hud.update();
+        } finally {
+          perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
+          perf.finishTime('hud', hudStart);
+        }
+      } else hud.update(false);
+      if (gate.render) perf.tick(now);
+      // Liveness breadcrumb the NEXT launch reads as a load-failure report: a
+      // client launched minimized is alive, not stuck building the scene, so
+      // this stays at tick level. Under gate.render it would leave the stale
+      // pre-first-frame checkpoint on disk and report a phantom failure.
       entryDiagnostics.renderedFrame(now);
       return;
     }
@@ -4424,7 +4516,9 @@ async function startGame(
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
     const net = online;
     if (!net) return;
-    spectateBadge.update(net.spectating);
+    // Stateless DOM badge: paint work; the first painted frame after a
+    // restore re-syncs it from the live value (phase 4 QA F7).
+    if (gate.paint) spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
     const resolved = resolveMove(
@@ -4494,6 +4588,11 @@ async function startGame(
       net.playerId,
     );
     const drainedEventsLength = drainedEvents.length;
+    // A spectating session remaps net.playerId to the watched player's pid, so
+    // their personal events would read as addressed to us; never notify there.
+    if (net.spectating === null) desktopNotifyOnSimEvents(drainedEvents, net.playerId);
+    // Same gate, second reason: a spectator's zone must not leak to presence.
+    if (net.spectating === null) desktopPresenceOnFrame(net);
     const eventsStart = perf.startTime();
     traceStart = perf.startTrace();
     try {
@@ -4598,9 +4697,13 @@ async function startGame(
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
-    syncGroundAimReticle();
+    // Cursor-driven renderer state: no cursor reaches a hidden window,
+    // and the reticle is only consumed by the skipped draw (phase 4 QA F7).
+    if (gate.render) syncGroundAimReticle();
     const onlineViews = renderer.views.size;
-    const rendererStart = perf.startTime();
+    // A hidden frame skips the draw, so timing it would dilute the renderer
+    // bucket with work that never happened.
+    const rendererStart = gate.render ? perf.startTime() : 0;
     traceStart = perf.startTrace();
     try {
       renderer.sync(
@@ -4614,6 +4717,7 @@ async function startGame(
         adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
         selfMotion,
         selfAuthoritativeDiscontinuity,
+        gate.render,
       );
     } finally {
       perf.finishTrace(
@@ -4628,26 +4732,41 @@ async function startGame(
         'frameDtMs',
         frameDtMs,
       );
-      perf.finishTime('renderer', rendererStart);
+      if (gate.render) perf.finishTime('renderer', rendererStart);
     }
-    traceStart = perf.startTrace();
-    try {
-      updateClickMoveMarker();
-    } finally {
-      perf.finishTrace('ui.clickMoveMarker', traceStart);
+    // Click-driven renderer marker: no clicks reach a hidden window, and the
+    // marker is only consumed by the skipped draw (phase 4 QA F7).
+    if (gate.render) {
+      traceStart = perf.startTrace();
+      try {
+        updateClickMoveMarker();
+      } finally {
+        perf.finishTrace('ui.clickMoveMarker', traceStart);
+      }
     }
-    maybeShowImmobileNote(now);
-    perf.markInputVisible(performance.now());
+    // HUD DOM write plus a throttle stamp: paint work, and no movement
+    // input reaches a hidden window anyway (phase 4 QA F7). updateBreathBar
+    // stays UNGATED on purpose: it accumulates the client-side breath
+    // timer, and freezing it while hidden would show a restored player
+    // more breath than they have (the lootRolls timer doctrine).
+    if (gate.paint) maybeShowImmobileNote(now);
+    if (gate.render) perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-    const hudStart = perf.startTime();
-    traceStart = perf.startTrace();
-    try {
-      hud.update();
-    } finally {
-      perf.finishTrace('hud.update', traceStart, 'mode', 'online');
-      perf.finishTime('hud', hudStart);
-    }
-    perf.tick(now);
+    if (gate.paint) {
+      const hudStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        hud.update();
+      } finally {
+        perf.finishTrace('hud.update', traceStart, 'mode', 'online');
+        perf.finishTime('hud', hudStart);
+      }
+    } else hud.update(false);
+    if (gate.render) perf.tick(now);
+    // Liveness breadcrumb the NEXT launch reads as a load-failure report: a
+    // client launched minimized is alive, not stuck building the scene, so
+    // this stays at tick level. Under gate.render it would leave the stale
+    // pre-first-frame checkpoint on disk and report a phantom failure.
     entryDiagnostics.renderedFrame(now);
   }
   const controller = {
@@ -4887,6 +5006,9 @@ async function startGame(
   // snapshots-per-rAF count on visibility flips so the first foreground frame
   // does not fold the backlog into the 3plus histogram bucket (ruling R9).
   document.addEventListener('visibilitychange', () => online?.netPipeline().noteVisibilityChange());
+  setDisplayChangeTarget(() => {
+    if (rendererReady) renderer.noteDisplayChanged();
+  });
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>
@@ -4939,6 +5061,7 @@ async function startGame(
               simEntities: world.entities.size,
             }),
             desktopShell: DESKTOP_APP,
+            shellHidden: desktopPresentationHidden,
           });
           // One-time machine-local performance nudge (packet 0 rulings R14-R16):
           // the assembler polls the same PerfMonitor the reporter reads.

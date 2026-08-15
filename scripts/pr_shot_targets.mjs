@@ -9280,6 +9280,139 @@ export const TARGETS = [
       return { clip: '#mobile-extra-controls' };
     },
   },
+  {
+    key: 'swing-timer',
+    label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
+    when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],
+    variants: [
+      {
+        key: 'wolf-form-desktop',
+        charClass: 'druid',
+        charName: 'Pawsteps',
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      // Stage: level to Wolf Form's learn level, shift through the real cast,
+      // stand a durable mob at melee range, and engage auto-attack through the
+      // public toggle. The proof is the BAR'S SWEEP between swings, so the
+      // burst below samples the #swingbar element at off-period intervals: on
+      // the fixed 1.0s Wolf Form cadence the fill sweeps the whole range,
+      // while a period wrongly stretched to the staff speed never empties.
+      const staged = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(5, player.id);
+        player.resource = player.maxResource;
+        sim.castAbility?.('cat_form', player.id);
+        let mob = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.hp <= 0 || e.id === player.id) continue;
+          const d = (e.pos.x - player.pos.x) ** 2 + (e.pos.z - player.pos.z) ** 2;
+          if (d < best) {
+            best = d;
+            mob = e;
+          }
+        }
+        if (!mob) return { ok: false, reason: 'no living mob in the offline world' };
+        mob.maxHp = 4000;
+        mob.hp = 4000;
+        mob.hostile = true;
+        mob.pos.x = player.pos.x + Math.sin(player.facing) * 2;
+        mob.pos.z = player.pos.z + Math.cos(player.facing) * 2;
+        mob.pos.y = player.pos.y;
+        if (mob.prevPos) {
+          mob.prevPos.x = mob.pos.x;
+          mob.prevPos.y = mob.pos.y;
+          mob.prevPos.z = mob.pos.z;
+        }
+        mob.spawnPos = { ...mob.pos };
+        mob.leashAnchor = { ...mob.pos };
+        sim.rebucket?.(mob);
+        player.targetId = mob.id;
+        return { ok: true, mobId: mob.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Let the level-up deed banners clear the mid-screen before the burst.
+      await wait(5200);
+      const engaged = await page.evaluate((mobId) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        const mob = sim?.entities?.get(mobId);
+        if (!game || !sim || !player || !mob) return { ok: false, reason: 'staged mob vanished' };
+        mob.hp = mob.maxHp;
+        mob.pos.x = player.pos.x + Math.sin(player.facing) * 2;
+        mob.pos.z = player.pos.z + Math.cos(player.facing) * 2;
+        mob.pos.y = player.pos.y;
+        if (mob.prevPos) {
+          mob.prevPos.x = mob.pos.x;
+          mob.prevPos.y = mob.pos.y;
+          mob.prevPos.z = mob.pos.z;
+        }
+        mob.spawnPos = { ...mob.pos };
+        mob.leashAnchor = { ...mob.pos };
+        sim.rebucket?.(mob);
+        player.targetId = mob.id;
+        player.hp = player.maxHp;
+        sim.startAutoAttack?.(player.id);
+        const inForm = player.auras.some((a) => a.kind === 'form_cat');
+        const bar = document.getElementById('swingbar');
+        if (!bar) return { ok: false, reason: '#swingbar is not in the DOM' };
+        const r = bar.getBoundingClientRect();
+        return { ok: true, inForm, rect: { x: r.x, y: r.y, w: r.width, h: r.height } };
+      }, staged.mobId);
+      if (!engaged.ok) throw new Error(engaged.reason);
+      if (!engaged.inForm) throw new Error('Wolf Form never landed');
+      // 12 samples at 170ms (~2s): off-period for both the 1.0s cadence and
+      // the old staff-stretched period, so the burst catches the full sweep.
+      const pad = 10;
+      for (let shotIndex = 0; shotIndex < 12; shotIndex++) {
+        await wait(170);
+        const r = await page.evaluate(() => {
+          const bar = document.getElementById('swingbar');
+          if (!bar) return null;
+          const rect = bar.getBoundingClientRect();
+          return rect.width > 0 ? { x: rect.x, y: rect.y, w: rect.width, h: rect.height } : null;
+        });
+        if (!r) continue;
+        await page.screenshot({
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/swing-timer-${variant.key}-t${String(shotIndex).padStart(2, '0')}.png`,
+          clip: {
+            x: Math.max(0, r.x - pad),
+            y: Math.max(0, r.y - pad),
+            width: r.w + pad * 2,
+            height: r.h + pad * 2,
+          },
+        });
+      }
+      return {};
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and

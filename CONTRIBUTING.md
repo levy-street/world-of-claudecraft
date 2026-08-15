@@ -167,7 +167,7 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   forbidden. Peer dependency noise from optional wallet/solana trees is
   tolerated via `.npmrc` (`strict-peer-dependencies=false`); do not loosen that
   further without measuring. The repo also carries a vendored three patch under
-  `patches/` (regenerated with `pnpm patch three@0.165.0`); a three version
+  `patches/` (regenerated with `pnpm patch three@0.185.1`); a three version
   bump must re-verify the compileAsync disposal race
   (`tests/three_compile_async_patch.test.ts`) before dropping or re-rolling it.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`

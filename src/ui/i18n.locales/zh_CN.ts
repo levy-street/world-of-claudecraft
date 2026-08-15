@@ -948,6 +948,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '你获得了 {amount} 点荣誉（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '荣誉不足。',
   'hudChrome.warfare.reasons.arenaWin': '竞技场胜利',
+  'hudChrome.warfare.reasons.arenaComplete': '竞技场参战',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年华击倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年华',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年华胜利',
@@ -1259,6 +1260,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': '在角色界面显示钱包',
   'hudChrome.options.showPlaytime': '在角色界面显示游戏时长',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',
+  'hudChrome.options.forceHighPerfGpu': '使用独立游戏显卡',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。',
+  'hudChrome.options.discordPresence': 'Discord 游戏状态',
+  'hudChrome.options.discordPresenceNote':
+    '游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。',
   'hudChrome.options.showDevBadges': '显示开发者徽章',
   'hudChrome.options.showOwnNameplate': '显示我的姓名板',
   'hudChrome.options.showPlayerNameplates': '显示玩家姓名板',
@@ -1976,6 +1983,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '反转视角（触控）',
   'hud.options.graphicsReloadNote': '图形质量和地形细节会在重新加载后生效。',
   'hud.options.reloadNow': '立即重新加载',
+  'hud.options.displayMode': '显示模式',
+  'hud.options.displayModeBorderless': '无边框全屏',
+  'hud.options.displayModeWindowed': '窗口',
   'hud.options.fullscreen': '全屏',
   'hud.options.touchLookSpeed': '触屏视角速度',
   'hud.options.joystickSize': '摇杆大小',
@@ -2942,7 +2952,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': '神圣领域',
   'entities.abilities.consecration.description': '净化你脚下的土地，持续 9 秒，每秒造成 {damage} 点神圣伤害并产生高额威胁。首次命中产生 1 点虔诚。信仰守卫站在其中时受到的伤害降低 10%。升华会提高其伤害。',
   'entities.abilities.righteous_fury.name': '炽燃誓约',
-  'entities.abilities.righteous_fury.description': '被动地将你的神圣伤害所产生的威胁提高 60%。仅限信仰守卫。',
+  'entities.abilities.righteous_fury.description': '被动地将你的神圣伤害所产生的威胁提高 30%。仅限信仰守卫。',
   'entities.abilities.retribution_aura.name': '报偿光环',
   'entities.abilities.retribution_aura.description':
     '以神圣能量环绕你和队伍成员，直到死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响的盟友普通攻击额外造成{buff}点神圣伤害。替换你自己的壁垒坚定。另一名圣骑士施放报偿光环时将刷新而非叠加。',
@@ -2997,7 +3007,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': '电弧箭',
   'entities.abilities.lightning_bolt.description': '造成 {damage} 点自然伤害。伤害随法术强度提升。元素：命中可给予 1 点雷霆。',
   'entities.abilities.rockbiter_weapon.name': '缚石武器',
-  'entities.abilities.rockbiter_weapon.description': '为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 30% 护甲，受到的伤害降低 10%，并产生两倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。',
+  'entities.abilities.rockbiter_weapon.description': '为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 40% 护甲和 20% 耐力，受到的伤害降低 15%，免疫生物的致命一击，并产生 2.75 倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。',
   'entities.abilities.healing_wave.name': '治愈之水',
   'entities.abilities.healing_wave.description': '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。恢复：将完整治疗量的 50% 在过量治疗之前存为治愈涌流，持续 12 秒，至多为目标最大生命值的 30%。',
   'entities.abilities.chain_heal.name': '层叠治愈',
@@ -3062,10 +3072,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '将目标缠绕在原地，最多持续 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形态',
   'entities.abilities.bear_form.description':
-    '变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
+    '变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
     '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
+  'entities.abilities.challenging_roar.description':
+    '发出挑衅的咆哮：10 码内的每个敌人都被嘲讽，其对你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。',
+  'entities.abilities.challenging_roar.name': '挑衅咆哮',
   'entities.abilities.growl.name': '威吓',
   'entities.abilities.growl.description':
     '对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。',
@@ -7527,6 +7540,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '立即重启',
   'desktop.update.later': '稍后',
   'desktop.update.dismiss': '关闭',
+  'desktop.update.whatsNew': '在浏览器中查看更新内容',
+  'desktop.notify.updateReadyTitle': '更新 {version} 已就绪',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就绪',
+  'desktop.notify.updateReadyBody': '重启 World of ClaudeCraft 以应用更新。',
+  'desktop.notify.partyInviteTitle': '组队邀请',
+  'desktop.notify.partyInviteBody': '{name} 邀请你加入队伍。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '游戏画面已停止响应。要重新加载吗？',
   'desktop.crash.reload': '重新加载',
@@ -7534,6 +7553,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
+  'gpuNotice.bodyDiscreteInactive':
+    '游戏没有使用独立（游戏）显卡，而是运行在节能显卡上，因此性能会下降。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
   'gpuNotice.bodyWeb':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。',
   'gpuNotice.hybridBodyWindows':

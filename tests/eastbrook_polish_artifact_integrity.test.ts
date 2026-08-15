@@ -752,12 +752,23 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
-// Re-minted after extracting Demon Tower rift presentation decisions from
-// renderer.ts for the monolith ratchet. No capture was retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): the first-order
+// composite follows renderer.ts, then this seal follows the swept evidence
+// bytes. No capture was retaken.
+// Re-minted after merging the latest release into Demon Tower. Only the
+// merged provenance inputs moved; no capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4b33f621783183f7cc557f6f617d5d225e477c93a6416cfbf68ecff1e53ccc8c';
+  'b4c9332be16d0065752a61a658d5ae893564bfca1c22184719719cbc26f943bb';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '75ae31fcabda01339756eb82747e250a535e13d52c3691376d2696cccdb609ff';
+  '8687a8856864c7f3fe605535b7567bfe26dd526e56ae6b7fa9de390f44e2d37a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1746,12 +1757,23 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // branch: the first-order composite follows the merged renderer.ts bytes,
     // then this second-order performance seal follows the swept evidence
     // bytes. No capture was retaken.
-    // Re-minted after extracting Demon Tower rift presentation decisions from
-    // renderer.ts. The performance records changed only in provenance bytes.
+    // Re-pinned for the quest-collectable spawn gate. The first-order
+    // composite follows renderer.ts, then this second-order seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of PR #3359's quest-collectable spawn gate with
+    // the release branch's extracted entity-view policy. The first-order
+    // composite follows renderer.ts and entityViewPolicy, then this seal
+    // follows the swept bytes. No capture was retaken.
+    // Re-minted for the review fixes on this branch (Soul Rend warms every rig
+    // a live body can take, plus the lazy form-visual fold): the first-order
+    // composite follows renderer.ts, then this seal follows the swept evidence
+    // bytes. No capture was retaken.
+    // Re-minted after merging the latest release into Demon Tower. The
+    // first-order composite and swept provenance moved; captures did not.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0072a5da866c665b94fbe47492bdc3a2164d5eb590374cfb5a45462952f9637d');
+    ).toBe('f8ebdcba80977998c0662da3ebe07eff690b28760b6bfd01de77cc77b16108f2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -3,6 +3,7 @@ import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  chatCommandMessage,
   ONLINE_WORLD_AUTH_TYPE as SCRIPT_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE as SCRIPT_WORLD_INCOMPATIBLE_MESSAGE,
   worldAuthMessage,
@@ -57,6 +58,13 @@ const AUTHENTICATED_NODE_CLIENTS = [
   {
     path: 'scripts/profiler/geared_arrival_roster.mjs',
     authSend: 'socket.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)))',
+  },
+  {
+    // The Nythraxis prewarm A/B. Its own short session parks the browser
+    // observer in an Aldric-free start zone between legs, so it joins the
+    // world as the observer character itself, not as a bot.
+    path: 'scripts/nythraxis_hitch_bench.mjs',
+    authSend: 'socket.send(JSON.stringify(worldAuthMessage(fixture.token, fixture.characterId)))',
   },
   {
     path: 'scripts/lib/perf_hitch_scenarios.mjs',
@@ -128,6 +136,8 @@ const NON_AUTHENTICATING_NODE_WS_SCRIPTS = [
   'scripts/ws_security_e2e.mjs',
 ] as const;
 const LEGACY_AUTH_LITERAL = /\bt\s*:\s*['"]auth['"]/;
+// A frame BUILT as { t: 'chat' }, never a received-message test (=== 'chat').
+const TOP_LEVEL_CHAT_FRAME = /\bt\s*:\s*['"]chat['"]/;
 
 function nodeWebSocketSources(dir = SCRIPTS_ROOT): Array<[string, string]> {
   const sources: Array<[string, string]> = [];
@@ -199,7 +209,13 @@ describe('standalone world WebSocket auth', () => {
           : './lib/world_auth.mjs';
       const normalizedSource = source.replace(/\s+/g, ' ');
 
-      expect(source).toContain(`import { worldAuthMessage } from '${helperPath}';`);
+      // worldAuthMessage comes from the shared helper, whether or not the
+      // script also co-imports chatCommandMessage from the same module.
+      expect(source).toMatch(
+        new RegExp(
+          `import \\{[^}]*\\bworldAuthMessage\\b[^}]*\\} from '${helperPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}';`,
+        ),
+      );
       expect(normalizedSource).toContain(authSend);
       // Rows sitting at the wrap width carry a second, fully-despaced pin
       // that survives any re-wrap while still proving the SEND itself.
@@ -207,6 +223,30 @@ describe('standalone world WebSocket auth', () => {
       expect(source).not.toMatch(LEGACY_AUTH_LITERAL);
     },
   );
+
+  it('never sends chat (and the /dev cheats behind it) as a top-level frame type', () => {
+    // The server's `case 'chat'` lives in the COMMAND switch, so a top-level
+    // { t: 'chat' } frame matches nothing and is dropped without an error: the
+    // script keeps running and reports numbers for bots that were never
+    // levelled, geared, god-moded or teleported. Five perf scripts shipped that
+    // shape, which is why this is a scan and not a review note.
+    const offenders = nodeWebSocketSources()
+      .filter(([, source]) => TOP_LEVEL_CHAT_FRAME.test(source))
+      .map(([path]) => path);
+    expect(offenders).toEqual([]);
+    expect(chatCommandMessage('/dev god')).toEqual({ t: 'cmd', cmd: 'chat', text: '/dev god' });
+    // Pinned to the live client's own send, the only authority on the shape.
+    expect(readFileSync(join(ROOT, 'src/net/online.ts'), 'utf8')).toContain(
+      "this.cmd({ cmd: 'chat', text });",
+    );
+    expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
+      'export function chatCommandMessage(text: string): ChatCommandMessage;',
+    );
+    // The scan is worthless if it cannot see a violation: prove the pattern
+    // catches the exact literal the five scripts carried.
+    expect(TOP_LEVEL_CHAT_FRAME.test("send(JSON.stringify({ t: 'chat', text }))")).toBe(true);
+    expect(TOP_LEVEL_CHAT_FRAME.test("if (message.t === 'chat') return;")).toBe(false);
+  });
 
   it('leaves no legacy auth discriminator in any standalone Node script', () => {
     const legacyClients = nodeWebSocketSources()

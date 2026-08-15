@@ -770,8 +770,11 @@ window.LiveViewer = {
       gizmo.setSpace('local');
       gizmo.setSize(0.9);
       gizmo.enabled = false;
-      gizmo.visible = false;
-      scene.add(gizmo);
+      // r169+: TransformControls is no longer an Object3D; the scene gets its
+      // helper, and visibility toggles target the helper.
+      const gizmoHelper = gizmo.getHelper();
+      gizmoHelper.visible = false;
+      scene.add(gizmoHelper);
       session.gizmo = gizmo;
       let gizmoMode = null; // null | 'translate' | 'rotate'
       gizmo.addEventListener('dragging-changed', (e) => {
@@ -806,11 +809,11 @@ window.LiveViewer = {
           gizmo.attach(heldWeapon.scene);
           gizmo.setMode(gizmoMode);
           gizmo.enabled = true;
-          gizmo.visible = true;
+          gizmoHelper.visible = true;
         } else {
           gizmo.detach();
           gizmo.enabled = false;
-          gizmo.visible = false;
+          gizmoHelper.visible = false;
         }
       };
       const setGizmoMode = (mode) => {

@@ -240,7 +240,7 @@ describe('Shaman v0.29 Warspirit', () => {
     expect(shaman.auras.some((aura) => aura.id === STONEBOUND_ID)).toBe(true);
     expect(
       (sim as unknown as { effectiveArmor(entity: Entity): number }).effectiveArmor(shaman),
-    ).toBeCloseTo(Math.round(baseArmor * 1.3), 5);
+    ).toBeCloseTo(Math.round(baseArmor * 1.4), 5);
 
     castInstant(sim, shaman, 'earth_shock');
     for (let tick = 0; tick < 20 * 3; tick++) sim.tick();

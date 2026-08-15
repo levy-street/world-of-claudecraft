@@ -52,12 +52,15 @@ const PALADIN_SPECS: SpecDef[] = [
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
     'sunward_disc',
     'Oathward',
-    'Increases all threat you generate by 50%, your armor by 20% and your Stamina by 35%.',
+    'Increases all threat you generate by 40%, your armor by 20% and your Stamina by 35%.',
     // staPct 0.35 carries the 2026-07 tank-parity pass that used to live in
     // SPEC_BASELINES: with no stamina multiplier the paladin sat at 76% of the
     // prot warrior's effective HP. The mastery is where an overhauled class
     // keeps its floor (see Recompense on the warrior), so it lands here.
-    { global: { threatPct: 0.5 }, stats: { armorPct: 0.2, staPct: 0.35 } },
+    // threatPct 0.5 -> 0.4 (v0.38 tank threat parity): one layer of the
+    // Faithwarden triple stack (ability mult x mastery x Burning Oath) trimmed
+    // so the composed total lands near the other tanks.
+    { global: { threatPct: 0.4 }, stats: { armorPct: 0.2, staPct: 0.35 } },
   ),
   spec(
     'retribution',
@@ -394,8 +397,8 @@ const DRUID_SPECS: SpecDef[] = [
     'Primal Heart',
     // The +15% armor carries the v0.27 Dire Bruin retune (the old feral_choice_bear
     // node) into the spec mastery: in Talents 2.0 the bear-tank identity IS this spec.
-    'Increases your physical ability damage by 50%, your bleed damage by 50%, your threat by 20%, and your armor by 15%.',
-    { global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.2 }, stats: { armorPct: 0.15 } },
+    'Increases your physical ability damage by 50%, your bleed damage by 50%, your threat by 45%, and your armor by 15%.',
+    { global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.45 }, stats: { armorPct: 0.15 } },
   ),
   spec(
     'restoration',
