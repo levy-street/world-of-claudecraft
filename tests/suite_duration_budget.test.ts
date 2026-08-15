@@ -48,8 +48,13 @@ const SINGLE_TEST_CAP = 480_000;
 // is dead weight and fails below).
 const SINGLE_TEST_EXCEPTIONS: ReadonlyMap<string, number> = new Map([
   // The Nythraxis matrix runs its full boss ladder as one case. Splitting it
-  // is the standing follow-up; shrink this when that lands.
-  ['tests/nythraxis_matrix.test.ts', 720_000],
+  // is the standing follow-up; shrink this when that lands. Raised 720s to
+  // 1200s for the v0.38 tank pass, which doubled the Monte Carlo roster from
+  // two boss tanks to four: the case measured 218s solo (was ~120s), and the
+  // two child runs it spawns now carry 480s timeouts each, so the case budget
+  // must clear 960s to let a child fail on its own bound rather than here.
+  // Same ~5x lane-contention headroom the 720s row carried, not looser.
+  ['tests/nythraxis_matrix.test.ts', 1_200_000],
 ]);
 
 const DEFAULT_FILE_ALLOWANCE = 300_000;
@@ -64,7 +69,7 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   ['tests/druid_balance_probe.test.ts', 540_000],
   ['tests/emerald_deck_escape.test.ts', 540_000],
   ['tests/guild_bank_pg_integration.test.ts', 840_000],
-  ['tests/nythraxis_matrix.test.ts', 720_000],
+  ['tests/nythraxis_matrix.test.ts', 1_200_000],
   ['tests/owned_class_balance_dps_probes.test.ts', 360_000],
 ]);
 
@@ -97,8 +102,8 @@ describe('suite duration budget (declared-timeout ratchet)', () => {
     // by quietly emptying every rule below.
     expect(withTimeouts).toBeGreaterThanOrEqual(70);
     const nythraxis = suite.get('tests/nythraxis_matrix.test.ts');
-    expect(nythraxis?.sum).toBe(720_000);
-    expect(Math.max(...(nythraxis?.perTest ?? [0]))).toBe(720_000);
+    expect(nythraxis?.sum).toBe(1_200_000);
+    expect(Math.max(...(nythraxis?.perTest ?? [0]))).toBe(1_200_000);
   });
 
   it('refuses any timeout the parser cannot size', () => {

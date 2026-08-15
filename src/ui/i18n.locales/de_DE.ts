@@ -5789,7 +5789,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.description':
     'Weiht den Boden 9 Sek. lang und verursacht jede Sekunde {damage} Heiligschaden. Glaubenswächter erleiden darin 10% weniger Schaden.',
   'entities.abilities.righteous_fury.name': 'Brennender Eid',
-  'entities.abilities.righteous_fury.description': 'Erhöht passiv die durch euren Heiligschaden erzeugte Bedrohung um 60%. Nur für Glaubenswächter.',
+  'entities.abilities.righteous_fury.description': 'Erhöht passiv die durch euren Heiligschaden erzeugte Bedrohung um 30%. Nur für Glaubenswächter.',
   'entities.abilities.retribution_aura.name': 'Aura der Vergeltung',
   'entities.abilities.retribution_aura.description':
     'Umgibt Euch und Eure Gruppe mit heiliger Energie bis zum Tod oder zur Ersetzung. Gegner, die einen betroffenen Verbündeten im Nahkampf treffen, erleiden {buff} Heiligschaden, und betroffene Verbündete verursachen mit Autoangriffen {buff} zusätzlichen Heiligschaden.',
@@ -5844,7 +5844,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': 'Lichtbogenblitz',
   'entities.abilities.lightning_bolt.description': 'Verursacht {damage} Naturschaden. Der Schaden steigt mit der Zaubermacht. Elementar: Ein Treffer gewährt 1 Donner.',
   'entities.abilities.rockbiter_weapon.name': 'Stonebound-Waffe',
-  'entities.abilities.rockbiter_weapon.description': 'Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Schaden. Verstärkung gewinnt zudem 30% Rüstung, erleidet 10% weniger Schaden und erzeugt doppelt so viel Bedrohung. Erdstoß zwingt sein Ziel, euch 3 Sek. lang anzugreifen, und Donnerschild gewährt 3 Sek. lang 10% Schadensminderung.',
+  'entities.abilities.rockbiter_weapon.description': 'Erfüllt eure Waffe 30 Min. lang. Jeder Schlag verursacht {damage} zusätzlichen Schaden. Verstärkung gewinnt zudem 40% Rüstung und 20% Ausdauer, erleidet 15% weniger Schaden und ist immun gegen kritische Treffer von Kreaturen und erzeugt das 2,75-Fache an Bedrohung. Erdstoß zwingt sein Ziel, euch 3 Sek. lang anzugreifen, und Donnerschild gewährt 3 Sek. lang 10% Schadensminderung.',
   'entities.abilities.healing_wave.name': 'Heilende Wasser',
   'entities.abilities.healing_wave.description': 'Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht. Wiederherstellung: Speichert 50% der vollen Heilung vor Überheilung 12 Sek. lang als Heilstrom, bis zu 30% der maximalen Gesundheit des Ziels.',
   'entities.abilities.earth_shock.name': 'Erdstoß',
@@ -5907,7 +5907,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
   'entities.abilities.bear_form.name': 'Bruin-Gestalt',
   'entities.abilities.bear_form.description':
-    'Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
+    'Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Knochenmalmer',
   'entities.abilities.growl.name': 'Bedrohen',
   'entities.abilities.growl.description':
@@ -9625,6 +9625,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Mit Apple fortfahren',
   'hudChrome.dailyRewards.reason.banned':
     'Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroisch',
   'hudChrome.itemHeroicTag': '[HEROISCH]',
   'hudChrome.itemSoulbound': 'Seelengebunden',
   'hudChrome.keybinds.categoryPet': 'Begleiter',
@@ -9969,6 +9970,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Ehre',
   'hudChrome.warfare.honorGain': 'Du erhältst {amount} Ehre ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Nicht genug Ehre.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Arenakampf ausgetragen',
   'hudChrome.warfare.reasons.arenaWin': 'Arenasieg',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta abgeschlossen',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-Ausschaltung',

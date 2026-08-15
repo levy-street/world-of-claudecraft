@@ -2660,6 +2660,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Tidak dapat masuk dengan Apple. Silakan coba lagi.',
   'hudChrome.auth.appleLoginCta': 'Lanjutkan dengan Apple',
   'hudChrome.dailyRewards.reason.banned': 'Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroik',
   'hudChrome.itemHeroicTag': '[HEROIK]',
   'hudChrome.itemSoulbound': 'Terikat Jiwa',
   'hudChrome.keybinds.categoryPet': 'Peliharaan',
@@ -4272,7 +4273,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin.',
   'entities.abilities.bear_charge.name': 'Terjangan Bruin',
   'entities.abilities.bear_form.description':
-    'Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal.',
+    'Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal.',
   'entities.abilities.bear_form.name': 'Wujud Bruin',
   'entities.abilities.berserker_rage.description':
     'Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)',
@@ -4515,10 +4516,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Mengobati peliharaanmu. Jika masih hidup, memulihkan total {overTime} kesehatan selama 12 detik dengan pemulihan setiap 3 detik. Jika mati, menghidupkannya kembali dengan 35% kesehatan.',
   'entities.abilities.revive_pet.name': 'Obati',
-  'entities.abilities.righteous_fury.description': 'Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 60%. Hanya Penjaga iman.',
+  'entities.abilities.righteous_fury.description': 'Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 30%. Hanya Penjaga iman.',
   'entities.abilities.righteous_fury.name': 'Sumpah Membara',
   'entities.abilities.rip.name': 'Celah Darah',
-  'entities.abilities.rockbiter_weapon.description': 'Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 30% zirah, menerima 10% kerusakan lebih sedikit, dan menghasilkan dua kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk.',
+  'entities.abilities.rockbiter_weapon.description': 'Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% kerusakan lebih sedikit, dan kebal terhadap serangan kritis dari makhluk, dan menghasilkan 2,75 kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk.',
   'entities.abilities.rockbiter_weapon.name': 'Senjata Stonebound',
   'entities.abilities.rupture.name': 'Kehabisan Darah',
   'entities.abilities.sap.description':
@@ -10737,6 +10738,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Kehormatan',
   'hudChrome.warfare.honorGain': 'Anda mendapatkan Kehormatan {amount} ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Tidak cukup Kehormatan.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Pertarungan arena dijalani',
   'hudChrome.warfare.reasons.arenaWin': 'Kemenangan arena',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta selesai',
   'hudChrome.warfare.reasons.fiestaKill': 'Eliminasi Fiesta',

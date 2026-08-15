@@ -1739,6 +1739,7 @@ export const ko_KR: EnTranslations = {
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
+        "arenaComplete": "투기장 참전",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
@@ -9719,7 +9720,7 @@ export const ko_KR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "불타는 맹세",
-        "description": "신성 피해가 만드는 위협 수준을 지속적으로 60% 높입니다. 신앙수호자 전용."
+        "description": "신성 피해가 만드는 위협 수준을 지속적으로 30% 높입니다. 신앙수호자 전용."
       },
       "retribution_aura": {
         "name": "응보의 오라",
@@ -9835,7 +9836,7 @@ export const ko_KR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
-        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 30% 얻고, 받는 피해가 10% 줄며, 위협 수준을 두 배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
+        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 40%, 체력을 20% 얻고, 받는 피해가 15% 줄며, 야수의 치명타에 면역이 되며, 위협 수준을 2.75배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
       },
       "healing_wave": {
         "name": "치유의 물결",
@@ -10014,7 +10015,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_form": {
         "name": "큰곰 변신",
-        "description": "곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "description": "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
         "name": "뼈 분쇄",
@@ -10024,6 +10025,10 @@ export const ko_KR: EnTranslations = {
       "growl": {
         "name": "위협",
         "description": "대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
+      },
+      "challenging_roar": {
+        "name": "위압의 포효",
+        "description": "위압적으로 포효합니다. 10미터 내의 모든 적이 도발되어 자신에 대한 위협 수준이 그 적이 가장 증오하는 대상과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
       },
       "cat_form": {
         "name": "늑대 변신",

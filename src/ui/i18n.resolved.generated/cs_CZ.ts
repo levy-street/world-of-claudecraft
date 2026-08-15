@@ -1739,6 +1739,7 @@ export const cs_CZ: EnTranslations = {
       "notEnoughHonor": "Nemáš dost cti.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
+        "arenaComplete": "Odehrán souboj v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
         "fiestaComplete": "Dokončení Fiesty",
         "fiestaWin": "Vítězství ve Fiestě",
@@ -1845,7 +1846,7 @@ export const cs_CZ: EnTranslations = {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
     "itemHeroicTag": "[HRDINSKÉ]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemSet": {
@@ -9719,7 +9720,7 @@ export const cs_CZ: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Hořící přísaha",
-        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 60 %. Pouze Strážce víry."
+        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 30 %. Pouze Strážce víry."
       },
       "retribution_aura": {
         "name": "Aura odplaty",
@@ -9835,7 +9836,7 @@ export const cs_CZ: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Zbraň spoutaná kamenem",
-        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 30 % zbroje, utrpí o 10 % nižší poškození a vytváří dvojnásobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
+        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 40 % zbroje a 20 % výdrže, utrpí o 15 % nižší poškození a je odolný vůči kritickým zásahům od nestvůr a vytváří 2,75násobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
       },
       "healing_wave": {
         "name": "Léčivé vody",
@@ -10014,7 +10015,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_form": {
         "name": "Medvědí podoba",
-        "description": "Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
+        "description": "Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
       },
       "maul": {
         "name": "Drcení kostí",
@@ -10024,6 +10025,10 @@ export const cs_CZ: EnTranslations = {
       "growl": {
         "name": "Hrozba",
         "description": "Zavrčí na cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit. Pouze v medvědí podobě."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Vlčí podoba",

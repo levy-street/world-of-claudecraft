@@ -1739,6 +1739,7 @@ export const vi_VN: EnTranslations = {
       "notEnoughHonor": "Không đủ danh dự.",
       "reasons": {
         "arenaWin": "Chiến thắng đấu trường",
+        "arenaComplete": "Đã đấu trận đấu trường",
         "fiestaKill": "Hạ gục trong Fiesta",
         "fiestaComplete": "Fiesta đã hoàn thành",
         "fiestaWin": "Chiến thắng Fiesta",
@@ -1845,7 +1846,7 @@ export const vi_VN: EnTranslations = {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp thế giới."
     },
     "itemHeroicTag": "[ANH HÙNG]",
-    "itemHeroicLabel": "Heroic",
+    "itemHeroicLabel": "Anh Hùng",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
     "itemUniqueEquipped": "Độc Nhất Khi Trang Bị",
     "itemSet": {
@@ -9719,7 +9720,7 @@ export const vi_VN: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Lời Thề Rực Cháy",
-        "description": "Bị động tăng 60% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin."
+        "description": "Bị động tăng 30% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin."
       },
       "retribution_aura": {
         "name": "Hào Quang Báo Đền",
@@ -9835,7 +9836,7 @@ export const vi_VN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Vũ Khí Khắc Đá",
-        "description": "Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 30% giáp, chịu ít hơn 10% sát thương và tạo ra gấp đôi mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây."
+        "description": "Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 40% giáp và 20% Thể Lực, chịu ít hơn 15% sát thương và miễn nhiễm với đòn chí mạng từ quái vật và tạo ra gấp 2,75 lần mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây."
       },
       "healing_wave": {
         "name": "Dòng Nước Hàn Gắn",
@@ -10014,7 +10015,7 @@ export const vi_VN: EnTranslations = {
       },
       "bear_form": {
         "name": "Hình Bruin",
-        "description": "Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
+        "description": "Biến hình thành gấu: giáp +110%, máu tối đa +30%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
       },
       "maul": {
         "name": "Nghiền Xương",
@@ -10024,6 +10025,10 @@ export const vi_VN: EnTranslations = {
       "growl": {
         "name": "Hăm Dọa",
         "description": "Gầm gừ với mục tiêu: mối đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Hình Sói",

@@ -1070,6 +1070,7 @@ const MOTD_RESULT_KEYS: Record<MotdResultCode, TranslationKey> = {
 };
 const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   arena_win: 'hudChrome.warfare.reasons.arenaWin',
+  arena_complete: 'hudChrome.warfare.reasons.arenaComplete',
   fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
   fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',

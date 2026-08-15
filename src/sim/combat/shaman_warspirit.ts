@@ -21,16 +21,22 @@ export const STORMSURGE_READY_ID = 'shaman_stormsurge_ready';
 export const STORMSURGE_CHANCE = 0.25;
 export const STORMSURGE_BAD_LUCK_CAP = 4;
 export const STONEBOUND_ARMOR_ID = 'shaman_stonebound_armor';
+export const STONEBOUND_STAMINA_ID = 'shaman_stonebound_stamina';
 export const STONEBOUND_DR_ID = 'shaman_stonebound_dr';
 export const STONEBOUND_WARD_SMOOTH_ID = 'shaman_stonebound_ward_smooth';
 export const WARSPIRIT_CADENCE_STEPS = 3;
 export const GALEHEART_ECHO_COUNT = 2;
 export const GALEHEART_ECHO_DAMAGE = 0.5;
 export const STORMCAST_DURATION = 12;
-// buff_armor_pct stores integer percentage points (30 = +30%).
-export const STONEBOUND_ARMOR_BONUS = 30;
-export const STONEBOUND_DAMAGE_REDUCTION = 0.1;
-export const STONEBOUND_THREAT_MULTIPLIER = 2;
+// buff_armor_pct / buff_sta_pct store integer percentage points (40 = +40%).
+// v0.38 tank threat/survivability parity pass: armor 30 -> 40, stamina bonus
+// added (was none, the posture had no health component at all), damage
+// reduction 0.1 -> 0.15, threat 2 -> 2.75. Sized so Stonebound effective HP
+// stays just under the prot warrior ceiling on a best-in-slot stamina kit.
+export const STONEBOUND_ARMOR_BONUS = 40;
+export const STONEBOUND_STAMINA_BONUS = 20;
+export const STONEBOUND_DAMAGE_REDUCTION = 0.15;
+export const STONEBOUND_THREAT_MULTIPLIER = 2.75;
 export const STONEBOUND_WARD_SMOOTH_REDUCTION = 0.1;
 export const STONEBOUND_WARD_SMOOTH_DURATION = 3;
 export const ELEMENTAL_TRANCE_ID = 'elemental_trance';
@@ -54,6 +60,7 @@ const WARSPIRIT_STATE_IDS: ReadonlySet<string> = new Set([
   STORMCAST_CHEAP_ID,
   STORMSURGE_READY_ID,
   STONEBOUND_ARMOR_ID,
+  STONEBOUND_STAMINA_ID,
   STONEBOUND_DR_ID,
   STONEBOUND_WARD_SMOOTH_ID,
 ]);
@@ -112,6 +119,7 @@ export function applyWarspiritPosture(
       GALEHEART_WEAPON_ID,
       STONEBOUND_WEAPON_ID,
       STONEBOUND_ARMOR_ID,
+      STONEBOUND_STAMINA_ID,
       STONEBOUND_DR_ID,
       STONEBOUND_WARD_SMOOTH_ID,
     ]),
@@ -144,6 +152,16 @@ export function applyWarspiritPosture(
     name: 'Stonebound Guard',
     kind: 'buff_dr',
     value: STONEBOUND_DAMAGE_REDUCTION + stoneboundTalentDamageReduction(ctx, player),
+    remaining: duration,
+    duration,
+    sourceId: player.id,
+    school: 'nature',
+  });
+  ctx.applyAura(player, {
+    id: STONEBOUND_STAMINA_ID,
+    name: 'Stonebound Vigor',
+    kind: 'buff_sta_pct',
+    value: STONEBOUND_STAMINA_BONUS,
     remaining: duration,
     duration,
     sourceId: player.id,

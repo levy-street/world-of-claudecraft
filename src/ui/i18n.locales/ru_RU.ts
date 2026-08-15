@@ -986,6 +986,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': 'Вы получаете {amount} очк. чести ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Недостаточно чести.',
   'hudChrome.warfare.reasons.arenaWin': 'Победа на арене',
+  'hudChrome.warfare.reasons.arenaComplete': 'Бой на арене',
   'hudChrome.warfare.reasons.fiestaKill': 'Устранение на Фиесте',
   'hudChrome.warfare.reasons.fiestaComplete': 'Завершение Фиесты',
   'hudChrome.warfare.reasons.fiestaWin': 'Победа на Фиесте',
@@ -3093,7 +3094,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': 'Святая земля',
   'entities.abilities.consecration.description': 'Освящает землю под вами на 9 сек., нанося {damage} светлого урона с высокой угрозой каждую секунду. Первое попадание даёт 1 Преданность. Стражи веры получают на 10% меньше урона, пока стоят внутри. Вознесение повышает его урон.',
   'entities.abilities.righteous_fury.name': 'Пылающая клятва',
-  'entities.abilities.righteous_fury.description': 'Пассивно повышает угрозу, создаваемую вашим светлым уроном, на 60%. Только Страж веры.',
+  'entities.abilities.righteous_fury.description': 'Пассивно повышает угрозу, создаваемую вашим светлым уроном, на 30%. Только Страж веры.',
   'entities.abilities.retribution_aura.name': 'Аура возмездия',
   'entities.abilities.retribution_aura.description': 'Окружает вас и вашу группу святой энергией до смерти или замены. Враги, атакующие затронутых союзников в ближнем бою, получают {buff} ед. урона от светлой магии, а затронутые союзники наносят дополнительно {buff} ед. урона от светлой магии автоатаками. Заменяет вашу собственную Стойкость бастиона. Повторное применение Ауры воздаяния другим паладином обновляет её, а не суммирует.',
   'entities.abilities.tame_beast.name': 'Дикие узы',
@@ -3146,7 +3147,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': 'Дуговая стрела',
   'entities.abilities.lightning_bolt.description': 'Наносит {damage} урона от природы. Урон растёт с силой заклинаний. Стихии: попадание даёт 1 Гром.',
   'entities.abilities.rockbiter_weapon.name': 'Оружие каменных уз',
-  'entities.abilities.rockbiter_weapon.description': 'Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона. Совершенствование вдобавок получает 30% брони, принимает на 10% меньше урона и создаёт вдвое больше угрозы. Земной толчок вынуждает свою цель атаковать вас 3 сек., а Громовой оберег даёт 10% снижения урона на 3 сек.',
+  'entities.abilities.rockbiter_weapon.description': 'Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона. Совершенствование вдобавок получает 40% брони и 20% выносливости, принимает на 15% меньше урона и невосприимчив к критическим ударам существ и создаёт в 2,75 раза больше угрозы. Земной толчок вынуждает свою цель атаковать вас 3 сек., а Громовой оберег даёт 10% снижения урона на 3 сек.',
   'entities.abilities.healing_wave.name': 'Целебные воды',
   'entities.abilities.healing_wave.description': 'Исцеляет союзную цель на {damage}. Исцеление растёт с силой заклинаний. Исцеление: сохраняет 50% полного исцеления до перелечивания как Целительный поток на 12 сек., до 30% от максимального здоровья цели.',
   'entities.abilities.chain_heal.name': 'Каскадное исцеление',
@@ -3216,10 +3217,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оплетает цель корнями на месте на срок до 12 сек.',
   'entities.abilities.bear_form.name': 'Облик бурого',
   'entities.abilities.bear_form.description':
-    'Вы принимаете облик медведя: броня +130%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
+    'Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
+  'entities.abilities.challenging_roar.description':
+    'Грозный рев: каждый враг в пределах 10 м получает провокацию, его угроза к вам повышается до уровня самого ненавистного ему врага, и он вынужден атаковать вас 3 сек. Только в облике бурого.',
+  'entities.abilities.challenging_roar.name': 'Грозный рев',
   'entities.abilities.growl.name': 'Устрашение',
   'entities.abilities.growl.description':
     'Рычит на цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек. Только в облике бурого.',

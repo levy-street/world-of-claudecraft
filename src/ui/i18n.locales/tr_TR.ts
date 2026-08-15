@@ -2647,6 +2647,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Apple ile oturum açılamadı. Lütfen tekrar dene.',
   'hudChrome.auth.appleLoginCta': 'Apple ile Devam Et',
   'hudChrome.dailyRewards.reason.banned': 'Günlük Ödüllerden yasaklandın. Gerekçe: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroik',
   'hudChrome.itemHeroicTag': '[KAHRAMANCA]',
   'hudChrome.interfaceTabs.chat': 'Sohbet',
   'hudChrome.interfaceTabs.combat': 'Savaş',
@@ -4245,7 +4246,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil. Yalnızca Bruin Formu.',
   'entities.abilities.bear_charge.name': 'Bruin Hücumu',
   'entities.abilities.bear_form.description':
-    'Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan.',
+    'Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.bear_form.name': 'Bruin Formu',
   'entities.abilities.berserker_rage.description':
     'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
@@ -4483,10 +4484,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Evcilinin yaralarını sarar. Yaşıyorsa 12 saniye boyunca her 3 saniyede bir iyileştirerek toplam {overTime} can yeniler. Ölüyse %35 canla diriltir.',
   'entities.abilities.revive_pet.name': 'Yarasını Sar',
-  'entities.abilities.righteous_fury.description': 'Kutsal hasarının ürettiği tehdidi pasif olarak %60 artırır. Yalnızca İnanç muhafızı.',
+  'entities.abilities.righteous_fury.description': 'Kutsal hasarının ürettiği tehdidi pasif olarak %30 artırır. Yalnızca İnanç muhafızı.',
   'entities.abilities.righteous_fury.name': 'Yanan Yemin',
   'entities.abilities.rip.name': 'Kanlı Yarık',
-  'entities.abilities.rockbiter_weapon.description': 'Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %30 zırh kazanır, %10 daha az hasar alır ve iki katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir.',
+  'entities.abilities.rockbiter_weapon.description': 'Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır ve yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir.',
   'entities.abilities.rockbiter_weapon.name': 'Stonebound Silahı',
   'entities.abilities.rupture.name': 'Kan Kaybı',
   'entities.abilities.sap.description':
@@ -10626,6 +10627,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Onur',
   'hudChrome.warfare.honorGain': '{amount} Onur ({reason}) kazanırsınız.',
   'hudChrome.warfare.notEnoughHonor': 'Yeterli Onur yok.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Arena müsabakası yapıldı',
   'hudChrome.warfare.reasons.arenaWin': 'Arena zaferi',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta tamamlandı',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta avlaması',

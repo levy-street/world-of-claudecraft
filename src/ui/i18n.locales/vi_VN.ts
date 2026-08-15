@@ -2545,6 +2545,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleLoginCta': 'Tiếp Tục với Apple',
   'hudChrome.dailyRewards.reason.banned':
     'Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}',
+  'hudChrome.itemHeroicLabel': 'Anh Hùng',
   'hudChrome.itemHeroicTag': '[ANH HÙNG]',
   'hudChrome.itemSoulbound': 'Ràng Buộc Linh Hồn',
   'hudChrome.keybinds.categoryPet': 'Thú Cưng',
@@ -4201,7 +4202,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bear_charge.name': 'Cú Lao Bruin',
   'entities.abilities.bear_form.description':
-    'Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
+    'Biến hình thành gấu: giáp +110%, máu tối đa +30%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
   'entities.abilities.bear_form.name': 'Hình Bruin',
   'entities.abilities.berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
@@ -4440,10 +4441,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu.',
   'entities.abilities.revive_pet.name': 'Băng Bó',
-  'entities.abilities.righteous_fury.description': 'Bị động tăng 60% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin.',
+  'entities.abilities.righteous_fury.description': 'Bị động tăng 30% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin.',
   'entities.abilities.righteous_fury.name': 'Lời Thề Rực Cháy',
   'entities.abilities.rip.name': 'Vết Nứt Máu',
-  'entities.abilities.rockbiter_weapon.description': 'Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 30% giáp, chịu ít hơn 10% sát thương và tạo ra gấp đôi mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây.',
+  'entities.abilities.rockbiter_weapon.description': 'Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 40% giáp và 20% Thể Lực, chịu ít hơn 15% sát thương và miễn nhiễm với đòn chí mạng từ quái vật và tạo ra gấp 2,75 lần mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây.',
   'entities.abilities.rockbiter_weapon.name': 'Vũ Khí Khắc Đá',
   'entities.abilities.rupture.name': 'Rỉ Máu Chí Tử',
   'entities.abilities.sap.description':
@@ -10553,6 +10554,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Danh dự',
   'hudChrome.warfare.honorGain': 'Bạn nhận được Danh dự {amount} ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Không đủ danh dự.',
+  'hudChrome.warfare.reasons.arenaComplete': 'Đã đấu trận đấu trường',
   'hudChrome.warfare.reasons.arenaWin': 'Chiến thắng đấu trường',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta đã hoàn thành',
   'hudChrome.warfare.reasons.fiestaKill': 'Hạ gục trong Fiesta',

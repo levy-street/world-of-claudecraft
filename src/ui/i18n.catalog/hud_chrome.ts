@@ -1822,6 +1822,9 @@ export const hudChromeStrings = {
     notEnoughHonor: 'Not enough Honor.',
     reasons: {
       arenaWin: 'Arena victory',
+      // Paid for a ranked loss and for a draw alike, so the line names the bout
+      // rather than the result (the same reading as battlegroundComplete below).
+      arenaComplete: 'Arena bout fought',
       fiestaKill: 'Fiesta takedown',
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',

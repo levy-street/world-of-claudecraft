@@ -974,6 +974,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorGain': '명예를 {amount} 획득했습니다({reason}).',
   'hudChrome.warfare.notEnoughHonor': '명예가 부족합니다.',
   'hudChrome.warfare.reasons.arenaWin': '투기장 승리',
+  'hudChrome.warfare.reasons.arenaComplete': '투기장 참전',
   'hudChrome.warfare.reasons.fiestaKill': '피에스타 처치',
   'hudChrome.warfare.reasons.fiestaComplete': '피에스타 완료',
   'hudChrome.warfare.reasons.fiestaWin': '피에스타 승리',
@@ -3042,7 +3043,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.consecration.name': '신성한 땅',
   'entities.abilities.consecration.description': '발밑의 땅을 9초 동안 신성하게 하여 매초 {damage}의 신성 피해를 높은 위협 수준과 함께 입힙니다. 첫 타격은 헌신을 1 만듭니다. 신앙수호자는 그 안에 서 있는 동안 받는 피해가 10% 줄어듭니다. 승천은 그 피해를 높입니다.',
   'entities.abilities.righteous_fury.name': '불타는 맹세',
-  'entities.abilities.righteous_fury.description': '신성 피해가 만드는 위협 수준을 지속적으로 60% 높입니다. 신앙수호자 전용.',
+  'entities.abilities.righteous_fury.description': '신성 피해가 만드는 위협 수준을 지속적으로 30% 높입니다. 신앙수호자 전용.',
   'entities.abilities.retribution_aura.name': '응보의 오라',
   'entities.abilities.retribution_aura.description': '죽거나 교체될 때까지 자신과 파티를 신성한 힘으로 감쌉니다. 영향을 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 영향을 받는 아군의 일반 공격은 {buff}의 신성 피해를 추가로 입힙니다. 자신의 보루 헌신을 대체합니다. 다른 성기사가 응보의 오라를 시전하면 중첩되지 않고 갱신됩니다.',
   'entities.abilities.tame_beast.name': '야생의 결속',
@@ -3095,7 +3096,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.name': '전격 화살',
   'entities.abilities.lightning_bolt.description': '{damage}의 자연 피해를 입힙니다. 피해량은 주문력에 따라 증가합니다. 정기: 명중하면 천둥을 1 얻습니다.',
   'entities.abilities.rockbiter_weapon.name': '바위결속 무기',
-  'entities.abilities.rockbiter_weapon.description': '무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 30% 얻고, 받는 피해가 10% 줄며, 위협 수준을 두 배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다.',
+  'entities.abilities.rockbiter_weapon.description': '무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 40%, 체력을 20% 얻고, 받는 피해가 15% 줄며, 야수의 치명타에 면역이 되며, 위협 수준을 2.75배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상을 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다. 회복: 과잉 치유가 되기 전에 온전한 치유량의 50%를 12초 동안 치유의 물결로 담아 둡니다. 상한은 대상 최대 생명력의 30%입니다.',
   'entities.abilities.chain_heal.name': '물결 치유',
@@ -3165,10 +3166,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '대상을 최대 12초 동안 제자리에 묶습니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
-    '곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
+    '곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
     '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
+  'entities.abilities.challenging_roar.description':
+    '위압적으로 포효합니다. 10미터 내의 모든 적이 도발되어 자신에 대한 위협 수준이 그 적이 가장 증오하는 대상과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용.',
+  'entities.abilities.challenging_roar.name': '위압의 포효',
   'entities.abilities.growl.name': '위협',
   'entities.abilities.growl.description':
     '대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용.',

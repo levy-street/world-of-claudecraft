@@ -13,6 +13,7 @@ import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 // shipping a silently-plain float.
 const ALL_REASONS: HonorReason[] = [
   'arena_win',
+  'arena_complete',
   'fiesta_kill',
   'fiesta_complete',
   'fiesta_win',

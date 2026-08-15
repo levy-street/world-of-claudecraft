@@ -4115,7 +4115,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform.',
   'entities.abilities.bear_charge.name': 'Bruinrusning',
   'entities.abilities.bear_form.description':
-    'Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
+    'Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.bear_form.name': 'Bruinform',
   'entities.abilities.berserker_rage.description':
     'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
@@ -4353,10 +4353,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.description':
     'Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa.',
   'entities.abilities.revive_pet.name': 'Lappa ihop',
-  'entities.abilities.righteous_fury.description': 'Ökar passivt hotet som er Heliga skada alstrar med 60%. Endast Trosväktare.',
+  'entities.abilities.righteous_fury.description': 'Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare.',
   'entities.abilities.righteous_fury.name': 'Brinnande ed',
   'entities.abilities.rip.name': 'Blodsspricka',
-  'entities.abilities.rockbiter_weapon.description': 'Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 30% rustning, tar 10% mindre skada och alstrar dubbelt så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek.',
+  'entities.abilities.rockbiter_weapon.description': 'Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 40% rustning och 20% uthållighet, tar 15% mindre skada och är immun mot kritiska träffar från varelser och alstrar 2,75 gånger så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek.',
   'entities.abilities.rockbiter_weapon.name': 'Stenbundet vapen',
   'entities.abilities.rupture.name': 'Förblöda',
   'entities.abilities.sap.description':
@@ -10278,6 +10278,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleError': 'Det gick inte att logga in med Apple. Försök igen.',
   'hudChrome.auth.appleLoginCta': 'Fortsätt med Apple',
   'hudChrome.dailyRewards.reason.banned': 'Du är avstängd från dagliga belöningar. Orsak: {reason}',
+  'hudChrome.itemHeroicLabel': 'Heroisk',
   'hudChrome.itemHeroicTag': '[HEROISK]',
   'hudChrome.itemSoulbound': 'Själabunden',
   'hudChrome.keybinds.categoryPet': 'Djur',
@@ -10649,6 +10650,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorFloat': '+{amount} Heder',
   'hudChrome.warfare.honorGain': 'Du får {amount} Heder ({reason}).',
   'hudChrome.warfare.notEnoughHonor': 'Inte tillräckligt med heder.',
+  'hudChrome.warfare.reasons.arenaComplete': 'arenamatch utkämpad',
   'hudChrome.warfare.reasons.arenaWin': 'Arenaseger',
   'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta avklarad',
   'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-nedtagning',
