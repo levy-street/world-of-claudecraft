@@ -4,6 +4,7 @@
   import MarketItemLink from '../components/MarketItemLink.svelte';
   import Pager from '../components/Pager.svelte';
   import Panel from '../components/Panel.svelte';
+  import WatchStar from '../components/WatchStar.svelte';
   import { fmtCopper, fmtNumber, fmtRelative } from '../format';
   import { adminLanguageTag, t } from '../i18n';
   import {
@@ -185,7 +186,7 @@
                     : t('market.watch', { name: row.name })}
                   onclick={() => toggleWatch(row.itemId)}
                 >
-                  {watchlist.has(row.itemId) ? '★' : '☆'}
+                  <WatchStar filled={watchlist.has(row.itemId)} />
                 </button>
               </td>
               <td>

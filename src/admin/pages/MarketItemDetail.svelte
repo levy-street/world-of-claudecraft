@@ -5,6 +5,7 @@
   import LineChart from '../components/LineChart.svelte';
   import PageHeader from '../components/PageHeader.svelte';
   import Panel from '../components/Panel.svelte';
+  import WatchStar from '../components/WatchStar.svelte';
   import { fmtChartBucket, fmtCopper, fmtDate, fmtNumber } from '../format';
   import { getAdminNavigation, routeHref } from '../navigation';
   import { t } from '../i18n';
@@ -104,9 +105,8 @@
           watchlist = toggleMarketWatchlist(watchlist, item);
         }}
       >
-        {watchlist.has(item)
-          ? `★ ${t('market.watched')}`
-          : `☆ ${t('market.addToWatchlist')}`}
+        <WatchStar filled={watchlist.has(item)} />
+        {watchlist.has(item) ? t('market.watched') : t('market.addToWatchlist')}
       </button>
       <span class="text-dim">{data.item.quality} {data.item.kind}</span>
       <span class="text-dim">
