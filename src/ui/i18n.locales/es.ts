@@ -11556,6 +11556,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.amount': 'Cantidad',
   'devCommand.fields.count': 'Número',
   'devCommand.fields.difficulty': 'Dificultad',
+  'devCommand.fields.floor': 'Planta',
+  'devCommand.raidFloorOption': '{name} — {floor}',
   'devCommand.fields.dungeon': 'Mazmorra',
   'devCommand.fields.gold': 'Oro',
   'devCommand.fields.item': 'Objeto',

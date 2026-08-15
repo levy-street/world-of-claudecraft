@@ -4,7 +4,7 @@
 
 import type { AuthoredDecor } from '../../dungeon_layout';
 import { buildStyle, mixSeed } from '../../rift/style';
-import { demonTowerFloorProfile } from '../../rift/tower_floors';
+import { DEMON_TOWER_ARENA_LINEAR_SCALE, demonTowerFloorProfile } from '../../rift/tower_floors';
 import {
   clampTowerFloorIndex,
   DEMON_TOWER_CORE_RADIUS,
@@ -76,30 +76,48 @@ export function demonTowerHazards(floorIndex: number): DelveHazardZone[] {
   const k = clampTowerFloorIndex(floorIndex);
   if (k === 0) {
     return [
-      { x: -10, z: -2, r: 3, rx: 2.4, rz: 12, tier: 'shallow' },
-      { x: 10, z: -2, r: 3, rx: 2.4, rz: 12, tier: 'shallow' },
+      scaledHazard(-10, -2, 3, 2.4, 12, 'shallow'),
+      scaledHazard(10, -2, 3, 2.4, 12, 'shallow'),
     ];
   }
   if (k === 1) {
     return [
-      { x: -10, z: -10, r: 4.6, rx: 4.6, rz: 4.6, tier: 'deep' },
-      { x: 10, z: -10, r: 4.6, rx: 4.6, rz: 4.6, tier: 'deep' },
-      { x: -10, z: 10, r: 4.6, rx: 4.6, rz: 4.6, tier: 'deep' },
-      { x: 10, z: 10, r: 4.6, rx: 4.6, rz: 4.6, tier: 'deep' },
+      scaledHazard(-10, -10, 4.6, 4.6, 4.6, 'deep'),
+      scaledHazard(10, -10, 4.6, 4.6, 4.6, 'deep'),
+      scaledHazard(-10, 10, 4.6, 4.6, 4.6, 'deep'),
+      scaledHazard(10, 10, 4.6, 4.6, 4.6, 'deep'),
     ];
   }
-  const ring = 20;
+  const ring = 20 * DEMON_TOWER_ARENA_LINEAR_SCALE;
   return Array.from({ length: 5 }, (_, i) => {
     const angle = ((i + 0.5) / 5) * Math.PI * 2;
-    return {
-      x: round3(Math.sin(angle) * ring),
-      z: round3(Math.cos(angle) * ring),
-      r: 3.2,
-      rx: 3.2,
-      rz: 3.2,
-      tier: 'deep' as const,
-    };
+    return scaledHazard(
+      Math.sin(angle) * (ring / DEMON_TOWER_ARENA_LINEAR_SCALE),
+      Math.cos(angle) * (ring / DEMON_TOWER_ARENA_LINEAR_SCALE),
+      3.2,
+      3.2,
+      3.2,
+      'deep',
+    );
   });
+}
+
+function scaledHazard(
+  x: number,
+  z: number,
+  r: number,
+  rx: number,
+  rz: number,
+  tier: DelveHazardZone['tier'],
+): DelveHazardZone {
+  return {
+    x: round3(x * DEMON_TOWER_ARENA_LINEAR_SCALE),
+    z: round3(z * DEMON_TOWER_ARENA_LINEAR_SCALE),
+    r: round3(r * DEMON_TOWER_ARENA_LINEAR_SCALE),
+    rx: round3(rx * DEMON_TOWER_ARENA_LINEAR_SCALE),
+    rz: round3(rz * DEMON_TOWER_ARENA_LINEAR_SCALE),
+    tier,
+  };
 }
 
 /** Measured after Tripo normalization. New entries are filled from `inspect`
@@ -132,8 +150,8 @@ const DECOR_RADIUS: Readonly<Record<string, number>> = {
 function decor(key: string, x: number, z: number, yaw = 0): AuthoredDecor {
   return {
     key,
-    x,
-    z,
+    x: round3(x * DEMON_TOWER_ARENA_LINEAR_SCALE),
+    z: round3(z * DEMON_TOWER_ARENA_LINEAR_SCALE),
     yaw,
     ...(DECOR_RADIUS[key] === undefined ? {} : { r: DECOR_RADIUS[key] }),
   };

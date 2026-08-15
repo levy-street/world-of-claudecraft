@@ -218,6 +218,38 @@ describe('/dev attune + /dev raid cheats', () => {
     expect(inst?.floorIndex).toBe(0);
   });
 
+  it('/dev raid tower can jump directly between authored floors without leaking floor entities', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev raid tower 3', pid);
+    const inst = sim.riftInstances.find((candidate) => candidate.partyKey !== null);
+    if (!inst) throw new Error('Expected an active Demon Tower instance');
+    const instanceId = inst.instanceId;
+    const summitObjectIds = [...inst.objectIds];
+
+    expect(inst.seed).toBe(DEMON_TOWER_SEED);
+    expect(inst.floorIndex).toBe(2);
+    expect(summitObjectIds.length).toBeGreaterThan(0);
+
+    sim.chat('/dev raid tower 1', pid);
+
+    expect(inst.instanceId).toBe(instanceId);
+    expect(inst.floorIndex).toBe(0);
+    expect(inst.objectIds.length).toBeGreaterThan(0);
+    expect(summitObjectIds.every((id) => !sim.entities.has(id))).toBe(true);
+  });
+
+  it('/dev raid tower clamps requested floors to the authored range', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev raid tower 2', pid);
+    expect(sim.riftInstances.find((candidate) => candidate.partyKey !== null)?.floorIndex).toBe(1);
+
+    sim.chat('/dev raid tower 999', pid);
+    expect(sim.riftInstances.find((candidate) => candidate.partyKey !== null)?.floorIndex).toBe(2);
+
+    sim.chat('/dev raid tower 0', pid);
+    expect(sim.riftInstances.find((candidate) => candidate.partyKey !== null)?.floorIndex).toBe(0);
+  });
+
   it('/dev raid reset clears raid lockouts', () => {
     const { sim, pid } = godSim();
     const meta = sim.players.get(pid)!;
@@ -229,7 +261,7 @@ describe('/dev attune + /dev raid cheats', () => {
   it('is gated: without dev commands, /dev raid does not zone in', () => {
     const { sim, pid } = godSim(false);
     sim.chat('/dev raid heroic', pid);
-    sim.chat('/dev raid tower', pid);
+    sim.chat('/dev raid tower 3', pid);
     const claimed = (
       sim as unknown as { instances: { dungeonId: string; partyKey: string | null }[] }
     ).instances.some((i) => i.dungeonId === 'nythraxis_boss_arena' && i.partyKey !== null);

@@ -273,6 +273,29 @@ describe('CharacterVisual keeps something driving the rig', () => {
     expect(Math.min(...weights)).toBeGreaterThan(1 - POSE_DRIVE_MIN_WEIGHT);
   });
 
+  it('honors a rig-specific, gentler one-shot return blend', () => {
+    const peek = visual as unknown as MixerPeek;
+    const def = (visual as unknown as { def: { oneShotReturnFade?: number } }).def;
+    def.oneShotReturnFade = 0.32;
+    const attack = peek.actions.get('Attack');
+    const idle = peek.actions.get('Idle');
+    expect(attack).toBeDefined();
+    expect(idle).toBeDefined();
+    if (!attack || !idle) throw new Error('test rig is missing Attack or Idle');
+
+    visual.playAttack();
+    for (let frame = 0; frame < 90 && peek.current !== idle; frame++) {
+      visual.update(FRAME, anim(), true);
+    }
+    expect(peek.current).toBe(idle);
+    for (let frame = 0; frame < 12; frame++) visual.update(FRAME, anim(), true);
+
+    expect(attack.isScheduled()).toBe(true);
+    expect(attack.getEffectiveWeight()).toBeGreaterThan(0.05);
+    expect(idle.getEffectiveWeight()).toBeGreaterThan(0.05);
+    expect(poseWeight(visual)).toBeGreaterThan(1 - POSE_DRIVE_MIN_WEIGHT);
+  });
+
   it('leaves a dead rig on a real pose when its rig ships no death clip', () => {
     // dead-lock freezes the watchdog, so enterDeath is the only repair there is.
     const actions = (visual as unknown as MixerPeek).actions;

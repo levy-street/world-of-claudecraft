@@ -4,6 +4,7 @@ import path from 'node:path';
 import * as esbuild from 'esbuild';
 
 export const PORTRAIT_RENDER_DEFINES = Object.freeze({
+  'import.meta.url': 'location.href',
   'import.meta.env.DEV': 'true',
   'import.meta.env.PROD': 'false',
   'import.meta.env.TEST': 'false',

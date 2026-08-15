@@ -50,6 +50,7 @@ export const ja_JP: EnTranslations = {
     "invalidValues": "実行する前に有効な値を選択してください。",
     "sent": "送信済み：{command}",
     "run": "実行",
+    "raidFloorOption": "{floor}：{name}",
     "fields": {
       "level": "レベル",
       "mob": "モブ",
@@ -63,6 +64,7 @@ export const ja_JP: EnTranslations = {
       "z": "Z",
       "dungeon": "ダンジョン",
       "difficulty": "難易度",
+      "floor": "階層",
       "name": "名前",
       "spec": "スペック"
     },

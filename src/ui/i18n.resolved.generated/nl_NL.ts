@@ -50,6 +50,7 @@ export const nl_NL: EnTranslations = {
     "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
     "sent": "Verzonden: {command}",
     "run": "Uitvoeren",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Niveau",
       "mob": "Mob",
@@ -63,6 +64,7 @@ export const nl_NL: EnTranslations = {
       "z": "Z",
       "dungeon": "Kerker",
       "difficulty": "Moeilijkheidsgraad",
+      "floor": "Floor",
       "name": "Naam",
       "spec": "Spec"
     },

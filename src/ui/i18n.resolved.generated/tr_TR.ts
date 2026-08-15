@@ -50,6 +50,7 @@ export const tr_TR: EnTranslations = {
     "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
     "sent": "Gönderildi: {command}",
     "run": "Çalıştır",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Seviye",
       "mob": "Yaratık",
@@ -63,6 +64,7 @@ export const tr_TR: EnTranslations = {
       "z": "Z",
       "dungeon": "Zindan",
       "difficulty": "Zorluk",
+      "floor": "Floor",
       "name": "Ad",
       "spec": "Uzmanlık"
     },

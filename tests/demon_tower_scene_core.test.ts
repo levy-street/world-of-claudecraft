@@ -168,6 +168,35 @@ describe('demon tower scene core', () => {
   });
 
   it('keeps rings ordered, lights finite and plans deterministic', () => {
+    expect(
+      demonTowerSceneProfiles().map((profile) => demonTowerScenePlan(profile).floorTextureScale),
+    ).toEqual([13, 11, 14]);
+    expect(
+      demonTowerSceneProfiles().map((profile) => demonTowerScenePlan(profile).ringRadii),
+    ).toEqual([
+      [16.4, 34, 55],
+      [17, 35, 50],
+      [15, 29, 47],
+    ]);
+    expect(
+      demonTowerSceneProfiles().map((profile) => demonTowerScenePlan(profile).lightAnchors),
+    ).toEqual([
+      [
+        { x: -42, z: 18, y: 3.4, scale: 1.4 },
+        { x: 42, z: 18, y: 3.4, scale: 1.4 },
+        { x: 0, z: 40, y: 2.2, scale: 1.1 },
+      ],
+      [
+        { x: -34, z: 0, y: 4.8, scale: 1.1 },
+        { x: 34, z: 0, y: 4.8, scale: 1.1 },
+        { x: 0, z: 36, y: 4.8, scale: 1.2 },
+      ],
+      [
+        { x: -28, z: 20, y: 3, scale: 1.2 },
+        { x: 28, z: 20, y: 3, scale: 1.2 },
+        { x: 0, z: -32, y: 3, scale: 1.1 },
+      ],
+    ]);
     for (const profile of demonTowerSceneProfiles()) {
       const plan = demonTowerScenePlan(profile);
       expect(plan.profile).toBe(profile);

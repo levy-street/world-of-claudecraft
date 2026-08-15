@@ -1,6 +1,10 @@
 import { DEV_KIT_ROLES } from '../sim/content/dev_kit_roles';
 import { GATHERING_PROFESSIONS } from '../sim/content/professions';
-import { DEMON_TOWER_THEME_NAME } from '../sim/content/rift/demon_tower';
+import {
+  DEMON_TOWER_FLOOR_COUNT,
+  DEMON_TOWER_THEME_NAME,
+  demonTowerFloorName,
+} from '../sim/content/rift/demon_tower';
 import { DUNGEONS, ITEMS, MOBS, QUESTS } from '../sim/data';
 import { ALL_CLASSES, MAX_LEVEL } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -184,6 +188,23 @@ function actionFields(actionId: string): string {
         'devCommand.fields.difficulty',
         'raidDifficulty',
         `<option value="heroic">${esc(t('devCommand.difficulty.heroic'))}</option><option value="normal">${esc(t('devCommand.difficulty.normal'))}</option>`,
+      )}${selectField(
+        'devCommand.fields.floor',
+        'raidFloor',
+        Array.from({ length: DEMON_TOWER_FLOOR_COUNT }, (_, floorIndex) => floorIndex)
+          .map(
+            (floorIndex) =>
+              `<option value="${floorIndex + 1}">${esc(
+                t('devCommand.raidFloorOption', {
+                  floor: t('hudChrome.riftTracker.floor', {
+                    current: floorIndex + 1,
+                    total: DEMON_TOWER_FLOOR_COUNT,
+                  }),
+                  name: localizedRiftName(demonTowerFloorName(floorIndex)),
+                }),
+              )}</option>`,
+          )
+          .join(''),
       )}`;
     case 'bot':
       return textField('devCommand.fields.name', 'botName', 'TestBot');

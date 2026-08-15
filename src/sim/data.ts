@@ -1134,10 +1134,10 @@ export function isVcPracticePos(x: number): boolean {
 // grow into a rift band.
 // ---------------------------------------------------------------------------
 export const RIFT_X_MIN = INSTANCE_X_BASE + 9000; // rift instance x (all slots share it; slots stack along z)
-// A generated room is at most ~28u half-width; sit the band edge clear of the
+// Authored Tower rooms reach 64u half-width; sit the band edge clear of the
 // west wall face so isRiftPos covers the whole footprint and delve/rift never
 // overlap (delves end far below this).
-export const RIFT_BAND_X_MIN = RIFT_X_MIN - 40;
+export const RIFT_BAND_X_MIN = RIFT_X_MIN - 68;
 // East cap. Every rift slot shares RIFT_X_MIN and stacks along z, so the band is
 // only RIFT_REGION_HALF_X wide either side; 1000u of headroom keeps it clear of the
 // relocated Protect Yumi maze band (YUMI_BAND_X_MIN) that now sits past it.
@@ -1159,8 +1159,8 @@ const RIFT_SLOT_SPACING = RIFT_FLOOR_SPACING * RIFT_MAX_FLOORS + 200;
 /** Region half-extents used to map a far-off position back to its rift floor.
  * HALF_X is aligned to the band edge (RIFT_X_MIN - RIFT_REGION_HALF_X ===
  * RIFT_BAND_X_MIN) so a position is never region-detected while isRiftPos() reads
- * false. Rooms are at most ~29u half-width, so 40 comfortably contains them. */
-export const RIFT_REGION_HALF_X = 40;
+ * false. The 64u Tower shell plus a 4u movement/collider margin fits here. */
+export const RIFT_REGION_HALF_X = 68;
 export const RIFT_REGION_HALF_Z = 160;
 
 export function riftInstanceOrigin(slot: number, floorIndex: number): { x: number; z: number } {

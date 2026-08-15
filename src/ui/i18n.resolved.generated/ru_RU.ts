@@ -50,6 +50,7 @@ export const ru_RU: EnTranslations = {
     "invalidValues": "Выберите допустимые значения перед запуском этой команды.",
     "sent": "Отправлено: {command}",
     "run": "Выполнить",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Уровень",
       "mob": "Существо",
@@ -63,6 +64,7 @@ export const ru_RU: EnTranslations = {
       "z": "Z",
       "dungeon": "Подземелье",
       "difficulty": "Сложность",
+      "floor": "Этаж",
       "name": "Имя",
       "spec": "Специализация"
     },

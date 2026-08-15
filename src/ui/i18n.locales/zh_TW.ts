@@ -9580,6 +9580,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.amount': '數量',
   'devCommand.fields.count': '數量',
   'devCommand.fields.difficulty': '難度',
+  'devCommand.fields.floor': '樓層',
+  'devCommand.raidFloorOption': '{floor}：{name}',
   'devCommand.fields.dungeon': '地城',
   'devCommand.fields.gold': '金幣',
   'devCommand.fields.item': '物品',

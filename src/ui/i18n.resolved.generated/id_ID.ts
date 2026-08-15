@@ -50,6 +50,7 @@ export const id_ID: EnTranslations = {
     "invalidValues": "Pilih nilai yang valid sebelum menjalankan perintah ini.",
     "sent": "Terkirim: {command}",
     "run": "Jalankan",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Tingkat",
       "mob": "Makhluk",
@@ -63,6 +64,7 @@ export const id_ID: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Tingkat kesulitan",
+      "floor": "Floor",
       "name": "Nama",
       "spec": "Spesialisasi"
     },

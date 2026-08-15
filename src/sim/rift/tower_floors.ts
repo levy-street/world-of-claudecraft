@@ -35,17 +35,29 @@ export interface DemonTowerFloorProfile {
   encounterSignature: readonly string[];
 }
 
+/** Horizontal scale applied to the original authored raid-floor blockout. */
+export const DEMON_TOWER_ARENA_LINEAR_SCALE = 2;
+
 export const DEMON_TOWER_FLOORS = [
   {
     id: 'bloodforge',
     name: 'The Bloodforge',
     subtitle: 'Break the furnaces. Survive the slag.',
-    arena: { shape: 'octagon', outerRadius: 32, innerRadius: 32, entryZ: -27.5 },
+    arena: {
+      shape: 'octagon',
+      outerRadius: 32 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      innerRadius: 32 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      entryZ: -27.5 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+    },
     style: {
       kit: 'bastion',
       sceneProfile: 'bloodforge',
       torch: { flame: 0xffa02f, emissive: 0xf04a12, light: 0xff6a1c },
-      fog: { color: 0x1d0703, near: 14, far: 78 },
+      fog: {
+        color: 0x1d0703,
+        near: 14 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+        far: 78 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      },
       wallTint: 0x3b2922,
       floorTint: 0x29211f,
       daisRaised: false,
@@ -84,12 +96,21 @@ export const DEMON_TOWER_FLOORS = [
     id: 'ossuary',
     name: 'The Ossuary of Chains',
     subtitle: 'Sever the soul chain before the dead mend.',
-    arena: { shape: 'ossuary_cross', outerRadius: 31, innerRadius: 23, entryZ: -20 },
+    arena: {
+      shape: 'ossuary_cross',
+      outerRadius: 31 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      innerRadius: 23 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      entryZ: -20 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+    },
     style: {
       kit: 'crypt',
       sceneProfile: 'ossuary',
       torch: { flame: 0xb684ff, emissive: 0x6728c7, light: 0x6de5ff },
-      fog: { color: 0x0c0a1d, near: 12, far: 70 },
+      fog: {
+        color: 0x0c0a1d,
+        near: 12 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+        far: 70 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      },
       wallTint: 0x786e72,
       floorTint: 0x27252f,
       daisRaised: false,
@@ -128,12 +149,21 @@ export const DEMON_TOWER_FLOORS = [
     id: 'void_crown',
     name: 'The Void Crown',
     subtitle: 'Defeat the Warden. End the tower.',
-    arena: { shape: 'void_crown', outerRadius: 30, innerRadius: 21.5, entryZ: -18 },
+    arena: {
+      shape: 'void_crown',
+      outerRadius: 30 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      innerRadius: 21.5 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      entryZ: -18 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+    },
     style: {
       kit: 'sanctum',
       sceneProfile: 'void_crown',
       torch: { flame: 0xe65cff, emissive: 0x8c24df, light: 0x826dff },
-      fog: { color: 0x070817, near: 10, far: 92 },
+      fog: {
+        color: 0x070817,
+        near: 10 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+        far: 92 * DEMON_TOWER_ARENA_LINEAR_SCALE,
+      },
       wallTint: 0x292544,
       floorTint: 0x171827,
       daisRaised: false,

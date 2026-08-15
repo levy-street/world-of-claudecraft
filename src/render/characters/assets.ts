@@ -1068,7 +1068,7 @@ function evictModularVariants(): void {
     // unconditionally ours to free.
     entry.far?.geo.dispose();
   }
-  if (import.meta.env?.DEV && modularVariantCache.size >= MODULAR_VARIANT_WARN_AT) {
+  if (import.meta.env.DEV && modularVariantCache.size >= MODULAR_VARIANT_WARN_AT) {
     console.warn(
       `[modular] ${modularVariantCache.size} composed variants live at once (cap ${MODULAR_VARIANT_CACHE_MAX}); every one is still on screen`,
     );
@@ -2339,7 +2339,7 @@ export function composedFarMeshes(root: THREE.Object3D): THREE.Mesh[] {
  *  have drifted and everything past the drift is drawing the wrong colour. */
 export function farSourceMaterials(root: THREE.Object3D, count: number): THREE.Material[] {
   const slots = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
-  if (import.meta.env?.DEV && slots.length > 0 && slots.length !== count) {
+  if (import.meta.env.DEV && slots.length > 0 && slots.length !== count) {
     console.warn(
       `[modular] far bake wants ${count} material slots, the composed body captured ${slots.length}; the two far walks have drifted`,
     );

@@ -1,3 +1,4 @@
+import { DEMON_TOWER_FLOOR_COUNT } from '../sim/content/rift/demon_tower';
 import { MAX_LEVEL } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 
@@ -240,7 +241,7 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     descriptionKey: 'devCommand.actions.raid.description',
     command: (values) =>
       values.raidTarget === 'demon_tower'
-        ? '/dev raid tower'
+        ? `/dev raid tower ${boundedInteger(values, 'raidFloor', 1, DEMON_TOWER_FLOOR_COUNT, 1)}`
         : `/dev raid ${values.raidDifficulty === 'normal' ? 'normal' : 'heroic'}`,
   },
   {

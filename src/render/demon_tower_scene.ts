@@ -141,11 +141,12 @@ function addBackdrop(
   profile: DemonTowerSceneProfile,
   color: number,
   lowGfx: boolean,
+  arenaRadius: number,
 ): void {
   if (profile === 'void_crown') {
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(
-        58,
+        arenaRadius * 1.93,
         lowGfx ? 16 : 28,
         lowGfx ? 10 : 16,
         0,
@@ -166,9 +167,9 @@ function addBackdrop(
         const shard = new THREE.Mesh(shardGeometry, shardMaterial);
         shard.scale.setScalar((0.35 + (i % 3) * 0.16) / 0.55);
         shard.position.set(
-          Math.sin(angle) * (33 + (i % 4) * 3),
+          Math.sin(angle) * (arenaRadius * 1.1 + (i % 4) * 6),
           8 + (i % 5) * 2,
-          Math.cos(angle) * (33 + (i % 4) * 3),
+          Math.cos(angle) * (arenaRadius * 1.1 + (i % 4) * 6),
         );
         shard.rotation.set(angle * 0.4, angle, angle * 0.2);
         group.add(shard);
@@ -176,8 +177,9 @@ function addBackdrop(
     }
     return;
   }
+  const vaultRadius = arenaRadius * 1.45;
   const vault = new THREE.Mesh(
-    new THREE.CylinderGeometry(46, 46, 24, lowGfx ? 16 : 32, 1, true),
+    new THREE.CylinderGeometry(vaultRadius, vaultRadius, 24, lowGfx ? 16 : 32, 1, true),
     new THREE.MeshStandardMaterial({
       color,
       roughness: 1,
@@ -189,7 +191,7 @@ function addBackdrop(
   vault.userData.towerEssential = 'backdrop';
   group.add(vault);
   const ceiling = new THREE.Mesh(
-    new THREE.CircleGeometry(46, lowGfx ? 16 : 32).rotateX(Math.PI / 2),
+    new THREE.CircleGeometry(vaultRadius, lowGfx ? 16 : 32).rotateX(Math.PI / 2),
     new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide }),
   );
   ceiling.position.y = 22;
@@ -205,6 +207,7 @@ function buildDemonTowerGeometry(
 ): void {
   const points = layout.shellPolygon;
   if (!points?.length) return;
+  const arenaRadius = Math.max(...points.map((point) => Math.hypot(point.x, point.z)));
   const plan = demonTowerScenePlan(profile);
   const floor = new THREE.Mesh(
     polygonGeometry(points),
@@ -229,16 +232,16 @@ function buildDemonTowerGeometry(
     addRadialAccents(
       group,
       8,
-      27,
+      54,
       0.22,
       plan.secondaryAccent,
       plan.floorAccentOpacity,
       Math.PI / 8,
     );
   else if (profile === 'ossuary')
-    addRadialAccents(group, 4, 25, 0.32, plan.secondaryAccent, plan.floorAccentOpacity, 0);
-  else addRadialAccents(group, 5, 24, 0.26, plan.accentColor, plan.floorAccentOpacity, Math.PI / 5);
-  addBackdrop(group, profile, plan.backdropColor, lowGfx);
+    addRadialAccents(group, 4, 50, 0.32, plan.secondaryAccent, plan.floorAccentOpacity, 0);
+  else addRadialAccents(group, 5, 48, 0.26, plan.accentColor, plan.floorAccentOpacity, Math.PI / 5);
+  addBackdrop(group, profile, plan.backdropColor, lowGfx, arenaRadius);
 }
 
 export function buildDemonTowerEnvironment(

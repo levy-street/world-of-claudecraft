@@ -291,7 +291,7 @@ export async function prewarmPlayerPortrait(
     },
     commit: (url) => cache.set(key, url),
     onError: (err) => {
-      if (import.meta.env?.DEV) console.warn(`[portrait] prewarm failed for ${key}`, err);
+      if (import.meta.env.DEV) console.warn(`[portrait] prewarm failed for ${key}`, err);
     },
   });
 }
@@ -418,7 +418,7 @@ function capture(
     cache.set(key, url);
     return url;
   } catch (err) {
-    if (import.meta.env?.DEV) console.warn(`[portrait] failed for ${key}`, err);
+    if (import.meta.env.DEV) console.warn(`[portrait] failed for ${key}`, err);
     return null;
   } finally {
     if (active) {

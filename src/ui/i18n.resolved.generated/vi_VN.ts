@@ -50,6 +50,7 @@ export const vi_VN: EnTranslations = {
     "invalidValues": "Hãy chọn giá trị hợp lệ trước khi chạy lệnh này.",
     "sent": "Đã gửi: {command}",
     "run": "Chạy",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Cấp",
       "mob": "Quái",
@@ -63,6 +64,7 @@ export const vi_VN: EnTranslations = {
       "z": "Z",
       "dungeon": "Hầm Ngục",
       "difficulty": "Độ Khó",
+      "floor": "Floor",
       "name": "Tên",
       "spec": "Chuyên Môn"
     },

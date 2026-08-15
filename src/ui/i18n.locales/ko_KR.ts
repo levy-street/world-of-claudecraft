@@ -9998,6 +9998,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.amount': '수량',
   'devCommand.fields.count': '개수',
   'devCommand.fields.difficulty': '난이도',
+  'devCommand.fields.floor': '층',
+  'devCommand.raidFloorOption': '{floor}: {name}',
   'devCommand.fields.dungeon': '던전',
   'devCommand.fields.gold': '골드',
   'devCommand.fields.item': '아이템',

@@ -1,4 +1,5 @@
-// Re-cut the baked takes in the five Wildheart Basin troll GLBs, the same
+// Re-cut the baked takes in the five Wildheart Basin troll GLBs and the 18
+// Demon Tower creatures that share their 41-joint Tripo biped rig, the same
 // build-time clip surgery _add_cantor_hit_anim.mjs and the Orkadia orc script
 // used: the retarget batch shipped a 8.46s 'Death' that is rotation-only,
 // arms-only, and loop-closed (final keyframe == first == standing pose), and a
@@ -39,13 +40,34 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 
-const DEFAULT_FILES = [
+const WILDHEART_FILES = [
   'wildheart_stalker',
   'wildheart_ravager',
   'wildheart_hexcaller',
   'wildheart_beastmaster',
   'wildheart_high_priest',
 ].map((n) => `public/models/creatures/${n}.glb`);
+const DEMON_TOWER_BIPED_FILES = [
+  'tower_abyss_knight',
+  'tower_blood_matron',
+  'tower_bone_acolyte',
+  'tower_boss_ash_tyrant',
+  'tower_boss_demon_lord',
+  'tower_boss_flesh_shaper',
+  'tower_boss_gatekeeper',
+  'tower_brimstone_zealot',
+  'tower_dread_harbinger',
+  'tower_flame_herald',
+  'tower_gloom_bat',
+  'tower_imp',
+  'tower_iron_defiler',
+  'tower_pact_reaver',
+  'tower_rot_hulk',
+  'tower_shade_dancer',
+  'tower_soulbinder',
+  'tower_void_sentinel',
+].map((name) => `public/models/creatures/${name}.glb`);
+const DEFAULT_FILES = [...WILDHEART_FILES, ...DEMON_TOWER_BIPED_FILES];
 const FILES =
   process.argv[2] !== undefined
     ? [[process.argv[2], process.argv[3] ?? process.argv[2]]]

@@ -50,6 +50,7 @@ export const cs_CZ: EnTranslations = {
     "invalidValues": "Před spuštěním tohoto příkazu vyber platné hodnoty.",
     "sent": "Odesláno: {command}",
     "run": "Spustit",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Úroveň",
       "mob": "Mob",
@@ -63,6 +64,7 @@ export const cs_CZ: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Obtížnost",
+      "floor": "Floor",
       "name": "Jméno",
       "spec": "Specializace"
     },

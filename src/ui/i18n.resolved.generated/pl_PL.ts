@@ -50,6 +50,7 @@ export const pl_PL: EnTranslations = {
     "invalidValues": "Wybierz prawidłowe wartości przed uruchomieniem tego polecenia.",
     "sent": "Wysłano: {command}",
     "run": "Uruchom",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Poziom",
       "mob": "Mob",
@@ -63,6 +64,7 @@ export const pl_PL: EnTranslations = {
       "z": "Z",
       "dungeon": "Loch",
       "difficulty": "Poziom trudności",
+      "floor": "Floor",
       "name": "Nazwa",
       "spec": "Specjalizacja"
     },

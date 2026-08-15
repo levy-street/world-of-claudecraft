@@ -50,6 +50,7 @@ export const en_CA: EnTranslations = {
     "invalidValues": "Choose valid values before running this command.",
     "sent": "Sent: {command}",
     "run": "Run",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Level",
       "mob": "Mob",
@@ -63,6 +64,7 @@ export const en_CA: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Difficulty",
+      "floor": "Floor",
       "name": "Name",
       "spec": "Spec"
     },

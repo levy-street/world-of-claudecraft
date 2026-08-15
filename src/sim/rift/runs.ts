@@ -59,6 +59,7 @@ import {
   spawnDemonTowerDoor,
   updateDemonTower,
 } from './tower';
+import { clampTowerFloorIndex } from './tower_scaling';
 import type { RiftInstance, RiftRoller } from './types';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
@@ -776,22 +777,19 @@ export function enterRift(
   }
 }
 
-export function descendRift(ctx: SimContext, pid?: number): void {
-  const r = ctx.resolve(pid);
-  if (!r) return;
-  const inst = riftInstanceAtPos(ctx, r.e.pos);
-  if (!inst?.descentOpen) return;
-  if (inst.floorIndex >= inst.floorCount - 1) return;
-
-  // Collect everyone currently standing in this floor's region before we tear it
-  // down, so the whole party descends together.
-  const descenders = instancePlayerIds(ctx, inst);
+function transitionRiftFloor(
+  ctx: SimContext,
+  inst: RiftInstance,
+  targetFloorIndex: number,
+  travelers: readonly number[],
+  announce: boolean,
+): void {
   // The floor we are about to abandon, captured BEFORE floorIndex advances: it is
   // what decides which corpses belong to it (see the corpse sweep below).
   const oldOrigin = riftInstanceOrigin(inst.slot, inst.floorIndex);
 
   freeRiftFloorEntities(ctx, inst);
-  inst.floorIndex += 1;
+  inst.floorIndex = targetFloorIndex;
   spawnRiftFloor(ctx, inst);
 
   // The next floor has its own z-stacked origin: teleport descenders THERE.
@@ -826,7 +824,7 @@ export function descendRift(ctx: SimContext, pid?: number): void {
     member.corpsePos = { ...entryPos };
   }
 
-  for (const id of descenders) {
+  for (const id of travelers) {
     const e = ctx.entities.get(id);
     if (!e) continue;
     // Same every-teleport teardown as the entry above: a descender can be
@@ -839,15 +837,17 @@ export function descendRift(ctx: SimContext, pid?: number): void {
     e.targetId = null;
     e.autoAttack = false;
     emitRiftState(ctx, id, inst, true);
-    ctx.emit({
-      type: 'log',
-      text: isDemonTowerSeed(inst.seed)
-        ? `You ascend into ${floor.name}.`
-        : `You descend deeper into ${floor.name}.`,
-      color: '#b9f',
-      pid: id,
-    });
-    if (inst.upgrade) {
+    if (announce) {
+      ctx.emit({
+        type: 'log',
+        text: isDemonTowerSeed(inst.seed)
+          ? `You ascend into ${floor.name}.`
+          : `You descend deeper into ${floor.name}.`,
+        color: '#b9f',
+        pid: id,
+      });
+    }
+    if (announce && inst.upgrade) {
       const directive = inst.upgrade.floors[inst.floorIndex];
       const narrative = floor.isBoss
         ? inst.upgrade.boss.concept
@@ -855,6 +855,36 @@ export function descendRift(ctx: SimContext, pid?: number): void {
       if (narrative) ctx.emit({ type: 'log', text: narrative, color: '#d9c7ff', pid: id });
     }
   }
+}
+
+export function descendRift(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const inst = riftInstanceAtPos(ctx, r.e.pos);
+  if (!inst?.descentOpen) return;
+  if (inst.floorIndex >= inst.floorCount - 1) return;
+
+  // Collect everyone currently standing in this floor's region before we tear it
+  // down, so the whole party descends together.
+  transitionRiftFloor(ctx, inst, inst.floorIndex + 1, instancePlayerIds(ctx, inst), true);
+}
+
+/** Dev-only authored-floor navigation. The command gate is the sole caller; the
+ * transition still uses the production teardown/spawn path so collision, entities,
+ * combat memory, corpses, and rift state cannot drift from an ordinary ascent. */
+export function jumpDemonTowerFloorForDev(
+  ctx: SimContext,
+  pid: number,
+  requestedFloorIndex: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const inst = riftInstanceAtPos(ctx, r.e.pos);
+  if (!inst || !isDemonTowerSeed(inst.seed)) return false;
+  const targetFloorIndex = clampTowerFloorIndex(requestedFloorIndex);
+  if (targetFloorIndex === inst.floorIndex) return true;
+  transitionRiftFloor(ctx, inst, targetFloorIndex, instancePlayerIds(ctx, inst), false);
+  return true;
 }
 
 export function leaveRift(ctx: SimContext, pid?: number): void {

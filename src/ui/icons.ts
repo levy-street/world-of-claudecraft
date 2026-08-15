@@ -5236,7 +5236,7 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
       genericAuraFallback(id);
   }
   if (!recipe) {
-    if (import.meta.env?.DEV && !warnedIds.has(id)) {
+    if (import.meta.env.DEV && !warnedIds.has(id)) {
       warnedIds.add(id);
       console.warn(`[icons] no recipe or def for ${kind} id "${id}" — using fallback icon`);
     }

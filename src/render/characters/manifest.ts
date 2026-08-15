@@ -114,6 +114,8 @@ export interface VisualDef {
   runRef?: number;
   attackTimeScale?: number;
   deathTimeScale?: number;
+  /** Blend duration from a completed attack/hit one-shot back to locomotion. */
+  oneShotReturnFade?: number;
   /** Skip the boot preload sweep (manifestUrls); the asset is fetched on demand
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
@@ -458,6 +460,8 @@ const TOWER_TRIPO_CREATURE_RIG: ClipMap = {
   attack: ['Attack'],
   death: 'Death',
 };
+
+const TOWER_ANIMATION_BLEND = { oneShotReturnFade: 0.32 } as const;
 
 // The Vineclaw Stalker's own attack (scripts/build_wildheart_stalker_anims.mjs, issue
 // #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack is shared by reference across all 5
@@ -2092,6 +2096,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // neither the sim-owned scale, reach, nor collision profile.
   // Tint stays deliberately weak because the tower is a fixed landmark.
   mob_tower_imp: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_imp.glb`,
     height: 1.68,
     yaw: -Math.PI / 2,
@@ -2100,6 +2105,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_hellhound: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_hellhound.glb`,
     height: 1.56,
     yaw: -Math.PI / 2,
@@ -2108,6 +2114,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_pact_reaver: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_pact_reaver.glb`,
     height: 2.35,
     yaw: -Math.PI / 2,
@@ -2116,6 +2123,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_brimstone_zealot: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_brimstone_zealot.glb`,
     height: 2.24,
     yaw: -Math.PI / 2,
@@ -2124,6 +2132,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_soulbinder: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_soulbinder.glb`,
     height: 2.24,
     yaw: -Math.PI / 2,
@@ -2132,6 +2141,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_iron_defiler: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_iron_defiler.glb`,
     height: 2.76,
     yaw: -Math.PI / 2,
@@ -2140,6 +2150,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_abyss_knight: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_abyss_knight.glb`,
     height: 2.97,
     yaw: -Math.PI / 2,
@@ -2148,6 +2159,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_dread_harbinger: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_dread_harbinger.glb`,
     height: 3.07,
     yaw: -Math.PI / 2,
@@ -2156,6 +2168,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_boss_gatekeeper: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_boss_gatekeeper.glb`,
     height: 3.6,
     yaw: -Math.PI / 2,
@@ -2164,6 +2177,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_boss_demon_lord: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_boss_demon_lord.glb`,
     height: 4.45,
     yaw: -Math.PI / 2,
@@ -2172,6 +2186,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_gloom_bat: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_gloom_bat.glb`,
     height: 1.44,
     yaw: -Math.PI / 2,
@@ -2180,6 +2195,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_cinder_crawler: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_cinder_crawler.glb`,
     height: 1.32,
     yaw: -Math.PI / 2,
@@ -2188,6 +2204,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_bone_acolyte: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_bone_acolyte.glb`,
     height: 2.13,
     yaw: -Math.PI / 2,
@@ -2196,6 +2213,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_shade_dancer: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_shade_dancer.glb`,
     height: 2.24,
     yaw: -Math.PI / 2,
@@ -2204,6 +2222,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_flame_herald: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_flame_herald.glb`,
     height: 2.58,
     yaw: -Math.PI / 2,
@@ -2212,6 +2231,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_rot_hulk: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_rot_hulk.glb`,
     height: 2.86,
     yaw: -Math.PI / 2,
@@ -2220,6 +2240,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_blood_matron: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_blood_matron.glb`,
     height: 2.65,
     yaw: -Math.PI / 2,
@@ -2228,6 +2249,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_void_sentinel: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_void_sentinel.glb`,
     height: 3.18,
     yaw: -Math.PI / 2,
@@ -2236,6 +2258,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_boss_flesh_shaper: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_boss_flesh_shaper.glb`,
     height: 3.18,
     yaw: -Math.PI / 2,
@@ -2244,6 +2267,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.06,
   },
   mob_tower_boss_ash_tyrant: {
+    ...TOWER_ANIMATION_BLEND,
     url: `${CREATURES}/tower_boss_ash_tyrant.glb`,
     height: 3.82,
     yaw: -Math.PI / 2,

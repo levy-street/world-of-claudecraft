@@ -50,6 +50,7 @@ export const en_XA: EnTranslations = {
     "invalidValues": "[Çĥóóšé ʋáļíð ʋáļúéš ƀéƒóŕé ŕúññíñĝ ţĥíš çóɱɱáñð.]",
     "sent": "[Šéñţ: {command}]",
     "run": "[Ŕúñ]",
+    "raidFloorOption": "[{floor}: {name}]",
     "fields": {
       "level": "[Ļéʋéļ]",
       "mob": "[Ɱóƀ]",
@@ -63,6 +64,7 @@ export const en_XA: EnTranslations = {
       "z": "[Ž]",
       "dungeon": "[Ðúñĝéóñ]",
       "difficulty": "[Ðíƒƒíçúļţý]",
+      "floor": "[Ƒļóóŕ]",
       "name": "[Ñáɱé]",
       "spec": "[Šþéç]"
     },

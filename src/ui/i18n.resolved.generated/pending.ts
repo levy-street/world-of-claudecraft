@@ -54,6 +54,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_void_sentinel.name"
   ],
   "fr_FR": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -87,6 +89,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "fr_CA": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -121,6 +125,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -154,6 +160,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "de_DE": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -191,6 +199,8 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -225,6 +235,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -258,6 +270,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "nl_NL": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -291,6 +305,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "pl_PL": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -324,6 +340,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "id_ID": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -357,6 +375,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "tr_TR": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -390,6 +410,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "sv_SE": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -423,6 +445,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "vi_VN": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",
@@ -456,6 +480,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.demonTowerVoidCrownName"
   ],
   "da_DK": [
+    "devCommand.fields.floor",
+    "devCommand.raidFloorOption",
     "entities.mobs.tower_abyss_knight.name",
     "entities.mobs.tower_blood_matron.name",
     "entities.mobs.tower_bone_acolyte.name",

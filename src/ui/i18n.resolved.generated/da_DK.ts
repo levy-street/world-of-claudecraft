@@ -50,6 +50,7 @@ export const da_DK: EnTranslations = {
     "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
     "sent": "Sendt: {command}",
     "run": "Kør",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "Niveau",
       "mob": "Væsen",
@@ -63,6 +64,7 @@ export const da_DK: EnTranslations = {
       "z": "Z",
       "dungeon": "Fangekælder",
       "difficulty": "Sværhedsgrad",
+      "floor": "Floor",
       "name": "Navn",
       "spec": "Specialisering"
     },

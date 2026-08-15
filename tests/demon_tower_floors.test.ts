@@ -9,7 +9,14 @@ import {
   demonTowerFloorName,
   demonTowerHazards,
 } from '../src/sim/content/rift/demon_tower';
+import {
+  RIFT_BAND_X_MIN,
+  RIFT_REGION_HALF_X,
+  RIFT_REGION_HALF_Z,
+  RIFT_X_MIN,
+} from '../src/sim/data';
 import { DEMON_TOWER_FLOORS, demonTowerFloorProfile } from '../src/sim/rift/tower_floors';
+import { demonTowerWavePlan } from '../src/sim/rift/tower_waves';
 
 function signedArea(points: readonly { x: number; z: number }[]): number {
   return (
@@ -64,6 +71,11 @@ describe('demon tower floor registry', () => {
     expect(new Set(DEMON_TOWER_FLOORS.map((floor) => floor.style.torch.light)).size).toBe(3);
     expect(new Set(DEMON_TOWER_FLOORS.map((floor) => floor.style.wallTint)).size).toBe(3);
     expect(new Set(DEMON_TOWER_FLOORS.map((floor) => floor.style.floorTint)).size).toBe(3);
+    expect(DEMON_TOWER_FLOORS.map((floor) => floor.style.fog)).toEqual([
+      { color: 0x1d0703, near: 28, far: 156 },
+      { color: 0x0c0a1d, near: 24, far: 140 },
+      { color: 0x070817, near: 20, far: 184 },
+    ]);
     expect(
       new Set(DEMON_TOWER_FLOORS.map((floor) => floor.encounterSignature.join('|'))).size,
     ).toBe(3);
@@ -74,6 +86,17 @@ describe('demon tower floor registry', () => {
   });
 
   it('builds three different CCW silhouettes with authored inner and outer radii', () => {
+    expect(
+      DEMON_TOWER_FLOORS.map((floor) => ({
+        outerRadius: floor.arena.outerRadius,
+        innerRadius: floor.arena.innerRadius,
+        entryZ: floor.arena.entryZ,
+      })),
+    ).toEqual([
+      { outerRadius: 64, innerRadius: 64, entryZ: -55 },
+      { outerRadius: 62, innerRadius: 46, entryZ: -40 },
+      { outerRadius: 60, innerRadius: 43, entryZ: -36 },
+    ]);
     const expectedVertexCounts = [8, 16, 10];
     for (const [k, floor] of DEMON_TOWER_FLOORS.entries()) {
       const polygon = demonTowerArenaPolygon(k);
@@ -98,7 +121,82 @@ describe('demon tower floor registry', () => {
     expect(hazards[1].every((zone) => zone.tier === 'deep' && zone.rx === zone.rz)).toBe(true);
     expect(hazards[2].every((zone) => zone.tier === 'deep')).toBe(true);
     expect(new Set(hazards.map((zones) => JSON.stringify(zones))).size).toBe(3);
+    expect(hazards[0]).toEqual([
+      { x: -20, z: -4, r: 6, rx: 4.8, rz: 24, tier: 'shallow' },
+      { x: 20, z: -4, r: 6, rx: 4.8, rz: 24, tier: 'shallow' },
+    ]);
+    expect(hazards[1]).toEqual([
+      { x: -20, z: -20, r: 9.2, rx: 9.2, rz: 9.2, tier: 'deep' },
+      { x: 20, z: -20, r: 9.2, rx: 9.2, rz: 9.2, tier: 'deep' },
+      { x: -20, z: 20, r: 9.2, rx: 9.2, rz: 9.2, tier: 'deep' },
+      { x: 20, z: 20, r: 9.2, rx: 9.2, rz: 9.2, tier: 'deep' },
+    ]);
+    expect(hazards[2]).toEqual([
+      { x: 23.511, z: 32.361, r: 6.4, rx: 6.4, rz: 6.4, tier: 'deep' },
+      { x: 38.042, z: -12.361, r: 6.4, rx: 6.4, rz: 6.4, tier: 'deep' },
+      { x: 0, z: -40, r: 6.4, rx: 6.4, rz: 6.4, tier: 'deep' },
+      { x: -38.042, z: -12.361, r: 6.4, rx: 6.4, rz: 6.4, tier: 'deep' },
+      { x: -23.511, z: 32.361, r: 6.4, rx: 6.4, rz: 6.4, tier: 'deep' },
+    ]);
     expect([0, 1, 2].map(demonTowerHazards)).toEqual(hazards);
+  });
+
+  it('pins representative doubled decor and wave placements on every floor', () => {
+    const decorKeys = [
+      'tower_bloodforge_furnace',
+      'tower_ossuary_bone_organ',
+      'tower_void_crown_spire',
+    ];
+    expect(
+      [0, 1, 2].map((floorIndex) => {
+        const floor = buildDemonTowerFloor(DEMON_TOWER_SEED, 20, 20, floorIndex);
+        const item = floor.layout.decor?.find((entry) => entry.key === decorKeys[floorIndex]);
+        return item && { key: item.key, x: item.x, z: item.z };
+      }),
+    ).toEqual([
+      { key: 'tower_bloodforge_furnace', x: -44, z: 18 },
+      { key: 'tower_ossuary_bone_organ', x: -44, z: 0 },
+      { key: 'tower_void_crown_spire', x: 0, z: 55 },
+    ]);
+    expect([0, 1, 2].map((floorIndex) => demonTowerWavePlan(floorIndex)[0].spawns[0])).toEqual([
+      { templateId: 'tower_imp', x: 0, z: 39.68 },
+      { templateId: 'tower_gloom_bat', x: -1.6, z: 27.677 },
+      { templateId: 'tower_abyss_knight', x: -5.661, z: 28.458 },
+    ]);
+  });
+
+  it('keeps every doubled arena feature inside the active rift region', () => {
+    expect(RIFT_REGION_HALF_X).toBe(68);
+    expect(RIFT_X_MIN - RIFT_REGION_HALF_X).toBe(RIFT_BAND_X_MIN);
+    let maxFeatureX = 0;
+    for (let floorIndex = 0; floorIndex < DEMON_TOWER_FLOORS.length; floorIndex++) {
+      const floor = buildDemonTowerFloor(DEMON_TOWER_SEED, 20, 20, floorIndex);
+      const points = [
+        ...(floor.layout.shellPolygon ?? []),
+        ...(floor.layout.decor ?? []),
+        ...floor.hazards.flatMap((hazard) => {
+          const rx = hazard.rx ?? hazard.r;
+          const rz = hazard.rz ?? hazard.r;
+          return [
+            { x: hazard.x - rx, z: hazard.z - rz },
+            { x: hazard.x + rx, z: hazard.z + rz },
+          ];
+        }),
+        ...floor.objects,
+        floor.entry,
+        ...demonTowerWavePlan(floorIndex).flatMap((wave) => wave.spawns),
+      ];
+      for (const point of points) {
+        maxFeatureX = Math.max(maxFeatureX, Math.abs(point.x));
+        expect(Math.abs(point.x), `floor ${floorIndex + 1} x=${point.x}`).toBeLessThanOrEqual(
+          RIFT_REGION_HALF_X,
+        );
+        expect(Math.abs(point.z), `floor ${floorIndex + 1} z=${point.z}`).toBeLessThanOrEqual(
+          RIFT_REGION_HALF_Z,
+        );
+      }
+    }
+    expect(maxFeatureX + 4).toBeLessThanOrEqual(RIFT_REGION_HALF_X);
   });
 
   it('builds plans that retain their registry identity without procedural drift', () => {

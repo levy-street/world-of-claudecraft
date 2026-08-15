@@ -72,7 +72,7 @@ describe('developer command window', () => {
     expect(document.querySelector('[data-dev-action="spawn"]')).not.toBeNull();
   });
 
-  it('offers Demon Tower in Enter Raid and sends its direct-entry command', () => {
+  it('offers Demon Tower floors in Enter Raid and sends the selected direct-entry command', () => {
     const { chat, window } = makeWindow();
     window.toggle();
     document.querySelector<HTMLButtonElement>('[data-dev-category="travel"]')?.click();
@@ -83,9 +83,19 @@ describe('developer command window', () => {
       'nythraxis',
       'demon_tower',
     ]);
+    const floor = document.querySelector<HTMLSelectElement>('[data-dev-field="raidFloor"]');
+    expect(Array.from(floor?.options ?? []).map((option) => option.value)).toEqual(['1', '2', '3']);
+    expect(floor?.closest('label')?.textContent).toContain('Floor');
+    expect(Array.from(floor?.options ?? []).map((option) => option.textContent)).toEqual([
+      'Floor 1 of 3: The Demon Tower: The Bloodforge',
+      'Floor 2 of 3: The Demon Tower: The Ossuary of Chains',
+      'Floor 3 of 3: The Demon Tower: The Void Crown',
+    ]);
     if (!target) throw new Error('Expected the Enter Raid destination selector');
     target.value = 'demon_tower';
+    if (!floor) throw new Error('Expected the Demon Tower floor selector');
+    floor.value = '3';
     document.querySelector<HTMLButtonElement>('[data-dev-run="raid"]')?.click();
-    expect(chat).toHaveBeenCalledWith('/dev raid tower');
+    expect(chat).toHaveBeenCalledWith('/dev raid tower 3');
   });
 });

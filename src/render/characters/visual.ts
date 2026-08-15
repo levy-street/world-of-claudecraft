@@ -2922,7 +2922,7 @@ export class CharacterVisual {
     if (a === this.current) {
       this.currentIsOneShot = false;
       this.currentOneShotIsEmote = false;
-      this.fadeTo(this.baseAction(), 0.18, false);
+      this.fadeTo(this.baseAction(), this.def.oneShotReturnFade ?? 0.18, false);
     }
   }
 

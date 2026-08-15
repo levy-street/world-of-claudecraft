@@ -10182,6 +10182,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.amount': 'Количество',
   'devCommand.fields.count': 'Число',
   'devCommand.fields.difficulty': 'Сложность',
+  'devCommand.fields.floor': 'Этаж',
+  'devCommand.raidFloorOption': '{floor}: {name}',
   'devCommand.fields.dungeon': 'Подземелье',
   'devCommand.fields.gold': 'Золото',
   'devCommand.fields.item': 'Предмет',

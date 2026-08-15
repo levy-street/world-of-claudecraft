@@ -1,7 +1,7 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
-import { DEMON_TOWER_SEED } from './content/rift/demon_tower';
+import { DEMON_TOWER_FLOOR_COUNT, DEMON_TOWER_SEED } from './content/rift/demon_tower';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
@@ -16,6 +16,7 @@ import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { jumpDemonTowerFloorForDev } from './rift/runs';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
@@ -500,8 +501,11 @@ export function handleDevChat(
       return null;
     }
     if (/\b(?:demon[_ -]?tower|tower)\b/.test(rest)) {
+      const requestedFloor = Number(/\b(?:demon[_ -]?tower|tower)\s+(\d+)\b/.exec(rest)?.[1] ?? 1);
       ctx.enterRift(DEMON_TOWER_SEED, RIFT_RANK_BASE_LEVEL.S, pid);
-      emitDevLog(ctx, pid, '[dev] Entering the Demon Tower (S rank).');
+      jumpDemonTowerFloorForDev(ctx, pid, requestedFloor - 1);
+      const floor = clampInteger(requestedFloor, 1, DEMON_TOWER_FLOOR_COUNT);
+      emitDevLog(ctx, pid, `[dev] Entering Demon Tower floor ${floor} (S rank).`);
       return null;
     }
     const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';

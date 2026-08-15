@@ -10015,6 +10015,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.amount': '数量',
   'devCommand.fields.count': '個数',
   'devCommand.fields.difficulty': '難易度',
+  'devCommand.fields.floor': '階層',
+  'devCommand.raidFloorOption': '{floor}：{name}',
   'devCommand.fields.dungeon': 'ダンジョン',
   'devCommand.fields.gold': 'ゴールド',
   'devCommand.fields.item': 'アイテム',

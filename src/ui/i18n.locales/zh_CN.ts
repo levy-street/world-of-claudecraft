@@ -9580,6 +9580,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.amount': '数量',
   'devCommand.fields.count': '数量',
   'devCommand.fields.difficulty': '难度',
+  'devCommand.fields.floor': '楼层',
+  'devCommand.raidFloorOption': '{floor}：{name}',
   'devCommand.fields.dungeon': '地下城',
   'devCommand.fields.gold': '金币',
   'devCommand.fields.item': '物品',

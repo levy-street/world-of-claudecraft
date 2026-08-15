@@ -50,6 +50,7 @@ export const zh_CN: EnTranslations = {
     "invalidValues": "运行此命令前请选择有效值。",
     "sent": "已发送：{command}",
     "run": "运行",
+    "raidFloorOption": "{floor}：{name}",
     "fields": {
       "level": "等级",
       "mob": "怪物",
@@ -63,6 +64,7 @@ export const zh_CN: EnTranslations = {
       "z": "Z",
       "dungeon": "地下城",
       "difficulty": "难度",
+      "floor": "楼层",
       "name": "名称",
       "spec": "专精"
     },

@@ -84,8 +84,8 @@ describe('demon tower scaling: three authored raids', () => {
     }
   });
 
-  it('tightens the authored outer footprint on each ascent', () => {
-    expect(FLOORS.map(demonTowerArenaRadius)).toEqual([32, 31, 30]);
+  it('doubles the authored floor diameters while tightening each ascent', () => {
+    expect(FLOORS.map(demonTowerArenaRadius)).toEqual([64, 62, 60]);
     for (let k = 1; k < DEMON_TOWER_FLOOR_COUNT; k++) {
       expect(demonTowerArenaRadius(k)).toBeLessThan(demonTowerArenaRadius(k - 1));
     }

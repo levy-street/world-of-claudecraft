@@ -50,6 +50,7 @@ export const ko_KR: EnTranslations = {
     "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
     "sent": "전송됨: {command}",
     "run": "실행",
+    "raidFloorOption": "{floor}: {name}",
     "fields": {
       "level": "레벨",
       "mob": "몹",
@@ -63,6 +64,7 @@ export const ko_KR: EnTranslations = {
       "z": "Z",
       "dungeon": "던전",
       "difficulty": "난이도",
+      "floor": "층",
       "name": "이름",
       "spec": "전문화"
     },

@@ -9631,7 +9631,7 @@ export class Renderer {
       })
       .catch((err) => {
         this.pendingInteriors.delete(key);
-        if (import.meta.env?.DEV) {
+        if (import.meta.env.DEV) {
           console.warn('Failed to build delve interior:', moduleId, 'at', ox, oz, err);
         }
       });
