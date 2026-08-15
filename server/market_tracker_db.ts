@@ -81,6 +81,14 @@ CREATE INDEX IF NOT EXISTS market_listing_snapshots_item
   ON market_listing_snapshots(realm, item_id, captured_at DESC);
 CREATE INDEX IF NOT EXISTS market_listing_snapshots_captured
   ON market_listing_snapshots(captured_at);
+-- marketLatestSnapshots asks for one realm's newest captured_at, and neither
+-- index above answers it: the item index buries captured_at behind item_id,
+-- and the captured index has no realm. Without this, any realm that is not the
+-- newest writer walks backward over every newer peer row and heap-filters them
+-- (measured in review at 1,068 ms and 1.73M buffers at 2M rows, on the read
+-- that backs the overview and flip pages).
+CREATE INDEX IF NOT EXISTS market_listing_snapshots_realm_captured
+  ON market_listing_snapshots(realm, captured_at DESC);
 CREATE TABLE IF NOT EXISTS market_alerts (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL,
@@ -150,64 +158,92 @@ export async function insertMarketSaleRow(pool: Pool, row: MarketSaleRow): Promi
 //
 // (a) A sale row flushed off the FIFO after its character was deleted. That
 //     race is seconds wide, so the RECURRING boot/daily pass below scopes to
-//     the last day of sold_at and rides market_sales_realm_sold_at, staying
-//     flat no matter how large the table grows. An unscoped anti-join here
-//     would eventually exceed the pool's 15s statement_timeout and the heal
-//     would silently stop running, exactly the case it exists for.
+//     this realm's last day of sold_at. BOTH halves of that predicate are
+//     load-bearing: market_sales_realm_sold_at leads with realm, and Postgres
+//     16 cannot skip-scan a leading column (that arrives in 18), so a sold_at
+//     bound WITHOUT realm degrades to a full scan. Measured at 2M rows in
+//     review: 26,667 buffers / 101 ms unscoped against 2,781 / 3.8 ms with the
+//     realm predicate. Each process only ever writes its own realm's rows, so
+//     scoping heals exactly what this process could have raced.
 // (b) Rows from a build without the anonymize call (rollback or a mixed fleet
 //     on the shared Postgres). That is a one-off backfill over the whole
-//     table, so it runs as the BATCHED primitive further below (the
-//     pruneMarketListingSnapshotsBatch shape) at boot, keeping every
-//     statement bounded by its LIMIT.
+//     table, so it runs as the KEYSET-WALKED primitive further below at boot.
 //
 // Ids are validated against a live characters row at insert time (above), so
 // any id with no characters row here is a deleted character, never a
 // legitimate foreign key. All passes are idempotent and safe to run
 // concurrently across realm processes, so no advisory lock is needed.
-export async function reconcileMarketSalesCharacterIdsRecent(pool: Pool): Promise<void> {
+export async function reconcileMarketSalesCharacterIdsRecent(
+  pool: Pool,
+  realm: string,
+): Promise<void> {
   await pool.query(
     `UPDATE market_sales SET buyer_character_id = NULL
-     WHERE buyer_character_id IS NOT NULL
+     WHERE realm = $1
+       AND buyer_character_id IS NOT NULL
        AND sold_at > now() - interval '1 day'
        AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = buyer_character_id)`,
+    [realm],
   );
   await pool.query(
     `UPDATE market_sales SET seller_character_id = NULL
-     WHERE seller_character_id IS NOT NULL
+     WHERE realm = $1
+       AND seller_character_id IS NOT NULL
        AND sold_at > now() - interval '1 day'
        AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = seller_character_id)`,
+    [realm],
   );
 }
 
-// One bounded slice of the full-table backfill for window (b) above. Returns
-// the number of rows healed in this batch; the caller loops until it reports
-// zero. Each UPDATE touches at most batchSize rows selected through the
-// partial indexes, so no single statement can approach the pool's
-// statement_timeout regardless of table size.
-export async function reconcileMarketSalesCharacterIdsBatch(
+// One KEYSET slice of the full-table backfill for window (b) above: the id
+// range (afterId, afterId + span] and nothing else.
+//
+// The obvious shape, a LIMIT subquery like the snapshot prune, is wrong here
+// and the difference is not obvious. LIMIT bounds rows RETURNED, not rows
+// SCANNED, and the steady state of a healthy database is zero orphans: the
+// filter matches nothing, the LIMIT never fills, and the statement reads the
+// whole table before returning empty. Review measured that terminating batch
+// at a 2M-row seq scan plus hash anti join, 26,695 buffers / 234 ms, twice,
+// at every boot of every realm process. The snapshot prune gets away with the
+// idiom because its predicate matches a large contiguous slice; this one is
+// designed to match nothing.
+//
+// Walking the PRIMARY KEY instead makes the bound real: each statement touches
+// a fixed id span through the pk index whether or not anything matches. The
+// caller advances afterId until it passes maxMarketSaleId.
+export async function reconcileMarketSalesCharacterIdsSpan(
   pool: Pool,
-  batchSize: number,
+  afterId: number,
+  span: number,
 ): Promise<number> {
-  const limit = Math.max(1, Math.floor(batchSize));
-  const buyers = await pool.query(
-    `UPDATE market_sales SET buyer_character_id = NULL
-     WHERE id IN (
-       SELECT id FROM market_sales
-        WHERE buyer_character_id IS NOT NULL
+  const width = Math.max(1, Math.floor(span));
+  const res = await pool.query(
+    `UPDATE market_sales SET
+       buyer_character_id = CASE
+         WHEN buyer_character_id IS NOT NULL
           AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = buyer_character_id)
-        LIMIT $1)`,
-    [limit],
-  );
-  const sellers = await pool.query(
-    `UPDATE market_sales SET seller_character_id = NULL
-     WHERE id IN (
-       SELECT id FROM market_sales
-        WHERE seller_character_id IS NOT NULL
+         THEN NULL ELSE buyer_character_id END,
+       seller_character_id = CASE
+         WHEN seller_character_id IS NOT NULL
           AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = seller_character_id)
-        LIMIT $1)`,
-    [limit],
+         THEN NULL ELSE seller_character_id END
+     WHERE id > $1 AND id <= $2
+       AND (
+         (buyer_character_id IS NOT NULL
+           AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = buyer_character_id))
+         OR (seller_character_id IS NOT NULL
+           AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.id = seller_character_id))
+       )`,
+    [afterId, afterId + width],
   );
-  return (buyers.rowCount ?? 0) + (sellers.rowCount ?? 0);
+  return res.rowCount ?? 0;
+}
+
+// The walk's upper bound, read once so the backfill terminates against a fixed
+// horizon instead of chasing rows this process is still inserting.
+export async function maxMarketSaleId(pool: Pool): Promise<number> {
+  const res = await pool.query('SELECT COALESCE(max(id), 0) AS max_id FROM market_sales');
+  return Number(res.rows[0]?.max_id ?? 0);
 }
 
 // One row per item with at least one PLAYER listing at capture time (house
@@ -653,16 +689,21 @@ export async function loadActiveMarketAlerts(
   }));
 }
 
-export async function markMarketAlertTriggered(
+// Stamp every alert that crossed on THIS capture in one statement, the shape
+// rearmMarketAlerts already uses. One awaited UPDATE per fired alert would put
+// an unbounded number of round trips on the shared FIFO the sale inserts also
+// ride, and a capture can fire many alerts at once.
+export async function markMarketAlertsTriggered(
   pool: Pool,
-  id: number,
-  valueCopper: number,
+  fired: readonly { id: number; valueCopper: number }[],
 ): Promise<void> {
+  if (fired.length === 0) return;
   await pool.query(
-    `UPDATE market_alerts
-        SET last_triggered_at = now(), last_value_copper = $2, last_met = TRUE
-      WHERE id = $1`,
-    [id, Math.round(valueCopper)],
+    `UPDATE market_alerts a
+        SET last_triggered_at = now(), last_value_copper = v.value_copper, last_met = TRUE
+       FROM unnest($1::bigint[], $2::bigint[]) AS v(id, value_copper)
+      WHERE a.id = v.id`,
+    [fired.map((f) => f.id), fired.map((f) => Math.round(f.valueCopper))],
   );
 }
 

@@ -22,9 +22,10 @@ vi.mock('../server/market_tracker_db', () => ({
   pruneMarketListingSnapshots: vi.fn(async () => 0),
   anonymizeMarketSalesForCharacter: vi.fn(async () => {}),
   reconcileMarketSalesCharacterIdsRecent: vi.fn(async () => {}),
-  reconcileMarketSalesCharacterIdsBatch: vi.fn(async () => 0),
+  reconcileMarketSalesCharacterIdsSpan: vi.fn(async () => 0),
+  maxMarketSaleId: vi.fn(async () => 0),
   loadActiveMarketAlerts: vi.fn(async () => []),
-  markMarketAlertTriggered: vi.fn(async () => {}),
+  markMarketAlertsTriggered: vi.fn(async () => {}),
   rearmMarketAlerts: vi.fn(async () => {}),
 }));
 
@@ -43,7 +44,7 @@ import {
   insertMarketListingSnapshotRows,
   insertMarketSaleRow,
   loadActiveMarketAlerts,
-  markMarketAlertTriggered,
+  markMarketAlertsTriggered,
   rearmMarketAlerts,
 } from '../server/market_tracker_db';
 import { REALM } from '../server/realm';
@@ -495,7 +496,7 @@ describe('market sale dispatch integration', () => {
 
   it('the snapshot tick evaluates alerts after the insert, marks crossings, re-arms cleared', async () => {
     const loadAlerts = vi.mocked(loadActiveMarketAlerts);
-    const markTriggered = vi.mocked(markMarketAlertTriggered);
+    const markTriggered = vi.mocked(markMarketAlertsTriggered);
     const rearm = vi.mocked(rearmMarketAlerts);
     loadAlerts.mockResolvedValueOnce([
       // Crosses now (ask 200 < 250, was not met): fires.
@@ -508,8 +509,10 @@ describe('market sale dispatch integration', () => {
     recordMarketListingSnapshot([listing({ itemId: 'wolf_fang', count: 5, price: 1000 })]);
     await marketTrackerIdle();
     expect(snapshotInsertMock).toHaveBeenCalledTimes(1);
+    // One set-shaped call carrying every crossing, not one call per alert: the
+    // round trips on the shared FIFO must not scale with the alert count.
     expect(markTriggered).toHaveBeenCalledTimes(1);
-    expect(markTriggered).toHaveBeenCalledWith(expect.anything(), 7, 200);
+    expect(markTriggered).toHaveBeenCalledWith(expect.anything(), [{ id: 7, valueCopper: 200 }]);
     expect(rearm).toHaveBeenCalledWith(expect.anything(), [9]);
   });
 });

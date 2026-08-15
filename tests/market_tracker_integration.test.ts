@@ -15,9 +15,10 @@ import {
   insertMarketSaleRow,
   MARKET_TRACKER_SCHEMA,
   type MarketSaleRow,
+  maxMarketSaleId,
   pruneMarketListingSnapshotsBatch,
-  reconcileMarketSalesCharacterIdsBatch,
   reconcileMarketSalesCharacterIdsRecent,
+  reconcileMarketSalesCharacterIdsSpan,
 } from '../server/market_tracker_db';
 
 const DB_URL = process.env.TEST_DATABASE_URL;
@@ -197,7 +198,9 @@ describeDb('market tracker storage (real Postgres)', () => {
 
     // The row is fresh (sold_at defaulted to now()), so the windowed
     // recurring pass sees and heals it.
-    await reconcileMarketSalesCharacterIdsRecent(scopedPool());
+    // Scoped to the realm the fixture rows carry: the realm predicate is what
+    // keeps this pass on market_sales_realm_sold_at.
+    await reconcileMarketSalesCharacterIdsRecent(scopedPool(), 'eastbrook');
 
     const verify = await scopedClient();
     try {
@@ -210,8 +213,11 @@ describeDb('market tracker storage (real Postgres)', () => {
       verify.release();
     }
 
-    // The batched full-table backfill agrees nothing is left to heal.
-    await expect(reconcileMarketSalesCharacterIdsBatch(scopedPool(), 100)).resolves.toBe(0);
+    // The keyset backfill walk agrees nothing is left to heal, and its horizon
+    // read sees the row this test inserted.
+    const horizon = await maxMarketSaleId(scopedPool());
+    expect(horizon).toBeGreaterThan(0);
+    await expect(reconcileMarketSalesCharacterIdsSpan(scopedPool(), 0, horizon)).resolves.toBe(0);
   });
 
   it('the retention batch deletes only aged snapshot rows, oldest first', async () => {

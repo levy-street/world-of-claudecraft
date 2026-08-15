@@ -24,10 +24,11 @@ import {
   loadActiveMarketAlerts,
   type MarketListingSnapshotRow,
   type MarketSaleRow,
-  markMarketAlertTriggered,
+  markMarketAlertsTriggered,
+  maxMarketSaleId,
   rearmMarketAlerts,
-  reconcileMarketSalesCharacterIdsBatch,
   reconcileMarketSalesCharacterIdsRecent,
+  reconcileMarketSalesCharacterIdsSpan,
 } from './market_tracker_db';
 import { REALM } from './realm';
 
@@ -251,9 +252,10 @@ export function recordMarketListingSnapshot(listings: readonly MarketListing[]):
         const alerts = await loadActiveMarketAlerts(pool, REALM);
         if (alerts.length === 0) return;
         const { fired, rearmed } = evaluateMarketAlerts(alerts, rows);
-        for (const hit of fired) {
-          await markMarketAlertTriggered(pool, hit.id, hit.valueCopper);
-        }
+        // Two set-shaped statements, not one per alert: this rides the same
+        // FIFO as the sale inserts, so the round trips per capture must not
+        // scale with how many alerts happened to cross.
+        await markMarketAlertsTriggered(pool, fired);
         await rearmMarketAlerts(pool, rearmed);
       })
       .catch((err) => {
@@ -269,18 +271,22 @@ export function recordMarketListingSnapshot(listings: readonly MarketListing[]):
 // loop. Snapshot retention is NOT here: the nightly retention sweep drives
 // pruneMarketListingSnapshotsBatch directly (registered in main.ts).
 
-// Recurring boot/daily pass: last-day window only, flat forever.
+// Recurring boot/daily pass: this realm's last day only, flat forever. The
+// realm argument is what keeps it on the index (market_tracker_db.ts).
 export function reconcileMarketTrackerCharacterIds(): Promise<void> {
-  return reconcileMarketSalesCharacterIdsRecent(pool);
+  return reconcileMarketSalesCharacterIdsRecent(pool, REALM);
 }
 
-// Boot-time full-table backfill for old-build deletions, batched so every
-// statement stays bounded; loops until a batch heals zero rows.
-const RECONCILE_BACKFILL_BATCH = 5000;
+// Boot-time full-table backfill for old-build deletions. It walks the primary
+// key in fixed id spans to a horizon read once at the start, so every statement
+// is bounded whether or not it heals anything, and the walk terminates instead
+// of chasing rows this process is still inserting. A healthy database heals
+// nothing here and simply walks out.
+const RECONCILE_BACKFILL_SPAN = 50_000;
 export async function backfillMarketTrackerCharacterIds(): Promise<void> {
-  for (;;) {
-    const healed = await reconcileMarketSalesCharacterIdsBatch(pool, RECONCILE_BACKFILL_BATCH);
-    if (healed === 0) return;
+  const horizon = await maxMarketSaleId(pool);
+  for (let afterId = 0; afterId < horizon; afterId += RECONCILE_BACKFILL_SPAN) {
+    await reconcileMarketSalesCharacterIdsSpan(pool, afterId, RECONCILE_BACKFILL_SPAN);
   }
 }
 

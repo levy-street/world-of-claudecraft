@@ -452,9 +452,26 @@ const STATIC_PAGE_ALIASES = new Map([
 const ADMIN_ONLINE_SAMPLE_MS = 60_000;
 // World Market tracker: aggregate the in-memory listing book into
 // market_listing_snapshots rows on this cadence (zero database reads per tick;
-// see server/market_tracker.ts). 5 minutes resolves the intraday price curve
-// the admin charts draw without measurable write volume.
-const MARKET_SNAPSHOT_INTERVAL_MS = 5 * 60_000;
+// see server/market_tracker.ts).
+//
+// The cadence is set by RETENTION, not by chart resolution. Intake is
+// (86400000 / this) rows per day per listed item, and the nightly sweep can
+// only delete RETENTION_SWEEP_MAX_ROWS_PER_RUN (default 50000) from this table
+// per night, so the table converges only while
+//   capturesPerDay * concurrentlyListedItems <= the per-table budget.
+// At 5 minutes (288 a day) break-even was about 174 items, which a few dozen
+// active sellers reach at MARKET_MAX_LISTINGS each; past it the table grows
+// without bound while the sweep logs a budget warning every night. 15 minutes
+// (96 a day) moves break-even to about 520, which the 663 listable items only
+// reach if most of the catalog is listed at once.
+//
+// Nothing on the read side wanted the finer cadence: the smallest chart bucket
+// is an HOUR (date_trunc in market_tracker_db.ts), so this still leaves four
+// samples per bucket. The cost is alert latency, up to 15 minutes instead of 5,
+// which standing price alerts on listings that live for hours or days tolerate.
+// tests/server/main_retention_wiring.test.ts pins the inequality so a future
+// cadence change has to face the arithmetic.
+const MARKET_SNAPSHOT_INTERVAL_MS = 15 * 60_000;
 // Each realm re-reads the blocklist on this interval so edits on another realm
 // process propagate and expired blocks fall out.
 const BLOCKED_IP_REFRESH_MS = 60_000;

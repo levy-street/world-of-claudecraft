@@ -356,6 +356,11 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_seller');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_item');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_captured');
+    // marketLatestSnapshots asks one realm for its newest capture, which
+    // neither of the two indexes above can answer (one buries captured_at
+    // behind item_id, the other has no realm), so the read degrades to a
+    // backward scan that heap-filters every newer peer realm's rows.
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_realm_captured');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_alerts');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_alerts_realm_active');
     // Idempotent heals for pre-merge builds of this schema: the account-id

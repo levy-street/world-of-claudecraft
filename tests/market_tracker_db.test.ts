@@ -11,11 +11,12 @@ import {
   insertMarketSaleRow,
   loadActiveMarketAlerts,
   type MarketListingSnapshotRow,
-  markMarketAlertTriggered,
+  markMarketAlertsTriggered,
+  maxMarketSaleId,
   pruneMarketListingSnapshotsBatch,
   rearmMarketAlerts,
-  reconcileMarketSalesCharacterIdsBatch,
   reconcileMarketSalesCharacterIdsRecent,
+  reconcileMarketSalesCharacterIdsSpan,
 } from '../server/market_tracker_db';
 
 const query = vi.fn();
@@ -192,11 +193,28 @@ describe('market alerts SQL', () => {
     expect(params).toEqual(['eastbrook', 'lowest_ask']);
   });
 
-  it('marking a trigger rounds the carried value and latches the edge', async () => {
-    await markMarketAlertTriggered(pool, 7, 199.5);
+  it('marks every fired alert in ONE statement, rounding the carried values', async () => {
+    // One UPDATE per fired alert would put an unbounded number of round trips
+    // on the FIFO the sale inserts share, and a single capture can cross many
+    // alerts at once.
+    await markMarketAlertsTriggered(pool, [
+      { id: 7, valueCopper: 199.5 },
+      { id: 9, valueCopper: 40.2 },
+    ]);
+    expect(query).toHaveBeenCalledTimes(1);
     const [sql, params] = query.mock.calls[0];
-    expect(sql).toContain('SET last_triggered_at = now(), last_value_copper = $2, last_met = TRUE');
-    expect(params).toEqual([7, 200]);
+    expect(sql).toContain('SET last_triggered_at = now(), last_value_copper = v.value_copper');
+    expect(sql).toContain('last_met = TRUE');
+    expect(sql).toContain('unnest($1::bigint[], $2::bigint[])');
+    expect(params).toEqual([
+      [7, 9],
+      [200, 40],
+    ]);
+  });
+
+  it('marking nothing issues no query', async () => {
+    await markMarketAlertsTriggered(pool, []);
+    expect(query).not.toHaveBeenCalled();
   });
 
   it('re-arming clears the edge for the given ids in one statement', async () => {
@@ -215,10 +233,18 @@ describe('market alerts SQL', () => {
 
 describe('reconcileMarketSalesCharacterIdsRecent', () => {
   it('nulls orphaned ids inside a one-day sold_at window, one UPDATE per column', async () => {
-    await reconcileMarketSalesCharacterIdsRecent(pool);
+    await reconcileMarketSalesCharacterIdsRecent(pool, 'eastbrook');
     expect(query).toHaveBeenCalledTimes(2);
-    const [buyerSql] = query.mock.calls[0];
-    const [sellerSql] = query.mock.calls[1];
+    const [buyerSql, buyerParams] = query.mock.calls[0];
+    const [sellerSql, sellerParams] = query.mock.calls[1];
+    // BOTH halves of the index predicate: market_sales_realm_sold_at leads with
+    // realm, and Postgres 16 cannot skip-scan a leading column, so a sold_at
+    // bound WITHOUT realm silently degrades to a full scan of a keep-forever
+    // table. Each process only ever writes its own realm's rows.
+    expect(buyerSql).toContain('WHERE realm = $1');
+    expect(sellerSql).toContain('WHERE realm = $1');
+    expect(buyerParams).toEqual(['eastbrook']);
+    expect(sellerParams).toEqual(['eastbrook']);
     expect(buyerSql).toContain('SET buyer_character_id = NULL');
     expect(buyerSql).toContain('NOT EXISTS');
     expect(buyerSql).toContain('buyer_character_id IS NOT NULL');
@@ -233,31 +259,39 @@ describe('reconcileMarketSalesCharacterIdsRecent', () => {
   });
 });
 
-describe('reconcileMarketSalesCharacterIdsBatch', () => {
-  it('heals bounded slices through a LIMIT subquery and reports rows touched', async () => {
+describe('reconcileMarketSalesCharacterIdsSpan', () => {
+  it('walks a bounded id span in ONE statement, never a LIMIT subquery', async () => {
     query.mockResolvedValueOnce({ rows: [], rowCount: 3 });
-    query.mockResolvedValueOnce({ rows: [], rowCount: 2 });
-    const healed = await reconcileMarketSalesCharacterIdsBatch(pool, 5000);
-    expect(healed).toBe(5);
-    expect(query).toHaveBeenCalledTimes(2);
-    const [buyerSql, buyerParams] = query.mock.calls[0];
-    const [sellerSql, sellerParams] = query.mock.calls[1];
-    for (const sql of [buyerSql, sellerSql]) {
-      expect(sql).toContain('WHERE id IN');
-      expect(sql).toContain('LIMIT $1');
-      expect(sql).toContain('NOT EXISTS');
-      // The full-table pass never carries the window: it exists to backfill
-      // deletions made by a build without the anonymize call.
-      expect(sql).not.toContain('interval');
-    }
-    expect(buyerParams).toEqual([5000]);
-    expect(sellerParams).toEqual([5000]);
+    const healed = await reconcileMarketSalesCharacterIdsSpan(pool, 100, 50_000);
+    expect(healed).toBe(3);
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    // The bound has to be on rows SCANNED, not rows returned. A LIMIT subquery
+    // reads the whole table whenever the filter matches nothing, which is the
+    // steady state of a healthy database, so the keyset walk is the contract.
+    expect(sql).toContain('WHERE id > $1 AND id <= $2');
+    expect(sql).not.toContain('LIMIT');
+    expect(sql).toContain('buyer_character_id');
+    expect(sql).toContain('seller_character_id');
+    // The full-table pass never carries the window: it exists to backfill
+    // deletions made by a build without the anonymize call.
+    expect(sql).not.toContain('interval');
+    expect(params).toEqual([100, 50_100]);
   });
 
-  it('clamps a nonsense batch size to at least one row', async () => {
+  it('clamps a nonsense span to at least one row', async () => {
     query.mockResolvedValue({ rows: [], rowCount: 0 });
-    await reconcileMarketSalesCharacterIdsBatch(pool, 0);
+    await reconcileMarketSalesCharacterIdsSpan(pool, 0, 0);
     const [, params] = query.mock.calls[0];
-    expect(params).toEqual([1]);
+    expect(params).toEqual([0, 1]);
+  });
+
+  it('reads the walk horizon once, coalescing an empty table to zero', async () => {
+    query.mockResolvedValueOnce({ rows: [{ max_id: '4242' }], rowCount: 1 });
+    expect(await maxMarketSaleId(pool)).toBe(4242);
+    expect(query.mock.calls[0][0]).toContain('COALESCE(max(id), 0)');
+    query.mockReset();
+    query.mockResolvedValueOnce({ rows: [{ max_id: null }], rowCount: 1 });
+    expect(await maxMarketSaleId(pool)).toBe(0);
   });
 });
