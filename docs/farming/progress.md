@@ -1606,8 +1606,20 @@ fixture state), qa-checklist READY (0 FAIL; the two SHOULD-FIXes are the
 zero-headroom warning, ledgered at (an), and the shard-weight deferral
 above). Known contention flakes proven green standalone (whole-file and
 filtered): professions_farming "plants, spends the seed" and
-language_fanout_registry's relocalize-caller arm. Gate record: see the sync
-close-out in the Notes below the Phase 8 record.
+language_fanout_registry's relocalize-caller arm. GATE RECORD: run 1
+(default 12 workers) hit "[gate:select] FAIL" at the full-suite fallback
+with 11 timeouts across 9 files, ALL declared-budget timeouts in the
+heavy balance-harness family (druid_balance_probe, hunter_dps_balance,
+the six owned_class_balance/raid suites, warlock_five_minute_windows;
+the release's balance PRs grew these harnesses and 12 concurrent heavy
+sims starved the suite tail on this box); all nine files plus
+druid_engines proven green standalone on the SAME frozen tree (36/36 at
+4 workers in 209s wall, warlock 2/2), the recorded environmental
+contention class. Run 2 on the identical frozen tree with
+GATE_MAX_WORKERS=8: "[gate:select] PASS: all 12 steps green (vitest
+workers: 8)", 39,695 passed, zero FAIL lines. Lesson for future gates on
+this box: prefer GATE_MAX_WORKERS=8 when the full-suite fallback is
+expected.
 
 ### Phase 9
 (not started)
