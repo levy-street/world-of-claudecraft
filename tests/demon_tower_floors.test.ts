@@ -113,18 +113,13 @@ describe('demon tower floor registry', () => {
     ]);
   });
 
-  it('pins three mechanically different deterministic hazard fields', () => {
+  it('keeps Bloodforge clear while pinning the later deterministic hazard fields', () => {
     const hazards = [0, 1, 2].map(demonTowerHazards);
-    expect(hazards.map((zones) => zones.length)).toEqual([2, 4, 5]);
-    expect(hazards[0].every((zone) => zone.tier === 'shallow')).toBe(true);
-    expect(hazards[0].some((zone) => zone.rx !== zone.rz)).toBe(true);
+    expect(hazards.map((zones) => zones.length)).toEqual([0, 4, 5]);
+    expect(hazards[0]).toEqual([]);
     expect(hazards[1].every((zone) => zone.tier === 'deep' && zone.rx === zone.rz)).toBe(true);
     expect(hazards[2].every((zone) => zone.tier === 'deep')).toBe(true);
     expect(new Set(hazards.map((zones) => JSON.stringify(zones))).size).toBe(3);
-    expect(hazards[0]).toEqual([
-      { x: -20, z: -4, r: 6, rx: 4.8, rz: 24, tier: 'shallow' },
-      { x: 20, z: -4, r: 6, rx: 4.8, rz: 24, tier: 'shallow' },
-    ]);
     expect(hazards[1]).toEqual([
       { x: -20, z: -20, r: 9.2, rx: 9.2, rz: 9.2, tier: 'deep' },
       { x: 20, z: -20, r: 9.2, rx: 9.2, rz: 9.2, tier: 'deep' },

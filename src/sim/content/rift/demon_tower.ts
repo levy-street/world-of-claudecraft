@@ -75,10 +75,7 @@ export function demonTowerArenaPolygon(floorIndex: number): Array<{ x: number; z
 export function demonTowerHazards(floorIndex: number): DelveHazardZone[] {
   const k = clampTowerFloorIndex(floorIndex);
   if (k === 0) {
-    return [
-      scaledHazard(-10, -2, 3, 2.4, 12, 'shallow'),
-      scaledHazard(10, -2, 3, 2.4, 12, 'shallow'),
-    ];
+    return [];
   }
   if (k === 1) {
     return [

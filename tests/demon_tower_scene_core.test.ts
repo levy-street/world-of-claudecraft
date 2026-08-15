@@ -1,6 +1,6 @@
 // Low-tier keeps the floor readable even when hero-prop density is reduced.
 // This pure render plan is the contract that guarantees the key silhouettes,
-// hazards and palette survive every quality tier.
+// later-floor hazards and palette survive every quality tier.
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -14,7 +14,7 @@ describe('demon tower scene core', () => {
     expect(demonTowerSceneProfiles()).toEqual(['bloodforge', 'ossuary', 'void_crown']);
   });
 
-  it('builds the real floor and backdrop on low tier while retaining hazards', () => {
+  it('builds the real floor and backdrop on low tier with the authored hazard counts', () => {
     for (const [index, profile] of demonTowerSceneProfiles().entries()) {
       const floor = buildDemonTowerFloor(DEMON_TOWER_SEED, 20, 20, index);
       const group = new THREE.Group();
@@ -26,7 +26,7 @@ describe('demon tower scene core', () => {
         if (typeof essential === 'string') essentials.add(essential);
       });
       expect([...essentials].sort()).toEqual(['backdrop', 'floor']);
-      expect(floor.hazards.length).toBeGreaterThan(0);
+      expect(floor.hazards).toHaveLength([0, 4, 5][index]);
       expect(lights).toBe(0);
     }
   });
@@ -126,62 +126,9 @@ describe('demon tower scene core', () => {
       expect(meshes).toHaveLength(floor.hazards.length * 2);
       expect(meshes.every((mesh) => mesh.visible)).toBe(true);
       if (style === 'tower_lava') {
-        const pool = meshes.find((mesh) => mesh.userData.riftHazard === 'pool');
-        const rim = meshes.find((mesh) => mesh.userData.riftHazard === 'rim');
-        const poolMaterial = pool?.material as THREE.MeshBasicMaterial;
-        const rimMaterial = rim?.material as THREE.MeshBasicMaterial;
-        expect(poolMaterial.color.getHex()).toBe(0x1b1917);
-        expect(poolMaterial.opacity).toBe(0.7);
-        expect(poolMaterial.polygonOffset).toBe(true);
-        expect(rimMaterial.color.getHex()).toBe(0x8f6a46);
-        expect(rimMaterial.opacity).toBe(0.28);
-        expect(rimMaterial.blending).toBe(THREE.NormalBlending);
-        pool?.geometry.computeBoundingBox();
-        rim?.geometry.computeBoundingBox();
-        expect(pool?.geometry.boundingBox?.max.y).toBeLessThanOrEqual(0.0121);
-        expect(rim?.geometry.boundingBox?.max.y).toBeLessThanOrEqual(0.0141);
-        expect(rimMaterial.color.getHSL({ h: 0, s: 0, l: 0 }).l).toBeGreaterThan(
-          poolMaterial.color.getHSL({ h: 0, s: 0, l: 0 }).l * 2,
-        );
+        expect(meshes, 'Bloodforge keeps its floor clear of oval hazard decals').toEqual([]);
       }
     }
-  });
-
-  it('uses the restrained Bloodforge glow on high tier', () => {
-    const floor = buildDemonTowerFloor(DEMON_TOWER_SEED, 20, 20, 0);
-    const group = new THREE.Group();
-    const interiors = new DungeonInteriors(new THREE.Scene(), false, [], []);
-    (interiors as unknown as { glowDecalTex: THREE.Texture }).glowDecalTex = new THREE.Texture();
-    const placeHazards = (
-      interiors as unknown as {
-        placeBlackwaterPools(
-          target: THREE.Group,
-          hazards: typeof floor.hazards,
-          hazardStyle: 'tower_lava',
-        ): void;
-      }
-    ).placeBlackwaterPools.bind(interiors);
-    placeHazards(group, [floor.hazards[0]], 'tower_lava');
-    const glow = group.children.find((child) => {
-      if (!(child instanceof THREE.Mesh)) return false;
-      const material = child.material as THREE.MeshBasicMaterial;
-      return material.map instanceof THREE.Texture;
-    }) as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial> | undefined;
-    expect(glow, 'high-tier lava glow').toBeDefined();
-    expect(glow?.material.color.getHex()).toBe(0x5f3425);
-    expect(glow?.position.y).toBeLessThanOrEqual(0.016);
-    glow?.geometry.computeBoundingBox();
-    const bounds = glow?.geometry.boundingBox;
-    const glowRadiusX = bounds ? ((bounds.max.x - bounds.min.x) * (glow?.scale.x ?? 0)) / 2 : 0;
-    const glowRadiusZ = bounds ? ((bounds.max.z - bounds.min.z) * (glow?.scale.z ?? 0)) / 2 : 0;
-    expect(glowRadiusX, 'lava glow follows the narrow hazard axis').toBeCloseTo(
-      (floor.hazards[0].rx ?? floor.hazards[0].r) * 1.15,
-      2,
-    );
-    expect(glowRadiusZ, 'lava glow follows the long hazard axis').toBeCloseTo(
-      (floor.hazards[0].rz ?? floor.hazards[0].r) * 1.15,
-      2,
-    );
   });
 
   it('gives each floor a unique backdrop and palette', () => {

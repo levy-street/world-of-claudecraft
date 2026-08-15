@@ -91,7 +91,7 @@ export const DEMON_TOWER_FLOORS = [
       ],
     ],
     bossId: 'tower_boss_ash_tyrant',
-    encounterSignature: ['slag-lanes', 'priority-heralds', 'ash-tyrant'],
+    encounterSignature: ['open-forge', 'priority-heralds', 'ash-tyrant'],
   },
   {
     id: 'ossuary',
