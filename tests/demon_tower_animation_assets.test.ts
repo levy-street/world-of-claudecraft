@@ -48,14 +48,26 @@ function clipPoseDelta(animation: Animation, finalFrameOnly = false): number {
         const negated = Math.hypot(...first.map((component, index) => value[index] + component));
         delta = Math.max(delta, Math.min(direct, negated));
       } else {
-        delta = Math.max(
-          delta,
-          Math.hypot(...first.map((component, index) => value[index] - component)),
-        );
+        delta = Math.max(delta, Math.hypot(...first.map((component, index) => value[index] - component)));
       }
     }
   }
   return delta;
+}
+
+function maximumQuaternionNormError(animation: Animation): number {
+  let error = 0;
+  for (const channel of animation.listChannels()) {
+    if (channel.getTargetPath() !== 'rotation') continue;
+    const output = channel.getSampler()?.getOutput();
+    if (!output) continue;
+    const value = new Array<number>(4);
+    for (let frame = 0; frame < output.getCount(); frame++) {
+      output.getElement(frame, value);
+      error = Math.max(error, Math.abs(Math.hypot(...value) - 1));
+    }
+  }
+  return error;
 }
 
 describe('Demon Tower shipped animation assets', () => {
@@ -82,16 +94,17 @@ describe('Demon Tower shipped animation assets', () => {
       expect(death, `${templateId} death`).toBeDefined();
       if (!idle || !attack || !death) continue;
 
-      expect(clipSignature(attack), `${templateId} attack must not duplicate Idle`).not.toBe(
-        clipSignature(idle),
-      );
-      expect(clipSignature(death), `${templateId} death must not duplicate Idle`).not.toBe(
-        clipSignature(idle),
-      );
+      for (const [clipName, animation] of animations) {
+        expect(
+          maximumQuaternionNormError(animation),
+          `${templateId} ${clipName} rotations must stay unit quaternions`,
+        ).toBeLessThan(1e-3);
+      }
+
+      expect(clipSignature(attack), `${templateId} attack must not duplicate Idle`).not.toBe(clipSignature(idle));
+      expect(clipSignature(death), `${templateId} death must not duplicate Idle`).not.toBe(clipSignature(idle));
       expect(attack.listChannels().length, `${templateId} Attack channels`).toBeGreaterThan(1);
-      expect(clipDuration(attack), `${templateId} Attack source duration`).toBeGreaterThanOrEqual(
-        1,
-      );
+      expect(clipDuration(attack), `${templateId} Attack source duration`).toBeGreaterThanOrEqual(1);
       expect(clipPoseDelta(attack), `${templateId} Attack must visibly move`).toBeGreaterThan(0.05);
       expect(
         clipDuration(attack) / (visual.attackTimeScale ?? 1.3),
@@ -103,10 +116,7 @@ describe('Demon Tower shipped animation assets', () => {
       ).toBeLessThanOrEqual(2.5);
       expect(death.listChannels().length, `${templateId} Death channels`).toBeGreaterThan(1);
       expect(clipDuration(death), `${templateId} Death source duration`).toBeGreaterThanOrEqual(1);
-      expect(
-        clipPoseDelta(death, true),
-        `${templateId} Death must end in a corpse pose`,
-      ).toBeGreaterThan(0.1);
+      expect(clipPoseDelta(death, true), `${templateId} Death must end in a corpse pose`).toBeGreaterThan(0.1);
       expect(visual.oneShotReturnFade, `${templateId} Attack-to-Idle blend`).toBe(0.32);
     }
   });

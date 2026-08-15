@@ -6,7 +6,7 @@
     "bytes": 1532,
     "sha256": "bfcef01e1be303722e0c3d5414837a61f8fa735c638ef097d08fe4ba6c0a3e31"
   },
-  "rendererFingerprint": "767d81e57bb5cc445e94336fe21a664751e1aa290265da504b958fedca7bb573",
+  "rendererFingerprint": "6842f0c5d99a52e70f4f0abfd8c37f22c14423d1ecd835577615476453cd387d",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4226920,
-      "sha256": "f93d8be2730245445c5f632412ae747781974415aff0c66651899fcf893e3850",
+      "bytes": 4227437,
+      "sha256": "f11767e7ea6a0251dc710376e78477f1e941f665405db6dbe31eb7c7393c26d1",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7224,8 +7224,8 @@
         "model": {
           "url": "models/creatures/tower_abyss_knight.glb",
           "path": "public/models/creatures/tower_abyss_knight.glb",
-          "bytes": 416952,
-          "sha256": "8b1caac9aea9ff34db5965c2b168628598a4f39263e2d92a181600cf2a6a40da"
+          "bytes": 422396,
+          "sha256": "e36188c96e6f82b76d791731554e9801be90bf020a51606345ec627a6fe0ff09"
         },
         "idle": "Idle",
         "height": 2.97,
@@ -7242,7 +7242,7 @@
         "resolved": "#3b2a6b",
         "strength": 0.06
       },
-      "sourceFingerprint": "05a37099997cfe9e0073ba4a7c6251fca14f2255e95b154732eaccbfe99f626e",
+      "sourceFingerprint": "eeb68f0e096bf1817fd57449b482ae3320431c10d8808a71410685b875ad9605",
       "output": {
         "path": "public/ui/mobs/tower_abyss_knight.webp",
         "bytes": 1658,
@@ -7258,8 +7258,8 @@
         "model": {
           "url": "models/creatures/tower_blood_matron.glb",
           "path": "public/models/creatures/tower_blood_matron.glb",
-          "bytes": 438556,
-          "sha256": "595f5c69f068295f0c6b7ec13712deda2e9154eda673c43e5a86b3f599fbd847"
+          "bytes": 444032,
+          "sha256": "a872936b1e26c9be0decede900f7e3984a1294920a3e8659569a34cebe39fb64"
         },
         "idle": "Idle",
         "height": 2.65,
@@ -7276,7 +7276,7 @@
         "resolved": "#8e1230",
         "strength": 0.06
       },
-      "sourceFingerprint": "fe61ec12543c20fbfc3c8dfdf536a27ea6d55280d080c668bd20478d06497fe8",
+      "sourceFingerprint": "c28f99b7b0a0f9c971d4edd06f93aca8897acf42360cc02cbe636d94ab3ef902",
       "output": {
         "path": "public/ui/mobs/tower_blood_matron.webp",
         "bytes": 2088,
@@ -7292,8 +7292,8 @@
         "model": {
           "url": "models/creatures/tower_bone_acolyte.glb",
           "path": "public/models/creatures/tower_bone_acolyte.glb",
-          "bytes": 475316,
-          "sha256": "cb035117f2e4f8e2a8d0e5fabbba1b047106ae04b5426d38f7e18e9511583218"
+          "bytes": 480704,
+          "sha256": "6b06a67f89c63f1df0903b04fc4baeefbb9821c4856b5842f9ba9fb29dcab2d5"
         },
         "idle": "Idle",
         "height": 2.13,
@@ -7310,7 +7310,7 @@
         "resolved": "#cfc6a8",
         "strength": 0.06
       },
-      "sourceFingerprint": "1bcf64b1458b9927009260fd3b9b13ccf2aa16c3947f1c3f012e44abef574d5c",
+      "sourceFingerprint": "b2880aab5db6d56df4757e36fb4f452a6657dfe8b97d98c7f01254fb25b96cf0",
       "output": {
         "path": "public/ui/mobs/tower_bone_acolyte.webp",
         "bytes": 2382,
@@ -7326,8 +7326,8 @@
         "model": {
           "url": "models/creatures/tower_boss_ash_tyrant.glb",
           "path": "public/models/creatures/tower_boss_ash_tyrant.glb",
-          "bytes": 467216,
-          "sha256": "63217b45608d7724ef424d6559e8c7aceb7b58620b1d00c5d5af8427a7e89134"
+          "bytes": 472720,
+          "sha256": "ba1580433c5e0419ea6ce7e8fe40c7f513a28acb98ccb5834394ae7f82c37e74"
         },
         "idle": "Idle",
         "height": 3.82,
@@ -7344,7 +7344,7 @@
         "resolved": "#ff5a1e",
         "strength": 0.06
       },
-      "sourceFingerprint": "714f3d58d39e03e845b5b56f473a3daebb3895037dca8e4b90639dd12ef6aae7",
+      "sourceFingerprint": "b4dac31198b6cdc025aac276f0674d8a26b39645a18a23699db2812735c28c3a",
       "output": {
         "path": "public/ui/mobs/tower_boss_ash_tyrant.webp",
         "bytes": 1662,
@@ -7360,8 +7360,8 @@
         "model": {
           "url": "models/creatures/tower_boss_demon_lord.glb",
           "path": "public/models/creatures/tower_boss_demon_lord.glb",
-          "bytes": 484136,
-          "sha256": "47e356b2d1d43a84e082044296431eda94dd0c2b77bb2fed85e8c3c39ca37e9a"
+          "bytes": 489620,
+          "sha256": "acb3719bc50fbec0d88623719ccae7a031450a83bfd63d9890c8070866d16378"
         },
         "idle": "Idle",
         "height": 4.45,
@@ -7378,7 +7378,7 @@
         "resolved": "#ff2d6a",
         "strength": 0.06
       },
-      "sourceFingerprint": "197016820407b06690f39afdfd5673183d5bd96ab5756de88e620d666c1c2bc0",
+      "sourceFingerprint": "e2456d0a965d90179720b19482cae968172d620273750a4114f1beb4c17eb5d2",
       "output": {
         "path": "public/ui/mobs/tower_boss_demon_lord.webp",
         "bytes": 2264,
@@ -7394,8 +7394,8 @@
         "model": {
           "url": "models/creatures/tower_boss_flesh_shaper.glb",
           "path": "public/models/creatures/tower_boss_flesh_shaper.glb",
-          "bytes": 497360,
-          "sha256": "7e6fb7a2349fd99cf6fa12ef51f137a3ac153fde3282480846cfa96d877c19b4"
+          "bytes": 502848,
+          "sha256": "6e9f9eddb0a140ca1cc9f95d91fcf886d079e080f9e295b4708a3beea4763044"
         },
         "idle": "Idle",
         "height": 3.18,
@@ -7412,7 +7412,7 @@
         "resolved": "#9a8f7a",
         "strength": 0.06
       },
-      "sourceFingerprint": "b6f0ad91a85e04d9fcf747be758c842f5814d69a4909909c2c8a37e0dc13849f",
+      "sourceFingerprint": "b883f033e2b7abebaec36032060fc6c9977a340f31f7eed582145b1800fc2274",
       "output": {
         "path": "public/ui/mobs/tower_boss_flesh_shaper.webp",
         "bytes": 1904,
@@ -7428,8 +7428,8 @@
         "model": {
           "url": "models/creatures/tower_boss_gatekeeper.glb",
           "path": "public/models/creatures/tower_boss_gatekeeper.glb",
-          "bytes": 510240,
-          "sha256": "dddc830250f4e60334548389d514a71e0af440cc889f817e4de1258300850aa3"
+          "bytes": 515668,
+          "sha256": "56906a98989311c5a06a8f89ddccb3409f9f9022be0539382821a297bef49e4b"
         },
         "idle": "Idle",
         "height": 3.6,
@@ -7446,7 +7446,7 @@
         "resolved": "#c2431a",
         "strength": 0.06
       },
-      "sourceFingerprint": "2acece98c4ed966bd77f527013f5c91119d954995fa7562d6f7c6f41e7ce88eb",
+      "sourceFingerprint": "23d1469f9a20910c3ad22609c9b77c177f76de1a5c3e60f746ff870a4ca668d1",
       "output": {
         "path": "public/ui/mobs/tower_boss_gatekeeper.webp",
         "bytes": 2256,
@@ -7462,8 +7462,8 @@
         "model": {
           "url": "models/creatures/tower_brimstone_zealot.glb",
           "path": "public/models/creatures/tower_brimstone_zealot.glb",
-          "bytes": 481576,
-          "sha256": "09b2a269ce4ec041e8eb3732b86e70f013c75781f6787b1ed93070796fea85df"
+          "bytes": 487084,
+          "sha256": "60f71085a6ba34eb017b39dabf03902714439912f335935059ed663672e86ce4"
         },
         "idle": "Idle",
         "height": 2.24,
@@ -7480,7 +7480,7 @@
         "resolved": "#e0742a",
         "strength": 0.06
       },
-      "sourceFingerprint": "99986240070a0a15bce73a654f9dab446add88e9c5ce8c771521cd7dfff75cdc",
+      "sourceFingerprint": "346c1597bc60d53387024790f8015a31064bb6fb6a10d212cd3065c1820e822f",
       "output": {
         "path": "public/ui/mobs/tower_brimstone_zealot.webp",
         "bytes": 2152,
@@ -7530,8 +7530,8 @@
         "model": {
           "url": "models/creatures/tower_dread_harbinger.glb",
           "path": "public/models/creatures/tower_dread_harbinger.glb",
-          "bytes": 431668,
-          "sha256": "90f6542caad51e4440427a10a25a10a9ee5406bde7390767e0aa890c2534860f"
+          "bytes": 437160,
+          "sha256": "40cc8431e5779ccdb01e0abeba6d5f0eae8c05c2e215f46491da8bcb5d2e6679"
         },
         "idle": "Idle",
         "height": 3.07,
@@ -7548,7 +7548,7 @@
         "resolved": "#9b1f4d",
         "strength": 0.06
       },
-      "sourceFingerprint": "353da5f92d178da80f004bab0832c35420bf9ca2a5e01f31001daf6439384c39",
+      "sourceFingerprint": "b672c815baec78a1090c71000e41a2a36f7cb88b3dd194a6f45f80bf14709fbb",
       "output": {
         "path": "public/ui/mobs/tower_dread_harbinger.webp",
         "bytes": 2176,
@@ -7564,8 +7564,8 @@
         "model": {
           "url": "models/creatures/tower_flame_herald.glb",
           "path": "public/models/creatures/tower_flame_herald.glb",
-          "bytes": 461828,
-          "sha256": "f7d3913c405b65487278f18c75d718332686f6de626a69b82b12c32669e67a9b"
+          "bytes": 467260,
+          "sha256": "3c7043dfa724eaac34918bef884811592b77d1a84e15d827338801885143f7bf"
         },
         "idle": "Idle",
         "height": 2.58,
@@ -7582,7 +7582,7 @@
         "resolved": "#ff7a1a",
         "strength": 0.06
       },
-      "sourceFingerprint": "e57f00f716c02c086e20ce667a825aa20faa63e42748957bb0f76d5b933887ba",
+      "sourceFingerprint": "c7896d1ed83d7481a8b7b01a968342987ad41029f548f73657a0b9012407f69a",
       "output": {
         "path": "public/ui/mobs/tower_flame_herald.webp",
         "bytes": 2028,
@@ -7598,8 +7598,8 @@
         "model": {
           "url": "models/creatures/tower_gloom_bat.glb",
           "path": "public/models/creatures/tower_gloom_bat.glb",
-          "bytes": 395228,
-          "sha256": "94ba0440e0298224b53533909139ed398aed1f3d29d01b17024a2c83613550c6"
+          "bytes": 400788,
+          "sha256": "befdf0f0a271084c56d84519e9598bad3c4bc37ae91bd42ce957c0a1ca70a395"
         },
         "idle": "Idle",
         "height": 1.44,
@@ -7616,7 +7616,7 @@
         "resolved": "#7b5bd6",
         "strength": 0.06
       },
-      "sourceFingerprint": "406739a883b41b9d2f77055e00d80f058dfc6c3ada3f42521dee796a7ee36e93",
+      "sourceFingerprint": "37f1c422a20bf078cd3755fa5e23cdf8e120764c202d822a4834204d9b246268",
       "output": {
         "path": "public/ui/mobs/tower_gloom_bat.webp",
         "bytes": 1550,
@@ -7666,8 +7666,8 @@
         "model": {
           "url": "models/creatures/tower_imp.glb",
           "path": "public/models/creatures/tower_imp.glb",
-          "bytes": 458424,
-          "sha256": "9bceb59945491d54149623d7b25d8ef27bbf60b913d01244496a5c7c29cd5649"
+          "bytes": 463828,
+          "sha256": "3aa219ce27a9c8642d7130d92e5188cc6c7a38e95ea164c4cb25ca6a5ca5a69c"
         },
         "idle": "Idle",
         "height": 1.68,
@@ -7684,7 +7684,7 @@
         "resolved": "#d94f2a",
         "strength": 0.06
       },
-      "sourceFingerprint": "84bc1f5bfc75347f18e33a22a085d8afb428e8a60b90b947e56d04821ae52002",
+      "sourceFingerprint": "17b56d04bccd16196d9e0b4464d0b370ff3760959a02815d68d66d837c2ffc6b",
       "output": {
         "path": "public/ui/mobs/tower_imp.webp",
         "bytes": 1922,
@@ -7700,8 +7700,8 @@
         "model": {
           "url": "models/creatures/tower_iron_defiler.glb",
           "path": "public/models/creatures/tower_iron_defiler.glb",
-          "bytes": 491604,
-          "sha256": "f3ceca3bf992de03b034e6694cba15c95c1b49051db2c41ef15055522f950bd9"
+          "bytes": 496968,
+          "sha256": "0e066381208bd7a453dd518b7146026d35420f83fb5278b9b20d8b036625a4b1"
         },
         "idle": "Idle",
         "height": 2.76,
@@ -7718,7 +7718,7 @@
         "resolved": "#6b6f78",
         "strength": 0.06
       },
-      "sourceFingerprint": "a29175ae9be2e26a3c62d5b89a92ae34c25655bd387c6c26e8618d593dedd30d",
+      "sourceFingerprint": "24ddcf616cd5a45c00dcdd2d1dd562b8118cc21fa3241ddf406593d255677323",
       "output": {
         "path": "public/ui/mobs/tower_iron_defiler.webp",
         "bytes": 2322,
@@ -7734,8 +7734,8 @@
         "model": {
           "url": "models/creatures/tower_pact_reaver.glb",
           "path": "public/models/creatures/tower_pact_reaver.glb",
-          "bytes": 490584,
-          "sha256": "e41b6bf531486467cb89efbe65c7fab5181a413a12ebf4c262ba464d39a53a64"
+          "bytes": 496012,
+          "sha256": "7d921a764d05ad2a47eed068a28d3c24e93117acc7772637ce37c310466293b3"
         },
         "idle": "Idle",
         "height": 2.35,
@@ -7752,7 +7752,7 @@
         "resolved": "#b03a1e",
         "strength": 0.06
       },
-      "sourceFingerprint": "ff68a4925b235986c9a632aa560944e426e78aa3107b43d061bddb9fe048145f",
+      "sourceFingerprint": "549f625cc6c0c7d63b56707c405916188a1769f7a6666d54e733e8da3fdc5f08",
       "output": {
         "path": "public/ui/mobs/tower_pact_reaver.webp",
         "bytes": 2274,
@@ -7768,8 +7768,8 @@
         "model": {
           "url": "models/creatures/tower_rot_hulk.glb",
           "path": "public/models/creatures/tower_rot_hulk.glb",
-          "bytes": 511476,
-          "sha256": "4cae4e15ed5174fc1b054ef96fb5aa0d6d9301a7094ec188970d25dee95bd8ad"
+          "bytes": 517024,
+          "sha256": "c7fb41b6a40dead9b61e15f50b5d900579d55f9726315690b2b3020d6ec4bbb1"
         },
         "idle": "Idle",
         "height": 2.86,
@@ -7786,7 +7786,7 @@
         "resolved": "#6f8f4a",
         "strength": 0.06
       },
-      "sourceFingerprint": "6627e8ecbeabbbb25168da772369dbfba5be97404b1ce01a98b4634e52931dd7",
+      "sourceFingerprint": "26a10f1797c91efccdf430d251689a2af38d41678a70c35fb2f36a63fc411927",
       "output": {
         "path": "public/ui/mobs/tower_rot_hulk.webp",
         "bytes": 2242,
@@ -7802,8 +7802,8 @@
         "model": {
           "url": "models/creatures/tower_shade_dancer.glb",
           "path": "public/models/creatures/tower_shade_dancer.glb",
-          "bytes": 488200,
-          "sha256": "37ad343aa63451fa3fd4afffab0ff8197122b3b5fac40d24dc281a9280e54f9d"
+          "bytes": 493692,
+          "sha256": "b1efd0772f7a31c3d3ce8b5feaf73419bd5e726ad84f1c60d08291672392ff00"
         },
         "idle": "Idle",
         "height": 2.24,
@@ -7820,7 +7820,7 @@
         "resolved": "#2f2a45",
         "strength": 0.06
       },
-      "sourceFingerprint": "181541f4591316664b2480b39c5f17e2094bb6e9208590d1b7e3118b4c9265c0",
+      "sourceFingerprint": "726b4edf74dcf773fd6cae584168eae7614452348f8e4a3fc18980634e3ad3cb",
       "output": {
         "path": "public/ui/mobs/tower_shade_dancer.webp",
         "bytes": 1536,
@@ -7836,8 +7836,8 @@
         "model": {
           "url": "models/creatures/tower_soulbinder.glb",
           "path": "public/models/creatures/tower_soulbinder.glb",
-          "bytes": 483764,
-          "sha256": "8351a133fcc827c355178616d1bb96db8e5317c105d0509ec9b92567dcb9c29b"
+          "bytes": 489236,
+          "sha256": "25c3a53561dc94df3bc5ca884d8555ec578038a5576a8a8aea8c570f852350e0"
         },
         "idle": "Idle",
         "height": 2.24,
@@ -7854,7 +7854,7 @@
         "resolved": "#7d2ad9",
         "strength": 0.06
       },
-      "sourceFingerprint": "2ce1be93783cc67d238650826dfbc5319599e3c6c7e0daa8695cb502a6163412",
+      "sourceFingerprint": "180095a2339687df54c5c03cc157e19facc67119cb86e8f2a0419f9e79f11232",
       "output": {
         "path": "public/ui/mobs/tower_soulbinder.webp",
         "bytes": 2196,
@@ -7870,8 +7870,8 @@
         "model": {
           "url": "models/creatures/tower_void_sentinel.glb",
           "path": "public/models/creatures/tower_void_sentinel.glb",
-          "bytes": 404528,
-          "sha256": "c2d44a1f4fc13c09bd021983ec4b5361389f1fd5e0ed048bf0afbca0b10dd44f"
+          "bytes": 409904,
+          "sha256": "6846d550aca8db1513462a114c8c194fd84fe9ef69bd80571691ad6b29f5f39a"
         },
         "idle": "Idle",
         "height": 3.18,
@@ -7888,7 +7888,7 @@
         "resolved": "#4a3a7a",
         "strength": 0.06
       },
-      "sourceFingerprint": "187fc4b6f079f1dec94dbf34f0235a0ab2c0c8bf7b0bfee07539a9bbfef987bf",
+      "sourceFingerprint": "16dd35e95da7b66390326648acf304940558920b0d8b63df070a6181b6271e47",
       "output": {
         "path": "public/ui/mobs/tower_void_sentinel.webp",
         "bytes": 1610,

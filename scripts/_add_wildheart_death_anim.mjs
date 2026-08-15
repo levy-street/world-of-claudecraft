@@ -19,14 +19,14 @@
 //
 //   node scripts/_add_wildheart_death_anim.mjs [in.glb] [out.glb]
 //
-// With no args it edits all five creature GLBs in place; with args it processes
-// the one file. Byte-stable from the FIRST pass: 'Death' is dropped and
+// With no args it edits every listed Wildheart and Demon Tower biped GLB in
+// place; with args it processes the one file. Byte-stable from the FIRST pass:
+// 'Death' is dropped and
 // re-authored AFTER the trims (matching the accessor order a guard-skipping
 // re-run reproduces, so f(raw) == f(f(raw)) and re-runs never invalidate the
 // minted media-manifest hashes), and the trims skip clips already at game
-// length. Meshopt encoder/decoder are registered like the cantor script (these
-// particular GLBs ship uncompressed with WebP textures, which the write
-// preserves).
+// length. Meshopt encoder/decoder are registered like the cantor script; the
+// write preserves the shipping meshopt geometry and embedded KTX2 textures.
 //
 // AXIS NOTE: this is the 41-joint Tripo biped (Root/Hip/Pelvis/Waist/...),
 // authored facing local +X, every wildheart VisualDef corrects with
@@ -125,11 +125,7 @@ const SLUMP_BONES = [
 ];
 
 // --- vector / quaternion helpers (Hamilton product; a*b applies b then a) ----
-const cross = (a, b) => [
-  a[1] * b[2] - a[2] * b[1],
-  a[2] * b[0] - a[0] * b[2],
-  a[0] * b[1] - a[1] * b[0],
-];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const qMul = (a, b) => [
   a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
@@ -185,26 +181,16 @@ function clipDuration(anim) {
 }
 
 function addChannel(doc, buffer, anim, node, path, times, values, tag) {
-  const input = doc
-    .createAccessor(`${tag}_t`)
-    .setType('SCALAR')
-    .setArray(new Float32Array(times))
-    .setBuffer(buffer);
+  const input = doc.createAccessor(`${tag}_t`).setType('SCALAR').setArray(new Float32Array(times)).setBuffer(buffer);
   const output = doc
     .createAccessor(`${tag}_v`)
     .setType(path === 'rotation' ? 'VEC4' : 'VEC3')
     .setArray(new Float32Array(values))
     .setBuffer(buffer);
-  const sampler = doc
-    .createAnimationSampler()
-    .setInput(input)
-    .setOutput(output)
-    .setInterpolation('LINEAR');
+  const sampler = doc.createAnimationSampler().setInput(input).setOutput(output).setInterpolation('LINEAR');
   anim
     .addSampler(sampler)
-    .addChannel(
-      doc.createAnimationChannel().setTargetNode(node).setTargetPath(path).setSampler(sampler),
-    );
+    .addChannel(doc.createAnimationChannel().setTargetNode(node).setTargetPath(path).setSampler(sampler));
 }
 
 // Dispose accessors owned by `anims` unless another animation still samples
@@ -248,6 +234,12 @@ function trimAnimation(doc, buffer, anim, t0, t1, tag) {
     const values = Array.from(outputAcc.getArray());
     const stride = values.length / times.length;
     const isRot = s.getOutput().getType() === 'VEC4';
+    // glTF-Transform exposes normalized Int16 quaternion payloads through the
+    // accessor's storage array. Copying those integers into a Float32 accessor
+    // without decoding them produces non-unit quaternions; Three then expands
+    // the skinned mesh into enormous triangles for the affected frames. Work
+    // in unit-quaternion space before interpolating or copying any key.
+    if (isRot) normalizeQuaternionFrames(values);
 
     const sampleAt = (t) => {
       if (t <= times[0]) return values.slice(0, stride);
@@ -300,11 +292,48 @@ function trimAnimation(doc, buffer, anim, t0, t1, tag) {
   return oldAccessors;
 }
 
+function normalizeQuaternionFrames(values) {
+  for (let i = 0; i < values.length; i += 4) {
+    const n = Math.hypot(values[i], values[i + 1], values[i + 2], values[i + 3]);
+    if (n < 1e-8) {
+      console.error('animation contains a zero-length quaternion');
+      process.exit(1);
+    }
+    values[i] /= n;
+    values[i + 1] /= n;
+    values[i + 2] /= n;
+    values[i + 3] /= n;
+  }
+  return values;
+}
+
+// Repair files produced by the older trim above. Those clips already satisfy
+// the duration guard, so normalize their stored Float32 quaternion frames in
+// place before the guard skips the trim. A second run is byte-stable because
+// unit quaternions remain unchanged within the tolerance.
+function repairBrokenQuaternionOutputs(anim) {
+  for (const sampler of anim.listSamplers()) {
+    const output = sampler.getOutput();
+    if (!output || output.getType() !== 'VEC4') continue;
+    const values = Array.from(output.getArray());
+    let broken = false;
+    for (let i = 0; i < values.length; i += 4) {
+      const n = Math.hypot(values[i], values[i + 1], values[i + 2], values[i + 3]);
+      if (Math.abs(n - 1) > 1e-3) {
+        broken = true;
+        break;
+      }
+    }
+    if (broken) output.setArray(new Float32Array(normalizeQuaternionFrames(values)));
+  }
+}
+
 await MeshoptDecoder.ready;
 await MeshoptEncoder.ready;
-const io = new NodeIO()
-  .registerExtensions(ALL_EXTENSIONS)
-  .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
+  'meshopt.decoder': MeshoptDecoder,
+  'meshopt.encoder': MeshoptEncoder,
+});
 
 async function processFile(inPath, outPath) {
   const sizeBefore = statSync(inPath).size;
@@ -343,6 +372,7 @@ async function processFile(inPath, outPath) {
       console.error(`${inPath}: missing clip ${clipName}`);
       process.exit(1);
     }
+    repairBrokenQuaternionOutputs(anim);
     if (clipDuration(anim) < guard) continue; // already trimmed
     const old = trimAnimation(doc, buffer, anim, window[0], window[1], tag);
     const keep = new Set();
@@ -378,8 +408,7 @@ async function processFile(inPath, outPath) {
   const hipHeight = restWorldPosition(hip)[1];
   const sinkWorld = Math.max(0, hipHeight * (1 - HIP_REST_FRACTION));
   const downLocal = qRotate(qInv(hipParentRot), [0, -1, 0]);
-  const preRot = (angle) =>
-    qMul(qMul(qInv(hipParentRot), qAboutAxis(tipAxis, angle)), hipParentRot);
+  const preRot = (angle) => qMul(qMul(qInv(hipParentRot), qAboutAxis(tipAxis, angle)), hipParentRot);
 
   const death = doc.createAnimation('Death');
   addChannel(
