@@ -97,11 +97,14 @@ function addAccentRing(group: THREE.Group, radius: number, color: number, opacit
       transparent: true,
       opacity,
       depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2,
       blending: THREE.NormalBlending,
       side: THREE.DoubleSide,
     }),
   );
-  ring.position.y = 0.1;
+  ring.position.y = 0.009;
   ring.renderOrder = 2;
   ring.userData.towerEssential = 'landmark';
   ring.userData.towerFloorAccent = true;
@@ -122,13 +125,16 @@ function addRadialAccents(
     transparent: true,
     opacity,
     depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
     blending: THREE.NormalBlending,
   });
   const geometry = new THREE.PlaneGeometry(width, length).rotateX(-Math.PI / 2);
   for (let i = 0; i < count; i++) {
     const angle = phase + (i / count) * Math.PI * 2;
     const strip = new THREE.Mesh(geometry, material);
-    strip.position.set(Math.sin(angle) * (length / 2), 0.11, Math.cos(angle) * (length / 2));
+    strip.position.set(Math.sin(angle) * (length / 2), 0.01, Math.cos(angle) * (length / 2));
     strip.rotation.y = angle;
     strip.renderOrder = 2;
     strip.userData.towerFloorAccent = true;
@@ -218,9 +224,12 @@ function buildDemonTowerGeometry(
       bumpScale: profile === 'void_crown' ? 0.1 : 0.14,
       roughness: plan.floorRoughness,
       metalness: profile === 'bloodforge' ? 0.22 : 0.05,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
     }),
   );
-  floor.position.y = 0.055;
+  floor.position.y = 0.006;
   floor.receiveShadow = true;
   floor.renderOrder = 1;
   floor.userData.towerEssential = 'floor';

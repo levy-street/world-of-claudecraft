@@ -22,12 +22,12 @@ export interface DemonTowerScenePlan {
 const PLANS: Readonly<Record<DemonTowerSceneProfile, DemonTowerScenePlan>> = {
   bloodforge: {
     profile: 'bloodforge',
-    floorColor: 0x191715,
+    floorColor: 0x171818,
     floorRoughness: 0.96,
     floorTextureScale: 6.5 * DEMON_TOWER_ARENA_LINEAR_SCALE,
-    floorAccentOpacity: 0.18,
-    accentColor: 0xa64724,
-    secondaryAccent: 0x80643e,
+    floorAccentOpacity: 0.1,
+    accentColor: 0x6b4030,
+    secondaryAccent: 0x61584a,
     backdropColor: 0x240805,
     backdropKind: 'forge_vault',
     ringRadii: [8.2, 17, 27.5].map((radius) => radius * DEMON_TOWER_ARENA_LINEAR_SCALE),

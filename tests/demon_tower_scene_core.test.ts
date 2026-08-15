@@ -55,7 +55,11 @@ describe('demon tower scene core', () => {
         if (object.userData.towerFloorAccent === true) accents.push(object);
       });
       expect(grounds, `${profile} floor`).toHaveLength(1);
+      expect(grounds[0]?.position.y, `${profile} floor seated on the collision plane`).toBeLessThan(
+        0.01,
+      );
       const material = grounds[0]?.material;
+      expect(material?.polygonOffset, `${profile} floor depth bias`).toBe(true);
       const uvs = grounds[0]?.geometry.getAttribute('uv');
       const uValues = uvs ? Array.from({ length: uvs.count }, (_, i) => uvs.getX(i)) : [];
       const vValues = uvs ? Array.from({ length: uvs.count }, (_, i) => uvs.getY(i)) : [];
@@ -82,7 +86,7 @@ describe('demon tower scene core', () => {
         0.32,
       );
       expect(accents.length, `${profile} authored floor accents`).toBeGreaterThan(0);
-      const expectedOpacity = [0.18, 0.2, 0.22][index];
+      const expectedOpacity = [0.1, 0.2, 0.22][index];
       expect(demonTowerScenePlan(profile).floorAccentOpacity, `${profile} planned opacity`).toBe(
         expectedOpacity,
       );
@@ -90,7 +94,9 @@ describe('demon tower scene core', () => {
         const accentMaterial = accent.material as THREE.MeshBasicMaterial;
         expect(accentMaterial.blending, `${profile} accent blending`).toBe(THREE.NormalBlending);
         expect(accentMaterial.opacity, `${profile} accent opacity`).toBe(expectedOpacity);
-        expect(accentMaterial.opacity, `${profile} accent visibility`).toBeGreaterThanOrEqual(0.16);
+        expect(accent.position.y, `${profile} accent seated on the floor`).toBeLessThanOrEqual(
+          0.01,
+        );
       }
     }
   });
@@ -119,9 +125,16 @@ describe('demon tower scene core', () => {
         const rim = meshes.find((mesh) => mesh.userData.riftHazard === 'rim');
         const poolMaterial = pool?.material as THREE.MeshBasicMaterial;
         const rimMaterial = rim?.material as THREE.MeshBasicMaterial;
-        expect(poolMaterial.color.getHex()).toBe(0x3b1710);
-        expect(poolMaterial.opacity).toBe(0.82);
-        expect(rimMaterial.color.getHex()).toBe(0xe3a44a);
+        expect(poolMaterial.color.getHex()).toBe(0x1b1917);
+        expect(poolMaterial.opacity).toBe(0.7);
+        expect(poolMaterial.polygonOffset).toBe(true);
+        expect(rimMaterial.color.getHex()).toBe(0x8f6a46);
+        expect(rimMaterial.opacity).toBe(0.28);
+        expect(rimMaterial.blending).toBe(THREE.NormalBlending);
+        pool?.geometry.computeBoundingBox();
+        rim?.geometry.computeBoundingBox();
+        expect(pool?.geometry.boundingBox?.max.y).toBeLessThanOrEqual(0.0121);
+        expect(rim?.geometry.boundingBox?.max.y).toBeLessThanOrEqual(0.0141);
         expect(rimMaterial.color.getHSL({ h: 0, s: 0, l: 0 }).l).toBeGreaterThan(
           poolMaterial.color.getHSL({ h: 0, s: 0, l: 0 }).l * 2,
         );
@@ -150,7 +163,8 @@ describe('demon tower scene core', () => {
       return material.map instanceof THREE.Texture;
     }) as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial> | undefined;
     expect(glow, 'high-tier lava glow').toBeDefined();
-    expect(glow?.material.color.getHex()).toBe(0xb74b22);
+    expect(glow?.material.color.getHex()).toBe(0x5f3425);
+    expect(glow?.position.y).toBeLessThanOrEqual(0.016);
   });
 
   it('gives each floor a unique backdrop, palette and ring grammar', () => {

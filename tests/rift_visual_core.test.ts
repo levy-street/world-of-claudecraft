@@ -17,16 +17,24 @@ describe('rift visual core', () => {
 
   it('pins the restrained Bloodforge hazard palette without weakening the warning rim', () => {
     expect(riftHazardPalette('tower_lava')).toEqual({
-      pool: 0x3b1710,
-      poolOpacity: 0.82,
-      rim: 0xe3a44a,
-      glow: 0xb74b22,
+      pool: 0x1b1917,
+      poolOpacity: 0.7,
+      rim: 0x8f6a46,
+      rimOpacity: 0.28,
+      glow: 0x5f3425,
+      poolY: 0.012,
+      rimY: 0.014,
+      glowY: 0.016,
     });
     expect(riftHazardPalette('lava')).toEqual({
       pool: 0xd83410,
       poolOpacity: 0.9,
       rim: 0xffca4a,
+      rimOpacity: 0.5,
       glow: 0xff5a1e,
+      poolY: 0.12,
+      rimY: 0.14,
+      glowY: 0.55,
     });
   });
 

@@ -17,14 +17,54 @@ export interface RiftHazardPalette {
   pool: number;
   poolOpacity: number;
   rim: number;
+  rimOpacity: number;
   glow: number;
+  poolY: number;
+  rimY: number;
+  glowY: number;
 }
 
 const RIFT_HAZARD_PALETTES: Readonly<Record<RiftHazardStyle, RiftHazardPalette>> = {
-  lava: { pool: 0xd83410, poolOpacity: 0.9, rim: 0xffca4a, glow: 0xff5a1e },
-  tower_lava: { pool: 0x3b1710, poolOpacity: 0.82, rim: 0xe3a44a, glow: 0xb74b22 },
-  soul: { pool: 0x221247, poolOpacity: 0.9, rim: 0x73e7ff, glow: 0x9b63ff },
-  void: { pool: 0x160c32, poolOpacity: 0.92, rim: 0xf05cff, glow: 0x806dff },
+  lava: {
+    pool: 0xd83410,
+    poolOpacity: 0.9,
+    rim: 0xffca4a,
+    rimOpacity: 0.5,
+    glow: 0xff5a1e,
+    poolY: 0.12,
+    rimY: 0.14,
+    glowY: 0.55,
+  },
+  tower_lava: {
+    pool: 0x1b1917,
+    poolOpacity: 0.7,
+    rim: 0x8f6a46,
+    rimOpacity: 0.28,
+    glow: 0x5f3425,
+    poolY: 0.012,
+    rimY: 0.014,
+    glowY: 0.016,
+  },
+  soul: {
+    pool: 0x221247,
+    poolOpacity: 0.9,
+    rim: 0x73e7ff,
+    rimOpacity: 0.5,
+    glow: 0x9b63ff,
+    poolY: 0.12,
+    rimY: 0.14,
+    glowY: 0.3,
+  },
+  void: {
+    pool: 0x160c32,
+    poolOpacity: 0.92,
+    rim: 0xf05cff,
+    rimOpacity: 0.5,
+    glow: 0x806dff,
+    poolY: 0.12,
+    rimY: 0.14,
+    glowY: 0.3,
+  },
 };
 
 export const DUNGEON_SUN_INTENSITY = 0.34;

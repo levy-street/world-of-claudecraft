@@ -1065,7 +1065,16 @@ export class DungeonInteriors {
     // (rx/rz), so the disc is a unit circle scaled to match the sim footprint.
     const pal =
       style === 'blackwater'
-        ? { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f }
+        ? {
+            pool: 0x0a1a12,
+            poolOpacity: 0.82,
+            rim: 0x3fae5a,
+            rimOpacity: 0.5,
+            glow: 0x2f8f4f,
+            poolY: 0.12,
+            rimY: 0.14,
+            glowY: 0.3,
+          }
         : riftHazardPalette(style);
     for (const h of hazards) {
       const rx = h.rx ?? h.r;
@@ -1075,12 +1084,15 @@ export class DungeonInteriors {
         new THREE.CircleGeometry(1, 28)
           .rotateX(-Math.PI / 2)
           .scale(rx, 1, rz)
-          .translate(h.x, 0.12 + y0, h.z),
+          .translate(h.x, pal.poolY + y0, h.z),
         new THREE.MeshBasicMaterial({
           color: pal.pool,
           transparent: true,
           opacity: pal.poolOpacity,
           depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -3,
+          polygonOffsetUnits: -3,
         }),
       );
       pool.renderOrder = 1; // floats over the floor tiles
@@ -1091,27 +1103,23 @@ export class DungeonInteriors {
         new THREE.RingGeometry(0.82, 1, 32)
           .rotateX(-Math.PI / 2)
           .scale(rx, 1, rz)
-          .translate(h.x, 0.14 + y0, h.z),
+          .translate(h.x, pal.rimY + y0, h.z),
         new THREE.MeshBasicMaterial({
           color: pal.rim,
           transparent: true,
-          opacity: 0.5,
+          opacity: pal.rimOpacity,
           side: THREE.DoubleSide,
           depthWrite: false,
-          blending: THREE.AdditiveBlending,
+          polygonOffset: true,
+          polygonOffsetFactor: -4,
+          polygonOffsetUnits: -4,
+          blending: style === 'tower_lava' ? THREE.NormalBlending : THREE.AdditiveBlending,
         }),
       );
       rim.renderOrder = 2;
       rim.userData.riftHazard = 'rim';
       group.add(rim);
-      this.addTorchGlow(
-        group,
-        h.x,
-        h.z,
-        pal.glow,
-        (style === 'lava' || style === 'tower_lava' ? 0.55 : 0.3) + y0,
-        Math.max(rx, rz) * 0.6,
-      );
+      this.addTorchGlow(group, h.x, h.z, pal.glow, pal.glowY + y0, Math.max(rx, rz) * 0.6);
     }
   }
 
