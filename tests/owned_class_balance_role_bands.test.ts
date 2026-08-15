@@ -59,20 +59,29 @@ describe('owned-class level 20 balance harness (sustained role bands)', () => {
       // on the combined tree pre-round). Re-author both sides of this pair
       // when the owned-class stack integrates.
       //
-      // THE ONE CROSS-ARCHETYPE ROW THE v0.38 SET-BONUS RETUNE ACTUALLY MOVED,
-      // and worth reading as a balance statement rather than a re-pin. Warspirit
-      // is mail melee and Vespers is cloth caster, so pricing the set bonuses
-      // against item_budget.ts cut Vespers by about 11 percent and left
-      // Warspirit flat: this ratio rose 1.1539 -> 1.2320 full and 1.1775 ->
-      // 1.2478 diet. The cause is that the caster 2-piece was the most
-      // over-budget bonus in the game (a flat +20 Spell Power, 2.2 epic chest
-      // pieces), so casters were carrying the largest hidden subsidy; post-retune
-      // every archetype sits at the same 18-point budget. Accepted as the
-      // correction rather than compensated for, and the ceiling is re-derived at
-      // its original relative margin. The FLOOR below is deliberately left where
-      // it was: the measurement moved away from it, so it still guards a
-      // Warspirit collapse with more headroom than before, and raising it would
-      // invent a failure mode this change did not test for.
+      // THE ONE CROSS-BUILD ROW THE v0.38 SET-BONUS RETUNE ACTUALLY MOVED:
+      // 1.1539 -> 1.2320 full and 1.1775 -> 1.2478 diet, because Vespers fell
+      // about 11 percent while Warspirit stayed flat.
+      //
+      // The cause is NOT melee-versus-caster, which is the reading this comment
+      // carried on its first draft and which the rogue harness disproves (leather
+      // melee fell about 10 percent too, right alongside the casters). What the
+      // drop actually tracks is how much of a set's payload was LIVE for the
+      // build wearing it. Vespers wears 4 Soulflame and loses a real subsidy: the
+      // caster 2-piece was the most over-budget bonus in the game at a flat +20
+      // Spell Power, 2.2 epic chest pieces. WARSPIRIT_PBE_LOADOUT wears 4
+      // STORMCALLERS pieces, and Stormcallers is the CASTER set, so an
+      // enhancement shaman was carrying an Intellect/Spirit/Spell Power payload
+      // it barely converts. Shrinking a bonus this build was not really using
+      // costs it nothing, which is why it reads flat.
+      //
+      // That a melee BiS loadout wants 4 pieces of a caster tier set is an
+      // itemization oddity in its own right, and it is the reason this row is a
+      // poor instrument for judging the retune. Read the rogue and Vespers
+      // harnesses for that. The ceiling is re-derived at its original relative
+      // margin; the FLOOR below is deliberately left where it was, since the
+      // measurement moved away from it and raising it would invent a failure mode
+      // this change did not test for.
       expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(band(1.28, 1.29));
       // Full sweep: the grown owned-class matrix ran ~180s under shard load and
       // roughly doubled in the shared lane (run 31288946173 killed it at 240s).

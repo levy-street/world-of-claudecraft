@@ -41,7 +41,9 @@ describe('owned-class level 20 balance harness (healer contract)', () => {
       // v0.38 set-bonus budget retune re-measure. Doctrine is the cloth healer,
       // so it carried the caster 2-piece (a flat +20 Spell Power, the single
       // most over-budget bonus in item_sets.ts at 2.2 epic chest pieces) and
-      // felt its removal hardest: doctrineSingle hps+dps 155.31 -> 137.22 full
+      // felt its removal hardest (the rogue harness fell about the same, so this is
+      // about which builds wore a LIVE set payload, not about caster versus
+      // melee): doctrineSingle hps+dps 155.31 -> 137.22 full
       // and 154.48 -> 139.34 diet; doctrineGroup combined 168.06 -> 109.90 full
       // and 182.28 -> 115.43 diet. Both floors are re-derived at their original
       // relative margins. Every other bound in this contract kept large
