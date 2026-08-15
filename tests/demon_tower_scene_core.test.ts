@@ -14,7 +14,7 @@ describe('demon tower scene core', () => {
     expect(demonTowerSceneProfiles()).toEqual(['bloodforge', 'ossuary', 'void_crown']);
   });
 
-  it('builds the real floor, backdrop and landmarks on low tier while retaining hazards', () => {
+  it('builds the real floor and backdrop on low tier while retaining hazards', () => {
     for (const [index, profile] of demonTowerSceneProfiles().entries()) {
       const floor = buildDemonTowerFloor(DEMON_TOWER_SEED, 20, 20, index);
       const group = new THREE.Group();
@@ -25,7 +25,7 @@ describe('demon tower scene core', () => {
         const essential = object.userData.towerEssential;
         if (typeof essential === 'string') essentials.add(essential);
       });
-      expect([...essentials].sort()).toEqual(['backdrop', 'floor', 'landmark']);
+      expect([...essentials].sort()).toEqual(['backdrop', 'floor']);
       expect(floor.hazards.length).toBeGreaterThan(0);
       expect(lights).toBe(0);
     }
@@ -86,6 +86,11 @@ describe('demon tower scene core', () => {
         0.32,
       );
       expect(accents.length, `${profile} authored floor accents`).toBeGreaterThan(0);
+      expect(accents, `${profile} keeps only linear floor accents`).toHaveLength([8, 4, 5][index]);
+      expect(
+        accents.every((accent) => accent.geometry instanceof THREE.PlaneGeometry),
+        `${profile} has no concentric floor rings`,
+      ).toBe(true);
       const expectedOpacity = [0.1, 0.2, 0.22][index];
       expect(demonTowerScenePlan(profile).floorAccentOpacity, `${profile} planned opacity`).toBe(
         expectedOpacity,
@@ -179,7 +184,7 @@ describe('demon tower scene core', () => {
     );
   });
 
-  it('gives each floor a unique backdrop, palette and ring grammar', () => {
+  it('gives each floor a unique backdrop and palette', () => {
     const plans = demonTowerSceneProfiles().map(demonTowerScenePlan);
     expect(plans.map((plan) => plan.backdropKind)).toEqual([
       'forge_vault',
@@ -190,20 +195,12 @@ describe('demon tower scene core', () => {
     expect(new Set(plans.map((plan) => plan.accentColor)).size).toBe(3);
     expect(new Set(plans.map((plan) => plan.secondaryAccent)).size).toBe(3);
     expect(new Set(plans.map((plan) => plan.backdropColor)).size).toBe(3);
-    expect(new Set(plans.map((plan) => plan.ringRadii.join(','))).size).toBe(3);
   });
 
-  it('keeps rings ordered, lights finite and plans deterministic', () => {
+  it('keeps lights finite and plans deterministic', () => {
     expect(
       demonTowerSceneProfiles().map((profile) => demonTowerScenePlan(profile).floorTextureScale),
     ).toEqual([13, 11, 14]);
-    expect(
-      demonTowerSceneProfiles().map((profile) => demonTowerScenePlan(profile).ringRadii),
-    ).toEqual([
-      [16.4, 34, 55],
-      [17, 35, 50],
-      [15, 29, 47],
-    ]);
     expect(
       demonTowerSceneProfiles().map((profile) => demonTowerScenePlan(profile).lightAnchors),
     ).toEqual([
@@ -226,9 +223,6 @@ describe('demon tower scene core', () => {
     for (const profile of demonTowerSceneProfiles()) {
       const plan = demonTowerScenePlan(profile);
       expect(plan.profile).toBe(profile);
-      expect(plan.ringRadii).toHaveLength(3);
-      expect(plan.ringRadii[0]).toBeLessThan(plan.ringRadii[1]);
-      expect(plan.ringRadii[1]).toBeLessThan(plan.ringRadii[2]);
       expect(plan.lightAnchors).toHaveLength(3);
       for (const light of plan.lightAnchors) {
         expect([light.x, light.z, light.y, light.scale].every(Number.isFinite)).toBe(true);

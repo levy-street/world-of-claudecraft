@@ -14,7 +14,6 @@ export interface DemonTowerScenePlan {
   secondaryAccent: number;
   backdropColor: number;
   backdropKind: 'forge_vault' | 'ossuary_vault' | 'void_storm';
-  ringRadii: readonly number[];
   lightAnchors: readonly { x: number; z: number; y: number; scale: number }[];
   lowTierEssentials: readonly ('floor' | 'backdrop' | 'hazards' | 'landmarks')[];
 }
@@ -30,7 +29,6 @@ const PLANS: Readonly<Record<DemonTowerSceneProfile, DemonTowerScenePlan>> = {
     secondaryAccent: 0x61584a,
     backdropColor: 0x240805,
     backdropKind: 'forge_vault',
-    ringRadii: [8.2, 17, 27.5].map((radius) => radius * DEMON_TOWER_ARENA_LINEAR_SCALE),
     lightAnchors: [
       { x: -42, z: 18, y: 3.4, scale: 1.4 },
       { x: 42, z: 18, y: 3.4, scale: 1.4 },
@@ -48,7 +46,6 @@ const PLANS: Readonly<Record<DemonTowerSceneProfile, DemonTowerScenePlan>> = {
     secondaryAccent: 0x67dcff,
     backdropColor: 0x0c0b1d,
     backdropKind: 'ossuary_vault',
-    ringRadii: [8.5, 17.5, 25].map((radius) => radius * DEMON_TOWER_ARENA_LINEAR_SCALE),
     lightAnchors: [
       { x: -34, z: 0, y: 4.8, scale: 1.1 },
       { x: 34, z: 0, y: 4.8, scale: 1.1 },
@@ -66,7 +63,6 @@ const PLANS: Readonly<Record<DemonTowerSceneProfile, DemonTowerScenePlan>> = {
     secondaryAccent: 0x6f7dff,
     backdropColor: 0x09091f,
     backdropKind: 'void_storm',
-    ringRadii: [7.5, 14.5, 23.5].map((radius) => radius * DEMON_TOWER_ARENA_LINEAR_SCALE),
     lightAnchors: [
       { x: -28, z: 20, y: 3, scale: 1.2 },
       { x: 28, z: 20, y: 3, scale: 1.2 },

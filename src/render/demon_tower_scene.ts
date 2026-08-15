@@ -89,28 +89,6 @@ function polygonGeometry(points: ReadonlyArray<{ x: number; z: number }>): THREE
   return geometry;
 }
 
-function addAccentRing(group: THREE.Group, radius: number, color: number, opacity: number): void {
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(radius - 0.16, radius + 0.16, 64).rotateX(-Math.PI / 2),
-    new THREE.MeshBasicMaterial({
-      color,
-      transparent: true,
-      opacity,
-      depthWrite: false,
-      polygonOffset: true,
-      polygonOffsetFactor: -2,
-      polygonOffsetUnits: -2,
-      blending: THREE.NormalBlending,
-      side: THREE.DoubleSide,
-    }),
-  );
-  ring.position.y = 0.009;
-  ring.renderOrder = 2;
-  ring.userData.towerEssential = 'landmark';
-  ring.userData.towerFloorAccent = true;
-  group.add(ring);
-}
-
 function addRadialAccents(
   group: THREE.Group,
   count: number,
@@ -235,8 +213,6 @@ function buildDemonTowerGeometry(
   floor.userData.towerEssential = 'floor';
   group.add(floor);
 
-  for (const radius of plan.ringRadii)
-    addAccentRing(group, radius, plan.accentColor, plan.floorAccentOpacity);
   if (profile === 'bloodforge')
     addRadialAccents(
       group,
