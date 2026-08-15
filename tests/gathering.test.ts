@@ -281,15 +281,16 @@ describe('isHarvestableCorpse', () => {
     // instead, so every tagged template is harvestable. The release harvest-gap
     // fix then tags dune_troll, bogtoad and hedge_knight: 45.
     expect(included).toHaveLength(45);
-    // ...and the untagged templates are counted rather than assumed: 185 of
+    // ...and the untagged templates are counted rather than assumed: 205 of
     // them ship, all excluded before this change and all excluded after it,
     // since fen_troll was already tagged (claw, tusk) and only moves from
     // `excluded` into this list, never through `untagged`. (184 before the
     // v0.32.0 base merge, plus the untagged dragonkin egg from the brood and
     // the four untagged camp mobs the quest-dedupe pass added, minus
-    // shoal_scuttler once it gained a mapped tag.)
+    // shoal_scuttler once it gained a mapped tag, plus the 20 Demon Tower
+    // enemies, whose otherworldly corpses intentionally yield no professions.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(185);
+    expect(untagged).toHaveLength(205);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

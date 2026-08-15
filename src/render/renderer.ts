@@ -221,7 +221,6 @@ import {
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
-import { DEMON_TOWER_CORE_RENDER_HEIGHT } from './demon_tower';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
@@ -517,6 +516,16 @@ import {
 import { createRevealGate } from './reveal_gate';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
+import {
+  DUNGEON_ENV_INTENSITY,
+  DUNGEON_HEMI_INTENSITY,
+  DUNGEON_RIM_BOOST,
+  DUNGEON_SUN_INTENSITY,
+  type RiftLightingGrade,
+  resolveRiftLightingGrade,
+  riftHazardStyleForProfile,
+  riftPuzzlePropRenderHeight,
+} from './rift_visual_core';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
   captureSceneCensus,
@@ -879,21 +888,9 @@ const hemiOutdoorIntensity = (): number =>
 
 const SUN_INTENSITY = 3.5;
 const ENV_INTENSITY = 0.37;
-// dungeon interiors: kill the daylight so torchlight carries the scene
-// (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
-const DUNGEON_SUN_INTENSITY = 0.34;
-const DUNGEON_ENV_INTENSITY = 0.05;
-// The authored Infernal Citadel is larger than a procedural floor and carries
-// real budgeted brazier lights. A stronger ambient floor preserves the black-red
-// infernal grade while keeping its loops, bosses, and doors readable between pools.
-const INFERNAL_SUN_INTENSITY = 0.54;
-const INFERNAL_HEMI_INTENSITY = 0.32;
-const INFERNAL_ENV_INTENSITY = 0.1;
-const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away,
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
-const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // day/night: at night the key sun and sky bounce cool toward moonlight. These
 // are the fully-night blend weights (scaled each frame by the grade's nightAmt).
 const MOON_SUN_COLOR = 0x9fb2e0; // pale cool moonlight the warm sun eases toward
@@ -918,8 +915,6 @@ const DAY_HEMI_SKY_WARMTH = 0.3;
 const DAY_HEMI_GROUND_WARMTH = 0.22;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
-// character rim glow scales up underground so silhouettes split from the murk
-const DUNGEON_RIM_BOOST = 2.4;
 // The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
 // plus a healthy hemisphere keep the whole competitive space readable, with
 // the braziers/torches adding warmth rather than carrying the scene alone.
@@ -8531,19 +8526,7 @@ export class Renderer {
       const built = buildRiftPuzzleProp(e.templateId, this.lowGfx);
       body = built.body;
       portal = built.portal;
-      height =
-        e.templateId === 'rift_tower_core'
-          ? DEMON_TOWER_CORE_RENDER_HEIGHT
-          : e.templateId === 'rift_pylon' || e.templateId === 'rift_pylon_lit'
-            ? 4.0
-            : e.templateId === 'rift_gate' || e.templateId === 'rift_gate_open'
-              ? 5.6
-              : e.templateId === 'rift_roller'
-                ? 3.0
-                : e.templateId === 'rift_infernal_orb' ||
-                    e.templateId === 'rift_infernal_orb_active'
-                  ? 2.2
-                  : 2.4;
+      height = riftPuzzlePropRenderHeight(e.templateId);
       objectMesh = body;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
@@ -9268,10 +9251,7 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
-  /** The active rift floor's own lighting grade, or null to inherit the
-   * authored/procedural default. Cached like riftFogAuthored, because the
-   * style is only read when the floor key changes. */
-  private riftFogLighting: { sun: number; hemi: number; env: number; rim: number } | null = null;
+  private riftFogLighting: RiftLightingGrade | null = null;
   private fogState:
     | 'outdoor'
     | 'dungeon'
@@ -9772,12 +9752,7 @@ export class Renderer {
                 layout: floor.layout,
                 style: floor.style,
                 hazards: floor.hazards,
-                hazardStyle:
-                  floor.style.sceneProfile === 'ossuary'
-                    ? 'soul'
-                    : floor.style.sceneProfile === 'void_crown'
-                      ? 'void'
-                      : 'lava',
+                hazardStyle: riftHazardStyleForProfile(floor.style.sceneProfile),
                 iceZone: floor.iceZone,
                 platform: floor.platform,
               })
@@ -9877,31 +9852,11 @@ export class Renderer {
       this.fogState = 'rift';
       if (!this.lowGfx) {
         const authored = this.riftFogAuthored;
-        // A floor may carry its OWN grade (InteriorStyle.lighting). Without one an
-        // authored floor falls back to the Infernal Citadel's, which is very dim
-        // fill plus a strong rim: dramatic on the citadel's blood-red models,
-        // washed-out on any other palette.
-        const grade = this.riftFogLighting;
-        this.sun.intensity = grade
-          ? grade.sun
-          : authored
-            ? INFERNAL_SUN_INTENSITY
-            : DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = grade
-          ? grade.hemi
-          : authored
-            ? INFERNAL_HEMI_INTENSITY
-            : DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = grade
-          ? grade.env
-          : authored
-            ? INFERNAL_ENV_INTENSITY
-            : DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = grade
-          ? grade.rim
-          : authored
-            ? INFERNAL_RIM_BOOST
-            : DUNGEON_RIM_BOOST;
+        const grade = resolveRiftLightingGrade(authored, this.riftFogLighting);
+        this.sun.intensity = grade.sun;
+        this.hemi.intensity = grade.hemi;
+        this.scene.environmentIntensity = grade.env;
+        sharedUniforms.uRimBoost.value = grade.rim;
       }
       return;
     }

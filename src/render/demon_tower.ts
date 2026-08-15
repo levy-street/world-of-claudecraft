@@ -15,9 +15,6 @@
 import * as THREE from 'three';
 import { DEMON_TOWER_CORE_RADIUS } from '../sim/rift/tower_scaling';
 
-/** World-unit height the model is fitted to (the height it was generated at). */
-const CORE_HEIGHT = 6.0;
-
 /**
  * Build the Demon Core body for a `rift_tower_core` ground object.
  *
@@ -49,7 +46,3 @@ export function buildDemonTowerCore(lowGfx: boolean): {
 
   return { body, portal: shell };
 }
-
-/** Render height the entity is drawn at, so the nameplate and pick radius sit
- * on the real model rather than a default. */
-export const DEMON_TOWER_CORE_RENDER_HEIGHT = CORE_HEIGHT;

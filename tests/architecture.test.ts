@@ -533,6 +533,7 @@ const RENDER_PURE_CORES = [
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
   'src/render/rift_death_zone_core.ts',
+  'src/render/rift_visual_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
   'src/render/shadow_pass_gate_core.ts',
