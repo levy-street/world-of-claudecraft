@@ -152,6 +152,10 @@ export interface Config {
   // 0-keeps-forever retention contract above.
   readonly levelUpEventsRetentionDays: number;
   readonly ftueEventsRetentionDays: number;
+  // How many days of market_listing_snapshots rows (the World Market tracker's
+  // periodic listing-book captures) to keep. market_sales is NOT bounded by a
+  // knob: it is the permanent economy history (keep-forever comment at its DDL).
+  readonly marketSnapshotRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -212,6 +216,7 @@ const DEFAULT_EMAIL_LOG_RETENTION_DAYS = 90;
 const DEFAULT_PLAYER_REPORT_RETENTION_DAYS = 180;
 const DEFAULT_BUG_REPORT_RETENTION_DAYS = 90;
 const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
+const DEFAULT_MARKET_SNAPSHOT_RETENTION_DAYS = 90;
 // level_up_events feeds multi-month friction maps, so it defaults to a year.
 // ftue_events answers a FIRST-SESSION question and has the higher intake
 // (roughly 100-250 rows per new character), so it defaults to a quarter: at
@@ -441,6 +446,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,
       DEFAULT_CHAT_VIOLATION_RETENTION_DAYS,
+    ),
+    marketSnapshotRetentionDays: numberOr(
+      env.MARKET_SNAPSHOT_RETENTION_DAYS,
+      DEFAULT_MARKET_SNAPSHOT_RETENTION_DAYS,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

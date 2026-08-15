@@ -342,6 +342,35 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the market tracker schema (sale history + listing snapshots)', async () => {
+    // Same "defined but never wired" guard as DISCORD_SCHEMA above: the market
+    // analytics writers (server/market_tracker.ts) are fire-and-forget, so a
+    // missing table would only ever surface as silent row loss in the logs.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_sales');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_listing_snapshots');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_item');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_realm_sold_at');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_buyer');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_sales_seller');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_item');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_captured');
+    // marketLatestSnapshots asks one realm for its newest capture, which
+    // neither of the two indexes above can answer (one buries captured_at
+    // behind item_id, the other has no realm), so the read degrades to a
+    // backward scan that heap-filters every newer peer realm's rows.
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_listing_snapshots_realm_captured');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS market_alerts');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS market_alerts_realm_active');
+    // Idempotent heals for pre-merge builds of this schema: the account-id
+    // column nothing read is dropped, and the alert edge-state column lands.
+    expect(applied).toContain('ALTER TABLE market_sales DROP COLUMN IF EXISTS buyer_account_id');
+    expect(applied).toContain(
+      'ALTER TABLE market_alerts ADD COLUMN IF NOT EXISTS last_met BOOLEAN NOT NULL DEFAULT FALSE',
+    );
+  });
+
   it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
     // PROGRESS_EVENTS_SCHEMA (server/progress_events_db.ts),
     // ACCOUNT_ATTRIBUTION_SCHEMA (server/attribution_db.ts), and

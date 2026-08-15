@@ -280,6 +280,7 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { observeMarketBuy } from './market_tracker';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -8022,7 +8023,7 @@ export class GameServer {
         }
         break;
       case 'market_buy':
-        if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
+        if (typeof msg.id === 'number') observeMarketBuy(sim, session, msg.id, pid);
         break;
       case 'market_cancel':
         if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);

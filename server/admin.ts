@@ -1,4 +1,5 @@
 import type * as http from 'node:http';
+import { MARKET_CUT } from '../src/sim/market';
 import { verifyLoginTwoFactor } from './account';
 import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
@@ -127,6 +128,21 @@ import type { Ctx, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import { PgMapsDb } from './maps_db';
+import { buildMarketOverview, buildMovers, marketItemCatalog, rankFlips } from './market_analytics';
+import {
+  deleteMarketAlert,
+  insertMarketAlert,
+  listMarketAlerts,
+  MARKET_ALERT_DIRECTIONS,
+  MARKET_HISTORY_BUCKETS,
+  type MarketAlertDirection,
+  type MarketHistoryBucket,
+  marketItemAskHistory,
+  marketItemPriceHistory,
+  marketLatestSnapshots,
+  marketRecentSales,
+  marketSaleStatsByItem,
+} from './market_tracker_db';
 import {
   addAccountNote,
   forceCharacterRename,
@@ -1917,6 +1933,25 @@ function makeRealAdminDb() {
       listUnstuckReportsDb(pool, options),
     listUnstuckHotspots: (options: Parameters<typeof listUnstuckHotspotsDb>[1]) =>
       listUnstuckHotspotsDb(pool, options),
+    // Market tracker analytics reads (server/market_tracker_db.ts), realm-scoped
+    // to this process like every other admin read.
+    marketSaleStats: (windowHours: number, offsetHours = 0) =>
+      marketSaleStatsByItem(pool, REALM, windowHours, offsetHours),
+    marketPriceHistory: (itemId: string, bucket: MarketHistoryBucket, sinceDays: number) =>
+      marketItemPriceHistory(pool, REALM, itemId, bucket, sinceDays),
+    marketAskHistory: (itemId: string, bucket: MarketHistoryBucket, sinceDays: number) =>
+      marketItemAskHistory(pool, REALM, itemId, bucket, sinceDays),
+    marketLatestSnapshots: () => marketLatestSnapshots(pool, REALM),
+    marketRecentSales: (itemId: string, limit: number) =>
+      marketRecentSales(pool, REALM, itemId, limit),
+    listMarketAlerts: () => listMarketAlerts(pool, REALM),
+    insertMarketAlert: (alert: {
+      itemId: string;
+      direction: MarketAlertDirection;
+      thresholdCopper: number;
+      createdByAccountId: number | null;
+    }) => insertMarketAlert(pool, { realm: REALM, ...alert }),
+    deleteMarketAlert: (id: number) => deleteMarketAlert(pool, REALM, id),
     listFilterWords,
     addFilterWord,
     removeFilterWord,
@@ -2409,6 +2444,177 @@ async function sharedIpsHandler(ctx: Ctx): Promise<void> {
     ...sharedIps,
     rows: sharedIps.rows.map((row) => ({ ...row, blocked: rt.isIpBlocked(row.ip) })),
   });
+}
+
+// ── Market tracker (World Market analytics) ─────────────────────────────────
+// Reads over market_sales / market_listing_snapshots (fed by
+// server/market_tracker.ts) merged with the in-memory ITEMS registry. Pure
+// shaping lives in server/market_analytics.ts; handlers only fetch and clamp.
+// No payload here may ever carry buyer/seller ids (the db reads omit them by
+// contract): these shapes are designed to become player-visible later.
+
+// Clamp an integer query param into [1, max], falling back on garbage.
+function clampIntParam(raw: string | null, fallback: number, max: number): number {
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(1, Math.floor(parsed)));
+}
+
+function marketBucketParam(raw: string | null): MarketHistoryBucket {
+  return (MARKET_HISTORY_BUCKETS as readonly string[]).includes(raw ?? '')
+    ? (raw as MarketHistoryBucket)
+    : 'day';
+}
+
+// The two standard stats windows the overview and flip finder read.
+const MARKET_OVERVIEW_DAY_HOURS = 24;
+const MARKET_OVERVIEW_WEEK_HOURS = 7 * 24;
+
+async function marketOverviewPieces() {
+  const db = adminDb();
+  const [snapshots, day, week] = await Promise.all([
+    db.marketLatestSnapshots(),
+    db.marketSaleStats(MARKET_OVERVIEW_DAY_HOURS),
+    db.marketSaleStats(MARKET_OVERVIEW_WEEK_HOURS),
+  ]);
+  return { snapshots, day, week };
+}
+
+/** GET /admin/api/market/overview: every tracked item's book + sale stats. */
+async function marketOverviewHandler(ctx: Ctx): Promise<void> {
+  const { snapshots, day, week } = await marketOverviewPieces();
+  ok(ctx.res, {
+    realm: REALM,
+    cutPct: Math.round(MARKET_CUT * 100),
+    capturedAt: snapshots[0]?.capturedAt ?? null,
+    items: buildMarketOverview(snapshots, day, week),
+  });
+}
+
+/**
+ * GET /admin/api/market/catalog: the item universe as {itemId, name} pairs.
+ * Pure in-memory (marketItemCatalog is a per-process cache over the ITEMS
+ * registry), zero SQL: exists so pages that only need id/name pairs (the
+ * alerts datalist) never pull the overview aggregates.
+ */
+async function marketCatalogHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, {
+    items: marketItemCatalog().map((item) => ({ itemId: item.itemId, name: item.name })),
+  });
+}
+
+/** GET /admin/api/market/item?item=&bucket=&days=: one item's detail page. */
+async function marketItemHandler(ctx: Ctx): Promise<void> {
+  const itemId = ctx.url.searchParams.get('item') ?? '';
+  const def = marketItemCatalog().find((item) => item.itemId === itemId);
+  if (!def) return fail(ctx.res, 404, 'unknown item');
+  const bucket = marketBucketParam(ctx.url.searchParams.get('bucket'));
+  const days = clampIntParam(ctx.url.searchParams.get('days'), 30, 365);
+  const db = adminDb();
+  const [priceHistory, askHistory, recentSales] = await Promise.all([
+    db.marketPriceHistory(itemId, bucket, days),
+    db.marketAskHistory(itemId, bucket, days),
+    db.marketRecentSales(itemId, 50),
+  ]);
+  ok(ctx.res, {
+    realm: REALM,
+    cutPct: Math.round(MARKET_CUT * 100),
+    item: def,
+    bucket,
+    days,
+    priceHistory,
+    askHistory,
+    recentSales,
+  });
+}
+
+/** GET /admin/api/market/flips?minSales=: ranked flip candidates. */
+async function marketFlipsHandler(ctx: Ctx): Promise<void> {
+  const minSales = clampIntParam(ctx.url.searchParams.get('minSales'), 3, 100);
+  const { snapshots, day, week } = await marketOverviewPieces();
+  const overview = buildMarketOverview(snapshots, day, week);
+  ok(ctx.res, {
+    realm: REALM,
+    cutPct: Math.round(MARKET_CUT * 100),
+    capturedAt: snapshots[0]?.capturedAt ?? null,
+    minSales,
+    rows: rankFlips(overview, minSales).slice(0, 100),
+  });
+}
+
+/** GET /admin/api/market/movers?windowHours=&minSales=: risers and fallers. */
+async function marketMoversHandler(ctx: Ctx): Promise<void> {
+  // Two supported windows: past day vs the day before, past week vs the week
+  // before. Anything else falls back to the day view.
+  const rawWindow = Number(ctx.url.searchParams.get('windowHours'));
+  const windowHours =
+    rawWindow === MARKET_OVERVIEW_WEEK_HOURS ? rawWindow : MARKET_OVERVIEW_DAY_HOURS;
+  const minSales = clampIntParam(ctx.url.searchParams.get('minSales'), 3, 100);
+  const db = adminDb();
+  const [current, previous] = await Promise.all([
+    db.marketSaleStats(windowHours),
+    db.marketSaleStats(windowHours, windowHours),
+  ]);
+  const movers = buildMovers(current, previous, minSales);
+  ok(ctx.res, {
+    realm: REALM,
+    windowHours,
+    minSales,
+    risers: movers.risers.slice(0, 50),
+    fallers: movers.fallers.slice(0, 50),
+  });
+}
+
+// Alerts fire on the lowest listed UNIT ask, so the ceiling any single unit
+// can cost is the whole-stack price cap (src/sim/market.ts MARKET_MAX_PRICE).
+const MARKET_ALERT_MAX_THRESHOLD_COPPER = 5_000_000;
+
+/** GET /admin/api/market/alerts: every alert with its item name resolved. */
+async function marketAlertsGetHandler(ctx: Ctx): Promise<void> {
+  const catalog = new Map(marketItemCatalog().map((item) => [item.itemId, item]));
+  const rows = (await adminDb().listMarketAlerts()).map((alert) => ({
+    ...alert,
+    name: catalog.get(alert.itemId)?.name ?? alert.itemId,
+  }));
+  ok(ctx.res, { realm: REALM, rows });
+}
+
+/** POST /admin/api/market/alerts: create a lowest-ask alert. */
+async function marketAlertsPostHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const itemId = typeof body.item === 'string' ? body.item : '';
+  if (!marketItemCatalog().some((item) => item.itemId === itemId))
+    return fail(ctx.res, 404, 'unknown item');
+  const direction = body.direction;
+  if (
+    typeof direction !== 'string' ||
+    !(MARKET_ALERT_DIRECTIONS as readonly string[]).includes(direction)
+  )
+    return fail(ctx.res, 400, 'direction must be below or above');
+  const threshold = Number(body.thresholdCopper);
+  if (
+    !Number.isSafeInteger(threshold) ||
+    threshold < 1 ||
+    threshold > MARKET_ALERT_MAX_THRESHOLD_COPPER
+  )
+    return fail(ctx.res, 400, 'thresholdCopper must be a positive copper amount');
+  const id = await adminDb().insertMarketAlert({
+    itemId,
+    direction: direction as MarketAlertDirection,
+    thresholdCopper: threshold,
+    createdByAccountId: adminIdentityOf(ctx).accountId,
+  });
+  ok(ctx.res, { id });
+}
+
+/** POST /admin/api/market/alerts/delete: remove an alert by id. */
+async function marketAlertsDeleteHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const id = Number(body.id);
+  if (!Number.isSafeInteger(id) || id < 1)
+    return fail(ctx.res, 400, 'a valid alert id is required');
+  const removed = await adminDb().deleteMarketAlert(id);
+  return removed ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'alert not found');
 }
 
 /** GET /admin/api/ip-associations: accounts tied to one stored IP marker, with live flags. */
@@ -3237,6 +3443,70 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: suspiciousPlayersHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/market/overview',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketOverviewHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/market/catalog',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketCatalogHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/market/item',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketItemHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/market/flips',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketFlipsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/market/movers',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketMoversHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/market/alerts',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketAlertsGetHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/market/alerts',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketAlertsPostHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/market/alerts/delete',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: marketAlertsDeleteHandler,
   },
   {
     method: 'GET',

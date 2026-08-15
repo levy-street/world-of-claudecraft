@@ -15,7 +15,9 @@
   let navToggle: HTMLButtonElement;
   let accountModalId = $state<number | null>(null);
   let accountModalChanged = $state<(() => void) | null>(null);
-  let page = $derived<AdminPage>(route.page === 'ip' ? 'shared-ips' : route.page);
+  let page = $derived<AdminPage>(
+    route.page === 'ip' ? 'shared-ips' : route.page === 'market-item' ? 'market' : route.page,
+  );
   let pageTitle = $derived(t(itemForPage(page).labelKey));
 
   function closeNav(returnFocus = false): void {
@@ -91,7 +93,7 @@
       </div>
     </header>
     <main id="admin-content">
-      {#if route.page !== 'ip'}
+      {#if route.page !== 'ip' && route.page !== 'market-item'}
         <PageHeader title={pageTitle} />
       {/if}
       {@render children()}

@@ -47,6 +47,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePlayerReportsBatch(',
       'pruneBugReportsBatch(',
       'pruneChatViolationsBatch(',
+      'pruneMarketListingSnapshotsBatch(',
     ]) {
       expect(preListen).not.toContain(call);
     }
@@ -105,9 +106,33 @@ describe('retention sweep wiring in server/main.ts', () => {
       // per event; each registers its bounded prune with the sweep.
       'pruneLevelUpEventsBatch(',
       'pruneFtueEventsBatch(',
+      // market_listing_snapshots accrues one row per capture per listed item;
+      // its retention lives only in this sweep (market_sales is keep-forever
+      // by design, documented at its DDL in server/market_tracker_db.ts).
+      'pruneMarketListingSnapshotsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
     }
+  });
+
+  it('keeps market snapshot intake inside one night of the sweep budget', () => {
+    // The one table here whose INTAKE is a knob rather than a consequence of
+    // player actions, so it is the one that can silently outrun its own prune.
+    // The sweep deletes at most maxRowsPerRun from a table per night, so the
+    // table converges only while capturesPerDay * concurrently listed items
+    // stays under that budget. A cadence change is a retention change, and
+    // without this pin the failure mode is invisible: the table just grows
+    // while the sweep logs a budget warning nobody reads.
+    const cadence = MAIN.match(/const MARKET_SNAPSHOT_INTERVAL_MS = (\d+) \* 60_000;/);
+    expect(cadence, 'the snapshot cadence literal moved').not.toBeNull();
+    const capturesPerDay = (24 * 60) / Number(cadence?.[1]);
+    // Mirrors DEFAULT_RETENTION_SWEEP_MAX_ROWS_PER_RUN (server/http/config.ts).
+    const budgetPerNight = 50_000;
+    const breakEvenItems = budgetPerNight / capturesPerDay;
+    // Comfortably past what MARKET_MAX_LISTINGS (12 per seller) puts within
+    // reach of a realistic active seller population, and past the point where
+    // a few dozen sellers could push the table into permanent growth.
+    expect(breakEvenItems).toBeGreaterThan(500);
   });
 
   it('derives the daily_reward_events cutoff from the reward clock, behind the keep-forever guard', () => {
@@ -157,6 +182,9 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(MAIN).toContain('prunePlayerReportsBatch(config.playerReportRetentionDays, n)');
     expect(MAIN).toContain('pruneBugReportsBatch(config.bugReportRetentionDays, n)');
     expect(MAIN).toContain('pruneChatViolationsBatch(config.chatViolationRetentionDays, n)');
+    expect(MAIN).toContain(
+      'pruneMarketListingSnapshotsBatch(pool, config.marketSnapshotRetentionDays, n)',
+    );
   });
 
   it('sweeps the play-session fold before the association ager', () => {
