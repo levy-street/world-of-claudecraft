@@ -116,6 +116,31 @@ export function diffMarketBuy(
   };
 }
 
+// The sim surface the market_buy observer touches, structural so a Vitest can
+// drive it with a stub and server/game.ts passes its live Sim unchanged.
+export interface MarketBuyHost {
+  readonly marketListings: readonly MarketListing[];
+  meta(pid: number): { copper: number } | null | undefined;
+  marketBuy(listingId: number, pid: number): void;
+}
+
+// The whole market_buy dispatch arm in one call, so the game.ts coordinator
+// keeps a single line (the monolith ratchet: this logic is a sibling module's
+// job, not the coordinator's). The observer needs the book and the buyer purse
+// from BEFORE the sim call and the purse from AFTER it, so the sim call itself
+// rides between the two reads here. recordMarketBuy is fire-and-forget and
+// guarded, so this never throws into and never awaits the dispatch path.
+export function observeMarketBuy(
+  sim: MarketBuyHost,
+  who: { characterId: number },
+  listingId: number,
+  pid: number,
+): void {
+  const capture = captureMarketBuy(sim.marketListings, listingId, sim.meta(pid)?.copper ?? null);
+  sim.marketBuy(listingId, pid);
+  recordMarketBuy(who, capture, sim.meta(pid)?.copper ?? null);
+}
+
 // Per-process FIFO tail shared by sale rows and snapshots, so shutdown drains
 // one queue. A rejected insert is caught (logged) and the chain continues.
 let tail: Promise<void> = Promise.resolve();

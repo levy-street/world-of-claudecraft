@@ -34,6 +34,7 @@ import {
   diffMarketBuy,
   evaluateMarketAlerts,
   marketTrackerIdle,
+  observeMarketBuy,
   recordMarketBuy,
   recordMarketListingSnapshot,
   snapshotMarketListings,
@@ -170,6 +171,54 @@ describe('diffMarketBuy (pure)', () => {
     expect(diffMarketBuy(BUYER, huge, 4000)?.sellerCharacterId).toBeNull();
     const max = captureMarketBuy([listing({ sellerKey: '2147483647' })], 1000, 5000);
     expect(diffMarketBuy(BUYER, max, 4000)?.sellerCharacterId).toBe(2147483647);
+  });
+});
+
+describe('observeMarketBuy (the extracted dispatch arm)', () => {
+  // The wrapper server/game.ts calls in place of sim.marketBuy. Its whole
+  // contract is ORDER: the book and the purse are read BEFORE the sim call
+  // (a completed sale splices the listing out and moves the copper) and the
+  // purse again AFTER, which is exactly what a coordinator cannot express in
+  // one line without this module.
+  function host(copper: { value: number }, book: MarketListing[]) {
+    const seen: { listingsAtCall: number; copperAtCall: number }[] = [];
+    return {
+      sim: {
+        marketListings: book,
+        meta: () => ({ copper: copper.value }),
+        marketBuy: (listingId: number) => {
+          seen.push({ listingsAtCall: book.length, copperAtCall: copper.value });
+          const idx = book.findIndex((l) => l.id === listingId);
+          if (idx === -1) return;
+          copper.value -= book[idx].price;
+          book.splice(idx, 1);
+        },
+      },
+      seen,
+    };
+  }
+
+  it('captures the pre-call book and purse, then records the debit as a sale', async () => {
+    const copper = { value: 5000 };
+    const { sim, seen } = host(copper, [listing()]);
+    observeMarketBuy(sim, BUYER, 1000, 7);
+    await marketTrackerIdle();
+    // The sim call saw the listing still in the book and the purse undebited.
+    expect(seen).toEqual([{ listingsAtCall: 1, copperAtCall: 5000 }]);
+    expect(vi.mocked(insertMarketSaleRow).mock.calls.at(-1)?.[1]).toMatchObject({
+      listingId: 1000,
+      totalPriceCopper: 1000,
+      buyerCharacterId: 43,
+    });
+  });
+
+  it('records nothing when the sim refuses the buy (no purse movement)', async () => {
+    const copper = { value: 5000 };
+    const { sim } = host(copper, [listing()]);
+    vi.mocked(insertMarketSaleRow).mockClear();
+    observeMarketBuy(sim, BUYER, 9999, 7); // no such listing: a refusal
+    await marketTrackerIdle();
+    expect(insertMarketSaleRow).not.toHaveBeenCalled();
   });
 });
 
