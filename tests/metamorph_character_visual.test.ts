@@ -130,7 +130,16 @@ describe('Metamorphosis character integration', () => {
     expect(source).toContain(
       "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
     );
-    expect(source).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
+    // Bounded to the builder body rather than matched against the whole file.
+    // The build is shared by five forms now, so an unbounded match would let a
+    // metamorph-only special case land inside the builder without moving any
+    // pin here; requiring it in the slice, and forbidding per-form branching,
+    // keeps that back at the pre-refactor blast radius.
+    const builderStart = source.indexOf('  private buildFormVisual(');
+    expect(builderStart).toBeGreaterThan(-1);
+    const builder = source.slice(builderStart, source.indexOf('\n  private ', builderStart + 10));
+    expect(builder).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
+    expect(builder).not.toContain("=== 'form_");
     expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
     expect(source).toContain("createCharacterVisual(metamorphEntity, 'form_metamorph')");
     expect(source).toContain('for (const visual of playerPrewarmInstances) visual.dispose();');
