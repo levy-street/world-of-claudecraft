@@ -2674,10 +2674,13 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   ladder (consumePreferredDisenchantVictim) has no lock arm either, so a
   ratified deny must cover victim selection too.
 - RELEASE-OWNED FINDINGS (recorded, NOT fixed on branch; surface to the
-  maintainer): (a) v0.38.0 does NOT carry the v0.37.1 queue-pop arming fix
-  (PR #3363 / commit 3d1546b34a), so the merged tree still has the
-  zero-battleground-seats defect that hotfix fixed; needs a forward-port to
-  v0.38.0 (no branch overlap: the branch never touches those popups).
+  maintainer): (a) RESOLVED UPSTREAM (2026-08-15 v0.39.0 sync, merge
+  9de151aacb: the release line's own 32fdb764c8 "sync main (the v0.37.1
+  hotfix) into release/v0.38.0" carries PR #3363 / commit 3d1546b34a, now
+  an ancestor of the branch tip); the earlier record: v0.38.0 did NOT carry
+  the v0.37.1 queue-pop arming fix, so the merged tree had the
+  zero-battleground-seats defect that hotfix fixed (no branch overlap: the
+  branch never touches those popups); do not re-surface as open.
   (b) RESOLVED UPSTREAM (2026-08-14 sync, release commit 94ac061152
   "fix(db): harden Rift rollback migration"): the script now requires a
   drained character_leases table, takes an advisory lock, compare-and-swaps
@@ -3209,7 +3212,15 @@ followups fixed in-session, nothing carried as future work.
   renderer.ts headroom SUPERSEDED at the 2026-08-14 v0.38.0 sync: the
   release extracted entity_view_policy_core and lowered renderer's ceiling
   to 13700 with renderer.ts at 13691 (nine lines of headroom; the old
-  zero-headroom-at-13708 claim is stale), while the merged union broke the
+  zero-headroom-at-13708 claim is stale), SUPERSEDED AGAIN at the
+  2026-08-15 v0.39.0 sync (merge 9de151aacb): the release's r185 render
+  work re-pinned renderer.ts at its exact merged count 13754/13754, and
+  the merge re-pinned hud.ts at its exact merged count 19388/19388 (both
+  extractions landed together and the merged file shrank below both prior
+  pins), so BOTH sit at ZERO headroom: any renderer.ts or hud.ts line this
+  branch adds reds the ratchet until an extraction lowers it (sim.ts is at
+  12606 under 12650, server/game.ts at 10867 under 10890, three lines of
+  growth in each from the release delta), while the merged union broke the
   sim.ts and server/game.ts ceilings instead, fixed at the sync by two
   extractions (professions/daily_gate_load.ts, sim.ts 12603 under a
   lowered 12650; server/interest_policy.ts, game.ts 10865 under a lowered
@@ -3560,3 +3571,124 @@ collapseLowest + Sell-tab price reference, repo-wide dead-code cleanup).
   class from phase 07, re-minted at this sync). After the reinstall and the
   tome re-mint the ONLY reds on this tree are the two deliberate ruling
   reds above.
+
+## Phase 10 QA release sync, second pass (2026-08-15, merge 9de151aacb; the QA audit itself STILL runs in a follow-up session)
+
+The phase-10-qa prompt was re-run in a fresh session and found the release
+had moved AGAIN: the newest origin/release/** line CONTAINING v0.38.0 is now
+release/v0.39.0 (v0.38.0's tip fb88c3f094 is an ancestor of it; the v0.39.0
+tip d2d1a8ad5c adds the 0.38.1 version surfaces, the r185 camera fix and the
+docker sequencer fix on top). Merged as 9de151aacb (322 commits: the
+Three.js r165 to r185 bump with its render fixes and GLB re-exports, the
+v0.38.0 zero-pending locale fill, the druid Wolf Form 1.0s cadence and Bruin
+Form tank kit, ranked arena loss honor, the desktop-client-update packet,
+the Grix respawn window, CI measured-weight sharding). Stopped at the
+operator's request after the merge, its audit, and the gate; the QA fan-out
+re-runs the phase-10-qa prompt in a fresh session and its sync step will
+find the branch current.
+
+- CONFLICTS (17), all hunk-level: the five ci.yml sparse-checkout cones
+  union the release's market-house-redesign subtree with the branch's three
+  (test literal matched, tests/ci_workflow.test.ts green); hud.ts keeps
+  BOTH sides' extractions (the branch's entity_display_core, the release's
+  ability_description with its newer Gut Punch descriptionNoStealth
+  variant; both inline twins deleted, the shared closing brace with them,
+  the now-consumerless AbilitySpecNoteField import dropped; a function-by-
+  function diff of each side's inline copy against the other side's
+  module showed only formatting drift plus the release's newer variant);
+  the hud monolith row re-pinned at the exact merged count 19388 (both
+  extractions landed together, so the merged file shrank below both prior
+  pins 19490/19433; renderer.ts likewise sits at the release's exact
+  13754/13754, ZERO headroom on both, see the amended Phase 10 carry
+  above); the seven parity goldens plus the two NEW release goldens
+  (cat_form_auto_swing, grix_respawn_window) re-minted from the merged
+  tree via UPDATE_PARITY (212 passed; movement frames-only state/event
+  hashes, ZERO rng digests: the sim auditor confirmed druid_engines
+  draws/drawDigest byte-identical to parent 1 and that the one new draw,
+  the Grix respawnWindow, is pinned by its own new golden); the four
+  Eastbrook polish evidence JSONs proven identical outside their provenance
+  blocks then swept by remint_polish_provenance.mjs with the three pin
+  literals re-set; the inscription tome fingerprints re-minted for the
+  lockfile bump (the phase 07 class, third occurrence: remint tool, four
+  suite hashes, media manifest via build_media_manifest.mjs generate,
+  provenance comment re-cut to describe every re-mint).
+- COUNT PINS: verified from suite runs, NO composition this time (IWorld
+  324, commands 200/213 unchanged; world_api_parity, command_schema,
+  command_facets, schema_wiring 405 tests green). i18n:gen and wiki:content
+  both re-run on the merged tree with ZERO drift vs the auto-merge, so the
+  generated artifacts were taken as merged; naming guards (ip_scrub,
+  originality_renames, overlay_ip_scrub) GREEN over the fill; S3 guard,
+  i18n_status_registry, i18n_completeness, guide freshness green.
+- PORTRAIT TRIO: fresh at the tip WITHOUT a re-mint, in the DESIGNED
+  bookkeeping-only lane: the r185 bump moved the live browser-bundle
+  digest (esbuild inlines three) but no def/still input, and
+  tests/mob_portrait_source_manifest.test.ts admits and pins that lane;
+  target_portrait_view + vale-cup evidence pins hold. RECORDED for the
+  next portrait touch: the committed acceptance's renderer provenance is
+  r165-era; the next content phase that re-blesses via the receipt flow
+  catches it up (a receipt-backed rerender on r185).
+- SEVEN-CLUSTER MERGE AUDIT (sim, render, ui, i18n, guards, premises,
+  server; three clusters re-run after a harness auth outage, resumed with
+  cached results): the mechanical tree proof first (the committed merge
+  tree differs from git merge-tree's auto-merge in exactly the 24 files
+  hand-resolved or re-minted; everything else byte-identical). ONE
+  BLOCKING FIND, fixed at this sync: the release's NEW
+  tests/nythraxis_hitch_bench.test.mjs pinned the literal
+  `const INTEREST_RADIUS = 90` by reading server/game.ts, but the previous
+  sync's ratchet extraction moved that declaration to
+  server/interest_policy.ts, so the auto-merge composed a red pin (a
+  disk-scan suite: it rides the always-run floor of every gate); re-pointed
+  at interest_policy.ts (the const's home) with a comment. Sim cluster
+  CLEAN (flask marker/arm/downward refusal/death persistence/arena wipe all
+  intact; the release's grantDelveRewards wrapper removal has no branch
+  caller; /dev bis cap arm + dev-portal eventId guard intact; new druid
+  aura ids do not collide with the elixir_ family). Render CLEAN (tome
+  chain live end to end, swapOnly filter intact, no stale r165 pins
+  anywhere). Guards CLEAN apart from the fixed pin (registry unions
+  complete both ways; gate_select changes fail toward more tests; sparse
+  cones exact; db-mock trap empty across the new release suites).
+- BRANCH-OWNED DEFECT SURFACED BY THE AUDIT, NOT MERGE FALLOUT, LEFT FOR
+  THE QA FAN-OUT (recorded here so it is not lost): the phase 04 Wyrmfall
+  Core letter is registered in src/ui/world_entity_i18n.ts (LETTER_IDS +
+  lettersById) but never added to LETTERS_BY_ID in src/ui/entity_i18n.ts,
+  so knownLetterId('wyrmfall_core_reward') is false and the mailbox
+  (mailbox_window.ts, hud.ts mailArrived) falls back to the wire-shipped
+  English sender/subject/body in EVERY locale, and the entity enumeration
+  skips the letter; pre-exists byte-identically on parent 1. Fix shape:
+  the HEROIC_MARK_LETTER row precedent plus a knownLetterId pin, and a
+  guard that every world_entity_i18n LETTER_ID is known to entity_i18n
+  (the class: two registries for one letter family with no cross-pin).
+- RELEASE-OWNED, recorded (do NOT fix on branch): (e) reword staleness in
+  the release's own fill: commit 4ca52c8eb0 dropped "(Druid talent)" from
+  Savage Mending's English (frenzied_regeneration is a Wildfang spec
+  ability now) but all 18 base overlays still carry the clause (de
+  "(Druidentalent)", ja, zh_CN, ko, ru, es, fr verified), invisible to
+  every gate because the rows are filled, not pending; the reword-refill
+  commit dddbf8da19 predates it. Queue for the branch's release fill pass
+  (it edits every overlay anyway) or raise upstream. (f)
+  docs/design/graphics-plan.md still opens with "Target: three@0.165",
+  invalidated by the bump. (g) the shard measured-weight coverage ratchet
+  (tests/ci_shard_partition.test.ts, 95 percent floor) reads 96.39 percent
+  on the merged tree with headroom for about 41 more unmeasured test
+  files; every branch-only suite takes the median fallback; when the floor
+  reds, RE-HARVEST scripts/ci_shard_weights.generated.json from a green
+  full-mode CI run of the branch PR, never lower the floor. Items (c) and
+  (d) stand; (a) and (b) resolved upstream (amended in the register).
+- PREMISES amended at this sync: phase 11 market seam (phase-11 file):
+  the release's market-house Browse-row redesign (icon-cell corner family,
+  armor pips bottom-right via the new pure resolver market_armor_badge.ts,
+  Heroic star top-left, marketNameColor, marketPriceHtml) is now part of
+  the seam any pattern/material findability work composes with; the
+  renderer/hud zero-headroom carry above; the release-owned register.
+  Also for the branch's capture work: the pr-screenshots rig gained the
+  change-aware target table scripts/pr_shot_targets.mjs (masterwrought
+  captures land as entries there, not one-off scripts) and
+  scripts/lib/world_auth.mjs gained chatCommandMessage(text) for raw-ws
+  chat commands.
+- RULING REDS re-verified at this tip: BOTH deliberate reds hold their
+  exact recorded shape (bags: the sunspun_haversack signable-rarity pin;
+  rogue band: assassination 170.383 under the 180 floor, byte-identical to
+  the recorded 170.38, combat/subtlety unchanged) and NO third red; the
+  druid/threat/arena changes did not move the rogue fight numbers.
+- GATE at the sync tip: recorded in the progress row and the session
+  report (gate_select on the committed tree, GATE_MAX_WORKERS=5).

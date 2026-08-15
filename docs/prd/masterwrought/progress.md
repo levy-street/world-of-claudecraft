@@ -405,3 +405,25 @@ never future-PR items, per the delivery contract in `state.md`).
   green at the pure release tip: the score-vs-fight stat-shape hazard).
   Everything else is green: full suite 38733 passed after the node_modules
   resync and the tome lockfile-fingerprint re-mint.
+- Phase 10 QA release sync, second pass (2026-08-15): the release moved again
+  before the fan-out ran; the newest line containing v0.38.0 is now
+  release/v0.39.0 (tip d2d1a8ad5c, 322 commits: the Three.js r185 bump, the
+  v0.38.0 zero-pending fill, the druid cadence and Bruin kit, arena loss
+  honor, the desktop packet, the Grix respawn window, measured-weight CI
+  sharding), merged as 9de151aacb and stopped at the operator's request
+  after the merge, its audit and the gate (the QA fan-out re-runs fresh).
+  Seventeen conflicts hand-resolved (hud.ts keeps both sides' extractions
+  and re-pins at its exact merged count; nine parity goldens re-minted with
+  zero rng movement; eastbrook seals swept; tome fingerprints re-minted a
+  third time for the lockfile bump). Count pins verified with NO composition;
+  generated i18n and wiki artifacts regenerated with zero drift; portrait
+  trio fresh in the designed bookkeeping-only lane. Seven-cluster audit: ONE
+  blocking find fixed (a new release disk-scan suite pinned INTEREST_RADIUS
+  in server/game.ts, re-pointed at the branch's interest_policy.ts leaf),
+  one branch-owned phase 04 defect surfaced and LEFT for the QA fan-out (the
+  Wyrmfall Core letter is missing from entity_i18n LETTERS_BY_ID, so mail
+  falls back to English in every locale), and three release-owned notes
+  recorded (Savage Mending overlay reword staleness, graphics-plan three
+  target, the shard-weight coverage ratchet at 96.39 percent). Both ruling
+  reds hold their exact recorded shape. Full record: state.md "Phase 10 QA
+  release sync, second pass".

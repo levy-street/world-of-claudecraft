@@ -45,6 +45,21 @@ STEP 1 - LOAD CONTEXT (Explore agent; do not read planning docs in the main loop
   collapse toggle), alongside src/sim/market.ts + src/ui/market_filters.ts +
   src/world_api/market.ts (verify where category/search logic lives and record the
   actual seam in state.md; premise corrected at the v0.38.0 sync, merge fa51741408),
+  AND the release's market-house UI redesign the v0.39.0 sync brought (merge
+  9de151aacb): src/ui/market_window.ts rebuilt the Browse row markup that any
+  pattern/material findability work extends. The icon cell is now a corner-mark
+  family (`.mkt-ico`): the bottom-right corner carries the armor weight pips from
+  the NEW pure resolver src/ui/market_armor_badge.ts (marketArmorPips, cloth 1 /
+  leather 2 / mail 3, non-color-only per issue 3104), the top-left corner carries
+  the Heroic gold star (marketHeroicStar with hudChrome.itemHeroicLabel), name
+  colors go through marketNameColor(quality), the price block through
+  marketPriceHtml (coinless gold-dominant, market-scoped), and the buy button
+  prompts on buyout (bank slot-purchase precedent). A pattern chip, a
+  "teaches"/pattern row mark, or a materials category MUST compose with that
+  corner family (both corners are taken; a third mark needs its own slot and a
+  non-color-only cue) and land as a pure resolver beside market_armor_badge.ts
+  with its own suite (tests/market_armor_badge.test.ts is the template);
+  src/styles/components.css carries the redesigned row rules.
   tests/parity/ (scenario + golden shape), src/sim/CLAUDE.md.
 Return: how a loot entry appends without disturbing existing draws, the quartermaster
 row shape, where market categories are defined and filtered.
