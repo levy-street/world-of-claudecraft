@@ -886,7 +886,10 @@ export class DungeonInteriors {
       return group;
     }
 
-    this.placeFloor(p, layout, variant);
+    // Tower scene profiles already provide one continuous authored surface.
+    // Stacking the modular tile kit under it creates coplanar depth fights that
+    // pop as large dark patches when the camera moves.
+    if (!opts?.style?.sceneProfile) this.placeFloor(p, layout, variant);
     this.placeWalls(p, layout, variant, arenaWalls);
     this.placePillarsAndTorches(group, p, layout, variant, torch);
     this.placeTombs(p, layout, variant);
