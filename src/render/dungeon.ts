@@ -56,10 +56,10 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
-import { ensureDemonTowerAssets } from './demon_tower';
+import { buildDemonTowerEnvironment } from './demon_tower_scene';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
-import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
@@ -745,7 +745,7 @@ export class DungeonInteriors {
       }>;
       // Rift hazards render as molten lava instead of the delve's blackwater; the
       // sim damage model is shared, only the palette differs.
-      hazardStyle?: 'blackwater' | 'lava';
+      hazardStyle?: 'blackwater' | 'lava' | 'soul' | 'void';
       // Rift ice-slide zone (frictionless slick you skate across to the goal
       // sigil): a pale frost sheet over this rect, purely cosmetic.
       iceZone?: { x: number; z: number; hw: number; hd: number } | null;
@@ -799,6 +799,7 @@ export class DungeonInteriors {
     const daisRaised = opts?.style?.daisRaised;
     const group = new THREE.Group();
     const p = new Placements();
+    let towerDecorReady: Promise<void> | null = null;
     // Every standard-layout interior routes its outer walls through the
     // hideable-wall path (formerly arena-only), so any wall crossing the
     // eye-to-camera segment fades to 20% opacity instead of blanking the view.
@@ -807,25 +808,29 @@ export class DungeonInteriors {
     // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
     // replace the single-room shell entirely. Walls come from the SAME segment
     // helper the sim derives collision from, so they cannot drift apart.
-    // The Demon Tower's arena is a shellPolygon floor, not a room graph, so it
-    // does not take the authored branch below. Its centrepiece still has to be
-    // resident BEFORE the floor's views are built: the core's view is created
-    // once, so a model that arrives later would leave the procedural stand-in on
-    // screen for the whole run.
-    if (layout.obstacles?.length) await ensureDemonTowerAssets();
+    if (opts?.style?.sceneProfile) {
+      buildDemonTowerEnvironment(
+        group,
+        layout,
+        opts.style.sceneProfile,
+        this.lowGfx,
+        (x, z, color, y, scale) => this.addInfernalLight(group, x, z, color, y, scale),
+      );
+      if (layout.decor?.length) towerDecorReady = ensureInfernalDecorAssets(layout.decor);
+    }
 
     // A shellPolygon floor with authored decor (the Demon Tower arenas) draws its
     // props through the SAME builder the citadel uses; only the wall/floor shell
     // differs, so there is no second decor path to keep in sync.
-    if (!layout.rooms && layout.decor?.length) {
-      await ensureInfernalDecorAssets();
+    if (!opts?.style?.sceneProfile && !layout.rooms && layout.decor?.length) {
+      await ensureInfernalDecorAssets(layout.decor);
       buildInfernalDecor(group, layout.decor, torch, (x, z, color, y, scale) =>
         this.addInfernalLight(group, x, z, color, y, scale),
       );
     }
 
     if (layout.rooms) {
-      await ensureInfernalDecorAssets();
+      await ensureInfernalDecorAssets(layout.decor);
       this.placeAuthoredFloor(p, layout, variant);
       this.placeAuthoredWalls(p, layout, variant);
       this.placeAuthoredRelief(group, layout);
@@ -921,13 +926,30 @@ export class DungeonInteriors {
       }
     }
 
-    this.emit(group, p, variant);
+    this.emit(group, p, variant, {
+      wall: opts?.style?.wallTint,
+      floor: opts?.style?.floorTint,
+    });
     if (arenaWalls) {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
     }
     group.position.set(ox, 0, oz);
     group.userData.renderCategory = 'dungeon';
     await attachSceneGroupGated(this.scene, group, this.compileGate);
+    // Tower shell, hazards and landmarks attach before network-backed dressing
+    // settles, so a cold cache never leaves an actionable invisible arena. The
+    // authored props stream into the already-visible root; if the root retired
+    // while loading, the parent check prevents stale lights/nodes from leaking.
+    if (towerDecorReady) {
+      void towerDecorReady
+        .then(() => {
+          if (!group.parent) return;
+          buildInfernalDecor(group, layout.decor ?? [], torch, (x, z, color, y, scale) =>
+            this.addInfernalLight(group, x, z, color, y, scale),
+          );
+        })
+        .catch(() => undefined);
+    }
     return group;
   }
 
@@ -1033,7 +1055,7 @@ export class DungeonInteriors {
   private placeBlackwaterPools(
     group: THREE.Group,
     hazards: Array<{ x: number; z: number; r: number; rx?: number; rz?: number }>,
-    style: 'blackwater' | 'lava' = 'blackwater',
+    style: 'blackwater' | 'lava' | 'soul' | 'void' = 'blackwater',
     liftAt?: (x: number, z: number) => number,
   ): void {
     // Rift lava reuses the delve blackwater overlay with a molten palette: the
@@ -1043,7 +1065,11 @@ export class DungeonInteriors {
     const pal =
       style === 'lava'
         ? { pool: 0xd83410, poolOpacity: 0.9, rim: 0xffca4a, glow: 0xff5a1e }
-        : { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f };
+        : style === 'soul'
+          ? { pool: 0x221247, poolOpacity: 0.9, rim: 0x73e7ff, glow: 0x9b63ff }
+          : style === 'void'
+            ? { pool: 0x160c32, poolOpacity: 0.92, rim: 0xf05cff, glow: 0x806dff }
+            : { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f };
     for (const h of hazards) {
       const rx = h.rx ?? h.r;
       const rz = h.rz ?? h.r;
@@ -1061,6 +1087,7 @@ export class DungeonInteriors {
         }),
       );
       pool.renderOrder = 1; // floats over the floor tiles
+      pool.userData.riftHazard = 'pool';
       group.add(pool);
       // A hot/bog rim so the edge of the hazard is unmistakable.
       const rim = new THREE.Mesh(
@@ -1078,6 +1105,7 @@ export class DungeonInteriors {
         }),
       );
       rim.renderOrder = 2;
+      rim.userData.riftHazard = 'rim';
       group.add(rim);
       this.addTorchGlow(
         group,

@@ -29,6 +29,7 @@ const DECOR_MODELS: Record<string, { url: string; height: number }> = {
   bone_throne: { url: '/models/props/bone_throne.glb', height: 2.2 },
   // The Demon Tower's arena dressing (content/rift/demon_tower.ts). Heights are
   // the world-unit values each prop was generated and QA'd at.
+  demon_core: { url: '/models/props/demon_core.glb', height: 6.0 },
   tower_pact_brazier: { url: '/models/props/tower_pact_brazier.glb', height: 1.7 },
   tower_ring_fin: { url: '/models/props/tower_ring_fin.glb', height: 4.2 },
   tower_gargoyle_perch: { url: '/models/props/tower_gargoyle_perch.glb', height: 2.2 },
@@ -43,6 +44,30 @@ const DECOR_MODELS: Record<string, { url: string; height: number }> = {
   tower_spike_cluster: { url: '/models/props/tower_spike_cluster.glb', height: 2.6 },
   tower_ember_font: { url: '/models/props/tower_ember_font.glb', height: 1.5 },
   tower_impaled_banner: { url: '/models/props/tower_impaled_banner.glb', height: 3.4 },
+  tower_bloodforge_furnace: { url: '/models/props/tower_bloodforge_furnace.glb', height: 6.5 },
+  tower_bloodforge_anvil: { url: '/models/props/tower_bloodforge_anvil.glb', height: 3.4 },
+  tower_bloodforge_chain_gantry: {
+    url: '/models/props/tower_bloodforge_chain_gantry.glb',
+    height: 7.5,
+  },
+  tower_bloodforge_slag_vent: {
+    url: '/models/props/tower_bloodforge_slag_vent.glb',
+    height: 2.2,
+  },
+  tower_bloodforge_gate: { url: '/models/props/tower_bloodforge_gate.glb', height: 8.0 },
+  tower_ossuary_reliquary: { url: '/models/props/tower_ossuary_reliquary.glb', height: 5.5 },
+  tower_ossuary_rib_arch: { url: '/models/props/tower_ossuary_rib_arch.glb', height: 7.0 },
+  tower_ossuary_bone_organ: { url: '/models/props/tower_ossuary_bone_organ.glb', height: 7.5 },
+  tower_ossuary_chain_pylon: { url: '/models/props/tower_ossuary_chain_pylon.glb', height: 6.0 },
+  tower_ossuary_skull_gate: { url: '/models/props/tower_ossuary_skull_gate.glb', height: 9.0 },
+  tower_void_crown_spire: { url: '/models/props/tower_void_crown_spire.glb', height: 9.5 },
+  tower_void_throne: { url: '/models/props/tower_void_throne.glb', height: 7.0 },
+  tower_void_crystal_conduit: {
+    url: '/models/props/tower_void_crystal_conduit.glb',
+    height: 4.8,
+  },
+  tower_void_banner: { url: '/models/props/tower_void_banner.glb', height: 6.5 },
+  tower_void_floating_shard: { url: '/models/props/tower_void_floating_shard.glb', height: 5.0 },
 };
 
 /** The arcane flame the rune pylons already use, re-tinted for the citadel's
@@ -66,8 +91,17 @@ function markShared(gltf: Gltf): void {
 /** Load every model an authored floor's decor needs (once per process). A model
  * that fails to load resolves to null and its decor entry is simply skipped, so a
  * missing asset never breaks the floor. */
-export async function ensureInfernalDecorAssets(): Promise<void> {
-  const urls = [FLAME_URL, ...Object.values(DECOR_MODELS).map((m) => m.url)];
+export async function ensureInfernalDecorAssets(decor?: readonly AuthoredDecor[]): Promise<void> {
+  const urls = decor
+    ? [
+        FLAME_URL,
+        ...new Set(
+          decor
+            .map((item) => DECOR_MODELS[item.key]?.url)
+            .filter((url): url is string => typeof url === 'string'),
+        ),
+      ]
+    : [FLAME_URL, ...Object.values(DECOR_MODELS).map((m) => m.url)];
   await Promise.all(
     urls.map(async (url) => {
       if (cache.has(url)) return;
@@ -227,7 +261,7 @@ export function buildInfernalDecor(
     model.rotation.y = d.yaw;
     group.add(model);
 
-    if (d.key === 'infernal_brazier') {
+    if (d.key === 'infernal_brazier' || d.key === 'tower_pact_brazier') {
       // Embers in the bowl (the bowl rim sits at ~0.75 of the model's height).
       const flame = buildFlame(0.7, torch.flame);
       if (flame) {
@@ -241,6 +275,19 @@ export function buildInfernalDecor(
       glow(d.x, d.z, torch.light, y0 + def.height * 0.85, 1.4); // the molten surface
     } else if (d.key === 'obsidian_fang') {
       glow(d.x, d.z, torch.light, y0 + 0.2, 0.6); // lava veins
+    } else if (
+      d.key === 'tower_bloodforge_furnace' ||
+      d.key === 'tower_bloodforge_slag_vent' ||
+      d.key === 'tower_bloodforge_gate'
+    ) {
+      glow(d.x, d.z, torch.light, y0 + def.height * 0.45, 1.25);
+    } else if (
+      d.key === 'tower_ossuary_reliquary' ||
+      d.key === 'tower_ossuary_chain_pylon' ||
+      d.key === 'tower_void_crystal_conduit' ||
+      d.key === 'tower_void_floating_shard'
+    ) {
+      glow(d.x, d.z, torch.light, y0 + def.height * 0.55, 1.0);
     }
   }
 }

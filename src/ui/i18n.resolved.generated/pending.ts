@@ -31,11 +31,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
-    "sim.rift.towerBossWave",
-    "sim.rift.towerCleared",
-    "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "hudChrome.itemHeroicLabel"
   ],
   "es_ES": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -59,11 +55,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_shade_dancer.name",
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
-    "hudChrome.itemHeroicLabel",
-    "sim.rift.towerBossWave",
-    "sim.rift.towerCleared",
-    "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "hudChrome.itemHeroicLabel"
   ],
   "fr_FR": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -88,10 +80,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "fr_CA": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -116,10 +115,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "en_CA": [],
   "it_IT": [
@@ -145,10 +151,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "de_DE": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -173,10 +186,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -205,10 +225,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -234,10 +261,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "nl_NL": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -262,10 +296,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "pl_PL": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -290,10 +331,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "id_ID": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -318,10 +366,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "tr_TR": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -346,10 +401,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "sv_SE": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -374,10 +436,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "vi_VN": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -402,10 +471,17 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ],
   "da_DK": [
     "entities.abilities.cheap_shot.descriptionNoStealth",
@@ -430,9 +506,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.tower_soulbinder.name",
     "entities.mobs.tower_void_sentinel.name",
     "hudChrome.itemHeroicLabel",
+    "sim.rift.ascendFloor",
     "sim.rift.towerBossWave",
     "sim.rift.towerCleared",
     "sim.rift.towerFloorClear",
-    "sim.rift.towerWave"
+    "sim.rift.towerWave",
+    "worldContent.demonTowerAscentName",
+    "worldContent.demonTowerBloodforgeName",
+    "worldContent.demonTowerCoreName",
+    "worldContent.demonTowerName",
+    "worldContent.demonTowerOssuaryName",
+    "worldContent.demonTowerVoidCrownName"
   ]
 };

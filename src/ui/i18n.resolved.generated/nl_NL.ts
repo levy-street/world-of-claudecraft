@@ -7060,6 +7060,7 @@ export const nl_NL: EnTranslations = {
       "allUnstable": "Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.",
       "enterFloor": "Je stapt door de rift naar {name}.",
       "descendFloor": "Je daalt dieper af in {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Je stapt terug door de rift.",
       "pylonLit": "Een runenpyloon ontwaakt tot leven ({lit}/{total}).",
       "wayDownOpens": "De weg naar beneden scheurt open.",
@@ -17206,6 +17207,12 @@ export const nl_NL: EnTranslations = {
     "delveRiteShrineReedInteract": "Rietschrijn: druk op F om het aan te raken",
     "delveRiteShrineSkullInteract": "Schedelschrijn: druk op F om het aan te raken",
     "mailboxName": "Brievenbus",
-    "noticeboardName": "Mededelingenbord"
+    "noticeboardName": "Mededelingenbord",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

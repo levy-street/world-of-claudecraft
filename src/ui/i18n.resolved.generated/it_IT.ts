@@ -7060,6 +7060,7 @@ export const it_IT: EnTranslations = {
       "allUnstable": "Tutti gli squarci sono instabili in questo momento. Riprova a breve.",
       "enterFloor": "Attraversi lo squarcio ed entri in {name}.",
       "descendFloor": "Scendi più in profondità in {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Fai un passo indietro attraverso lo squarcio.",
       "pylonLit": "Un pilone runico si accende ({lit}/{total}).",
       "wayDownOpens": "La via verso il basso si squarcia.",
@@ -17206,6 +17207,12 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario delle Canne: premi F per toccarlo",
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
-    "noticeboardName": "Bacheca degli annunci"
+    "noticeboardName": "Bacheca degli annunci",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

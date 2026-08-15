@@ -7060,6 +7060,7 @@ export const fr_CA: EnTranslations = {
       "allUnstable": "Toutes les failles sont instables pour le moment. Réessayez bientôt.",
       "enterFloor": "Vous franchissez la faille et pénétrez dans {name}.",
       "descendFloor": "Vous descendez plus profondément dans {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Vous repassez par la faille.",
       "pylonLit": "Un pylône runique s'embrase ({lit}/{total}).",
       "wayDownOpens": "Le chemin vers le bas se déchire.",
@@ -17206,6 +17207,12 @@ export const fr_CA: EnTranslations = {
     "delveRiteShrineReedInteract": "Autel du roseau : appuyez sur F pour le toucher",
     "delveRiteShrineSkullInteract": "Autel du crâne : appuyez sur F pour le toucher",
     "mailboxName": "Boîte aux lettres",
-    "noticeboardName": "Panneau d'affichage"
+    "noticeboardName": "Panneau d'affichage",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

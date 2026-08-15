@@ -874,6 +874,7 @@ export const en = {
       allUnstable: 'All rifts are unstable right now. Try again soon.',
       enterFloor: 'You step through the rift into {name}.',
       descendFloor: 'You descend deeper into {name}.',
+      ascendFloor: 'You ascend into {name}.',
       stepBack: 'You step back through the rift.',
       pylonLit: 'A rune pylon flares to life ({lit}/{total}).',
       wayDownOpens: 'The way down tears open.',

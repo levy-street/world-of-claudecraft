@@ -639,7 +639,7 @@ import {
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
-import { demonTowerRankTuning } from './rift/tower';
+import { demonTowerRankTuning, demonTowerSummonAllowance } from './rift/tower';
 import type { RiftEvent, RiftInstance } from './rift/types';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
@@ -8615,8 +8615,12 @@ export class Sim {
         ? demonTowerRankTuning(riftInst.floorIndex)
         : riftRankTuningFor(riftInst.baseLevel)
       : null;
-    for (let k = 0; k < count; k++) {
-      const ang = (k / count) * Math.PI * 2 + 0.7;
+    const spawnCount =
+      riftInst && isDemonTowerSeed(riftInst.seed)
+        ? Math.min(count, demonTowerSummonAllowance(this.ctx, riftInst))
+        : count;
+    for (let k = 0; k < spawnCount; k++) {
+      const ang = (k / Math.max(1, spawnCount)) * Math.PI * 2 + 0.7;
       const pos = this.groundPos(
         boss.pos.x + Math.sin(ang) * spawnRadius,
         boss.pos.z + Math.cos(ang) * spawnRadius,
@@ -8659,6 +8663,7 @@ export class Sim {
       add.summonedAdd = true;
       this.addEntity(add);
       boss.summonedIds.push(add.id);
+      riftInst?.mobIds.push(add.id);
       inst?.mobIds.push(add.id);
       delveRun?.mobIds.push(add.id);
       if (victim && !victim.dead && victim.kind === 'player') {

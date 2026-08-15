@@ -9772,7 +9772,12 @@ export class Renderer {
                 layout: floor.layout,
                 style: floor.style,
                 hazards: floor.hazards,
-                hazardStyle: 'lava',
+                hazardStyle:
+                  floor.style.sceneProfile === 'ossuary'
+                    ? 'soul'
+                    : floor.style.sceneProfile === 'void_crown'
+                      ? 'void'
+                      : 'lava',
                 iceZone: floor.iceZone,
                 platform: floor.platform,
               })

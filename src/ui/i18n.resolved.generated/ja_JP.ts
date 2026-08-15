@@ -7060,6 +7060,7 @@ export const ja_JP: EnTranslations = {
       "allUnstable": "すべての裂け目が今は不安定だ。しばらくしてからもう一度試そう。",
       "enterFloor": "裂け目をくぐり、{name}へ足を踏み入れた。",
       "descendFloor": "{name}のさらに深くへ降りていく。",
+      "ascendFloor": "{name}へ昇る。",
       "stepBack": "裂け目を通って元の場所へ戻った。",
       "pylonLit": "ルーンの尖塔が光を放った（{lit}/{total}）。",
       "wayDownOpens": "下層への道が裂け開いた。",
@@ -17206,6 +17207,12 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
     "mailboxName": "メールボックス",
-    "noticeboardName": "掲示板"
+    "noticeboardName": "掲示板",
+    "demonTowerName": "悪魔の塔",
+    "demonTowerBloodforgeName": "悪魔の塔：血の鍛冶場",
+    "demonTowerOssuaryName": "悪魔の塔：鎖の納骨堂",
+    "demonTowerVoidCrownName": "悪魔の塔：虚無の王冠",
+    "demonTowerCoreName": "魔核",
+    "demonTowerAscentName": "塔の昇り道"
   }
 };

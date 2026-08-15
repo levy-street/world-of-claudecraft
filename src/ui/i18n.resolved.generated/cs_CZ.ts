@@ -7060,6 +7060,7 @@ export const cs_CZ: EnTranslations = {
       "allUnstable": "Všechny trhliny jsou právě nestabilní. Zkus to znovu brzy.",
       "enterFloor": "Vstupuješ skrz trhlinu do {name}.",
       "descendFloor": "Sestupuješ hlouběji do {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Vracíš se zpět skrz trhlinu.",
       "pylonLit": "Runový pilíř vzplane k životu ({lit}/{total}).",
       "wayDownOpens": "Cesta dolů se protrhává.",
@@ -17206,6 +17207,12 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineReedInteract": "Rákosová svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
     "mailboxName": "Poštovní schránka",
-    "noticeboardName": "Vývěska"
+    "noticeboardName": "Vývěska",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

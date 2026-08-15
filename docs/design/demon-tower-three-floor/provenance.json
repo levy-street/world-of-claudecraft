@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-15",
+  "policy": {
+    "thirdPartyReferenceArt": false,
+    "credentialCommitted": false,
+    "tripoModel": "v3.1-20260211",
+    "lane": "prop",
+    "textureFormat": "KTX2",
+    "totalTripoCredits": 560,
+    "totalUsd": 5.6
+  },
+  "conceptReferences": [
+    {
+      "file": "references/bloodforge-concept.png",
+      "generator": "OpenAI imagegen",
+      "sha256": "857e17e210f4f2d2342bc63782367e9863d229973d373c84efa02088f31f4f43",
+      "prompt": "Create a single high-end AAA game environment concept sheet for World of ClaudeCraft's Demon Tower, Floor 1: The Bloodforge. Stylized low-poly/chibi fantasy art direction matching premium Warcraft-like readable shapes, but wholly original. Show one large 16:9 third-person gameplay hero view plus three small callout panels of modular props. Arena terrain is a broad black-iron hexagonal foundry suspended over lava, concentric brass channels, cracked basalt plates, two side forge furnaces, chain gantries, massive demonic anvils, molten sluice trenches with clearly readable safe lanes, orange-red heat haze and sparks. Central landmark is an infernal crucible core, not a generic sphere. Strong silhouettes, restrained palette of soot black, oxidized brass and molten orange; clean navigable combat space, no text, no UI, no logos, no photorealism. Design should be feasible as low-poly GLB modular assets and procedural Three.js terrain."
+    },
+    {
+      "file": "references/ossuary-concept.png",
+      "generator": "OpenAI imagegen",
+      "sha256": "3fd2028e0eb727851417bec5e5999c6c7b0cf1241686f02d36910ed21bad9b50",
+      "prompt": "Create a single high-end AAA game environment concept sheet for World of ClaudeCraft's Demon Tower, Floor 2: The Ossuary of Chains. Stylized low-poly/chibi fantasy art direction matching premium Warcraft-like readable shapes, wholly original. One large 16:9 third-person gameplay hero view plus three small modular-prop callout panels. Terrain is a broad asymmetrical bone-cathedral arena: ivory rib-vault bridges over a dark soul chasm, cracked black stone in a cross-shaped navigable floor, four chained reliquary pylons, colossal horned skull gates, hanging cages, bone organ pipes, purple soul braziers and pale ghost-light. Central landmark is a chained ossuary heart/reliquary. Clear combat lanes, obvious dangerous chasm edges and safe platforms, dramatic vertical silhouettes, palette of bone ivory, charcoal, bruised violet and spectral cyan; no lava, no generic circular room, no text, no UI, no logos, no photorealism. Must be feasible as low-poly modular GLB assets plus procedural Three.js floor geometry."
+    },
+    {
+      "file": "references/void-crown-concept.png",
+      "generator": "OpenAI imagegen",
+      "sha256": "1f9f5006c15ac4fbe6e02bc26dce65c8eec0c6697fded7c62fc4070f9cc67429",
+      "prompt": "Create a single high-end AAA game environment concept sheet for World of ClaudeCraft's Demon Tower, Floor 3 final summit: The Void Crown. Stylized low-poly/chibi fantasy art direction matching premium Warcraft-like readable shapes, wholly original. One large 16:9 third-person gameplay hero view plus three small modular-prop callout panels. Arena is a shattered crown-shaped platform high above a cosmic abyss: five jagged obsidian petals linked by narrow broken bridges around a levitating cracked throne-core, chunks of masonry floating upward, enormous curved crown spires, torn crimson banners, void crystals and blue-violet lightning conduits. Parts of the outer ring are missing; luminous magenta fracture lines clearly telegraph dangerous collapse zones while broad safe sectors remain readable. Open storm sky, distant eclipsed moon, volumetric violet mist below, palette of obsidian, cold silver, deep indigo and hot magenta. No lava, no bone cathedral, no generic circle, no text, no UI, no logos, no photorealism. Feasible as low-poly modular GLB assets and procedural Three.js terrain, designed for an epic multi-phase raid boss."
+    }
+  ],
+  "assets": [
+    {
+      "name": "tower_bloodforge_furnace",
+      "height": 6.5,
+      "rotateY": 90,
+      "prompt": "Original stylized low-poly infernal foundry furnace for a chibi fantasy MMO raid, massive black iron block silhouette, horned demon-face firebox, oxidized brass bands and rivets, visible molten orange interior, modular freestanding prop, centered, isolated, no floor, no scene, no text, game-ready readable from isometric distance",
+      "conceptTask": "48f9142c-8c0e-470f-8c2e-ad5e44c39660",
+      "modelTask": "dd1f2be1-fef5-426f-87ca-6f2630db7dc5",
+      "credits": 35,
+      "sha256": "d5d17c69117b893f6602529aaa0e4c185ad218c83a7554326088668395e7809d"
+    },
+    {
+      "name": "tower_bloodforge_anvil",
+      "height": 3.4,
+      "prompt": "Original stylized low-poly demonic blacksmith anvil for a chibi fantasy MMO raid, massive horned obsidian anvil on black iron base, oxidized brass rivets, glowing molten orange rune grooves, strong chunky silhouette, modular freestanding prop, centered isolated, no floor, no scene, no text, readable from isometric distance",
+      "conceptTask": "10b84fcf-7146-4dca-95ad-d19850b66cbd",
+      "modelTask": "e251a2a1-c437-4c5f-a49b-185cfb63a699",
+      "credits": 35,
+      "sha256": "56a237e0849bb858164e60a113d9045ed823f9bf21c289f5da1b165dd3b4fe21"
+    },
+    {
+      "name": "tower_bloodforge_chain_gantry",
+      "height": 7.5,
+      "prompt": "Original stylized low-poly infernal foundry chain gantry for a chibi fantasy MMO raid, two thick black iron horned pillars joined by an overhead beam, huge hanging hooks and heavy chains, brass rivets, faint orange forge glow, wide walk-through arch silhouette, modular freestanding prop, centered isolated, no floor, no scene, no text",
+      "conceptTask": "2236aaec-cf0a-48e1-83c3-af1b5cf2064d",
+      "modelTask": "eb705178-a95f-4de6-8ab1-265b01dc3c68",
+      "credits": 35,
+      "sha256": "c23e08b72779353ac8eeba9bbc8977d8edd3fffcb98cd899bae95f3cdb63b1e9"
+    },
+    {
+      "name": "tower_bloodforge_slag_vent",
+      "height": 2.2,
+      "prompt": "Original stylized low-poly infernal slag vent for a chibi fantasy MMO raid, squat hexagonal black iron floor vent with horned brass frame, broken grate and bright molten orange interior, strong readable hazard landmark, modular freestanding prop, centered isolated, no floor plane, no scene, no text",
+      "conceptTask": "2cb165cb-e52a-44fd-9215-ea2ee7416b86",
+      "modelTask": "e6ab1261-8397-4fcf-8f50-04bf6f41010c",
+      "credits": 35,
+      "sha256": "f8281a889a592236e5d68485b859645ed92d2811a271b5798d1f29ef4d9b82eb"
+    },
+    {
+      "name": "tower_bloodforge_gate",
+      "height": 8,
+      "prompt": "Original stylized low-poly monumental Bloodforge entrance for a chibi fantasy MMO raid, one complete connected symmetrical structure: two square black-iron furnace towers joined by a thick horned overhead lintel, broad open walk-through doorway at center, oxidized brass bands and rivets, visible orange fireboxes in both towers, chains and spikes, stable flat bases, front-facing architectural gate, centered isolated, no floor, no scene, no text",
+      "conceptTask": "3c5aac4d-6d68-4315-bba0-40f97273735d",
+      "modelTask": "7b56a253-f27b-4dde-85e7-9e770d46796e",
+      "supersededTasks": ["818e40b4-3e66-435d-82f3-c17e1fbf202a", "d86d8b23-1746-4e84-a3b3-c6507421711d"],
+      "credits": 70,
+      "sha256": "74ed1cfa91f60944e586434e6134a073fc9de18211d41d1b19609b69f59fe0be"
+    },
+    {
+      "name": "tower_ossuary_reliquary",
+      "height": 5.5,
+      "prompt": "Original stylized low-poly chained ossuary heart reliquary for a chibi fantasy MMO raid, jagged ivory ribs wrapping a suspended violet soul crystal, charcoal stone plinth, heavy black chains, spectral cyan accents, dramatic hero setpiece, centered isolated, no floor, no scene, no text, readable isometric silhouette",
+      "conceptTask": "0d24a89b-35ef-4d21-b972-dd7cf4d5c676",
+      "modelTask": "402fba28-6f98-449c-bd5c-ebe0e0aaa7e8",
+      "credits": 35,
+      "sha256": "4948002a211ffdef046a36472c2a95731fd1b684bc2e99f82576e105f725f326"
+    },
+    {
+      "name": "tower_ossuary_rib_arch",
+      "height": 7,
+      "prompt": "Original stylized low-poly walk-through rib arch for a chibi fantasy MMO ossuary raid, two sturdy charcoal stone bases, symmetrical giant ivory ribs curving overhead and visibly connected at the crown, small violet soul crystals, wide clear doorway, complete freestanding architectural arch, centered isolated, no floor, no scene, no text",
+      "conceptTask": "12e0d570-2c36-4b3b-bf61-7beb4b7ffc9c",
+      "modelTask": "6896245f-b40d-4fc2-822b-5defe4a761cf",
+      "credits": 35,
+      "sha256": "e1f51dfab6f39abfb5d521526d07d94e52a1c801b08c91b77b836c49bd0ef3f5"
+    },
+    {
+      "name": "tower_ossuary_bone_organ",
+      "height": 7.5,
+      "prompt": "Original stylized low-poly bone pipe organ for a chibi fantasy MMO ossuary raid, clustered vertical ivory femur and horn pipes on a charcoal stone altar, skull keyboard facade, purple spectral glow between pipes, tall dramatic silhouette, complete freestanding prop, centered isolated, no floor, no scene, no text",
+      "conceptTask": "aca5cb75-c0e9-4811-bd72-e536f8963bb2",
+      "modelTask": "c115c20a-a78b-4ddf-bf85-803296e27d6d",
+      "credits": 35,
+      "sha256": "2fd25e1e818318318c4d723bdbde365d4fc4601e4d7ffa28d2c05db871fe7a4c"
+    },
+    {
+      "name": "tower_ossuary_chain_pylon",
+      "height": 6,
+      "prompt": "Original stylized low-poly ossuary chain pylon for a chibi fantasy MMO raid, sturdy square charcoal stone pillar wrapped in ivory vertebrae and skull armor, heavy black chains anchored on both sides, purple soul flame brazier at top, complete freestanding prop, centered isolated, no floor, no scene, no text",
+      "conceptTask": "9e76f15a-f49b-4ab3-998d-7a71f1e848f3",
+      "modelTask": "e1855609-de3f-4d6f-a2dd-623734eec245",
+      "credits": 35,
+      "sha256": "ead69f3b5bd4bf404ad3177067beb8c7976e4c0765d07eb55b67bf4737639225"
+    },
+    {
+      "name": "tower_ossuary_skull_gate",
+      "height": 9,
+      "prompt": "Original stylized low-poly monumental skull gate for a chibi fantasy MMO raid, huge symmetrical horned ivory demon skull forming a broad walk-through mouth arch, charcoal stone buttresses on both sides, black portcullis raised, violet and cyan soul lights, complete connected freestanding structure, centered isolated, no floor, no scene, no text",
+      "conceptTask": "4eb98c5f-dd02-4d53-a4af-8ce5503029bf",
+      "modelTask": "70aa195e-703e-45af-8b3a-15a30b628549",
+      "credits": 35,
+      "sha256": "9327400b9d9e57d43522a592a741d2da3b491738d20359048987384735c08ac5"
+    },
+    {
+      "name": "tower_void_crown_spire",
+      "height": 9.5,
+      "prompt": "Original stylized low-poly Void Crown spire for a chibi fantasy MMO raid summit, tall hooked obsidian crown blade on a cold silver armored base, inset glowing magenta crystal, torn dark crimson banner, strong asymmetrical vertical silhouette, complete freestanding prop, centered isolated, no floor, no scene, no text",
+      "conceptTask": "f229f591-4c15-4ae9-9e93-9e24ef0d884a",
+      "modelTask": "fe48da8d-5dd3-434e-a035-901e293a88c0",
+      "credits": 35,
+      "sha256": "d87a06cf5d6af067bf745484f6f53bfc0e11ceb94bec4babd87db6273c59a808"
+    },
+    {
+      "name": "tower_void_throne",
+      "height": 7,
+      "prompt": "Original stylized low-poly Void Crown throne for a chibi fantasy MMO raid summit, complete black obsidian throne with tall hooked crown back, cold silver armor trim, levitating cracked magenta crystal above the seat, short three-step dais included, dramatic symmetrical hero landmark, centered isolated, no floor plane, no scene, no text",
+      "conceptTask": "a94c107b-3af4-425e-b8e7-625b53391bba",
+      "modelTask": "b4957e6f-ef43-4b1b-afd6-53167d079bad",
+      "credits": 35,
+      "sha256": "54e680acfabe8296f156319ecc6c5c1527f9dda14b94f59623b72d49c47fe4df"
+    },
+    {
+      "name": "tower_void_crystal_conduit",
+      "height": 4.8,
+      "prompt": "Original stylized low-poly void crystal lightning conduit for a chibi fantasy MMO raid, chunky cold silver and obsidian pedestal, large faceted magenta crystal held by four crown claws, etched violet channels, complete freestanding prop, centered isolated, no floor, no scene, no text",
+      "conceptTask": "83be20a8-bb35-46c8-ae84-4e2daee33b87",
+      "modelTask": "132f211e-2585-4edf-8565-1c6d03dac5b3",
+      "credits": 35,
+      "sha256": "e95f665a2ac98ce668420c7fec04bb069cfc99f495037d88184e758e345f5542"
+    },
+    {
+      "name": "tower_void_banner",
+      "height": 6.5,
+      "prompt": "Original stylized low-poly Void Crown war banner for a chibi fantasy MMO raid, tall cold silver spear pole with hooked obsidian crown blade, torn dark crimson cloth banner, small inset magenta gem, chunky stable base, complete freestanding prop, centered isolated, no floor, no scene, no text",
+      "conceptTask": "12105c1e-5a9e-4f29-9358-2894f0496c46",
+      "modelTask": "0363b03d-0757-4edc-a0b4-9e1adb0269d3",
+      "credits": 35,
+      "sha256": "2d7dd24397a1b725280993a1f099f4885945c5ff2e134cb6e7de96dc2494fc66"
+    },
+    {
+      "name": "tower_void_floating_shard",
+      "height": 5,
+      "prompt": "Original stylized low-poly levitating void masonry cluster for a chibi fantasy MMO raid, one large jagged obsidian crystal-rock suspended above a small silver rune pedestal with three smaller orbiting shards, glowing magenta fracture seams, complete centered isolated prop, no floor, no scene, no text",
+      "conceptTask": "1affd7ac-1ed0-422f-aa67-8700d9fd50ed",
+      "modelTask": "67bf8d04-2c8b-4aa4-9d17-df94a2f6bce0",
+      "credits": 35,
+      "sha256": "df71bcb54e8e03d74fe94e0726891042407089a1c4b9450950ef292daf95cff7"
+    }
+  ]
+}

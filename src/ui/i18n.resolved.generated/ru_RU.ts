@@ -7060,6 +7060,7 @@ export const ru_RU: EnTranslations = {
       "allUnstable": "Все разломы сейчас нестабильны. Попробуйте позже.",
       "enterFloor": "Вы проходите сквозь разлом и попадаете в {name}.",
       "descendFloor": "Вы спускаетесь глубже в {name}.",
+      "ascendFloor": "Вы поднимаетесь в {name}.",
       "stepBack": "Вы возвращаетесь назад сквозь разлом.",
       "pylonLit": "Рунный пилон вспыхивает ({lit}/{total}).",
       "wayDownOpens": "Путь вниз разверзается.",
@@ -17206,6 +17207,12 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
     "mailboxName": "Почтовый ящик",
-    "noticeboardName": "Доска объявлений"
+    "noticeboardName": "Доска объявлений",
+    "demonTowerName": "Демоническая башня",
+    "demonTowerBloodforgeName": "Демоническая башня: Кровавая кузня",
+    "demonTowerOssuaryName": "Демоническая башня: Оссуарий цепей",
+    "demonTowerVoidCrownName": "Демоническая башня: Корона Пустоты",
+    "demonTowerCoreName": "Демоническое Ядро",
+    "demonTowerAscentName": "Подъём в башне"
   }
 };

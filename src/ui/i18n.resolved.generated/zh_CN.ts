@@ -7060,6 +7060,7 @@ export const zh_CN: EnTranslations = {
       "allUnstable": "所有裂隙目前都不稳定。请稍后再试。",
       "enterFloor": "你穿过裂隙，进入了{name}。",
       "descendFloor": "你深入{name}的更深处。",
+      "ascendFloor": "你向上进入{name}。",
       "stepBack": "你退回裂隙，返回原地。",
       "pylonLit": "一座符文尖塔亮起（{lit}/{total}）。",
       "wayDownOpens": "通往下层的裂口被撕开了。",
@@ -17206,6 +17207,12 @@ export const zh_CN: EnTranslations = {
     "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
     "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰",
     "mailboxName": "邮箱",
-    "noticeboardName": "告示板"
+    "noticeboardName": "告示板",
+    "demonTowerName": "恶魔之塔",
+    "demonTowerBloodforgeName": "恶魔之塔：血铸熔炉",
+    "demonTowerOssuaryName": "恶魔之塔：锁链骨堂",
+    "demonTowerVoidCrownName": "恶魔之塔：虚空之冠",
+    "demonTowerCoreName": "恶魔核心",
+    "demonTowerAscentName": "高塔升途"
   }
 };

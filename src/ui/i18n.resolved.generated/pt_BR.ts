@@ -7060,6 +7060,7 @@ export const pt_BR: EnTranslations = {
       "allUnstable": "Todas as fendas estão instáveis no momento. Tente novamente em breve.",
       "enterFloor": "Você atravessa a fenda e entra em {name}.",
       "descendFloor": "Você desce mais fundo em {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Você dá um passo para trás através da fenda.",
       "pylonLit": "Um pilar rúnico se acende ({lit}/{total}).",
       "wayDownOpens": "O caminho para baixo se abre com um rasgão.",
@@ -17206,6 +17207,12 @@ export const pt_BR: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuário do Junco: Pressione F para tocá-lo",
     "delveRiteShrineSkullInteract": "Santuário da Caveira: Pressione F para tocá-lo",
     "mailboxName": "Caixa de correio",
-    "noticeboardName": "Quadro de Avisos"
+    "noticeboardName": "Quadro de Avisos",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

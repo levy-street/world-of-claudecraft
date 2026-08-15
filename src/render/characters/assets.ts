@@ -534,6 +534,11 @@ const allPreloadUrls = characterPreloadUrls(false);
 // DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
 // there would throw.
 const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
+// Demon Tower combat starts as soon as the player crosses its permanent portal.
+// Keep its complete encounter pack inside the entry barrier even on iOS: unlike
+// ordinary roaming mobs, a missing body here can make an already-hostile raid wave
+// invisible. The 20 Tower GLBs are KTX2 + meshopt and form one bounded pack.
+const BOOT_CRITICAL_URL_PREFIXES = ['models/creatures/tower_'];
 // Armory weapon-SKIN models stream too (64 of the 78 weapon files): they are
 // cosmetic replacements for base weapons that always stay in the gate, so a
 // wearer whose skin GLB has not arrived yet degrades to their base weapon (the
@@ -542,7 +547,8 @@ const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
 const streamedSkinUrls = new Set(weaponSkinModelUrls());
 const streamableUrls = allPreloadUrls.filter(
   (url) =>
-    STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url),
+    !BOOT_CRITICAL_URL_PREFIXES.some((prefix) => url.includes(prefix)) &&
+    (STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url)),
 );
 let streamedUrls = GFX.iosMemoryProfile ? streamableUrls : [];
 let streamedUrlSet = new Set(streamedUrls);
@@ -624,6 +630,12 @@ export function startStreamedCharacterPreloads(): number {
   }
   return streamedUrls.length;
 }
+
+export const characterPreloadInternalsForTest = {
+  allPreloadUrls: () => new Set(allPreloadUrls),
+  iosStreamedUrls: () => new Set(streamableUrls),
+  iosBootUrls: () => new Set(allPreloadUrls.filter((url) => !streamableUrls.includes(url))),
+};
 
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so
 // they line up with the glTF-embedded UVs. These load on every tier so skin

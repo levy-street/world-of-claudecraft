@@ -2841,7 +2841,7 @@ export const DEEDS: Record<string, DeedDef> = {
   dgn_demon_tower_unbound: {
     id: 'dgn_demon_tower_unbound',
     name: 'The Tower Unbound',
-    desc: 'Climb all ten floors of the Demon Tower and put down Malgrath at its summit.',
+    desc: 'Conquer all three trials of the Demon Tower and put down Malgrath at its summit.',
     category: 'dungeon',
     renown: 50,
     trigger: { kind: 'stat', stat: 'demonTowerClears', count: 1 },

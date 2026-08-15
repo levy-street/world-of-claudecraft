@@ -9091,6 +9091,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'sim.rift.deadEntryCombat':
     'Tu grupo sigue en combate. Los caídos pueden volver a entrar cuando termine la lucha.',
   'sim.rift.descendFloor': 'Desciendes más profundo en {name}.',
+  'sim.rift.ascendFloor': 'Asciendes hacia {name}.',
+  'sim.rift.towerWave': 'El Núcleo Demoníaco aúlla. Oleada {wave} de {total}.',
+  'sim.rift.towerBossWave':
+    'El núcleo se abre y de él emerge una presencia mucho más terrible.',
+  'sim.rift.towerFloorClear': 'El Núcleo Demoníaco se resquebraja. El camino ascendente está abierto.',
+  'sim.rift.towerCleared': 'El Núcleo Demoníaco se apaga. La torre es tuya.',
   'sim.rift.detonateAbsoluteZero': '¡Cero Absoluto estalla!',
   'sim.rift.detonateAbyssalMaw': '¡Las Fauces Abisales se cierran!',
   'sim.rift.detonateArcaneAnnihilation': '¡Aniquilación Arcana estalla!',
@@ -13410,4 +13416,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Ese código de apariencia proviene de una versión más reciente del juego.',
   'auth.designCodeErrMalformed': 'Ese código de apariencia está dañado. Copia el código completo e inténtalo de nuevo.',
   'hudChrome.nameplate.cheaterTag': '< Tramposo >',
+  'worldContent.demonTowerName': 'La Torre Demoníaca',
+  'worldContent.demonTowerBloodforgeName': 'La Torre Demoníaca: La Forja de Sangre',
+  'worldContent.demonTowerOssuaryName': 'La Torre Demoníaca: El Osario de las Cadenas',
+  'worldContent.demonTowerVoidCrownName': 'La Torre Demoníaca: La Corona del Vacío',
+  'worldContent.demonTowerCoreName': 'Núcleo Demoníaco',
+  'worldContent.demonTowerAscentName': 'Ascenso de la Torre',
 };

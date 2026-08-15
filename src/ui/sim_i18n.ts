@@ -13,7 +13,7 @@
 // matcher — so a new unhandled sim string cannot ship silently.
 import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
-import { tEntity } from './entity_i18n';
+import { localizedRiftName, tEntity } from './entity_i18n';
 import {
   formatNumber,
   getLanguage,
@@ -8679,6 +8679,8 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
 ]);
 
 export function localizeSimAuraName(name: string): string | null {
+  const towerName = towerMechanicName(name);
+  if (towerName) return towerName;
   const key = AURA_NAME_KEY[name];
   if (key) return tSim(key);
   if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
@@ -8694,7 +8696,115 @@ export function localizeSimAuraName(name: string): string | null {
 // aura localizer (the mechanic names double as the debuff aura names), falling back to the
 // raw English name for any mechanic not yet registered.
 function locBossMechanic(name: string): string {
-  return localizeSimAuraName(name) ?? name;
+  return towerMechanicName(name) ?? localizeSimAuraName(name) ?? name;
+}
+
+const TOWER_MECHANICS: Partial<Record<SupportedLanguage, Readonly<Record<string, string>>>> = {
+  es: {
+    'Graft Flesh': 'Injerto de carne',
+    'Sinew Snare': 'Trampa de tendones',
+    Ashfall: 'Lluvia de ceniza',
+    'Cinder Wake': 'Estela de brasas',
+    'Ember Quake': 'Terremoto de ascuas',
+    'Molten Rush': 'Embestida fundida',
+    'Warden the Gate': 'Guardia de la puerta',
+    Chainfire: 'Fuego encadenado',
+    'Gate Slam': 'Golpe de la puerta',
+    'The Unmaking': 'La Descreación',
+    'Rift Collapse': 'Colapso de la brecha',
+    'Sunder the Spire': 'Quebrar la aguja',
+    'Unbound Nova': 'Nova desatada',
+    'Rift Collapse detonates!': '¡El Colapso de la brecha detona!',
+  },
+  ja_JP: {
+    'Graft Flesh': '肉体接合',
+    'Sinew Snare': '腱の罠',
+    Ashfall: '灰の降下',
+    'Cinder Wake': '残り火の軌跡',
+    'Ember Quake': '熾火の地震',
+    'Molten Rush': '溶融突進',
+    'Warden the Gate': '門の守護',
+    Chainfire: '連鎖炎',
+    'Gate Slam': '門の強打',
+    'The Unmaking': '解体',
+    'Rift Collapse': '裂け目の崩壊',
+    'Sunder the Spire': '尖塔粉砕',
+    'Unbound Nova': '解放の新星',
+    'Rift Collapse detonates!': '裂け目の崩壊が爆発する！',
+  },
+  ko_KR: {
+    'Graft Flesh': '살점 접합',
+    'Sinew Snare': '힘줄 덫',
+    Ashfall: '재의 강하',
+    'Cinder Wake': '잿불 자취',
+    'Ember Quake': '잿불 지진',
+    'Molten Rush': '용암 돌진',
+    'Warden the Gate': '관문 수호',
+    Chainfire: '연쇄 화염',
+    'Gate Slam': '관문 강타',
+    'The Unmaking': '해체',
+    'Rift Collapse': '균열 붕괴',
+    'Sunder the Spire': '첨탑 파쇄',
+    'Unbound Nova': '해방된 폭발',
+    'Rift Collapse detonates!': '균열 붕괴가 폭발합니다!',
+  },
+  ru_RU: {
+    'Graft Flesh': 'Сращивание плоти',
+    'Sinew Snare': 'Сухожильная ловушка',
+    Ashfall: 'Пеплопад',
+    'Cinder Wake': 'Шлейф углей',
+    'Ember Quake': 'Угольный разлом',
+    'Molten Rush': 'Расплавленный рывок',
+    'Warden the Gate': 'Страж врат',
+    Chainfire: 'Цепной огонь',
+    'Gate Slam': 'Удар врат',
+    'The Unmaking': 'Развоплощение',
+    'Rift Collapse': 'Коллапс разлома',
+    'Sunder the Spire': 'Раскол шпиля',
+    'Unbound Nova': 'Освобождённая нова',
+    'Rift Collapse detonates!': 'Коллапс разлома взрывается!',
+  },
+  zh_CN: {
+    'Graft Flesh': '血肉嫁接',
+    'Sinew Snare': '筋腱陷阱',
+    Ashfall: '灰烬天降',
+    'Cinder Wake': '余烬尾迹',
+    'Ember Quake': '余烬震荡',
+    'Molten Rush': '熔火冲锋',
+    'Warden the Gate': '守卫大门',
+    Chainfire: '连锁烈焰',
+    'Gate Slam': '大门猛击',
+    'The Unmaking': '万物消解',
+    'Rift Collapse': '裂隙坍塌',
+    'Sunder the Spire': '粉碎尖塔',
+    'Unbound Nova': '无缚新星',
+    'Rift Collapse detonates!': '裂隙坍塌爆发了！',
+  },
+  zh_TW: {
+    'Graft Flesh': '血肉嫁接',
+    'Sinew Snare': '筋腱陷阱',
+    Ashfall: '灰燼天降',
+    'Cinder Wake': '餘燼尾跡',
+    'Ember Quake': '餘燼震盪',
+    'Molten Rush': '熔火衝鋒',
+    'Warden the Gate': '守衛大門',
+    Chainfire: '連鎖烈焰',
+    'Gate Slam': '大門猛擊',
+    'The Unmaking': '萬物消解',
+    'Rift Collapse': '裂隙坍塌',
+    'Sunder the Spire': '粉碎尖塔',
+    'Unbound Nova': '無縛新星',
+    'Rift Collapse detonates!': '裂隙坍塌爆發了！',
+  },
+};
+
+function towerMechanicName(name: string): string | null {
+  const language = getLanguage();
+  return (
+    TOWER_MECHANICS[language]?.[name] ??
+    (language === 'es_ES' ? TOWER_MECHANICS.es?.[name] : null) ??
+    null
+  );
 }
 
 type ArenaExtraKey =
@@ -11464,11 +11574,15 @@ const RULES: Rule[] = [
   },
   {
     re: /^You step through the rift into (.+)\.$/,
-    build: (m) => t('sim.rift.enterFloor', { name: m[1] }),
+    build: (m) => t('sim.rift.enterFloor', { name: localizedRiftName(m[1]) }),
   },
   {
     re: /^You descend deeper into (.+)\.$/,
-    build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
+    build: (m) => t('sim.rift.descendFloor', { name: localizedRiftName(m[1]) }),
+  },
+  {
+    re: /^You ascend into (.+)\.$/,
+    build: (m) => t('sim.rift.ascendFloor', { name: localizedRiftName(m[1]) }),
   },
   { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
   {
@@ -11495,6 +11609,10 @@ const RULES: Rule[] = [
   {
     re: /^The Demon Core goes dark\. The tower is yours\.$/,
     build: () => t('sim.rift.towerCleared'),
+  },
+  {
+    re: /^Rift Collapse detonates!$/,
+    build: () => towerMechanicName('Rift Collapse detonates!') ?? 'Rift Collapse detonates!',
   },
   { re: /^The frost sigil blazes\. The way stirs\.$/, build: () => t('sim.rift.iceGoalLit') },
   { re: /^The sockets grind shut\. The way stirs\.$/, build: () => t('sim.rift.socketsShut') },

@@ -4,8 +4,8 @@
 // These are the assertions that would actually catch a regression in the wiring:
 // a floor that arrives pre-populated (the tower's whole feel is wave-by-wave), a
 // second wave landing on top of the first, an ascent that opens before the floor
-// is clear, the floor-5 gatekeeper stealing the run's boss slot and ending it
-// early, or the summit failing to pay out.
+// is clear, Vaskar stealing the Void Crown's boss slot and ending it early, or
+// the Demon Lord failing to pay out.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -14,8 +14,9 @@ import {
   demonTowerArenaPolygon,
   isDemonTowerSeed,
 } from '../src/sim/content/rift/demon_tower';
-import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS, riftInstanceOrigin } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { RIFT_MECHANIC_SPACING_SEC } from '../src/sim/mob/mechanic_spacing';
 import { riftRankTemplate } from '../src/sim/rift/ranks';
 import { generateRiftFloor, generateRiftPlan, riftFloorCount } from '../src/sim/rift/rift_gen';
 import { demonTowerRankTuning } from '../src/sim/rift/tower';
@@ -25,7 +26,12 @@ import {
   demonTowerFloorTuning,
   isDemonTowerBossFloor,
 } from '../src/sim/rift/tower_scaling';
-import { demonTowerBossFor } from '../src/sim/rift/tower_waves';
+import {
+  DEMON_TOWER_GATEKEEPER,
+  demonTowerBossFor,
+  demonTowerWavePlan,
+  safeTowerSpawnPosition,
+} from '../src/sim/rift/tower_waves';
 import type { RiftInstance } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 import type { WorldContent } from '../src/sim/types';
@@ -74,9 +80,11 @@ function tickAlive(sim: Sim, n: number): void {
 /** Take the open ascent up, the way a player does: walk onto it. */
 function ascend(sim: Sim, inst: RiftInstance): void {
   expect(inst.descentOpen, 'ascent must be open before climbing').toBe(true);
-  const desc = sim.entities.get(inst.descentId!);
+  if (inst.descentId === null) throw new Error('ascent id must exist before climbing');
+  const desc = sim.entities.get(inst.descentId);
   expect(desc, 'ascent object must exist').toBeTruthy();
-  sim.player.pos = { ...desc!.pos };
+  if (!desc) throw new Error('ascent object must exist before climbing');
+  sim.player.pos = { ...desc.pos };
   tickAlive(sim, SWEEP);
 }
 
@@ -110,8 +118,8 @@ describe('demon tower: generation', () => {
   it('is a fixed landmark on its reserved seed, at every rank', () => {
     expect(isDemonTowerSeed(DEMON_TOWER_SEED)).toBe(true);
     expect(isDemonTowerSeed(DEMON_TOWER_SEED + 1)).toBe(false);
-    // Unlike the C-only Infernal Citadel, the tower opens the same ten floors
-    // whatever baseLevel it is entered at.
+    // Unlike the C-only Infernal Citadel, the tower opens the same three
+    // authored raids whatever baseLevel it is entered at.
     for (const baseLevel of [20, 22, 25, 28]) {
       expect(riftFloorCount(DEMON_TOWER_SEED, baseLevel)).toBe(DEMON_TOWER_FLOOR_COUNT);
       expect(generateRiftPlan(DEMON_TOWER_SEED, baseLevel).floorCount).toBe(
@@ -124,10 +132,8 @@ describe('demon tower: generation', () => {
     for (let k = 0; k < DEMON_TOWER_FLOOR_COUNT; k++) {
       const poly = demonTowerArenaPolygon(k);
       const radius = demonTowerArenaRadius(k);
-      expect(poly.length).toBeGreaterThan(16);
-      for (const p of poly) {
-        expect(Math.hypot(p.x, p.z)).toBeCloseTo(radius, 2);
-      }
+      expect(poly.length).toBeGreaterThanOrEqual(8);
+      expect(Math.max(...poly.map((p) => Math.hypot(p.x, p.z)))).toBeCloseTo(radius, 2);
       // CCW winding is what the shell seam expects (rift_gen does the same check).
       let area = 0;
       for (let i = 0; i < poly.length; i++) {
@@ -182,14 +188,13 @@ describe('demon tower: a live run', () => {
     expect(inst.towerWaveMobIds).toHaveLength(0);
 
     tickAlive(sim, SWEEP);
-    const tuning = demonTowerFloorTuning(0);
     expect(inst.towerWave).toBe(1);
-    expect(inst.towerWaveMobIds).toHaveLength(tuning.packSize);
+    expect(inst.towerWaveMobIds).toHaveLength(demonTowerWavePlan(0)[0].spawns.length);
 
     // While the wave lives, the core must NOT send another one.
     tickAlive(sim, SWEEP * 3);
     expect(inst.towerWave).toBe(1);
-    expect(inst.towerWaveMobIds).toHaveLength(tuning.packSize);
+    expect(inst.towerWaveMobIds).toHaveLength(demonTowerWavePlan(0)[0].spawns.length);
     expect(inst.puzzleSolved).toBe(false);
     expect(inst.descentOpen).toBe(false);
   });
@@ -226,51 +231,58 @@ describe('demon tower: a live run', () => {
       ...inst.towerWaveMobIds.map((id) => sim.entities.get(id)?.maxHp ?? 0),
     );
 
-    // Jump the same instance to a much higher floor and re-arm it.
+    // Climb to the Void Crown and compare against the same base portal rank.
     const sim2 = makeSim();
     sim2.enterRift(DEMON_TOWER_SEED, 20, sim2.player.id);
     const inst2 = towerInstance(sim2);
-    for (let k = 0; k < 6; k++) {
+    for (let k = 0; k < 2; k++) {
       clearFloor(sim2, inst2);
       ascend(sim2, inst2);
     }
-    expect(inst2.floorIndex).toBe(6);
+    expect(inst2.floorIndex).toBe(2);
     tickAlive(sim2, SWEEP);
     const highFloorHp = Math.max(
       ...inst2.towerWaveMobIds.map((id) => sim2.entities.get(id)?.maxHp ?? 0),
     );
-    // Floor 7 demons are a different, tougher tier AND carry the floor multiplier.
+    // Void Crown demons are a different, tougher tier AND carry the floor multiplier.
     expect(highFloorHp).toBeGreaterThan(groundFloorHp * 2);
   });
 
-  it('releases the floor-5 gatekeeper on the last wave without ending the run', () => {
+  it('fields Vaskar as a Void Crown lieutenant without stealing the run boss slot', () => {
     const sim = makeSim();
     sim.enterRift(DEMON_TOWER_SEED, 20, sim.player.id);
     const inst = towerInstance(sim);
-    for (let k = 0; k < 4; k++) {
+    for (let k = 0; k < 2; k++) {
       clearFloor(sim, inst);
       ascend(sim, inst);
     }
-    expect(inst.floorIndex).toBe(4);
-    expect(isDemonTowerBossFloor(4)).toBe(true);
+    expect(inst.floorIndex).toBe(2);
+    expect(isDemonTowerBossFloor(2)).toBe(true);
 
-    const tuning = demonTowerFloorTuning(4);
-    for (let w = 0; w < tuning.waveCount; w++) {
+    const plan = demonTowerWavePlan(2);
+    const lieutenantWave = plan.findIndex((wave) =>
+      wave.spawns.some((spawn) => spawn.templateId === DEMON_TOWER_GATEKEEPER),
+    );
+    expect(lieutenantWave).toBeGreaterThan(0);
+    for (let w = 0; w <= lieutenantWave; w++) {
       tickAlive(sim, SWEEP);
-      if (w < tuning.waveCount - 1) killLiveDemons(sim, inst);
+      if (w < lieutenantWave) killLiveDemons(sim, inst);
     }
-    // The last wave brought the gatekeeper with it...
-    expect(inst.towerBossId).not.toBeNull();
-    const boss = sim.entities.get(inst.towerBossId!);
-    expect(boss?.templateId).toBe(demonTowerBossFor(4));
-    // ...but he must NOT hold the run's boss slot, or the run ends five floors early.
+    const boss = inst.towerWaveMobIds
+      .map((id) => sim.entities.get(id))
+      .find((entity) => entity?.templateId === DEMON_TOWER_GATEKEEPER);
+    expect(boss).toBeTruthy();
+    // Vaskar is part of the authored wave, not the Demon Lord release.
+    expect(inst.towerBossId).toBeNull();
     expect(inst.bossId).toBeNull();
     expect(inst.puzzleSolved).toBe(false);
 
     // Summoned boss adds must inherit this floor's Tower curve, not the S-rank
     // portal table. v0.38.0 retuned S independently, so confusing the two makes
     // these adds several times deadlier without touching Tower tuning.
-    if (!boss) throw new Error('gatekeeper did not spawn');
+    if (!boss) throw new Error('Vaskar did not spawn');
+    expect(RIFT_MECHANIC_SPACING_SEC).toBe(5);
+    expect(boss.riftMechanicSpacing).toBe(5);
     const summon = sim as unknown as {
       spawnBossAdds(entity: typeof boss, mobId: string, count: number): void;
     };
@@ -278,7 +290,8 @@ describe('demon tower: a live run', () => {
     const addId = boss.summonedIds.at(-1);
     const add = addId === undefined ? undefined : sim.entities.get(addId);
     expect(add).toBeTruthy();
-    const rankTuning = demonTowerRankTuning(inst.floorIndex);
+    expect(add?.riftMechanicSpacing).toBeUndefined();
+    const rankTuning = demonTowerRankTuning(2);
     const expected = createMob(
       -1,
       riftRankTemplate(MOBS.tower_imp, rankTuning, 'add'),
@@ -301,20 +314,110 @@ describe('demon tower: a live run', () => {
       mechanicHealMult: rankTuning.healthMultiplier,
     });
 
+    // A surviving summon is part of the encounter population: killing Vaskar
+    // cannot advance the wave while his add is still active.
     killLiveDemons(sim, inst);
     tickAlive(sim, SWEEP);
-    expect(inst.puzzleSolved).toBe(true);
-    expect(inst.descentOpen).toBe(true);
+    expect(inst.towerBossId).toBeNull();
+    if (add) {
+      add.hp = 0;
+      add.dead = true;
+    }
+    tickAlive(sim, SWEEP);
+    expect(inst.towerBossId).not.toBeNull();
+    expect(inst.bossId).toBe(inst.towerBossId);
+    const towerBossId = inst.towerBossId;
+    if (towerBossId === null) throw new Error('Demon Lord did not spawn');
+    expect(sim.entities.get(towerBossId)?.templateId).toBe(demonTowerBossFor(2));
+    expect(sim.entities.get(towerBossId)?.riftMechanicSpacing).toBe(5);
+    expect(inst.puzzleSolved).toBe(false);
   });
 
-  it('climbs all ten floors and the summit boss claims the run', () => {
+  it('releases each live floor boss at the safe authored position', () => {
+    const sim = makeSim();
+    sim.enterRift(DEMON_TOWER_SEED, 20, sim.player.id);
+    const inst = towerInstance(sim);
+
+    for (let floorIndex = 0; floorIndex < DEMON_TOWER_FLOOR_COUNT; floorIndex++) {
+      expect(inst.floorIndex).toBe(floorIndex);
+      const waveCount = demonTowerFloorTuning(floorIndex).waveCount;
+      for (let wave = 0; wave < waveCount; wave++) {
+        tickAlive(sim, SWEEP);
+        if (wave < waveCount - 1) killLiveDemons(sim, inst);
+      }
+      if (inst.towerBossId === null) throw new Error(`floor ${floorIndex + 1} boss missing`);
+      const boss = sim.entities.get(inst.towerBossId);
+      if (!boss) throw new Error(`floor ${floorIndex + 1} boss entity missing`);
+      const origin = riftInstanceOrigin(inst.slot, floorIndex);
+      const localBoss = {
+        x: boss.spawnPos.x - origin.x,
+        z: boss.spawnPos.z - origin.z,
+      };
+      const expected = safeTowerSpawnPosition(floorIndex, {
+        x: 0,
+        z: demonTowerArenaRadius(floorIndex) * 0.36,
+      });
+      expect(localBoss.x).toBeCloseTo(expected.x, 6);
+      expect(localBoss.z).toBeCloseTo(expected.z, 6);
+      expect(Math.hypot(localBoss.x, localBoss.z)).toBeGreaterThan(5);
+
+      killLiveDemons(sim, inst);
+      tickAlive(sim, SWEEP);
+      if (floorIndex < DEMON_TOWER_FLOOR_COUNT - 1) ascend(sim, inst);
+    }
+  });
+
+  it('caps boss summons against the complete live Tower population', () => {
+    const sim = makeSim();
+    sim.enterRift(DEMON_TOWER_SEED, 20, sim.player.id);
+    const inst = towerInstance(sim);
+    tickAlive(sim, SWEEP);
+    const summoner = sim.entities.get(inst.towerWaveMobIds[0]);
+    if (!summoner) throw new Error('tower wave should provide a summoner fixture');
+    const summon = sim as unknown as {
+      spawnBossAdds(entity: typeof summoner, mobId: string, count: number): void;
+    };
+    summon.spawnBossAdds(summoner, 'tower_imp', 50);
+    const live = inst.mobIds.filter((id) => {
+      const mob = sim.entities.get(id);
+      return mob && !mob.dead;
+    });
+    expect(live.length).toBe(18);
+    expect(summoner.summonedIds).toHaveLength(18 - inst.towerWaveMobIds.length);
+  });
+
+  it('replays the same runtime wave trace for the same seed and config', () => {
+    const trace = (): unknown => {
+      const sim = makeSim();
+      sim.enterRift(DEMON_TOWER_SEED, 20, sim.player.id);
+      const inst = towerInstance(sim);
+      tickAlive(sim, SWEEP);
+      return inst.towerWaveMobIds.map((id) => {
+        const mob = sim.entities.get(id);
+        return (
+          mob && {
+            id: mob.id,
+            templateId: mob.templateId,
+            pos: mob.pos,
+            maxHp: mob.maxHp,
+            weapon: mob.weapon,
+            spacing: mob.riftMechanicSpacing,
+          }
+        );
+      });
+    };
+    expect(trace()).toEqual(trace());
+  });
+
+  it('climbs all three raids and the Demon Lord claims the run', () => {
     const sim = makeSim(true);
     sim.tick();
     const door = [...sim.entities.values()].find(
       (e) => e.templateId === 'rift_portal' && e.riftSeed === DEMON_TOWER_SEED,
     );
     expect(door).toBeTruthy();
-    sim.player.pos = { ...door!.pos };
+    if (!door) throw new Error('tower door should exist');
+    sim.player.pos = { ...door.pos };
     sim.tick();
     const inst = towerInstance(sim);
 
@@ -335,16 +438,29 @@ describe('demon tower: a live run', () => {
     // opens the way home and pays out.
     expect(inst.towerBossId).not.toBeNull();
     expect(inst.bossId).toBe(inst.towerBossId);
-    expect(sim.entities.get(inst.bossId!)?.templateId).toBe(
+    if (inst.bossId === null) throw new Error('summit boss should exist');
+    expect(sim.entities.get(inst.bossId)?.templateId).toBe(
       demonTowerBossFor(DEMON_TOWER_FLOOR_COUNT - 1),
     );
 
-    killLiveDemons(sim, inst);
+    const bossId = inst.bossId;
+    if (bossId === null) throw new Error('summit boss should exist');
+    const boss = sim.entities.get(bossId);
+    if (!boss) throw new Error('summit boss entity should exist');
+    boss.hp = 0;
+    boss.dead = true;
     tickAlive(sim, SWEEP);
     expect(inst.bossDiedAtTick).not.toBeNull();
+    expect(inst.puzzleSolved).toBe(false);
+    expect(inst.exitId).toBeNull();
+
+    killLiveDemons(sim, inst);
+    tickAlive(sim, SWEEP);
+    expect(inst.puzzleSolved).toBe(true);
     expect(inst.exitId).not.toBeNull();
+    expect(inst.cacheId).toBeNull();
     // A natural/dev rift seals its entry after a clear. The tower is a permanent
     // landmark and must remain available for the next raid.
-    expect(sim.entities.get(door!.id)).toBe(door);
+    expect(sim.entities.get(door.id)).toBe(door);
   });
 });

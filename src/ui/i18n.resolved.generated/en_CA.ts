@@ -7060,6 +7060,7 @@ export const en_CA: EnTranslations = {
       "allUnstable": "All rifts are unstable right now. Try again soon.",
       "enterFloor": "You step through the rift into {name}.",
       "descendFloor": "You descend deeper into {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "You step back through the rift.",
       "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
       "wayDownOpens": "The way down tears open.",
@@ -17206,6 +17207,12 @@ export const en_CA: EnTranslations = {
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
     "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
     "mailboxName": "Mailbox",
-    "noticeboardName": "Notice Board"
+    "noticeboardName": "Notice Board",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

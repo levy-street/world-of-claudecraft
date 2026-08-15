@@ -841,7 +841,9 @@ export function descendRift(ctx: SimContext, pid?: number): void {
     emitRiftState(ctx, id, inst, true);
     ctx.emit({
       type: 'log',
-      text: `You descend deeper into ${floor.name}.`,
+      text: isDemonTowerSeed(inst.seed)
+        ? `You ascend into ${floor.name}.`
+        : `You descend deeper into ${floor.name}.`,
       color: '#b9f',
       pid: id,
     });
@@ -1231,11 +1233,12 @@ function trashCleared(ctx: SimContext, inst: RiftInstance): boolean {
 
 function openDescent(ctx: SimContext, inst: RiftInstance): void {
   if (inst.descentOpen || !inst.descentAt) return;
+  const tower = isDemonTowerSeed(inst.seed);
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const desc = createGroundObject(
     ctx.nextId++,
     '',
-    'Rift Descent',
+    tower ? 'Tower Ascent' : 'Rift Descent',
     ctx.groundPos(origin.x + inst.descentAt.x, origin.z + inst.descentAt.z),
   );
   desc.templateId = 'rift_descent';
@@ -1244,8 +1247,10 @@ function openDescent(ctx: SimContext, inst: RiftInstance): void {
   ctx.addEntity(desc);
   inst.descentId = desc.id;
   inst.descentOpen = true;
-  for (const pid of instancePlayerIds(ctx, inst)) {
-    ctx.emit({ type: 'log', text: 'The way down tears open.', color: '#b9f', pid });
+  if (!tower) {
+    for (const pid of instancePlayerIds(ctx, inst)) {
+      ctx.emit({ type: 'log', text: 'The way down tears open.', color: '#b9f', pid });
+    }
   }
 }
 
@@ -1312,7 +1317,7 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   // scan targets it; the pick, not a grab, opens it (see interaction.ts + rift_lockpick).
   // COMPLETION loot, so race losers get the egress but no cache (maintainer
   // decision, 2026-07-30: a loser keeps only what dropped off the mobs).
-  if (inst.outcome !== 'lost') {
+  if (inst.outcome !== 'lost' && !isDemonTowerSeed(inst.seed)) {
     const cache = createGroundObject(
       ctx.nextId++,
       '',
@@ -1407,7 +1412,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.finishedAt = ctx.time;
   // Rank-gated payout on the corpse (every winning clear, ranked or dev): C a
   // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
-  if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
+  if (boss && !isDemonTowerSeed(inst.seed)) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
 
   // A cleared rift seals its way in: the entry portal despawns, so a finished
   // run can never be walked into and re-farmed. Ranked natural portals seal
@@ -1870,6 +1875,7 @@ export function updateRiftInstances(ctx: SimContext): void {
         inst.partyKey !== null &&
         inst.exitId === null &&
         inst.bossDiedAtTick !== null &&
+        (!isDemonTowerSeed(inst.seed) || (inst.puzzleSolved && trashCleared(ctx, inst))) &&
         floorForInstance(inst).isBoss,
     )
     .sort((a, b) => (a.bossDiedAtTick as number) - (b.bossDiedAtTick as number) || a.slot - b.slot);

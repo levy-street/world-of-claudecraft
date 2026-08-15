@@ -7060,6 +7060,7 @@ export const id_ID: EnTranslations = {
       "allUnstable": "Semua rift sedang tidak stabil saat ini. Coba lagi nanti.",
       "enterFloor": "Kamu melangkah melalui rift menuju {name}.",
       "descendFloor": "Kamu turun lebih dalam ke {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Kamu melangkah mundur melalui rift.",
       "pylonLit": "Sebuah pilar rune menyala hidup ({lit}/{total}).",
       "wayDownOpens": "Jalan turun terkoyak terbuka.",
@@ -17206,6 +17207,12 @@ export const id_ID: EnTranslations = {
     "delveRiteShrineReedInteract": "Altar Buluh: Tekan F untuk menyentuhnya",
     "delveRiteShrineSkullInteract": "Altar Tengkorak: Tekan F untuk menyentuhnya",
     "mailboxName": "Kotak Surat",
-    "noticeboardName": "Papan Pengumuman"
+    "noticeboardName": "Papan Pengumuman",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

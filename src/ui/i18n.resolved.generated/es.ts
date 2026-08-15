@@ -7060,13 +7060,14 @@ export const es: EnTranslations = {
       "allUnstable": "Todas las brechas están inestables en este momento. Vuelve a intentarlo pronto.",
       "enterFloor": "Cruzas la brecha hacia {name}.",
       "descendFloor": "Desciendes más profundo en {name}.",
+      "ascendFloor": "Asciendes hacia {name}.",
       "stepBack": "Retrocedes a través de la brecha.",
       "pylonLit": "Un pilar rúnico cobra vida ({lit}/{total}).",
       "wayDownOpens": "El camino hacia abajo se abre.",
-      "towerWave": "The Demon Core howls. Wave {wave} of {total}.",
-      "towerBossWave": "The core splits open. Something far worse steps through.",
-      "towerFloorClear": "The Demon Core cracks. The way up is open.",
-      "towerCleared": "The Demon Core goes dark. The tower is yours.",
+      "towerWave": "El Núcleo Demoníaco aúlla. Oleada {wave} de {total}.",
+      "towerBossWave": "El núcleo se abre y de él emerge una presencia mucho más terrible.",
+      "towerFloorClear": "El Núcleo Demoníaco se resquebraja. El camino ascendente está abierto.",
+      "towerCleared": "El Núcleo Demoníaco se apaga. La torre es tuya.",
       "exitOpens": "La brecha se estremece. Un camino a casa se abre tras los caídos.",
       "portalOpens": "¡Una brecha de rango {tier} se abre en {zone}!",
       "portalSealed": "La brecha de rango {tier} en {zone} ha sido sellada.",
@@ -17206,6 +17207,12 @@ export const es: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario del Junco: pulsa F para tocarlo",
     "delveRiteShrineSkullInteract": "Santuario de la Calavera: pulsa F para tocarlo",
     "mailboxName": "Buzón",
-    "noticeboardName": "Tablón de anuncios"
+    "noticeboardName": "Tablón de anuncios",
+    "demonTowerName": "La Torre Demoníaca",
+    "demonTowerBloodforgeName": "La Torre Demoníaca: La Forja de Sangre",
+    "demonTowerOssuaryName": "La Torre Demoníaca: El Osario de las Cadenas",
+    "demonTowerVoidCrownName": "La Torre Demoníaca: La Corona del Vacío",
+    "demonTowerCoreName": "Núcleo Demoníaco",
+    "demonTowerAscentName": "Ascenso de la Torre"
   }
 };

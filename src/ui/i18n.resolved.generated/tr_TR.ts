@@ -7060,6 +7060,7 @@ export const tr_TR: EnTranslations = {
       "allUnstable": "Şu anda tüm Yarıklar kararsız. Yakında tekrar dene.",
       "enterFloor": "Yarıktan geçip {name} içine giriyorsun.",
       "descendFloor": "{name} içinde daha derine iniyorsun.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Yarıktan geriye adım atıyorsun.",
       "pylonLit": "Bir rün sütunu hayat buluyor ({lit}/{total}).",
       "wayDownOpens": "Aşağıya giden yol açılıyor.",
@@ -17206,6 +17207,12 @@ export const tr_TR: EnTranslations = {
     "delveRiteShrineReedInteract": "Saz Sunağı: Dokunmak için F'ye bas",
     "delveRiteShrineSkullInteract": "Kafatası Sunağı: Dokunmak için F'ye bas",
     "mailboxName": "Posta Kutusu",
-    "noticeboardName": "İlan Tahtası"
+    "noticeboardName": "İlan Tahtası",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

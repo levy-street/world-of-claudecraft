@@ -171,6 +171,11 @@ export interface DungeonLayout {
 // in render/dungeon.ts); InteriorStyle just makes that tinting data-driven.
 export type InteriorKit = 'crypt' | 'bastion' | 'sanctum' | 'temple';
 
+/** Authored Demon Tower environment built on top of a base interior kit. The
+ * sim carries only this stable identity; Three.js construction remains in the
+ * renderer. */
+export type DemonTowerSceneProfile = 'bloodforge' | 'ossuary' | 'void_crown';
+
 /** A generated re-grade of one of the four KayKit interior kits. Sim-layer data
  * (no Three imports); the renderer reads it in DungeonInteriors.build and the fog
  * pass, and the colliders never look at it (geometry comes from the DungeonLayout).
@@ -194,6 +199,8 @@ export interface InteriorStyle {
    * reads as drama on the citadel's blood-red models and as WASHED-OUT on any
    * other palette. A floor with its own look sets its own numbers here. */
   lighting?: { sun: number; hemi: number; env: number; rim: number };
+  /** Optional authored environment layer. Omitted for ordinary rifts. */
+  sceneProfile?: DemonTowerSceneProfile;
 }
 
 function grid(zFrom: number, zTo: number, zStep: number, xs: readonly number[]): GridPoint[] {

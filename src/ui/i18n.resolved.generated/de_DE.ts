@@ -7060,6 +7060,7 @@ export const de_DE: EnTranslations = {
       "allUnstable": "Alle Risse sind gerade instabil. Versuche es bald noch einmal.",
       "enterFloor": "Du trittst durch den Riss nach {name}.",
       "descendFloor": "Du steigst tiefer hinab in {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Du trittst zurück durch den Riss.",
       "pylonLit": "Ein Runenpylon erwacht flammend zum Leben ({lit}/{total}).",
       "wayDownOpens": "Der Weg hinab reißt auf.",
@@ -17206,6 +17207,12 @@ export const de_DE: EnTranslations = {
     "delveRiteShrineReedInteract": "Schilfschrein: Drücke F, um ihn zu berühren",
     "delveRiteShrineSkullInteract": "Schädelschrein: Drücke F, um ihn zu berühren",
     "mailboxName": "Briefkasten",
-    "noticeboardName": "Anschlagtafel"
+    "noticeboardName": "Anschlagtafel",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

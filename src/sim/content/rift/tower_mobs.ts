@@ -1,14 +1,13 @@
-// The Demon Tower bestiary: eight wave demons plus the two bosses.
+// The Demon Tower bestiary: sixteen wave demons, three floor bosses and one
+// named lieutenant.
 //
 // These MUST be static entries in the merged MOBS table, because per-tick mob
 // mechanics are read from MOBS[entity.templateId] (src/sim/mob/locomotion.ts).
 // The tower's escalation comes from rift/tower_scaling.ts multiplying these
 // baselines per floor, NEVER from spawning ad-hoc templates.
 //
-// The roster is ordered weakest to strongest (DEMON_TOWER_ROSTER in
-// rift/tower_waves.ts slides a two-wide window up it as the raid climbs), so the
-// stat lines below ascend in lockstep with that order and each tier adds one
-// readable threat on top of the previous:
+// Each floor now owns a curated roster in rift/tower_floors.ts; this table keeps
+// the reusable baselines and authored mechanic vocabulary for those encounters.
 //
 //   cinder whelp   fast, fragile, arrives in numbers
 //   hellhound      pack rusher, bleeds on hit
@@ -35,7 +34,7 @@ const MAX_LEVEL = 23;
 
 /** Wave-demon loot. The tower pays in Rift Essence rather than a per-demon rare:
  * a floor sends up to 14 at a time, so a rare roll per body would flood the
- * economy. The chase items ride the two bosses instead. */
+ * economy. The chase items ride the named encounters instead. */
 const demonLoot = (copper: number): LootEntry[] => [
   { copper, chance: 1 },
   { itemId: RIFT_ESSENCE_ITEM_ID, chance: 0.04 },
@@ -515,8 +514,8 @@ const TOWER_BOSSES: Record<string, MobTemplate> = {
       enrage: 'THEN CLIMB OVER MY CORPSE!',
     },
   },
-  // Floor 10. The summit, and the hardest single encounter in the game: a
-  // telegraphed lethal zone on top of the full pressure kit, at 10.6x health.
+  // Floor 3. The summit: a telegraphed lethal zone on top of the full pressure
+  // kit and the Tower's strongest local tuning.
   tower_boss_demon_lord: {
     id: 'tower_boss_demon_lord',
     name: 'Malgrath, the Tower Unbound',
@@ -581,7 +580,7 @@ const TOWER_BOSSES: Record<string, MobTemplate> = {
     rankMechanics: ['bigCast', 'deathZoneCast', 'stomp', 'summonAdds'],
     enrage: { belowHpPct: 0.25, dmgMult: 1.6, hasteMult: 1.35 },
     yells: {
-      engage: 'Ten floors of the faithful died where you stand.',
+      engage: 'Three trials broke the faithful before you.',
       enrage: 'I AM THE TOWER!',
     },
   },

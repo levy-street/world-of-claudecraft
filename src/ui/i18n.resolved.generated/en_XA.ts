@@ -7060,6 +7060,7 @@ export const en_XA: EnTranslations = {
       "allUnstable": "[Áļļ ŕíƒţš áŕé úñšţáƀļé ŕíĝĥţ ñóŵ. Ţŕý áĝáíñ šóóñ.]",
       "enterFloor": "[Ýóú šţéþ ţĥŕóúĝĥ ţĥé ŕíƒţ íñţó {name}.]",
       "descendFloor": "[Ýóú ðéšçéñð ðééþéŕ íñţó {name}.]",
+      "ascendFloor": "[Ýóú ášçéñð íñţó {name}.]",
       "stepBack": "[Ýóú šţéþ ƀáçķ ţĥŕóúĝĥ ţĥé ŕíƒţ.]",
       "pylonLit": "[Á ŕúñé þýļóñ ƒļáŕéš ţó ļíƒé ({lit}/{total}).]",
       "wayDownOpens": "[Ţĥé ŵáý ðóŵñ ţéáŕš óþéñ.]",
@@ -17206,6 +17207,12 @@ export const en_XA: EnTranslations = {
     "delveRiteShrineReedInteract": "[Ŕééð Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineSkullInteract": "[Šķúļļ Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "mailboxName": "[Ɱáíļƀóẋ]",
-    "noticeboardName": "[Ñóţíçé Ɓóáŕð]"
+    "noticeboardName": "[Ñóţíçé Ɓóáŕð]",
+    "demonTowerName": "[Ţĥé Ðéɱóñ Ţóŵéŕ]",
+    "demonTowerBloodforgeName": "[Ţĥé Ðéɱóñ Ţóŵéŕ: Ţĥé Ɓļóóðƒóŕĝé]",
+    "demonTowerOssuaryName": "[Ţĥé Ðéɱóñ Ţóŵéŕ: Ţĥé Óššúáŕý óƒ Çĥáíñš]",
+    "demonTowerVoidCrownName": "[Ţĥé Ðéɱóñ Ţóŵéŕ: Ţĥé Ʋóíð Çŕóŵñ]",
+    "demonTowerCoreName": "[Ðéɱóñ Çóŕé]",
+    "demonTowerAscentName": "[Ţóŵéŕ Ášçéñţ]"
   }
 };

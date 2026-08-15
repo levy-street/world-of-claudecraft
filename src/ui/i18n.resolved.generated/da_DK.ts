@@ -7060,6 +7060,7 @@ export const da_DK: EnTranslations = {
       "allUnstable": "Alle rifter er ustabile lige nu. Prøv igen senere.",
       "enterFloor": "Du træder gennem riften ind i {name}.",
       "descendFloor": "Du stiger dybere ned i {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Du træder tilbage gennem riften.",
       "pylonLit": "En runepylon blusser til live ({lit}/{total}).",
       "wayDownOpens": "Vejen ned river sig åben.",
@@ -17206,6 +17207,12 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineReedInteract": "Sivskrin: Tryk på F for at røre det",
     "delveRiteShrineSkullInteract": "Kranieskrin: Tryk på F for at røre det",
     "mailboxName": "Postkasse",
-    "noticeboardName": "Opslagstavle"
+    "noticeboardName": "Opslagstavle",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

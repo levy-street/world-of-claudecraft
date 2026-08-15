@@ -7060,6 +7060,7 @@ export const sv_SE: EnTranslations = {
       "allUnstable": "Alla revor är instabila just nu. Försök igen snart.",
       "enterFloor": "Du kliver genom revan in i {name}.",
       "descendFloor": "Du stiger djupare ner i {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Du kliver tillbaka genom revan.",
       "pylonLit": "En runpelare flammar till liv ({lit}/{total}).",
       "wayDownOpens": "Vägen ner rivs upp.",
@@ -17206,6 +17207,12 @@ export const sv_SE: EnTranslations = {
     "delveRiteShrineReedInteract": "Vasshelgedom: Tryck på F för att röra vid den",
     "delveRiteShrineSkullInteract": "Skallhelgedom: Tryck på F för att röra vid den",
     "mailboxName": "Brevlåda",
-    "noticeboardName": "Anslagstavla"
+    "noticeboardName": "Anslagstavla",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

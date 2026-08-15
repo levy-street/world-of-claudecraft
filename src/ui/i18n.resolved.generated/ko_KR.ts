@@ -7060,6 +7060,7 @@ export const ko_KR: EnTranslations = {
       "allUnstable": "모든 균열이 지금은 불안정합니다. 잠시 후 다시 시도하세요.",
       "enterFloor": "균열을 통과해 {name}에 들어섰습니다.",
       "descendFloor": "{name}의 더 깊은 곳으로 내려갑니다.",
+      "ascendFloor": "{name}(으)로 올라갑니다.",
       "stepBack": "균열을 통해 원래 자리로 돌아왔습니다.",
       "pylonLit": "룬 첨탑이 빛을 발합니다 ({lit}/{total}).",
       "wayDownOpens": "아래로 향하는 길이 찢겨 열립니다.",
@@ -17206,6 +17207,12 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
     "mailboxName": "우편함",
-    "noticeboardName": "게시판"
+    "noticeboardName": "게시판",
+    "demonTowerName": "악마의 탑",
+    "demonTowerBloodforgeName": "악마의 탑: 피의 대장간",
+    "demonTowerOssuaryName": "악마의 탑: 사슬 납골당",
+    "demonTowerVoidCrownName": "악마의 탑: 공허의 왕관",
+    "demonTowerCoreName": "악마의 핵",
+    "demonTowerAscentName": "탑의 승강로"
   }
 };

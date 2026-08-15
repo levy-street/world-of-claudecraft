@@ -1605,6 +1605,35 @@ describe('server restart-countdown announcements are localized (broadcastSystem 
   });
 });
 
+describe('Demon Tower actionable combat localization', () => {
+  const mechanics = [
+    'Graft Flesh',
+    'Sinew Snare',
+    'Ashfall',
+    'Cinder Wake',
+    'Ember Quake',
+    'Molten Rush',
+    'Warden the Gate',
+    'Chainfire',
+    'Gate Slam',
+    'The Unmaking',
+    'Rift Collapse',
+    'Sunder the Spire',
+    'Unbound Nova',
+  ];
+
+  it('translates every Tower mechanic and the lethal detonation in critical locales', () => {
+    for (const lang of ['es', 'es_ES', 'ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW'] as const) {
+      setLanguage(lang);
+      for (const mechanic of mechanics) {
+        expect(localizeSimAuraName(mechanic), `${lang}: ${mechanic}`).not.toBe(mechanic);
+      }
+      expect(localizeSimText('Rift Collapse detonates!')).not.toBe('Rift Collapse detonates!');
+    }
+    setLanguage('en');
+  });
+});
+
 // --- S3 meta-guard: the scan LIST itself. PR 2039 closed the quest_commands
 // blind spot by adding src/sim/quests/quest_commands.ts to the simSrc scan
 // list above; the profession-choice denial strings have their only emitter

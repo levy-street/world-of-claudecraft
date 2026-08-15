@@ -1,6 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { characterPreloadUrls, manifestUrlsForGraphics } from '../src/render/characters/manifest';
+import { characterPreloadInternalsForTest } from '../src/render/characters/assets';
+import {
+  characterPreloadUrls,
+  manifestUrlsForGraphics,
+  VISUALS,
+} from '../src/render/characters/manifest';
 import { foliagePreloadInternalsForTest } from '../src/render/foliage';
 import { propPreloadInternalsForTest } from '../src/render/props';
 
@@ -79,6 +84,20 @@ describe('character preload set covers placement at every graphics tier (v0.16.0
     expect(high).toContain(gloomshadeUrl);
     for (const importTierStandardMaterials of [false, true]) {
       expect(characterPreloadUrls(importTierStandardMaterials)).toContain(gloomshadeUrl);
+    }
+  });
+
+  it('preloads the complete Demon Tower encounter pack before actionable world entry', () => {
+    const towerVisuals = Object.entries(VISUALS).filter(([key]) => key.startsWith('mob_tower_'));
+    const iosBoot = characterPreloadInternalsForTest.iosBootUrls();
+    const iosStreamed = characterPreloadInternalsForTest.iosStreamedUrls();
+    expect(towerVisuals).toHaveLength(20);
+    for (const [, def] of towerVisuals) {
+      expect(def.lazyPreload).not.toBe(true);
+      expect(low).toContain(def.url);
+      expect(high).toContain(def.url);
+      expect(iosBoot).toContain(def.url);
+      expect(iosStreamed).not.toContain(def.url);
     }
   });
 });

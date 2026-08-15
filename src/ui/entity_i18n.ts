@@ -28,6 +28,7 @@ import {
   isPendingTranslation,
   type SupportedLanguage,
   supportedLanguages,
+  type TranslationKey,
   t,
   tOptional,
 } from './i18n';
@@ -513,6 +514,20 @@ export function dungeonDisplayName(dungeonId: string): string {
   return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
 }
 
+const DEMON_TOWER_NAME_KEYS: Readonly<Record<string, TranslationKey>> = {
+  'The Demon Tower': 'worldContent.demonTowerName',
+  'The Demon Tower: The Bloodforge': 'worldContent.demonTowerBloodforgeName',
+  'The Demon Tower: The Ossuary of Chains': 'worldContent.demonTowerOssuaryName',
+  'The Demon Tower: The Void Crown': 'worldContent.demonTowerVoidCrownName',
+};
+
+/** Resolve the Tower's stable authored identities while leaving procedural Rift
+ * names untouched. This is shared by nameplates, maps, trackers and a11y copy. */
+export function localizedRiftName(name: string): string {
+  const key = DEMON_TOWER_NAME_KEYS[name];
+  return key ? t(key) : name;
+}
+
 /** The label a live rift floor (IWorld.riftFloor) shows wherever a surface needs
  *  display text for it: the generated floor name, plus its C/B/A/S rank in
  *  parens (omitted for a dev-portal run, whose tier is null). Not a tEntity
@@ -521,7 +536,10 @@ export function dungeonDisplayName(dungeonId: string): string {
  *  map-window summary format it identically instead of each re-declaring the
  *  same rank ? label ternary. */
 export function riftFloorLabel(name: string, rank: string | null): string {
-  return rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name });
+  const localizedName = localizedRiftName(name);
+  return rank
+    ? t('hud.core.riftLabelRanked', { name: localizedName, rank })
+    : t('hud.core.riftLabel', { name: localizedName });
 }
 
 export function resetEntityTranslationFallbackLog(): void {

@@ -3,32 +3,32 @@
   "purpose": "Binds every shipped mob portrait to the actual renderer job, model, attachment, tint, renderer, and output bytes.",
   "bootstrapReview": {
     "path": "docs/achievements/placeholder-art-completion-2026-08-09/portrait-manifest-bootstrap-review.md",
-    "bytes": 1510,
-    "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
+    "bytes": 1532,
+    "sha256": "bfcef01e1be303722e0c3d5414837a61f8fa735c638ef097d08fe4ba6c0a3e31"
   },
-  "rendererFingerprint": "48dc152f5aa71cf79d26aa38146ac462da5ee8550cadca7f7d57203a10321976",
+  "rendererFingerprint": "5220588e61b1fc50b68230dd59ade0327402a948886f8bd92fbb0191fbc9093f",
   "renderer": {
     "trackedFiles": [
       {
         "path": "scripts/render_finder_portraits.mjs",
-        "bytes": 10988,
-        "sha256": "5f9b0357f3062fee9cc2021a0bfbd43691b2a30b09e90c96d989171c0f89cec7"
+        "bytes": 11242,
+        "sha256": "45df4ba938de3c512a8fd0255aad05417d614eca9bc1b8947ff5a15a4d3bb516"
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 8547,
-        "sha256": "8811b612d40a20c55800e2f15ab58ee1580a905fa3a8cf81574cfc6e3853077b"
+        "bytes": 8790,
+        "sha256": "917d38140c06b658302748cef680a559b9741ef3dfdf479eee91c7321c31f8ab"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
-        "bytes": 1356,
-        "sha256": "ab4f2b23cebeb6e346856786b9d3fe95010b2db058ef0d990bb1ee34847533ed"
+        "bytes": 1392,
+        "sha256": "93038bf1a45a2505484318a726e3ad438459253fc007d4be6dc37c18f13a77d7"
       }
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3823392,
-      "sha256": "bf4b228a191aa849fd084e5585d8bc53f98df56ee1ec5fe05c78f65d52985ca2",
+      "bytes": 3846925,
+      "sha256": "0e6245bd54075a23da1b90dc202bf1303baaf861cc3e8322e6917c147b98860d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 230,
+  "portraitCount": 250,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -2784,8 +2784,8 @@
       "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
-        "bytes": 2830,
-        "sha256": "1478390b23f574f1676e6c4102661ba0cb8620a0bb09be259f911c71e4e7baa3"
+        "bytes": 2848,
+        "sha256": "a3dd07d0266886f22d94f012b5cad6f0e0eed9d879e31f0cfe2eca571737c507"
       }
     },
     {
@@ -7216,6 +7216,686 @@
       }
     },
     {
+      "id": "tower_abyss_knight",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_abyss_knight",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_abyss_knight.glb",
+          "path": "public/models/creatures/tower_abyss_knight.glb",
+          "bytes": 431060,
+          "sha256": "6372a092da7cb22c792649cbb21b94e6fb181b50a307cc5610e1a192b78578a8"
+        },
+        "idle": "Idle",
+        "height": 2.8,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#3b2a6b",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "ec62838cbc5ce59415d9c455a680dc8b1b4c7a74c57f07ec885bf5699952b8c2",
+      "output": {
+        "path": "public/ui/mobs/tower_abyss_knight.webp",
+        "bytes": 1498,
+        "sha256": "1f64cbd204e045c9026550e120451a2d2b8aa291d8dbc8e75f498895d1531e2e"
+      }
+    },
+    {
+      "id": "tower_blood_matron",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_blood_matron",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_blood_matron.glb",
+          "path": "public/models/creatures/tower_blood_matron.glb",
+          "bytes": 448992,
+          "sha256": "33cfd6c66ba027c51fea1d0b214b73a58966fd49d7c458a28dc0f198c370cd3c"
+        },
+        "idle": "Idle",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8e1230",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "76d7701528a9422502e65fc8365bdbc77b1cf12b03ff421d3a362c0863455085",
+      "output": {
+        "path": "public/ui/mobs/tower_blood_matron.webp",
+        "bytes": 1846,
+        "sha256": "003ee03af621393d1d8e0a837b6d32ac791411eb1a94e7a9e53923fdb46dcd02"
+      }
+    },
+    {
+      "id": "tower_bone_acolyte",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_bone_acolyte",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_bone_acolyte.glb",
+          "path": "public/models/creatures/tower_bone_acolyte.glb",
+          "bytes": 489316,
+          "sha256": "9c0cc58884fc66dac0cefce51951aad4122553fe2db72c40ef6cec89e44add44"
+        },
+        "idle": "Idle",
+        "height": 1.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#cfc6a8",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "bb89cfbb8fa068f67d429513adc824f44b8196f356befbddfe5d199c5a0bdeca",
+      "output": {
+        "path": "public/ui/mobs/tower_bone_acolyte.webp",
+        "bytes": 2042,
+        "sha256": "52b9b770482175aac050c1a702ab0ed4289b1e1a289ff8ca9e3fef3ee171319e"
+      }
+    },
+    {
+      "id": "tower_boss_ash_tyrant",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_boss_ash_tyrant",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_boss_ash_tyrant.glb",
+          "path": "public/models/creatures/tower_boss_ash_tyrant.glb",
+          "bytes": 478312,
+          "sha256": "370f6f3efa48306f517f73e596f32ff1d30a7e9c18567c64826fc9ba2b74b3c8"
+        },
+        "idle": "Idle",
+        "height": 3.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ff5a1e",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "e79babecf4ec838ee848814b25e14a539f43e13482ce05eec2d6a5cf6b6657ae",
+      "output": {
+        "path": "public/ui/mobs/tower_boss_ash_tyrant.webp",
+        "bytes": 1692,
+        "sha256": "3686453f0f6958c4c8efe98e91714077a8d5367a9420f1fd04c2915f1bb25b13"
+      }
+    },
+    {
+      "id": "tower_boss_demon_lord",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_boss_demon_lord",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_boss_demon_lord.glb",
+          "path": "public/models/creatures/tower_boss_demon_lord.glb",
+          "bytes": 494588,
+          "sha256": "34ad5056812d1fb3904cd5785e04df6d009df731a50690f537f9af3a542ccdbb"
+        },
+        "idle": "Idle",
+        "height": 4.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ff2d6a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "2856ca297a18b7789a8c7a2c2490066af604d47c9a479e47cdd1fed706c32ed3",
+      "output": {
+        "path": "public/ui/mobs/tower_boss_demon_lord.webp",
+        "bytes": 2136,
+        "sha256": "8a8b679b7ed3282f4386ed99b87c8babaa714595f9cab20ad1b28b97edf24200"
+      }
+    },
+    {
+      "id": "tower_boss_flesh_shaper",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_boss_flesh_shaper",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_boss_flesh_shaper.glb",
+          "path": "public/models/creatures/tower_boss_flesh_shaper.glb",
+          "bytes": 508156,
+          "sha256": "a15926f67d880ba4e6273bcc569e4adfffcd52fa6a165c547d59a97e2681f236"
+        },
+        "idle": "Idle",
+        "height": 3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9a8f7a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "fddd5bf05cfb73b56dbca12871e785332118b60cb39e09e0adf14e96caa14fc8",
+      "output": {
+        "path": "public/ui/mobs/tower_boss_flesh_shaper.webp",
+        "bytes": 1830,
+        "sha256": "d469af24ae2f48371466df14fb9ccae8b2c5518de4ab7db70840457c6386da22"
+      }
+    },
+    {
+      "id": "tower_boss_gatekeeper",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_boss_gatekeeper",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_boss_gatekeeper.glb",
+          "path": "public/models/creatures/tower_boss_gatekeeper.glb",
+          "bytes": 520960,
+          "sha256": "3f4727c2cb1d33bd6caae54e2793c9b3d47a9b531f8421b54da1de7c6d63bf33"
+        },
+        "idle": "Idle",
+        "height": 3.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#c2431a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "0df16bd9b7d097f2a7c7536a1eedf2ae7989481fc8b23bea5c86cb5c691c2694",
+      "output": {
+        "path": "public/ui/mobs/tower_boss_gatekeeper.webp",
+        "bytes": 2392,
+        "sha256": "0a5977426b16ce2b6d45d133fd38b2aa72c0fc1b9b21346c23b085249063eec4"
+      }
+    },
+    {
+      "id": "tower_brimstone_zealot",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_brimstone_zealot",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_brimstone_zealot.glb",
+          "path": "public/models/creatures/tower_brimstone_zealot.glb",
+          "bytes": 492700,
+          "sha256": "5ed113f53b765bb590252ea0c07372cf35272baa44c6ce0661fbd1aa8c8e533f"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e0742a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "e32d3dade4acb8e9eedc6e67ddf233f2227ebc8a068e9ffebf7087d3adfb3597",
+      "output": {
+        "path": "public/ui/mobs/tower_brimstone_zealot.webp",
+        "bytes": 2028,
+        "sha256": "46548ff16d2e61dcc534c540ef184e5271f023d946f2a2ff52f632609916f8de"
+      }
+    },
+    {
+      "id": "tower_cinder_crawler",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_cinder_crawler",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_cinder_crawler.glb",
+          "path": "public/models/creatures/tower_cinder_crawler.glb",
+          "bytes": 291468,
+          "sha256": "3a085a8c794473de53c5ef375e88dcd335f1f59bdaa194666d671ac1c2e266da"
+        },
+        "idle": "Idle",
+        "height": 1.1,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d2691e",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "d3fd975084ff0420423096d271bcb50dc74107579e4139c1875433b373d22f36",
+      "output": {
+        "path": "public/ui/mobs/tower_cinder_crawler.webp",
+        "bytes": 1962,
+        "sha256": "add3f7ff708ba66e1d211acaf25f2ae41a6c7d31f223f84a97aff1ca47ed89b0"
+      }
+    },
+    {
+      "id": "tower_dread_harbinger",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_dread_harbinger",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_dread_harbinger.glb",
+          "path": "public/models/creatures/tower_dread_harbinger.glb",
+          "bytes": 442684,
+          "sha256": "dfb5381e71a8280bc625105196c38e85f321ca14b084f1515ebb5f38a42c2b72"
+        },
+        "idle": "Idle",
+        "height": 2.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#9b1f4d",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "8d3e91fbf5ff61319543b3b17883aa50a0bfa4436dcff7bfb9f192d6cad65e44",
+      "output": {
+        "path": "public/ui/mobs/tower_dread_harbinger.webp",
+        "bytes": 2016,
+        "sha256": "c8ef4f6fbfe223c7a994eb883ba23d1eef76dc4d690391a844d9d07b555b573a"
+      }
+    },
+    {
+      "id": "tower_flame_herald",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_flame_herald",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_flame_herald.glb",
+          "path": "public/models/creatures/tower_flame_herald.glb",
+          "bytes": 473208,
+          "sha256": "9f2a274577b2ca289f346fded2382052be4511e27b897c477e4fac4f33220f49"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ff7a1a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "b00c9fff05b1ce399c663de681d3b509dc164fcec24f4a9775d08800d3907d49",
+      "output": {
+        "path": "public/ui/mobs/tower_flame_herald.webp",
+        "bytes": 1910,
+        "sha256": "5d4f260fec046c0e0817364041627d3987c21e86ab0888a1dff3dd8930a2139c"
+      }
+    },
+    {
+      "id": "tower_gloom_bat",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_gloom_bat",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_gloom_bat.glb",
+          "path": "public/models/creatures/tower_gloom_bat.glb",
+          "bytes": 407888,
+          "sha256": "ffb021ca16853077a7a8e92438e2c2fd7b105000a4aaaef7c8935ec8cafa175a"
+        },
+        "idle": "Idle",
+        "height": 1.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7b5bd6",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "cb5156d887979385ceeb816c7da33d5934c67fc8e8edbd9c3d780fcbe3520005",
+      "output": {
+        "path": "public/ui/mobs/tower_gloom_bat.webp",
+        "bytes": 1460,
+        "sha256": "d3adbec46ab6e29b315fd7c1e9da13e73cdb298f85f9610f7413b4922f5fd41c"
+      }
+    },
+    {
+      "id": "tower_hellhound",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_hellhound",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_hellhound.glb",
+          "path": "public/models/creatures/tower_hellhound.glb",
+          "bytes": 318612,
+          "sha256": "2d0976f3c02b7522ded75b80743cd4d8517784add354a2df4cc459c267bb8b3a"
+        },
+        "idle": "Idle",
+        "height": 1.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8f2417",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "3241b0554e251b55ccbf9ac7ddadbcbe21bab4306d3f562f4f64305773592b4a",
+      "output": {
+        "path": "public/ui/mobs/tower_hellhound.webp",
+        "bytes": 1706,
+        "sha256": "bf6f94ee13dcdf78bd72e464aa2617f7b0cd1f6392c47920a488ae0628726ecb"
+      }
+    },
+    {
+      "id": "tower_imp",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_imp",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_imp.glb",
+          "path": "public/models/creatures/tower_imp.glb",
+          "bytes": 469484,
+          "sha256": "824e07359432dddbf00dc1f8126604330bea8138ad6b017e63de307febf1f4c2"
+        },
+        "idle": "Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d94f2a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "28aace2337c8c005870624a371d4c23f89f02255f4c24ad7f3a6ed5de2c45087",
+      "output": {
+        "path": "public/ui/mobs/tower_imp.webp",
+        "bytes": 1946,
+        "sha256": "1d2b8e275d1d07516339356ca70d4c4b677b13753324b847a3956d03b64ef5ff"
+      }
+    },
+    {
+      "id": "tower_iron_defiler",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_iron_defiler",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_iron_defiler.glb",
+          "path": "public/models/creatures/tower_iron_defiler.glb",
+          "bytes": 505280,
+          "sha256": "ed47f8ca62a5bdc774fe92037506d5f6589fc04e81b662607ae50d87870ca23c"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6b6f78",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "3cb4745e1c3451b0ea7c4838ad00adb33ea2fe7a5689194eadf0419849948012",
+      "output": {
+        "path": "public/ui/mobs/tower_iron_defiler.webp",
+        "bytes": 2174,
+        "sha256": "6b9a38678facbc36a8ab6a3b2e6b8c0ccc53057dca44c3784ccb9a0effc497ca"
+      }
+    },
+    {
+      "id": "tower_pact_reaver",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_pact_reaver",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_pact_reaver.glb",
+          "path": "public/models/creatures/tower_pact_reaver.glb",
+          "bytes": 501904,
+          "sha256": "f3a12459f562a1f6c11930d0376a537dcb9bb4a7918f87d4bb7604f5acca532e"
+        },
+        "idle": "Idle",
+        "height": 2.1,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#b03a1e",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "d6e96a2b5e4dd484fe4cef69f3cfbc2791ee87eb65ca029952e289560c01d292",
+      "output": {
+        "path": "public/ui/mobs/tower_pact_reaver.webp",
+        "bytes": 2146,
+        "sha256": "020e5569c0b46365d46513b3b376cbab2f7259b8722458a36fe18cdeb7eaebe4"
+      }
+    },
+    {
+      "id": "tower_rot_hulk",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_rot_hulk",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_rot_hulk.glb",
+          "path": "public/models/creatures/tower_rot_hulk.glb",
+          "bytes": 523028,
+          "sha256": "b1c812bca8753de5c7be88f9dffc981f9668f86c34df9981374dd55ac9ef5d58"
+        },
+        "idle": "Idle",
+        "height": 2.7,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6f8f4a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "882f0e5e7460a3f74e8d70bc56b3461c7dccf123fa9a8639e0861a1906b75e77",
+      "output": {
+        "path": "public/ui/mobs/tower_rot_hulk.webp",
+        "bytes": 2148,
+        "sha256": "084fa82979cd9d29de249df8f17fcb7f8c86fb02a22c06761976d0d261a7d2c5"
+      }
+    },
+    {
+      "id": "tower_shade_dancer",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_shade_dancer",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_shade_dancer.glb",
+          "path": "public/models/creatures/tower_shade_dancer.glb",
+          "bytes": 499152,
+          "sha256": "18ef2f1db0188b47377606639f095d0823b2af740e62afd93a255080261a0d66"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#2f2a45",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "b3eba61aa65dde0f0903be5e56027e8cfe9b3c33d5b553864fc34276b939ce29",
+      "output": {
+        "path": "public/ui/mobs/tower_shade_dancer.webp",
+        "bytes": 1488,
+        "sha256": "221ac97c7e1cbd4928599db334547835ab395c8fde523e82961929c1827cf983"
+      }
+    },
+    {
+      "id": "tower_soulbinder",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_soulbinder",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_soulbinder.glb",
+          "path": "public/models/creatures/tower_soulbinder.glb",
+          "bytes": 495456,
+          "sha256": "9eb2cd69237f42d24db55cbd26901db80b908b6c46c0084bea77c33761acbfe4"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7d2ad9",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "69f6944a73b281d43c41f4e9d12cbcc1ebf03498d504ad81013ead0a616fdcb7",
+      "output": {
+        "path": "public/ui/mobs/tower_soulbinder.webp",
+        "bytes": 1922,
+        "sha256": "81999871ef7455e6d8802d49e6e6e80300590bfd9423cbad1256d742b205d006"
+      }
+    },
+    {
+      "id": "tower_void_sentinel",
+      "family": "demon",
+      "finderEncounter": false,
+      "visualKey": "mob_tower_void_sentinel",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/tower_void_sentinel.glb",
+          "path": "public/models/creatures/tower_void_sentinel.glb",
+          "bytes": 418568,
+          "sha256": "071b20c92c33dba12dcd35357462fc9f94f8c6dce9530993836e81c8043f2f06"
+        },
+        "idle": "Idle",
+        "height": 3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.06
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#4a3a7a",
+        "strength": 0.06
+      },
+      "sourceFingerprint": "1cfa105d930dbb724282bed507cc5887e0416e95e5786a6ba4308c07606f81fc",
+      "output": {
+        "path": "public/ui/mobs/tower_void_sentinel.webp",
+        "bytes": 1570,
+        "sha256": "59b951c8d4dddb97a5a0f5e520dbd6827803bf3ac1a6b2b0657b015ab0bad1e2"
+      }
+    },
+    {
       "id": "training_dummy",
       "family": "humanoid",
       "finderEncounter": false,
@@ -7313,8 +7993,8 @@
       "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 2560,
-        "sha256": "f9cd6552c6514dc9832fff101740cacc2c021dd978e3a1b120f484c07ba1640b"
+        "bytes": 2536,
+        "sha256": "d5447ebc4702d37178dc570e6a04ac45fc3ee15bb1549284ef2bd0613ca88aed"
       }
     },
     {

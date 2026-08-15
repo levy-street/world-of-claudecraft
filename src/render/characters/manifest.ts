@@ -2083,8 +2083,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // skin washes pink fast
   },
-  // -- The Demon Tower (rift/tower.ts): the eight wave demons plus the two
-  // bosses, all Tripo creature-lane rigs on the shared generated clip vocabulary.
+  // -- The Demon Tower (rift/tower.ts): sixteen wave demons, three floor bosses
+  // and one named lieutenant, all on the shared generated clip vocabulary.
   // Heights are the world-unit values they were generated and QA'd at. Tint is
   // deliberately weak: unlike a procedural rift, the tower is a fixed landmark,
   // so its demons keep one authored look on every visit.

@@ -7060,6 +7060,7 @@ export const vi_VN: EnTranslations = {
       "allUnstable": "Tất cả Rạn Nứt hiện đang không ổn định. Hãy thử lại sau.",
       "enterFloor": "Bạn bước qua Rạn Nứt vào {name}.",
       "descendFloor": "Bạn đi sâu hơn vào {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Bạn bước lùi qua Rạn Nứt.",
       "pylonLit": "Một trụ rune bùng sáng ({lit}/{total}).",
       "wayDownOpens": "Lối đi xuống xé toạc mở ra.",
@@ -17206,6 +17207,12 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineReedInteract": "Miếu Lau Sậy: Nhấn F để chạm vào",
     "delveRiteShrineSkullInteract": "Miếu Đầu Lâu: Nhấn F để chạm vào",
     "mailboxName": "Hòm Thư",
-    "noticeboardName": "Bảng Thông Báo"
+    "noticeboardName": "Bảng Thông Báo",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

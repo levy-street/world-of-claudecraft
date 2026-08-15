@@ -685,6 +685,12 @@ type WorldEntityTranslations = {
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
     noticeboardName: string;
+    demonTowerName: string;
+    demonTowerBloodforgeName: string;
+    demonTowerOssuaryName: string;
+    demonTowerVoidCrownName: string;
+    demonTowerCoreName: string;
+    demonTowerAscentName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -807,6 +813,12 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
       noticeboardName: 'Notice Board',
+      demonTowerName: 'The Demon Tower',
+      demonTowerBloodforgeName: 'The Demon Tower: The Bloodforge',
+      demonTowerOssuaryName: 'The Demon Tower: The Ossuary of Chains',
+      demonTowerVoidCrownName: 'The Demon Tower: The Void Crown',
+      demonTowerCoreName: 'Demon Core',
+      demonTowerAscentName: 'Tower Ascent',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

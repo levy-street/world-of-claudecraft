@@ -30,6 +30,7 @@
 import { DEMON_TOWER_SEED, DEMON_TOWER_THEME_NAME } from '../content/rift/demon_tower';
 import { MOBS, riftInstanceOrigin } from '../data';
 import { createGroundObject, createMob } from '../entity';
+import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import type { SimContext } from '../sim_context';
 import {
   RIFT_HEROIC_MIN_MOVE_SPEED,
@@ -43,10 +44,11 @@ import {
 import {
   DEMON_TOWER_FLOOR_COUNT,
   DEMON_TOWER_MAX_LIVE_DEMONS,
+  demonTowerArenaRadius,
   demonTowerFloorTuning,
   isDemonTowerBossFloor,
 } from './tower_scaling';
-import { demonTowerBossFor, demonTowerWavePlan } from './tower_waves';
+import { demonTowerBossFor, demonTowerWavePlan, safeTowerSpawnPosition } from './tower_waves';
 import type { RiftInstance } from './types';
 
 /** The floor plan's puzzle kind that marks an instance as a tower floor. */
@@ -113,19 +115,17 @@ export function resetTowerFloor(inst: RiftInstance): void {
 }
 
 /** Demons of the current wave still standing. */
-function liveWaveCount(ctx: SimContext, inst: RiftInstance): number {
+export function demonTowerLiveDemonCount(ctx: SimContext, inst: RiftInstance): number {
   let alive = 0;
-  for (const id of inst.towerWaveMobIds) {
+  for (const id of inst.mobIds) {
     const m = ctx.entities.get(id);
     if (m && !m.dead) alive++;
   }
   return alive;
 }
 
-function towerBossAlive(ctx: SimContext, inst: RiftInstance): boolean {
-  if (inst.towerBossId === null) return false;
-  const boss = ctx.entities.get(inst.towerBossId);
-  return !!boss && !boss.dead;
+export function demonTowerSummonAllowance(ctx: SimContext, inst: RiftInstance): number {
+  return Math.max(0, DEMON_TOWER_MAX_LIVE_DEMONS - demonTowerLiveDemonCount(ctx, inst));
 }
 
 /**
@@ -162,7 +162,10 @@ function spawnTowerDemon(
   // multipliers apply on top.
   mob.mechanicDamageMult = riftRoleDamageMultiplier(rankTuning, role);
   mob.mechanicHealMult = riftRoleHealthMultiplier(rankTuning, role);
-  if (asBoss) mob.riftMechanicLimit = tuning.mechanicLimit;
+  if (asBoss) {
+    mob.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;
+    mob.riftMechanicLimit = tuning.mechanicLimit;
+  }
   mob.facing = Math.PI;
   mob.prevFacing = mob.facing;
   ctx.addEntity(mob);
@@ -186,21 +189,32 @@ function releaseWave(
     // The live cap is a backstop, not the pacing rule: waves already land one at
     // a time. It matters when a boss and its summoned adds share the floor with
     // the final wave, which is exactly where a raid-scale spawn storm would hurt.
-    if (inst.towerWaveMobIds.length >= DEMON_TOWER_MAX_LIVE_DEMONS) break;
-    const id = spawnTowerDemon(ctx, inst, spawn.templateId, spawn.x, spawn.z, floorLevel, false);
+    if (demonTowerLiveDemonCount(ctx, inst) >= DEMON_TOWER_MAX_LIVE_DEMONS) break;
+    const id = spawnTowerDemon(
+      ctx,
+      inst,
+      spawn.templateId,
+      spawn.x,
+      spawn.z,
+      floorLevel,
+      spawn.lieutenant === true,
+    );
     if (id !== null) inst.towerWaveMobIds.push(id);
   }
 
   if (wave.releasesBoss) {
     const bossTemplate = demonTowerBossFor(inst.floorIndex);
     if (bossTemplate) {
-      const id = spawnTowerDemon(ctx, inst, bossTemplate, 0, 0, floorLevel, true);
+      const bossAt = safeTowerSpawnPosition(inst.floorIndex, {
+        x: 0,
+        z: demonTowerArenaRadius(inst.floorIndex) * 0.36,
+      });
+      const id = spawnTowerDemon(ctx, inst, bossTemplate, bossAt.x, bossAt.z, floorLevel, true);
       if (id !== null) {
         inst.towerBossId = id;
         // Only the SUMMIT boss takes the run's boss slot: that death is what
         // opens the way home and pays out (runs.ts). Claiming bossId for the
-        // floor-5 gatekeeper would let the shared clear logic end the run five
-        // floors early.
+        // a lieutenant would let the shared clear logic end the run early.
         if (inst.floorIndex === DEMON_TOWER_FLOOR_COUNT - 1) inst.bossId = id;
       }
     }
@@ -245,7 +259,7 @@ export function updateDemonTower(
   const tuning = demonTowerFloorTuning(inst.floorIndex);
 
   // Still fighting: nothing to do.
-  if (liveWaveCount(ctx, inst) > 0 || towerBossAlive(ctx, inst)) return;
+  if (demonTowerLiveDemonCount(ctx, inst) > 0) return;
 
   if (inst.towerWave < tuning.waveCount) {
     releaseWave(ctx, inst, floorLevel, playerIds);

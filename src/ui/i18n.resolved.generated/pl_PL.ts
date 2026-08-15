@@ -7060,6 +7060,7 @@ export const pl_PL: EnTranslations = {
       "allUnstable": "Wszystkie Szczeliny są obecnie niestabilne. Spróbuj ponownie wkrótce.",
       "enterFloor": "Przechodzisz przez Szczelinę do {name}.",
       "descendFloor": "Schodzisz głębiej w {name}.",
+      "ascendFloor": "You ascend into {name}.",
       "stepBack": "Cofasz się przez Szczelinę.",
       "pylonLit": "Pylon run rozbłyska życiem ({lit}/{total}).",
       "wayDownOpens": "Droga w dół rozdziera się.",
@@ -17206,6 +17207,12 @@ export const pl_PL: EnTranslations = {
     "delveRiteShrineReedInteract": "Kapliczka Trzciny: Naciśnij F, aby jej dotknąć",
     "delveRiteShrineSkullInteract": "Kapliczka Czaszki: Naciśnij F, aby jej dotknąć",
     "mailboxName": "Skrzynka pocztowa",
-    "noticeboardName": "Tablica ogłoszeń"
+    "noticeboardName": "Tablica ogłoszeń",
+    "demonTowerName": "The Demon Tower",
+    "demonTowerBloodforgeName": "The Demon Tower: The Bloodforge",
+    "demonTowerOssuaryName": "The Demon Tower: The Ossuary of Chains",
+    "demonTowerVoidCrownName": "The Demon Tower: The Void Crown",
+    "demonTowerCoreName": "Demon Core",
+    "demonTowerAscentName": "Tower Ascent"
   }
 };

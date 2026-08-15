@@ -93,7 +93,8 @@ describe('demon tower door', () => {
     sim.tick();
     const inst = sim.riftInstances.find((i) => i.partyKey !== null);
     expect(inst).toBeTruthy();
-    expect(inst!.seed >>> 0).toBe(DEMON_TOWER_SEED);
-    expect(inst!.floorCount).toBe(10);
+    if (!inst) throw new Error('tower instance should exist after entering the door');
+    expect(inst.seed >>> 0).toBe(DEMON_TOWER_SEED);
+    expect(inst.floorCount).toBe(3);
   });
 });
