@@ -6,6 +6,8 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers } from '../src/sim/content/talents';
 import { type AbilityDef, type AuraKind, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
@@ -641,6 +643,47 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 
     const inStealth = view.tick(world({ stealthed: true })).slots[0];
     expect(inStealth.usable).toBe(true);
+  });
+
+  it('Cheap Trick keeps Gut Punch usable out of Duskveil', () => {
+    // The talent bakes ignoreStealthRequirement onto the RESOLVED ability
+    // (content/classes.ts applyTalentMods), which is what the sim's cast gate
+    // reads. The bar must read the same resolved flag, or the one button the
+    // talent exists to unlock paints unusable and aria-disabled while the cast
+    // it refuses to advertise goes through.
+    const known = ability('cheap_shot', { cost: 60, requiresStealth: true });
+    known.ignoreStealthRequirement = true;
+    const view = createActionBarView(descriptor(slot(1, { ability: known })), fakeDeps());
+    expect(view.tick(world({ stealthed: false })).slots[0].usable).toBe(true);
+    expect(view.tick(world({ stealthed: true })).slots[0].usable).toBe(true);
+  });
+
+  it('drives the same slot from the REAL Cheap Trick resolve, both row options', () => {
+    // Both worlds build `known` through abilitiesKnownAt (offline on the Sim,
+    // online in ClientWorld's snapshot rebuild), so pinning the real resolve
+    // here covers the bar in both hosts at once.
+    const resolve = (rowOption: string) => {
+      const mods = computeTalentModifiers('rogue', { spec: null, rows: { 11: rowOption } }, 20);
+      const known = abilitiesKnownAt('rogue', 20, mods).find((k) => k.def.id === 'cheap_shot');
+      if (!known) throw new Error('cheap_shot missing from the resolved rogue kit at level 20');
+      return known;
+    };
+    const withTalent = createActionBarView(
+      descriptor(slot(1, { ability: resolve('rog_r11_cheap_trick') })),
+      fakeDeps(),
+    );
+    expect(withTalent.tick(world({ stealthed: false, resource: 500 })).slots[0].usable).toBe(true);
+
+    const withoutTalent = createActionBarView(
+      descriptor(slot(1, { ability: resolve('rog_r11_foul_play') })),
+      fakeDeps(),
+    );
+    expect(withoutTalent.tick(world({ stealthed: false, resource: 500 })).slots[0].usable).toBe(
+      false,
+    );
+    expect(withoutTalent.tick(world({ stealthed: true, resource: 500 })).slots[0].usable).toBe(
+      true,
+    );
   });
 
   it('an ability with no stealth requirement ignores the stealthed flag', () => {

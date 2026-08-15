@@ -1313,7 +1313,7 @@ describe('chat module (direct, no Sim)', () => {
     expect(chatMod.handleDevChat(ctx, '/dev', 1)).toBe(null);
     // Every subcommand the parser accepts must be listed, so the help can never
     // silently drift behind the commands again (the "/dev bot" omission this pins).
-    for (const cmd of ['level', 'tp', 'give', 'gold', 'quest', 'quests', 'bot'])
+    for (const cmd of ['level', 'tp', 'give', 'gold', 'quest', 'quests', 'bot', 'hp'])
       expect(help, `help omits /dev ${cmd}`).toContain(`/dev ${cmd}`);
   });
 });

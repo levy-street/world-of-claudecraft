@@ -133,3 +133,44 @@ describe('isPerfNudgeArmId', () => {
     expect(isPerfNudgeArmId('')).toBe(false);
   });
 });
+
+describe('inactive-dedicated-GPU notice suppression', () => {
+  it('suppresses the integrated arm once the boot notice showed that shell verdict', () => {
+    // The nudge copy tells players the desktop app picks the gaming GPU
+    // automatically, which directly contradicts a notice that just said the
+    // dedicated GPU is idle, so the notice wins and this arm goes quiet.
+    expect(
+      resolvePerfNudge({
+        ...baseInput,
+        suggestionIds: ['integrated-gpu'],
+        discreteNoticeAlreadyShown: true,
+      }),
+    ).toEqual({ shown: false, bodyKey: null });
+  });
+
+  it('still shows the integrated arm when that notice did not show', () => {
+    expect(
+      resolvePerfNudge({
+        ...baseInput,
+        suggestionIds: ['integrated-gpu'],
+        discreteNoticeAlreadyShown: false,
+      }).bodyKey,
+    ).toBe('perfNudge.integratedGpu');
+    // Absent (a caller with no shell verdict at all) reads the same as false.
+    expect(resolvePerfNudge({ ...baseInput, suggestionIds: ['integrated-gpu'] }).bodyKey).toBe(
+      'perfNudge.integratedGpu',
+    );
+  });
+
+  it('does not let the discrete notice suppress the software arm', () => {
+    // The two suppressions are independent: a discrete verdict says nothing
+    // about software rendering, whose explanation the player still needs.
+    expect(
+      resolvePerfNudge({
+        ...baseInput,
+        suggestionIds: ['hardware-acceleration'],
+        discreteNoticeAlreadyShown: true,
+      }),
+    ).toEqual({ shown: true, bodyKey: 'perfNudge.hardwareAccelerationWeb' });
+  });
+});

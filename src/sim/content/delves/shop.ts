@@ -11,14 +11,23 @@
 //                      (difficulty ≥ 2) run.
 //
 // Pricing intent (the Collapsed Reliquary is the ENTRY-tier delve):
-//   Marks income is ~3 Marks/day for a Normal-only player and ~6-8 for a
-//   dedicated Heroic runner (see `delveMarkPayout` in sim.ts). Prices here are
-//   deliberately STEEP relative to that income, the reward gear is a clear
-//   upgrade over the silver-vendor armor of the same tier (Smith Haldren's
-//   commons: chainmail vest 60 armor, leather jerkin 40, robe 22, trousers 24),
-//   so each piece is uncommon-or-rare quality with stat bonuses on top. A casual
-//   player kits out over ~2-3 weeks; the Heroic signature rares are a multi-week
-//   goal each.
+//   Marks income rides the daily window: the first 3 clears of the day (a
+//   single tally shared across delves) pay full base Marks (1 Normal / 2
+//   Heroic; the Drowned Litany doubles both) PLUS any earned chest/rite bonus;
+//   every later clear pays a diminished base only, with no bonus Marks (see
+//   `delveMarkPayout` and `delveBonusMarksFor` in src/sim/delves/runs.ts).
+//   That puts a Normal-only player here around 3-9 Marks/day by lockpick
+//   skill (the chest's loot tier sets the bonus), and a flawless Heroic runner
+//   at 12 in-window; the Litany's 2x lifts those bands to 18 flawless Normal
+//   and 24 flawless Heroic. Past the window a grinder still drips diminished
+//   BASE Marks per clear without bound (Heroic 1, doubled at the Litany), so
+//   this is a bounded full-rate window plus a slow drip, not a hard daily
+//   cap. Prices are deliberately STEEP relative to that income, the reward
+//   gear is a clear upgrade over the silver-vendor armor of the same tier
+//   (Smith Haldren's commons: chainmail vest 60 armor, leather jerkin 40,
+//   robe 22, trousers 24), so each piece is uncommon-or-rare quality with
+//   stat bonuses on top. A casual player kits out over ~2-3 weeks; the Heroic
+//   signature rares are a multi-week goal each.
 //
 //   FORWARD DESIGN: later delves are tuned to cost FAR more Marks (and reward
 //   far more Marks per clear), so this tier's prices are the floor of a long
@@ -100,13 +109,23 @@ const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
   // widened to sweep this table (and the heroic vendor's) rather than only
   // NPCS[*].vendorItems, which would have let these rows through in silence.
   //
-  // These rows carry NO proficiency requirement, unlike the tier-2 and tier-3
-  // copper rows on the ordinary counters (content/vendor_row_gates.ts). That is
-  // not an oversight and not a decision made here: whether a tool's PURCHASE
-  // should be gated on the same proficiency its USE is gated on is an open
-  // question the maintainer holds. The clears gate is what paces these rows
-  // today, and it is a content gate rather than a profession one, so nothing
-  // here presumes an answer either way.
+  // These rows carry NO proficiency requirement, and that is the SETTLED
+  // answer (maintainer ruling, 2026-08-14), no longer an open question: under
+  // R22 every tool purchase gate in the game is advisory, and enforcement
+  // lives at the harvest via the wield gate (professions/wield_gate.ts, tiers
+  // 4/5 at gathering 85/100), which a Marks-bought land tool meets or waits on
+  // exactly like a crafted one. The item tooltip prints the same
+  // "Requires {craft} N" line the copper counters show
+  // (tests/gather_tool_tooltip.test.ts), so the buyer is warned before
+  // spending. The clears gate is what paces these rows; rods stay wield-exempt
+  // under R22 and are paced by the water-tier gate instead.
+  //
+  // RE-CHECK TRIGGER: these prices assume a world whose highest shipped node
+  // and fishing-water tier is 3, where a tier-4/5 tool opens no content and
+  // its value is fine-grade minting, cast speed, and comfort. The patch that
+  // ships the first tier-4 node or water (the post-level-20 zone expansion)
+  // turns these into ACCESS items: re-derive both Marks prices and the wield
+  // table in that SAME change, not after.
   { itemId: 'thorium_mining_pick', marks: 24, gate: 'clears:3' },
   { itemId: 'ashwood_axe', marks: 24, gate: 'clears:3' },
   { itemId: 'goldleaf_sickle', marks: 24, gate: 'clears:3' },

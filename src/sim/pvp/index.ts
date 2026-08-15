@@ -1,6 +1,7 @@
 export {
   ARENA_DAILY_TAPER_FLOOR_START,
   ARENA_DAILY_TAPER_START,
+  ARENA_LOSS_HONOR_SHARE,
   ARENA_REPEAT_DR,
   arenaRepeatHonorMultiplier,
   awardBattlegroundAssistHonor,
@@ -8,7 +9,7 @@ export {
   awardBattlegroundKillHonor,
   awardFiestaCompletionHonor,
   awardFiestaKillHonor,
-  awardRankedArenaWinHonor,
+  awardRankedArenaResultHonor,
   BATTLEGROUND_ASSIST_HONOR,
   BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
   BATTLEGROUND_KILL_HONOR,
@@ -26,6 +27,7 @@ export {
   honorTeamIdentity,
   normalizeHonorCounter,
   normalizeHonorDailyState,
+  RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
   repeatHonorMultiplier,
 } from './honor';

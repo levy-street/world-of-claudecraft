@@ -155,6 +155,21 @@
        raw hex). Exact pre-existing value. */
     --color-quality-default: #fff;
 
+    /* World Market item-NAME colors (consumer: market_name_color.ts via the
+       Browse-row name). Poor/common/uncommon/legendary alias the shipped
+       QUALITY_COLOR values verbatim; rare and epic are LIFTED because the
+       shipped hues fail WCAG AA on the market panel ground (rare #0070dd reads
+       3.87:1, epic #a335ee reads 3.82:1, both under the 4.5:1 text floor). The
+       lifted values keep the same hue but clear AA (rare #5aa9f0 -> 7.42:1,
+       epic #c88ef5 -> 7.67:1). Scoped to the market name on purpose: the icon
+       border and every other surface stay on the shared palette (icons.ts). */
+    --mkt-name-poor: #b8b8b8;
+    --mkt-name-common: #f2efe6;
+    --mkt-name-uncommon: #7fc98f;
+    --mkt-name-rare: #5aa9f0;
+    --mkt-name-epic: #c88ef5;
+    --mkt-name-legendary: #ffab5e;
+
     /* Crafting skill-gain difficulty tints (consumer: components.css
        .crafting-difficulty[data-difficulty], painted by crafting_window.ts as
        a data attribute, never an inline color). The classic four-color recipe

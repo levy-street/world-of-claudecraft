@@ -167,7 +167,7 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   forbidden. Peer dependency noise from optional wallet/solana trees is
   tolerated via `.npmrc` (`strict-peer-dependencies=false`); do not loosen that
   further without measuring. The repo also carries a vendored three patch under
-  `patches/` (regenerated with `pnpm patch three@0.165.0`); a three version
+  `patches/` (regenerated with `pnpm patch three@0.185.1`); a three version
   bump must re-verify the compileAsync disposal race
   (`tests/three_compile_async_patch.test.ts`) before dropping or re-rolling it.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
@@ -268,7 +268,7 @@ node scripts/gate_select.mjs
 ```
 
 It runs the same step list as the full gate with one substitution: the full Vitest
-run becomes an always-run set plus `vitest related`, and it falls back to the full
+run becomes one merged `vitest related` invocation (the always-run floor rides it as seeds), and it falls back to the full
 suite for any change it cannot reason about. When you want the whole suite locally,
 the full gate remains the deeper check:
 

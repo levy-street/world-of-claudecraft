@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+  GEARED_ARRIVAL_LOADOUTS,
   gearedArrivalBotFixture,
   gearedArrivalFixtureManifest,
   gearedArrivalFixtureSha256,
 } from '../scripts/profiler/geared_arrival_fixture.mjs';
 import { DEFAULT_APPEARANCE, normalizeAppearance } from '../src/render/characters/modular';
+import { weaponTypeForItem } from '../src/sim/content/weapon_skin_rules';
+import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import { ITEMS } from '../src/sim/data';
 import { sanitizeAppearance } from '../src/world_api/appearance';
 
 describe('geared arrival fixture', () => {
@@ -13,7 +17,7 @@ describe('geared arrival fixture', () => {
     const right = gearedArrivalFixtureManifest(20);
     expect(left).toEqual(right);
     expect(gearedArrivalFixtureSha256(20)).toBe(
-      '668d677b4d65f78e97c374b03b740a3ba6c885e49852b144369f5f7f3cab5c4f',
+      'efe08bfca55303cab4a69fef6d272ba659ea44b80959a9c52bb490c8c819851d',
     );
     for (const bot of left) {
       expect(sanitizeAppearance(bot.appearance)).toEqual(bot.appearance);
@@ -39,6 +43,27 @@ describe('geared arrival fixture', () => {
     expect(unique((bot) => bot.skin)).toBe(20);
     expect(unique((bot) => bot.weapon)).toBe(5);
     expect(unique((bot) => bot.helmHidden)).toBe(2);
+  });
+
+  it('gives every loadout a weapon its own skins can actually ride', () => {
+    // The crowd exists to put VFX weapon skins on screen. A loadout whose
+    // "weapon" has no mainhand slot equips nothing, so its skins never render
+    // and that bot silently drops out of the measurement: GEARED_ARRIVAL_LOADOUTS
+    // shipped a handaxe, which is a TOOL, and nothing said so while the /dev give
+    // that would have handed it over was being dropped on the wire.
+    for (const loadout of GEARED_ARRIVAL_LOADOUTS) {
+      const item = ITEMS[loadout.weapon];
+      expect(item, `${loadout.weapon} is not a real item`).toBeDefined();
+      expect(item.kind, `${loadout.weapon} must be a weapon`).toBe('weapon');
+      expect(item.slot, `${loadout.weapon} must equip to a hand`).toBe('mainhand');
+      const type = weaponTypeForItem(loadout.weapon);
+      expect(type, `${loadout.weapon} has no weapon type`).not.toBeNull();
+      for (const skinId of loadout.skins) {
+        const skin = WEAPON_SKINS[skinId];
+        expect(skin, `${skinId} is not a catalog skin`).toBeDefined();
+        expect(skin.weaponType, `${skinId} cannot ride ${loadout.weapon}`).toBe(type);
+      }
+    }
   });
 
   it('rejects invalid manifest cardinalities', () => {

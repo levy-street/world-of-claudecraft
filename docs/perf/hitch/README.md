@@ -212,9 +212,9 @@ long frames above their floor, and worst frames above 100 ms prove the referee d
 the production failure class. Optimization work changes the game until it passes. It
 does not loosen this benchmark.
 
-## Three r165 compileAsync patch
+## Three compileAsync patch (r165 analysis, carried to r185)
 
-`patches/three@0.165.0.patch` reworks the three r165 `compileAsync` readiness poll
+`patches/three@0.185.1.patch` reworks three's `compileAsync` readiness poll
 (`checkMaterialsReady`) in three ways, each pinned by the installed-source guard test
 (`tests/three_compile_async_patch.test.ts`):
 
@@ -235,10 +235,15 @@ does not loosen this benchmark.
   every material holding it repaid the query inside the same pass. One not-ready verdict
   per distinct program now covers all its materials for the rest of the pass.
 
-Upstream still carries all three defects as of r185 (`WebGLRenderer.compileAsync` is
-unchanged from r165). A future three upgrade must re-verify upstream `compileAsync`
-behavior and deliberately retain, replace, or remove the patch and its installed-source
-guard test.
+The analysis above was derived on r165, where the patch shipped as
+`patches/three@0.165.0.patch`. The desktop-client-update three-train upgrade (phase 6)
+re-verified upstream `compileAsync` on 0.185.1: `WebGLRenderer.compileAsync` is
+unchanged from r165 and all three defects remain, so the decision was RETAIN, taken by
+re-authoring the patch against the r185 sources (the bounded-poll and per-pass dedup
+improvements the release branch landed on the r165 patch were ported in as they
+arrived). The guard test pins the r185 form. Any future three upgrade must again
+re-verify upstream `compileAsync` behavior and deliberately retain, replace, or remove
+the patch and its installed-source guard test.
 
 ## Freeze rule
 

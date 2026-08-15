@@ -1,4 +1,5 @@
 import type { PrewarmPacingReceipt } from './link_rate_budget';
+import type { PrewarmResumeStats } from './prewarm_resume_ledger_core';
 
 export type RendererPrewarmCategory =
   | 'views'
@@ -82,6 +83,45 @@ export interface RendererPrewarmStats {
   diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null;
   compileUnits?: RendererPrewarmCompileUnitStats[];
   prewarmPacing?: PrewarmPacingReceipt;
+  /** What became of the entries the deadline dropped. Read LIVE: the resume
+   *  lane is fire-and-forget and settles long after the pass returns, so this
+   *  is a getter over the ledger rather than a value frozen at pass end.
+   *  Without it a report can say an entry timed out and still not say whether
+   *  its work ever happened. */
+  readonly resume: PrewarmResumeStats;
+}
+
+/** The five per-status rollups over one pass's entries. Derived, so it lives
+ *  beside the interface it fills rather than as five filter passes at the end
+ *  of the renderer's prewarm method. */
+export function summarizePrewarmManifest(
+  entries: readonly RendererPrewarmManifestEntryStats[],
+): Pick<
+  RendererPrewarmStats,
+  | 'manifestCompleted'
+  | 'manifestPartial'
+  | 'manifestSkipped'
+  | 'manifestTimedOut'
+  | 'manifestFailed'
+  | 'partialEntryIds'
+  | 'timedOutEntryIds'
+  | 'failedEntryIds'
+> {
+  const idsWith = (status: RendererPrewarmManifestEntryStats['status']): string[] =>
+    entries.filter((entry) => entry.status === status).map((entry) => entry.id);
+  const partialEntryIds = idsWith('partial');
+  const timedOutEntryIds = idsWith('timed-out');
+  const failedEntryIds = idsWith('failed');
+  return {
+    manifestCompleted: entries.filter((entry) => entry.status === 'completed').length,
+    manifestPartial: partialEntryIds.length,
+    manifestSkipped: entries.filter((entry) => entry.status === 'skipped').length,
+    manifestTimedOut: timedOutEntryIds.length,
+    manifestFailed: failedEntryIds.length,
+    partialEntryIds,
+    timedOutEntryIds,
+    failedEntryIds,
+  };
 }
 
 interface CompileUnitIdentity {

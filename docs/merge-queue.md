@@ -35,7 +35,14 @@ automatically instead of by hand.
 ## What changes at the merge button
 
 - The merge button becomes **Merge when ready**. It queues the PR instead of
-  merging it. `gh pr merge` queues the same way.
+  merging it. From the CLI, `gh pr merge` does NOT work here (measured
+  2026-08-14: it calls the auto-merge API, which this repo disables, and
+  fails with "Auto merge is not allowed"); queue from the CLI with the
+  GraphQL mutation instead:
+
+  ```bash
+  gh api graphql -f query='mutation { enqueuePullRequest(input: {pullRequestId: "<gh pr view N --json id -q .id>"}) { mergeQueueEntry { position } } }'
+  ```
 - A PR can be queued once its own required checks are green. The queue then
   builds the candidate merge result (your PR merged onto the current tip, plus
   any PRs queued ahead of you) and runs CI on it as a `merge_group` event.

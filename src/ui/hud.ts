@@ -2,7 +2,7 @@ import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
-import { InstanceMusicController } from '../game/instance_music';
+import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -156,14 +156,11 @@ import {
 } from '../world_api';
 import {
   type AbilityScaling,
-  abilityBuffValue,
   abilityDamageBonus,
-  abilityDurationValue,
-  abilityOverTimeEffect,
   abilityPrimaryEffect,
   abilitySecondaryEffect,
-  abilityTemporalHourglassValues,
 } from './ability_damage';
+import { abilityDisplayDescription, formatAbilityNumber } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
@@ -314,7 +311,6 @@ import {
   zoneWelcome,
 } from './entity_display_core';
 import {
-  type AbilitySpecNoteField,
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
@@ -363,7 +359,10 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
-import { abilityRequirementKeys } from './hud/action_bar/ability_requirement_keys';
+import {
+  type AbilityRequirementResolve,
+  abilityRequirementKeys,
+} from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -1098,6 +1097,7 @@ const MOTD_RESULT_KEYS: Record<MotdResultCode, TranslationKey> = {
 };
 const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   arena_win: 'hudChrome.warfare.reasons.arenaWin',
+  arena_complete: 'hudChrome.warfare.reasons.arenaComplete',
   fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
   fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
   fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
@@ -1643,6 +1643,11 @@ export class Hud {
   private subzoneTimer: number | undefined;
   private lastSubzone: string | null = null;
   private readonly instanceMusic = new InstanceMusicController(music);
+  // The last music-machine decision, computed ABOVE the paint cut (music keeps
+  // playing on hidden frames, so its transitions must too); the paint half
+  // reads this instead of driving the machine itself. Null only before the
+  // first medium-band tick.
+  private lastMusicDecision: InstanceMusicDecision | null = null;
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
@@ -6650,7 +6655,10 @@ export class Hud {
         });
       }
     }
-    const requirements = abilityRequirementLines(a, this.sim.talents.spec);
+    // Pass the RESOLVED ability, not just its def: a talent that retires a
+    // requirement (Cheap Trick on Gut Punch) must retire its line with it, the
+    // same way the resolved cost / cast / cooldown above beat the def's.
+    const requirements = abilityRequirementLines(a, this.sim.talents.spec, res);
     if (requirements.length) {
       html += requirements.map((line) => `<div class="tt-sub">${esc(line)}</div>`).join('');
     }
@@ -8924,7 +8932,7 @@ export class Hud {
       });
   }
 
-  update(): void {
+  update(paint = true): void {
     const sim = this.sim;
     const p = sim.player;
     const now = performance.now();
@@ -8951,12 +8959,43 @@ export class Hud {
     if (fastHud) this.chatAnnouncer.flush(now);
 
     this.questDialog.updateVoice();
+    // Self-contained timer controller: a roll must keep expiring on schedule
+    // whether or not this frame paints.
+    this.lootRolls.update(now);
+    // The zone/combat/boss music state machine, hoisted above the cut (phase 4
+    // QA F1): music keeps PLAYING on hidden frames, so its transitions (combat
+    // over, zone change, boss engage, Sowfield) must keep executing or a
+    // minimized player hears the stale track until restore. Same medium
+    // cadence the painted path always drove it at; the paint half reads the
+    // stored decision instead of driving the machine itself.
+    if (mediumHud) {
+      this.lastMusicDecision = this.instanceMusic.update({
+        now,
+        lastCombatEventAt: this.lastCombatEventAt,
+        lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
+        playerId: sim.playerId,
+        playerPos: p.pos,
+        zone: zoneAt(p.pos.x, p.pos.z),
+        inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
+        entities: sim.entities.values(),
+        cupInfo: sim.cupInfo,
+        riftFloor: sim.riftFloor,
+      });
+    }
+
+    // The cut between the non-paint half of the frame and the paint half. A
+    // hidden desktop window calls update(false) and still runs everything
+    // above: the fast-tier reconcileSfx sweep (which unloops a stale
+    // cast:<id> loop the player would otherwise keep hearing after the caster
+    // leaves interest, and prunes the mob bark maps), the idle-bark sweep, the
+    // combat and chat live-region flushes, quest voice, the loot timers, and
+    // the music state machine. Nothing below this line does anything but paint.
+    if (!paint) return;
     this.meters.update();
     this.mountRaceStrip.repaintIfChanged();
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
-    this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
@@ -9628,20 +9667,11 @@ export class Hud {
         }
       }
 
-      const musicState = this.instanceMusic.update({
-        now,
-        lastCombatEventAt: this.lastCombatEventAt,
-        lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
-        playerId: sim.playerId,
-        playerPos: p.pos,
-        zone: currentZone,
-        inDungeon,
-        entities: sim.entities.values(),
-        cupInfo: sim.cupInfo,
-        riftFloor: sim.riftFloor,
-      });
-      const inCombat = musicState.inCombat;
-      const { atSowfield } = musicState;
+      // The music machine ran in the non-paint head this same frame (same
+      // mediumHud divider); this half only reads its decision.
+      const musicState = this.lastMusicDecision;
+      const inCombat = musicState?.inCombat === true;
+      const atSowfield = musicState?.atSowfield === true;
 
       // classic combat indicator: crossed swords + red ring on the player portrait.
       // Routed through the cached ref + the elided toggleClass writer: a counted,
@@ -16703,7 +16733,6 @@ export class Hud {
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
-      armorySkinIds: this.dailyRewardsWindow.armoryPrewarmSkinIds(),
       includeCharFamily,
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
@@ -16715,11 +16744,6 @@ export class Hud {
       // paced unit never books the 43 to 201 ms cold-capture block.
       renderPortrait: (portraitClass, skin, framing) =>
         prewarmPlayerPortrait(portraitClass as PlayerClass, skin, framing),
-      prewarmArmorySkin: (skinId, armoryMode) =>
-        this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {
-          keepWarmupBuffer: true,
-        }),
-      finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm(),
     });
   }
 
@@ -16766,8 +16790,7 @@ export class Hud {
     this.previewPrewarmHandle?.cancel();
     const handle = runPreviewPrewarmSchedule(this.postEntryPreviewPrewarmUnits(includeCharFamily), {
       enqueue: (label, run) => this.renderer.queueSecondaryPreviewPrewarm(label, run),
-      isFamilyBusy: (family) =>
-        family === 'char' ? this.isCharPreviewSurfaceVisible() : this.dailyRewardsWindow.isOpen,
+      isFamilyBusy: () => this.isCharPreviewSurfaceVisible(),
       // Pause while the FPS governor reports a struggling frame; the core's
       // poll cap keeps ambient pressure from starving the warmup forever.
       hasHeadroom: () => this.renderer.perfStats().renderBudget.mode !== 'degrading',
@@ -16805,10 +16828,11 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
-    // Fresh contexts start cold; re-run the paced schedule so armory and
-    // portrait first-open stay covered after a rebuild exactly like they are
-    // after boot. The char family (the shell plus its dependent skin/pose
-    // units) is excluded here: unlike boot, this restart runs with no curtain
+    // Fresh contexts start cold; re-run the paced schedule so the portrait
+    // caches stay covered after a rebuild exactly like they are after boot.
+    // (The armory is not in that schedule: it warms per inspected card.)
+    // The char family (the shell plus its dependent skin/pose units) is
+    // excluded here: unlike boot, this restart runs with no curtain
     // up (resetGraphicsPreviewContexts already dropped it before this point),
     // so building the ~700 ms paperdoll shell + its secondary WebGL context as
     // a schedule unit would hitch a live frame, the exact stall class the
@@ -19125,60 +19149,6 @@ function describeAbilitySummary(
   return parts.join(' · ');
 }
 
-// Fills every description placeholder from the RESOLVED ability: {damage} ($d)
-// the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
-// first buff's value, {duration} ($t) the first timed effect's duration. All are
-// rank- and talent-resolved, so the prose can never drift from what a cast does.
-function abilityDisplayDescription(
-  res: ResolvedAbility,
-  damageText: string,
-  scaling?: AbilityScaling,
-  spec?: string | null,
-): string {
-  const buff = abilityBuffValue(res);
-  const duration = abilityDurationValue(res);
-  const hourglass = abilityTemporalHourglassValues(res);
-  // {rage} splices the RESOLVED gainResource total, so a talent that raises the
-  // granted amount (Blood Offering on Blood Toll) shows in the tooltip.
-  const rageGained = res.effects.reduce(
-    (sum, eff) => sum + (eff.type === 'gainResource' ? eff.amount : 0),
-    0,
-  );
-  const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  const text = tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: 'description',
-    values: {
-      damage: damageText,
-      overTime: abilityOverTimeText(res, scaling),
-      buff: buff === null ? '' : formatAbilityNumber(buff),
-      duration: duration === null ? '' : formatAbilityNumber(duration),
-      healing: hourglass === null ? '' : formatAbilityNumber(hourglass.healing),
-      selfCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.selfCooldownRecovery),
-      allyCooldownRecovery:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.allyCooldownRecovery),
-      hostilePveDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePveDuration),
-      hostilePvpDuration:
-        hourglass === null ? '' : formatAbilityNumber(hourglass.hostilePvpDuration),
-      groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
-      rage: rageText,
-    },
-  });
-  // Spec-aware teaching line: a shared button explains its interaction ONLY
-  // for the player's current spec, so a new player never reads another
-  // spec's rules on their own tooltip.
-  const note = spec ? res.def.specNotes?.[spec] : undefined;
-  if (!note) return text;
-  return `${text} ${tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: `specNote_${spec}` as AbilitySpecNoteField,
-  })}`;
-}
-
 function combatAbilityName(name: string | null): string {
   return name ? abilityDisplayNameFromSource(name) : t('hud.combat.attack');
 }
@@ -19203,10 +19173,6 @@ function parseSimMoney(text: string): number | null {
     else copper += amount;
   }
   return matched ? copper : null;
-}
-
-function formatAbilityNumber(value: number): string {
-  return formatNumber(value, { maximumFractionDigits: 1 });
 }
 
 function abilityRangeLine(def: AbilityDef): string | null {
@@ -19255,8 +19221,12 @@ function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
 
 // Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
 // owns the truth table incl. the Skulduggery-only stealth-bypass line.
-export function abilityRequirementLines(def: AbilityDef, spec?: string | null): string[] {
-  return abilityRequirementKeys(def, spec).map((req) => {
+export function abilityRequirementLines(
+  def: AbilityDef,
+  spec?: string | null,
+  resolved?: AbilityRequirementResolve,
+): string[] {
+  return abilityRequirementKeys(def, spec, resolved).map((req) => {
     switch (req.key) {
       case 'requiresForm':
         if (req.form) {
@@ -19394,26 +19364,6 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     default:
       return '';
   }
-}
-
-// Builds the `$o` over-time string (a hybrid's dot/hot TOTAL) the same way
-// abilityEffectText builds `$d`, including the "(+N)" scaling callout (which the
-// bonus helper zeroes for hybrid riders, matching combat's no-double-dip rule).
-function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  const eff = abilityOverTimeEffect(res);
-  if (!eff) return '';
-  const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
-  const bonus =
-    b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
-  if (eff.type === 'dot' && eff.perCombo !== undefined) {
-    return (
-      t('abilityUi.tooltip.finisherDamage', {
-        base: formatAbilityNumber(eff.total),
-        perCombo: formatAbilityNumber(eff.perCombo),
-      }) + bonus
-    );
-  }
-  return formatAbilityNumber(eff.total) + bonus;
 }
 
 function abilityAmountRange(min: number, max: number): string {

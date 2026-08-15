@@ -7,7 +7,9 @@
 import { describe, expect, it } from 'vitest';
 import { DELVE_MODULES, DELVES } from '../src/sim/data';
 import {
+  DELVE_DAILY_FULL_CLEARS,
   DELVE_IMPLEMENTED_AFFIXES,
+  delveBonusMarksFor,
   delveMarkPayout,
   delveShopGateMet,
   pickDelveModules,
@@ -114,6 +116,33 @@ describe('delveMarkPayout', () => {
     expect([0, 1]).toContain(
       delveMarkPayout({ rng: new Rng(7) } as unknown as SimContext, run('normal'), meta(3)),
     );
+  });
+});
+
+describe('delveBonusMarksFor', () => {
+  // Callers run AFTER grantDelveClearTo incremented markClears for the clear the
+  // bonus rides, so a post-increment tally of 1..3 means "this clear was one of
+  // the day's first three" and 4+ means the window was already spent.
+  const meta = (markClears: number) => ({
+    delveDaily: { date: '', firstClearXp: new Set<string>(), markClears },
+  });
+
+  it('the base and bonus windows share ONE tuning constant, pinned at 3', () => {
+    expect(DELVE_DAILY_FULL_CLEARS).toBe(3);
+  });
+
+  it('pays the full bonus while the clear rode the daily window, the 3rd clear included', () => {
+    // A tally of 0 is unreachable today (the granters only run on a credited
+    // clear, which increments first), but the intended answer is "in-window".
+    expect(delveBonusMarksFor(meta(0), 2)).toBe(2);
+    expect(delveBonusMarksFor(meta(1), 2)).toBe(2);
+    expect(delveBonusMarksFor(meta(2), 4)).toBe(4);
+    expect(delveBonusMarksFor(meta(3), 4)).toBe(4);
+  });
+
+  it('pays zero bonus Marks on every later clear of the day', () => {
+    expect(delveBonusMarksFor(meta(4), 2)).toBe(0);
+    expect(delveBonusMarksFor(meta(9), 4)).toBe(0);
   });
 });
 

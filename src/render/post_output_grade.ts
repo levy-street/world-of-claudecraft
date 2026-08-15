@@ -61,7 +61,7 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     #elif defined(REINHARD_TONE_MAPPING)
       outputColor.rgb = ReinhardToneMapping(outputColor.rgb);
     #elif defined(CINEON_TONE_MAPPING)
-      outputColor.rgb = OptimizedCineonToneMapping(outputColor.rgb);
+      outputColor.rgb = CineonToneMapping(outputColor.rgb);
     #elif defined(ACES_FILMIC_TONE_MAPPING)
       outputColor.rgb = ACESFilmicToneMapping(outputColor.rgb);
     #elif defined(AGX_TONE_MAPPING)

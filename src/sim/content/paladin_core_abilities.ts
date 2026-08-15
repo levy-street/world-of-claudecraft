@@ -554,7 +554,7 @@ const protection: AbilityDef[] = [
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    threat: { mult: 3 },
+    threat: { mult: 2.5 },
     effects: [{ type: 'weaponStrike', bonus: 21, weaponMult: 1 }],
     description:
       'Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield.',
@@ -593,7 +593,7 @@ const protection: AbilityDef[] = [
     projectileFx: 'paladinSunwardDisc',
     requiresTarget: true,
     requiresShield: true,
-    threat: { mult: 3 },
+    threat: { mult: 2.25 },
     effects: [
       { type: 'directDamage', min: 90, max: 110 },
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
@@ -632,7 +632,7 @@ const protection: AbilityDef[] = [
     school: 'holy',
     requiresTarget: false,
     requiresShield: true,
-    threat: { mult: 3.5 },
+    threat: { mult: 2.5 },
     effects: [
       {
         type: 'aoeDamage',
@@ -714,7 +714,7 @@ const protection: AbilityDef[] = [
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    threat: { mult: 3 },
+    threat: { mult: 1.75 },
     // Ranked from level 5. Nine ticks of the rank 3 numbers is ~225 damage in an
     // area, against ~50 for a single-target nuke of that level, so the early ranks
     // carry the ground control and threat while the damage arrives later.

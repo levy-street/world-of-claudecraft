@@ -1170,11 +1170,13 @@ export function buildSky(
     },
     skyBiomeAssetsResident,
     envRotationY(biome: SkyKey): number {
-      // dome samples at u + off. three r165 negates environmentRotation
-      // before building the PMREM lookup matrix ("accommodate left-handed
-      // frame", WebGLMaterials.js), so the effective lookup azimuth is
-      // alpha + theta, so matching the dome needs theta = +off*2pi. (A negated
-      // value lands the env sun 2x the offset away from the dome's.)
+      // dome samples at u + off. three r185 builds the PMREM lookup matrix as
+      // makeRotationFromEuler(rot).transpose() (WebGLMaterials.js); for this
+      // Y-only rotation the transpose equals r165's negated-euler build
+      // (both are R_y(-theta), verified against both sources on the 0.185
+      // train), so the effective lookup azimuth stays alpha + theta and
+      // matching the dome still needs theta = +off*2pi. (A negated value
+      // lands the env sun 2x the offset away from the dome's.)
       return sunOffsetU(biome, sun) * 2 * Math.PI;
     },
     biomeAt: biomeBlendAt,

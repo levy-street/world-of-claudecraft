@@ -1464,6 +1464,75 @@ const readUi = (module: string): string => readFileSync(`${UI_DIR}${module}`, 'u
 const HUD_PATH = `${UI_DIR}hud.ts`;
 const HUD_SOURCE = readFileSync(HUD_PATH, 'utf8');
 const scan = readMethodCallSites(HUD_PATH, HUD_SOURCE, 'Hud', 'update');
+
+// THE PAINT CUT. A hidden desktop window calls `update(false)`, which runs the
+// head of the method and returns before anything paints. What makes that safe
+// is WHICH calls sit above the cut: the fast-tier `reconcileSfx` sweep is what
+// unloops a `cast:<id>` loop after its caster leaves interest, so parking it
+// would leave a minimized player listening to a cast that ended. The live-region
+// flushes and the loot timers are the same kind of claim.
+//
+// Constructing a real `Hud` in a unit test is not viable here (nothing in the
+// suite does; it needs the full document, a Sim and a Renderer), so this pins
+// the contract with the same AST scan the registry above already trusts: the
+// cut's position in the body relative to every call site.
+describe('the hidden-frame paint cut', () => {
+  const cutLines = HUD_SOURCE.split('\n')
+    .map((text, index) => ({ text: text.trim(), line: index + 1 }))
+    .filter((row) => row.text === 'if (!paint) return;');
+  const cut = (): number => {
+    expect(cutLines).toHaveLength(1);
+    return cutLines[0].line;
+  };
+
+  it('cuts the body exactly once, behind a parameter that defaults to painting', () => {
+    expect(cutLines).toHaveLength(1);
+    // The default is what keeps every other caller (and the web build) painting.
+    expect(HUD_SOURCE.match(/^ {2}update\(paint = true\): void \{$/gm)).toHaveLength(1);
+  });
+
+  it('keeps exactly the audio, live-region and timer work above the cut', () => {
+    const above = scan.sites.filter((site) => site.line < cut()).map((site) => site.call);
+    // An exact list, not a subset: a new paint call added to the head would
+    // start running on hidden frames, and that is the regression to catch.
+    expect(above).toEqual([
+      'this.fxTier',
+      'this.reconcileSfx',
+      'this.sweepMobIdleBarks',
+      'this.combatAnnouncer.flush',
+      'this.chatAnnouncer.flush',
+      'this.questDialog.updateVoice',
+      'this.lootRolls.update',
+      // Music keeps playing on hidden frames, so its state machine must keep
+      // transitioning there too (phase 4 QA F1: a minimized player heard the
+      // stale track until restore while this sat below the cut).
+      'this.instanceMusic.update',
+    ]);
+  });
+
+  it('leaves the paint sinks below the cut', () => {
+    const cutLine = cut();
+    for (const call of [
+      'this.meters.update',
+      'this.mountRaceStrip.repaintIfChanged',
+      'this.mountRaceControls.update',
+      'this.lockpickController.repaintIfChanged',
+      'this.tutorial.update',
+      // The timed proposal popups stay below the cut DELIBERATELY (phase 4 QA
+      // F3 adjudication): their show() and cue ride the ungated event drain,
+      // proposal expiry is server-authoritative, and the first painted frame
+      // after restore rebuilds them from the live snapshot, so nothing a
+      // hidden window does with their DOM matters. Hoisting them would put
+      // DOM writes above the cut.
+      'this.dungeonFinderProposalPopup.render',
+      'this.bgProposalPopup.render',
+    ]) {
+      const site = scan.sites.find((entry) => entry.call === call);
+      expect(site, `${call} is no longer driven by update()`).toBeDefined();
+      expect(site?.line).toBeGreaterThan(cutLine);
+    }
+  });
+});
 const observedKeys = scan.sites.map((s) => {
   const { band, gate } = splitBand(s.conditions);
   return keyOf(s.call, band, gate);

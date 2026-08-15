@@ -6,7 +6,7 @@
 // policy header). The band cases below are kept, inverted: they now assert that
 // a zone's level band does NOT change its respawn, so reintroducing a band by
 // accident fails here rather than shipping.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { CORPSE_DURATION } from '../src/sim/combat/damage';
 import {
   DUNGEON_X_THRESHOLD,
@@ -180,45 +180,108 @@ describe('resolveRespawnSeconds: full precedence', () => {
   const vale = { x: -27, z: 71 }; // level band [1, 7]
 
   it('lets a template respawnSeconds win over everything', () => {
-    expect(resolveRespawnSeconds({ respawnSeconds: 10 }, thornpeak, undefined)).toBe(10);
-    expect(resolveRespawnSeconds({ respawnSeconds: 10 }, thornpeak, 2)).toBe(10);
+    expect(resolveRespawnSeconds({ respawnSeconds: 10 }, thornpeak, undefined, null)).toBe(10);
+    expect(resolveRespawnSeconds({ respawnSeconds: 10 }, thornpeak, 2, null)).toBe(10);
     // ...and it is NOT multiplied by the rare 4x.
-    expect(resolveRespawnSeconds({ respawnSeconds: 10, rare: true }, thornpeak, undefined)).toBe(
-      10,
-    );
+    expect(
+      resolveRespawnSeconds({ respawnSeconds: 10, rare: true }, thornpeak, undefined, null),
+    ).toBe(10);
   });
 
   it('applies the one world delay to plain trash, wherever it stands', () => {
-    expect(resolveRespawnSeconds({}, thornpeak, undefined)).toBe(60);
-    expect(resolveRespawnSeconds({}, vale, undefined)).toBe(60);
-    expect(resolveRespawnSeconds(undefined, vale, undefined)).toBe(60);
+    expect(resolveRespawnSeconds({}, thornpeak, undefined, null)).toBe(60);
+    expect(resolveRespawnSeconds({}, vale, undefined, null)).toBe(60);
+    expect(resolveRespawnSeconds(undefined, vale, undefined, null)).toBe(60);
   });
 
   it('keeps a bare rare on the historical base, so its 100s cadence holds', () => {
     // `rare: true` with no authored multiplier is a SCHEDULE too: 4 x 25 is the
     // 100s every bare rare shipped with, and it must not drift with the band.
-    expect(resolveRespawnSeconds({ rare: true }, thornpeak, undefined)).toBe(100);
-    expect(resolveRespawnSeconds({ rare: true }, vale, undefined)).toBe(100);
+    expect(resolveRespawnSeconds({ rare: true }, thornpeak, undefined, null)).toBe(100);
+    expect(resolveRespawnSeconds({ rare: true }, vale, undefined, null)).toBe(100);
     // The explicit global base still multiplies the same way it always did.
-    expect(resolveRespawnSeconds({ rare: true }, thornpeak, 2)).toBe(8);
+    expect(resolveRespawnSeconds({ rare: true }, thornpeak, 2, null)).toBe(8);
   });
 
   it('keeps an authored respawnMult on the historical base, so its wall clock holds', () => {
     // 7.2 * 25 = the three minutes a quest rare shipped with, in EVERY band.
-    expect(resolveRespawnSeconds({ respawnMult: 7.2 }, vale, undefined)).toBe(180);
-    expect(resolveRespawnSeconds({ respawnMult: 7.2 }, thornpeak, undefined)).toBe(180);
+    expect(resolveRespawnSeconds({ respawnMult: 7.2 }, vale, undefined, null)).toBe(180);
+    expect(resolveRespawnSeconds({ respawnMult: 7.2 }, thornpeak, undefined, null)).toBe(180);
     // 864 * 25 = six hours, not the forty-plus the tier base would have produced.
-    expect(resolveRespawnSeconds({ respawnMult: 864 }, thornpeak, undefined)).toBe(21_600);
+    expect(resolveRespawnSeconds({ respawnMult: 864 }, thornpeak, undefined, null)).toBe(21_600);
     // An authored multiplier also beats the rare default, as it always did.
-    expect(resolveRespawnSeconds({ respawnMult: 2, rare: true }, thornpeak, undefined)).toBe(50);
+    expect(resolveRespawnSeconds({ respawnMult: 2, rare: true }, thornpeak, undefined, null)).toBe(
+      50,
+    );
     // ...and an explicit global base still overrides what it multiplies.
-    expect(resolveRespawnSeconds({ respawnMult: 7.2 }, thornpeak, 2)).toBe(14.4);
+    expect(resolveRespawnSeconds({ respawnMult: 7.2 }, thornpeak, 2, null)).toBe(14.4);
+  });
+
+  it('draws a respawnWindow through the injected roll, floor on a null roll', () => {
+    const span = { respawnWindow: { minMult: 12, maxMult: 24 } };
+    // The roll decides where in [min, max) the death lands, in mult units.
+    expect(resolveRespawnSeconds(span, vale, undefined, (min, _max) => min)).toBe(300);
+    expect(resolveRespawnSeconds(span, vale, undefined, (_min, max) => max)).toBe(600);
+    expect(resolveRespawnSeconds(span, vale, undefined, (min, max) => (min + max) / 2)).toBe(450);
+    // A null roll (the pure callers that want a deterministic bound) resolves to
+    // the window FLOOR. Required-and-nullable, so this is a choice, not an omission.
+    expect(resolveRespawnSeconds(span, vale, undefined, null)).toBe(300);
+    // An explicit global base still overrides what the rolled mult multiplies.
+    expect(resolveRespawnSeconds(span, vale, 2, (_min, max) => max)).toBe(48);
+    // ...and a fixed template respawnSeconds still wins over the window.
+    expect(
+      resolveRespawnSeconds({ ...span, respawnSeconds: 10 }, vale, undefined, (_min, max) => max),
+    ).toBe(10);
+  });
+
+  it('never consults the roll for a template without a window', () => {
+    // The contract the whole "existing goldens are byte-identical" argument
+    // rests on: a fixed-schedule death must not touch the rng stream at all.
+    // Guarded only transitively before this, so it is pinned where the rule lives.
+    const roll = vi.fn((min: number, _max: number) => min);
+    resolveRespawnSeconds({ respawnMult: 432 }, vale, undefined, roll);
+    resolveRespawnSeconds({ rare: true }, vale, undefined, roll);
+    resolveRespawnSeconds({ respawnSeconds: 10 }, vale, undefined, roll);
+    resolveRespawnSeconds({}, vale, undefined, roll);
+    resolveRespawnSeconds(undefined, vale, undefined, roll);
+    expect(roll).not.toHaveBeenCalled();
+    // ...and exactly once for the windowed one, so the pin cannot pass vacuously.
+    resolveRespawnSeconds({ respawnWindow: { minMult: 36, maxMult: 72 } }, vale, undefined, roll);
+    expect(roll).toHaveBeenCalledTimes(1);
+  });
+
+  it('puts Grix the Tunnelking on the 15 to 30 minute random window', () => {
+    const grix = MOBS.grix_the_tunnelking;
+    expect(grix.respawnWindow).toEqual({ minMult: 36, maxMult: 72 });
+    // 36..72 times the 25s legacy base is 900..1800 seconds, wherever he stands.
+    expect(resolveRespawnSeconds(grix, vale, undefined, (min, _max) => min)).toBe(900);
+    expect(resolveRespawnSeconds(grix, thornpeak, undefined, (_min, max) => max)).toBe(1800);
+    // He stays strictly rarer than the plain Zone 1 rares (Mogger, Old Greyjaw
+    // at 4x = 100s) and far more frequent than the three-hour tier he left.
+    expect(grix.respawnWindow?.minMult).toBeGreaterThan(4);
+    expect(grix.respawnWindow?.maxMult).toBeLessThan(432);
+  });
+
+  it('holds every authored respawnWindow to a sane shape', () => {
+    // The pair now lives in one field, so a lone bound is unrepresentable and
+    // only the ordering is worth pinning: rng.range(min, max) with max below min
+    // inverts the window silently.
+    const windowed = Object.values(MOBS).filter((t) => t.respawnWindow !== undefined);
+    // Grix ships today; the floor keeps this sweep from going vacuous.
+    expect(windowed.length).toBeGreaterThanOrEqual(1);
+    for (const t of windowed) {
+      expect(t.respawnWindow?.maxMult, t.id).toBeGreaterThan(t.respawnWindow?.minMult as number);
+      // A window REPLACES the fixed multiplier; authoring both is ambiguous.
+      expect(t.respawnMult, t.id).toBeUndefined();
+    }
   });
 
   it('classifies self-scheduled templates by multiplier OR rare status', () => {
     expect(isSelfScheduled({ respawnMult: 4 })).toBe(true);
     expect(isSelfScheduled({ rare: true })).toBe(true);
     expect(isSelfScheduled({ respawnMult: 4, rare: true })).toBe(true);
+    // A random window is an authored schedule too.
+    expect(isSelfScheduled({ respawnWindow: { minMult: 36, maxMult: 72 } })).toBe(true);
     expect(isSelfScheduled({})).toBe(false);
     // Elite and boss status alone do NOT self-schedule: an open-world boss that
     // never declares a cadence rides the world delay like the trash around it.
@@ -234,8 +297,12 @@ describe('resolveRespawnSeconds: full precedence', () => {
     // A true quantification over the real catalog, not a hand-picked list: every
     // rare and every authored-multiplier template, priced from three different
     // bands, must equal what the flat-25s era produced.
+    // A windowed template is excluded BY CONSTRUCTION, not by oversight: it has
+    // no single pre-change number to equal, because a window is the deliberate
+    // retune (Grix, whose own cadence is pinned in its own test above). Every
+    // other self-scheduled template must be untouched.
     const selfScheduled = Object.values(MOBS).filter(
-      (t) => t.respawnSeconds === undefined && isSelfScheduled(t),
+      (t) => t.respawnSeconds === undefined && isSelfScheduled(t) && t.respawnWindow === undefined,
     );
     // 25 ship today; the floor sits at the real count so thinning the
     // population (and quietly shrinking this sweep) fails here.
@@ -244,7 +311,7 @@ describe('resolveRespawnSeconds: full precedence', () => {
     for (const t of selfScheduled) {
       const before = LEGACY_RESPAWN_SECONDS * (t.respawnMult ?? (t.rare ? 4 : 1));
       for (const pos of [vale, thornpeak, { x: 0, z: 1500 }]) {
-        const now = resolveRespawnSeconds(t, pos, undefined);
+        const now = resolveRespawnSeconds(t, pos, undefined, null);
         if (now !== before) drift.push(`${t.id} at (${pos.x},${pos.z}): ${before} -> ${now}`);
       }
     }
@@ -253,18 +320,20 @@ describe('resolveRespawnSeconds: full precedence', () => {
 
   it('names exactly the templates whose respawn DID move, so the change is visible', () => {
     // The complement of the pin above. Only plain trash may appear here; a
-    // self-scheduled template showing up is the regression.
+    // self-scheduled template showing up is the regression. The windowed
+    // template is the ONE sanctioned mover, so it is named explicitly rather
+    // than filtered out: a second one appearing here has to be argued for.
     const moved = Object.values(MOBS)
       .filter((t) => t.respawnSeconds === undefined && isSelfScheduled(t))
       .filter(
         (t) =>
-          resolveRespawnSeconds(t, thornpeak, undefined) !==
+          resolveRespawnSeconds(t, thornpeak, undefined, null) !==
           LEGACY_RESPAWN_SECONDS * (t.respawnMult ?? (t.rare ? 4 : 1)),
       )
       .map((t) => t.id);
-    expect(moved).toEqual([]);
+    expect(moved).toEqual(['grix_the_tunnelking']);
     // ...while plain trash DOES take the world delay, so the policy is live.
-    expect(resolveRespawnSeconds(MOBS.thornpeak_ogre, thornpeak, undefined)).toBe(60);
+    expect(resolveRespawnSeconds(MOBS.thornpeak_ogre, thornpeak, undefined, null)).toBe(60);
     expect(isSelfScheduled(MOBS.thornpeak_ogre)).toBe(false);
   });
 
@@ -279,16 +348,18 @@ describe('resolveRespawnSeconds: full precedence', () => {
     expect(drogmar.respawnMult).toBe(7.2);
     expect(isSelfScheduled(drogmar)).toBe(true);
     // 7.2 * 25 = three minutes, and it holds wherever he stands.
-    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined)).toBe(180);
-    expect(resolveRespawnSeconds(drogmar, vale, undefined)).toBe(180);
+    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined, null)).toBe(180);
+    expect(resolveRespawnSeconds(drogmar, vale, undefined, null)).toBe(180);
     // Decisive against a regression to the trash delay.
-    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined)).not.toBe(TRASH_RESPAWN_SECONDS);
+    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined, null)).not.toBe(
+      TRASH_RESPAWN_SECONDS,
+    );
     // He matches Old Cragmaw, the shipped cadence for a quest kill target, and
     // deliberately NOT Marrowlord Varkas's boss hour: a required quest step
     // must not make a party wait or queue. This is the assertion that fails if
     // someone "corrects" him onto a boss cadence without reading q_drogmar.
-    expect(resolveRespawnSeconds(MOBS.old_cragmaw, thornpeak, undefined)).toBe(180);
-    expect(resolveRespawnSeconds(MOBS.marrowlord_varkas, thornpeak, undefined)).toBe(3600);
+    expect(resolveRespawnSeconds(MOBS.old_cragmaw, thornpeak, undefined, null)).toBe(180);
+    expect(resolveRespawnSeconds(MOBS.marrowlord_varkas, thornpeak, undefined, null)).toBe(3600);
   });
 
   it('holds Drogmar to a quest-friendly cadence because a quest requires him', () => {
@@ -313,10 +384,10 @@ describe('resolveRespawnSeconds: full precedence', () => {
     // from another in-world position: the decisive contrast is on-map (60s)
     // against off-map (the 25s instance-plane fallback).
     const offMap = instanceOrigin(0, 0);
-    expect(resolveRespawnSeconds({}, vale, undefined)).toBe(TRASH_RESPAWN_SECONDS);
-    expect(resolveRespawnSeconds({}, offMap, undefined)).toBe(DEFAULT_RESPAWN_SECONDS);
-    expect(resolveRespawnSeconds({}, vale, undefined)).not.toBe(
-      resolveRespawnSeconds({}, offMap, undefined),
+    expect(resolveRespawnSeconds({}, vale, undefined, null)).toBe(TRASH_RESPAWN_SECONDS);
+    expect(resolveRespawnSeconds({}, offMap, undefined, null)).toBe(DEFAULT_RESPAWN_SECONDS);
+    expect(resolveRespawnSeconds({}, vale, undefined, null)).not.toBe(
+      resolveRespawnSeconds({}, offMap, undefined, null),
     );
   });
 });
@@ -335,6 +406,21 @@ describe('the death site consumes the policy', () => {
     expect(mob.dead).toBe(true);
     expect(mob.respawnTimer).toBe(TRASH_RESPAWN_SECONDS);
     expect(mob.respawnTimer).not.toBe(DEFAULT_RESPAWN_SECONDS);
+  });
+
+  it('rolls Grix a fresh 15 to 30 minute timer from the sim rng at death', () => {
+    const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
+    const grix = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === 'grix_the_tunnelking',
+    );
+    if (!grix) throw new Error('no grix_the_tunnelking spawned');
+    sim.dealDamage(null, grix, 999_999, false, 'physical', null, 'hit');
+    expect(grix.dead).toBe(true);
+    // Uniform in [900, 1800): inside the window, and decisively off the old
+    // fixed three hours.
+    expect(grix.respawnTimer).toBeGreaterThanOrEqual(900);
+    expect(grix.respawnTimer).toBeLessThan(1800);
+    expect(grix.respawnTimer).not.toBe(10_800);
   });
 
   it('honors an explicit global base, which is what the fast suites rely on', () => {
@@ -366,7 +452,7 @@ describe('the death site consumes the policy', () => {
     for (const e of openWorld) {
       const template = MOBS[e.templateId];
       if (template?.respawnSeconds !== undefined || isSelfScheduled(template)) continue;
-      expect(resolveRespawnSeconds(template, e.spawnPos, undefined), e.templateId).not.toBe(
+      expect(resolveRespawnSeconds(template, e.spawnPos, undefined, null), e.templateId).not.toBe(
         DEFAULT_RESPAWN_SECONDS,
       );
     }

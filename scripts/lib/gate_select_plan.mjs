@@ -4,25 +4,22 @@
 // The selective gate runs the FULL gate's step list (i18n gen + freshness, wiki,
 // manifest regen + freshness, malware, biome, sfx, browser, typecheck, all four
 // builds) and changes exactly
-// one step: the full unsharded vitest run becomes two bounded runs.
+// one step: the full unsharded vitest run becomes one bounded merged run over
+// two conceptual sets:
 //
-//   1. always-run   every test whose coverage reaches outside the module graph
-//                   (scripts/lib/test_visibility.mjs). `vitest related` can never
-//                   select these reliably, so they are never selected at all:
-//                   they just always run.
-//   2. related      `vitest related` over the changed source files, which models
-//                   the remaining ~80% of the suite correctly.
+//   floor    every test whose coverage reaches outside the module graph
+//            (scripts/lib/test_visibility.mjs). `vitest related` can never
+//            select these reliably, so they are never selected at all: they
+//            ride the argv as self-selecting seeds and just always run.
+//   related  the changed source files as graph seeds, which model the
+//            remaining ~80% of the suite correctly.
 //
-// Two invocations here BY REMAINING CHOICE: `related` seeds its affected set
-// with the given paths themselves, so a merged floor-plus-sources invocation
-// is possible and the CI shards use exactly that (scripts/lib/ci_shard_plan.mjs,
-// merged 2026-08-14, with the seed property pinned by execution in
-// tests/ci_shard_plan.test.ts). The local gate keeps two legs for now simply
-// as a not-yet-taken follow-up (its artifacts are already generated once at
-// the gate entry, so nothing blocks the same merge here); take it with its
-// own pin round. The overlap between the two (a 'partial' test selected by
-// both) re-runs a handful of files and is pure wasted time, never a
-// correctness gap.
+// ONE merged invocation since 2026-08-14, the same form the CI shards run
+// (scripts/lib/ci_shard_plan.mjs): `related` seeds its affected set with
+// the given paths themselves, so the floor files ride the related argv as
+// self-selecting seeds and the old two-leg overlap re-runs are gone by
+// construction. The win32 shell argv limit is the one shape that still
+// chunks; see buildMergedRelatedArgs below for the strictness contract.
 //
 // SAFETY FALLBACK: any change this planner cannot reason about (a broad config
 // file, a lockfile, a vitest/vite/tsconfig edit) drops the whole plan to the FULL
@@ -30,6 +27,7 @@
 // gets the old bar. Failing toward MORE tests is the only safe direction, since
 // a selection miss is silent.
 
+import { chunkFileArgs } from './gate_discovery.mjs';
 import {
   isNonCodePath,
   isRelatedSourcePath,
@@ -49,6 +47,14 @@ import {
 // isNonCodePath (.yaml / .lock) and is treated as inert. For the merge bar that
 // would be a silent hole: a dependency bump could change behavior anywhere and
 // select nothing.
+/**
+ * Minimum plausible always-run floor. The computed floor is ~800 files; a
+ * collapse to a handful means the classifier walk broke, and selection must
+ * fail toward the full suite, never toward a silently tiny floor. Shared
+ * with the CI arm (scripts/lib/ci_shard_plan.mjs re-exports it).
+ */
+export const FLOOR_SANITY_MIN = 300;
+
 const FULL_SUITE_TRIGGER_RE =
   /^(package\.json|package-lock\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|\.npmrc|turbo\.json|biome\.json|vite\.config\.[cm]?[jt]s|vitest(?:\..+)?\.config\.[cm]?[jt]s|tsconfig(?:\..+)?\.json)$/;
 
@@ -281,8 +287,21 @@ export function classifySelectPaths(paths) {
  * }} opts
  * @returns {SelectPlan}
  */
-export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists }) {
+export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists, floorSanityMin = 0 }) {
   const always = [...new Set(alwaysRunFiles ?? [])].sort();
+  // Opt-in mirror of the CI arm's floor sanity fallback: the live callers
+  // (gate_select.mjs, gate_shadow.mjs) pass FLOOR_SANITY_MIN; unit fixtures
+  // with deliberately tiny floors default to 0. A collapsed floor means the
+  // visibility walk broke, and the only safe answer is the full suite.
+  if (always.length < floorSanityMin) {
+    return {
+      mode: 'full',
+      reason: `computed always-run floor is implausibly small (${always.length} < ${floorSanityMin}): running the full suite`,
+      alwaysRunFiles: always,
+      relatedSources: [],
+      changedTestFiles: [],
+    };
+  }
   const { testFiles, relatedSources, broadConfigs, generatedI18n, generatedManifests } =
     classifySelectPaths(changedPaths);
 
@@ -394,24 +413,74 @@ export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists }) {
 }
 
 /**
- * Vitest argv for the always-run leg.
+ * Pure leg planner for the selective vitest step, platform-split:
  *
- * @param {{ files: string[], workers: number }} opts
- * @returns {string[]}
+ * POSIX: ONE merged `vitest related` invocation (the CI shard form,
+ * lib/ci_shard_plan.mjs): changed paths as graph seeds, floor files as
+ * SELF-SELECTING seeds (`related` seeds its affected set with the given
+ * paths themselves; pinned by execution in tests/ci_shard_plan.test.ts),
+ * with the STRICT `--passWithNoTests=false` spelling, which is load-bearing
+ * (the related subcommand defaults the flag TRUE via ??=): the floor rides
+ * every invocation, so an empty collection is a broken walk and must exit 1.
+ * No chunking: execve takes megabytes of argv and the gate spawns without a
+ * shell there.
+ *
+ * WIN32: the CLASSIC two-leg shape, deliberately. Measured against vitest
+ * 4.1.10: `related` resolves its seed paths without slash-normalizing
+ * (resolve(root, file), backslashes), while spec moduleIds and dep ids are
+ * slash-normalized, so on Windows every seed matches NOTHING and a merged
+ * leg would run zero tests behind a tolerant flag. The floor therefore
+ * stays on `vitest run` (chunked under cmd.exe's 8191-char line), and the
+ * related leg keeps the tolerant flag it always had there.
+ *
+ * @param {{
+ *   relatedSources: string[],
+ *   alwaysRunFiles: string[],
+ *   platform: string,
+ * }} opts
+ * @returns {Array<
+ *   | { kind: 'merged-related', files: string[], strict: true }
+ *   | { kind: 'floor-run', files: string[], index: number, of: number }
+ *   | { kind: 'tolerant-related', files: string[] }
+ * >}
  */
-export function buildAlwaysRunArgs({ files, workers }) {
-  return ['run', ...files, `--maxWorkers=${workers}`];
+export function planSelectiveLegs({ relatedSources, alwaysRunFiles, platform }) {
+  if (platform === 'win32') {
+    const chunks = chunkFileArgs({ files: alwaysRunFiles });
+    /** @type {ReturnType<typeof planSelectiveLegs>} */
+    const legs = chunks.map((files, i) => ({
+      kind: 'floor-run',
+      files,
+      index: i + 1,
+      of: chunks.length,
+    }));
+    if (relatedSources.length > 0) {
+      legs.push({ kind: 'tolerant-related', files: relatedSources });
+    }
+    return legs;
+  }
+  return [
+    {
+      kind: 'merged-related',
+      files: [...relatedSources, ...alwaysRunFiles],
+      strict: true,
+    },
+  ];
 }
 
 /**
- * Vitest argv for the `related` leg, or null when there is nothing to relate.
+ * Vitest argv for one planned selective leg.
  *
- * @param {{ sources: string[], workers: number }} opts
- * @returns {string[] | null}
+ * @param {ReturnType<typeof planSelectiveLegs>[number]} leg
+ * @param {number} workers
+ * @returns {string[]}
  */
-export function buildRelatedArgs({ sources, workers }) {
-  if (!sources || sources.length === 0) return null;
-  return ['related', ...sources, '--run', '--passWithNoTests', `--maxWorkers=${workers}`];
+export function buildSelectiveLegArgs(leg, workers) {
+  if (leg.kind === 'floor-run') return ['run', ...leg.files, `--maxWorkers=${workers}`];
+  if (leg.kind === 'tolerant-related') {
+    return ['related', ...leg.files, '--run', '--passWithNoTests', `--maxWorkers=${workers}`];
+  }
+  return ['related', ...leg.files, '--run', '--passWithNoTests=false', `--maxWorkers=${workers}`];
 }
 
 /**

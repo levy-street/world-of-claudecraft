@@ -198,7 +198,9 @@ export function nightLightFragmentGlsl(worldPos: string): string {
   if (uNightLightCount > 0 && wocNLAnchor2 < uNightLightBound.z) {
     float wocNLAnchorD = sqrt(wocNLAnchor2);
     vec3 wocNLIrradiance = vec3(0.0);
-    vec3 wocNLNormal = inverseTransformDirection(normal, viewMatrix);
+    // r185 canonical name; inverseTransformDirection survives only as a
+    // deprecated #define alias slated for removal on a later three.
+    vec3 wocNLNormal = transformDirectionByInverseViewMatrix(normal, viewMatrix);
     for (int i = 0; i < ${NIGHT_LIGHT_SLOTS}; i++) {
       if (i >= uNightLightCount) break;
       vec4 wocNLTint = uNightLightColor[i];

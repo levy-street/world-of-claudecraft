@@ -1,22 +1,11 @@
-import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import { DT, type Entity } from '../types';
 import { relocateSwept } from './heroic_leap';
 import { isVeilboundMarchActive } from './paladin_veilbound_state';
+import { isPullEligible } from './pull_eligibility';
 
 const OATH_CHAIN_PULL_SUFFIX = '_pull';
-
-// A practice dummy (Highwatch training dummy, MOBS.*.dummy) is a fixed
-// world fixture: moveSpeed 0, never chases, never flees. Letting a forced-move
-// pull ignore that would drag it off its marker (issue: it went MIA after an
-// Oath Chain). Scoped to dummy rather than the general ccImmune flag: several
-// existing suites deliberately land hard CC (root/incapacitate/polymorph) on
-// MOBS.training_dummy as a generic, undying practice target, so ccImmune
-// would silence those tests too.
-function isPullEligible(target: Entity): boolean {
-  return MOBS[target.templateId]?.dummy !== true;
-}
 
 function finishOathChainPull(ctx: SimContext, target: Entity, aura: Entity['auras'][number]): void {
   const slowDuration = aura.pullSlowDuration ?? 0;

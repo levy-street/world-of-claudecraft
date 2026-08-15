@@ -9,9 +9,10 @@
 // never settles, and every KTX2-textured GLB load hangs the loader queue: the
 // v0.32.2/v0.32.3 desktop "Loading world" freeze.
 //
-// The shipped file carries a local patch replacing embind's four dynamic-code
-// sites with the eval-free generic implementations (the shapes Emscripten
-// emits with -sDYNAMIC_EXECUTION=0), applied by scripts/patch_basis_transcoder.mjs.
+// The shipped file carries a local patch replacing embind's two remaining
+// dynamic-code sites (three 0.185's newer Emscripten already ships the other
+// embind helpers eval-free) with the generic implementations Emscripten emits
+// with -sDYNAMIC_EXECUTION=0, applied by scripts/patch_basis_transcoder.mjs.
 // Three layers pin it: the no-dynamic-code scans here, the transform's own
 // throw arms (exercised below), and a full transcode of a shipped KTX2
 // texture asserting byte parity with three's pristine transcoder, so a
@@ -55,17 +56,15 @@ describe('basis transcoder blob worker survives a CSP without unsafe-eval', () =
     expect(EVAL_REFERENCE.test(transcoderBody)).toBe(false);
   });
 
-  it('scans the real file: the four patched sites exist and the size is right', () => {
+  it('scans the real file: both patched sites exist and the size is right', () => {
     for (const name of [
-      'function createNamedFunction(',
       'function craftInvokerFunction(',
-      'function craftEmvalAllocator(',
-      'function __emval_get_method_caller(',
+      'var __emval_get_method_caller=(argCount,argTypes,kind)=>',
     ]) {
       expect(transcoderSource).toContain(name);
     }
     // Vacuity floor: a truncated or stubbed artifact cannot satisfy the
-    // negative scans above and this floor at once (the real file is ~61k).
+    // negative scans above and this floor at once (the real file is ~58k).
     expect(transcoderSource.length).toBeGreaterThan(50_000);
   });
 
@@ -79,7 +78,9 @@ describe('basis transcoder blob worker survives a CSP without unsafe-eval', () =
   });
 
   it('the scans are decisive: both flag the pristine vendored transcoder', () => {
-    expect(vendoredSource).toContain('new Function');
+    // 0.185's Emscripten builds code via newFunc(Function, ...) rather than a
+    // literal `new Function(` spelling.
+    expect(vendoredSource).toContain('newFunc(Function,');
     expect(DYNAMIC_FUNCTION_CALL.test(vendoredSource)).toBe(true);
   });
 });
@@ -97,11 +98,11 @@ describe('patchBasisTranscoderSource fails loudly instead of shipping evals', ()
   });
 
   it('throws when a site appears twice', () => {
-    const doubled = `${vendoredSource}\nfunction craftEmvalAllocator(){}`;
+    const doubled = `${vendoredSource}\nfunction craftInvokerFunction(){}`;
     expect(() => patchBasisTranscoderSource(doubled)).toThrow(/ambiguous/);
   });
 
-  it('throws when dynamic code survives outside the four known sites', () => {
+  it('throws when dynamic code survives outside the known sites', () => {
     const extra = `${vendoredSource}\nvar sneaky=new Function("return 1");`;
     expect(() => patchBasisTranscoderSource(extra)).toThrow(/markers remain/);
   });

@@ -72,7 +72,37 @@ describe('initDesktopDownload', () => {
   });
 });
 
+// The static entry-page hrefs are the no-JS fallback for the download buttons.
+// They are release-owned (scripts/release_version.mjs rewrites them at prepare)
+// while the module derives its version from package.json at build time, so this
+// is the guard that reds when only one of the two moves.
+function entryLinks(path: string, platform: string): HTMLAnchorElement[] {
+  const entry = new DOMParser().parseFromString(readFileSync(path, 'utf8'), 'text/html');
+  return [
+    ...entry.querySelectorAll<HTMLAnchorElement>(
+      `.desktop-download-link[data-platform="${platform}"]`,
+    ),
+  ];
+}
+
 describe('desktop download entry markup', () => {
+  it.each(['index.html', 'play.html'])('%s pins its mac and Windows hrefs', (path) => {
+    for (const platform of ['mac', 'win'] as const) {
+      const links = entryLinks(path, platform);
+      expect(links).toHaveLength(1);
+      expect(links[0]?.getAttribute('href')).toBe(desktopDownloadUrl(platform));
+    }
+  });
+
+  it('pins the index.html Linux href, and keeps play.html free of one', () => {
+    const links = entryLinks('index.html', 'linux');
+    expect(links).toHaveLength(1);
+    expect(links[0]?.getAttribute('href')).toBe(desktopDownloadUrl('linux'));
+    // play.html deliberately links only mac and Windows; collectReleaseVersionFailures
+    // exempts pages that never carried an AppImage link.
+    expect(entryLinks('play.html', 'linux')).toHaveLength(0);
+  });
+
   it.each(['index.html', 'play.html'])('%s ships an enabled Windows fallback link', (path) => {
     const html = readFileSync(path, 'utf8');
     const entry = new DOMParser().parseFromString(html, 'text/html');

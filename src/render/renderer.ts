@@ -12,7 +12,6 @@ import {
   arenaOrigin,
   BG_SLOT_COUNT,
   battlegroundOrigin,
-  CAMPS,
   CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
@@ -223,6 +222,7 @@ import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
+import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
@@ -290,6 +290,7 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
+import { type FramePresentHost, presentFrame } from './frame_present';
 import {
   type FrostNovaRootVisual,
   isFrostNovaRootAura,
@@ -328,6 +329,7 @@ import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
+import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
@@ -430,6 +432,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
   createPrewarmCompileLifecycle,
   type PrewarmCompileLifecycle,
@@ -437,6 +440,7 @@ import {
   type RendererPrewarmDiagnosticsBaselineStats,
   type RendererPrewarmManifestEntryStats,
   type RendererPrewarmStats,
+  summarizePrewarmManifest,
 } from './prewarm_compile_lifecycle';
 import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
 import {
@@ -480,6 +484,7 @@ import {
   trackPrefetch,
   waitForPrefetch,
 } from './prewarm_resume';
+import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
@@ -513,6 +518,7 @@ import {
 import { createRevealGate } from './reveal_gate';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
+import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
   captureSceneCensus,
@@ -552,7 +558,12 @@ import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
-import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
+import {
+  freezeStaticMatrices,
+  freezeStaticSubtreeMatrices,
+  lookAtFrozen,
+  refreshFrozenWorldMatrix,
+} from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
@@ -634,6 +645,7 @@ import {
   isZoneFeatureShadowCasting,
   isZoneFeatureVisible,
 } from './zone_feature_visibility_core';
+import { zonePrewarmTemplateIds } from './zone_prewarm_templates_core';
 import {
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
@@ -722,7 +734,8 @@ const PREWARM_BUILD_RESERVE_MS = 3000;
 // See prewarmCompileAwaitDeadline.
 const PREWARM_COMPILE_AWAIT_RESERVE_MS = 2000;
 // Compile roots per entry unit: one unit launches its batch's compileAsync
-// calls and awaits them together, so r165's 10 ms poll floors overlap instead
+// calls and awaits them together, so three's 10 ms poll floors (r165 through
+// the installed 0.185, see patches/three@0.185.1.patch) overlap instead
 // of stacking (>1000 serial awaits measured 10+ s of pure timer wait). Small
 // enough that a batch's synchronous submission prologues stay a bounded slice
 // between the yields of the early-submission loop (submitCompileUnits).
@@ -1993,6 +2006,15 @@ export class Renderer {
   private readonly onWebGLContextRestored = (): void => {
     this.contextRestoredCount++;
     this.captureGlIdentity();
+    // three's onContextRestore re-runs initGLContext, which REPLACES
+    // webgl.info with a fresh WebGLInfo; the composer-tier draw-stats session
+    // captured the old object at construction and would read a dead
+    // accumulator (governor draw signal and opaque-sort input pinned at zero)
+    // for the rest of the session. Re-create it against the live info; the
+    // fresh session's first beginFrame re-baselines safely. Pre-existing on
+    // the release branch (not a phase 6 regression); r185 even preserves
+    // autoReset onto the new object, so only this rebind is needed.
+    if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
     this.vfx?.onContextRestored();
   };
   private readonly onViewportResize = (): void => {
@@ -2098,8 +2120,9 @@ export class Renderer {
     // The scene root sits at identity forever, but with the default
     // matrixAutoUpdate the root recomposes each frame, which flags
     // matrixWorldNeedsUpdate and FORCE-cascades a matrixWorld multiply through
-    // every node in the graph (three r165 updateMatrixWorld), defeating both
-    // the static-subtree freeze and the hidden-rig gate below. Freeze the root:
+    // the graph (three updateMatrixWorld; r185's force still bypasses the
+    // dirty check for every auto-update descendant), defeating both the
+    // static-subtree freeze and the hidden-rig gate below. Freeze the root:
     // children with auto-update still recompose themselves normally.
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
@@ -2130,9 +2153,10 @@ export class Renderer {
       initGfxTier(this.webgl); // software-GL autodetect needs the live context
     }
     if (GFX.composer || GFX.gradePass) {
-      // three r165's render() resets info per pass (after the shadow pass, see
-      // draw_stats_core.ts header), so with the composer's multiple passes every
-      // post-frame reader saw only the final fullscreen pass (1 call/1 triangle).
+      // three's render() resets info per pass (since r185 at the top of the
+      // pass, see draw_stats_core.ts header), so with the composer's multiple
+      // passes every post-frame reader saw only the final fullscreen pass
+      // (1 call/1 triangle).
       // The session owns manual accumulation and every downstream consumer.
       // Direct profiles keep Three's normal auto-reset path.
       this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
@@ -2216,7 +2240,10 @@ export class Renderer {
       this.farVista.enabled ? this.farVista.cameraFar : 950,
     );
     // updateCamera owns the one explicit camera matrix refresh. Prevent each
-    // WebGLRenderer pass from repeating it for an unchanged camera.
+    // WebGLRenderer pass from repeating it for an unchanged camera. r185 also
+    // gates the camera's own compose on this flag, so every explicit refresh
+    // goes through refreshFrozenWorldMatrix and every aim through lookAtFrozen
+    // (a plain updateMatrixWorld/lookAt no longer composes a frozen node).
     this.camera.matrixWorldAutoUpdate = false;
     // Nameplate Three/DOM ownership lives in the painter; it reads the
     // viewport / mob-nameplate toggle lazily (the renderer reassigns viewport on
@@ -3200,6 +3227,12 @@ export class Renderer {
     window.visualViewport?.addEventListener('resize', this.onViewportResize);
     window.visualViewport?.addEventListener('scroll', this.onViewportResize);
     document.addEventListener('fullscreenchange', this.onViewportResize);
+    // Moving the window to a display with a different scale factor fires no
+    // resize event of its own when the CSS viewport size is unchanged, so the
+    // backing store would keep the old ratio until something else resized.
+    this.dprUnwatch = watchDevicePixelRatio(() => {
+      if (!this.shutdownStarted) this.resizeViewport();
+    });
     } catch (error) {
       this.beginRendererShutdown();
       this.disposeRendererResources();
@@ -3234,6 +3267,8 @@ export class Renderer {
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
     window.visualViewport?.removeEventListener('scroll', this.onViewportResize);
     document.removeEventListener('fullscreenchange', this.onViewportResize);
+    this.dprUnwatch?.();
+    this.dprUnwatch = null;
     for (const timer of this.resizeTimers) window.clearTimeout(timer);
     this.resizeTimers = [];
     if (this.devProbeTimer !== null) {
@@ -3434,6 +3469,43 @@ export class Renderer {
     this.applyResolution();
   }
 
+  private dprUnwatch: (() => void) | null = null;
+
+  // Reused presentFrame host, refreshed field-by-field each sync (see the call
+  // site): class-field init runs before the constructor assigns the real
+  // surfaces, so it starts empty and is never read before the first refresh.
+  private readonly framePresentHost = {
+    vfx: null,
+    post: null,
+    webgl: null,
+    scene: null,
+    camera: null,
+  } as unknown as FramePresentHost;
+
+  // Frames whose terminal draw actually submitted, counted at the one
+  // presentFrame call site. Every other counter sits UPSTREAM of the sync
+  // present argument, so this is the only evidence downstream of the skip
+  // decision; the E2E probe (scripts/desktop_hidden_skip_probe.mjs) asserts
+  // it freezes while hidden, which kills a forced-present mutation
+  // deterministically instead of leaning on SwiftShader frame-rate collapse
+  // (phase 4 QA F4).
+  private presentedFrameCount = 0;
+
+  /** Frames whose terminal draw actually submitted this session. */
+  presentedFrames(): number {
+    return this.presentedFrameCount;
+  }
+
+  /**
+   * A display change the page cannot observe on its own (the window moved to
+   * another monitor, or its scale factor changed). resizeViewport re-measures
+   * and applyResolution re-reads window.devicePixelRatio live, so this is the
+   * whole fix.
+   */
+  noteDisplayChanged(): void {
+    if (!this.shutdownStarted) this.resizeViewport();
+  }
+
   // Allocate at the manual resolution ceiling. Automatic changes on the supported
   // grade-only path update only the live region below, never target storage.
   private applyResolution(): void {
@@ -3588,14 +3660,15 @@ export class Renderer {
         for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
         return;
       }
-      // A DataTexture upload is synchronous even from requestIdleCallback. Newer
-      // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
-      // ranges and pays one full upload. Either way each atomic WebGL call enters
-      // the shared queue so it cannot overlap a live shader compile.
+      // A DataTexture upload is synchronous even from requestIdleCallback. The
+      // installed 0.185 ships native update ranges, so the idle arm row-batches
+      // the HDRI instead of paying one full upload. Either way each atomic
+      // WebGL call enters the shared queue so it cannot overlap a live shader
+      // compile.
       await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
-      // PMREM generation is indivisible in Three r165. Defer two timed-out
-      // callbacks before deliberately paying that single unit under sustained
-      // load, rather than running it on the first forced callback.
+      // PMREM generation is indivisible in three (0.185 included). Defer two
+      // timed-out callbacks before deliberately paying that single unit under
+      // sustained load, rather than running it on the first forced callback.
       await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
       await this.backgroundGpuWork.run(
         () => this.ensureEnvironmentBiome(zone.biome),
@@ -4452,7 +4525,9 @@ export class Renderer {
       // monotonic there, so it already includes the off-screen water-simulation
       // passes); other profiles keep the live post-frame read, where three's
       // per-render auto-reset drops those passes, so add them back at 1 draw call
-      // and 2 triangles each.
+      // and 2 triangles each. (Since r185 that live read would also include
+      // the shadow pass; empty on every shipped direct profile, which never
+      // enables dynamic shadows, pinned in tests/gfx.test.ts.)
       calls: drawStatsFrame
         ? drawStatsFrame.calls
         : info.render.calls + this.lastWaterSimulationPasses,
@@ -4680,7 +4755,12 @@ export class Renderer {
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
     // through untouched, and their water passes are already present in
-    // the logical-frame session, so they must not be counted twice.
+    // the logical-frame session, so they must not be counted twice. Since
+    // r185 the live read would include the shadow pass too (r165 excluded
+    // it), but every shipped direct profile also disables dynamic shadows
+    // (low tier and the iOS memory profile; pinned in tests/gfx.test.ts), so
+    // the governor signal did not move; only a dev override pairing
+    // composer:false with shadows on would see the shadow-inclusive read.
     sample.calls = drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses);
     sample.triangles =
       drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2);
@@ -4903,6 +4983,34 @@ export class Renderer {
     if (visual) this.viewCreateRetry.markSucceeded(e.id, slot);
     else this.viewCreateRetry.markFailed(e.id, slot, now);
     return visual;
+  }
+
+  /** Build one lazy FORM rig into its view slot. A null build leaves the slot
+   *  unset; the shared gate retries after its cooldown. A freshly built form
+   *  root is exactly a brand-new rig's materials linking for the first time
+   *  (same as a race/mech base-visual swap), so it is gated the same way instead
+   *  of freezing the frame the form lands on (#2571). Metamorphosis is the one
+   *  form that does not gate: it grows out of the body it replaces. */
+  private buildFormVisual(
+    e: Entity,
+    v: EntityView,
+    formKey: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+    slot: 'sheepVisual' | 'bearVisual' | 'catVisual' | 'travelVisual' | 'metamorphVisual',
+    gateCompile: boolean,
+  ): void {
+    const built = this.createCharacterVisualWithRetry(e, formKey, formKey);
+    if (!built) return;
+    v[slot] = built;
+    v.group.add(built.root); // group.scale already carries e.scale
+    // The encounter mark lands on whichever body is ACTIVE, and a form rig keys
+    // its own Soul Rend programs (other meshes, other skinning): it cannot
+    // inherit the base rig's warmed variant.
+    encounterPrewarm.queueLiveSoulRendPrewarm(this, built, null, e.kind);
+    if (!gateCompile) return;
+    v.formCompilePending = built.root;
+    this.gateSwapFlagOnCompile(built.root, () => {
+      v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
+    });
   }
 
   private prewarmWorldFrame(dt: number): void {
@@ -5162,27 +5270,7 @@ export class Renderer {
   }
 
   private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {
-    const ids = new Set<string>();
-    // Static content is authoritative here: online clients only receive nearby
-    // entities, so a just-crossed zone may not have delivered its first snapshot
-    // by the time the transition prewarm starts.
-    if (kind === 'mob') {
-      for (const camp of CAMPS) {
-        if (zoneAt(camp.center.x, camp.center.z).id === zone.id) ids.add(camp.mobId);
-      }
-    } else {
-      for (const npc of Object.values(NPCS)) {
-        if (!npc.dynamic && zoneAt(npc.pos.x, npc.pos.z).id === zone.id) ids.add(npc.id);
-      }
-    }
-    // Dynamic/event content has no static camp record. Union whatever the sim
-    // already knows without making correctness depend on snapshot timing.
-    for (const entity of this.sim.entities.values()) {
-      if (entity.kind !== kind || !entity.templateId || entity.pos.x > DUNGEON_X_THRESHOLD)
-        continue;
-      if (zoneAt(entity.pos.x, entity.pos.z).id === zone.id) ids.add(entity.templateId);
-    }
-    return [...ids].sort();
+    return zonePrewarmTemplateIds(zone.id, kind, this.sim.entities.values());
   }
 
   private buildEntityPrewarmGroup(zone: ZoneDef): {
@@ -5422,26 +5510,16 @@ export class Renderer {
       });
   }
 
-  private previewPrewarmLane: Promise<void> = Promise.resolve();
+  private readonly previewPrewarm = createPreviewPrewarmLane({
+    idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }),
+    run: (unit, priority, label, options) =>
+      this.backgroundGpuWork.run(unit, priority, label, options),
+  });
 
-  /** Post-entry secondary-context preview prewarm (paperdoll, armory, portrait
-   *  caches): one bounded unit per idle slot, arbitrated with every other lane
-   *  that reaches WebGL. releaseTail because a unit's cost is dominated by its
-   *  compileAsync links, which settle off-thread. Rejections propagate to the
-   *  caller per unit; the lane itself never wedges on one. */
+  /** Scheduled secondary-context preview warming (paperdoll, portrait caches).
+   *  Lane policy lives in preview_prewarm_lane.ts. */
   queueSecondaryPreviewPrewarm(label: string, unit: () => void | Promise<void>): Promise<void> {
-    const queued = this.previewPrewarmLane
-      .then(() => idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 }))
-      .then(() =>
-        this.backgroundGpuWork.run(unit, GPU_WORK_PRIORITY.BACKGROUND, label, {
-          releaseTail: true,
-        }),
-      );
-    this.previewPrewarmLane = queued.then(
-      () => undefined,
-      () => undefined,
-    );
-    return queued;
+    return this.previewPrewarm.queueScheduled(label, unit);
   }
 
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();
@@ -5570,8 +5648,9 @@ export class Renderer {
 
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
-   * Three r165 chooses output colour space from the current render target in
-   * compileAsync's synchronous prologue. Restore that global before awaiting
+   * Three chooses output colour space from the current render target in
+   * compileAsync's synchronous prologue (authored on r165; the r185 prewarm
+   * re-audit kept this restore). Restore that global before awaiting
    * the parallel linker so live frames never inherit the prewarm target.
    */
   private async compilePrewarmColorPrograms(
@@ -5753,6 +5832,9 @@ export class Renderer {
     const focusX = this.cameraLookAt.x;
     const focusZ = this.cameraLookAt.z;
     const input = this.opaqueSortPolicyInput;
+    // The direct arm's live read would include the shadow pass since r185
+    // (r165 excluded it), but shipped direct profiles never render shadows
+    // (pinned in tests/gfx.test.ts), so the sort threshold did not move.
     input.drawCalls = this.drawStats
       ? this.drawStats.currentFrame().calls
       : this.webgl.info.render.calls;
@@ -6044,6 +6126,7 @@ export class Renderer {
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
+    const resumeLedger = createPrewarmResumeLedger();
 
     // One shared dedupe store across EVERY compile collection in this entry
     // pass (early submission, the compile entry's tail, the live-scene
@@ -6175,6 +6258,7 @@ export class Renderer {
                 morphNormalCount: morphs?.normal?.length ?? 0,
                 morphColorCount: morphs?.color?.length ?? 0,
                 hasTangents: mesh.geometry?.attributes?.tangent !== undefined,
+                hasNormals: mesh.geometry?.attributes?.normal !== undefined,
                 vertexColorItemSize: colorAttribute?.itemSize ?? 0,
                 castShadow: mesh.castShadow === true,
               },
@@ -7007,11 +7091,12 @@ export class Renderer {
         category: 'sky',
         priority: 64,
         required: true,
-        // Exempt unconditionally: uploadDataTextureInChunks falls back to one
-        // full upload on pinned r165, so the 2k RGBA16F dome upload is an
-        // indivisible ~183ms call that must stay behind the loading screen
-        // even when a slow MACHINE spent the soft budget while the network
-        // stayed healthy. The exemption adds no network wait (the inline wait
+        // Exempt unconditionally: the exemption was sized when pinned r165
+        // paid the 2k RGBA16F dome upload as one indivisible ~183ms call; the
+        // installed 0.185 row-batches it via native update ranges, but the
+        // batches still total the same GPU work, which must stay behind the
+        // loading screen even when a slow MACHINE spent the soft budget while
+        // the network stayed healthy. The exemption adds no network wait (the inline wait
         // below is already 0 past the reserve boundary) and the hard deadline
         // still bounds the entry via prewarmEntryShouldDefer. Constrained
         // profiles never run this entry, so the conditional exemption form
@@ -7382,11 +7467,10 @@ export class Renderer {
       // the cosmetic entries (which resume BELOW the preview lane) ahead of
       // the link/upload debt, the exact starvation this lane exists to fix.
       const resume = orderPrewarmResumeEntries(droppedEntries);
-      const failedResumeUnits: string[] = [];
-      if (resume.length > 0) {
-        console.info(
-          `[entry-guard] prewarm resume scheduled: dropped=[${resume.map((entry) => entry.id).join(',')}]`,
-        );
+      resumeLedger.schedule(resume, prewarmResumeIsDebt);
+      const dropped = resume.map((entry) => entry.id).join(',');
+      if (dropped.length > 0) {
+        console.info(`[entry-guard] prewarm resume scheduled: dropped=[${dropped}]`);
       }
       void settlePrewarmBeforePublish(
         async () => {
@@ -7415,6 +7499,7 @@ export class Renderer {
               // link queue shallow; live gates (LIVE_VIEW/ACTIONABLE_VIEW)
               // preempt between batches, waiting at most one batch's settle.
               const debt = prewarmResumeIsDebt(entry.id);
+              resumeLedger.noteStart(entry.id);
               return this.backgroundGpuWork.run(
                 unit.run,
                 debt ? GPU_WORK_PRIORITY.BOOT_DEBT : GPU_WORK_PRIORITY.BOOT_RESUME,
@@ -7431,7 +7516,7 @@ export class Renderer {
             },
             afterEntry: hidePrewarmArtifacts,
             onUnitError: (entry, unit, error) => {
-              failedResumeUnits.push(`${entry.id}:${unit.id}`);
+              resumeLedger.noteFailure(entry.id, unit.id);
               console.warn(`Renderer prewarm resume unit failed: ${entry.id}:${unit.id}`, error);
             },
           });
@@ -7439,13 +7524,15 @@ export class Renderer {
         () => cleanupPrewarmArtifacts({ clearVfx: false, publishPools: true }),
       )
         .then(() => {
+          resumeLedger.finish(true);
           if (resume.length === 0) return;
-          const unitCount = resume.reduce((sum, entry) => sum + entry.units.length, 0);
+          const done = resumeLedger.stats();
           console.info(
-            `[entry-guard] prewarm resume done: units=${unitCount};failed=[${failedResumeUnits.join(',')}]`,
+            `[entry-guard] prewarm resume done: units=${done.plannedUnits};failed=[${done.failedUnitIds.join(',')}]`,
           );
         })
         .catch((err) => {
+          resumeLedger.finish(false);
           console.warn('Renderer prewarm resume failed', err);
         });
     }
@@ -7516,9 +7603,6 @@ export class Renderer {
 
     const elapsed = performance.now() - started;
     const finalCounts = this.prewarmCounts();
-    const manifestTimedOut = manifestEntries.filter((entry) => entry.status === 'timed-out');
-    const manifestFailed = manifestEntries.filter((entry) => entry.status === 'failed');
-    const manifestPartial = manifestEntries.filter((entry) => entry.status === 'partial');
     const stats: RendererPrewarmStats = {
       elapsedMs: roundMs(elapsed),
       maxMs: roundMs(maxMs),
@@ -7539,14 +7623,10 @@ export class Renderer {
       createdViewTypes,
       manifestPlanned: manifest.length,
       manifestEntries,
-      manifestCompleted: manifestEntries.filter((entry) => entry.status === 'completed').length,
-      manifestPartial: manifestPartial.length,
-      manifestSkipped: manifestEntries.filter((entry) => entry.status === 'skipped').length,
-      manifestTimedOut: manifestTimedOut.length,
-      manifestFailed: manifestFailed.length,
-      partialEntryIds: manifestPartial.map((entry) => entry.id),
-      timedOutEntryIds: manifestTimedOut.map((entry) => entry.id),
-      failedEntryIds: manifestFailed.map((entry) => entry.id),
+      ...summarizePrewarmManifest(manifestEntries),
+      get resume() {
+        return resumeLedger.stats();
+      },
       diagnosticsBaseline,
       compileUnits: compileLifecycle.records,
       prewarmPacing: pacing.receipt(compileBatchRoots, hardMaxMs),
@@ -8765,9 +8845,10 @@ export class Renderer {
     if (reconciledLights.changed && viewLights.length > 0) {
       this.lightRankDirty = true;
       // A light-owning view is exempt from the hidden-view matrix gate below:
-      // the light budget reads light.getWorldPosition, and r165's
-      // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
-      // ancestor, so a gated group would rank the light at a stale position.
+      // the light budget reads light.getWorldPosition, and updateWorldMatrix
+      // does NOT heal through a matrixWorldAutoUpdate=false ancestor (r185
+      // visits the gated ancestor but skips its compose; r165 never healed it
+      // either), so a gated group would rank the light at a stale position.
       this.lightOwnerGroups.add(group);
     }
     this.views.set(e.id, {
@@ -8860,6 +8941,7 @@ export class Renderer {
       tiltOnProp: false,
     });
     const view = this.views.get(e.id);
+    if (visual && view) encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, view, e.kind);
     // Never gate the player's OWN view: it must be on screen immediately, its
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
@@ -9081,6 +9163,10 @@ export class Renderer {
     v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
     v.group.add(next.root);
     this.reconcileViewLights(v);
+    // The replacement rig is COLD: its Soul Rend clones are not the disposed
+    // rig's, so the encounter prewarm has to warm it like a body that just
+    // arrived (v carries the look `next` was built holding).
+    encounterPrewarm.queueLiveSoulRendPrewarm(this, next, v, e.kind);
     // A live base-visual replace (race/mech toggle) is exactly a brand-new
     // rig's materials linking for the first time; gate it the same as a
     // gear swap rather than freezing the frame it lands on (#2571).
@@ -9117,12 +9203,13 @@ export class Renderer {
   /** Apply (or clear) a weapon-skin cosmetic on one view and latch it. The
    *  latch is written HERE, never at enqueue time, so a queued application
    *  that never ran is retried by the next frame's diff. */
-  private applyWeaponSkin(v: EntityView, skinId: string | null): void {
+  private applyWeaponSkin(v: EntityView, skinId: string | null, kind: string): void {
     if (!v.visual) return;
     v.weaponSkinId = skinId;
     const changed = v.visual.setWeaponSkin(skinId);
     if (changed) for (const node of changed) this.gateSwapOnCompile(node);
     this.reconcileViewLights(v);
+    encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, kind);
   }
 
   /** Spend this frame's weapon-skin application budget, nearest wearer first.
@@ -9139,7 +9226,8 @@ export class Renderer {
     );
     for (const entry of due) {
       const view = this.views.get(entry.viewId);
-      if (view) this.applyWeaponSkin(view, entry.skinId);
+      const kind = this.sim.entities.get(entry.viewId)?.kind ?? '';
+      if (view) this.applyWeaponSkin(view, entry.skinId, kind);
     }
   }
 
@@ -9327,6 +9415,7 @@ export class Renderer {
     oz: number,
     opts?: Parameters<DungeonInteriors['buildInterior']>[3],
   ): void {
+    encounterPrewarm.startInteriorEncounterPrewarm(interior, this);
     void this.ensureDungeons()
       .buildInterior(interior, ox, oz, opts)
       .catch((err) => {
@@ -9817,6 +9906,7 @@ export class Renderer {
       inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
         ? dungeonAt(px)?.interior
         : null;
+    encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null);
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
@@ -10401,6 +10491,7 @@ export class Renderer {
     // pooled and reused) view.
     this.weaponSkinApplies.cancel(id);
     this.scene.remove(v.group);
+    unfreezeRigMatrices(v.group); // a pooled visual must not keep hide-frozen flags
     this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
       for (const light of v.viewLights) {
@@ -10561,9 +10652,15 @@ export class Renderer {
     selfAlphaLead = 0,
     selfMotion: SelfMotionFrame | null = null,
     selfAuthoritativeDiscontinuity = false,
+    // False while the window is hidden: everything below still runs (view
+    // lifecycle, mixers, uTime, the viewport poll) so coming back costs no
+    // create burst or shader link, and only the terminal draw is skipped.
+    present = true,
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
+    // Feed the background lane the live frame clock (see its header).
+    this.backgroundGpuWork.noteFrame(totalStart);
     let phaseStart = totalStart;
     const frameStats = this.lastFrameStats;
     const framePhaseMs = frameStats.phaseMs;
@@ -10579,7 +10676,10 @@ export class Renderer {
     // reads its draw signal below. The WebGL counters themselves stay monotonic
     // (autoReset is off); out-of-band renders reset them via discardOutOfBandDraws.
     if (this.drawStats) this.drawStats.beginFrame();
-    this.updateAdaptiveResolution(dt);
+    // A skipped frame draws nothing, so it carries no rendering signal at all:
+    // feeding its wall-clock dt to the governor would read hidden time as free
+    // headroom and ratchet quality up for the first frame back on screen.
+    if (present) this.updateAdaptiveResolution(dt);
     this.viewportPollTimer += dt;
     if (this.viewportPollTimer >= 0.25) {
       this.viewportPollTimer = 0;
@@ -11180,11 +11280,16 @@ export class Renderer {
       // Gated per newly attached payload: nothing else in this loop drives its own
       // .visible, so first-sight materials link off-thread instead of freezing the
       // frame the gear lands on (#2571).
+      // Both held swaps re-run finishWeaponAttach, which re-snapshots the
+      // original-material map with the new weapon's meshes, so the encounter
+      // mark's warmed clones no longer describe this body: re-queue on the new
+      // held look (the identity carries it, so a sheathe toggle warms nothing).
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
         const changed = v.visual.setWeapon(e.mainhandItemId);
         if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
+        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
       }
 
       if (e.offhandItemId !== v.offhandItemId) {
@@ -11192,6 +11297,7 @@ export class Renderer {
         const changed = v.visual.setOffhand(e.offhandItemId);
         if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
+        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
       }
 
       // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
@@ -11208,7 +11314,7 @@ export class Renderer {
       if (e.weaponSkinId !== v.weaponSkinId) {
         if (e.weaponSkinId === null) {
           this.weaponSkinApplies.cancel(id);
-          this.applyWeaponSkin(v, null);
+          this.applyWeaponSkin(v, null, e.kind);
         } else {
           this.weaponSkinApplies.enqueue(id, e.weaponSkinId);
         }
@@ -11230,60 +11336,15 @@ export class Renderer {
       }
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
-      // A null build leaves the field unset; the shared gate retries after its cooldown.
-      // A freshly built form root is exactly a brand-new rig's materials linking for
-      // the first time (same as a race/mech base-visual swap), so it is gated the
-      // same way instead of freezing the frame the form lands on (#2571).
-      if (polyed && !v.sheepVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_sheep', 'form_sheep');
-        if (built) {
-          v.sheepVisual = built;
-          v.group.add(built.root); // group.scale already carries e.scale
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
-      }
-      if (bear && !v.bearVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_bear', 'form_bear');
-        if (built) {
-          v.bearVisual = built;
-          v.group.add(built.root);
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
-      }
-      if (cat && !v.catVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_cat', 'form_cat');
-        if (built) {
-          v.catVisual = built;
-          v.group.add(built.root);
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
-      }
+      // (build, compile gate and encounter prewarm all live in buildFormVisual)
+      if (polyed && !v.sheepVisual) this.buildFormVisual(e, v, 'form_sheep', 'sheepVisual', true);
+      if (bear && !v.bearVisual) this.buildFormVisual(e, v, 'form_bear', 'bearVisual', true);
+      if (cat && !v.catVisual) this.buildFormVisual(e, v, 'form_cat', 'catVisual', true);
       if (travel && !v.travelVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_travel', 'form_travel');
-        if (built) {
-          v.travelVisual = built;
-          v.group.add(built.root);
-          v.formCompilePending = built.root;
-          this.gateSwapFlagOnCompile(built.root, () => {
-            v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-          });
-        }
+        this.buildFormVisual(e, v, 'form_travel', 'travelVisual', true);
       }
       if (metamorphForm && !v.metamorphVisual) {
-        const built = this.createCharacterVisualWithRetry(e, 'form_metamorph', 'form_metamorph');
-        if (built) {
-          v.metamorphVisual = built;
-          v.group.add(built.root);
-        }
+        this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false);
       }
       const formReadyMask = characterFormReadyMask(
         v.sheepVisual,
@@ -12156,18 +12217,18 @@ export class Renderer {
         ? collectBodyNightLights(this.views, sim.entities, p.pos.x, p.pos.z, this.nightBodyLights)
         : 0;
 
-    // Hidden views skip their whole matrix subtree: three recomposes even
-    // invisible hierarchies, and a distance-culled or off-screen rig is 30-60
-    // nodes of dead per-frame compose+multiply. Re-showing flips the gate back
-    // on, and the next scene update revisits the subtree and recomposes it
-    // from the live position/rotation properties, so nothing renders stale.
-    // (pick() skips hidden views, so a frozen matrix never ghosts a hitbox.
-    // CAUTION: getWorldPosition on a node inside a GATED subtree does not heal
-    // the chain in r165, hence the light-owner exemption; any new world-space
-    // read of a view child must use group.position or exempt the view too.)
+    // Hidden views hide-freeze their WHOLE rig subtree's matrix flags (r185
+    // recurses children unconditionally, so the old root-only gate left every
+    // default-flag descendant recomposing per frame; rig_visibility_freeze.ts
+    // carries the semantics). Flag walks run on transitions only, and the
+    // reveal forces one recompose of the current pose, so nothing renders
+    // stale. (pick() skips hidden views, so a frozen matrix never ghosts a
+    // hitbox. CAUTION: getWorldPosition inside a frozen subtree does not heal
+    // the chain, hence the light-owner exemption; any new world-space read of
+    // a hidden view's child must use group.position or exempt the view too.)
     let visibleViews = 0;
     for (const [, v] of this.views) {
-      v.group.matrixWorldAutoUpdate = v.group.visible || this.lightOwnerGroups.has(v.group);
+      syncRigMatrixFreeze(v.group, v.group.visible || this.lightOwnerGroups.has(v.group));
       if (v.group.visible) visibleViews++;
     }
 
@@ -12719,14 +12780,17 @@ export class Renderer {
       this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
     }
     this.updateOpaqueDrawOrder(dt);
-    if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
-    this.vfx.prepareDraw(this.camera);
-    if (this.post) {
-      // screen-fx pass state (ripple re-projection, flash decay) advances
-      // with the camera finalized for this frame
-      this.post.updateScreenFx(dt);
-      this.post.render();
-    } else this.webgl.render(this.scene, this.camera);
+    if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
+    // Refresh the reused host every frame instead of building a literal: sync
+    // is the rAF hot path (no per-frame allocation), and post can be torn down
+    // and rebuilt by a graphics rebuild, so a cached reference would go stale.
+    const host = this.framePresentHost;
+    host.vfx = this.vfx;
+    host.post = this.post;
+    host.webgl = this.webgl;
+    host.scene = this.scene;
+    host.camera = this.camera;
+    if (presentFrame(host, dt, present)) this.presentedFrameCount++;
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
@@ -12817,7 +12881,7 @@ export class Renderer {
   async captureScreenshot(maxEdge = 1280, quality = 0.7): Promise<string | null> {
     if (this.shutdownStarted) return null;
     try {
-      this.camera.updateMatrixWorld();
+      refreshFrozenWorldMatrix(this.camera);
       this.vfx.prepareDraw(this.camera);
       if (this.post) this.post.render();
       else this.webgl.render(this.scene, this.camera);
@@ -13197,8 +13261,7 @@ export class Renderer {
         this.camera.fov = CAMERA_BASE_FOV;
         this.camera.updateProjectionMatrix();
       }
-      this.camera.lookAt(this.cameraLookAt);
-      this.camera.updateMatrixWorld();
+      lookAtFrozen(this.camera, this.cameraLookAt);
       return;
     }
     const p = this.sim.player;
@@ -13322,8 +13385,8 @@ export class Renderer {
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
-    this.camera.lookAt(this.cameraLookAt);
-    this.camera.updateMatrixWorld();
+    // lookAtFrozen, never a bare lookAt (r185 frozen-matrix aim, static_matrix.ts).
+    lookAtFrozen(this.camera, this.cameraLookAt);
 
     // Spatial-audio listener (at the camera, facing the player) + ambience state.
     const sink = this.audioSink;

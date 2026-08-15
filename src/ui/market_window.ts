@@ -9,9 +9,9 @@
 // back through IWorld + injected callbacks. It holds no Sim reference and reaches
 // into Hud only through its deps.
 //
-// Colors live in the extracted stylesheet: item-quality tint comes
-// from the shared QUALITY_COLOR map, the unranked fallback is a CSS token, so no
-// raw hex sits in this painter.
+// Colors live in the extracted stylesheet: the item-quality name tint comes from
+// market_name_color.ts as CSS custom properties (rare/epic lifted to clear WCAG
+// AA on the panel, market-scoped), so no raw hex sits in this painter.
 //
 // The Browse tab's Buy button dispatches through a confirm prompt rather than
 // straight to IWorld: the terms it states and the confirm-time recheck that
@@ -33,8 +33,7 @@ import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
-import { QUALITY_COLOR } from './icons';
-import { marketArmorBadge } from './market_armor_badge';
+import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';
 import {
   type MarketBuyConfirm,
   marketBuyConfirm,
@@ -54,6 +53,8 @@ import {
   type MarketSort,
   type MarketSubtypeFilter,
 } from './market_filters';
+import { marketNameColor } from './market_name_color';
+import { marketPriceHtml } from './market_price_view';
 import {
   buildMarketView,
   COPPER_PER_GOLD,
@@ -70,11 +71,6 @@ import {
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
-
-// The unranked quality fallback as a CSS custom property. The
-// shared QUALITY_COLOR map carries the real per-quality hex; this token covers a
-// listing whose item has no quality field, so no raw hex lives in the painter.
-const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 
 // The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
 // components.css). #market-window clips with overflow: hidden on mobile, and a menu
@@ -728,8 +724,20 @@ export class MarketWindow {
         total: formatNumber(page.total, { maximumFractionDigits: 0 }),
       });
     }
+    // Localized short unit letters for the single-unit price, resolved once per
+    // render (not per row) and handed to the i18n-free price builder.
+    const priceUnits = {
+      gold: esc(t('itemUi.money.goldShort')),
+      silver: esc(t('itemUi.money.silverShort')),
+      copper: esc(t('itemUi.money.copperShort')),
+    };
     for (const { listing: l, item } of page.items) {
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+      // The Browse-row NAME uses the market-readable quality color (rare/epic
+      // lifted to clear WCAG AA on the panel; market_name_color.ts). The icon
+      // border below keeps the shipped hue via its own q-<quality> class, so
+      // quality still reads on the icon at full saturation while the name stays
+      // legible.
+      const qColor = marketNameColor(item.quality);
       const row = document.createElement('div');
       row.className = 'mkt-row';
       const itemName = itemDisplayName(item);
@@ -742,14 +750,35 @@ export class MarketWindow {
           ? ` <span class="stack">${esc(t('itemUi.market.stackCount', { count: formatNumber(l.count, { maximumFractionDigits: 0 }) }))}</span>`
           : '';
       const armorBadge = marketArmorBadge(item);
+      // Armor class as a weight-pips symbol on the icon corner rather than a text
+      // pill: the pip COUNT (cloth 1, leather 2, mail 3) carries the distinction
+      // with color stripped, so the cue is not color-only (the WCAG 1.4.1
+      // contract from issue 3104), and a symbol needs no per-locale translation
+      // the way a C/L/M letter would. The localized armor-type word still rides
+      // the accessible name (aria-label + title) so screen readers and hover keep it.
       const badge = armorBadge
-        ? ` <span class="mkt-armor-badge mkt-armor-badge--${armorBadge.armorType}">${esc(t(armorBadge.labelKey))}</span>`
+        ? marketArmorPips(armorBadge.armorType, esc(t(armorBadge.labelKey)))
         : '';
+      // Heroic-tier mark: a gold star on the icon's top-left corner (opposite the
+      // armor pips). Uses the bare "Heroic" label (hudChrome.itemHeroicLabel), not
+      // the bracketed [HEROIC] tooltip tag, so a screen reader reads "Heroic", not
+      // "left-bracket HEROIC right-bracket".
+      const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicLabel')));
+      // Gold-dominant, coinless, copper-trimmed price (market-scoped, see
+      // market_price_view). The pure builder is i18n-free: pass the localized
+      // short unit letters and the full localized amount (which rides the block's
+      // aria-label and hover title so the coinless visual never hides the real
+      // value).
+      const priceHtml = marketPriceHtml(
+        l.price,
+        priceUnits,
+        esc(formatLocalizedMoney(l.price, 'long')),
+      );
       row.innerHTML =
-        `${this.deps.itemIcon(item)}` +
-        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}${badge}</span>` +
+        `<span class="mkt-ico">${this.deps.itemIcon(item)}${badge}${heroicStar}</span>` +
+        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
-        `<span class="mkt-price">${this.deps.moneyHtml(l.price)}${each}</span>`;
+        `<span class="mkt-price">${priceHtml}${each}</span>`;
       const btn = document.createElement('button');
       btn.className = `mkt-btn${l.mine ? ' cancel' : ''}`;
       btn.textContent = l.mine ? t('itemUi.market.reclaim') : t('itemUi.market.buy');
@@ -883,8 +912,10 @@ export class MarketWindow {
       body.appendChild(pick);
       return;
     }
+    // Keep the release Sell-tab lowest-price fields (priceRef, stagedItemId) AND
+    // the redesign's market-scoped WCAG name color (marketNameColor), not raw QUALITY_COLOR.
     const { item, have, suggested, priceRef, itemId: stagedItemId } = view.form;
-    const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+    const qColor = marketNameColor(item.quality);
     const pick = document.createElement('div');
     pick.className = 'mkt-sell-pick';
     pick.innerHTML = `${this.deps.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
@@ -987,14 +1018,14 @@ export class MarketWindow {
     }
     this.renderCollectSales(body, view.sales, view.salesOmitted);
     for (const { item, count, instance } of view.rows) {
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+      const qColor = marketNameColor(item.quality);
       const row = document.createElement('div');
       row.className = 'mkt-collect';
       const stack =
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
+      row.innerHTML = `<span class="mkt-collect-item">${this.deps.itemIcon(item)}<span class="mkt-collect-name" style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span></span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
       body.appendChild(row);
     }
@@ -1020,7 +1051,7 @@ export class MarketWindow {
     const list = document.createElement('div');
     list.className = 'mkt-sale-list';
     for (const { item, count, proceeds, buyerName } of sales) {
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+      const qColor = marketNameColor(item.quality);
       const row = document.createElement('div');
       row.className = 'mkt-sale';
       const stack =

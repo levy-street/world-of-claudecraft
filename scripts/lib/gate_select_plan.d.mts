@@ -30,10 +30,22 @@ export function buildSelectPlan(opts: {
   changedPaths: string[];
   alwaysRunFiles: string[];
   exists?: (p: string) => boolean;
+  floorSanityMin?: number;
 }): SelectPlan;
 
-export function buildAlwaysRunArgs(opts: { files: string[]; workers: number }): string[];
+export const FLOOR_SANITY_MIN: number;
 
-export function buildRelatedArgs(opts: { sources: string[]; workers: number }): string[] | null;
+export type SelectiveLeg =
+  | { kind: 'merged-related'; files: string[]; strict: true }
+  | { kind: 'floor-run'; files: string[]; index: number; of: number }
+  | { kind: 'tolerant-related'; files: string[] };
+
+export function planSelectiveLegs(opts: {
+  relatedSources: string[];
+  alwaysRunFiles: string[];
+  platform: string;
+}): SelectiveLeg[];
+
+export function buildSelectiveLegArgs(leg: SelectiveLeg, workers: number): string[];
 
 export function buildFullSuiteArgs(opts: { workers: number }): string[];

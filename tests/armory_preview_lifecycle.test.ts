@@ -10,10 +10,14 @@ const inspect = readFileSync(new URL('../src/ui/armory_inspect.ts', import.meta.
 const store = readFileSync(new URL('../src/ui/daily_rewards_window.ts', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+const core = readFileSync(new URL('../src/ui/preview_prewarm_core.ts', import.meta.url), 'utf8');
 
 describe('Armory preview lifecycle', () => {
   it('keeps one renderer and parks it instead of disposing on modal close', () => {
-    const close = inspect.slice(inspect.indexOf('close(): void'), inspect.indexOf('async prewarm'));
+    const close = inspect.slice(
+      inspect.indexOf('close(): void'),
+      inspect.indexOf('destroy(): void'),
+    );
     expect(close).toContain('this.hideOverlay(true)');
     expect(close).not.toContain('.dispose()');
     expect(inspect).toContain('this.parking.appendChild(this.stage)');
@@ -27,38 +31,92 @@ describe('Armory preview lifecycle', () => {
       "const characterRigs = new Map<string, CharacterVisual>([['', visual]])",
     );
     expect(preview).toContain('selectCharacterRig(next);');
-    expect(preview).toContain('if (disposed || !active || prewarming) return;');
+    expect(preview).toContain('if (disposed || !active) return;');
     expect(preview).not.toMatch(/applyMode\(\);\s*animate\(\);/);
     expect(preview).toContain('setActive(next: boolean)');
-    // The buffer restore (with its prepaid composer target reallocation draw)
-    // runs in restoreWarmupBuffer; the paced keep-buffer path defers it to the
-    // schedule's one finalize unit instead of paying it per unit.
-    expect(preview).toContain(
-      'if (options?.keepWarmupBuffer !== true) restoreWarmupBuffer();\n        prewarming = false;',
-    );
-    const restoreStart = preview.indexOf('function restoreWarmupBuffer(): void {');
-    expect(restoreStart).toBeGreaterThan(-1);
-    const restore = preview.slice(restoreStart, preview.indexOf('\n  }', restoreStart));
-    expect(restore).toContain('composer.render();');
+    // The whole warming surface is gone with the schedule that used it: no
+    // prewarm entry point, no warmup drawing buffer, and none of the deferral
+    // machinery that existed only to hold card clicks arriving mid-warm. Pinned
+    // negatively so it cannot creep back without a caller and a measurement
+    // (docs/design/armory-preview-warming.md).
+    expect(preview).not.toContain('prewarming');
+    expect(preview).not.toContain('WarmupBuffer');
+    expect(preview).not.toContain('pendingSelection');
+    expect(preview).not.toContain('pendingActive');
+    expect(inspect).not.toContain('prewarm');
   });
 
-  it('walks every armory skin through the post-entry prewarm schedule', () => {
-    expect(store).toContain('WEAPON_SKIN_LIST.map((skin) => skin.id)');
-    expect(hud).toContain('this.dailyRewardsWindow.armoryPrewarmSkinIds()');
-    // One MODE per paced unit (a whole-skin unit was a measured 170 to 225 ms
-    // main-thread block in live play), keeping the warmup buffer across units
-    // (the per-unit restore cost two composer target reallocations plus a
-    // forced full-size draw EVERY unit) with the one finalize restore at the
-    // end of the schedule.
-    expect(hud).toContain(
-      'this.dailyRewardsWindow.prewarmArmoryPreviewSkins([skinId], [armoryMode], {',
-    );
-    expect(hud).toContain('keepWarmupBuffer: true,');
-    expect(hud).toContain(
-      'finishArmoryPrewarm: () => this.dailyRewardsWindow.finishArmoryPreviewPrewarm()',
-    );
-    // The schedule starts after the reveal (post-entry paced units), no longer
-    // holding the loading curtain for the whole catalog.
+  it('reaches the Armory stage from a CARD CLICK and from nowhere else', () => {
+    // The invariant this branch actually ships: no preparation on store open,
+    // construction only on the click that opens a card. Symbol-absence searches
+    // alone cannot say that (they pass if the chain returns under a new name),
+    // so this walks the real chain and then pins that it is the ONLY one.
+    //
+    // ensureArmoryInspect is the single door to the stage: ensureStage is
+    // private and reached only through it.
+    const doors = [...inspect.matchAll(/this\.ensureStage\(\)/g)].length;
+    expect(doors).toBeGreaterThan(0);
+    const callers = [...store.matchAll(/this\.ensureArmoryInspect\(\)/g)].length;
+    // Exactly one caller, and it is the card-open path.
+    expect(callers).toBe(1);
+    expect(store).toContain('this.ensureArmoryInspect().open(row)');
+
+    // openStore never reaches it, DIRECTLY or through what it calls. Checking
+    // openStore's own body alone would miss a preparation hidden one hop away,
+    // so every method it reaches is checked too.
+    const bodyOf = (name: string): string => {
+      const at = store.indexOf(name);
+      expect(at, `${name} not found`).toBeGreaterThan(-1);
+      return store.slice(at, store.indexOf('\n  }', at));
+    };
+    const openStore = bodyOf('openStore(): void {');
+    expect(openStore).toContain("this.tab = 'store'");
+    for (const hop of [
+      openStore,
+      bodyOf('toggle(): void {'),
+      bodyOf('private async renderCurrent('),
+      bodyOf('private async renderStore('),
+    ]) {
+      expect(hop.toLowerCase()).not.toContain('ensurearmory');
+      expect(hop.toLowerCase()).not.toContain('warm');
+    }
+
+    // And the hud's store entry point adds nothing of its own.
+    const hudOpenStart = hud.indexOf('openWocStore(): void {');
+    expect(hudOpenStart).toBeGreaterThan(-1);
+    const hudOpen = hud.slice(hudOpenStart, hud.indexOf('\n  }', hudOpenStart));
+    expect(hudOpen.toLowerCase()).not.toContain('armory');
+    expect(hudOpen.toLowerCase()).not.toContain('warm');
+  });
+
+  it('keeps the armory catalog OUT of the post-entry prewarm schedule', () => {
+    // The whole warming chain is gone from the store window, its catalog
+    // helper included: nothing but the prewarm ever called it, so it went with
+    // it rather than lingering as a method with no caller.
+    expect(store).not.toContain('armoryPrewarmSkinIds');
+    expect(store).not.toContain('prewarmArmoryPreview');
+    expect(store).not.toContain('finishArmoryPreviewPrewarm');
+    // Measured, warming it cost about 2.1 to 2.6 s of live-frame hitches that
+    // every online session paid for a window only some players open, and the
+    // cost was positional rather than per skin, so no gentler schedule was
+    // available. The lazy per-card path builds what one inspected card needs,
+    // and a second card measured 79 ms. Evidence and the before/after:
+    // docs/design/armory-preview-warming.md.
+    //
+    // NEGATIVE pin, hardened against a rename. Checking for the old identifiers
+    // alone would pass if the chain came back as warmArmoryCatalog(); the DOMAIN
+    // WORD cannot be renamed away, so the composed plan must not mention armory
+    // at all, in any casing.
+    const composeStart = hud.indexOf('postEntryPreviewPrewarmUnits(');
+    expect(composeStart).toBeGreaterThan(-1);
+    const compose = hud.slice(composeStart, hud.indexOf('\n  }', composeStart));
+    expect(compose.toLowerCase()).not.toContain('armory');
+    // And the deps SURFACE itself, which is the other way it could come back:
+    // a new optional dep would leave both the plan test and tsc silent.
+    expect(core.toLowerCase()).not.toContain('armoryskinids');
+    expect(core).not.toContain('prewarmArmorySkin');
+    // The schedule itself still starts after the reveal, never holding the
+    // loading curtain.
     const revealAt = main.indexOf('const revealWorld = (): void => {');
     expect(revealAt).toBeGreaterThan(-1);
     const startAt = main.indexOf('hud.startPostEntryPreviewPrewarm();', revealAt);
@@ -124,36 +182,5 @@ describe('Armory preview lifecycle', () => {
     expect(prewarm).toContain('this.renderActive = requestedActive ?? wasActive;');
     expect(prewarm).toContain('if (requestedActive !== null) this.syncSize();');
     expect(prewarm).not.toContain('this.renderActive = wasActive;');
-  });
-
-  it('carries a mid-prewarm setActive request past the ArmoryPreview finally instead of a stale wasActive', () => {
-    // setActive must not touch the shared active/rAF state while prewarm()
-    // owns the render buffer and loop; it should only record the request.
-    const setActiveStart = preview.indexOf('setActive(next: boolean): void {');
-    const setActiveEnd = preview.indexOf(
-      'setAppearance(next: PreviewAppearance): void {',
-      setActiveStart,
-    );
-    const setActive = preview.slice(setActiveStart, setActiveEnd);
-    expect(setActive).toContain('if (prewarming) {');
-    expect(setActive).toContain('pendingActive = next;');
-
-    const prewarmStart = preview.indexOf('async prewarm(');
-    const finallyStart = preview.indexOf('} finally {', prewarmStart);
-    const finallyEnd = preview.indexOf('dispose(): void {', finallyStart);
-    const finallyBody = preview.slice(finallyStart, finallyEnd);
-    expect(finallyBody).toContain('const requestedActive = pendingActive;');
-    expect(finallyBody).toContain('active = requestedActive ?? wasActive;');
-    expect(finallyBody).not.toContain('active = wasActive;');
-  });
-
-  it('defers every selection setter while prewarming (all four writes present)', () => {
-    // The statement-form rewrite of the (pendingSelection ??= {}).x sites is
-    // otherwise pin-free; a dropped write would silently clobber a card
-    // click landing mid-unit.
-    expect(preview).toContain('pendingSelection.appearance = next;');
-    expect(preview).toContain('pendingSelection.skin = next;');
-    expect(preview).toContain('pendingSelection.mode = next;');
-    expect(preview).toContain('pendingSelection.scene = next;');
   });
 });

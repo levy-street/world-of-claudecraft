@@ -151,7 +151,7 @@ difference from the other paths:
 |---|---|---|---|
 | `gate:fast` | **A subset.** No builds, no admin/bot typecheck, no i18n or wiki freshness, no sfx, no browser. | `related` plus two guard files | **No** |
 | `gate` | **All**, plus the dep-sync and ffmpeg preflights | **Every** test file | Yes (provably complete) |
-| `gate:select` | **All, and the same preflights** | always-run set + `related` | Yes (empirically complete) |
+| `gate:select` | **All, and the same preflights** | ONE merged `related` (floor seeds + sources) | Yes (empirically complete) |
 
 The distinction that matters: **`gate:fast` is weaker because it drops whole checks;
 `gate:select` drops none of them.** A change that breaks the client bundle, the admin

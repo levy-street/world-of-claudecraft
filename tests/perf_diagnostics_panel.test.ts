@@ -18,6 +18,7 @@ function snapshot(): PerfSnapshot {
   return {
     seconds: 20,
     frames: 1200,
+    hiddenPresentSkips: 0,
     fps: 60,
     frameMs,
     windows: {
@@ -203,6 +204,55 @@ describe('PerfDiagnosticsPanel', () => {
     expect(document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe(
       '100',
     );
+  });
+
+  it('restarts the scan when a shell-hidden gap shows up in the skip counter', () => {
+    // The desktop shell pins document.visibilityState at 'visible' while
+    // minimized, so the visibilitychange path above never fires there and the
+    // panel's driver (perf.tick) stops outright. The hiddenPresentSkips delta
+    // between two updates is the record that a hidden stretch happened, and
+    // it must restart the active-gameplay capture like a web tab pause
+    // (phase 4 QA F12). Pre-scan skips must NOT trip the detector.
+    setVisibility('visible');
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const startMeasurement = vi.fn();
+    const runSceneCensus = vi.fn(() => null);
+    const sample = snapshot();
+    sample.hiddenPresentSkips = 50;
+    const panel = new PerfDiagnosticsPanel({
+      startMeasurement,
+      snapshot: () => sample,
+      runSceneCensus,
+      desktopShell: true,
+    });
+    panel.setReady(true);
+    panel.onMonitorReset();
+
+    // Baseline update: 50 pre-scan skips are old news, the scan keeps going.
+    now += 4000;
+    panel.update(sample);
+    expect(document.body.textContent).toContain('11 seconds remaining');
+
+    // The window was minimized in between: skips grew, wall-clock jumped.
+    sample.hiddenPresentSkips = 260;
+    now += 12_000;
+    panel.update(sample);
+    expect(startMeasurement).toHaveBeenCalledTimes(1);
+    expect(runSceneCensus).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain(
+      'Tab restored. Restarting a clean 15-second active-gameplay capture.',
+    );
+    expect(document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('0');
+
+    // A full clean window from the restart completes; the hidden stretch
+    // never counted toward the 15 seconds.
+    now += 7000;
+    panel.update(sample);
+    expect(runSceneCensus).not.toHaveBeenCalled();
+    now += 8000;
+    panel.update(sample);
+    expect(runSceneCensus).toHaveBeenCalledTimes(1);
   });
 
   it('refreshes only census data on the frozen completed snapshot', () => {

@@ -755,10 +755,27 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the phase 10 QA merge of release/v0.38.0 into
 // feature/masterwrought: both sides re-minted since the common base, so the
 // merged tree mints values matching neither parent. No capture was retaken.
+// Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
+// edits (the view gate call sites and the ground-object pool key move) shift
+// the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
+// input, geometry value, or capture moved.
+// Re-minted for the merge of PR #3359's quest-collectable spawn gate with the
+// release branch's extracted entity-view policy. Both renderer.ts and the
+// entityViewPolicy leaf are provenance inputs; no capture was retaken.
+// Re-minted for the review fixes on this branch (Soul Rend warms every rig a
+// live body can take, plus the lazy form-visual fold): the first-order
+// composite follows renderer.ts, then this seal follows the swept evidence
+// bytes. No capture was retaken.
+// Re-minted for the r185 frozen-camera aim fix: the first-order composite
+// follows renderer.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the merge of release/v0.39.0 into feature/masterwrought:
+// both sides re-minted since the common base, so the merged tree mints
+// values matching neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'e01de8f7cf774c773c124095bf3d3483d3b050f3e69c6a68f68f16ad675fafdf';
+  '3665a57d22715b3bd896688f447a55fdc892fa78bf7b82b236eb9fb94e2aeabb';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '704d3a7f17c75c25a0d6aaffff00f15eaf07a833f5b78d2cb5f9191aa421c976';
+  'c5eb98d84998d930902cbae894ec1367b7ee8b54d912fa183c15a2efb5e34d0a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1747,10 +1764,31 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // feature/masterwrought: both parents moved provenance inputs, so the
     // merged tree mints a value matching neither parent. No capture was
     // retaken.
+    // Re-minted for the merge of release/v0.38.0 into the Armory warming
+    // branch: the first-order composite follows the merged renderer.ts bytes,
+    // then this second-order performance seal follows the swept evidence
+    // bytes. No capture was retaken.
+    // Re-pinned for the quest-collectable spawn gate. The first-order
+    // composite follows renderer.ts, then this second-order seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the merge of PR #3359's quest-collectable spawn gate with
+    // the release branch's extracted entity-view policy. The first-order
+    // composite follows renderer.ts and entityViewPolicy, then this seal
+    // follows the swept bytes. No capture was retaken.
+    // Re-minted for the review fixes on this branch (Soul Rend warms every rig
+    // a live body can take, plus the lazy form-visual fold): the first-order
+    // composite follows renderer.ts, then this seal follows the swept evidence
+    // bytes. No capture was retaken.
+    // Re-minted for the r185 frozen-camera aim fix. The first-order composite
+    // follows renderer.ts, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
+    // Re-minted for the merge of release/v0.39.0 into feature/masterwrought:
+    // both sides re-minted since the common base, so the merged tree mints
+    // values matching neither parent. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('04171784c88d1fda8191ce5fd733830200567c1b8aeecb8fdeee2a179aeab612');
+    ).toBe('718449dba2d5eac861a6cf938138e92bd8f92051c3218f863a5c55a02069455d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

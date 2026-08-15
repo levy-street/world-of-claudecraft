@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.38.0",
+  "version": "0.38.1",
   "private": true,
   "license": "MIT",
   "author": {
@@ -124,12 +124,12 @@
     "bs58": "^6.0.0",
     "electron-log": "^5.4.4",
     "electron-updater": "^6.8.9",
-    "n8ao": "^1.10.1",
+    "n8ao": "^2.0.0",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
-    "postprocessing": "6.36.0",
+    "postprocessing": "6.39.4",
     "prom-client": "15.1.3",
-    "three": "0.165.0",
+    "three": "0.185.1",
     "tweetnacl": "1.0.3",
     "ws": "^8.21.0"
   },
@@ -145,14 +145,14 @@
     "@testing-library/svelte": "^5.4.2",
     "@types/node": "^26.1.1",
     "@types/pg": "^8.20.0",
-    "@types/three": "^0.165.0",
+    "@types/three": "^0.185.4",
     "@types/ws": "^8.18.1",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitest/browser": "4.1.10",
     "@vitest/browser-playwright": "4.1.10",
     "axe-core": "4.12.1",
-    "electron": "^43.0.0",
-    "electron-builder": "^26.15.6",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.7",
     "esbuild": "^0.28.1",
     "ffmpeg-static": "^5.3.0",
     "ffprobe-static": "^3.1.0",
@@ -328,7 +328,7 @@
       "@reown/appkit"
     ],
     "patchedDependencies": {
-      "three@0.165.0": "patches/three@0.165.0.patch"
+      "three@0.185.1": "patches/three@0.185.1.patch"
     }
   }
 }

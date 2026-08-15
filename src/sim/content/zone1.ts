@@ -336,7 +336,20 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     elite: true,
     canSwim: true,
     ccImmune: true,
-    respawnMult: 432,
+    // Random respawn window, drawn fresh per death: 36 to 72 times the 25s base
+    // is 15 to 30 minutes (was a fixed 432, three hours).
+    //
+    // WHY THE CADENCE MOVED. A level 7 named miniboss is content for players
+    // passing through Zone 1, and an experienced player solos an account to cap
+    // in about four hours, so a three-hour timer meant most of his audience
+    // never saw him at all. WHY THIS WINDOW. Zone 1's rare ladder runs from
+    // Mogger and Old Greyjaw at 4x (100s) up to Wraithbinder Maldrec at 432x
+    // (three hours); the geometric midpoint of that span is about 42x, and this
+    // window brackets it. Grix stays strictly rarer than the plain rares and far
+    // rarer than trash, while a Zone 1 visit now contains two to four of his
+    // spawns instead of a fraction of one. The randomness is separate and is
+    // what stops the camp being clock-farmed.
+    respawnWindow: { minMult: 36, maxMult: 72 },
     hpBase: 280,
     hpPerLevel: 52,
     dmgBase: 11,

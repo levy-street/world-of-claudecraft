@@ -24,17 +24,54 @@ const MAX_MIRRORED_CONSOLE_LINES = 200;
 // dialog text stays flat. The class covers C0 (\u0000-\u001f),
 // DEL (\u007f), and C1 (\u0080-\u009f, which includes
 // \u009b, the one-byte control-sequence introducer), so a crafted string
-// cannot smuggle a terminal escape past the filter. Shared by clampText and
-// shell_strings.cjs.
+// cannot smuggle a terminal escape past the filter; the Unicode line breaks
+// LS and PS (\u2028, \u2029), which surfaces honoring Unicode line breaking
+// render as real newlines; and the invisible direction and width formatters
+// (soft hyphen \u00ad, the Arabic letter mark \u061c, the Mongolian vowel
+// separator \u180e, zero-widths and marks \u200b-\u200f, bidi embeds and
+// overrides \u202a-\u202e, word joiner and the invisible operators
+// \u2060-\u2064, isolates \u2066-\u2069, \ufeff, interlinear annotation
+// \ufff9-\ufffb, and the fully invisible tag characters
+// \u{e0000}-\u{e007f}), so text bound for an OS surface cannot reorder,
+// hide, or smuggle what it displays.
+// Shared by clampText and shell_strings.cjs.
 function flattenControlChars(text) {
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: matching control chars is the point
-  return text.replace(/[\u0000-\u001f\u007f-\u009f]+/g, ' ');
+  return text.replace(
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: matching control chars is the point
+    /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u2064\u2066-\u2069\ufeff\ufff9-\ufffb\u{e0000}-\u{e007f}]+/gu,
+    ' ',
+  );
 }
 
 function clampText(value, maxLength) {
   if (typeof value !== 'string') return '';
   const cleaned = flattenControlChars(value);
-  return cleaned.length > maxLength ? `${cleaned.slice(0, maxLength)}...` : cleaned;
+  if (cleaned.length <= maxLength) {
+    // An upstream cut (the preload pre-cap) can hand this function a string
+    // already ending in a lone high surrogate, and the flattener can collapse
+    // a run so the string lands under the cap with that tail intact; drop it
+    // here too, not only at this function's own cap boundary.
+    const tail = cleaned.charCodeAt(cleaned.length - 1);
+    return tail >= 0xd800 && tail <= 0xdbff ? cleaned.slice(0, -1) : cleaned;
+  }
+  // A cap landing between the halves of an astral character would leave a
+  // lone high surrogate that native UTF-8 conversion renders as U+FFFD.
+  const cut = cleaned.charCodeAt(maxLength - 1);
+  const end = cut >= 0xd800 && cut <= 0xdbff ? maxLength - 1 : maxLength;
+  return `${cleaned.slice(0, end)}...`;
+}
+
+// Neutralize markup-significant characters for an OS notification surface
+// that may parse them: the freedesktop notification spec allows markup in
+// bodies, and several Linux daemons (KDE, dunst, xfce4-notifyd) render
+// b/i/a tags, so a hostile page must not be able to style a toast or plant
+// a clickable link in it. Entity escaping is the spec's own literal form:
+// markup-parsing daemons decode the entities back to the literal
+// characters, and daemons that do not parse markup never meet these
+// characters in legitimate strings (the t() templates and the server's
+// name charset exclude them).
+function escapeNotificationMarkup(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // Best-effort redaction for log text that might embed a credential (the shell
@@ -143,6 +180,7 @@ module.exports = {
   MAX_MIRRORED_CONSOLE_LINES,
   flattenControlChars,
   clampText,
+  escapeNotificationMarkup,
   redactSecrets,
   rendererErrorLogEntry,
   normalizeConsoleMessage,

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { StaticOpaqueN8AOPass } from '../src/render/post_n8ao';
@@ -131,5 +133,23 @@ describe('static N8AO shader specialization', () => {
     pass.dispose();
 
     for (const dispose of disposals) expect(dispose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('reversed-depth premises behind the dropped surgery arm', () => {
+  // The static evaluation surgery deletes only the plain c0 declaration since
+  // n8ao 2.0.0 removed computeNormal's REVERSEDEPTH arm; that stays sound on
+  // exactly two premises, each pinned so a silent return goes red here.
+  it('the n8ao dist carries no reversed-depth c0 spelling', () => {
+    const dist = readFileSync(path.resolve(__dirname, '../node_modules/n8ao/dist/N8AO.js'), 'utf8');
+    expect(dist.includes('1.0 - texelFetch(sceneDepth, p, 0).x')).toBe(false);
+  });
+
+  it('the repo never enables three reversed depth', () => {
+    for (const file of ['src/render/renderer.ts', 'src/render/gfx.ts']) {
+      const source = readFileSync(path.resolve(__dirname, '..', file), 'utf8');
+      expect(source.includes('reversedDepthBuffer'), file).toBe(false);
+      expect(source.includes('reverseDepthBuffer'), file).toBe(false);
+    }
   });
 });

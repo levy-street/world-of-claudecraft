@@ -178,6 +178,7 @@ const POST_OVERHAUL_RUNTIME_AURA_SOURCES = [
   ['shaman_pyrebrand_mastery', 'rockbiter_weapon'],
   ['shaman_stonebound_armor', 'rockbiter_weapon'],
   ['shaman_stonebound_dr', 'rockbiter_weapon'],
+  ['shaman_stonebound_stamina', 'rockbiter_weapon'],
   ['shaman_stonebound_unleash_guard', 'unleash_weapon'],
   ['shaman_stonebound_ward_smooth', 'lightning_shield'],
   ['shaman_stoneward', 'stoneward'],
@@ -264,7 +265,7 @@ describe('resolveAuraIconId', () => {
     // ProcDef producers plus the closed semantic inventory above.
     expect(choiceSources).toHaveLength(7);
     expect(new Set(choiceSources.map(([id]) => id)).size).toBe(choiceSources.length);
-    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(98);
+    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(99);
     const expected = new Map<string, string>([
       ...choiceSources,
       ...NON_CHOICE_RUNTIME_AURA_SOURCES,
@@ -273,7 +274,7 @@ describe('resolveAuraIconId', () => {
     expect([...RUNTIME_AURA_ICON_SOURCE_IDS.entries()].sort()).toEqual(
       [...expected.entries()].sort(),
     );
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(110);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(111);
     for (const [id, source] of expected) {
       const imageUrl = abilityImageUrl(source);
       expect(imageUrl, `${id} -> ${source} static painted source`).toMatch(

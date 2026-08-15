@@ -15,7 +15,9 @@ export const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, 
 renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// PCFShadowMap: r182 deprecated PCFSoftShadowMap with WebGLRenderer (warns and
+// falls back); matches the game renderer's shadow type.
+renderer.shadowMap.type = THREE.PCFShadowMap;
 container.appendChild(renderer.domElement);
 
 export const scene = new THREE.Scene();
@@ -319,10 +321,12 @@ export const stats = { fps: 0 };
 let frames = 0;
 let fpsAt = performance.now();
 
-const clock = new THREE.Clock();
+// THREE.Timer, not the r183-deprecated Clock (which warns at construction).
+const timer = new THREE.Timer();
 function tick() {
   requestAnimationFrame(tick);
-  const dt = Math.min(0.1, clock.getDelta());
+  timer.update();
+  const dt = Math.min(0.1, timer.getDelta());
   if (glide) {
     glide.t = Math.min(1, glide.t + dt / 0.22);
     const k = glide.t * glide.t * (3 - 2 * glide.t);

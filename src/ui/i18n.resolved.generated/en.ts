@@ -1367,6 +1367,10 @@ export const en: EnTranslations = {
       "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
       "showWalletOnPlayerCard": "Show Wallet on Player Card",
       "showPlaytime": "Show Time Played on Character Screen",
+      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
+      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
+      "discordPresence": "Discord Rich Presence",
+      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
       "showDevBadges": "Show Developer Badges",
       "showOwnNameplate": "Show My Nameplate",
       "showPlayerNameplates": "Show Player Nameplates",
@@ -1739,6 +1743,7 @@ export const en: EnTranslations = {
       "notEnoughHonor": "Not enough Honor.",
       "reasons": {
         "arenaWin": "Arena victory",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Fiesta takedown",
         "fiestaComplete": "Fiesta completed",
         "fiestaWin": "Fiesta victory",
@@ -1845,6 +1850,7 @@ export const en: EnTranslations = {
       "joinChannels": "Tip: type /join world or /join lfg to chat with players across the world."
     },
     "itemHeroicTag": "[HEROIC]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Soulbound",
     "itemUniqueEquipped": "Unique-Equipped",
     "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
@@ -7844,7 +7850,15 @@ export const en: EnTranslations = {
       "readyBody": "Restart to install now, or keep playing and it installs when you quit.",
       "restart": "Restart now",
       "later": "Later",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "whatsNew": "See what changed in your browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is ready",
+      "updateReadyTitleNoVersion": "Update is ready",
+      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
+      "partyInviteTitle": "Party invite",
+      "partyInviteBody": "{name} invited you to a party."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7856,6 +7870,7 @@ export const en: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
     "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
     "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
@@ -8223,6 +8238,9 @@ export const en: EnTranslations = {
       "graphicsReloadNote": "Graphics Quality and Terrain Detail apply after a reload.",
       "reloadNow": "Reload Now",
       "fullscreen": "Fullscreen",
+      "displayMode": "Display Mode",
+      "displayModeBorderless": "Borderless Fullscreen",
+      "displayModeWindowed": "Windowed",
       "touchLookSpeed": "Touch Look Speed",
       "joystickSize": "Joystick Size",
       "buttonSize": "Button Size",
@@ -9571,6 +9589,7 @@ export const en: EnTranslations = {
       "cheap_shot": {
         "name": "Gut Punch",
         "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
@@ -9783,7 +9802,7 @@ export const en: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Burning Oath",
-        "description": "Passively increases the threat generated by your Holy damage by 60%. Faithwarden only."
+        "description": "Passively increases the threat generated by your Holy damage by 30%. Faithwarden only."
       },
       "retribution_aura": {
         "name": "Requital Aura",
@@ -9899,7 +9918,7 @@ export const en: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Weapon",
-        "description": "Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 30% armor, takes 10% less damage, and generates twice as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec."
+        "description": "Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec."
       },
       "healing_wave": {
         "name": "Mending Waters",
@@ -10078,7 +10097,7 @@ export const en: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +130%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
@@ -10088,6 +10107,10 @@ export const en: EnTranslations = {
       "growl": {
         "name": "Menace",
         "description": "Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wolf Form",
@@ -10633,7 +10656,7 @@ export const en: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
-        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
+        "description": "Restores 180 health over 10 sec. Bruin Form only."
       },
       "frost_trap": {
         "name": "Rime Snare",

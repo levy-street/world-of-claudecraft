@@ -12529,9 +12529,9 @@
   .mkt-controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-    gap: 10px 8px;
+    gap: var(--spacing-sm);
     align-items: end;
-    margin: 2px 0 8px;
+    margin: 2px 0 var(--spacing-md);
     position: relative;
     z-index: 3;
   }
@@ -12723,7 +12723,7 @@
   .mkt-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 4px 10px;
+    gap: 3px var(--spacing-md);
     align-content: start;
   }
   .mkt-note,
@@ -12738,83 +12738,255 @@
     margin: 2px 0 8px;
     font-family: Georgia, serif;
   }
+  /* Single-line rows: the name and seller sit inline (below), so each listing is
+     one line and the list stays dense without feeling heavy. Row padding and the
+     inter-column gap come from the spacing scale, with a little vertical air so
+     rows breathe rather than crowd (DESIGN.md: compress spacing before shrinking
+     type, and give elements room). */
   .mkt-row {
     display: grid;
-    grid-template-columns: 30px 1fr auto auto;
-    gap: 9px;
+    grid-template-columns: 28px 1fr auto auto;
+    gap: var(--spacing-sm);
     align-items: center;
-    padding: 5px 6px;
-    border-radius: 4px;
+    padding: 4px var(--spacing-xs);
+    border-radius: var(--radius-sm);
     font-size: 12px;
-    min-height: 40px;
+    min-height: 32px;
   }
   .mkt-row:hover {
     background: #ffffff0d;
   }
+  /* Inline layout: the name and the seller share ONE baseline row instead of
+     stacking, so each listing is a single line. That keeps the rows short (the
+     compact density) and stops the name looming over a subtitle. The name takes
+     priority and the seller truncates with an ellipsis when a long name leaves
+     it no room, so a single line always holds. */
   .mkt-row .mkt-name {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
     overflow: hidden;
+    min-width: 0;
   }
+  /* The item name is the row's headline, in the serif face at regular weight,
+     14.5px: warm and easy to read across a dense grid without the heaviness a
+     bolder weight brings at this size. The quality color comes from the painter's
+     market_name_color tokens; this only sets face/weight/size, never color. */
   .mkt-row .mkt-name .nm {
-    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* The name holds its full width and shrinks only after the seller has given
+       up all of its space (order matters: seller shrinks first). */
+    flex: 0 1 auto;
+    min-width: 0;
   }
   .mkt-row .mkt-name .stack {
     color: var(--color-text-light);
   }
+  /* The seller sits inline after the name, quiet, prefixed with a dot separator.
+     It yields FIRST when the row is tight: flex-shrink 100 vs the name's 1, so a
+     long name eats the seller before the name itself ever truncates. */
   .mkt-row .mkt-name .seller {
     font-size: 10.5px;
-    color: #8c8468;
+    color: #6f6853;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 100 auto;
+    min-width: 0;
+  }
+  .mkt-row .mkt-name .seller::before {
+    content: "\00b7\00a0";
+    color: #4a4230;
   }
   .mkt-row .mkt-name .seller.house {
     color: var(--gold-dim);
   }
-  /* Cloth/leather/mail armor-class cue (issue #3104): text-based like the deed
-     chip family, so the distinction never rides on color alone. */
-  .mkt-armor-badge {
-    display: inline-block;
-    font-size: 9.5px;
-    padding: 1px 6px;
-    border-radius: 999px;
-    font-family: var(--title-font);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    white-space: nowrap;
-    vertical-align: middle;
+  /* The icon cell is the positioning parent for the armor-class pip chip that
+     rides its corner. */
+  .mkt-ico {
+    position: relative;
+    display: block;
+    width: 28px;
+    height: 28px;
   }
-  .mkt-armor-badge--cloth {
-    border: 1px solid #3f7ea3;
-    color: #9fd4f2;
-    background: #10222c;
+  /* Cloth/leather/mail armor-class cue (issue #3104): a weight-pips symbol, NOT a
+     colored dot. The pip COUNT (cloth 1, leather 2, mail 3) carries the
+     distinction with color removed, so the cue survives grayscale/colorblindness
+     and is not color-only (WCAG 1.4.1); the color is a bonus fast-scan channel.
+     The chip sits on the icon corner so it costs no room on the name line. The
+     localized armor word rides the element's aria-label/title (set in the
+     painter) for screen readers and hover. */
+  .mkt-armor-pips {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    display: grid;
+    place-items: center;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 2.5px;
+    border-radius: 4px;
+    background: #0d0b07;
+    border: 1px solid var(--mkt-pip-color);
+    box-shadow: 0 1px 2px #000a;
   }
-  .mkt-armor-badge--leather {
-    border: 1px solid #8a5a2a;
-    color: #e0b47c;
-    background: #26170a;
+  .mkt-pip-row {
+    display: flex;
+    gap: 2px;
+    align-items: center;
   }
-  .mkt-armor-badge--mail {
-    border: 1px solid #5c6470;
-    color: #cdd3db;
-    background: #1c1f24;
+  /* 3px dots with a 2px gap: large and separated enough that three of them read
+     as three countable pips, not a text ellipsis ("..."), which the earlier
+     2.5px/1.5px sizing suggested at 1x (mail = 3 pips). */
+  .mkt-pip {
+    display: block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--mkt-pip-color);
   }
+  /* Per-class color: a fast-scan bonus on top of the countable pips, never the
+     sole cue. Values match the shipped armor-badge palette. */
+  .mkt-armor-pips--cloth {
+    --mkt-pip-color: #6fc0e8;
+  }
+  .mkt-armor-pips--leather {
+    --mkt-pip-color: #d79a55;
+  }
+  .mkt-armor-pips--mail {
+    --mkt-pip-color: #b6c0cd;
+  }
+  /* Heroic-tier mark: a small gold star on the icon's TOP-LEFT corner, opposite
+     the armor pips (bottom-right) so the two never collide. Warm gold, distinct
+     from any quality color; the localized "Heroic" word rides its aria-label. */
+  .mkt-heroic-star {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    font-size: 12px;
+    line-height: 1;
+    color: #ffcf6a;
+    text-shadow:
+      0 1px 2px #000,
+      0 0 3px #000;
+    pointer-events: none;
+  }
+  /* Price is the number a shopper is actually comparing, so give it real weight.
+     The market paints a gold-dominant, coinless, copper-trimmed block
+     (market_price_view.ts): the largest denomination is the big headline, the
+     rest sit small beside it, and the number's COLOR carries the denomination
+     instead of a coin circle. */
   .mkt-row .mkt-price {
-    font-size: 11.5px;
-    color: var(--color-accent);
+    text-align: right;
     white-space: nowrap;
+  }
+  /* Side-by-side: the sub-units sit on the same baseline as the gold headline
+     (e.g. "138g 60s" on one line), which keeps each row a single line and reads
+     left to right like a normal amount. */
+  .mkt-price-stack {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 5px;
+    line-height: 1.1;
+  }
+  .mkt-price-main {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The single-unit number right-aligns in the price lane, so the last digit of
+     a "5g" and a "48,500g" line up down the column for fast comparison. */
+  .mkt-price-num {
+    display: inline-block;
     text-align: right;
   }
+  /* Denomination by color (the coinless cue), with a small unit letter as the
+     non-color backup so it is never color-only. Gold is yellow, copper a clear
+     orange-brown, kept distinct so a copper price never reads as gold. */
+  .mkt-price-main--gold {
+    color: #e8c874;
+  }
+  .mkt-price-main--silver {
+    color: #dfe3ea;
+  }
+  .mkt-price-main--copper {
+    color: #d17a4e;
+  }
+  /* The denomination letter (g/s/c) is the NON-COLOR cue, so it stays large and
+     fully opaque, set off by a clear gap: it anchors the value (colorblind-safe)
+     and never reads as color-only. */
+  .mkt-price-unit {
+    font-style: normal;
+    font-size: 0.9em;
+    font-weight: 800;
+    opacity: 1;
+    margin-left: 3px;
+  }
+  /* The per-unit "each" subline stays quiet: it is context, not the headline. */
+  .mkt-row .mkt-price .seller {
+    font-size: 10.5px;
+    font-weight: 400;
+    color: #8c8468;
+  }
+  /* Buy button: a forged, dimensional button in the shared .btn recipe
+     (DESIGN.md 10.1), not a flat chip: a gradient fill, a one-pixel bronze
+     border over a black keyline, an inset top highlight with a drop shadow, and
+     a one-pixel press. Buy reads green for "purchase"; Reclaim keeps the warm
+     brown of a returning action. */
   .mkt-btn {
     font-family: var(--title-font);
     font-size: 11px;
+    letter-spacing: 0.3px;
     cursor: var(--cursor-point);
-    border-radius: 4px;
-    padding: 4px 11px;
-    border: 1px solid #5a4a18;
-    background: linear-gradient(#3a6a28, #244a18 60%, #1a3812);
-    color: #d6ffc8;
+    border-radius: var(--radius-sm);
+    padding: 4px 12px;
+    border: 1px solid var(--color-gold-800);
+    outline: 1px solid #000;
+    background: linear-gradient(var(--color-gold-900), #241d0e 55%, #1a140a);
+    color: #ffe6a8;
     white-space: nowrap;
+    text-shadow: 1px 1px 1px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff26,
+      0 2px 4px #0007;
+    transition:
+      filter var(--transition-speed),
+      box-shadow var(--transition-speed),
+      border-color var(--transition-speed);
   }
   .mkt-btn:hover {
-    filter: brightness(1.18);
+    filter: brightness(1.22);
+    border-color: var(--color-gold-600);
+    box-shadow:
+      inset 0 1px 0 #ffffff26,
+      0 2px 4px #0007,
+      0 0 8px var(--color-primary-glow);
   }
+  .mkt-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px #0009;
+  }
+  /* Keyboard focus: the black keyline above is a static border effect that would
+     otherwise sit where a focus ring belongs, and (living in @layer components,
+     after base) it beats the shared .btn:focus-visible from base.css on layer
+     order. Restore a visible ring in the same layer, mirroring .btn:focus-visible
+     (components.css) so every Buy / Reclaim button shows keyboard focus again. */
+  .mkt-btn:focus-visible {
+    outline: 3px solid var(--color-border-focus) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 8px var(--color-primary-glow) !important;
+  }
+  /* Reclaim: the same forged button in the warm returning-action palette. */
   .mkt-btn.cancel {
     background: linear-gradient(#6a3a18, #4a2810 60%, #381c0c);
     color: #ffd8b8;
@@ -12867,13 +13039,17 @@
     padding: 10px 6px;
     text-align: center;
   }
+  /* The staged item card matches a Browse card (bordered, accent spine) instead
+     of the old dashed box, so the Sell tab reads like the rest of the window. */
   .mkt-sell-pick {
     display: flex;
     gap: 10px;
     align-items: center;
     padding: 8px;
-    border: 1px dashed #5a4a2a;
-    border-radius: 6px;
+    border: 1px solid #2a2418;
+    border-left: 3px solid #6f5a2a;
+    background: linear-gradient(180deg, #ffffff07, #ffffff02);
+    border-radius: 7px;
     margin-bottom: 10px;
   }
   .mkt-sell-pick.empty {
@@ -12881,9 +13057,13 @@
     font-size: 12px;
     justify-content: center;
     font-style: italic;
+    border-left-color: #2a2418;
   }
+  /* Serif name, matching the Browse row headline. */
   .mkt-sell-pick .ps-name {
-    font-size: 13px;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 500;
   }
   /* The Sell tab's current-lowest-price reference (issue #3043): a same-page
      market check. Muted like the adjacent .mkt-price-row labels, so the
@@ -12930,41 +13110,89 @@
     font-size: 11px;
     margin-right: 6px;
   }
+  /* The primary List / Collect-all action is the forged GOLD PRIMARY button
+     (DESIGN.md 10.1: at most one per surface): a subdued gold-brown gradient over
+     ink, a bronze border on a black keyline, an inset top highlight with a drop
+     shadow, and the standard 14px/700 label. Sized to its label and left-aligned
+     under the form, distinct from the green Buy buttons in the rows. */
   .mkt-list-btn {
+    display: inline-block;
     font-family: var(--title-font);
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
     cursor: var(--cursor-point);
-    border-radius: 5px;
-    padding: 8px;
-    border: 1px solid #5a4a18;
-    background: linear-gradient(#5a4a18, #3a2f0d 55%, #2a2208);
+    border-radius: var(--radius-sm);
+    padding: 9px 22px;
+    border: 1px solid var(--color-gold-700);
+    outline: 1px solid #000;
+    background: linear-gradient(var(--color-gold-900), #241d0e 60%, #1a140a);
     color: #ffe6a8;
-    margin-top: 4px;
+    text-shadow: 1px 1px 1px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff1f,
+      0 2px 4px #0007;
+    margin-top: var(--spacing-sm);
+    transition:
+      filter var(--transition-speed),
+      box-shadow var(--transition-speed),
+      border-color var(--transition-speed);
   }
   .mkt-list-btn:hover {
     filter: brightness(1.15);
+    border-color: var(--color-gold-500);
+    box-shadow:
+      inset 0 1px 0 #ffffff1f,
+      0 2px 4px #0007,
+      0 0 8px var(--color-primary-glow);
+  }
+  .mkt-list-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px #0009;
+  }
+  /* Restore keyboard focus over the black keyline (see .mkt-btn:focus-visible
+     above for why the same-layer override is needed). Covers List and
+     Collect-all. */
+  .mkt-list-btn:focus-visible {
+    outline: 3px solid var(--color-border-focus) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 8px var(--color-primary-glow) !important;
   }
   .mkt-list-btn:disabled {
-    opacity: 0.5;
+    filter: grayscale(1) brightness(0.7);
     cursor: default;
-    filter: none;
+    box-shadow: none;
   }
+  /* Collect rows get the Browse card treatment (bordered, accent spine) so the
+     tab matches the rest of the window. */
   .mkt-collect {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
     padding: 8px;
-    background: #ffffff0a;
-    border-radius: 6px;
+    border: 1px solid #241f16;
+    border-left: 3px solid #6f5a2a;
+    background: linear-gradient(180deg, #ffffff07, #ffffff02);
+    border-radius: 7px;
     margin-bottom: 8px;
   }
   /* The icon + name cluster inside a collect row (was an inline flex literal in
-     market_window.ts; moved here so the painter carries no layout px). */
+     market_window.ts; moved here so the painter carries no layout px). The item
+     name (the span after the icon) is serif, matching the Browse row headline. */
   .mkt-collect-item {
     display: flex;
     gap: 8px;
     align-items: center;
+  }
+  /* The collect-row item name. Selected by class, NOT position: the sale ledger
+     reuses .mkt-collect-item with a two-line .mkt-sale-name as its last child, so
+     a :last-child rule here would turn the buyer line serif too (it has its own
+     .mkt-sale-name > span:first-child rule below). */
+  .mkt-collect-name {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 500;
   }
   /* The sale ledger under the proceeds line: what sold, to whom, for how much.
      Indented and dimmer than a .mkt-collect row because it itemizes the purse
@@ -12985,6 +13213,13 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+  /* The item name line (first child; the buyer line stays the small sans below).
+     Serif, matching the Browse row headline but a touch smaller for the ledger. */
+  .mkt-sale-name > span:first-child {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
   }
   .mkt-sale-buyer,
   .mkt-sale-more {

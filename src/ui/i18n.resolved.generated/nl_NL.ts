@@ -1367,6 +1367,10 @@ export const nl_NL: EnTranslations = {
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
       "showPlaytime": "Speeltijd tonen op personagescherm",
+      "forceHighPerfGpu": "Toegewijde game-GPU gebruiken",
+      "forceHighPerfGpuNote": "Standaard aan: de desktop-app vraagt deze computer om zijn toegewijde game-GPU. Zet dit uit als het spel niet opstart of met een zwart scherm opent, of als het laptopscherm leeg blijft. Wordt toegepast bij de volgende start van het spel.",
+      "discordPresence": "Discord-activiteit",
+      "discordPresenceNote": "Toont de zone waarin je je bevindt en hoelang je deze sessie al speelt als je Discord-activiteit, en iedereen die je Discord-profiel kan zien, kan beide zien. Alleen de zonenaam, je sessietijd en het spel worden gedeeld, nooit je personage, je account, of met wie je speelt. Vereist dat de Discord-app op deze computer actief is.",
       "showDevBadges": "Ontwikkelaarsinsignes tonen",
       "showOwnNameplate": "Mijn naambordje tonen",
       "showPlayerNameplates": "Spelersnamen Tonen",
@@ -1739,6 +1743,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughHonor": "Niet genoeg eer.",
       "reasons": {
         "arenaWin": "Arena-overwinning",
+        "arenaComplete": "arenagevecht uitgevochten",
         "fiestaKill": "Fiesta-uitschakeling",
         "fiestaComplete": "Fiesta voltooid",
         "fiestaWin": "Fiesta-overwinning",
@@ -1845,6 +1850,7 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
+    "itemHeroicLabel": "Heroïsch",
     "itemSoulbound": "Zielsgebonden",
     "itemUniqueEquipped": "Uniek-Uitgerust",
     "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
@@ -7844,7 +7850,15 @@ export const nl_NL: EnTranslations = {
       "readyBody": "Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.",
       "restart": "Nu herstarten",
       "later": "Later",
-      "dismiss": "Sluiten"
+      "dismiss": "Sluiten",
+      "whatsNew": "Bekijk wat er is veranderd in je browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is klaar",
+      "updateReadyTitleNoVersion": "Update is klaar",
+      "updateReadyBody": "Herstart World of ClaudeCraft om de update toe te passen.",
+      "partyInviteTitle": "Groepsuitnodiging",
+      "partyInviteBody": "{name} heeft je uitgenodigd voor een groep."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7856,6 +7870,7 @@ export const nl_NL: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
+    "bodyDiscreteInactive": "Het spel gebruikt niet de game-GPU en draait in plaats daarvan op de energiezuinige GPU, waardoor de prestaties zullen lijden. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
     "bodyWeb": "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
     "hybridBodyWindows": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, stel je browser dan in op Hoge prestaties via Instellingen > Systeem > Beeldscherm > Beeldinstellingen, en herstart hem daarna. De desktop-app kiest de game-GPU automatisch.",
     "hybridBodyLinux": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, dan biedt je browser of grafische stuurprogramma mogelijk een eigen GPU-keuze-instelling, of biedt je distributie een GPU-wisselhulpmiddel (zoals PRIME of optimus-manager). De desktop-app kiest de game-GPU automatisch.",
@@ -8223,6 +8238,9 @@ export const nl_NL: EnTranslations = {
       "graphicsReloadNote": "Beeldkwaliteit en Terreindetail worden na een herlaadbeurt toegepast.",
       "reloadNow": "Nu herladen",
       "fullscreen": "Volledig scherm",
+      "displayMode": "Schermmodus",
+      "displayModeBorderless": "Randloos volledig scherm",
+      "displayModeWindowed": "Venster",
       "touchLookSpeed": "Kijksnelheid bij aanraking",
       "joystickSize": "Joystickgrootte",
       "buttonSize": "Knopgrootte",
@@ -9571,6 +9589,7 @@ export const nl_NL: EnTranslations = {
       "cheap_shot": {
         "name": "Buikstoot",
         "description": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Moet in sluiptocht zijn. Levert 2 combopunten op.",
+        "descriptionNoStealth": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Levert 2 combopunten op.",
         "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec."
       },
       "sap": {
@@ -9783,7 +9802,7 @@ export const nl_NL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brandende Eed",
-        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 60%. Alleen Geloofswachter."
+        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 30%. Alleen Geloofswachter."
       },
       "retribution_aura": {
         "name": "Aura van Vergelding",
@@ -9899,7 +9918,7 @@ export const nl_NL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Steengebonden Wapen",
-        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 30% pantser, krijgt 10% minder schade en wekt tweemaal zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
+        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 40% pantser en 20% Uithouding, krijgt 15% minder schade en is immuun voor kritieke treffers van wezens en wekt 2,75 keer zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
       },
       "healing_wave": {
         "name": "Helende Wateren",
@@ -10078,7 +10097,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruingedaante",
-        "description": "Verander in een beer: pantser +130%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
+        "description": "Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
       },
       "maul": {
         "name": "Botverbrijzelen",
@@ -10088,6 +10107,10 @@ export const nl_NL: EnTranslations = {
       "growl": {
         "name": "Bedreigen",
         "description": "Gromt naar het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
+      },
+      "challenging_roar": {
+        "name": "Onheilspellend Gebrul",
+        "description": "Een onheilspellend gebrul: elke vijand binnen 10 m wordt bedreigd, zijn dreiging jegens jou stijgt tot het niveau van zijn meest gehate vijand, en wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
       },
       "cat_form": {
         "name": "Wolfsgedaante",

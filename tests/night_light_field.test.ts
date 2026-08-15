@@ -93,7 +93,10 @@ describe('the GLSL strings', () => {
 
   it('lights against the surface normal with the punctual falloff', () => {
     const glsl = nightLightFragmentGlsl('vWPos.xyz');
-    expect(glsl).toContain('inverseTransformDirection(normal, viewMatrix)');
+    // The r185 canonical helper: the old inverseTransformDirection spelling
+    // is a deprecated alias whose removal would break this shader at compile.
+    expect(glsl).toContain('transformDirectionByInverseViewMatrix(normal, viewMatrix)');
+    expect(glsl).not.toContain('inverseTransformDirection(');
     // three's own point-light curve, stated in SQUARED distance: pow4(d / r)
     // is pow2(d2 / r2), and the attenuation divides by d2 either way, so the
     // window and the falloff need no root at all.

@@ -387,7 +387,7 @@ function renderPreviewRoot(root, viewName, captureDataUrl) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = rig.exposure;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   document.body.append(renderer.domElement);
 
   const scene = new THREE.Scene();

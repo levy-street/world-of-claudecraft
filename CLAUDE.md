@@ -56,8 +56,9 @@ the nested `npm run` forms below are the package.json script names.
 - `npm run server`: esbuild-bundle + run the authoritative server on :8787.
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
 - `node scripts/gate_select.mjs`: **the pre-merge gate.** Same step list as `npm run gate`
-  (nothing dropped) with one substitution: the full vitest run becomes an always-run set
-  plus `vitest related`. Roughly 3x faster; falls back to the full suite for any change it
+  (nothing dropped) with one substitution: the full vitest run becomes ONE merged
+  `vitest related` invocation (the always-run floor rides it as self-selecting seeds,
+  same form as the CI shards). Roughly 3x faster; falls back to the full suite for any change it
   cannot reason about. See `docs/qa-gate.md`.
 - `npm run gate`: the full CI-equivalent gate, still the deeper check (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, the real-browser
@@ -73,6 +74,12 @@ the nested `npm run` forms below are the package.json script names.
 - `npm run env` / `npm run bench`: build + run the headless RL env server.
 - `npm run db:up` / `npm run db:down`: Postgres 16 in Docker (dev DB on :5433).
 - `npm run realms`: run multiple realm processes locally.
+- `node scripts/release_mint.mjs vX.Y.Z`: THE settings step when a new `release/**`
+  branch is minted (re-points the merge-queue ruleset, with an audit dump; run it
+  every mint or the queue goes silently dormant, see `docs/merge-queue.md`,
+  "Minting a release branch"). Merging on the queue-protected branches: `gh pr merge`
+  does not work there; use the `enqueuePullRequest` GraphQL mutation (exact command
+  in `docs/merge-queue.md`).
 
 See `README.md` for the full host/develop/play guide and the classic-fidelity checklist; `DEPLOY.md` for production.
 
