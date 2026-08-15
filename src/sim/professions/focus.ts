@@ -324,6 +324,14 @@ export const RESPEC_TIER_CONFIG: Readonly<Record<RespecPaymentTier, RespecTierCo
   instant: { durationMsPerPoint: 0, coinPerPoint: 25, materialsPerPoint: 5 },
 };
 
+// The item RespecCost.materials counts. Reuses the generic professions material
+// sink (arcane_dust, "Chime Dust") that already prices the disenchant/recharge/
+// enchant-reagent family (disenchant_reagents.ts DISENCHANT_MATERIAL_BY_QUALITY,
+// enchanting.ts) rather than minting a bespoke re-spec reagent: the #1148 tuning
+// rule is a modest, non-punitive cost, not a new gathering target, and arcane_dust
+// is already the cheapest common-quality rung of that ladder.
+export const RESPEC_MATERIAL_ITEM_ID = 'arcane_dust';
+
 export interface RespecCost {
   readonly durationMs: number;
   readonly coin: number;

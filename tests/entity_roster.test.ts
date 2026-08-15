@@ -9,6 +9,7 @@ import { createDeedRuntime } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
 import {
   addEntityToRoster,
+  type DelayedEvent,
   drainDelayedEvents,
   dropEntityFromRoster,
   type GroundAoE,
@@ -18,13 +19,15 @@ import {
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
+import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
+import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
 import type { Entity } from '../src/sim/types';
 
-type AnyEntity = Entity & Record<string, any>;
+type AnyEntity = Entity & Record<string, unknown>;
 
 // A SpatialGrid contains `e` iff a radius query around its position finds its id.
 function gridHas(grid: SpatialGrid, e: Entity): boolean {
@@ -49,8 +52,8 @@ function makeCtx() {
   const players = new Map();
   const cfg = { seed: 1 } as unknown as SimContextHost['cfg'];
   const clock = { time: 0, tick: 0 };
-  let delayedEvents: { at: number; event: any; guard?: () => boolean }[] = [];
-  let pendingProjectiles: any[] = [];
+  let delayedEvents: DelayedEvent[] = [];
+  let pendingProjectiles: PendingProjectile[] = [];
   const emit = vi.fn();
   const clearEntityMarker = vi.fn();
   const pulseGroundAoE = vi.fn();
@@ -61,6 +64,7 @@ function makeCtx() {
     nextRiftInstanceId: 1,
     riftPortalNextAt: 120,
     riftPortalSpawnCount: 0,
+    riftPortalsEnabled: false,
     get rng() {
       return rng;
     },
@@ -112,6 +116,7 @@ function makeCtx() {
     get players() {
       return players;
     },
+    masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
     get cfg() {
       return cfg;
@@ -132,9 +137,18 @@ function makeCtx() {
     yumiCatDamaged: vi.fn(),
     cleanupYumiMatch: vi.fn(),
     nextArenaMatchId: 1,
+    bgQueue: [],
+    bgMatches: new Map(),
+    bgBusySlots: new Set(),
+    bgOutcomes: [],
+    bgProposals: [],
+    bgProposalLockouts: new Map(),
+    nextBgProposalId: 1,
+    nextBgMatchId: 1,
     delveRuns: [],
     delvePetStash: new Map(),
     utcDay: '',
+    resetDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
@@ -240,7 +254,10 @@ function makeCtx() {
     nextLootRollId: 1,
     devCommands: false,
     marketListings: [],
+    commissionOrderBoard: [],
+    nextCommissionOrderId: 1,
     bankerIds: [],
+    guildBanks: new Map(),
     vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
@@ -249,6 +266,7 @@ function makeCtx() {
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
+    bumpCommissionOrderBoardRev: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),
     markDeedsDirty: vi.fn(),
@@ -342,6 +360,11 @@ function makeCtx() {
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
     completeGatherCast: vi.fn(),
+    completeCraftCast: vi.fn(),
+    completeDisenchantCast: vi.fn(),
+    completeApplyEnchantCast: vi.fn(),
+    completeSalvageCast: vi.fn(),
+    completeRechargeCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),
@@ -376,6 +399,7 @@ function makeCtx() {
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
+    mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
     // Vale Cup <-> Arena queue exclusion.
     vcupSeatedOrQueued: vi.fn(() => false),
@@ -385,6 +409,11 @@ function makeCtx() {
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
+    // Thornhollow Fields battleground hooks.
+    bgOnPlayerDeath: vi.fn(),
+    bgOnPlayerDamaged: vi.fn(),
+    bgOnPlayerHealed: vi.fn(),
+    bgCancelFlagAura: vi.fn(() => false),
   };
   const ctx = createSimContext(host);
   return {
@@ -504,7 +533,7 @@ describe('entity_roster: despawn prologue (isolated ctx)', () => {
     const t = makeCtx();
     t.clock.time = 50;
     const m = mob(220, 1, 1);
-    m.overheadEmoteId = 'laugh' as any;
+    m.overheadEmoteId = 'laugh' as Entity['overheadEmoteId'];
     m.overheadEmoteUntil = 49; // already past
     addEntityToRoster(t.ctx, m);
     runDespawnDecay(t.ctx);
@@ -530,6 +559,20 @@ describe('entity_roster: delayed-event drain (isolated ctx)', () => {
     expect(t.delayed()).toEqual([{ at: 100, event: { type: 'respawn', pid: 4 } }]);
   });
 
+  it('runs a due deterministic callback once without emitting a wire event', () => {
+    const t = makeCtx();
+    const resolve = vi.fn();
+    t.clock.time = 10;
+    t.ctx.delayedEvents = [{ at: 10, resolve }];
+
+    drainDelayedEvents(t.ctx);
+    drainDelayedEvents(t.ctx);
+
+    expect(resolve).toHaveBeenCalledTimes(1);
+    expect(t.emit).not.toHaveBeenCalled();
+    expect(t.delayed()).toEqual([]);
+  });
+
   it('is a no-op (no allocation churn) when there are no delayed events', () => {
     const t = makeCtx();
     drainDelayedEvents(t.ctx);
@@ -549,7 +592,8 @@ describe('entity_roster: ground-AoE drain (isolated ctx)', () => {
       interval: 1,
       tickTimer: 0,
       school: 'holy',
-      ability: 'consecration',
+      ability: 'Consecration',
+      abilityId: 'consecration',
       ...over,
     };
   }
@@ -581,3 +625,49 @@ describe('entity_roster: graveyardReadout (pure)', () => {
 
 // The release-spirit / ghost-loop tests moved to tests/spirit.test.ts (the flow now
 // lives in src/sim/spirit.ts). graveyardReadout (above) stays here with the roster.
+
+// The despawn prologue's paladin gate (review 3050): the three paladin-sourced
+// cleanups walk the full roster, so dropEntityFromRoster runs them only for a
+// despawning paladin player. Pinned both ways against a real Sim: a non-paladin
+// despawn must not disturb a live paladin's devotion, and a paladin despawn
+// must still strip every aura it sourced.
+describe('paladin-sourced despawn cleanup gate', () => {
+  function plantDevotion(target: Entity, sourceId: number): void {
+    target.auras.push({
+      id: 'devotion_ward',
+      name: 'Bastion Devotion',
+      kind: 'buff_dr',
+      remaining: 999,
+      duration: 999,
+      permanent: true,
+      value: 0.05,
+      sourceId,
+      school: 'holy',
+    });
+  }
+
+  it('leaves a live paladin devotion intact when a non-paladin despawns', () => {
+    const sim = new Sim({ seed: 4242, playerClass: 'paladin', autoEquip: true });
+    const ctx = (sim as unknown as { ctx: Parameters<typeof dropEntityFromRoster>[0] }).ctx;
+    plantDevotion(sim.player, sim.player.id);
+
+    const bystander = createMob(880001, MOBS.ridge_stalker, 3, { x: 4, y: 0, z: 4 });
+    addEntityToRoster(ctx, bystander);
+    dropEntityFromRoster(ctx, bystander.id);
+
+    expect(sim.player.auras.some((a) => a.id === 'devotion_ward')).toBe(true);
+  });
+
+  it('still strips every sourced devotion when the paladin despawns', () => {
+    const sim = new Sim({ seed: 4243, playerClass: 'paladin', autoEquip: true });
+    const ctx = (sim as unknown as { ctx: Parameters<typeof dropEntityFromRoster>[0] }).ctx;
+    const allyId = sim.addPlayer('priest', 'Vera');
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing ally');
+    plantDevotion(ally, sim.player.id);
+
+    dropEntityFromRoster(ctx, sim.player.id);
+
+    expect(ally.auras.some((a) => a.id === 'devotion_ward')).toBe(false);
+  });
+});

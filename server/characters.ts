@@ -44,13 +44,19 @@
 import type * as http from 'node:http';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
+import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+// The shared, host-agnostic bounds check for an untrusted look (the
+// action_bar.ts pattern). The renderer owns what the values MEAN; the server
+// only guarantees the stored document is small and well shaped.
+import { sanitizeAppearance } from '../src/world_api/appearance';
 import { normalizeCharName, offensiveName } from './auth';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
   type CharacterRow,
+  consumeAppearanceReroll,
   createCharacterCapped,
   deleteCharacter,
   getCharacter,
@@ -73,6 +79,7 @@ import {
   CHARACTER_CREATE_POLICY,
   CHARACTER_DELETE_POLICY,
   CHARACTER_RENAME_POLICY,
+  CHARACTER_REROLL_POLICY,
   CHARACTER_TAKEOVER_POLICY,
   rateLimit,
 } from './http/middleware/rate_limit';
@@ -120,6 +127,14 @@ const DELETE_CONFIRM = {
   error: 'type the character name to confirm deletion',
   code: 'character.delete_confirm',
 } as const;
+const INVALID_APPEARANCE = {
+  error: 'invalid appearance',
+  code: 'character.invalid_appearance',
+} as const;
+const REROLL_NOT_AVAILABLE = {
+  error: 'appearance reroll is not available for this character',
+  code: 'character.reroll_unavailable',
+} as const;
 
 /** The ctx.state key the owned, authorized character row is stashed under. */
 const CHARACTER_RESOURCE = 'character';
@@ -139,6 +154,22 @@ const VALID_CLASSES: readonly string[] = [
 ];
 /** Highest selectable skin index (mirrors the legacy Math.min(7, ...) clamp). */
 const MAX_SKIN = 7;
+/** The free-redesign window: every character created before this instant carries
+ *  one appearance redesign, whether or not it already has an authored look. UTC
+ *  midnight, so every client agrees on who is inside the window without doing
+ *  any timezone arithmetic of its own, and compared server-side only.
+ *
+ *  Set ahead of the ship date rather than on it, deliberately: a cutoff that has
+ *  already passed when the change merges gives nothing to the characters created
+ *  in between, and a current client posts a look, so the `appearance IS NULL`
+ *  arm below will not catch them either. The slack is what makes the window
+ *  survive a slow review. Re-check it before merging; if it has gone stale, push
+ *  it out rather than shipping a window that is already shut.
+ *
+ *  Re-checked 2026-08-10 (third review round) and pushed from 08-17 to 08-24, so
+ *  the window still has two weeks of slack from the current head rather than the
+ *  one it had left. */
+export const APPEARANCE_REROLL_CUTOFF = new Date('2026-08-24T00:00:00Z');
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 
 // ---------------------------------------------------------------------------
@@ -155,12 +186,26 @@ export interface CharactersRuntime {
   takeOverCharacter(accountId: number, characterId: number): Promise<'taken-over' | 'not-online'>;
   /** game.rekeyMarketSeller: re-key an online seller's listings after a rename. */
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean;
+  /** game.setHelmHiddenForCharacter: mirror a redesign's helm choice onto a live
+   *  session, so its autosave does not write the old value back over the row. */
+  setHelmHiddenForCharacter(characterId: number, hidden: boolean): boolean;
+  /** game.applyAppearanceForCharacter: mirror a redesign's LOOK onto a live
+   *  session (entity field + wire-memo bust), so the player and every peer see
+   *  the new body now rather than at next relog. */
+  applyAppearanceForCharacter(
+    characterId: number,
+    appearance: Record<string, unknown> | null,
+  ): boolean;
   /** game.saveMarket: persist the World Market after a rekey. */
   saveMarket(): Promise<void>;
+  /** game.purgeMarketSeller: drop a deleted character's listings + collection. */
+  purgeMarketSeller(characterId: number, name: string): boolean;
   /** game.rekeyMailOwner: re-key the character's Ravenpost mailbox after a rename. */
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean;
   /** game.saveMail: persist the Ravenpost mail book after a rekey. */
   saveMail(): Promise<void>;
+  /** game.purgeMailOwner: clear a deleted character's Ravenpost mailbox. */
+  purgeMailOwner(characterId: number, name: string): boolean;
   /** main.ts initialCharacterState: the serialized fresh-character state for create. */
   initialCharacterState(cls: PlayerClass, name: string, skin: number): CharacterState;
   /** main.ts publicOrigin: canonical share origin for the owner-sheet URLs. */
@@ -202,6 +247,7 @@ const REAL_CHARACTERS_DB = {
   listCharacters,
   getCharacter,
   createCharacterCapped,
+  consumeAppearanceReroll,
   reclaimDeactivatedName,
   renameCharacter,
   saveCharacterState,
@@ -235,6 +281,72 @@ function ownedCharacter(ctx: Ctx): CharacterRow {
 /** Server canonical form for the delete confirmation (mirrors the legacy inline helper). */
 function normalizeDeleteConfirmation(name: unknown): string {
   return typeof name === 'string' ? name.trim().toLowerCase() : '';
+}
+
+/** Sanitize an untrusted appearance payload for storage.
+ *  `undefined`/`null` = "no authored look" (a legacy-rig character); a plain
+ *  object is bounded by the shared wire validator (known keys only, plain
+ *  values, short strings, small slider maps); anything else is the caller's
+ *  400. What the values MEAN is the renderer's business: every consumer runs
+ *  normalizeAppearance before composing, so a stored style id that no longer
+ *  exists clamps to a valid body rather than breaking one. */
+function parseAppearanceBody(raw: unknown): Record<string, unknown> | null | 'invalid' {
+  if (raw === undefined || raw === null) return null;
+  return sanitizeAppearance(raw) ?? 'invalid';
+}
+
+/** The cosmetic half of a create payload, sanitized ONCE for both dispatch
+ *  arms (this module's RouteDef handler and the retained legacy ladder arm in
+ *  server/main.ts), so a dispatch rollback cannot quietly create characters
+ *  without their authored look or with the wrong helmet. `'invalid'` is the
+ *  caller's 400. */
+export function parseCreationCosmetics(
+  body: Record<string, unknown>,
+): { appearance: Record<string, unknown> | null; helmHidden: boolean } | 'invalid' {
+  const appearance = parseAppearanceBody(body.appearance);
+  if (appearance === 'invalid') return 'invalid';
+  // The creator's helmet toggle is this character's STANDING wardrobe
+  // preference, not just a turntable view: a player who authored a face should
+  // meet it in the world rather than a bucket. So an authored look defaults to
+  // a HIDDEN helm.
+  //
+  // The default only ever applies to a client that omits the field, and the
+  // creator never does: it always posts the toggle. So an omission means a
+  // client that predates this feature: a cached web bundle, an older native
+  // shell, a script. Those characters have no authored face to bury and used to
+  // get a helm, so defaulting them to hidden would silently change what they
+  // create. Keyed off the appearance rather than a flat default, each arm
+  // therefore keeps its own status quo.
+  const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : appearance !== null;
+  return { appearance, helmHidden };
+}
+
+/** Stamp the creation-time helm choice onto a fresh character state. The look
+ *  rides its own column, but helm visibility is SIM state, so it belongs in
+ *  the blob. Zero-default omission (the sim's own serialization convention):
+ *  only a hidden helm is written, so a shown one leaves the blob unchanged. */
+export function withCreationHelm(state: CharacterState, helmHidden: boolean): CharacterState {
+  if (helmHidden) state.helmHidden = true;
+  return state;
+}
+
+/** Whether this character still holds its one-shot redesign token. Two ways in,
+ *  and the token is what makes it one-shot either way:
+ *   - CREATED INSIDE THE FREE WINDOW (before APPEARANCE_REROLL_CUTOFF). Every
+ *     character that existed when the creator shipped gets one redesign on the
+ *     house, including one that already carries an authored look.
+ *   - NEVER DESIGNED AT ALL, whenever it was made. This arm is not the product
+ *     rule, it is the safety net under it: without it a character created after
+ *     the cutoff by a client too old to post an appearance would have neither a
+ *     look nor a way to choose one, permanently. It can only ever ADD
+ *     eligibility, so it cannot contradict the window.
+ *  Mirrors consumeAppearanceReroll's WHERE arm, which is the authority; decided
+ *  server-side so the list payload is the single truth the roster button reads. */
+function appearanceRerollAvailable(c: CharacterRow): boolean {
+  if (c.appearance_reroll_used) return false;
+  if (c.appearance === null || c.appearance === undefined) return true;
+  const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
+  return Number.isFinite(created) && created < APPEARANCE_REROLL_CUTOFF.getTime();
 }
 
 /** Shape a realm rank lookup into the character-sheet's rank field (pure; mirrors main.ts). */
@@ -278,9 +390,157 @@ export function buildCharacterList(
         c.class,
         c.state?.equipment?.mainhand ?? null,
         weaponSkinLoadout,
+        c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       ),
+      // The authored modular look (null = pre-creator character, legacy rig).
+      // Re-validated here the same way the join path does (ws_auth.ts
+      // sanitizeAppearance): this column is JSONB and a row could predate the
+      // current bounds, so raw `c.appearance` can carry a document today's
+      // rules would reject or empty out, e.g. `{}`. Sanitizing keeps
+      // char-select and the in-world render agreeing on the same look instead
+      // of char-select composing a default modular body for a row the join
+      // path nulls out.
+      appearance: sanitizeAppearance(c.appearance),
+      // Mirror of state.helmHidden so the roster preview wears (or bares) the
+      // kit helm exactly as the world last saw this character.
+      helmHidden: c.state?.helmHidden === true,
+      createdAt: c.created_at ? new Date(c.created_at).toISOString() : null,
+      // Server-decided (cutoff + unspent token): the roster's one-shot
+      // redesign button renders exactly when this is true.
+      appearanceRerollAvailable: appearanceRerollAvailable(c),
     })),
   };
+}
+
+/**
+ * The world-state rekey that follows a successful deactivated-name reclaim: the
+ * orphaned holder was just archived out of the freed name (a rename in effect),
+ * so ALL THREE of renameHandler's rekeys run here too. The market rows and the
+ * mailbox move onto the stable id plus the archived name; without that, the
+ * next holder of the display name could claim the orphan's escrow through the
+ * name-fallback read arms. The orphan's OWN signed item instances (bags, bank,
+ * equipped) are swept to the archived name; without that, their persisted blob
+ * keeps signing a name that now belongs to a stranger (the #1145 self-signed
+ * discount, Battlefield Experience attribution, and the eqi inspect wire all
+ * compare signer to a live display name). Every rekey matches the holder's
+ * STORED casing (reclaimed.freedName), never the requester's typed casing: the
+ * db lookup is case-insensitive and the book matches are exact. The no-nonce
+ * blob save is safe for the same reason renameHandler's is: a deactivated
+ * account cannot hold a live session, so no lease fence is in play. Like the
+ * DB reclaim itself, this runs BEFORE the create retry; a crash between the
+ * committed reclaim and these rekeys leaves the orphan archived with its
+ * world state still name-keyed (the same class of unrecoverable window the
+ * delete purge documents below; nothing re-triggers the rekey).
+ * Exported so BOTH create dispatch arms share it.
+ */
+export async function rekeyReclaimedCharacterWorldState(
+  rt: Pick<CharactersRuntime, 'rekeyMarketSeller' | 'saveMarket' | 'rekeyMailOwner' | 'saveMail'>,
+  reclaimed: {
+    id: number;
+    archivedName: string;
+    freedName: string;
+    level: number;
+    state: CharacterState | null;
+  },
+): Promise<void> {
+  if (rt.rekeyMarketSeller(reclaimed.id, reclaimed.freedName, reclaimed.archivedName)) {
+    await rt.saveMarket();
+  }
+  if (rt.rekeyMailOwner(reclaimed.id, reclaimed.freedName, reclaimed.archivedName)) {
+    await rt.saveMail();
+  }
+  if (
+    reclaimed.state &&
+    rekeyInstanceSigner(reclaimed.state, reclaimed.freedName, reclaimed.archivedName)
+  ) {
+    // Swallow-and-log like the market and mail save wrappers above: this is
+    // the helper's one await that can reject, and a throw here would skip
+    // the caller's create retry and 500 a reclaim that already committed.
+    // The cost of swallowing is bounded and accepted: a failed blob save
+    // leaves the orphan's signers on the freed name with nothing to
+    // re-trigger the sweep, the same unrecoverable-window class the purge
+    // and crash comments record.
+    try {
+      await charactersDb.saveCharacterState(reclaimed.id, reclaimed.level, reclaimed.state);
+    } catch (err) {
+      console.error('failed to save the reclaimed holder signer sweep:', err);
+    }
+  }
+}
+
+/**
+ * The renamed character's OWN signer sweep (#2837). The market and mail rekeys
+ * above cover the world-state books (ownership keys, display names, and the
+ * renamer's own escrowed payload signers); this covers the five signer-bearing
+ * regions of the persisted character state itself (carried inventory, bank,
+ * vendor buyback, and equipped, under both `equipmentInstance` spellings), so
+ * the #1145 self-signed crafting discount, Battlefield Experience attribution,
+ * and the eqi inspect wire all follow the new name. A live entity/meta needs no
+ * sweep: the caller's isCharacterOnline/online-session guard runs first, so
+ * there is never a live one at rename time. Foreign-held copies signed with the
+ * old name live in other characters' blobs or parcels and stay out of scope.
+ *
+ * Exported so BOTH rename dispatch arms share one behavior: this module's
+ * renameHandler below and the retained legacy ladder arm in main.ts (the
+ * API_DISPATCH=legacy rollback path), the purge/reclaim precedent above. Call
+ * it only with the RETURNING row from a successful rename: a rename that
+ * matched no row must never sweep a character's live blob.
+ */
+export async function rekeyRenamedCharacterOwnSigner(
+  characterId: number,
+  level: number,
+  state: CharacterState | null,
+  oldName: string,
+  newName: string,
+): Promise<void> {
+  if (state && rekeyInstanceSigner(state, oldName, newName)) {
+    await charactersDb.saveCharacterState(characterId, level, state);
+  }
+}
+
+/**
+ * The world-state purge that follows a successful character delete (R43). A deleted
+ * character can never collect again, so its World Market listings, its Merchant
+ * collection, and its Ravenpost mailbox leave the realm's shared books here instead
+ * of sitting uncollectable forever.
+ *
+ * The purge mutates the LIVE sim through the injected runtime and only then persists:
+ * the realm process serving this request is the one running the world, and it
+ * re-persists the market and mail blobs from memory every autosave, so editing the
+ * world_state rows alone (inside db.deleteCharacter, say) would be clobbered within
+ * seconds. Each save is skipped when its purge reports no change. This assumes the
+ * current one-process-per-realm topology: a second process serving the same realm
+ * would re-persist its own un-purged copy. The two saves are deliberately NOT one
+ * transaction (unlike the leave path, whose atomicity guards an item duplicating
+ * between a bag and its escrow): a market listing and a mail parcel are independent
+ * escrows and each half is idempotent. The autosave bounds a SAVE FAILURE (the
+ * wrappers swallow write errors; memory re-persists within thirty seconds); a
+ * process CRASH between the two saves loses the un-saved half permanently, the
+ * same unrecoverable window the delete handler's comment records, because the
+ * committed row delete leaves nothing to re-trigger the purge.
+ *
+ * Exported so BOTH delete dispatch arms share one behavior: this module's
+ * deleteHandler and the retained legacy ladder arm in main.ts (the API_DISPATCH=legacy
+ * rollback path), the buildCharacterList delegation precedent. Call it only AFTER the
+ * DB delete reports success, mirroring renameHandler: a delete that matched no row
+ * must never purge a live character's escrow.
+ */
+export async function purgeDeletedCharacterWorldState(
+  rt: Pick<CharactersRuntime, 'purgeMarketSeller' | 'saveMarket' | 'purgeMailOwner' | 'saveMail'>,
+  characterId: number,
+  name: string,
+): Promise<void> {
+  // Never let a purge failure turn a COMMITTED delete into a 500: the row is
+  // gone and a client retry would 404 with the mail half never purged. The
+  // live-book mutations self-heal through the autosave (the save wrappers
+  // swallow their own write errors already); this catch covers the walks
+  // themselves, matching that posture.
+  try {
+    if (rt.purgeMarketSeller(characterId, name)) await rt.saveMarket();
+    if (rt.purgeMailOwner(characterId, name)) await rt.saveMail();
+  } catch (err) {
+    console.error('failed to purge deleted character world state:', err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -394,13 +654,25 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     0,
     Math.min(MAX_SKIN, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
   );
+  // The authored look and the helm choice ride the create body and are fixed
+  // to THIS character: the look lands in its own column, so no later creation
+  // can restyle an existing character. Both optional (a legacy/api client
+  // without the creator still creates fine); a malformed appearance is a 400.
+  const cosmetics = parseCreationCosmetics(body);
+  if (cosmetics === 'invalid') {
+    json(ctx.res, 400, INVALID_APPEARANCE);
+    return;
+  }
   const create = () =>
     charactersDb.createCharacterCapped(
       accountId,
       name,
       cls,
       CHARACTER_LIMIT,
-      rt.initialCharacterState(cls, name, skin),
+      // Rebuilt per attempt: the reclaim path calls create() twice, exactly
+      // as the inline rt.initialCharacterState call it replaces did.
+      withCreationHelm(rt.initialCharacterState(cls, name, skin), cosmetics.helmHidden),
+      cosmetics.appearance,
     );
   const respondCreated = (c: CharacterRow): void => {
     gameMetricsCounters().characterCreated();
@@ -424,10 +696,12 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     if (!isUniqueViolation(err)) throw err;
     // The name collided. Free it if held only by a deactivated account, then retry
     // once; otherwise it is genuinely taken.
-    if (!(await charactersDb.reclaimDeactivatedName(name))) {
+    const reclaimed = await charactersDb.reclaimDeactivatedName(name);
+    if (!reclaimed) {
       json(ctx.res, 409, NAME_TAKEN);
       return;
     }
+    await rekeyReclaimedCharacterWorldState(rt, reclaimed);
     try {
       const c = await create();
       if (!c) {
@@ -480,6 +754,20 @@ async function ownerSheetHandler(ctx: Ctx): Promise<void> {
   );
 }
 
+/**
+ * GET /api/characters/:id/deeds-recent: the owner's newest-first deed unlock
+ * ids from the character_deeds observer table, `{ deeds: [id, ...] }` capped
+ * at DEEDS_RECENT_CAP. The state blob only keeps the earn DAY, so this read is
+ * the client's one source of exact earn order (the Book of Deeds recent
+ * strip). Ids only: the owner's Book already holds every earned day, and the
+ * timestamps stay server-side.
+ */
+async function deedsRecentHandler(ctx: Ctx): Promise<void> {
+  const character = ownedCharacter(ctx);
+  const rows = await charactersDb.recentDeedsForCharacter(character.id, DEEDS_RECENT_CAP);
+  json(ctx.res, 200, { deeds: rows.map((row) => row.deedId) });
+}
+
 /** POST /api/characters/:id/rename: moderator-sanctioned rename (force_rename gated). */
 async function renameHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -528,20 +816,10 @@ async function renameHandler(ctx: Ctx): Promise<void> {
     if (rt.rekeyMailOwner(character.id, character.name, c.name)) {
       await rt.saveMail();
     }
-    // The renamed character's OWN signed instances (bags, bank, equipped) still
-    // carry the old signer name in their persisted blob; sweep it so the
-    // self-signed crafting discount, Battlefield Experience attribution, and
-    // the eqi inspect wire follow the new name. Only the persisted blob needs
-    // the sweep: the market/mail rekeys above reach WORLD state that lives in
-    // the running server regardless of sessions, but a character's live
-    // entity/meta exists only while joined, and the isCharacterOnline gate
-    // above guarantees there is none at rename time. Foreign-held copies
-    // signed with the old name live in other characters' blobs and are out of
-    // scope. renameCharacter's RETURNING row carries the current blob, and the
-    // no-nonce save is safe for the same offline reason.
-    if (c.state && rekeyInstanceSigner(c.state, character.name, c.name)) {
-      await charactersDb.saveCharacterState(c.id, c.level, c.state);
-    }
+    // renameCharacter's RETURNING row carries the current blob, and the
+    // no-nonce save is safe for the same offline reason the market/mail
+    // rekeys above are: isCharacterOnline already guarantees no live session.
+    await rekeyRenamedCharacterOwnSigner(c.id, c.level, c.state, character.name, c.name);
     json(ctx.res, 200, {
       id: c.id,
       name: c.name,
@@ -581,7 +859,69 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const ok = await charactersDb.deleteCharacter(accountId, character.id);
+  // The row is gone; take its shared world state with it (R43). Read freshness
+  // comes from the SYNCHRONOUS in-memory purge (both reads serve from the live
+  // sim in this process). The AWAITED saves NARROW the crash window before the
+  // 200: a death after the committed DELETE but before the blobs persist would
+  // reload listings and mail keyed to a character that no longer exists, with
+  // no way to re-trigger the purge. They cannot close it outright (the game
+  // save wrappers swallow their own errors and answer anyway; the 30 s
+  // autosave is the failure-path backstop), but do not drop the await.
+  if (ok) await purgeDeletedCharacterWorldState(rt, character.id, character.name);
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
+}
+
+/** POST /api/characters/:id/appearance-reroll: spend the character's one-shot
+ *  redesign token on a new authored look. Eligibility (ownership + inside the
+ *  free window or never designed + unspent token) is decided ATOMICALLY in the
+ *  single UPDATE
+ *  (consumeAppearanceReroll), so two concurrent submits cannot both land; the
+ *  handler only shapes the payload and maps the outcome. Allowed while the
+ *  character is online: the new look simply applies from the next world entry
+ *  (appearance rides the join, not the live session), and the helm half is
+ *  pushed onto the live session below. */
+async function appearanceRerollHandler(ctx: Ctx): Promise<void> {
+  const character = ownedCharacter(ctx);
+  const body = (ctx.body ?? {}) as Record<string, unknown>;
+  const appearance = parseAppearanceBody(body.appearance);
+  // Unlike create, the reroll's whole point is a new look: absent counts as
+  // malformed rather than "clear the appearance".
+  if (appearance === 'invalid' || appearance === null) {
+    json(ctx.res, 400, INVALID_APPEARANCE);
+    return;
+  }
+  // Same rule as creation (parseCreationCosmetics): the editor's helmet toggle
+  // is a standing wardrobe choice, so a redesign sets it exactly as the creator
+  // does rather than being a preview that evaporates on Save.
+  //
+  // An omission is NULL, not false. The real editor always posts the field, so
+  // only a client that does not offer the toggle can omit it, and defaulting
+  // that to false made the UPDATE run `state - 'helmHidden'`, actively UN-hiding
+  // a helm the player had hidden in world. Null leaves the blob alone.
+  const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : null;
+  const ok = await charactersDb.consumeAppearanceReroll(
+    ctxAccountId(ctx),
+    character.id,
+    appearance,
+    helmHidden,
+    APPEARANCE_REROLL_CUTOFF,
+  );
+  if (!ok) {
+    json(ctx.res, 400, REROLL_NOT_AVAILABLE);
+    return;
+  }
+  // The row now says one thing and a live session's memory says another; its
+  // 30 s autosave writes the whole blob, so without this push the helm half of
+  // the redesign would be silently reverted (and the look, which rides its own
+  // column, would not). No-op when the character is not in world.
+  if (helmHidden !== null) useRuntime().setHelmHiddenForCharacter(character.id, helmHidden);
+  // ...and the look itself, for the same reason: the route is allowed while
+  // the character is online, and a body that only updates at relog leaves the
+  // player and every peer on the old look while the roster shows the new one.
+  useRuntime().applyAppearanceForCharacter(character.id, appearance);
+  // Echo the normalized look so the client can update its roster row without
+  // a second list fetch.
+  json(ctx.res, 200, { ok: true, appearance, helmHidden });
 }
 
 // ---------------------------------------------------------------------------
@@ -637,6 +977,16 @@ export const routes: RouteDef[] = [
     meta: OWNED_CHARACTER_META,
   },
   {
+    method: 'GET',
+    path: '/api/characters/:id/deeds-recent',
+    surface: 'api',
+    // Registry-only (the new-route rule): no legacy ladder twin. Read-tier
+    // bearer + ownership, the owner-sheet gate pair exactly.
+    middleware: [readGuard, requireOwnedCharacter(CHARACTER_NOT_FOUND)],
+    handler: deedsRecentHandler,
+    meta: OWNED_CHARACTER_META,
+  },
+  {
     method: 'POST',
     path: '/api/characters/:id/rename',
     surface: 'api',
@@ -663,6 +1013,22 @@ export const routes: RouteDef[] = [
       requireOwnedCharacter(NOT_FOUND),
     ],
     handler: takeoverHandler,
+    meta: OWNED_CHARACTER_META,
+  },
+  {
+    method: 'POST',
+    path: '/api/characters/:id/appearance-reroll',
+    surface: 'api',
+    // Registry-only (the new-route rule): no legacy ladder twin. withBody BEFORE
+    // requireOwnedCharacter, the rename/delete order, so a malformed body answers
+    // uniformly for any :id.
+    middleware: [
+      activeGuard,
+      rateLimit(CHARACTER_REROLL_POLICY),
+      withBody(),
+      requireOwnedCharacter(CHARACTER_NOT_FOUND),
+    ],
+    handler: appearanceRerollHandler,
     meta: OWNED_CHARACTER_META,
   },
   {

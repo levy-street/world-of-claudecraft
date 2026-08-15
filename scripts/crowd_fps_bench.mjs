@@ -12,20 +12,29 @@
 //   npm run dev                             # :5173 (proxies /api,/ws -> :8787)
 //   node scripts/crowd_fps_bench.mjs
 //
-// Env: CROWD_BATCHES=10,20,30,40 (cumulative crowd sizes), CROWD_W/H, CROWD_DPR,
+// Exact 40-player PR evidence run (replace both SHAs with `git rev-parse`
+// output, and keep the raw text plus JSON files):
+//   CROWD_BASE_SHA=<base-sha> CROWD_HEAD_SHA=<head-sha> CROWD_BATCHES=40 \
+//   CROWD_OUT=tmp/crowd-40.txt CROWD_JSON_OUT=tmp/crowd-40.json npm run perf:crowd
+//
+// Env: CROWD_BATCHES=10,20,35,50 (cumulative crowd sizes), CROWD_W/H, CROWD_DPR,
 //      CROWD_SETTLE_MS, GAME_URL, SERVER_URL, BROWSER_PATH, CROWD_MIN_FPS (per-sample
-//      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path).
+//      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path),
+//      CROWD_BASE_SHA and CROWD_HEAD_SHA (the compared revisions recorded in evidence).
 //
 // This is a GATE, not just a probe (scripts/lib/bench_gate.mjs): every crowd batch
 // must join EXACTLY (actual sockets, bots.length, never attempts; partial joins fail,
 // with no escape hatch: lower CROWD_BATCHES for exploratory runs), a missing or
 // non-finite metric fails as missing evidence, and the verdict drives the exit code.
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { evaluateCrowdRun, parseCeilingEnv } from './lib/bench_gate.mjs';
+import { assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
 
 // Stream every sampled row to a file immediately, so a kill/timeout (the render
@@ -43,6 +52,10 @@ function record(line) {
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const SERVER = process.env.SERVER_URL ?? 'http://localhost:8787';
+// The bench mints accounts and drives /dev cheats (teleport, level), both
+// directly and through the page it opens: every target must be local, always.
+assertLoopbackUrl(SERVER, 'SERVER_URL');
+assertLoopbackUrl(GAME_URL, 'GAME_URL');
 const WS_BASE = SERVER.replace(/^http/, 'ws');
 const BATCHES = (process.env.CROWD_BATCHES ?? '10,20,35,50').split(',').map(Number);
 const W = Number(process.env.CROWD_W ?? 1920);
@@ -51,7 +64,25 @@ const DPR = Number(process.env.CROWD_DPR ?? 1);
 const SETTLE_MS = Number(process.env.CROWD_SETTLE_MS ?? 3500);
 const CLUSTER_R = Number(process.env.CROWD_R ?? 9);
 const MIN_FPS = parseCeilingEnv('CROWD_MIN_FPS', process.env.CROWD_MIN_FPS);
+const BOOT_TIMEOUT_MS = Number(process.env.CROWD_BOOT_TIMEOUT_MS ?? 25000);
 const JSON_OUT = process.env.CROWD_JSON_OUT ?? 'tmp/crowd-fps-latest.json';
+const checkedOutHeadSha = gitOutput(['rev-parse', 'HEAD']);
+const evidenceHeadSha = process.env.CROWD_HEAD_SHA?.trim() || checkedOutHeadSha;
+const evidenceBaseSha = process.env.CROWD_BASE_SHA?.trim() || null;
+
+if (process.env.CROWD_HEAD_SHA && evidenceHeadSha !== checkedOutHeadSha) {
+  throw new Error(
+    `CROWD_HEAD_SHA=${evidenceHeadSha} does not match checked-out HEAD ${checkedOutHeadSha}`,
+  );
+}
+
+function gitOutput(args) {
+  try {
+    return execFileSync('git', args, { encoding: 'utf8' }).trim();
+  } catch {
+    return null;
+  }
+}
 
 const CLASSES = [
   'warrior',
@@ -190,7 +221,7 @@ async function enterWorld(page) {
           document.querySelector('#login-user') &&
           document.querySelector('#btn-login'),
       ),
-    { timeout: 25000, polling: 200 },
+    { timeout: BOOT_TIMEOUT_MS, polling: 200 },
   );
   await page.evaluate(
     (u, p) => {
@@ -249,7 +280,9 @@ async function enterWorld(page) {
     (row?.querySelector('.enter-world-btn') ?? document.querySelector('.enter-world-btn'))?.click();
   }, camName);
   await page.waitForFunction(() => window.__game?.world?.player && window.__game?.perf?.report, {
-    timeout: 25000,
+    // A cold vite plus a profile-less browser can spend well over 25s on the
+    // Ultra asset preload; the world join itself is server-confirmed earlier.
+    timeout: BOOT_TIMEOUT_MS,
     polling: 300,
   });
   await sleep(1500);
@@ -276,6 +309,7 @@ async function sample(page, label) {
       views: rr.views,
       programs: rr.programs,
       entitiesMs: rr.phaseMs?.entities?.avg ?? rr.phaseMs?.entities,
+      nameplatesMs: rr.phaseMs?.nameplates?.avg ?? rr.phaseMs?.nameplates,
       submitMs: rr.phaseMs?.submit?.avg ?? rr.phaseMs?.submit,
       rendererMs: r.mainMs?.renderer?.avg,
       entityCount: g.world.entities.size,
@@ -287,7 +321,7 @@ async function sample(page, label) {
 
 function row(s) {
   const f = (n, w = 6) => String(typeof n === 'number' ? Math.round(n * 10) / 10 : n).padStart(w);
-  return `${String(s.label).padEnd(14)} fps=${f(s.fps)} p95=${f(s.frameP95)} p99=${f(s.frameP99)} ents=${f(s.entityCount, 4)} views=${f(s.views, 4)} calls=${f(s.calls)} tris=${f(s.triangles, 9)} entMs=${f(s.entitiesMs, 5)} subMs=${f(s.submitMs, 5)}`;
+  return `${String(s.label).padEnd(14)} fps=${f(s.fps)} p95=${f(s.frameP95)} p99=${f(s.frameP99)} ents=${f(s.entityCount, 4)} views=${f(s.views, 4)} calls=${f(s.calls)} tris=${f(s.triangles, 9)} entMs=${f(s.entitiesMs, 5)} npMs=${f(s.nameplatesMs, 5)} subMs=${f(s.submitMs, 5)}`;
 }
 
 async function main() {
@@ -308,12 +342,64 @@ async function main() {
   });
   const bots = [];
   const results = [];
+  const evidence = {
+    provenance: {
+      baseSha: evidenceBaseSha,
+      headSha: evidenceHeadSha,
+      checkedOutHeadSha,
+      command: 'npm run perf:crowd',
+    },
+    environment: {
+      batches: BATCHES,
+      viewport: { width: W, height: H, dpr: DPR },
+      settleMs: SETTLE_MS,
+      clusterRadius: CLUSTER_R,
+      gameUrl: GAME_URL,
+      serverUrl: SERVER,
+      headed: true,
+      vsync: false,
+    },
+    hardware: {
+      platform: os.platform(),
+      release: os.release(),
+      arch: os.arch(),
+      cpu: os.cpus()[0]?.model ?? null,
+      logicalCpus: os.cpus().length,
+      totalMemoryBytes: os.totalmem(),
+    },
+    browser: {
+      product: await browser.version(),
+      userAgent: await browser.userAgent(),
+      executablePath: BROWSER_PATH,
+    },
+  };
   try {
     const page = await browser.newPage();
     await page.setViewport({ width: W, height: H, deviceScaleFactor: DPR });
     page.on('pageerror', (e) => console.log('  [pageerror]', String(e).slice(0, 120)));
     console.log('entering world (render client)...');
     await enterWorld(page);
+    if (process.env.CROWD_AT) {
+      // Move the whole scenario to a named spot (CROWD_AT="x,z"): the observer
+      // teleports through the server dev command (needs ALLOW_DEV_COMMANDS=1)
+      // and the bots cluster on the position read back below. A town center
+      // measures the environment-plus-crowd case the spawn meadow cannot.
+      const [atX, atZ] = process.env.CROWD_AT.split(',').map(Number);
+      if (!Number.isFinite(atX) || !Number.isFinite(atZ)) {
+        throw new Error(`CROWD_AT must be "x,z", got "${process.env.CROWD_AT}"`);
+      }
+      await page.evaluate((x, z) => window.__game.world.chat(`/dev tp ${x} ${z}`), atX, atZ);
+      await page.waitForFunction(
+        (x, z) => {
+          const p = window.__game.world.player;
+          return Math.abs(p.pos.x - x) < 30 && Math.abs(p.pos.z - z) < 30;
+        },
+        { timeout: 20000, polling: 300 },
+        atX,
+        atZ,
+      );
+      await sleep(SETTLE_MS);
+    }
     const center = await page.evaluate(() => ({
       x: window.__game.world.player.pos.x,
       z: window.__game.world.player.pos.z,
@@ -353,6 +439,11 @@ async function main() {
       crowdSample.actualJoined = bots.length;
       results.push(crowdSample);
       record(`  ${row(results.at(-1))}`);
+      if (process.env.CROWD_CENSUS === '1' && target === BATCHES.at(-1)) {
+        // One-shot per-system draw breakdown at the largest crowd: names where
+        // the calls/triangles actually go (characters vs world systems).
+        crowdSample.census = await page.evaluate(() => window.__game.perf.runSceneCensus());
+      }
       try {
         await page.screenshot({ path: `tmp/crowd-${target}.png` });
       } catch {
@@ -387,7 +478,7 @@ async function main() {
     fs.mkdirSync(path.dirname(JSON_OUT) || '.', { recursive: true });
     fs.writeFileSync(
       JSON_OUT,
-      `${JSON.stringify({ batches: BATCHES, minFps: MIN_FPS, results, verdict }, null, 2)}\n`,
+      `${JSON.stringify({ evidence, minFps: MIN_FPS, results, verdict }, null, 2)}\n`,
     );
     console.log(`wrote ${JSON_OUT}`);
     process.exitCode = verdict.ok ? 0 : 1;

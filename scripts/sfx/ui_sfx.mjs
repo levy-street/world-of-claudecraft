@@ -27,6 +27,9 @@ const MASTER_GAINS_DB = {
   ui_fiesta_down: 6.66,
   ui_fiesta_revive: 4.01,
   ui_gather_cast: 0,
+  // Craft-family cast-start placeholder (Craft Cast System Phase 6): soft
+  // workbench wind-up, distinct from the per-family completion cues.
+  ui_craft_cast: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -143,6 +146,16 @@ export const UI_SFX_SPECS = [
   cue('ui_gather_cast', 0.5, 'Soft low woody wind-up thump as a gathering swing begins.', [
     tone(180, 0, 0.22, 0.16, { wave: 'triangle', endFrequency: 130 }),
     noise('brown', 0, 0.16, 0.08, { lowpass: 500 }),
+  ]),
+  // Craft-family cast start (Craft Cast System Phase 6): deterministic synth
+  // stand-in for "tools to the bench" anticipation on craft, disenchant,
+  // apply-enchant, salvage, and tool recharge. Completion still uses the
+  // per-family / action cues in src/game/audio.ts (craftSuccess, disenchant,
+  // enchant, salvage). Swap for a custom recording when one lands.
+  cue('ui_craft_cast', 0.5, 'Soft metallic workbench wind-up as a craft-family cast begins.', [
+    tone(220, 0, 0.2, 0.14, { wave: 'triangle', endFrequency: 160 }),
+    tone(330, 0.04, 0.22, 0.08, { wave: 'triangle', endFrequency: 240 }),
+    noise('brown', 0, 0.18, 0.06, { lowpass: 700 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

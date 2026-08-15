@@ -15,6 +15,7 @@ import {
   readFileSync,
   rmSync,
   statSync,
+  writeFileSync,
 } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, join, resolve, sep } from 'node:path';
@@ -23,6 +24,7 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, meshopt, prune, textureCompress } from '@gltf-transform/functions';
 import { MeshoptEncoder } from 'meshoptimizer';
+import { failedWizardStep, wizardProcessFailure } from '../wizard_status.mjs';
 import { REPO_ROOT } from './env.mjs';
 import { removeWeapon } from './integrate.mjs';
 import { JOBS_ROOT } from './job.mjs';
@@ -35,6 +37,7 @@ const LANES = new Set(['creature', 'weapon', 'prop']);
 // In-memory registry of the currently-running child per jobId. A job with no
 // live child is idle (finished, failed, or awaiting the next operator action).
 const running = new Map(); // jobId -> { proc, phase, startedAt }
+const lastRun = new Map(); // jobId -> { phase, exitCode, error?, finishedAt }
 
 function safeName(s) {
   return String(s || '')
@@ -53,6 +56,31 @@ function jobIdFor(lane, name) {
   // showed "No model rendered" even though generation succeeded. Slugging the full
   // id here keeps the id the wizard hands out identical to the one the pipeline uses.
   return safeName(`${lane}_${safeName(name)}`);
+}
+
+const WIZARD_OPTION_KEYS = [
+  'model',
+  'image',
+  'rigType',
+  'height',
+  'family',
+  'rotateY',
+  'faceLimit',
+];
+
+function savedWizardOptions(options) {
+  return Object.fromEntries(
+    WIZARD_OPTION_KEYS.filter((key) => options?.[key] != null).map((key) => [
+      key,
+      String(options[key]),
+    ]),
+  );
+}
+
+function writeWizardMeta(jobId, meta) {
+  const dir = join(JOBS_ROOT, jobId);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, 'wizard.json'), `${JSON.stringify(meta, null, 2)}\n`);
 }
 
 // ---------------------------------------------------------------------------
@@ -223,6 +251,7 @@ function spawnStep(jobId, args, phase) {
   // child never writes to and status reports running:false on the first poll.
   jobId = safeName(jobId);
   if (running.has(jobId)) throw new Error('a step is already running for this asset');
+  lastRun.delete(jobId);
   const dir = join(JOBS_ROOT, jobId);
   // The pipeline child creates the job dir, but we open the capture stream first,
   // so ensure it exists and never let a stream error crash the server.
@@ -244,10 +273,17 @@ function spawnStep(jobId, args, phase) {
     out.end();
     entry.exitCode = code;
     running.delete(jobId);
+    lastRun.set(jobId, { phase, exitCode: code, finishedAt: Date.now() });
   });
-  proc.on('error', () => {
+  proc.on('error', (error) => {
     out.end();
     running.delete(jobId);
+    lastRun.set(jobId, {
+      phase,
+      exitCode: null,
+      error: String(error.message ?? error),
+      finishedAt: Date.now(),
+    });
   });
   return entry;
 }
@@ -337,6 +373,12 @@ export function startModel({ lane, name, prompt: rawPrompt, options, regenerate 
   const gen = genArgs(lane, options);
   if (!prompt && !gen.includes('--image')) throw new Error('prompt or image required');
   const jobId = jobIdFor(lane, key);
+  writeWizardMeta(jobId, {
+    lane,
+    name: key,
+    prompt,
+    options: savedWizardOptions(options),
+  });
   // Always drive a DETERMINISTIC job id (--job) so status/steps line up; --new-job
   // lets the pipeline create it on the first model run (it exists on resume/regen).
   const args = [lane, '--name', key, '--job', jobId, '--new-job', '--until', 'generate'];
@@ -391,11 +433,23 @@ export function finishAsset({ lane, jobId, options, regenerateAnimations }) {
 /** Integrate the approved asset into the game (copy GLB into public/, credits,
  *  registry snippet). Runs the lane once more with --apply (idempotent stages
  *  resume; only the copy/credits run). */
-export function applyAsset({ lane, jobId }) {
-  if (!existsSync(join(JOBS_ROOT, jobId, 'job.json'))) throw new Error('job not found');
+export function applyCommandArgs({ lane, jobId, name, options }) {
   const args = [lane, '--job', jobId, '--apply'];
+  if (name) args.push('--name', name);
+  args.push(...genArgs(lane, options));
+  return args;
+}
+
+export function applyAsset({ lane, jobId, options }) {
+  if (!existsSync(join(JOBS_ROOT, jobId, 'job.json'))) throw new Error('job not found');
   const nm = readJob(jobId)?.name;
-  if (nm) args.push('--name', nm);
+  const savedOptions = readWizardMeta(jobId)?.options;
+  const args = applyCommandArgs({
+    lane,
+    jobId,
+    name: nm,
+    options: options ?? savedOptions,
+  });
   spawnStep(jobId, args, 'apply');
   return { jobId };
 }
@@ -487,6 +541,16 @@ function readJob(jobId) {
   }
 }
 
+function readWizardMeta(jobId) {
+  const f = join(JOBS_ROOT, jobId, 'wizard.json');
+  if (!existsSync(f)) return null;
+  try {
+    return JSON.parse(readFileSync(f, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
 // Preview image dirs the wizard surfaces, newest-relevant first. preview_model
 // is the raw-model review shot; preview is the final (animated/finished) set.
 const PREVIEW_DIRS = ['preview', 'preview_model'];
@@ -539,6 +603,8 @@ export function wizardStatus(jobId) {
   const id = safeName(jobId);
   const job = readJob(id);
   const live = running.get(id);
+  const settled = lastRun.get(id);
+  const processFailure = wizardProcessFailure(settled);
   if (!job) {
     // A child can be mid-first-step before it has written job.json: still report
     // running + the captured log so the browser shows progress immediately.
@@ -546,10 +612,11 @@ export function wizardStatus(jobId) {
     const boot = existsSync(outFile) ? readFileSync(outFile, 'utf8').slice(-4000) : '';
     return {
       jobId: id,
-      exists: !!live,
+      exists: !!live || !!settled,
       running: !!live,
       phase: live?.phase ?? null,
       steps: {},
+      failure: processFailure,
       previews: [],
       log: boot,
     };
@@ -569,6 +636,8 @@ export function wizardStatus(jobId) {
     running: !!live,
     phase: live?.phase ?? null,
     steps: Object.fromEntries(Object.entries(job.steps ?? {}).map(([k, v]) => [k, v.status])),
+    failure: failedWizardStep(job.steps) ?? processFailure,
+    wizard: readWizardMeta(id),
     validation: job.validation ?? null,
     previews: listPreviews(id),
     // Live-viewer GLBs: the wizard renders these in the operator's real browser,

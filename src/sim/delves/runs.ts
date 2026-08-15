@@ -20,6 +20,7 @@
 // and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { DelveCompanionInfo } from '../../world_api';
+import { bagsFullError } from '../bags';
 import type { DelveShopGate, DelveShopOffer } from '../data';
 import {
   COMPANION_UPGRADE_COSTS,
@@ -49,6 +50,7 @@ import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';
@@ -83,7 +85,6 @@ import {
 import {
   initLitanyBaptistryModule,
   isDelvePuzzleKind,
-  LITANY_PUZZLE_KINDS,
   pullLitanyBellRope,
   tickDrownedLitanyRooms,
 } from './drowned_litany_rooms';
@@ -130,10 +131,6 @@ const DELVE_LORE_ORDER = [
 // these so a Heroic run never rolls an inert affix (PRD §6.7 v1 subset). The
 // other registered crypt affixes (grave_tax / unstable_roof / cult_remnants)
 // keep their UI/i18n entries but are excluded from the roll until implemented.
-export const DELVE_PUZZLE_KINDS = new Set<string>([
-  'pressure_plate',
-  ...Array.from(LITANY_PUZZLE_KINDS),
-]);
 export const DELVE_IMPLEMENTED_AFFIXES = new Set<string>([
   'restless_graves',
   'bad_air',
@@ -300,10 +297,12 @@ export function delveRunForMob(ctx: SimContext, mobId: number): DelveRun | null 
 }
 
 export function refreshDelveDaily(ctx: SimContext, meta: PlayerMeta): void {
-  // `utcDay` is supplied by the host (never read from the wall clock here, so the
-  // sim stays deterministic). When unknown (''), the daily window does not roll
-  // over, same-seed replays stay reproducible.
-  const today = ctx.utcDay;
+  // `resetDay` is supplied by the host (never read from the wall clock here, so
+  // the sim stays deterministic), and is the realm's own daily boundary rather
+  // than a UTC calendar date, so the delve daily rolls over with every other
+  // daily. When unknown (''), the window does not roll over, same-seed replays
+  // stay reproducible.
+  const today = ctx.resetDay;
   if (today && meta.delveDaily.date !== today) {
     meta.delveDaily = { date: today, firstClearXp: new Set(), markClears: 0 };
   }
@@ -341,6 +340,7 @@ export function canEnterDelve(ctx: SimContext, pid: number): string | null {
   if (ctx.tradeFor(pid)) return 'You cannot enter a delve while trading.';
   if (ctx.duelFor(pid)) return 'You cannot enter a delve during a duel.';
   if (ctx.arenaMatches.has(pid)) return 'You cannot enter a delve during an arena match.';
+  if (ctx.bgMatches.has(pid)) return 'You cannot enter a delve during a battleground.';
   return null;
 }
 
@@ -394,10 +394,13 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   const slotIndex = ctx.partyMembersForKey(key).length;
   const pos = delveMemberSpawnPos(ctx, entry, slotIndex);
   const p = r.e;
+  // A live gather/fishing session never survives a delve teleport.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = pos;
   p.prevPos = { ...pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
   run.emptyFor = 0;
@@ -428,6 +431,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   if (run?.companion) ctx.despawnDelveCompanion(run);
   restorePetFromDelveStash(ctx, r.meta.entityId);
   const p = r.e;
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -596,9 +600,10 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
 
 export function updateDelveRuns(ctx: SimContext): void {
   for (const run of ctx.delveRuns) {
-    // The lockpick per-step clock is enforced for EVERY run (a solo offline run
-    // has partyKey === null and is skipped by tickDelveRun below, but its lock
-    // must still time out identically to an online/headless one).
+    // The lockpick per-step clock is enforced for EVERY run slot. partyKey ===
+    // null means a FREE (unclaimed) slot, skipped by tickDelveRun below; a
+    // claimed solo run carries `solo:<pid>` (claimDelveRun via instanceKeyFor),
+    // so it ticks like any party run and its lock times out identically.
     ctx.tickLockpickTimeout(run);
     if (run.partyKey !== null) tickDelveRun(ctx, run);
   }
@@ -635,18 +640,26 @@ export function ejectToDelveDoor(
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
+  // A live free eject (nobody died) still displaces: end any session first.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.dead = false;
   const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   // The Keeper's Toll survives a delve eject too (see resurrection.ts); all else clears.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
   recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods, r.meta.equipmentInstance);
   p.hp = p.maxHp;
-  p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
+  p.resource =
+    p.resourceType === 'mana'
+      ? p.maxResource
+      : p.resourceType === 'energy' || p.resourceType === 'focus'
+        ? 100
+        : 0;
   p.targetId = null;
   p.combatTimer = 99;
   p.inCombat = false;
@@ -712,20 +725,47 @@ export function onDelveBossDefeated(ctx: SimContext, run: DelveRun): void {
   }
 }
 
+// The daily full-payout window: this many clears per reset day (one tally
+// shared across delves and tiers) pay full base Marks AND may carry chest/rite
+// bonus Marks. Both comparators below read this ONE constant so the base and
+// bonus windows cannot desync under a retune.
+export const DELVE_DAILY_FULL_CLEARS = 3;
+
 // Base Marks payout for one clear. PRD §6.5 FR-5.3: full Marks for the first 3
-// completions per UTC day, then a diminished payout (Heroic 1 guaranteed, Normal
-// 50% chance of 1). §6.7 FR-7.1 Heroic "+30% Marks" rides the tier `rewardMult`.
-// Reads `markClears` BEFORE the caller increments it. NOTE: at the base of 1 Mark
-// the +30% rounds to no per-clear difference; the Heroic mark advantage comes from
-// the post-3 guaranteed-vs-50% rule. Uses `ctx.rng` only (deterministic).
+// completions per reset day (1 Normal / 2 Heroic), then a diminished payout
+// (Heroic 1 guaranteed, Normal 50% chance of 1). Reads `markClears` BEFORE the
+// caller increments it. NOTE: the §6.7 FR-7.1 Heroic "+30% Marks" rides the
+// tier `rewardMult` (1.3) but rounds to no per-clear difference at this base;
+// the real Heroic edge is the in-window 2-vs-1 plus the post-window
+// guaranteed-vs-50% rule. Uses `ctx.rng` only (deterministic).
 export function delveMarkPayout(ctx: SimContext, run: DelveRun, meta: PlayerMeta): number {
   const isHeroic = run.tierId === 'heroic';
-  // First 3 clears/day pay full: 1 Normal / 2 Heroic (§7.4). After that, Heroic
-  // still guarantees 1; Normal has a 50% shot. (The old `Math.round(rewardMult)`
-  // rounded Heroic's 1.3 down to 1, silently erasing the Heroic advantage.)
-  if (meta.delveDaily.markClears < 3) return isHeroic ? 2 : 1;
+  // The first DELVE_DAILY_FULL_CLEARS clears/day pay full: 1 Normal / 2 Heroic
+  // (§7.4); this reads markClears BEFORE the caller increments it, hence `<`.
+  // After that, Heroic still guarantees 1; Normal has a 50% shot. (The old
+  // `Math.round(rewardMult)` rounded Heroic's 1.3 down to 1, silently erasing
+  // the Heroic advantage.)
+  if (meta.delveDaily.markClears < DELVE_DAILY_FULL_CLEARS) return isHeroic ? 2 : 1;
   if (isHeroic) return 1;
   return ctx.rng.chance(0.5) ? 1 : 0;
+}
+
+// Chest/rite bonus Marks ride the SAME daily window as the base payout above: a
+// clear whose base Marks were paid inside the full-payout window may carry its
+// loot-tier bonus Marks; every later clear pays base Marks only. Without this,
+// the uncapped premium bonuses (+2 lockpick / +4 rite) let an all-day grinder
+// outrun the shop pricing the window exists to protect. Both callers
+// (grantLockpickBonus, grantRiteBonus) iterate the member list
+// grantDelveRewards just credited, so `markClears` was incremented for the
+// clear the bonus rides: that clear was in-window exactly when the incremented
+// tally is still `<=` the window (the payout above reads pre-increment, hence
+// its `<`). Bonus COPPER is deliberately not windowed (copper is not the paced
+// currency), and neither is the loot tier itself. Draws no rng.
+export function delveBonusMarksFor(
+  meta: Pick<PlayerMeta, 'delveDaily'>,
+  bonusMarks: number,
+): number {
+  return meta.delveDaily.markClears <= DELVE_DAILY_FULL_CLEARS ? bonusMarks : 0;
 }
 
 // Unlock the next un-owned lore journal entry (PRD §6.4 / §7.6, five entries
@@ -780,16 +820,30 @@ export function grantDelveClearTo(
   ctx.emit({ type: 'delveComplete', delveId: run.delveId, tierId: run.tierId, pid });
 }
 
-export function grantDelveRewards(ctx: SimContext, run: DelveRun): void {
-  if (run.completed) return;
+// Returns the members actually credited with this clear (empty when the run
+// was already completed). The chest/rite bonus granters iterate THAT list, so
+// a bonus can only ever ride a clear this call just granted: the per-member
+// `markClears` tally the window check reads is the one this pass incremented,
+// structurally, not by call-site convention.
+export function grantDelveRewards(ctx: SimContext, run: DelveRun): number[] {
+  // An already-completed run credits nobody, so the downstream granters pay NO
+  // bonus at all (no marks, no copper, no lockpickBonus event); deliberate,
+  // and safer than the old double-pay, but it couples the whole bonus to this
+  // flag. A future second grant path must carry its own credited list rather
+  // than fall back to party membership. Pinned by the "already-completed"
+  // tests in tests/delves.test.ts.
+  if (run.completed) return [];
   run.completed = true;
   const delve = DELVES[run.delveId];
   const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
+  const credited: number[] = [];
   for (const pid of members) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     grantDelveClearTo(ctx, run, delve, meta, pid);
+    credited.push(pid);
   }
+  return credited;
 }
 
 export function openDelveSurfaceExit(ctx: SimContext, run: DelveRun): void {
@@ -999,11 +1053,13 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
   members.forEach((pid, i) => {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) return;
+    cancelProfessionSessionOnDisplacement(ctx, p);
     const pos = delveMemberSpawnPos(ctx, entry, i);
     p.pos = pos;
     p.prevPos = { ...pos };
     ctx.rebucket(p);
     p.facing = 0;
+    p.prevFacing = 0;
     ctx.emit({
       type: 'log',
       text: `You pass through the tombstone into ${modName}.`,
@@ -1405,13 +1461,10 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
       });
       return false;
     }
-    if (!state.attemptAvailable) {
-      ctx.error(
-        r.meta.entityId,
-        'The lock is jammed beyond picking. Clear the delve again for another attempt.',
-      );
-      return false;
-    }
+    // attemptAvailable only ever goes false alongside `looted` (see
+    // lockpick_controller.ts lockpickSucceed), so the `state.looted` check
+    // above already covers a spent chest; no separate jammed guard is
+    // reachable here.
     if (run.lockpick && run.lockpick.state === 'IN_PROGRESS') {
       // Someone is already picking it (single interactor, v1).
       if (run.lockpick.ownerId !== r.meta.entityId) {
@@ -1536,12 +1589,33 @@ export function delveRiteChoose(ctx: SimContext, intensity: RiteIntensity, pid?:
 
 // ----- companion economy + shop + wire getters -------------------------------
 
+// Reach for Brother Halven's Marks shop and the companion upgrade board: the
+// same 12-yard radius around the delve door the WS dispatch handler already
+// pre-gates on (server/game.ts 'delve_buy' / 'companion_upgrade'), enforced
+// here too as defense-in-depth, matching every other location-gated spend in
+// the sim (market.ts nearMerchant, bank.ts nearBanker, mail/post_office.ts
+// nearMailbox, items.ts buyItem's dist2d check, instances/heroic_vendor.ts
+// heroicVendorInRange, professions/training.ts isAtStation).
+const DELVE_SHOP_RANGE = 12;
+
+function nearDelveDoor(pos: Pick<Vec3, 'x' | 'z'>, delve: DelveDef): boolean {
+  return Math.hypot(pos.x - delve.doorPos.x, pos.z - delve.doorPos.z) <= DELVE_SHOP_RANGE;
+}
+
 export function companionUpgrade(ctx: SimContext, companionId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const def = DELVE_COMPANIONS[companionId];
   if (!def) {
     ctx.error(r.meta.entityId, 'Unknown companion.');
+    return;
+  }
+  // The companion is ranked up at Brother Halven, not from anywhere in the
+  // world: find the delve this companion belongs to and require the player
+  // stand at its door.
+  const delve = Object.values(DELVES).find((d) => d.autoCompanionId === companionId);
+  if (!delve || !nearDelveDoor(r.e.pos, delve)) {
+    ctx.error(r.meta.entityId, 'Too far away.');
     return;
   }
   const rank = r.meta.companionUpgrades[companionId] ?? 1;
@@ -1599,10 +1673,11 @@ export function delveClearsFor(ctx: SimContext, pid: number): Record<string, num
   return { ...(ctx.players.get(pid)?.delveClears ?? {}) };
 }
 
-// Server-authoritative Marks-vendor purchase. Re-validates the gate + balance
-// here regardless of what the client shows; the client only sends intent. The
-// server geo-gates this to the board NPC (see the `delve_buy` command) so a
-// player must be standing at Brother Halven, mirroring `enter_delve`.
+// Server-authoritative Marks-vendor purchase. Re-validates the door range, the
+// gate, and the balance here regardless of what the client shows; the client
+// only sends intent. The WS dispatch (see the `delve_buy` command) pre-gates
+// the same 12-yard door range so a player must be standing at Brother Halven,
+// mirroring `enter_delve`; the check below is defense-in-depth.
 export function delveBuyShopItem(
   ctx: SimContext,
   delveId: string,
@@ -1622,12 +1697,25 @@ export function delveBuyShopItem(
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
+  const delve = DELVES[delveId];
+  if (!delve || !nearDelveDoor(r.e.pos, delve)) {
+    ctx.error(meta.entityId, 'Too far away.');
+    return;
+  }
   if (!delveShopGateMet(meta, delveId, entry.gate)) {
     ctx.error(meta.entityId, 'You have not unlocked that item yet.');
     return;
   }
   if (meta.delveMarks < entry.marks) {
     ctx.error(meta.entityId, `You need ${entry.marks} Delve Marks to buy ${def.name}.`);
+    return;
+  }
+  // Capacity BEFORE the spend, the buyItem shape: the grant hub deliberately
+  // never capacity-caps (a mid-flight grant must not vanish), so without this
+  // gate a full-bag purchase landed PAST capacity, making the one counter
+  // every other buy path gates an overflow loophole.
+  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.delveMarks -= entry.marks;

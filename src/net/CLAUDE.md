@@ -28,9 +28,45 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   (Low/Medium/High/Full labels plus tooltip keys from online count vs the advertised
   cap; `tests/realm_population.test.ts`).
 - `native_*.ts`: the Capacitor native-app seam (Apple/Discord sign-in, device
-  attestation, update check), gated on `NATIVE_APP`; each has a `tests/native_*.test.ts`.
-- `wallet.ts`: Wallet-Standard Solana connect in the browser, no `sim/` dependency
-  (the account-to-wallet link is verified server-side).
+  attestation, update check), gated on `NATIVE_APP`; covered by the
+  `tests/native_*.test.ts` suites.
+- Wire-decode siblings extracted from `online.ts`, all following the one decode idiom
+  (DOM-free, ClientWorld-free, every field re-validated, a malformed row DROPPED rather
+  than rendered so a version-skewed frame never puts `undefined` in a sentence):
+  `snapshot_timer_wire.ts` (stable cooldown-timer decode; UNKNOWN version markers are
+  isolated from both the legacy and the stable arm, so a future server can never make an
+  older client reinterpret fields it does not understand), `guild_bank_log_wire.ts` (the
+  `gbanklog` frame; the renderable-op vocabulary is a CLOSED allowlist deliberately
+  restated on this side of the wire, so server-internal diagnostic ops could never render
+  as guild history even from a regressed server), `account_cosmetics_wire.ts`
+  (`self.cosmetics`; malformed input yields all-empty defaults, never a throw).
+- `net_pipeline_stats.ts`: always-on snapshot-pipeline counters (parse/apply timing,
+  approx bytes, raw inter-arrival gap). Clock-injected (it never reads `performance.now`
+  itself) and deliberately bucket-agnostic: `src/net` never imports `src/game`;
+  `src/main.ts` is the junction that drains the digest into the perf monitor once per
+  animation frame.
+- `quest_state_optimistic.ts`: the pure resolution behind the `pendingQuestCommands`
+  optimism (scope in Never, below): while a `turnin` is in flight, prerequisite checks
+  treat that quest as done, so a follow-up quest appears in the same gossip re-render
+  instead of a snapshot later (issue 1667 rationale in its header).
+- Wallet/economy cluster (`wallet*.ts`, `desktop_wallet_*.ts`, `mobile_wallet_deeplink.ts`,
+  `stripe_checkout.ts`, `economy_sdk.ts`, `seeker_entitlement_sync.ts`,
+  `discord_onboarding_gate.ts`): non-custodial Solana linking plus the CLAUDIUM economy
+  client. The contracts: the account-to-wallet LINK is always challenge+signature
+  verified server-side (`server/wallet.ts`), nothing here is imported by `src/sim/`, and
+  `economy_sdk.ts` is same-origin only (the game server's `/api/claudium/*` proxy, never
+  the economy service) and NEVER throws into render: every failure resolves to the typed
+  unavailable state the disabled UI already renders. Cross-host handoffs: the desktop
+  shell mints a one-time code and the system browser completes connect/sign on the
+  separate `wallet-handoff.html` entry (`wallet_handoff_browser.ts` +
+  `desktop_wallet_handoff.ts`, results riding back through the `/api/desktop-wallet/*`
+  routes); mobile web deep-links to a wallet app with an encrypted return channel
+  (`mobile_wallet_deeplink.ts`, re-checked on return by `wallet_resume.ts`'s
+  visibility/focus handlers); `discord_onboarding_gate.ts` is the shared predicate that
+  keeps a just-completed Discord login on the `/desktop-login` handoff page from racing
+  into loading the game. Only the enter-online call site in `src/main.ts` consumes it
+  today; the resume guard there still inlines its own equivalent checks, so a change to
+  the predicate must keep that inline arm aligned (or migrate it onto the predicate).
 - `resume_play.ts`: the mobile WebView resume marker (`RESUME_KEY`), stamped while
   in-world and consumed by `src/main.ts` on boot so an OS-evicted WebView reload
   re-enters the world instead of landing on home; freshness-bounded
@@ -56,6 +92,10 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
   protected from the prune at the end. Encoder is server `wireEntity`; fields are
   terse (`x/y/z/f/hp/mhp/k/tid/nm/lv/auras...`); **self adds `res/cds/inv/qlog/tal/
   party/trade/duel/arena/market...`** Keep field names byte-identical on both sides.
+  `applySnapshot` is the spine, not the whole decode story: field-family decodes live
+  in the wire-decode siblings above (`snapshot_timer_wire.ts`,
+  `account_cosmetics_wire.ts`, `guild_bank_log_wire.ts`); a new decode block is a new
+  sibling, never more inline code here.
 - **Delta invariant:** the server OMITS heavy/unchanged fields (`cds`, `inv`,
   `equip`, `qlog`, `qdone`, `tal`, `stats`, `party`...). Guard every one with
   `if (s.X !== undefined)` and keep the prior value otherwise; do NOT default a
@@ -72,11 +112,9 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
   churn. Entities not in `ents`/`keep` are pruned each snapshot.
 
 ## Auth & connect flow
-REST first: `Api.login`/`register` to bearer `token`; `Api.characters()` lists the
-realm's chars; `Api.realms()`/`setRealm(url)` pick a realm origin (`base`). Then
-`new ClientWorld(token, characterId, cls, base)` opens the WS (realm origin, else
-page host), sends the current `ONLINE_WORLD_AUTH_TYPE` discriminator on open, and waits
-for `hello`. Old and future world-layout epochs fail closed before character admission.
+The REST-login-then-WS narrative reads straight from `online.ts`; the one contract worth
+pinning here: the WS open sends the current `ONLINE_WORLD_AUTH_TYPE` discriminator, and
+old or future world-layout epochs fail closed BEFORE character admission.
 
 ## Reconnect and session resume
 An unexpectedly dropped socket auto-reconnects with jittered exponential backoff
@@ -117,14 +155,10 @@ A reload instead of an in-socket reconnect (the mobile WebView eviction case) is
 handled by `resume_play.ts`, above.
 
 ## Adding a networked action
-1. Add the method to the owning FACET interface under `src/world_api/<facet>.ts`
-(a combat action to `src/world_api/combat.ts`, a market action to `market.ts`, ...);
-the aggregate `IWorld` in `src/world_api.ts` re-exports it via `extends`, so render/ui
-see it unchanged. Add the wire token to the shared `COMMAND_NAMES` table in
-`src/world_api.ts` (append-only: the wire string IS the protocol, never rename or
-remove one), tag it in `COMMAND_FACETS`, and update the `IWORLD_MEMBERS` pin in
-`tests/world_api_parity.test.ts` (W0c), all in the same change (full recipe:
-`src/world_api/CLAUDE.md`). 2. Implement here as a one-line
+1. Do the seam step first, owned by `src/world_api/CLAUDE.md`: facet member,
+`COMMAND_NAMES` wire token (append-only: the wire string IS the protocol, never rename
+or remove one), `COMMAND_FACETS` tag, and the `IWORLD_MEMBERS` pin (W0c), all in the
+same change. 2. Implement here as a one-line
 `this.cmd({ cmd: 'foo', ... })`; the `cmd()` send path is typed to `ClientCommand`,
 so a token missing from the table is a compile error. 3. Add the matching
 `case 'foo':` in `server/game.ts` `dispatchMessage` and surface results via an
@@ -163,7 +197,8 @@ failure, kept as stable English that `main.ts` re-localizes.
   else the server resolves. The only sanctioned optimism inside `net/` is the
   trivial local UI nudges already present (`targetEntity` setting `targetId`,
   shielded from stale in-flight snapshots by `pendingTargetEcho`;
-  `pendingQuestCommands`); keep that scope. Both follow the same
+  `pendingQuestCommands`, whose resolution logic is the pure
+  `quest_state_optimistic.ts`); keep that scope. Both follow the same
   reconcile-on-snapshot contract: display-only, and the server's value always
   wins within a bounded window (`tests/target_echo_client.test.ts` pins the
   target one).

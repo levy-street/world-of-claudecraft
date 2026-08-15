@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "batchId": "item-art-consistency-2026-08-09",
+  "captureScript": {
+    "path": "scripts/item_art_consistency_shots.mjs",
+    "sha256": "5dc69b21f370ec7cbd10670c475e010394a573cba7d2167a76c3340479ea1476",
+    "bytes": 26744
+  },
+  "contract": {
+    "states": [
+      "before",
+      "after"
+    ],
+    "devices": [
+      "desktop",
+      "mobile-landscape"
+    ],
+    "surfaces": [
+      "inventory",
+      "bank",
+      "merchant",
+      "equipment",
+      "tooltip",
+      "mail",
+      "action-slot"
+    ],
+    "fileCount": 28
+  },
+  "files": [
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-desktop-inventory.png",
+      "sha256": "cc69929144fe10d645154023711d78ee33a1357bbf9dd1beb3e448d8ff7e1699",
+      "bytes": 91306,
+      "width": 310,
+      "height": 421
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-desktop-bank.png",
+      "sha256": "a1a0a108ac857e11f92acf60b03ca9f8c5466331b3ad344ceee848d4ce7f6738",
+      "bytes": 70852,
+      "width": 420,
+      "height": 392
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-desktop-merchant.png",
+      "sha256": "f203ef2b46bcdfe3fef1103e168013a2e514ec09dd8025b25dc944cc682abd0f",
+      "bytes": 130913,
+      "width": 744,
+      "height": 388
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-desktop-equipment.png",
+      "sha256": "01314f98242b7123376f27c64f3eed7231140eaef5a1078dc0bad282648e23c9",
+      "bytes": 289456,
+      "width": 740,
+      "height": 741
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-desktop-tooltip.png",
+      "sha256": "126ce9e77b0741dd923ccdb73dee6a88086b5661933d0984055b5d8e3283724e",
+      "bytes": 160824,
+      "width": 760,
+      "height": 442
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-desktop-mail.png",
+      "sha256": "7802954d577f4431bd50e65c34dfb7c45a903916dda921dcb0d8539d85056e0d",
+      "bytes": 69342,
+      "width": 460,
+      "height": 560
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-desktop-action-slot.png",
+      "sha256": "40405dead2c9d67019a20583e0b0d8f1d8e3f04717607df4c443e89397887e84",
+      "bytes": 20791,
+      "width": 612,
+      "height": 62
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-mobile-landscape-inventory.png",
+      "sha256": "3186eb19f5c76a3db6396d8954562f76d8efe5d4f902ec0c4da13916eae77ce7",
+      "bytes": 429162,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-mobile-landscape-bank.png",
+      "sha256": "2edfc194c9c4ff67611d21728937e2ffa6dd221ba03c0273aef24a66cc2b49e4",
+      "bytes": 488873,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-mobile-landscape-merchant.png",
+      "sha256": "769a3a801874642cdb6ec4f11e48bf929e017664294e8046ef5778475726a5e0",
+      "bytes": 536265,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-mobile-landscape-equipment.png",
+      "sha256": "0402f808cf60191d0801a46d59da286b80ab4117e08e1661d8020ee67806c617",
+      "bytes": 499039,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-mobile-landscape-tooltip.png",
+      "sha256": "6d2ba9689793c3e67db1b48467a7943ede39ddb7a37c3c2ff8c8f3599139818a",
+      "bytes": 554561,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-mobile-landscape-mail.png",
+      "sha256": "163c5cd69ffde20bc40f70d7e21835e93052c48404a7d5f3ab22850f0b8de79d",
+      "bytes": 316544,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/before-mobile-landscape-action-slot.png",
+      "sha256": "3dc2b90a93df692fd0ae7c028bf3d5b0ab1b65a2809967214c8ed9a43a3589ac",
+      "bytes": 1002100,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-desktop-inventory.png",
+      "sha256": "2feb7b565d618773e84290b2ac9c4148e84d13112a74460396c49dbaa9cd24a8",
+      "bytes": 92740,
+      "width": 310,
+      "height": 421
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-desktop-bank.png",
+      "sha256": "14fed5e5d1bfa93ea110c188274dafd73c887d87fa44ea4030889c1a7b84203a",
+      "bytes": 70642,
+      "width": 420,
+      "height": 392
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-desktop-merchant.png",
+      "sha256": "01d5f41c0cf2ef6f33189d7027d0a8b0a084dba4c4a14e0430f95732b2caa130",
+      "bytes": 130648,
+      "width": 744,
+      "height": 388
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-desktop-equipment.png",
+      "sha256": "61c659c947eba86750294a0afb777d28aa6f1c0901594a8c618f5bf204f44ffa",
+      "bytes": 291388,
+      "width": 740,
+      "height": 741
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-desktop-tooltip.png",
+      "sha256": "1fd134c0d73c7e0f4d4d97e6d3897d408c4de9cb4011fce98b1800c4d87e1569",
+      "bytes": 160028,
+      "width": 760,
+      "height": 442
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-desktop-mail.png",
+      "sha256": "acc5d7b2563f46372c874bbbd43651a3664f7a9d08c1c84d887de807cf785dc5",
+      "bytes": 69544,
+      "width": 460,
+      "height": 560
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-desktop-action-slot.png",
+      "sha256": "89a15ee56d406ecb543abf27d043c3bb9af250680c21d66adbf15f1c3b14efe6",
+      "bytes": 20627,
+      "width": 612,
+      "height": 62
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-mobile-landscape-inventory.png",
+      "sha256": "2efcd00e95a7ad080513ac9e2a871b3b62e99456ff70bb8d0e2482d0f770de1a",
+      "bytes": 433529,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-mobile-landscape-bank.png",
+      "sha256": "fab37fc302b1416ea67ea9c45c1ba6ab5868b47d48d8d6ceb7f7e1322aef22f9",
+      "bytes": 495713,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-mobile-landscape-merchant.png",
+      "sha256": "87bd1fa43209a4d3cb2ff3f678b4e83a555f527a8ddedfc5a92fabae8b63bd19",
+      "bytes": 541928,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-mobile-landscape-equipment.png",
+      "sha256": "ad57b04486627c4e513ed65c2fdf176950fe5d4c3500b2dfd5925d2d40943f06",
+      "bytes": 497875,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-mobile-landscape-tooltip.png",
+      "sha256": "267645b8ed704d74b9ea7a18b34c101617e7edeff19afc07d0045da743f6138e",
+      "bytes": 560039,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-mobile-landscape-mail.png",
+      "sha256": "7392836f31efe8112c7e09f95dfffc9386a32488d98dd3d146af312da8ff81e4",
+      "bytes": 319764,
+      "width": 1688,
+      "height": 780
+    },
+    {
+      "path": "docs/screenshots/item-art-consistency-2026-08-09/after-mobile-landscape-action-slot.png",
+      "sha256": "2a3f5dc14c2fc24e4236606f9e71b1e81649780c3a3bc129e7d1dd9ccea33ac6",
+      "bytes": 1001683,
+      "width": 1688,
+      "height": 780
+    }
+  ]
+}

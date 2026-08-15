@@ -1,7 +1,7 @@
 // Pure view-core for the Book of Deeds window (#deeds-window) and the
 // watchlist HUD tracker. DOM/Three/i18n-free: it maps the IWorldDeeds facet
-// reads (earned map, lifetime stat block, renown, active title) plus the
-// static catalog (injected, so tests drive synthetic tables) to flat render
+// reads (earned map, lifetime stat block, renown, the two worn cosmetics) plus
+// the static catalog (injected, so tests drive synthetic tables) to flat render
 // models the thin painters draw. Registered in UI_PURE_CORES; unit-tested
 // against both Sim- and ClientWorld-shaped inputs in tests/deeds_view.test.ts.
 //
@@ -83,10 +83,56 @@ export const DEED_BESPOKE_CRESTS: ReadonlySet<string> = new Set([
  *  display category base `deed_cat_<category>`. The image branch in icons.ts outranks the
  *  bespoke recipe for the same id; the recipes stay as the forward-compat fallback tier
  *  (an artless bespoke deed still lands on deed_<id>, never the base crest). */
+/** Where a jump-to-deed (a chat deed-link or recent-strip activation) may
+ *  land: the deed's display category, or null when the jump must not move the
+ *  Book at all. Null for a catalog-unknown id (content drift) and for a
+ *  hidden deed not yet earned: revealing even the destination shelf would
+ *  leak the masked deed's existence (the masking contract in this header).
+ *  The painter consumes this instead of re-deriving the mask, so the two can
+ *  never drift. */
+export function deedJumpCategory(
+  deeds: Readonly<Record<string, DeedDef>>,
+  deedsEarned: ReadonlyMap<string, string>,
+  id: string,
+): DeedDisplayCategory | null {
+  if (!Object.hasOwn(deeds, id)) return null;
+  const def = deeds[id];
+  if (def.hidden === true && !deedsEarned.has(id)) return null;
+  return deedDisplayCategory(def.category);
+}
+
+/** The crest-id prefix every deed crest carries (`deed_<deedId>` painted,
+ *  `deed_cat_<category>` fallback). One spelling for deedCrestId and the
+ *  painted-art membership below. */
+const DEED_CREST_ID_PREFIX = 'deed_';
+
+/** Prefix of the display-category FALLBACK crests (procedural recipes
+ *  composited over an opaque radial in icons.ts, unlike the alpha-matted
+ *  painted `deed_<id>` art). */
+export const DEED_CATEGORY_CREST_PREFIX = 'deed_cat_';
+
 export function deedCrestId(id: string, category: string): string {
   return DEED_IMAGE_IDS.has(id) || DEED_BESPOKE_CRESTS.has(id)
-    ? `deed_${id}`
-    : `deed_cat_${deedDisplayCategory(category)}`;
+    ? `${DEED_CREST_ID_PREFIX}${id}`
+    : `${DEED_CATEGORY_CREST_PREFIX}${deedDisplayCategory(category)}`;
+}
+
+/**
+ * True when this crest id resolves to committed painted art (an alpha-matted
+ * WebP under public/ui/deeds), false for every crest the icon system must
+ * COMPOSITE procedurally: the deed_cat_* category fallbacks AND a bespoke
+ * crest whose commissioned art has not landed yet (deedCrestId still answers
+ * `deed_<id>` for those, so a prefix test cannot tell the two apart). The
+ * procedural compositor fills its whole tile with an opaque radial, which is
+ * what the reliquary's missing-state carve-out keys on (reliquaryCellArtOpaque).
+ * Mirrors icons.ts deedImageUrl's membership without importing the canvas
+ * module into a pure core.
+ */
+export function deedCrestHasPaintedArt(crestId: string): boolean {
+  return (
+    crestId.startsWith(DEED_CREST_ID_PREFIX) &&
+    DEED_IMAGE_IDS.has(crestId.slice(DEED_CREST_ID_PREFIX.length))
+  );
 }
 
 export interface DeedProgress {
@@ -153,6 +199,9 @@ export interface DeedsViewInput {
   deedStats: Readonly<DeedStats>;
   renown: number;
   activeTitle: string | null;
+  // The selected nameplate border, a deed id like activeTitle (never the
+  // reward slug): the picker marks this option active.
+  activeBorder: string | null;
   // The static catalog, injected (the bank-view lookup precedent): the
   // painter binds the live DEEDS/DEED_ORDER, tests drive synthetic tables.
   deeds: Readonly<Record<string, DeedDef>>;
@@ -167,6 +216,18 @@ export interface DeedsViewInput {
   // Localized searchable text (name + desc), pre-lowercased by the painter so
   // the core stays i18n-free; both sides of the match share one casing rule.
   searchText(id: string): string;
+  // Newest-first unlock ids from the host's recency record (the async
+  // deedsRecent() facet read), null/absent before it lands or when the host
+  // has none: the sub-day earn ORDER the day-granular earned map cannot carry.
+  recentOrder?: readonly string[] | null;
+  // This session's non-retro unlock ids in drain order (oldest first), the
+  // painter's noteUnlocks feed. The freshest signal: it outranks a fetched
+  // order that may predate an upsert still in flight.
+  sessionUnlocks?: readonly string[];
+  // A deed to spotlight after the next paint (a chat deed-link or
+  // recent-strip jump). The core echoes it back only when the deed produced
+  // an entry, so the painter never scrolls to a card that is not in the DOM.
+  focusDeedId?: string | null;
 }
 
 export interface DeedRecentModel {
@@ -187,8 +248,10 @@ export interface DeedsSummaryModel {
   earned: number;
   visibleTotal: number;
   completion: number;
-  // Last 5 unlocks by earned day, newest first (catalog order breaks ties,
-  // later entries first: appended content reads as more recent).
+  // Last 5 unlocks, newest first, merged from the three recency signals
+  // (session unlocks, then the host's fetched order, then the day-granular
+  // fallback where catalog order breaks same-day ties, later entries first:
+  // appended content reads as more recent).
   recent: DeedRecentModel[];
   // Top 3 unearned counter-trigger deeds by progress fraction (feats and
   // zero-progress deeds excluded), catalog order breaking ties.
@@ -215,6 +278,9 @@ export interface DeedEntryModel {
   // Earned-only badge for a hidden deed now revealed on the Feats shelf.
   hiddenBadge: boolean;
   titleReward: boolean;
+  // The card's reward chip for the other worn cosmetic: a border-reward deed
+  // says so before it is earned, the way a title-reward deed already does.
+  borderReward: boolean;
   crestId: string;
 }
 
@@ -224,11 +290,23 @@ export interface DeedTitleOption {
   active: boolean;
 }
 
+export interface DeedBorderOption {
+  // null is the "No Border" option.
+  id: string | null;
+  active: boolean;
+}
+
 export interface DeedsViewModel {
   summary: DeedsSummaryModel;
   categories: DeedsCategoryModel[];
   entries: DeedEntryModel[];
   titles: DeedTitleOption[];
+  // Earned border-reward deeds, the titles list's sibling. Both arrays are in
+  // input.order (catalog) order behind their None head, which the picker
+  // renders verbatim: array order is a consumer contract, never re-sorted.
+  borders: DeedBorderOption[];
+  // input.focusDeedId when that deed rendered an entry this paint, else null.
+  focusDeedId: string | null;
 }
 
 /** Build the whole cold-window model. Per-call allocation is fine here (the
@@ -240,6 +318,7 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
 
   const entries: DeedEntryModel[] = [];
   const titles: DeedTitleOption[] = [{ id: null, active: input.activeTitle === null }];
+  const borders: DeedBorderOption[] = [{ id: null, active: input.activeBorder === null }];
   let earnedCount = 0;
   let visibleTotal = 0;
 
@@ -265,6 +344,11 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
     if (earned && def.reward?.kind === 'title') {
       titles.push({ id, active: input.activeTitle === id });
     }
+    // A deed carries at most one reward, so the two pickers can never list the
+    // same id: a title deed is absent from borders and a border deed from titles.
+    if (earned && def.reward?.kind === 'border') {
+      borders.push({ id, active: input.activeBorder === id });
+    }
     if (input.category !== bucket) continue;
     const progress = earned ? null : deedProgress(def.trigger, input.deedStats);
     if (!matchesFilter(input.filter, earned, progress)) continue;
@@ -281,10 +365,12 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
       feat,
       hiddenBadge: def.hidden === true,
       titleReward: def.reward?.kind === 'title',
+      borderReward: def.reward?.kind === 'border',
       crestId: deedCrestId(id, def.category),
     });
   }
 
+  const focus = input.focusDeedId ?? null;
   return {
     summary: buildSummary(input, earnedCount, visibleTotal),
     categories: DEED_DISPLAY_CATEGORIES.map((category) => {
@@ -293,6 +379,8 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
     }),
     entries,
     titles,
+    borders,
+    focusDeedId: focus !== null && entries.some((e) => e.id === focus) ? focus : null,
   };
 }
 
@@ -318,18 +406,35 @@ function buildSummary(
   earned: number,
   visibleTotal: number,
 ): DeedsSummaryModel {
-  // Recent unlocks: earned entries whose id still exists in the catalog
-  // (content drift tolerated by skipping), newest day first; catalog order
-  // (later first) breaks same-day ties deterministically.
+  // Recent unlocks, three recency signals merged strongest-first with dedup:
+  //  1. this session's unlocks, newest first (exact, both hosts, instant);
+  //  2. the host's fetched newest-first order (exact, survives relog);
+  //  3. the day-granular fallback: earned entries newest day first, catalog
+  //     order (later first) breaking same-day ties deterministically.
+  // Every id must still be earned and catalog-known (content drift and a
+  // stale fetched row are tolerated by skipping).
   const orderIndex = new Map<string, number>();
   for (let i = 0; i < input.order.length; i++) orderIndex.set(input.order[i], i);
-  const recent: { id: string; day: string; index: number }[] = [];
+  const dayFallback: { id: string; day: string; index: number }[] = [];
   for (const [id, day] of input.deedsEarned) {
     const def = input.deeds[id];
     if (!def) continue;
-    recent.push({ id, day, index: orderIndex.get(id) ?? 0 });
+    dayFallback.push({ id, day, index: orderIndex.get(id) ?? 0 });
   }
-  recent.sort((a, b) => (a.day === b.day ? b.index - a.index : a.day < b.day ? 1 : -1));
+  dayFallback.sort((a, b) => (a.day === b.day ? b.index - a.index : a.day < b.day ? 1 : -1));
+  const seen = new Set<string>();
+  const recent: string[] = [];
+  const pushRecent = (id: string): void => {
+    // Own-property check, not a bare index read: the fetched recentOrder is
+    // wire data whose ids could name prototype keys (the known_item doctrine).
+    if (seen.has(id) || !input.deedsEarned.has(id) || !Object.hasOwn(input.deeds, id)) return;
+    seen.add(id);
+    recent.push(id);
+  };
+  const session = input.sessionUnlocks ?? [];
+  for (let i = session.length - 1; i >= 0; i--) pushRecent(session[i]);
+  for (const id of input.recentOrder ?? []) pushRecent(id);
+  for (const entry of dayFallback) pushRecent(entry.id);
 
   const nearest: { id: string; progress: DeedProgress; fraction: number; index: number }[] = [];
   for (const id of input.order) {
@@ -349,10 +454,10 @@ function buildSummary(
     earned,
     visibleTotal,
     completion: visibleTotal > 0 ? earned / visibleTotal : 0,
-    recent: recent.slice(0, 5).map((entry) => ({
-      id: entry.id,
-      crestId: deedCrestId(entry.id, input.deeds[entry.id].category),
-      earnedDay: entry.day,
+    recent: recent.slice(0, 5).map((id) => ({
+      id,
+      crestId: deedCrestId(id, input.deeds[id].category),
+      earnedDay: input.deedsEarned.get(id) ?? '',
     })),
     nearest: nearest.slice(0, 3).map((entry) => ({ id: entry.id, progress: entry.progress })),
   };
@@ -492,6 +597,9 @@ export interface DeedUnlockPlan {
   // Non-retro unlocks whose reward is a title: a second log line hints the
   // Titles section.
   titleHintIds: string[];
+  // The border sibling: without it three of the four border deeds unlock with
+  // no pointer at the picker that wears them.
+  borderHintIds: string[];
   // One celebration sound per drain, not one per unlock.
   playSound: boolean;
   // Retro back-credits (on-join catch-up): NO banner, NO audio, ONE summary
@@ -507,9 +615,15 @@ export function buildDeedUnlockPlan(
 ): DeedUnlockPlan {
   const logIds: string[] = [];
   const titleHintIds: string[] = [];
+  const borderHintIds: string[] = [];
   let retroCount = 0;
   for (const event of events) {
-    const def = deeds[event.deedId];
+    // hasOwn, like every other resolver in this family (deed_border_view,
+    // the sim validators): the catalog is a plain object, so a bare index on
+    // a prototype key answers truthy and would surface a deed that does not
+    // exist. These ids are server-authored today; the guard costs nothing and
+    // keeps the family uniform.
+    const def = Object.hasOwn(deeds, event.deedId) ? deeds[event.deedId] : undefined;
     if (!def) continue;
     if (event.retro) {
       retroCount++;
@@ -517,11 +631,13 @@ export function buildDeedUnlockPlan(
     }
     logIds.push(event.deedId);
     if (def.reward?.kind === 'title') titleHintIds.push(event.deedId);
+    if (def.reward?.kind === 'border') borderHintIds.push(event.deedId);
   }
   return {
     logIds,
     bannerId: logIds.length > 0 ? logIds[logIds.length - 1] : null,
     titleHintIds,
+    borderHintIds,
     playSound: logIds.length > 0,
     retroCount,
   };
@@ -533,11 +649,15 @@ export function buildDeedUnlockPlan(
 // (dropping one would silently freeze an open window).
 // ---------------------------------------------------------------------------
 
-/** The eight dimensions a slow-band repaint keys on. */
+/** The dimensions a slow-band repaint keys on. Both worn cosmetics are here
+ *  for the same reason: neither picker writes an optimistic local copy, so
+ *  online the accepted choice only shows up when the snapshot echo moves this
+ *  signature. */
 export interface DeedsRefreshSigParts {
   renown: number;
   earnedCount: number;
   activeTitle: string | null;
+  activeBorder: string | null;
   filter: DeedsFilter;
   search: string;
   category: DeedDisplayCategory | 'titles';
@@ -552,6 +672,7 @@ export function deedsRefreshSig(parts: DeedsRefreshSigParts): string {
     parts.renown,
     parts.earnedCount,
     parts.activeTitle,
+    parts.activeBorder,
     parts.filter,
     parts.search,
     parts.category,

@@ -107,8 +107,6 @@ export type LitanyMapPrimitive =
 export const LITANY_Z_MIN = -19;
 export const LITANY_Z_MAX = 91;
 export const LITANY_WALL_X = 25;
-export const LITANY_SIDE_Z = 36;
-export const LITANY_SIDE_HD = 55;
 export const LITANY_DOOR_Z = -17;
 
 export const LITANY_MODULE_IDS = [

@@ -73,37 +73,56 @@ export interface SharedInterestCandidates {
 // per DISTINCT occupied cell, and returns an O(1) lookup from sessionId to the
 // candidate Entity list for that session's anchor cell. The candidate list for a
 // cell is SHARED by reference across every session anchored in it.
+export interface WideBandQuery {
+  /** The wider per-cell radius (e.g. the battleground match drop radius). */
+  radius: number;
+  /** True when an x coordinate lies inside the wide band. The CALLER supplies
+   *  the predicate (this module stays world-agnostic spatial math). */
+  covers(x: number): boolean;
+}
+
 export function buildSharedInterestCandidates(
   grid: SpatialGrid,
   anchors: Iterable<AnchorRef>,
   baseRadius: number,
+  /** Optional wide band: anchor cells whose center the predicate covers query
+   *  at the wider radius (the raised same-slot battleground interest). */
+  wideBand: WideBandQuery | null = null,
 ): SharedInterestCandidates {
   const cellSize = grid.cellSize;
   const radius = sharedQueryRadius(baseRadius, cellSize);
+  const wideRadius = wideBand ? sharedQueryRadius(wideBand.radius, cellSize) : radius;
 
   // First pass: bucket each session into its anchor cell and record the distinct
   // occupied cells (their integer cx/cz, so the center is recovered exactly).
   const sessionCell = new Map<number, number>();
-  const distinctCells = new Map<number, { cx: number; cz: number }>();
+  const distinctCells = new Map<number, { cx: number; cz: number; wide: boolean }>();
   for (const { sessionId, anchor } of anchors) {
     const cx = Math.floor(anchor.pos.x / cellSize);
     const cz = Math.floor(anchor.pos.z / cellSize);
     const key = cellKeyForPosition(anchor.pos.x, anchor.pos.z, cellSize);
     sessionCell.set(sessionId, key);
-    if (!distinctCells.has(key)) distinctCells.set(key, { cx, cz });
+    // A cell queries wide when ANY of its anchors sits in the wide band: keyed
+    // on the anchor itself, so the cell-center rounding can never disagree
+    // with the per-session cutoff the caller applies.
+    const wide = Boolean(wideBand?.covers(anchor.pos.x));
+    const cell = distinctCells.get(key);
+    if (!cell) distinctCells.set(key, { cx, cz, wide });
+    else cell.wide = cell.wide || wide;
   }
 
   // Second pass: one grid query per distinct cell, from its center.
   const cellCandidates = new Map<number, readonly Entity[]>();
   let cellQueryCount = 0;
-  for (const [key, { cx, cz }] of distinctCells) {
+  for (const [key, { cx, cz, wide }] of distinctCells) {
     const centerX = (cx + 0.5) * cellSize;
     const centerZ = (cz + 0.5) * cellSize;
+    const cellRadius = wide ? wideRadius : radius;
     const list: Entity[] = [];
     // Deliberately ignore the d2 the callback receives: it is measured from the
     // CELL CENTER, not any viewer, so it must not leak into the returned list as
     // if it were a viewer distance. Callers re-apply their own anchor cutoff.
-    grid.forEachInRadius(centerX, centerZ, radius, (e) => {
+    grid.forEachInRadius(centerX, centerZ, cellRadius, (e) => {
       list.push(e);
     });
     cellCandidates.set(key, list);

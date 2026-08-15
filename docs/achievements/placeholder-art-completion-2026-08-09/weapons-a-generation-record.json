@@ -1,0 +1,2950 @@
+{
+  "schemaVersion": 1,
+  "scope": "weapon base-ID chunk A, sorted live authored ITEM_WEAPON_VARIANTS indices 0 through 39",
+  "derivedAt": "2026-08-09T15:16:46.524Z",
+  "sourceSession": "/Users/fernando/.codex/sessions/2026/08/09/rollout-2026-08-09T09-41-45-019fe6f8-ff7e-72f0-b234-7224f7d62512.jsonl",
+  "contract": {
+    "master": "1254x1254 opaque RGB PNG retained in ignored staging",
+    "shipped": "128x128 opaque WebP, <=15 KiB",
+    "visualChecks": [
+      "180px contact sheet",
+      "40px contact sheet",
+      "28px contact sheet"
+    ],
+    "acceptedByParent": true
+  },
+  "contactSheets": [
+    "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/previews/all-180.png",
+    "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/previews/all-40.png",
+    "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/previews/all-28.png"
+  ],
+  "summary": {
+    "assets": 40,
+    "uniqueShippedHashes": 40,
+    "generationRetries": 0,
+    "conversionRetries": 0,
+    "maxShippedBytes": 2892
+  },
+  "assets": [
+    {
+      "index": 0,
+      "id": "apprentice_staff",
+      "name": "Vale Apprentice Staff",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "staff_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:43:23.379Z",
+        "extensionId": "exec-e4c91659-85d6-47a8-8b91-0b24c850eba6",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique premium hand-painted classic dark-fantasy MMORPG inventory art for \"Vale Apprentice Staff\" (item id apprentice_staff), an uncommon novice caster's staff from the Vale. It should feel carefully made but attainable: a slim warm hickory shaft, modest blue-violet crystal bud held by simple aged-brass prongs, one short cream cord wrap, and a faint restrained arcane glow.\nInput images: Image 1 is only a loose weapon-family and silhouette reference for a staff; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep navy-charcoal painterly atmospheric ground with a subtle cool halo, opaque edge to edge\nSubject: one complete staff only, no wielder\nStyle/medium: beautiful hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork, tactile wood, brass, cord, and crystal, not a 3D render\nComposition/framing: centered fully contained staff on a strong lower-left to upper-right diagonal, entire tip and butt visible with comfortable padding, subject fills about 76 percent of the square, readable at 28 to 40 pixels\nLighting/mood: controlled warm top-left key light with cool magical rim glow, dignified novice wonder\nColor palette: walnut brown, aged brass, restrained sapphire and violet, deep desaturated navy ground\nMaterials/textures: visible wood grain, scuffed brass, wrapped cord fibers, faceted crystal with a small luminous core\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: flat glyph, generic silhouette, black-void product shot, photorealism, low-poly 3D, excessive particles, noisy scenery, oversized glow, duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/staff_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-e4c91659-85d6-47a8-8b91-0b24c850eba6.png",
+        "resultHashSha256": "c7407092e7af2cb1ff4a3aec4d8a913daa0df6e89b37c6e2ec3b6a0de929377d",
+        "resultBytes": 1782134,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/apprentice_staff.png",
+        "hashSha256": "c7407092e7af2cb1ff4a3aec4d8a913daa0df6e89b37c6e2ec3b6a0de929377d",
+        "bytes": 1782134,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/apprentice_staff.webp",
+        "runtimeUrl": "/ui/items/apprentice_staff.webp",
+        "hashSha256": "a23bedf5792e84c9b8485a08cfa69b6a59375baac09f9cb210fd67afc97a4625",
+        "bytes": 1190,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 1,
+      "id": "arcanite_war_axe",
+      "name": "Glyphsteel War Axe",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "axe_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:45:04.570Z",
+        "extensionId": "exec-ef93d99f-c5ba-44a6-b0d3-e49b836fa934",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique premium hand-painted classic dark-fantasy MMORPG inventory art for \"Glyphsteel War Axe\" (item id arcanite_war_axe), a rare master-crafted one-handed war axe. Give it a broad asymmetric midnight-steel blade, a compact hooked beard, angular silver inlay channels like abstract forge marks rather than letters, a reinforced dark ash haft, and a restrained cold-blue inner gleam that makes the metal feel exceptional.\nInput images: Image 1 is only a loose axe-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep charcoal and muted cobalt painterly atmospheric ground, opaque edge to edge\nSubject: one complete one-handed war axe only, no wielder\nStyle/medium: beautiful hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, tactile metal and wood, softly modeled brushwork, not a 3D render\nComposition/framing: centered fully contained axe on a strong lower-left to upper-right diagonal, blade and pommel fully visible with comfortable padding, subject fills about 78 percent of the square, readable at 28 to 40 pixels\nLighting/mood: controlled warm top-left key light with a narrow icy edge light, disciplined rare-forge prestige\nColor palette: gunmetal, silver, dark ash brown, restrained cobalt-blue, deep charcoal ground\nMaterials/textures: forged steel hammer texture, polished cutting edge, fine inlay, wrapped leather and wood grain\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: double-headed axe, flat glyph, generic silhouette, black-void product shot, photorealism, low-poly 3D, excessive particles, noisy scenery, oversized glow, duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/axe_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-ef93d99f-c5ba-44a6-b0d3-e49b836fa934.png",
+        "resultHashSha256": "fdd4180be0d80926b1dc28cc58629a47f5b0c443f3955203593d0c42d16359b4",
+        "resultBytes": 2175629,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/arcanite_war_axe.png",
+        "hashSha256": "fdd4180be0d80926b1dc28cc58629a47f5b0c443f3955203593d0c42d16359b4",
+        "bytes": 2175629,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/arcanite_war_axe.webp",
+        "runtimeUrl": "/ui/items/arcanite_war_axe.webp",
+        "hashSha256": "51b9c7e35e039d65d836be5e20fad79310f79f980b1cfacb010b3d09761f50e7",
+        "bytes": 2118,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 2,
+      "id": "bogiron_mace",
+      "name": "Bogiron Mace",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "hammer_c",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:46:06.011Z",
+        "extensionId": "exec-c64f0fc7-1456-43be-ba1e-c06cd1863ef3",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique hand-painted classic dark-fantasy MMORPG inventory art for \"Bogiron Mace\" (item id bogiron_mace), a common but sturdy one-handed weapon hammered from local marsh iron. It has a squat six-flanged black-iron head, slightly uneven hand-forged faces, a short weathered oak haft, rough brown leather grip, small copper securing pins, and honest traces of russet oxidation and dried moss in the recesses.\nInput images: Image 1 is only a loose mace-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: murky peat-brown and slate-green painterly atmospheric ground, opaque edge to edge\nSubject: one complete humble mace only, no wielder\nStyle/medium: beautiful hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, grounded practical craftsmanship, tactile surfaces, not a 3D render\nComposition/framing: centered fully contained mace on a lower-left to upper-right diagonal, head and pommel fully visible with comfortable padding, subject fills about 76 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm overcast top-left key light, rugged marshland utility\nColor palette: soot-black iron, russet brown, muted peat green, worn oak, dark slate ground\nMaterials/textures: pitted hand-forged iron, nicked flanges, coarse leather, damp wood grain, tiny moss traces\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; no crop; no magic glow; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: ornate royal weapon, flat glyph, generic silhouette, black-void product shot, photorealism, low-poly 3D, particles, noisy scenery, duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_c.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-c64f0fc7-1456-43be-ba1e-c06cd1863ef3.png",
+        "resultHashSha256": "9f739212ee53e9717813bd982a13975245680906568d7b87e680ae2be003c8d6",
+        "resultBytes": 2263218,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/bogiron_mace.png",
+        "hashSha256": "9f739212ee53e9717813bd982a13975245680906568d7b87e680ae2be003c8d6",
+        "bytes": 2263218,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/bogiron_mace.webp",
+        "runtimeUrl": "/ui/items/bogiron_mace.webp",
+        "hashSha256": "0d60d9ceb8aee659e56c2bd898912ca6054dacf93d6d80e96c0fab848dcfd780",
+        "bytes": 1702,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 3,
+      "id": "bonewrought_greatsword",
+      "name": "Bonewrought Greatsword",
+      "quality": "epic",
+      "slot": "mainhand",
+      "model": "adv_sword_2handed_color",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:46:35.496Z",
+        "extensionId": "exec-c6bdc32b-3cdf-4d15-a0c8-a28291ac1212",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create singular premium hand-painted classic dark-fantasy MMORPG inventory art for \"Bonewrought Greatsword\" (item id bonewrought_greatsword), an epic two-handed relic. Build a long dark-steel blade around an ivory vertebra-like central ridge, with a rib-bone guard curving protectively around the ricasso, black leather two-hand grip, a shardlike bone pommel, old hairline cracks, and restrained amethyst necromantic light breathing from the seams. Elegant and ominous, never gory.\nInput images: Image 1 is only a loose greatsword-family and silhouette reference; do not copy its generic low-poly rendering or gold palette. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep plum-black and cold slate painterly atmospheric ground, opaque edge to edge\nSubject: one complete epic greatsword only, no wielder\nStyle/medium: beautiful hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, dramatic but clean silhouette, tactile bone and forged steel, not a 3D render\nComposition/framing: centered fully contained two-handed sword on a lower-left to upper-right diagonal, tip and pommel fully visible with safe padding, subject fills about 80 percent of the square, readable at 28 to 40 pixels\nLighting/mood: pale top-left moonlit key with subtle violet seam light, regal funereal menace\nColor palette: aged ivory, blackened steel, deep plum, restrained amethyst, cold slate\nMaterials/textures: polished dark steel, porous carved bone, fine cracks, worn black leather, small silver rivets\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; no crop; no gore; no skull pile; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: generic golden sword, flat glyph, black-void product shot, photorealism, low-poly 3D, excessive particles, noisy scenery, huge glow, duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed_color.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-c6bdc32b-3cdf-4d15-a0c8-a28291ac1212.png",
+        "resultHashSha256": "60696acea850c2feadaf92d2f07c0f4691e4af358ef59ba1325dc470f98ff3b0",
+        "resultBytes": 2182016,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/bonewrought_greatsword.png",
+        "hashSha256": "60696acea850c2feadaf92d2f07c0f4691e4af358ef59ba1325dc470f98ff3b0",
+        "bytes": 2182016,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/bonewrought_greatsword.webp",
+        "runtimeUrl": "/ui/items/bonewrought_greatsword.webp",
+        "hashSha256": "cb8fa827ad4c59ff203d3b347334b3f3a99d8a85fcb635891151765b5cf72ca0",
+        "bytes": 1952,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 4,
+      "id": "briarroot_staff",
+      "name": "Briarroot Staff",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "staff_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:46:59.646Z",
+        "extensionId": "exec-4f93f265-d2c0-4ae4-bdc4-109a614b4d6b",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Briarroot Staff\" (item id briarroot_staff), an uncommon druidic staff grown rather than forged. A slender twisted hawthorn root rises into a natural fork cradling one warm amber seed-stone, with three purposeful thorns, a little sage-green moss, a weathered tan hide grip, and a faint living green pulse under the bark. Rustic, graceful, and clearly distinct from a crystal wizard staff.\nInput images: Image 1 is only a loose staff-family and silhouette reference; do not copy its generic low-poly rendering or crystal head. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep forest-green and umber painterly atmospheric ground, opaque edge to edge\nSubject: one complete living-wood staff only, no wielder\nStyle/medium: beautiful hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, organic painterly brushwork, tactile bark and moss, not a 3D render\nComposition/framing: centered fully contained staff on a lower-left to upper-right diagonal, crown and root butt fully visible with comfortable padding, subject fills about 78 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm top-left woodland light with a restrained seed glow, secretive living calm\nColor palette: walnut and briar brown, amber, sage green, tan hide, deep forest ground\nMaterials/textures: twisted bark grain, tiny moss clumps, translucent amber seed, worn hide binding\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; no crop; no extra branches; no flowers; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: wizard crystal staff, flat glyph, generic silhouette, black-void product shot, photorealism, low-poly 3D, excessive particles, noisy forest scene, oversized glow, duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/staff_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-4f93f265-d2c0-4ae4-bdc4-109a614b4d6b.png",
+        "resultHashSha256": "22c4da60f907fb1815cbd99073fb6e2fe7939c129fc2e9470ea8e43b68eb8e21",
+        "resultBytes": 1941480,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/briarroot_staff.png",
+        "hashSha256": "22c4da60f907fb1815cbd99073fb6e2fe7939c129fc2e9470ea8e43b68eb8e21",
+        "bytes": 1941480,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/briarroot_staff.webp",
+        "runtimeUrl": "/ui/items/briarroot_staff.webp",
+        "hashSha256": "4a0d5aa519f04c688b0c8122eeb69bc05b5ad9eb5f9f418e8f20a0db1559cfff",
+        "bytes": 1514,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 5,
+      "id": "bristleback_maul",
+      "name": "Gallowglass Hammer",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "hammer_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:48:47.129Z",
+        "extensionId": "exec-f99406d6-2499-449a-8966-38ab24993290",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Gallowglass Hammer\" (item id bristleback_maul), a uncommon weapon. A disciplined border mercenary's two-handed hammer: a compact rectangular smoke-steel head with one blunt striking face and a short reinforced back spike, engraved only with simple nonalphabetic knot channels, fixed to a long dark-oak haft with iron langets, forest-green leather cross-wrap, and a small weathered brass collar. It should feel battle-ready and purposeful, not ceremonial.\nInput images: Image 1 is only a loose hammer_d weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep forest-charcoal and muted iron-blue painterly atmospheric ground, opaque edge to edge\nSubject: one complete two-handed war hammer only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained hammer on a lower-left to upper-right diagonal, both head and butt cap fully visible with comfortable padding, subject fills about 78 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cool daylight from the top left with a restrained warm steel highlight, steadfast veteran mood\nColor palette: smoke steel, dark oak, forest green, aged brass, charcoal blue\nMaterials/textures: hammered steel, nicked striking face, worn leather cross-wrap, dark wood grain, riveted langets\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: oversized fantasy boulder head, executioner's imagery, dangling gore; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-f99406d6-2499-449a-8966-38ab24993290.png",
+        "resultHashSha256": "7b63809feb840c94c7cfc5daf16e0e768f8d256e49e1ab054dcc52b58bbd2f43",
+        "resultBytes": 1931208,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/bristleback_maul.png",
+        "hashSha256": "7b63809feb840c94c7cfc5daf16e0e768f8d256e49e1ab054dcc52b58bbd2f43",
+        "bytes": 1931208,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/bristleback_maul.webp",
+        "runtimeUrl": "/ui/items/bristleback_maul.webp",
+        "hashSha256": "da70452f8f731d3eea36d26738ecd41f39dbdb0a2715075b2f602f1f0911d0c7",
+        "bytes": 1344,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 6,
+      "id": "bronzework_mace",
+      "name": "Bronzework Mace",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "hammer_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:49:18.615Z",
+        "extensionId": "exec-45870cd0-e45b-46d7-a8a6-762dcbd5f90d",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Bronzework Mace\" (item id bronzework_mace), a common weapon. A humble yet handsome one-handed workshop mace cast and hand-finished by a village bronzeworker: a warm bronze six-lobed head with shallow practical flanges, a straight ash handle, dark red-brown leather grip, and two plain peened copper pins. Cleanly maintained, lightly scuffed, and entirely nonmagical.\nInput images: Image 1 is only a loose hammer_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: warm umber and muted slate painterly atmospheric ground, opaque edge to edge\nSubject: one complete compact one-handed mace only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained mace on a lower-left to upper-right diagonal, head and pommel fully visible with generous padding, subject fills about 74 percent of the square, readable at 28 to 40 pixels\nLighting/mood: soft warm top-left workshop light, grounded honest-craft mood\nColor palette: honey bronze, ash brown, oxblood leather, muted charcoal\nMaterials/textures: cast bronze with hand-filed edges, tiny scuffs, ash grain, matte worn leather, copper pins\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: golden royal ornament, magic glow, giant head; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-45870cd0-e45b-46d7-a8a6-762dcbd5f90d.png",
+        "resultHashSha256": "39f1743a5c2aea2e174d90d643f8a94b396b359d323333228b437e7719ea444f",
+        "resultBytes": 2032421,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/bronzework_mace.png",
+        "hashSha256": "39f1743a5c2aea2e174d90d643f8a94b396b359d323333228b437e7719ea444f",
+        "bytes": 2032421,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/bronzework_mace.webp",
+        "runtimeUrl": "/ui/items/bronzework_mace.webp",
+        "hashSha256": "4d632bd69866727dd8577912ad58bbe773714d39b49c6b29918ad0e2894f4ae7",
+        "bytes": 1698,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 7,
+      "id": "brutoks_maul",
+      "name": "Brutok's Maul",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "hammer_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:49:44.852Z",
+        "extensionId": "exec-1e57c2af-a3d9-4f39-9429-41ad26f458c8",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Brutok's Maul\" (item id brutoks_maul), a rare weapon. A feared ogre chieftain's rare two-handed maul built from a dense squared slab of dark meteoric iron, with chipped corners, a single pale boar-tusk wedge lashed beneath the head, thick iron bands down a scarred blackwood haft, and a rough burnt-orange hide grip. Powerful and brutal but still a coherent usable weapon, with a faint furnace-red heat caught inside old cracks.\nInput images: Image 1 is only a loose hammer_d weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep soot-black and ember-brown painterly atmospheric ground, opaque edge to edge\nSubject: one complete massive two-handed maul only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained maul on a lower-left to upper-right diagonal, full head and haft visible with safe padding, subject fills about 80 percent of the square, readable at 28 to 40 pixels\nLighting/mood: hard warm top-left forge light with subtle ember crack accents, intimidating raid-trophy mood\nColor palette: black iron, charcoal wood, burnt orange hide, bone ivory, restrained ember red\nMaterials/textures: chipped meteoric iron, scorched wood, coarse hide, iron bands, weathered tusk\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: cartoon club, gore, skull pile, huge flames, unusably oversized head; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-1e57c2af-a3d9-4f39-9429-41ad26f458c8.png",
+        "resultHashSha256": "5718e5e1c2c66d2bb775c78eaca04f7fc0bc459d5c7912d3471e39a3345f4cf5",
+        "resultBytes": 2118585,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/brutoks_maul.png",
+        "hashSha256": "5718e5e1c2c66d2bb775c78eaca04f7fc0bc459d5c7912d3471e39a3345f4cf5",
+        "bytes": 2118585,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/brutoks_maul.webp",
+        "runtimeUrl": "/ui/items/brutoks_maul.webp",
+        "hashSha256": "5f7135b9e7ddc0079ef62895e1413ad648800c6b29f60b0bba38162ee0766b87",
+        "bytes": 1872,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 8,
+      "id": "caravan_warden_dirk",
+      "name": "Caravan Warden Dirk",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "dagger_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:50:13.512Z",
+        "extensionId": "exec-d2ed0c15-5029-4eef-a532-e9687e1a1fcf",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Caravan Warden Dirk\" (item id caravan_warden_dirk), a uncommon weapon. A reliable road guard's uncommon dirk: a stout leaf-shaped steel blade with a pronounced central ridge, modest downturned brass quillons, dark walnut grip wrapped in faded caravan-red cord, a flattened compass-rose-like pommel made only of simple geometry with no letters, and fine road dust in the creases. Protective, practical, and immediately readable as a dirk.\nInput images: Image 1 is only a loose dagger_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: dusky road-brown and muted indigo painterly atmospheric ground, opaque edge to edge\nSubject: one complete practical dirk only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained dagger on a lower-left to upper-right diagonal, tip and pommel fully visible with generous padding, subject fills about 72 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm late-day top-left key light with a cool road-dusk rim, dependable travel mood\nColor palette: steel silver, walnut, faded caravan red, aged brass, dusty indigo\nMaterials/textures: satin steel, scuffed brass, cord-wrapped wood, road dust, small leather collar\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: assassin poison, ornate jeweled dagger, blood, oversized blade; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-d2ed0c15-5029-4eef-a532-e9687e1a1fcf.png",
+        "resultHashSha256": "b1d0b9a7caf040eda19e296615e3ebad730df009cd7574edf3a8070db293101d",
+        "resultBytes": 2301710,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/caravan_warden_dirk.png",
+        "hashSha256": "b1d0b9a7caf040eda19e296615e3ebad730df009cd7574edf3a8070db293101d",
+        "bytes": 2301710,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/caravan_warden_dirk.webp",
+        "runtimeUrl": "/ui/items/caravan_warden_dirk.webp",
+        "hashSha256": "7b28d2614320796015c7c85f56cf108f9051eb4ed7a4d29f0d2c9befb7240dca",
+        "bytes": 2486,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 9,
+      "id": "copper_bearded_axe",
+      "name": "Copper Bearded Axe",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "axe_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:53:06.802Z",
+        "extensionId": "exec-bcac58cf-aa25-46e4-966a-fee4761d651f",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Copper Bearded Axe\" (item id copper_bearded_axe), a common weapon. A humble village-made one-handed axe with a broad practical copper blade swept into a clear bearded lower edge, a slightly hammered surface, simple iron eye reinforcement, straight pale ash haft, and a short dark-brown hide grip. Functional, warm, attractive, and entirely nonmagical.\nInput images: Image 1 is only a loose axe_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: warm workshop umber and muted blue-gray painterly atmospheric ground, opaque edge to edge\nSubject: one complete one-handed bearded axe only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained axe on a lower-left to upper-right diagonal, blade and butt fully visible with generous padding, subject fills about 74 percent of the square, readable at 28 to 40 pixels\nLighting/mood: soft golden top-left workshop light, fresh honest-craft mood\nColor palette: aged copper, pale ash wood, dark brown hide, muted slate blue\nMaterials/textures: hammer-marked copper, sharpened edge, pale wood grain, rough hide wrap, small iron wedge\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: double-headed axe, royal ornament, magic glow, oversized blade; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/axe_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-bcac58cf-aa25-46e4-966a-fee4761d651f.png",
+        "resultHashSha256": "a5bda2bd2effd7fd6bee585768c2c845ac027d96e57a94460bfb6683368c8411",
+        "resultBytes": 2181772,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/copper_bearded_axe.png",
+        "hashSha256": "a5bda2bd2effd7fd6bee585768c2c845ac027d96e57a94460bfb6683368c8411",
+        "bytes": 2181772,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/copper_bearded_axe.webp",
+        "runtimeUrl": "/ui/items/copper_bearded_axe.webp",
+        "hashSha256": "c649d54efc2619d077e475e6203aeb58fd009ed21acd14932ef8f7d67218f9e6",
+        "bytes": 2218,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 10,
+      "id": "copper_flanged_mace",
+      "name": "Copper Flanged Mace",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "hammer_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:52:20.326Z",
+        "extensionId": "exec-35eb8362-3452-477c-822c-720161e5ab0d",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Copper Flanged Mace\" (item id copper_flanged_mace), a common weapon. A compact hand-forged one-handed mace with six narrow copper flanges around an iron core, each flange visibly filed and slightly irregular, a straight maple haft, blackened iron collar, and plain tan leather grip. It must differ strongly from a round bronzework mace through its slender star-shaped head and copper-and-iron construction.\nInput images: Image 1 is only a loose hammer_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: dark russet and cool workshop-slate painterly atmospheric ground, opaque edge to edge\nSubject: one complete compact flanged mace only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained mace on a lower-left to upper-right diagonal, head and pommel fully visible with generous padding, subject fills about 74 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm top-left forge light with cool edge contrast, modest craftsman's pride\nColor palette: burnished copper, black iron, maple brown, tan leather, slate\nMaterials/textures: filed copper flanges, iron core, maple grain, stitched leather, peened rivets\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: round mace head, golden royal ornament, magic glow, giant head; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-35eb8362-3452-477c-822c-720161e5ab0d.png",
+        "resultHashSha256": "7d863871e2680883493b57968f40a53b7ef0a074279f2b2447b67b2ca95f79a8",
+        "resultBytes": 2196517,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/copper_flanged_mace.png",
+        "hashSha256": "7d863871e2680883493b57968f40a53b7ef0a074279f2b2447b67b2ca95f79a8",
+        "bytes": 2196517,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/copper_flanged_mace.webp",
+        "runtimeUrl": "/ui/items/copper_flanged_mace.webp",
+        "hashSha256": "8e81b01dfad17543cbe3e22a1e4491bd6ca989be4b3a7855838049c4e216e8c5",
+        "bytes": 2154,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 11,
+      "id": "corpse_candle_focus",
+      "name": "Corpse-Candle Focus",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "wand_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:51:50.199Z",
+        "extensionId": "exec-0d6ee523-fdd6-4671-9800-596de1388137",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Corpse-Candle Focus\" (item id corpse_candle_focus), a uncommon weapon. An eerie one-handed caster focus shaped as a short blackened pewter rod supporting a thick bone-white tallow candle in a clawlike cup, with long hardened wax tears, a tiny sickly blue-green flame, a narrow violet cord wrap, and an oval tarnished-silver counterweight. Spooky and refined, not gruesome, with no literal corpse parts.\nInput images: Image 1 is only a loose wand_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep blue-black and bruised violet painterly atmospheric ground, opaque edge to edge\nSubject: one complete short candle focus only, no hand and no holder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained focus on a lower-left to upper-right diagonal, flame and pommel fully visible with comfortable padding, subject fills about 70 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cold top-left moonlight plus a restrained sickly candle glow, hushed occult mood\nColor palette: blackened pewter, bone-white wax, blue-green flame, tarnished silver, bruised violet\nMaterials/textures: dripped matte tallow, pitted pewter, woven cord, oxidized silver, delicate flame\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: skull, severed bone, gore, huge fire, ordinary household candlestick; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/wand_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-0d6ee523-fdd6-4671-9800-596de1388137.png",
+        "resultHashSha256": "9e5326f6723196d7d788c46daef60ff5c28a0020536d12fc98207cba1e90bd80",
+        "resultBytes": 1910329,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/corpse_candle_focus.png",
+        "hashSha256": "9e5326f6723196d7d788c46daef60ff5c28a0020536d12fc98207cba1e90bd80",
+        "bytes": 1910329,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/corpse_candle_focus.webp",
+        "runtimeUrl": "/ui/items/corpse_candle_focus.webp",
+        "hashSha256": "3ddc66d021556bc3f1eb9574b9f1518c7ecb1af7e71ef19e6a11e7ac3e2a543f",
+        "bytes": 1822,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 12,
+      "id": "crag_warden_cudgel",
+      "name": "Crag Warden Cudgel",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "hammer_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:51:19.608Z",
+        "extensionId": "exec-86de1b1a-5a47-45e5-beb5-6ab29a5e62f4",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Crag Warden Cudgel\" (item id crag_warden_cudgel), a rare weapon. A rare mountain sentinel's one-handed cudgel: a compact faceted head of blue-gray granite locked inside four dark-steel ribs, capped with a blunt square striking plate, mounted on a weathered rowan haft with slate-blue leather grip and a small silver mountain-shaped collar made only of simple geometry. Heavy, protective, and usable.\nInput images: Image 1 is only a loose hammer_b weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: stormy mountain blue and charcoal painterly atmospheric ground, opaque edge to edge\nSubject: one complete one-handed stone-and-steel cudgel only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained cudgel on a lower-left to upper-right diagonal, head and pommel fully visible with comfortable padding, subject fills about 75 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cold clear top-left alpine light with warm wood accents, steadfast watchful mood\nColor palette: blue-gray granite, dark steel, rowan brown, slate blue, small silver highlights\nMaterials/textures: faceted granite, scratched steel ribs, weathered wood, stitched leather, silver collar\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: giant rock club, glowing crystal, royal scepter, unusable proportions; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-86de1b1a-5a47-45e5-beb5-6ab29a5e62f4.png",
+        "resultHashSha256": "f48eeb2a6e968a0706507e51ad696e0d5a0363cfc680cd03a3af6da23e0c26ab",
+        "resultBytes": 1678677,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/crag_warden_cudgel.png",
+        "hashSha256": "f48eeb2a6e968a0706507e51ad696e0d5a0363cfc680cd03a3af6da23e0c26ab",
+        "bytes": 1678677,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/crag_warden_cudgel.webp",
+        "runtimeUrl": "/ui/items/crag_warden_cudgel.webp",
+        "hashSha256": "8918ace69e298396a6220be18596225b7984aa03949b98a5c3d78f242308d959",
+        "bytes": 2554,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 13,
+      "id": "craghorn_staff",
+      "name": "Craghorn Staff",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "staff_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:54:17.058Z",
+        "extensionId": "exec-3aaa55cf-1fed-4ba6-8a35-97524da7e309",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Craghorn Staff\" (item id craghorn_staff), a common weapon. A simple mountain herder's caster staff made from pale wind-bent ash, its top forming a sturdy crook wrapped around one naturally shed gray ram horn and a small river-stone bead. Rough rawhide bindings, a dark iron ferrule, and no magic effects. Humble, weathered, and attractive.\nInput images: Image 1 is only a loose staff_b weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: misty mountain gray and subdued brown painterly atmospheric ground, opaque edge to edge\nSubject: one complete rustic crook staff only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained staff on a lower-left to upper-right diagonal, horn crown and ferrule fully visible with generous padding, subject fills about 77 percent of the square, readable at 28 to 40 pixels\nLighting/mood: soft cloudy top-left alpine light, quiet practical mood\nColor palette: pale ash wood, weathered horn gray, rawhide tan, dark iron, misty slate\nMaterials/textures: wind-smoothed wood, ridged ram horn, cracked rawhide, river stone, iron ferrule\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: crystal wizard staff, glowing orb, ornate magic, animal skull; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/staff_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-3aaa55cf-1fed-4ba6-8a35-97524da7e309.png",
+        "resultHashSha256": "3696b5250ecc82f7f54edefb4d6b90b2e2aaa63c528f8762d9cfc7ccd03b8abd",
+        "resultBytes": 2091122,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/craghorn_staff.png",
+        "hashSha256": "3696b5250ecc82f7f54edefb4d6b90b2e2aaa63c528f8762d9cfc7ccd03b8abd",
+        "bytes": 2091122,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/craghorn_staff.webp",
+        "runtimeUrl": "/ui/items/craghorn_staff.webp",
+        "hashSha256": "f26fa850b2df435f44c8bffa804ffae04f3ca25101c16ad92f1b910b4a447e71",
+        "bytes": 1952,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 14,
+      "id": "cragthorn_greatstaff",
+      "name": "Cragthorn Greatstaff",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "staff_c",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:55:11.419Z",
+        "extensionId": "exec-c9cc15e2-0ef1-4c10-9fde-b681b69981a0",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Cragthorn Greatstaff\" (item id cragthorn_greatstaff), a rare weapon. A rare two-handed primal greatstaff grown from dark mountain yew around a split shard of storm-blue geode, with a strong forked crown, four short iron-hard natural thorns, silver rootlike bands gripping the stone, charcoal hide wraps, and a faint blue-white pulse deep inside the geode. Ancient, rugged, and imposing without becoming a tree.\nInput images: Image 1 is only a loose staff_c weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep storm-blue and granite-charcoal painterly atmospheric ground, opaque edge to edge\nSubject: one complete imposing greatstaff only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained greatstaff on a lower-left to upper-right diagonal, full crown and root butt visible with safe padding, subject fills about 80 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cold top-left lightning-afterglow with warm bark highlights, rare mountain power\nColor palette: dark yew brown, storm blue, silver, charcoal hide, granite gray\nMaterials/textures: gnarled yew grain, faceted geode, silver root bands, hard thorns, rough hide\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: delicate wizard wand, oversized tree branches, flowers, huge lightning bolts; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/staff_c.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-c9cc15e2-0ef1-4c10-9fde-b681b69981a0.png",
+        "resultHashSha256": "9ebec36251e8ef00606834410bc325da11e5a17ae0d82efc685ab172b3e2fd46",
+        "resultBytes": 2191290,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/cragthorn_greatstaff.png",
+        "hashSha256": "9ebec36251e8ef00606834410bc325da11e5a17ae0d82efc685ab172b3e2fd46",
+        "bytes": 2191290,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/cragthorn_greatstaff.webp",
+        "runtimeUrl": "/ui/items/cragthorn_greatstaff.webp",
+        "hashSha256": "f269d9998292bbbfb033aa2628d4b61e2987490c778460062c8954d98b5d8469",
+        "bytes": 2892,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 15,
+      "id": "crossroads_saber",
+      "name": "Crossroads Saber",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "sword_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:55:57.035Z",
+        "extensionId": "exec-a538b953-11ee-4f3b-9dde-365cc8754b75",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Crossroads Saber\" (item id crossroads_saber), a uncommon weapon. A seasoned road captain's uncommon one-handed saber: a gently curved single-edged steel blade with a broad clipped point, brass D-shaped knuckle guard, walnut grip wrapped in alternating muted red and navy cord, a small iron wheel pommel, and tasteful travel wear along the scabbard-contact line. Versatile and cosmopolitan, never ornate.\nInput images: Image 1 is only a loose sword_d weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: dusty twilight indigo and warm road-umber painterly atmospheric ground, opaque edge to edge\nSubject: one complete curved saber only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained saber on a lower-left to upper-right diagonal, blade tip and pommel fully visible with comfortable padding, subject fills about 78 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm top-left sunset key with cool twilight edge, confident traveler mood\nColor palette: steel silver, aged brass, walnut, muted red and navy, dusty indigo\nMaterials/textures: satin steel, scuffed brass guard, cord wrap, walnut grain, iron pommel\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: straight longsword, pirate ornament, jeweled royal blade, magic glow; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/sword_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-a538b953-11ee-4f3b-9dde-365cc8754b75.png",
+        "resultHashSha256": "e6879a9f8f2eea5af3addd40562334e60cdae450accd0a37403b3a454fdd53bc",
+        "resultBytes": 2200633,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/crossroads_saber.png",
+        "hashSha256": "e6879a9f8f2eea5af3addd40562334e60cdae450accd0a37403b3a454fdd53bc",
+        "bytes": 2200633,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/crossroads_saber.webp",
+        "runtimeUrl": "/ui/items/crossroads_saber.webp",
+        "hashSha256": "18df6d98177e1a7fd6d9f7a888c0b7e9db4e99d266f8e45abb28f028e652be06",
+        "bytes": 2010,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 16,
+      "id": "cultist_flayer",
+      "name": "Cultist Flayer",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "dagger_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:56:27.990Z",
+        "extensionId": "exec-37534d98-27af-42f3-a146-49098232f10c",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Cultist Flayer\" (item id cultist_flayer), a uncommon weapon. A sinister ritualist's uncommon dagger with a narrow hooked steel blade, a shallow inward cutting curve, blackened iron spine, compact asymmetrical crescent guard, tightly wrapped dark wine-red cord grip, and one cloudy smoky-quartz pommel. Menacing and practical, but bloodless, with only abstract scratches and no symbols or lettering.\nInput images: Image 1 is only a loose dagger_b weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep burgundy-black and smoky charcoal painterly atmospheric ground, opaque edge to edge\nSubject: one complete hooked dagger only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained dagger on a lower-left to upper-right diagonal, hooked tip and pommel fully visible with generous padding, subject fills about 72 percent of the square, readable at 28 to 40 pixels\nLighting/mood: narrow cold top-left light with restrained wine-red reflected glow, secretive menace\nColor palette: cold steel, black iron, dark wine red, smoky quartz, charcoal\nMaterials/textures: sharpened hooked steel, blackened spine, cord wrap, cloudy stone, worn iron\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: blood, gore, skin, pentagram, readable occult glyphs, oversized fantasy blade; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-37534d98-27af-42f3-a146-49098232f10c.png",
+        "resultHashSha256": "9d4b02eb285e57bdb37fd7cd65c995d8467ef16575ad598fbf09087d09bf0099",
+        "resultBytes": 1492903,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/cultist_flayer.png",
+        "hashSha256": "9d4b02eb285e57bdb37fd7cd65c995d8467ef16575ad598fbf09087d09bf0099",
+        "bytes": 1492903,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/cultist_flayer.webp",
+        "runtimeUrl": "/ui/items/cultist_flayer.webp",
+        "hashSha256": "6ffc2febd7361f741a213180448cf546beabe92c98737581df17bad5276a40bb",
+        "bytes": 1630,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 17,
+      "id": "deacons_cleaver",
+      "name": "Deacon's Cleaver",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "axe_c",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:58:44.424Z",
+        "extensionId": "exec-571f07ce-f1a3-4a3a-98c9-28f820c21de6",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Deacon's Cleaver\" (item id deacons_cleaver), a uncommon weapon. A stern chapel-warden's uncommon one-handed cleaver with a broad forward-weighted iron blade, squared clipped tip, pale brass spine strip, modest winglike guard, ivory linen wrapped grip, and one plain dark-red wax charm at the pommel with no seal or writing. Severe, clean, and battle-practical rather than butcherly.\nInput images: Image 1 is only a loose axe_c weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: smoky chapel charcoal and muted amber painterly atmospheric ground, opaque edge to edge\nSubject: one complete one-handed war cleaver only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained cleaver on a lower-left to upper-right diagonal, blade and pommel fully visible with comfortable padding, subject fills about 76 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm high top-left candlelike key with cool steel edge, austere watchful mood\nColor palette: iron gray, pale brass, ivory linen, dark wax red, smoky charcoal\nMaterials/textures: satin iron, worn brass strip, tightly wrapped linen, plain wax charm, black leather collar\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: kitchen cleaver, blood, gore, real-world religious symbols, readable seal, jeweled ornament; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/axe_c.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-571f07ce-f1a3-4a3a-98c9-28f820c21de6.png",
+        "resultHashSha256": "454467dddb1c5435da1b2de7e1b5e679443f871cfc82f7fae5041a348b33f748",
+        "resultBytes": 2433091,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/deacons_cleaver.png",
+        "hashSha256": "454467dddb1c5435da1b2de7e1b5e679443f871cfc82f7fae5041a348b33f748",
+        "bytes": 2433091,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/deacons_cleaver.webp",
+        "runtimeUrl": "/ui/items/deacons_cleaver.webp",
+        "hashSha256": "494b85be3c5a9d89600a31e23778c5ebfafb22e1982065929b84a2aee565dd26",
+        "bytes": 2200,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 18,
+      "id": "deathless_greatblade",
+      "name": "Deathless Greatblade",
+      "quality": "epic",
+      "slot": "mainhand",
+      "model": "adv_sword_2handed_color",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:59:13.901Z",
+        "extensionId": "exec-29827ba6-d4e1-49ca-90df-e892285de6af",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Deathless Greatblade\" (item id deathless_greatblade), a epic weapon. An epic two-handed court blade from an undying sovereign's armory: a long narrow silver-black blade with a hollow central fuller lit by cold turquoise soul-light, a swept crownlike guard of tarnished electrum, midnight-blue two-hand grip, and an elegant coffin-shaped pommel. Aristocratic, spectral, and sharply distinct from a bone weapon.\nInput images: Image 1 is only a loose adv_sword_2handed_color weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep midnight blue and spectral teal painterly atmospheric ground, opaque edge to edge\nSubject: one complete epic greatblade only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained greatblade on a lower-left to upper-right diagonal, tip and pommel fully visible with safe padding, subject fills about 81 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cold top-left moonlight with restrained turquoise fuller glow, immortal royal dread\nColor palette: silver-black steel, tarnished electrum, midnight blue, spectral turquoise\nMaterials/textures: mirror-dark forged steel, luminous recessed fuller, aged electrum, velvet-wrapped grip\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: bone construction, generic gold sword, skulls, giant flames, broad cleaver silhouette; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed_color.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-29827ba6-d4e1-49ca-90df-e892285de6af.png",
+        "resultHashSha256": "766b24ee69172c0f4555460856ae119dcf1404edaa865f91663091b896667cef",
+        "resultBytes": 1985374,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/deathless_greatblade.png",
+        "hashSha256": "766b24ee69172c0f4555460856ae119dcf1404edaa865f91663091b896667cef",
+        "bytes": 1985374,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/deathless_greatblade.webp",
+        "runtimeUrl": "/ui/items/deathless_greatblade.webp",
+        "hashSha256": "f6c77bb844eb16410c10b63679eed9679d361a33dc7bbe909e790cd032437eee",
+        "bytes": 2078,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 19,
+      "id": "deathless_heartwood",
+      "name": "Heartwood of the Deathless Crown",
+      "quality": "legendary",
+      "slot": "mainhand",
+      "model": "adv_druid_staff",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:57:51.411Z",
+        "extensionId": "exec-d07490b5-7022-46d5-9610-314167f9efba",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Heartwood of the Deathless Crown\" (item id deathless_heartwood), a legendary weapon. A singular legendary druidic relic carved from nearly black ancient heartwood, rising into a graceful crown of pale stag-antler branches that cradle one deep emerald seed-heart. Thin veins of warm gold sap run through the wood, small moon-silver bands bind the crown, a moss-green hide grip anchors the shaft, and a restrained halo of emerald life pushes back a faint violet death haze. Majestic, living, and unmistakable.\nInput images: Image 1 is only a loose adv_druid_staff weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep evergreen, black-violet, and antique-gold painterly atmospheric ground, opaque edge to edge\nSubject: one complete legendary antler-crowned staff only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained staff on a lower-left to upper-right diagonal, every antler tine and root butt fully visible with safe padding, subject fills about 80 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm top-left sacred woodland light with emerald core illumination and a subtle cool rim, legendary renewal against death\nColor palette: black heartwood, pale antler ivory, deep emerald, moon silver, antique gold, moss green\nMaterials/textures: ancient polished wood, ridged antler, translucent seed-heart, silver bindings, hide and moss\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: ordinary wizard staff, giant tree canopy, flowers, skulls, huge particle storm, cropped antlers; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_druid_staff.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-d07490b5-7022-46d5-9610-314167f9efba.png",
+        "resultHashSha256": "dce7e2ce1e748828bdb796edd0192c2c5e8b9e5a2accc608ce9a6503a4d5b014",
+        "resultBytes": 2339403,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/deathless_heartwood.png",
+        "hashSha256": "dce7e2ce1e748828bdb796edd0192c2c5e8b9e5a2accc608ce9a6503a4d5b014",
+        "bytes": 2339403,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/deathless_heartwood.webp",
+        "runtimeUrl": "/ui/items/deathless_heartwood.webp",
+        "hashSha256": "995c4c68e715d72e6fcdcdbdfa3df216fd115e67bf72157c2f2bfe08683ab691",
+        "bytes": 2570,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 20,
+      "id": "direfang_greatblade",
+      "name": "Direfang Greatblade",
+      "quality": "epic",
+      "slot": "mainhand",
+      "model": "adv_sword_2handed_color",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T14:59:45.699Z",
+        "extensionId": "exec-11f0824f-dcbc-430b-a30a-9626d1c0179e",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Direfang Greatblade\" (item id direfang_greatblade), a epic weapon. An epic hunter's two-handed greatblade inspired by a dire beast's fang: a broad slightly recurved steel blade with a pale ivory toothed spine inset, a sharp swept point, dark bronze guard shaped like two opposing talons without an animal face, weathered gray fur beneath the guard, forest-brown two-hand leather grip, and restrained amber predator-light along the edge.\nInput images: Image 1 is only a loose adv_sword_2handed_color weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep pine green and storm-gray painterly atmospheric ground, opaque edge to edge\nSubject: one complete epic hunting greatblade only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained greatblade on a lower-left to upper-right diagonal, tip and pommel fully visible with safe padding, subject fills about 80 percent of the square, readable at 28 to 40 pixels\nLighting/mood: crisp top-left woodland light with warm amber edge accents, feral disciplined power\nColor palette: cold steel, ivory, dark bronze, forest brown, gray fur, restrained amber\nMaterials/textures: forged steel, polished ivory inset, aged bronze talons, coarse fur, worn leather\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: literal wolf head, generic golden sword, bone-only blade, blood, oversized serrations, huge glow; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed_color.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-11f0824f-dcbc-430b-a30a-9626d1c0179e.png",
+        "resultHashSha256": "eb97979067e57868972d9adcbe2634df954c95600be1f596ddf1ce9e37d005be",
+        "resultBytes": 2197690,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/direfang_greatblade.png",
+        "hashSha256": "eb97979067e57868972d9adcbe2634df954c95600be1f596ddf1ce9e37d005be",
+        "bytes": 2197690,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/direfang_greatblade.webp",
+        "runtimeUrl": "/ui/items/direfang_greatblade.webp",
+        "hashSha256": "917bc551a442af012d125972d5f35f89a271d0591ceea1ed13becded1647c612",
+        "bytes": 1986,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 21,
+      "id": "drogmars_skullcleaver",
+      "name": "Drogmar's Skullcleaver",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "axe_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:01:25.708Z",
+        "extensionId": "exec-70f9dcf2-b3a0-4368-952f-b306b79229aa",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Drogmar's Skullcleaver\" (item id drogmars_skullcleaver), a rare weapon. A rare warlord's one-handed axe built for crushing helmets: a massive forward-swept black-steel blade with a thick reinforced poll, three pale bone rivet plates along the spine, a scarred ironwood haft wrapped in dark oxblood hide, and a compact blunt spike at the butt. Savage but masterfully balanced, with no literal skull decoration and no gore.\nInput images: Image 1 is only a loose axe_b weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep rust-red and smoky charcoal painterly atmospheric ground, opaque edge to edge\nSubject: one complete brutal one-handed battle axe only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained axe on a lower-left to upper-right diagonal, full blade and butt spike visible with safe padding, subject fills about 78 percent of the square, readable at 28 to 40 pixels\nLighting/mood: hard warm top-left battlefield light with cold edge highlights, warlord trophy mood\nColor palette: black steel, ironwood brown, oxblood leather, bone ivory, smoky rust\nMaterials/textures: chipped black steel, thick forged poll, bone rivet plates, scarred wood, coarse hide\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: literal skull, gore, blood, double-headed axe, cartoon proportions, huge flames; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/axe_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-70f9dcf2-b3a0-4368-952f-b306b79229aa.png",
+        "resultHashSha256": "5a0378b6782b19655cfd9f5ee42b433f6cc7ba0df6a2fb4747fe6838d2d76a89",
+        "resultBytes": 2310401,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drogmars_skullcleaver.png",
+        "hashSha256": "5a0378b6782b19655cfd9f5ee42b433f6cc7ba0df6a2fb4747fe6838d2d76a89",
+        "bytes": 2310401,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/drogmars_skullcleaver.webp",
+        "runtimeUrl": "/ui/items/drogmars_skullcleaver.webp",
+        "hashSha256": "f6502411eef539924947dc0f1f9bb4d187ce3d597cff285018e2910b1e841383",
+        "bytes": 2676,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 22,
+      "id": "drovers_staff",
+      "name": "Drover's Staff",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "adv_druid_staff",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:02:10.712Z",
+        "extensionId": "exec-9ae80687-01a3-45be-bd72-15df5976a3da",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Drover's Staff\" (item id drovers_staff), a uncommon weapon. An uncommon traveling beast-keeper's staff cut from sun-darkened elm, with a broad shepherd's crook reinforced by a small iron hook, two smooth amber beads captured beneath the curve, faded ochre leather wraps, and a sturdy steel-shod root butt. A faint honey-warm animal-friendship glow, practical enough for the road and distinct from magical crystal staves.\nInput images: Image 1 is only a loose adv_druid_staff weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: dusky pasture green and warm earth painterly atmospheric ground, opaque edge to edge\nSubject: one complete shepherd-style staff only, no animal and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained staff on a lower-left to upper-right diagonal, crook and ferrule fully visible with comfortable padding, subject fills about 78 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm top-left late-afternoon light with gentle amber accents, patient pastoral mood\nColor palette: sun-dark elm, ochre leather, iron gray, amber, deep pasture green\nMaterials/textures: polished elm grain, forged hook, smooth amber beads, worn leather, steel ferrule\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: wizard crystal, animal skull, hanging bells, extra tools, bright spell effects; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_druid_staff.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-9ae80687-01a3-45be-bd72-15df5976a3da.png",
+        "resultHashSha256": "90bdec680e9b3811a2852fa55c2be07f48d2cad286b8d9284d11d1b270ab639d",
+        "resultBytes": 2120373,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drovers_staff.png",
+        "hashSha256": "90bdec680e9b3811a2852fa55c2be07f48d2cad286b8d9284d11d1b270ab639d",
+        "bytes": 2120373,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/drovers_staff.webp",
+        "runtimeUrl": "/ui/items/drovers_staff.webp",
+        "hashSha256": "eba988ce37711516a467ed645d2c19826adcdb8724d105ecf2d11e2da3da7339",
+        "bytes": 2514,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 23,
+      "id": "drowned_choir_fang",
+      "name": "Drowned Choir-Fang",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "dagger_c",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:02:43.049Z",
+        "extensionId": "exec-9070f641-aeec-498e-b3d3-0dd2f5c6a662",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Drowned Choir-Fang\" (item id drowned_choir_fang), a rare weapon. A rare sea-haunted dagger shaped like a long predator tooth: a pale blue-gray blade of layered tideglass and fossil ivory, one subtle inward serration, a dark verdigris-bronze wave guard, grip wrapped in water-dark teal cord, tiny barnacle marks near the pommel, and restrained ghostly cyan light along the cutting edge as though carrying a distant underwater song.\nInput images: Image 1 is only a loose dagger_c weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep ocean teal and midnight slate painterly atmospheric ground, opaque edge to edge\nSubject: one complete sea-fang dagger only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained dagger on a lower-left to upper-right diagonal, fang tip and pommel fully visible with generous padding, subject fills about 73 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cold top-left underwater-like caustic light with restrained cyan edge glow, mournful abyssal mood\nColor palette: tideglass blue-gray, fossil ivory, verdigris bronze, dark teal, spectral cyan\nMaterials/textures: layered sea glass, polished ivory, oxidized bronze, wet-looking cord, tiny barnacle texture\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: literal singing mouths, musical notes, gore, giant coral growth, oversized glow; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_c.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-9070f641-aeec-498e-b3d3-0dd2f5c6a662.png",
+        "resultHashSha256": "495c34dc0c8feee35026b6d8389620dc6b0873b508e3fc55e333a6e2485503ad",
+        "resultBytes": 1936328,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drowned_choir_fang.png",
+        "hashSha256": "495c34dc0c8feee35026b6d8389620dc6b0873b508e3fc55e333a6e2485503ad",
+        "bytes": 1936328,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/drowned_choir_fang.webp",
+        "runtimeUrl": "/ui/items/drowned_choir_fang.webp",
+        "hashSha256": "e4d285b7d510277c9e6a385aa5190288fc41e88338053c89eceb404b823ed58e",
+        "bytes": 2474,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 24,
+      "id": "drowned_tide_scepter",
+      "name": "Drowned Tide Scepter",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "wand_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:03:09.993Z",
+        "extensionId": "exec-56b69e8e-7230-494b-a260-ff2e97f5d46e",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Drowned Tide Scepter\" (item id drowned_tide_scepter), a rare weapon. A rare one-handed tidecaster's scepter: a short shaft of black tide-worn wood capped by a verdigris-bronze trident crown that cradles one luminous deep-blue sea pearl, with narrow silver wave bands, dark navy cord grip, a teardrop counterweight, and a restrained halo like moonlight under water. Regal but corroded by the deep.\nInput images: Image 1 is only a loose wand_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep navy and green-black ocean painterly atmospheric ground, opaque edge to edge\nSubject: one complete short sea scepter only, no hand and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained scepter on a lower-left to upper-right diagonal, trident crown and pommel fully visible with comfortable padding, subject fills about 72 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cool top-left moonlit key with deep-blue pearl illumination, drowned royal mystery\nColor palette: verdigris bronze, black wood, deep sapphire, moon silver, navy\nMaterials/textures: corroded bronze, tide-worn wood, luminous pearl, silver wave bands, woven cord\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: full-size trident, glass bottle, giant water splash, ordinary wand, excessive coral; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/wand_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-56b69e8e-7230-494b-a260-ff2e97f5d46e.png",
+        "resultHashSha256": "a9afbcdf33ed220894aa066a9a2cd8ac52299488ede6f0275af24950462684f7",
+        "resultBytes": 2038705,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drowned_tide_scepter.png",
+        "hashSha256": "a9afbcdf33ed220894aa066a9a2cd8ac52299488ede6f0275af24950462684f7",
+        "bytes": 2038705,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/drowned_tide_scepter.webp",
+        "runtimeUrl": "/ui/items/drowned_tide_scepter.webp",
+        "hashSha256": "d8e22760de7c16624d7781d4107618b186a3ad57f5a641bde59aec1ffebc625e",
+        "bytes": 2164,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 25,
+      "id": "drownedmoon_kris",
+      "name": "Drowned Moon Kris",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "adv_dagger",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:04:32.101Z",
+        "extensionId": "exec-d36d05c2-3691-4578-af66-d60027de5649",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Drowned Moon Kris\" (item id drownedmoon_kris), a rare weapon. A rare ceremonial sea-kris with a graceful three-wave moon-silver blade, dark tideglass central ridge, a low crescent guard in verdigris bronze, grip wrapped in midnight-blue ray-skin texture, and a single pale moon-pearl pommel. Salt-aged and spectral, with restrained blue lunar light tracing the wavy edge.\nInput images: Image 1 is only a loose adv_dagger weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: midnight ocean blue and smoky silver painterly atmospheric ground, opaque edge to edge\nSubject: one complete wavy-bladed kris only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained kris on a lower-left to upper-right diagonal, tip and pearl pommel fully visible with generous padding, subject fills about 73 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cold top-left moonlight with a restrained blue edge shimmer, drowned lunar elegance\nColor palette: moon silver, dark tideglass, verdigris bronze, midnight blue, pale pearl\nMaterials/textures: wavy silver blade, translucent tideglass ridge, corroded bronze, ray-skin wrap, luminous pearl\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: straight dagger, giant ocean splash, multiple moons, huge glow, jeweled royal excess; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_dagger.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-d36d05c2-3691-4578-af66-d60027de5649.png",
+        "resultHashSha256": "83e630acec7d5c797b0018c2e1bf788bafc1082689fe02222b797adee4404afd",
+        "resultBytes": 2240142,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drownedmoon_kris.png",
+        "hashSha256": "83e630acec7d5c797b0018c2e1bf788bafc1082689fe02222b797adee4404afd",
+        "bytes": 2240142,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/drownedmoon_kris.webp",
+        "runtimeUrl": "/ui/items/drownedmoon_kris.webp",
+        "hashSha256": "069117be0c79371698bd3c9c0d1fa157e3d0359b1f9297cefe6eb2ed1bac89c0",
+        "bytes": 2056,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 26,
+      "id": "drownedmoon_maul",
+      "name": "Drowned Moon Maul",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "hammer_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:04:57.536Z",
+        "extensionId": "exec-57934f3d-e8d5-4354-b612-69638230a400",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Drowned Moon Maul\" (item id drownedmoon_maul), a rare weapon. A rare two-handed maul built from a drowned temple bell: a broad cylindrical verdigris-bronze head with two thick silver striking bands and a pale moonstone disk inset on each visible end, suspended on a long dark driftwood haft reinforced by corroded iron straps, with navy rope grip and a small anchor-shaped butt cap made from simple geometry. Heavy, tidal, and solemn.\nInput images: Image 1 is only a loose hammer_d weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep sea-green and moonlit navy painterly atmospheric ground, opaque edge to edge\nSubject: one complete bell-headed two-handed maul only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained maul on a lower-left to upper-right diagonal, entire bell head and butt cap visible with safe padding, subject fills about 79 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cool top-left lunar light with soft moonstone highlights, solemn drowned-temple power\nColor palette: verdigris bronze, moon silver, pale moonstone, dark driftwood, navy rope\nMaterials/textures: corroded bell bronze, polished silver bands, cloudy moonstone, salt-worn wood, wet rope\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: ordinary square hammer, oversized anchor, giant water effects, golden palace maul; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-57934f3d-e8d5-4354-b612-69638230a400.png",
+        "resultHashSha256": "0b7bfcd95771fbed608848d149c695e3672b249e44b353d9d365d1b8b432d5b6",
+        "resultBytes": 1958780,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drownedmoon_maul.png",
+        "hashSha256": "0b7bfcd95771fbed608848d149c695e3672b249e44b353d9d365d1b8b432d5b6",
+        "bytes": 1958780,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/drownedmoon_maul.webp",
+        "runtimeUrl": "/ui/items/drownedmoon_maul.webp",
+        "hashSha256": "01db97b3a5b3d860ef3752a34b6637a9dd4f96b68d76b49515485d6f5620560b",
+        "bytes": 2640,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 27,
+      "id": "drownedmoon_scepter",
+      "name": "Drowned Moon Scepter",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "wand_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:05:25.204Z",
+        "extensionId": "exec-2bb87ca4-3f3b-46e2-8ba7-a21d603ad3c4",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Drowned Moon Scepter\" (item id drownedmoon_scepter), a rare weapon. A rare one-handed lunar sea scepter, distinct from a trident: a slim black-coral shaft ending in a wide tarnished-silver crescent that cups one opalescent moon pearl, with tiny verdigris bronze wave filigree at the base, dark teal silk wrap, and a narrow teardrop pommel. Restrained misty-blue moonlight glows between crescent and pearl.\nInput images: Image 1 is only a loose wand_b weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep indigo and ocean-black painterly atmospheric ground, opaque edge to edge\nSubject: one complete crescent-topped scepter only, no hand and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained scepter on a lower-left to upper-right diagonal, crescent and pommel fully visible with comfortable padding, subject fills about 72 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cool top-left moonlight with soft pearl radiance, mysterious submerged-court mood\nColor palette: tarnished silver, black coral, opalescent pearl, verdigris, dark teal\nMaterials/textures: ridged black coral, aged silver crescent, luminous pearl, oxidized bronze filigree, silk wrap\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: trident crown, ordinary wand, giant crescent, water splash, overly delicate jewelry; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/wand_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-2bb87ca4-3f3b-46e2-8ba7-a21d603ad3c4.png",
+        "resultHashSha256": "4739490949ceb7113f960fba7e365cd3935b6e322bd112f57900f5a104ce4739",
+        "resultBytes": 1989480,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/drownedmoon_scepter.png",
+        "hashSha256": "4739490949ceb7113f960fba7e365cd3935b6e322bd112f57900f5a104ce4739",
+        "bytes": 1989480,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/drownedmoon_scepter.webp",
+        "runtimeUrl": "/ui/items/drownedmoon_scepter.webp",
+        "hashSha256": "ee442d3a1c4a8166d7bc8b63c023caf8c7662732a9525209432edf18d5df6248",
+        "bytes": 1720,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 28,
+      "id": "duskfang_dirk",
+      "name": "Duskfang Dirk",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "dagger_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:05:55.278Z",
+        "extensionId": "exec-dbc73707-4435-4873-9db0-10429b00de3b",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Duskfang Dirk\" (item id duskfang_dirk), a uncommon weapon. An uncommon twilight hunter's dirk forged with a slender smoky-steel blade resembling a predator fang, subtly darkening toward the spine, a compact bronze crossguard with swept tips, grip wrapped in dusky violet leather, and a small black horn pommel. One faint plum edge reflection suggests dusk, but the weapon is mostly practical and nonmagical.\nInput images: Image 1 is only a loose dagger_b weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep dusk violet and forest-charcoal painterly atmospheric ground, opaque edge to edge\nSubject: one complete narrow fang-like dirk only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained dirk on a lower-left to upper-right diagonal, tip and horn pommel fully visible with generous padding, subject fills about 72 percent of the square, readable at 28 to 40 pixels\nLighting/mood: low warm top-left sunset light with a cool violet rim, stealthy twilight mood\nColor palette: smoky steel, aged bronze, dusky violet, black horn, forest charcoal\nMaterials/textures: satin steel, scuffed bronze, matte leather, polished horn, fine edge wear\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: glowing poison, blood, giant tooth, ornate assassin jewelry, curved kris blade; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-dbc73707-4435-4873-9db0-10429b00de3b.png",
+        "resultHashSha256": "09a36ef5a2c282661ae346e856234bfa1232a5ba2bd38ac62fc8611ecd3c1702",
+        "resultBytes": 2176599,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/duskfang_dirk.png",
+        "hashSha256": "09a36ef5a2c282661ae346e856234bfa1232a5ba2bd38ac62fc8611ecd3c1702",
+        "bytes": 2176599,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/duskfang_dirk.webp",
+        "runtimeUrl": "/ui/items/duskfang_dirk.webp",
+        "hashSha256": "bf38195e73b8802afe94cf89bfefcff993123a1321e5bdef288a253f2b6c7ac6",
+        "bytes": 1670,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 29,
+      "id": "eastbrook_arming_sword",
+      "name": "Eastbrook Arming Sword",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "sword_b",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:07:15.025Z",
+        "extensionId": "exec-8c7dda8b-48c4-41de-8af6-b860862c476f",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Eastbrook Arming Sword\" (item id eastbrook_arming_sword), a common weapon. A dependable town-guard one-handed arming sword made by Eastbrook smiths: a straight double-edged satin-steel blade with a shallow fuller, simple slightly downturned iron crossguard, blue leather grip matching Eastbrook civic gear, and a round brass pommel. Freshly maintained with a few honest training nicks, entirely nonmagical.\nInput images: Image 1 is only a loose sword_b weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep Eastbrook blue and warm charcoal painterly atmospheric ground, opaque edge to edge\nSubject: one complete one-handed arming sword only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained sword on a lower-left to upper-right diagonal, tip and pommel fully visible with comfortable padding, subject fills about 77 percent of the square, readable at 28 to 40 pixels\nLighting/mood: clean warm top-left daylight with cool steel edge, trustworthy civic mood\nColor palette: satin steel, iron gray, Eastbrook blue, warm brass, charcoal\nMaterials/textures: forged steel, shallow fuller, blue leather wrap, scuffed iron guard, brass pommel\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: magic glow, jeweled royal sword, oversized guard, fantasy spikes, ornate engraving; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/sword_b.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-8c7dda8b-48c4-41de-8af6-b860862c476f.png",
+        "resultHashSha256": "d0cd6a1aa56354c1983f2d3c0723620fbba84af4827f0efa7c8eabe8677ec742",
+        "resultBytes": 2215618,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/eastbrook_arming_sword.png",
+        "hashSha256": "d0cd6a1aa56354c1983f2d3c0723620fbba84af4827f0efa7c8eabe8677ec742",
+        "bytes": 2215618,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_arming_sword.webp",
+        "runtimeUrl": "/ui/items/eastbrook_arming_sword.webp",
+        "hashSha256": "714ecf17349282e1333b3d04227454984698818bc7ba0c4a187334f08035e8e3",
+        "bytes": 1714,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 30,
+      "id": "eastbrook_greatsword",
+      "name": "Eastbrook Greatsword",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "adv_sword_2handed",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:08:16.480Z",
+        "extensionId": "exec-27ddb96e-e177-49c0-ba88-2dab9cbc5e4b",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Eastbrook Greatsword\" (item id eastbrook_greatsword), a common weapon. A practical militia two-handed greatsword from Eastbrook: a long broad double-edged steel blade with a sturdy central ridge, extended straight dark-iron guard, two-hand grip wrapped in muted blue and brown leather, and a pear-shaped brass pommel. Plain, balanced, well cared for, and clearly related to Eastbrook civic equipment without copying the arming sword.\nInput images: Image 1 is only a loose adv_sword_2handed weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: muted Eastbrook blue and dark workshop slate painterly atmospheric ground, opaque edge to edge\nSubject: one complete two-handed greatsword only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained greatsword on a lower-left to upper-right diagonal, full tip, guard, and pommel visible with safe padding, subject fills about 81 percent of the square, readable at 28 to 40 pixels\nLighting/mood: clean warm top-left daylight with broad steel highlight, resolute militia mood\nColor palette: polished steel, dark iron, muted blue, brown leather, warm brass\nMaterials/textures: broad forged blade, central ridge, riveted guard, layered leather grip, brass pommel\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: magic glow, jeweled ornament, wavy blade, giant spikes, duplicate arming-sword proportions; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_sword_2handed.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-27ddb96e-e177-49c0-ba88-2dab9cbc5e4b.png",
+        "resultHashSha256": "6bada945920665c03d16a0604e37619cbcda59f6f3d103d487fbdaf2e516ff00",
+        "resultBytes": 2222650,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/eastbrook_greatsword.png",
+        "hashSha256": "6bada945920665c03d16a0604e37619cbcda59f6f3d103d487fbdaf2e516ff00",
+        "bytes": 2222650,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_greatsword.webp",
+        "runtimeUrl": "/ui/items/eastbrook_greatsword.webp",
+        "hashSha256": "7b4aebb75ac4b07e7402828f15475f953c59530a92e935663ac812612b80e64c",
+        "bytes": 1790,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 31,
+      "id": "elderwood_battle_staff",
+      "name": "Highpine Battle Staff",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "staff_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:07:50.418Z",
+        "extensionId": "exec-461f749f-c8f2-47f4-9d38-a1bd4e2d4249",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Highpine Battle Staff\" (item id elderwood_battle_staff), a rare weapon. A rare martial caster's battle staff cut from dense red-gold highpine heartwood, reinforced with four dark-steel striking rings and long bronze langets, crowned by a compact pinecone-shaped green resin crystal held inside protective iron branches, with deep forest leather grip and an iron-shod butt. Tough enough for melee, with restrained evergreen light inside the resin.\nInput images: Image 1 is only a loose staff_d weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep pine green and smoky bronze painterly atmospheric ground, opaque edge to edge\nSubject: one complete reinforced battle staff only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained staff on a lower-left to upper-right diagonal, crystal crown and iron butt fully visible with safe padding, subject fills about 80 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm top-left forest sun with cool green core glow, resilient highland craftsmanship\nColor palette: red-gold pine, dark steel, aged bronze, forest green, resin emerald\nMaterials/textures: dense pine grain, hammered rings, bronze langets, translucent resin, worn leather\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: delicate wizard staff, giant tree branches, flower ornament, oversized crystal, huge spell effects; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/staff_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-461f749f-c8f2-47f4-9d38-a1bd4e2d4249.png",
+        "resultHashSha256": "51aab8a400a61d445a5d38990689d6d5eed00a3fdf0b73226eeedce314d5f50a",
+        "resultBytes": 2229943,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/elderwood_battle_staff.png",
+        "hashSha256": "51aab8a400a61d445a5d38990689d6d5eed00a3fdf0b73226eeedce314d5f50a",
+        "bytes": 2229943,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/elderwood_battle_staff.webp",
+        "runtimeUrl": "/ui/items/elderwood_battle_staff.webp",
+        "hashSha256": "19f52c7454014c828a7be76d7da3afa1dea496ec8400354898578875bc1b0f05",
+        "bytes": 2090,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 32,
+      "id": "emberfang_warblade",
+      "name": "Emberfang Warblade",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "sword_c",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:08:45.760Z",
+        "extensionId": "exec-f726d54e-2078-4119-b354-6c6d73ec5438",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Emberfang Warblade\" (item id emberfang_warblade), a rare weapon. A rare one-handed warblade forged to resemble a fire-beast fang: a forward-curved black-steel blade with a bright polished inner edge, a narrow ember-red fuller broken into natural heat fissures, compact bronze talon guard, charred leather grip, and an obsidian tooth pommel. Restrained heat shimmer and ember glow, dangerous but not aflame.\nInput images: Image 1 is only a loose sword_c weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep coal-black and burnt crimson painterly atmospheric ground, opaque edge to edge\nSubject: one complete curved one-handed warblade only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained warblade on a lower-left to upper-right diagonal, fang tip and pommel fully visible with comfortable padding, subject fills about 77 percent of the square, readable at 28 to 40 pixels\nLighting/mood: hard warm top-left forge light with restrained ember fissure glow, predatory forged heat\nColor palette: black steel, polished silver edge, ember red, aged bronze, charred brown\nMaterials/textures: heat-darkened steel, glowing recessed fuller, bronze talon guard, scorched leather, obsidian\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: full flames, literal animal head, red lightsaber, oversized serrations, molten background; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/sword_c.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-f726d54e-2078-4119-b354-6c6d73ec5438.png",
+        "resultHashSha256": "7e95a3f498864ca2305dc6e93bfa27358454907744c7b9d668adb8c64d9d5293",
+        "resultBytes": 2034801,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/emberfang_warblade.png",
+        "hashSha256": "7e95a3f498864ca2305dc6e93bfa27358454907744c7b9d668adb8c64d9d5293",
+        "bytes": 2034801,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/emberfang_warblade.webp",
+        "runtimeUrl": "/ui/items/emberfang_warblade.webp",
+        "hashSha256": "9dd07216ecefd4f77b0edd463d39781c749a038cc5434f2b68e39029f12811ff",
+        "bytes": 2270,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 33,
+      "id": "emberglass_warstaff",
+      "name": "Emberglass Warstaff",
+      "quality": "epic",
+      "slot": "mainhand",
+      "model": "adv_staff",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:10:39.375Z",
+        "extensionId": "exec-575687e6-b95b-4d18-8269-366a55420028",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Emberglass Warstaff\" (item id emberglass_warstaff), a epic weapon. A singular epic two-handed warstaff from the WARFARE armory: a long blackened-steel shaft armored with dark bronze striking collars, crowned by a protective fork of tempered iron around one jagged translucent emberglass prism whose golden-orange core looks like captured forge heat. Deep red leather grip, geometric chevron metalwork with no letters, and controlled orange radiance. Martial first, magical second.\nInput images: Image 1 is only a loose adv_staff weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep charcoal, dark crimson, and forge-orange painterly atmospheric ground, opaque edge to edge\nSubject: one complete epic armored warstaff only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained warstaff on a lower-left to upper-right diagonal, crystal crown and reinforced butt fully visible with safe padding, subject fills about 81 percent of the square, readable at 28 to 40 pixels\nLighting/mood: strong warm top-left forge key with crisp cool steel rim and restrained emberglass glow, elite battlemage prestige\nColor palette: black steel, dark bronze, ember orange, deep red leather, charcoal\nMaterials/textures: tempered steel shaft, bronze collars, fractured translucent emberglass, leather cross-wrap, polished edges\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: wooden druid staff, giant flames, plain wizard wand, oversized crystal bouquet, molten background; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/adv_staff.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-575687e6-b95b-4d18-8269-366a55420028.png",
+        "resultHashSha256": "57f5d5748d0b6cf65f2f14348b55c8cec1ba9fe79e58c575efe8e28fd40394c2",
+        "resultBytes": 2080222,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/emberglass_warstaff.png",
+        "hashSha256": "57f5d5748d0b6cf65f2f14348b55c8cec1ba9fe79e58c575efe8e28fd40394c2",
+        "bytes": 2080222,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/emberglass_warstaff.webp",
+        "runtimeUrl": "/ui/items/emberglass_warstaff.webp",
+        "hashSha256": "8b3daec05242f542315e47af1a0b7a83dd24152961d4028c1e8e89511e50c4cd",
+        "bytes": 2070,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 34,
+      "id": "emberwood_staff",
+      "name": "Emberwood Staff",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "staff_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:10:14.266Z",
+        "extensionId": "exec-817d8d02-72f8-4b1e-a93c-092a84cb1e8d",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Emberwood Staff\" (item id emberwood_staff), a uncommon weapon. An uncommon caster staff cut from fire-scarred reddish wood, its natural fork holding one small coal-black seed with a warm orange heart, wrapped with simple copper wire and dark tan leather. A few charred bark fissures retain dim embers, but the staff is rustic, modest, and fully usable rather than engulfed in fire.\nInput images: Image 1 is only a loose staff_d weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep burnt umber and smoky navy painterly atmospheric ground, opaque edge to edge\nSubject: one complete rustic emberwood staff only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained staff on a lower-left to upper-right diagonal, forked crown and butt fully visible with comfortable padding, subject fills about 78 percent of the square, readable at 28 to 40 pixels\nLighting/mood: warm top-left firelight with restrained coal-heart glow, campfire resilience\nColor palette: fire-scarred red wood, copper, coal black, ember orange, dark tan\nMaterials/textures: charred bark, reddish wood grain, twisted copper wire, matte seed stone, worn leather\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: full flames, giant ruby crystal, ornate battlestaff, black metal shaft, noisy sparks; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/staff_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-817d8d02-72f8-4b1e-a93c-092a84cb1e8d.png",
+        "resultHashSha256": "3666d191101b6ed4159b687fcacc54ddce12c5a76d46ba5f7d79a6540d74fb2f",
+        "resultBytes": 1972728,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/emberwood_staff.png",
+        "hashSha256": "3666d191101b6ed4159b687fcacc54ddce12c5a76d46ba5f7d79a6540d74fb2f",
+        "bytes": 1972728,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/emberwood_staff.webp",
+        "runtimeUrl": "/ui/items/emberwood_staff.webp",
+        "hashSha256": "86aa19ea9654afa295c0a184ad1056459d61d63aa9a69c9c33520d450be5040f",
+        "bytes": 1942,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 35,
+      "id": "fang_of_korzul",
+      "name": "Fang of Korzul",
+      "quality": "epic",
+      "slot": "mainhand",
+      "model": "dagger_c",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:11:11.507Z",
+        "extensionId": "exec-4d366fa6-ce69-4a4f-aff5-e35932022544",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Fang of Korzul\" (item id fang_of_korzul), a epic weapon. An epic dagger fashioned from a single enormous fang of Korzul the Gravewyrm: a curved ivory tooth sharpened to a glassy edge, its root socket reinforced by black grave-steel and a swept winglike guard, grip wrapped in desaturated purple wyrm-hide, a chipped onyx pommel, and narrow cold-violet necrotic veins trapped inside the ivory. Ancient dragon trophy, elegant and deadly, never gory.\nInput images: Image 1 is only a loose dagger_c weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep grave-violet and cold slate painterly atmospheric ground, opaque edge to edge\nSubject: one complete gravewyrm-fang dagger only, no sheath and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained curved dagger on a lower-left to upper-right diagonal, fang tip and pommel fully visible with safe padding, subject fills about 74 percent of the square, readable at 28 to 40 pixels\nLighting/mood: pale top-left moonlight with restrained violet vein glow, epic gravewyrm menace\nColor palette: aged ivory, black grave-steel, desaturated purple, onyx, cold violet\nMaterials/textures: polished tooth enamel, porous fang root, blackened steel, scaled hide wrap, chipped onyx\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: small ordinary tooth, blood, gore, literal dragon head, giant spell cloud, straight steel blade; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/dagger_c.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-4d366fa6-ce69-4a4f-aff5-e35932022544.png",
+        "resultHashSha256": "fc2e42630cb370050fa0c0b903346e261965be3eef892648f0401b0c95d5fdd0",
+        "resultBytes": 2089929,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/fang_of_korzul.png",
+        "hashSha256": "fc2e42630cb370050fa0c0b903346e261965be3eef892648f0401b0c95d5fdd0",
+        "bytes": 2089929,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/fang_of_korzul.webp",
+        "runtimeUrl": "/ui/items/fang_of_korzul.webp",
+        "hashSha256": "99f528e500c42a6b8f37425e66ffb12265a15ff402fe13f52bc81087819d0ae4",
+        "bytes": 2348,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 36,
+      "id": "fanglords_beastspear",
+      "name": "Fanglord's Beastspear",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "spear_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:11:49.347Z",
+        "extensionId": "exec-fe8befa1-f2bc-4b95-810d-b7d6cca05a3d",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Fanglord's Beastspear\" (item id fanglords_beastspear), a rare weapon. A rare Beastmaster's two-handed boar spear: a broad leaf-shaped dark-steel spearhead flanked by two shorter pale predator-fang lugs that stop a charging beast, set on a long ironbark shaft with bronze socket, forest-green leather grip, one compact gray-fur collar, and a sharpened iron butt spike. Strong hunter craftsmanship with restrained amber edge light.\nInput images: Image 1 is only a loose spear_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep wildheart green and warm earth painterly atmospheric ground, opaque edge to edge\nSubject: one complete two-handed hunting spear only, no animal and no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained spear on a lower-left to upper-right diagonal, full spearhead and butt spike visible with safe padding, subject fills about 82 percent of the square, readable at 28 to 40 pixels\nLighting/mood: crisp warm top-left woodland light with subtle amber edge accents, confident beastmaster mood\nColor palette: dark steel, fang ivory, ironbark brown, forest green, aged bronze, gray fur\nMaterials/textures: forged spearhead, polished fang lugs, dense wood grain, stitched leather, coarse fur\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: trident, giant animal head, decorative banner, blood, flimsy thin shaft, huge magic effects; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/spear_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-fe8befa1-f2bc-4b95-810d-b7d6cca05a3d.png",
+        "resultHashSha256": "0cd7c598936f52234cab42623c9e8bb27c8c8bac96d909fc28b60258acd97fca",
+        "resultBytes": 2139817,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/fanglords_beastspear.png",
+        "hashSha256": "0cd7c598936f52234cab42623c9e8bb27c8c8bac96d909fc28b60258acd97fca",
+        "bytes": 2139817,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/fanglords_beastspear.webp",
+        "runtimeUrl": "/ui/items/fanglords_beastspear.webp",
+        "hashSha256": "e517326a7f294d34301fde23e4c549a5d2f8c66cdc01eae65cdd6dc6f9f62d07",
+        "bytes": 1918,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 37,
+      "id": "fen_reaver_glaive",
+      "name": "Fen Reaver Glaive",
+      "quality": "rare",
+      "slot": "mainhand",
+      "model": "scythe",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:13:04.275Z",
+        "extensionId": "exec-2f9861cb-6564-40a5-b922-d3b093ca74f3",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Fen Reaver Glaive\" (item id fen_reaver_glaive), a rare weapon. A rare two-handed marsh reaver's polearm combining glaive and war scythe: a long sweeping crescent blade of dark green-black steel, sharpened inner curve, short hooked back spur, oxidized bronze socket, long water-dark ash shaft wrapped with braided reed cord, and a narrow iron butt spike. A restrained swamp-green sheen clings to the blade, menacing but clean.\nInput images: Image 1 is only a loose scythe weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep fen green, peat black, and misty teal painterly atmospheric ground, opaque edge to edge\nSubject: one complete long war-scythe glaive only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained polearm on a lower-left to upper-right diagonal, entire crescent blade and butt spike visible with safe padding, subject fills about 82 percent of the square, readable at 28 to 40 pixels\nLighting/mood: cold top-left marsh moonlight with a narrow sickly-green steel reflection, stalking fen mood\nColor palette: green-black steel, oxidized bronze, dark ash wood, reed tan, misty teal\nMaterials/textures: swept forged blade, patinated socket, damp wood grain, braided reeds, worn iron\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: farming sickle, giant grim-reaper fantasy, character or cloak, skulls, dripping poison, oversized magic; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/scythe.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-2f9861cb-6564-40a5-b922-d3b093ca74f3.png",
+        "resultHashSha256": "5d7bd516763e4568edc6c4ded45bf64b9e9851a60a16f840e851c721d1ef56cc",
+        "resultBytes": 2237088,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/fen_reaver_glaive.png",
+        "hashSha256": "5d7bd516763e4568edc6c4ded45bf64b9e9851a60a16f840e851c721d1ef56cc",
+        "bytes": 2237088,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/fen_reaver_glaive.webp",
+        "runtimeUrl": "/ui/items/fen_reaver_glaive.webp",
+        "hashSha256": "ec468ffcba65d4eed1c9ea404c63794fc431ec4fc175ce5f39cf02561eab4592",
+        "bytes": 1854,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 38,
+      "id": "fenreed_staff",
+      "name": "Fenreed Staff",
+      "quality": "common",
+      "slot": "mainhand",
+      "model": "staff_a",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:13:40.434Z",
+        "extensionId": "exec-d1ac9d1e-9bbd-4c82-aee1-311b37a08c07",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Fenreed Staff\" (item id fenreed_staff), a common weapon. A humble marsh caster's staff made from a straight weathered alder branch, its crown bundled with three dried fen reeds around one smooth muted-green river pebble, bound in tan cord and a strip of faded sage cloth, with a simple black-iron ferrule. Entirely nonmagical, light, handmade, and charming.\nInput images: Image 1 is only a loose staff_a weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: soft peat-brown and subdued sage-green painterly atmospheric ground, opaque edge to edge\nSubject: one complete simple reed-bound staff only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained staff on a lower-left to upper-right diagonal, reed crown and ferrule fully visible with generous padding, subject fills about 77 percent of the square, readable at 28 to 40 pixels\nLighting/mood: soft overcast top-left marsh light, modest handmade calm\nColor palette: weathered alder, reed tan, muted river green, faded sage, black iron\nMaterials/textures: alder wood grain, dry fibrous reeds, smooth river pebble, cord and cloth, iron ferrule\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: magic glow, crystal orb, flowers, lush tree branches, elaborate druid crown; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/staff_a.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-d1ac9d1e-9bbd-4c82-aee1-311b37a08c07.png",
+        "resultHashSha256": "feedb3135557f3d58a4b0fba53df49d3fac1a0c00a7f7efee518c1a41398a95a",
+        "resultBytes": 2237477,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/fenreed_staff.png",
+        "hashSha256": "feedb3135557f3d58a4b0fba53df49d3fac1a0c00a7f7efee518c1a41398a95a",
+        "bytes": 2237477,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/fenreed_staff.webp",
+        "runtimeUrl": "/ui/items/fenreed_staff.webp",
+        "hashSha256": "05cde89a06af1489a8f92546f0ec0ee401457fa6cf998d5a78f5b9ced6a0294b",
+        "bytes": 1352,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    },
+    {
+      "index": 39,
+      "id": "fenshadow_maul",
+      "name": "Fenshadow Maul",
+      "quality": "uncommon",
+      "slot": "mainhand",
+      "model": "hammer_d",
+      "generation": {
+        "mode": "built-in image_gen",
+        "timestamp": "2026-08-09T15:14:06.372Z",
+        "extensionId": "exec-7f4dc48d-a512-44bf-82c2-667f60e061e0",
+        "exactFinalPrompt": "Use case: stylized-concept\nAsset type: opaque square game inventory icon for World of ClaudeCraft\nPrimary request: Create genuinely unique beautiful hand-painted classic dark-fantasy MMORPG inventory art for \"Fenshadow Maul\" (item id fenshadow_maul), a uncommon weapon. An uncommon two-handed maul used by silent fen wardens: a low wide head of dense black bogwood enclosed by two battered iron striking caps, a subtle plum-black resin seam through the wood, long dark elm haft, muted moss-green hide grip, and a simple spike ferrule. Shadowy through natural materials and lighting, not a spell effect.\nInput images: Image 1 is only a loose hammer_d weapon-family and silhouette reference; do not copy its generic low-poly rendering. Images 2 to 4 are the game's item-art style references for painterly lighting, material readability, scale, and atmospheric ground.\nScene/backdrop: deep plum-charcoal and moss-dark fen painterly atmospheric ground, opaque edge to edge\nSubject: one complete two-handed bogwood maul only, no wielder\nStyle/medium: premium hand-painted fantasy inventory illustration, classic 2000s MMORPG readability, softly modeled brushwork and tactile materials, not a 3D render\nComposition/framing: centered fully contained maul on a lower-left to upper-right diagonal, head and ferrule fully visible with comfortable padding, subject fills about 79 percent of the square, readable at 28 to 40 pixels\nLighting/mood: dim cool top-left fen light with warm iron edge accents, quiet ambush mood\nColor palette: black bogwood, battered iron, plum resin, dark elm, moss green\nMaterials/textures: water-hardened bogwood, riveted iron caps, glossy natural resin seam, worn hide, dark wood grain\nConstraints: one distinct weapon; opaque square background; clean silhouette; crisp focal edges; fully contained and centered; no crop; no text; no letters; no readable runes; no border or frame; no hands or characters; no watermark\nAvoid: stone boulder head, ghost cloud, giant purple glow, skulls, drowned-temple bell, cartoon club; flat glyph; generic silhouette; black-void product shot; photorealism; low-poly 3D; excessive particles; noisy scenery; duplicated weapon",
+        "references": [
+          {
+            "role": "loose weapon-family silhouette only",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/weapons/hammer_d.jpg"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/eastbrook_buckler.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/valespun_robe.webp"
+          },
+          {
+            "role": "painted item style reference",
+            "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/linen_pouch.webp"
+          }
+        ],
+        "resultPath": "/Users/fernando/.codex/generated_images/019fe6f8-ff7e-72f0-b234-7224f7d62512/exec-7f4dc48d-a512-44bf-82c2-667f60e061e0.png",
+        "resultHashSha256": "b64ee8f5072b4642c161cf40f12cc70f09f4aaf17476503403647c107b10abf7",
+        "resultBytes": 1894153,
+        "resultDimensions": [
+          1254,
+          1254
+        ],
+        "resultChannels": 3,
+        "retries": 0
+      },
+      "master": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/tmp/imagegen/placeholder-art-completion/weapons-a/masters/fenshadow_maul.png",
+        "hashSha256": "b64ee8f5072b4642c161cf40f12cc70f09f4aaf17476503403647c107b10abf7",
+        "bytes": 1894153,
+        "dimensions": [
+          1254,
+          1254
+        ],
+        "channels": 3,
+        "format": "png"
+      },
+      "shipped": {
+        "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/items/fenshadow_maul.webp",
+        "runtimeUrl": "/ui/items/fenshadow_maul.webp",
+        "hashSha256": "a82a1910d50c4f090d64c927b0e728bd3456e88dc344e13cddfa97027db30a41",
+        "bytes": 1748,
+        "dimensions": [
+          128,
+          128
+        ],
+        "channels": 3,
+        "hasAlpha": false,
+        "isOpaque": true,
+        "format": "webp",
+        "encoding": {
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        },
+        "conversionRetries": 0
+      }
+    }
+  ]
+}

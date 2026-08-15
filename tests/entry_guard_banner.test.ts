@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // Thin-painter coverage for the world-entry crash recovery banner: localized preset
 // display names (including the unknown-preset fallback), body interpolation through

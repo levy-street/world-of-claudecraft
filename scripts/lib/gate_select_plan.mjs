@@ -1,0 +1,494 @@
+// Pure planning helpers for scripts/gate_select.mjs, the selective gate.
+// Kept free of spawn/fs/git so Vitest can pin every branch without a shell.
+//
+// The selective gate runs the FULL gate's step list (i18n gen + freshness, wiki,
+// manifest regen + freshness, malware, biome, sfx, browser, typecheck, all four
+// builds) and changes exactly
+// one step: the full unsharded vitest run becomes one bounded merged run over
+// two conceptual sets:
+//
+//   floor    every test whose coverage reaches outside the module graph
+//            (scripts/lib/test_visibility.mjs). `vitest related` can never
+//            select these reliably, so they are never selected at all: they
+//            ride the argv as self-selecting seeds and just always run.
+//   related  the changed source files as graph seeds, which model the
+//            remaining ~80% of the suite correctly.
+//
+// ONE merged invocation since 2026-08-14, the same form the CI shards run
+// (scripts/lib/ci_shard_plan.mjs): `related` seeds its affected set with
+// the given paths themselves, so the floor files ride the related argv as
+// self-selecting seeds and the old two-leg overlap re-runs are gone by
+// construction. The win32 shell argv limit is the one shape that still
+// chunks; see buildMergedRelatedArgs below for the strictness contract.
+//
+// SAFETY FALLBACK: any change this planner cannot reason about (a broad config
+// file, a lockfile, a vitest/vite/tsconfig edit) drops the whole plan to the FULL
+// suite. Selection is an optimization for changes we understand; anything else
+// gets the old bar. Failing toward MORE tests is the only safe direction, since
+// a selection miss is silent.
+
+import { chunkFileArgs } from './gate_discovery.mjs';
+import {
+  isNonCodePath,
+  isRelatedSourcePath,
+  isTestPath,
+  normalizeRepoPath,
+} from './gate_fast_plan.mjs';
+
+// NOTE: this deliberately does NOT reuse gate_fast_plan's isBroadConfigPath.
+// That predicate means the OPPOSITE thing there: gate:fast uses it to EXCLUDE a
+// path from `vitest --changed` (because expanding on it would run nearly the
+// whole suite), whereas here the same class of path must FORCE the whole suite.
+// Reusing it would have inverted the safety fallback.
+//
+// It is also incomplete for this purpose: it still names `package-lock.json`,
+// which the Phase 7 pnpm migration removed, and never learned `pnpm-lock.yaml`.
+// Under gate_fast_plan's own rules a lockfile change falls through to
+// isNonCodePath (.yaml / .lock) and is treated as inert. For the merge bar that
+// would be a silent hole: a dependency bump could change behavior anywhere and
+// select nothing.
+/**
+ * Minimum plausible always-run floor. The computed floor is ~800 files; a
+ * collapse to a handful means the classifier walk broke, and selection must
+ * fail toward the full suite, never toward a silently tiny floor. Shared
+ * with the CI arm (scripts/lib/ci_shard_plan.mjs re-exports it).
+ */
+export const FLOOR_SANITY_MIN = 300;
+
+const FULL_SUITE_TRIGGER_RE =
+  /^(package\.json|package-lock\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|\.npmrc|turbo\.json|biome\.json|vite\.config\.[cm]?[jt]s|vitest(?:\..+)?\.config\.[cm]?[jt]s|tsconfig(?:\..+)?\.json)$/;
+
+/**
+ * Changes that must widen the run to the FULL suite: build/test/dependency
+ * configuration whose blast radius the import graph cannot express.
+ *
+ * @param {string} p
+ * @returns {boolean}
+ */
+export function isFullSuiteTrigger(p) {
+  const n = normalizeRepoPath(p);
+  if (!n) return false;
+  const base = n.includes('/') ? n.slice(n.lastIndexOf('/') + 1) : n;
+  if (FULL_SUITE_TRIGGER_RE.test(base)) return true;
+  // Vitest setup/global-setup and the shared test helpers change behavior for
+  // every file that runs, so they can never be narrowed either. NESTED helper
+  // directories too (tests/server/helpers/), excluding the test files that
+  // merely live beside the fakes: a changed test runs itself through the
+  // ordinary test bucket, and promoting it to everything is pure waste.
+  // Nested FIXTURE dirs (tests/server/fixtures/) deliberately stay inert: the
+  // golden corpus is huge, endpoint PRs regenerate it routinely, and every
+  // consuming suite reaches its fixtures through fs and therefore rides the
+  // always-run floor (verified against the real classifier; a future
+  // fixture-importing GRAPH test would be the thing to revisit here).
+  if (n.startsWith('tests/helpers/') || n.startsWith('tests/fixtures/')) return true;
+  if (/^tests\/.+\/helpers\//.test(n) && !isTestPath(n)) return true;
+  if (/^tests\/(global_setup|jsdom_local_storage_setup)\.[cm]?ts$/.test(n)) return true;
+  return false;
+}
+
+/**
+ * The regenerated i18n artifacts the selective planner classifies into their
+ * own bucket instead of the unrecognized-widen-to-full catch-all. These are
+ * the ONLY generated trees with that standing, and it rests on two facts:
+ *
+ * INTEGRITY is owned by freshness, which selection never touches: ci.yml's
+ * pr-checks job (and its release-checks mirror, and the full local gate's
+ * i18n step) reruns `npm run i18n:gen` and fails on `git diff --exit-code`
+ * over EXACTLY these paths, on every code PR, in every test mode. A
+ * hand-edited or stale artifact is a red check regardless of selection.
+ *
+ * COVERAGE is owned by the import graph, WITH the artifacts as the entry
+ * nodes: the artifacts are the most-connected runtime modules in the i18n
+ * graph (src/ui/i18n.ts statically imports and re-exports the resolved
+ * barrel), while their DRIVING sources (catalog, overlays) are build inputs
+ * the runtime reaches only through type-erased edges, so `related` over a
+ * driving source selects almost nothing. The planner therefore feeds the
+ * changed artifact paths THEMSELVES to `vitest related`, which walks the real
+ * import graph to every consumer (measured: a single resolved slice reaches
+ * about 240 of 2296 suites). They are inert only for the widen decision,
+ * never dropped from selection.
+ *
+ * Membership is TOP-LEVEL ONLY under the two resolved dirs: the generator's
+ * orphan sweep deletes an unexpected top-level .ts on regeneration (making a
+ * hand-added file freshness-red), but the sweep does not recurse, so a
+ * SUBDIRECTORY path under an artifact dir is not freshness-provable and must
+ * keep the unrecognized-widen behavior.
+ *
+ * tests/ci_workflow.test.ts pins this list against the freshness-diff paths
+ * in ci.yml itself AND against the local gate's I18N_ARTIFACTS list
+ * (lib/gate_steps.mjs): a path may only be listed here while both freshness
+ * steps prove it, so the copies cannot drift apart silently.
+ *
+ * Any OTHER `.generated` path keeps today's behavior (unrecognized: widen to
+ * the full suite); do not add one here without its own freshness-equivalent
+ * proof.
+ */
+export const GENERATED_I18N_ARTIFACT_PREFIXES = Object.freeze([
+  'src/ui/i18n.resolved.generated/',
+  'src/admin/i18n.resolved.generated/',
+]);
+
+export const GENERATED_I18N_ARTIFACT_FILES = Object.freeze([
+  'src/ui/i18n.catalog/translation_keys.generated.ts',
+]);
+
+/**
+ * The second (and only other) freshness-guarded generated family: the three
+ * committed build manifests. Their standing rests on the same two facts as
+ * the i18n artifacts, proven for these paths: (1) regeneration is
+ * deterministic and sub-second (wiki content 137 ms, SFX manifest 91 ms,
+ * media manifest 230 ms measured locally on 2026-08-14), and pr-checks,
+ * release-checks, and the nightly checks job all regenerate them (the
+ * `wiki:content && build:bundle` step) and `git diff --exit-code` the
+ * committed copies, so a stale commit is freshness-red on every code PR in
+ * every mode; (2) their consumer suites reach them through the import
+ * graph, so feeding the paths to `vitest related` as graph nodes keeps
+ * those suites selected without widening the run.
+ *
+ * Membership is EXACT FILES, no prefixes: each generator owns exactly one
+ * committed .ts. A DELETED manifest stays unprovable (regeneration recreates
+ * it untracked, which `git diff` cannot flag) and widens, same doctrine as
+ * the i18n arm.
+ *
+ * tests/ci_workflow.test.ts welds this list to the ci.yml manifest
+ * freshness diff argv AND to the local gate's MANIFEST_ARTIFACTS list
+ * (lib/gate_steps.mjs); a path may only be listed here while both freshness
+ * steps prove it. The freshness set is a strict SUPERSET of this list: the
+ * SFX generator also writes the runtime pack and gain-ceiling cache, which
+ * are diffed for integrity but never declassified (fs-read data, not graph
+ * nodes). Any OTHER `.generated` path keeps the widen behavior; do not add
+ * one without its own freshness-equivalent proof.
+ */
+export const GENERATED_MANIFEST_ARTIFACT_FILES = Object.freeze([
+  'src/game/sfx_manifest.generated.ts',
+  'src/guide/content.generated.ts',
+  'src/render/assets/manifest.generated.ts',
+]);
+
+/**
+ * True only for the three freshness-guarded committed build manifests.
+ *
+ * @param {string} p
+ * @returns {boolean}
+ */
+export function isGeneratedManifestArtifactPath(p) {
+  const n = normalizeRepoPath(p);
+  if (!n) return false;
+  return GENERATED_MANIFEST_ARTIFACT_FILES.includes(n);
+}
+
+/**
+ * True only for the freshness-guarded generated i18n artifact paths above:
+ * the exact catalog key-union file, or a TOP-LEVEL .ts directly under one of
+ * the two resolved dirs (the freshness sweep cannot see deeper).
+ *
+ * @param {string} p
+ * @returns {boolean}
+ */
+export function isGeneratedI18nArtifactPath(p) {
+  const n = normalizeRepoPath(p);
+  if (!n) return false;
+  if (GENERATED_I18N_ARTIFACT_FILES.includes(n)) return true;
+  return GENERATED_I18N_ARTIFACT_PREFIXES.some((prefix) => {
+    if (!n.startsWith(prefix)) return false;
+    const rest = n.slice(prefix.length);
+    return rest.endsWith('.ts') && !rest.includes('/');
+  });
+}
+
+/**
+ * @typedef {'full' | 'selective'} SelectMode
+ * @typedef {{
+ *   mode: SelectMode,
+ *   reason: string,
+ *   alwaysRunFiles: string[],
+ *   relatedSources: string[],
+ *   changedTestFiles: string[],
+ * }} SelectPlan
+ */
+
+/**
+ * Split a changed-path list into the buckets the plan needs.
+ *
+ * @param {string[]} paths
+ * @returns {{
+ *   testFiles: string[],
+ *   relatedSources: string[],
+ *   broadConfigs: string[],
+ *   nonCode: string[],
+ *   generatedI18n: string[],
+ *   generatedManifests: string[],
+ * }}
+ */
+export function classifySelectPaths(paths) {
+  const testFiles = [];
+  const relatedSources = [];
+  const broadConfigs = [];
+  const nonCode = [];
+  const generatedI18n = [];
+  const generatedManifests = [];
+  for (const raw of paths ?? []) {
+    const p = normalizeRepoPath(raw);
+    if (!p) continue;
+    if (isFullSuiteTrigger(p)) {
+      broadConfigs.push(p);
+      continue;
+    }
+    // Freshness-guarded generated i18n artifacts: own bucket so every
+    // consumer of this classification can apply its deletion guard and audit
+    // line, and so the plan builders can FEED the paths to `vitest related`
+    // as graph nodes (see the header above: the consumers hang off the
+    // artifact side of the import graph) without letting them widen the run.
+    if (isGeneratedI18nArtifactPath(p)) {
+      generatedI18n.push(p);
+      continue;
+    }
+    // Same standing, second family: the three committed build manifests
+    // (see GENERATED_MANIFEST_ARTIFACT_FILES above). Separate bucket so the
+    // audit lines name what actually moved.
+    if (isGeneratedManifestArtifactPath(p)) {
+      generatedManifests.push(p);
+      continue;
+    }
+    if (isTestPath(p)) {
+      testFiles.push(p);
+      continue;
+    }
+    if (isRelatedSourcePath(p)) {
+      relatedSources.push(p);
+      continue;
+    }
+    // A TypeScript declaration file is erased at runtime, so it cannot change
+    // behavior any test could observe; it can only change what `tsc` accepts,
+    // and check:types runs in FULL on every selective gate. Without this arm a
+    // .d.mts lands in the unrecognized bucket and forces the whole suite, which
+    // fires on every new scripts/lib module (each ships a hand-written .d.mts).
+    if (/\.d\.[cm]?ts$/.test(p)) {
+      nonCode.push(p);
+      continue;
+    }
+    if (isNonCodePath(p)) {
+      nonCode.push(p);
+      continue;
+    }
+    // Anything unrecognized is treated as a reason to widen, not narrow.
+    broadConfigs.push(p);
+  }
+  return { testFiles, relatedSources, broadConfigs, nonCode, generatedI18n, generatedManifests };
+}
+
+/**
+ * Build the selective plan.
+ *
+ * @param {{
+ *   changedPaths: string[],
+ *   alwaysRunFiles: string[],
+ *   exists?: (p: string) => boolean,
+ * }} opts
+ * @returns {SelectPlan}
+ */
+export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists, floorSanityMin = 0 }) {
+  const always = [...new Set(alwaysRunFiles ?? [])].sort();
+  // Opt-in mirror of the CI arm's floor sanity fallback: the live callers
+  // (gate_select.mjs, gate_shadow.mjs) pass FLOOR_SANITY_MIN; unit fixtures
+  // with deliberately tiny floors default to 0. A collapsed floor means the
+  // visibility walk broke, and the only safe answer is the full suite.
+  if (always.length < floorSanityMin) {
+    return {
+      mode: 'full',
+      reason: `computed always-run floor is implausibly small (${always.length} < ${floorSanityMin}): running the full suite`,
+      alwaysRunFiles: always,
+      relatedSources: [],
+      changedTestFiles: [],
+    };
+  }
+  const { testFiles, relatedSources, broadConfigs, generatedI18n, generatedManifests } =
+    classifySelectPaths(changedPaths);
+
+  if (broadConfigs.length > 0) {
+    return {
+      mode: 'full',
+      reason: `broad/unclassified change (${broadConfigs.slice(0, 3).join(', ')}${
+        broadConfigs.length > 3 ? ', ...' : ''
+      }): running the full suite`,
+      alwaysRunFiles: always,
+      relatedSources: [],
+      changedTestFiles: testFiles,
+    };
+  }
+
+  // A generated i18n artifact is inert only while it is PRESENT: the freshness
+  // step's `git diff` cannot flag a deleted-then-regenerated file (regeneration
+  // recreates it untracked, which `git diff` does not show), so a diff that
+  // deletes one is unprovable and widens. A caller that cannot check existence
+  // widens too.
+  if (generatedI18n.length > 0) {
+    if (typeof exists !== 'function') {
+      return {
+        mode: 'full',
+        reason: `generated i18n artifact(s) changed but existence cannot be verified (${generatedI18n[0]}): running the full suite`,
+        alwaysRunFiles: always,
+        relatedSources: [],
+        changedTestFiles: testFiles,
+      };
+    }
+    const missing = generatedI18n.filter((p) => !exists(p));
+    if (missing.length > 0) {
+      return {
+        mode: 'full',
+        reason: `generated i18n artifact(s) removed (${missing.slice(0, 3).join(', ')}${
+          missing.length > 3 ? ', ...' : ''
+        }): running the full suite`,
+        alwaysRunFiles: always,
+        relatedSources: [],
+        changedTestFiles: testFiles,
+      };
+    }
+  }
+
+  // Same deletion doctrine for the manifest family: a removed manifest is
+  // the one shape its freshness diff cannot flag, so it is unprovable and
+  // widens; so does a caller that cannot check existence.
+  if (generatedManifests.length > 0) {
+    if (typeof exists !== 'function') {
+      return {
+        mode: 'full',
+        reason: `generated manifest artifact(s) changed but existence cannot be verified (${generatedManifests[0]}): running the full suite`,
+        alwaysRunFiles: always,
+        relatedSources: [],
+        changedTestFiles: testFiles,
+      };
+    }
+    const missing = generatedManifests.filter((p) => !exists(p));
+    if (missing.length > 0) {
+      return {
+        mode: 'full',
+        reason: `generated manifest artifact(s) removed (${missing.slice(0, 3).join(', ')}${
+          missing.length > 3 ? ', ...' : ''
+        }): running the full suite`,
+        alwaysRunFiles: always,
+        relatedSources: [],
+        changedTestFiles: testFiles,
+      };
+    }
+  }
+
+  // Present in the reason so an audited log never reads "no changes" while
+  // artifacts moved; freshness owns their integrity, `related` their coverage.
+  const artifactNote =
+    (generatedI18n.length > 0
+      ? `; ${generatedI18n.length} generated i18n artifact(s) fed to related (freshness-guarded)`
+      : '') +
+    (generatedManifests.length > 0
+      ? `; ${generatedManifests.length} generated manifest artifact(s) fed to related (freshness-guarded)`
+      : '');
+
+  // A changed test file always runs, whether or not the graph would pick it.
+  const alwaysWithChangedTests = [...new Set([...always, ...testFiles])].sort();
+
+  // The artifacts join the related leg as GRAPH NODES (see the header above):
+  // their consumers are reachable only from the artifact side of the graph,
+  // so dropping them here is what would silently unselect every suite that
+  // pins resolved-table content through the src/ui/i18n.ts re-export seam,
+  // or manifest content through its importers.
+  const relatedWithArtifacts = [...relatedSources, ...generatedI18n, ...generatedManifests];
+
+  if (relatedWithArtifacts.length === 0 && testFiles.length === 0) {
+    return {
+      mode: 'selective',
+      reason: `no code or test changes: always-run set only${artifactNote}`,
+      alwaysRunFiles: alwaysWithChangedTests,
+      relatedSources: [],
+      changedTestFiles: testFiles,
+    };
+  }
+
+  return {
+    mode: 'selective',
+    reason: `${relatedSources.length} changed source file(s), ${testFiles.length} changed test file(s)${artifactNote}`,
+    alwaysRunFiles: alwaysWithChangedTests,
+    relatedSources: relatedWithArtifacts,
+    changedTestFiles: testFiles,
+  };
+}
+
+/**
+ * Pure leg planner for the selective vitest step, platform-split:
+ *
+ * POSIX: ONE merged `vitest related` invocation (the CI shard form,
+ * lib/ci_shard_plan.mjs): changed paths as graph seeds, floor files as
+ * SELF-SELECTING seeds (`related` seeds its affected set with the given
+ * paths themselves; pinned by execution in tests/ci_shard_plan.test.ts),
+ * with the STRICT `--passWithNoTests=false` spelling, which is load-bearing
+ * (the related subcommand defaults the flag TRUE via ??=): the floor rides
+ * every invocation, so an empty collection is a broken walk and must exit 1.
+ * No chunking: execve takes megabytes of argv and the gate spawns without a
+ * shell there.
+ *
+ * WIN32: the CLASSIC two-leg shape, deliberately. Measured against vitest
+ * 4.1.10: `related` resolves its seed paths without slash-normalizing
+ * (resolve(root, file), backslashes), while spec moduleIds and dep ids are
+ * slash-normalized, so on Windows every seed matches NOTHING and a merged
+ * leg would run zero tests behind a tolerant flag. The floor therefore
+ * stays on `vitest run` (chunked under cmd.exe's 8191-char line), and the
+ * related leg keeps the tolerant flag it always had there.
+ *
+ * @param {{
+ *   relatedSources: string[],
+ *   alwaysRunFiles: string[],
+ *   platform: string,
+ * }} opts
+ * @returns {Array<
+ *   | { kind: 'merged-related', files: string[], strict: true }
+ *   | { kind: 'floor-run', files: string[], index: number, of: number }
+ *   | { kind: 'tolerant-related', files: string[] }
+ * >}
+ */
+export function planSelectiveLegs({ relatedSources, alwaysRunFiles, platform }) {
+  if (platform === 'win32') {
+    const chunks = chunkFileArgs({ files: alwaysRunFiles });
+    /** @type {ReturnType<typeof planSelectiveLegs>} */
+    const legs = chunks.map((files, i) => ({
+      kind: 'floor-run',
+      files,
+      index: i + 1,
+      of: chunks.length,
+    }));
+    if (relatedSources.length > 0) {
+      legs.push({ kind: 'tolerant-related', files: relatedSources });
+    }
+    return legs;
+  }
+  return [
+    {
+      kind: 'merged-related',
+      files: [...relatedSources, ...alwaysRunFiles],
+      strict: true,
+    },
+  ];
+}
+
+/**
+ * Vitest argv for one planned selective leg.
+ *
+ * @param {ReturnType<typeof planSelectiveLegs>[number]} leg
+ * @param {number} workers
+ * @returns {string[]}
+ */
+export function buildSelectiveLegArgs(leg, workers) {
+  if (leg.kind === 'floor-run') return ['run', ...leg.files, `--maxWorkers=${workers}`];
+  if (leg.kind === 'tolerant-related') {
+    return ['related', ...leg.files, '--run', '--passWithNoTests', `--maxWorkers=${workers}`];
+  }
+  return ['related', ...leg.files, '--run', '--passWithNoTests=false', `--maxWorkers=${workers}`];
+}
+
+/**
+ * Vitest argv for the full-suite fallback.
+ *
+ * @param {{ workers: number }} opts
+ * @returns {string[]}
+ */
+export function buildFullSuiteArgs({ workers }) {
+  return ['run', `--maxWorkers=${workers}`];
+}

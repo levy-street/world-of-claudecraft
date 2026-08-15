@@ -1,0 +1,172 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/muster-order-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones",
+  "detailInventory": {
+    "scanMethod": "labeled-turnaround-component-zones",
+    "targetMinDetails": 8,
+    "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+    "details": [
+      {
+        "id": "backboard-border",
+        "kind": "contour",
+        "description": "A narrow dark board border remains visible around the parchment.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "object silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "exposed-backboard-border"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "layered-page-seams",
+        "kind": "seam",
+        "description": "Five thin leaf edges read as separate parchment layers.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "packet thickness",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "layered-page-edges"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/side.png",
+        "confidence": 0.895
+      },
+      {
+        "id": "page-corner-offsets",
+        "kind": "contour",
+        "description": "Each leaf has a slightly different corner and edge offset.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "handmade paper",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "irregular-page-corners"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/rear.png",
+        "confidence": 0.89
+      },
+      {
+        "id": "teal-binding-band",
+        "kind": "ridge",
+        "description": "A raised teal band crosses and visibly binds the packet.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "Fenbridge quest identity",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "teal-cross-band"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/hero.png",
+        "confidence": 0.885
+      },
+      {
+        "id": "binding-fold",
+        "kind": "seam",
+        "description": "A darker fold line articulates the center of the cloth binding.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "cloth construction",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "binding-fold-line"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/front.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "red-wax-seal",
+        "kind": "gloss",
+        "description": "An offset red wax seal has a lower roughness than the parchment.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "quest legibility",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "wax-gloss-and-ink-lines"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/hero.png",
+        "confidence": 0.875
+      },
+      {
+        "id": "seal-impression",
+        "kind": "ridge",
+        "description": "A faceted raised impression breaks the wax disk.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "seal depth",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "faceted-seal-impression"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/side.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "three-text-lines",
+        "kind": "linework",
+        "description": "Three short dark horizontal ink lines sit opposite the seal.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "document read",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "three-ink-lines"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-order/zones/rear.png",
+        "confidence": 0.865
+      }
+    ]
+  },
+  "authoringInstruction": "Complete: every observed detail maps to an authored component.localFeatures or material.localOverrides key in sculpt-spec.json."
+}

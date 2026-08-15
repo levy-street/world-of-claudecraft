@@ -24,12 +24,13 @@ import {
   type StandardEventsFeature,
 } from '@wallet-standard/features';
 import bs58 from 'bs58';
-import { apiUrl } from '../client_origin';
+import { apiUrl, NATIVE_APP } from '../client_origin';
 import type {
   MobileWalletClient,
   MobileWalletLauncher,
   MobileWalletState,
 } from './mobile_wallet_deeplink';
+import type { NativeSolanaWalletClient, NativeSolanaWalletState } from './native_solana_mobile';
 import type { WalletConnectClient, WalletConnectState } from './wallet_connect';
 import {
   currentStandaloneWalletWebApp,
@@ -79,6 +80,10 @@ export const WALLET_CONNECT_ID = 'woc.walletconnect';
 export const WALLET_CONNECT_NAME = 'Wallet app or QR code';
 export const WALLET_CONNECT_ICON =
   'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%233b82f6"/%3E%3Cpath d="M18 27c8-8 20-8 28 0l3 3-5 5-3-3c-5-5-13-5-18 0l-3 3-5-5 3-3Zm5 10 5-5 4 4 4-4 5 5-9 9-9-9Z" fill="white"/%3E%3C/svg%3E' as WalletIcon;
+export const NATIVE_SOLANA_WALLET_ID = 'woc.native.solana-mobile';
+export const NATIVE_SOLANA_WALLET_NAME = 'Seed Vault Wallet';
+export const NATIVE_SOLANA_WALLET_ICON =
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%230f172a"/%3E%3Cpath d="M18 20h28v25H18z" fill="%2314f195"/%3E%3Cpath d="M24 14h16v8H24zM26 29h12v7H26z" fill="%239945ff"/%3E%3C/svg%3E' as WalletIcon;
 const MOBILE_WALLET_IDS: Record<MobileWalletProvider, string> = {
   phantom: 'woc.mobile.phantom',
   solflare: 'woc.mobile.solflare',
@@ -119,6 +124,10 @@ let mobileWalletProvider: MobileDeeplinkWalletProvider | null = null;
 let mobileWalletAddress: string | null = null;
 let mobileWalletSelected = false;
 let mobileWalletOff: (() => void) | null = null;
+let nativeWalletClient: NativeSolanaWalletClient | null = null;
+let nativeWalletAddress: string | null = null;
+let nativeWalletSelected = false;
+let nativeWalletOff: (() => void) | null = null;
 
 function canUseStorage(): boolean {
   return typeof window !== 'undefined' && !!window.localStorage;
@@ -225,12 +234,30 @@ function chooseAccount(
 }
 
 function currentState(): WalletState {
-  const address = mobileWalletSelected
-    ? mobileWalletAddress
-    : walletConnectSelected
-      ? walletConnectAddress
-      : (selectedAccount?.address ?? null);
+  const address = nativeWalletSelected
+    ? nativeWalletAddress
+    : mobileWalletSelected
+      ? mobileWalletAddress
+      : walletConnectSelected
+        ? walletConnectAddress
+        : (selectedAccount?.address ?? null);
   return { address, isConnected: address !== null };
+}
+
+export function configureNativeSolanaWallet(client: NativeSolanaWalletClient | null): void {
+  nativeWalletOff?.();
+  nativeWalletOff = null;
+  nativeWalletClient = client;
+  nativeWalletAddress = null;
+  nativeWalletSelected = false;
+  if (client) {
+    nativeWalletOff = client.onChange((state: NativeSolanaWalletState) => {
+      if (!nativeWalletSelected) return;
+      const previous = nativeWalletAddress;
+      nativeWalletAddress = state.address;
+      if (previous !== nativeWalletAddress) emitWalletState();
+    });
+  }
 }
 
 export function configureWalletConnect(projectId: string | null): void {
@@ -353,6 +380,25 @@ async function selectWalletConnect(connect: boolean): Promise<WalletState> {
   return currentState();
 }
 
+async function selectNativeSolanaWallet(connect: boolean): Promise<WalletState> {
+  const client = nativeWalletClient;
+  if (!client) throw new Error('native Solana wallet is unavailable');
+  const state = connect ? await client.connect() : await client.current();
+  const previous = currentState().address;
+  detachSelectedWalletEvents();
+  selectedWallet = null;
+  selectedAccount = null;
+  mobileWalletSelected = false;
+  mobileWalletAddress = null;
+  walletConnectSelected = false;
+  walletConnectAddress = null;
+  nativeWalletSelected = true;
+  nativeWalletAddress = state.address;
+  writeStoredWalletName(NATIVE_SOLANA_WALLET_ID);
+  if (previous !== nativeWalletAddress) emitWalletState();
+  return currentState();
+}
+
 function emitWalletState(): void {
   const state = currentState();
   for (const cb of listeners) cb(state);
@@ -372,6 +418,8 @@ function setSelected(
   const previousAddress = currentState().address;
   mobileWalletSelected = false;
   mobileWalletAddress = null;
+  nativeWalletSelected = false;
+  nativeWalletAddress = null;
   walletConnectSelected = false;
   walletConnectAddress = null;
   walletConnectOptionId = WALLET_CONNECT_ID;
@@ -513,6 +561,11 @@ export function initWallet(): Wallets {
       walletConnectSelected = false;
       walletConnectAddress = null;
     });
+  } else if (storedWallet === NATIVE_SOLANA_WALLET_ID && nativeWalletClient) {
+    void selectNativeSolanaWallet(false).catch(() => {
+      nativeWalletSelected = false;
+      nativeWalletAddress = null;
+    });
   } else {
     trySilentReconnect();
   }
@@ -521,6 +574,18 @@ export function initWallet(): Wallets {
 
 export function availableWallets(): readonly WalletOption[] {
   if (walletConnectionsDisabledHere()) return [];
+  if (NATIVE_APP) {
+    return nativeWalletClient
+      ? [
+          {
+            id: NATIVE_SOLANA_WALLET_ID,
+            name: NATIVE_SOLANA_WALLET_NAME,
+            icon: NATIVE_SOLANA_WALLET_ICON,
+            connected: nativeWalletSelected && nativeWalletAddress !== null,
+          },
+        ]
+      : [];
+  }
   const options = compatibleWallets().map(walletOption);
   const policy = walletConnectionOptionsForPlatform(
     currentWalletPlatform(),
@@ -592,6 +657,7 @@ export async function connectWallet(walletIdToConnect: string): Promise<WalletSt
   if (walletConnectionsDisabledHere()) {
     throw new Error('wallet connections are unavailable in the installed mobile web app');
   }
+  if (walletIdToConnect === NATIVE_SOLANA_WALLET_ID) return selectNativeSolanaWallet(true);
   const mobileProvider = mobileProviderForId(walletIdToConnect);
   if (mobileProvider) return selectMobileWallet(mobileProvider, true);
   if (walletIdToConnect === WALLET_CONNECT_ID) return selectWalletConnect(true);
@@ -619,13 +685,15 @@ export async function openWalletModal(): Promise<void> {
     try {
       result = await walletPicker(
         options,
-        mobileWalletSelected && mobileWalletProvider
-          ? MOBILE_WALLET_IDS[mobileWalletProvider]
-          : walletConnectSelected
-            ? walletConnectOptionId
-            : selectedWallet
-              ? walletId(selectedWallet)
-              : null,
+        nativeWalletSelected
+          ? NATIVE_SOLANA_WALLET_ID
+          : mobileWalletSelected && mobileWalletProvider
+            ? MOBILE_WALLET_IDS[mobileWalletProvider]
+            : walletConnectSelected
+              ? walletConnectOptionId
+              : selectedWallet
+                ? walletId(selectedWallet)
+                : null,
         currentWalletPlatform() === 'desktop-web'
           ? 'desktop'
           : currentStandaloneWalletWebApp()
@@ -647,6 +715,16 @@ export async function openWalletModal(): Promise<void> {
 }
 
 export async function disconnectWallet(): Promise<void> {
+  if (nativeWalletSelected) {
+    const client = nativeWalletClient;
+    const previous = nativeWalletAddress;
+    nativeWalletSelected = false;
+    nativeWalletAddress = null;
+    writeStoredWalletName(null);
+    if (previous !== null) emitWalletState();
+    if (client) await client.disconnect();
+    return;
+  }
   if (mobileWalletSelected) {
     const client = mobileWalletClient;
     const previous = mobileWalletAddress;
@@ -680,6 +758,9 @@ export async function disconnectWallet(): Promise<void> {
  * base58-encoded (the encoding the server's verifier expects).
  */
 export async function signMessageBase58(message: string): Promise<string> {
+  if (nativeWalletSelected && nativeWalletClient) {
+    return nativeWalletClient.signMessageBase58(message);
+  }
   if (mobileWalletSelected && mobileWalletProvider) {
     const client = await loadMobileWalletClient(mobileWalletProvider);
     return client.signMessageBase58(message);
@@ -710,6 +791,9 @@ function base64ToBytes(encoded: string): Uint8Array {
 
 /** Ask the connected wallet to sign and send a service-built Solana transaction. */
 export async function signAndSendTransactionBase64(transactionBase64: string): Promise<string> {
+  if (nativeWalletSelected && nativeWalletClient) {
+    return nativeWalletClient.signAndSendTransactionBase64(transactionBase64);
+  }
   if (mobileWalletSelected && mobileWalletProvider) {
     const client = await loadMobileWalletClient(mobileWalletProvider);
     return client.signAndSendTransactionBase64(transactionBase64);

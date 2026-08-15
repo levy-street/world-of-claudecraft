@@ -28,7 +28,7 @@ const ITEMS = [
   { src: 'crystal+cave+3d+model.glb', out: 'hollow_gate_crystal.glb', target: 12000 },
   { src: 'fantasy+tree+cave+3d+model.glb', out: 'hollow_gate_tree.glb', target: 14000 },
 ];
-const SRC_DIR = '/Users/demihenderson/Downloads/veiled-hollow/dungeons';
+const SRC_DIR = '<redacted-local-path>';
 const OUT_DIR = 'public/models/props';
 
 await MeshoptDecoder.ready;

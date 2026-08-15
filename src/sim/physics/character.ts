@@ -421,7 +421,7 @@ export function moveCharacter(
   // raw end height still gates the gradient half of the rule: only a step that
   // LANDS on dry ground is judged by the terrain's own steepness. A too-steep
   // bank then yields to the shore step-out onto a low standable lip.
-  const wls = stepWaterLevel(x, z, px, pz);
+  const wls = stepWaterLevel(x, z, px, pz, params.seed);
   const rawEnd = groundHeight(px, pz, params.seed);
   const groundStart = Math.max(groundHeight(x, z, params.seed), wls);
   let groundEnd = Math.max(rawEnd, wls);
@@ -467,7 +467,7 @@ export function moveCharacter(
         if (Math.hypot(contourX, contourZ) > MIN_MOTION) {
           const cx = x + contourX;
           const cz = z + contourZ;
-          const contourWls = stepWaterLevel(x, z, cx, cz);
+          const contourWls = stepWaterLevel(x, z, cx, cz, params.seed);
           const contourRaw = groundHeight(cx, cz, params.seed);
           const contourGround = Math.max(contourRaw, contourWls);
           const contourRise = contourGround - Math.max(groundStart, contourWls);

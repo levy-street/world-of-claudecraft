@@ -1,7 +1,9 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
+import { DEMON_TOWER_FLOOR_COUNT, DEMON_TOWER_SEED } from './content/rift/demon_tower';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
+import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
@@ -9,11 +11,15 @@ import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
+import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
-import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { jumpDemonTowerFloorForDev } from './rift/runs';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
+import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
 
@@ -141,6 +147,7 @@ export function handleDevChat(
   if (teleportMatch) {
     const entity = ctx.entities.get(pid);
     if (entity) {
+      cancelProfessionSessionOnDisplacement(ctx, entity);
       const pos = ctx.groundPos(Number(teleportMatch[1]), Number(teleportMatch[2]));
       entity.pos = pos;
       entity.prevPos = { ...pos };
@@ -235,6 +242,9 @@ export function handleDevChat(
       const leveled = entity.level < gate;
       if (leveled) ctx.setPlayerLevel(gate, pid);
       meta.copper += 100 * 10000;
+      // Every teleport, the dev ones included, runs the one session teardown
+      // (the same call /dev tp makes above).
+      cancelProfessionSessionOnDisplacement(ctx, entity);
       const pos = ctx.groundPos(marla.pos.x + 2, marla.pos.z + 1);
       entity.pos = pos;
       entity.prevPos = { ...pos };
@@ -326,12 +336,73 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/(?:dev\s+bg|devbg)\s+end\s*$/i.test(raw)) {
+    // End the caller's live match early, resolving on the current score (ties
+    // draw) through the normal result screen + release flow.
+    if (devEndBg(ctx, pid))
+      emitDevLog(ctx, pid, '[dev] Thornhollow Fields resolved early on score.');
+    else ctx.error(pid, '[dev] You are not in an unresolved battleground.');
+    return null;
+  }
+
+  if (/^\/(?:dev\s+bg|devbg)\s*$/i.test(raw)) {
+    if (ctx.bgMatches.has(pid)) {
+      ctx.error(pid, '[dev] You are already in a battleground.');
+      return null;
+    }
+    bgQueueJoin(ctx, pid, { bypassLevel: true });
+    // The join can still refuse (an arena match, an oversize party, queueing a
+    // party you do not lead); it already told the caller why, so bail before
+    // padding leaks a bot. Dying and standing inside a dungeon are no longer
+    // among them: a queue now survives both.
+    if (!ctx.bgQueue.some((g) => g.pids.includes(pid))) return null;
+    if (bgQueueSize(ctx) < 2) {
+      // Solo walk-around: pad the queue with one stationary dev bot (reusing an
+      // idle one if a previous /dev bg left it behind) so the force-start below
+      // has an opposing side. Partied bots stay untouched: queueing one would
+      // drag its whole party in.
+      let botPid = -1;
+      for (const meta of ctx.players.values()) {
+        const id = meta.entityId;
+        const e = ctx.entities.get(id);
+        if (meta.isDevBot && e && !e.dead && !ctx.bgMatches.has(id) && !ctx.partyOf(id)) {
+          botPid = id;
+          break;
+        }
+      }
+      // The suffix loop only exists to step past name collisions with
+      // player-spawned "/dev bot" dummies; nine tries is plenty.
+      for (let i = 1; i <= 9 && botPid < 0; i++)
+        botPid = ctx.spawnDevBot(i === 1 ? 'Riftbot' : `Riftbot${i}`);
+      if (botPid >= 0) bgQueueJoin(ctx, botPid, { bypassLevel: true });
+    }
+    devStartBg(ctx);
+    const match = ctx.bgMatches.get(pid);
+    if (match) {
+      const count = match.teams[0].length + match.teams[1].length;
+      emitDevLog(ctx, pid, `[dev] Thornhollow Fields force-started with ${count} champions.`);
+    } else {
+      ctx.error(
+        pid,
+        '[dev] Could not force-start Thornhollow Fields (needs 2 queued players and a free slot).',
+      );
+    }
+    return null;
+  }
+
   if (/^\/(?:dev\s+vendor|devvendor)\s*$/i.test(raw)) {
     const vendorId = ctx.spawnDevVendor(pid);
     if (vendorId < 0) ctx.error(pid, '[dev] Could not spawn the test vendor.');
     else {
       emitDevLog(ctx, pid, '[dev] Spawned the Test Quartermaster (free epic gear) next to you.');
     }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+bis|devbis)\s*$/i.test(raw)) {
+    const equipped = equipBestInSlotForDev(ctx, pid);
+    if (equipped === 0) ctx.error(pid, '[dev] Could not outfit best-in-slot gear.');
+    else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
     return null;
   }
 
@@ -366,10 +437,14 @@ export function handleDevChat(
     const craftId = mobileStationMatch[1].toLowerCase();
     const station = placeMobileStationForPlayer(ctx, craftId, pid);
     if (!station) {
-      ctx.error(
-        pid,
-        `[dev] Could not place a mobile ${craftId} station (specialization required).`,
-      );
+      // The module's dead gate already printed the real reason for a dead
+      // caller; the specialization line would state the wrong one on top.
+      if (!ctx.resolve(pid)?.e.dead) {
+        ctx.error(
+          pid,
+          `[dev] Could not place a mobile ${craftId} station (specialization required).`,
+        );
+      }
     } else {
       const minutes = Math.round((station.expiresAtTick - station.placedAtTick) / (20 * 60));
       emitDevLog(ctx, pid, `[dev] Mobile ${craftId} station placed here for ${minutes} minutes.`);
@@ -423,6 +498,14 @@ export function handleDevChat(
     if (/\breset\b/.test(rest)) {
       if (meta) meta.raidLockouts.clear();
       emitDevLog(ctx, pid, '[dev] Raid lockouts cleared.');
+      return null;
+    }
+    if (/\b(?:demon[_ -]?tower|tower)\b/.test(rest)) {
+      const requestedFloor = Number(/\b(?:demon[_ -]?tower|tower)\s+(\d+)\b/.exec(rest)?.[1] ?? 1);
+      ctx.enterRift(DEMON_TOWER_SEED, RIFT_RANK_BASE_LEVEL.S, pid);
+      jumpDemonTowerFloorForDev(ctx, pid, requestedFloor - 1);
+      const floor = clampInteger(requestedFloor, 1, DEMON_TOWER_FLOOR_COUNT);
+      emitDevLog(ctx, pid, `[dev] Entering Demon Tower floor ${floor} (S rank).`);
       return null;
     }
     const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';
@@ -493,9 +576,78 @@ export function handleDevChat(
     portal.facing = e.facing + Math.PI; // face back toward the player
     portal.prevFacing = portal.facing;
     ctx.addEntity(portal);
+    riftFx(ctx, portal.pos.x, portal.pos.z, 'arcane', 'burst', 'rift_portal_spawn');
     ctx.emit({
       type: 'log',
       text: `[dev] Opened a ${tier}-rank portal to ${plan.name} (${plan.floorCount} floors, L${baseLevel}). Walk through it.`,
+      color: '#b9f',
+      pid,
+    });
+    return null;
+  }
+
+  // [dev] Spawn a portal whose FIRST floor is guaranteed to roll a specific
+  // headline mechanic, for testing the rift SFX pass without hunting seeds by
+  // hand: /dev riftmech <ice|roller|lava|gate> [level]. Iterates seeds (same
+  // approach as the /dev portal kind search above) checking generateRiftFloor's
+  // floor-0 plan until one matches, since exactly one headline mechanic rolls
+  // per floor (rift_gen.ts). Bails with an error after a bounded search rather
+  // than spinning forever on a level/mechanic combination that cannot roll.
+  const riftMechMatch =
+    /^\/(?:dev\s+riftmech|devriftmech)\s+(ice|roller|lava|gate)(?:\s+(\d+))?\s*$/i.exec(raw);
+  if (riftMechMatch) {
+    const e = ctx.entities.get(pid);
+    if (!e) return null;
+    const wantMech = riftMechMatch[1].toLowerCase();
+    const baseLevel = Math.max(
+      1,
+      Math.min(60, riftMechMatch[2] ? Number(riftMechMatch[2]) : e.level),
+    );
+    let seed = ctx.rng.int(1, 1_000_000_000) >>> 0;
+    let found = false;
+    for (let i = 0; i < 5000; i++) {
+      if (isSetPieceSeed(seed)) {
+        seed = (seed + 1) >>> 0;
+        continue;
+      }
+      const floor = generateRiftFloor(seed, baseLevel, 0);
+      const matches =
+        wantMech === 'ice'
+          ? floor.iceZone !== null
+          : wantMech === 'roller'
+            ? floor.rollers.length > 0
+            : wantMech === 'lava'
+              ? floor.hazards.length > 0
+              : floor.gate !== null;
+      if (matches) {
+        found = true;
+        break;
+      }
+      seed = (seed + 1) >>> 0;
+    }
+    if (!found) {
+      ctx.error(pid, `[dev] Found no ${wantMech} floor at L${baseLevel}. Try again.`);
+      return null;
+    }
+    const tier = riftRankForBaseLevel(Math.round(baseLevel));
+    const d = 5;
+    const px = e.pos.x + Math.sin(e.facing) * d;
+    const pz = e.pos.z + Math.cos(e.facing) * d;
+    const plan = generateRiftPlan(seed, baseLevel);
+    const portal = createGroundObject(ctx.nextId++, '', plan.name, ctx.groundPos(px, pz));
+    portal.templateId = 'rift_portal';
+    portal.objectItemId = null;
+    portal.lootable = true;
+    portal.riftSeed = seed;
+    portal.riftBaseLevel = baseLevel;
+    portal.riftTier = tier;
+    portal.facing = e.facing + Math.PI;
+    portal.prevFacing = portal.facing;
+    ctx.addEntity(portal);
+    riftFx(ctx, portal.pos.x, portal.pos.z, 'arcane', 'burst', 'rift_portal_spawn');
+    ctx.emit({
+      type: 'log',
+      text: `[dev] Opened a portal to ${plan.name} (L${baseLevel}); floor 1 has the ${wantMech} mechanic. Walk through it.`,
       color: '#b9f',
       pid,
     });
@@ -537,6 +689,39 @@ export function handleDevChat(
     emitDevLog(ctx, pid, '[dev] Health restored.');
     return null;
   }
+  const hpMatch = /^\/(?:dev\s+hp|devhp)\s+(\d+)\s*$/i.exec(raw);
+  if (hpMatch) {
+    const percent = clampInteger(Number(hpMatch[1]), 1, 100);
+    const player = ctx.entities.get(pid);
+    if (!player) return null;
+    const targeted = player.targetId === null ? null : ctx.entities.get(player.targetId);
+    // Never another tester's BODY: on a shared realm with dev commands enabled,
+    // this would be one tester rewriting another tester's fight. That covers
+    // their controlled pet too, which is a mob carrying their id as ownerId, not
+    // a player entity. Yourself, your own pet, or an unowned non-player body
+    // only, and a named-but-unusable target refuses rather than silently falling
+    // back to self (an automation caller whose target did not land would
+    // otherwise measure its own hp and never know).
+    const someoneElses =
+      !!targeted &&
+      ((targeted.kind === 'player' && targeted.id !== pid) ||
+        (targeted.ownerId !== null && targeted.ownerId !== pid));
+    if (targeted && (targeted.dead || someoneElses)) {
+      ctx.error(pid, '[dev] Target yourself, your own pet, or a living unowned body.');
+      return null;
+    }
+    const entity = targeted ?? (player.dead ? null : player);
+    if (!entity) {
+      ctx.error(pid, '[dev] No living target.');
+      return null;
+    }
+    // Sets hp directly: no threat, no damage event, no death check, and raising
+    // it does not rewind an encounter script that already advanced on the way
+    // down. A playtest cheat, not a combat path.
+    entity.hp = Math.max(1, Math.floor((entity.maxHp * percent) / 100));
+    emitDevLog(ctx, pid, `[dev] Set ${entity.name} to ${percent}% health.`);
+    return null;
+  }
   if (/^\/(?:dev\s+resource|devresource)\s*$/i.test(raw)) {
     const entity = ctx.entities.get(pid);
     if (entity && !entity.dead) entity.resource = entity.maxResource;
@@ -574,7 +759,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

@@ -1,22 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const storeWindow = readFileSync(
-  new URL('../src/ui/daily_rewards_window.ts', import.meta.url),
-  'utf8',
-);
-const claudiumWindow = readFileSync(
-  new URL('../src/ui/claudium_window.ts', import.meta.url),
-  'utf8',
-);
-const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-const inspect = readFileSync(new URL('../src/ui/armory_inspect.ts', import.meta.url), 'utf8');
-const componentsCss = readFileSync(
-  new URL('../src/styles/components.css', import.meta.url),
-  'utf8',
-);
-const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+function readSource(path: string): string {
+  return readFileSync(new URL(path, import.meta.url), 'utf8').replace(/\r\n?/g, '\n');
+}
+
+const storeWindow = readSource('../src/ui/daily_rewards_window.ts');
+const claudiumWindow = readSource('../src/ui/claudium_window.ts');
+const hud = readSource('../src/ui/hud.ts');
+const main = readSource('../src/main.ts');
+const inspect = readSource('../src/ui/armory_inspect.ts');
+const componentsCss = readSource('../src/styles/components.css');
+const mobileCss = readSource('../src/styles/hud.mobile.css');
 
 describe('WOC Store window contract', () => {
   it('opens on the Store tab and keeps Daily Rewards as a sub-tab', () => {
@@ -236,8 +231,8 @@ describe('WOC Store window contract', () => {
     expect(storeWindow).toContain('this.storeError = !this.storeReady;');
   });
 
-  it('keeps the store, Claudium, and Daily Rewards surfaces out of native builds', () => {
-    expect(main).toContain('dailyRewardsEnabled: !NATIVE_APP');
+  it('keeps the store and Claudium out of native builds while gating Daily Rewards by wallet capability', () => {
+    expect(main).toContain('dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true');
     expect(main).toContain('devCommandsEnabled: import.meta.env.DEV');
     const economyWiring = main.slice(
       main.indexOf('if (!NATIVE_APP) {', main.indexOf('const claudiumHooks')),

@@ -153,8 +153,8 @@ function readPanelIds(html: string): string[] {
 // The two populations on the day this was written. They are equal by coincidence, not by
 // construction (37 cases = 34 markup panels with a case + 3 code-built; 37 markup ids = those
 // 34 + the 3 without one), so they get two names and must be bumped independently.
-const CASE_COUNT = 37;
-const MARKUP_COUNT = 37;
+const CASE_COUNT = 38;
+const MARKUP_COUNT = 38;
 
 const closeSwitch = readCloseManagedWindowSwitch(hudTs);
 const caseIds = closeSwitch.cases;

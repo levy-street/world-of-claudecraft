@@ -2,8 +2,11 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
+import { buildDemonTowerCore } from './demon_tower';
+import { GFX } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
+import { applyWornStone } from './worn_stone';
 
 // GLB-backed arch body (Tripo-generated, see public/models/props), with a
 // procedural fallback (arch + keystone + plinths below) for pre-load races /
@@ -16,7 +19,7 @@ let loadedDoorArchGltf: THREE.Group | null = null;
 let loadedWildheartGateGltf: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(DOOR_ARCH_ASSET_URL).then((gltf) => {
       const scene = gltf.scene;
       // The GLB opening faces its local X axis; the procedural arch it
@@ -33,7 +36,7 @@ if (typeof window !== 'undefined') {
       loadedDoorArchGltf = scene;
     }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(WILDHEART_GATE_ASSET_URL).then((gltf) => {
       gltf.scene.traverse((child) => {
         if (!(child instanceof THREE.Mesh)) return;
@@ -75,12 +78,29 @@ let nythraxisClickMat: THREE.MeshBasicMaterial | null = null;
 // on both inputs just keeps the builder correct for any caller and unit-testable.
 const portalMats = new Map<string, THREE.MeshBasicMaterial>();
 
+export function resetDoorPortalProfileCaches(): void {
+  stoneMat = null;
+  nythraxisClickMat = null;
+  portalMats.clear();
+  riftPortalMats.clear();
+}
+
 // Height the Blood Orb hovers at: clear of the citadel's altar model (1.2yd native,
 // placed at scale 1.5, see src/sim/content/rift/infernal_citadel.ts).
 const ORB_Y = 2.15;
 
 function doorStoneMaterial(): THREE.Material {
-  stoneMat ??= markSharedMaterial(new THREE.MeshLambertMaterial({ color: 0x6a6a72 }));
+  if (!stoneMat) {
+    // Low tier keeps the cheap Lambert; the standard tier upgrades the arch
+    // to a MeshStandardMaterial so it can carry the worn-stone layer.
+    if (GFX.standardMaterials) {
+      const mat = new THREE.MeshStandardMaterial({ color: 0x6a6a72, roughness: 0.9 });
+      applyWornStone(mat);
+      stoneMat = markSharedMaterial(mat);
+    } else {
+      stoneMat = markSharedMaterial(new THREE.MeshLambertMaterial({ color: 0x6a6a72 }));
+    }
+  }
   return stoneMat;
 }
 
@@ -368,7 +388,7 @@ function fittedPropClone(
 }
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_GATE_URL)
       .then((gltf) => {
         // Per-portal views clone the scene but SHARE geometry/material refs with
@@ -383,7 +403,7 @@ if (typeof window !== 'undefined') {
         riftGateGltf = null;
       }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_ROCK_URL)
       .then((gltf) => {
         markGltfShared(gltf);
@@ -393,7 +413,7 @@ if (typeof window !== 'undefined') {
         riftRockGltf = null;
       }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_FLAME_URL)
       .then((gltf) => {
         markGltfShared(gltf);
@@ -403,7 +423,7 @@ if (typeof window !== 'undefined') {
         riftFlameGltf = null;
       }),
   );
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(RIFT_RUNE_URL)
       .then((gltf) => {
         markGltfShared(gltf);
@@ -789,6 +809,10 @@ export function buildRiftPuzzleProp(
       body.add(ring);
       return { body };
     }
+    case 'rift_tower_core':
+      // The Demon Tower centrepiece lives in its own module (render/demon_tower.ts);
+      // this is a delegation, not a case block grown inside this file.
+      return buildDemonTowerCore(_lowGfx);
     case 'rift_infernal_orb':
     case 'rift_infernal_orb_active': {
       // The Blood Orb on the citadel's sacrificial altar: a dark sphere hovering

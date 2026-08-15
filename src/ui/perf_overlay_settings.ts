@@ -81,8 +81,16 @@ export class PerfOverlaySettingsPanel {
 
     container.appendChild(this.buildTitle());
 
+    // The gilded corner ornament (components.css) is a ::before on this same
+    // container, so the container itself must stay non-scrolling or the
+    // ornament scrolls away with the content instead of staying pinned to the
+    // window frame (issue #2569). Everything that DOES need to scroll (the
+    // card body plus the footer buttons) lives inside this dedicated wrapper.
+    const scroll = div('perf-scroll');
+    container.appendChild(scroll);
+
     const panel = div('perf-panel');
-    container.appendChild(panel);
+    scroll.appendChild(panel);
 
     this.buildMaster(panel);
 
@@ -96,7 +104,7 @@ export class PerfOverlaySettingsPanel {
     this.buildAppearanceCard(right);
     this.buildPositionCard(right);
 
-    container.appendChild(this.buildFooter());
+    scroll.appendChild(this.buildFooter());
   }
 
   /** Push a dropped drag position back into the X/Y sliders (no full re-render). */

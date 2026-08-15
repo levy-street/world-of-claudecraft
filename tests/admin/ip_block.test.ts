@@ -23,6 +23,7 @@ function detail(
       chatMutedUntil: null,
       chatMuteReason: '',
       chatStrikes: 0,
+      generalChatRateLimit: null,
       lastLoginIp: null,
       playtimeSeconds: 0,
       characters: [],

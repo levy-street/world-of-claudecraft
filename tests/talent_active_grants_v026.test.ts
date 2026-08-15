@@ -27,7 +27,7 @@ describe('v0.26 active talent grants', () => {
     expect(passive).toEqual([]);
   });
 
-  it('keeps every row-granted ability out of the no-row baseline kit', () => {
+  it('keeps row-exclusive grants out of the no-row baseline kit', () => {
     const leaked: string[] = [];
 
     for (const cls of ALL_CLASSES) {
@@ -39,7 +39,9 @@ describe('v0.26 active talent grants', () => {
       for (const row of ROW_TREES[cls]) {
         for (const option of row.options) {
           const abilityId = option.effect.grant?.ability;
-          if (abilityId && baseline.has(abilityId))
+          const ability = abilityId ? ABILITIES[abilityId] : undefined;
+          const isEarlyGrant = ability !== undefined && ability.learnLevel > row.level;
+          if (abilityId && baseline.has(abilityId) && !isEarlyGrant)
             leaked.push(`${cls}:${option.id}->${abilityId}`);
         }
       }

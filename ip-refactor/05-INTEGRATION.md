@@ -23,7 +23,7 @@ Therefore:
 ## Procedure (run in the feature/ip-pivot checkout)
 For EACH ready branch, one at a time:
 ```bash
-REPO=/Users/reubenhorne/Documents/code/world-of-claudecraft/world-of-claudecraft
+REPO=world-of-claudecraft/world-of-claudecraft
 cd "$REPO"
 git worktree list                # confirm THIS path holds feature/ip-pivot (worktrees shift)
 git branch --show-current        # must be feature/ip-pivot
@@ -133,9 +133,9 @@ no-op diff rather than a conflict.
 You are the INTEGRATOR for the IP-pivot refactor. Merge ready track branches into
 feature/ip-pivot, ONE AT A TIME (never concurrently — feature/ip-pivot is a single shared
 checkout and every merge regenerates the same i18n/guide artifacts). Read
-/Users/reubenhorne/Documents/code/woc-refactor/ip-refactor/README.md and
+woc-refactor/ip-refactor/README.md and
 00-SHARED-CONVENTIONS.md and the LOCKED NAME-MAP.md first.
-Working directory: /Users/reubenhorne/Documents/code/world-of-claudecraft/world-of-claudecraft
+Working directory: world-of-claudecraft/world-of-claudecraft
 Confirm `git worktree list` shows this path on feature/ip-pivot, `git branch --show-current`
 = feature/ip-pivot, and `git status` is clean.
 
@@ -162,7 +162,7 @@ For each branch:
    If red -> STOP and report. Never --force; never regenerate a golden by hand; never loosen,
    .skip, or edit the ip_scrub denylist to pass.
 3. git push.
-4. In /Users/reubenhorne/Documents/code/woc-refactor/ip-refactor/02-WORKING-MEMORY.md, flip the
+4. In woc-refactor/ip-refactor/02-WORKING-MEMORY.md, flip the
    newly-integrated session(s) to `merged`, tick the scanner-worklist entries it cleared, and
    set the generated-artifact touch log rows to "integrator (reconciled)". Append-only.
 Report one line per branch: merged+pushed, or aborted/stopped + why.

@@ -165,7 +165,7 @@ function townPerfRaw({ rootVisible = true, shadowEnabled = true } = {}) {
     drawStats: {
       colorDraws: 18,
       shadowDraws: 9,
-      triangles: 29_644,
+      triangles: 29_436,
       buildingCount: 6,
       roofHideTargetCount: 6,
       microBatchCount: 2,
@@ -359,7 +359,7 @@ function validTownMetadata({
           ? {
               colorDraws: 18,
               shadowDraws: 9,
-              triangles: townContract?.townTriangles ?? 29_644,
+              triangles: townContract?.townTriangles ?? 29_436,
               buildingCount: 6,
               roofHideTargetCount: 6,
               microBatchCount: 2,
@@ -764,7 +764,6 @@ describe('Eastbrook Grand Armoury capture contract', () => {
         'eastbrook_fence_smithy_west',
         'eastbrook_fence_smithy_outer',
         'eastbrook_fence_smithy_east',
-        'eastbrook_fence_market_outer',
       ],
       artisanRow: [],
       benches: [

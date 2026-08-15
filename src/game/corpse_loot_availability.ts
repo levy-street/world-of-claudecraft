@@ -46,7 +46,8 @@ export function corpseLootAvailability(
 ) {
   const componentTags = MOBS[mob.templateId]?.componentTags;
   // isHarvestableCorpse, the sim's own predicate, not a tag count of our own
-  // (#2513): a corpse whose every family is unmapped (fen_troll: claw, tusk)
+  // (#2513): a corpse whose every family is unmapped (no shipped template
+  // since #2905 mapped fen_troll's claw and tusk; the fixtures retag one)
   // cannot yield anything and the command boundary refuses it, so offering the
   // picker here would advertise a dead end. This arm was the one place in this
   // function that restated a sim rule instead of importing it, which is exactly

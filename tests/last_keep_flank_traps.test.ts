@@ -20,6 +20,7 @@ import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind'
 import { rideSteepnessAt } from '../src/sim/ride_height';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // the live world seed: the reports are seed-pinned castle geometry
 const SEED = 20061;
@@ -221,7 +222,17 @@ function describeWedges(list: Wedge[]): string {
 }
 
 function makeWalker(spot: { x: number; z: number }) {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+  // The Last Keep's grounds are the documented zero-combat keep (no camp,
+  // npc, or ground object sits anywhere near the ward): terrain and colliders
+  // read the module-level BUILTIN_WORLD regardless of this Sim's `world`
+  // option (data.ts getActiveWorldContent), so an empty ambient world cannot
+  // change the physics this file exercises.
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   const p = sim.player;
   const meta = (
@@ -346,6 +357,27 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
       pushToward(sim, p, meta, { x: 431.2, z: 1995 }, 20 * 12);
       expect(p.pos.z, 'rounds the keep to the north yard').toBeLessThan(1997);
       expect(p.pos.y, 'stays on the terrace').toBeGreaterThan(CASTLE.ward.h - 0.4);
+    }
+  });
+
+  it('never freezes a walker pressed into the ward terrace retaining edge', () => {
+    // The ward terrace's faces are sheer 2.6yd risers. The steepness gate reads
+    // a 1-yard-cell memo, so the flat bailey ground one step out from the west
+    // face inherits the cell's slope and reads as steep. That alone used to strip
+    // movement control while the exact-position downhill was flat (nothing to
+    // slide off), trapping the body at the base with input disabled: players were
+    // stuck all along the west edge and had to /unstuck. A walker pressed into
+    // the edge must be REFUSED the climb yet still free to walk back off it.
+    for (const z of [2000, 2005, 2010, 2015]) {
+      const { sim, p, meta } = makeWalker({ x: 395, z });
+      pushToward(sim, p, meta, { x: 404, z }, 20 * 3); // press east into the face
+      const pinnedX = p.pos.x;
+      expect(pinnedX, `refused the sheer west face at z=${z}`).toBeLessThan(CASTLE.ward.x0);
+      pushToward(sim, p, meta, { x: 384, z }, 20 * 3); // now try to walk back west
+      expect(
+        pinnedX - p.pos.x,
+        `walks back off the west edge instead of freezing at z=${z}`,
+      ).toBeGreaterThan(3);
     }
   });
 });

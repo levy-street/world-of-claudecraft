@@ -13,10 +13,10 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { RAID_MAX } from '../src/sim/social/party';
+import { bareClient as sharedBareClient } from './helpers/bare_client';
 
 function fakeWs() {
   const sent: any[] = [];
@@ -26,31 +26,10 @@ function lastSnap(sent: any[]): any {
   for (let i = sent.length - 1; i >= 0; i--) if (sent[i].t === 'snap') return sent[i];
   return null;
 }
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'mage' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.missingSince = new Map();
-  c.mouselookFacing = null;
-  c.markers = {};
-  return c;
+// Every bareClient in this suite is a mage (the loot-need-vs-greed cases pin
+// class-specific need eligibility), unlike the shared fixture's warrior default.
+function bareClient(pid: number) {
+  return sharedBareClient(pid, { playerClass: 'mage' });
 }
 
 // A hand-built frame, the untrusted shape a client actually sends, parsed and

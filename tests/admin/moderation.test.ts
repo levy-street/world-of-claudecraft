@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -32,6 +32,7 @@ const modDetail = {
     chatMutedUntil: null,
     chatMuteReason: '',
     chatStrikes: 0,
+    generalChatRateLimit: null,
     lastLoginIp: '1.2.3.4',
     playtimeSeconds: 3600,
     characters: [],

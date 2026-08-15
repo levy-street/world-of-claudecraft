@@ -460,22 +460,41 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(JSON.parse(newCap.body as string).steam).toEqual({ enabled: true });
   });
 
-  it('the /api/status dev_commands advert AGREES on both arms under ALLOW_DEV_COMMANDS=1', async () => {
+  it('the /api/status epic advert DIVERGES under EPIC_ENABLED=1: false on legacy, true on new', async () => {
+    // Twin of the Steam status advert above: Epic routes are registry-only
+    // (server/epic/routes.ts), so the legacy ladder hardcodes epic.enabled=false
+    // while the migrated statusHandler reads epicEnabled() live.
+    const { oldCap, newCap } = await captureWithEnv({ EPIC_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/status' }),
+    );
+    expect(oldCap.status).toBe(200);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(oldCap.body as string).epic).toEqual({ enabled: false });
+    expect(JSON.parse(newCap.body as string).epic).toEqual({ enabled: true });
+  });
+
+  it('the /api/status dev capability adverts AGREE on both arms', async () => {
     // Unlike steam.enabled directly above, dev_commands must NOT diverge: the dev_*
     // cheats ride the WEBSOCKET dispatcher, which both ladders serve identically, so
     // there is no arm on which advertising true would strand a client. /api/status is
     // a known-deviation route (the name-list trim), so the corpus filter masks the
     // whole path and only this explicit case can catch the two arms drifting apart.
-    // The corpus runs with the env OFF, so this covers the ON state, where a
-    // one-armed edit would show up as a tester whose /dev GUI appears or vanishes
-    // depending on which dispatch the realm happens to be running.
-    const { oldCap, newCap } = await captureWithEnv({ ALLOW_DEV_COMMANDS: '1' }, () =>
-      makeReq({ method: 'GET', url: '/api/status' }),
-    );
-    expect(oldCap.status).toBe(200);
-    expect(newCap.status).toBe(200);
-    expect(JSON.parse(oldCap.body as string).dev_commands).toBe(true);
-    expect(JSON.parse(newCap.body as string).dev_commands).toBe(true);
+    // Pin both env arms explicitly because the known-deviation filter masks the
+    // entire status route in the general corpus.
+    for (const [value, expected] of [
+      ['0', false],
+      ['1', true],
+    ] as const) {
+      const { oldCap, newCap } = await captureWithEnv({ ALLOW_DEV_COMMANDS: value }, () =>
+        makeReq({ method: 'GET', url: '/api/status' }),
+      );
+      expect(oldCap.status).toBe(200);
+      expect(newCap.status).toBe(200);
+      expect(JSON.parse(oldCap.body as string).dev_commands).toBe(expected);
+      expect(JSON.parse(newCap.body as string).dev_commands).toBe(expected);
+      expect(JSON.parse(oldCap.body as string).profiler_invulnerability).toBe(expected);
+      expect(JSON.parse(newCap.body as string).profiler_invulnerability).toBe(expected);
+    }
   });
 
   it('the /api/status players_cap AGREES on both arms and clamps a negative cap to 0', async () => {
@@ -523,6 +542,38 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     );
     expect(oldCap.status).toBe(404);
     expect(newCap.status).not.toBe(404);
+  });
+
+  it('the Epic link surface 404s on the legacy ladder but is served on the new arm', async () => {
+    // Twin of the Steam registry-only pin: /api/epic/status exists only as a
+    // RouteDef. Legacy 404s; new arm serves (401 without bearer when enabled).
+    const { oldCap, newCap } = await captureWithEnv({ EPIC_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/epic/status' }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).not.toBe(404);
+  });
+
+  it('the OTA update check 404s on the legacy ladder but is served on the new arm', async () => {
+    // POST /api/ota/updates is a registry-only RouteDef (the deeds/steam
+    // new-route rule). Under legacy dispatch the ladder has no such arm, so it
+    // falls through to 404; under new dispatch the router serves it. The env
+    // key is FORCED unset (a developer .env may set it) so the handler takes
+    // the fail-closed no-update 200 and the case never performs an outbound
+    // manifest fetch.
+    const { oldCap, newCap } = await captureWithEnv({ OTA_MANIFEST_URL: undefined }, () =>
+      makeReq({
+        method: 'POST',
+        url: '/api/ota/updates',
+        body: { platform: 'ios', version_name: 'builtin', version_build: '0.32.0' },
+      }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(newCap.body as string)).toEqual({
+      message: 'No new version available',
+      error: 'no_new_version_available',
+    });
   });
 
   it('GET /api/perf-report is identical old-vs-new and is a 404 (re-pins the masked /api/perf-report)', async () => {
@@ -868,6 +919,31 @@ describe('/admin/api dispatch parity (legacy flag vs new flag)', () => {
       label: 'the antibot-config audit read',
     },
     { method: 'POST', url: '/admin/api/antibot-config', label: 'the antibot-config write' },
+    // Phase 15 arrivals: the R35 professions inspector and the two GM
+    // restores, bearer-gated like every other authed admin route.
+    {
+      method: 'GET',
+      url: '/admin/api/characters/5/professions',
+      label: 'the professions inspector read',
+    },
+    {
+      method: 'POST',
+      url: '/admin/api/moderation/characters/5/restore-item',
+      label: 'the GM item restore write',
+    },
+    {
+      method: 'POST',
+      url: '/admin/api/moderation/characters/5/restore-slot',
+      label: 'the GM slot restore write',
+    },
+    // Guild Bank Phase 4: the operator read behind the dormant-slot hatch. It
+    // exposes a guild's pooled property, so the arms must agree that an
+    // anonymous caller never reaches the live book on either dispatch path.
+    {
+      method: 'GET',
+      url: '/admin/api/guilds/5/bank',
+      label: 'the guild bank operator read',
+    },
     { method: 'PUT', url: '/admin/api/overview', label: 'a wrong method (delegates to legacy)' },
     {
       method: 'HEAD',
@@ -1127,7 +1203,7 @@ describe('/internal dispatch parity (legacy flag vs new flag)', () => {
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
   });
 
-  it('POST /internal/discord/members-meta with the correct secret and no members is an authed 200 { updated: 0 }, identical old-vs-new', async () => {
+  it('POST /internal/discord/members-meta with the correct secret and no members is an authed 200 zero report, identical old-vs-new', async () => {
     const { oldCap, newCap } = await captureWithEnv({ [DISCORD_ENV]: PARITY_SECRET }, () =>
       makeReq({
         method: 'POST',
@@ -1137,9 +1213,14 @@ describe('/internal dispatch parity (legacy flag vs new flag)', () => {
       }),
     );
     expect(oldCap.status).toBe(200);
+    // The endpoint now reports what it APPLIED, not what it read: `updated` still
+    // counts the records accepted (the bot treats a zero on a NON-empty push as a
+    // refusal), and changed/skipped/unapplied say what became of them. Both
+    // dispatch arms share one implementation, so the identity check below is what
+    // proves a behavior edit cannot land on only one of them.
     expect(JSON.parse(oldCap.body as string)).toEqual({
       success: true,
-      data: { updated: 0 },
+      data: { updated: 0, changed: 0, skipped: 0, unapplied: [] },
       error: null,
     });
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));

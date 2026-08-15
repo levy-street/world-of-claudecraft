@@ -3,9 +3,11 @@
 // resets, otherwise a player can chip it down — or kill it outright — for a
 // risk-free kill, which also breaks the classic reset contract.
 import { describe, expect, it } from 'vitest';
+import { dealDamage } from '../src/sim/combat/damage';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 function makeSim() {
   return new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
@@ -92,6 +94,88 @@ describe('evading mobs are immune while resetting', () => {
   });
 });
 
+// The immunity must not be silent: a direct attack against an evading mob
+// reports an 'evade' damage result (amount 0) so the client floats the word
+// and logs the line, exactly like miss/dodge/parry results. DoT and reflect
+// ticks (direct === false) stay silent so a dotted evader does not spam one
+// event per tick.
+describe('attacks against an evading mob report an Evade result', () => {
+  it('emits exactly one zero-amount evade damage event for a direct hit', () => {
+    const sim = makeSim();
+    const wolf = nearestMob(sim);
+    wolf.maxHp = 5000;
+    wolf.hp = 5000;
+    wolf.aiState = 'evade';
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, sim.player, wolf, 1000, false, 'physical', 'Heroic Strike', 'hit');
+
+    const events = sim.drainEvents().filter((e) => e.type === 'damage');
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      type: 'damage',
+      sourceId: sim.player.id,
+      targetId: wolf.id,
+      amount: 0,
+      crit: false,
+      school: 'physical',
+      ability: 'Heroic Strike',
+      kind: 'evade',
+    });
+    expect(wolf.hp).toBe(5000);
+  });
+
+  it('stays silent for non-direct damage (DoT and reflect ticks)', () => {
+    const sim = makeSim();
+    const wolf = nearestMob(sim);
+    wolf.maxHp = 5000;
+    wolf.hp = 5000;
+    wolf.aiState = 'evade';
+    sim.drainEvents();
+
+    dealDamage(
+      sim.ctx,
+      sim.player,
+      wolf,
+      1000,
+      false,
+      'shadow',
+      'Corruption',
+      'hit',
+      false,
+      undefined,
+      false,
+    );
+
+    expect(sim.drainEvents().filter((e) => e.type === 'damage')).toHaveLength(0);
+    expect(wolf.hp).toBe(5000);
+  });
+
+  it('does not report evade for an owned pet with stale evade state (the hit lands)', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, autoEquip: true });
+    const attackerId = sim.addPlayer('warrior', 'Attacker');
+    const ownerId = sim.addPlayer('hunter', 'Owner');
+    const attacker = sim.entities.get(attackerId);
+    if (!attacker) throw new Error('missing attacker');
+    const pet = nearestMob(sim);
+    pet.ownerId = ownerId;
+    pet.hostile = false;
+    pet.aiState = 'evade';
+    pet.maxHp = 5000;
+    pet.hp = 5000;
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, attacker, pet, 1000, false, 'physical', null, 'hit');
+
+    const events = sim.drainEvents().filter((e) => e.type === 'damage');
+    expect(events.some((e) => e.type === 'damage' && e.kind === 'evade')).toBe(false);
+    expect(events.some((e) => e.type === 'damage' && e.kind === 'hit' && e.amount === 1000)).toBe(
+      true,
+    );
+    expect(pet.hp).toBe(4000);
+  });
+});
+
 // An evading mob walks a STRAIGHT line home with no pathfinding, and resolvePosition
 // only pushes a body radially OUT of a collider — never around it. So an evading mob
 // whose line home crosses a prop (the Gravecaller Encampment tent/campfire/crate) or
@@ -100,7 +184,6 @@ describe('evading mobs are immune while resetting', () => {
 // pinned on their own camp props and blocked progression. Once stalled, the mob
 // phases through the blocker just far enough to clear it, then walks home and resets.
 describe('an evading mob that cannot path home recovers instead of getting stuck', () => {
-  const WORLD_SEED = 20061; // the live world seed
   const CAMP_TENT = { x: -3, z: 505, y: 0 }; // the prop the summoners pin against
 
   // the summoner that spawns closest to the camp tent — the one players see stuck

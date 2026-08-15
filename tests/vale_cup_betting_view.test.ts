@@ -12,6 +12,8 @@ function makeMatch(over: Partial<VcMatchInfo> = {}): VcMatchInfo {
   return {
     id: 11,
     phase: 'briefing',
+    rated: true,
+    practice: false,
     countdown: 0,
     timeLeft: 360,
     golden: false,

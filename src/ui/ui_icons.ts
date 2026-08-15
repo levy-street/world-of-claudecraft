@@ -57,6 +57,7 @@ export type UiIconName =
   | 'next'
   | 'more'
   | 'meters'
+  | 'battleground'
   | 'whisper'
   | 'music'
   | 'talents'
@@ -64,6 +65,7 @@ export type UiIconName =
   | 'jump'
   | 'autorun'
   | 'swap'
+  | 'sort'
   | 'nameplates'
   | 'vibrate'
   | 'lock'
@@ -77,12 +79,18 @@ export type UiIconName =
   | 'professions'
   | 'makers-mark'
   | 'enchant-rune'
-  | 'bond-link';
+  | 'bond-link'
+  | 'download'
+  | 'eye'
+  | 'eye-off'
+  | 'wiki';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
 // glyphs set fill-rule="evenodd" locally.
 const ICONS: Record<UiIconName, string> = {
+  // hand-authored capture-the-flag banner on a pole (Thornhollow Fields battleground)
+  battleground: '<path d="M150 56h26v400h-26z"/><path d="M176 78h236l-52 66 52 66H176z"/>',
   // ── game-icons.net (CC BY 3.0) ───────────────────────────────────────────
   arena:
     '<path d="M19.75 14.438c59.538 112.29 142.51 202.35 232.28 292.718l3.626 3.75.063-.062c21.827 21.93 44.04 43.923 66.405 66.25-18.856 14.813-38.974 28.2-59.938 40.312l28.532 28.53 68.717-68.717c42.337 27.636 76.286 63.646 104.094 105.81l28.064-28.06c-42.47-27.493-79.74-60.206-106.03-103.876l68.936-68.938-28.53-28.53c-11.115 21.853-24.413 42.015-39.47 60.593-43.852-43.8-86.462-85.842-130.125-125.47-.224-.203-.432-.422-.656-.625C183.624 122.75 108.515 63.91 19.75 14.437zm471.875 0c-83.038 46.28-154.122 100.78-221.97 161.156l22.814 21.562 56.81-56.812 13.22 13.187-56.438 56.44 24.594 23.186c61.802-66.92 117.6-136.92 160.97-218.72zm-329.53 125.906l200.56 200.53c-4.36 4.443-8.84 8.793-13.405 13.032L148.875 153.53l13.22-13.186zm-76.69 113.28l-28.5 28.532 68.907 68.906c-26.29 43.673-63.53 76.414-106 103.907l28.063 28.06c27.807-42.164 61.758-78.174 104.094-105.81l68.718 68.717 28.53-28.53c-20.962-12.113-41.08-25.5-59.937-40.313 17.865-17.83 35.61-35.433 53.157-52.97l-24.843-25.655-55.47 55.467c-4.565-4.238-9.014-8.62-13.374-13.062l55.844-55.844-24.53-25.374c-18.28 17.856-36.602 36.06-55.158 54.594-15.068-18.587-28.38-38.758-39.5-60.625z"/>',
@@ -172,6 +180,19 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored swap: two opposing horizontal arrows (the mobile action-ring
   // page-cycle badge), matching the jump/autorun glyph weight
   swap: '<path d="M96 150 340 150 340 118 436 174 340 230 340 198 96 198ZM416 314 172 314 172 282 76 338 172 394 172 362 416 362Z"/>',
+  // hand-authored sort: three shrinking bars plus a down arrow (the bag
+  // clean-up button; matches the swap/meters geometric weight)
+  sort: '<path d="M64 104h288v48H64zM64 232h208v48H64zM64 360h128v48H64zM402 104h48v224h-48z"/><path d="M362 328h128l-64 88z"/>',
+  // hand-authored download: arrow into a base line (the desktop update card),
+  // matching the jump glyph weight
+  download:
+    '<path d="M236 72h40v196h84L256 372 156 268h80z"/><rect x="116" y="408" width="280" height="40" rx="14"/>',
+  // hand-authored eye (the paperdoll helmet-visibility toggle): almond outline
+  // cut open around a solid pupil (evenodd ring, like the vibrate case)
+  eye: '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/>',
+  // the eye behind a diagonal slash bar (helm hidden state)
+  'eye-off':
+    '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/><path d="M106 42 470 406l-40 40L66 82z" stroke="rgba(40,26,20,0.85)" stroke-width="26"/>',
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate:
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
@@ -202,6 +223,11 @@ const ICONS: Record<UiIconName, string> = {
   // crosshair this button used to borrow (the same glyph the mobile target-cycle uses).
   professions:
     '<path d="M104 268h304v36h-30l-22 92a44 44 0 0 1-43 34h-114a44 44 0 0 1-43-34l-22-92h-30z"/><path d="M318 104 246 236" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round"/><circle cx="238" cy="250" r="30"/>',
+  // hand-authored question mark (the Wiki launcher): a stroked hook over a dot,
+  // the universal "look it up" affordance, drawn bold so it reads at
+  // micro-button size and stays tellable apart from the emote speech bubble
+  // (a filled balloon) and the deeds book (a solid tome)
+  wiki: '<path d="M168 180c0-72 176-80 176 6 0 62-88 64-88 132" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round"/><circle cx="256" cy="412" r="36"/>',
   // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
   // stroke used beside a crafted copy's provenance line. Unlike the filled
   // chrome glyphs above, this mark is intentionally an open currentColor line.
@@ -259,15 +285,28 @@ function chromeArtIcon(url: string): string {
  *
  * A name with committed painted art (CHROME_ART_IDS) hydrates as that `<img>` instead of
  * the inline SVG: these placeholders ARE the primary destinations (the side rail, the
- * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. The SVG stays
- * the source everywhere else, including every direct `svgIcon()` call, so the small inline
- * uses beside text keep tinting with `currentColor`.
+ * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. A failed image
+ * load swaps that one icon slot to the existing SVG glyph. The SVG stays the source
+ * everywhere else, including every direct `svgIcon()` call, so the small inline uses beside
+ * text keep tinting with `currentColor`.
  */
 export function hydrateIcons(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => {
     const name = el.dataset.icon;
     if (!name || !hasUiIcon(name) || el.querySelector(':scope > .ui-icon')) return;
     const art = chromeIconUrl(name);
-    el.insertAdjacentHTML('afterbegin', art ? chromeArtIcon(art) : svgIcon(name));
+    if (!art) {
+      el.insertAdjacentHTML('afterbegin', svgIcon(name));
+      return;
+    }
+    el.insertAdjacentHTML('afterbegin', chromeArtIcon(art));
+    const image = el.querySelector<HTMLImageElement>(':scope > img.ui-icon-art');
+    image?.addEventListener(
+      'error',
+      () => {
+        image.outerHTML = svgIcon(name);
+      },
+      { once: true },
+    );
   });
 }

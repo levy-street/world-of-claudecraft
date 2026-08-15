@@ -6,6 +6,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { AbilityEffect, Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -17,7 +18,9 @@ function harness(sim: Sim): TestSim {
 }
 
 function warriorAtCap(seed = 2620): TestSim {
-  const sim = harness(new Sim({ seed, playerClass: 'warrior', autoEquip: false }));
+  const sim = harness(
+    new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD }),
+  );
   sim.setPlayerLevel(20);
   return sim;
 }
@@ -276,7 +279,9 @@ describe('v0.26 winning Warrior authored row and mastery runtime', () => {
   });
 
   it('Sanguine Aura buffs only the caster and melee party members with one composite aura', () => {
-    const sim = harness(new Sim({ seed: 2627, playerClass: 'warrior', noPlayer: true }));
+    const sim = harness(
+      new Sim({ seed: 2627, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD }),
+    );
     const warrior = sim.addPlayer('warrior', 'Warrior');
     const paladin = sim.addPlayer('paladin', 'Paladin');
     const mage = sim.addPlayer('mage', 'Mage');
@@ -315,7 +320,9 @@ describe('v0.26 winning Warrior authored row and mastery runtime', () => {
   });
 
   it('Sanguine Aura from a second Warrior refreshes one shared party buff', () => {
-    const sim = harness(new Sim({ seed: 2628, playerClass: 'warrior', noPlayer: true }));
+    const sim = harness(
+      new Sim({ seed: 2628, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD }),
+    );
     const first = sim.addPlayer('warrior', 'First');
     const second = sim.addPlayer('warrior', 'Second');
     const recipient = sim.addPlayer('paladin', 'Recipient');

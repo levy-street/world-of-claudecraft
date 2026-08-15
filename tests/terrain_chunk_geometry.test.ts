@@ -119,15 +119,29 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(12);
 
-    // Re-minted for the Eastbrook camp respacing (PR #2584, maintainer-ordered):
-    // camp radii drive the terrain flatten aprons, so the deliberate, reviewed
-    // spread of the starter camps regrades the Vale rect. The prior pin
-    // (6f7fb63da247a5eb272dd9d7a42a5fcd) dated from before that change; the
-    // gap-cell fill must still not perturb a single byte of in-rect geometry.
-    expect(digestOf(inRect)).toBe('987a8787d8d0101698ed259f73aa557b');
-    // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
-    // visual change.
-    expect(digestOf(gapFill)).toBe('1da89b363fda0dcac73d4d5a24c1760d');
+    // Re-minted for the natural-relief heightfield plus the shared height
+    // lattice in terrain_chunk_build.ts (vertex normals now difference the
+    // lattice at the chunk's own spacing instead of a fixed 1.5yd stencil).
+    // Both were intended, reviewed visual changes. Re-minted again for the
+    // gather-node placement fix (herb_eastbrook_4 moved off the boarball
+    // pitch to (6,-69) is the move these chunks see): an authored node pos
+    // is a calm-anchor world fixture, so the pads around the old and new
+    // spots reshape nearby vertices. Localization checked against the dense
+    // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
+    // in the same commit): the whole ten-node placement fix moves 146 of
+    // its 140639 points, 0.1 percent, all inside the moved nodes' pad
+    // footprints.
+    // Re-minted again for the northwest coast spit carve in applyValeCoast
+    // (src/sim/world.ts): the low beach shelf that aproned the grey cliff foot
+    // is submerged so the bay water meets the cliff, an intended, looked-at
+    // visual change. The carve only ever lowers and stays local: sampled on a
+    // 0.5yd lattice over the vale and its gap cells it moves 8704 of 1589721
+    // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
+    // and nothing rises anywhere. Both digests move because that window
+    // straddles the rect edge at x = -180.
+    expect(digestOf(inRect)).toBe('39afe77d61ac348961d01e890aaddb00');
+    // The gap super-chunks take the same re-mint.
+    expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 
     terrain.cancelStreaming();
   });

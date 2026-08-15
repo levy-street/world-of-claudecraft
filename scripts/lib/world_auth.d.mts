@@ -1,4 +1,6 @@
-export const ONLINE_WORLD_AUTH_TYPE: 'auth-world-3';
+export const ONLINE_WORLD_AUTH_TYPE: 'auth-world-6';
+
+export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE: 'Game and server versions are incompatible. Reload or update, then try again.';
 
 export interface WorldAuthMessage {
   readonly t: typeof ONLINE_WORLD_AUTH_TYPE;
@@ -7,3 +9,11 @@ export interface WorldAuthMessage {
 }
 
 export function worldAuthMessage(token: string, character: number): WorldAuthMessage;
+
+export interface ChatCommandMessage {
+  readonly t: 'cmd';
+  readonly cmd: 'chat';
+  readonly text: string;
+}
+
+export function chatCommandMessage(text: string): ChatCommandMessage;

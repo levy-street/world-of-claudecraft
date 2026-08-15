@@ -1,3 +1,4 @@
+export * from './buy_quantity_prompt_window';
 export * from './heroic_vendor_view';
 export * from './heroic_vendor_window';
 export * from './train_learn_core';
@@ -7,3 +8,5 @@ export * from './unbind_view';
 export * from './unbind_window';
 export * from './vendor_view';
 export * from './vendor_window';
+export * from './warfare_vendor_view';
+export * from './warfare_vendor_window';

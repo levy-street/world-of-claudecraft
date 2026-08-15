@@ -10,6 +10,7 @@ import {
   tryEncodeItemLink,
   tryEncodeQuestLink,
 } from '../src/ui/hud/quest/quest_link';
+import { stripComments } from './helpers/strip_comments';
 
 describe('quest_link', () => {
   it('encodes a questId into a token', () => {
@@ -183,16 +184,13 @@ describe('the guarded encoders return null exactly when the parser would balk (#
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const QUEST_LINK_FILE = 'src/ui/hud/quest/quest_link.ts';
 
-// Mirrors the stripComments precedent in tests/architecture.test.ts: blank
-// block comments (preserving line count), then line comments, keeping the '//'
-// inside a "://" URL. Load-bearing in BOTH directions here. Without it, this
-// file's own prose naming the encoders would report phantom offenders, and a
-// call commented out rather than deleted would keep the sweep green.
-function stripComments(src: string): string {
-  return src
-    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
-}
+// The shared single-pass stripper (tests/helpers/strip_comments.ts) blanks
+// block comments preserving line count and strips line comments in the SAME
+// pass, so a bare /* inside a line comment (src/main.ts carries one near line
+// 3144) cannot open a phantom block that swallows real code from the sweep.
+// Load-bearing in BOTH directions here. Without it, this file's own prose
+// naming the encoders would report phantom offenders, and a call commented
+// out rather than deleted would keep the sweep green.
 
 function walk(dir: string): string[] {
   const out: string[] = [];

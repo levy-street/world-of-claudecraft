@@ -68,10 +68,11 @@ describe('dailyRewardEventsCutoffDay', () => {
 
   it('memoizes per UTC day: a same-day call past the reward boundary returns the memoized cutoff', async () => {
     // The memo exists because currentDailyRewardDay resolves runtime config for
-    // both the provisional UTC day and the reward day against a single-slot
-    // config cache: at the sweep hour the two days always differ, so every
-    // uncached call can cost two payout-service round trips, multiplied across
-    // a catch-up run's batches. Observable proof of the hit: at 22:00Z the
+    // both the provisional UTC day and the reward day: at the sweep hour the
+    // two days always differ, so every uncached call can cost two
+    // payout-service round trips, multiplied across a catch-up run's batches
+    // (the config cache has been per-day since #2791, but the memo still spares
+    // the clock resolution and the cold fetches). Observable proof of the hit: at 22:00Z the
     // reward day has rolled to '2026-07-16' and a fresh derivation would return
     // '2025-06-11', so getting '2025-06-10' back shows the second call never
     // re-resolved the reward clock.

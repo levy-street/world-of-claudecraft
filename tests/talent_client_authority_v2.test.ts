@@ -2,6 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { emptyAllocation, rowForLevel } from '../src/sim/content/talents';
 
+// Kept bespoke on purpose (issue #2088): this fixture stubs `cmd` with a
+// vi.fn() spy for the command-send assertions below, unlike the shared
+// tests/helpers/bare_client.ts bareClient(), which is the default for a new
+// suite that does not need to observe outgoing commands.
 function bareClient(): ClientWorld {
   const client = Object.create(ClientWorld.prototype) as ClientWorld;
   client.talents = emptyAllocation();

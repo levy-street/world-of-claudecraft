@@ -60,6 +60,20 @@ import type {
   ItemInstancePayload,
   SimEvent,
 } from '../src/sim/types';
+import { completeCraftCast } from './helpers/enchant_family_cast';
+import { VENDOR_TEST_WORLD } from './sim_shared';
+
+function craftItemComplete(
+  sim: import('../src/sim/sim').Sim,
+  recipe: string,
+  commission: boolean,
+  pid: number,
+) {
+  const start = craftItemMod(sim.ctx, recipe, commission, pid);
+  if (!start.ok || !start.casting) return start;
+  completeCraftCast(sim, pid);
+  return sim.lastCraftResult ?? start;
+}
 
 const SWORD_RECIPE = 'recipe_eastbrook_arming_sword';
 const SWORD = 'eastbrook_arming_sword'; // weapon, common quality
@@ -85,7 +99,7 @@ function grantReagents(sim: Sim, recipeId: string, pid: number, crafts = 1): voi
 }
 
 function makeSim(seed = 7) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: VENDOR_TEST_WORLD });
 }
 
 function entityOf(sim: Sim, pid: number): Entity {
@@ -143,7 +157,13 @@ function pointOf(pos: { x: number; z: number } | undefined): { x: number; z: num
 }
 
 function makeTradeSim(seed = 42) {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, noPlayer: true });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    noPlayer: true,
+    world: VENDOR_TEST_WORLD,
+  });
   const a = sim.addPlayer('warrior', 'Ayla');
   const b = sim.addPlayer('warrior', 'Borin');
   const ea = entityOf(sim, a);
@@ -253,7 +273,7 @@ describe('commission opt-in at craft time', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     grantReagents(sim, SWORD_RECIPE, pid);
-    const result = craftItemMod(sim.ctx, SWORD_RECIPE, true, pid);
+    const result = craftItemComplete(sim, SWORD_RECIPE, true, pid);
     expect(result.ok).toBe(true);
     expect(result.commission).toBe(true);
     const slots = slotsOf(sim, pid, SWORD);
@@ -265,7 +285,7 @@ describe('commission opt-in at craft time', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     grantReagents(sim, SWORD_RECIPE, pid);
-    const result = craftItemMod(sim.ctx, SWORD_RECIPE, false, pid);
+    const result = craftItemComplete(sim, SWORD_RECIPE, false, pid);
     expect(result.ok).toBe(true);
     expect(result.commission).toBeUndefined();
     const slots = slotsOf(sim, pid, SWORD);
@@ -277,7 +297,7 @@ describe('commission opt-in at craft time', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     grantReagents(sim, POTION_RECIPE, pid);
-    const result = craftItemMod(sim.ctx, POTION_RECIPE, true, pid);
+    const result = craftItemComplete(sim, POTION_RECIPE, true, pid);
     expect(result.ok).toBe(true);
     expect(result.commission).toBeUndefined();
     const slots = slotsOf(sim, pid, POTION);
@@ -290,8 +310,8 @@ describe('commission opt-in at craft time', () => {
     const pid = sim.playerId;
     grantReagents(sim, SWORD_RECIPE, pid, 2);
     sim.drainEvents();
-    const plain = countDraws(sim, () => craftItemMod(sim.ctx, SWORD_RECIPE, false, pid));
-    const commissioned = countDraws(sim, () => craftItemMod(sim.ctx, SWORD_RECIPE, true, pid));
+    const plain = countDraws(sim, () => craftItemComplete(sim, SWORD_RECIPE, false, pid));
+    const commissioned = countDraws(sim, () => craftItemComplete(sim, SWORD_RECIPE, true, pid));
     expect(plain.result.ok).toBe(true);
     expect(commissioned.result.ok).toBe(true);
     expect(plain.draws).toBe(1);
@@ -313,7 +333,7 @@ describe('commission opt-in at craft time', () => {
     const origNext = rng.next.bind(rng);
     rng.next = () => 0;
     try {
-      const result = craftItemMod(sim.ctx, VESTMENTS_RECIPE, true, pid);
+      const result = craftItemComplete(sim, VESTMENTS_RECIPE, true, pid);
       expect(result.ok).toBe(true);
       expect(result.masterwork).toBe(true);
       expect(result.commission).toBe(true);
@@ -805,7 +825,12 @@ describe('persistence: commission payloads survive save/load', () => {
 // ---------------------------------------------------------------------------
 describe('mail/market: a commissioned equipment instance never mails or lists', () => {
   it('mailSend refuses armed AND bound sword copies (fungible-only escrow), payload intact', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const sender = sim.addPlayer('warrior', 'Sender');
     sim.addPlayer('mage', 'Rex');
     const box = entityOf(sim, sim.postOffice.mailboxIds[0]);
@@ -829,7 +854,12 @@ describe('mail/market: a commissioned equipment instance never mails or lists', 
   });
 
   it('marketList refuses armed AND bound copies with no escrow', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Lister');
     let merchant: Entity | null = null;
     for (const e of sim.entities.values()) {
@@ -861,7 +891,7 @@ describe('determinism: the commission arc replays byte-identically', () => {
       const sim = makeSim(1234);
       const pid = sim.playerId;
       grantReagents(sim, SWORD_RECIPE, pid);
-      craftItemMod(sim.ctx, SWORD_RECIPE, true, pid);
+      craftItemComplete(sim, SWORD_RECIPE, true, pid);
       const slot = slotsOf(sim, pid, SWORD)[0];
       instanceOf(slot).boundTo = pid; // stand in for the trade stamp
       standAtStation(sim, pid);
@@ -881,6 +911,9 @@ describe('determinism: the commission arc replays byte-identically', () => {
 // 9. The wire: ClientWorld send shapes (byte-identical when not commissioned).
 // ---------------------------------------------------------------------------
 describe('ClientWorld command send shapes', () => {
+  // Kept bespoke on purpose (issue #2088): a hand-picked field subset plus a
+  // captured `rawCmd`, returning the {client, sent} pair. tests/helpers/bare_client.ts
+  // bareClient() is the default for a new suite that just needs a bare ClientWorld.
   function clientWithCapture(): { client: ClientWorld; sent: Record<string, unknown>[] } {
     const client = Object.create(ClientWorld.prototype) as ClientWorld;
     (client as unknown as { spectating: null }).spectating = null;
@@ -948,6 +981,12 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
   }
 
+  /** Finish a craft cast started over the wire (1.5s+ casts need a complete flush). */
+  function completeCraftWire(server: GameServer, pid: number): void {
+    completeCraftCast(server.sim as never, pid);
+    routeTick(server);
+  }
+
   function broadcast(server: GameServer): void {
     (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
   }
@@ -983,6 +1022,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
     }
     cmd(server, sa, { cmd: 'craft_item', recipe: SWORD_RECIPE, commission: true });
     routeTick(server);
+    completeCraftWire(server, sa.pid);
     const crafted = serverSlots(server, sa.pid, SWORD);
     expect(crafted).toHaveLength(1);
     expect(crafted[0].instance).toEqual({ bindOnTrade: true });
@@ -1113,9 +1153,13 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
 
     // A truthy-but-not-true commission value reads as false at the strict
     // dispatch guard: both crafts grant the plain pre-phase fungible stack.
+    // Cast-paced: complete each start before the next so busy cannot steal one.
     cmd(server, st, { cmd: 'craft_item', recipe: SWORD_RECIPE, commission: 'true' });
+    routeTick(server);
+    completeCraftWire(server, st.pid);
     cmd(server, st, { cmd: 'craft_item', recipe: SWORD_RECIPE, commission: 1 });
     routeTick(server);
+    completeCraftWire(server, st.pid);
     const plain = serverSlots(server, st.pid, SWORD);
     expect(plain.reduce((n, s) => n + s.count, 0)).toBe(2);
     for (const slot of plain) expect(slot.instance).toBeUndefined();
@@ -1131,6 +1175,7 @@ describe('live GameServer: commission craft, bound trade refusal, unbind over th
       boundTo: 999,
     });
     routeTick(server);
+    completeCraftWire(server, st.pid);
     const armed = serverSlots(server, st.pid, SWORD).filter((s) => s.instance !== undefined);
     expect(armed).toHaveLength(1);
     expect(armed[0].instance).toEqual({ bindOnTrade: true });

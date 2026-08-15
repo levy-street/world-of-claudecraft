@@ -66,6 +66,36 @@ export function isZoneFeatureVisible(
   return featureEdgeDistance(footprint, camX, camZ) < drawDistance;
 }
 
+// The sun shadow camera is a 105 yd half-extent orthographic box around the
+// player, and the 31 degree sun throws a caster's shadow at most ~1.7x its
+// height sunward: a feature group farther than this range cannot land one
+// texel inside the volume. The merged town/flora meshes disable frustum
+// culling (their bounds are zone-sized), so without this decision the shadow
+// pass redraws them at ANY distance the fogless detail horizon reaches. The
+// far-tree LOD set the precedent: "the shadow pass deliberately does NOT
+// follow the extended radius".
+export const ZONE_FEATURE_SHADOW_RANGE = 220;
+/** Band width around the range inside which the prior state holds, so the
+ *  per-mesh castShadow writes never become a per-frame flap at the edge. */
+export const ZONE_FEATURE_SHADOW_HYSTERESIS = 20;
+
+/**
+ * Whether a feature group should cast into the sun shadow map this frame.
+ * A null footprint keeps casting, mirroring isZoneFeatureVisible's fail-open.
+ */
+export function isZoneFeatureShadowCasting(
+  footprint: FeatureFootprint | null,
+  camX: number,
+  camZ: number,
+  wasCasting: boolean,
+): boolean {
+  if (!footprint) return true;
+  const edge = featureEdgeDistance(footprint, camX, camZ);
+  return wasCasting
+    ? edge <= ZONE_FEATURE_SHADOW_RANGE + ZONE_FEATURE_SHADOW_HYSTERESIS
+    : edge < ZONE_FEATURE_SHADOW_RANGE - ZONE_FEATURE_SHADOW_HYSTERESIS;
+}
+
 /**
  * True when an InstancedMesh buffer still holds a factory all-zero matrix.
  * Footprints are measured ONCE at attach, so one unseeded instance silently

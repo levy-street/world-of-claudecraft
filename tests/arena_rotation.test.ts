@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { arenaOrigin, isArenaPos, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../src/sim/data';
 import { arenaMapForSlot } from '../src/sim/dungeon_layout';
 import { Sim } from '../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -15,8 +16,12 @@ function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 }
 
+// Every fighter here clears the ranked (1v1/2v2) minimum-level gate; Fiesta
+// and Protect Yumi (also driven through this helper below) don't need it,
+// but a level-15 character queues into either the same as a level-1 one.
 function addFighter(sim: Sim, cls: PlayerClass, name: string): number {
   const pid = sim.addPlayer(cls, name);
+  sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
   const e = sim.entities.get(pid)!;
   e.pos.x = 0;
   e.pos.z = -40;

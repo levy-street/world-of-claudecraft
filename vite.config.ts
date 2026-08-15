@@ -7,11 +7,18 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
 import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
+import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
+import {
+  diagnosticsCaptureAllowed,
+  diagnosticsReadAllowed,
+} from './scripts/lib/diagnostics_capture_guard.mjs';
+import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
+const disableVitestFsModuleCache = shouldDisableVitestFsModuleCache(root);
 
 // Lightning CSS engine targets, derived from .browserslistrc (the single source of
 // the floor) via the zero-dep parser, never a hand-typed object. Drives both the
@@ -297,16 +304,109 @@ function musicEditorSavePlugin() {
   };
 }
 
+// Dev-only in-memory collector for an unattended local diagnostics run. Reports never
+// touch disk and the endpoints do not exist in preview or production builds.
+function diagnosticsCapturePlugin() {
+  let latestReport = '';
+  return {
+    name: 'woc-diagnostics-capture',
+    apply: 'serve' as const,
+    configureServer(server: {
+      middlewares: {
+        use: (
+          fn: (
+            req: {
+              url?: string;
+              method?: string;
+              headers: Record<string, string | string[] | undefined>;
+              socket: { remoteAddress?: string };
+              setEncoding: (encoding: BufferEncoding) => void;
+              on: (event: string, callback: (chunk?: unknown) => void) => void;
+            },
+            res: {
+              statusCode: number;
+              setHeader: (name: string, value: string) => void;
+              end: (body?: string) => void;
+            },
+            next: () => void,
+          ) => void,
+        ) => void;
+      };
+    }) {
+      server.middlewares.use((req, res, next) => {
+        const pathOnly = (req.url ?? '').split('?')[0];
+        const host = Array.isArray(req.headers.host) ? req.headers.host[0] : req.headers.host;
+        if (pathOnly === '/__diagnostics/latest') {
+          if (req.method !== 'GET') {
+            res.statusCode = 405;
+            res.end('GET only');
+            return;
+          }
+          if (!diagnosticsReadAllowed(req.socket.remoteAddress, host)) {
+            res.statusCode = 403;
+            res.end('loopback requests only');
+            return;
+          }
+          res.setHeader('Cache-Control', 'no-store');
+          res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+          res.statusCode = latestReport ? 200 : 404;
+          res.end(latestReport || 'No completed diagnostics capture yet.');
+          return;
+        }
+        if (pathOnly !== '/__diagnostics/capture') {
+          next();
+          return;
+        }
+        if (req.method !== 'POST') {
+          res.statusCode = 405;
+          res.end('POST only');
+          return;
+        }
+        const origin = Array.isArray(req.headers.origin)
+          ? req.headers.origin[0]
+          : req.headers.origin;
+        if (!diagnosticsCaptureAllowed(req.socket.remoteAddress, origin, host)) {
+          res.statusCode = 403;
+          res.end('loopback same-origin requests only');
+          return;
+        }
+        let body = '';
+        let bodyBytes = 0;
+        let rejected = false;
+        req.setEncoding('utf8');
+        req.on('data', (chunk) => {
+          if (rejected) return;
+          const text = typeof chunk === 'string' ? chunk : String(chunk ?? '');
+          bodyBytes += Buffer.byteLength(text, 'utf8');
+          if (bodyBytes > 2_000_000) {
+            rejected = true;
+            res.statusCode = 413;
+            res.end('report too large');
+            return;
+          }
+          body += text;
+        });
+        req.on('end', () => {
+          if (rejected) return;
+          latestReport = body;
+          res.statusCode = 204;
+          res.end();
+        });
+      });
+    },
+  };
+}
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
   // plugin is scoped to Vitest so it cannot affect production client builds.
   plugins: [
     svelte(),
-    ...(process.env.VITEST ? [svelteTesting()] : []),
+    ...(process.env.VITEST ? [svelteTesting({ autoCleanup: false })] : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),
+    ...(process.env.WOC_DIAGNOSTICS_CAPTURE === '1' ? [diagnosticsCapturePlugin()] : []),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
   define: {
@@ -323,6 +423,27 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Vite's default watch ignore list is only .git, node_modules, test-results,
+    // cacheDir and outDir, so the dev watcher otherwise descends into every agent
+    // runtime directory at the repo root. A linked worktree parked under one of them
+    // is a full second checkout: its 7 root *.html entries each trigger a page reload
+    // on change (Vite reloads for ANY watched .html, in the module graph or not), and
+    // its tsconfig.json triggers a full reload plus a moduleGraph.invalidateAll().
+    // Creating, deleting, or switching branches inside such a worktree rewrites all of
+    // them at once, so the served game reloads for edits that cannot reach it. Same
+    // rows as `test.exclude` below (see its comment), for the same reason; pinned by
+    // tests/vite_dev_watch.test.ts.
+    watch: {
+      ignored: [
+        '**/.claude/**',
+        '**/.codex/**',
+        '**/.agents/**',
+        '**/.worktrees/**',
+        '**/.wt/**',
+        '**/.venv/**',
+        '**/tmp/**',
+      ],
+    },
     proxy: {
       '/api': { target: apiProxyTarget, changeOrigin: true },
       '/admin/api': { target: apiProxyTarget, changeOrigin: true },
@@ -374,14 +495,36 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
+    // Sharding: BalancedSequencer (LPT over MEASURED per-file durations,
+    // scripts/ci_shard_weights.generated.json, harvested from green CI runs
+    // by scripts/ci_shard_weights_harvest.mjs). Re-wired 2026-08-14: the D11
+    // follow-on's LPT missed its bar on static import-cost weights and
+    // stripe re-measured WORSE than sha1-contiguous with real durations.
+    // Measured on the lane-excluded shard pool, scored in real ms: contiguous
+    // worst 10.49m, measured-LPT worst 9.79m spread 0.06m; the
+    // measured-scale FALLBACK for unknown files is load-bearing (raw
+    // heuristic units regressed to 11.21m). shard() only runs under --shard, so unsharded
+    // local runs are untouched. passWithNoTests false so an empty pack
+    // cannot green the sequencer.
+    sequence: { sequencer: BalancedSequencer },
+    passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
-    // jsdom environment); see the file for why this is needed on Node 22+.
-    setupFiles: ['./tests/jsdom_local_storage_setup.ts'],
+    // DOM environment). Needed on Node 22+ for jsdom and happy-dom files;
+    // no-op when `window` is absent (default node env). See the file.
+    setupFiles: ['./tests/svelte_testing_setup.ts', './tests/jsdom_local_storage_setup.ts'],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked
     //   config or instruction files are not product test sources. Excluding them keeps a
     //   stale local worktree from duplicating tests. .venv is local Python tooling.
+    //   .worktrees/ is the repo's own gitignored convention for local linked worktrees
+    //   (see .gitignore), while .wt/ is the OSS Brain linked-worktree cache used by
+    //   release automation. These entries are root-relative on purpose: an active
+    //   checkout can itself live under .wt/, and an absolute-style **/.wt/** pattern
+    //   hides its entire suite. Leaving either parked-worktree directory out of this
+    //   list means a stale branch snapshot can fail tests/architecture.test.ts or
+    //   tests/localization_fixes.test.ts and block pre-push for reasons unrelated to
+    //   the current branch.
     // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
     //   leak into a bare `vitest run`: excluding its files keeps the default Node run from
     //   importing the Playwright provider or launching a browser. Cross-engine CI is P17b.
@@ -392,10 +535,12 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      '**/.claude/**',
-      '**/.codex/**',
-      '**/.agents/**',
-      '**/.venv/**',
+      '.claude/**',
+      '.codex/**',
+      '.agents/**',
+      '.worktrees/**',
+      '.wt/**',
+      '.venv/**',
       'tmp/**',
       'tests/browser/**',
       '**/*.browser.test.ts',
@@ -408,5 +553,18 @@ export default defineConfig({
     // headroom for the current world size; deliberately long walkers keep their
     // own explicit budgets.
     testTimeout: 20000,
+    // Phase 4 local-gate-perf: persist Vite module transform cache across runs
+    // (Vitest 4.1 experimental.fsModuleCache). Default path is under
+    // node_modules/.experimental-vitest-cache (gitignored via node_modules/).
+    // OSS Brain linked worktrees symlink node_modules back to the parent checkout,
+    // and base-health gates run from that parent checkout under ORCH. Both shapes
+    // can contend on the same experimental temp-file store and fail before
+    // reporting parseable tests. Disable it for OSS Brain-controlled checkouts;
+    // normal local checkouts and CI keep the warm-cache path.
+    // Clear with `npx vitest --clearCache` if a warm run misbehaves. Full gate
+    // remains the merge bar; this speeds warm re-runs and related/day-loop paths.
+    experimental: {
+      fsModuleCache: !disableVitestFsModuleCache,
+    },
   },
 });

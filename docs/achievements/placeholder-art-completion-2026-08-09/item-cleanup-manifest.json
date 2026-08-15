@@ -1,0 +1,114 @@
+{
+  "mode": "built-in image_gen",
+  "processing": "Generated as opaque 1254x1254 PNG masters, then resized directly to 128x128 with Sharp cover fit and encoded as opaque WebP at quality 82 with smartSubsample enabled.",
+  "assets": [
+    {
+      "id": "firebottle",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square inventory item icon for a classic dark-fantasy MMORPG\nPrimary request: create a fresh, premium hand-painted icon for the item \"Firebottle\".\nInput images: Image 1 is the game's overall painted item lighting and finish reference. Images 2 and 3 are glass, cork, flame-color, and material-rendering references only. Image 4 is the current placeholder and a semantic anti-reference: do not reproduce its round red healing-potion silhouette, red liquid, glow ring, or starburst.\nScene/backdrop: deep charcoal-blue atmospheric painted ground, subtly smoky, with no literal room or landscape.\nSubject: exactly one throwable corked pitch-and-oil bottle, made from squat blackened soot-stained glass, with a short rag fuse tied securely at the neck and a small licking orange flame at the fuse tip. A little warm amber pitch is visible inside, but it must read immediately as an incendiary weapon, never as a drink or healing potion.\nStyle/medium: richly hand-painted classic MMORPG inventory art, restrained brush texture, believable fantasy materials, crisp readable silhouette, same visual family as the supplied game items.\nComposition/framing: square; one centered three-quarter-view object filling about 74 percent of the tile; bottle and flame fully inside the canvas with generous safe padding; no crop; readable at 28 pixels.\nLighting/mood: strong top-left key light with warm firelight on the soot-black glass, controlled highlights, grounded dramatic contrast.\nColor palette: charcoal, smoked brown-black glass, tarnished cork and cloth, amber pitch, focused ember orange.\nMaterials/textures: thick blackened glass, sticky pitch, rough cork, singed cloth fibers, small natural flame.\nConstraints: opaque image; exactly one tangible item; no text, letters, numbers, border, frame, badge, ring, hand, character, watermark, logo, or UI chrome.\nAvoid: red healing potion, round heart-shaped flask, magical glyph, starburst, flat glyph, cartoon clip art, low-poly 3D product shot, photoreal catalog render, cropped flame or bottle.",
+      "references": [
+        "public/ui/items/eastbrook_buckler.webp",
+        "public/ui/items/glass_vial.webp",
+        "public/ui/items/venomfire_elixir.webp",
+        "public/ui/items/firebottle.webp"
+      ],
+      "resultPath": "/Users/fernando/.codex/generated_images/019fe700-3d57-7f23-824d-99a055c8ba5c/exec-b27158f6-b5bd-4599-808c-697618b086b3.png",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/item-cleanup/masters/firebottle.png",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 1885518,
+        "sha256": "5dbcd612591f42004d4e6abeb339b5d70f04766efb7c88098916dc39267b498b"
+      },
+      "shipping": {
+        "path": "public/ui/items/firebottle.webp",
+        "width": 128,
+        "height": 128,
+        "bytes": 2636,
+        "sha256": "c3965ddb8daa75ba1b8eb5adb75845ac3220e2eb2af0f5db3ad8d28cebd7b122",
+        "opaque": true
+      },
+      "retries": 0
+    },
+    {
+      "id": "sharp_claw",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square inventory material icon for a classic dark-fantasy MMORPG\nPrimary request: create a fresh, premium hand-painted icon for the common crafting material \"Sharp Claw\".\nInput images: Image 1 is the game's overall painted item lighting and finish reference. Images 2 and 3 are harvested keratin, bone, sinew, and hide material references only. Image 4 is the current placeholder and a semantic anti-reference: do not reproduce its clean crescent glyph or featureless shape.\nScene/backdrop: deep earthy charcoal atmospheric painted ground with a quiet brown undertone, no literal environment.\nSubject: exactly one rugged freshly harvested predatory claw, a thick hooked talon with visible layered keratin ridges, small wear nicks along the edge, and a short rough sinewy joint at the base. It should feel workmanlike and common, useful to a crafter, not ornamental and not magical.\nStyle/medium: richly hand-painted classic MMORPG inventory art, restrained brush texture, believable fantasy material rendering, crisp readable silhouette, same visual family as the supplied game items.\nComposition/framing: square; one centered three-quarter-view claw filling about 76 percent of the tile; broad hook and joint fully visible with generous safe padding; no crop; unmistakable at 28 pixels.\nLighting/mood: top-left neutral-warm key light, controlled rim light, grounded contrast.\nColor palette: weathered ivory and warm tan keratin, muted brown sinew, deep charcoal-brown ground.\nMaterials/textures: stratified keratin ridges, slightly rough chipped edge, fibrous dry sinew at the root.\nConstraints: opaque image; exactly one tangible claw specimen; no text, letters, numbers, border, frame, badge, ring, star, halo, hand, creature, watermark, logo, or UI chrome.\nAvoid: tusk, tooth, crescent moon, clean flat symbol, perfectly polished jewelry, magical glyph, starburst, multiple claws, severed gore, cartoon clip art, low-poly 3D product shot, cropped tip or base.",
+      "references": [
+        "public/ui/items/eastbrook_buckler.webp",
+        "public/ui/items/wolf_fang.webp",
+        "public/ui/items/rough_hide.webp",
+        "public/ui/items/sharp_claw.webp"
+      ],
+      "resultPath": "/Users/fernando/.codex/generated_images/019fe700-3d57-7f23-824d-99a055c8ba5c/exec-591470b2-848e-485d-aff1-598c87161267.png",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/item-cleanup/masters/sharp_claw.png",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 2034953,
+        "sha256": "e7adfa3707cd5b374a0e72ef713918d259c711f1868a5a1a1b19b619448edaac"
+      },
+      "shipping": {
+        "path": "public/ui/items/sharp_claw.webp",
+        "width": 128,
+        "height": 128,
+        "bytes": 2276,
+        "sha256": "44f29bf14ba13a7b03ea25f3b2ae0edb57b4f4a041a694d28a711ed3c880be36",
+        "opaque": true
+      },
+      "retries": 0
+    },
+    {
+      "id": "curved_tusk",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square inventory material icon for a classic dark-fantasy MMORPG\nPrimary request: create a fresh, premium hand-painted icon for the common crafting material \"Curved Tusk\".\nInput images: Image 1 is the game's overall painted item lighting and finish reference. Images 2 and 3 are tusk, ivory, wear, and harvest-material references only; create a distinct original specimen rather than copying either. Image 4 is the current placeholder and a semantic anti-reference: do not reproduce its thin claw-like crescent glyph.\nScene/backdrop: deep earthy charcoal atmospheric painted ground with subtle umber haze, no literal environment.\nSubject: exactly one heavy weathered ivory boar-or-ogre tusk with a strong broad sweeping curve, thick mass, blunt chipped root, earthy staining in the grain, a few age grooves, and a solid tapered point. It must read instantly as a tusk rather than a claw or small tooth.\nStyle/medium: richly hand-painted classic MMORPG inventory art, restrained brush texture, believable fantasy materials, crisp readable silhouette, same visual family as the supplied game items.\nComposition/framing: square; one centered diagonal three-quarter-view tusk filling about 78 percent of the tile; full broad curve, root, and point all inside the canvas with safe padding; no crop; readable at 28 pixels.\nLighting/mood: strong top-left warm key light, soft cool rim, grounded dramatic contrast.\nColor palette: aged cream ivory, ochre and umber earth stains, charcoal-brown ground.\nMaterials/textures: dense weathered ivory, longitudinal grain, chipped porous root, worn edges.\nConstraints: opaque image; exactly one tangible tusk specimen; no text, letters, numbers, border, frame, badge, ring, hand, skull, creature, blood, watermark, logo, or UI chrome.\nAvoid: claw, fingernail, tiny fang, crescent moon, perfectly clean polished horn, magical glyph, starburst, multiple tusks, cartoon clip art, low-poly 3D product shot, cropped root or tip.",
+      "references": [
+        "public/ui/items/eastbrook_buckler.webp",
+        "public/ui/items/cracked_ogre_tusk.webp",
+        "public/ui/items/grubjaw_tusk.webp",
+        "public/ui/items/curved_tusk.webp"
+      ],
+      "resultPath": "/Users/fernando/.codex/generated_images/019fe700-3d57-7f23-824d-99a055c8ba5c/exec-0dfc7ada-6f79-4e17-a9ab-cc875ff1afc0.png",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/item-cleanup/masters/curved_tusk.png",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 2116976,
+        "sha256": "152065a44de50b2542fdfa8d9b86481f1bb390c887ab89387cac253091496abe"
+      },
+      "shipping": {
+        "path": "public/ui/items/curved_tusk.webp",
+        "width": 128,
+        "height": 128,
+        "bytes": 2270,
+        "sha256": "59b331638302cccd5abaa3a71d87593df93e510d7adc33651d8c02e714f641be",
+        "opaque": true
+      },
+      "retries": 0
+    },
+    {
+      "id": "pristine_claw",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square rare inventory material icon for a classic dark-fantasy MMORPG\nPrimary request: create a fresh, premium hand-painted icon for the rare crafting material \"Pristine Claw\".\nInput images: Image 1 is the game's overall painted item lighting and finish reference. Images 2 and 3 are harvested keratin and creature-material references only. Image 4 is the current placeholder and a semantic anti-reference: do not reproduce its gold crescent glyph, enclosing ring, or star.\nScene/backdrop: deep charcoal-blue atmospheric painted ground with restrained cool haze, no literal environment and no magic glyph.\nSubject: exactly one rare flawless predatory claw specimen, a substantial hooked talon of pale polished keratin with fine natural growth striations, a clean intact joint at its base, a razor-kept tip, and a subtle cool-blue pearlescent sheen. The specimen should look exceptionally preserved and valuable through material quality alone, not through symbols or spell effects.\nStyle/medium: richly hand-painted classic MMORPG inventory art, restrained brush texture, believable fantasy material rendering, crisp readable silhouette, same visual family as the supplied game items.\nComposition/framing: square; one centered three-quarter-view claw filling about 76 percent of the tile; hook, tip, and complete joint fully inside the canvas with generous safe padding; no crop; unmistakable at 28 pixels.\nLighting/mood: refined top-left key light with a restrained icy-blue rim and rich shadow separation, rarer and more polished than a common claw.\nColor palette: pale ivory, cool pearl-blue highlights, faint steel-gray joint tones, deep blue-charcoal ground.\nMaterials/textures: flawless layered keratin, fine growth lines, smooth intact articulation, sharp clean edge.\nConstraints: opaque image; exactly one tangible claw specimen; no text, letters, numbers, border, frame, badge, circle, ring, star, halo, rays, runes, hand, creature, watermark, logo, or UI chrome.\nAvoid: tusk, tooth, crescent moon, gold icon, clean flat symbol, magical glyph, starburst, multiple claws, gore, cartoon clip art, low-poly 3D product shot, cropped tip or joint.",
+      "references": [
+        "public/ui/items/eastbrook_buckler.webp",
+        "public/ui/items/wolf_fang.webp",
+        "public/ui/items/greyjaw_fang.webp",
+        "public/ui/items/pristine_claw.webp"
+      ],
+      "resultPath": "/Users/fernando/.codex/generated_images/019fe700-3d57-7f23-824d-99a055c8ba5c/exec-52f99e52-cc81-492d-82c0-f9be6ba76829.png",
+      "master": {
+        "path": "tmp/imagegen/placeholder-art-completion/item-cleanup/masters/pristine_claw.png",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 1915693,
+        "sha256": "eb35f8904781c7c345dc8c4e6ca847a8d19bfa2d16d160a6f73a4d77603b0160"
+      },
+      "shipping": {
+        "path": "public/ui/items/pristine_claw.webp",
+        "width": 128,
+        "height": 128,
+        "bytes": 2174,
+        "sha256": "9e960f2ffe8de1dcc3a267e261c24810d039c69c53e5bbff975c85ff0dd5c805",
+        "opaque": true
+      },
+      "retries": 0
+    }
+  ]
+}

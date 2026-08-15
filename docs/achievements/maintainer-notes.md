@@ -41,7 +41,11 @@ directory lives in git history before 2026-07-11.
   if unwanted.
 - Paragon and mythic reward TITLES where the legacy milestones granted
   borders: deliberate, and changing it now would invalidate persisted
-  activeTitle picks.
+  activeTitle and activeBorder picks. Note the premise has moved: this call
+  was made when a border was a badge flourish, and Phase 19 made borders real
+  nameplate and portrait chrome with their own picker, so whether these two
+  should now grant borders instead of (or beside) titles is a live maintainer
+  question rather than a settled one.
 
 ## Deferred until an engine surface exists
 
@@ -69,8 +73,8 @@ Rolling the server binary back past this feature is the one direction the
 deeds persistence cannot heal itself from (the `server/deeds_records.ts`
 header comment calls this out): the base serializer reconstructs only the
 fields it knows, so the FIRST save a pre-deeds binary makes strips `deeds`,
-`deedStats`, `activeTitle`, and `renown` from that character's
-`characters.state` blob. Before rolling back, snapshot the characters table:
+`deedStats`, `activeTitle`, `activeBorder`, and `renown` from that
+character's `characters.state` blob. Before rolling back, snapshot the characters table:
 
 ```sh
 pg_dump "$DATABASE_URL" --table=characters --format=custom \
@@ -97,7 +101,7 @@ Genuinely unrecoverable once a base binary saves a character:
 - The deedStats lifetime counters.
 - The per-deed earn-day stamps (the utcDay values in the persisted `deeds`
   map; a retro re-grant stamps the current day, not the original).
-- The persisted activeTitle pick.
+- The persisted activeTitle and activeBorder picks.
 - Event-witnessed deeds no state predicate can re-prove: the retro pass can
   only grant what the surviving blob demonstrates.
 
@@ -107,7 +111,7 @@ earned map on every load, so it never needs hand-repair. For characters
 that saved under the base binary with no snapshot, `character_deeds` is the
 recovery seed: their earned ids are still known even though the blob no
 longer carries them, so a restore script can rebuild the `deeds` map from
-the table (earn days, deedStats, and activeTitle stay lost).
+the table (earn days, deedStats, activeTitle, and activeBorder stay lost).
 
 ### Rollout population
 

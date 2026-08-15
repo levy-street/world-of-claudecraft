@@ -3,14 +3,16 @@
 //
 // Data sources, all live from the project so nothing drifts:
 //  - structure + icons: content.generated.ts (roles, resource, specs, signature kit, full kit)
-//  - canonical class description: classDetails.lore.* (the SAME copy as character creation)
+//  - canonical class description: classDetails.lore.* (the SAME copy as character creation),
+//    with one guide-owned override where that shared string has fallen behind (CLASS_LEAD_OVERRIDE)
 //  - armor / weapons: CLASS_DETAILS (the char-select showcase data) + classDetails.* labels
 //  - spec + mastery prose, role badges, crests, tags: ../class_view (shared with Talents)
 // Spoiler-safe: no balance numbers; ability "what it's for" lines are authored guide keys,
 // never the number-laden sim ability descriptions.
 
-import type { PlayerClass } from '../../sim/types';
+import type { PlayerClass, ResourceType } from '../../sim/types';
 import { CLASS_DETAILS } from '../../ui/class_details_data';
+import { crestImageFallbackAttributes } from '../../ui/crest_image_fallback';
 import { esc } from '../../ui/esc';
 import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import { iconDataUrl } from '../../ui/icons';
@@ -24,7 +26,12 @@ import {
   roleBadges,
   specCardHtml,
 } from '../class_view';
-import { GUIDE_CLASSES, GUIDE_WARLOCK_PETS, type GuideClassInfo } from '../content.generated';
+import {
+  GUIDE_CLASSES,
+  GUIDE_DRUID_FORMS,
+  GUIDE_WARLOCK_PETS,
+  type GuideClassInfo,
+} from '../content.generated';
 import { hrefFor } from '../routes';
 import { modelViewerEmbed, wireModelViewers } from '../viewer';
 import type { GuidePage, PageContext } from './types';
@@ -73,6 +80,20 @@ const FILTER_GROUPS: {
   },
 ];
 
+// The class lead. classDetails.lore.* is the canonical character-creation copy and stays the
+// default, but the guide owns a correction where that shared string has fallen behind the game:
+// the mage's third specialization (Chronomancy) is a HEALER now, not a third damage school
+// (src/sim/content/talents_classic.ts). Both the index card and the detail lead read through
+// here so the two surfaces never disagree.
+const CLASS_LEAD_OVERRIDE: Partial<Record<string, TranslationKey>> = {
+  mage: 'guide.classPage.mageLore',
+};
+
+function classLead(id: string): string {
+  const override = CLASS_LEAD_OVERRIDE[id];
+  return override ? t(override) : classLore(id);
+}
+
 function chip(group: string, value: string, label: string): string {
   return `<button type="button" class="guide-chip" data-group="${esc(group)}" data-value="${esc(value)}" aria-pressed="false">${esc(label)}</button>`;
 }
@@ -106,21 +127,21 @@ function classCard(c: GuideClassInfo): string {
     ? ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}" data-style="${esc(m.style)}" data-complexity="${esc(m.complexity)}" data-first="${m.goodFirst}"`
     : ` data-roles="${esc(c.roles.join(' '))}" data-resource="${esc(c.resource)}"`;
   // Show the actual class figure (the pre-rendered character still) as the card image, the
-  // same subject the detail page turntable spins; fall back to the procedural class crest only
-  // if a still is somehow absent (the guide.test asset guard makes that a build failure). The
-  // image is decorative here (alt=""): the whole card is a link the adjacent name span already
-  // labels, so a non-empty alt would double the link's accessible name ("Warrior Warrior...").
+  // same subject the detail page turntable spins; fall back to the procedural class crest if a
+  // still is absent or fails at runtime (the guide.test asset guard makes absence a build
+  // failure). The image is decorative here (alt=""): the whole card is a link the adjacent name
+  // span already labels, so a non-empty alt would double its accessible name.
   const figure = c.still
     ? `<div class="guide-class-card-portrait">
-        <img class="guide-class-card-still" src="${esc(c.still)}" alt="" width="88" height="88" loading="lazy" decoding="async" />
+        <img class="guide-class-card-still" src="${esc(c.still)}" ${crestImageFallbackAttributes(`class_${c.id}`, 128, { decorative: true })} alt="" width="88" height="88" loading="lazy" decoding="async" />
       </div>`
-    : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest');
+    : crestImg(classCrest(c.id, 128), 64, 'guide-class-crest', '', `class_${c.id}`);
   return `
     <a class="guide-class-card" href="${esc(hrefFor(`classes/${c.id}`))}" style="--class-color:${esc(c.color)}"${data}>
       ${figure}
       <span class="guide-class-card-name">${esc(className(c.id))}</span>
       <span class="guide-badges">${roleBadges(c.roles)}</span>
-      <span class="guide-class-card-hook">${esc(classLore(c.id))}</span>
+      <span class="guide-class-card-hook">${esc(classLead(c.id))}</span>
     </a>`;
 }
 
@@ -212,10 +233,20 @@ function notFoundInline(): string {
   </article>`;
 }
 
+// Typed per-resource key map: adding a ResourceType without a guide string is
+// a compile error here, instead of an untracked-key throw on the class page
+// (review 3050 finding: the `as TranslationKey` cast hid the focus gap).
+const RESOURCE_NAME_KEYS: Record<ResourceType, TranslationKey> = {
+  rage: 'guide.resourceName.rage',
+  mana: 'guide.resourceName.mana',
+  energy: 'guide.resourceName.energy',
+  focus: 'guide.resourceName.focus',
+};
+
 function factsHtml(c: GuideClassInfo): string {
   const details = CLASS_DETAILS[c.id as PlayerClass];
   const rows: [TranslationKey, string][] = [
-    ['classDetails.labels.resource', t(`guide.resourceName.${c.resource}` as TranslationKey)],
+    ['classDetails.labels.resource', t(RESOURCE_NAME_KEYS[c.resource])],
   ];
   if (details) {
     rows.unshift(['classDetails.labels.weapons', t(details.weaponsKey)]);
@@ -279,10 +310,11 @@ function fullKitHtml(c: GuideClassInfo): string {
 }
 
 function warlockPetsHtml(): string {
+  const poster = classCrest('warlock', 96);
   const items = GUIDE_WARLOCK_PETS.map(
     (pet) => `
       <li class="guide-pet">
-        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name, still: pet.still })}
+        ${modelViewerEmbed({ modelKey: pet.model, tint: pet.tint, name: pet.name, still: pet.still, poster, posterCrestId: 'class_warlock' })}
         <span class="guide-pet-name">${esc(pet.name)}</span>
         <span class="guide-pet-line">${esc(t(`guide.petHook.${pet.id}` as TranslationKey))}</span>
       </li>`,
@@ -295,6 +327,73 @@ function warlockPetsHtml(): string {
     </section>`;
 }
 
+// The mage's own summoned pet: a Frost mage's Water Elemental (src/sim/content/mage_pets.ts,
+// summoned by the `summon_water_elemental` ability). Prose plus the ability's procedural icon:
+// there is no generated still for the elemental, so no model viewer here.
+function magePetHtml(c: GuideClassInfo): string {
+  const summon = c.abilities.find((a) => a.id === 'summon_water_elemental');
+  const row = summon
+    ? `<ul class="guide-kit">
+        <li class="guide-kit-item">
+          ${crestImg(iconDataUrl('ability', summon.id, 56), 48, 'guide-ability-icon')}
+          <div class="guide-kit-text">
+            <span class="guide-kit-name">${esc(summon.name)}</span>
+            <span class="guide-kit-line">${esc(t('guide.classPage.mageEleSummon'))}</span>
+          </div>
+        </li>
+      </ul>`
+    : '';
+  // Water Jet is the pet's own pet-bar command, not the summon spell, so it reads as a
+  // paragraph rather than a kit line under the summon's icon and name.
+  return `
+    <section class="guide-block">
+      <h2>${esc(t('guide.classPage.mageEleHeading'))}</h2>
+      <p>${esc(t('guide.classPage.mageEleNote'))}</p>
+      ${row}
+      <p>${esc(t('guide.classPage.mageEleJet'))}</p>
+    </section>`;
+}
+
+// A class's summoned companions, where it has them. Warlock demons come from the generated
+// roster; the mage gets its own block (one elemental, no roster to walk).
+function petsHtml(c: GuideClassInfo): string {
+  if (c.id === 'warlock') return warlockPetsHtml();
+  if (c.id === 'mage') return magePetHtml(c);
+  return '';
+}
+
+// Druid shapeshifting. The three modelled forms come from the generated roster (the same
+// figures the model gallery spins); Moonwing Form has no model entry, so it is prose.
+// The names are this page's own keys (the sim's Bruin / Wolf / Fleet Form), so a reword on
+// the model gallery's labels can never silently rename the forms here.
+const FORM_NAME_KEY: Record<string, TranslationKey> = {
+  form_bear: 'guide.classPage.formName.form_bear',
+  form_cat: 'guide.classPage.formName.form_cat',
+  form_travel: 'guide.classPage.formName.form_travel',
+};
+
+function druidFormsHtml(): string {
+  const poster = classCrest('druid', 96);
+  const items = GUIDE_DRUID_FORMS.map((f) => {
+    const nameKey = FORM_NAME_KEY[f.id];
+    if (!nameKey) return '';
+    const name = t(nameKey);
+    return `
+      <li class="guide-pet">
+        ${modelViewerEmbed({ modelKey: f.model, tint: f.tint, name, still: f.still, poster, posterCrestId: 'class_druid' })}
+        <span class="guide-pet-name">${esc(name)}</span>
+        <span class="guide-pet-line">${esc(t(`guide.classPage.formLine.${f.id}` as TranslationKey))}</span>
+      </li>`;
+  }).join('');
+  return `
+    <section class="guide-block">
+      <h2>${esc(t('guide.classPage.formsHeading'))}</h2>
+      <p>${esc(t('guide.classPage.formsNote'))}</p>
+      <ul class="guide-pet-list">${items}</ul>
+      <p>${esc(t('guide.classPage.formsMoonwing'))}</p>
+    </section>`;
+}
+
 function detailHtml(id: string): string {
   const c = GUIDE_CLASSES.find((x) => x.id === id);
   if (!c) return notFoundInline();
@@ -303,22 +402,23 @@ function detailHtml(id: string): string {
       <p class="guide-section-more"><a href="${esc(hrefFor('classes'))}">${esc(t('guide.classPage.back'))}</a></p>
       <header class="guide-class-hero">
         <div class="guide-class-portrait">
-          ${modelViewerEmbed({ modelKey: c.model, tint: c.tint, name: className(c.id), still: c.still, poster: classCrest(c.id, 192), posterSize: 160, variant: 'feature', autoplay: true })}
+          ${modelViewerEmbed({ modelKey: c.model, tint: c.tint, name: className(c.id), still: c.still, poster: classCrest(c.id, 192), posterCrestId: `class_${c.id}`, posterSize: 160, variant: 'feature', autoplay: true })}
         </div>
         <div class="guide-class-hero-text">
           <h1 class="guide-class-hero-name">${esc(className(c.id))}</h1>
           <div class="guide-badges">
             ${roleBadges(c.roles)}
-            ${badge(t(`guide.resourceName.${c.resource}` as TranslationKey), 'guide-badge-resource')}
+            ${badge(t(RESOURCE_NAME_KEYS[c.resource]), 'guide-badge-resource')}
           </div>
           ${classTags(c.id)}
         </div>
       </header>
-      <p class="guide-lead">${esc(classLore(c.id))}</p>
+      <p class="guide-lead">${esc(classLead(c.id))}</p>
       ${factsHtml(c)}
       ${signatureKitHtml(c)}
       ${specsHtml(c)}
-      ${c.id === 'warlock' ? warlockPetsHtml() : ''}
+      ${petsHtml(c)}
+      ${c.id === 'druid' ? druidFormsHtml() : ''}
       ${fullKitHtml(c)}
       ${related([
         { href: hrefFor('reference/talents'), key: 'guide.nav.talents' },
@@ -341,7 +441,8 @@ export const classes: GuidePage = {
     return id ? detailHtml(id) : indexHtml();
   },
   mount(root: HTMLElement, ctx: PageContext) {
-    if (ctx.params[0]) return wireModelViewers(root); // class portrait + warlock demons
+    // class portrait + warlock demons + druid forms
+    if (ctx.params[0]) return wireModelViewers(root);
     return mountChooser(root);
   },
 };

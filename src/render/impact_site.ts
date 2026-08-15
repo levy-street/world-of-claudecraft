@@ -3,6 +3,7 @@ import { DUNGEON_X_THRESHOLD } from '../sim/data';
 import { hash2 } from '../sim/rng';
 import { MIREFEN_IMPACT_CRATER, terrainHeight } from '../sim/world';
 import { GFX } from './gfx';
+import { applySurfaceDetail } from './worn_stone';
 
 // Render-only story dressing for Brother Aldric's fallen-star hook. The sim
 // heightfield remains authoritative; every decal and prop here samples
@@ -162,14 +163,15 @@ function buildScorchGeometry(seed: number): THREE.BufferGeometry {
 }
 
 function rimMaterial(): THREE.Material {
-  return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({
-        vertexColors: true,
-        roughness: 0.96,
-        metalness: 0,
-        flatShading: true,
-      })
-    : new THREE.MeshLambertMaterial({ vertexColors: true });
+  if (!GFX.standardMaterials) return new THREE.MeshLambertMaterial({ vertexColors: true });
+  const mat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.96,
+    metalness: 0,
+    flatShading: true,
+  });
+  applySurfaceDetail(mat, 'rock', { strength: 0.5 });
+  return mat;
 }
 
 function buildRimGeometry(seed: number): THREE.BufferGeometry {
@@ -216,16 +218,20 @@ function buildRimGeometry(seed: number): THREE.BufferGeometry {
 }
 
 function meteorMaterial(): THREE.Material {
-  return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({
-        color: 0x171716,
-        roughness: 0.98,
-        metalness: 0.02,
-        emissive: 0x060302,
-        emissiveIntensity: 0.04,
-        flatShading: false,
-      })
-    : new THREE.MeshLambertMaterial({ color: 0x181716, emissive: 0x050201 });
+  if (!GFX.standardMaterials)
+    return new THREE.MeshLambertMaterial({ color: 0x181716, emissive: 0x050201 });
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x171716,
+    roughness: 0.98,
+    metalness: 0.02,
+    emissive: 0x060302,
+    emissiveIntensity: 0.04,
+    flatShading: false,
+  });
+  // The 0.04 ember tint is a surface grade, not a light source, so the stone
+  // layer still reads (the emissive-skip policy is for actually glowing mats).
+  applySurfaceDetail(mat, 'rock', { strength: 0.5 });
+  return mat;
 }
 
 function buildMeteorGeometry(seed: number): THREE.BufferGeometry {
@@ -283,14 +289,15 @@ function buildCrack(seed: number, crackIndex: number, angle: number, length: num
 }
 
 function pebbleMaterial(): THREE.Material {
-  return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({
-        color: 0x2b2924,
-        roughness: 0.95,
-        metalness: 0.05,
-        flatShading: true,
-      })
-    : new THREE.MeshLambertMaterial({ color: 0x2b2924 });
+  if (!GFX.standardMaterials) return new THREE.MeshLambertMaterial({ color: 0x2b2924 });
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x2b2924,
+    roughness: 0.95,
+    metalness: 0.05,
+    flatShading: true,
+  });
+  applySurfaceDetail(mat, 'rock', { strength: 0.5 });
+  return mat;
 }
 
 function addRimPebbles(group: THREE.Group, seed: number): void {

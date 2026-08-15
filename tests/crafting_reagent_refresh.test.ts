@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Crafting window bag-freshness (issue #2375). The Craft gate is derived
 // entirely from the bag, but the window is a COLD painter: before this suite
@@ -306,7 +306,10 @@ describe('crafting window bag-freshness wiring (source pins)', () => {
     // Scoped to the method: moving the latch into the probe would leave every
     // other paint cause (the station edge, a craft, a tab switch, the open
     // itself) un-armed, and a whole-file pin would not notice.
-    const renderCrafting = region('private renderCrafting(): void {', 'closeCrafting(): void {');
+    const renderCrafting = region(
+      'private renderCrafting(focusReturnRecipeId = ',
+      'closeCrafting(): void {',
+    );
     expect(renderCrafting).toContain(
       'this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);',
     );
@@ -332,9 +335,12 @@ describe('crafting window bag-freshness wiring (source pins)', () => {
   });
 
   it('the online authoritative inventory delta converges it on the same frame', () => {
-    expect(hud).toMatch(
-      /onInventoryChanged\(\): void \{[^}]*this\.refreshOpenCraftingIfReagentsChanged\(\);\s*\}/,
-    );
+    // Bounded at the METHOD's own two-space closing brace rather than a flat
+    // [^}]* reach from the opener (#2931 made that break this pin once) or
+    // the next definition (whose gap a future method could squat in): inner
+    // blocks close at deeper indents, so the slice is exactly the hook body.
+    const arm = region('onInventoryChanged(): void {', '\n  }');
+    expect(arm).toContain('this.refreshOpenCraftingIfReagentsChanged();');
   });
 
   it('the offline vendor buy converges it on the click', () => {
@@ -354,12 +360,16 @@ function craftingDeps() {
     hideTooltip: vi.fn(),
     onCraft: vi.fn(),
     onClose: vi.fn(),
+    onOpenOrders: vi.fn(),
     itemIcon: vi.fn(() => ''),
     moneyHtml: vi.fn(() => ''),
     itemTooltip: vi.fn(() => ''),
     attachTooltip: vi.fn(),
     commissionChecked: vi.fn((_recipeId: string) => false),
     onToggleCommission: vi.fn(),
+    craftQty: () => 1,
+    onCraftQty: vi.fn(),
+    announce: vi.fn(),
     selectedCraft: () => null as string | null,
     onSelectCraft: vi.fn(),
   };
@@ -377,6 +387,26 @@ const BOTH_REAGENTS: InvSlot[] = [
   { itemId: REAGENT_A, count: 3 },
   { itemId: REAGENT_B, count: 3 },
 ];
+
+describe('the fine-substitution suffix renders on BOTH claimed surfaces', () => {
+  it('paints the suffix span and folds the same text into the row aria name', () => {
+    // The phase 14 QA: the visible-line-AND-aria-fold claim had zero
+    // rendered arms (only the view's number was pinned). Base copper is
+    // absent and one fine copy covers the bill, so the reagent row must
+    // carry the suffix in the .crafting-fine-sub span and in the row's
+    // composed aria name.
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    paint(el, [
+      { itemId: 'fine_copper_ore', count: 1 },
+      { itemId: REAGENT_B, count: 1 },
+    ]);
+    const sub = el.querySelector('.crafting-fine-sub');
+    expect(sub?.textContent?.trim()).toBe('(spends 1 fine-grade)');
+    expect(el.querySelector('[aria-label*="spends 1 fine-grade"]')).not.toBeNull();
+    el.remove();
+  });
+});
 
 describe('crafting window repaint preserves the player position', () => {
   it('keeps the tab strip scrolled where the player left it', () => {

@@ -27,6 +27,24 @@ const CROWD_LOD_HARD_RIGS = 48;
 const CROWD_LOD_MIN_SCALE = 0.6;
 
 /**
+ * The articulated-rig range BEFORE the crowd and per-tier factors below scale it:
+ * the one distance in this policy that is the same number on every client, in
+ * every scene, on every preset.
+ *
+ * Everything else here is deliberately adaptive, which makes it the wrong anchor
+ * for anything a second client must agree with: `crowdLodScaleSq` reads a
+ * PER-CLIENT, per-frame count of visible rigs, so the live band edges swing by
+ * more than 2x as unrelated players wander in and out of one viewer's frustum,
+ * and two viewers standing in the same spot do not even compute the same edge.
+ * A cosmetic fade keyed to the live edge would therefore pulse on crowd churn
+ * and differ between viewers; keyed to THIS it cannot do either
+ * (`weapon_vfx_shed_core.ts` is the consumer, and its header says why that
+ * matters for graphics-settings fairness).
+ */
+export const CHARACTER_LOD_RANGE = 58;
+export const CHARACTER_LOD_RANGE_SQ = CHARACTER_LOD_RANGE * CHARACTER_LOD_RANGE;
+
+/**
  * Ceiling on the linear range multiplier the animated far band may add on top of
  * the articulated band (58yd base * 1.3 = ~75yd, just inside the 80yd draw cap).
  * `gfx.ts` picks the per-tier value; this module clamps to it so no caller can
@@ -85,7 +103,7 @@ export function animatesEveryFrame(
   entityId: number,
   localPlayerId: number,
   targetId: number | null,
-  castingAbility: string | null,
+  casting: boolean,
   inCombat = false,
   ownerId: number | null = null,
   combatTargetId: number | null = null,
@@ -94,7 +112,7 @@ export function animatesEveryFrame(
   return (
     entityId === localPlayerId ||
     entityId === targetId ||
-    castingAbility !== null ||
+    casting ||
     (inCombat &&
       (ownerId === localPlayerId ||
         combatTargetId === localPlayerId ||
@@ -151,15 +169,15 @@ export function farAnimRangeScale(
 /** The per-frame character LOD plan: squared band edges plus their cadences. */
 export interface CharacterLodBands {
   /** past this, articulated shadows hand off to the static proxy */
-  readonly shadowRangeSq: number;
+  shadowRangeSq: number;
   /** past this, the rig drops to the low far cadence (still articulated) */
-  readonly lodRangeSq: number;
+  lodRangeSq: number;
   /** past this, the rig collapses to the single-draw frozen far mesh */
-  readonly staticRangeSq: number;
+  staticRangeSq: number;
   /** frozen-mesh edge for an entity whose pose is actionable (see below) */
-  readonly actionableStaticRangeSq: number;
-  readonly midCadence: number;
-  readonly farCadence: number;
+  actionableStaticRangeSq: number;
+  midCadence: number;
+  farCadence: number;
 }
 
 /**
@@ -179,18 +197,43 @@ export function characterLodBands(
   tierFarScale: number,
   pressure = 0,
 ): CharacterLodBands {
+  return characterLodBandsInto(
+    {
+      shadowRangeSq: 0,
+      lodRangeSq: 0,
+      staticRangeSq: 0,
+      actionableStaticRangeSq: 0,
+      midCadence: 1,
+      farCadence: 1,
+    },
+    visibleRigs,
+    baseShadowRangeSq,
+    baseLodRangeSq,
+    tierFarScale,
+    pressure,
+  );
+}
+
+/** Fill a caller-owned crowd LOD plan for the renderer hot path. */
+export function characterLodBandsInto(
+  out: CharacterLodBands,
+  visibleRigs: number,
+  baseShadowRangeSq: number,
+  baseLodRangeSq: number,
+  tierFarScale: number,
+  pressure = 0,
+): CharacterLodBands {
   const crowdSq = crowdLodScaleSq(visibleRigs);
   const lodRangeSq = baseLodRangeSq * crowdSq;
   const farScale = farAnimRangeScale(tierFarScale, visibleRigs, pressure);
   const staticRangeSq = lodRangeSq * farScale * farScale;
-  return {
-    shadowRangeSq: baseShadowRangeSq * crowdSq,
-    lodRangeSq,
-    staticRangeSq,
-    actionableStaticRangeSq: Math.max(staticRangeSq, baseLodRangeSq),
-    midCadence: midAnimCadence(visibleRigs),
-    farCadence: farAnimCadence(visibleRigs),
-  };
+  out.shadowRangeSq = baseShadowRangeSq * crowdSq;
+  out.lodRangeSq = lodRangeSq;
+  out.staticRangeSq = staticRangeSq;
+  out.actionableStaticRangeSq = Math.max(staticRangeSq, baseLodRangeSq);
+  out.midCadence = midAnimCadence(visibleRigs);
+  out.farCadence = farAnimCadence(visibleRigs);
+  return out;
 }
 
 /** Whether a rig at `distSq` draws as the frozen far mesh instead of its rig. */

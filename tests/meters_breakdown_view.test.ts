@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BREAKDOWN_GROUP_ROW_CAP,
   BREAKDOWN_ROW_CAP,
   type BreakdownEntry,
   breakdownKey,
+  buildGroupedMeterBreakdown,
   buildMeterBreakdown,
 } from '../src/ui/meters_breakdown_view';
 
@@ -73,5 +75,88 @@ describe('meters hover breakdown', () => {
   it('returns an empty model rather than NaN shares when nothing was recorded', () => {
     const model = buildMeterBreakdown([], 10);
     expect(model).toEqual({ total: 0, perSecond: 0, rows: [] });
+  });
+});
+
+// A pet's output folds into its owner's BAR (the damage-meter convention), which
+// left a hunter unable to answer "how much of that was the pet": the flat model
+// interleaves both by amount and can fold the pet's abilities into `Other` while
+// the owner's fill the panel. The grouped model gives each contributor a
+// subtotal with its own abilities under it.
+describe('grouped hover breakdown (per-contributor subtotals)', () => {
+  it('splits the member and each pet into their own group with a subtotal', () => {
+    const model = buildGroupedMeterBreakdown(
+      [
+        entry('Aimed Shot', 3000),
+        entry('Ashbolt', 1800, 'Emberkin'),
+        entry('Arcane Shot', 600),
+        entry('Firebolt', 400, 'Emberkin'),
+      ],
+      10,
+    );
+    expect(model.total).toBe(5800);
+    expect(model.groups.map((g) => [g.petName, g.amount])).toEqual([
+      [null, 3600],
+      ['Emberkin', 2200],
+    ]);
+    // the two subtotals account for the whole total
+    expect(model.groups.reduce((s, g) => s + g.amount, 0)).toBe(model.total);
+    expect(model.groups.map((g) => g.share)).toEqual([3600 / 5800, 2200 / 5800]);
+    // each contributor's own abilities sit under it, never interleaved
+    expect(model.groups[0].rows.map((r) => r.ability)).toEqual(['Aimed Shot', 'Arcane Shot']);
+    expect(model.groups[1].rows.map((r) => r.ability)).toEqual(['Ashbolt', 'Firebolt']);
+  });
+
+  it('omits a contributor with nothing instead of rendering a zero group', () => {
+    // a just-summoned or idle pet must not add a dead row
+    const model = buildGroupedMeterBreakdown(
+      [entry('Aimed Shot', 300), entry('Claw', 0, 'Emberkin')],
+      10,
+    );
+    expect(model.groups.map((g) => g.petName)).toEqual([null]);
+  });
+
+  it('ranks a pet that out-damages its owner first', () => {
+    const model = buildGroupedMeterBreakdown(
+      [entry('Aimed Shot', 100), entry('Ashbolt', 900, 'Emberkin')],
+      10,
+    );
+    expect(model.groups.map((g) => g.petName)).toEqual(['Emberkin', null]);
+    expect(model.groups.map((g) => g.fill)).toEqual([1, 100 / 900]);
+  });
+
+  it('keeps the member ahead of a pet on an exact tie', () => {
+    const model = buildGroupedMeterBreakdown(
+      [entry('Aimed Shot', 500), entry('Ashbolt', 500, 'Emberkin')],
+      10,
+    );
+    expect(model.groups.map((g) => g.petName)).toEqual([null, 'Emberkin']);
+  });
+
+  it('caps PER GROUP so a pet can never be squeezed out by its owner', () => {
+    const owner = Array.from({ length: 20 }, (_, i) => entry(`Skill${i}`, 500 - i));
+    const model = buildGroupedMeterBreakdown([...owner, entry('Ashbolt', 1, 'Emberkin')], 10);
+    // the owner's tail folds inside the OWNER's group...
+    expect(model.groups[0].rows).toHaveLength(BREAKDOWN_GROUP_ROW_CAP);
+    expect(model.groups[0].rows.at(-1)?.folded).toBeGreaterThan(0);
+    // ...and the pet still has its own group with its ability intact
+    expect(model.groups[1].petName).toBe('Emberkin');
+    expect(model.groups[1].rows.map((r) => r.ability)).toEqual(['Ashbolt']);
+  });
+
+  it('measures every row against the whole total so pet and owner rows compare', () => {
+    const model = buildGroupedMeterBreakdown(
+      [entry('Aimed Shot', 750), entry('Ashbolt', 250, 'Emberkin')],
+      10,
+    );
+    // 250 of a 1000 total reads 25%, not 100% of its own one-row group
+    expect(model.groups[1].rows[0].share).toBe(0.25);
+    expect(model.groups[0].rows[0].share).toBe(0.75);
+  });
+
+  it('handles an all-zero segment without dividing by zero', () => {
+    const model = buildGroupedMeterBreakdown([entry('Aimed Shot', 0)], 10);
+    expect(model.total).toBe(0);
+    expect(model.groups).toEqual([]);
   });
 });

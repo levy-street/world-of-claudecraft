@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // THE BUG (#2529): a runtime language change does not reload the page. It
 // dispatches `woc:languagechange`, and `Hud.refreshLocalizedDynamicUi()` forces

@@ -30,6 +30,8 @@ const IDLE: MoveInput = {
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
 };
 
 function makeSim(): Sim {

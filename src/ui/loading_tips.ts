@@ -12,6 +12,7 @@ const LOADING_TIP_KEYS: TranslationKey[] = [
   'loading.tips.professions',
   'loading.tips.loadouts',
   'loading.tips.pvp',
+  'loading.tips.reliquary',
 ];
 
 export interface LoadingTipRotation {

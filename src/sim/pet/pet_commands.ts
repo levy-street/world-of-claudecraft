@@ -36,9 +36,12 @@
 // routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
-import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
+import { clearPacklordState } from '../combat/hunter_packlord';
+import { isTemporaryNecromancyUndead } from '../combat/necromancy';
+import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
-import type { PetState } from '../sim';
+import { consumeSelectedInventorySlot } from '../item_copy_ref';
+import type { PetState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
 import {
@@ -50,7 +53,12 @@ import {
   PET_GROWL_INTERVAL,
   type PetMode,
 } from '../types';
-import { startWaterJet } from './pet_ai';
+import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
+import { isTameableFamily } from './pet_scaling';
+import { isPrimaryOwnedPetEntity } from './pet_selection';
+import { petCanForceTaunt } from './pet_taunt_gate';
+import { warlockPetScaleAtLevel } from './warlock_pet_growth';
+import { useWarlockPetSkill } from './warlock_pet_skills';
 
 // Slice-only tuning consts, moved verbatim from sim.ts with the slice.
 const PET_TAUNT_RANGE = 5;
@@ -60,7 +68,17 @@ const DEMON_HEAL_MANA_COST = 55;
 const DEMON_HEAL_DURATION = 5;
 const DEMON_HEAL_TICK = 1;
 const TAMED_TARGET_RESPAWN_SECONDS = 60;
+// Share of its pool a revived pet stands up with. The Revive Pet command's number,
+// named here because the owner's own resurrection now performs the same work for
+// free and must hand the pet back at exactly what the command would have given
+// (pet/pet_owner_revive.ts).
+export const PET_REVIVE_HP_FRACTION = 0.35;
 const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
+
+function templateHasPetSpecial(templateId: string): boolean {
+  const template = MOBS[templateId];
+  return !!template && (!!template.petChainPull || !!template.petRanged?.active);
+}
 
 // A live pet check fails while inside a delve even for owners with a valid
 // equipped pet (it is stowed for the run, see stowPetForDelve/restorePetFromDelveStash),
@@ -90,7 +108,7 @@ function nonPlayerAuraHp(aura: Aura): number {
 }
 
 export function applyNonPlayerStatAura(
-  ctx: SimContext,
+  _ctx: SimContext,
   target: Entity,
   aura: Aura,
   direction: 1 | -1,
@@ -129,14 +147,30 @@ export function clearNonPlayerStatAuras(ctx: SimContext, target: Entity): void {
 export function petOf(ctx: SimContext, ownerPid: number, includeDead = false): Entity | null {
   for (const e of ctx.entities.values()) {
     if (
-      e.kind === 'mob' &&
-      e.ownerId === ownerPid &&
+      isPrimaryOwnedPetEntity(e, ownerPid) &&
+      !e.guardianState &&
       !ctx.isDelveCompanionMob(e) &&
       (includeDead || !e.dead)
     )
       return e;
   }
   return null;
+}
+
+/** Living combat units addressed by the owner's direct attack command.
+ *  Temporary Necromancy servants remain excluded from petOf so they never
+ *  replace or persist as the owner's primary pet, but still obey group attack
+ *  orders alongside the persistent Graveguard. */
+function combatCommandPetsOf(ctx: SimContext, ownerPid: number): Entity[] {
+  const pets: Entity[] = [];
+  const persistent = petOf(ctx, ownerPid);
+  if (persistent) pets.push(persistent);
+  for (const entity of ctx.entities.values()) {
+    if (entity.ownerId === ownerPid && !entity.dead && isTemporaryNecromancyUndead(entity)) {
+      pets.push(entity);
+    }
+  }
+  return pets;
 }
 
 export function serializePet(ctx: SimContext, ownerPid: number): PetState | null {
@@ -155,7 +189,23 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
     mode: pet.petMode,
     autoTaunt: pet.petAutoTaunt,
     autoWaterJet: pet.petAutoWaterJet,
+    autoSkill: pet.petAutoSkill,
   };
+}
+
+export function canRestorePetState(meta: PlayerMeta, state: PetState): boolean {
+  const summonsTemplate = (ability: (typeof ABILITIES)[string]): boolean =>
+    ability.effects.some(
+      (effect) =>
+        (effect.type === 'summonDemon' && effect.mobId === state.templateId) ||
+        (effect.type === 'summonPet' && effect.templateId === state.templateId) ||
+        (effect.type === 'summonUndead' && effect.templateId === state.templateId),
+    );
+  const classCanSummon = Object.values(ABILITIES).some(
+    (ability) => ability.class === meta.cls && summonsTemplate(ability),
+  );
+  if (!classCanSummon) return true;
+  return meta.known.some((ability) => summonsTemplate(ability.def));
 }
 
 /** A summoned warlock demon (imp/voidwalker/succubus/felhunter/doomguard/infernal,
@@ -192,12 +242,17 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
   const level = owner.level;
   const pos = ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1);
   const pet = createMob(ctx.nextId++, template, level, pos);
+  pet.scale = warlockPetScaleAtLevel(template, level);
   pet.name = cleanPetName(state.name) ?? template.name;
   pet.ownerId = owner.id;
   pet.petMode = state.mode ?? 'defensive';
   pet.petTauntTimer = 0;
   pet.petAutoTaunt = state.autoTaunt ?? false;
   pet.petAutoWaterJet = state.autoWaterJet ?? false;
+  pet.petSkillTimer = 0;
+  pet.petAutoSkill =
+    owner.petSpecialCommandsSupported !== false &&
+    (state.autoSkill ?? templateHasPetSpecial(state.templateId));
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = state.dead ? 'dead' : 'idle';
@@ -208,6 +263,10 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
   pet.lootable = false;
   pet.wanderTarget = null;
   clearThreat(pet);
+  // Grow the pool by the owner's share BEFORE restoring the saved health, so a
+  // pet saved at full comes back at the full inherited pool rather than at the
+  // template pool with the share bolted on afterwards.
+  applyPetOwnerScaling(ctx, pet);
   if (state.dead) {
     pet.dead = true;
     pet.hp = 0;
@@ -231,9 +290,13 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   pet.weapon = scaled.weapon;
   pet.stats.armor = scaled.stats.armor;
   pet.moveSpeed = scaled.moveSpeed;
-  pet.scale = scaled.scale;
+  pet.scale = warlockPetScaleAtLevel(template, owner.level);
   pet.color = scaled.color;
   pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
+  // maxHp/armor were just rebuilt from the template alone, so the owner's share is
+  // gone with them: drop the tracked delta before re-deriving it at the new level.
+  pet.petOwnerHpBonus = 0;
+  applyPetOwnerScaling(ctx, pet);
 }
 
 function cleanPetName(raw: string): string | null {
@@ -244,8 +307,7 @@ function cleanPetName(raw: string): string | null {
 export function tameError(ctx: SimContext, p: Entity, target: Entity): string | null {
   if (target.kind !== 'mob' || !target.hostile) return 'You cannot tame that.';
   const template = MOBS[target.templateId];
-  if (!template || (template.family !== 'beast' && template.family !== 'spider'))
-    return 'Only beasts can be tamed.';
+  if (!template || !isTameableFamily(template.family)) return 'Only beasts can be tamed.';
   if (template.elite || template.boss || template.rare) return 'That beast is too strong to tame.';
   if (target.level > p.level) return 'That beast is too high level for you to tame.';
   if (target.spawnPos.x > DUNGEON_X_THRESHOLD) return 'You cannot tame dungeon creatures.';
@@ -272,6 +334,8 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
   pet.petTauntTimer = 0;
   pet.petAutoTaunt = false;
   pet.petAutoWaterJet = false;
+  pet.petSkillTimer = 0;
+  pet.petAutoSkill = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = 'idle';
@@ -279,6 +343,9 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
   pet.inCombat = false;
   pet.tappedById = null;
   pet.auras = [];
+  // Apply the owner's share before the full-health fill so a freshly tamed beast
+  // starts at its inherited pool, not the bare template pool.
+  applyPetOwnerScaling(ctx, pet);
   pet.hp = pet.maxHp;
   pet.loot = null;
   pet.lootable = false;
@@ -354,12 +421,23 @@ export function createDemonPet(
     owner.level,
     ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1),
   );
+  pet.scale = warlockPetScaleAtLevel(template, owner.level);
   pet.name = template.name;
   pet.ownerId = owner.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
-  pet.petAutoTaunt = false;
+  // A melee_tank demon (Gloomshade) is built to hold threat, so it comes up with
+  // auto-taunt already on for a solo owner; every other demon keeps the old opt-in
+  // default. petCanForceTaunt is the shared taunt-eligibility gate (pet_taunt_gate.ts)
+  // so a future tank demon that can't taunt doesn't default on. In a party/raid,
+  // default off: an unattended 10s Growl cycle would rip non-boss adds off the real
+  // tank (classic keeps autocast Torment off by default for the same reason), so
+  // grouped owners keep the manual /pettaunt opt-in instead.
+  pet.petAutoTaunt =
+    template.petRole === 'melee_tank' && petCanForceTaunt(mobId) && !ctx.partyOf(owner.id);
   pet.petAutoWaterJet = false;
+  pet.petSkillTimer = 0;
+  pet.petAutoSkill = owner.petSpecialCommandsSupported !== false && templateHasPetSpecial(mobId);
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = 'idle';
@@ -384,6 +462,9 @@ export function createDemonPet(
 }
 
 export function despawnPersistentPet(ctx: SimContext, pet: Entity): void {
+  const owner = pet.ownerId === null ? null : ctx.entities.get(pet.ownerId);
+  const ownerMeta = owner ? ctx.players.get(owner.id) : null;
+  if (owner && ownerMeta?.cls === 'hunter') clearPacklordState(ctx, owner);
   clearNonPlayerStatAuras(ctx, pet);
   pet.auras = [];
   clearThreat(pet);
@@ -423,6 +504,7 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
   const healed = Math.min(amount, pet.maxHp - pet.hp);
   if (healed <= 0) return;
   pet.hp += healed;
+  const overheal = amount - healed;
   ctx.emit({
     type: 'heal2',
     sourceId: owner.id,
@@ -430,6 +512,7 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
     amount: healed,
     crit: false,
     ability: 'Demon Heal',
+    ...(overheal > 0 ? { overheal } : {}),
   });
   ctx.healingThreat(owner, pet, healed);
 }
@@ -528,7 +611,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
   pet.pos = ctx.groundPos(r.e.pos.x + 2, r.e.pos.z + 1);
   pet.prevPos = { ...pet.pos };
   ctx.rebucket(pet);
-  pet.hp = Math.max(1, Math.round(pet.maxHp * 0.35));
+  pet.hp = Math.max(1, Math.round(pet.maxHp * PET_REVIVE_HP_FRACTION));
   ctx.emit({
     type: 'log',
     text: `${pet.name} returns to your side.`,
@@ -546,19 +629,21 @@ export function petAttack(ctx: SimContext, pid?: number): void {
   }
   if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
-  const pet = petOf(ctx, r.e.id);
-  if (!pet) {
+  const pets = combatCommandPetsOf(ctx, r.e.id);
+  if (pets.length === 0) {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
-  if (!target || target.dead || !ctx.isHostileTo(pet, target)) {
+  if (!target || target.dead || !ctx.isHostileTo(pets[0], target)) {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
-  pet.aggroTargetId = target.id;
-  pet.inCombat = true;
-  if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
+  for (const pet of pets) {
+    pet.aggroTargetId = target.id;
+    pet.inCombat = true;
+    if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
+  }
 }
 
 export function petTaunt(ctx: SimContext, pid?: number): void {
@@ -575,7 +660,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
-  if (MOBS[pet.templateId]?.petCanTaunt === false) return;
+  if (!petCanForceTaunt(pet.templateId)) return;
   if (pet.petTauntTimer > 0) {
     ctx.error(r.e.id, 'Pet taunt is not ready.');
     return;
@@ -618,7 +703,38 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   startWaterJet(ctx, pet, target, jet);
 }
 
-export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
+/** Manual pet-bar cast for a template-authored signature ability. Gloomshade
+ *  pulls with Abyssal Chain; Emberkin launches an extra Felbolt. */
+export function petSpecial(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  if (!isPetClass(r.meta.cls)) {
+    ctx.error(r.e.id, 'Only pet classes can command pets.');
+    return;
+  }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
+  r.meta.lastActiveTick = ctx.tickCount;
+  const pet = petOf(ctx, r.e.id);
+  if (!pet) {
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
+    return;
+  }
+  // Manual commands share the pet AI's control gate: a stunned demon cannot
+  // bypass its own incapacitation merely because the owner pressed the bar.
+  if (ctx.isStunned(pet)) return;
+  if (!templateHasPetSpecial(pet.templateId) || (pet.petSkillTimer ?? 0) > 0) return;
+  const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
+  if (!target || target.dead || !ctx.isHostileTo(pet, target)) {
+    ctx.error(r.e.id, 'Your pet needs a hostile target.');
+    return;
+  }
+  if (!useWarlockPetSkill(ctx, pet, target, petRangedAttack)) return;
+  pet.aggroTargetId = target.id;
+  pet.inCombat = true;
+  if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
+}
+
+export function feedPet(ctx: SimContext, itemId: string, pid?: number, slotIndex?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   if (r.meta.cls !== 'hunter') {
@@ -644,7 +760,20 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(r.e.id, 'Your pet is already at full health.');
     return;
   }
-  ctx.removeItem(itemId, 1, r.e.id);
+  // A named slot consumes exactly that copy; an id-only call keeps the legacy
+  // newest-first walk (ctx.removeItem) untouched.
+  if (slotIndex !== undefined) {
+    if (consumeSelectedInventorySlot(r.meta.inventory, itemId, slotIndex) === null) {
+      // Say why. Every other surface in this family emits the same line; a silent
+      // refusal reads to the player as the button being broken.
+      ctx.error(r.e.id, "You don't have that item.");
+      return;
+    }
+    ctx.onInventoryChangedForQuests?.(r.meta);
+  } else {
+    ctx.removeItem(itemId, 1, r.e.id);
+  }
+
   pet.auras = pet.auras.filter((a) => a.id !== 'feed_pet');
   ctx.applyAura(pet, {
     id: 'feed_pet',
@@ -726,19 +855,28 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
   }
   if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
-  const pet = petOf(ctx, r.e.id, true);
-  if (!pet) {
+  const pets = combatCommandPetsOf(ctx, r.e.id);
+  const deadPrimary = petOf(ctx, r.e.id, true);
+  if (deadPrimary && !pets.some((pet) => pet.id === deadPrimary.id)) pets.push(deadPrimary);
+  if (pets.length === 0) {
     ctx.error(r.e.id, noPetError(r.e));
     return;
   }
-  pet.petMode = mode;
-  if (mode === 'passive') {
-    pet.aggroTargetId = null;
-    pet.inCombat = false;
-    pet.autoAttack = false;
-    pet.petManualTauntPending = false;
+  for (const pet of pets) {
+    pet.petMode = mode;
+    if (mode === 'passive') {
+      pet.aggroTargetId = null;
+      pet.inCombat = false;
+      pet.autoAttack = false;
+      pet.petManualTauntPending = false;
+    }
   }
-  ctx.emit({ type: 'log', text: `${pet.name} is now ${mode}.`, color: '#ffd100', pid: r.e.id });
+  ctx.emit({
+    type: 'log',
+    text: `${deadPrimary?.name ?? pets[0].name} is now ${mode}.`,
+    color: '#ffd100',
+    pid: r.e.id,
+  });
 }
 
 export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number): void {
@@ -755,7 +893,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
     ctx.error(r.e.id, noPetError(r.e));
     return;
   }
-  if (MOBS[pet.templateId]?.petCanTaunt === false) {
+  if (!petCanForceTaunt(pet.templateId)) {
     pet.petAutoTaunt = false;
     return;
   }
@@ -787,6 +925,28 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
   pet.petAutoWaterJet = enabled;
 }
 
+/** Autocast toggle for the signature ability shown on a Warlock pet's bar. */
+export function setPetAutoSpecial(ctx: SimContext, enabled: boolean, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  if (!isPetClass(r.meta.cls)) {
+    ctx.error(r.e.id, 'Only pet classes can command pets.');
+    return;
+  }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
+  r.meta.lastActiveTick = ctx.tickCount;
+  const pet = petOf(ctx, r.e.id, true);
+  if (!pet) {
+    ctx.error(r.e.id, noPetError(r.e));
+    return;
+  }
+  if (!templateHasPetSpecial(pet.templateId)) {
+    pet.petAutoSkill = false;
+    return;
+  }
+  pet.petAutoSkill = enabled;
+}
+
 // -------------------------------------------------------------------------
 // Readouts (/pettaunt, /pet) — return strings the Sim command handlers surface.
 // -------------------------------------------------------------------------
@@ -797,7 +957,7 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
 export function petTauntReadout(ctx: SimContext, owner: Entity): string {
   const pet = petOf(ctx, owner.id);
   if (!pet) return 'You do not have a pet.';
-  if (MOBS[pet.templateId]?.petCanTaunt === false) return 'This pet cannot taunt.';
+  if (!petCanForceTaunt(pet.templateId)) return 'This pet cannot taunt.';
   if (pet.petTauntTimer <= 0) {
     return pet.petAutoTaunt
       ? `Your pet's Growl is ready. Auto-taunt is on.`

@@ -96,8 +96,8 @@ stall cone walk), `tests/parkour.test.ts` + `tests/physics_character.test.ts`
 bench stride, flat-canopy grab, the full-height sweep over the beacon, walls,
 armoury, and notice board, plus the re-anchored legacy chapel and gable
 flows), `tests/town_collision.test.ts` (station furniture + headstones),
-captures under `docs/screenshots/dungeon-parkour-roofs/` and
-`docs/screenshots/ledge-climb-roofs/`.
+and the automated parkour / climb / town-collision suites above (visual PR
+captures for roof work are ephemeral before/after shots, not permanent docs).
 
 ## Slope glue: walking up a pitched surface stays grounded
 

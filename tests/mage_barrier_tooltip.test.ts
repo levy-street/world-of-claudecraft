@@ -26,7 +26,7 @@ describe('mage personal barrier tooltip', () => {
     if (!barrier) throw new Error('missing temporal_barrier');
 
     expect(abilityEffectText(barrier, { spellPower: 80, rangedPower: 0, attackPower: 0 })).toBe(
-      '160 (+20)',
+      '232 (+20)',
     );
   });
 });

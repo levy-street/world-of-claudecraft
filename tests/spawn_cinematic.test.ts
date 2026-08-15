@@ -97,7 +97,6 @@ describe('spawn cinematic entry policy', () => {
     seen: false,
     playerLevel: 1,
     reducedMotion: false,
-    native: false,
     platform: 'web',
     engine: 'chromium',
     constrainedMemory: false,
@@ -108,12 +107,11 @@ describe('spawn cinematic entry policy', () => {
     expect(decideSpawnCinematic(eligible)).toEqual({ play: true, reason: 'eligible' });
   });
 
-  it('suppresses the GPU-heavy pan on constrained native iOS WebKit at every non-Low preset', () => {
+  it('suppresses the GPU-heavy pan on constrained iOS WebKit at every non-Low preset, native app or plain browser alike', () => {
     for (const graphicsPreset of [2, 3, 4, 5]) {
       expect(
         decideSpawnCinematic({
           ...eligible,
-          native: true,
           platform: 'ios',
           engine: 'webkit',
           constrainedMemory: true,
@@ -123,17 +121,15 @@ describe('spawn cinematic entry policy', () => {
     }
   });
 
-  it('requires every native iOS WebKit risk predicate before suppressing the cinematic', () => {
+  it('requires every iOS WebKit risk predicate before suppressing the cinematic', () => {
     const risky = {
       ...eligible,
-      native: true,
       platform: 'ios',
       engine: 'webkit',
       constrainedMemory: true,
     };
     for (const safe of [
       { ...risky, graphicsPreset: 1 },
-      { ...risky, native: false },
       { ...risky, platform: 'android' },
       { ...risky, engine: 'chromium' },
       { ...risky, constrainedMemory: false },
@@ -160,7 +156,6 @@ describe('spawn cinematic entry policy', () => {
       'seen: introSeen',
       'playerLevel: world.player.level',
       "reducedMotion: settings.get('reduceMotion') || osReducedMotion",
-      'native: isNativeRuntime()',
       'platform: mobilePlatform()',
       'engine: startupBrowserEnv.engine',
       'constrainedMemory: GFX.constrainedMemory',

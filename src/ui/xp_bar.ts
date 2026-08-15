@@ -3,6 +3,7 @@
 // tested directly. All display strings route through i18n's t().
 
 import { MAX_LEVEL, virtualLevelProgress, xpForLevel } from '../sim/types';
+import { clamp01 } from './clamp';
 import { formatNumber, t } from './i18n';
 
 export interface XpBarInput {
@@ -76,8 +77,4 @@ export function xpBarView(input: XpBarInput): XpBarView {
     `${formatXp(lifetimeXp)} ${t('game.xp.totalXp')}  ·  ` +
     `${formatPercent(prog.into / prog.span)} ${t('game.xp.toNext')}`;
   return { fillFrac: clamp01(prog.into / prog.span), restedFrac: 0, label, postCap: true };
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
 }

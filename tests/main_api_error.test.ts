@@ -38,6 +38,24 @@ describe('userFacingApiError code-first resolution', () => {
     expect(userFacingApiError(err)).not.toBe('db write failed 0x9');
   });
 
+  it('localizes Seeker entitlement failures by stable code', () => {
+    const cases = [
+      ['seeker.native_only', 'apiError.seeker.native_only'],
+      ['seeker.attestation_failed', 'apiError.seeker.attestation_failed'],
+      ['seeker.wallet_required', 'apiError.seeker.wallet_required'],
+      ['seeker.genesis_token_required', 'apiError.seeker.genesis_token_required'],
+      ['seeker.genesis_token_claimed', 'apiError.seeker.genesis_token_claimed'],
+      ['seeker.entitlement_required', 'apiError.seeker.entitlement_required'],
+      ['seeker.current_ownership_required', 'apiError.seeker.current_ownership_required'],
+    ] as const;
+
+    for (const [code, key] of cases) {
+      const raw = `raw server detail for ${code}`;
+      expect(userFacingApiError(new ApiError(raw, 403, code))).toBe(t(key));
+      expect(userFacingApiError(new ApiError(raw, 403, code))).not.toBe(raw);
+    }
+  });
+
   it('falls back to the prose arm for an un-migrated raw-English error (no code)', () => {
     const err = new Error('username already taken');
     expect(userFacingApiError(err)).toBe(t('errors.api.usernameTaken'));

@@ -11,6 +11,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import { type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Policy tests for the online display-only self extrapolator, driven against a
 // REAL lagging authority: a live Sim plays the server (inputs arrive lagMs
@@ -29,6 +30,8 @@ const mi = (over: Partial<MoveInput> = {}): MoveInput => ({
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
   ...over,
 });
 
@@ -79,7 +82,12 @@ class Lab {
     readonly frameMs = FRAME_MS,
     opts: { start?: { x: number; z: number }; facing?: number } = {},
   ) {
-    this.srv = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+    this.srv = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     this.srv.setPlayerLevel(60);
     const start = opts.start ?? { x: 0, z: -80 };
     teleport(this.srv, start.x, start.z);
@@ -165,7 +173,7 @@ describe('SelfMotionPredictor', () => {
       type: 'unstuck',
       phase: 'completed',
       pid: 7,
-      reason: 'nearest_graveyard',
+      reason: 'moved_to_graveyard',
       area: { kind: 'overworld', id: 'eastbrook_vale' },
       origin: { x: 0, y: 0, z: 0, localX: 0, localZ: 0 },
       destination: { x: 0, y: 0, z: 4, localX: 0, localZ: 4 },
@@ -183,7 +191,12 @@ describe('SelfMotionPredictor', () => {
   });
 
   it('snaps both predictive and fallback poses on a sub-threshold authoritative recovery', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     teleport(sim, 0, -40);
     const self = {
       ...sim.player,

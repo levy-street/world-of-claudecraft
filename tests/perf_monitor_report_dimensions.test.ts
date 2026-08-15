@@ -25,6 +25,7 @@ function installBrowserGlobals(search = ''): { appendChild: ReturnType<typeof vi
     createElement: () => ({
       style: {},
       addEventListener: () => {},
+      appendChild: () => {},
     }),
   };
   Object.defineProperty(globalThis, 'navigator', {
@@ -70,6 +71,13 @@ describe('perf monitor ungated mainMs buckets', () => {
     ).toThrow('boom');
     // Both calls recorded even though the second threw (finally arm).
     expect(perf.snapshot(1000).mainMs.events.count).toBe(2);
+  });
+
+  it('records the same bucket through the allocation-free start and finish seam', () => {
+    const perf = new PerfMonitor(null);
+    const start = perf.startTime();
+    perf.finishTime('renderer', start);
+    expect(perf.snapshot(1000).mainMs.renderer.count).toBe(1);
   });
 
   it('keeps the overlay mount, input chain, and dev-trace spans gated while buckets record', () => {
@@ -157,5 +165,74 @@ describe('perf monitor worst-10s window', () => {
     expect(perf.snapshot(140_000).windows.worst10s).not.toBeNull();
     perf.reset();
     expect(perf.snapshot(141_000).windows.worst10s).toBeNull();
+  });
+});
+
+describe('perf monitor forensics state assembly', () => {
+  // The day-night commit's claim: the forensics vector carries the dimensions
+  // that separate a night hitch cluster (streetlamps lit, more active point
+  // lights) from the same cluster at noon. Stub renderer, real assembly path.
+  it('assembles the day-night and light dimensions from the renderer stats', () => {
+    const perf = new PerfMonitor(null);
+    const stats = {
+      programs: 700,
+      textures: 900,
+      geometries: 800,
+      calls: 1200,
+      triangles: 9_000_000,
+      views: 40,
+      gpuQueue: { units: 3, totalSyncMs: 12.6, stallCount: 2 },
+      effectiveRenderScale: 1,
+      renderBudget: { mode: 'steady' },
+      nightAmount: 0.85,
+      qualityBuckets: { features: { activePointLights: 6 } },
+      lastFrame: { biome: 'marsh', playerPosition: { x: 123.4, z: -55.6 }, activeViews: 33 },
+    };
+    perf.setRenderer({ perfStats: () => stats, setHitchLogEnabled: () => {} } as never);
+
+    const state = (perf as never as { forensicsState(): Record<string, unknown> }).forensicsState();
+
+    expect(state.nightAmount).toBe(0.85);
+    expect(state.activePointLights).toBe(6);
+    expect(state.programs).toBe(700);
+    expect(state.gpuQueueSyncMs).toBe(13);
+    // A wedged unit moves neither units nor sync time, so the stall counter is
+    // the dimension that can bracket a hitch with a queue that stopped draining.
+    expect(state.gpuQueueStalls).toBe(2);
+    // A renderer that predates the frame-cost metric (or any stub, as here)
+    // carries no totalFrameGapMs. It must read 0, never NaN: `diffStates`
+    // compares with !==, and NaN !== NaN, so a NaN dimension would emit a
+    // spurious diff entry on EVERY hitch record it appears in.
+    expect(state.gpuQueueFrameGapMs).toBe(0);
+    expect(state.biome).toBe('marsh');
+    expect(state.px).toBe(123);
+    expect(state.pz).toBe(-56);
+    expect(state.activeViews).toBe(33);
+  });
+
+  // The frame-cost dimension is the arm that stops a background unit's hitch
+  // reading as an empty diff. It is CUMULATIVE on purpose: a running max stops
+  // moving after the first record and goes quiet for every later occurrence.
+  it('carries the cumulative gpu-queue frame-gap cost into the forensics vector', () => {
+    const perf = new PerfMonitor(null);
+    const stats = {
+      programs: 1,
+      textures: 1,
+      geometries: 1,
+      calls: 1,
+      triangles: 1,
+      views: 1,
+      gpuQueue: { units: 9, totalSyncMs: 40, totalFrameGapMs: 812.4, stallCount: 0 },
+      effectiveRenderScale: 1,
+      renderBudget: { mode: 'steady' },
+      nightAmount: 0,
+      qualityBuckets: { features: { activePointLights: 0 } },
+      lastFrame: { biome: 'vale', playerPosition: { x: 0, z: 0 }, activeViews: 1 },
+    };
+    perf.setRenderer({ perfStats: () => stats, setHitchLogEnabled: () => {} } as never);
+
+    const state = (perf as never as { forensicsState(): Record<string, unknown> }).forensicsState();
+
+    expect(state.gpuQueueFrameGapMs).toBe(812);
   });
 });

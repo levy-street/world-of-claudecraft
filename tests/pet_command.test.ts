@@ -114,11 +114,23 @@ describe('/pet command', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('hunter', 'Aleph');
     const pet = givePet(sim, a);
-    pet.hp = Math.round(pet.maxHp * 0.5);
+    // givePet adopts a wild mob directly rather than going through completeTame, so
+    // the pet arrives without the owner's inherited share (pet/pet_scaling.ts). Tick
+    // once to let that settle before pinning a ratio: the first application grows the
+    // pool AND hands the pet the new headroom, which would otherwise move the
+    // percentage out from under this assertion. A real tame is already scaled.
+    sim.tick();
+    // Pin an exact pool so the ratio is unambiguous. The inherited share leaves an odd
+    // pool where no integer HP reads as exactly 50%, and the readout's rounding is
+    // what this test is actually about. Re-deriving is a no-op once the share has
+    // settled (the delta is zero), so maxHp stays put through the tick below.
+    pet.maxHp = 100;
+    pet.hp = 50;
     sim.tick();
 
     sim.chat('/pet', a);
     const text = errorText(sim.tick())!;
+    expect(text).toContain('HP 50/100');
     expect(text).toContain('(50%)');
   });
 

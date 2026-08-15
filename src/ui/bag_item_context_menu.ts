@@ -16,6 +16,7 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { ENCHANTS } from '../sim/content/enchants';
+import { isItemLocked } from '../sim/item_lock';
 import { isDisenchantable, isEnchantedInstance } from '../sim/professions/enchanting';
 import { isSalvageable } from '../sim/professions/salvage';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
@@ -34,7 +35,7 @@ export function isEnchantReagentItem(itemId: string): boolean {
   return ENCHANT_REAGENT_IDS.has(itemId);
 }
 
-export type BagItemNewActionId = 'disenchant' | 'salvage' | 'applyEnchant';
+export type BagItemNewActionId = 'disenchant' | 'salvage' | 'applyEnchant' | 'lock' | 'unlock';
 export type BagItemContextActionId = 'default' | BagItemNewActionId;
 
 export interface BagItemContextAction {
@@ -46,6 +47,8 @@ const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   disenchant: 'hudChrome.itemMenu.disenchant',
   salvage: 'hudChrome.itemMenu.salvage',
   applyEnchant: 'hudChrome.itemMenu.applyEnchant',
+  lock: 'hudChrome.bags.lockItem',
+  unlock: 'hudChrome.bags.unlockItem',
 };
 
 /** The classic left-click verb for the default (first) menu row, so the menu's
@@ -61,27 +64,47 @@ function defaultActionLabelKey(def: ItemDef): TranslationKey {
 }
 
 /** The eligible new actions for this item, in fixed order (disenchant,
- *  salvage, apply-enchant). Empty when none apply, which is what keeps a plain
- *  item's right-click byte-identical to today. */
-export function bagItemNewActions(def: ItemDef, itemId: string): BagItemNewActionId[] {
+ *  salvage, apply-enchant, then the player item lock toggle last). `instance`
+ *  is the specific copy the click resolved (issue 3042): a locked copy never
+ *  offers salvage (mirrors the sim's evaluateSalvageAdmission 'locked' deny),
+ *  and every item, gear or not, always offers exactly one of lock/unlock, so
+ *  the toggle is reachable from any bag cell. Disenchant and apply-enchant
+ *  stay available on a locked copy: the lock protects against salvage, craft
+ *  consumption, and vendor sale only (the issue's own first-pass scope), not
+ *  every profession action. */
+export function bagItemNewActions(
+  def: ItemDef,
+  itemId: string,
+  instance?: ItemInstancePayload,
+): BagItemNewActionId[] {
   const out: BagItemNewActionId[] = [];
   if (isDisenchantable(def)) out.push('disenchant');
-  if (isSalvageable(def)) out.push('salvage');
+  if (isSalvageable(def) && !isItemLocked(instance)) out.push('salvage');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
+  out.push(isItemLocked(instance) ? 'unlock' : 'lock');
   return out;
 }
 
-/** Whether this item has at least one new action, so a right-click / tap
- *  opens the menu instead of running the classic action directly. */
-export function bagItemHasContextActions(def: ItemDef, itemId: string): boolean {
-  return bagItemNewActions(def, itemId).length > 0;
+/** Every item now carries at least the lock/unlock row (issue 3042), so this
+ *  is always true; kept as a named predicate so callers read intent rather
+ *  than a bare truthy array length. */
+export function bagItemHasContextActions(
+  def: ItemDef,
+  itemId: string,
+  instance?: ItemInstancePayload,
+): boolean {
+  return bagItemNewActions(def, itemId, instance).length > 0;
 }
 
 /** The full ordered menu: the classic default row first (so left-click's binding
  *  survives as row one), then each eligible new action. */
-export function bagItemContextActions(def: ItemDef, itemId: string): BagItemContextAction[] {
+export function bagItemContextActions(
+  def: ItemDef,
+  itemId: string,
+  instance?: ItemInstancePayload,
+): BagItemContextAction[] {
   const rows: BagItemContextAction[] = [{ id: 'default', labelKey: defaultActionLabelKey(def) }];
-  for (const id of bagItemNewActions(def, itemId)) {
+  for (const id of bagItemNewActions(def, itemId, instance)) {
     rows.push({ id, labelKey: NEW_ACTION_LABEL_KEY[id] });
   }
   return rows;

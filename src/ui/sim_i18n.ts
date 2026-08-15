@@ -13,7 +13,7 @@
 // matcher — so a new unhandled sim string cannot ship silently.
 import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
-import { tEntity } from './entity_i18n';
+import { localizedRiftName, tEntity } from './entity_i18n';
 import {
   formatNumber,
   getLanguage,
@@ -24,6 +24,7 @@ import {
   t,
 } from './i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
+import { localizeTalentTitle } from './talent_i18n';
 
 const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
@@ -35,6 +36,7 @@ const baseEnTable = {
   'error.bagSocketsFull': 'All your bag slots are full.',
   'error.bagSwapTooManyItems': 'You have too many items to swap to that bag.',
   'error.bagRemoveTooManyItems': 'You have too many items to remove that bag.',
+  'error.bagEquipHasProperty': 'That bag cannot be equipped while it carries a special property.',
   'error.tradeBagSpace': 'Trade failed: not enough bag space.',
   'log.bagsMigrated': 'Your belongings have been packed into new bags.',
   // Bank (guild-bank-ready pooled bank; src/sim/bank.ts). The error.* lines are the
@@ -45,9 +47,55 @@ const baseEnTable = {
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
+  // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
+  // item store. The error.* lines are the refusal toasts (too-far, quest-item,
+  // and "Not enough money." reuse the existing rows above / the hud arm); the
+  // log.* lines are the success notices. The four parameterized log.* rows are
+  // matched by RULES entries; the rest register in the EXACT matcher
+  // automatically.
+  // Deliberately NOT the bare 'You are not in a guild.': that exact sentence is
+  // already server_i18n's guild.notInOne (emitted 8x from server/social.ts), and
+  // the hud runs the server matcher FIRST, so a duplicate row here would be dead
+  // at runtime while still shipping a second per-locale copy free to diverge.
+  // The guild-bank refusal names its own feature instead, so this row is the
+  // ONE that renders it.
+  'error.guildBankNoGuild': 'You must be in a guild to use the guild bank.',
+  'error.guildBankRank': 'Only guild officers may use the guild bank.',
+  'error.guildBankFull': 'The guild bank is full.',
+  // The anonymous-pipe item policy refusals (guildBankPipeRefusal). DEPOSIT names
+  // the dimension: quest and soulbound get their own lines; noMarketList and
+  // transfer-locked copies share the generic one (the mail noMailQuestItems
+  // grouping precedent). WITHDRAW is one line for every dimension, because the
+  // deposit wording ("you cannot store that") is false once the copy is already
+  // in the book and the officer asked to take it out; that arm is reachable only
+  // from a tampered or legacy row, which the guild pane renders as dormant.
+  'error.guildBankQuestItem': 'You cannot store quest items in the guild bank.',
+  'error.guildBankSoulbound': 'You cannot store soulbound items in the guild bank.',
+  'error.guildBankNoTransfer': 'That item cannot be stored in the guild bank.',
+  'error.guildBankWithdrawRefused': 'That item cannot be withdrawn from the guild bank.',
+  'error.guildBankTreasuryCap': 'The guild treasury cannot hold that much.',
+  'error.guildBankTreasuryShort': 'The guild treasury does not hold that much.',
+  'error.guildBankCarryCap': 'You cannot carry that much money.',
+  'error.guildBankCannotAfford': 'Your guild cannot afford that expansion.',
+  'error.guildBankMaxSlots': 'The guild bank cannot be expanded further.',
+  'log.guildBankOpened': 'You open the guild bank.',
+  'log.guildBankSlotsPurchased': 'You purchase additional guild bank slots.',
+  'log.guildBankDepositGold': 'You deposit {money} into the guild treasury.',
+  'log.guildBankWithdrawGold': 'You withdraw {money} from the guild treasury.',
+  'log.guildBankDepositItem': 'You deposit {item} into the guild bank.',
+  'log.guildBankWithdrawItem': 'You withdraw {item} from the guild bank.',
   'error.specLevel': 'You may choose a specialization at level {level}.',
   'error.equipLevel': 'You must be level {level} to equip that.',
   'error.mountLevel': 'You must be level {level} to ride that mount.',
+  // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
+  // arenaQueueJoin, 1v1/2v2 only): the joining player's own level, and a
+  // premade teammate's level checked in the per-member loop.
+  'error.arenaMinLevel': 'You must be level {level} to queue for the arena.',
+  'error.arenaMinLevelMember': '{name} must be at least level {level} to queue for the arena.',
+  // The 1v1 auto-prune notice (src/sim/social/arena.ts matchmakeArena1v1):
+  // byte-identical to arenaQueueLeave's own 1v1 leave text so both paths give
+  // a still-connected player the same "you left the queue" line.
+  'log.arenaQueueAutoLeave1v1': 'You leave the Ashen Coliseum queue.',
   // Mount collection pivot (src/sim/mounts.ts toggleMount, src/sim/items.ts
   // buyItem): the toggle with nothing owned, and the two stablemaster buy gates.
   // Placeholder-free, so they register in the EXACT matcher automatically.
@@ -58,6 +106,9 @@ const baseEnTable = {
   // mount or select a mount without having purchased the riding skill from Marla.
   // Placeholder-free, so it registers in the EXACT matcher automatically.
   'error.ridingUntrained': 'You must learn to ride first. Find a riding trainer.',
+  // (The narrower "You can't ride while carrying the flag." row lived here
+  // until the mount ban widened to the whole battleground; its replacement is
+  // the BG_EXTRA errMountInBg RULE below, beside the mode's other refusals.)
   // Riding skill purchase (learnRiding in src/sim/mounts_training.ts).
   'error.ridingAlreadyLearned': 'You have already learned Riding.',
   'error.ridingTrainLevel': 'You must be level 20 to learn Riding.',
@@ -78,20 +129,32 @@ const baseEnTable = {
     'You leave the paddock and the lesson ends. Come back to Marla to try again.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
+  'error.unknownAbility': 'You do not know that ability.',
   'error.maxLoadouts': 'You can save at most {count} loadouts.',
+  'error.emptyLoadoutName': 'Loadout name cannot be empty.',
   'error.noLoadout': 'No such loadout.',
   'error.loadoutLevel': 'That loadout needs a higher level.',
   'error.cannotEquip': 'You cannot equip that.',
+  // Unique-equipped refusal: a second worn copy of the same legendary item
+  // (src/sim/items.ts equipItem, rule in src/sim/equipment_rules.ts).
+  'error.uniqueEquipped': 'You can only equip one of those.',
   // Refusal when an aimed equip slot (a paperdoll drop target) does not accept the
   // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  // Firebottle hut burns (src/sim/interactions/firebottle_hut.ts REASON_MESSAGE).
+  'error.firebottleNeeded': 'You need a firebottle to torch that.',
+  'error.firebottleNotReady': 'Your firebottle is not ready yet.',
+  'error.firebottleTooFar': 'Get right up against a hut to torch it.',
+  'error.hutStillBurning': 'This hut is still burning.',
   'error.fullHealth': 'You are already at full health.',
   'error.nothingRestore': 'Nothing to restore.',
   'error.nothingToConsume': 'Nothing to consume.',
   'error.nothingToDevour': 'Nothing to devour.',
   'error.recentKillRequired': 'You need a recent kill.',
+  'error.burningPactRequired': 'Conflagrate requires Burning Pact on the target.',
+  'error.notEnoughRuin': 'Not enough Wrack!',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',
   'error.noMerchant': 'There is no merchant nearby.',
@@ -99,6 +162,9 @@ const baseEnTable = {
   // Bind invariant: sellItem refuses a bound (boundTo-stamped) copy so
   // the vendor can never launder the Maker's Bond into a plain buyback copy.
   'error.sellBound': 'That item is bound and cannot be sold.',
+  // Player item lock (issue 3042, src/sim/item_lock.ts): a player-locked
+  // copy, distinct from the Maker's Bond bind above.
+  'error.sellLocked': 'That item is locked and cannot be sold.',
   'error.noBuyback': 'That item is not available for buyback.',
   'error.nailedShut': 'It is nailed shut.',
   'error.enoughOfThose': 'You have enough of those.',
@@ -112,6 +178,10 @@ const baseEnTable = {
   'error.noItem': "You don't have that item.",
   'error.cantWhileDead': "You can't do that while dead.",
   'error.cantWhileSwimming': "You can't do that while swimming.",
+  'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
+  'error.tithefiendNeedsDirge': 'Your Tithefiend needs an enemy affected by Dirge of Decay.',
+  'error.alreadyEating': 'You are already eating.',
+  'error.alreadyDrinking': 'You are already drinking.',
   'error.tameThat': 'You cannot tame that.',
   'error.tameBeastsOnly': 'Only beasts can be tamed.',
   'error.tameTooStrong': 'That beast is too strong to tame.',
@@ -133,6 +203,11 @@ const baseEnTable = {
     'Nothing you selected can be harvested from that corpse.',
   'error.gatherNodeMissing': 'That resource node does not exist.',
   'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
+  'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
+  // Raw fishing catches refuse useItem (src/sim/items.ts): cooking reagents
+  // only; cook before eating. EXACT-matched; English falls through per locale
+  // until the release localization pass fills translations.
+  'error.rawCatchCookFirst': 'That is raw. Cook it first.',
   // Profession-choice quest denials (src/sim/quests/quest_commands.ts): the archetype
   // pair or hobby selection fails validation on quest accept or again at turn-in.
   'error.professionChoiceUnavailable': 'That profession choice is not available.',
@@ -140,6 +215,15 @@ const baseEnTable = {
   'error.townFocusNotInTown': 'You must be in town to set your focus.',
   'error.townFocusOverBudget': 'That allocation exceeds your focus point budget.',
   'error.townFocusInvalid': 'Invalid focus allocation.',
+  // #1144: the chosen re-spec payment tier's coin/material cost is unaffordable.
+  'error.townFocusCannotAfford': 'You cannot afford that focus re-spec.',
+  // #1144: the 'time'/'timeAndPartial' tiers queue the reallocation instead of
+  // committing it immediately; these three cover the queue/resolve lifecycle
+  // (see Sim.setTownFocus / updateTownFocusRespec in src/sim/sim.ts).
+  'log.townFocusRespecQueued': 'Your focus re-spec will complete in {seconds}s.',
+  'log.townFocusRespecComplete': 'Your focus re-spec is complete.',
+  'error.townFocusRespecCancelled':
+    'You could not afford your pending focus re-spec, so it was cancelled.',
   // Custom per-item ground-pickup lines (src/sim/content/ground_pickup_lines.ts).
   // Emitted via def.pickupDeny/def.pickupEnough (variable-routed, so the S3 guard
   // cannot see them); values must stay byte-identical to that table for the EXACT
@@ -183,6 +267,11 @@ const baseEnTable = {
   'groundPickup.graveVossEnough':
     "You have already taken what Royal Assassin Voss's grave will give.",
   'groundPickup.cryptRitualCircleEnough': 'The circle has nothing more to give you.',
+  // Murloc huts (q_deepfen_purge): the pickup deny arm is defensive (hut clicks
+  // route to the firebottle handler first), but the lines exist per the
+  // every-object-has-lines rule and localize like the rest.
+  'groundPickup.murlocHutDeny': 'You have no reason to torch that.',
+  'groundPickup.murlocHutEnough': 'These huts are already smouldering.',
   // The Veiled Hollow pickup surfaces (sealstone puzzle + the three memory
   // monuments): dems added these to GROUND_PICKUP_LINES; their EXACT matcher
   // entries land here so the client re-localizes the sim-emitted lines.
@@ -261,6 +350,10 @@ const baseEnTable = {
   'groundPickup.wreckfieldFlotsamCrateEnough': 'You have salvaged all the flotsam Edda marked.',
   'groundPickup.gullhavenWatchbellDeny': "The watchbell answers only the bellkeeper's errand.",
   'groundPickup.gullhavenWatchbellEnough': 'Every coastal watchbell has been rung.',
+  // Item-agnostic: every multi-count `interact` objective credits once per
+  // distinct object, so this covers all of them (bells rung, lanterns relit,
+  // banners planted, carts righted). Emitted from interactObjectForQuests.
+  'groundPickup.objectAlreadyCredited': 'You have already done this one.',
   'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
   'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
   'error.vcupNoNation': 'Pick a banner nation first.',
@@ -273,6 +366,7 @@ const baseEnTable = {
   'log.deletedBuild': 'Deleted build “{name}”.',
   'log.dismissPet': 'You dismiss {name}.',
   'log.summonDemon': 'You summon {name}.',
+  'log.pyreCrashes': '{name} crashes into the battle.',
   'log.tamedPet': '{name} is now your loyal companion.',
   'log.entityDies': '{name} dies.',
   'log.prestiged': 'You have prestiged! Prestige Rank {rank}.',
@@ -295,6 +389,9 @@ const baseEnTable = {
   // Per-member ready-check follow-up lines (social/ready_check.ts finalizeReadyCheck).
   'log.readyCheckNotReady': '{name} is not ready.',
   'log.readyCheckNoResponse': '{name} did not respond to the ready check.',
+  // Talking to a quest giver re-grants a lost required item (a deleted firebottle
+  // for q_deepfen_purge); placeholder-free, so it registers in the EXACT matcher.
+  'log.questItemRecovered': 'You recover a quest item you were missing.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
   'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
@@ -348,6 +445,12 @@ const baseEnTable = {
   'aura.temporalExhaustion': 'Temporal Exhaustion',
   // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
   'aura.cauterizeFatigue': 'Cauterize Fatigue',
+  'aura.carrierFatigue': 'Carrier Fatigue',
+  // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
+  'aura.carriedFlag': 'Carrying the Flag',
+  'aura.sprintRune': 'Sprint',
+  'aura.battleRune': 'Battle Rune',
+  'aura.wardRune': 'Ward Rune',
   'mechanic.warStomp': 'Shuddering Stomp',
   // Heroic warrior-mob anti-kite charge (MobTemplate.charge, src/sim/mob/charge.ts):
   // the stun debuff on the player and the {mechanic} in the "unleashes" line.
@@ -413,6 +516,7 @@ const baseEnTable = {
   'aura.feedingFrenzy': 'Feeding Frenzy',
   'aura.demoralized': 'Demoralized',
   'aura.resurrectionSickness': "The Keeper's Toll",
+  'aura.unstuckSickness': 'Unstuck Sickness',
   'aura.hotPursuit': 'Hot Pursuit',
   'aura.redHarvest': 'Red Harvest',
   'aura.recklessVow': 'Reckless Vow',
@@ -420,6 +524,9 @@ const baseEnTable = {
   'aura.colossus': 'Colossus',
   // 4-piece set-bonus proc buffs (src/sim/content/item_sets.ts SetProc names).
   'aura.clearcasting': 'Clearcasting',
+  'aura.effigy': 'Effigy',
+  'aura.gloomtithe': 'Gloomtithe',
+  'aura.tithefiend': 'Tithefiend',
   // Talent-proc buff/ward names (choice_rows_classic.ts ProcDef names).
   'aura.searingLight': 'Searing Light',
   'aura.lingeringGraceWard': 'Lingering Grace',
@@ -469,6 +576,10 @@ const baseEnTable = {
   'aura.improvedImmolate': 'Improved Immolate',
   'aura.demonArmor': 'Demon Armor',
   'aura.desolation': 'Desolation',
+  'aura.destructionRuin': 'Ruin',
+  'aura.ruinousBrand': 'Ruinous Brand',
+  'aura.duskfireClaim': 'Duskfire Claim',
+  'aura.pyreGuardian': 'Pyre Guardian',
   'aura.umbralMastery': 'Umbral Mastery',
   'aura.improvedFear': 'Improved Fear',
   'aura.unyieldingPact': 'Unyielding Pact',
@@ -479,6 +590,25 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  // WARFARE capstone (7-piece) signature procs, item_sets.ts. PvP-gated, so they
+  // only ever appear on a hostile-player kill or cast, but they render in the
+  // same four places every other set proc does: buff frame, buff tooltip, combat
+  // log gain and fade, and the death recap.
+  'aura.unbrokenOath': 'Unbroken Oath',
+  'aura.ashenStep': 'Ashen Step',
+  'aura.emberward': 'Emberward',
+  'aura.thornguard': 'Thornguard',
+  // The Drakelands dragonkin brood (v0.35 rework): mechanic labels and the
+  // player-facing burn/ward/stun aura names.
+  'mechanic.broodCleave': 'Brood Cleave',
+  'mechanic.mawCleave': 'Maw Cleave',
+  'mechanic.fireBreath': 'Fire Breath',
+  'mechanic.tailHammer': 'Tail Hammer',
+  'mechanic.broodRipple': 'Brood Ripple',
+  'aura.searedScales': 'Seared Scales',
+  'aura.hatchlingBurn': 'Hatchling Burn',
+  'aura.broodlordsWard': "Broodlord's Ward",
+  'aura.matriarchsWard': "Matriarch's Ward",
   'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
   'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
@@ -492,6 +622,18 @@ const baseEnTable = {
   'aura.wintersChill': "Winter's Chill",
   'aura.icicles': 'Icicles',
   'aura.perfectMoment': 'Perfect Moment',
+  'aura.radiantResonance': 'Radiant Resonance',
+  'aura.solarReprisal': 'Solar Reprisal',
+  'aura.dawnsWrath': "Dawn's Wrath",
+  'aura.moontide': 'Moontide',
+  // The operator-applied Cheater mark's countdown debuff (src/sim/moderation/).
+  // The sim authors the aura name in English; this row is what stops the debuff
+  // bar and combat log shipping that English to all 21 locales.
+  'aura.cheaterMark': 'Marked as a Cheater',
+  'aura.oldBlood': 'Old Blood',
+  'aura.verdance': 'Verdance',
+  'aura.lopingStride': 'Loping Stride',
+  'aura.marrowbreak': 'Marrowbreak',
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
   'log.cardDuelQueued': 'You queue for a Card Duel.',
   'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
@@ -636,6 +778,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Invalid talent build.',
     'error.unknownSpec': 'Unknown specialization.',
     'error.maxLoadouts': 'You can save at most {count} loadouts.',
+    'error.emptyLoadoutName': 'Loadout name cannot be empty.',
     'error.noLoadout': 'No such loadout.',
     'error.loadoutLevel': 'That loadout needs a higher level.',
     'error.cannotEquip': 'You cannot equip that.',
@@ -650,6 +793,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -663,6 +807,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noItem': "You don't have that item.",
     'error.cantWhileDead': "You can't do that while dead.",
     'error.cantWhileSwimming': "You can't do that while swimming.",
+    'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
+    'error.tithefiendNeedsDirge': 'Your Tithefiend needs an enemy affected by Dirge of Decay.',
+    'error.alreadyEating': 'You are already eating.',
+    'error.alreadyDrinking': 'You are already drinking.',
     'error.tameThat': 'You cannot tame that.',
     'error.tameBeastsOnly': 'Only beasts can be tamed.',
     'error.tameTooStrong': 'That beast is too strong to tame.',
@@ -676,6 +824,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Nothing you selected can be harvested from that corpse.',
     'error.gatherNodeMissing': 'That resource node does not exist.',
     'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
+    'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
     'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
     'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
     'error.vcupNoNation': 'Pick a banner nation first.',
@@ -799,8 +948,51 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Silt Hide',
     'aura.demoralized': 'Demoralized',
     'aura.resurrectionSickness': "The Keeper's Toll",
+    'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
+    'error.unknownAbility': 'No conoces esa habilidad.',
+    'error.notEnoughRuin': '¡No hay suficiente Ruina!',
+    'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
+    'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
+    'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
+    'error.guildBankRank':
+      'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
+    'error.guildBankFull': 'El banco de la hermandad está lleno.',
+    'error.guildBankQuestItem': 'No puedes guardar objetos de misión en el banco de la hermandad.',
+    'error.guildBankSoulbound':
+      'No puedes guardar objetos ligados al alma en el banco de la hermandad.',
+    'error.guildBankNoTransfer': 'Ese objeto no se puede guardar en el banco de la hermandad.',
+    'error.guildBankWithdrawRefused': 'Ese objeto no se puede retirar del banco de la hermandad.',
+    'error.guildBankTreasuryCap': 'La tesorería de la hermandad no puede contener tanto.',
+    'error.guildBankTreasuryShort': 'La tesorería de la hermandad no tiene tanto.',
+    'error.guildBankCarryCap': 'No puedes llevar tanto dinero.',
+    'error.guildBankCannotAfford': 'Tu hermandad no puede permitirse esa ampliación.',
+    'error.guildBankMaxSlots': 'El banco de la hermandad no se puede ampliar más.',
+    'log.guildBankOpened': 'Abres el banco de la hermandad.',
+    'log.guildBankSlotsPurchased': 'Compras espacios adicionales del banco de la hermandad.',
+    'log.guildBankDepositGold': 'Depositas {money} en la tesorería de la hermandad.',
+    'log.guildBankWithdrawGold': 'Retiras {money} de la tesorería de la hermandad.',
+    'log.guildBankDepositItem': 'Depositas {item} en el banco de la hermandad.',
+    'log.guildBankWithdrawItem': 'Retiras {item} del banco de la hermandad.',
+    'error.rawCatchCookFirst': 'Está crudo. Cocínalo primero.',
+    'log.questItemRecovered': 'Recuperas un objeto de misión que te faltaba.',
+    'groundPickup.objectAlreadyCredited': 'Ya has hecho esto.',
+    'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
+    'error.mountTrainDismountFirst': 'Desmonta primero.',
+    'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
+    'error.ridingTrainLevel': 'Debes ser nivel 20 para aprender equitación.',
+    'error.mountTrainLevel': 'Debes ser nivel 20 para tomar lecciones de equitación.',
+    'error.ridingQuestUntrained': 'Debes aprender equitación antes de tomar esta lección.',
+    'error.ridingUntrained': 'Debes aprender a montar primero. Busca un instructor de equitación.',
+    'error.ridingWrongNpc': 'Debes hablar con Marla Hitchen para aprender equitación.',
+    'error.mountTrainNeedsQuest': 'Primero debes aceptar la misión de equitación.',
     'error.notInGroup': 'Ese aliado no está en tu grupo.',
     'error.noDeadAlly': 'Debes seleccionar a un aliado muerto de tu grupo.',
     'error.professionChoiceUnavailable': 'Esa elección de profesión no está disponible.',
@@ -1010,11 +1202,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Piel de limo',
     'aura.demoralized': 'Desmoralizado',
     'aura.resurrectionSickness': 'Mal de resurrección',
+    'aura.unstuckSickness': 'Mal de desatasco',
     'error.lineOfSight': 'Sin línea de visión.',
     'error.bagsFull': 'Tus bolsas están llenas.',
     'error.bagSocketsFull': 'Todos tus huecos de bolsa están ocupados.',
     'error.bagSwapTooManyItems': 'Tienes demasiados objetos para cambiar a esa bolsa.',
     'error.bagRemoveTooManyItems': 'Tienes demasiados objetos para quitar esa bolsa.',
+    'error.bagEquipHasProperty':
+      'No puedes equipar esa bolsa mientras tenga una propiedad especial.',
     'error.tradeBagSpace': 'Intercambio fallido: no hay suficiente espacio en las bolsas.',
     'log.bagsMigrated': 'Tus pertenencias se han guardado en bolsas nuevas.',
     'error.specLevel': 'Puedes elegir una especialización al nivel {level}.',
@@ -1026,6 +1221,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Configuración de talentos no válida.',
     'error.unknownSpec': 'Especialización desconocida.',
     'error.maxLoadouts': 'Puedes guardar como máximo {count} configuraciones.',
+    'error.emptyLoadoutName': 'El nombre de la configuración no puede estar vacío.',
     'error.noLoadout': 'Esa configuración no existe.',
     'error.loadoutLevel': 'Esa configuración requiere un nivel más alto.',
     'error.cannotEquip': 'No puedes equipar eso.',
@@ -1042,6 +1238,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún vendedor cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado y no se puede abrir.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -1068,6 +1265,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Nada de lo que has seleccionado se puede recolectar de ese cadáver.',
     'error.gatherNodeMissing': 'Ese nodo de recursos no existe.',
     'error.gatherNodeNotRespawned': 'Este nodo de recursos aún no ha reaparecido para ti.',
+    'error.toolEffectSlotFromWindow': 'Engárzalo desde la ventana de Profesiones.',
     'error.vcupDeserter': 'El Guardacampo lo recuerda. Vuelve más tarde.',
     'error.vcupPartyTooBig': 'Esa categoría necesita un grupo más pequeño.',
     'error.vcupNoNation': 'Primero elige una nación de estandarte.',
@@ -1202,8 +1400,53 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.enraged': 'Enfurecido',
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
+    'error.uniqueEquipped': 'Solo puedes equiparte uno de esos.',
+    'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
+    'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
   },
   es_ES: {
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
+    'error.unknownAbility': 'No conoces esa habilidad.',
+    'error.notEnoughRuin': '¡No hay suficiente Ruina!',
+    'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
+    'error.shellskinPreventsAttacks': 'Piel de Caparazón impide atacar.',
+    'error.tithefiendNeedsDirge':
+      'Tu Diezmademonio necesita un enemigo afectado por Endecha de Descomposición.',
+    'error.guildBankNoGuild': 'Debes estar en una hermandad para usar el banco de la hermandad.',
+    'error.guildBankRank':
+      'Solo los oficiales de la hermandad pueden usar el banco de la hermandad.',
+    'error.guildBankFull': 'El banco de la hermandad está lleno.',
+    'error.guildBankQuestItem': 'No puedes guardar objetos de misión en el banco de la hermandad.',
+    'error.guildBankSoulbound':
+      'No puedes guardar objetos ligados al alma en el banco de la hermandad.',
+    'error.guildBankNoTransfer': 'Ese objeto no se puede guardar en el banco de la hermandad.',
+    'error.guildBankWithdrawRefused': 'Ese objeto no se puede retirar del banco de la hermandad.',
+    'error.guildBankTreasuryCap': 'La tesorería de la hermandad no puede contener tanto.',
+    'error.guildBankTreasuryShort': 'La tesorería de la hermandad no tiene tanto.',
+    'error.guildBankCarryCap': 'No puedes llevar tanto dinero.',
+    'error.guildBankCannotAfford': 'Tu hermandad no puede permitirse esa ampliación.',
+    'error.guildBankMaxSlots': 'El banco de la hermandad no se puede ampliar más.',
+    'log.guildBankOpened': 'Abres el banco de la hermandad.',
+    'log.guildBankSlotsPurchased': 'Compras espacios adicionales del banco de la hermandad.',
+    'log.guildBankDepositGold': 'Depositas {money} en la tesorería de la hermandad.',
+    'log.guildBankWithdrawGold': 'Retiras {money} de la tesorería de la hermandad.',
+    'log.guildBankDepositItem': 'Depositas {item} en el banco de la hermandad.',
+    'log.guildBankWithdrawItem': 'Retiras {item} del banco de la hermandad.',
+    'error.rawCatchCookFirst': 'Está crudo. Cocínalo primero.',
+    'log.questItemRecovered': 'Recuperas un objeto de misión que te faltaba.',
+    'groundPickup.objectAlreadyCredited': 'Ya has hecho esto.',
+    'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
+    'error.mountTrainDismountFirst': 'Desmonta primero.',
+    'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
+    'error.ridingTrainLevel': 'Debes ser nivel 20 para aprender equitación.',
+    'error.mountTrainLevel': 'Debes ser nivel 20 para tomar lecciones de equitación.',
+    'error.ridingQuestUntrained': 'Debes aprender equitación antes de tomar esta lección.',
+    'error.ridingUntrained': 'Debes aprender a montar primero. Busca un instructor de equitación.',
+    'error.ridingWrongNpc': 'Debes hablar con Marla Hitchen para aprender equitación.',
+    'error.mountTrainNeedsQuest': 'Primero debes aceptar la misión de equitación.',
     'error.notInGroup': 'Ese aliado no está en tu grupo.',
     'error.noDeadAlly': 'Debes seleccionar a un aliado muerto de tu grupo.',
     'error.professionChoiceUnavailable': 'Esa elección de profesión no está disponible.',
@@ -1410,11 +1653,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Piel de limo',
     'aura.demoralized': 'Desmoralizado',
     'aura.resurrectionSickness': 'Mal de resurrección',
+    'aura.unstuckSickness': 'Mal de desatasco',
     'error.lineOfSight': 'Sin línea de visión.',
     'error.bagsFull': 'Tus bolsas están llenas.',
     'error.bagSocketsFull': 'Todos tus huecos de bolsa están ocupados.',
     'error.bagSwapTooManyItems': 'Tienes demasiados objetos para cambiar a esa bolsa.',
     'error.bagRemoveTooManyItems': 'Tienes demasiados objetos para quitar esa bolsa.',
+    'error.bagEquipHasProperty':
+      'No puedes equipar esa bolsa mientras tenga una propiedad especial.',
     'error.tradeBagSpace': 'Intercambio fallido: no hay suficiente espacio en las bolsas.',
     'log.bagsMigrated': 'Tus pertenencias se han guardado en bolsas nuevas.',
     'error.specLevel': 'Podrás elegir una especialización en el nivel {level}.',
@@ -1426,6 +1672,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Configuración de talentos no válida.',
     'error.unknownSpec': 'Especialización desconocida.',
     'error.maxLoadouts': 'Puedes guardar como máximo {count} configuraciones.',
+    'error.emptyLoadoutName': 'El nombre de la configuración no puede estar vacío.',
     'error.noLoadout': 'Esa configuración no existe.',
     'error.loadoutLevel': 'Esa configuración requiere un nivel superior.',
     'error.cannotEquip': 'No puedes equipar eso.',
@@ -1442,6 +1689,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún mercader cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -1468,6 +1716,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Nada de lo que has seleccionado se puede recolectar de ese cadáver.',
     'error.gatherNodeMissing': 'Ese nodo de recursos no existe.',
     'error.gatherNodeNotRespawned': 'Este nodo de recursos aún no ha reaparecido para ti.',
+    'error.toolEffectSlotFromWindow': 'Engárzalo desde la ventana de Profesiones.',
     'error.vcupDeserter': 'El Guardacampo lo recuerda. Vuelve más tarde.',
     'error.vcupPartyTooBig': 'Esa categoría necesita un grupo más pequeño.',
     'error.vcupNoNation': 'Primero elige una nación de estandarte.',
@@ -1605,8 +1854,57 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Frío Invernal',
     'aura.icicles': 'Carámbanos',
     'aura.perfectMoment': 'Momento perfecto',
+    'error.uniqueEquipped': 'Solo puedes llevar equipado uno de esos.',
+    'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
+    'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
   },
   fr_FR: {
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
+    'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
+    'error.notEnoughRuin': 'Pas assez de Ruine !',
+    'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
+    'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
+    'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
+    'error.guildBankFull': 'La banque de guilde est pleine.',
+    'error.guildBankQuestItem':
+      "Vous ne pouvez pas déposer d'objets de quête dans la banque de guilde.",
+    'error.guildBankSoulbound':
+      "Vous ne pouvez pas déposer d'objets liés à l'âme dans la banque de guilde.",
+    'error.guildBankNoTransfer': 'Cet objet ne peut pas être déposé dans la banque de guilde.',
+    'error.guildBankWithdrawRefused': 'Cet objet ne peut pas être retiré de la banque de guilde.',
+    'error.guildBankTreasuryCap':
+      'La trésorerie de la guilde ne peut pas contenir une somme aussi importante.',
+    'error.guildBankTreasuryShort':
+      "La trésorerie de la guilde ne dispose pas d'une somme aussi importante.",
+    'error.guildBankCarryCap': 'Vous ne pouvez pas transporter une somme aussi importante.',
+    'error.guildBankCannotAfford': "Votre guilde n'a pas les moyens de payer cette extension.",
+    'error.guildBankMaxSlots': 'La banque de guilde ne peut plus être agrandie.',
+    'log.guildBankOpened': 'Vous ouvrez la banque de guilde.',
+    'log.guildBankSlotsPurchased':
+      'Vous achetez des emplacements de banque de guilde supplémentaires.',
+    'log.guildBankDepositGold': 'Vous déposez {money} dans la trésorerie de la guilde.',
+    'log.guildBankWithdrawGold': 'Vous retirez {money} de la trésorerie de la guilde.',
+    'log.guildBankDepositItem': 'Vous déposez {item} dans la banque de guilde.',
+    'log.guildBankWithdrawItem': 'Vous retirez {item} de la banque de guilde.',
+    'error.rawCatchCookFirst': "C'est cru. Faites-le cuire d'abord.",
+    'log.questItemRecovered': "Vous récupérez un objet de quête qu'il vous manquait.",
+    'groundPickup.objectAlreadyCredited': 'Vous avez déjà fait celui-ci.',
+    'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
+    'error.mountTrainDismountFirst': "Descendez d'abord.",
+    'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
+    'error.ridingTrainLevel': "Vous devez être niveau 20 pour apprendre l'équitation.",
+    'error.mountTrainLevel': "Vous devez être niveau 20 pour prendre des leçons d'équitation.",
+    'error.ridingQuestUntrained': "Vous devez apprendre l'équitation avant de prendre cette leçon.",
+    'error.ridingUntrained':
+      "Vous devez apprendre à monter d'abord. Trouvez un instructeur d'équitation.",
+    'error.ridingWrongNpc': "Vous devez parler à Marla Hitchen pour apprendre l'équitation.",
+    'error.mountTrainNeedsQuest': "Vous devez d'abord accepter la quête d'équitation.",
     'error.notInGroup': "Cet allié n'est pas dans votre groupe.",
     'error.noDeadAlly': 'Vous devez cibler un allié mort dans votre groupe.',
     'error.professionChoiceUnavailable': "Ce choix de profession n'est pas disponible.",
@@ -1817,11 +2115,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Peau de vase',
     'aura.demoralized': 'Démoralisé',
     'aura.resurrectionSickness': 'Mal de résurrection',
+    'aura.unstuckSickness': 'Mal de déblocage',
     'error.lineOfSight': 'Pas de ligne de vue.',
     'error.bagsFull': 'Vos sacs sont pleins.',
     'error.bagSocketsFull': 'Tous vos emplacements de sac sont occupés.',
     'error.bagSwapTooManyItems': "Vous avez trop d'objets pour passer à ce sac.",
     'error.bagRemoveTooManyItems': "Vous avez trop d'objets pour retirer ce sac.",
+    'error.bagEquipHasProperty':
+      'Vous ne pouvez pas équiper ce sac tant qu’il possède une propriété spéciale.',
     'error.tradeBagSpace': 'Échange échoué : pas assez de place dans les sacs.',
     'log.bagsMigrated': 'Vos affaires ont été rangées dans de nouveaux sacs.',
     'error.specLevel': 'Vous pourrez choisir une spécialisation au niveau {level}.',
@@ -1833,6 +2134,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Distribution de talents invalide.',
     'error.unknownSpec': 'Spécialisation inconnue.',
     'error.maxLoadouts': 'Vous pouvez enregistrer au maximum {count} configurations.',
+    'error.emptyLoadoutName': 'Le nom de la configuration ne peut pas être vide.',
     'error.noLoadout': "Cette configuration n'existe pas.",
     'error.loadoutLevel': 'Cette configuration nécessite un niveau plus élevé.',
     'error.cannotEquip': 'Vous ne pouvez pas équiper cela.',
@@ -1849,6 +2151,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est condamné par des clous.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -1876,6 +2179,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
     'error.gatherNodeMissing': "Ce nœud de ressources n'existe pas.",
     'error.gatherNodeNotRespawned': "Ce nœud de ressources n'est pas encore réapparu pour vous.",
+    'error.toolEffectSlotFromWindow': 'Sertissez-le depuis la fenêtre des Métiers.',
     'error.vcupDeserter': "Le Gardien du terrain s'en souvient. Revenez plus tard.",
     'error.vcupPartyTooBig': 'Cette catégorie exige un groupe plus petit.',
     'error.vcupNoNation': "Choisissez d'abord une nation de bannière.",
@@ -2013,8 +2317,57 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Froid hivernal',
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
+    'error.uniqueEquipped': 'Vous ne pouvez en équiper qu’un seul de ce type.',
+    'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
+    'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
   },
   fr_CA: {
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
+    'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
+    'error.notEnoughRuin': 'Pas assez de Ruine !',
+    'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
+    'error.shellskinPreventsAttacks': "Peau de carapace empêche d'attaquer.",
+    'error.tithefiendNeedsDirge':
+      "Votre Démon de dîme a besoin d'un ennemi affecté par Chant funèbre de pourriture.",
+    'error.guildBankNoGuild': 'Vous devez être dans une guilde pour utiliser la banque de guilde.',
+    'error.guildBankRank': 'Seuls les officiers de la guilde peuvent utiliser la banque de guilde.',
+    'error.guildBankFull': 'La banque de guilde est pleine.',
+    'error.guildBankQuestItem':
+      "Vous ne pouvez pas déposer d'objets de quête dans la banque de guilde.",
+    'error.guildBankSoulbound':
+      "Vous ne pouvez pas déposer d'objets liés à l'âme dans la banque de guilde.",
+    'error.guildBankNoTransfer': 'Cet objet ne peut pas être déposé dans la banque de guilde.',
+    'error.guildBankWithdrawRefused': 'Cet objet ne peut pas être retiré de la banque de guilde.',
+    'error.guildBankTreasuryCap':
+      'La trésorerie de la guilde ne peut pas contenir une somme aussi importante.',
+    'error.guildBankTreasuryShort':
+      "La trésorerie de la guilde ne dispose pas d'une somme aussi importante.",
+    'error.guildBankCarryCap': 'Vous ne pouvez pas transporter une somme aussi importante.',
+    'error.guildBankCannotAfford': "Votre guilde n'a pas les moyens de payer cette extension.",
+    'error.guildBankMaxSlots': 'La banque de guilde ne peut plus être agrandie.',
+    'log.guildBankOpened': 'Vous ouvrez la banque de guilde.',
+    'log.guildBankSlotsPurchased':
+      'Vous achetez des emplacements de banque de guilde supplémentaires.',
+    'log.guildBankDepositGold': 'Vous déposez {money} dans la trésorerie de la guilde.',
+    'log.guildBankWithdrawGold': 'Vous retirez {money} de la trésorerie de la guilde.',
+    'log.guildBankDepositItem': 'Vous déposez {item} dans la banque de guilde.',
+    'log.guildBankWithdrawItem': 'Vous retirez {item} de la banque de guilde.',
+    'error.rawCatchCookFirst': "C'est cru. Faites-le cuire d'abord.",
+    'log.questItemRecovered': "Vous récupérez un objet de quête qu'il vous manquait.",
+    'groundPickup.objectAlreadyCredited': 'Vous avez déjà fait celui-ci.',
+    'error.mountTrainInProgress': "Une leçon d'équitation est déjà en cours.",
+    'error.mountTrainDismountFirst': "Descendez d'abord.",
+    'error.ridingAlreadyLearned': "Vous avez déjà appris l'équitation.",
+    'error.ridingTrainLevel': "Vous devez être niveau 20 pour apprendre l'équitation.",
+    'error.mountTrainLevel': "Vous devez être niveau 20 pour prendre des leçons d'équitation.",
+    'error.ridingQuestUntrained': "Vous devez apprendre l'équitation avant de prendre cette leçon.",
+    'error.ridingUntrained':
+      "Vous devez apprendre à monter d'abord. Trouvez un instructeur d'équitation.",
+    'error.ridingWrongNpc': "Vous devez parler à Marla Hitchen pour apprendre l'équitation.",
+    'error.mountTrainNeedsQuest': "Vous devez d'abord accepter la quête d'équitation.",
     'error.notInGroup': "Cet allié n'est pas dans votre groupe.",
     'error.noDeadAlly': 'Vous devez cibler un allié mort dans votre groupe.',
     'error.professionChoiceUnavailable': "Ce choix de profession n'est pas disponible.",
@@ -2224,11 +2577,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Peau de vase',
     'aura.demoralized': 'Démoralisé',
     'aura.resurrectionSickness': 'Mal de résurrection',
+    'aura.unstuckSickness': 'Mal de déblocage',
     'error.lineOfSight': 'Pas de ligne de vue.',
     'error.bagsFull': 'Vos sacs sont pleins.',
     'error.bagSocketsFull': 'Tous vos emplacements de sac sont occupés.',
     'error.bagSwapTooManyItems': "Vous avez trop d'objets pour passer à ce sac.",
     'error.bagRemoveTooManyItems': "Vous avez trop d'objets pour retirer ce sac.",
+    'error.bagEquipHasProperty':
+      'Vous ne pouvez pas équiper ce sac tant qu’il possède une propriété spéciale.',
     'error.tradeBagSpace': 'Échange échoué : pas assez de place dans les sacs.',
     'log.bagsMigrated': 'Vos affaires ont été rangées dans de nouveaux sacs.',
     'error.specLevel': 'Vous pourrez choisir une spécialisation au niveau {level}.',
@@ -2240,6 +2596,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Spécialisation invalide.',
     'error.unknownSpec': 'Spécialisation inconnue.',
     'error.maxLoadouts': 'Vous pouvez enregistrer au maximum {count} configurations.',
+    'error.emptyLoadoutName': 'Le nom de la configuration ne peut pas être vide.',
     'error.noLoadout': "Cette configuration n'existe pas.",
     'error.loadoutLevel': 'Cette configuration exige un niveau plus élevé.',
     'error.cannotEquip': 'Vous ne pouvez pas équiper cela.',
@@ -2256,6 +2613,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est cloué.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -2284,6 +2642,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
     'error.gatherNodeMissing': "Ce nœud de ressources n'existe pas.",
     'error.gatherNodeNotRespawned': "Ce nœud de ressources n'est pas encore réapparu pour vous.",
+    'error.toolEffectSlotFromWindow': 'Sertissez-le depuis la fenêtre des Métiers.',
     'error.vcupDeserter': "Le Gardien du terrain s'en souvient. Revenez plus tard.",
     'error.vcupPartyTooBig': 'Cette catégorie exige un groupe plus petit.',
     'error.vcupNoNation': "Choisissez d'abord une nation de bannière.",
@@ -2421,6 +2780,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Froid hivernal',
     'aura.icicles': 'Stalactites de glace',
     'aura.perfectMoment': 'Moment parfait',
+    'error.uniqueEquipped': 'Vous ne pouvez porter qu’un seul objet de ce type.',
+    'error.townFocusCannotAfford':
+      'Vous n’avez pas assez de moyens pour cette respécialisation de focus.',
+    'log.townFocusRespecComplete': 'Votre respécialisation de focus est complétée.',
   },
   en_CA: {
     'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
@@ -2509,6 +2872,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Silt Hide',
     'aura.demoralized': 'Demoralized',
     'aura.resurrectionSickness': "The Keeper's Toll",
+    'aura.unstuckSickness': 'Unstuck Sickness',
     'error.lineOfSight': 'Line of sight.',
     'error.bagsFull': 'Your bags are full.',
     'error.bagSocketsFull': 'All your bag slots are full.',
@@ -2525,6 +2889,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Invalid talent build.',
     'error.unknownSpec': 'Unknown specialization.',
     'error.maxLoadouts': 'You can save at most {count} loadouts.',
+    'error.emptyLoadoutName': 'Loadout name cannot be empty.',
     'error.noLoadout': 'No such loadout.',
     'error.loadoutLevel': 'That loadout needs a higher level.',
     'error.cannotEquip': 'You cannot equip that.',
@@ -2539,6 +2904,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -2552,6 +2918,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noItem': "You don't have that item.",
     'error.cantWhileDead': "You can't do that while dead.",
     'error.cantWhileSwimming': "You can't do that while swimming.",
+    'error.alreadyEating': 'You are already eating.',
+    'error.alreadyDrinking': 'You are already drinking.',
     'error.tameThat': 'You cannot tame that.',
     'error.tameBeastsOnly': 'Only beasts can be tamed.',
     'error.tameTooStrong': 'That beast is too strong to tame.',
@@ -2565,6 +2933,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Nothing you selected can be harvested from that corpse.',
     'error.gatherNodeMissing': 'That resource node does not exist.',
     'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
+    'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
     'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
     'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
     'error.vcupNoNation': 'Pick a banner nation first.',
@@ -2610,6 +2979,48 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'error.arenaMinLevel': "Devi essere di livello {level} per metterti in coda per l'arena.",
+    'error.arenaMinLevelMember':
+      "{name} deve essere almeno di livello {level} per mettersi in coda per l'arena.",
+    'log.arenaQueueAutoLeave1v1': 'Esci dalla coda del Colosseo Cinereo.',
+    'error.unknownAbility': 'Non conosci questa abilità.',
+    'error.notEnoughRuin': 'Rovina insufficiente!',
+    'error.burningPactRequired': 'Conflagrazione richiede Patto Ardente sul bersaglio.',
+    'error.shellskinPreventsAttacks': 'Pelle di Corazza impedisce di attaccare.',
+    'error.tithefiendNeedsDirge':
+      'Il tuo Demone della Decima richiede un nemico affetto da Canto Funebre della Putrefazione.',
+    'error.guildBankNoGuild': 'Devi essere in una gilda per usare la banca della gilda.',
+    'error.guildBankRank': 'Solo gli ufficiali della gilda possono usare la banca della gilda.',
+    'error.guildBankFull': 'La banca della gilda è piena.',
+    'error.guildBankQuestItem': 'Non puoi depositare oggetti missione nella banca della gilda.',
+    'error.guildBankSoulbound':
+      "Non puoi depositare oggetti vincolati all'anima nella banca della gilda.",
+    'error.guildBankNoTransfer': "Quell'oggetto non può essere depositato nella banca della gilda.",
+    'error.guildBankWithdrawRefused':
+      "Quell'oggetto non può essere ritirato dalla banca della gilda.",
+    'error.guildBankTreasuryCap': 'La tesoreria della gilda non può contenere una cifra così alta.',
+    'error.guildBankTreasuryShort': 'La tesoreria della gilda non contiene una cifra così alta.',
+    'error.guildBankCarryCap': 'Non puoi portare con te una cifra così alta.',
+    'error.guildBankCannotAfford': "La tua gilda non può permettersi quell'ampliamento.",
+    'error.guildBankMaxSlots': 'La banca della gilda non può essere ampliata oltre.',
+    'log.guildBankOpened': 'Apri la banca della gilda.',
+    'log.guildBankSlotsPurchased': 'Acquisti spazi aggiuntivi della banca della gilda.',
+    'log.guildBankDepositGold': 'Depositi {money} nella tesoreria della gilda.',
+    'log.guildBankWithdrawGold': 'Ritiri {money} dalla tesoreria della gilda.',
+    'log.guildBankDepositItem': 'Depositi {item} nella banca della gilda.',
+    'log.guildBankWithdrawItem': 'Ritiri {item} dalla banca della gilda.',
+    'error.rawCatchCookFirst': 'È crudo. Cucinalo prima.',
+    'log.questItemRecovered': 'Recuperi un oggetto missione che ti mancava.',
+    'groundPickup.objectAlreadyCredited': 'Lo hai già fatto.',
+    'error.mountTrainInProgress': 'È già in corso una lezione di equitazione.',
+    'error.mountTrainDismountFirst': 'Smonta prima.',
+    'error.ridingAlreadyLearned': "Hai già imparato l'equitazione.",
+    'error.ridingTrainLevel': "Devi essere di livello 20 per imparare l'equitazione.",
+    'error.mountTrainLevel': 'Devi essere di livello 20 per prendere lezioni di equitazione.',
+    'error.ridingQuestUntrained': "Devi imparare l'equitazione prima di prendere questa lezione.",
+    'error.ridingUntrained': 'Devi imparare a cavalcare prima. Trova un istruttore di equitazione.',
+    'error.ridingWrongNpc': "Devi parlare con Marla Hitchen per imparare l'equitazione.",
+    'error.mountTrainNeedsQuest': 'Devi prima accettare la missione di equitazione.',
     'error.notInGroup': "Quell'alleato non è nel gruppo.",
     'error.noDeadAlly': 'Devi bersagliare un alleato del gruppo che sia morto.',
     'error.professionChoiceUnavailable': 'Quella scelta di professione non è disponibile.',
@@ -2818,11 +3229,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Pelle di limo',
     'aura.demoralized': 'Demoralizzato',
     'aura.resurrectionSickness': 'Mal di resurrezione',
+    'aura.unstuckSickness': 'Mal di sblocco',
     'error.lineOfSight': 'Nessuna linea di vista.',
     'error.bagsFull': 'Le tue borse sono piene.',
     'error.bagSocketsFull': 'Tutti gli alloggiamenti delle borse sono occupati.',
     'error.bagSwapTooManyItems': 'Hai troppi oggetti per passare a quella borsa.',
     'error.bagRemoveTooManyItems': 'Hai troppi oggetti per rimuovere quella borsa.',
+    'error.bagEquipHasProperty':
+      'Non puoi equipaggiare quella borsa finché possiede una proprietà speciale.',
     'error.tradeBagSpace': 'Scambio fallito: spazio insufficiente nelle borse.',
     'log.bagsMigrated': 'I tuoi averi sono stati riposti in nuove borse.',
     'error.specLevel': 'Puoi scegliere una specializzazione al livello {level}.',
@@ -2834,6 +3248,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Build dei talenti non valida.',
     'error.unknownSpec': 'Specializzazione sconosciuta.',
     'error.maxLoadouts': 'Puoi salvare al massimo {count} configurazioni.',
+    'error.emptyLoadoutName': 'Il nome della configurazione non può essere vuoto.',
     'error.noLoadout': 'Configurazione inesistente.',
     'error.loadoutLevel': 'Quella configurazione richiede un livello più alto.',
     'error.cannotEquip': 'Non puoi equipaggiare quello.',
@@ -2850,6 +3265,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Non c'è nessun mercante nelle vicinanze.",
     'error.noSellQuest': 'Non puoi vendere oggetti delle missioni.',
     'error.sellBound': "Quell'oggetto è legato e non può essere venduto.",
+    'error.sellLocked': "Quell'oggetto è bloccato e non può essere venduto.",
     'error.noBuyback': "Quell'oggetto non è disponibile per il riacquisto.",
     'error.nailedShut': 'È inchiodato.',
     'error.enoughOfThose': 'Ne hai già abbastanza.',
@@ -2876,6 +3292,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Quel cadavere non ha nulla da raccogliere tra i componenti selezionati.',
     'error.gatherNodeMissing': 'Quel nodo di risorse non esiste.',
     'error.gatherNodeNotRespawned': 'Questo nodo di risorse non è ancora ricomparso per te.',
+    'error.toolEffectSlotFromWindow': 'Incastonalo dalla finestra Professioni.',
     'error.vcupDeserter': 'Il Custode del campo ricorda. Torna più tardi.',
     'error.vcupPartyTooBig': 'Quella categoria richiede un gruppo più piccolo.',
     'error.vcupNoNation': 'Prima scegli una nazione della bandiera.',
@@ -3012,8 +3429,53 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Gelo Invernale',
     'aura.icicles': 'Ghiaccioli',
     'aura.perfectMoment': 'Momento Perfetto',
+    'error.uniqueEquipped': 'Puoi equipaggiarne solo uno di quel tipo.',
+    'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
+    'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
   },
   de_DE: {
+    'error.arenaMinLevel': 'Du musst Stufe {level} sein, um dich für die Arena einzureihen.',
+    'error.arenaMinLevelMember':
+      '{name} muss mindestens Stufe {level} sein, um sich für die Arena einzureihen.',
+    'log.arenaQueueAutoLeave1v1': 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
+    'error.unknownAbility': 'Ihr beherrscht diese Fähigkeit nicht.',
+    'error.notEnoughRuin': 'Nicht genug Verderben!',
+    'error.burningPactRequired': 'Feuersbrunst erfordert Brennender Pakt auf dem Ziel.',
+    'error.shellskinPreventsAttacks': 'Panzerhaut verhindert Angriffe.',
+    'error.tithefiendNeedsDirge':
+      'Euer Zehntteufel benötigt einen Gegner mit Klagelied des Verfalls.',
+    'error.guildBankNoGuild': 'Ihr müsst in einer Gilde sein, um die Gildenbank zu benutzen.',
+    'error.guildBankRank': 'Nur Gildenoffiziere dürfen die Gildenbank benutzen.',
+    'error.guildBankFull': 'Die Gildenbank ist voll.',
+    'error.guildBankQuestItem': 'Ihr könnt keine Questgegenstände in der Gildenbank lagern.',
+    'error.guildBankSoulbound':
+      'Ihr könnt keine seelengebundenen Gegenstände in der Gildenbank lagern.',
+    'error.guildBankNoTransfer': 'Dieser Gegenstand kann nicht in der Gildenbank gelagert werden.',
+    'error.guildBankWithdrawRefused':
+      'Dieser Gegenstand kann nicht aus der Gildenbank entnommen werden.',
+    'error.guildBankTreasuryCap': 'Die Gildenkasse kann nicht so viel fassen.',
+    'error.guildBankTreasuryShort': 'Die Gildenkasse enthält nicht so viel.',
+    'error.guildBankCarryCap': 'Ihr könnt nicht so viel Geld tragen.',
+    'error.guildBankCannotAfford': 'Eure Gilde kann sich diese Erweiterung nicht leisten.',
+    'error.guildBankMaxSlots': 'Die Gildenbank kann nicht weiter erweitert werden.',
+    'log.guildBankOpened': 'Ihr eröffnet die Gildenbank.',
+    'log.guildBankSlotsPurchased': 'Ihr kauft zusätzliche Gildenbankfächer.',
+    'log.guildBankDepositGold': 'Ihr zahlt {money} in die Gildenkasse ein.',
+    'log.guildBankWithdrawGold': 'Ihr hebt {money} aus der Gildenkasse ab.',
+    'log.guildBankDepositItem': 'Ihr lagert {item} in die Gildenbank ein.',
+    'log.guildBankWithdrawItem': 'Ihr entnehmt {item} aus der Gildenbank.',
+    'error.rawCatchCookFirst': 'Das ist roh. Kocht es zuerst.',
+    'log.questItemRecovered': 'Ihr erhaltet einen fehlenden Questgegenstand zurück.',
+    'groundPickup.objectAlreadyCredited': 'Das habt Ihr bereits erledigt.',
+    'error.mountTrainInProgress': 'Es läuft bereits eine Reitstunde.',
+    'error.mountTrainDismountFirst': 'Ihr müsst zuerst absitzen.',
+    'error.ridingAlreadyLearned': 'Ihr habt Reiten bereits erlernt.',
+    'error.ridingTrainLevel': 'Ihr müsst Stufe 20 sein, um Reiten zu erlernen.',
+    'error.mountTrainLevel': 'Ihr müsst Stufe 20 sein, um Reitstunden zu nehmen.',
+    'error.ridingQuestUntrained': 'Ihr müsst Reiten erlernen, bevor Ihr diese Stunde nehmt.',
+    'error.ridingUntrained': 'Ihr müsst zuerst reiten lernen. Sucht einen Reitlehrer.',
+    'error.ridingWrongNpc': 'Ihr müsst mit Marla Hitchen sprechen, um Reiten zu erlernen.',
+    'error.mountTrainNeedsQuest': 'Ihr müsst zuerst die Reitstunden-Quest annehmen.',
     'error.notInGroup': 'Dieser Verbündete ist nicht in deiner Gruppe.',
     'error.noDeadAlly': 'Du musst einen toten Verbündeten in deiner Gruppe als Ziel wählen.',
     'error.professionChoiceUnavailable': 'Diese Berufsauswahl ist nicht verfügbar.',
@@ -3223,11 +3685,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Schlickhaut',
     'aura.demoralized': 'Demoralisiert',
     'aura.resurrectionSickness': 'Wiederbelebungskrankheit',
+    'aura.unstuckSickness': 'Befreiungskrankheit',
     'error.lineOfSight': 'Kein Sichtkontakt.',
     'error.bagsFull': 'Eure Taschen sind voll.',
     'error.bagSocketsFull': 'Alle Eure Taschenplätze sind belegt.',
     'error.bagSwapTooManyItems': 'Ihr habt zu viele Gegenstände, um zu dieser Tasche zu wechseln.',
     'error.bagRemoveTooManyItems': 'Ihr habt zu viele Gegenstände, um diese Tasche abzulegen.',
+    'error.bagEquipHasProperty':
+      'Diese Tasche kann nicht angelegt werden, solange sie eine besondere Eigenschaft besitzt.',
     'error.tradeBagSpace': 'Handel fehlgeschlagen: nicht genug Taschenplatz.',
     'log.bagsMigrated': 'Eure Habseligkeiten wurden in neue Taschen gepackt.',
     'error.specLevel': 'Ihr könnt auf Stufe {level} eine Spezialisierung wählen.',
@@ -3239,6 +3704,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Ungültige Talentverteilung.',
     'error.unknownSpec': 'Unbekannte Spezialisierung.',
     'error.maxLoadouts': 'Ihr könnt höchstens {count} Vorlagen speichern.',
+    'error.emptyLoadoutName': 'Der Vorlagenname darf nicht leer sein.',
     'error.noLoadout': 'Diese Vorlage existiert nicht.',
     'error.loadoutLevel': 'Für diese Vorlage ist eine höhere Stufe erforderlich.',
     'error.cannotEquip': 'Das könnt Ihr nicht ausrüsten.',
@@ -3255,6 +3721,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Es ist kein Händler in der Nähe.',
     'error.noSellQuest': 'Ihr könnt keine Questgegenstände verkaufen.',
     'error.sellBound': 'Dieser Gegenstand ist gebunden und kann nicht verkauft werden.',
+    'error.sellLocked': 'Dieser Gegenstand ist gesperrt und kann nicht verkauft werden.',
     'error.noBuyback': 'Dieser Gegenstand ist nicht zum Rückkauf verfügbar.',
     'error.nailedShut': 'Es ist vernagelt.',
     'error.enoughOfThose': 'Davon habt Ihr genug.',
@@ -3283,6 +3750,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Dieses Ressourcenvorkommen existiert nicht.',
     'error.gatherNodeNotRespawned':
       'Dieses Ressourcenvorkommen ist für Euch noch nicht erneut erschienen.',
+    'error.toolEffectSlotFromWindow': 'Öffnet die Berufe, um das anzubringen.',
     'error.vcupDeserter': 'Der Platzwart vergisst nicht. Kommt später wieder.',
     'error.vcupPartyTooBig': 'Diese Klasse braucht eine kleinere Gruppe.',
     'error.vcupNoNation': 'Wählt zuerst eine Bannernation.',
@@ -3420,8 +3888,42 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Winterkälte',
     'aura.icicles': 'Eiszapfen',
     'aura.perfectMoment': 'Perfekter Moment',
+    'error.uniqueEquipped': 'Du kannst davon nur eins ausrüsten.',
+    'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
+    'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
   },
   zh_CN: {
+    'error.arenaMinLevel': '你必须达到等级 {level} 才能加入竞技场队列。',
+    'error.arenaMinLevelMember': '{name} 必须至少达到等级 {level} 才能加入竞技场队列。',
+    'log.arenaQueueAutoLeave1v1': '你离开了灰烬斗技场队列。',
+    'error.unknownAbility': '你尚未学会该技能。',
+    'error.notEnoughRuin': '毁灭不足！',
+    'error.burningPactRequired': '燃尽需要目标身上有燃烧契约。',
+    'error.shellskinPreventsAttacks': '甲壳之肤阻止攻击。',
+    'error.tithefiendNeedsDirge': '你的什一魔需要一个受腐朽挽歌影响的敌人。',
+    'error.guildBankNoGuild': '你必须加入公会才能使用公会银行。',
+    'error.guildBankRank': '只有公会官员才能使用公会银行。',
+    'error.guildBankFull': '公会银行已满。',
+    'error.guildBankSoulbound': '你无法将灵魂绑定的物品存入公会银行。',
+    'error.guildBankNoTransfer': '该物品无法存入公会银行。',
+    'error.guildBankTreasuryCap': '公会金库无法容纳这么多金钱。',
+    'error.guildBankTreasuryShort': '公会金库没有这么多金钱。',
+    'error.guildBankCarryCap': '你无法携带这么多金钱。',
+    'error.guildBankCannotAfford': '你的公会无力支付该扩展费用。',
+    'error.guildBankMaxSlots': '公会银行无法再扩展了。',
+    'log.guildBankOpened': '你开启了公会银行。',
+    'log.guildBankSlotsPurchased': '你购买了额外的公会银行格子。',
+    'log.guildBankDepositGold': '你向公会金库存入了 {money}。',
+    'log.guildBankWithdrawGold': '你从公会金库取出了 {money}。',
+    'log.guildBankDepositItem': '你将 {item} 存入了公会银行。',
+    'log.guildBankWithdrawItem': '你从公会银行取出了 {item}。',
+    'error.rawCatchCookFirst': '这是生的。请先烹饪。',
+    'log.questItemRecovered': '你补回了一件缺失的任务物品。',
+    'groundPickup.objectAlreadyCredited': '你已经做过这个了。',
+    'error.mountTrainInProgress': '骑乘课程已在进行中。',
+    'error.mountTrainDismountFirst': '请先下骑。',
+    'error.mountTrainLevel': '你必须达到等级20才能参加骑乘课程。',
+    'error.mountTrainNeedsQuest': '你必须先接受骑乘课程任务。',
     'error.notInGroup': '该盟友不在你的队伍中。',
     'error.noDeadAlly': '你必须以队伍中一名死亡的盟友为目标。',
     'error.professionChoiceUnavailable': '该专业选项不可用。',
@@ -3489,6 +3991,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死亡护符救了你！',
     'error.heroicMarksNeeded': '购买{name}需要{marks}个英雄徽记。',
     'aura.clearcasting': '清晰施法',
+    'aura.effigy': '巫蛊像',
+    'aura.gloomtithe': '幽暗什一',
+    'aura.tithefiend': '什一魔',
     'aura.searingLight': '灼热圣光',
     'aura.lingeringGraceWard': '萦绕恩泽',
     'aura.nocturns': '冥想',
@@ -3680,9 +4185,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': '淤泥之皮',
     'aura.demoralized': '士气低落',
     'aura.resurrectionSickness': '复活后遗症',
+    'aura.unstuckSickness': '脱困后遗症',
     'error.lineOfSight': '目标不在视线内。',
     'error.bagsFull': '你的背包已满。',
     'error.bankQuestItem': '你无法将任务物品存入银行。',
+    'error.guildBankQuestItem': '你无法将任务物品存入公会银行。',
+    'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
@@ -3691,6 +4199,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': '你的所有背包栏位都已占用。',
     'error.bagSwapTooManyItems': '物品太多，无法换成那个背包。',
     'error.bagRemoveTooManyItems': '物品太多，无法移除那个背包。',
+    'error.bagEquipHasProperty': '该背包带有特殊属性时无法装备。',
     'error.tradeBagSpace': '交易失败：背包空间不足。',
     'log.bagsMigrated': '你的物品已装入新背包。',
     'error.specLevel': '你将在{level}级时选择专精。',
@@ -3708,6 +4217,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': '无效的天赋配置。',
     'error.unknownSpec': '未知的专精。',
     'error.maxLoadouts': '你最多只能保存{count}套配置。',
+    'error.emptyLoadoutName': '配置名称不能为空。',
     'error.noLoadout': '没有这套配置。',
     'error.loadoutLevel': '这套配置需要更高的等级。',
     'error.cannotEquip': '你无法装备它。',
@@ -3724,6 +4234,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近没有商人。',
     'error.noSellQuest': '你无法出售任务物品。',
     'error.sellBound': '该物品已绑定，无法出售。',
+    'error.sellLocked': '该物品已锁定，无法出售。',
     'error.noBuyback': '该物品无法回购。',
     'error.nailedShut': '它被钉死了。',
     'error.enoughOfThose': '你已经有足够多的这种物品了。',
@@ -3749,6 +4260,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.corpseSelectionNothingToHarvest': '你选择的部位都无法从那具尸体上采集。',
     'error.gatherNodeMissing': '那个资源点不存在。',
     'error.gatherNodeNotRespawned': '这个资源点尚未为你刷新。',
+    'error.toolEffectSlotFromWindow': '请在专业窗口中镶嵌它。',
     'error.vcupDeserter': '场地管理员记着呢。稍后再来吧。',
     'error.vcupPartyTooBig': '这个赛级需要更小的队伍。',
     'error.vcupNoNation': '请先选择一个旗帜国度。',
@@ -3803,6 +4315,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '你需要最近完成一次击杀。',
     'aura.temporalExhaustion': '时光疲惫',
     'aura.cauterizeFatigue': '烧灼疲乏',
+    'aura.carrierFatigue': '旗手疲劳',
+    'aura.carriedFlag': '携带旗帜',
+    'aura.sprintRune': '疾跑',
+    'aura.battleRune': '战斗符文',
+    'aura.wardRune': '守护符文',
     'mechanic.charge': '突进',
     'aura.bladedEcho': '利刃回响',
     'aura.emboldened': '鼓舞',
@@ -3812,8 +4329,42 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '凛冬之寒',
     'aura.icicles': '冰锥',
     'aura.perfectMoment': '完美时刻',
+    'error.uniqueEquipped': '你只能装备一个此类物品。',
+    'error.townFocusCannotAfford': '你负担不起这次专注重置。',
+    'log.townFocusRespecComplete': '你的专注重置已完成。',
   },
   zh_TW: {
+    'error.arenaMinLevel': '你必須達到等級 {level} 才能加入競技場佇列。',
+    'error.arenaMinLevelMember': '{name} 必須至少達到等級 {level} 才能加入競技場佇列。',
+    'log.arenaQueueAutoLeave1v1': '你離開了灰燼競技場佇列。',
+    'error.unknownAbility': '你尚未學會該技能。',
+    'error.notEnoughRuin': '毀滅不足！',
+    'error.burningPactRequired': '燃盡需要目標身上有燃燒契約。',
+    'error.shellskinPreventsAttacks': '甲殼之膚阻止攻擊。',
+    'error.tithefiendNeedsDirge': '你的什一魔需要一個受腐朽輓歌影響的敵人。',
+    'error.guildBankNoGuild': '你必須加入公會才能使用公會銀行。',
+    'error.guildBankRank': '只有公會幹部才能使用公會銀行。',
+    'error.guildBankFull': '公會銀行已滿。',
+    'error.guildBankSoulbound': '你無法將靈魂綁定物品存入公會銀行。',
+    'error.guildBankNoTransfer': '該物品無法存入公會銀行。',
+    'error.guildBankTreasuryCap': '公會金庫容納不下這麼多金錢。',
+    'error.guildBankTreasuryShort': '公會金庫沒有這麼多金錢。',
+    'error.guildBankCarryCap': '你身上無法攜帶這麼多金錢。',
+    'error.guildBankCannotAfford': '你的公會無力支付該擴充費用。',
+    'error.guildBankMaxSlots': '公會銀行無法再擴充了。',
+    'log.guildBankOpened': '你開啟了公會銀行。',
+    'log.guildBankSlotsPurchased': '你購買了額外的公會銀行欄位。',
+    'log.guildBankDepositGold': '你將 {money} 存入公會金庫。',
+    'log.guildBankWithdrawGold': '你從公會金庫取出了 {money}。',
+    'log.guildBankDepositItem': '你將 {item} 存入公會銀行。',
+    'log.guildBankWithdrawItem': '你從公會銀行取出了 {item}。',
+    'error.rawCatchCookFirst': '這是生的，請先烹飪。',
+    'log.questItemRecovered': '你尋回了一件遺失的任務物品。',
+    'groundPickup.objectAlreadyCredited': '你已經做過這個了。',
+    'error.mountTrainInProgress': '騎乘課程已在進行中。',
+    'error.mountTrainDismountFirst': '請先下騎。',
+    'error.mountTrainLevel': '你必須達到等級 20 才能參加騎乘課程。',
+    'error.mountTrainNeedsQuest': '你必須先接受騎乘課程任務。',
     'error.notInGroup': '該盟友不在你的隊伍中。',
     'error.noDeadAlly': '你必須鎖定隊伍中一名陣亡的盟友。',
     'error.professionChoiceUnavailable': '該專業選擇目前無法使用。',
@@ -3881,6 +4432,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死亡護符救了你！',
     'error.heroicMarksNeeded': '購買{name}需要{marks}個英雄徽記。',
     'aura.clearcasting': '清晰施法',
+    'aura.effigy': '巫毒塑像',
+    'aura.gloomtithe': '幽暗什一',
+    'aura.tithefiend': '什一魔',
     'aura.searingLight': '灼熱聖光',
     'aura.lingeringGraceWard': '綿延恩典',
     'aura.nocturns': '冥想',
@@ -4072,9 +4626,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': '淤泥之皮',
     'aura.demoralized': '士氣低落',
     'aura.resurrectionSickness': '復活虛弱',
+    'aura.unstuckSickness': '脫困虛弱',
     'error.lineOfSight': '目標不在視線內。',
     'error.bagsFull': '你的背包已滿。',
     'error.bankQuestItem': '你無法將任務物品存入銀行。',
+    'error.guildBankQuestItem': '你無法將任務物品存入公會銀行。',
+    'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
@@ -4083,6 +4640,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': '你的所有背包欄位都已佔用。',
     'error.bagSwapTooManyItems': '物品太多，無法換成那個背包。',
     'error.bagRemoveTooManyItems': '物品太多，無法移除那個背包。',
+    'error.bagEquipHasProperty': '此背包帶有特殊屬性時無法裝備。',
     'error.tradeBagSpace': '交易失敗：背包空間不足。',
     'log.bagsMigrated': '你的物品已裝入新背包。',
     'error.specLevel': '你必須達到等級 {level} 才能選擇專精。',
@@ -4100,6 +4658,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': '無效的天賦配置。',
     'error.unknownSpec': '未知的專精。',
     'error.maxLoadouts': '你最多只能儲存 {count} 組配置。',
+    'error.emptyLoadoutName': '配置名稱不能為空。',
     'error.noLoadout': '沒有這組配置。',
     'error.loadoutLevel': '這組配置需要更高的等級。',
     'error.cannotEquip': '你無法裝備那件物品。',
@@ -4116,6 +4675,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近沒有商人。',
     'error.noSellQuest': '你無法出售任務物品。',
     'error.sellBound': '該物品已綁定，無法出售。',
+    'error.sellLocked': '該物品已鎖定，無法出售。',
     'error.noBuyback': '那件物品無法購回。',
     'error.nailedShut': '它被釘死了。',
     'error.enoughOfThose': '你已經有足夠的那種物品了。',
@@ -4141,6 +4701,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.corpseSelectionNothingToHarvest': '你選擇的部位都無法從那具屍體上採集。',
     'error.gatherNodeMissing': '那個資源點不存在。',
     'error.gatherNodeNotRespawned': '這個資源點尚未為你重新出現。',
+    'error.toolEffectSlotFromWindow': '請在專業視窗中鑲嵌它。',
     'error.vcupDeserter': '場地管理員記著呢。稍後再來吧。',
     'error.vcupPartyTooBig': '這個賽級需要更小的隊伍。',
     'error.vcupNoNation': '請先選擇一個旗幟國度。',
@@ -4195,6 +4756,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '你需要最近完成一次擊殺。',
     'aura.temporalExhaustion': '時光疲憊',
     'aura.cauterizeFatigue': '燒灼疲乏',
+    'aura.carrierFatigue': '旗手疲勞',
+    'aura.carriedFlag': '攜帶旗幟',
+    'aura.sprintRune': '疾跑',
+    'aura.battleRune': '戰鬥符文',
+    'aura.wardRune': '守護符文',
     'mechanic.charge': '猛衝',
     'aura.bladedEcho': '利刃迴響',
     'aura.emboldened': '壯膽',
@@ -4204,8 +4770,43 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '凜冬之寒',
     'aura.icicles': '冰錐',
     'aura.perfectMoment': '完美時刻',
+    'error.uniqueEquipped': '你只能裝備一個此類物品。',
+    'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
+    'log.townFocusRespecComplete': '你的專注重置已完成。',
   },
   ko_KR: {
+    'error.arenaMinLevel': '투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'error.arenaMinLevelMember':
+      '{name}님은 투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'log.arenaQueueAutoLeave1v1': '잿빛 원형경기장 대기열에서 나왔습니다.',
+    'error.unknownAbility': '아직 배우지 않은 기술입니다.',
+    'error.notEnoughRuin': '파멸이 부족합니다!',
+    'error.burningPactRequired': '점화하려면 대상에게 불타는 계약이 있어야 합니다.',
+    'error.shellskinPreventsAttacks': '갑각 피부 상태에서는 공격할 수 없습니다.',
+    'error.tithefiendNeedsDirge': '십일조 악마에게는 부패의 만가에 걸린 적이 필요합니다.',
+    'error.guildBankNoGuild': '길드 은행을 사용하려면 길드에 소속되어 있어야 합니다.',
+    'error.guildBankRank': '길드 임원만 길드 은행을 사용할 수 있습니다.',
+    'error.guildBankFull': '길드 은행이 가득 찼습니다.',
+    'error.guildBankSoulbound': '귀속된 아이템은 길드 은행에 보관할 수 없습니다.',
+    'error.guildBankNoTransfer': '그 아이템은 길드 은행에 보관할 수 없습니다.',
+    'error.guildBankTreasuryCap': '길드 금고는 그만큼 많은 돈을 담을 수 없습니다.',
+    'error.guildBankTreasuryShort': '길드 금고에 그만큼의 돈이 없습니다.',
+    'error.guildBankCarryCap': '그만큼의 돈을 소지할 수 없습니다.',
+    'error.guildBankCannotAfford': '길드가 그 확장 비용을 지불할 수 없습니다.',
+    'error.guildBankMaxSlots': '길드 은행을 더 이상 확장할 수 없습니다.',
+    'log.guildBankOpened': '길드 은행을 열었습니다.',
+    'log.guildBankSlotsPurchased': '추가 길드 은행 칸을 구매했습니다.',
+    'log.guildBankDepositGold': '길드 금고에 {money}을(를) 넣었습니다.',
+    'log.guildBankWithdrawGold': '길드 금고에서 {money}을(를) 꺼냈습니다.',
+    'log.guildBankDepositItem': '길드 은행에 {item}을(를) 넣었습니다.',
+    'log.guildBankWithdrawItem': '길드 은행에서 {item}을(를) 꺼냈습니다.',
+    'error.rawCatchCookFirst': '그것은 날것입니다. 먼저 요리하세요.',
+    'log.questItemRecovered': '잃어버렸던 퀘스트 아이템을 되찾았습니다.',
+    'groundPickup.objectAlreadyCredited': '이건 이미 완료했어요.',
+    'error.mountTrainInProgress': '기승 수업이 이미 진행 중입니다.',
+    'error.mountTrainDismountFirst': '먼저 내리세요.',
+    'error.mountTrainLevel': '기승 수업을 받으려면 20레벨이 되어야 합니다.',
+    'error.mountTrainNeedsQuest': '먼저 기승 수업 퀘스트를 수락해야 합니다.',
     'error.notInGroup': '그 아군은 당신의 그룹에 속해 있지 않습니다.',
     'error.noDeadAlly': '그룹 내 죽은 아군을 대상으로 지정해야 합니다.',
     'error.professionChoiceUnavailable': '해당 전문 기술 선택지는 사용할 수 없습니다.',
@@ -4274,6 +4875,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '죽음의 수호가 당신을 구했습니다!',
     'error.heroicMarksNeeded': '{name}을(를) 구매하려면 영웅의 징표 {marks}개가 필요합니다.',
     'aura.clearcasting': '선명한 시전',
+    'aura.effigy': '제물 인형',
+    'aura.gloomtithe': '암흑 십일조',
+    'aura.tithefiend': '십일조 악마',
     'aura.searingLight': '타오르는 빛',
     'aura.lingeringGraceWard': '지속되는 은총',
     'aura.nocturns': '명상',
@@ -4470,9 +5074,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': '침니 껍질',
     'aura.demoralized': '사기 저하',
     'aura.resurrectionSickness': '부활의 후유증',
+    'aura.unstuckSickness': '탈출의 후유증',
     'error.lineOfSight': '시야가 막혀 있습니다.',
     'error.bagsFull': '가방이 가득 찼습니다.',
     'error.bankQuestItem': '퀘스트 아이템은 은행에 보관할 수 없습니다.',
+    'error.guildBankQuestItem': '퀘스트 아이템은 길드 은행에 보관할 수 없습니다.',
+    'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
@@ -4481,6 +5088,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': '모든 가방 칸이 사용 중입니다.',
     'error.bagSwapTooManyItems': '소지품이 너무 많아 그 가방으로 교체할 수 없습니다.',
     'error.bagRemoveTooManyItems': '소지품이 너무 많아 그 가방을 해제할 수 없습니다.',
+    'error.bagEquipHasProperty': '특수 속성이 있는 가방은 장착할 수 없습니다.',
     'error.tradeBagSpace': '거래 실패: 가방 공간이 부족합니다.',
     'log.bagsMigrated': '소지품이 새 가방에 담겼습니다.',
     'error.specLevel': '{level}레벨에 전문화를 선택할 수 있습니다.',
@@ -4498,6 +5106,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': '잘못된 특성 구성입니다.',
     'error.unknownSpec': '알 수 없는 전문화입니다.',
     'error.maxLoadouts': '특성 묶음은 최대 {count}개까지 저장할 수 있습니다.',
+    'error.emptyLoadoutName': '특성 묶음 이름은 비워 둘 수 없습니다.',
     'error.noLoadout': '해당 특성 묶음이 없습니다.',
     'error.loadoutLevel': '해당 특성 묶음을 사용하려면 더 높은 레벨이 필요합니다.',
     'error.cannotEquip': '그것을 착용할 수 없습니다.',
@@ -4514,6 +5123,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '근처에 상인이 없습니다.',
     'error.noSellQuest': '퀘스트 아이템은 판매할 수 없습니다.',
     'error.sellBound': '그 아이템은 귀속되어 판매할 수 없습니다.',
+    'error.sellLocked': '그 아이템은 잠겨 있어 판매할 수 없습니다.',
     'error.noBuyback': '그 아이템은 되살 수 없습니다.',
     'error.nailedShut': '못으로 단단히 박혀 있습니다.',
     'error.enoughOfThose': '그것을 이미 충분히 가지고 있습니다.',
@@ -4539,6 +5149,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.corpseSelectionNothingToHarvest': '선택한 부위는 그 시체에서 채집할 수 없습니다.',
     'error.gatherNodeMissing': '그 자원 지점은 존재하지 않습니다.',
     'error.gatherNodeNotRespawned': '이 자원 지점은 아직 당신에게 다시 생성되지 않았습니다.',
+    'error.toolEffectSlotFromWindow': '전문 기술 창에서 장착하세요.',
     'error.vcupDeserter': '경기장 관리인은 기억하고 있습니다. 나중에 다시 오세요.',
     'error.vcupPartyTooBig': '해당 등급에는 더 작은 파티가 필요합니다.',
     'error.vcupNoNation': '먼저 깃발 국가를 선택하세요.',
@@ -4596,6 +5207,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '최근에 처치한 적이 필요합니다.',
     'aura.temporalExhaustion': '시간의 탈진',
     'aura.cauterizeFatigue': '소작의 피로',
+    'aura.carrierFatigue': '기수 피로',
+    'aura.carriedFlag': '깃발 운반 중',
+    'aura.sprintRune': '질주',
+    'aura.battleRune': '전투 룬',
+    'aura.wardRune': '수호 룬',
     'mechanic.charge': '쇄도',
     'aura.bladedEcho': '칼날의 메아리',
     'aura.emboldened': '대담함',
@@ -4605,8 +5221,43 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '겨울의 한기',
     'aura.icicles': '고드름',
     'aura.perfectMoment': '완벽한 순간',
+    'error.uniqueEquipped': '그런 것은 하나만 장착할 수 있습니다.',
+    'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
+    'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
   },
   ja_JP: {
+    'error.arenaMinLevel': 'アリーナのキューに参加するにはレベル{level}が必要です。',
+    'error.arenaMinLevelMember':
+      '{name}はアリーナのキューに参加するにはレベル{level}以上である必要があります。',
+    'log.arenaQueueAutoLeave1v1': '灰の闘技場のキューを離れました。',
+    'error.unknownAbility': 'そのアビリティをまだ習得していません。',
+    'error.notEnoughRuin': '破滅が足りません！',
+    'error.burningPactRequired': 'コンフラグレートには対象に灼熱の契約が必要です。',
+    'error.shellskinPreventsAttacks': '甲殻の皮膚により攻撃できません。',
+    'error.tithefiendNeedsDirge': 'タイスフィーンドには腐朽の葬送歌を受けた敵が必要です。',
+    'error.guildBankNoGuild': 'ギルド銀行を利用するにはギルドに加入している必要があります。',
+    'error.guildBankRank': 'ギルド銀行を利用できるのはギルド幹部のみです。',
+    'error.guildBankFull': 'ギルド銀行がいっぱいです。',
+    'error.guildBankSoulbound': '魂縛のアイテムはギルド銀行に預けられません。',
+    'error.guildBankNoTransfer': 'そのアイテムはギルド銀行に預けられません。',
+    'error.guildBankTreasuryCap': 'ギルド金庫にはそれだけの額を入れられません。',
+    'error.guildBankTreasuryShort': 'ギルド金庫にはそれだけの額がありません。',
+    'error.guildBankCarryCap': 'それだけのお金は持ち運べません。',
+    'error.guildBankCannotAfford': 'その拡張を購入するには、ギルドの資金が足りません。',
+    'error.guildBankMaxSlots': 'ギルド銀行をこれ以上拡張できません。',
+    'log.guildBankOpened': 'ギルド銀行を開きました。',
+    'log.guildBankSlotsPurchased': '追加のギルド銀行スロットを購入しました。',
+    'log.guildBankDepositGold': 'ギルド金庫に{money}を預けました。',
+    'log.guildBankWithdrawGold': 'ギルド金庫から{money}を引き出しました。',
+    'log.guildBankDepositItem': 'ギルド銀行に{item}を預けました。',
+    'log.guildBankWithdrawItem': 'ギルド銀行から{item}を引き出しました。',
+    'error.rawCatchCookFirst': 'これは生です。先に調理してください。',
+    'log.questItemRecovered': '不足していたクエストアイテムを回収しました。',
+    'groundPickup.objectAlreadyCredited': 'これはもう済んでいる。',
+    'error.mountTrainInProgress': '騎乗レッスンはすでに進行中です。',
+    'error.mountTrainDismountFirst': '先に降りてください。',
+    'error.mountTrainLevel': '騎乗レッスンを受けるにはレベル20が必要です。',
+    'error.mountTrainNeedsQuest': '先に騎乗レッスンのクエストを受諾してください。',
     'error.notInGroup': 'その仲間はあなたのグループに入っていません。',
     'error.noDeadAlly': 'グループ内の死亡した仲間をターゲットしてください。',
     'error.professionChoiceUnavailable': 'その職業選択は利用できません。',
@@ -4679,6 +5330,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '死の加護があなたを救った！',
     'error.heroicMarksNeeded': '{name}を購入するには英雄の証が{marks}個必要です。',
     'aura.clearcasting': 'クリアキャスティング',
+    'aura.effigy': '呪いの人形',
+    'aura.gloomtithe': '闇の献納',
+    'aura.tithefiend': 'タイスフィーンド',
     'aura.searingLight': '灼熱の光',
     'aura.lingeringGraceWard': '留まる恩寵',
     'aura.nocturns': '瞑想',
@@ -4879,9 +5533,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': '沈泥の皮殻',
     'aura.demoralized': '意気消沈',
     'aura.resurrectionSickness': '復活の後遺症',
+    'aura.unstuckSickness': 'スタック解除の後遺症',
     'error.lineOfSight': '視線が通っていません。',
     'error.bagsFull': 'バッグがいっぱいです。',
     'error.bankQuestItem': 'クエストアイテムは銀行に預けられません。',
+    'error.guildBankQuestItem': 'クエストアイテムはギルド銀行に預けられません。',
+    'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
@@ -4890,6 +5547,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'バッグスロットはすべて使用中です。',
     'error.bagSwapTooManyItems': 'アイテムが多すぎてそのバッグに交換できません。',
     'error.bagRemoveTooManyItems': 'アイテムが多すぎてそのバッグを外せません。',
+    'error.bagEquipHasProperty': '特殊な特性が付いているバッグは装備できません。',
     'error.tradeBagSpace': '取引失敗：バッグの空きが足りません。',
     'log.bagsMigrated': '持ち物は新しいバッグに収納されました。',
     'error.specLevel': '専門化はレベル{level}で選択できます。',
@@ -4907,6 +5565,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': '無効なタレントビルドです。',
     'error.unknownSpec': '不明な専門化です。',
     'error.maxLoadouts': 'ロードアウトは最大{count}個まで保存できます。',
+    'error.emptyLoadoutName': 'ロードアウト名を空にはできません。',
     'error.noLoadout': 'そのようなロードアウトはありません。',
     'error.loadoutLevel': 'そのロードアウトにはより高いレベルが必要です。',
     'error.cannotEquip': 'それは装備できません。',
@@ -4923,6 +5582,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '近くに商人がいません。',
     'error.noSellQuest': 'クエストアイテムは売却できません。',
     'error.sellBound': 'そのアイテムはバインドされているため売却できません。',
+    'error.sellLocked': 'そのアイテムはロックされているため売却できません。',
     'error.noBuyback': 'そのアイテムは買い戻しできません。',
     'error.nailedShut': '釘で打ち付けられています。',
     'error.enoughOfThose': 'それはもう十分に持っています。',
@@ -4949,6 +5609,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.corpseSelectionNothingToHarvest': '選んだ部位はどれも、その死体から採取できません。',
     'error.gatherNodeMissing': 'その資源ポイントは存在しません。',
     'error.gatherNodeNotRespawned': 'この資源ポイントは、あなたにはまだ再出現していません。',
+    'error.toolEffectSlotFromWindow': '専門技能ウィンドウから装着してください。',
     'error.vcupDeserter': '整備人は覚えている。また後で来なさい。',
     'error.vcupPartyTooBig': 'その階級にはもっと小さなパーティーが必要だ。',
     'error.vcupNoNation': 'まずは旗の国を選ぼう。',
@@ -5006,6 +5667,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': '直前に敵を倒している必要があります。',
     'aura.temporalExhaustion': '時の疲弊',
     'aura.cauterizeFatigue': '焼灼の疲労',
+    'aura.carrierFatigue': '旗手の疲弊',
+    'aura.carriedFlag': '旗を運搬中',
+    'aura.sprintRune': 'スプリント',
+    'aura.battleRune': 'バトルルーン',
+    'aura.wardRune': 'ウォードルーン',
     'mechanic.charge': '突撃',
     'aura.bladedEcho': '刃の残響',
     'aura.emboldened': '奮起',
@@ -5015,8 +5681,52 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': '冬の凍え',
     'aura.icicles': '氷柱',
     'aura.perfectMoment': '完璧な瞬間',
+    'error.uniqueEquipped': 'その種類は1つだけ装備できます。',
+    'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
+    'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
   },
   pt_BR: {
+    'error.arenaMinLevel': 'Você precisa ser nível {level} para entrar na fila da arena.',
+    'error.arenaMinLevelMember':
+      '{name} precisa ser pelo menos nível {level} para entrar na fila da arena.',
+    'log.arenaQueueAutoLeave1v1': 'Você sai da fila do Coliseu Cinzento.',
+    'error.unknownAbility': 'Você não conhece essa habilidade.',
+    'error.notEnoughRuin': 'Ruína insuficiente!',
+    'error.burningPactRequired': 'Conflagrar exige Pacto Ardente no alvo.',
+    'error.shellskinPreventsAttacks': 'Pele de Casco impede ataques.',
+    'error.tithefiendNeedsDirge':
+      'Seu Demônio do Dízimo precisa de um inimigo afetado por Réquiem da Ruína.',
+    'error.guildBankNoGuild': 'Você precisa estar em uma guilda para usar o banco da guilda.',
+    'error.guildBankRank': 'Somente oficiais da guilda podem usar o banco da guilda.',
+    'error.guildBankFull': 'O banco da guilda está cheio.',
+    'error.guildBankQuestItem': 'Você não pode guardar itens de missão no banco da guilda.',
+    'error.guildBankSoulbound': 'Você não pode guardar itens vinculados à alma no banco da guilda.',
+    'error.guildBankNoTransfer': 'Esse item não pode ser guardado no banco da guilda.',
+    'error.guildBankWithdrawRefused': 'Esse item não pode ser retirado do banco da guilda.',
+    'error.guildBankTreasuryCap': 'A tesouraria da guilda não pode guardar tanto assim.',
+    'error.guildBankTreasuryShort': 'A tesouraria da guilda não tem tanto assim.',
+    'error.guildBankCarryCap': 'Você não pode carregar tanto dinheiro assim.',
+    'error.guildBankCannotAfford': 'Sua guilda não pode pagar por essa expansão.',
+    'error.guildBankMaxSlots': 'O banco da guilda não pode ser expandido além disso.',
+    'log.guildBankOpened': 'Você abre o banco da guilda.',
+    'log.guildBankSlotsPurchased': 'Você compra espaços adicionais do banco da guilda.',
+    'log.guildBankDepositGold': 'Você deposita {money} na tesouraria da guilda.',
+    'log.guildBankWithdrawGold': 'Você retira {money} da tesouraria da guilda.',
+    'log.guildBankDepositItem': 'Você deposita {item} no banco da guilda.',
+    'log.guildBankWithdrawItem': 'Você retira {item} do banco da guilda.',
+    'error.rawCatchCookFirst': 'Isso está cru. Cozinhe antes.',
+    'log.questItemRecovered': 'Você recupera um item de missão que estava faltando.',
+    'groundPickup.objectAlreadyCredited': 'Você já fez isso.',
+    'error.mountTrainInProgress': 'Uma aula de equitação já está em andamento.',
+    'error.mountTrainDismountFirst': 'Desmonte primeiro.',
+    'error.ridingAlreadyLearned': 'Você já aprendeu equitação.',
+    'error.ridingTrainLevel': 'Você precisa ser nível 20 para aprender equitação.',
+    'error.mountTrainLevel': 'Você precisa ser nível 20 para fazer aulas de equitação.',
+    'error.ridingQuestUntrained': 'Você precisa aprender equitação antes de fazer esta aula.',
+    'error.ridingUntrained':
+      'Você precisa aprender a montar primeiro. Procure um instrutor de equitação.',
+    'error.ridingWrongNpc': 'Você precisa falar com Marla Hitchen para aprender equitação.',
+    'error.mountTrainNeedsQuest': 'Você precisa aceitar a missão de equitação primeiro.',
     'error.notInGroup': 'Esse aliado não está no seu grupo.',
     'error.noDeadAlly': 'Você deve ter como alvo um aliado morto do seu grupo.',
     'error.professionChoiceUnavailable': 'Essa escolha de profissão não está disponível.',
@@ -5222,11 +5932,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Pele de lodo',
     'aura.demoralized': 'Desmoralizado',
     'aura.resurrectionSickness': 'Mal da Ressurreição',
+    'aura.unstuckSickness': 'Mal do Desbloqueio',
     'error.lineOfSight': 'Sem linha de visão.',
     'error.bagsFull': 'Suas bolsas estão cheias.',
     'error.bagSocketsFull': 'Todos os seus espaços de bolsa estão ocupados.',
     'error.bagSwapTooManyItems': 'Você tem itens demais para trocar para essa bolsa.',
     'error.bagRemoveTooManyItems': 'Você tem itens demais para remover essa bolsa.',
+    'error.bagEquipHasProperty':
+      'Essa bolsa não pode ser equipada enquanto tiver uma propriedade especial.',
     'error.tradeBagSpace': 'Troca falhou: espaço insuficiente nas bolsas.',
     'log.bagsMigrated': 'Seus pertences foram guardados em bolsas novas.',
     'error.specLevel': 'Você pode escolher uma especialização no nível {level}.',
@@ -5238,6 +5951,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Estrutura de talentos inválida.',
     'error.unknownSpec': 'Especialização desconhecida.',
     'error.maxLoadouts': 'Você pode salvar no máximo {count} conjuntos.',
+    'error.emptyLoadoutName': 'O nome do conjunto não pode ficar vazio.',
     'error.noLoadout': 'Esse conjunto não existe.',
     'error.loadoutLevel': 'Esse conjunto exige um nível mais alto.',
     'error.cannotEquip': 'Você não pode equipar isso.',
@@ -5254,6 +5968,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Não há nenhum comerciante por perto.',
     'error.noSellQuest': 'Você não pode vender itens de missão.',
     'error.sellBound': 'Esse item está vinculado e não pode ser vendido.',
+    'error.sellLocked': 'Esse item está bloqueado e não pode ser vendido.',
     'error.noBuyback': 'Esse item não está disponível para recompra.',
     'error.nailedShut': 'Está pregado e não abre.',
     'error.enoughOfThose': 'Você já tem o bastante desses.',
@@ -5280,6 +5995,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Nada do que você selecionou pode ser coletado desse cadáver.',
     'error.gatherNodeMissing': 'Esse ponto de recursos não existe.',
     'error.gatherNodeNotRespawned': 'Este ponto de recursos ainda não ressurgiu para você.',
+    'error.toolEffectSlotFromWindow': 'Encaixe isso pela janela de Profissões.',
     'error.vcupDeserter': 'O Zelador do campo se lembra. Volte mais tarde.',
     'error.vcupPartyTooBig': 'Essa categoria exige um grupo menor.',
     'error.vcupNoNation': 'Escolha primeiro uma nação de bandeira.',
@@ -5417,8 +6133,44 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Frio do Inverno',
     'aura.icicles': 'Pingentes de Gelo',
     'aura.perfectMoment': 'Momento Perfeito',
+    'error.uniqueEquipped': 'Você só pode equipar um desses.',
+    'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
+    'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
   },
   ru_RU: {
+    'error.arenaMinLevel': 'Чтобы встать в очередь на арену, нужен {level} уровень.',
+    'error.arenaMinLevelMember':
+      'Для постановки {name} в очередь на арену нужен как минимум {level} уровень.',
+    'log.arenaQueueAutoLeave1v1': 'Вы покидаете очередь Пепельного Колизея.',
+    'error.unknownAbility': 'Вы не знаете эту способность.',
+    'error.notEnoughRuin': 'Недостаточно Погибели!',
+    'error.burningPactRequired': 'Для Поджигания на цели должен быть Пылающий договор.',
+    'error.shellskinPreventsAttacks': 'Панцирная кожа не позволяет атаковать.',
+    'error.tithefiendNeedsDirge':
+      'Вашему демону десятины нужен противник под действием Панихиды распада.',
+    'error.guildBankNoGuild': 'Чтобы пользоваться банком гильдии, нужно состоять в гильдии.',
+    'error.guildBankRank': 'Пользоваться банком гильдии могут только офицеры гильдии.',
+    'error.guildBankFull': 'Банк гильдии полон.',
+    'error.guildBankSoulbound': 'Персональные предметы нельзя хранить в банке гильдии.',
+    'error.guildBankNoTransfer': 'Этот предмет нельзя хранить в банке гильдии.',
+    'error.guildBankTreasuryCap': 'Казна гильдии не может вместить такую сумму.',
+    'error.guildBankTreasuryShort': 'В казне гильдии не хватает такой суммы.',
+    'error.guildBankCarryCap': 'Вы не можете нести так много денег.',
+    'error.guildBankCannotAfford': 'У вашей гильдии недостаточно денег на это расширение.',
+    'error.guildBankMaxSlots': 'Банк гильдии больше нельзя расширить.',
+    'log.guildBankOpened': 'Вы открываете банк гильдии.',
+    'log.guildBankSlotsPurchased': 'Вы покупаете дополнительные ячейки банка гильдии.',
+    'log.guildBankDepositGold': 'Вы кладёте {money} в казну гильдии.',
+    'log.guildBankWithdrawGold': 'Вы забираете {money} из казны гильдии.',
+    'log.guildBankDepositItem': 'Вы кладёте {item} в банк гильдии.',
+    'log.guildBankWithdrawItem': 'Вы забираете {item} из банка гильдии.',
+    'error.rawCatchCookFirst': 'Это сырое. Сначала приготовьте.',
+    'log.questItemRecovered': 'Вы получаете обратно недостающий предмет задания.',
+    'groundPickup.objectAlreadyCredited': 'Это уже сделано.',
+    'error.mountTrainInProgress': 'Урок верховой езды уже идёт.',
+    'error.mountTrainDismountFirst': 'Сначала спешьтесь.',
+    'error.mountTrainLevel': 'Чтобы брать уроки верховой езды, нужен 20 уровень.',
+    'error.mountTrainNeedsQuest': 'Сначала нужно принять задание на урок верховой езды.',
     'error.notInGroup': 'Этот союзник не состоит в вашей группе.',
     'error.noDeadAlly': 'Выберите погибшего союзника из своей группы.',
     'error.professionChoiceUnavailable': 'Этот выбор профессии недоступен.',
@@ -5488,6 +6240,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': 'Оберег от смерти спасает вас!',
     'error.heroicMarksNeeded': 'Вам нужно {marks} Героических знаков, чтобы купить {name}.',
     'aura.clearcasting': 'Ясность',
+    'aura.effigy': 'Изваяние',
+    'aura.gloomtithe': 'Мрачная десятина',
+    'aura.tithefiend': 'Демон десятины',
     'aura.searingLight': 'Жгучий свет',
     'aura.lingeringGraceWard': 'Длящаяся благодать',
     'aura.nocturns': 'Медитация',
@@ -5690,9 +6445,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltHide': 'Иловая шкура',
     'aura.demoralized': 'Деморализация',
     'aura.resurrectionSickness': 'Болезнь воскрешения',
+    'aura.unstuckSickness': 'Болезнь спасения',
     'error.lineOfSight': 'Нет прямой видимости.',
     'error.bagsFull': 'Ваши сумки полны.',
     'error.bankQuestItem': 'Предметы заданий нельзя хранить в банке.',
+    'error.guildBankQuestItem': 'Предметы заданий нельзя хранить в банке гильдии.',
+    'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
@@ -5701,6 +6459,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Все ячейки для сумок заняты.',
     'error.bagSwapTooManyItems': 'У вас слишком много предметов, чтобы сменить эту сумку.',
     'error.bagRemoveTooManyItems': 'У вас слишком много предметов, чтобы снять эту сумку.',
+    'error.bagEquipHasProperty': 'Эту сумку нельзя экипировать, пока у неё есть особое свойство.',
     'error.tradeBagSpace': 'Обмен не удался: недостаточно места в сумках.',
     'log.bagsMigrated': 'Ваши вещи разложены по новым сумкам.',
     'error.specLevel': 'Выбрать специализацию можно на {level} уровне.',
@@ -5719,6 +6478,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.invalidBuild': 'Недопустимая сборка талантов.',
     'error.unknownSpec': 'Неизвестная специализация.',
     'error.maxLoadouts': 'Можно сохранить не более {count} наборов.',
+    'error.emptyLoadoutName': 'Название набора не может быть пустым.',
     'error.noLoadout': 'Такого набора нет.',
     'error.loadoutLevel': 'Для этого набора нужен более высокий уровень.',
     'error.cannotEquip': 'Вы не можете это экипировать.',
@@ -5735,6 +6495,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Поблизости нет торговца.',
     'error.noSellQuest': 'Вы не можете продавать предметы заданий.',
     'error.sellBound': 'Этот предмет привязан и не может быть продан.',
+    'error.sellLocked': 'Этот предмет заблокирован и не может быть продан.',
     'error.noBuyback': 'Этот предмет недоступен для выкупа.',
     'error.nailedShut': 'Заколочено наглухо.',
     'error.enoughOfThose': 'У вас достаточно таких предметов.',
@@ -5760,6 +6521,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.corpseSelectionNothingToHarvest': 'С этого трупа нельзя собрать ничего из выбранного.',
     'error.gatherNodeMissing': 'Этого источника ресурсов не существует.',
     'error.gatherNodeNotRespawned': 'Этот источник ресурсов ещё не восстановился для вас.',
+    'error.toolEffectSlotFromWindow': 'Установите его в окне профессий.',
     'error.vcupDeserter': 'Смотритель поля помнит. Возвращайся позже.',
     'error.vcupPartyTooBig': 'Для этой категории нужна группа поменьше.',
     'error.vcupNoNation': 'Сначала выбери знамённую нацию.',
@@ -5817,6 +6579,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.recentKillRequired': 'Нужно недавнее убийство.',
     'aura.temporalExhaustion': 'Временное истощение',
     'aura.cauterizeFatigue': 'Усталость от прижигания',
+    'aura.carrierFatigue': 'Усталость знаменосца',
+    'aura.carriedFlag': 'Несет флаг',
+    'aura.sprintRune': 'Спринт',
+    'aura.battleRune': 'Руна битвы',
+    'aura.wardRune': 'Руна защиты',
     'mechanic.charge': 'Натиск',
     'aura.bladedEcho': 'Клинковое эхо',
     'aura.emboldened': 'Ободрение',
@@ -5826,11 +6593,59 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.wintersChill': 'Зимний холод',
     'aura.icicles': 'Сосульки',
     'aura.perfectMoment': 'Идеальный миг',
+    'error.uniqueEquipped': 'Можно экипировать только один такой предмет.',
+    'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
+    'log.townFocusRespecComplete': 'Смена фокуса завершена.',
   },
   ...BASE_NEW,
   cs_CZ: {
+    'error.arenaMinLevel': 'Musíš být na úrovni {level}, abys se mohl(a) zařadit do fronty arény.',
+    'error.arenaMinLevelMember':
+      '{name} musí být alespoň na úrovni {level}, aby se mohl(a) zařadit do fronty arény.',
+    'log.arenaQueueAutoLeave1v1': 'Opouštíš frontu Popelavého kolosea.',
+    'error.guildBankNoGuild': 'Pro použití cechovní banky musíš být v cechu.',
+    'error.guildBankRank': 'Cechovní banku smí používat pouze důstojníci.',
+    'error.guildBankFull': 'Cechovní banka je plná.',
+    'error.guildBankQuestItem': 'Úkolové předměty nelze ukládat do cechovní banky.',
+    'error.guildBankSoulbound': 'Předměty vázané na duši nelze ukládat do cechovní banky.',
+    'error.guildBankNoTransfer': 'Tento předmět nelze uložit do cechovní banky.',
+    'error.guildBankWithdrawRefused': 'Tento předmět nelze z cechovní banky vybrat.',
+    'error.guildBankTreasuryCap': 'Cechovní pokladna tolik nepojme.',
+    'error.guildBankTreasuryShort': 'Cechovní pokladna tolik nemá.',
+    'error.guildBankCarryCap': 'Tolik peněz neuneseš.',
+    'error.guildBankCannotAfford': 'Tvůj cech si toto rozšíření nemůže dovolit.',
+    'error.guildBankMaxSlots': 'Cechovní banku už nelze dál rozšířit.',
+    'log.guildBankOpened': 'Otevíráš cechovní banku.',
+    'log.guildBankSlotsPurchased': 'Kupuješ další sloty cechovní banky.',
+    'log.guildBankDepositGold': 'Ukládáš {money} do cechovní pokladny.',
+    'log.guildBankWithdrawGold': 'Vybíráš {money} z cechovní pokladny.',
+    'log.guildBankDepositItem': 'Ukládáš {item} do cechovní banky.',
+    'log.guildBankWithdrawItem': 'Vybíráš {item} z cechovní banky.',
+    'error.rawCatchCookFirst': 'To je syrové. Nejdřív to uvař.',
+    'log.questItemRecovered': 'Získáváš zpět úkolový předmět, který ti chyběl.',
+    'groundPickup.objectAlreadyCredited': 'Tohle už je hotové.',
+    'error.emptyLoadoutName': 'Název sestavy nesmí být prázdný.',
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
+    'error.sellLocked': 'Tento předmět je zamčený a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
+    'error.bagEquipHasProperty': 'Tuto tašku nelze vybavit, dokud má zvláštní vlastnost.',
+    'error.unknownAbility': 'Tuto schopnost neznáš.',
+    'error.notEnoughRuin': 'Nedostatek Zkázy!',
+    'error.burningPactRequired': 'Vzplanutí vyžaduje Hořící pakt na cíli.',
+    'error.shellskinPreventsAttacks': 'Krunýřová kůže brání útokům.',
+    'error.tithefiendNeedsDirge': 'Tvůj desátkový běs potřebuje nepřítele pod Žalozpěvem rozkladu.',
+    'error.toolEffectSlotFromWindow': 'Zasaď to v okně Profese.',
+    'error.mountTrainInProgress': 'Jezdecká lekce už probíhá.',
+    'error.mountTrainDismountFirst': 'Nejdřív sesedni.',
+    'error.mountAlreadyOwned': 'Toto jízdní zvíře už vlastníš.',
+    'error.ridingAlreadyLearned': 'Jízdu ses již naučil(a).',
+    'error.mountBuyLevel': 'Musíš být na úrovni 20, abys mohl(a) koupit jízdní zvíře.',
+    'error.ridingTrainLevel': 'Musíš být na úrovni 20, abys se mohl(a) naučit Jízdu.',
+    'error.mountTrainLevel': 'Musíš být na úrovni 20, abys si mohl(a) vzít jezdecké lekce.',
+    'error.ridingQuestUntrained': 'Musíš se nejprve naučit Jízdu, než si vezmeš tuto lekci.',
+    'error.ridingUntrained': 'Musíš se nejprve naučit jezdit. Najdi jezdeckého instruktora.',
+    'error.ridingWrongNpc': 'Musíš promluvit s Marla Hitchen, abys se naučil(a) Jízdu.',
+    'error.mountTrainNeedsQuest': 'Nejdřív musíš přijmout úkol Jezdecké lekce.',
     'log.readyCheckNotReady': '{name} není připraven(a).',
     'log.readyCheckNoResponse': '{name} neodpověděl(a) na kontrolu připravenosti.',
     'error.notInGroup': 'Tento spojenec není ve vaší skupině.',
@@ -5934,8 +6749,56 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Dokonalý okamžik',
   },
   nl_NL: {
+    'error.arenaMinLevel':
+      'Je moet niveau {level} zijn om je aan te sluiten bij de wachtrij voor de arena.',
+    'error.arenaMinLevelMember':
+      '{name} moet minstens niveau {level} zijn om zich aan te sluiten bij de wachtrij voor de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Je verlaat de wachtrij van het Ashen Coliseum.',
+    'error.guildBankNoGuild': 'Je moet in een gilde zitten om de gildebank te gebruiken.',
+    'error.guildBankRank': 'Alleen gildeofficieren mogen de gildebank gebruiken.',
+    'error.guildBankFull': 'De gildebank is vol.',
+    'error.guildBankQuestItem': 'Je kunt geen questvoorwerpen in de gildebank opslaan.',
+    'error.guildBankSoulbound': 'Je kunt geen zielsgebonden voorwerpen in de gildebank opslaan.',
+    'error.guildBankNoTransfer': 'Dat voorwerp kan niet in de gildebank worden opgeslagen.',
+    'error.guildBankWithdrawRefused': 'Dat voorwerp kan niet uit de gildebank worden opgenomen.',
+    'error.guildBankTreasuryCap': 'De gildekas kan niet zoveel bevatten.',
+    'error.guildBankTreasuryShort': 'De gildekas bevat niet zoveel.',
+    'error.guildBankCarryCap': 'Je kunt niet zoveel geld dragen.',
+    'error.guildBankCannotAfford': 'Je gilde kan zich die uitbreiding niet veroorloven.',
+    'error.guildBankMaxSlots': 'De gildebank kan niet verder worden uitgebreid.',
+    'log.guildBankOpened': 'Je opent de gildebank.',
+    'log.guildBankSlotsPurchased': 'Je koopt extra gildebankvakken.',
+    'log.guildBankDepositGold': 'Je stort {money} in de gildekas.',
+    'log.guildBankWithdrawGold': 'Je neemt {money} op uit de gildekas.',
+    'log.guildBankDepositItem': 'Je stort {item} in de gildebank.',
+    'log.guildBankWithdrawItem': 'Je neemt {item} op uit de gildebank.',
+    'error.rawCatchCookFirst': 'Dat is rauw. Kook het eerst.',
+    'log.questItemRecovered': 'Je krijgt een questvoorwerp terug dat je miste.',
+    'groundPickup.objectAlreadyCredited': 'Dit heb je al gedaan.',
+    'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
+    'error.sellLocked': 'Dat voorwerp is vergrendeld en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
+    'error.bagEquipHasProperty':
+      'Je kunt deze tas niet uitrusten zolang hij een bijzondere eigenschap heeft.',
+    'error.unknownAbility': 'Je kent die vaardigheid niet.',
+    'error.notEnoughRuin': 'Niet genoeg Ruïne!',
+    'error.burningPactRequired': 'Ontvlamming vereist Brandpact op het doelwit.',
+    'error.shellskinPreventsAttacks': 'Schildhuid verhindert aanvallen.',
+    'error.tithefiendNeedsDirge':
+      'Je Tiendduivel heeft een vijand nodig die onder Klaaglied van Verval lijdt.',
+    'error.toolEffectSlotFromWindow': 'Open Beroepen om dit aan te brengen.',
+    'error.mountTrainInProgress': 'Er is al een rijles bezig.',
+    'error.mountTrainDismountFirst': 'Stijg eerst af.',
+    'error.mountAlreadyOwned': 'Je hebt dat rijdier al.',
+    'error.ridingAlreadyLearned': 'Je hebt Rijden al geleerd.',
+    'error.mountBuyLevel': 'Je moet niveau 20 zijn om een rijdier te kopen.',
+    'error.ridingTrainLevel': 'Je moet niveau 20 zijn om Rijden te leren.',
+    'error.mountTrainLevel': 'Je moet niveau 20 zijn om rijlessen te volgen.',
+    'error.ridingQuestUntrained': 'Je moet Rijden leren voordat je deze les kunt volgen.',
+    'error.ridingUntrained': 'Je moet eerst leren rijden. Zoek een rijinstructeur.',
+    'error.ridingWrongNpc': 'Je moet met Marla Hitchen praten om Rijden te leren.',
+    'error.mountTrainNeedsQuest': 'Je moet eerst de quest Rijlessen aanvaarden.',
     'log.readyCheckNotReady': '{name} is niet gereed.',
     'log.readyCheckNoResponse': '{name} heeft niet gereageerd op de gereedheidscontrole.',
     'error.notInGroup': 'Die bondgenoot zit niet in jouw groep.',
@@ -6038,8 +6901,55 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Volmaakt Ogenblik',
   },
   pl_PL: {
+    'error.arenaMinLevel': 'Musisz mieć poziom {level}, aby dołączyć do kolejki na arenę.',
+    'error.arenaMinLevelMember':
+      '{name} musi mieć co najmniej poziom {level}, aby dołączyć do kolejki na arenę.',
+    'log.arenaQueueAutoLeave1v1': 'Opuszczasz kolejkę do Popielnego Koloseum.',
+    'error.guildBankNoGuild': 'Musisz należeć do gildii, aby korzystać z banku gildii.',
+    'error.guildBankRank': 'Tylko oficerowie gildii mogą korzystać z banku gildii.',
+    'error.guildBankFull': 'Bank gildii jest pełny.',
+    'error.guildBankQuestItem': 'Nie możesz przechowywać przedmiotów zadań w banku gildii.',
+    'error.guildBankSoulbound':
+      'Nie możesz przechowywać przedmiotów związanych z duszą w banku gildii.',
+    'error.guildBankNoTransfer': 'Tego przedmiotu nie można przechowywać w banku gildii.',
+    'error.guildBankWithdrawRefused': 'Tego przedmiotu nie można wyjąć z banku gildii.',
+    'error.guildBankTreasuryCap': 'Skarbiec gildii nie pomieści tak dużej kwoty.',
+    'error.guildBankTreasuryShort': 'Skarbiec gildii nie ma tak dużej kwoty.',
+    'error.guildBankCarryCap': 'Nie możesz nosić przy sobie aż tylu pieniędzy.',
+    'error.guildBankCannotAfford': 'Twoją gildię nie stać na to rozszerzenie.',
+    'error.guildBankMaxSlots': 'Banku gildii nie da się już bardziej rozszerzyć.',
+    'log.guildBankOpened': 'Otwierasz bank gildii.',
+    'log.guildBankSlotsPurchased': 'Kupujesz dodatkowe miejsca w banku gildii.',
+    'log.guildBankDepositGold': 'Wpłacasz {money} do skarbca gildii.',
+    'log.guildBankWithdrawGold': 'Wypłacasz {money} ze skarbca gildii.',
+    'log.guildBankDepositItem': 'Wkładasz {item} do banku gildii.',
+    'log.guildBankWithdrawItem': 'Wyjmujesz {item} z banku gildii.',
+    'error.rawCatchCookFirst': 'To jest surowe. Najpierw to ugotuj.',
+    'log.questItemRecovered': 'Odzyskujesz brakujący przedmiot zadania.',
+    'groundPickup.objectAlreadyCredited': 'To już zrobiłeś.',
+    'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
+    'error.sellLocked': 'Ten przedmiot jest zablokowany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
+    'error.bagEquipHasProperty': 'Nie możesz założyć tej torby, dopóki ma specjalną właściwość.',
+    'error.unknownAbility': 'Nie znasz tej zdolności.',
+    'error.notEnoughRuin': 'Za mało Ruiny!',
+    'error.burningPactRequired': 'Pożoga wymaga Płonącego paktu na celu.',
+    'error.shellskinPreventsAttacks': 'Pancerna Skóra uniemożliwia ataki.',
+    'error.tithefiendNeedsDirge': 'Twój Dziesięcinnik potrzebuje wroga objętego Pieśnią rozkładu.',
+    'error.toolEffectSlotFromWindow': 'Otwórz Zawody, aby to osadzić.',
+    'error.mountTrainInProgress': 'Lekcja jazdy konnej już trwa.',
+    'error.mountTrainDismountFirst': 'Najpierw zsiądź.',
+    'error.mountAlreadyOwned': 'Masz już tego wierzchowca.',
+    'error.ridingAlreadyLearned': 'Nauczyłeś się już Jeździectwa.',
+    'error.mountBuyLevel': 'Musisz osiągnąć poziom 20, aby kupić wierzchowca.',
+    'error.ridingTrainLevel': 'Musisz osiągnąć poziom 20, aby nauczyć się Jeździectwa.',
+    'error.mountTrainLevel': 'Musisz osiągnąć poziom 20, aby wziąć lekcje jazdy konnej.',
+    'error.ridingQuestUntrained': 'Musisz nauczyć się Jeździectwa, zanim weźmiesz tę lekcję.',
+    'error.ridingUntrained':
+      'Musisz najpierw nauczyć się jeździć. Znajdź instruktora jazdy konnej.',
+    'error.ridingWrongNpc': 'Musisz porozmawiać z Marla Hitchen, aby nauczyć się Jeździectwa.',
+    'error.mountTrainNeedsQuest': 'Najpierw musisz przyjąć zadanie Lekcje jazdy konnej.',
     'log.readyCheckNotReady': '{name} nie jest gotowy(-a).',
     'log.readyCheckNoResponse': '{name} nie odpowiedział(a) na sprawdzanie gotowości.',
     'error.notInGroup': 'Ten sojusznik nie należy do twojej grupy.',
@@ -6144,8 +7054,54 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Idealna chwila',
   },
   id_ID: {
+    'error.arenaMinLevel': 'Kamu harus level {level} untuk mengantre ke arena.',
+    'error.arenaMinLevelMember': '{name} harus setidaknya level {level} untuk mengantre ke arena.',
+    'log.arenaQueueAutoLeave1v1': 'Kamu meninggalkan antrean Koloseum Abu.',
+    'error.guildBankNoGuild': 'Kamu harus berada dalam sebuah guild untuk menggunakan bank guild.',
+    'error.guildBankRank': 'Hanya perwira guild yang boleh menggunakan bank guild.',
+    'error.guildBankFull': 'Bank guild penuh.',
+    'error.guildBankQuestItem': 'Kamu tidak bisa menyimpan barang misi di bank guild.',
+    'error.guildBankSoulbound': 'Kamu tidak bisa menyimpan barang terikat jiwa di bank guild.',
+    'error.guildBankNoTransfer': 'Barang itu tidak bisa disimpan di bank guild.',
+    'error.guildBankWithdrawRefused': 'Barang itu tidak bisa ditarik dari bank guild.',
+    'error.guildBankTreasuryCap': 'Kas guild tidak bisa menampung sebanyak itu.',
+    'error.guildBankTreasuryShort': 'Kas guild tidak memiliki sebanyak itu.',
+    'error.guildBankCarryCap': 'Kamu tidak bisa membawa uang sebanyak itu.',
+    'error.guildBankCannotAfford': 'Guildmu tidak mampu membayar perluasan itu.',
+    'error.guildBankMaxSlots': 'Bank guild tidak dapat diperluas lagi.',
+    'log.guildBankOpened': 'Kamu membuka bank guild.',
+    'log.guildBankSlotsPurchased': 'Kamu membeli slot bank guild tambahan.',
+    'log.guildBankDepositGold': 'Kamu menyetor {money} ke kas guild.',
+    'log.guildBankWithdrawGold': 'Kamu menarik {money} dari kas guild.',
+    'log.guildBankDepositItem': 'Kamu menyetor {item} ke bank guild.',
+    'log.guildBankWithdrawItem': 'Kamu menarik {item} dari bank guild.',
+    'error.rawCatchCookFirst': 'Itu masih mentah. Masak dulu.',
+    'log.questItemRecovered': 'Kamu mendapatkan kembali barang misi yang hilang.',
+    'groundPickup.objectAlreadyCredited': 'Kamu sudah melakukan ini.',
+    'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
+    'error.sellLocked': 'Barang itu terkunci dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
+    'error.bagEquipHasProperty': 'Tas itu tidak bisa dipakai selama memiliki atribut khusus.',
+    'error.unknownAbility': 'Kamu belum mengetahui kemampuan itu.',
+    'error.notEnoughRuin': 'Ruin tidak cukup!',
+    'error.burningPactRequired': 'Kobaran Api membutuhkan Pakta Membara pada target.',
+    'error.shellskinPreventsAttacks': 'Kulit Cangkang mencegah serangan.',
+    'error.tithefiendNeedsDirge':
+      'Iblis Persepuluhan-mu membutuhkan musuh yang terkena Ratapan Pembusukan.',
+    'error.toolEffectSlotFromWindow': 'Buka Profesi untuk memasangnya.',
+    'error.mountTrainInProgress': 'Sudah ada pelajaran menunggang yang sedang berlangsung.',
+    'error.mountTrainDismountFirst': 'Turun dulu.',
+    'error.mountAlreadyOwned': 'Kamu sudah punya tunggangan itu.',
+    'error.ridingAlreadyLearned': 'Kamu sudah mempelajari Menunggang.',
+    'error.mountBuyLevel': 'Kamu harus level 20 untuk membeli tunggangan.',
+    'error.ridingTrainLevel': 'Kamu harus level 20 untuk mempelajari Menunggang.',
+    'error.mountTrainLevel': 'Kamu harus level 20 untuk mengikuti pelajaran menunggang.',
+    'error.ridingQuestUntrained':
+      'Kamu harus mempelajari Menunggang sebelum mengikuti pelajaran ini.',
+    'error.ridingUntrained': 'Kamu harus belajar menunggang dulu. Cari pelatih menunggang kuda.',
+    'error.ridingWrongNpc': 'Kamu harus bicara dengan Marla Hitchen untuk mempelajari Menunggang.',
+    'error.mountTrainNeedsQuest': 'Kamu harus menerima misi Pelajaran Menunggang Kuda dulu.',
     'log.readyCheckNotReady': '{name} belum siap.',
     'log.readyCheckNoResponse': '{name} tidak menanggapi pemeriksaan kesiapan.',
     'error.notInGroup': 'Sekutu itu tidak ada dalam grupmu.',
@@ -6248,8 +7204,54 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momen Sempurna',
   },
   tr_TR: {
+    'error.arenaMinLevel': 'Arena sırasına girmek için {level}. seviyeye ulaşmalısın.',
+    'error.arenaMinLevelMember':
+      '{name} arena sırasına girmek için en az {level}. seviyede olmalı.',
+    'log.arenaQueueAutoLeave1v1': 'Kül Koliseumu sırasından ayrıldın.',
+    'error.guildBankNoGuild': 'Lonca bankasını kullanmak için bir loncada olmalısın.',
+    'error.guildBankRank': 'Lonca bankasını yalnızca subaylar kullanabilir.',
+    'error.guildBankFull': 'Lonca bankası dolu.',
+    'error.guildBankQuestItem': 'Görev eşyalarını lonca bankasında saklayamazsın.',
+    'error.guildBankSoulbound': 'Ruha bağlı eşyaları lonca bankasında saklayamazsın.',
+    'error.guildBankNoTransfer': 'O eşya lonca bankasında saklanamaz.',
+    'error.guildBankWithdrawRefused': 'O eşya lonca bankasından çekilemez.',
+    'error.guildBankTreasuryCap': 'Lonca hazinesi bu kadarını tutamaz.',
+    'error.guildBankTreasuryShort': 'Lonca hazinesinde bu kadar yok.',
+    'error.guildBankCarryCap': 'Bu kadar parayı taşıyamazsın.',
+    'error.guildBankCannotAfford': 'Loncan bu genişletmeyi karşılayamıyor.',
+    'error.guildBankMaxSlots': 'Lonca bankası daha fazla genişletilemez.',
+    'log.guildBankOpened': 'Lonca bankasını açıyorsun.',
+    'log.guildBankSlotsPurchased': 'Ek lonca bankası yuvaları satın alıyorsun.',
+    'log.guildBankDepositGold': 'Lonca hazinesine {money} yatırıyorsun.',
+    'log.guildBankWithdrawGold': 'Lonca hazinesinden {money} çekiyorsun.',
+    'log.guildBankDepositItem': 'Lonca bankasına {item} yatırıyorsun.',
+    'log.guildBankWithdrawItem': 'Lonca bankasından {item} çekiyorsun.',
+    'error.rawCatchCookFirst': 'Bu çiğ. Önce pişir.',
+    'log.questItemRecovered': 'Eksik olan bir görev eşyasını geri alıyorsun.',
+    'groundPickup.objectAlreadyCredited': 'Bunu zaten yaptın.',
+    'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
+    'error.sellLocked': 'O eşya kilitli ve satılamaz.',
     ...BASE_NEW.tr_TR,
+    'error.bagEquipHasProperty': 'Bu çanta özel bir özelliğe sahip olduğu sürece kuşanılamaz.',
+    'error.unknownAbility': 'Bu yeteneği bilmiyorsun.',
+    'error.notEnoughRuin': 'Yeterli Harabiyet yok!',
+    'error.burningPactRequired': 'Tutuşturma için hedefte Yanan Ahit olmalı.',
+    'error.shellskinPreventsAttacks': 'Kabuk Deri saldırıları engelliyor.',
+    'error.tithefiendNeedsDirge':
+      'Öşür İfritin, Çürüme Ağıdı etkisindeki bir düşmana ihtiyaç duyar.',
+    'error.toolEffectSlotFromWindow': 'Bunu takmak için Meslekler penceresini aç.',
+    'error.mountTrainInProgress': 'Zaten devam eden bir binicilik dersi var.',
+    'error.mountTrainDismountFirst': 'Önce in.',
+    'error.mountAlreadyOwned': 'O bineğe zaten sahipsin.',
+    'error.ridingAlreadyLearned': 'Biniciliği zaten öğrendin.',
+    'error.mountBuyLevel': 'Binek almak için 20. seviyeye ulaşmalısın.',
+    'error.ridingTrainLevel': 'Biniciliği öğrenmek için 20. seviyeye ulaşmalısın.',
+    'error.mountTrainLevel': 'Binicilik dersi almak için 20. seviyeye ulaşmalısın.',
+    'error.ridingQuestUntrained': 'Bu dersi almadan önce Biniciliği öğrenmelisin.',
+    'error.ridingUntrained': 'Önce binmeyi öğrenmelisin. Bir binicilik eğitmeni bul.',
+    'error.ridingWrongNpc': 'Biniciliği öğrenmek için Marla Hitchen ile konuşmalısın.',
+    'error.mountTrainNeedsQuest': 'Önce Binicilik Dersleri görevini kabul etmelisin.',
     'log.readyCheckNotReady': '{name} hazır değil.',
     'log.readyCheckNoResponse': '{name} hazırlık kontrolüne yanıt vermedi.',
     'error.notInGroup': 'O müttefik grubunda değil.',
@@ -6353,8 +7355,54 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Mükemmel An',
   },
   sv_SE: {
+    'error.arenaMinLevel': 'Du måste vara nivå {level} för att köa till arenan.',
+    'error.arenaMinLevelMember': '{name} måste vara minst nivå {level} för att köa till arenan.',
+    'log.arenaQueueAutoLeave1v1': 'Du lämnar kön till Askgrå kolosseum.',
+    'error.guildBankNoGuild': 'Du måste vara med i ett gille för att använda gillesbanken.',
+    'error.guildBankRank': 'Endast gillesofficerare får använda gillesbanken.',
+    'error.guildBankFull': 'Gillesbanken är full.',
+    'error.guildBankQuestItem': 'Du kan inte förvara uppdragsföremål i gillesbanken.',
+    'error.guildBankSoulbound': 'Du kan inte förvara själsbundna föremål i gillesbanken.',
+    'error.guildBankNoTransfer': 'Det föremålet kan inte förvaras i gillesbanken.',
+    'error.guildBankWithdrawRefused': 'Det föremålet kan inte tas ut ur gillesbanken.',
+    'error.guildBankTreasuryCap': 'Gillets kassa kan inte rymma så mycket.',
+    'error.guildBankTreasuryShort': 'Gillets kassa innehåller inte så mycket.',
+    'error.guildBankCarryCap': 'Du kan inte bära så mycket pengar.',
+    'error.guildBankCannotAfford': 'Ditt gille har inte råd med den utökningen.',
+    'error.guildBankMaxSlots': 'Gillesbanken kan inte utökas mer.',
+    'log.guildBankOpened': 'Du öppnar gillesbanken.',
+    'log.guildBankSlotsPurchased': 'Du köper fler fack i gillesbanken.',
+    'log.guildBankDepositGold': 'Du sätter in {money} i gillets kassa.',
+    'log.guildBankWithdrawGold': 'Du tar ut {money} från gillets kassa.',
+    'log.guildBankDepositItem': 'Du sätter in {item} i gillesbanken.',
+    'log.guildBankWithdrawItem': 'Du tar ut {item} från gillesbanken.',
+    'error.rawCatchCookFirst': 'Det där är rått. Tillaga det först.',
+    'log.questItemRecovered': 'Du återfår ett uppdragsföremål du saknade.',
+    'groundPickup.objectAlreadyCredited': 'Du har redan gjort det här.',
+    'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
+    'error.sellLocked': 'Det föremålet är låst och kan inte säljas.',
     ...BASE_NEW.sv_SE,
+    'error.bagEquipHasProperty':
+      'Du kan inte utrusta den här väskan så länge den har en särskild egenskap.',
+    'error.unknownAbility': 'Du kan inte den förmågan.',
+    'error.notEnoughRuin': 'Inte tillräckligt med Ruin!',
+    'error.burningPactRequired': 'Storbrand kräver Brinnande pakt på målet.',
+    'error.shellskinPreventsAttacks': 'Skalhud förhindrar attacker.',
+    'error.tithefiendNeedsDirge':
+      'Din tiondedemon behöver en fiende som påverkas av Förruttnelsens klagosång.',
+    'error.toolEffectSlotFromWindow': 'Öppna Yrken för att sätta in den.',
+    'error.mountTrainInProgress': 'En ridlektion pågår redan.',
+    'error.mountTrainDismountFirst': 'Stig av först.',
+    'error.mountAlreadyOwned': 'Du har redan det riddjuret.',
+    'error.ridingAlreadyLearned': 'Du har redan lärt dig Ridning.',
+    'error.mountBuyLevel': 'Du måste vara nivå 20 för att köpa ett riddjur.',
+    'error.ridingTrainLevel': 'Du måste vara nivå 20 för att lära dig Ridning.',
+    'error.mountTrainLevel': 'Du måste vara nivå 20 för att ta ridlektioner.',
+    'error.ridingQuestUntrained': 'Du måste lära dig Ridning innan du tar den här lektionen.',
+    'error.ridingUntrained': 'Du måste lära dig rida först. Hitta en ridinstruktör.',
+    'error.ridingWrongNpc': 'Du måste prata med Marla Hitchen för att lära dig Ridning.',
+    'error.mountTrainNeedsQuest': 'Du måste först acceptera uppdraget Ridlektioner.',
     'log.readyCheckNotReady': '{name} är inte redo.',
     'log.readyCheckNoResponse': '{name} svarade inte på beredskapskontrollen.',
     'error.notInGroup': 'Den allierade är inte i din grupp.',
@@ -6457,8 +7505,54 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekt ögonblick',
   },
   vi_VN: {
+    'error.arenaMinLevel': 'Bạn phải đạt cấp {level} để xếp hàng vào đấu trường.',
+    'error.arenaMinLevelMember':
+      '{name} phải đạt tối thiểu cấp {level} để xếp hàng vào đấu trường.',
+    'log.arenaQueueAutoLeave1v1': 'Bạn rời hàng chờ Đấu Trường Tro Tàn.',
+    'error.guildBankNoGuild': 'Bạn phải ở trong một bang hội để sử dụng ngân hàng bang hội.',
+    'error.guildBankRank': 'Chỉ sĩ quan bang hội mới có thể sử dụng ngân hàng bang hội.',
+    'error.guildBankFull': 'Ngân hàng bang hội đã đầy.',
+    'error.guildBankQuestItem': 'Bạn không thể cất vật phẩm nhiệm vụ trong ngân hàng bang hội.',
+    'error.guildBankSoulbound':
+      'Bạn không thể cất vật phẩm ràng buộc linh hồn trong ngân hàng bang hội.',
+    'error.guildBankNoTransfer': 'Vật phẩm đó không thể cất trong ngân hàng bang hội.',
+    'error.guildBankWithdrawRefused': 'Vật phẩm đó không thể rút ra khỏi ngân hàng bang hội.',
+    'error.guildBankTreasuryCap': 'Ngân khố bang hội không thể chứa nhiều đến vậy.',
+    'error.guildBankTreasuryShort': 'Ngân khố bang hội không có nhiều đến vậy.',
+    'error.guildBankCarryCap': 'Bạn không thể mang theo nhiều tiền đến vậy.',
+    'error.guildBankCannotAfford': 'Bang hội của bạn không đủ khả năng chi trả cho lần mở rộng đó.',
+    'error.guildBankMaxSlots': 'Ngân hàng bang hội không thể mở rộng thêm nữa.',
+    'log.guildBankOpened': 'Bạn mở ngân hàng bang hội.',
+    'log.guildBankSlotsPurchased': 'Bạn mua thêm ô ngân hàng bang hội.',
+    'log.guildBankDepositGold': 'Bạn gửi {money} vào ngân khố bang hội.',
+    'log.guildBankWithdrawGold': 'Bạn rút {money} từ ngân khố bang hội.',
+    'log.guildBankDepositItem': 'Bạn gửi {item} vào ngân hàng bang hội.',
+    'log.guildBankWithdrawItem': 'Bạn rút {item} từ ngân hàng bang hội.',
+    'error.rawCatchCookFirst': 'Thứ đó còn sống. Hãy nấu chín trước đã.',
+    'log.questItemRecovered': 'Bạn tìm lại được một vật phẩm nhiệm vụ đã bị mất.',
+    'groundPickup.objectAlreadyCredited': 'Bạn đã làm cái này rồi.',
+    'error.emptyLoadoutName': 'Tên build không được để trống.',
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
+    'error.sellLocked': 'Vật phẩm đó đã bị khóa và không thể bán.',
     ...BASE_NEW.vi_VN,
+    'error.bagEquipHasProperty': 'Không thể trang bị túi này khi nó còn mang thuộc tính đặc biệt.',
+    'error.unknownAbility': 'Bạn chưa học kỹ năng đó.',
+    'error.notEnoughRuin': 'Không đủ Ruin!',
+    'error.burningPactRequired': 'Bùng Cháy cần mục tiêu đang chịu Khế Ước Rực Cháy.',
+    'error.shellskinPreventsAttacks': 'Da Mai ngăn không cho tấn công.',
+    'error.tithefiendNeedsDirge': 'Quỷ Thập Phân của bạn cần một kẻ địch đang chịu Ai Ca Mục Rữa.',
+    'error.toolEffectSlotFromWindow': 'Mở Nghề nghiệp để khảm nó.',
+    'error.mountTrainInProgress': 'Đã có một bài học cưỡi ngựa đang diễn ra.',
+    'error.mountTrainDismountFirst': 'Xuống thú cưỡi trước đã.',
+    'error.mountAlreadyOwned': 'Bạn đã sở hữu thú cưỡi đó rồi.',
+    'error.ridingAlreadyLearned': 'Bạn đã học Cưỡi Ngựa rồi.',
+    'error.mountBuyLevel': 'Bạn phải đạt cấp 20 để mua thú cưỡi.',
+    'error.ridingTrainLevel': 'Bạn phải đạt cấp 20 để học Cưỡi Ngựa.',
+    'error.mountTrainLevel': 'Bạn phải đạt cấp 20 để tham gia bài học cưỡi ngựa.',
+    'error.ridingQuestUntrained': 'Bạn phải học Cưỡi Ngựa trước khi tham gia bài học này.',
+    'error.ridingUntrained': 'Bạn phải học cưỡi trước. Hãy tìm một người huấn luyện cưỡi ngựa.',
+    'error.ridingWrongNpc': 'Bạn phải nói chuyện với Marla Hitchen để học Cưỡi Ngựa.',
+    'error.mountTrainNeedsQuest': 'Bạn phải nhận nhiệm vụ Bài Học Cưỡi Ngựa trước.',
     'log.readyCheckNotReady': '{name} chưa sẵn sàng.',
     'log.readyCheckNoResponse': '{name} không phản hồi kiểm tra sẵn sàng.',
     'error.notInGroup': 'Đồng minh đó không ở trong nhóm của bạn.',
@@ -6560,8 +7654,55 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
   },
   da_DK: {
+    'error.arenaMinLevel': 'Du skal være niveau {level} for at stille dig i kø til arenaen.',
+    'error.arenaMinLevelMember':
+      '{name} skal være mindst niveau {level} for at stille sig i kø til arenaen.',
+    'log.arenaQueueAutoLeave1v1': 'Du forlader køen til Det Askegrå Kolosseum.',
+    'error.guildBankNoGuild': 'Du skal være i et laug for at bruge laugsbanken.',
+    'error.guildBankRank': 'Kun laugsofficerer må bruge laugsbanken.',
+    'error.guildBankFull': 'Laugsbanken er fuld.',
+    'error.guildBankQuestItem': 'Du kan ikke opbevare opgavegenstande i laugsbanken.',
+    'error.guildBankSoulbound': 'Du kan ikke opbevare sjælebundne genstande i laugsbanken.',
+    'error.guildBankNoTransfer': 'Den genstand kan ikke opbevares i laugsbanken.',
+    'error.guildBankWithdrawRefused': 'Den genstand kan ikke tages ud af laugsbanken.',
+    'error.guildBankTreasuryCap': 'Laugets skatkammer kan ikke rumme så meget.',
+    'error.guildBankTreasuryShort': 'Laugets skatkammer indeholder ikke så meget.',
+    'error.guildBankCarryCap': 'Du kan ikke bære så mange penge.',
+    'error.guildBankCannotAfford': 'Dit laug har ikke råd til den udvidelse.',
+    'error.guildBankMaxSlots': 'Laugsbanken kan ikke udvides yderligere.',
+    'log.guildBankOpened': 'Du åbner laugsbanken.',
+    'log.guildBankSlotsPurchased': 'Du køber flere laugsbankpladser.',
+    'log.guildBankDepositGold': 'Du indsætter {money} i laugets skatkammer.',
+    'log.guildBankWithdrawGold': 'Du tager {money} ud af laugets skatkammer.',
+    'log.guildBankDepositItem': 'Du indsætter {item} i laugsbanken.',
+    'log.guildBankWithdrawItem': 'Du tager {item} ud af laugsbanken.',
+    'error.rawCatchCookFirst': 'Det er råt. Tilbered det først.',
+    'log.questItemRecovered': 'Du genfinder en opgavegenstand, du manglede.',
+    'groundPickup.objectAlreadyCredited': 'Du har allerede gjort det her.',
+    'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
+    'error.sellLocked': 'Den genstand er låst og kan ikke sælges.',
     ...BASE_NEW.da_DK,
+    'error.bagEquipHasProperty':
+      'Du kan ikke iføre dig denne taske, så længe den har en særlig egenskab.',
+    'error.unknownAbility': 'Du kender ikke den evne.',
+    'error.notEnoughRuin': 'Ikke nok Ruin!',
+    'error.burningPactRequired': 'Antændelse kræver Brændende Pagt på målet.',
+    'error.shellskinPreventsAttacks': 'Skalhud forhindrer angreb.',
+    'error.tithefiendNeedsDirge':
+      'Din Tiendedæmon skal bruge en fjende, der er ramt af Forfaldets Klagesang.',
+    'error.toolEffectSlotFromWindow': 'Åbn Erhverv for at sætte den i.',
+    'error.mountTrainInProgress': 'Der er allerede en ridelektion i gang.',
+    'error.mountTrainDismountFirst': 'Stig af først.',
+    'error.mountAlreadyOwned': 'Du har allerede det ridedyr.',
+    'error.ridingAlreadyLearned': 'Du har allerede lært Ridning.',
+    'error.mountBuyLevel': 'Du skal have niveau 20 for at købe et ridedyr.',
+    'error.ridingTrainLevel': 'Du skal have niveau 20 for at lære Ridning.',
+    'error.mountTrainLevel': 'Du skal have niveau 20 for at tage ridelektioner.',
+    'error.ridingQuestUntrained': 'Du skal lære Ridning, inden du tager denne lektion.',
+    'error.ridingUntrained': 'Du skal lære at ride først. Find en rideinstruktør.',
+    'error.ridingWrongNpc': 'Du skal tale med Marla Hitchen for at lære Ridning.',
+    'error.mountTrainNeedsQuest': 'Du skal først acceptere questen Ridelektioner.',
     'log.readyCheckNotReady': '{name} er ikke klar.',
     'log.readyCheckNoResponse': '{name} svarede ikke på klar-tjekket.',
     'error.notInGroup': 'Den allierede er ikke i din gruppe.',
@@ -6663,6 +7804,31 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
   },
+};
+
+const ARENA_QUEUE_AUTO_LEAVE_1V1: Record<SupportedLanguage, string> = {
+  en: 'You leave the Ashen Coliseum queue.',
+  en_CA: 'You leave the Ashen Coliseum queue.',
+  es: 'Sales de la cola del Coliseo Cinéreo.',
+  es_ES: 'Sales de la cola del Coliseo Cinéreo.',
+  fr_FR: 'Vous quittez la file du Colisée cendré.',
+  fr_CA: 'Vous quittez la file du Colisée cendré.',
+  it_IT: 'Esci dalla coda del Colosseo Cinereo.',
+  de_DE: 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
+  zh_CN: '你离开了灰烬斗技场队列。',
+  zh_TW: '你離開了灰燼競技場佇列。',
+  ko_KR: '잿빛 원형경기장 대기열에서 나왔습니다.',
+  ja_JP: '灰の闘技場のキューを離れました。',
+  pt_BR: 'Você sai da fila do Coliseu Cinzento.',
+  ru_RU: 'Вы покидаете очередь Пепельного Колизея.',
+  cs_CZ: 'Opouštíš frontu Ashen Coliseum.',
+  nl_NL: 'Je verlaat de wachtrij van het Ashen Coliseum.',
+  pl_PL: 'Opuszczasz kolejkę Ashen Coliseum.',
+  id_ID: 'Kamu keluar dari antrean Ashen Coliseum.',
+  tr_TR: 'Ashen Coliseum sırasından ayrılıyorsun.',
+  sv_SE: 'Du lämnar Ashen Coliseums kö.',
+  vi_VN: 'Bạn rời hàng đợi Ashen Coliseum.',
+  da_DK: 'Du forlader Ashen Coliseum-køen.',
 };
 
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
@@ -7192,7 +8358,12 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
-    { ...baseEnTable, ...BASE_DICT[lang], ...PET_DICT[lang] },
+    {
+      ...baseEnTable,
+      ...BASE_DICT[lang],
+      ...PET_DICT[lang],
+      'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+    },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
@@ -7221,6 +8392,7 @@ const mobNameToId = new Map<string, string>();
 for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
 const abilityNameToId = new Map<string, string>();
 for (const [id, a] of Object.entries(ABILITIES)) abilityNameToId.set(a.name, id);
+abilityNameToId.set('Veil Mark', 'veilbound_mark');
 const delveNameToId = new Map<string, string>();
 for (const [id, d] of Object.entries(DELVES)) delveNameToId.set(d.name, id);
 // Module display names are also the delveUi.moduleName.* source values; reverse
@@ -7278,6 +8450,17 @@ function locPetGrowlAutoState(state: string): string {
 // player (stun/incapacitate/absorb aura) and as the boss "unleashes" combat-log line, so
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
+  Moontide: 'aura.moontide',
+  // The operator-applied Cheater mark's countdown debuff (cheaterMarkAura in
+  // src/sim/moderation/cheater_mark.ts). Without this row localizeSimAuraName
+  // returns null and every caller falls back to the RAW ENGLISH aura name, which
+  // no gate catches: the sanction would read "Marked as a Cheater" in all 21
+  // locales. Keep this string byte-identical to the aura's `name`.
+  'Marked as a Cheater': 'aura.cheaterMark',
+  'Old Blood': 'aura.oldBlood',
+  Verdance: 'aura.verdance',
+  'Loping Stride': 'aura.lopingStride',
+  Marrowbreak: 'aura.marrowbreak',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
   // src/sim/content/classes.ts); shown on the buff bar and combat log.
   'Bladed Echo': 'aura.bladedEcho',
@@ -7290,6 +8473,14 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Cauterize Fatigue': 'aura.cauterizeFatigue',
+  // Thornhollow Fields battleground auras (src/sim/social/battleground.ts): spawn
+  // protection, the carrier-fatigue vulnerability, the carried-flag buff, and the
+  // sprint-rune haste.
+  'Carrier Fatigue': 'aura.carrierFatigue',
+  'Carrying the Flag': 'aura.carriedFlag',
+  Sprint: 'aura.sprintRune',
+  'Battle Rune': 'aura.battleRune',
+  'Ward Rune': 'aura.wardRune',
   'Might of the Bear': 'aura.elixirBear',
   // Crafted alchemy elixir auras (content/profession_items.ts): the
   // buff_sta aura display name each crafted elixir pushes on use.
@@ -7325,6 +8516,17 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Thunderclap: 'mechanic.thunderclap',
   Stormcall: 'mechanic.stormcall',
   'Howling Gale': 'mechanic.howlingGale',
+  // The Drakelands dragonkin brood (v0.35): the broodlord/matriarch kit and
+  // the egg ripple's damage label, plus the burn/ward auras below.
+  'Brood Cleave': 'mechanic.broodCleave',
+  'Maw Cleave': 'mechanic.mawCleave',
+  'Fire Breath': 'mechanic.fireBreath',
+  'Tail Hammer': 'mechanic.tailHammer',
+  'Brood Ripple': 'mechanic.broodRipple',
+  'Seared Scales': 'aura.searedScales',
+  'Hatchling Burn': 'aura.hatchlingBurn',
+  "Broodlord's Ward": 'aura.broodlordsWard',
+  "Matriarch's Ward": 'aura.matriarchsWard',
   // On-hit / DoT / debuff flavor auras applied to players (would otherwise leak raw English
   // in the buff/debuff frame and combat log). Data-driven from src/sim/content/zone*.ts.
   'Spider Venom': 'aura.spiderVenom',
@@ -7367,6 +8569,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Feeding Frenzy': 'aura.feedingFrenzy',
   Demoralized: 'aura.demoralized',
   'Resurrection Sickness': 'aura.resurrectionSickness',
+  'Unstuck Sickness': 'aura.unstuckSickness',
   'Hot Pursuit': 'aura.hotPursuit',
   'Red Harvest': 'aura.redHarvest',
   'Reckless Vow': 'aura.recklessVow',
@@ -7374,11 +8577,20 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Colossus: 'aura.colossus',
   // 4-piece set-bonus proc buffs (item_sets.ts): shown in the buff frame.
   Clearcasting: 'aura.clearcasting',
+  Effigy: 'aura.effigy',
+  Gloomtithe: 'aura.gloomtithe',
+  Tithefiend: 'aura.tithefiend',
   Gravemight: 'aura.gravemight',
   Fangrush: 'aura.fangrush',
   Bonesplinter: 'aura.bonesplinter',
   'Ragged Gash': 'aura.raggedGash',
   Soulblaze: 'aura.soulblaze',
+  // 7-piece WARFARE capstone procs (item_sets.ts), same surfaces as the four
+  // piece procs above.
+  'Unbroken Oath': 'aura.unbrokenOath',
+  'Ashen Step': 'aura.ashenStep',
+  Emberward: 'aura.emberward',
+  Thornguard: 'aura.thornguard',
   // Frost mage proc engine (src/sim/combat/frost_mage.ts): the two self
   // procs and the target debuff; buff bar, target frame and combat log.
   'Fingers of Frost': 'aura.fingersOfFrost',
@@ -7386,6 +8598,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Winter's Chill": 'aura.wintersChill',
   Icicles: 'aura.icicles',
   'Perfect Moment': 'aura.perfectMoment',
+  'Radiant Resonance': 'aura.radiantResonance',
+  'Solar Reprisal': 'aura.solarReprisal',
+  "Dawn's Wrath": 'aura.dawnsWrath',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',
@@ -7435,22 +8650,161 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Improved Immolate': 'aura.improvedImmolate',
   'Demon Armor': 'aura.demonArmor',
   Desolation: 'aura.desolation',
+  Ruin: 'aura.destructionRuin',
+  'Ruinous Brand': 'aura.ruinousBrand',
+  'Duskfire Claim': 'aura.duskfireClaim',
+  'Pyre Guardian': 'aura.pyreGuardian',
   'Umbral Mastery': 'aura.umbralMastery',
   'Improved Fear': 'aura.improvedFear',
   'Unyielding Pact': 'aura.unyieldingPact',
   'Grimoire of Carnage': 'aura.grimoireOfCarnage',
   'Curse Mastery': 'aura.curseMastery',
 };
+
+const WARLOCK_ABILITY_AURA_IDS: Readonly<Record<string, string>> = {
+  'Umbral Anchor': 'umbral_anchor',
+  'Possess the Evil Eye': 'possess_evil_eye',
+  'Hour of Judgment': 'hour_of_judgment',
+  Coven: 'coven',
+  'Sacrilegious March': 'sacrilegious_march',
+  'Sanguine Covenant': 'dark_pact',
+};
+
+const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
+  'Blacktide',
+  'Leaden Hex',
+  'Shadow Credit',
+  'Hexstorm',
+  'Forbidden Reflection',
+]);
+
 export function localizeSimAuraName(name: string): string | null {
+  const towerName = towerMechanicName(name);
+  if (towerName) return towerName;
   const key = AURA_NAME_KEY[name];
-  return key ? tSim(key) : null;
+  if (key) return tSim(key);
+  if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
+  if (name === 'Fate Threads') return t('hudChrome.warlock.fateThreadsLabel');
+  if (name === 'Soul Fragments') return t('hudChrome.procOverlay.soulFragmentsMeter');
+  const abilityId = WARLOCK_ABILITY_AURA_IDS[name];
+  if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  if (WARLOCK_TALENT_AURA_NAMES.has(name)) return localizeTalentTitle(name);
+  return null;
 }
 
 // A boss/mob "mechanic" name spliced into "{mob} unleashes {mechanic}!". Reuses the shared
 // aura localizer (the mechanic names double as the debuff aura names), falling back to the
 // raw English name for any mechanic not yet registered.
 function locBossMechanic(name: string): string {
-  return localizeSimAuraName(name) ?? name;
+  return towerMechanicName(name) ?? localizeSimAuraName(name) ?? name;
+}
+
+const TOWER_MECHANICS: Partial<Record<SupportedLanguage, Readonly<Record<string, string>>>> = {
+  es: {
+    'Graft Flesh': 'Injerto de carne',
+    'Sinew Snare': 'Trampa de tendones',
+    Ashfall: 'Lluvia de ceniza',
+    'Cinder Wake': 'Estela de brasas',
+    'Ember Quake': 'Terremoto de ascuas',
+    'Molten Rush': 'Embestida fundida',
+    'Warden the Gate': 'Guardia de la puerta',
+    Chainfire: 'Fuego encadenado',
+    'Gate Slam': 'Golpe de la puerta',
+    'The Unmaking': 'La Descreación',
+    'Rift Collapse': 'Colapso de la brecha',
+    'Sunder the Spire': 'Quebrar la aguja',
+    'Unbound Nova': 'Nova desatada',
+    'Rift Collapse detonates!': '¡El Colapso de la brecha detona!',
+  },
+  ja_JP: {
+    'Graft Flesh': '肉体接合',
+    'Sinew Snare': '腱の罠',
+    Ashfall: '灰の降下',
+    'Cinder Wake': '残り火の軌跡',
+    'Ember Quake': '熾火の地震',
+    'Molten Rush': '溶融突進',
+    'Warden the Gate': '門の守護',
+    Chainfire: '連鎖炎',
+    'Gate Slam': '門の強打',
+    'The Unmaking': '解体',
+    'Rift Collapse': '裂け目の崩壊',
+    'Sunder the Spire': '尖塔粉砕',
+    'Unbound Nova': '解放の新星',
+    'Rift Collapse detonates!': '裂け目の崩壊が爆発する！',
+  },
+  ko_KR: {
+    'Graft Flesh': '살점 접합',
+    'Sinew Snare': '힘줄 덫',
+    Ashfall: '재의 강하',
+    'Cinder Wake': '잿불 자취',
+    'Ember Quake': '잿불 지진',
+    'Molten Rush': '용암 돌진',
+    'Warden the Gate': '관문 수호',
+    Chainfire: '연쇄 화염',
+    'Gate Slam': '관문 강타',
+    'The Unmaking': '해체',
+    'Rift Collapse': '균열 붕괴',
+    'Sunder the Spire': '첨탑 파쇄',
+    'Unbound Nova': '해방된 폭발',
+    'Rift Collapse detonates!': '균열 붕괴가 폭발합니다!',
+  },
+  ru_RU: {
+    'Graft Flesh': 'Сращивание плоти',
+    'Sinew Snare': 'Сухожильная ловушка',
+    Ashfall: 'Пеплопад',
+    'Cinder Wake': 'Шлейф углей',
+    'Ember Quake': 'Угольный разлом',
+    'Molten Rush': 'Расплавленный рывок',
+    'Warden the Gate': 'Страж врат',
+    Chainfire: 'Цепной огонь',
+    'Gate Slam': 'Удар врат',
+    'The Unmaking': 'Развоплощение',
+    'Rift Collapse': 'Коллапс разлома',
+    'Sunder the Spire': 'Раскол шпиля',
+    'Unbound Nova': 'Освобождённая нова',
+    'Rift Collapse detonates!': 'Коллапс разлома взрывается!',
+  },
+  zh_CN: {
+    'Graft Flesh': '血肉嫁接',
+    'Sinew Snare': '筋腱陷阱',
+    Ashfall: '灰烬天降',
+    'Cinder Wake': '余烬尾迹',
+    'Ember Quake': '余烬震荡',
+    'Molten Rush': '熔火冲锋',
+    'Warden the Gate': '守卫大门',
+    Chainfire: '连锁烈焰',
+    'Gate Slam': '大门猛击',
+    'The Unmaking': '万物消解',
+    'Rift Collapse': '裂隙坍塌',
+    'Sunder the Spire': '粉碎尖塔',
+    'Unbound Nova': '无缚新星',
+    'Rift Collapse detonates!': '裂隙坍塌爆发了！',
+  },
+  zh_TW: {
+    'Graft Flesh': '血肉嫁接',
+    'Sinew Snare': '筋腱陷阱',
+    Ashfall: '灰燼天降',
+    'Cinder Wake': '餘燼尾跡',
+    'Ember Quake': '餘燼震盪',
+    'Molten Rush': '熔火衝鋒',
+    'Warden the Gate': '守衛大門',
+    Chainfire: '連鎖烈焰',
+    'Gate Slam': '大門猛擊',
+    'The Unmaking': '萬物消解',
+    'Rift Collapse': '裂隙坍塌',
+    'Sunder the Spire': '粉碎尖塔',
+    'Unbound Nova': '無縛新星',
+    'Rift Collapse detonates!': '裂隙坍塌爆發了！',
+  },
+};
+
+function towerMechanicName(name: string): string | null {
+  const language = getLanguage();
+  return (
+    TOWER_MECHANICS[language]?.[name] ??
+    (language === 'es_ES' ? TOWER_MECHANICS.es?.[name] : null) ??
+    null
+  );
 }
 
 type ArenaExtraKey =
@@ -7710,6 +9064,1138 @@ export const ARENA_EXTRA: Record<SupportedLanguage, Record<ArenaExtraKey, string
 function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   const table = ARENA_EXTRA[getLanguage()] ?? ARENA_EXTRA.en;
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
+}
+
+const ARENA_MIN_LEVEL_QUEUE_ERROR: Record<SupportedLanguage, string> = {
+  en: 'You must be level {level} to queue for the arena.',
+  en_CA: 'You must be level {level} to queue for the arena.',
+  es: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  es_ES: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  fr_FR: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  fr_CA: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  it_IT: "Devi essere di livello {level} per metterti in coda per l'arena.",
+  de_DE: 'Ihr müsst Stufe {level} sein, um Euch für die Arena anzumelden.',
+  zh_CN: '你必须达到 {level} 级才能加入竞技场队列。',
+  zh_TW: '你必須達到 {level} 級才能加入競技場佇列。',
+  ko_KR: '투기장 대기열에 들어가려면 레벨 {level}이어야 합니다.',
+  ja_JP: 'アリーナキューに入るにはレベル {level} が必要です。',
+  pt_BR: 'Você precisa estar no nível {level} para entrar na fila da arena.',
+  ru_RU: 'Чтобы встать в очередь арены, нужен уровень {level}.',
+  cs_CZ: 'Pro vstup do fronty arény musíš mít úroveň {level}.',
+  nl_NL: 'Je moet niveau {level} zijn om in de arena-wachtrij te gaan.',
+  pl_PL: 'Musisz mieć poziom {level}, aby dołączyć do kolejki areny.',
+  id_ID: 'Kamu harus level {level} untuk masuk antrean arena.',
+  tr_TR: 'Arena kuyruğuna girmek için seviye {level} olmalısın.',
+  sv_SE: 'Du måste vara nivå {level} för att gå med i arenakön.',
+  vi_VN: 'Bạn phải đạt cấp {level} để vào hàng đợi đấu trường.',
+  da_DK: 'Du skal være niveau {level} for at gå i arenakø.',
+};
+
+function tArenaMinLevelQueueError(level: string): string {
+  return interpolate(ARENA_MIN_LEVEL_QUEUE_ERROR[getLanguage()] ?? ARENA_MIN_LEVEL_QUEUE_ERROR.en, {
+    level,
+  });
+}
+
+// Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
+// English is authoritative; the non-Latin surfaces ship real fills (the M16
+// spirit) and the remaining locales fall back to English here until the
+// release-tier locale fill (the PR-tier S3 guard requires recognition only).
+type BgExtraKey =
+  | 'joinQueue'
+  | 'partyJoinQueue'
+  | 'leaveQueue'
+  | 'battleBegins'
+  | 'fightFor'
+  // The backfill pair (a queued solo seated into a match already under way):
+  // the joiner's own line, which must say the match is off the ladder, and the
+  // one their new teammates see.
+  | 'backfillJoin'
+  | 'backfillArrived'
+  | 'seizeRune'
+  | 'seizeBattleRune'
+  | 'seizeWardRune'
+  | 'teamCrimson'
+  | 'teamAzure'
+  | 'errInBattleground'
+  | 'errNotInBattleground'
+  | 'errQueueDead'
+  | 'errQueueInMatch'
+  | 'errMemberQueued'
+  | 'errMemberRequeueLocked'
+  | 'errNoFlag'
+  | 'errPartyTooLarge'
+  | 'errPartyLeaderOnly'
+  | 'errDelveDuringBg'
+  | 'errLevelTooLow'
+  | 'errMemberLevelTooLow'
+  | 'heldAtGate'
+  // The whole-match mount ban (src/sim/mounts.ts). It lives in THIS table, not
+  // the mount rows in baseEnTable, because the rule and its wording belong to
+  // the battleground: every locale reuses the mode's own glossary for it.
+  | 'errMountInBg'
+  // The queue-pop OFFER (social/battleground_proposal.ts): the prompt, the
+  // two ways it ends, and the three refusals guarding it.
+  | 'offerReady'
+  | 'offerKeptPlace'
+  | 'groupLeaveQueue'
+  | 'errNoOffer'
+  | 'errOfferWaiting'
+  | 'errRequeueLocked'
+  | 'offerBackfill'
+  | 'offerBackfillGone'
+  | 'offerBackfillDeclined';
+
+const BG_EXTRA_EN: Record<BgExtraKey, string> = {
+  errMemberRequeueLocked: 'A party member must wait before queueing for Thornhollow Fields again.',
+  offerReady: 'Thornhollow Fields is ready. Accept to join the battle.',
+  offerBackfill:
+    'A Thornhollow Fields battle already under way needs a fighter. Accept to join; this match will not change your rating.',
+  offerBackfillGone:
+    'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+  offerBackfillDeclined:
+    'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
+  offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
+  groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
+  errNoOffer: 'You have no Thornhollow Fields invitation to answer.',
+  errOfferWaiting: 'You have a Thornhollow Fields invitation waiting. Answer it first.',
+  errRequeueLocked: 'You must wait {seconds} seconds before queueing for Thornhollow Fields again.',
+  joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
+  partyJoinQueue: 'Your party of {count} joins the Thornhollow Fields queue.',
+  leaveQueue: 'You leave the Thornhollow Fields queue.',
+  battleBegins: 'The Thornhollow Fields battle begins: take their flag!',
+  fightFor: 'Thornhollow Fields: you fight for the {team}. First to {caps} captures wins.',
+  seizeRune: 'You seize a Sprint Rune!',
+  seizeBattleRune: 'You seize a Battle Rune!',
+  seizeWardRune: 'You seize a Ward Rune!',
+  backfillJoin:
+    'Thornhollow Fields: you join a battle already under way for the {team}. This match will not change your rating.',
+  backfillArrived: 'A fresh fighter joins the {team}.',
+  teamCrimson: 'Crimson',
+  teamAzure: 'Azure',
+  errInBattleground: 'You are already in a battleground.',
+  errNotInBattleground: 'You are not in a battleground.',
+  errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
+  errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
+  errMemberQueued: 'A party member is already queued or in a match.',
+  errNoFlag: 'There is no flag within reach.',
+  errPartyTooLarge: 'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
+  errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
+  errDelveDuringBg: 'You cannot enter a delve during a battleground.',
+  errLevelTooLow: 'Thornhollow Fields requires level {level}.',
+  errMemberLevelTooLow: 'Every party member must be level {level} to queue for Thornhollow Fields.',
+  heldAtGate: 'The gates open when the battle begins.',
+  errMountInBg: "You can't ride in a battleground.",
+};
+
+export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
+  en: BG_EXTRA_EN,
+  zh_CN: {
+    errMemberRequeueLocked: '有队伍成员需要等待后才能再次排队进入荆谷原野。',
+    offerReady: '荆谷原野已准备就绪。接受邀请即可加入战斗。',
+    offerBackfill:
+      '一场正在进行的荆谷原野战斗需要一名战士。接受即可加入；本场对战不会改变你的评分。',
+    offerBackfillGone: '那场战斗不再需要战士了。你保留在荆谷原野队列中的位置。',
+    offerBackfillDeclined: '你拒绝了这场已经开始的战斗，并保留在荆谷原野队列中的位置。',
+    offerKeptPlace: '战斗未能成行。你保留了荆谷原野队列中的位置。',
+    groupLeaveQueue: '你的队伍离开了荆谷原野队列。',
+    errNoOffer: '你没有可以回应的荆谷原野邀请。',
+    errOfferWaiting: '你有一个荆谷原野邀请待回应。请先回应它。',
+    errRequeueLocked: '你必须等待 {seconds} 秒才能再次排队进入荆谷原野。',
+    joinQueue: '你加入了荆谷原野队列。需要{count}名勇士才能开始比赛。',
+    partyJoinQueue: '你的{count}人小队加入了荆谷原野队列。',
+    leaveQueue: '你离开了荆谷原野队列。',
+    battleBegins: '荆谷原野之战开始了:夺取他们的旗帜!',
+    fightFor: '荆谷原野:你为{team}而战。先夺得{caps}次旗帜者获胜。',
+    seizeRune: '你夺得了疾行符文!',
+    backfillJoin: '荆谷原野:你加入了{team}正在进行的战斗。本场比赛不会改变你的评分。',
+    backfillArrived: '一名新的战士加入了{team}。',
+    teamCrimson: '赤红队',
+    teamAzure: '蔚蓝队',
+    errInBattleground: '你已经在战场中了。',
+    errNotInBattleground: '你不在战场中。',
+    errQueueDead: '死亡状态下无法排队进入荆谷原野。',
+    errQueueInMatch: '比赛进行中无法排队进入荆谷原野。',
+    errMemberQueued: '有队友已在队列或比赛中。',
+    errNoFlag: '附近没有可夺取的旗帜。',
+    errPartyTooLarge: '你的队伍人数超出荆谷原野上限。最多5人小队可排队。',
+    errPartyLeaderOnly: '只有队长才能让小队排入荆谷原野队列。',
+    errDelveDuringBg: '战场进行中无法进入探秘。',
+    errLevelTooLow: '荆谷原野需要等级{level}。',
+    errMemberLevelTooLow: '所有小队成员必须达到等级{level}才能加入荆谷原野队列。',
+    seizeBattleRune: '你夺得了战斗符文!',
+    seizeWardRune: '你夺得了守护符文!',
+    heldAtGate: '战斗开始时城门才会打开。',
+    errMountInBg: '战场中无法骑乘坐骑。',
+  },
+  zh_TW: {
+    errMemberRequeueLocked: '有隊伍成員需要等待後才能再次排隊進入荊谷原野。',
+    offerReady: '荊谷原野已準備就緒。接受邀請即可加入戰鬥。',
+    offerBackfill:
+      '一場正在進行的荊谷原野戰鬥需要一名戰士。接受即可加入；本場對戰不會改變你的評分。',
+    offerBackfillGone: '那場戰鬥不再需要戰士了。你保留在荊谷原野隊列中的位置。',
+    offerBackfillDeclined: '你拒絕了這場已經開始的戰鬥，並保留在荊谷原野隊列中的位置。',
+    offerKeptPlace: '戰鬥未能成行。你保留了荊谷原野佇列中的位置。',
+    groupLeaveQueue: '你的隊伍離開了荊谷原野佇列。',
+    errNoOffer: '你沒有可以回應的荊谷原野邀請。',
+    errOfferWaiting: '你有一個荊谷原野邀請待回應。請先回應它。',
+    errRequeueLocked: '你必須等待 {seconds} 秒才能再次排隊進入荊谷原野。',
+    joinQueue: '你加入了荊谷原野佇列。需要{count}名勇士才能開始比賽。',
+    partyJoinQueue: '你的{count}人隊伍加入了荊谷原野佇列。',
+    leaveQueue: '你離開了荊谷原野佇列。',
+    battleBegins: '荊谷原野之戰開始了:奪取他們的旗幟!',
+    fightFor: '荊谷原野:你為{team}而戰。先奪得{caps}次旗幟者獲勝。',
+    seizeRune: '你奪得了疾行符文!',
+    backfillJoin: '荊谷原野:你加入了{team}正在進行的戰鬥。本場比賽不會改變你的評分。',
+    backfillArrived: '一名新的戰士加入了{team}。',
+    teamCrimson: '赤紅隊',
+    teamAzure: '蔚藍隊',
+    errInBattleground: '你已經在戰場中了。',
+    errNotInBattleground: '你不在戰場中。',
+    errQueueDead: '死亡狀態下無法排隊進入荊谷原野。',
+    errQueueInMatch: '比賽進行中無法排隊進入荊谷原野。',
+    errMemberQueued: '有隊友已在佇列或比賽中。',
+    errNoFlag: '附近沒有可奪取的旗幟。',
+    errPartyTooLarge: '你的隊伍人數超出荊谷原野上限。最多5人隊伍可排隊。',
+    errPartyLeaderOnly: '只有隊長才能讓隊伍排入荊谷原野佇列。',
+    errDelveDuringBg: '戰場進行中無法進入探祕。',
+    errLevelTooLow: '荊谷原野需要等級{level}。',
+    errMemberLevelTooLow: '所有隊伍成員必須達到等級{level}才能加入荊谷原野佇列。',
+    seizeBattleRune: '你奪得了戰鬥符文!',
+    seizeWardRune: '你奪得了守護符文!',
+    heldAtGate: '戰鬥開始時城門才會打開。',
+    errMountInBg: '戰場中無法騎乘坐騎。',
+  },
+  ja_JP: {
+    errMemberRequeueLocked:
+      'パーティーメンバーがソーンホロウ平原に再び参加できるようになるまで待つ必要があります。',
+    offerReady: 'ソーンホロウ平原の準備が整いました。参加するには承諾してください。',
+    offerBackfill:
+      '進行中のソーンホロウ平原の戦いに戦士が必要です。承諾すると参加できます。この試合はレーティングに影響しません。',
+    offerBackfillGone:
+      'その戦いはもう戦士を必要としていません。ソーンホロウ平原の待機列での順番は保持されます。',
+    offerBackfillDeclined:
+      '進行中の戦いを辞退しました。ソーンホロウ平原の待機列での順番は保持されます。',
+    offerKeptPlace: '戦闘は成立しませんでした。ソーンホロウ平原のキューでの順番は保持されます。',
+    groupLeaveQueue: 'あなたのパーティーはソーンホロウ平原のキューから離脱しました。',
+    errNoOffer: '応答できるソーンホロウ平原の招待がありません。',
+    errOfferWaiting: 'ソーンホロウ平原の招待が届いています。先に応答してください。',
+    errRequeueLocked: '再びソーンホロウ平原のキューに参加するには{seconds}秒待つ必要があります。',
+    joinQueue: 'ソーンホロウ平原のキューに参加しました。試合開始には{count}人の勇者が必要です。',
+    partyJoinQueue: '{count}人のパーティがソーンホロウ平原のキューに参加しました。',
+    leaveQueue: 'ソーンホロウ平原のキューから離脱しました。',
+    battleBegins: 'ソーンホロウ平原の戦いが始まった:敵の旗を奪え!',
+    fightFor:
+      'ソーンホロウ平原:あなたは{team}として戦います。先に{caps}回旗を奪取したチームの勝利です。',
+    seizeRune: 'スプリントルーンを手に入れた!',
+    backfillJoin:
+      'ソーンホロウ平原:進行中の戦いに{team}として参加します。この試合でレーティングは変動しません。',
+    backfillArrived: '新たな戦士が{team}に加わりました。',
+    teamCrimson: 'クリムゾン',
+    teamAzure: 'アズール',
+    errInBattleground: 'すでに戦場にいます。',
+    errNotInBattleground: '戦場にいません。',
+    errQueueDead: '死亡中はソーンホロウ平原のキューに参加できません。',
+    errQueueInMatch: '別の試合中はソーンホロウ平原のキューに参加できません。',
+    errMemberQueued: 'パーティメンバーがすでにキューまたは試合に参加しています。',
+    errNoFlag: '手の届く範囲に旗がありません。',
+    errPartyTooLarge:
+      'パーティの人数がソーンホロウ平原の上限を超えています。参加できるのは最大5人です。',
+    errPartyLeaderOnly:
+      'ソーンホロウ平原のキューにパーティを登録できるのはパーティリーダーだけです。',
+    errDelveDuringBg: '戦場の最中はディレルヴに入れません。',
+    errLevelTooLow: 'ソーンホロウ平原にはレベル{level}が必要です。',
+    errMemberLevelTooLow:
+      'ソーンホロウ平原のキューに参加するには、パーティ全員がレベル{level}である必要があります。',
+    heldAtGate: '門は戦闘開始とともに開かれます。',
+    errMountInBg: '戦場では騎乗できません。',
+    seizeBattleRune: 'バトルルーンを手に入れた!',
+    seizeWardRune: 'ウォードルーンを手に入れた!',
+  },
+  ko_KR: {
+    errMemberRequeueLocked: '파티원이 쏜할로우 평원 대기열에 다시 참가하려면 기다려야 합니다.',
+    offerReady: '쏜할로우 평원이 준비되었습니다. 수락하여 전투에 참여하세요.',
+    offerBackfill:
+      '이미 진행 중인 쏜할로우 평원 전투에 전사가 필요합니다. 수락하면 참여합니다. 이 전투는 평점에 영향을 주지 않습니다.',
+    offerBackfillGone:
+      '그 전투는 더 이상 전사가 필요하지 않습니다. 쏜할로우 평원 대기열에서의 순서는 유지됩니다.',
+    offerBackfillDeclined:
+      '이미 진행 중인 전투를 거절했습니다. 쏜할로우 평원 대기열에서의 순서는 유지됩니다.',
+    offerKeptPlace: '전투가 성사되지 않았습니다. 쏜할로우 평원 대기열의 순번은 유지됩니다.',
+    groupLeaveQueue: '당신의 파티가 쏜할로우 평원 대기열에서 나왔습니다.',
+    errNoOffer: '응답할 쏜할로우 평원 초대가 없습니다.',
+    errOfferWaiting: '쏜할로우 평원 초대가 대기 중입니다. 먼저 응답하세요.',
+    errRequeueLocked: '쏜할로우 평원 대기열에 다시 참가하려면 {seconds}초를 기다려야 합니다.',
+    joinQueue:
+      '쏜할로우 평원 대기열에 참가했습니다. 경기를 시작하려면 {count}명의 용사가 필요합니다.',
+    partyJoinQueue: '{count}명의 파티가 쏜할로우 평원 대기열에 참가했습니다.',
+    leaveQueue: '쏜할로우 평원 대기열에서 나왔습니다.',
+    battleBegins: '쏜할로우 평원 전투가 시작되었습니다. 적의 깃발을 빼앗으세요!',
+    fightFor:
+      '쏜할로우 평원: 당신은 {team} 소속으로 싸웁니다. 먼저 {caps}회 깃발을 탈취한 팀이 승리합니다.',
+    seizeRune: '질주 룬을 차지했습니다!',
+    backfillJoin:
+      '쏜할로우 평원: 진행 중인 전투에 {team}으로 참가합니다. 이 경기는 평점에 반영되지 않습니다.',
+    backfillArrived: '새로운 전사가 {team}에 합류했습니다.',
+    teamCrimson: '진홍팀',
+    teamAzure: '청람팀',
+    errInBattleground: '이미 전장에 있습니다.',
+    errNotInBattleground: '전장에 있지 않습니다.',
+    errQueueDead: '죽은 상태로는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
+    errQueueInMatch: '다른 경기 중에는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
+    errMemberQueued: '파티원이 이미 대기열이나 경기에 참가 중입니다.',
+    errNoFlag: '근처에 잡을 수 있는 깃발이 없습니다.',
+    errPartyTooLarge:
+      '파티 인원이 쏜할로우 평원 제한을 초과합니다. 최대 5인 파티만 참가할 수 있습니다.',
+    errPartyLeaderOnly: '쏜할로우 평원 대기열에는 파티장만 파티를 등록할 수 있습니다.',
+    errDelveDuringBg: '전장 중에는 탐사에 들어갈 수 없습니다.',
+    errLevelTooLow: '쏜할로우 평원은 레벨 {level}부터 참가할 수 있습니다.',
+    errMemberLevelTooLow:
+      '쏜할로우 평원 대기열에 참가하려면 모든 파티원이 레벨 {level} 이상이어야 합니다.',
+    heldAtGate: '전투가 시작되면 성문이 열립니다.',
+    errMountInBg: '전장에서는 탈것을 탈 수 없습니다.',
+    seizeBattleRune: '전투 룬을 차지했습니다!',
+    seizeWardRune: '수호 룬을 차지했습니다!',
+  },
+  ru_RU: {
+    errMemberRequeueLocked:
+      'Участнику группы нужно подождать, прежде чем снова встать в очередь Терновой Лощины.',
+    offerReady: 'Терновая Лощина готова. Примите приглашение, чтобы вступить в бой.',
+    offerBackfill:
+      'Уже идущему бою в Терновой Лощине нужен боец. Примите, чтобы вступить; этот бой не изменит ваш рейтинг.',
+    offerBackfillGone:
+      'Тому бою больше не нужен боец. Ваше место в очереди Терновой Лощины сохранено.',
+    offerBackfillDeclined:
+      'Вы отказались от уже идущего боя и сохранили место в очереди Терновой Лощины.',
+    offerKeptPlace: 'Бой не состоялся. Ваше место в очереди Терновой Лощины сохранено.',
+    groupLeaveQueue: 'Ваша группа покинула очередь Терновой Лощины.',
+    errNoOffer: 'У вас нет приглашения в Терновую Лощину, на которое можно ответить.',
+    errOfferWaiting: 'Вас ждёт приглашение в Терновую Лощину. Сначала ответьте на него.',
+    errRequeueLocked:
+      'Нужно подождать {seconds} сек., прежде чем снова встать в очередь Терновой Лощины.',
+    joinQueue: 'Вы встали в очередь Терновой Лощины. Для начала матча нужно {count} бойцов.',
+    partyJoinQueue: 'Ваша группа из {count} бойцов встала в очередь Терновой Лощины.',
+    leaveQueue: 'Вы покинули очередь Терновой Лощины.',
+    battleBegins: 'Битва за Терновую Лощину началась: захватите их флаг!',
+    fightFor:
+      'Терновая Лощина: вы сражаетесь за {team}. Побеждает команда, первой захватившая флаг {caps} раз.',
+    seizeRune: 'Вы подобрали руну спринта!',
+    backfillJoin:
+      'Терновая Лощина: вы вступаете в уже идущий бой за {team}. Этот матч не изменит ваш рейтинг.',
+    backfillArrived: 'Новый боец присоединяется к отряду {team}.',
+    teamCrimson: 'Багровых',
+    teamAzure: 'Лазурных',
+    errInBattleground: 'Вы уже находитесь на поле боя.',
+    errNotInBattleground: 'Вы не находитесь на поле боя.',
+    errQueueDead: 'Нельзя встать в очередь Терновой Лощины, будучи мертвым.',
+    errQueueInMatch: 'Нельзя встать в очередь Терновой Лощины во время другого матча.',
+    errMemberQueued: 'Кто-то из группы уже в очереди или в матче.',
+    errNoFlag: 'Поблизости нет флага, который можно взять.',
+    errPartyTooLarge:
+      'Ваша группа слишком велика для Терновой Лощины. В очередь встают группы до 5 бойцов.',
+    errPartyLeaderOnly: 'Записать группу в очередь Терновой Лощины может только лидер группы.',
+    errDelveDuringBg: 'Нельзя войти в вылазку во время боя на поле боя.',
+    errLevelTooLow: 'Для Терновой Лощины требуется уровень {level}.',
+    errMemberLevelTooLow:
+      'Чтобы встать в очередь Терновой Лощины, каждый в группе должен иметь уровень {level}.',
+    heldAtGate: 'Ворота откроются с началом битвы.',
+    errMountInBg: 'На поле боя нельзя ездить верхом.',
+    seizeBattleRune: 'Вы подобрали руну битвы!',
+    seizeWardRune: 'Вы подобрали руну защиты!',
+  },
+  en_CA: {
+    errMemberRequeueLocked:
+      'A party member must wait before queueing for Thornhollow Fields again.',
+    offerReady: 'Thornhollow Fields is ready. Accept to join the battle.',
+    offerBackfill:
+      'A Thornhollow Fields battle already under way needs a fighter. Accept to join; this match will not change your rating.',
+    offerBackfillGone:
+      'That battle no longer needs a fighter. You keep your place in the Thornhollow Fields queue.',
+    offerBackfillDeclined:
+      'You decline the battle already under way, and keep your place in the Thornhollow Fields queue.',
+    offerKeptPlace: 'The battle did not fill. You keep your place in the Thornhollow Fields queue.',
+    groupLeaveQueue: 'Your group leaves the Thornhollow Fields queue.',
+    errNoOffer: 'You have no Thornhollow Fields invitation to answer.',
+    errOfferWaiting: 'You have a Thornhollow Fields invitation waiting. Answer it first.',
+    errRequeueLocked:
+      'You must wait {seconds} seconds before queueing for Thornhollow Fields again.',
+    joinQueue: 'You join the Thornhollow Fields queue. Need {count} champions to start a match.',
+    partyJoinQueue: 'Your party of {count} joins the Thornhollow Fields queue.',
+    leaveQueue: 'You leave the Thornhollow Fields queue.',
+    battleBegins: 'The Thornhollow Fields battle begins: take their flag!',
+    fightFor: 'Thornhollow Fields: you fight for the {team}. First to {caps} captures wins.',
+    seizeRune: 'You seize a Sprint Rune!',
+    seizeBattleRune: 'You seize a Battle Rune!',
+    seizeWardRune: 'You seize a Ward Rune!',
+    backfillJoin:
+      'Thornhollow Fields: you join a battle already under way for the {team}. This match will not change your rating.',
+    backfillArrived: 'A fresh fighter joins the {team}.',
+    teamCrimson: 'Crimson',
+    teamAzure: 'Azure',
+    errInBattleground: 'You are already in a battleground.',
+    errNotInBattleground: 'You are not in a battleground.',
+    errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
+    errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
+    errMemberQueued: 'A party member is already queued or in a match.',
+    errNoFlag: 'There is no flag within reach.',
+    errPartyTooLarge:
+      'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
+    errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
+    errDelveDuringBg: 'You cannot enter a delve during a battleground.',
+    errLevelTooLow: 'Thornhollow Fields requires level {level}.',
+    errMemberLevelTooLow:
+      'Every party member must be level {level} to queue for Thornhollow Fields.',
+    heldAtGate: 'The gates open when the battle begins.',
+    errMountInBg: "You can't ride in a battleground.",
+  },
+  es: {
+    errMemberRequeueLocked:
+      'Un miembro del grupo debe esperar antes de volver a entrar en la cola de los Campos de Thornhollow.',
+    offerReady: 'Los Campos de Thornhollow están listos. Acepta para unirte a la batalla.',
+    offerBackfill:
+      'Una batalla en curso en los Campos de Thornhollow necesita un luchador. Acepta para unirte; este combate no cambiará tu clasificación.',
+    offerBackfillGone:
+      'Esa batalla ya no necesita un luchador. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Rechazas la batalla ya en curso y conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerKeptPlace:
+      'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    groupLeaveQueue: 'Tu grupo sale de la cola de los Campos de Thornhollow.',
+    errNoOffer: 'No tienes ninguna invitación a los Campos de Thornhollow que responder.',
+    errOfferWaiting:
+      'Tienes una invitación a los Campos de Thornhollow pendiente. Respóndela primero.',
+    errRequeueLocked:
+      'Debes esperar {seconds} segundos antes de volver a entrar en la cola de los Campos de Thornhollow.',
+    joinQueue:
+      'Te unes a la cola de los Campos de Thornhollow. Se necesitan {count} campeones para iniciar el combate.',
+    partyJoinQueue: 'Tu grupo de {count} se une a la cola de los Campos de Thornhollow.',
+    leaveQueue: 'Sales de la cola de los Campos de Thornhollow.',
+    battleBegins: 'Comienza la batalla de los Campos de Thornhollow: ¡toma su bandera!',
+    fightFor:
+      'Campos de Thornhollow: luchas por el bando {team}. Gana el primer equipo que logre {caps} capturas.',
+    seizeRune: '¡Te apoderas de una Runa de Velocidad!',
+    seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
+    seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    backfillJoin:
+      'Te unes a una batalla ya en curso con {team} en los Campos de Thornhollow. Este combate no cambiará tu clasificación.',
+    backfillArrived: 'Un nuevo combatiente entra en combate con {team}.',
+    teamCrimson: 'Carmesí',
+    teamAzure: 'Azur',
+    errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
+    errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
+    errQueueInMatch:
+      'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
+    errMemberQueued: 'Un miembro del grupo ya está en cola o en un combate.',
+    errNoFlag: 'No hay ninguna bandera al alcance.',
+    errPartyTooLarge:
+      'Tu grupo es demasiado grande para los Campos de Thornhollow. La cola admite grupos de hasta 5.',
+    errPartyLeaderOnly:
+      'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
+    errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
+    errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
+    errMemberLevelTooLow:
+      'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
+    heldAtGate: 'Las puertas se abren cuando comienza la batalla.',
+    errMountInBg: 'No puedes montar en un campo de batalla.',
+  },
+  es_ES: {
+    errMemberRequeueLocked:
+      'Un miembro del grupo debe esperar antes de volver a entrar en la cola de los Campos de Thornhollow.',
+    offerReady: 'Los Campos de Thornhollow están listos. Acepta para unirte a la batalla.',
+    offerBackfill:
+      'Una batalla en curso en los Campos de Thornhollow necesita un luchador. Acepta para unirte; este combate no cambiará tu clasificación.',
+    offerBackfillGone:
+      'Esa batalla ya no necesita un luchador. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Rechazas la batalla ya en curso y conservas tu lugar en la cola de los Campos de Thornhollow.',
+    offerKeptPlace:
+      'La batalla no se completó. Conservas tu lugar en la cola de los Campos de Thornhollow.',
+    groupLeaveQueue: 'Tu grupo sale de la cola de los Campos de Thornhollow.',
+    errNoOffer: 'No tienes ninguna invitación a los Campos de Thornhollow que responder.',
+    errOfferWaiting:
+      'Tienes una invitación a los Campos de Thornhollow pendiente. Respóndela primero.',
+    errRequeueLocked:
+      'Debes esperar {seconds} segundos antes de volver a entrar en la cola de los Campos de Thornhollow.',
+    joinQueue:
+      'Te unes a la cola de los Campos de Thornhollow. Se necesitan {count} campeones para iniciar el combate.',
+    partyJoinQueue: 'Tu grupo de {count} se une a la cola de los Campos de Thornhollow.',
+    leaveQueue: 'Sales de la cola de los Campos de Thornhollow.',
+    battleBegins: 'Comienza la batalla de los Campos de Thornhollow: ¡toma su bandera!',
+    fightFor:
+      'Campos de Thornhollow: luchas por el bando {team}. Gana el primer equipo que logre {caps} capturas.',
+    seizeRune: '¡Te apoderas de una Runa de Velocidad!',
+    seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
+    seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    backfillJoin:
+      'Te unes a una batalla ya en curso con {team} en los Campos de Thornhollow. Este combate no cambiará tu clasificación.',
+    backfillArrived: 'Un nuevo combatiente entra en combate con {team}.',
+    teamCrimson: 'Carmesí',
+    teamAzure: 'Azur',
+    errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
+    errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
+    errQueueInMatch:
+      'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
+    errMemberQueued: 'Un miembro del grupo ya está en cola o en un combate.',
+    errNoFlag: 'No hay ninguna bandera al alcance.',
+    errPartyTooLarge:
+      'Tu grupo es demasiado grande para los Campos de Thornhollow. La cola admite grupos de hasta 5.',
+    errPartyLeaderOnly:
+      'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
+    errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
+    errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
+    errMemberLevelTooLow:
+      'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
+    heldAtGate: 'Las puertas se abren cuando comienza la batalla.',
+    errMountInBg: 'No puedes montar en un campo de batalla.',
+  },
+  fr_FR: {
+    errMemberRequeueLocked:
+      'Un membre du groupe doit attendre avant de rejoindre à nouveau la file des Champs de Thornhollow.',
+    offerReady: 'Les Champs de Thornhollow sont prêts. Acceptez pour rejoindre la bataille.',
+    offerBackfill:
+      'Une bataille en cours aux Champs de Thornhollow a besoin d’un combattant. Acceptez pour la rejoindre ; ce match ne modifiera pas votre cote.',
+    offerBackfillGone:
+      'Cette bataille n’a plus besoin de combattant. Vous gardez votre place dans la file des Champs de Thornhollow.',
+    offerBackfillDeclined:
+      'Vous refusez la bataille déjà en cours et gardez votre place dans la file des Champs de Thornhollow.',
+    offerKeptPlace:
+      'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
+    groupLeaveQueue: 'Votre groupe quitte la file des Champs de Thornhollow.',
+    errNoOffer: 'Vous n’avez aucune invitation aux Champs de Thornhollow à laquelle répondre.',
+    errOfferWaiting: 'Une invitation aux Champs de Thornhollow vous attend. Répondez-y d’abord.',
+    errRequeueLocked:
+      'Vous devez attendre {seconds} secondes avant de rejoindre à nouveau la file des Champs de Thornhollow.',
+    joinQueue:
+      'Vous rejoignez la file des Champs de Thornhollow. Il faut {count} champions pour lancer un combat.',
+    partyJoinQueue: 'Votre groupe de {count} rejoint la file des Champs de Thornhollow.',
+    leaveQueue: 'Vous quittez la file des Champs de Thornhollow.',
+    battleBegins: 'La bataille des Champs de Thornhollow commence : prenez leur drapeau !',
+    fightFor:
+      'Champs de Thornhollow : vous combattez pour {team}. La première équipe à {caps} captures l’emporte.',
+    seizeRune: 'Vous vous emparez d’une Rune de course !',
+    seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
+    seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    backfillJoin:
+      'Vous rejoignez une bataille déjà engagée avec {team} dans les Champs de Thornhollow. Ce match ne modifiera pas votre classement.',
+    backfillArrived: 'Un nouveau combattant rejoint {team}.',
+    teamCrimson: 'les Cramoisis',
+    teamAzure: 'les Azurs',
+    errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
+    errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
+    errQueueInMatch:
+      'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
+    errMemberQueued: 'Un membre du groupe est déjà en file ou en combat.',
+    errNoFlag: 'Aucun drapeau à portée.',
+    errPartyTooLarge:
+      'Votre groupe est trop nombreux pour les Champs de Thornhollow. La file accepte les groupes jusqu’à 5.',
+    errPartyLeaderOnly:
+      'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
+    errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
+    errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
+    errMemberLevelTooLow:
+      'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
+    heldAtGate: 'Les portes s’ouvrent au début de la bataille.',
+    errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
+  },
+  fr_CA: {
+    errMemberRequeueLocked:
+      'Un membre du groupe doit attendre avant de rejoindre à nouveau la file des Champs de Thornhollow.',
+    offerReady: 'Les Champs de Thornhollow sont prêts. Acceptez pour rejoindre la bataille.',
+    offerBackfill:
+      'Une bataille en cours aux Champs de Thornhollow a besoin d’un combattant. Acceptez pour la rejoindre ; ce match ne modifiera pas votre cote.',
+    offerBackfillGone:
+      'Cette bataille n’a plus besoin de combattant. Vous gardez votre place dans la file des Champs de Thornhollow.',
+    offerBackfillDeclined:
+      'Vous refusez la bataille déjà en cours et gardez votre place dans la file des Champs de Thornhollow.',
+    offerKeptPlace:
+      'La bataille ne s’est pas formée. Vous conservez votre place dans la file des Champs de Thornhollow.',
+    groupLeaveQueue: 'Votre groupe quitte la file des Champs de Thornhollow.',
+    errNoOffer: 'Vous n’avez aucune invitation aux Champs de Thornhollow à laquelle répondre.',
+    errOfferWaiting: 'Une invitation aux Champs de Thornhollow vous attend. Répondez-y d’abord.',
+    errRequeueLocked:
+      'Vous devez attendre {seconds} secondes avant de rejoindre à nouveau la file des Champs de Thornhollow.',
+    joinQueue:
+      'Vous rejoignez la file des Champs de Thornhollow. Il faut {count} champions pour lancer un combat.',
+    partyJoinQueue: 'Votre groupe de {count} rejoint la file des Champs de Thornhollow.',
+    leaveQueue: 'Vous quittez la file des Champs de Thornhollow.',
+    battleBegins: 'La bataille des Champs de Thornhollow commence : prenez leur drapeau !',
+    fightFor:
+      'Champs de Thornhollow : vous combattez pour {team}. La première équipe à {caps} captures l’emporte.',
+    seizeRune: 'Vous vous emparez d’une Rune de course !',
+    seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
+    seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    backfillJoin:
+      'Vous rejoignez une bataille déjà engagée avec {team} dans les Champs de Thornhollow. Ce match ne modifiera pas votre classement.',
+    backfillArrived: 'Un nouveau combattant rejoint {team}.',
+    teamCrimson: 'les Cramoisis',
+    teamAzure: 'les Azurs',
+    errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
+    errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
+    errQueueInMatch:
+      'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
+    errMemberQueued: 'Un membre du groupe est déjà en file ou en combat.',
+    errNoFlag: 'Aucun drapeau à portée.',
+    errPartyTooLarge:
+      'Votre groupe est trop nombreux pour les Champs de Thornhollow. La file accepte les groupes jusqu’à 5.',
+    errPartyLeaderOnly:
+      'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
+    errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
+    errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
+    errMemberLevelTooLow:
+      'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
+    heldAtGate: 'Les portes s’ouvrent au début de la bataille.',
+    errMountInBg: 'Vous ne pouvez pas monter en selle sur un champ de bataille.',
+  },
+  it_IT: {
+    errMemberRequeueLocked:
+      'Un membro del gruppo deve attendere prima di rientrare in coda per i Campi di Thornhollow.',
+    offerReady: 'I Campi di Thornhollow sono pronti. Accetta per unirti alla battaglia.',
+    offerBackfill:
+      'Una battaglia già in corso nei Campi di Thornhollow ha bisogno di un combattente. Accetta per unirti; questo scontro non cambierà il tuo punteggio.',
+    offerBackfillGone:
+      'Quella battaglia non ha più bisogno di un combattente. Mantieni il tuo posto nella coda dei Campi di Thornhollow.',
+    offerBackfillDeclined:
+      'Rifiuti la battaglia già in corso e mantieni il tuo posto nella coda dei Campi di Thornhollow.',
+    offerKeptPlace:
+      'La battaglia non si è formata. Mantieni il tuo posto nella coda dei Campi di Thornhollow.',
+    groupLeaveQueue: 'Il tuo gruppo esce dalla coda dei Campi di Thornhollow.',
+    errNoOffer: 'Non hai alcun invito ai Campi di Thornhollow a cui rispondere.',
+    errOfferWaiting: 'Hai un invito ai Campi di Thornhollow in attesa. Rispondi prima a quello.',
+    errRequeueLocked:
+      'Devi attendere {seconds} secondi prima di rientrare in coda per i Campi di Thornhollow.',
+    joinQueue:
+      'Ti unisci alla coda dei Campi di Thornhollow. Servono {count} campioni per iniziare una partita.',
+    partyJoinQueue: 'Il tuo gruppo di {count} si unisce alla coda dei Campi di Thornhollow.',
+    leaveQueue: 'Esci dalla coda dei Campi di Thornhollow.',
+    battleBegins: 'La battaglia dei Campi di Thornhollow ha inizio: prendete la loro bandiera!',
+    fightFor:
+      'Campi di Thornhollow: combatti per {team}. Vince la prima squadra ad arrivare a {caps} catture.',
+    seizeRune: 'Ti impossessi di una Runa di Scatto!',
+    seizeBattleRune: 'Ti impossessi di una Runa di Battaglia!',
+    seizeWardRune: 'Ti impossessi di una Runa di Protezione!',
+    backfillJoin:
+      'Ti unisci a una battaglia già in corso con {team} nei Campi di Thornhollow. Questa partita non modificherà il tuo punteggio.',
+    backfillArrived: 'Un nuovo combattente entra in campo con {team}.',
+    teamCrimson: 'i Cremisi',
+    teamAzure: 'gli Azzurri',
+    errInBattleground: 'Sei già in un campo di battaglia.',
+    errNotInBattleground: 'Non sei in un campo di battaglia.',
+    errQueueDead: 'Non puoi entrare in coda per i Campi di Thornhollow da morto.',
+    errQueueInMatch:
+      'Non puoi entrare in coda per i Campi di Thornhollow mentre sei in un’altra partita.',
+    errMemberQueued: 'Un membro del gruppo è già in coda o in partita.',
+    errNoFlag: 'Non c’è nessuna bandiera a portata.',
+    errPartyTooLarge:
+      'Il tuo gruppo è troppo numeroso per i Campi di Thornhollow. La coda accetta gruppi fino a 5.',
+    errPartyLeaderOnly:
+      'Solo il capogruppo può mettere il gruppo in coda per i Campi di Thornhollow.',
+    errDelveDuringBg: 'Non puoi entrare in un’incursione durante un campo di battaglia.',
+    errLevelTooLow: 'I Campi di Thornhollow richiedono il livello {level}.',
+    errMemberLevelTooLow:
+      'Ogni membro del gruppo deve essere di livello {level} per entrare in coda per i Campi di Thornhollow.',
+    heldAtGate: 'I cancelli si aprono quando inizia la battaglia.',
+    errMountInBg: 'Non puoi cavalcare in un campo di battaglia.',
+  },
+  de_DE: {
+    errMemberRequeueLocked:
+      'Ein Gruppenmitglied muss warten, bevor es sich erneut für die Thornhollow-Felder anmelden kann.',
+    offerReady: 'Die Thornhollow-Felder sind bereit. Nimm an, um dich der Schlacht anzuschließen.',
+    offerBackfill:
+      'Eine laufende Schlacht auf den Thornhollow-Feldern braucht einen Kämpfer. Nimm an, um beizutreten; dieses Spiel ändert deine Wertung nicht.',
+    offerBackfillGone:
+      'Diese Schlacht braucht keinen Kämpfer mehr. Du behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
+    offerBackfillDeclined:
+      'Du lehnst die laufende Schlacht ab und behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
+    offerKeptPlace:
+      'Die Schlacht kam nicht zustande. Du behältst deinen Platz in der Warteschlange der Thornhollow-Felder.',
+    groupLeaveQueue: 'Deine Gruppe verlässt die Warteschlange der Thornhollow-Felder.',
+    errNoOffer: 'Du hast keine Einladung zu den Thornhollow-Feldern, die du beantworten könntest.',
+    errOfferWaiting:
+      'Eine Einladung zu den Thornhollow-Feldern wartet auf dich. Beantworte sie zuerst.',
+    errRequeueLocked:
+      'Du musst {seconds} Sekunden warten, bevor du dich erneut für die Thornhollow-Felder anmelden kannst.',
+    joinQueue:
+      'Du reihst dich in die Warteschlange der Thornhollow-Felder ein. Für ein Match werden {count} Recken benötigt.',
+    partyJoinQueue:
+      'Deine Gruppe aus {count} reiht sich in die Warteschlange der Thornhollow-Felder ein.',
+    leaveQueue: 'Du verlässt die Warteschlange der Thornhollow-Felder.',
+    battleBegins: 'Die Schlacht um die Thornhollow-Felder beginnt: Erobert ihre Flagge!',
+    fightFor:
+      'Thornhollow-Felder: Du kämpfst für {team}. Wer zuerst {caps} Eroberungen schafft, gewinnt.',
+    seizeRune: 'Du schnappst dir eine Sprintrune!',
+    seizeBattleRune: 'Du schnappst dir eine Kampfrune!',
+    seizeWardRune: 'Du schnappst dir eine Schutzrune!',
+    backfillJoin:
+      'Du steigst auf den Thornhollow-Feldern in eine bereits laufende Schlacht ein und kämpfst für {team}. Dieses Match ändert deine Wertung nicht.',
+    backfillArrived: 'Ein neuer Kämpfer kämpft nun für {team}.',
+    teamCrimson: 'die Karmesinroten',
+    teamAzure: 'die Azurblauen',
+    errInBattleground: 'Du bist bereits auf einem Schlachtfeld.',
+    errNotInBattleground: 'Du bist auf keinem Schlachtfeld.',
+    errQueueDead: 'Du kannst dich nicht für die Thornhollow-Felder anmelden, solange du tot bist.',
+    errQueueInMatch:
+      'Du kannst dich nicht für die Thornhollow-Felder anmelden, während du in einem anderen Match bist.',
+    errMemberQueued: 'Ein Gruppenmitglied ist bereits angemeldet oder in einem Match.',
+    errNoFlag: 'Keine Flagge in Reichweite.',
+    errPartyTooLarge:
+      'Deine Gruppe ist zu groß für die Thornhollow-Felder. Angemeldet werden Gruppen bis zu 5 Spielern.',
+    errPartyLeaderOnly:
+      'Nur der Gruppenleiter darf die Gruppe für die Thornhollow-Felder anmelden.',
+    errDelveDuringBg: 'Du kannst während eines Schlachtfelds keinen Tiefgang betreten.',
+    errLevelTooLow: 'Die Thornhollow-Felder erfordern Stufe {level}.',
+    errMemberLevelTooLow:
+      'Jedes Gruppenmitglied muss Stufe {level} sein, um sich für die Thornhollow-Felder anzumelden.',
+    heldAtGate: 'Die Tore öffnen sich, wenn die Schlacht beginnt.',
+    errMountInBg: 'Auf einem Schlachtfeld kannst du nicht reiten.',
+  },
+  pt_BR: {
+    errMemberRequeueLocked:
+      'Um membro do grupo precisa esperar antes de entrar na fila dos Campos de Thornhollow de novo.',
+    offerReady: 'Os Campos de Thornhollow estão prontos. Aceite para entrar na batalha.',
+    offerBackfill:
+      'Uma batalha em andamento nos Campos de Thornhollow precisa de um lutador. Aceite para entrar; esta partida não mudará sua classificação.',
+    offerBackfillGone:
+      'Aquela batalha não precisa mais de um lutador. Você mantém seu lugar na fila dos Campos de Thornhollow.',
+    offerBackfillDeclined:
+      'Você recusa a batalha em andamento e mantém seu lugar na fila dos Campos de Thornhollow.',
+    offerKeptPlace:
+      'A batalha não se formou. Você mantém seu lugar na fila dos Campos de Thornhollow.',
+    groupLeaveQueue: 'Seu grupo sai da fila dos Campos de Thornhollow.',
+    errNoOffer: 'Você não tem nenhum convite para os Campos de Thornhollow para responder.',
+    errOfferWaiting:
+      'Há um convite para os Campos de Thornhollow aguardando. Responda a ele primeiro.',
+    errRequeueLocked:
+      'Você precisa esperar {seconds} segundos antes de entrar na fila dos Campos de Thornhollow de novo.',
+    joinQueue:
+      'Você entra na fila dos Campos de Thornhollow. São necessários {count} campeões para iniciar a partida.',
+    partyJoinQueue: 'Seu grupo de {count} entra na fila dos Campos de Thornhollow.',
+    leaveQueue: 'Você sai da fila dos Campos de Thornhollow.',
+    battleBegins: 'A batalha dos Campos de Thornhollow começa: tomem a bandeira deles!',
+    fightFor:
+      'Campos de Thornhollow: você luta pelos {team}. Vence a primeira equipe a chegar a {caps} capturas.',
+    seizeRune: 'Você toma uma Runa de Corrida!',
+    seizeBattleRune: 'Você toma uma Runa de Batalha!',
+    seizeWardRune: 'Você toma uma Runa de Proteção!',
+    backfillJoin:
+      'Você entra em uma batalha em andamento pelos {team} nos Campos de Thornhollow. Esta partida não alterará sua classificação.',
+    backfillArrived: 'Um novo combatente entra em campo pelos {team}.',
+    teamCrimson: 'Carmesins',
+    teamAzure: 'Azuis',
+    errInBattleground: 'Você já está em um campo de batalha.',
+    errNotInBattleground: 'Você não está em um campo de batalha.',
+    errQueueDead: 'Você não pode entrar na fila dos Campos de Thornhollow enquanto estiver morto.',
+    errQueueInMatch:
+      'Você não pode entrar na fila dos Campos de Thornhollow durante outra partida.',
+    errMemberQueued: 'Um membro do grupo já está na fila ou em uma partida.',
+    errNoFlag: 'Não há nenhuma bandeira ao alcance.',
+    errPartyTooLarge:
+      'Seu grupo é grande demais para os Campos de Thornhollow. A fila aceita grupos de até 5.',
+    errPartyLeaderOnly:
+      'Apenas o líder do grupo pode inscrever o grupo na fila dos Campos de Thornhollow.',
+    errDelveDuringBg: 'Você não pode entrar em uma incursão durante um campo de batalha.',
+    errLevelTooLow: 'Os Campos de Thornhollow exigem nível {level}.',
+    errMemberLevelTooLow:
+      'Todos os membros do grupo precisam ser nível {level} para entrar na fila dos Campos de Thornhollow.',
+    heldAtGate: 'Os portões se abrem quando a batalha começa.',
+    errMountInBg: 'Você não pode montar em um campo de batalha.',
+  },
+  cs_CZ: {
+    errMemberRequeueLocked:
+      'Člen skupiny musí počkat, než se znovu zařadí do fronty na Thornhollowská pole.',
+    offerReady: 'Thornhollowská pole jsou připravena. Přijmi pozvání a zapoj se do bitvy.',
+    offerBackfill:
+      'Probíhající bitva na Trnitých polích potřebuje bojovníka. Přijmi a připoj se; tento zápas nezmění tvé hodnocení.',
+    offerBackfillGone:
+      'Ta bitva už bojovníka nepotřebuje. Své místo ve frontě na Trnitá pole si ponecháváš.',
+    offerBackfillDeclined:
+      'Odmítáš probíhající bitvu a ponecháváš si své místo ve frontě na Trnitá pole.',
+    offerKeptPlace:
+      'Bitva se nenaplnila. Své místo ve frontě na Thornhollowská pole si ponecháváš.',
+    groupLeaveQueue: 'Tvoje skupina opouští frontu na Thornhollowská pole.',
+    errNoOffer: 'Nemáš žádné pozvání na Thornhollowská pole, na které bys mohl(a) odpovědět.',
+    errOfferWaiting: 'Čeká na tebe pozvání na Thornhollowská pole. Nejprve na něj odpověz.',
+    errRequeueLocked:
+      'Než se znovu zařadíš do fronty na Thornhollowská pole, musíš počkat {seconds} s.',
+    joinQueue:
+      'Zařadil(a) ses do fronty na Thornhollowská pole. K zahájení zápasu je potřeba {count} šampionů.',
+    partyJoinQueue: 'Tvá skupina o {count} hráčích se zařadila do fronty na Thornhollowská pole.',
+    leaveQueue: 'Opustil(a) jsi frontu na Thornhollowská pole.',
+    battleBegins: 'Bitva o Thornhollowská pole začíná: seberte jim vlajku!',
+    fightFor:
+      'Thornhollowská pole: bojuješ za {team}. Vítězí tým, který první získá vlajku {caps}krát.',
+    seizeRune: 'Zmocnil(a) ses Runy sprintu!',
+    seizeBattleRune: 'Zmocnil(a) ses Runy boje!',
+    seizeWardRune: 'Zmocnil(a) ses Runy ochrany!',
+    backfillJoin:
+      'Připojuješ se k již probíhající bitvě za {team} na Thornhollowských polích. Tento zápas neovlivní tvůj rating.',
+    backfillArrived: 'Do boje za {team} se zapojuje nový bojovník.',
+    teamCrimson: 'Rudé',
+    teamAzure: 'Azurové',
+    errInBattleground: 'Už jsi na bojišti.',
+    errNotInBattleground: 'Nejsi na bojišti.',
+    errQueueDead: 'Do fronty na Thornhollowská pole se nemůžeš zařadit mrtvý.',
+    errQueueInMatch: 'Do fronty na Thornhollowská pole se nemůžeš zařadit během jiného zápasu.',
+    errMemberQueued: 'Někdo ze skupiny už je ve frontě nebo v zápase.',
+    errNoFlag: 'V dosahu není žádná vlajka.',
+    errPartyTooLarge:
+      'Tvá skupina je na Thornhollowská pole příliš velká. Do fronty se řadí skupiny až po 5 hráčích.',
+    errPartyLeaderOnly: 'Do fronty na Thornhollowská pole může skupinu zařadit jen vůdce skupiny.',
+    errDelveDuringBg: 'Během bojiště nemůžeš vstoupit do výpravy.',
+    errLevelTooLow: 'Thornhollowská pole vyžadují úroveň {level}.',
+    errMemberLevelTooLow:
+      'Každý ve skupině musí mít úroveň {level}, aby se mohl zařadit do fronty na Thornhollowská pole.',
+    heldAtGate: 'Brány se otevřou, až začne bitva.',
+    errMountInBg: 'Na bojišti nemůžeš používat jezdecké zvíře.',
+  },
+  nl_NL: {
+    errMemberRequeueLocked:
+      'Een groepslid moet wachten voordat het zich opnieuw kan aanmelden voor de Doornholte-Velden.',
+    offerReady: 'De Doornholte-Velden zijn gereed. Accepteer om aan de strijd deel te nemen.',
+    offerBackfill:
+      'Een lopend gevecht op de Thornhollow-velden heeft een strijder nodig. Accepteer om mee te doen; deze wedstrijd verandert je waardering niet.',
+    offerBackfillGone:
+      'Dat gevecht heeft geen strijder meer nodig. Je behoudt je plek in de wachtrij voor de Thornhollow-velden.',
+    offerBackfillDeclined:
+      'Je wijst het lopende gevecht af en behoudt je plek in de wachtrij voor de Thornhollow-velden.',
+    offerKeptPlace:
+      'De strijd kwam niet rond. Je behoudt je plaats in de wachtrij van de Doornholte-Velden.',
+    groupLeaveQueue: 'Je groep verlaat de wachtrij van de Doornholte-Velden.',
+    errNoOffer: 'Je hebt geen uitnodiging voor de Doornholte-Velden om te beantwoorden.',
+    errOfferWaiting: 'Er wacht een uitnodiging voor de Doornholte-Velden. Beantwoord die eerst.',
+    errRequeueLocked:
+      'Je moet {seconds} seconden wachten voordat je je opnieuw kunt aanmelden voor de Doornholte-Velden.',
+    joinQueue:
+      'Je sluit je aan bij de wachtrij van de Doornholte-Velden. Er zijn {count} kampioenen nodig om een wedstrijd te starten.',
+    partyJoinQueue: 'Je groep van {count} sluit zich aan bij de wachtrij van de Doornholte-Velden.',
+    leaveQueue: 'Je verlaat de wachtrij van de Doornholte-Velden.',
+    battleBegins: 'De slag om de Doornholte-Velden begint: pak hun vlag!',
+    fightFor:
+      'Doornholte-Velden: je vecht voor {team}. Het eerste team met {caps} veroveringen wint.',
+    seizeRune: 'Je bemachtigt een Sprintrune!',
+    seizeBattleRune: 'Je bemachtigt een Strijdrune!',
+    seizeWardRune: 'Je bemachtigt een Wachtrune!',
+    backfillJoin:
+      'Je sluit je aan bij een al begonnen strijd voor {team} op de Doornholte-Velden. Deze wedstrijd verandert je rating niet.',
+    backfillArrived: 'Een nieuwe strijder vecht nu voor {team}.',
+    teamCrimson: 'de Karmozijnen',
+    teamAzure: 'de Azuren',
+    errInBattleground: 'Je bent al op een slagveld.',
+    errNotInBattleground: 'Je bent niet op een slagveld.',
+    errQueueDead: 'Je kunt je niet aanmelden voor de Doornholte-Velden terwijl je dood bent.',
+    errQueueInMatch:
+      'Je kunt je niet aanmelden voor de Doornholte-Velden tijdens een andere wedstrijd.',
+    errMemberQueued: 'Een groepslid staat al in de wachtrij of zit in een wedstrijd.',
+    errNoFlag: 'Er is geen vlag binnen bereik.',
+    errPartyTooLarge:
+      'Je groep is te groot voor de Doornholte-Velden. De wachtrij neemt groepen tot 5 spelers.',
+    errPartyLeaderOnly:
+      'Alleen de groepsleider mag de groep in de wachtrij zetten voor de Doornholte-Velden.',
+    errDelveDuringBg: 'Je kunt tijdens een slagveld geen delve betreden.',
+    errLevelTooLow: 'De Doornholte-Velden vereisen niveau {level}.',
+    errMemberLevelTooLow:
+      'Elk groepslid moet niveau {level} zijn om zich aan te melden voor de Doornholte-Velden.',
+    heldAtGate: 'De poorten gaan open zodra de slag begint.',
+    errMountInBg: 'Je kunt niet rijden op een slagveld.',
+  },
+  pl_PL: {
+    errMemberRequeueLocked:
+      'Członek drużyny musi odczekać, zanim ponownie dołączy do kolejki na Pola Ciernistej Kotliny.',
+    offerReady: 'Pola Ciernistej Kotliny są gotowe. Zaakceptuj, aby dołączyć do bitwy.',
+    offerBackfill:
+      'Trwająca bitwa na Polach Thornhollow potrzebuje wojownika. Zaakceptuj, aby dołączyć; ten mecz nie zmieni twojego rankingu.',
+    offerBackfillGone:
+      'Ta bitwa nie potrzebuje już wojownika. Zachowujesz swoje miejsce w kolejce na Pola Thornhollow.',
+    offerBackfillDeclined:
+      'Odrzucasz trwającą bitwę i zachowujesz swoje miejsce w kolejce na Pola Thornhollow.',
+    offerKeptPlace:
+      'Bitwa nie doszła do skutku. Zachowujesz swoje miejsce w kolejce na Pola Ciernistej Kotliny.',
+    groupLeaveQueue: 'Twoja drużyna opuszcza kolejkę na Pola Ciernistej Kotliny.',
+    errNoOffer: 'Nie masz zaproszenia na Pola Ciernistej Kotliny, na które mógłbyś odpowiedzieć.',
+    errOfferWaiting:
+      'Czeka na ciebie zaproszenie na Pola Ciernistej Kotliny. Najpierw na nie odpowiedz.',
+    errRequeueLocked:
+      'Musisz odczekać {seconds} s, zanim ponownie dołączysz do kolejki na Pola Ciernistej Kotliny.',
+    joinQueue:
+      'Dołączasz do kolejki na Pola Ciernistej Kotliny. Do rozpoczęcia meczu potrzeba {count} mistrzów.',
+    partyJoinQueue: 'Twoja {count}-osobowa drużyna dołącza do kolejki na Pola Ciernistej Kotliny.',
+    leaveQueue: 'Opuszczasz kolejkę na Pola Ciernistej Kotliny.',
+    battleBegins: 'Bitwa o Pola Ciernistej Kotliny się zaczyna: zabierzcie im flagę!',
+    fightFor:
+      'Pola Ciernistej Kotliny: walczysz po stronie {team}. Wygrywa drużyna, która pierwsza zdobędzie flagę {caps} razy.',
+    seizeRune: 'Zdobywasz Runę Sprintu!',
+    seizeBattleRune: 'Zdobywasz Runę Bitwy!',
+    seizeWardRune: 'Zdobywasz Runę Ochrony!',
+    backfillJoin:
+      'Dołączasz do trwającej już bitwy po stronie {team} na Polach Ciernistej Kotliny. Ten mecz nie zmieni twojego rankingu.',
+    backfillArrived: 'Nowy wojownik dołącza do {team}.',
+    teamCrimson: 'Szkarłatnych',
+    teamAzure: 'Lazurowych',
+    errInBattleground: 'Jesteś już na polu bitwy.',
+    errNotInBattleground: 'Nie jesteś na polu bitwy.',
+    errQueueDead: 'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny, będąc martwym.',
+    errQueueInMatch:
+      'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny w trakcie innego meczu.',
+    errMemberQueued: 'Ktoś z drużyny jest już w kolejce lub w meczu.',
+    errNoFlag: 'W zasięgu nie ma żadnej flagi.',
+    errPartyTooLarge:
+      'Twoja drużyna jest za duża na Pola Ciernistej Kotliny. Do kolejki wchodzą drużyny do 5 osób.',
+    errPartyLeaderOnly: 'Tylko przywódca drużyny może zapisać drużynę na Pola Ciernistej Kotliny.',
+    errDelveDuringBg: 'Nie możesz wejść do wyprawy w trakcie pola bitwy.',
+    errLevelTooLow: 'Pola Ciernistej Kotliny wymagają poziomu {level}.',
+    errMemberLevelTooLow:
+      'Każdy członek drużyny musi mieć poziom {level}, aby dołączyć do kolejki na Pola Ciernistej Kotliny.',
+    heldAtGate: 'Bramy otwierają się wraz z początkiem bitwy.',
+    errMountInBg: 'Na polu bitwy nie możesz dosiadać wierzchowca.',
+  },
+  id_ID: {
+    errMemberRequeueLocked:
+      'Anggota kelompok harus menunggu sebelum mengantre Padang Thornhollow lagi.',
+    offerReady: 'Padang Thornhollow sudah siap. Terima untuk bergabung ke pertempuran.',
+    offerBackfill:
+      'Pertempuran yang sedang berlangsung di Padang Thornhollow membutuhkan seorang petarung. Terima untuk bergabung; pertandingan ini tidak akan mengubah peringkatmu.',
+    offerBackfillGone:
+      'Pertempuran itu tidak lagi membutuhkan petarung. Kamu tetap memegang tempatmu di antrean Padang Thornhollow.',
+    offerBackfillDeclined:
+      'Kamu menolak pertempuran yang sedang berlangsung dan tetap memegang tempatmu di antrean Padang Thornhollow.',
+    offerKeptPlace:
+      'Pertempuran tidak terisi penuh. Posisimu di antrean Padang Thornhollow tetap terjaga.',
+    groupLeaveQueue: 'Kelompokmu keluar dari antrean Padang Thornhollow.',
+    errNoOffer: 'Kamu tidak punya undangan Padang Thornhollow untuk dijawab.',
+    errOfferWaiting: 'Ada undangan Padang Thornhollow yang menunggu. Jawab dulu undangan itu.',
+    errRequeueLocked:
+      'Kamu harus menunggu {seconds} detik sebelum mengantre Padang Thornhollow lagi.',
+    joinQueue:
+      'Kamu masuk antrean Padang Thornhollow. Butuh {count} juara untuk memulai pertandingan.',
+    partyJoinQueue: 'Kelompokmu yang berisi {count} orang masuk antrean Padang Thornhollow.',
+    leaveQueue: 'Kamu keluar dari antrean Padang Thornhollow.',
+    battleBegins: 'Pertempuran Padang Thornhollow dimulai: rebut bendera mereka!',
+    fightFor:
+      'Padang Thornhollow: kamu bertarung untuk {team}. Tim pertama yang meraih {caps} tangkapan menang.',
+    seizeRune: 'Kamu merebut Rune Lari Cepat!',
+    seizeBattleRune: 'Kamu merebut Rune Pertempuran!',
+    seizeWardRune: 'Kamu merebut Rune Pelindung!',
+    backfillJoin:
+      'Kamu bergabung dengan pertempuran yang sedang berlangsung untuk {team} di Padang Thornhollow. Pertandingan ini tidak akan mengubah peringkatmu.',
+    backfillArrived: 'Seorang petarung baru bergabung dengan {team}.',
+    teamCrimson: 'Merah Tua',
+    teamAzure: 'Biru Langit',
+    errInBattleground: 'Kamu sudah berada di medan perang.',
+    errNotInBattleground: 'Kamu tidak berada di medan perang.',
+    errQueueDead: 'Kamu tidak bisa mengantre Padang Thornhollow saat tewas.',
+    errQueueInMatch:
+      'Kamu tidak bisa mengantre Padang Thornhollow saat sedang dalam pertandingan lain.',
+    errMemberQueued: 'Seorang anggota kelompok sudah mengantre atau sedang bertanding.',
+    errNoFlag: 'Tidak ada bendera dalam jangkauan.',
+    errPartyTooLarge:
+      'Kelompokmu terlalu besar untuk Padang Thornhollow. Antrean menerima kelompok hingga 5 orang.',
+    errPartyLeaderOnly:
+      'Hanya pemimpin kelompok yang boleh mendaftarkan kelompok ke antrean Padang Thornhollow.',
+    errDelveDuringBg: 'Kamu tidak bisa memasuki delve selama medan perang berlangsung.',
+    errLevelTooLow: 'Padang Thornhollow membutuhkan level {level}.',
+    errMemberLevelTooLow:
+      'Setiap anggota kelompok harus level {level} untuk mengantre Padang Thornhollow.',
+    heldAtGate: 'Gerbang terbuka saat pertempuran dimulai.',
+    errMountInBg: 'Kamu tidak bisa menunggang tunggangan di medan perang.',
+  },
+  tr_TR: {
+    errMemberRequeueLocked:
+      'Bir grup üyesinin Dikenvadi Ovaları sırasına yeniden girmek için beklemesi gerekiyor.',
+    offerReady: 'Dikenvadi Ovaları hazır. Savaşa katılmak için kabul et.',
+    offerBackfill:
+      'Devam eden bir Thornhollow Ovaları savasinin bir savasciya ihtiyaci var. Katilmak icin kabul et; bu mac derecelendirmeni degistirmeyecek.',
+    offerBackfillGone:
+      'O savasin artik bir savasciya ihtiyaci yok. Thornhollow Ovalari sirandaki yerini koruyorsun.',
+    offerBackfillDeclined:
+      'Devam eden savasi reddediyorsun ve Thornhollow Ovalari sirandaki yerini koruyorsun.',
+    offerKeptPlace: 'Savaş dolmadı. Dikenvadi Ovaları sırasındaki yerini koruyorsun.',
+    groupLeaveQueue: 'Grubun Dikenvadi Ovaları sırasından ayrıldı.',
+    errNoOffer: 'Yanıtlayabileceğin bir Dikenvadi Ovaları daveti yok.',
+    errOfferWaiting: 'Bekleyen bir Dikenvadi Ovaları davetin var. Önce onu yanıtla.',
+    errRequeueLocked:
+      'Dikenvadi Ovaları sırasına yeniden girmek için {seconds} saniye beklemelisin.',
+    joinQueue:
+      'Dikenvadi Ovaları sırasına katıldın. Maçın başlaması için {count} şampiyon gerekiyor.',
+    partyJoinQueue: '{count} kişilik grubun Dikenvadi Ovaları sırasına katıldı.',
+    leaveQueue: 'Dikenvadi Ovaları sırasından ayrıldın.',
+    battleBegins: 'Dikenvadi Ovaları savaşı başlıyor: bayraklarını kapın!',
+    fightFor: 'Dikenvadi Ovaları: {team} için savaşıyorsun. {caps} bayrak kapan ilk takım kazanır.',
+    seizeRune: 'Bir Koşu Rünü ele geçirdin!',
+    seizeBattleRune: 'Bir Savaş Rünü ele geçirdin!',
+    seizeWardRune: 'Bir Koruma Rünü ele geçirdin!',
+    backfillJoin:
+      'Dikenvadi Ovalarında süregelen bir savaşa {team} safında katılıyorsun. Bu maç puanını değiştirmeyecek.',
+    backfillArrived: 'Yeni bir savaşçı {team} safına katıldı.',
+    teamCrimson: 'Kızıllar',
+    teamAzure: 'Gökmaviler',
+    errInBattleground: 'Zaten bir savaş alanındasın.',
+    errNotInBattleground: 'Bir savaş alanında değilsin.',
+    errQueueDead: 'Ölüyken Dikenvadi Ovaları sırasına giremezsin.',
+    errQueueInMatch: 'Başka bir maçtayken Dikenvadi Ovaları sırasına giremezsin.',
+    errMemberQueued: 'Grup üyelerinden biri zaten sırada ya da bir maçta.',
+    errNoFlag: 'Menzilde bayrak yok.',
+    errPartyTooLarge:
+      'Grubun Dikenvadi Ovaları için fazla kalabalık. Sıraya en fazla 5 kişilik gruplar girebilir.',
+    errPartyLeaderOnly: 'Grubu Dikenvadi Ovaları sırasına yalnızca grup lideri sokabilir.',
+    errDelveDuringBg: 'Savaş alanı sürerken Mağara Seferine giremezsin.',
+    errLevelTooLow: 'Dikenvadi Ovaları için {level}. seviye gerekir.',
+    errMemberLevelTooLow:
+      'Dikenvadi Ovaları sırasına girmek için grubun her üyesi {level}. seviye olmalı.',
+    heldAtGate: 'Savaş başlayınca kapılar açılır.',
+    errMountInBg: 'Savaş alanında binek kullanamazsın.',
+  },
+  sv_SE: {
+    errMemberRequeueLocked: 'En gruppmedlem måste vänta innan ni köar till Törnhålefälten igen.',
+    offerReady: 'Törnhålefälten är redo. Acceptera för att gå med i striden.',
+    offerBackfill:
+      'En pågående strid på Thornhollow-fälten behöver en kämpe. Acceptera för att gå med; den här matchen ändrar inte din rankning.',
+    offerBackfillGone:
+      'Den striden behöver inte längre en kämpe. Du behåller din plats i kön till Thornhollow-fälten.',
+    offerBackfillDeclined:
+      'Du tackar nej till den pågående striden och behåller din plats i kön till Thornhollow-fälten.',
+    offerKeptPlace: 'Striden blev inte fulltalig. Du behåller din plats i kön till Törnhålefälten.',
+    groupLeaveQueue: 'Din grupp lämnar kön till Törnhålefälten.',
+    errNoOffer: 'Du har ingen inbjudan till Törnhålefälten att svara på.',
+    errOfferWaiting: 'En inbjudan till Törnhålefälten väntar. Svara på den först.',
+    errRequeueLocked: 'Du måste vänta {seconds} sekunder innan du köar till Törnhålefälten igen.',
+    joinQueue:
+      'Du ställer dig i kön till Törnhålefälten. Det behövs {count} mästare för att starta en match.',
+    partyJoinQueue: 'Din grupp på {count} ställer sig i kön till Törnhålefälten.',
+    leaveQueue: 'Du lämnar kön till Törnhålefälten.',
+    battleBegins: 'Slaget om Törnhålefälten börjar: ta deras flagga!',
+    fightFor: 'Törnhålefälten: du strider för {team}. Först till {caps} erövringar vinner.',
+    seizeRune: 'Du lägger beslag på en Spurtruna!',
+    seizeBattleRune: 'Du lägger beslag på en Stridsruna!',
+    seizeWardRune: 'Du lägger beslag på en Skyddsruna!',
+    backfillJoin:
+      'Du ansluter till en redan pågående strid för {team} på Törnhålefälten. Den här matchen påverkar inte din rankning.',
+    backfillArrived: 'En ny kämpe strider nu för {team}.',
+    teamCrimson: 'de Karmosinröda',
+    teamAzure: 'de Azurblå',
+    errInBattleground: 'Du är redan på ett slagfält.',
+    errNotInBattleground: 'Du är inte på ett slagfält.',
+    errQueueDead: 'Du kan inte köa till Törnhålefälten medan du är död.',
+    errQueueInMatch: 'Du kan inte köa till Törnhålefälten under en annan match.',
+    errMemberQueued: 'En gruppmedlem står redan i kö eller är i en match.',
+    errNoFlag: 'Det finns ingen flagga inom räckhåll.',
+    errPartyTooLarge: 'Din grupp är för stor för Törnhålefälten. Kön tar grupper på upp till 5.',
+    errPartyLeaderOnly: 'Endast gruppledaren får ställa gruppen i kö till Törnhålefälten.',
+    errDelveDuringBg: 'Du kan inte gå in i en delve under ett slagfält.',
+    errLevelTooLow: 'Törnhålefälten kräver nivå {level}.',
+    errMemberLevelTooLow:
+      'Varje gruppmedlem måste vara nivå {level} för att köa till Törnhålefälten.',
+    heldAtGate: 'Portarna öppnas när slaget börjar.',
+    errMountInBg: 'Du kan inte rida på ett slagfält.',
+  },
+  vi_VN: {
+    errMemberRequeueLocked:
+      'Một thành viên trong nhóm phải đợi trước khi vào lại hàng chờ Cánh Đồng Thung Gai.',
+    offerReady: 'Cánh Đồng Thung Gai đã sẵn sàng. Chấp nhận để tham gia trận chiến.',
+    offerBackfill:
+      'Một trận chiến đang diễn ra ở Cánh Đồng Thornhollow cần một chiến binh. Chấp nhận để tham gia; trận này sẽ không thay đổi thứ hạng của bạn.',
+    offerBackfillGone:
+      'Trận chiến đó không còn cần chiến binh nữa. Bạn vẫn giữ chỗ của mình trong hàng chờ Cánh Đồng Thornhollow.',
+    offerBackfillDeclined:
+      'Bạn từ chối trận chiến đang diễn ra và vẫn giữ chỗ của mình trong hàng chờ Cánh Đồng Thornhollow.',
+    offerKeptPlace: 'Trận đấu không đủ người. Bạn vẫn giữ chỗ trong hàng chờ Cánh Đồng Thung Gai.',
+    groupLeaveQueue: 'Nhóm của bạn rời hàng chờ Cánh Đồng Thung Gai.',
+    errNoOffer: 'Bạn không có lời mời Cánh Đồng Thung Gai nào để trả lời.',
+    errOfferWaiting: 'Bạn có một lời mời Cánh Đồng Thung Gai đang chờ. Hãy trả lời trước.',
+    errRequeueLocked: 'Bạn phải đợi {seconds} giây trước khi vào lại hàng chờ Cánh Đồng Thung Gai.',
+    joinQueue: 'Bạn vào hàng chờ Cánh Đồng Thung Gai. Cần {count} nhà vô địch để bắt đầu trận đấu.',
+    partyJoinQueue: 'Tổ đội {count} người của bạn vào hàng chờ Cánh Đồng Thung Gai.',
+    leaveQueue: 'Bạn rời hàng chờ Cánh Đồng Thung Gai.',
+    battleBegins: 'Trận chiến Cánh Đồng Thung Gai bắt đầu: hãy cướp cờ của chúng!',
+    fightFor:
+      'Cánh Đồng Thung Gai: bạn chiến đấu cho {team}. Đội đầu tiên đạt {caps} lần cướp cờ sẽ thắng.',
+    seizeRune: 'Bạn giành được Rune Nước Rút!',
+    seizeBattleRune: 'Bạn giành được Rune Chiến Trận!',
+    seizeWardRune: 'Bạn giành được Rune Hộ Vệ!',
+    backfillJoin:
+      'Bạn tham gia một trận đấu đang diễn ra cho {team} tại Cánh Đồng Thung Gai. Trận này sẽ không thay đổi thứ hạng của bạn.',
+    backfillArrived: 'Một chiến binh mới gia nhập {team}.',
+    teamCrimson: 'phe Đỏ Thẫm',
+    teamAzure: 'phe Xanh Biếc',
+    errInBattleground: 'Bạn đã ở trong một chiến trường rồi.',
+    errNotInBattleground: 'Bạn không ở trong chiến trường.',
+    errQueueDead: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đã chết.',
+    errQueueInMatch: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đang ở trận đấu khác.',
+    errMemberQueued: 'Một thành viên tổ đội đã ở trong hàng chờ hoặc đang thi đấu.',
+    errNoFlag: 'Không có lá cờ nào trong tầm với.',
+    errPartyTooLarge:
+      'Tổ đội của bạn quá đông cho Cánh Đồng Thung Gai. Hàng chờ chỉ nhận tổ đội tối đa 5 người.',
+    errPartyLeaderOnly: 'Chỉ nhóm trưởng mới có thể đưa tổ đội vào hàng chờ Cánh Đồng Thung Gai.',
+    errDelveDuringBg: 'Bạn không thể vào Hang Sâu trong lúc đang ở chiến trường.',
+    errLevelTooLow: 'Cánh Đồng Thung Gai yêu cầu cấp {level}.',
+    errMemberLevelTooLow:
+      'Mọi thành viên tổ đội phải đạt cấp {level} để vào hàng chờ Cánh Đồng Thung Gai.',
+    heldAtGate: 'Cổng sẽ mở khi trận chiến bắt đầu.',
+    errMountInBg: 'Bạn không thể cưỡi thú cưỡi ở chiến trường.',
+  },
+  da_DK: {
+    errMemberRequeueLocked:
+      'Et gruppemedlem skal vente, før I kan stille jer i kø til Tornehule Sletter igen.',
+    offerReady: 'Tornehule Sletter er klar. Accepter for at deltage i kampen.',
+    offerBackfill:
+      'En igangværende kamp på Thornhollow-sletterne mangler en kæmper. Accepter for at deltage; denne kamp ændrer ikke din rangering.',
+    offerBackfillGone:
+      'Den kamp mangler ikke længere en kæmper. Du beholder din plads i køen til Thornhollow-sletterne.',
+    offerBackfillDeclined:
+      'Du afviser den igangværende kamp og beholder din plads i køen til Thornhollow-sletterne.',
+    offerKeptPlace: 'Kampen blev ikke fyldt. Du beholder din plads i køen til Tornehule Sletter.',
+    groupLeaveQueue: 'Din gruppe forlader køen til Tornehule Sletter.',
+    errNoOffer: 'Du har ingen invitation til Tornehule Sletter at svare på.',
+    errOfferWaiting: 'Der venter en invitation til Tornehule Sletter. Svar på den først.',
+    errRequeueLocked:
+      'Du skal vente {seconds} sekunder, før du kan stille dig i kø til Tornehule Sletter igen.',
+    joinQueue:
+      'Du stiller dig i køen til Tornehule Sletter. Der mangler {count} mestre for at starte en kamp.',
+    partyJoinQueue: 'Din gruppe på {count} stiller sig i køen til Tornehule Sletter.',
+    leaveQueue: 'Du forlader køen til Tornehule Sletter.',
+    battleBegins: 'Slaget om Tornehule Sletter begynder: tag deres flag!',
+    fightFor:
+      'Tornehule Sletter: du kæmper for {team}. Det første hold med {caps} erobringer vinder.',
+    seizeRune: 'Du snupper en Spurtrune!',
+    seizeBattleRune: 'Du snupper en Kamprune!',
+    seizeWardRune: 'Du snupper en Værnerune!',
+    backfillJoin:
+      'Du slutter dig til en kamp der allerede er i gang for {team} på Tornehule Sletter. Denne kamp ændrer ikke din rating.',
+    backfillArrived: 'En ny kriger kæmper nu for {team}.',
+    teamCrimson: 'de Karmosinrøde',
+    teamAzure: 'de Azurblå',
+    errInBattleground: 'Du er allerede på en slagmark.',
+    errNotInBattleground: 'Du er ikke på en slagmark.',
+    errQueueDead: 'Du kan ikke stille dig i kø til Tornehule Sletter, mens du er død.',
+    errQueueInMatch: 'Du kan ikke stille dig i kø til Tornehule Sletter under en anden kamp.',
+    errMemberQueued: 'Et gruppemedlem står allerede i kø eller er i en kamp.',
+    errNoFlag: 'Der er intet flag inden for rækkevidde.',
+    errPartyTooLarge:
+      'Din gruppe er for stor til Tornehule Sletter. Køen tager grupper på op til 5.',
+    errPartyLeaderOnly: 'Kun gruppelederen kan stille gruppen i kø til Tornehule Sletter.',
+    errDelveDuringBg: 'Du kan ikke gå ind i en delve under en slagmark.',
+    errLevelTooLow: 'Tornehule Sletter kræver niveau {level}.',
+    errMemberLevelTooLow:
+      'Hvert gruppemedlem skal være niveau {level} for at stille sig i kø til Tornehule Sletter.',
+    heldAtGate: 'Portene åbner, når slaget begynder.',
+    errMountInBg: 'Du kan ikke ride på en slagmark.',
+  },
+};
+
+function tBg(key: BgExtraKey, params?: InterpolationValues): string {
+  const table = BG_EXTRA[getLanguage()] ?? BG_EXTRA.en;
+  return interpolate(table[key] ?? BG_EXTRA_EN[key], params);
+}
+
+/** The localized team word for a captured English BG_TEAM_NAMES value. Shared by
+ *  the three rules that interpolate a side into their line; an unrecognized
+ *  capture passes through verbatim rather than resolving to an empty string. */
+function bgTeamWord(captured: string): string {
+  if (captured === 'Crimson') return tBg('teamCrimson');
+  if (captured === 'Azure') return tBg('teamAzure');
+  return captured;
 }
 
 type QuestExtraKey =
@@ -8524,6 +11010,41 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  {
+    re: /^Your Umbral Anchor is out of range\.$/,
+    build: () =>
+      `${tEntity({ kind: 'ability', id: 'umbral_anchor', field: 'name' })}: ${t('hud.errors.outOfRange')}`,
+  },
+  // #1144: timed town-focus re-spec queued (Sim.setTownFocus).
+  {
+    re: /^Your focus re-spec will complete in (\d+)s\.$/,
+    build: (m) => tSim('log.townFocusRespecQueued', { seconds: m[1] }),
+  },
+  // Profession-service in-progress countdowns (social/chat_readouts.ts
+  // castingReadout): craft/disenchant/enchant/salvage/tool-recharge each hold
+  // their own remaining/total countdown line.
+  {
+    re: /^You are crafting: (.+)s of (.+)s remaining\.$/,
+    build: (m) => t('hudChrome.professions.craftingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are disenchanting: (.+)s of (.+)s remaining\.$/,
+    build: (m) =>
+      t('hudChrome.professions.disenchantingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are enchanting: (.+)s of (.+)s remaining\.$/,
+    build: (m) => t('hudChrome.professions.enchantingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are salvaging: (.+)s of (.+)s remaining\.$/,
+    build: (m) => t('hudChrome.professions.salvagingProgress', { remaining: m[1], total: m[2] }),
+  },
+  {
+    re: /^You are recharging a tool effect: (.+)s of (.+)s remaining\.$/,
+    build: (m) =>
+      t('hudChrome.professions.rechargingToolEffectProgress', { remaining: m[1], total: m[2] }),
+  },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
@@ -8623,6 +11144,14 @@ const RULES: Rule[] = [
     build: (m) => tSim('error.mountLevel', { level: m[1] }),
   },
   {
+    re: /^You must be level (\d+) to queue for the arena\.$/,
+    build: (m) => tArenaMinLevelQueueError(m[1]),
+  },
+  {
+    re: /^(.+) must be at least level (\d+) to queue for the arena\.$/,
+    build: (m) => tSim('error.arenaMinLevelMember', { name: m[1], level: m[2] }),
+  },
+  {
     re: /^You must have a shield equipped\.$/,
     build: () => t('hudChrome.abilityError.shieldRequired'),
   },
@@ -8635,6 +11164,10 @@ const RULES: Rule[] = [
   { re: /^Deleted build "(.+)"\.$/, build: (m) => tSim('log.deletedBuild', { name: m[1] }) },
   { re: /^You dismiss (.+)\.$/, build: (m) => tSim('log.dismissPet', { name: locMob(m[1]) }) },
   { re: /^You summon (.+)\.$/, build: (m) => tSim('log.summonDemon', { name: locMob(m[1]) }) },
+  {
+    re: /^(.+) crashes into the battle\.$/,
+    build: (m) => tSim('log.pyreCrashes', { name: locMob(m[1]) }),
+  },
   {
     re: /^(.+) fades back into the void\.$/,
     build: (m) => tSim('log.petFadesVoid', { name: locMob(m[1]) }),
@@ -8864,6 +11397,7 @@ const RULES: Rule[] = [
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,
     build: () => tArenaExtra('join2v2'),
   },
+  { re: /^You leave the Ashen Coliseum queue\.$/, build: () => t('hud.logs.arenaLeave') },
   { re: /^You leave the Ashen Coliseum 2v2 queue\.$/, build: () => tArenaExtra('leave2v2') },
   {
     re: /^Your team leaves the Ashen Coliseum 2v2 queue\.$/,
@@ -8907,6 +11441,126 @@ const RULES: Rule[] = [
     re: /^(.+) cannot queue from inside an instance\.$/,
     build: (m) => tArenaExtra('memberInstance', { name: m[1] }),
   },
+  // Thornhollow Fields 5v5 capture-the-flag (src/sim/social/battleground.ts emits).
+  {
+    re: /^You join the Thornhollow Fields queue\. Need (.+?) champions to start a match\.$/,
+    build: (m) => tBg('joinQueue', { count: m[1] }),
+  },
+  {
+    re: /^Your party of (.+?) joins the Thornhollow Fields queue\.$/,
+    build: (m) => tBg('partyJoinQueue', { count: m[1] }),
+  },
+  { re: /^You leave the Thornhollow Fields queue\.$/, build: () => tBg('leaveQueue') },
+  {
+    re: /^A party member must wait before queueing for Thornhollow Fields again\.$/,
+    build: () => tBg('errMemberRequeueLocked'),
+  },
+  // The queue-pop offer (social/battleground_proposal.ts). The requeue lockout
+  // is the only one carrying a value, so it is the only one that captures.
+  {
+    re: /^Thornhollow Fields is ready\. Accept to join the battle\.$/,
+    build: () => tBg('offerReady'),
+  },
+  {
+    re: /^A Thornhollow Fields battle already under way needs a fighter\. Accept to join; this match will not change your rating\.$/,
+    build: () => tBg('offerBackfill'),
+  },
+  {
+    re: /^That battle no longer needs a fighter\. You keep your place in the Thornhollow Fields queue\.$/,
+    build: () => tBg('offerBackfillGone'),
+  },
+  {
+    re: /^You decline the battle already under way, and keep your place in the Thornhollow Fields queue\.$/,
+    build: () => tBg('offerBackfillDeclined'),
+  },
+  {
+    re: /^The battle did not fill\. You keep your place in the Thornhollow Fields queue\.$/,
+    build: () => tBg('offerKeptPlace'),
+  },
+  {
+    re: /^Your group leaves the Thornhollow Fields queue\.$/,
+    build: () => tBg('groupLeaveQueue'),
+  },
+  {
+    re: /^You have no Thornhollow Fields invitation to answer\.$/,
+    build: () => tBg('errNoOffer'),
+  },
+  {
+    re: /^You have a Thornhollow Fields invitation waiting\. Answer it first\.$/,
+    build: () => tBg('errOfferWaiting'),
+  },
+  {
+    re: /^You must wait (\d+) seconds before queueing for Thornhollow Fields again\.$/,
+    build: (m) => tBg('errRequeueLocked', { seconds: Number(m[1]) }),
+  },
+  {
+    re: /^The Thornhollow Fields battle begins: take their flag!$/,
+    build: () => tBg('battleBegins'),
+  },
+  {
+    re: /^Thornhollow Fields: you fight for the (.+?)\. First to (.+?) captures wins\.$/,
+    build: (m) => tBg('fightFor', { team: bgTeamWord(m[1]), caps: m[2] }),
+  },
+  {
+    re: /^Thornhollow Fields: you join a battle already under way for the (.+?)\. This match will not change your rating\.$/,
+    build: (m) => tBg('backfillJoin', { team: bgTeamWord(m[1]) }),
+  },
+  {
+    re: /^A fresh fighter joins the (.+?)\.$/,
+    build: (m) => tBg('backfillArrived', { team: bgTeamWord(m[1]) }),
+  },
+  { re: /^You seize a Sprint Rune!$/, build: () => tBg('seizeRune') },
+  { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
+  { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
+  { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
+  { re: /^You are not in a battleground\.$/, build: () => tBg('errNotInBattleground') },
+  {
+    re: /^You cannot queue for Thornhollow Fields while dead\.$/,
+    build: () => tBg('errQueueDead'),
+  },
+  {
+    re: /^You cannot queue for Thornhollow Fields while in another match\.$/,
+    build: () => tBg('errQueueInMatch'),
+  },
+  {
+    re: /^A party member is already queued or in a match\.$/,
+    build: () => tBg('errMemberQueued'),
+  },
+  { re: /^There is no flag within reach\.$/, build: () => tBg('errNoFlag') },
+  {
+    re: /^Your party is too large for Thornhollow Fields\. It queues parties of up to (.+?)\.$/,
+    build: () => tBg('errPartyTooLarge'),
+  },
+  // Ahead of the broad `Only the party leader may queue your team for (.+)\.`
+  // fiesta rule below, which would otherwise splice the English venue name into
+  // an otherwise localized sentence.
+  {
+    re: /^Only the party leader may queue your team for Thornhollow Fields\.$/,
+    build: () => tBg('errPartyLeaderOnly'),
+  },
+  {
+    re: /^You cannot enter a delve during a battleground\.$/,
+    build: () => tBg('errDelveDuringBg'),
+  },
+  {
+    re: /^Thornhollow Fields requires level (\d+)\.$/,
+    build: (m) => tBg('errLevelTooLow', { level: m[1] }),
+  },
+  {
+    re: /^Every party member must be level (\d+) to queue for Thornhollow Fields\.$/,
+    build: (m) => tBg('errMemberLevelTooLow', { level: m[1] }),
+  },
+  {
+    re: /^The gates open when the battle begins\.$/,
+    build: () => tBg('heldAtGate'),
+  },
+  // The whole-match mount ban (src/sim/mounts.ts summonMountItem + the
+  // toggleMount lesson branch). It replaced the narrower carrying-the-flag
+  // refusal, whose baseEnTable row went in the same change.
+  {
+    re: /^You can't ride in a battleground\.$/,
+    build: () => tBg('errMountInBg'),
+  },
   // Delve / lockpicking sim text. Re-localized through t() against the sim.delve.* /
   // sim.lockpick.* keys (src/ui/i18n.catalog/index.ts). The module-enter banner is two
   // rules anchored on the fixed objective lines ("X: Clear the room." / "X: Defeat the
@@ -8920,11 +11574,15 @@ const RULES: Rule[] = [
   },
   {
     re: /^You step through the rift into (.+)\.$/,
-    build: (m) => t('sim.rift.enterFloor', { name: m[1] }),
+    build: (m) => t('sim.rift.enterFloor', { name: localizedRiftName(m[1]) }),
   },
   {
     re: /^You descend deeper into (.+)\.$/,
-    build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
+    build: (m) => t('sim.rift.descendFloor', { name: localizedRiftName(m[1]) }),
+  },
+  {
+    re: /^You ascend into (.+)\.$/,
+    build: (m) => t('sim.rift.ascendFloor', { name: localizedRiftName(m[1]) }),
   },
   { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
   {
@@ -8932,6 +11590,30 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.pylonLit', { lit: m[1], total: m[2] }),
   },
   { re: /^The way down tears open\.$/, build: () => t('sim.rift.wayDownOpens') },
+  // The Demon Tower (src/sim/rift/tower.ts): wave announcements and the two
+  // floor-clear lines. The counter captures are permissive (matching the pylon
+  // rule above) rather than \d+, because the S3 drift guard probes every rule
+  // with a placeholder substitution rather than a real number.
+  {
+    re: /^The Demon Core howls\. Wave ([^ ]+) of ([^ ]+)\.$/,
+    build: (m) => t('sim.rift.towerWave', { wave: m[1], total: m[2] }),
+  },
+  {
+    re: /^The core splits open\. Something far worse steps through\.$/,
+    build: () => t('sim.rift.towerBossWave'),
+  },
+  {
+    re: /^The Demon Core cracks\. The way up is open\.$/,
+    build: () => t('sim.rift.towerFloorClear'),
+  },
+  {
+    re: /^The Demon Core goes dark\. The tower is yours\.$/,
+    build: () => t('sim.rift.towerCleared'),
+  },
+  {
+    re: /^Rift Collapse detonates!$/,
+    build: () => towerMechanicName('Rift Collapse detonates!') ?? 'Rift Collapse detonates!',
+  },
   { re: /^The frost sigil blazes\. The way stirs\.$/, build: () => t('sim.rift.iceGoalLit') },
   { re: /^The sockets grind shut\. The way stirs\.$/, build: () => t('sim.rift.socketsShut') },
   {
@@ -9473,6 +12155,27 @@ const RULES: Rule[] = [
   {
     re: /^Card Duel requires another player online\.$/,
     build: () => tSim('error.cardDuelUnavailable'),
+  },
+  // Guild Bank success notices (src/sim/guild_bank.ts). The money fragment is
+  // sim-formatted ("3g 5s 7c") and splices verbatim like the market price rows;
+  // item names re-localize through the entity dictionary. The "treasury" /
+  // "guild bank" sentence tails are deliberately distinct so the money and item
+  // forms can never shadow each other.
+  {
+    re: /^You deposit (.+) into the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankDepositGold', { money: m[1] }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild treasury\.$/,
+    build: (m) => tSim('log.guildBankWithdrawGold', { money: m[1] }),
+  },
+  {
+    re: /^You deposit (.+) into the guild bank\.$/,
+    build: (m) => tSim('log.guildBankDepositItem', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^You withdraw (.+) from the guild bank\.$/,
+    build: (m) => tSim('log.guildBankWithdrawItem', { item: locItem(m[1]) }),
   },
 ];
 

@@ -32,8 +32,10 @@ in-place (so `clips: kaykit([...])` drives it unchanged), and injects calibrated
 through the game's own attach path. Review `preview/held_attack.png` to see it swing a sword.
 
 Weapon keys MUST contain a family token (sword, dagger, staff, hammer, axe, halberd, spear,
-scythe, wand) or the `tests/held_weapon_models.test.ts` contract fails. Prefer the
-deterministic `--recolor` for skins; `--prompt` repaints need `OPENAI_API_KEY`.
+scythe, wand) or the `tests/held_weapon_models.test.ts` contract fails. For skins,
+`--tripo --prompt "..."` is the RECOMMENDED mode (real re-texturing); `--recolor` is the
+cheap deterministic fallback, and a bare `--prompt` repaint needs `OPENAI_API_KEY`
+(mode details: `scripts/asset_pipeline/CLAUDE.md`).
 
 ## 2. Generate, then ALWAYS review the previews
 Run the lane command WITHOUT `--apply` first. Then Read (the Read tool, they are images) the
@@ -57,24 +59,13 @@ preview PNGs under `tmp/asset_pipeline/<job>/preview/`: `front.png`, `right.png`
 - Wrong shape entirely: new run with a sharper `--prompt` or a `--image` concept
   (T-pose reference for creatures). This is a new paid generation; check `balance`.
 - `status [--job id]` lists jobs; `validate` / `inspect` / `inplace-check` re-check a GLB.
-- `library [--open]` builds the browsable asset viewer/inspector
-  (`tmp/asset_pipeline/library/index.html`): every shipped + generated asset with thumbnails,
-  structural inspection, all animation frames, and registration status (orphans flagged).
-  Rebuild after integrating an asset; only new/changed files re-render (content-hash cache).
-- `library --serve [--port 5180]` starts a LIVE 3D viewer: click an asset to render the real
-  GLB with orbit (drag/zoom), an animation-clip dropdown, and a "vs player" scale toggle;
-  skins render on their class model with the atlas applied live. Runs until Ctrl-C.
-- `skin --class <cls> --suffix <name> --tripo --prompt "..."` is REAL skin generation: Tripo
-  re-textures the class model from the prompt (keeping its UVs) and the pipeline composites the
-  parts into a drop-in atlas (`lib/tripo_skin.mjs`). Genuinely AI-painted, ~30-40 credits, a true
-  texture-swap (no sim/wire changes). Prefer this over `--recolor` (a color filter, not generation).
-- `skinset --set prismatic|chrome [--tripo] [--apply]` generates a cohesive set for all 9 classes
-  at once; with `--tripo` each class model is re-textured from a per-model prompt (`SUIT_PROMPTS`)
-  for real AI art, else the procedural gradient-map fallback. `--apply` registers/overwrites the
-  set with the SKINS/SKIN_COUNTS lockstep. Then `npx vitest run tests/skin_event.test.ts` and
-  `node scripts/build_media_manifest.mjs generate`. NOTE: skins are texture swaps on the SAME rig
-  (they change the look, not the silhouette); a radically new BODY shape is the Combat Mech
-  cosmetic-body path, which needs a `SkinCatalog` union change and is NOT automated by this lane.
+- Lane and viewer detail beyond this loop (the `library` viewer and `--serve` live 3D
+  inspector, `skin --tripo` real re-texturing vs the `--recolor` filter, `skinset` whole
+  roster sets and their SKINS/SKIN_COUNTS lockstep) lives in the full reference,
+  `scripts/asset_pipeline/CLAUDE.md`; read the matching section there before running those
+  lanes. One rule worth repeating: skins are texture swaps on the SAME rig; a radically
+  new body silhouette is the cosmetic-body path (`SkinCatalog` union change, not automated
+  by the skin lanes).
 
 ## 3b. QA gate (mandatory before apply)
 ```
@@ -104,8 +95,11 @@ Rerun with `--apply` (still `--job <id>` so nothing regenerates). Then:
   (`src/sim/colliders.ts`), or the `GROUND_OBJECTS` interactable lane (no collision).
 - creature: add the printed VisualDef to `VISUALS` and wire the mob template in `MOB_KEYS`
   (`src/render/characters/manifest.ts`); set the real world-unit height and tint.
-- New player-facing entities also need: `src/ui/world_entity_i18n.ts` name entries (English
-  only at PR tier) and wiki regen (`npm run wiki:content`, `npm run wiki:stills` for models).
+- New player-facing entities also need: `src/ui/world_entity_i18n.ts` name entries and wiki
+  regen (`npm run wiki:content`, `npm run wiki:stills` for models). Every new ITEM id also
+  owes committed WebP art (`tests/item_art_consistency.test.ts`) in the same change, and a
+  wordy English name owes its M16 non-Latin fills too (root `CLAUDE.md` i18n bullet);
+  "English only at PR tier" does not cover those two.
 - Never extend `SkinCatalog` (`src/sim/types.ts`): it is a closed sim/wire union. Class
   variants go through the skin lane; new bodies are mobs/NPCs.
 - Verify in game: `npm run dev`, screenshot the asset in place.

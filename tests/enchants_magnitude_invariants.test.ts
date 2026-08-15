@@ -67,7 +67,12 @@ describe('enchant table magnitude invariants', () => {
     // layer lands at roughly 15 to 25 percent of that budget per axis, the
     // "finishing bonus" target, instead of the pre-trim 30 to 43 percent.
     expect(bestPerSlotTotal('int')).toBe(24); // 20 percent of the 120 int budget
-    expect(bestPerSlotTotal('sta')).toBe(24); // 21 percent of the 113 sta budget; the HP pin below covers the x10 conversion
+    // 27 = the prior 24 plus offhand's enchant_offhand_stamina (+3, #2825: the
+    // offhand slot had no base enchant at all before that fix); 24 percent of
+    // the 113 sta budget, still inside the finishing-bonus band. The HP pin
+    // below covers the x10 conversion, over its own fixed 5-slot gear list
+    // that does not include offhand, so it is unaffected by this stack.
+    expect(bestPerSlotTotal('sta')).toBe(27);
     expect(bestPerSlotTotal('agi')).toBe(25); // 19 percent of the 130 agi budget
     expect(bestPerSlotTotal('str')).toBe(19); // 15 percent of the 125 str budget
     // Spirit rides only neck, chest, and the two rings, so its stack sits
@@ -192,6 +197,7 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
     expect(all).toEqual({
       enchant_weapon_might: { str: 2 },
       enchant_weapon_intellect: { int: 2 },
+      enchant_offhand_stamina: { sta: 3 },
       enchant_helmet_fortitude: { sta: 3 },
       enchant_neck_spirit: { spi: 3 },
       enchant_shoulder_agility: { agi: 2 },

@@ -19,6 +19,11 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/me', permission: 'any' },
 
   { method: 'GET', pattern: '/admin/api/overview', permission: 'analytics.read' },
+  // The ad-spend ledger (server/ad_spend.ts): read beside the dashboards,
+  // writes behind the dedicated manage grant.
+  { method: 'GET', pattern: '/admin/api/ad-spend', permission: 'analytics.read' },
+  { method: 'POST', pattern: '/admin/api/ad-spend', permission: 'analytics.manage' },
+  { method: 'POST', pattern: '/admin/api/ad-spend/delete', permission: 'analytics.manage' },
   { method: 'GET', pattern: '/admin/api/provider-usage', permission: 'ops_usage.read' },
   { method: 'GET', pattern: '/admin/api/online', permission: 'accounts.read' },
   { method: 'GET', pattern: '/admin/api/online-history', permission: 'analytics.read' },
@@ -29,6 +34,52 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/perf/tick', permission: 'ops.perf' },
   { method: 'POST', pattern: '/admin/api/perf/tick/capture', permission: 'ops.perf' },
   { method: 'GET', pattern: '/admin/api/characters', permission: 'accounts.read' },
+  // R35 GM professions tooling: the inspector is a read; the two restores
+  // mint value onto a character, so they carry the audited-write permission.
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/characters\/(\d+)\/professions$/,
+    permission: 'accounts.read',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-item$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
+    permission: 'moderation.act',
+  },
+  { method: 'GET', pattern: '/admin/api/guilds', permission: 'accounts.read' },
+  { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)$/, permission: 'accounts.read' },
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/guilds\/(\d+)\/history$/,
+    permission: 'moderation.read',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/guilds\/(\d+)\/rename$/,
+    permission: 'moderation.act',
+  },
+  // The guild bank operator READ (the slot list the purge below needs). It is
+  // deliberately WIDER than the purge it serves: reading destroys nothing, and
+  // "is this guild's bank stuck?" is the question whoever picks up the ticket
+  // has to answer before there is anything to escalate. moderation.read, not
+  // accounts.read: this is a guild's private pooled property, so it sits with
+  // the sibling audit panel on the same detail page (guilds/:id/history) rather
+  // than with the roster. The payload is guild-scoped only (item ids, counts,
+  // dormant flags, treasury); the per-copy instance payload with its bind
+  // identity is dropped at the boundary, see server/admin_guild_bank_view.ts.
+  { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)\/bank$/, permission: 'moderation.read' },
+  // The dormant guild bank slot escape hatch: destroys player property, so it
+  // carries its own permission, not moderation.act.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/guilds\/(\d+)\/bank\/purge-slot$/,
+    permission: 'guildbank.purge',
+  },
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/accounts\/(\d+)$/, permission: 'accounts.read' },
@@ -41,6 +92,11 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     method: 'POST',
     pattern: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
     permission: 'accounts.password',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/,
+    permission: 'moderation.act',
   },
   { method: 'GET', pattern: '/admin/api/shared-ips', permission: 'moderation.read' },
   { method: 'GET', pattern: '/admin/api/ip-associations', permission: 'accounts.read' },
@@ -61,6 +117,14 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     method: 'GET',
     pattern: /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/,
     permission: 'support.read',
+  },
+  // Resolving/dismissing is an operator write a player never sees, same shape as
+  // the account flair writes above: it rides the general moderation.act bucket
+  // rather than minting a one-off permission.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/bug-reports\/(\d+)\/(resolve|dismiss)$/,
+    permission: 'moderation.act',
   },
 
   { method: 'GET', pattern: '/admin/api/suspicious-players', permission: 'botdetector.read' },
@@ -93,6 +157,23 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   {
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/chat-mute$/,
+    permission: 'moderation.act',
+  },
+  // The Cheater mark (src/sim/moderation/): a punitive, publicly visible tag, so
+  // it sits with the other moderation actions. It is cosmetic-only by
+  // construction, which is exactly why it does not earn a permission of its own:
+  // marking changes no stat and destroys no property, unlike the guild bank purge.
+  // Both arms are here because a registry-only route has no legacy ladder arm for
+  // tests/admin_routes.test.ts to scan, so a missing row would only surface as a
+  // fail-closed 404 (the central gate) at runtime.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/cheater-mark$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-cheater-mark$/,
     permission: 'moderation.act',
   },
   {

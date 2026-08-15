@@ -1,11 +1,22 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { ABILITIES, ITEMS } from '../src/sim/data';
 import {
+  contextualIconPrewarmEntries,
   defaultIconPrewarmEntries,
   defaultIconPrewarmPlan,
   type IconPrewarmEntry,
   prewarmIconCache,
+  prewarmIconDataUrl,
 } from '../src/ui/icon_prewarm';
-import { iconDataUrl, needsIconDataUrlWarm, storePrewarmedIconDataUrl } from '../src/ui/icons';
+import {
+  AURA_RECIPE_IDS,
+  iconDataUrl,
+  needsIconDataUrlWarm,
+  needsProceduralIconDataUrlWarm,
+  proceduralIconDataUrl,
+  storePrewarmedIconDataUrl,
+  storePrewarmedProceduralIconDataUrl,
+} from '../src/ui/icons';
 
 type IdleCb = (d: { timeRemaining(): number }) => void;
 
@@ -224,14 +235,32 @@ describe('prewarmIconCache', () => {
     w.idleQueue.shift()!({ timeRemaining: () => 50 });
     expect(warmed).toEqual([['class_mage', 20]]);
   });
+
+  it('forwards the procedural-cache mode used by painted aura fallbacks', () => {
+    const w = stubWindow();
+    restore = w.restore;
+    const warmed: Array<[string, string]> = [];
+    prewarmIconCache([{ kind: 'aura', id: 'counter_shot', mode: 'procedural' }], {
+      warm: (_kind, id, _size, mode) => {
+        warmed.push([id, mode]);
+      },
+    });
+    w.idleQueue.shift()!({ timeRemaining: () => 50 });
+    expect(warmed).toEqual([['counter_shot', 'procedural']]);
+  });
 });
 
 describe('defaultIconPrewarmEntries', () => {
-  it('covers the item catalog and the ability table', () => {
+  it('covers the exact item catalog, ability table, and core chrome entries', () => {
     const list = defaultIconPrewarmEntries();
-    expect(list.length).toBeGreaterThan(100);
-    expect(list.some((e) => e.kind === 'item')).toBe(true);
-    expect(list.some((e) => e.kind === 'ability')).toBe(true);
+    const itemIds = new Set(list.filter((entry) => entry.kind === 'item').map((entry) => entry.id));
+    const abilityIds = new Set(
+      list.filter((entry) => entry.kind === 'ability').map((entry) => entry.id),
+    );
+    expect(itemIds).toEqual(
+      new Set([...Object.keys(ITEMS), 'backpack', 'coin_gold', 'slot_empty']),
+    );
+    expect(abilityIds).toEqual(new Set([...Object.keys(ABILITIES), 'attack']));
     for (const e of list) expect(typeof e.id).toBe('string');
   });
 
@@ -266,9 +295,116 @@ describe('defaultIconPrewarmEntries', () => {
       { kind: 'crest', id: 'class_mage' },
     ]);
   });
+
+  it('keeps painted ability URLs static while prewarming explicit procedural aura recipes', () => {
+    const plan = defaultIconPrewarmPlan();
+    expect(plan.entries).toContainEqual({ kind: 'ability', id: 'counter_shot' });
+    expect(plan.entries).not.toContainEqual({
+      kind: 'aura',
+      id: 'counter_shot',
+      mode: 'procedural',
+    });
+    expect(plan.entries).toContainEqual({
+      kind: 'aura',
+      id: 'aura_buff_ap_pct',
+      mode: 'procedural',
+    });
+  });
+
+  it('limits the full procedural fallback catalog to explicit aura recipes', () => {
+    const actual = new Set(
+      defaultIconPrewarmPlan()
+        .entries.filter((entry) => entry.kind === 'aura' && entry.mode === 'procedural')
+        .map((entry) => entry.id),
+    );
+    expect(actual).toEqual(new Set(AURA_RECIPE_IDS));
+    expect(actual.size).toBeLessThan(Object.keys(ABILITIES).length);
+  });
+});
+
+describe('contextualIconPrewarmEntries', () => {
+  it('routes every player and session source into its exact first-open cache entries', () => {
+    expect(
+      contextualIconPrewarmEntries({
+        equipmentItemIds: ['equipment', null],
+        classIds: ['mage'],
+        inventoryItemIds: ['inventory'],
+        bagItemIds: ['bag'],
+        knownAbilityIds: ['known_ability'],
+        classAbilityIds: ['class_ability'],
+        talentIconRefs: [
+          { kind: 'crest', id: 'talent_crest' },
+          { kind: 'ability', id: 'talent_ability' },
+        ],
+        recipeResultItemIds: ['recipe'],
+        finderLootItemIds: ['finder'],
+        questRewardItemIds: ['quest'],
+        heroicVendorItemIds: ['heroic_vendor'],
+        marketListingItemIds: ['market_listing'],
+        marketCollectionItemIds: ['market_collection'],
+        marketHouseItemIds: ['market_house'],
+        vendorItemIds: ['vendor'],
+      }),
+    ).toEqual([
+      { kind: 'item', id: 'equipment' },
+      { kind: 'crest', id: 'class_mage', size: 20, mode: 'procedural' },
+      { kind: 'crest', id: 'class_mage', size: 96, mode: 'procedural' },
+      { kind: 'item', id: 'inventory' },
+      { kind: 'item', id: 'bag' },
+      { kind: 'ability', id: 'known_ability' },
+      { kind: 'aura', id: 'known_ability', mode: 'procedural' },
+      { kind: 'ability', id: 'class_ability' },
+      { kind: 'aura', id: 'class_ability', mode: 'procedural' },
+      { kind: 'crest', id: 'talent_crest' },
+      { kind: 'ability', id: 'talent_ability' },
+      { kind: 'aura', id: 'talent_ability', mode: 'procedural' },
+      { kind: 'item', id: 'recipe' },
+      { kind: 'item', id: 'finder' },
+      { kind: 'item', id: 'quest' },
+      { kind: 'item', id: 'heroic_vendor' },
+      { kind: 'item', id: 'market_listing' },
+      { kind: 'item', id: 'market_collection' },
+      { kind: 'item', id: 'market_house' },
+      { kind: 'item', id: 'vendor' },
+    ]);
+  });
 });
 
 describe('worker icon cache bridge', () => {
+  it('routes the production worker result to the requested procedural cache only', async () => {
+    const id = '__worker_production_procedural_route_test__';
+    const size = 75;
+    const url = 'data:image/png;base64,cHJvZHVjdGlvbi1wcm9jZWR1cmFs';
+    expect(needsProceduralIconDataUrlWarm('aura', id, size)).toBe(true);
+    expect(needsIconDataUrlWarm('aura', id, size)).toBe(true);
+
+    await prewarmIconDataUrl('aura', id, size, 'procedural', {
+      requestIcon: () => Promise.resolve(new Blob(['worker-icon'])),
+      toDataUrl: () => Promise.resolve(url),
+    });
+
+    expect(needsProceduralIconDataUrlWarm('aura', id, size)).toBe(false);
+    expect(proceduralIconDataUrl('aura', id, size)).toBe(url);
+    expect(needsIconDataUrlWarm('aura', id, size)).toBe(true);
+  });
+
+  it('routes the production worker result to the requested default cache only', async () => {
+    const id = '__worker_production_default_route_test__';
+    const size = 76;
+    const url = 'data:image/png;base64,cHJvZHVjdGlvbi1kZWZhdWx0';
+    expect(needsIconDataUrlWarm('aura', id, size)).toBe(true);
+    expect(needsProceduralIconDataUrlWarm('aura', id, size)).toBe(true);
+
+    await prewarmIconDataUrl('aura', id, size, 'default', {
+      requestIcon: () => Promise.resolve(new Blob(['worker-icon'])),
+      toDataUrl: () => Promise.resolve(url),
+    });
+
+    expect(needsIconDataUrlWarm('aura', id, size)).toBe(false);
+    expect(iconDataUrl('aura', id, size)).toBe(url);
+    expect(needsProceduralIconDataUrlWarm('aura', id, size)).toBe(true);
+  });
+
   it('makes a worker-rendered URL immediately available to synchronous consumers', () => {
     const id = '__worker_cache_bridge_test__';
     const size = 73;
@@ -277,5 +413,15 @@ describe('worker icon cache bridge', () => {
     storePrewarmedIconDataUrl('aura', id, size, url);
     expect(needsIconDataUrlWarm('aura', id, size)).toBe(false);
     expect(iconDataUrl('aura', id, size)).toBe(url);
+  });
+
+  it('publishes worker output into the separate painted-aura fallback cache', () => {
+    const id = '__worker_procedural_cache_bridge_test__';
+    const size = 74;
+    const url = 'data:image/png;base64,cHJvY2VkdXJhbC1mYWxsYmFjaw==';
+    expect(needsProceduralIconDataUrlWarm('aura', id, size)).toBe(true);
+    storePrewarmedProceduralIconDataUrl('aura', id, size, url);
+    expect(needsProceduralIconDataUrlWarm('aura', id, size)).toBe(false);
+    expect(proceduralIconDataUrl('aura', id, size)).toBe(url);
   });
 });

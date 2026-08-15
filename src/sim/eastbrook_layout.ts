@@ -350,6 +350,12 @@ export const REMOVED_EASTBROOK_PLACEMENTS = deepFreeze({
       start: { x: -16, z: 14 },
       end: { x: -20, z: 2 },
     },
+    {
+      id: 'eastbrook_fence_market_outer',
+      disposition: 'removed',
+      start: { x: -12.222218917656093, z: 4.01813945810839 },
+      end: { x: -11.729022993287566, z: 1.0589575136875549 },
+    },
   ],
   artisanRow: [
     {
@@ -753,7 +759,6 @@ function makeFence(
 }
 
 const SMITHY = buildingById('eastbrook_smithy');
-const OUTER_MARKET_STALL = MARKET_STALLS[1];
 const FENCES = [
   makeFence(
     'eastbrook_fence_smithy_west',
@@ -778,14 +783,6 @@ const FENCES = [
     localToWorld(SMITHY.position, SMITHY.rotation, 4.5, -3.2),
     0.28,
     0.9,
-  ),
-  makeFence(
-    'eastbrook_fence_market_outer',
-    'market_edge',
-    localToWorld(OUTER_MARKET_STALL.position, OUTER_MARKET_STALL.rotation, -4, -2.6),
-    localToWorld(OUTER_MARKET_STALL.position, OUTER_MARKET_STALL.rotation, -1, -2.6),
-    0.28,
-    0.75,
   ),
 ] as const;
 

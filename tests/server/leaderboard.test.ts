@@ -14,6 +14,7 @@
 // exercised here touch only the injected runtime, never the real db reads.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase10_units';
 
+import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SHEET_RECENT_DEEDS, type SheetRank } from '../../server/character_sheet';
@@ -27,6 +28,7 @@ import {
   buildStandardBoard,
   configureLeaderboardRuntime,
   decodeArenaFormat,
+  decodedRouteName,
   decodeLegacyLimit,
   decodePage,
   decodePageSize,
@@ -105,7 +107,7 @@ function deedsRow(rank: number): DeedsLeaderboardEntry {
 }
 
 function arenaRow(name: string): ArenaLeaderRow {
-  return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5 };
+  return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5, draws: 0 };
 }
 
 function characterRow(id: number, name: string): CharacterRow {
@@ -412,6 +414,32 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
+  it('a malformed percent-escape in the name 404s instead of throwing a 500', async () => {
+    // decodedRouteName is the handler's decode arm: a good escape decodes, a
+    // malformed one falls back to the raw segment (which then misses the name
+    // lookup), mirroring the /c/ page's arm for the identical lookup. The
+    // URIError path used to escape the handler and turn the route into a 500.
+    expect(decodedRouteName('Mira%20Vale')).toBe('Mira Vale');
+    expect(decodedRouteName('%E0%A4%A')).toBe('%E0%A4%A');
+    const db = new FakeCharactersDb();
+    const out = await readPublicSheet(db, decodedRouteName('%E0%A4%A'), sheetDeps);
+    expect(out).toEqual({ status: 404, body: { error: 'character not found' } });
+  });
+
+  it('BOTH sheet arms route the name through decodedRouteName (wiring pin)', () => {
+    // The helper tests above prove decodedRouteName's behavior; this pins the
+    // WIRING, without which reverting either call site to a bare
+    // decodeURIComponent would leave every test green while the route 500s
+    // again. Two arms serve the same path: the RouteDef handler here, and the
+    // retained legacy ladder in main.ts that API_DISPATCH=legacy (the
+    // documented one-flag production rollback) switches back to.
+    const here = readFileSync(new URL('../../server/leaderboard.ts', import.meta.url), 'utf8');
+    expect(here).toMatch(/readPublicSheet\(dbReads, decodedRouteName\(ctx\.params\.name\)/);
+    expect(here.match(/decodeURIComponent\(/g) ?? []).toHaveLength(1); // only inside the helper
+    const legacy = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    expect(legacy).toMatch(/const rawName = decodedRouteName\(publicSheetMatch\[1\]\);/);
+  });
+
   it('resolves by name (case-insensitively) and returns a 200 public sheet with guild + rank', async () => {
     const db = new FakeCharactersDb();
     db.seed(characterRow(11, 'Zealot'));
@@ -543,7 +571,7 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, players_cap, steam, dev_commands } with NO names list', async () => {
+  it('returns counts and capability adverts with NO names list', async () => {
     configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
@@ -556,9 +584,11 @@ describe('status handler (name-list trim deviation)', () => {
       // The configured realm cap, advertised so the client realm list can show Full.
       players_cap: 250,
       steam: { enabled: false },
+      epic: { enabled: false },
       // The /dev GUI capability advert. False here because the suite runs without
       // ALLOW_DEV_COMMANDS, which is also the production posture.
       dev_commands: false,
+      profiler_invulnerability: false,
     });
     expect('names' in (body as object)).toBe(false);
   });
@@ -574,19 +604,34 @@ describe('status handler (name-list trim deviation)', () => {
       process.env.ALLOW_DEV_COMMANDS = '1';
       const on = fakeCtx({ method: 'GET', url: '/api/status' });
       await handlerFor('/api/status')(on);
-      expect((captured(on.res).body as { dev_commands: boolean }).dev_commands).toBe(true);
+      expect(
+        captured(on.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: true, profiler_invulnerability: true });
 
       // Same process, no re-boot: flipping the env must flip the next answer.
       process.env.ALLOW_DEV_COMMANDS = '0';
       const off = fakeCtx({ method: 'GET', url: '/api/status' });
       await handlerFor('/api/status')(off);
-      expect((captured(off.res).body as { dev_commands: boolean }).dev_commands).toBe(false);
+      expect(
+        captured(off.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: false, profiler_invulnerability: false });
 
       // Only the exact string '1' arms it, matching every other ALLOW_DEV_COMMANDS gate.
       process.env.ALLOW_DEV_COMMANDS = 'true';
       const truthy = fakeCtx({ method: 'GET', url: '/api/status' });
       await handlerFor('/api/status')(truthy);
-      expect((captured(truthy.res).body as { dev_commands: boolean }).dev_commands).toBe(false);
+      expect(
+        captured(truthy.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: false, profiler_invulnerability: false });
     } finally {
       if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
       else process.env.ALLOW_DEV_COMMANDS = previous;
@@ -617,6 +662,22 @@ describe('status handler (name-list trim deviation)', () => {
     } finally {
       if (saved === undefined) delete process.env.STEAM_ENABLED;
       else process.env.STEAM_ENABLED = saved;
+    }
+  });
+
+  it('adverts epic.enabled true when EPIC_ENABLED=1 (the capability advert)', async () => {
+    const saved = process.env.EPIC_ENABLED;
+    process.env.EPIC_ENABLED = '1';
+    try {
+      configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4 }));
+      const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(ctx);
+      const { status, body } = captured(ctx.res);
+      expect(status).toBe(200);
+      expect((body as { epic: { enabled: boolean } }).epic).toEqual({ enabled: true });
+    } finally {
+      if (saved === undefined) delete process.env.EPIC_ENABLED;
+      else process.env.EPIC_ENABLED = saved;
     }
   });
 });

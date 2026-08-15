@@ -152,7 +152,10 @@ describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () 
     expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:plus`/);
     // The qty input was missing from this list, and it is the rung the ladder prefers.
     expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:qty`/);
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:remove`/);
+    // Remove keys on the per-chip key (issue 1165): a plain stack and an
+    // instanced copy of one item id are distinct chips. The stepper keys stay
+    // on slot.itemId because only a plain stack (no instance) grows a stepper.
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{chipKey\}:remove`/);
   });
 });
 

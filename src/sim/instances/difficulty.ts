@@ -106,6 +106,11 @@ export function applyDungeonMobTuning(
     if (normal && dmgMult !== undefined) {
       mob.mechanicDamageMult = normal.mechanicDamageMultiplierByMob?.[mob.templateId] ?? dmgMult;
       mob.mechanicHealMult = normal.healthMultiplier;
+      // A petSpell caster's nuke is rolled from the base table and cannot be
+      // reached by the template transform (melee only) or by
+      // mechanicDamageMult, so it takes its own factor or stays at 1.
+      const ranged = normal.rangedDamageMultiplierByMob?.[mob.templateId];
+      if (ranged !== undefined) mob.rangedDamageMult = ranged;
     }
     return;
   }

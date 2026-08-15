@@ -91,6 +91,10 @@ const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.ur
   /\r\n/g,
   '\n',
 );
+const highscoreBoardTs = readFileSync(
+  new URL('../src/ui/highscore_board.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -198,6 +202,24 @@ function splitGameUiTemplate(): { templateHtml: string; liveHtml: string } {
 }
 
 describe('client HTML shell', () => {
+  it('uses the painted combat-status crest in both game entries', () => {
+    for (const entry of [html, playHtml]) {
+      const combat = entry.match(/<div class="combat-flash"[^>]*>[\s\S]*?<\/div>/)?.[0];
+      expect(combat).toBeDefined();
+      expect(combat).toContain('id="pf-combat"');
+      expect(combat).toContain('role="status"');
+      expect(combat).toContain('src="/ui/crests/status/combat.webp"');
+      expect(combat).toContain('data-crest-fallback-id="status_combat"');
+      expect(combat).toContain('data-crest-fallback-size="32"');
+      expect(combat).not.toContain(String.fromCodePoint(0x2694));
+      expect(entry).toContain('id="pf-rest" role="status"');
+    }
+    expect(existsSync(new URL('../public/ui/crests/status/combat.webp', import.meta.url))).toBe(
+      true,
+    );
+    expect(hudCss).toContain('.combat-flash img');
+  });
+
   it('keeps game HUD controls out of the live startup DOM', () => {
     const { liveHtml, templateHtml } = splitGameUiTemplate();
 
@@ -214,19 +236,26 @@ describe('client HTML shell', () => {
     expect(liveHtml).not.toContain('id="chat-input"');
   });
 
-  it('carries the map-canvas a11y label + #map-summary live region in BOTH entries', () => {
+  it('carries the concise live map summary and detailed non-live description in BOTH entries', () => {
     // updateMapWindow() writes the sr-only summary on every redraw via
     // setText($('#map-summary'), ...), which is not null-guarded, so the element
     // MUST exist in every entry that ships the map window or opening the map
     // throws. index.html and play.html both boot src/main.ts and both carry the
     // map window, so the live region + canvas accessible name must be in both.
     expect(hudTs).toContain("const summaryEl = $('#map-summary');");
+    expect(hudTs).toContain("const markerSummaryEl = $('#map-marker-summary');");
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="map-canvas"');
       expect(entry).toContain('data-i18n-aria="hud.core.mapCanvasLabel"');
+      expect(entry).toContain('aria-describedby="map-summary map-marker-summary"');
+      expect(entry).not.toMatch(/id="map-canvas"[^>]*tabindex=/);
       expect(entry).toContain('<span id="map-summary"');
       expect(entry).toContain('role="status"');
       expect(entry).toContain('aria-live="polite"');
+      const markerSummary = entry.match(/<span id="map-marker-summary"[^>]*>/)?.[0] ?? '';
+      expect(markerSummary).toContain('class="visually-hidden"');
+      expect(markerSummary).not.toContain('role=');
+      expect(markerSummary).not.toContain('aria-live=');
     }
   });
 
@@ -247,6 +276,54 @@ describe('client HTML shell', () => {
         '<div id="ls-slow-hint" data-i18n="loading.slowConnection" role="status" aria-live="polite">',
       );
     }
+  });
+
+  it('removes loading-curtain and progress motion for reduced-motion players', () => {
+    expect(shellCss).toContain('transition: opacity calc(0.35s * var(--motion-scale)) ease;');
+    expect(shellCss).toContain('transition: width calc(0.2s * var(--motion-scale)) ease;');
+    const reducedMotion = shellCss.match(
+      /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n {2}\}/,
+    )?.[1];
+    expect(reducedMotion).toContain('#loading-screen');
+    expect(reducedMotion).toContain('#ls-fill');
+    expect(reducedMotion).toContain('transition: none;');
+    expect(mainTs).toContain(
+      "return loadingCurtainFadeMs(new Settings().get('reduceMotion') || osReducedMotion);",
+    );
+    expect(mainTs.match(/}, loadingCurtainFadeDelayMs\(\)\);/g)).toHaveLength(2);
+  });
+
+  it('restores graphics preview contexts only after rebinding the committed renderer', () => {
+    const commitAt = mainTs.indexOf('commit: (next, target) => {');
+    const progressAt = mainTs.indexOf('onProgress:', commitAt);
+    const commit = mainTs.slice(commitAt, progressAt);
+    const replaceAt = commit.indexOf('hud.replaceRenderer(next);');
+    const restoreAt = commit.indexOf('hud.restoreGraphicsPreviewContexts();');
+    expect(commitAt).toBeGreaterThan(-1);
+    expect(progressAt).toBeGreaterThan(commitAt);
+    expect(replaceAt).toBeGreaterThan(-1);
+    expect(restoreAt).toBeGreaterThan(replaceAt);
+  });
+
+  it('keeps live graphics rebuilds bound to the existing world and online session', () => {
+    const buildAt = mainTs.indexOf('buildRenderer: (target, recycled) => {');
+    const prepareAt = mainTs.indexOf('prepareCurrentZone:', buildAt);
+    const build = mainTs.slice(buildAt, prepareAt);
+    expect(buildAt).toBeGreaterThan(-1);
+    expect(prepareAt).toBeGreaterThan(buildAt);
+    expect(build).toContain('new Renderer(world, recycled.canvas, nameplates, {');
+    expect(mainTs).toContain('online?.neutralizeInputForClientPause();');
+  });
+
+  it('attempts both auxiliary graphics teardown arms before reporting reset failures', () => {
+    const resetAt = mainTs.indexOf('resetAuxiliaryRenderers: () => {');
+    const captureAt = mainTs.indexOf('captureRendererContext:', resetAt);
+    const reset = mainTs.slice(resetAt, captureAt);
+    expect(resetAt).toBeGreaterThan(-1);
+    expect(captureAt).toBeGreaterThan(resetAt);
+    expect(reset).toMatch(/try\s*\{\s*hud\.resetGraphicsPreviewContexts\(\);\s*\} catch/);
+    expect(reset).toMatch(/try\s*\{\s*resetPortraitRendererForGraphicsRebuild\(\);\s*\} catch/);
+    expect(reset).toContain('throw new AggregateError');
   });
 
   it('places skip links as the first focusable elements in BOTH entries', () => {
@@ -622,7 +699,9 @@ describe('client HTML shell', () => {
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
-    expect(hudTs).toContain('levelText: String(target.level),');
+    // Written into the reused target descriptor rather than a per-frame object
+    // literal; the routing this test guards is unchanged.
+    expect(hudTs).toContain('targetFrame.levelText = String(target.level);');
     expect(hudTs).toContain(
       "this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));",
     );
@@ -833,11 +912,12 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("'DiscordClick'");
   });
 
-  it('excludes wallet surfaces from native and Steam builds while allowing website desktop', () => {
+  it('excludes wallet surfaces from unverified native and Steam builds while allowing Seeker', () => {
     expect(hudCss).toContain('body.native-app #nav-btn-download,');
     expect(hudCss).toContain(
-      'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
+      'body.native-app:not(.seeker-wallet-enabled) .cs-wallet,\n  body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,\n  body.native-app:not(.seeker-wallet-enabled) .account-wallet-card',
     );
+    expect(hudCss).not.toContain('body.native-app .cs-wallet,');
     expect(hudCss).toContain('body.native-app #performance-tip,');
     expect(hudCss).toContain('body.desktop-app #token-ca,\n  body.desktop-app .official-site-copy');
     expect(hudCss).not.toContain('body.desktop-app .cs-wallet');
@@ -896,13 +976,29 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('hud.prewarmStaticUiAssets();');
     expect(hudTs).toContain('prewarmStaticUiAssets(): void {');
     expect(hudTs).toContain('raidMarkerDataUrl(marker);');
-    const crestWarm = mainTs.slice(
-      mainTs.indexOf('for (const cls of ALL_CLASSES)'),
-      mainTs.indexOf('for (const slot of world.inventory)'),
+    const priorityCall = mainTs.slice(
+      mainTs.indexOf('contextualIconPrewarmEntries({'),
+      mainTs.indexOf('const iconPrewarm = defaultIconPrewarmPlan'),
     );
-    expect(crestWarm).toContain("kind: 'crest'");
-    expect(crestWarm).toContain('size: 20');
-    expect(crestWarm).toContain('size: 96');
+    for (const source of [
+      'equipmentItemIds',
+      'classIds',
+      'inventoryItemIds',
+      'bagItemIds',
+      'knownAbilityIds',
+      'classAbilityIds',
+      'talentIconRefs',
+      'recipeResultItemIds',
+      'finderLootItemIds',
+      'questRewardItemIds',
+      'heroicVendorItemIds',
+      'marketListingItemIds',
+      'marketCollectionItemIds',
+      'marketHouseItemIds',
+      'vendorItemIds',
+    ]) {
+      expect(priorityCall, source).toContain(`${source}:`);
+    }
   });
 
   it('keeps the desktop character roster readable inside a centered cinematic stage', () => {
@@ -1475,15 +1571,19 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {\n      width: 8px;',
     );
+    // By CLASS, not by id: the redesign editor is a second panel in the same
+    // docked slot, and an id-keyed override left it unstyled on mobile.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-news {\n      grid-column: 1 / -1;',
+      'body.mobile-touch #charselect-panel .cs-news-panel {\n      grid-column: 1 / -1;',
     );
     expect(shellCss).toContain('scrollbar-gutter: stable;\n      scrollbar-width: auto;');
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel {\n      height: auto;\n      overflow: visible;',
     );
+    // The feed shares this rule with the redesign editor's customizer host:
+    // both render at natural height and let the PAGE scroll.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel .cs-news-feed {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
+      'body.mobile-touch #charselect-panel .cs-news-feed,\n  body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
     );
     // charselect's columns stay overflow:hidden (their #char-list and
     // .cs-news-feed CHILDREN scroll); charcreate's columns hold a
@@ -1572,11 +1672,13 @@ describe('client HTML shell', () => {
   });
 
   it('renders the high scores leaderboard responsively on mobile', () => {
-    expect(mainTs).toContain(
+    // The board markup moved to src/ui/highscore_board.ts (extracted out of main.ts,
+    // the news_feed.ts precedent); the mobile data-label captions moved with it.
+    expect(highscoreBoardTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
       '<span class="hs-realm" data-label="${esc(realmLabel)}">${esc(r.realm ?? \'\')}</span>',
     );
-    expect(mainTs).toContain(
+    expect(highscoreBoardTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
       '<span class="hs-xp" data-label="${esc(lifetimeXpLabel)}">${formatXp(r.lifetimeXp)}</span>',
     );
@@ -1592,10 +1694,22 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('stacks the character-select news panel on mobile', () => {
+  it('stacks BOTH docked character-select panels on mobile', () => {
+    // The news feed and the one-shot redesign editor share the slot and the
+    // `cs-news-panel` chrome. The override is keyed on that class rather than on
+    // `#charselect-news`, because an id-keyed one left the redesign panel at the
+    // desktop fixed height with none of the mobile fixes while its button
+    // rendered on every device.
     expect(html).toContain('id="charselect-news"');
+    expect(html).toContain('id="charselect-reroll"');
+    expect(html).toContain('class="cs-news-panel cs-reroll-panel"');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-news {\n    flex: none;\n    width: 100%;',
+      'body.mobile-touch #charselect-panel .cs-news-panel {\n    flex: none;\n    width: 100%;',
+    );
+    // ...and the customizer follows the feed's "the page is the scroller" rule,
+    // rather than scrolling inside a panel that is itself scrolling.
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-reroll-panel #charselect-reroll-host {',
     );
   });
 
@@ -2063,9 +2177,18 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
-    // corpse-claim mirror online); the call now closes right after the
-    // nothing-to-interact string.
-    expect(mainTs).toContain("t('errors.nothingInteract'),\n      ),");
+    // corpse-claim mirror online). The R40 confirm gate now trails the
+    // nothing-to-interact string, with harvestStateReliable still an
+    // explicit `undefined` (the default), never a live override.
+    expect(mainTs).toContain(
+      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n      ),",
+    );
+    // The escort away line sits immediately before it (escort_interact.ts): an
+    // escort run has no other client entry point, so an unwired argument here
+    // would silently make those quests uncompletable again.
+    expect(mainTs).toContain(
+      "t('questUi.errors.escortAway'),\n        t('errors.nothingInteract'),",
+    );
     expect(mainTs).not.toContain('online === null');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
@@ -2075,6 +2198,12 @@ describe('client HTML shell', () => {
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
     );
     expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
+    // The R40 gate rides the CLICK dispatch too (the phase 14 QA found only
+    // the interact-key site pinned): the world-click harvest passes the same
+    // confirm gate, trailing the tool gate.
+    expect(mainTs).toContain(
+      'gatherNodeToolGateFor(world, node),\n            gatherEffectConfirm,\n          ),',
+    );
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre
@@ -2089,14 +2218,36 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.hud-mobile-compact #player-frame {\n    left: calc(50% - 15px);\n  }',
     );
+    // The pet frame joins the same nudge: it shares the bottom-centre column with
+    // the player frame and the two bars, so it has to travel with them.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar {\n    left: calc(50% - 15px);\n  }',
+      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar,\n  body.mobile-touch.hud-mobile-compact #pet-frame {\n    left: calc(50% - 15px);\n  }',
     );
     // Left-handed mode mirrors the floating capture zone; the autorun target is
     // a child of the move joystick, so it follows that mirror without its own
     // satellite placement rules.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: 0;\n  }',
+      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: max(18px, env(safe-area-inset-right));\n  }',
+    );
+  });
+
+  // #mobile-move-zone is the floating capture zone the joystick above rests
+  // in; every other touch control anchors off env(safe-area-inset-*), but
+  // this one was still pinned to the literal device corner (left: 0; bottom:
+  // 0), so on a notched/rounded-corner phone it could sit under the home
+  // indicator gesture strip. Mirror the same left/bottom offsets the
+  // adjacent .mobile-joystick rule uses, without touching the zone's own
+  // width/height (it must not shrink the capture area).
+  it('anchors the move-zone capture area off the safe-area insets like its sibling joystick', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-move-zone {\n' +
+        '    position: absolute;\n' +
+        '    left: max(18px, env(safe-area-inset-left));\n' +
+        '    bottom: calc(26px + env(safe-area-inset-bottom));\n' +
+        '    width: min(30vw, 132px);',
+    );
+    expect(hudMobileCss).toContain(
+      'min-width: 112px;\n    max-width: 132px;\n    height: min(36vh, 172px);',
     );
   });
 
@@ -2431,19 +2582,29 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
     expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
     expect(hudMobileCss).toContain(
-      '--mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));',
+      '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      '--mobile-map-quest-stack-bottom: calc(\n      max(10px, env(safe-area-inset-bottom)) /\n      var(--ui-scale, 1)\n    );',
     );
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #quest-log-window');
     expect(hudMobileCss).toContain('top: var(--mobile-map-quest-stack-top);');
     expect(hudMobileCss).toContain('max-height: var(--mobile-map-quest-log-max-height);');
     expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #map-window');
     expect(hudMobileCss).toContain('var(--mobile-map-quest-stack-gap)');
-    expect(hudMobileCss).toContain('22px');
+    expect(hudMobileCss).toContain('var(--mobile-map-stack-shell-height)');
+    expect(hudMobileCss).toContain(
+      'width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));',
+    );
+    expect(hudMobileCss).not.toContain('width: min(\n      46vw,\n      300px,');
   });
 
   it('caps mobile quest and NPC panels instead of stretching them edge to edge', () => {
+    // The WARFARE shop joined this centered-sheet group, so the pinned run grew
+    // with it rather than being narrowed around it: keeping the new window inside
+    // the assertion is what makes this guard cover it too.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #quest-log-window,\n  body.mobile-touch #vendor-window,\n  body.mobile-touch #quest-dialog',
+      'body.mobile-touch #quest-log-window,\n  body.mobile-touch #vendor-window,\n  body.mobile-touch #warfare-window,\n  body.mobile-touch #quest-dialog',
     );
     expect(hudMobileCss).toContain('width: clamp(320px, 76vw, 680px);');
     expect(hudMobileCss).toContain('max-width: calc(100vw - 20px);');
@@ -2472,5 +2633,126 @@ describe('client HTML shell', () => {
     // On mobile Bags is a full-screen modal sheet. !important intentionally
     // beats the inline managed-window value without changing desktop stacking.
     expect(hudMobileCss).toMatch(/body\.mobile-touch #bags \{[\s\S]*?z-index:\s*95 !important;/);
+  });
+});
+
+// The pet cluster: the pet command bar and the pet health frame share ONE row above
+// the player frame on desktop, and are deliberately SPLIT again on mobile (command bar
+// under the thumb at the top, health strip in the bottom-centre column). Both halves
+// are pinned because either one alone silently changes the layout: the markup that
+// puts the two in one wrapper, and the mobile rule that dissolves it.
+describe('pet cluster layout', () => {
+  const hudCssSrc = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+  const hudMobileSrc = readFileSync(
+    new URL('../src/styles/hud.mobile.css', import.meta.url),
+    'utf8',
+  );
+
+  it.each([['index.html'], ['play.html']])(
+    '%s wraps the pet bar and pet frame in one cluster above the player frame',
+    (file) => {
+      const src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+      const cluster = src.indexOf('id="pet-cluster"');
+      const petbar = src.indexOf('id="petbar"');
+      const petFrame = src.indexOf('id="pet-frame"');
+      const player = src.indexOf('id="player-frame"');
+      expect(cluster).toBeGreaterThan(-1);
+      // Bar on the left, health on the right, and the whole row above the player.
+      expect(cluster).toBeLessThan(petbar);
+      expect(petbar).toBeLessThan(petFrame);
+      expect(petFrame).toBeLessThan(player);
+    },
+  );
+
+  it('lays the cluster out as one row and un-anchors the pet bar from the stack edge', () => {
+    expect(hudCssSrc).toMatch(/#pet-cluster \{[^}]*display: flex/);
+    // The bar keeps its own absolute top:-52px seat for the mobile sheet, so the
+    // desktop cluster has to override it or the two halves overlap.
+    expect(hudCssSrc).toMatch(/#pet-cluster > #petbar \{[^}]*position: static/);
+  });
+
+  it('shares one content inset with the player frame so the row lines up with it', () => {
+    expect(hudCssSrc).toContain('--unit-frame-content-inset: 18px;');
+    expect(hudCssSrc).toMatch(
+      /#pet-cluster \{[^}]*padding-left: var\(--unit-frame-content-inset\)/,
+    );
+  });
+
+  // The bottom-centre column (player frame, cast bar, swing bar, pet strip) is nudged
+  // sideways by FOUR separate rules: compact, compact+left-handed, and a narrow-phone
+  // variant of each. A rule that moves the bars but forgets the pet strip leaves it
+  // horizontally detached from the column it belongs to, and the left-handed rule's
+  // extra class means it WINS over the narrow rule, so the omission does not even fall
+  // back to a sane value. Pinned as an invariant over every such rule rather than as
+  // four string literals: only one of the four was pinned before, which is how the
+  // narrow left-handed variant shipped without the strip twice.
+  it('nudges the pet strip in EVERY rule that nudges the cast bar', () => {
+    const rules = hudMobileSrc.split('}');
+    const nudges = rules
+      .map((block) => {
+        const open = block.lastIndexOf('{');
+        if (open === -1) return null;
+        return { selector: block.slice(0, open), body: block.slice(open + 1) };
+      })
+      .filter(
+        (r): r is { selector: string; body: string } =>
+          r !== null && /left:\s*calc\(50%/.test(r.body) && r.selector.includes('#castbar'),
+      );
+    // Vacuity floor: all SIX column nudges must actually be found, which is the count
+    // on the release base too (compact, compact left-handed, their two narrow-phone
+    // variants, and the tablet tier plus its left-handed mirror). This change adds no
+    // rule; it adds the pet strip to the ones that already existed.
+    expect(nudges.length).toBeGreaterThanOrEqual(6);
+    for (const rule of nudges) {
+      expect(rule.selector).toContain('#pet-frame');
+    }
+  });
+
+  // The sliver's own CSS, pinned because nothing else reads it: the class exists,
+  // raid style re-seats it absolutely (its rows are fixed-height with overflow hidden,
+  // so an in-flow strip would be clipped), and the two variants too small to hit are
+  // made non-interactive. That last one is the load-bearing pin: without
+  // pointer-events the sliver is a 3px (mobile) or 2px (raid) click target whose
+  // handler stopPropagations away the member selection the player actually meant.
+  it('gives the pet sliver its own class rather than reusing .bar', () => {
+    expect(hudCssSrc).toContain('.party-frame .pfm-pet {');
+    expect(hudCssSrc).toContain('.party-frame .pfm-pet-fill {');
+    // `.bar` would be caught by pf-hide-resource and by the raid strip positioning.
+    expect(hudCssSrc).not.toMatch(/\.party-frame \.bar\.pfm-pet/);
+  });
+
+  it('re-seats the sliver absolutely in raid style and makes it non-interactive', () => {
+    const raid = hudCssSrc.slice(
+      hudCssSrc.indexOf('#party-frames.party-style-raid .party-frame .pfm-pet {'),
+    );
+    const block = raid.slice(0, raid.indexOf('}'));
+    expect(block).toContain('position: absolute');
+    expect(block).toContain('pointer-events: none');
+  });
+
+  it('shrinks the sliver on mobile and makes it non-interactive there too', () => {
+    const m = hudMobileSrc.slice(
+      hudMobileSrc.indexOf('body.mobile-touch #party-frames .party-frame .pfm-pet {'),
+    );
+    const block = m.slice(0, m.indexOf('}'));
+    expect(block).toMatch(/height:\s*3px/);
+    expect(block).toContain('pointer-events: none');
+  });
+
+  // A dead pet is always hp 0, so its FILL is scaleX(0) and has no pixels: the dead
+  // state has to sit on the track or it renders nothing at all, which is the one
+  // state a hunter needs to tell apart in order to revive.
+  it('puts the dead-pet styling on the track, not the zero-width fill', () => {
+    expect(hudCssSrc).toContain('.party-frame .pfm-pet.dead {');
+    expect(hudCssSrc).not.toContain('.party-frame .pfm-pet.dead .pfm-pet-fill');
+  });
+
+  // display:contents dissolves the wrapper so each child keeps its own fixed seat.
+  // Without it the mobile layout inherits the desktop row and the command bar is
+  // dragged down out of thumb reach into the bottom-centre column.
+  it('dissolves the cluster on mobile so the two halves keep separate seats', () => {
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #pet-cluster \{\s*display: contents;\s*\}/);
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #petbar \{[^}]*position: fixed/);
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #pet-frame \{[^}]*position: fixed/);
   });
 });

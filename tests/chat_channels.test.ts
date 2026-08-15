@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CHANNEL_LABEL_KEYS,
   CHAT_TAB_CHANNELS,
   channelNeedsJoin,
   channelSendPrefix,
@@ -11,10 +12,12 @@ import {
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
+  reorderChatTabs,
   sentLineChannel,
   sentLineTarget,
   sentLineTargetForHost,
   serializeChatTabs,
+  stepChatTab,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
 } from '../src/ui/hud/chat/chat_channels';
@@ -67,6 +70,92 @@ describe('chat channel tabs — pure model', () => {
     it('trims and drops empty input', () => {
       expect(composeChatLine('world', '   ')).toBe('');
       expect(composeChatLine('world', '  ping  ')).toBe('/world ping');
+    });
+  });
+
+  describe('reorderChatTabs (drag-to-reorder, issue #1365)', () => {
+    it('moves a tab to sit immediately before a sibling it was dropped on', () => {
+      expect(reorderChatTabs(['world', 'guild', 'party'], 'party', 'world')).toEqual([
+        'party',
+        'world',
+        'guild',
+      ]);
+      expect(reorderChatTabs(['world', 'guild', 'party'], 'world', 'party')).toEqual([
+        'guild',
+        'world',
+        'party',
+      ]);
+    });
+
+    it('moves the tab to the end when dropped on the "+" add button (before = null)', () => {
+      expect(reorderChatTabs(['world', 'guild', 'party'], 'world', null)).toEqual([
+        'guild',
+        'party',
+        'world',
+      ]);
+    });
+
+    it('is a same-reference no-op for an unknown moved id', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'lfg' as 'world', 'world')).toBe(tabs);
+    });
+
+    it('is a same-reference no-op for a before id no longer in the list', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'world', 'party' as 'guild')).toBe(tabs);
+    });
+
+    it('is a same-reference no-op when dropped on its own position', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'world', 'world')).toBe(tabs);
+    });
+
+    it('leaves a single-tab list unchanged (by reference) when dropped on the add button', () => {
+      const tabs: 'world'[] = ['world'];
+      expect(reorderChatTabs(tabs, 'world', null)).toBe(tabs);
+    });
+
+    it('is a same-reference no-op when a tab is dropped on the sibling it already precedes', () => {
+      const tabs: ('world' | 'guild' | 'party')[] = ['world', 'guild', 'party'];
+      expect(reorderChatTabs(tabs, 'world', 'guild')).toBe(tabs);
+    });
+
+    it('is a same-reference no-op when the last tab is dropped on the add button', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'guild', null)).toBe(tabs);
+    });
+  });
+
+  describe('stepChatTab (the keyboard-accessible non-drag reorder path)', () => {
+    it('swaps a tab with its right neighbor on step +1', () => {
+      expect(stepChatTab(['world', 'guild', 'party'], 'world', 1)).toEqual([
+        'guild',
+        'world',
+        'party',
+      ]);
+    });
+
+    it('swaps a tab with its left neighbor on step -1', () => {
+      expect(stepChatTab(['world', 'guild', 'party'], 'party', -1)).toEqual([
+        'world',
+        'party',
+        'guild',
+      ]);
+    });
+
+    it('is a same-reference no-op at the left edge', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(stepChatTab(tabs, 'world', -1)).toBe(tabs);
+    });
+
+    it('is a same-reference no-op at the right edge', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(stepChatTab(tabs, 'guild', 1)).toBe(tabs);
+    });
+
+    it('is a same-reference no-op for an unknown id', () => {
+      const tabs: 'world'[] = ['world'];
+      expect(stepChatTab(tabs, 'guild' as 'world', 1)).toBe(tabs);
     });
   });
 
@@ -342,12 +431,44 @@ describe('chat channel tabs — pure model', () => {
       // by construction.
       for (const online of [true, false]) {
         for (const channel of CHAT_TAB_CHANNELS) {
-          const line = channelSendPrefix(channel) + 'hello there';
+          const line = `${channelSendPrefix(channel)}hello there`;
           expect(sentLineTargetForHost(line, { online }), `${channel} online=${online}`).toBe(
             channel,
           );
         }
       }
     });
+  });
+});
+
+describe('chat channel tabs: the battleground channel', () => {
+  // /bg reaches BOTH teams in the match. Before it existed the only way to say
+  // anything to the opposing side was General, which broadcasts realm-wide.
+  it('is a bindable tab channel with its own prefix and needs no /join', () => {
+    expect(CHAT_TAB_CHANNELS).toContain('battleground');
+    expect(channelSendPrefix('battleground')).toBe('/bg ');
+    expect(channelNeedsJoin('battleground')).toBe(false);
+  });
+
+  it('prefixes plain text typed on the tab, and never a typed slash command', () => {
+    expect(composeChatLine('battleground', 'nice flag grab')).toBe('/bg nice flag grab');
+    expect(composeChatLine('battleground', '/p regroup')).toBe('/p regroup');
+  });
+
+  it('sticks after a /bg line so the next plain line stays in the match', () => {
+    expect(sentLineChannel('/bg gg')).toBe('battleground');
+    expect(sentLineChannel('/BG gg')).toBe('battleground');
+    // Not a prefix match on other commands that begin with b.
+    expect(sentLineChannel('/bgsomething gg')).toBeNull();
+  });
+
+  it('carries a tab label and a log color unlike every GROUP channel', () => {
+    expect(CHANNEL_LABEL_KEYS.battleground).toBe('hud.core.chatChannels.names.battleground');
+    // The point is not merely "some other color". Party, guild and lfg are the
+    // social/group channels, and this is the one channel that also reaches the
+    // enemy team, so it must not wear their family's blue or green.
+    for (const social of ['say', 'party', 'guild', 'lfg'] as const) {
+      expect(chatChannelColor('battleground')).not.toBe(chatChannelColor(social));
+    }
   });
 });

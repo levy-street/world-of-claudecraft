@@ -5,7 +5,7 @@
 // the shared types are importable from the barrel without duplication.
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import { STATIONS } from '../src/sim/data';
+import { BUILTIN_WORLD, STATIONS, setActiveWorldContent } from '../src/sim/data';
 import type { ProfessionRecord } from '../src/sim/professions';
 import { emptyCraftSkills } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
@@ -73,10 +73,36 @@ describe('professions contracts (#1164)', () => {
     expect(client.professionsState).toEqual({ skills: [] });
   });
 
-  it('serves the same version-pinned station placements through both IWorld implementations', () => {
+  it('serves the builtin station placements through both IWorld implementations', () => {
+    // Identity holds because the active bundle wraps the builtin STATIONS
+    // reference on every shipped host, not because either side pins the
+    // static const anymore.
     const sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
     const client = makeClientWorld();
     expect(sim.stationPlacements).toBe(STATIONS);
+    expect(client.stationPlacements).toBe(STATIONS);
+  });
+
+  it('ClientWorld station placements follow an active-content swap', () => {
+    const client = makeClientWorld();
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin services missing');
+    const custom = {
+      id: 's_swap_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 1, z: 2 },
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    try {
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        services: { ...builtin, stations: [custom] },
+      });
+      expect(client.stationPlacements).toEqual([custom]);
+    } finally {
+      setActiveWorldContent(null);
+    }
     expect(client.stationPlacements).toBe(STATIONS);
   });
 

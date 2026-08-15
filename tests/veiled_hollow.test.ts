@@ -14,6 +14,7 @@ import {
   REALM_ZONE,
 } from '../src/sim/content/realm';
 import { zoneAt } from '../src/sim/data';
+import { FATIGUE_FIRST_BITE_TICKS } from '../src/sim/fatigue';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { hollowLandness, terrainHeight, WATER_LEVEL } from '../src/sim/world';
@@ -138,8 +139,17 @@ describe('open-sea swim fatigue', () => {
     p.pos.y = -4.6; // treading at the surface
     p.prevPos = { ...p.pos };
     let warned = false;
-    // swim until the sea has bitten once (staying past that is lethal by design)
-    for (let t = 0; t < 20 * 16 && p.hp === 1000; t++) {
+    // The pacing itself, pinned to a LITERAL. The loop bound below is derived
+    // from FATIGUE_FIRST_BITE_TICKS, and so is every other fatigue assertion in
+    // the suite, so they all move WITH the constant and none of them can catch
+    // a re-pace on its own: raise SLOWDOWN and they stay green while the sea
+    // quietly stops biting. 900 ticks is 45s at the 20 Hz tick.
+    expect(FATIGUE_FIRST_BITE_TICKS).toBe(900);
+    // Swim until the sea has bitten once (staying past that is lethal by
+    // design). The bound follows the fatigue module's own pacing plus a margin,
+    // so a slow clock cannot silently truncate the run.
+    const limit = Math.round(FATIGUE_FIRST_BITE_TICKS * 1.25);
+    for (let t = 0; t < limit && p.hp === 1000; t++) {
       const events = sim.tick();
       if (events.some((e) => e.type === 'log' && e.text.includes('open sea'))) warned = true;
       p.pos.x = 160;

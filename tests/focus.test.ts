@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
-import { ZONES } from '../src/sim/data';
+import { ITEMS, ZONES } from '../src/sim/data';
 import {
   applyFocusBonus,
   applyFocusTierBonus,
@@ -11,6 +11,7 @@ import {
   isTownFocusComponent,
   normalizeTownFocusOnLoad,
   POINTS_PER_TIER_BONUS,
+  RESPEC_MATERIAL_ITEM_ID,
   RESPEC_TIER_CONFIG,
   setTownFocus,
   TOWN_FOCUS_COMPONENTS,
@@ -151,12 +152,14 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
   });
 
   it('refuses a real tag vocabulary word that no harvest item maps', () => {
-    // claw/tusk/gills/horn are carried by shipped mobs but map to no item. They
-    // are the narrow-vs-wide allowlist call: allowed here, a persisted
+    // gills/horn are carried by shipped mobs but map to no item (claw and
+    // tusk joined HARVEST_COMPONENT_ITEMS, this branch's own fix). They are
+    // the narrow-vs-wide allowlist call: allowed here, a persisted
     // `{ gills: 1 }` would make the omitted-components harvest default derive
     // an all-unmapped pick and take the #2509 refusal on every plain interact
-    // press (tests/corpse_harvest_sim.test.ts measures that on old_greyjaw).
-    for (const tag of ['claw', 'tusk', 'gills', 'horn']) rejects({ [tag]: 3 });
+    // press (tests/corpse_harvest_sim.test.ts measures that on
+    // sethrael_palecoil).
+    for (const tag of ['gills', 'horn']) rejects({ [tag]: 3 });
   });
 
   it('refuses an unknown key sitting beside a perfectly good one', () => {
@@ -231,7 +234,7 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
     expect(result.allocation).toEqual(PREVIOUS);
   });
 
-  it('is exactly the six item-mapped families, and the panel exports that same binding', () => {
+  it('is exactly the eight item-mapped families, and the panel exports that same binding', () => {
     // Pinned to LITERALS, not re-derived. `Object.keys(HARVEST_COMPONENT_ITEMS)`
     // compared against a constant DEFINED as that expression is a constant
     // self-comparison: it holds however the item map changes, so it cannot
@@ -244,6 +247,8 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
       'venomSac',
       'meat',
       'cloth',
+      'claw',
+      'tusk',
     ]);
     // And each really is a mapped family, pinned by item id rather than by
     // truthiness, so widening the item map cannot quietly widen the allowlist
@@ -255,6 +260,8 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
       venomSac: 'venom_gland',
       meat: 'game_meat',
       cloth: 'homespun_cloth',
+      claw: 'sharp_claw',
+      tusk: 'curved_tusk',
     });
     // ONE definition, stated as the identity it is: the panel re-exports the
     // sim's binding (src/ui/town_focus_view.ts), so this reds the moment the UI
@@ -290,7 +297,9 @@ describe('normalizeTownFocusOnLoad: an older save self-heals (#2511)', () => {
   });
 
   it('drops every key when the whole saved allocation is junk', () => {
-    expect(normalizeTownFocusOnLoad({ eastbrook: 4, claw: 1 })).toEqual({});
+    // claw is a real, mapped family now (this branch's own fix); horn is
+    // still waiting on its item.
+    expect(normalizeTownFocusOnLoad({ eastbrook: 4, horn: 1 })).toEqual({});
   });
 
   it('returns a fresh empty allocation for a missing or empty save', () => {
@@ -407,5 +416,21 @@ describe('computeRespecCost (#1144): three payment tiers for the same reallocati
     const previous = { hide: 5, fang: 0 };
     const cost = computeRespecCost(previous, { hide: 0, fang: 5 }, 'time');
     expect(cost.durationMs).toBe(10 * RESPEC_TIER_CONFIG.time.durationMsPerPoint);
+  });
+});
+
+// #1144: RESPEC_MATERIAL_ITEM_ID names the real item Sim.setTownFocus charges
+// (the previously zero-caller cost model's SECOND unwired half; the tier
+// numbers had a test, but nothing named what "materials" actually spent). A
+// referential-integrity pin, not a magnitude one: a rename or retirement of
+// the underlying item id would otherwise only surface as a runtime no-op
+// charge (countItem/removeItem on a dangling id silently read/remove zero).
+describe('RESPEC_MATERIAL_ITEM_ID (#1144): the item the materials cost spends', () => {
+  it('names a real, shipped item', () => {
+    expect(ITEMS[RESPEC_MATERIAL_ITEM_ID]).toBeDefined();
+  });
+
+  it('is the arcane_dust generic professions material sink, not a bespoke reagent', () => {
+    expect(RESPEC_MATERIAL_ITEM_ID).toBe('arcane_dust');
   });
 });

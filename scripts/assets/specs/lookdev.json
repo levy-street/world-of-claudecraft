@@ -1,20 +1,84 @@
 {
   "items": [
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/light_01.png", "out": "vfx/light_01.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/light_02.png", "out": "vfx/light_02.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/flare_01.png", "out": "vfx/flare_01.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/spark_04.png", "out": "vfx/spark_04.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/spark_06.png", "out": "vfx/spark_06.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/star_07.png", "out": "vfx/star_07.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/magic_01.png", "out": "vfx/magic_01.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/magic_04.png", "out": "vfx/magic_04.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/twirl_01.png", "out": "vfx/twirl_01.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/flame_03.png", "out": "vfx/flame_03.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/fire_01.png", "out": "vfx/fire_01.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/smoke_05.png", "out": "vfx/smoke_05.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/trace_05.png", "out": "vfx/trace_05.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/slash_02.png", "out": "vfx/slash_02.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/dirt_02.png", "out": "vfx/dirt_02.png", "type": "copy" },
-    { "src": "/Users/reubenhorne/Documents/code/levy-street/world-of-claudecraft/tmp/asset_src/kenney/particle-pack/PNG (Black background)/circle_05.png", "out": "vfx/circle_05.png", "type": "copy" }
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/light_01.png",
+      "out": "vfx/light_01.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/light_02.png",
+      "out": "vfx/light_02.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/flare_01.png",
+      "out": "vfx/flare_01.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/spark_04.png",
+      "out": "vfx/spark_04.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/spark_06.png",
+      "out": "vfx/spark_06.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/star_07.png",
+      "out": "vfx/star_07.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/magic_01.png",
+      "out": "vfx/magic_01.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/magic_04.png",
+      "out": "vfx/magic_04.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/twirl_01.png",
+      "out": "vfx/twirl_01.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/flame_03.png",
+      "out": "vfx/flame_03.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/fire_01.png",
+      "out": "vfx/fire_01.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/smoke_05.png",
+      "out": "vfx/smoke_05.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/trace_05.png",
+      "out": "vfx/trace_05.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/slash_02.png",
+      "out": "vfx/slash_02.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/dirt_02.png",
+      "out": "vfx/dirt_02.png",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/kenney/particle-pack/PNG (Black background)/circle_05.png",
+      "out": "vfx/circle_05.png",
+      "type": "copy"
+    }
   ]
 }

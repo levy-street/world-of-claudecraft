@@ -18,7 +18,10 @@ export function clampMinimapZoom(z: number): number {
   let bestDist = Math.abs(z - best);
   for (const lvl of MINIMAP_ZOOM_LEVELS) {
     const d = Math.abs(z - lvl);
-    if (d < bestDist) { best = lvl; bestDist = d; }
+    if (d < bestDist) {
+      best = lvl;
+      bestDist = d;
+    }
   }
   return best;
 }
@@ -27,7 +30,9 @@ export function clampMinimapZoom(z: number): number {
 // clamped at the ends (no wrap-around). Returns the current level unchanged
 // when already at a boundary.
 export function nextMinimapZoom(current: number, dir: number): number {
-  const idx = MINIMAP_ZOOM_LEVELS.indexOf(clampMinimapZoom(current) as typeof MINIMAP_ZOOM_LEVELS[number]);
+  const idx = MINIMAP_ZOOM_LEVELS.indexOf(
+    clampMinimapZoom(current) as (typeof MINIMAP_ZOOM_LEVELS)[number],
+  );
   const next = Math.max(0, Math.min(MINIMAP_ZOOM_LEVELS.length - 1, idx + Math.sign(dir)));
   return MINIMAP_ZOOM_LEVELS[next];
 }

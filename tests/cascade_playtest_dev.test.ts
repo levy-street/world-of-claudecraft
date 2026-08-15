@@ -73,6 +73,13 @@ describe('/dev cascade scenario', () => {
     sim.chat('/dev cascade', p.id);
     const centerId = p.cascadeDevStats!.centerId;
 
+    // Preserve an individual mark through the group cast so the readout pins
+    // the live individual conversion coefficient, not only the group label.
+    sim.targetEntity(centerId);
+    sim.castAbility('temporal_echo');
+    sim.tick();
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+
     const logs: string[] = [];
     sim.targetEntity(centerId);
     sim.castAbility('temporal_cascade');
@@ -84,6 +91,7 @@ describe('/dev cascade scenario', () => {
     }
     const cascade = logs.filter((l) => l.startsWith('[cascade]'));
     expect(cascade.some((l) => l.includes('cast selected'))).toBe(true);
+    expect(logs.some((l) => l.includes('individual 40%'))).toBe(true);
     expect(cascade.some((l) => l.includes('totals'))).toBe(true);
     // At least one target (the hurt center) took a recorded initial heal.
     expect(p.cascadeDevStats!.initialHeal).toBeGreaterThan(0);

@@ -1,0 +1,17 @@
+{
+  "note": "Meshopt maintenance pass for the original Demon Tower Tripo wave. Copy the 20 tower_*.glb creature sources and the 14 original tower_*.glb props plus demon_core.glb into the two tmp directories before running; generated three-floor props already leave asset_pipeline with meshopt and are not part of this spec.",
+  "items": [
+    {
+      "srcDir": "tmp/asset_src/demon_tower/creatures",
+      "outDir": "models/creatures",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "srcDir": "tmp/asset_src/demon_tower/props",
+      "outDir": "models/props",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
+}

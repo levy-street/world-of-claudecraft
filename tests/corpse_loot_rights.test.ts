@@ -49,6 +49,9 @@ function rig(e: Entity, partyInfo: { members: { pid: number }[] } | null = null)
     playerId: ME,
     partyInfo,
     entities: new Map([[e.id, e]]),
+    questLog: new Map(),
+    targetEntity: () => {},
+    interact: () => {},
     lootCorpse,
     harvestCorpse,
     delveInteract: () => false as const,
@@ -66,7 +69,8 @@ function rig(e: Entity, partyInfo: { members: { pid: number }[] } | null = null)
   } as unknown as Parameters<typeof tryNearbyInteraction>[1] & {
     showError: ReturnType<typeof vi.fn>;
   };
-  const press = () => tryNearbyInteraction(world, hud, [NODE], null, 'far', 'notReady', 'nothing');
+  const press = () =>
+    tryNearbyInteraction(world, hud, [NODE], null, 'far', 'notReady', 'escortAway', 'nothing');
   return { world, hud, press, lootCorpse, harvestCorpse, harvestNode };
 }
 

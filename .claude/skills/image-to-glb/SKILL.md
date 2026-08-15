@@ -81,11 +81,11 @@ exporter, spec, tests, and optimized GLB stay the reproducible source of truth.
 
 Every eastbrook-style asset stamps a sha256 source fingerprint over a pinned file list
 (factory, entry, exporter, spec, `build_assets.mjs`, reference turnarounds, the shared
-atlas, and `package-lock.json`). Tests recompute it live and compare against the GLB.
+atlas, and `pnpm-lock.yaml`). Tests recompute it live and compare against the GLB.
 Consequences:
 
 - Editing ANY fingerprinted file (including a lockfile-only dependency bump or a release
-  merge that touches `package-lock.json`) requires re-exporting every affected asset
+  merge that touches `pnpm-lock.yaml`) requires re-exporting every affected asset
   family with `--no-preview`, regenerating the manifest, and re-pinning the sha256 and
   fingerprint literals in tests, design-doc tables, and the capture evidence JSONs (the
   polish integrity test cross-checks stored provenance against live values).

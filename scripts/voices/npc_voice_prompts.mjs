@@ -1046,6 +1046,14 @@ export const VOICE_ALIAS = {
   brother_aldric_raid: 'brother_aldric',
   scout_maren_highwatch: 'scout_maren',
   brother_halven_marsh: 'brother_halven',
+  // Warmarshal Draven Kole, the Highwatch Master of the Warfare Stores, sells the
+  // identical WARFARE stock FURY sells in Eastbrook and speaks in the same
+  // parade-ground register, so he borrows FURY's designed voice for now. This is
+  // the one alias here that is a ROLE match rather than the same character
+  // recurring under a suffixed id (docs/design/npc_voices.md): promote him to his
+  // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
+  // greeting carries, once an ElevenLabs key is available to design and render it.
+  warmarshal_draven_kole: 'fury',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

@@ -1,0 +1,661 @@
+{
+  "schemaVersion": 1,
+  "batch": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+  "created": "2026-08-10",
+  "worktree": "/Users/fernando/Documents/wocc-release-art-audit-v036",
+  "generationMode": "OpenAI built-in image generation",
+  "generationSessionId": "019fe6e9-7ed7-7bc3-a44e-c7475af3a73f",
+  "reconstructedFromThreadRecord": "/Users/fernando/.codex/sessions/2026/08/09/rollout-2026-08-09T09-24-49-019fe6e9-7ed7-7bc3-a44e-c7475af3a73f.jsonl",
+  "transparency": "flat #ff00ff chroma-key generation, installed helper soft matte and despill",
+  "sourceContract": "512x512 RGBA PNG, transparent corners, alpha>=8 padding >=28, center tolerance <=8, coverage 0.34..0.61",
+  "shippingContract": "128x128 transparent WebP, <=15 KiB, alpha>=8 padding >=7, center tolerance <=2, coverage 0.35..0.60",
+  "promptEncoding": "exactPrompt preserves the exact LF-delimited prompt submitted to each built-in image-generation call",
+  "referenceCatalog": [
+    {
+      "id": "col_all_slots",
+      "repositoryPath": "public/ui/deeds/col_all_slots.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_all_slots.webp",
+      "bytes": 5200,
+      "sha256": "d4cc0abcb80c0cdb682d312cc4c8f0aea5c55639d73eb7b09481405c1beb683e",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "col_discovery_250",
+      "repositoryPath": "public/ui/deeds/col_discovery_250.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_discovery_250.webp",
+      "bytes": 5516,
+      "sha256": "d2505942f1ad571da16b269de57cc2c11a82398bb148c0a17e8a5f16f622dffe",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "col_set_crownforged",
+      "repositoryPath": "public/ui/deeds/col_set_crownforged.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_set_crownforged.webp",
+      "bytes": 6108,
+      "sha256": "a2103d7d01c276f0534892a8d1b3513af6b7ae6384fd583b901ececfee46159e",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "col_seven_regalia",
+      "repositoryPath": "public/ui/deeds/col_seven_regalia.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_seven_regalia.webp",
+      "bytes": 5816,
+      "sha256": "66a0d69ecde204f9e374dacb1342ae78f5025d1cdce3a04633aad91a429a147e",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "cmb_thunzharr",
+      "repositoryPath": "public/ui/deeds/cmb_thunzharr.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/cmb_thunzharr.webp",
+      "bytes": 5216,
+      "sha256": "17732f6817c176a68bf6929871b76ffa6efe578cabb93ea5084306404760f1ae",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "cmb_thunzharr_ten",
+      "repositoryPath": "public/ui/deeds/cmb_thunzharr_ten.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/cmb_thunzharr_ten.webp",
+      "bytes": 5612,
+      "sha256": "6f403e9fe5b7018187aa4dc7863dd42d8012bd8d0d34051a02b9bc6b6aa21a0f",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "cmb_thunzharr_unbroken",
+      "repositoryPath": "public/ui/deeds/cmb_thunzharr_unbroken.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/cmb_thunzharr_unbroken.webp",
+      "bytes": 5122,
+      "sha256": "d038cdc4c862fad97c87e1d83ce799fe1734f26d6f5e0844493012e7e2392708",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dgn_gravewyrm_sanctum",
+      "repositoryPath": "public/ui/deeds/dgn_gravewyrm_sanctum.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_gravewyrm_sanctum.webp",
+      "bytes": 5034,
+      "sha256": "45f612fe1f74b662bb8fb8e7baf667b4e3fc7c7a4d2fa8ea040d70c20525d4d4",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dgn_gravewyrm_sanctum_heroic",
+      "repositoryPath": "public/ui/deeds/dgn_gravewyrm_sanctum_heroic.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_gravewyrm_sanctum_heroic.webp",
+      "bytes": 5556,
+      "sha256": "5191feb121797ff773ccbfa71814f14e4f5a6740aae31c35772cb928e5c770bd",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dgn_nythraxis",
+      "repositoryPath": "public/ui/deeds/dgn_nythraxis.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis.webp",
+      "bytes": 5318,
+      "sha256": "73386057aba8fa8a2637a6f32d5d38be992ac2eef2bd3bceae8ef0e2e2a28ecf",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dgn_nythraxis_deathless",
+      "repositoryPath": "public/ui/deeds/dgn_nythraxis_deathless.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis_deathless.webp",
+      "bytes": 5976,
+      "sha256": "d30bf360933e1d34e65142c96d98215feb806dd498cd5e90c2a4143322b00c0d",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dgn_nythraxis_gravebreaker",
+      "repositoryPath": "public/ui/deeds/dgn_nythraxis_gravebreaker.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis_gravebreaker.webp",
+      "bytes": 5880,
+      "sha256": "7e820d279e4da8f81775bd478d2b43c7d86cfd15499393a7db6c507b834afa4d",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dgn_nythraxis_heroic",
+      "repositoryPath": "public/ui/deeds/dgn_nythraxis_heroic.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis_heroic.webp",
+      "bytes": 5752,
+      "sha256": "4d50e387586b53b2ded8e1164226660272725a226478012beb4ecc5c49a24e64",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dgn_sanctum_speed",
+      "repositoryPath": "public/ui/deeds/dgn_sanctum_speed.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_sanctum_speed.webp",
+      "bytes": 5680,
+      "sha256": "4318e30d7c2834e83f0958d881f2d19bb6e6db02a2c4ba755b46c5beafa5fc6c",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "dlv_reliquary_heroic",
+      "repositoryPath": "public/ui/deeds/dlv_reliquary_heroic.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dlv_reliquary_heroic.webp",
+      "bytes": 6172,
+      "sha256": "e7a80ffa9064a58568b8e69d034c0eeafd5ba0bb2e7b5a66dae70a9dfbc7e0b5",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "feat_book_complete",
+      "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp",
+      "bytes": 5258,
+      "sha256": "e82718df4e3dd966c44d99db1018b50856b443147eb973ccb52edf8d8ff55b22",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    },
+    {
+      "id": "soc_wyrms_hoard",
+      "repositoryPath": "public/ui/deeds/soc_wyrms_hoard.webp",
+      "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/soc_wyrms_hoard.webp",
+      "bytes": 5602,
+      "sha256": "dd41bed75c2ea570fdb029e99e9667931f11e168b33dae44018f69fdbe759be0",
+      "dimensions": {
+        "width": 128,
+        "height": 128
+      },
+      "format": "WebP",
+      "alpha": true
+    }
+  ],
+  "assets": [
+    {
+      "id": "col_reliquary_complete",
+      "canonicalName": "The Grand Reliquary",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"The Grand Reliquary\" (col_reliquary_complete), the character-catalog completion capstone in World of ClaudeCraft.\nScene/backdrop: inside the crest only, a cavernous near-black indigo vault with restrained violet mist and a radiant golden focal glow. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: monumental open reliquary vault doors revealing one beautifully ordered grand collection: a small crown, a legendary crystal, a sealed book, a dragon horn, a miniature armor helm, a potion vial and a mount token, arranged as one coherent treasure display rather than a cluttered pile. A thin radiant arch of gold completes over the collection like a museum halo.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art, matching the provided World of ClaudeCraft deeds exactly. Ornate but readable, tactile metal and relic materials, crisp focal edges, deep jewel palette, triumphant controlled light.\nComposition/framing: centered compact vault tableau inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and subtle diagonal studs. Entire frame visible with generous exterior padding, no crop, readable at 24 to 40 pixels.\nInput images: Image 1 is the complete-book deed reference. Image 2 is the Collection frame and vault motif reference. Image 3 is the heroic Reliquary mood/material reference. Image 4 is the collected-regalia reference. Preserve the common frame language; do not copy unrelated shapes.\nConstraints: exactly one crest and one grand vault display; no people; no text, letters, numerals, labels, UI tile, square border, watermark, collage, checkerboard, or extra crest. No #ff00ff inside the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "feat_book_complete",
+          "role": "completed Book of Deeds painting reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        },
+        {
+          "image": 2,
+          "id": "col_discovery_250",
+          "role": "Collection frame and vault-motif reference",
+          "repositoryPath": "public/ui/deeds/col_discovery_250.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_discovery_250.webp"
+        },
+        {
+          "image": 3,
+          "id": "dlv_reliquary_heroic",
+          "role": "heroic Reliquary mood and material reference",
+          "repositoryPath": "public/ui/deeds/dlv_reliquary_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dlv_reliquary_heroic.webp"
+        },
+        {
+          "image": 4,
+          "id": "col_seven_regalia",
+          "role": "collected-regalia reference",
+          "repositoryPath": "public/ui/deeds/col_seven_regalia.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_seven_regalia.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-6d853c85-1403-4b5d-b51a-7c6524e9f219.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_complete.png",
+        "bytes": 2039943,
+        "sha256": "8ab51d1db5452bbfddbbbb2dff3a56fda1b16840255018c3345bb8b516b7fb80",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_conquerors",
+      "canonicalName": "Shelf of Conquerors",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"Shelf of Conquerors\" (col_reliquary_conquerors), the completed Conquerors shelf achievement in World of ClaudeCraft.\nScene/backdrop: inside the crest only, a shadowed trophy-vault alcove in charcoal, oxblood and cold steel, lit by a focused warm museum beam. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: one compact stone-and-gilt trophy shelf holding unmistakable spoils from defeated champions: a broken black greatsword, a plated boss helm, a curved dragon horn, a small crowned skull medallion and a folded war banner. Arrange them as an intentional victorious exhibition, not a loose heap. A small laurel clasp anchors the shelf.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art matching the existing deeds. Tactile worn metal, bone and cloth, crisp silhouette, rich dark colors, heroic but not gory, top-left warm key and cool shadow.\nComposition/framing: centered trophy shelf inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and subtle diagonal studs. Entire frame visible, generous exterior padding, no crop, strong read at 24 to 40 pixels.\nInput images: Image 1 supplies trophy-hoard mood. Image 2 supplies conquered-boss heraldry. Image 3 supplies heroic dragon-bone language. Image 4 supplies collection/set framing. Preserve the common frame; do not copy unrelated subjects.\nConstraints: exactly one crest and one trophy shelf; no living characters; no gore; no text, letters, numerals, labels, UI tile, square border, watermark, collage, checkerboard, or extra crest. No #ff00ff within the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "soc_wyrms_hoard",
+          "role": "trophy-hoard mood reference",
+          "repositoryPath": "public/ui/deeds/soc_wyrms_hoard.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/soc_wyrms_hoard.webp"
+        },
+        {
+          "image": 2,
+          "id": "dgn_nythraxis_gravebreaker",
+          "role": "conquered-boss heraldry reference",
+          "repositoryPath": "public/ui/deeds/dgn_nythraxis_gravebreaker.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis_gravebreaker.webp"
+        },
+        {
+          "image": 3,
+          "id": "dgn_gravewyrm_sanctum_heroic",
+          "role": "heroic dragon-bone language reference",
+          "repositoryPath": "public/ui/deeds/dgn_gravewyrm_sanctum_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_gravewyrm_sanctum_heroic.webp"
+        },
+        {
+          "image": 4,
+          "id": "col_set_crownforged",
+          "role": "collection and set-framing reference",
+          "repositoryPath": "public/ui/deeds/col_set_crownforged.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_set_crownforged.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-04555717-71e8-49cb-af5a-f7df91409a66.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_conquerors.png",
+        "bytes": 1878613,
+        "sha256": "65137c204d41e497f16466ef0fdc3bc6915920f960c2dbad6cc40d34283fc389",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_illum_gravewyrm_heroic",
+      "canonicalName": "Sanctum Illuminated",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"Sanctum Illuminated\" (col_reliquary_illum_gravewyrm_heroic), earned by illuminating the Heroic Gravewyrm Sanctum page in World of ClaudeCraft.\nScene/backdrop: inside the crest only, abyssal navy and grave-green shadow with a concentrated icy-blue and antique-gold manuscript glow. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: one open illuminated manuscript with blank parchment. Rising from the center fold is a compact heroic Gravewyrm emblem: a regal skeletal dragon skull with swept horns and a curved spine halo, worked in pale bone, blue enamel and gold leaf. A small sanctum lantern burns beneath the emblem and thin grave-blue rays show the page is complete.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art matching the existing deeds. Ornate illuminated-manuscript feel without writing, tactile parchment, bone and metal, crisp dragon silhouette, deep cold jewel palette.\nComposition/framing: centered manuscript and Gravewyrm emblem inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and subtle diagonal studs. Entire frame visible, generous exterior padding, no crop, readable at 24 to 40 pixels.\nInput images: Images 1 and 2 define Gravewyrm identity and heroic palette. Image 3 supplies Sanctum achievement material. Image 4 defines the completed illuminated-book language. Preserve the common frame; do not copy unrelated subjects.\nConstraints: exactly one crest and one open manuscript; one skeletal dragon emblem; blank pages, no text, letters, runes, numerals, labels or pseudo-writing; no gore, people, UI tile, square border, watermark, collage, checkerboard, or extra crest. No #ff00ff within the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "dgn_gravewyrm_sanctum_heroic",
+          "role": "Heroic Gravewyrm identity and palette reference",
+          "repositoryPath": "public/ui/deeds/dgn_gravewyrm_sanctum_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_gravewyrm_sanctum_heroic.webp"
+        },
+        {
+          "image": 2,
+          "id": "dgn_gravewyrm_sanctum",
+          "role": "base Gravewyrm identity reference",
+          "repositoryPath": "public/ui/deeds/dgn_gravewyrm_sanctum.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_gravewyrm_sanctum.webp"
+        },
+        {
+          "image": 3,
+          "id": "dgn_sanctum_speed",
+          "role": "Sanctum achievement material reference",
+          "repositoryPath": "public/ui/deeds/dgn_sanctum_speed.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_sanctum_speed.webp"
+        },
+        {
+          "image": 4,
+          "id": "feat_book_complete",
+          "role": "completed illuminated-book language reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-987d6bcd-e733-4ea9-b937-b629ca88be69.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_illum_gravewyrm_heroic.png",
+        "bytes": 2230068,
+        "sha256": "e573fd684b66dbb3b83190aa052348a4b8b8e4acc8f39fbce83d427ac92d1a0d",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_illum_nythraxis_heroic",
+      "canonicalName": "Nythraxis Illuminated",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"Nythraxis Illuminated\" (col_reliquary_illum_nythraxis_heroic), earned by illuminating the Heroic Nythraxis Raid page in World of ClaudeCraft.\nScene/backdrop: inside the crest only, deep crypt-black and royal purple with a concentrated antique-gold manuscript glow. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: one open illuminated manuscript with blank parchment. Rising from the center fold is a compact heroic Nythraxis emblem: a crowned skeletal warlord skull wreathed in disciplined violet-black necromantic flame, edged in gold leaf. A small page-clasp gem glows below. The manuscript is unmistakably complete and radiant.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art matching the existing deeds. Ornate illuminated-manuscript feel without writing, tactile parchment and metal, crisp iconic focal shape, deep jewel palette.\nComposition/framing: centered manuscript and emblem inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and subtle diagonal studs. Entire frame visible, generous exterior padding, no crop, readable at 24 to 40 pixels.\nInput images: Images 1 and 2 define Heroic Nythraxis identity and palette. Image 3 defines the completed illuminated-book language. Image 4 supplies the crowned-skull achievement motif. Preserve the common frame; do not copy unrelated subjects.\nConstraints: exactly one crest and one open manuscript; blank pages, no text, letters, runes, numerals, labels or pseudo-writing; no UI tile, square border, watermark, collage, checkerboard, or extra crest. No #ff00ff within the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "dgn_nythraxis_heroic",
+          "role": "Heroic Nythraxis identity and palette reference",
+          "repositoryPath": "public/ui/deeds/dgn_nythraxis_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis_heroic.webp"
+        },
+        {
+          "image": 2,
+          "id": "dgn_nythraxis",
+          "role": "base Nythraxis identity and palette reference",
+          "repositoryPath": "public/ui/deeds/dgn_nythraxis.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis.webp"
+        },
+        {
+          "image": 3,
+          "id": "feat_book_complete",
+          "role": "completed illuminated-book language reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        },
+        {
+          "image": 4,
+          "id": "dgn_nythraxis_deathless",
+          "role": "crowned-skull achievement motif reference",
+          "repositoryPath": "public/ui/deeds/dgn_nythraxis_deathless.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dgn_nythraxis_deathless.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-776f0d96-6b12-44ed-aac5-9c30c299937e.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_illum_nythraxis_heroic.png",
+        "bytes": 1984544,
+        "sha256": "2ea8e6ca41aba5299116e90fa6a7b1bba5b90801c9ce172fba500e0d57dd4feb",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_illum_thunzharr",
+      "canonicalName": "Thunzharr Illuminated",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"Thunzharr Illuminated\" (col_reliquary_illum_thunzharr), earned by illuminating the Thunzharr, the Waking Peak page in World of ClaudeCraft.\nScene/backdrop: inside the crest only, storm-black and midnight teal with a concentrated white-gold manuscript glow and restrained electric blue. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: one open illuminated manuscript with blank parchment. Rising from its center fold is the unmistakable silhouette of the Waking Peak, a tall split mountain struck through by a single vertical fork of lightning, rendered as a gold-leaf miniature with blue-white energy. A ring of small storm medallions ornaments the page edges, and one amber clasp glows below. The page is unmistakably complete and radiant.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art matching the existing deeds. Illuminated-manuscript richness without writing, tactile parchment and metal, crisp mountain silhouette, deep storm jewel palette.\nComposition/framing: centered manuscript and mountain emblem inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and subtle diagonal studs. Entire frame visible, generous exterior padding, no crop, readable at 24 to 40 pixels.\nInput images: Images 1 to 3 define Thunzharr and Waking Peak identity, palette and lightning language. Image 4 defines the completed illuminated-book language. Preserve the common frame; do not copy unrelated subjects.\nConstraints: exactly one crest and one open manuscript; one mountain and one primary lightning strike; blank pages, no text, letters, runes, numerals, labels or pseudo-writing; no people, UI tile, square border, watermark, collage, checkerboard, or extra crest. No #ff00ff within the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "cmb_thunzharr",
+          "role": "Thunzharr identity and palette reference",
+          "repositoryPath": "public/ui/deeds/cmb_thunzharr.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/cmb_thunzharr.webp"
+        },
+        {
+          "image": 2,
+          "id": "cmb_thunzharr_unbroken",
+          "role": "Waking Peak identity reference",
+          "repositoryPath": "public/ui/deeds/cmb_thunzharr_unbroken.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/cmb_thunzharr_unbroken.webp"
+        },
+        {
+          "image": 3,
+          "id": "cmb_thunzharr_ten",
+          "role": "lightning-language reference",
+          "repositoryPath": "public/ui/deeds/cmb_thunzharr_ten.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/cmb_thunzharr_ten.webp"
+        },
+        {
+          "image": 4,
+          "id": "feat_book_complete",
+          "role": "completed illuminated-book language reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-77a907c8-f8f4-4cf1-90a3-0e7d04dbba51.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_illum_thunzharr.png",
+        "bytes": 2246702,
+        "sha256": "84e7720b5c1362d5e22b5650b7ba297d9033747bc9b87b77b1a4c18c0ee51c80",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_rank_2",
+      "canonicalName": "Spoilskeeper",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"Spoilskeeper\" (col_reliquary_rank_2), the second Curator rank in World of ClaudeCraft.\nScene/backdrop: inside the crest only, a deep charcoal-indigo painted ground with subtle vault haze and warm amber glints. Outside the complete circular crest, use one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: one compact bronze reliquary coffer, slightly open, holding ten clearly separate small relic tokens and gemstones arranged as a deliberate collection. Add a slim curator key across the lower front. It should read as an early but earned museum-keeper rank, practical bronze and leather rather than royal excess.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art, matching the provided existing World of ClaudeCraft deeds exactly. Tactile metal and leather, crisp focal edges, restrained magical glow, deep jewel colors, top-left warm key light and cool shadow.\nComposition/framing: centered subject inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and four subtle diagonal studs seen in the references. Entire frame visible, generous exterior padding, no crop. Subject and frame together should occupy roughly 66 to 72 percent of the square and stay readable at 24 to 40 pixels.\nInput images: Image 1 is the primary Collection deed frame and rendering reference. Image 2 is the Reliquary chest and lantern material/mood reference. Image 3 is the complete-book deed painting reference. Image 4 is the ornate collection-key emblem reference. Preserve the common frame language; do not copy unrelated subject shapes.\nConstraints: exactly one crest, one coffer, one key; no people; no text, letters, numerals, labels, UI tile, square border, watermark, collage, checkerboard, or extra crest. No #ff00ff within the crest art. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "col_discovery_250",
+          "role": "primary Collection deed frame and rendering reference",
+          "repositoryPath": "public/ui/deeds/col_discovery_250.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_discovery_250.webp"
+        },
+        {
+          "image": 2,
+          "id": "dlv_reliquary_heroic",
+          "role": "Reliquary chest, lantern, material, and mood reference",
+          "repositoryPath": "public/ui/deeds/dlv_reliquary_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dlv_reliquary_heroic.webp"
+        },
+        {
+          "image": 3,
+          "id": "feat_book_complete",
+          "role": "completed Book of Deeds painting reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        },
+        {
+          "image": 4,
+          "id": "col_all_slots",
+          "role": "ornate collection-key emblem reference",
+          "repositoryPath": "public/ui/deeds/col_all_slots.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_all_slots.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-84169fb0-9666-456d-b089-c73febfae2a7.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_2.png",
+        "bytes": 1908114,
+        "sha256": "94158df7b2e45dbef25aea973fd2f49f6cfd59fe80392b704a839bce4314afa3",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_rank_3",
+      "canonicalName": "The Cataloguer",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"The Cataloguer\" (col_reliquary_rank_3), the third Curator rank in World of ClaudeCraft.\nScene/backdrop: inside the crest only, deep midnight-blue painted archive darkness with restrained violet and amber glints. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: an elegant open midnight-blue leather catalogue ledger with blank parchment pages, a silver curator key, and a small magnifying lens. Around the ledger, a disciplined arc of many tiny gold collection seals and gem studs suggests a growing catalog without any numerals or writing. This rank is richer and more learned than Spoilskeeper, with silver and gold refinement but not yet royal.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art, matching the provided World of ClaudeCraft deeds exactly. Tactile leather, parchment and metal, crisp focal edges, restrained magical light, top-left warm key and cool shadow.\nComposition/framing: centered subject inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and four subtle diagonal studs seen in the references. Entire frame visible, generous exterior padding, no crop. Frame and subject should remain readable at 24 to 40 pixels.\nInput images: Image 1 is the primary Collection deed frame and rendering reference. Image 2 is the Reliquary material and mood reference. Image 3 is the complete-book reference. Image 4 is the ornate collection emblem reference. Preserve the shared frame language; do not copy unrelated shapes.\nConstraints: exactly one crest and one open ledger; blank pages only; no text, letters, numerals, labels, pseudo-writing, UI tile, square border, people, watermark, collage, checkerboard, or extra crest. No #ff00ff inside the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "col_discovery_250",
+          "role": "primary Collection deed frame and rendering reference",
+          "repositoryPath": "public/ui/deeds/col_discovery_250.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_discovery_250.webp"
+        },
+        {
+          "image": 2,
+          "id": "dlv_reliquary_heroic",
+          "role": "Reliquary chest, lantern, material, and mood reference",
+          "repositoryPath": "public/ui/deeds/dlv_reliquary_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dlv_reliquary_heroic.webp"
+        },
+        {
+          "image": 3,
+          "id": "feat_book_complete",
+          "role": "completed Book of Deeds painting reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        },
+        {
+          "image": 4,
+          "id": "col_all_slots",
+          "role": "ornate collection-key emblem reference",
+          "repositoryPath": "public/ui/deeds/col_all_slots.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_all_slots.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-b8f25322-da32-43a7-8d6e-8e199eb194ff.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_3.png",
+        "bytes": 2156438,
+        "sha256": "50117bb3608e8b66890a1a48ee91dcbfab4410176dd01fef48ff4b9a6f8e9bc2",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_rank_4",
+      "canonicalName": "Arch-Curator",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"Arch-Curator\" (col_reliquary_rank_4), the fourth Curator rank in World of ClaudeCraft.\nScene/backdrop: inside the crest only, a deep teal-black grand-vault interior with subtle blue-green haze and controlled gold illumination. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: a ceremonial grand-curator staff shaped like an ornate vault key, crossed over a miniature many-drawered relic cabinet whose drawers hold jewel-toned treasures. Crown the crossing with one polished archival seal. The silhouette should feel authoritative, scholarly and near-legendary, with dark steel, teal enamel and bright gilt.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art, matching the provided World of ClaudeCraft deeds exactly. Tactile engraved metal and wood, crisp focal edges, restrained magical accents, deep jewel colors, top-left warm key light and cool shadow.\nComposition/framing: centered subject inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and four subtle diagonal studs seen in the references. Entire frame visible, generous exterior padding, no crop. Strong compact silhouette readable at 24 to 40 pixels.\nInput images: Image 1 is the primary Collection deed frame and rendering reference. Image 2 is the Reliquary chest material/mood reference. Image 3 is the complete-book painting reference. Image 4 is the collection-key emblem reference. Preserve the common frame language; do not copy unrelated subjects.\nConstraints: exactly one crest, one ceremonial key-staff and one compact relic cabinet; no people; no text, letters, numerals, labels, UI tile, square border, watermark, collage, checkerboard, or extra crest. No #ff00ff within the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "col_discovery_250",
+          "role": "primary Collection deed frame and rendering reference",
+          "repositoryPath": "public/ui/deeds/col_discovery_250.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_discovery_250.webp"
+        },
+        {
+          "image": 2,
+          "id": "dlv_reliquary_heroic",
+          "role": "Reliquary chest, lantern, material, and mood reference",
+          "repositoryPath": "public/ui/deeds/dlv_reliquary_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dlv_reliquary_heroic.webp"
+        },
+        {
+          "image": 3,
+          "id": "feat_book_complete",
+          "role": "completed Book of Deeds painting reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        },
+        {
+          "image": 4,
+          "id": "col_all_slots",
+          "role": "ornate collection-key emblem reference",
+          "repositoryPath": "public/ui/deeds/col_all_slots.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_all_slots.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-5b3e5738-0aa9-4298-bf28-e6115be6899c.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_4.png",
+        "bytes": 2077507,
+        "sha256": "6c90402b5d3f25b142b9bb38804a145c7032d0058412f684f05688e5e6e621eb",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    },
+    {
+      "id": "col_reliquary_rank_5",
+      "canonicalName": "Eternal Spoils",
+      "generationMode": "OpenAI built-in image generation",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent fantasy MMORPG deed crest\nPrimary request: Create the painted deed crest for \"Eternal Spoils\" (col_reliquary_rank_5), the fifth and final Curator rank in World of ClaudeCraft.\nScene/backdrop: inside the crest only, near-black indigo vault darkness with rich amethyst haze and radiant antique-gold highlights. Outside the complete circular crest, one perfectly flat solid #ff00ff chroma-key field with no shadows, gradients, texture, reflections, or lighting variation.\nSubject: a magnificent open gilt reliquary overflowing with a controlled fan of distinct relics, gemstones, a tiny crown fragment and a sealed scroll. Above it floats a thick struck-gold eternal-knot seal, a clean horizontal lemniscate motif echoing the shipped Curator rank-5 sigil. A single loop of golden light binds the seal to the treasure, conveying collection without end. This is the unmistakable capstone of the four-rank ladder.\nStyle/medium: premium hand-painted classic dark-fantasy MMO achievement art, matching the provided World of ClaudeCraft deeds exactly. Tactile precious metal and gems, crisp focal edges, restrained but triumphant magical glow, deep jewel colors, top-left warm key light and cool shadow.\nComposition/framing: centered subject inside the same narrow double dark-metal and aged-gold circular frame with four long cardinal diamond points and four subtle diagonal studs seen in the references. Entire frame visible, generous exterior padding, no crop. Compact iconic silhouette readable at 24 to 40 pixels.\nInput images: Image 1 is the primary Collection deed frame and rendering reference. Image 2 is the Reliquary material/mood reference. Image 3 is the complete-book achievement reference. Image 4 is the ornate collection-key reference. Preserve the common frame language; do not copy unrelated subjects.\nConstraints: exactly one crest, one reliquary and one eternal-knot seal; no people; no text, letters, numerals, labels, UI tile, square border, watermark, collage, checkerboard, or extra crest. The eternal knot is a symbol, not lettering. No #ff00ff within the crest. Crisp closed silhouette and soft antialiased matte against the flat chroma-key exterior.",
+      "orderedReferences": [
+        {
+          "image": 1,
+          "id": "col_discovery_250",
+          "role": "primary Collection deed frame and rendering reference",
+          "repositoryPath": "public/ui/deeds/col_discovery_250.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_discovery_250.webp"
+        },
+        {
+          "image": 2,
+          "id": "dlv_reliquary_heroic",
+          "role": "Reliquary chest, lantern, material, and mood reference",
+          "repositoryPath": "public/ui/deeds/dlv_reliquary_heroic.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/dlv_reliquary_heroic.webp"
+        },
+        {
+          "image": 3,
+          "id": "feat_book_complete",
+          "role": "completed Book of Deeds painting reference",
+          "repositoryPath": "public/ui/deeds/feat_book_complete.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/feat_book_complete.webp"
+        },
+        {
+          "image": 4,
+          "id": "col_all_slots",
+          "role": "ornate collection-key emblem reference",
+          "repositoryPath": "public/ui/deeds/col_all_slots.webp",
+          "generationTimePath": "/Users/fernando/Documents/wocc-release-art-audit-v036/public/ui/deeds/col_all_slots.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-a1bc2457-71c0-4509-b9f4-cf8d3bcb8ee4.png",
+      "generatedOriginEvidence": {
+        "copiedTo": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_5.png",
+        "bytes": 2324071,
+        "sha256": "4bec242ef6efe9cb5ef1bafadda1e46610fcb811f0413c8ec467f484a92137a5",
+        "dimensions": { "width": 1254, "height": 1254 },
+        "channels": 3,
+        "hasAlpha": false
+      },
+      "retries": []
+    }
+  ]
+}

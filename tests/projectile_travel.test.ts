@@ -89,6 +89,54 @@ describe('scheduleProjectile + advancePendingProjectiles', () => {
     expect(ticks).toBeGreaterThan(15);
   });
 
+  it('can launch from a supplied impact point while retaining the original caster', () => {
+    const ctx = fakeCtx();
+    const caster = ent(1, 0, 0);
+    const target = ent(2, 0, 26);
+    ctx.entities.set(1, caster);
+    ctx.entities.set(2, target);
+    const landed = { n: 0 };
+
+    scheduleProjectile(
+      ctx as any,
+      caster,
+      target,
+      () => {
+        landed.n++;
+      },
+      { x: 0, z: 20 },
+    );
+
+    const ticks = advanceUntilLanded(ctx, landed);
+    expect(ticks).toBeGreaterThan(2);
+    expect(ticks).toBeLessThan(8);
+    expect(landed.n).toBe(1);
+  });
+
+  it('does not advance a projectile launched by an impact until the next tick', () => {
+    const ctx = fakeCtx();
+    const caster = ent(1, 0, 0);
+    const first = ent(2, 0, 0.2);
+    const second = ent(3, 0, 0.4);
+    ctx.entities.set(caster.id, caster);
+    ctx.entities.set(first.id, first);
+    ctx.entities.set(second.id, second);
+    const hits: number[] = [];
+
+    scheduleProjectile(ctx as any, caster, first, () => {
+      hits.push(first.id);
+      scheduleProjectile(ctx as any, caster, second, () => hits.push(second.id), first.pos);
+    });
+
+    advancePendingProjectiles(ctx as any);
+    expect(hits).toEqual([first.id]);
+    expect(ctx.pendingProjectiles).toHaveLength(1);
+
+    advancePendingProjectiles(ctx as any);
+    expect(hits).toEqual([first.id, second.id]);
+    expect(ctx.pendingProjectiles).toHaveLength(0);
+  });
+
   it('lands LATER against a target running away during flight', () => {
     const ctx = fakeCtx();
     const src = ent(1, 0, 0);

@@ -1,5 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { orderTabTargets, TabCandidate } from '../src/sim/tab_target';
+import { describe, expect, it } from 'vitest';
+import {
+  orderTabTargets,
+  stepTabTarget,
+  type TabCandidate,
+  type TabOrder,
+} from '../src/sim/tab_target';
 
 // Player faces +Z (facing 0): forward is (sin 0, cos 0) = (0, 1).
 const FACING_NORTH = 0;
@@ -96,5 +101,89 @@ describe('orderTabTargets', () => {
     const order = orderTabTargets([engagedFar, idleFar], FACING_NORTH);
     expect(order.ids).toEqual([1, 2]);
     expect(order.primaryCount).toBe(1);
+  });
+});
+
+// Tab (+1) and Shift+Tab (-1) share one index step so the two binds are exact
+// mirrors. These pin the forward arm at its pre-existing behavior AND the
+// backward arm as its inverse.
+describe('stepTabTarget', () => {
+  const order = (ids: number[], primaryCount: number): TabOrder => ({ ids, primaryCount });
+
+  it('grabs the priority enemy in both directions when nothing is targeted', () => {
+    const o = order([7, 8, 9], 3);
+    expect(stepTabTarget(o, -1, 1)).toBe(7);
+    expect(stepTabTarget(o, -1, -1)).toBe(7);
+  });
+
+  it('walks the near cluster forward and wraps at its end', () => {
+    const o = order([7, 8, 9], 3);
+    expect(stepTabTarget(o, 0, 1)).toBe(8);
+    expect(stepTabTarget(o, 1, 1)).toBe(9);
+    expect(stepTabTarget(o, 2, 1)).toBe(7);
+  });
+
+  it('walks the near cluster backward and wraps at its start', () => {
+    const o = order([7, 8, 9], 3);
+    expect(stepTabTarget(o, 2, -1)).toBe(8);
+    expect(stepTabTarget(o, 1, -1)).toBe(7);
+    expect(stepTabTarget(o, 0, -1)).toBe(9);
+  });
+
+  it('stays inside the cluster in both directions while a fallback band exists', () => {
+    // ids 7,8 are the cluster; 9 is the distant fallback. Neither direction may
+    // step out to it from inside the cluster.
+    const o = order([7, 8, 9], 2);
+    expect(stepTabTarget(o, 1, 1)).toBe(7);
+    expect(stepTabTarget(o, 0, -1)).toBe(8);
+  });
+
+  it('walks the fallback band forward, then wraps back into the cluster', () => {
+    const o = order([7, 8, 9], 1);
+    expect(stepTabTarget(o, 1, 1)).toBe(9);
+    expect(stepTabTarget(o, 2, 1)).toBe(7);
+  });
+
+  it('walks the fallback band backward, re-entering the cluster at its last id', () => {
+    const o = order([7, 8, 9], 2);
+    expect(stepTabTarget(o, 2, -1)).toBe(8);
+  });
+
+  it('wraps backward to the very last id when the cluster is empty', () => {
+    const o = order([7, 8, 9], 0);
+    expect(stepTabTarget(o, 0, -1)).toBe(9);
+    expect(stepTabTarget(o, 2, 1)).toBe(7);
+  });
+
+  it('is its own inverse across the whole cluster: forward n then back n returns', () => {
+    const o = order([7, 8, 9, 10], 4);
+    for (let start = 0; start < o.ids.length; start++) {
+      let idx = start;
+      for (let n = 0; n < 3; n++) idx = o.ids.indexOf(stepTabTarget(o, idx, 1));
+      for (let n = 0; n < 3; n++) idx = o.ids.indexOf(stepTabTarget(o, idx, -1));
+      expect(idx).toBe(start);
+    }
+  });
+
+  it('handles a single candidate by staying on it in either direction', () => {
+    const o = order([7], 1);
+    expect(stepTabTarget(o, 0, 1)).toBe(7);
+    expect(stepTabTarget(o, 0, -1)).toBe(7);
+  });
+
+  // The documented EXCEPTION to the inverse property, pinned so a future
+  // "symmetry fix" reds here on purpose instead of silently changing what Tab
+  // selects. Forward off the last fallback wraps to the cluster HEAD, backward
+  // off the cluster head wraps to the cluster TAIL, so the round trip does not
+  // return. That is deliberate: making it return would mean backward stepping
+  // OUT of the cluster into a distant idle enemy, which is exactly what the
+  // cluster design forbids.
+  it('is deliberately NOT an inverse across the cluster/fallback wrap', () => {
+    const o = order([7, 8, 9], 2); // 7,8 = cluster; 9 = distant fallback
+    // Forward off the fallback lands on the cluster head, not back in the band.
+    expect(stepTabTarget(o, 2, 1)).toBe(7);
+    // Backward off that head wraps within the cluster instead of returning to 9.
+    expect(stepTabTarget(o, 0, -1)).toBe(8);
+    expect(stepTabTarget(o, 0, -1)).not.toBe(9);
   });
 });

@@ -9,20 +9,25 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { isStunned } from '../src/sim/combat/cc';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
+import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
-import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
+import { SPORT_ROLES, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
+  bgOriginAt,
   DELVES,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
   delveAt,
   dungeonAt,
+  ITEMS,
+  isBgPos,
   isDelvePos,
   MOBS,
   ZONES,
@@ -31,6 +36,12 @@ import {
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
 import { specialRoleChatTag } from '../src/sim/discord_roles';
+import {
+  GUILD_CREATION_FEE_COPPER,
+  type GuildBankOpDelta,
+  guildBankRungsBought,
+} from '../src/sim/guild_bank';
+import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -42,7 +53,7 @@ import {
 } from '../src/sim/jail';
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
-import { sanitizeMarketQuery } from '../src/sim/market_query';
+import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
@@ -50,10 +61,24 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
+import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { effectiveFishingBand } from '../src/sim/professions/fishing';
+import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
+import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
+import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
+import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
+import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
+import {
+  catalogCharacterCompletion,
+  characterReliquaryOwnership,
+  curatorRankFromOwned,
+  reliquaryWireJson,
+} from '../src/sim/reliquary';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import { populateCommunityRiftPortals } from '../src/sim/rift/portals';
-import type { PetState, PlayerMeta } from '../src/sim/sim';
+import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
+import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
 import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
@@ -64,16 +89,19 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
-  ALL_EQUIP_SLOTS,
   type Aura,
   DT,
   dist2d,
   type Entity,
-  type EquipSlot,
   emptyMoveInput,
+  FISHING_CAST_ID,
+  type InvSlot,
+  type ItemInstancePayload,
   isDungeonDifficulty,
+  isEquipSlot,
   MAX_LEVEL,
   type MobFamily,
+  PLAYER_INTEREST_DROP_RADIUS,
   RUN_SPEED,
   type SimEvent,
   type SportRole,
@@ -82,21 +110,36 @@ import {
   type VcNationId,
 } from '../src/sim/types';
 import { isAtSowfield } from '../src/sim/vale_cup_layout';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type BankBonusSource,
+  type BgLadderEntry,
   COMMAND_NAMES,
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
+  PET_SPECIAL_WIRE_VERSION,
+  type PetSpecialWireVersion,
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
+import { sameAppearance } from '../src/world_api/appearance';
 import { recordOnlineSample } from './admin_db';
+import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
-import { recordBankOp } from './bank_ledger';
+import {
+  diffGuildBankOp,
+  type GuildBankLedgerOp,
+  guildCreateFeeDelta,
+  recordBankOp,
+  recordGuildBankCounterpartyOrphan,
+  recordGuildBankDeltas,
+  recordGuildBankEscrowRollback,
+} from './bank_ledger';
+import { reportBgOutcomes } from './battleground_telemetry';
 import type {
   BotDetector,
   BotTrackingContext,
@@ -109,6 +152,7 @@ import {
   buildDetectionCalibrationSnapshot,
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
+import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
 import { ChatFilter } from './chat_filter';
 import {
   isChatFilterWrite,
@@ -117,15 +161,27 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import {
+  applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
+  persistCheaterMark,
+  refreshCheaterMark,
+} from './cheater_mark_runtime';
+import {
+  type CosmeticOpGuardState,
+  consumeCosmeticOpToken,
+  createCosmeticOpGuard,
+} from './cosmetic_op_guard';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
   closePlaySession,
+  GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
   grantAccountWeaponSkins,
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
+  loadGuildBankRows,
   loadMailState,
   loadMarketState,
   loadRiftState,
@@ -134,6 +190,7 @@ import {
   pool,
   releaseCharacterLease,
   revokeAccountMechChroma,
+  saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
   saveMailState,
@@ -147,20 +204,70 @@ import {
 import { getDeedBroadcasts } from './deeds_db';
 import {
   deedRecordsIdle,
+  discordFeedDeed,
   isHiddenDeedId,
   isMarqueeDeed,
   reconcileCharacterDeeds,
   recordDeedUnlocks,
 } from './deeds_records';
-import { enqueueActivity } from './discord_activity';
+import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
+import { enqueueLinkChange } from './discord_link_changes';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+import {
+  copperFlowSourceForCommand,
+  harvestBandForNode,
+  harvestTierForNode,
+} from './economy_telemetry';
+import { isUpdateDue } from './entity_update_cadence';
+// Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
+// barrels), the same way deeds_records imports onDeedRecorded: the barrels
+// drag routes.ts (and its load-time requireAccount over the db module) into
+// every test that partial-mocks the db, the known overlay-mock breakage class.
+// Dual fan-out (D21): Steam and Epic reconcile independently.
+import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
+import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
+import {
+  classifyOnlineGeneralChat,
+  GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT,
+  GeneralChatQuotaCoordinator,
+  type GeneralChatRateLimitHydration,
+  GeneralChatRateLimitLiveState,
+  resolveGeneralChatAdmission,
+} from './general_chat_quota';
+import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
+import {
+  type CounterpartyActor,
+  type CounterpartyMovement,
+  counterpartyIdle,
+  counterpartyMovement,
+  counterpartyOrphan,
+  counterpartyOrphanEvidence,
+  counterpartySnapshot,
+  stampCounterpartyDeltas,
+} from './guild_bank_counterparty';
+import { readGuildBankLog } from './guild_bank_log';
+import {
+  consumeGuildBankOpToken,
+  createGuildBankOpGuard,
+  type GuildBankOpGuardState,
+} from './guild_bank_op_guard';
+import { compactGuildBankOpLog } from './guild_bank_op_log';
+import {
+  collectGuildBankDeltas,
+  // Imported from the module that DEFINES it, never through ./db: every test
+  // that partial-mocks the db module would otherwise have to re-export it for
+  // the `instanceof` below to resolve at all.
+  GuildBankEscrowRefused,
+  type GuildBankWriteResult,
+  loadGuildBanksIntoSim,
+} from './guild_bank_state';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
@@ -173,12 +280,12 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
-import { trackReachedLevel5 } from './meta_capi';
 import {
   applyMobScanTick,
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
 } from './mob_scan_tick_stats';
+import { parseModerationChatCommand } from './moderation_commands';
 import {
   forceCharacterRename,
   moderateAccount,
@@ -205,12 +312,20 @@ import {
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
+import {
+  createParseSubsystem,
+  type FightParticipant,
+  type ParseSubsystem,
+  readBuildVersion,
+} from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
-import { nextRaidResetMs } from './raid_reset';
+import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
+import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
+import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import { createSerialWriter } from './serial_writer';
 import {
@@ -218,41 +333,49 @@ import {
   StableAuraWireCache,
   StableSelfTimerWireCache,
 } from './snapshot_timer_wire';
-import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
+import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
-// Imported from the mirror module DIRECTLY (not the ./steam barrel), the same
-// way deeds_records imports onDeedRecorded: the barrel drags routes.ts (and its
-// load-time requireAccount over the db module) into every test that
-// partial-mocks the db, the known overlay-mock breakage class.
-import { reconcileOnLogin } from './steam/mirror';
+import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
+import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
-const WORLD_SEED = 20061;
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 // Interest management: the client renders entities out to 80yd, so new
 // entities enter interest just past that, and known entities persist a
 // little farther so the boundary doesn't churn create/destroy cycles.
 const INTEREST_RADIUS = 90;
-const INTEREST_DROP_RADIUS = 100;
+// Exported so the idle-mob-tick radius below (and its test) stay pinned to this
+// exact number instead of drifting into a second copy.
+export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;
 // Stationary quest/vendor npcs anchor map markers, so they keep the legacy
 // radius; once known they cost a handful of bytes per snapshot anyway.
 const NPC_INTEREST_RADIUS = 120;
 const NPC_DROP_RADIUS = 130;
-// the widest radius any entity kind can be relevant at
+// the widest OPEN-WORLD radius any entity kind can be relevant at (the
+// battleground band widens past this: BG_MATCH_DROP_RADIUS below)
 const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
-// Distance-tiered update rates: full snapshot rate inside nameplate range
-// (55yd, beyond every ability range), half rate out to the 80yd draw range,
-// quarter rate beyond. The viewer's target and anything attacking the
-// viewer always update at full rate regardless of distance.
-const FULL_RATE_RADIUS_SQ = 55 * 55;
-const HALF_RATE_RADIUS_SQ = 80 * 80;
-const HALF_RATE_DIVISOR = 2;
-const QUARTER_RATE_DIVISOR = 4;
+// Thornhollow Fields: the 100x280 field (diagonal ~297yd) fits inside this
+// raised radius, so a fighter's OWN SIDE and the field's furniture stay
+// tracked across the whole field. It is deliberately NOT a blanket same-slot
+// widening (see bgWideInterestApplies): it applies to
+//   (a) SAME-TEAM player pairs of one match, which the M map plots as teammate
+//       positions and the party frames read, and
+//   (b) the slot's non-player entities (flags, runes, props), which both sides
+//       are meant to track.
+// An ENEMY player falls back to the open-world radii above, so their position,
+// facing, health, resource, cast bar and auras are never SHIPPED past normal
+// interest. Hiding enemies is the server's job here, not the client's: fog is
+// presentation, and a client that ignores it must learn nothing extra.
+// Same-slot only in every arm: slot spacing (BG_SLOT_SPACING in
+// src/sim/data.ts) puts cross-slot pairs beyond BG_MATCH_DROP_RADIUS, pinned by
+// the cross-slot corner check in tests/battleground_band.test.ts.
+export const BG_MATCH_INTEREST_RADIUS = 300;
+export const BG_MATCH_DROP_RADIUS = 320;
 // How often the achieved tick rate rides the snapshot head. The meter's 3s
 // sliding window moves slowly and the client holds the last value across
 // omissions, so ~2 Hz keeps the overlay live without paying the scalar on
@@ -271,6 +394,10 @@ const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease'
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
+// Queue depth past which the shared market serial writer warns (rate-limited
+// to once a minute): the observable form of the accepted dirty-book-autosave
+// coupling documented at the writer's declaration.
+const MARKET_WRITE_QUEUE_WARN_DEPTH = 16;
 // Usage notices for the two PLAYER chat-suppression tiers. Kept as constants
 // because the S3 localization guard scans sendChatNotice literals, and
 // src/ui/server_i18n.ts carries the matching rules. (A "mute" is the ADMIN
@@ -332,8 +459,6 @@ export const MOB_UPDATE_BUCKETS = [
   'elemental',
   'dragonkin',
   'demon',
-  'kobold',
-  'murloc',
   'reptile',
   'other',
 ] as const satisfies readonly (MobFamily | 'other')[];
@@ -359,6 +484,9 @@ export const SIM_LAP_PHASES = [
   'mob.update',
   'mob.auras',
   'ent.misc',
+  // The Drakelands dragonkin brood pass (src/sim/mob/dragonkin_brood.ts):
+  // egg proximity/chain/hatch, whelp upkeep, broodlord counter-stun.
+  'dragonkinBrood',
   'engaged',
   'duels',
   'cardDuel',
@@ -368,6 +496,7 @@ export const SIM_LAP_PHASES = [
   'instances',
   'delves',
   'valecup',
+  'battleground',
   'dfinder',
   'market',
   'postOffice',
@@ -400,6 +529,33 @@ export const SIM_MOB_ZONE_PHASES = [
   MOB_ZONE_PHASE_OTHER,
 ];
 
+// Per-key-group attribution buckets for the bcastSelf phase (selfWireJson).
+// HOST-DERIVED like the mob zone buckets and populated only while a detailed
+// capture is active, so a production capture names WHICH self key group eats
+// the budget instead of one opaque bcastSelf total: the market and corder
+// incidents both hid inside that total for a whole diagnosis round each.
+// Buckets are CONTIGUOUS code ranges of selfWireJson (a lap probe, the sim
+// perfLap shape), not individual keys, to keep the probe to one clock read
+// per boundary.
+export const SELF_WIRE_PHASES = [
+  'base', // wireEntity + the always-on scalar block + its stringify
+  'timers', // lockouts, corpse, auras, cooldowns, node cooldowns, charges, stats, weapon
+  'social', // party, marks, trade, duel, cardDuel, honor, arena
+  'bg',
+  'vcup',
+  'df',
+  'market',
+  'mail',
+  'bank', // bank + guildBank
+  'loot', // lroll, lrollg, mloot
+  'delve',
+  'prof', // prof, cprof, mst
+  'corder',
+  'craft', // enchant outcomes, town focus, gathering, tool slots, mounts, renown, title
+  'heavy', // the wireRev-gated heavy block + sport
+  'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
+].map((n) => `self.${n}`);
+
 // The zone/group bucket a mob's update cost is attributed to. Pure and allocation-free
 // (a cheap zoneAt band scan plus a Map lookup of an interned string).
 export function mobZonePhase(mob: Entity): string {
@@ -409,6 +565,35 @@ export function mobZonePhase(mob: Entity): string {
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
+// Thornhollow Fields `bg` self key: 1 Hz covers the in-match clocks (wave respawn,
+// match cap, carrier vulnerability) that tick by whole seconds; queue and match
+// transitions force a fresh readout via lastBgWireTick resets (the arena
+// staleness fix), and the flag/score events ride the event queue instantly.
+const BG_WIRE_HZ = 1;
+const BG_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * BG_WIRE_HZ)));
+// Personal battleground events that change the throttled `bg` readout the
+// moment they land (found/start/flag plays/result/queue churn).
+const BG_WIRE_RESET_EVENTS = new Set([
+  'bgQueued',
+  'bgUnqueued',
+  // The offer prompt is a 30 second clock the player must act on, so it must
+  // never wait up to a BG_WIRE_HZ period to appear or to show a new accept.
+  'bgProposed',
+  'bgProposalUpdate',
+  'bgFound',
+  'bgStart',
+  'bgFlag',
+  'bgKill', // the board tallies moved: refresh them with the feed line
+  'bgEnd',
+]);
+// A respawn is NOT in that set: the sim emits it pid-scoped for the RESPAWNER
+// only, while the readout it invalidates (the match-wide `dead` column) is read
+// by every member. A per-recipient reset would leave the other nine scoreboards
+// showing bodies for up to one BG_WIRE_HZ period, which the offline host, which
+// recomputes the view every frame, never does. So a respawn fans out to the
+// whole match instead (bgRespawnRefreshPids), the shape the bgKill events
+// already have because the sim emits one copy per member.
+const BG_RESPAWN_EVENT = 'respawn';
 // Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
 // queue sizes, so 2 Hz keeps the window/indicator live without re-serializing
 // the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
@@ -420,6 +605,76 @@ const VC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * VC_WIRE_HZ)));
 // the same cadence and only re-sends when a listing actually changes.
 const DF_WIRE_HZ = 2;
 const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
+// World Market browse readout cadence. The browse view is a filter + page over
+// the whole listing book, the single most expensive per-viewer read in
+// selfWireJson on a grown book, and nothing in it carries a sub-second clock,
+// so 4 Hz keeps the window feeling live while capping the rebuild rate. The
+// viewer's OWN market commands re-arm the gate (MARKET_WIRE_PROMPT_CMDS) so
+// their search/buy/cancel feedback still lands on the next snapshot. On top of
+// the cadence, a rebuild-only-on-change gate (sim.marketBrowseRevFor plus the
+// query object identity) skips the rebuild entirely while nothing changed;
+// MARKET_BROWSE_REFRESH_TICKS is its staleness backstop, the heavy-gate
+// refresh idea applied here.
+const MARKET_WIRE_HZ = 4;
+const MARKET_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MARKET_WIRE_HZ)));
+const MARKET_BROWSE_REFRESH_TICKS = 40;
+const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
+  'market_search',
+  'market_sell_price_check',
+  'market_list',
+  'market_list_instance',
+  'market_buy',
+  'market_cancel',
+  'market_collect',
+]);
+// Commission order board readout, the market recipe applied to the second
+// O(realm-collection) read that shipped on the per-tick self path (issue
+// #1298's `corder`): commissionOrdersFor walks the whole board and every
+// open-scope order lands in EVERY viewer's projection, so the unconditional
+// per-tick rebuild scaled with realm activity exactly like the market browse
+// did. Same three layers: a 4 Hz cadence, a rebuild-only-on-change gate
+// polling sim.commissionOrderBoardRev (viewer-independent: the projection is
+// a pure function of board plus pid), and a staleness backstop. The viewer's
+// OWN commission commands re-arm the gate for next-snapshot feedback.
+const CORDER_WIRE_HZ = 4;
+export const CORDER_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * CORDER_WIRE_HZ)));
+export const CORDER_BOARD_REFRESH_TICKS = 40;
+const CORDER_WIRE_PROMPT_CMDS = new Set<string>([
+  'open_commission_order',
+  'cancel_commission_order',
+  'accept_commission_order',
+  'deliver_commission_order',
+]);
+// Known residual, named on purpose: the board revision is realm-global and
+// corder has no proximity gate, so ONE board mutation anywhere re-triggers an
+// O(board) rebuild for every online session at its next due tick. Under
+// sustained churn (~4 mutations per second) the change gate degenerates to
+// the plain 5x cadence win. If that rate ever materializes, the next lever is
+// the bg readout's sharedMatchView memo shape: build the viewer-identical
+// open-scope subset once per board revision and splice the per-viewer rows.
+// The mail gate below shares the realm-global-revision half of this residual
+// (any letter booked anywhere rebuilds every at-pillar viewer's inbox at up
+// to 4 Hz); cheap now that mailInfoFor is bucket-based, and the
+// per-recipient buckets make a per-recipient revision the natural follow-up.
+
+// Ravenpost mailbox readout cadence, the market gate applied to `mail`: the
+// view is a full projection of the viewer's delivered letters (bodies
+// included) that used to re-serialize at 20 Hz for anyone standing at a raven
+// pillar, and nothing in it carries a sub-second clock. On top of the cadence,
+// a rebuild-only-on-change gate (sim.mailRevFor) skips the rebuild while
+// nothing changed; MAIL_REFRESH_TICKS is its staleness backstop, and the
+// viewer's OWN mail commands re-arm the gate so their take/delete/read
+// feedback still lands on the next snapshot. The always-streamed O(1) `mailU`
+// envelope count is deliberately NOT gated.
+const MAIL_WIRE_HZ = 4;
+export const MAIL_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MAIL_WIRE_HZ)));
+export const MAIL_REFRESH_TICKS = 40;
+const MAIL_WIRE_PROMPT_CMDS = new Set<string>([
+  'mail_send',
+  'mail_take',
+  'mail_delete',
+  'mail_read',
+]);
 
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
@@ -541,6 +796,7 @@ const LANE_DROP_CAUSE = {
 } as const satisfies Record<MsgLane, WsDropCause>;
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
+  'bg_queue',
   'vcup_queue',
   'vcup_ready',
   'vcup_practice',
@@ -555,8 +811,12 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
+  'inv_sort', // consolidates stacks + restamps cell hints: the self snapshot must resend it
   'unequip_item',
-  'salvage_item',
+  // salvage_item is deliberately ABSENT since the Craft Cast System: the
+  // command only starts a cast (nothing mutates on receipt), and the
+  // complete-time loot event is a HEAVY_SELF_EVENTS member, so listing it
+  // here would buy a wasted heavy re-serialize per cast start.
   'rift_upgrade_item',
   'rift_enchant_item',
   'rift_socket_gem',
@@ -564,6 +824,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'unequip_bag',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',
@@ -589,6 +850,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_weapon_skin',
   'prestige',
   'market_list',
+  'market_list_instance',
   'market_buy',
   'market_cancel',
   'market_collect',
@@ -599,6 +861,13 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
+  // Guild bank ops that touch a HEAVY self field: the two item moves rewrite
+  // the carried inventory (heavy-gated `inv`). The gold ops and buy_slots are
+  // deliberately absent: copper rides the ALWAYS-SENT base self object (not
+  // the heavy gate) and the treasury/slots ride the ungated maybe('guildBank')
+  // stream, so listing them would only buy a redundant heavy re-serialize.
+  'guild_bank_deposit',
+  'guild_bank_withdraw',
   'pet_feed',
   'dev_give',
   'dev_level',
@@ -611,6 +880,11 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'levelup',
   'virtualLevelUp',
   'deedUnlocked', // the earned map + stat block ride the heavy-gated deeds/dstats keys
+  // The Reliquary sparse blob (firstFind / illuminatedPages / marks / recent)
+  // rides the heavy-gated `reliq` key. No saveCharacter on pure fill; since
+  // Phase 18 the event is NOT presentation-only: detectActivity derives the
+  // illumination marquee fan-out from its illuminatedPageId field.
+  'reliquaryUnlock',
   'questAccepted',
   'questProgress',
   'questReady',
@@ -625,6 +899,15 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonPet',
   'dismissPet',
   'summonDemon',
+  // The acquisition craft's slot/recharge outcome: a successful slot consumes
+  // a charm copy and a successful recharge consumes arcane materials, neither
+  // through a loot-event path, so the self inv mirror re-diffs off this event.
+  // Deny arms ride along and force the same re-diff for no state change,
+  // ACCEPTED as the family's standing shape: enchantResult/unbindResult are
+  // members on the same terms, and HEAVY_SELF_CMDS already dirties on receipt
+  // regardless of outcome, so a denial-spamming client buys nothing another
+  // command does not already offer it.
+  'toolEffectResult',
   // Maker's Bond unbind (Professions 2.0): a successful unbind can
   // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the
   // result event itself must re-diff the heavy self keys or the holder's inv
@@ -640,6 +923,13 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // offer an enchant the player can no longer afford. The bagged arm's loot
   // event already covered it; this makes both arms explicit.
   'enchantResult',
+  // Commission order board delivery (issue #1298): the crafter's arm
+  // removes the delivered copy directly from PlayerMeta.inventory (no
+  // addItem/removeItem call, so no loot event fires on that side), so the
+  // result event itself must re-diff the crafter's heavy self keys or their
+  // inv mirror goes stale until the staggered refresh. The requester's side
+  // already gets a loot event from the ordinary addItemInstance grant.
+  'commissionOrderResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -672,6 +962,11 @@ export interface ClientSession {
   // stored link through `new URL()`, and the chat path would otherwise pay that on
   // EVERY line a streamer sends, to every channel.
   chatFlair: ChatSenderFlair | undefined;
+  // Latch: this session has worn a Cheater mark at some point. It gates the
+  // per-save write-back, so an unmarked account (nearly all of them) never pays
+  // a write, and it stays TRUE through the save that finally zeroes the row so
+  // the last write is not skipped by the aura already having expired.
+  cheaterMarked: boolean;
   characterId: number;
   pid: number; // player entity id in the sim
   name: string;
@@ -680,6 +975,13 @@ export interface ClientSession {
   joinedAt: number;
   dbSessionId: number | null; // play_sessions row, set once the insert lands
   metricsMaxLevel: number;
+  // The level the characters row currently carries, as of the last save that
+  // actually landed. Seeded at join from the loaded blob (joining is not a
+  // transition) and compared against the SERIALIZED level after every successful
+  // save, so the linked-member change feed learns about a level move exactly once
+  // instead of once per 30 s autosave. A GM/PBE join-time setPlayerLevel raises the
+  // in-memory level above this seed, so its first save reports the move.
+  lastPersistedLevel: number;
   left: boolean; // set in leave(); guards against the open-session insert landing after disconnect
   // linkdead grace: true while the socket has dropped but the character is
   // held in-world awaiting a reconnect. graceUntil is the epoch-ms deadline
@@ -695,6 +997,11 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
+  // Advances only when rememberedChat is written (rememberChatChannel), so the
+  // async General quota path can fence its sticky-channel set against a NEWER
+  // channel selection without unrelated commands (/who, /unstuck) tripping it.
+  chatChannelSequence: number;
+  generalChatRateLimit: GeneralChatRateLimit | null;
   // Pre-parse inbound gate state (#978): the frame and byte token buckets
   // plus the windowed abuse score, covering every frame (input, cast, cmd,
   // ...), separate from the chat-only bucket above, so a client flooding
@@ -709,6 +1016,17 @@ export interface ClientSession {
   // refusals above the far-above-human budget drop and tally into the same
   // abuse window.
   listReadGuard: ListReadGuardState;
+  // Token bucket for the five guild bank ops (Guild Bank Phase 3 QA): every
+  // allowed op is a keep-forever bank_ledger write plus an unflushed-delta
+  // log entry, so the rate is capped far above human banking cadence and
+  // refusals tally into the shared abuse window like every other shed frame.
+  guildBankOpGuard: GuildBankOpGuardState;
+  // Token bucket shared by the two Book of Deeds cosmetic sets (title and
+  // border): both fields are identityFields members, so every accepted set
+  // re-wires the FULL identity record to every in-range viewer, and the rate
+  // is capped far above human picking cadence with refusals tallying into the
+  // shared abuse window like every other shed frame.
+  cosmeticOpGuard: CosmeticOpGuardState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -738,11 +1056,39 @@ export interface ClientSession {
   // Recipient-negotiated timer representation. Legacy remains the default for
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
+  petSpecialWireVersion: 0 | PetSpecialWireVersion;
   timerWireCache: StableSelfTimerWireCache;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
+  // Thornhollow Fields battleground readout, same idea at its own cadence (BG_WIRE_HZ)
+  lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
+  // World Market browse readout, same idea at its own cadence (MARKET_WIRE_HZ),
+  // plus the rebuild-only-on-change state: the sim browse revision and the
+  // query object last built for, and the tick of the last rebuild (the
+  // MARKET_BROWSE_REFRESH_TICKS staleness backstop's tracker).
+  lastMarketWireTick: number;
+  lastMarketBrowseRev: number | null;
+  lastMarketQueryRef: MarketQuery | null;
+  // The Sell tab's price-check item id last built for (issue #3043), the
+  // marketQuery precedent: a primitive, so a plain !== value compare is its own
+  // change signal (no identity trick needed).
+  lastSellPriceItemIdRef: string | null;
+  lastMarketRebuildTick: number;
+  // Commission order board readout, same recipe at its own cadence
+  // (CORDER_WIRE_HZ): the board revision last built for plus the backstop
+  // tracker. The revision is viewer-independent (sim.commissionOrderBoardRev),
+  // so there is no query ref to track.
+  lastCorderWireTick: number;
+  lastCorderBoardRev: number | null;
+  lastCorderRebuildTick: number;
+  // Ravenpost mailbox readout, the market shape at its own cadence
+  // (MAIL_WIRE_HZ): the sim mail revision last built for and the tick of the
+  // last rebuild (the MAIL_REFRESH_TICKS staleness backstop's tracker).
+  lastMailWireTick: number;
+  lastMailRev: number | null;
+  lastMailRebuildTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -760,6 +1106,50 @@ export interface ClientSession {
   // last social snapshot. Drives the cheap periodic position push (no DB) that
   // keeps allies live on the world map.
   socialTrackedIds?: number[];
+  // Monotonic fence for the sim guild stamps (name + membership). Bumped by
+  // every SYNCHRONOUS stamp from a committed membership/rank mutation
+  // (onGuildMembershipChanged); sendSocialSnapshot captures it before its DB
+  // read and skips its own (possibly staler) stamp when the fence moved, so an
+  // in-flight snapshot can never roll the guild bank's officer gate back to a
+  // pre-demote rank.
+  guildStampSeq: number;
+  // Guild books this session dirtied (guild id -> a per-mark seq), awaiting the
+  // fenced escrow save (Guild Bank Phase 3). Marked when a dispatched guild
+  // bank op's before/after diff is non-empty (and at guild_create's seed);
+  // cleared per guild after a SUCCESSFUL save only if the seq is unchanged, so
+  // an op landing mid-save keeps the book scheduled for the next save.
+  dirtyGuildBanks: Map<number, number>;
+  // The UNFLUSHED book deltas behind those dirty marks, in op order (guild id
+  // -> the diffGuildBankOp output of every successful op not yet committed by
+  // an escrow save). This log is this session's UNCOMMITTED WORK and it is the
+  // escrow save's WRITE PAYLOAD: the save persists "durable truth plus these
+  // deltas", never the whole shared live book, so one officer's save can never
+  // carry another officer's not-yet-durable op into the row. Consumed from the
+  // front when a save commits; replayed BACKWARD onto the live book when this
+  // session's escrow can never commit again (fence-out, or the leave flush
+  // exhausted its retries), leaving every other session's ops intact. Bounded
+  // per guild by GUILD_BANK_UNFLUSHED_OP_CAP, which COMPACTS the log
+  // (server/guild_bank_op_log.ts) rather than dropping it: dropping the write
+  // payload would silently discard committed-intent work.
+  unflushedGuildBankOps: Map<number, GuildBankOpDelta[]>;
+  // Consecutive escrow REFUSALS per guild. A refusal rolls the whole save back
+  // (character half included), so nothing is ever half-committed; the count
+  // only bounds how long a session waits for the other officer's commit before
+  // it is rolled back and disconnected instead.
+  guildBankDeficitSkips: Map<number, number>;
+  // Set once this session's book work can never become durable and its live
+  // state has therefore been abandoned. A quarantined session persists
+  // NOTHING, ever again: its character half is the half that would carry the
+  // value its book half could not, so letting it save is the mint the refusal
+  // exists to prevent. It is kicked and reloads from its durable row.
+  escrowQuarantined: boolean;
+  // How many leading log entries per guild an IN-FLIGHT escrow save captured.
+  // The post-commit release consumes exactly that many by index, so the cap's
+  // compaction must leave that prefix alone while the write is awaited or the
+  // splice would eat the wrong entries (persisting work twice, or dropping
+  // it). Set when the payload is captured, cleared when the save settles,
+  // including on a throw.
+  inFlightGuildBankOps: Map<number, number>;
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
   userAgent: string;
@@ -843,6 +1233,7 @@ export interface AdminLiveAura {
   value: number;
   remaining: number;
   duration: number;
+  permanent?: boolean;
 }
 
 export interface AdminLiveLocation {
@@ -891,6 +1282,7 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
+  perm?: 1;
   // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
   // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
   // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
@@ -898,7 +1290,8 @@ interface WireAura {
   // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
   // which decodes back to 0, so value-less auras and an old server are unchanged.
   value?: number;
-  // imbue judgement min/max bonus-damage range (aura_effect imbueRange); only imbue sets these.
+  // Optional secondary aura values: imbue judgement's min/max damage range and
+  // Greater Invisibility's reduction/aftereffect duration.
   value2?: number;
   value3?: number;
   // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
@@ -922,6 +1315,17 @@ interface WireAura {
   src?: number;
   // Encounter-owned control marker. Omitted for ordinary auras.
   ub?: 1;
+  // No-player-counter-may-shed marker (the recovery sicknesses). Presence only: the
+  // client reads it through the same isPlayerRemovableAura predicate the sim uses, so
+  // the buff bar never offers a right-click cancel the server would refuse. Omitted for
+  // ordinary auras, and an old server's omission decodes to undefined, as before.
+  und?: 1;
+  // Break-threshold ARMED marker (Lingering Dread's soak-before-snap fear):
+  // presence only, never the live soak value - the number decrements per hit
+  // and would churn the stable aura cache, while the client (the victim-worn
+  // dread band in src/render/ability_vfx) only keys on whether the talent
+  // armed the fear at all. Omitted for ordinary auras.
+  bt?: 1;
 }
 
 interface WhoRosterRow {
@@ -933,7 +1337,18 @@ interface WhoRosterRow {
 }
 
 type RememberedChat =
-  | { channel: 'say' | 'yell' | 'general' | 'party' | 'guild' | 'officer' | 'world' | 'lfg' }
+  | {
+      channel:
+        | 'say'
+        | 'yell'
+        | 'general'
+        | 'party'
+        | 'battleground'
+        | 'guild'
+        | 'officer'
+        | 'world'
+        | 'lfg';
+    }
   | { channel: 'whisper'; target: string };
 
 // Identity fields rarely change, so they ride only in "full" records: on an
@@ -954,6 +1369,16 @@ function identityFields(e: Entity): Record<string, unknown> {
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
+    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
+    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
+    // and changes at most once a session, and everything in this record is
+    // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
+    // into the object would re-serialize half a kilobyte 20 times a second per
+    // online player to produce the same bytes. It is serialized once per entity
+    // instead (EntityWireCache.appJson) and spliced into the cached identity
+    // JSON; the self record picks it up through the `maybeRaw` delta channel in
+    // bcastSelf, which already exists for heavy, rarely-changing fields.
+    // appearanceWireJson() is the one place that string is minted.
     const eq = e.equippedItems;
     for (const _ in eq) {
       out.eq = eq;
@@ -995,13 +1420,37 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
   if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
   if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
+  // Curator standing (cosmetic): rank plus the character-scoped completion pair
+  // behind it, for the inspect card's Reliquary line and the rank-5 sigil.
+  // Sparse like the flair above: refreshCuratorStanding only stamps them for a
+  // ranked character, so an unranked player ships nothing and a full record
+  // with the keys absent resets the mirror. The pair NESTS under the rank so
+  // all-or-nothing is structural at the encoder, not a convention the
+  // refresher must remember.
+  if (e.curatorRank) {
+    out.crk = e.curatorRank; // Curator rank 1-5
+    if (e.relicsOwned) out.cro = e.relicsOwned; // character-scoped relics owned
+    // relicsTotal is the one player-INDEPENDENT number of the three: it is the
+    // character-scoped catalog size, so a client could derive it from its own
+    // content tables and never ask. It rides the wire anyway because a
+    // MIXED-VERSION client must not print a total that disagrees with the
+    // server's catalog: the denominator on the card is whatever the server counted
+    // when it stamped the pair, so an older or newer client shows the server's
+    // completion rather than a locally-derived one that quietly differs.
+    if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
+  }
   if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
+  // Operator-applied Cheater tag. A bare flag, not the remaining budget: every
+  // nearby client needs to RENDER the tag, but only the wearer needs the
+  // countdown, and the wearer already has it on the mark's own aura.
+  if (e.cheaterMark) out.chm = 1;
   // Official streamer's platform links (player menu). Already gated by
   // wireStreamerLinks at the point they were set on the entity, so an account whose
   // streamer flag is off has none here, whatever is stored against it.
   if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   if (e.guild) out.gd = e.guild;
   if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
+  if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
@@ -1033,14 +1482,21 @@ function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
 // result), so at raid-sized entity/aura counts and 20 Hz the spread form was a
 // measurable source of short-lived garbage. Output is byte-identical to the
 // prior spread chain; only the allocation shape changed.
+// A pre-v3 recipient ignores `perm`. Give it a large finite timer that is
+// refreshed by ordinary legacy aura snapshots, so rolling deploys keep the
+// aura visible instead of decoding the v3 sentinel as already expired.
+const LEGACY_PERMANENT_AURA_SECONDS = 7 * 24 * 60 * 60;
+
 function wireAura(a: Aura): WireAura {
+  const permanent = a.permanent === true;
   const w: WireAura = {
     id: a.id,
     name: a.name,
     kind: a.kind,
-    rem: round2(a.remaining),
-    dur: a.duration,
+    rem: permanent ? LEGACY_PERMANENT_AURA_SECONDS : round2(a.remaining),
+    dur: permanent ? LEGACY_PERMANENT_AURA_SECONDS : a.duration,
   };
+  if (permanent) w.perm = 1;
   // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
   // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
   // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
@@ -1049,13 +1505,19 @@ function wireAura(a: Aura): WireAura {
   // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
   // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
   if (a.value !== 0) w.value = a.value;
-  // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
-  // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
+  // Optional secondary aura values (imbue range or Greater Invisibility aftereffect);
+  // dot/hot cadence; non-physical school. Each rides only when it carries meaning, so
+  // ordinary auras stay lean and decode to their defaults.
   if (a.value2 !== undefined) w.value2 = a.value2;
   if (a.value3 !== undefined) w.value3 = a.value3;
   if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
   if (a.school !== 'physical') w.school = a.school;
-  if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
+  // Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
+  // engine banks (druid/shaman/hunter spec engines): their badge and tooltip
+  // teach the live stage including 0 and 1, and the decode side cannot tell
+  // "absent because 1" from "absent because 0", so the count is always sent.
+  if (isPersistentEngineAura(a.id)) w.stacks = a.stacks ?? 0;
+  else if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
   // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
   // buff icon can badge the count online exactly as offline; undefined for every other aura.
   if (a.charges !== undefined) w.charges = a.charges;
@@ -1066,6 +1528,8 @@ function wireAura(a: Aura): WireAura {
   // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
   if (a.sourceId) w.src = a.sourceId;
   if (a.unbreakableControl) w.ub = 1;
+  if (a.undispellable) w.und = 1;
+  if (a.breakThreshold !== undefined) w.bt = 1;
   return w;
 }
 
@@ -1099,6 +1563,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cast = e.castingAbility;
     out.castRem = round2(e.castRemaining);
     out.castTot = round2(e.castTotal);
+    if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
   // Mount summon/dismount transition, so every client can time the summon FX / call
@@ -1120,6 +1585,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
   }
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
+  if (e.helmHidden) out.hh = 1; // paperdoll eye toggle: kit helm left off the composed body
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
   if (e.forcedTargetTimer > 0) out.ftm = round2(e.forcedTargetTimer);
@@ -1148,8 +1614,19 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
     if (e.petAutoWaterJet) out.pw = 1;
+    if ((e.petSkillTimer ?? 0) > 0) out.ps = round2(e.petSkillTimer ?? 0);
+    if (e.petAutoSkill) out.px = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
+  // Remote Paladins need the compact active-charge count so every client can
+  // render Ascension's orbiting seals. Self snapshots additionally carry pdev
+  // with the exact Devotion value and remaining duration for the local HUD.
+  if (e.kind === 'player' && e.templateId === 'paladin') {
+    // Omit-when-default like the fields above (review 3050): the idle 0 was
+    // serialized into every snapshot for every remote paladin.
+    const ascensionCharges = e.paladinDevotion?.ascensionCharges ?? 0;
+    if (ascensionCharges > 0) out.pasc = ascensionCharges;
+  }
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (includeAuras && e.auras.length > 0) {
@@ -1179,27 +1656,30 @@ function isStealthed(e: Entity): boolean {
   return e.stealthed; // cached in the sim's updateAuras; see Entity.stealthed
 }
 
-// full rate close up and for anything the viewer is fighting; mid range
-// updates every other tick, far entities every fourth. Measured against
-// the per-session last-sent tick rather than a tick-parity stagger: when
-// the event loop degrades and one broadcast covers several sim ticks, a
-// parity check can stay permanently false and starve entities frozen
-function isUpdateDue(
-  tick: number,
-  e: Entity,
-  d2: number,
+// Both endpoints inside the SAME battleground slot: the necessary condition for
+// the raised match-wide interest (never across slots, never to the open world).
+function inSameBgSlot(a: Entity, b: Entity): boolean {
+  if (!isBgPos(a.pos.x) || !isBgPos(b.pos.x)) return false;
+  return bgOriginAt(a.pos.z).slot === bgOriginAt(b.pos.z).slot;
+}
+
+// The raised battleground interest, narrowed to what the mode actually needs a
+// client to hold (see BG_MATCH_INTEREST_RADIUS): a same-slot TEAMMATE, or a
+// same-slot non-player entity (flag, rune, prop). `viewerBgTeam` is the pid
+// list of the viewer's own team, or null when the viewer is not in a match.
+// An enemy player, and anything an enemy owns, returns false and falls back to
+// the open-world radii in interestLimitSq.
+function bgWideInterestApplies(
   viewer: Entity,
-  sentAtTick: number,
+  e: Entity,
+  viewerBgTeam: readonly number[] | null,
 ): boolean {
-  // The one Vale Cup ball is watched by the whole Sowfield: a far keeper sits
-  // past the 55yd full-rate tier and the stands past 80yd, where a ~25 yd/s
-  // ball turns visibly steppy at half/quarter rate. One entity at full rate
-  // costs one lite record per tick, so it is always due.
-  if (e.templateId === VALE_CUP_BALL_TEMPLATE_ID) return true;
-  if (d2 <= FULL_RATE_RADIUS_SQ) return true;
-  if (viewer.targetId === e.id || e.aggroTargetId === viewer.id) return true;
-  const divisor = d2 <= HALF_RATE_RADIUS_SQ ? HALF_RATE_DIVISOR : QUARTER_RATE_DIVISOR;
-  return tick - sentAtTick >= divisor;
+  if (!inSameBgSlot(viewer, e)) return false;
+  // A summoned mob (pet, guardian, totem) inherits its OWNER's arm: an enemy's
+  // pet trails the enemy, so widening it would leak the same position by proxy.
+  const subjectId = e.kind === 'player' ? e.id : e.ownerId;
+  if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
+  return viewerBgTeam?.includes(subjectId) ?? false;
 }
 
 // Per-entity wire fragments, refreshed lazily at most once per tick and
@@ -1222,7 +1702,15 @@ interface EntityWireVariantCache {
 
 interface EntityWireCache {
   tick: number;
+  /** identityFields() as JSON, WITHOUT the authored look: the string actually
+   *  diffed for identity changes. Kept beside idJson so the appearance splice
+   *  below only re-runs when the rest of the identity moves. */
+  baseIdJson: string;
   idJson: string;
+  /** The authored modular look, serialized ONCE for this entity (null when it
+   *  has none). Immutable for the session, so it is minted on first use and
+   *  spliced, never re-stringified. */
+  appJson: string | null;
   baseDynJson: string;
   idVer: number;
   baseDynVer: number;
@@ -1336,9 +1824,23 @@ export interface PerfCaptureStatus {
   last: PerfCaptureResult | null;
 }
 
-export interface GameServerOptions {
-  readonly communityTestRifts?: boolean;
-}
+// The creation fee as WHOLE GOLD, computed once for the two refusal emits.
+//
+// The client matcher splices an INTEGER (src/ui/server_i18n.ts guild.createFee,
+// `You need (\\d+) gold to found a guild.`), so a fee that stopped being whole
+// gold would emit "1.5" and silently ship raw English to every locale with
+// nothing reddening. The requirement is asserted HERE, where the number is
+// made, rather than left to a comment: a non-whole fee fails at import (and so
+// in every server test) instead of at a player's screen.
+const GUILD_CREATION_FEE_GOLD = ((): number => {
+  const gold = GUILD_CREATION_FEE_COPPER / 10_000;
+  if (!Number.isInteger(gold) || gold <= 0) {
+    throw new Error(
+      `GUILD_CREATION_FEE_COPPER must be a positive whole number of gold for the guild.createFee matcher, got ${GUILD_CREATION_FEE_COPPER}`,
+    );
+  }
+  return gold;
+})();
 
 export class GameServer {
   sim: Sim;
@@ -1347,13 +1849,42 @@ export class GameServer {
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
   private readonly botDetector: BotDetector = createBotDetector();
   readonly chatLog = new ChatLogger(insertChatLogs);
+  // Combat parse capture; constructed in the constructor (needs this.sim).
+  readonly parseCapture: ParseSubsystem;
   // Admin-managed soft/hard word lists + escalation config. Loaded from the DB
   // at boot (loadChatFilter) and refreshed whenever an admin edits the lists.
   readonly chatFilter = new ChatFilter();
   private readonly ipBlockList = new IpBlockList();
   private readonly socialDb = new PgSocialDb(pool);
   readonly social: SocialService;
+  // Guild creation fees reserved at the guild_create dispatch gate (Guild Bank
+  // Phase 3 QA, reserve-at-gate), keyed by character id and consumed by
+  // exactly one of: the create's committed success arm (onGuildCreated writes
+  // the create_fee ledger row) or the refusal/error arm
+  // (refundGuildCreateFee returns the copper). A character can hold at most
+  // one reservation; the gate refuses a second guild_create while one is
+  // pending, so a pipelined double-create can never double-charge or
+  // double-refund.
+  private readonly pendingGuildCreateFees = new Map<
+    number,
+    // `pursePaid` is the SIGNED copper the founder's purse was observed to
+    // move across the charge (negative), snapshotted at the gate rather than
+    // derived from `amount`, so the create_fee ledger row's two halves are two
+    // independent measurements and their balance check can actually fail.
+    { accountId: number; amount: number; pursePaid: number }
+  >();
+  // Guilds whose bank is CLOSED because a guild-delete is in flight: the
+  // window between the empty-bank guard passing and the guilds DELETE (which
+  // cascades the guild_banks row away) plus its post-commit hooks. Guild bank
+  // ops for a guild in this set are refused, so nothing can be deposited into
+  // a bank that is about to stop existing (server/social.ts
+  // beginGuildBankDelete / endGuildBankDelete). Entries live for the two
+  // awaited DB steps of one command and are removed on every arm, including
+  // a throw.
+  private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
+  private readonly generalChatQuota: GeneralChatQuotaCoordinator;
+  private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -1375,6 +1906,14 @@ export class GameServer {
   // above there is no realm-global dueness tracker: each session keeps its own
   // lastDfWireTick gate, and the memo only collapses same-tick evaluations.
   private readonly dfBoardReadout = createRealmReadoutMemo<DungeonFinderBoard>();
+  // Live Thornhollow Fields online ladder, the memo's third tenant. It rides
+  // INSIDE each viewer's own `bg` key (so no shared JSON fragment of its own,
+  // hence realmReadoutObject and never realmReadoutJson), but the ROWS are
+  // viewer-identical and scanning every online player once per session per
+  // BG_WIRE_HZ tick is exactly the uncached viewer-identical read the hot-path
+  // rules call a defect. Built once per broadcast pass and handed to every
+  // bgInfoFor call in that pass instead.
+  private readonly bgLadderReadout = createRealmReadoutMemo<BgLadderEntry[]>();
   // When the realm-wide Vale Cup readout is next due, tracked realm-global (not
   // per session) so every viewer still gates together in one pass and the memo
   // above builds once. `>=` against this, never `tickCount % interval`:
@@ -1406,7 +1945,7 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  private readonly characterSaveQueues = new Map<number, Promise<boolean>>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
@@ -1420,7 +1959,32 @@ export class GameServer {
   // a queue their transactions could commit out of capture order and persist an
   // older snapshot over a newer one. Snapshots are captured inside the queued
   // thunk, so commit order equals capture order equals freshness order.
-  private readonly enqueueMarketWrite = createSerialWriter();
+  // ACCEPTED (Guild Bank Phase 3 QA, database-performance review): dirty-book
+  // character autosaves ALSO ride this one writer (the locked design: the
+  // leave flush writes market, mail, AND books in one transaction, so a
+  // second queue would reopen the interleaving this writer exists to
+  // prevent), which collapses their effective save concurrency to 1 and can
+  // queue a leave flush behind an autosave batch. The depth watch below makes
+  // that collapse loud; if the warn fires in production, the escalation path
+  // is a per-guild serializer for the autosave arm (state.md records it).
+  private readonly marketSerialWriter = createSerialWriter();
+  private marketWriteQueueDepth = 0;
+  private lastMarketQueueWarnMs = 0;
+  private readonly enqueueMarketWrite = <T>(write: () => Promise<T>): Promise<T> => {
+    this.marketWriteQueueDepth++;
+    if (
+      this.marketWriteQueueDepth > MARKET_WRITE_QUEUE_WARN_DEPTH &&
+      Date.now() - this.lastMarketQueueWarnMs > 60_000
+    ) {
+      this.lastMarketQueueWarnMs = Date.now();
+      console.warn(
+        `market serial writer queue depth ${this.marketWriteQueueDepth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
+      );
+    }
+    return this.marketSerialWriter(write).finally(() => {
+      this.marketWriteQueueDepth--;
+    });
+  };
   private readonly enqueueRiftWrite = createSerialWriter();
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
@@ -1463,6 +2027,8 @@ export class GameServer {
     ...SIM_LAP_PHASES,
     // Per-zone breakdown of the mob.update phase, with the same capture gating.
     ...SIM_MOB_ZONE_PHASES,
+    // Per-key-group breakdown of the bcastSelf phase, same capture gating.
+    ...SELF_WIRE_PHASES,
   ]);
   // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
   // (bcastGrid/bcastSelf/visits) AND the sim.tick() perfLap sub-phases are measured;
@@ -1477,6 +2043,11 @@ export class GameServer {
   // probe pays one Map.get (plus one ring add) per mob per tick in steady state.
   // Unbounded is fine: templateIds are a finite content set (MOBS).
   private readonly mobUpdateBucketNames = new Map<string, string>();
+  // Per-callback ns accumulators behind the SELF_WIRE_PHASES buckets: filled by
+  // the selfWireJson lap probe across every session of a broadcast pass, then
+  // flushed into the tickProfiler beside the bcastSelf total. Only touched
+  // while perfDetailActive.
+  private readonly selfWireNs = new Map<string, bigint>();
   // On-demand capture state (admin-triggered). The deadline is wall-clock based:
   // a saturated sim may commit far fewer or many more ticks than nominal, but a
   // requested 30-second incident capture must still finish after about 30 seconds.
@@ -1513,10 +2084,14 @@ export class GameServer {
   private readonly ipSessionCounts = new Map<string, number>();
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
-  private readonly communityTestRifts: boolean;
 
-  constructor(options: GameServerOptions = {}) {
-    this.communityTestRifts = options.communityTestRifts ?? false;
+  constructor(generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT) {
+    this.generalChatQuota = new GeneralChatQuotaCoordinator({
+      consume: consumeGeneralChatQuota,
+      maxInFlight: generalChatQuotaMaxInFlight,
+      observeDbCall: (outcome, durationSeconds) =>
+        gameMetricsCounters().generalChatQuotaDbCall(outcome, durationSeconds),
+    });
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -1527,7 +2102,21 @@ export class GameServer {
       worldBossAtBoot: true,
       // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
       riftPortals: true,
-      communityRifts: this.communityTestRifts,
+      // Distance-cull idle-mob AI (issue #2703): shouldSkipIdleMobTick skips a
+      // wild, unbuffed, out-of-combat mob's per-tick aggro scan and wander
+      // movement while it sits farther than this from EVERY connected player,
+      // and it plainly never fires when nobody is connected at all. The world
+      // grew from 3 zones to 11 (vite.config.ts) with it, so a realm's total mob
+      // count and its per-mob terrain-height cost both grew well past what this
+      // knob was originally sized against, and this Sim never opted in: every
+      // mob everywhere paid full AI cost on every 50 ms tick regardless of
+      // player proximity, which is what turned "nobody online" into a
+      // multiples-of-idle CPU baseline as the world grew. INTEREST_DROP_RADIUS
+      // is the exact distance a mob remains rendered to a viewer, so a culled
+      // mob can never be one a player can actually see sit still, and it is
+      // well past MAX_AGGRO_RADIUS (20 yd, mob/aggro_ranges.ts), so culling
+      // never skips a scan that could have pulled someone.
+      idleMobTickRadius: INTEREST_DROP_RADIUS,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
@@ -1556,7 +2145,13 @@ export class GameServer {
     });
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
-    this.social = new SocialService(this.socialDb, this.socialTransport());
+    this.social = new SocialService(
+      this.socialDb,
+      this.socialTransport(),
+      () => Date.now(),
+      // Guild names run the same offensive-name screen as character names.
+      (name) => offensiveName(name),
+    );
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
@@ -1564,6 +2159,51 @@ export class GameServer {
       suspend: (input) => moderateAccount({ ...input, action: 'suspend' }),
       forceRename: (input) => forceCharacterRename(input),
     });
+    // Combat parse capture (server/parse/): a read-only observer at the tick
+    // drain, inert unless PARSE_CAPTURE=1 and an ingest URL is configured.
+    this.parseCapture = createParseSubsystem({
+      sim: this.sim,
+      realm: REALM,
+      build: readBuildVersion(),
+      resolveParticipant: (pid) => this.resolveParseParticipant(pid),
+    });
+  }
+
+  // Full participant identity for the parse recorder: stable characterId,
+  // display name, class (a player entity's templateId is its class), spec, and
+  // a MINIMIZED snapshot. Data-minimization rule (security review): only the
+  // fields the parse product reads (build + ratings + progression) leave the
+  // process; bags, bank, money, quests, mail, and position never enter a
+  // telemetry record. Null when the pid has no live session.
+  private resolveParseParticipant(pid: number): FightParticipant | null {
+    const session = this.clients.get(pid);
+    if (session === undefined || session.left) return null;
+    const entity = this.sim.entities.get(pid);
+    if (entity === undefined) return null;
+    const state = this.sim.serializeCharacter(pid);
+    const spec = state?.talents?.spec;
+    const snapshot =
+      state === null
+        ? null
+        : {
+            level: state.level,
+            lifetimeXp: state.lifetimeXp ?? 0,
+            prestigeRank: state.prestigeRank ?? 0,
+            talents: state.talents ?? null,
+            equipment: state.equipment,
+            arena1v1Rating: state.arena1v1Rating ?? null,
+            arena2v2Rating: state.arena2v2Rating ?? null,
+          };
+    return {
+      entityId: pid,
+      characterId: session.characterId,
+      name: session.name,
+      class: entity.templateId,
+      spec: typeof spec === 'string' && spec.length > 0 ? spec : null,
+      level: entity.level,
+      team: null,
+      snapshot,
+    };
   }
 
   // Returns the number of currently active WS sessions from the given IP.
@@ -1578,6 +2218,16 @@ export class GameServer {
   // owns that lease (keep it) or the lease is an orphan to release.
   hasSessionForCharacter(characterId: number): boolean {
     return this.sessionsByCharacterId.has(characterId);
+  }
+
+  // Cheap admin readout: character ids with a live socket only. Linkdead
+  // sessions stay resident for resume semantics but are not shown as online.
+  liveCharacterIds(): Set<number> {
+    const ids = new Set<number>();
+    for (const session of this.sessionsByCharacterId.values()) {
+      if (!session.linkdead && session.ws.readyState === 1) ids.add(session.characterId);
+    }
+    return ids;
   }
 
   // -------------------------------------------------------------------------
@@ -1657,6 +2307,7 @@ export class GameServer {
       const priorGm = !!moderatorEntity.gm;
       const stowedPet = this.sim.stowPetForSpectate(moderator.pid);
       const limbo = this.sim.groundPos(SPECTATE_LIMBO_X, SPECTATE_LIMBO_Z);
+      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
       moderatorEntity.pos = limbo;
       moderatorEntity.prevPos = { ...limbo };
       this.sim.grid.update(moderatorEntity);
@@ -1676,6 +2327,17 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketBrowseRev = null;
+    moderator.lastMarketQueryRef = null;
+    moderator.lastSellPriceItemIdRef = null;
+    moderator.lastMarketRebuildTick = 0;
+    moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
+    moderator.lastCorderBoardRev = null;
+    moderator.lastCorderRebuildTick = 0;
+    moderator.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
+    moderator.lastMailRev = null;
+    moderator.lastMailRebuildTick = 0;
     moderator.sentEnts.clear();
     // force the heavy self block (tal/inv/equip/bags/...) to re-run next
     // snapshot: it is gated on meta.wireRev vs session.lastWireRev, and that
@@ -1694,6 +2356,7 @@ export class GameServer {
     }
     const moderatorEntity = this.sim.entities.get(moderator.pid);
     if (moderatorEntity) {
+      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
       moderatorEntity.pos = { ...state.savedPos };
       moderatorEntity.prevPos = { ...state.savedPos };
       this.sim.grid.update(moderatorEntity);
@@ -1705,6 +2368,17 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    moderator.lastMarketBrowseRev = null;
+    moderator.lastMarketQueryRef = null;
+    moderator.lastSellPriceItemIdRef = null;
+    moderator.lastMarketRebuildTick = 0;
+    moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
+    moderator.lastCorderBoardRev = null;
+    moderator.lastCorderRebuildTick = 0;
+    moderator.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
+    moderator.lastMailRev = null;
+    moderator.lastMailRebuildTick = 0;
     moderator.sentEnts.clear();
     // same as enterSpectate: force the heavy self block to re-run so the
     // moderator's OWN talents/inventory/equip/etc. resend immediately
@@ -1717,6 +2391,10 @@ export class GameServer {
   private teleportSessionEntity(session: ClientSession, pos: { x: number; z: number }): void {
     const entity = this.sim.entities.get(session.pid);
     if (!entity) return;
+    // Server-side teleports bypass the sim's own paths, so the shared
+    // displacement teardown runs here too: a jailed or moderated angler's
+    // live session never travels with them.
+    cancelProfessionSessionOnDisplacement(this.sim.ctx, entity);
     const ground = this.sim.groundPos(pos.x, pos.z);
     entity.pos = ground;
     entity.prevPos = { ...ground };
@@ -1747,9 +2425,18 @@ export class GameServer {
     // JAILED_BLOCKED_COMMANDS). A live Vale Cup match resolves as a desertion,
     // same as leave(); idempotent when they are in neither.
     this.sim.arenaQueueLeave(target.pid);
+    // A live arena/fiesta match resolves as a desertion too: leaving the
+    // arenaMatches entry behind silently gated releaseSpirit for the rest of
+    // the mode's duration (and let the arena timeout teleport a prisoner).
+    this.sim.arenaResolveDesertion(target.pid);
     this.sim.vcupQueueLeave(target.pid);
     this.sim.vcupResolveDesertion(target.pid);
     this.sim.leaveCardMinigameEntirely(target.pid);
+    // Thornhollow Fields: leave the queue and desert any live match (the deserter takes
+    // the rating loss; the team fights on) so the jail sweep never fights the
+    // battleground for control of the prisoner's entity.
+    this.sim.bgQueueLeave(target.pid);
+    this.sim.bgResolveDesertion(target.pid);
     this.teleportJailedSession(target);
     // System notice (chat log), not the fading error toast: the prisoner must be
     // able to read the sentence after alt-tabbing back, like other moderation
@@ -1915,6 +2602,17 @@ export class GameServer {
       pushSnapshot: (id) => {
         void this.sendSocialSnapshot(id);
       },
+      onGuildRenamed: (id, guildId, oldName, newName) => {
+        const s = this.sessionByCharacterId(id);
+        if (!s) return;
+        // Vale Cup banner/credit identity moves before the live entity stamp;
+        // this is a rename, never a leave/rejoin or a deed transition.
+        this.sim.renamePlayerGuild(s.pid, oldName, newName);
+        this.send(s, {
+          t: 'events',
+          list: [{ type: 'guildRenamed', guildId, newName }],
+        });
+      },
       onBlocksChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);
         if (s) s.blockedIds = new Set(ids);
@@ -1927,6 +2625,111 @@ export class GameServer {
         const s = this.sessionByCharacterId(id);
         const meta = s ? this.sim.meta(s.pid) : null;
         if (meta) this.sim.ctx.bumpDeedStat(meta, 'guildsFounded', 1);
+      },
+      // The ONE combined guild stamp entry point (Guild Bank Phase 2): every
+      // committed membership/rank mutation lands here SYNCHRONOUSLY from its
+      // SocialService call site, pairing the nameplate name stamp
+      // (setPlayerGuild) with the session-only membership stamp
+      // (setPlayerGuildMembership) so the two can never diverge. The seq bump
+      // fences the async snapshot chokepoint (sendSocialSnapshot): a snapshot
+      // whose DB read STARTED before this commit must never re-apply its stale
+      // rank over this fresher stamp, because the guild bank's officer gate
+      // reads it (a stale officer stamp is privilege-escalation-shaped).
+      onGuildMembershipChanged: (id, membership) => {
+        const s = this.sessionByCharacterId(id);
+        if (!s) return; // offline: nothing live to stamp; the join path covers them
+        s.guildStampSeq++;
+        this.sim.setPlayerGuild(s.pid, membership?.guildName ?? '');
+        this.sim.setPlayerGuildMembership(
+          s.pid,
+          membership ? { guildId: membership.guildId, rank: membership.rank } : null,
+        );
+      },
+      // Guild Bank Phase 3: the create commit's book seed + creation fee.
+      onGuildCreated: (id, guildId) => {
+        // Seed the empty book into the LIVE sim in the same success arm that
+        // stamped the founder: ops never lazily create a book (loadGuildBank
+        // is load-once; a lazy book would shadow the persisted row after a
+        // restart), so without this seed the founder's bank would be silently
+        // inert until a realm restart boot-loads it.
+        this.sim.loadGuildBank(guildId, null);
+        // RESERVE-AT-GATE (Phase 3 QA, revising create-then-charge): the fee
+        // was already deducted synchronously at the guild_create dispatch
+        // gate, so this success arm only consumes the pending reservation:
+        // it writes the create_fee ledger row and schedules the escrow save.
+        // A founder who vanished mid-flight already paid at the gate (their
+        // leave flush persists the charged purse), so the fee can no longer
+        // be dodged by logging out before the commit.
+        const fee = this.pendingGuildCreateFees.get(id);
+        this.pendingGuildCreateFees.delete(id);
+        const s = this.sessionByCharacterId(id);
+        if (!s) {
+          // Offline founder: the charge was applied at the gate and their leave
+          // flush is what persists the charged purse, so there is no live
+          // session to ride and nothing here can verify it either way. The row
+          // is written on the same terms it always was.
+          if (fee && fee.amount > 0) {
+            recordGuildBankDeltas(
+              'create_fee',
+              { characterId: id, accountId: fee.accountId },
+              guildId,
+              [guildCreateFeeDelta(fee.amount, fee.pursePaid)],
+            );
+          }
+          return;
+        }
+        // Persist the charged purse and the seeded (empty) book together
+        // through the fenced escrow save, and only call the fee PAID once that
+        // write is durable (see persistGuildCreateFee).
+        void this.persistGuildCreateFee(s, guildId, fee ?? null);
+      },
+      // Disband committed (the empty-bank guard passed): evict the book so the
+      // map stays bounded and a re-created guild id can never inherit a stale
+      // book. The guild_banks row cascaded away with the guilds DELETE. Every
+      // session's pending dirty mark (and unflushed-op log) for the guild
+      // clears too: with the book evicted the null-serialize skip already
+      // keeps saves from writing it, but a cleared mark also stops
+      // re-serialization attempts against a guild id whose row no longer
+      // exists. (With the fail-closed holdings read below, a disband can no
+      // longer commit while any session holds a mark, so this loop is
+      // belt-and-suspenders.)
+      onGuildDisbanded: (guildId) => {
+        this.sim.evictGuildBank(guildId);
+        for (const s of this.sessionsByCharacterId.values()) {
+          s.dirtyGuildBanks.delete(guildId);
+          s.unflushedGuildBankOps.delete(guildId);
+          s.guildBankDeficitSkips.delete(guildId);
+        }
+      },
+      // The disband guard's read, and the OPEN of the guild-delete window it
+      // has to hold. Returns the LIVE sim book's holdings, or null (the guard
+      // fails closed) when:
+      //  - no book is loaded, so nothing can prove the DB row is empty;
+      //  - ANY session holds an unflushed dirty mark for the guild, because
+      //    the live book proves only live state and a disband would
+      //    cascade-delete the DURABLE row while the ops that emptied it are
+      //    not yet durable (scanned over sessionsByCharacterId, not clients:
+      //    a mid-leave session's flush is still in flight);
+      //  - another guild-delete already holds the window.
+      // Taking the window is what closes the TOCTOU: the guard is
+      // synchronous, but two awaits and a DELETE follow it, and dispatched
+      // guild bank ops run straight off the socket event. While the window is
+      // held runGuildBankOp refuses every op for this guild, so nothing can
+      // land in the bank between the guard passing and the row cascading
+      // away. Self-heals within one autosave interval; the guard's refusal
+      // line already tells the actor to retry.
+      beginGuildBankDelete: (guildId) => {
+        if (this.guildBankDeleteWindows.has(guildId)) return null;
+        for (const s of this.sessionsByCharacterId.values()) {
+          if (s.dirtyGuildBanks.has(guildId)) return null;
+        }
+        const holdings = this.sim.guildBankHoldings(guildId);
+        if (!holdings) return null;
+        this.guildBankDeleteWindows.add(guildId);
+        return holdings;
+      },
+      endGuildBankDelete: (guildId) => {
+        this.guildBankDeleteWindows.delete(guildId);
       },
       isBlocking: (recipientId, senderCharacterId) => {
         const s = this.sessionByCharacterId(recipientId);
@@ -1955,17 +2758,32 @@ export class GameServer {
     const session = this.sessionByCharacterId(charId);
     if (!session) return;
     try {
+      // Capture the stamp fence BEFORE the DB read: if a synchronous
+      // membership stamp (onGuildMembershipChanged) lands while the snapshot
+      // is in flight, this read may be staler than the live stamps and must
+      // not overwrite them below.
+      const seqBefore = session.guildStampSeq;
       const snap = await this.social.snapshot(charId);
       this.send(session, { t: 'social', ...snap });
       // Stamp the guild name onto the player's world entity so it rides the
-      // identity wire and shows under their nameplate for everyone nearby. This
-      // is the single chokepoint hit on join and on every membership change.
+      // identity wire and shows under their nameplate for everyone nearby,
+      // PAIRED with the session-only membership stamp the guild bank's
+      // officer-plus gate reads (the two must never diverge). This chokepoint
+      // is hit on join and on every membership change; committed mutations
+      // ALSO stamp synchronously at their SocialService call sites, and the
+      // fence check keeps this async arm from rolling one of those back.
       // On the FIRST join-time stamp (firstJoin), a pre-existing guild arrives a
       // beat after addPlayer's retro pass (the name lives in the social DB, not
       // the blob), so retroDeeds re-credits soc_guild_joined silently instead of
       // firing the live banner for an existing member; later changes are genuine
       // live joins and pass firstJoin false.
-      this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '', { retroDeeds: firstJoin });
+      if (session.guildStampSeq === seqBefore) {
+        this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '', { retroDeeds: firstJoin });
+        this.sim.setPlayerGuildMembership(
+          session.pid,
+          snap.guild ? { guildId: snap.guild.id, rank: snap.guild.rank } : null,
+        );
+      }
       // remember who to track for the live position push (friends + guildmates)
       session.socialTrackedIds = [
         ...snap.friends.map((f) => f.id),
@@ -2031,11 +2849,19 @@ export class GameServer {
           last = now;
           if (dt > 0.5) dt = 0.5;
           acc += dt;
-          // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
-          // works without the sim reading the wall clock itself (determinism invariant).
-          this.sim.utcDay = new Date().toISOString().slice(0, 10);
+          // Feed the authoritative calendar to the sim so its daily windows work
+          // without the sim reading the wall clock itself (determinism invariant).
+          // Two values, two questions: `utcDay` stamps WHEN something happened
+          // (the deed earn date), while `resetDay` is the daily-rollover window,
+          // derived from this realm's own reset boundary so the first
+          // battleground win of the day turns over with the raid lockouts rather
+          // than at midnight UTC (5 PM Pacific, mid-evening).
+          const calendarNowMs = Date.now();
+          this.sim.utcDay = new Date(calendarNowMs).toISOString().slice(0, 10);
+          this.sim.resetDay = resetDayKey(calendarNowMs, REALM_RESET_TIME_ZONE);
           this.bcastGridNs = 0n;
           this.bcastSelfNs = 0n;
+          this.selfWireNs.clear();
           this.bcSerializeNs = 0n;
           this.bcVisits = 0;
           this.bcSerializes = 0;
@@ -2069,7 +2895,12 @@ export class GameServer {
               scan.threatEntryVisits,
               this.perfCaptureDeadlineNs !== null,
             );
+            this.recordBattlegroundOutcomes();
             this.enforceJailStates();
+            // Parse capture observes the full drained batch BEFORE routeEvents:
+            // routeEvents early-outs when no clients are connected, and the
+            // recorder must see every tick. Read-only; never mutates events.
+            this.parseCapture.observe(events);
             this.routeEvents(events);
             this.detectActivity(events);
             lap('events');
@@ -2090,6 +2921,7 @@ export class GameServer {
           lap('broadcast');
           this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
           this.tickProfiler.add('bcastSelf', Number(this.bcastSelfNs) / 1e6);
+          this.flushSelfWirePhases();
           this.socialPosTimer += dt;
           if (this.socialPosTimer >= 1) {
             this.socialPosTimer = 0;
@@ -2148,6 +2980,20 @@ export class GameServer {
       void this.saveRifts();
       void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
     }
+  }
+
+  /**
+   * Drain this tick's resolved rated Thornhollow Fields matches onto the
+   * /metrics counters (server/battleground_telemetry.ts).
+   *
+   * Off the sim's own drained record rather than the `bgEnd` events, and that is
+   * the load-bearing choice: `bgEnd` is PERSONAL (one copy per fighter), so a
+   * counter driven from the event stream would book every match ten times and
+   * quietly overstate every rate built on it. The sim writes exactly one record
+   * per resolve, and only for a rated match.
+   */
+  private recordBattlegroundOutcomes(): void {
+    reportBgOutcomes(drainBgOutcomes(this.sim.bgOutcomes), gameMetricsCounters());
   }
 
   private enforceJailStates(): void {
@@ -2264,6 +3110,14 @@ export class GameServer {
   private async grantPlaytimePoints(): Promise<void> {
     const windowSecs = PLAYTIME_GRANT_MS / 1000;
     for (const session of this.clients.values()) {
+      // A linkdead session is held in this.clients for the whole disconnect grace,
+      // and the activity window (windowSecs) equals LINKDEAD_GRACE_MS exactly (both
+      // 5 minutes), so without this guard a player who gave input any time in the 5
+      // minutes before the socket dropped keeps passing the idle check for the
+      // entire grace and banks a durable grant while offline. Guarding here rather
+      // than rewinding lastInputAt on drop: resumeSession resets it to sim.time on
+      // resume, and other consumers (idle sweep, daily activity) read it too.
+      if (session.linkdead) continue; // disconnected: no playtime credit during grace
       if (this.sim.time - session.lastInputAt > windowSecs) continue; // idle: skip
       const last = this.lastPlaytimeGrantAt.get(session.accountId);
       if (last !== undefined && this.sim.time - last < windowSecs) continue;
@@ -2353,6 +3207,50 @@ export class GameServer {
       if (live.accountId !== accountId) continue;
       this.stampAccountFlair(live, flair);
     }
+  }
+
+  /** Push a Cheater mark change onto every live session of that account
+   *  (server/cheater_mark_runtime.ts owns the behavior and its contract). */
+  applyCheaterMarkLive(accountId: number, seconds: number): void {
+    applyCheaterMarkLiveRuntime(this.clients.values(), this.sim, accountId, seconds);
+  }
+
+  /** Apply a committed cross-process policy notification to live sessions. */
+  applyGeneralChatRateLimitLive(accountId: number, rateLimit: GeneralChatRateLimit | null): void {
+    this.generalChatRateLimitLiveState.policyChanged(accountId, rateLimit);
+    this.generalChatQuota.policyChanged(accountId);
+    for (const session of this.clients.values()) {
+      if (session.accountId === accountId) session.generalChatRateLimit = rateLimit;
+    }
+  }
+
+  /** Replace active-session policy state after the LISTEN connection resynchronizes. */
+  resyncGeneralChatRateLimits(
+    accountIds: readonly number[],
+    policies: ReadonlyMap<number, GeneralChatRateLimit>,
+  ): void {
+    const queried = new Set(accountIds);
+    for (const session of this.clients.values()) {
+      if (!queried.has(session.accountId)) continue;
+      session.generalChatRateLimit = policies.get(session.accountId) ?? null;
+    }
+    for (const accountId of queried) {
+      this.generalChatRateLimitLiveState.policyChanged(accountId, policies.get(accountId) ?? null);
+      this.generalChatQuota.policyChanged(accountId);
+    }
+  }
+
+  /** Fence an auth-query policy snapshot against later LISTEN notifications. */
+  beginGeneralChatRateLimitHydration(accountId: number): GeneralChatRateLimitHydration {
+    return this.generalChatRateLimitLiveState.beginHydration(accountId);
+  }
+
+  generalChatQuotaInFlight(): number {
+    return this.generalChatQuota.inFlight;
+  }
+
+  generalChatQuotaCachedAccounts(): number {
+    return this.generalChatQuota.cachedAccounts;
   }
 
   /** The chat flair of the session at `pid`, read from the SESSION, never an entity. */
@@ -2451,7 +3349,77 @@ export class GameServer {
     }
   }
 
+  // Update one player's Curator standing (rank + the character-scoped completion
+  // pair) for the inspect card's Reliquary line and the rank-5 sigil. Cosmetic
+  // identity only: the sim never reads these back, and no client command can set
+  // them, so the numbers are server-computed or they do not exist.
+  //
+  // Unlike the three flair refreshers beside it this is pure CPU off the LIVE sim
+  // meta (one catalog walk, no DB row, no RPC), so it is synchronous and needs no
+  // "did the player leave mid-fetch" guard.
+  //
+  // What inspect and /c/ actually share: ONE formula (catalogCharacterCompletion)
+  // scored over EQUIVALENT ownership surfaces (items + marks + bags-AND-bank
+  // reins + earned deeds). Same inputs, same pair and same rank, with no second
+  // derivation to drift. That is NOT a promise the two agree at every instant.
+  // This reads LIVE meta; the public sheet reads the PERSISTED state blob, so /c/
+  // lags live meta until the next character save writes it. Join-time reconciles
+  // are the sharpest case: unionLegacyMilestones folds legacy milestone deeds
+  // into meta.deedsEarned at load, so a catalogued title relic behind one of them
+  // scores HERE the moment the character joins and only reaches the blob, and so
+  // /c/, at the save after that.
+  //
+  // Unranked reads as ABSENT, not zero: an owned count of 0 clears all three
+  // fields so a fresh character's identity record carries no standing at all.
+  private refreshCuratorStanding(session: ClientSession): void {
+    const e = this.sim.entities.get(session.pid);
+    const meta = this.sim.meta(session.pid);
+    if (!e || !meta) return;
+    // Cleared BEFORE the walk so a throw inside the resolution fails to
+    // ABSENT, not to a stale stamp riding the wire (both call sites catch).
+    // The trade is explicit: a transient throw now hides a CORRECT standing
+    // for up to one sweep where the old code kept the last value; absent is
+    // the honest degraded state for a cosmetic, and the walk is pure CPU
+    // with no realistic throw path.
+    // Assigning unconditionally is free either way: wireCacheFor diffs the
+    // identity JSON, so an unchanged stamp re-broadcasts nothing and a changed
+    // one re-broadcasts itself, exactly like the flair refreshers above.
+    e.curatorRank = undefined;
+    e.relicsOwned = undefined;
+    e.relicsTotal = undefined;
+    const { owned, total } = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    const rank = curatorRankFromOwned(owned);
+    // Gated on the RANK, not the raw count, so all three move as one by
+    // construction: a raised rank-1 threshold could otherwise strand the pair
+    // on the wire with the rank absent. Today rank >= 1 iff owned >= 1.
+    if (rank > 0) {
+      e.curatorRank = rank;
+      e.relicsOwned = owned;
+      e.relicsTotal = total;
+    }
+  }
+
+  // The periodic identity-flair cycle, in two halves that are deliberately NOT
+  // under the same guard.
+  //
+  // The synchronous curator sweep runs FIRST and UNGUARDED. The overlap guard
+  // below belongs to the three AWAITED refreshers (wallet RPC, Discord, GitHub):
+  // one of those cycles can outrun the interval and must not pile up. The curator
+  // sweep is pure CPU off live sim meta with no IO of its own, so it can never be
+  // the thing that piles up, and leaving it under the guard meant one degraded
+  // RPC cycle froze every online player's Curator standing for as long as that
+  // cycle hung. The per-session try/catch is the same best-effort contract the
+  // .catch arms give the awaited three: one throwing session must not kill the
+  // sweep for the sessions behind it. Join stamps the standing separately, so
+  // this half only has to catch what changed mid-session.
   private async refreshAllHolderTiers(): Promise<void> {
+    for (const session of this.clients.values()) {
+      try {
+        this.refreshCuratorStanding(session);
+      } catch (err) {
+        console.error('curator standing refresh failed:', err);
+      }
+    }
     if (this.holderTierRefreshing) return; // a slow cycle (RPC) must not pile up
     this.holderTierRefreshing = true;
     try {
@@ -2706,7 +3674,11 @@ export class GameServer {
         this.sim.setPlayerSkin(live.pid, 0, 'class');
       }
     }
-    this.sim.addItem(itemId, 1, session.pid);
+    // movement: the sim-side twin of Sim.unequipMechChroma. Unequipping a mech
+    // chroma re-grants the item equipping it consumed, so this relocates a copy
+    // the account already owns. Both arms carry the flag or the offline Sim and
+    // this server would answer the obtain tally differently for one action.
+    this.sim.addItem(itemId, 1, session.pid, { movement: true });
     void revokeAccountMechChroma(session.accountId, chromaId)
       .then((cosmetics) => this.replaceLiveAccountCosmetics(session.accountId, cosmetics))
       .catch((err) => console.error('failed to remove account mech chroma:', err));
@@ -2798,6 +3770,8 @@ export class GameServer {
         sourceUrl?: string | null;
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
+        petSpecialWireVersion?: 0 | PetSpecialWireVersion;
+        generalChatRateLimit?: GeneralChatRateLimit | null;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
@@ -2806,6 +3780,10 @@ export class GameServer {
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
         hotbarLayout?: ActionBarLayout | null;
+        // The character's authored modular look (characters.appearance),
+        // normalized at write. Stamped onto the world entity so it rides the
+        // identity wire (`app`) to every client in view.
+        appearance?: Record<string, unknown> | null;
       } = {},
   ): ClientSession | { error: string } {
     // Anti-bot: cap simultaneous online characters per account. Accounts can
@@ -2843,7 +3821,17 @@ export class GameServer {
       state: state ?? undefined,
       characterId,
       bankBonus: meta.bankBonus,
+      appearance: meta.appearance ?? null,
     });
+    const player = this.sim.entities.get(pid);
+    if (player) {
+      player.petSpecialCommandsSupported = meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (meta.petSpecialWireVersion !== PET_SPECIAL_WIRE_VERSION) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === pid) entity.petAutoSkill = false;
+      }
+    }
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -2893,6 +3881,9 @@ export class GameServer {
       // ordinary player) keeps these empty values and never touches the wire.
       accountFlair: EMPTY_ACCOUNT_FLAIR,
       chatFlair: undefined,
+      // Latched by the join restore / a live apply, never seeded true here: the
+      // account row has not been read yet at this point.
+      cheaterMarked: false,
       characterId,
       pid,
       name,
@@ -2901,6 +3892,10 @@ export class GameServer {
       joinedAt: Date.now(),
       dbSessionId: null,
       metricsMaxLevel: initialLevel,
+      // The PERSISTED level, not initialLevel: a GM or PBE join-time level raise has
+      // already moved the entity but not the row, so seeding from the loaded blob
+      // lets the first save report that move to the change feed.
+      lastPersistedLevel: state?.level ?? 1,
       left: false,
       linkdead: false,
       graceUntil: 0,
@@ -2910,14 +3905,24 @@ export class GameServer {
       chatLastRateError: 0,
       chatRateViolations: 0,
       chatCooldownUntil: 0,
+      chatChannelSequence: 0,
+      generalChatRateLimit: meta.generalChatRateLimit ?? null,
       msgRate: createMsgRateBucket(Date.now() / 1000),
       msgLanes: createMsgLanes(Date.now() / 1000),
       listReadGuard: createListReadGuard(Date.now() / 1000),
+      guildBankOpGuard: createGuildBankOpGuard(Date.now() / 1000),
+      cosmeticOpGuard: createCosmeticOpGuard(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
       blockedIds: new Set(),
       blockListLoaded: false,
+      guildStampSeq: 0,
+      dirtyGuildBanks: new Map(),
+      unflushedGuildBankOps: new Map(),
+      guildBankDeficitSkips: new Map(),
+      escrowQuarantined: false,
+      inFlightGuildBankOps: new Map(),
       ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
@@ -2926,9 +3931,23 @@ export class GameServer {
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
+      petSpecialWireVersion:
+        meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0,
       timerWireCache: new StableSelfTimerWireCache(),
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
+      lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
+      lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
+      lastMarketBrowseRev: null,
+      lastMarketQueryRef: null,
+      lastSellPriceItemIdRef: null,
+      lastMarketRebuildTick: 0,
+      lastCorderWireTick: -CORDER_WIRE_INTERVAL_TICKS,
+      lastCorderBoardRev: null,
+      lastCorderRebuildTick: 0,
+      lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
+      lastMailRev: null,
+      lastMailRebuildTick: 0,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -2974,27 +3993,35 @@ export class GameServer {
     // loaded ids: every join-time grant is a deterministic function of the
     // already-durable blob, so a crash that loses the index rows costs nothing
     // to replay, and the batch is a DB write only (it never calls
-    // onDeedRecorded, so it never drives Steam; Steam's own login catch-up is
-    // reconcileOnLogin below). Fire-and-forget: it never blocks or reorders the
-    // join, and resumes skip it (they return above without reloading state).
+    // onDeedRecorded, so it never drives storefront mirrors; each storefront's
+    // own login catch-up is reconcileOnLogin below). Fire-and-forget: it never
+    // blocks or reorders the join, and resumes skip it (they return above
+    // without reloading state).
     reconcileCharacterDeeds({ characterId, accountId }, [
       ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
     ]);
-    // Steam mirror drift heal (the steady-state counterpart to the link-time
-    // reconcile): a live achievement push can exhaust its retry ladder and
-    // drop, and an already-linked account never re-links, so the login
-    // reconcile is the only path that replays it. Chained BEHIND the deeds
-    // records FIFO rather than run beside it: reconcileOnLogin stamps a 6h TTL
-    // then reads earnedDeedIds, so if it ran before the reconcile above healed a
-    // dropped character_deeds row it would miss that id and the TTL would
-    // throttle the retry for 6h. Awaiting the tail first guarantees its read
-    // observes the healed rows. deedRecordsIdle is NOT awaited on the join path
-    // (join latency is unchanged); the continuation is fire-and-forget, fully
-    // guarded, per-account throttled, and a no-op unless STEAM_ENABLED and the
-    // account is linked.
+    // Storefront mirror drift heal (the steady-state counterpart to the
+    // link-time reconcile): a live achievement push can exhaust its retry
+    // ladder and drop, and an already-linked account never re-links, so the
+    // login reconcile is the only path that replays it. Chained BEHIND the
+    // deeds records FIFO rather than run beside it: each reconcileOnLogin
+    // stamps a 6h TTL then reads earnedDeedIds, so if it ran before the
+    // reconcile above healed a dropped character_deeds row it would miss that
+    // id and the TTL would throttle the retry for 6h. Awaiting the tail first
+    // guarantees its read observes the healed rows. deedRecordsIdle is NOT
+    // awaited on the join path (join latency is unchanged); the continuation
+    // is fire-and-forget, fully guarded, per-account throttled, and a no-op
+    // unless each storefront's flag is on and the account is linked. Steam and
+    // Epic run independently (D21): one outage must not block the other.
     void deedRecordsIdle()
-      .then(() => reconcileOnLogin(accountId))
+      .then(() => {
+        reconcileSteamOnLogin(accountId);
+        reconcileEpicOnLogin(accountId);
+      })
       .catch(() => {});
+    // D7Retained ad conversion: fires once per account when a session opens
+    // during day seven after signup (atomic claim inside; fire-and-forget).
+    maybeTrackDay7Retained(session);
     openPlaySession(accountId, characterId, name, meta, initialLevel)
       .then((id) => {
         session.dbSessionId = id;
@@ -3015,6 +4042,9 @@ export class GameServer {
       name,
       cls,
       realm: REALM,
+      // Staff advert for admin-gated client surfaces (the /dev Spawns tab).
+      // Every gated command is re-checked server-side, so a forged true is inert.
+      admin: session.isAdmin,
       // Soft (cosmetic) words the client masks locally when its profanity
       // filter is on. Hard words are never sent — they're enforced server-side.
       softWords: this.chatFilter.softWords(),
@@ -3051,6 +4081,26 @@ export class GameServer {
     void this.refreshAccountFlair(session).catch((err) =>
       console.error('account flair refresh failed:', err),
     );
+    // Restore any live Cheater mark, same best-effort contract: a failed read
+    // must never block joining the world. Failing OPEN (joining untagged) is the
+    // deliberate choice over failing closed, because the alternative is locking a
+    // player out of a game they paid for over a cosmetic sanction; the budget is
+    // not burned while the tag is absent, so a missed restore delays the sanction
+    // rather than cancelling it.
+    void refreshCheaterMark(
+      session,
+      this.sim,
+      () => this.clients.get(session.pid) === session,
+    ).catch((err) => console.error('cheater mark refresh failed:', err));
+    // Stamp the Curator standing off the just-loaded meta so an inspect landing
+    // before the first 60s cycle already reads the true rank. Synchronous (pure
+    // CPU), so the try/catch is what keeps the same "a flair stamp must never
+    // affect joining the world" contract the awaited reads get from .catch.
+    try {
+      this.refreshCuratorStanding(session);
+    } catch (err) {
+      console.error('curator standing refresh failed:', err);
+    }
     return session;
   }
 
@@ -3083,13 +4133,66 @@ export class GameServer {
     session.chatMutedUntil = meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null;
     session.chatMuteReason = meta.reason ?? '';
     session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
+    session.generalChatRateLimit = meta.generalChatRateLimit ?? null;
+    this.generalChatQuota.policyChanged(session.accountId);
     session.isAdmin = meta.isAdmin ?? false;
     session.adminPermissions = new Set(meta.adminPermissions ?? []);
+    // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
+    // join. Without this, a mid-session save that already landed durably would
+    // be clobbered by the stale join-time snapshot once lastSent resets below
+    // forces a resend. Only refresh when the caller actually supplies a layout:
+    // ws_auth.ts always does on the real reconnect path, but an in-process/test
+    // caller that omits it (meta = {}) must keep the session's saved value
+    // rather than being reset to null, matching the sibling bankBonus
+    // "absent means keep" pattern above.
+    if (meta.hotbarLayout !== undefined) {
+      session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    }
+    // The freshly-read look, same "absent means keep" contract as the layout
+    // above. ws_auth always supplies it on a real reconnect, so a redesign
+    // saved during the linkdead grace window lands here: the join-time value
+    // on the entity would otherwise outlive the row for the whole session,
+    // with the appearance memo happily serving the stale string (the wipe of
+    // lastSent below re-SENDS, but what it re-sends is the memo).
+    if (meta.appearance !== undefined) {
+      const e = this.sim.entities.get(session.pid);
+      // Compared by VALUE, not identity. meta.appearance is a fresh parse of a
+      // fresh row read, so it is never the same object as the one already on
+      // the entity and an identity check elided nothing: every reconnect busted
+      // the memo and re-shipped the look. Serializing two ~0.6 KB documents once
+      // per resume is nothing against re-minting the wire string and forcing a
+      // full identity record on every player in view.
+      if (e && !sameAppearance(e.modularAppearance, meta.appearance ?? null)) {
+        e.modularAppearance = meta.appearance ?? null;
+        this.bustAppearanceWireMemo(e.id);
+      }
+    }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
+    // Load-bearing for every rev + cadence gate (market, mail, corder):
+    // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
+    // each gate's `sent.X === undefined` arm forces both dueness and a
+    // rebuild on the next snapshot, so the stale lastXRev trackers need no
+    // reset here (pinned by the resume case in
+    // tests/commission_wire_cadence.test.ts). A future resume that PRESERVES
+    // lastSent (a reconnect-bandwidth optimization) must reset those
+    // trackers instead, or the gates serve a stale view until their
+    // staleness backstops.
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    session.petSpecialWireVersion =
+      meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
+    const player = this.sim.entities.get(session.pid);
+    if (player) {
+      player.petSpecialCommandsSupported =
+        session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (session.petSpecialWireVersion === 0) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === session.pid) entity.petAutoSkill = false;
+      }
+    }
     session.timerWireCache = new StableSelfTimerWireCache();
     session.sentEnts = new Map();
     session.selfHeavyDirty = true;
@@ -3102,6 +4205,7 @@ export class GameServer {
       name: session.name,
       cls,
       realm: REALM,
+      admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
     });
@@ -3120,7 +4224,22 @@ export class GameServer {
   // sim and stays online for friends, analytics, and the play session row.
   // Returns true when grace began (false: the session was already torn down,
   // already linkdead, or the event came from a stale pre-resume socket).
-  socketClosed(session: ClientSession, ws: WebSocket): boolean {
+  //
+  // withMarket (default true) chooses whether the safety flush below also
+  // writes the realm-global World Market and mail escrow. The one caller that
+  // passes false is the mid-handshake death re-check in server/ws_auth.ts: that
+  // session processed zero input (game.join returns synchronously and the
+  // re-check runs before any message handling), so it cannot have touched the
+  // realm-global market or mail escrow, and those halves would write nothing
+  // new. It matters because that death happens exactly when the pool is
+  // exhausted: one whole-realm market+mail transaction per dead handshake, all
+  // serialized on the process-global market queue, feeds back into the resource
+  // that caused the death. Every ordinary dropped socket keeps the default.
+  socketClosed(
+    session: ClientSession,
+    ws: WebSocket,
+    opts: { withMarket?: boolean } = {},
+  ): boolean {
     // A late close/error from a socket that a resume already replaced must
     // not tear down the live session riding the new socket.
     if (session.ws !== ws) return false;
@@ -3136,7 +4255,7 @@ export class GameServer {
     const meta = this.sim.meta(session.pid);
     if (meta) Object.assign(meta.moveInput, emptyMoveInput());
     // Safety flush so a process crash during the grace window loses nothing.
-    void this.saveCharacter(session, { withMarket: true }).catch((err) =>
+    void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
       console.error(`linkdead save failed for ${session.name}:`, err),
     );
     return true;
@@ -3211,6 +4330,9 @@ export class GameServer {
     this.cancelAndRecordUnstuck(session);
     session.left = true;
     this.clients.delete(session.pid);
+    if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
+      this.generalChatQuota.forgetAccount(session.accountId);
+    }
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
     this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
@@ -3236,12 +4358,24 @@ export class GameServer {
     // Card Duel: drop the queue slot and forfeit any live match on disconnect,
     // same idempotent-before-persistence shape as the two lines above.
     this.sim.leaveCardMinigameEntirely(session.pid);
+    // Thornhollow Fields desertion also resolves before the leave save so the leaver's
+    // recorded loss and rating delta are in the persisted state (idempotent;
+    // removePlayer repeats it harmlessly).
+    this.sim.bgResolveDesertion(session.pid);
     // Freeze reward eligibility and reconcile pending loot before the leave
     // snapshot. saveCharacterOnLeave awaits the database; without this
     // synchronous prefix, a roll or boss death can mutate the character after
     // serialization and removePlayer then discards that unsaved reward.
     this.sim.preparePlayerLeave(session.pid);
     await this.saveCharacterOnLeave(session);
+    // Whatever book work this session still holds can never commit now: it has
+    // no save left. Undo the part whose character half never landed, and
+    // record the part whose character half did (an escrow deficit that ran out
+    // of saves to retry on). The exhausted-retry arm inside saveCharacterOnLeave
+    // already cleared its own marks, so this is a no-op there.
+    if (session.dirtyGuildBanks.size > 0) {
+      this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
+    }
     this.sessionsByCharacterId.delete(session.characterId);
     // Release the per-character load lease so a fresh login (here or on another
     // process) can reload the character without waiting out the TTL. Order
@@ -3274,11 +4408,20 @@ export class GameServer {
         // timer only persists the market every 30s. Without this, a crash right
         // after the leave-flush of bags would tear the escrow in half (item lost
         // or duplicated). saveCharacter(withMarket) writes both in one transaction.
-        await this.saveCharacter(session, { withMarket: true });
+        await this.saveCharacter(session, { withMarket: true, final: true });
         return;
       } catch (err) {
         if (attempt === LEAVE_SAVE_MAX_ATTEMPTS) {
           console.error(`save on leave failed after ${attempt} attempts for ${session.name}:`, err);
+          // This session will never save again, so any guild books it
+          // dirtied are permanently unflushable: the live book is ahead of
+          // durable truth with no session left to converge it, and the
+          // disband guard (which scans session marks) loses sight of it the
+          // moment this session tears down. Reconcile now, exactly like the
+          // fence-out arm (Guild Bank Phase 3 QA).
+          if (session.dirtyGuildBanks.size > 0) {
+            this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
+          }
           return;
         }
         const retryMs = Math.min(
@@ -3291,62 +4434,240 @@ export class GameServer {
     }
   }
 
-  async saveCharacter(session: ClientSession, opts: { withMarket?: boolean } = {}): Promise<void> {
+  // Resolves false when the blob DID NOT PERSIST, which is now three shapes:
+  // the lease-fenced write matched no row (a same-account takeover rotated the
+  // nonce, the original meaning), the escrow refused a book half so the whole
+  // transaction rolled back, and this session is quarantined so it may never
+  // save again. True means "did not fence out and was not refused", not
+  // "landed": the no-state arm (pid already gone from the sim, unreachable
+  // from the restore paths which hold a live session) is a silent no-op
+  // that resolves true. Callers that must know their write was not fenced
+  // (the audited GM restores) read it; every legacy void caller ignores it.
+  async saveCharacter(
+    session: ClientSession,
+    opts: { withMarket?: boolean; final?: boolean } = {},
+  ): Promise<boolean> {
+    // A quarantined session's live state was abandoned when its escrow was
+    // rolled back: its character half is the half that would carry the value
+    // its book half could not, so persisting it is exactly the mint the
+    // refusal prevented. It reloads from its durable row instead.
+    if (session.escrowQuarantined) return false;
     const previous = this.characterSaveQueues.get(session.characterId);
     const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+      // Re-checked INSIDE the queue, not only at entry: a save enqueued before
+      // the rollback would otherwise run after it, and by then this session's
+      // book ops have been undone while its character blob still reflects
+      // them, so committing it is exactly the mint the rollback prevented.
+      if (session.escrowQuarantined) return false;
       const state = this.sim.serializeCharacter(session.pid);
       const e = this.sim.entities.get(session.pid);
+      // Persist the Cheater mark's remaining budget. It rides its own write and
+      // NOT the character blob because the mark is ACCOUNT state: folding it into
+      // one character's save would let an alt's stale snapshot resurrect a budget
+      // another character already burned down.
+      //
+      // The live aura is the ONLY sim source of truth, because the aura is what
+      // ticks (see src/sim/moderation/CLAUDE.md). Its absence means the sanction
+      // is served, and burn(0) is what clears the account row.
+      void persistCheaterMark(session, e?.auras);
       // Captured at serialize time: only unlocks already inside THIS blob may
       // publish when it lands. An unlock granted while the write is in flight
       // stays pending for the save queued behind it, so the character_deeds
       // index (and Steam, chained off it) never runs ahead of durable state.
       const recordUpTo = session.pendingDeedRecords.length;
       if (state && e) {
-        if (session.spectating) {
-          state.pos = {
-            x: session.spectating.savedPos.x,
-            z: session.spectating.savedPos.z,
-          };
-          state.pet = session.spectating.stowedPet;
-        }
-        if (session.jailVisit) {
-          state.pos = {
-            x: session.jailVisit.savedPos.x,
-            z: session.jailVisit.savedPos.z,
-          };
-          state.facing = session.jailVisit.savedFacing;
-          state.pet = session.jailVisit.stowedPet;
-        }
-        if (session.jailed) {
-          const jailPos = this.jailSpawnFor(session);
-          state.pos = { x: jailPos.x, z: jailPos.z };
-          state.jail = session.jailed;
-          state.dead = false;
-          state.ghost = false;
-          state.corpsePos = null;
-          state.hp = Math.max(1, state.hp);
-        } else {
-          delete state.jail;
-        }
+        // The session-position/jail fixups, applicable to ANY snapshot of this
+        // character (the T0 one below, or a re-serialized one inside the
+        // queued escrow thunk).
+        const applyFixups = (s: NonNullable<typeof state>): NonNullable<typeof state> => {
+          if (session.spectating) {
+            s.pos = {
+              x: session.spectating.savedPos.x,
+              z: session.spectating.savedPos.z,
+            };
+            s.pet = session.spectating.stowedPet;
+          }
+          if (session.jailVisit) {
+            s.pos = {
+              x: session.jailVisit.savedPos.x,
+              z: session.jailVisit.savedPos.z,
+            };
+            s.facing = session.jailVisit.savedFacing;
+            s.pet = session.jailVisit.stowedPet;
+          }
+          if (session.jailed) {
+            const jailPos = this.jailSpawnFor(session);
+            s.pos = { x: jailPos.x, z: jailPos.z };
+            s.jail = session.jailed;
+            s.dead = false;
+            s.ghost = false;
+            s.corpsePos = null;
+            s.hp = Math.max(1, s.hp);
+          } else {
+            delete s.jail;
+          }
+          return s;
+        };
+        applyFixups(state);
         // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
         // is temporarily 20, but serializeCharacter reports the real level — so the
         // character-list/leaderboard `level` column never reflects the temp state.
         let saved: boolean;
-        if (opts.withMarket) {
-          // Atomic on the leave path so a logout bag-flush can never tear away
-          // from the global Market escrow (see saveCharacterAndMarketState). Run
-          // through the market queue and capture the market snapshot at write
-          // time so this commit can't clobber a newer one.
-          saved = await this.enqueueMarketWrite(() =>
-            saveCharacterAndMarketState(
-              session.characterId,
-              state.level,
-              state,
-              this.sim.serializeMarket(),
-              this.sim.serializeMail(),
-              session.leaseNonce,
-            ),
+        // The level the row will actually carry. The escrow arm below
+        // re-serializes a FRESH snapshot inside the queued thunk (snap), so a
+        // silent level move landing during the queue wait persists snap.level
+        // while the T0 `state.level` stays behind; the linked-member level
+        // feed must gate on the PERSISTED value or it reports the move a save
+        // late (or never, when that save was the leave flush). Release-merge
+        // mirror of the v0.34.0 lastPersistedLevel change onto this branch's
+        // three-path saveCharacter.
+        let persistedLevel = state.level;
+        // Guild books this save will carry (Guild Bank Phase 3, reshaped by
+        // the escrow root fix). The payload is NOT the shared live book: it is
+        // this session's OWN unflushed delta log per guild, and the write is a
+        // read-modify-write inside the fenced transaction
+        // (server/db.ts writeGuildBankRow: SELECT ... FOR UPDATE, then
+        // mergeGuildBankRow, then the upsert). That is the whole guarantee:
+        //
+        //   A session persists DURABLE TRUTH PLUS ITS OWN DELTAS, so its
+        //   commit can only ever contain its own work. Another officer's
+        //   not-yet-durable op is not in this payload and cannot ride it into
+        //   the row, so the fence means exactly what its comments say: a
+        //   fenced-out session's ops reach durable state through NO path.
+        //
+        // The marks and log lengths are still captured at write time inside
+        // the queued closure, exactly like the market snapshot, so an op
+        // dispatched during the serial-writer wait re-schedules itself instead
+        // of being dropped. A guild whose serializeGuildBank returns null (no
+        // loaded book: unloaded, oversized, or malformed at boot) is SKIPPED
+        // entirely (collectGuildBankDeltas), so an unloaded book's row is
+        // never touched.
+        const carriedGuildBankSeqs: [number, number][] = [];
+        // How many unflushed-op log entries per guild this save's payload
+        // includes (captured with the marks): a commit consumes exactly that
+        // many from the front of each log, so a mid-save op's entry survives
+        // alongside its surviving dirty mark.
+        const carriedGuildBankOpCounts = new Map<number, number>();
+        // What each book write actually did, filled by the db layer inside the
+        // transaction (see GuildBankWriteResult).
+        const guildBankResults: GuildBankWriteResult[] = [];
+        // Guilds the payload SKIPPED (no loaded book: unloaded, oversized, or
+        // malformed at boot). Their rows are not this process's to touch, so
+        // their marks and logs must survive the commit: releasing them would
+        // leave a character half durable with a book half never written.
+        const skippedGuildBanks = new Set<number>();
+        const collectDeltas = () => {
+          carriedGuildBankSeqs.length = 0;
+          carriedGuildBankOpCounts.clear();
+          guildBankResults.length = 0;
+          skippedGuildBanks.clear();
+          session.inFlightGuildBankOps.clear();
+          for (const entry of session.dirtyGuildBanks) {
+            carriedGuildBankSeqs.push(entry);
+            const carried = session.unflushedGuildBankOps.get(entry[0])?.length ?? 0;
+            carriedGuildBankOpCounts.set(entry[0], carried);
+            session.inFlightGuildBankOps.set(entry[0], carried);
+          }
+          const saves = collectGuildBankDeltas(
+            (guildId) => this.sim.serializeGuildBank(guildId),
+            (guildId) => session.unflushedGuildBankOps.get(guildId) ?? [],
+            carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
+          const carriedIds = new Set(saves.map((save) => save.guildId));
+          for (const [guildId] of carriedGuildBankSeqs) {
+            if (!carriedIds.has(guildId)) skippedGuildBanks.add(guildId);
+          }
+          return saves;
+        };
+        // Captured BEFORE the await: a save that carries a guild book is the
+        // dupe-sensitive escrow shape, and the dirty marks it would clear are
+        // still set while the write is in flight, so a throw below must be
+        // attributable even though carriedGuildBankSeqs is filled only once
+        // the queued closure actually runs.
+        const carriesGuildBooks = session.dirtyGuildBanks.size > 0;
+        if (opts.withMarket || carriesGuildBooks) {
+          // Atomic on the leave path so a logout bag-flush can never tear away
+          // from the global Market escrow (see saveCharacterAndMarketState),
+          // and on any save carrying a guild book so the character half and
+          // the book half commit or vanish together (the same escrow shape;
+          // both siblings ride the character-lease fence). Run through the
+          // market queue and capture the market/book snapshots at write time
+          // so this commit can't clobber newer ones.
+          try {
+            saved = await this.enqueueMarketWrite(() => {
+              // BOTH escrow halves are captured HERE, in one synchronous step at
+              // write time, after the serial-writer wait: an op dispatched
+              // during the wait mutates the live character AND the live book,
+              // so a character blob serialized before the wait paired with a
+              // book serialized inside it would commit two different instants
+              // (a deposit lands in both halves, a withdraw in neither: the
+              // Phase 3 QA database-review BLOCKING). Re-serializing may fail
+              // only if the player left mid-wait; then the T0 snapshot (whose
+              // ops are all pre-wait) is still self-consistent with the books
+              // its session could have dirtied. recordUpTo stays captured at
+              // T0: the fresher blob can only contain MORE than it publishes,
+              // never less (publish never runs ahead of durable state).
+              const fresh = this.sim.serializeCharacter(session.pid);
+              const snap = fresh ? applyFixups(fresh) : state;
+              persistedLevel = snap.level;
+              return opts.withMarket
+                ? saveCharacterAndMarketState(
+                    session.characterId,
+                    snap.level,
+                    snap,
+                    this.sim.serializeMarket(),
+                    this.sim.serializeMail(),
+                    session.leaseNonce,
+                    collectDeltas(),
+                    guildBankResults,
+                  )
+                : saveCharacterAndGuildBankState(
+                    session.characterId,
+                    snap.level,
+                    snap,
+                    collectDeltas(),
+                    session.leaseNonce,
+                    guildBankResults,
+                  );
+            });
+          } catch (err) {
+            // The whole escrow rolled back: the character half AND every book
+            // half. The live sim is now ahead of durable truth for those books
+            // until a later save or a reconcile lands, which is exactly the
+            // window the dupe guards live in, so it must be visible in
+            // production, not only in a log line. The counter observes, it
+            // never swallows: the refusal arm still runs below and a foreign
+            // error is still rethrown.
+            //
+            // A REFUSAL is deliberately not counted here. Two officers of one
+            // guild contending is ordinary concurrency and the usual outcome is
+            // "refused, will retry, resolves in a round trip", which is not a
+            // failure and must not share a counter kind with one (an operator
+            // alerting on escrow_save_failed > 0 was getting that noise).
+            // handleGuildBankEscrowRefusal below owns the vocabulary instead:
+            // escrow_refused_retry per guild on the retry arm, and this
+            // escrow_save_failed once for the session on the TERMINAL arm,
+            // where the save really did fail for good.
+            if (carriesGuildBooks && !(err instanceof GuildBankEscrowRefused)) {
+              gameMetricsCounters().guildBankIncident('escrow_save_failed');
+            }
+            // A REFUSED book half aborts the whole transaction, character row
+            // included, so this save persisted nothing at all. Skip every
+            // post-save step (no lastSave, no deed publish, no mark release:
+            // the log is exactly as it was) and decide whether to retry or
+            // roll the session back.
+            if (err instanceof GuildBankEscrowRefused) {
+              this.handleGuildBankEscrowRefusal(session, err.results, opts.final === true);
+              // Nothing persisted, character row included, so this reports the
+              // same "did not land" as a fence-out to any caller reading it.
+              return false;
+            }
+            throw err;
+          } finally {
+            // Whatever happened to the write, no payload is in flight any
+            // more: the cap's compaction may touch the whole log again.
+            session.inFlightGuildBankOps.clear();
+          }
         } else {
           saved = await saveCharacterState(
             session.characterId,
@@ -3365,8 +4686,24 @@ export class GameServer {
         // saves. Only an explicit false is a fence-out: the no-nonce legacy path
         // returns true, so a strict comparison never mistakes an ordinary save for one.
         if (saved === false) {
+          // Same dupe-sensitive shape as the throw above, reached the other
+          // way: the write matched no row, so nothing persisted. Counted only
+          // when this save actually carried books (an ordinary fenced-out
+          // character save is not a guild bank incident).
+          if (carriedGuildBankSeqs.length > 0) {
+            gameMetricsCounters().guildBankIncident('save_fenced_out');
+          }
           console.warn(
             `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
+          );
+          // Guild books this save carried were mutated in the LIVE sim by ops
+          // whose character half just rolled back, so the LIVE book is ahead
+          // of what this session can ever make durable. Undo exactly this
+          // session's own ops on the live book; no other session's payload can
+          // contain them, so there is nothing else to converge.
+          this.revertOwnGuildBookOps(
+            session,
+            carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
           // The lease is gone: this session is a displaced zombie whose writes
           // can never land again. Give the player the same explicit signal an
@@ -3378,9 +4715,35 @@ export class GameServer {
           if (!session.left) {
             void this.kickSession(session, 'character taken over', 'character taken over');
           }
-          return;
+          return false;
         }
         session.lastSave = Date.now();
+        // The carried books: release their dirty marks where the write
+        // actually landed AND the seq is unchanged (a mid-save op re-dirtied
+        // the book with state this commit did not include), consuming the
+        // committed prefix of each unflushed-op log (a mid-save op's entry
+        // survives). A book whose write was SKIPPED keeps its mark and its log
+        // for a later retry; see resolveGuildBankDeficit.
+        // Reaching here means the transaction COMMITTED, so every book half it
+        // CARRIED landed: a refused one aborts the whole transaction and throws
+        // (GuildBankEscrowRefused), so there is no partial arm to handle. A
+        // guild the payload SKIPPED is the one thing that still needs guarding:
+        // nothing was written for it, so nothing may be released.
+        for (const [guildId, seq] of carriedGuildBankSeqs) {
+          if (skippedGuildBanks.has(guildId)) continue;
+          const written = guildBankResults.find((r) => r.guildId === guildId);
+          if (written && !written.written) continue; // defensive: a refusal throws
+          const carried = carriedGuildBankOpCounts.get(guildId) ?? 0;
+          if (session.dirtyGuildBanks.get(guildId) === seq) {
+            session.dirtyGuildBanks.delete(guildId);
+          }
+          session.guildBankDeficitSkips.delete(guildId);
+          const log = session.unflushedGuildBankOps.get(guildId);
+          if (log) {
+            log.splice(0, carried);
+            if (log.length === 0) session.unflushedGuildBankOps.delete(guildId);
+          }
+        }
         // The blob is durable: publish every unlock it contains. A rejected
         // save skips this (the throw propagates past it), leaving the ids
         // pending for the next save attempt (the 30s autosave, the next
@@ -3396,11 +4759,31 @@ export class GameServer {
           { characterId: session.characterId, accountId: session.accountId },
           session.pendingDeedRecords.splice(0, recordUpTo),
         );
+        // Same durability ordering as the deed publish above: the level the bot can
+        // read only moved once this write landed. Delta-gated on the SERIALIZED level
+        // (never e.level, which a Fiesta bout temporarily raises), so this covers the
+        // autosave sweep, leave, shutdown, and every silent Sim.setPlayerLevel path
+        // (dev_level, the GM join arm, the PBE boost) while staying silent on the
+        // overwhelming majority of saves that move no level.
+        // DELIBERATE EXCLUSION: lifetimeXp-only movement is not enqueued. It can only
+        // flip the highestCharacterForAccount tiebreak between two same-level
+        // characters on one account, and it rises on nearly every save of an active
+        // player, so gating on it would turn the 30 s autosave sweep into a per-player
+        // metronome. The bot's periodic full resync heals that rare tiebreak flip.
+        if (persistedLevel !== session.lastPersistedLevel) {
+          session.lastPersistedLevel = persistedLevel;
+          // Date.now(), like every other enqueue site: the feed's dedupe window is
+          // measured against wall-clock now, so handing it a stamp coupled to the
+          // save bookkeeping buys nothing and a stale one would merge where it
+          // should mint.
+          enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, Date.now());
+        }
       }
+      return true;
     });
     this.characterSaveQueues.set(session.characterId, run);
     try {
-      await run;
+      return await run;
     } finally {
       if (this.characterSaveQueues.get(session.characterId) === run) {
         this.characterSaveQueues.delete(session.characterId);
@@ -3436,6 +4819,23 @@ export class GameServer {
       }
     };
     await Promise.all(Array.from({ length: Math.min(SAVE_CONCURRENCY, sessions.length) }, worker));
+    // SHUTDOWN gets a second pass over whoever is still dirty. A guild book
+    // whose escrow replay stalled on another officer's not-yet-durable work
+    // keeps its mark and resolves on the session's NEXT save, and at shutdown
+    // there is otherwise no next save: the residue would go durable unrecorded
+    // and heal only if the realm came back with both officers online. One
+    // extra pass is enough because the first pass made every other session's
+    // work durable. The 30 s autosave sweep does not need it (its next tick is
+    // the retry) and must not pay for it.
+    if (reason !== 'shutdown') return;
+    const stillDirty = sessions.filter((s) => s.dirtyGuildBanks.size > 0);
+    for (const session of stillDirty) {
+      // FINAL: there is no pass three, so a refusal here resolves now rather
+      // than waiting for a retry that will never come.
+      await this.saveCharacter(session, { final: true }).catch((err) =>
+        console.error(`${reason} retry failed for ${session.name}:`, err),
+      );
+    }
   }
 
   // The World Market is shared global state, persisted as a single JSONB blob.
@@ -3474,24 +4874,802 @@ export class GameServer {
     }
   }
 
-  async loadRifts(): Promise<void> {
-    try {
-      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now(), {
-        strict: this.communityTestRifts,
-      });
-    } catch (err) {
-      console.error('failed to load shared Rift state:', err);
-      if (this.communityTestRifts) throw err;
+  // Guild bank books (Guild Bank Phase 3): boot-load every realm guild's book
+  // into the live sim BEFORE players join (a guild with no row gets an empty
+  // book), releasing the deliberately silent-inert Phase 2 wire. An oversized
+  // row is SKIPPED loudly (that guild's ops stay inert and its row survives on
+  // disk); a load failure leaves every book absent, which is safe (ops refuse
+  // silently) but logged. There is no periodic saveGuildBanks sibling BY
+  // DESIGN: books persist only through the fenced escrow save that carries the
+  // acting character (saveCharacter below), never standalone.
+  async loadGuildBanks(): Promise<void> {
+    // A failed boot load leaves EVERY guild bank on the realm silently inert
+    // until restart (ops refuse, and last-member-leave/disband fail closed on
+    // the unloaded books, refusing guild deletion), so a transient DB blip is
+    // retried before giving up LOUDLY. Never throws: the realm still boots.
+    const attempts = 3;
+    let rows: Awaited<ReturnType<typeof loadGuildBankRows>> | null = null;
+    for (let attempt = 1; attempt <= attempts && rows === null; attempt++) {
+      try {
+        rows = await loadGuildBankRows();
+      } catch (err) {
+        console.error(`guild bank boot load attempt ${attempt}/${attempts} failed:`, err);
+        if (attempt < attempts) await new Promise((r) => setTimeout(r, 500 * attempt));
+      }
+    }
+    if (rows === null) {
+      console.error(
+        'GUILD BANKS UNAVAILABLE: the boot load failed after every retry; all guild bank ops on this realm stay inert and guild deletion (disband, last-member leave) is refused fail-closed until a restart loads the books',
+      );
       return;
     }
-    if (!this.communityTestRifts) return;
+    // Soft size watch (a quarter of the hard bound): a legitimate 48-slot
+    // book is a few KB, so a row this large is growing toward the skip bound
+    // (or corrupt-but-well-shaped) and deserves operator eyes BEFORE it trips
+    // the hard skip and goes inert.
+    for (const row of rows) {
+      if (!row.oversized && (row.dataBytes ?? 0) > GUILD_BANK_ROW_MAX_BYTES / 4) {
+        console.warn(
+          `guild bank row for guild ${row.guildId} is ${row.dataBytes} bytes (soft watch threshold ${GUILD_BANK_ROW_MAX_BYTES / 4}); it still loads, but investigate before it reaches the hard bound and goes inert`,
+        );
+      }
+    }
+    const result = loadGuildBanksIntoSim(this.sim, rows);
+    // Each of these leaves ONE guild's book unloaded until a restart: its ops
+    // are inert and its disband is refused fail-closed, an outage for that
+    // guild rather than a transient. Counted per guild beside the loud log
+    // (the guild id stays in the log; it is never a metric label).
+    for (const guildId of result.oversized) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
+      console.error(
+        `guild bank row for guild ${guildId} exceeds the size bound; left unloaded (ops stay inert, the row is preserved)`,
+      );
+    }
+    for (const guildId of result.malformed) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
+      console.error(
+        `guild bank row for guild ${guildId} is structurally not a book; left unloaded (ops stay inert, the row is preserved)`,
+      );
+    }
+    for (const guildId of result.missing) {
+      gameMetricsCounters().guildBankIncident('book_unloaded');
+      console.error(`guild bank book for guild ${guildId} failed to load into the sim`);
+    }
+  }
 
-    populateCommunityRiftPortals(this.sim.ctx);
+  // Upper bound on one session's per-guild unflushed-op log (Guild Bank
+  // Phase 3 QA): at the guarded op rate (guild_bank_op_guard.ts) reaching it
+  // takes minutes of continuously failing commits. Crossing it COMPACTS the
+  // log (server/guild_bank_op_log.ts), semantics-preserving, rather than
+  // dropping it: the log is the escrow save's write payload, so a drop would
+  // silently discard committed-intent work. Pinned in
+  // tests/guild_bank_persistence.test.ts.
+  static readonly GUILD_BANK_UNFLUSHED_OP_CAP = 500;
+
+  /** Make the reserve-at-gate creation fee DURABLE, and only then book it.
+   *
+   *  THE HOLE THIS CLOSES: the fee is deducted from the LIVE purse at the
+   *  guild_create gate, the create commits, and the charge reaches the database
+   *  only through this session's character half. Fire-and-forgetting that save
+   *  meant a save which never became durable (a same-account takeover fence-out
+   *  discards the session's state; a crash loses it) left the guild created and
+   *  the founder's DURABLE purse untouched: a free guild. The book half cannot
+   *  rescue it either, because revertOwnGuildBookOps replays BOOK deltas and
+   *  the fee is not one: it lives on the character.
+   *
+   *  What is fixable here is fixable automatically: while the session is alive
+   *  the deduction sits in the live purse, so the autosave, the next op's save,
+   *  or the leave flush all persist it. What is NOT fixable is a session whose
+   *  live state is thrown away, and for that arm the honest answer is to make
+   *  the failure LOUD and MACHINE-READABLE rather than to book a payment that
+   *  did not happen.
+   *
+   *  So the `create_fee` ledger row is written AFTER the write commits (the
+   *  durability ordering the deed publish beside it already uses). A failed
+   *  save writes no row, which keeps the audit honest in the only direction
+   *  that matters: a guild with no create_fee row is a guild that was not paid
+   *  for, and it is findable with one query. The incident counter
+   *  (`create_fee_unpaid`) is the alerting half; the loud log carries the
+   *  guild, the character, and the amount an operator has to collect. */
+  private async persistGuildCreateFee(
+    session: ClientSession,
+    guildId: number,
+    fee: { accountId: number; amount: number; pursePaid: number } | null,
+  ): Promise<void> {
+    this.markGuildBankDirty(session, guildId);
+    let durable = false;
     try {
-      await this.persistRifts();
+      durable = await this.saveCharacter(session);
     } catch (err) {
-      console.error('failed to save shared Rift state:', err);
-      throw err;
+      console.error(`guild create fee save failed for ${session.name}:`, err);
+    }
+    if (!fee || fee.amount <= 0) return;
+    if (!durable) {
+      // The live purse still holds the deduction, so an ordinary transient
+      // failure self-heals on the next save of a session that is still alive.
+      // This line is for the arm that cannot: a fenced-out or quarantined
+      // session's live state is abandoned, and the fee goes with it.
+      gameMetricsCounters().guildBankIncident('create_fee_unpaid');
+      console.error(
+        `guild create fee for guild ${guildId} did not become durable for character ${session.characterId} (${session.name}): ${fee.amount} copper may be uncollected, and no create_fee row was written`,
+      );
+      return;
+    }
+    recordGuildBankDeltas(
+      'create_fee',
+      { characterId: session.characterId, accountId: fee.accountId },
+      guildId,
+      [guildCreateFeeDelta(fee.amount, fee.pursePaid)],
+    );
+  }
+
+  // Schedule a guild's book for the next fenced escrow save of this session.
+  private markGuildBankDirty(session: ClientSession, guildId: number): void {
+    session.dirtyGuildBanks.set(guildId, (session.dirtyGuildBanks.get(guildId) ?? 0) + 1);
+  }
+
+  // The refusal/error arm of the reserve-at-gate creation fee: return the
+  // reserved copper to the founder's purse. Consumes the pending reservation
+  // exactly once (the success arm consumed it instead when the create
+  // committed). A founder who left before the refusal arm ran cannot be
+  // refunded in the live sim; that arm is logged LOUDLY for operator
+  // compensation (rare: it needs a refused create racing a logout).
+  private refundGuildCreateFee(characterId: number): void {
+    const fee = this.pendingGuildCreateFees.get(characterId);
+    if (!fee) return; // already consumed by the success arm
+    this.pendingGuildCreateFees.delete(characterId);
+    if (fee.amount <= 0) return;
+    const s = this.sessionsByCharacterId.get(characterId);
+    const refunded = s ? this.sim.refundGuildCreationFeeFor(s.pid, fee.amount) : 0;
+    if (refunded !== fee.amount) {
+      console.error(
+        `guild create fee refund could not be applied for character ${characterId}: reserved ${fee.amount}, refunded ${refunded}; operator compensation needed`,
+      );
+    }
+  }
+
+  // When this session's escrow can never commit again, its guild-book
+  // mutations remain in the LIVE book while the character half rolled back
+  // (fence-out: a same-account takeover) or never landed (the leave flush
+  // exhausted its retries). SYNCHRONOUS and unconditional: replay exactly this
+  // session's own unflushed deltas BACKWARD onto the live book, leaving every
+  // other session's unflushed ops untouched.
+  //
+  // There is deliberately no evict-and-reload arm any more, and no
+  // cross-session dirty scan to choose between arms. Under the escrow root fix
+  // a session's payload contains only its own deltas, so a dead session's ops
+  // are in NO other session's payload and durable truth can never have been
+  // advanced by them: reloading the row would restore state that is either
+  // identical (a no-op) or another officer's newer work (destroying it).
+  //
+  // EVERY unflushed delta is undone, with no exceptions to reason about: a
+  // save either commits both halves or commits neither, so an unflushed delta
+  // never has a durable character half behind it.
+  private revertOwnGuildBookOps(dead: ClientSession, guildIds: number[]): void {
+    for (const guildId of guildIds) {
+      const log = dead.unflushedGuildBankOps.get(guildId) ?? [];
+      dead.dirtyGuildBanks.delete(guildId);
+      dead.unflushedGuildBankOps.delete(guildId);
+      dead.guildBankDeficitSkips.delete(guildId);
+      if (log.length === 0) continue;
+      // Counted per GUILD, the unit the remedy applies to: reaching this at
+      // all means a session that can never commit again held unflushed book
+      // ops, the shape the Phase 3 QA dupe lived in. This is the ONE reconcile
+      // site under the escrow root fix (the fence-out, the exhausted leave
+      // flush, the teardown sweep, and the escrow-refusal quarantine all land
+      // here), so the counter lives here rather than at four call sites. A
+      // guild whose log is already empty is a bookkeeping no-op, not an
+      // incident, and is not counted.
+      gameMetricsCounters().guildBankIncident('reconcile');
+      this.sim.revertGuildBankDeltas(guildId, log);
+    }
+  }
+
+  // How many consecutive escrow REFUSALS one session tolerates for one guild
+  // before it is rolled back rather than retried. Deliberately SMALL: while a
+  // refusal is outstanding this character persists NOTHING, including progress
+  // that has nothing to do with the guild bank, so every extra retry is
+  // unrelated progress an adversary can put at risk by keeping the book short.
+  // Two is enough because a refusal immediately flushes the sessions it is
+  // waiting on (see handleGuildBankEscrowRefusal), which turns the wait into a
+  // round trip instead of an autosave interval.
+  static readonly GUILD_BANK_DEFICIT_MAX_SKIPS = 2;
+
+  // The escrow REFUSAL arm. The book half could not be replayed onto durable
+  // truth, so the whole transaction rolled back and this save persisted
+  // NOTHING: not the books, not the character. That is the invariant the
+  // feature rests on, stated as a rule rather than as a residue:
+  //
+  //   If the book half cannot be applied, the character half must not commit.
+  //
+  // Carrying the shortfall and recording it was the alternative, and it is a
+  // two-account money printer: officer A deposits without flushing, officer B
+  // withdraws, B's character half commits while the book half does not, then A
+  // gets itself fenced (an ordinary re-login) so nothing will ever make A's
+  // deposit durable. B keeps the copper, A's stake comes back, repeatable on
+  // demand. Refusing removes it: B's purse can never durably gain what the
+  // book never durably lost.
+  //
+  // Two outcomes:
+  // - RETRY, while another session still holds unflushed work for the guild:
+  //   their commit is what makes this replay applicable, and it lands within
+  //   an autosave interval. Nothing is consumed; the marks and the log are
+  //   exactly as they were.
+  // - ROLL BACK, when no other session holds unflushed work (so nothing will
+  //   ever make the missing value durable) or the retries ran out. This
+  //   session's live state is abandoned: its own book ops come back off the
+  //   live book, it is QUARANTINED so it can never persist again, one
+  //   aggregate anomaly row records the incident, and it is disconnected to
+  //   reload from its durable row. Everything it did since its last successful
+  //   save is lost, which is exactly what a lease fence-out already does, and
+  //   it conserves precisely because none of it was ever durable.
+  private handleGuildBankEscrowRefusal(
+    session: ClientSession,
+    results: readonly GuildBankWriteResult[],
+    // True when this is the LAST save this session will ever get (the leave
+    // flush, or the shutdown flush's second pass). There is no later retry to
+    // wait for, so the refusal is resolved now rather than left to a save that
+    // will never come: otherwise the session would tear down with its progress
+    // discarded and no log line and no ledger row to say why.
+    final = false,
+  ): void {
+    let quarantine = false;
+    for (const result of results) {
+      if (result.written) continue;
+      const guildId = result.guildId;
+      let anotherSessionDirty = false;
+      for (const s of this.sessionsByCharacterId.values()) {
+        // A quarantined or departing session's marks are NOT a reason to wait:
+        // it will never commit them, so counting it would burn every retry
+        // (blocking this session's character saves the whole time) before
+        // reaching the same rollback.
+        if (s === session || s.escrowQuarantined || s.left) continue;
+        if (s.dirtyGuildBanks.has(guildId)) {
+          anotherSessionDirty = true;
+          break;
+        }
+      }
+      const skips = (session.guildBankDeficitSkips.get(guildId) ?? 0) + 1;
+      const canResolve =
+        !final &&
+        anotherSessionDirty &&
+        !result.rowUnusable &&
+        skips < GameServer.GUILD_BANK_DEFICIT_MAX_SKIPS;
+      if (canResolve) {
+        // ORDINARY CONCURRENCY, not a failure: another officer of this guild
+        // holds unflushed work, their commit is what makes this replay
+        // applicable, and the flush below makes that a round trip rather than
+        // an autosave interval. Nothing was consumed and nothing is lost, so
+        // it gets its own counter kind: sharing escrow_save_failed made that
+        // counter unusable for `> 0` alerting. Counted per GUILD, the unit the
+        // retry applies to.
+        gameMetricsCounters().guildBankIncident('escrow_refused_retry');
+        session.guildBankDeficitSkips.set(guildId, skips);
+        // Do not wait out an autosave interval: FLUSH the sessions whose
+        // unflushed work this replay is waiting on, so the retry lands a round
+        // trip later rather than 30 seconds later. This is what keeps the
+        // blocked window (during which THIS character persists nothing at all,
+        // including progress that has nothing to do with the guild bank) to
+        // the shortest it can be, and it is why the skip bound is small.
+        //
+        // Only on the FIRST refusal: if that flush is itself refused it will
+        // flush back, and an unbounded ping-pong of fire-and-forget saves
+        // between two mutually-stuck sessions is worse than the wait it saves.
+        if (skips > 1) continue;
+        for (const s of this.sessionsByCharacterId.values()) {
+          if (s === session || s.escrowQuarantined || s.left) continue;
+          if (!s.dirtyGuildBanks.has(guildId)) continue;
+          void this.saveCharacter(s).catch((err) =>
+            console.error(`guild bank deficit flush failed for ${s.name}:`, err),
+          );
+        }
+        continue;
+      }
+      const log = session.unflushedGuildBankOps.get(guildId) ?? [];
+      recordGuildBankEscrowRollback(session, guildId, log, result.deficit);
+      console.error(
+        `guild bank escrow rolled back for guild ${guildId} (character ${session.characterId}): ${
+          result.rowUnusable
+            ? 'the stored row is oversized or malformed, or the merged book would cross the size bound, so it is preserved untouched'
+            : `${result.deficit?.kind} shortfall ${result.deficit?.shortfall} on ${result.deficit?.op}${result.deficit?.itemId ? ` (${result.deficit.itemId})` : ''}, and ${
+                anotherSessionDirty
+                  ? `it did not resolve within ${skips} escrow saves`
+                  : 'no other session holds unflushed work for this guild, so it never can'
+              }`
+        }. The session is quarantined and disconnected; nothing it did since its last save was durable, so nothing is lost that was.`,
+      );
+      quarantine = true;
+    }
+    if (!quarantine) return;
+    // TERMINAL: this refusal will never resolve, so the save really did fail
+    // for good (character half included, nothing durable). That is what
+    // escrow_save_failed means, and it is booked here rather than at the throw
+    // site so a refusal that merely RETRIES never reaches it. Counted once per
+    // SAVE, matching the db-threw arm above.
+    gameMetricsCounters().guildBankIncident('escrow_save_failed');
+    // The terminal arm of the escrow design and the one an operator should
+    // alert on: a live session is being abandoned because its book half can
+    // never be replayed onto durable truth. Counted once per SESSION (the unit
+    // the remedy applies to; the per-guild reverts it triggers are counted as
+    // 'reconcile' inside revertOwnGuildBookOps), beside the loud log that
+    // carries the guild id and the deficit.
+    gameMetricsCounters().guildBankIncident('escrow_quarantined');
+    // The character half is the half that would carry the value the book half
+    // could not, so this session must never save again.
+    session.escrowQuarantined = true;
+    // Undo EVERY book this session dirtied, not only the refused one: the
+    // session as a whole is abandoned, so its deltas in a second guild's book
+    // are live value nobody will ever make durable, and another officer
+    // withdrawing that phantom value would be refused in turn.
+    this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
+    if (!session.left) {
+      void this.kickSession(session, 'guild bank escrow rollback', 'character taken over');
+    }
+  }
+
+  // Run one guild bank op with the observer pair around it: the before/after
+  // book diff (the personal bank's recordBankOp idiom) detects success, writes
+  // the fire-and-forget ledger rows, and marks the guild book dirty for the
+  // escrow save. Never awaited, never a gameplay dependency; a refused op
+  // diffs empty and does nothing.
+  //
+  // THE ONLY server-side guild book mutation path. `target` says how to read
+  // the book around the mutation:
+  //  - `{ pid }`  a dispatched player op: the gated guildBankInfoFor read, and
+  //    the guild id comes from that player's membership stamp.
+  //  - `{ guildId, actorAccountId }`  the OPERATOR path (the admin dormant-slot
+  //    purge), which has no acting player: the ungated guild-scoped read, the
+  //    guild id is explicit, and the LEDGER ROW IS ATTRIBUTED TO THE OPERATOR'S
+  //    ACCOUNT rather than the carrier's owner, so the evidence names who
+  //    ordered the removal. `session` is then only the CARRIER whose fenced
+  //    escrow save takes the book (see adminPurgeGuildBankSlot).
+  // Extending this seam rather than writing a second mutation path is the
+  // Phase 3 acceptance line: the diff feeds BOTH the bank_ledger rows and the
+  // per-session unflushed-delta log the fence-out revert depends on, so a
+  // mutation outside it would be invisible to the audit and unrevertable.
+  private runGuildBankOp(
+    session: ClientSession,
+    target: { pid: number } | { guildId: number; actorAccountId: number },
+    op: GuildBankLedgerOp,
+    run: () => void,
+  ): void {
+    // A guild whose DELETE is already in flight has passed its empty-bank
+    // guard, so its row is about to cascade away: an op landing now would be
+    // destroyed by that cascade with its dirty mark and unflushed log wiped by
+    // the post-commit hook (onGuildDisbanded), leaving an orphaned ledger row
+    // behind. Refuse before the sim runs, so nothing mutates, no ledger row is
+    // written and no book is marked dirty. The window's contract
+    // (beginGuildBankDelete) is stated over THIS method, so it covers the
+    // operator arm too; only the player arm has somebody to TELL, and it is
+    // told, because the window is only two DB round trips wide but a deposit
+    // that appears to do nothing at all is worse than one that says to try
+    // again. The operator arm's answer is shaped by adminPurgeGuildBankSlot,
+    // which pre-checks the same window so it can name the reason.
+    const actingGuildId =
+      'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
+    if (actingGuildId !== undefined && this.guildBankDeleteWindows.has(actingGuildId)) {
+      // English on the wire, re-localized by the client matcher
+      // (src/ui/server_i18n.ts guild.bankClosing), the server-text contract:
+      // src/sim and server stay language-agnostic.
+      if ('pid' in target) {
+        this.sendChatNotice(session, 'The guild bank is closing. Try again in a moment.');
+      }
+      return;
+    }
+    const read = () =>
+      'pid' in target
+        ? this.sim.guildBankInfoFor(target.pid)
+        : this.sim.guildBankInfoForGuild(target.guildId);
+    // The COUNTERPARTY read, taken from the SAME instants as the book read so
+    // both halves of the op describe one moment. Server-derived throughout:
+    // the acting character's live purse and bags off the sim's own meta, never
+    // anything the client sent. The operator purge path has no acting
+    // character, so its counterparty is null on both sides and the movement
+    // resolves to a recorded ZERO (the copy is destroyed, not handed to
+    // anybody), which is what lets the audit check a purge instead of skipping
+    // it.
+    //
+    // counterpartySnapshot COPIES the quantities out. `meta.inventory` is the
+    // live array the sim mutates in place, so holding it across run() would
+    // difference every item movement to zero and pass everything silently.
+    const readCounterparty = () => {
+      if (!('pid' in target)) return null;
+      const meta = this.sim.meta(target.pid);
+      const actor: CounterpartyActor | null = meta
+        ? { copper: meta.copper, inventory: meta.inventory }
+        : null;
+      return counterpartySnapshot(actor);
+    };
+    const before = read();
+    const actorBefore = readCounterparty();
+    run();
+    const after = read();
+    const movement = counterpartyMovement(actorBefore, readCounterparty());
+    // Rung 0 of the ladder OPENS the bank from the acting officer's own PURSE
+    // (the sim decides which rung is next off the BEFORE book); it gets its
+    // own ledger op name so the audit's treasury replay can exclude the
+    // purse-paid copper like create_fee, and so the revert path never credits
+    // the treasury for money it never held. The rung is derived EXACTLY as
+    // the sim's buy op derives it (guildBankRungsBought, which floors a
+    // non-position count): a tampered live count below the opened base still
+    // charges the purse, so naming it buy_slots here would corrupt the audit
+    // replay and let a revert mint treasury copper.
+    const effectiveOp: GuildBankLedgerOp =
+      op === 'buy_slots' && before !== null && guildBankRungsBought(before.purchasedSlots) === 0
+        ? 'open_bank'
+        : op;
+    const deltas = diffGuildBankOp(effectiveOp, before, after);
+    // A successful player op requires a stamped officer-plus membership, and
+    // the stamp cannot change inside the synchronous run() above. The operator
+    // path names its guild outright (it has no acting player to read).
+    const guildId =
+      'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
+    // Attribution: a player op is the acting character's own; an operator op
+    // keeps the carrier's character (the column is NOT NULL and an operator may
+    // hold no character) but books the OPERATOR'S account, so the row names who
+    // ordered it instead of the bystander who lent the escrow transaction.
+    const who =
+      'pid' in target
+        ? session
+        : { characterId: session.characterId, accountId: target.actorAccountId };
+    // Movement of the acting character's purse or bags that NO ledger row
+    // accounts for. Two ways to get here, and both are the same defect seen
+    // from different sides:
+    //  - the book did not move at all (deltas empty), so no ordinary row is
+    //    written and the value that left the purse would leave no trace;
+    //  - the book moved, but the purse/bags ALSO moved under an id no row
+    //    names, so every written row balances by construction and the extra
+    //    movement is invisible again.
+    // Neither can happen legitimately (an op moves both sides or refuses and
+    // moves neither), so both get the loud path: an anomaly ledger row for the
+    // offline audit, a counter for production alerting, and a log line naming
+    // the guild. Never a silent drop.
+    const reportOrphan = (unaccounted: CounterpartyMovement) => {
+      if (guildId === undefined || counterpartyIdle(unaccounted)) return;
+      const orphan = counterpartyOrphan(unaccounted);
+      if (!orphan) return;
+      gameMetricsCounters().guildBankIncident('counterparty_orphan');
+      console.error(
+        `guild bank counterparty orphan on ${effectiveOp} for guild ${guildId} (character ${session.characterId}): the acting character's purse/bags moved value no ledger row accounts for (copper ${orphan.copperDelta}${orphan.itemId ? `, ${orphan.count} x ${orphan.itemId}` : ''})`,
+      );
+      recordGuildBankCounterpartyOrphan(
+        who,
+        guildId,
+        after?.purchasedSlots ?? before?.purchasedSlots ?? 0,
+        orphan,
+        counterpartyOrphanEvidence(effectiveOp, unaccounted),
+      );
+    };
+    if (deltas.length === 0) {
+      reportOrphan(movement);
+      return;
+    }
+    if (guildId === undefined) return;
+    // Stamp the payer/payee half onto the rows the book diff produced. The
+    // stamp DRAINS the movement across the deltas, so the recorded numbers sum
+    // to exactly what moved and a multi-row op can never book one purse
+    // movement twice. Whatever is LEFT is movement no row claimed, and it goes
+    // down the orphan path rather than being dropped.
+    const unaccounted = stampCounterpartyDeltas(deltas, movement);
+    this.markGuildBankDirty(session, guildId);
+    // Record the op in the session's unflushed log: this log is the escrow
+    // save's WRITE PAYLOAD (replayed forward onto durable truth) and the
+    // reconcile's undo list (replayed backward onto the live book).
+    let log = session.unflushedGuildBankOps.get(guildId) ?? [];
+    for (const d of deltas) {
+      log.push({
+        op: effectiveOp,
+        itemId: d.itemId,
+        count: d.count,
+        instance: (d.instance ?? null) as GuildBankOpDelta['instance'],
+        craftedRecipeId: d.craftedRecipeId ?? null,
+        copperDelta: d.copperDelta,
+        // diffGuildBankOp always sets the before witness on the guild path
+        // (pinned in tests/bank_ledger.test.ts); the fallback is defensive.
+        purchasedSlotsBefore: d.purchasedSlotsBefore ?? 0,
+        purchasedSlotsAfter: d.purchasedSlotsAfter,
+      });
+    }
+    if (log.length > GameServer.GUILD_BANK_UNFLUSHED_OP_CAP) {
+      // Overflow (commits failing for minutes at the guarded op rate):
+      // COMPACT, never drop. The log is what this session will persist, so
+      // dropping it would silently discard committed-intent work; compaction
+      // is semantics-preserving (server/guild_bank_op_log.ts). The settled
+      // prefix (character half durable, book half pending) is compacted
+      // separately so the boundary survives.
+      // An IN-FLIGHT save's captured prefix must survive compaction verbatim:
+      // it already captured that many entries and will consume them BY INDEX
+      // when it commits, so reshuffling them would make the splice eat the
+      // wrong ones (persisting work twice, or dropping it).
+      const protect = Math.min(session.inFlightGuildBankOps.get(guildId) ?? 0, log.length);
+      const head = log.slice(0, protect);
+      log = [...head, ...compactGuildBankOpLog(log.slice(protect))];
+    }
+    session.unflushedGuildBankOps.set(guildId, log);
+    recordGuildBankDeltas(effectiveOp, who, guildId, deltas);
+    // AFTER the op's own rows, so the anomaly reads as a follow-on to them:
+    // purse/bags movement that none of those rows accounts for.
+    reportOrphan(unaccounted);
+  }
+
+  /** Answer a `guild_bank_log` request with the guild's visible bank history,
+   *  or refuse it.
+   *
+   *  THE GATE IS THE BANK'S OWN GATE, deliberately not a looser one:
+   *  `guildBankInfoFor(pid)` is non-null only for an alive guild member (ANY
+   *  rank: the view gate is membership-wide, and the log is the trust surface
+   *  that lets the whole guild audit its officers) whose book is loaded,
+   *  standing at a banker. A NON-member is refused by exactly the same
+   *  predicate that denies them the bank itself, so the log can never become a
+   *  side channel around the membership gate, and the guild id comes from
+   *  the server's own membership STAMP, never from the request: a client cannot
+   *  name a guild to read.
+   *
+   *  The gate is re-checked AFTER the awaited read, because the read may share
+   *  an in-flight query and a leave, a kick, a death, or a walk-away can
+   *  land in that window; the answer must reflect the authority at DELIVERY
+   *  time, not at request time. A refusal is an explicit frame rather than
+   *  silence, so the pane can say so instead of rendering an empty history that
+   *  reads as "no officer has ever done anything". */
+  private sendGuildBankLog(session: ClientSession, pid: number): void {
+    const guildId = this.guildBankLogGuildFor(pid);
+    if (guildId === null) {
+      this.send(session, { t: 'gbanklog', ok: false });
+      return;
+    }
+    readGuildBankLog(guildId)
+      .then((entries) => {
+        // Same session, same character, same guild, still authorized. A
+        // linkdead or replaced session is caught by sendRaw's readyState guard
+        // as well; this is the AUTHORIZATION half.
+        if (session.left || session.pid !== pid || this.guildBankLogGuildFor(pid) !== guildId) {
+          this.send(session, { t: 'gbanklog', ok: false });
+          return;
+        }
+        this.send(session, { t: 'gbanklog', ok: true, entries });
+      })
+      .catch((err) => {
+        // A cold cache whose query failed or timed out. Never a stack trace to
+        // the player, and never a silent drop: the pane needs an answer to
+        // leave its loading state, and "refused" is the honest one (we do not
+        // know the history right now).
+        //
+        // COUNTED, because the frame a player gets is byte-identical to the
+        // "you are not an officer" refusal: without its own incident kind a
+        // total read outage would look exactly like ordinary refusals at the
+        // wire and nothing would ever page. The counter sits beside the loud
+        // log, never instead of it.
+        gameMetricsCounters().guildBankIncident('log_read_failed');
+        console.error(`guild bank log read failed for guild ${guildId}:`, err);
+        this.send(session, { t: 'gbanklog', ok: false });
+      });
+  }
+
+  /** The guild whose bank log this pid may read, or null when it may read
+   *  none. The single place the log's authorization is decided, shared by the
+   *  request gate and the post-await re-check so the two can never drift. */
+  private guildBankLogGuildFor(pid: number): number | null {
+    const guildId = this.sim.meta(pid)?.guildMembership?.guildId;
+    if (guildId === undefined) return null;
+    // The rank + proximity + alive + book-loaded gate, reused verbatim.
+    return this.sim.guildBankInfoFor(pid) === null ? null : guildId;
+  }
+
+  /** The OPERATOR READ of one guild's live bank (the admin route in
+   *  server/admin.ts), null when that guild has no loaded book. The discovery
+   *  half of the escape hatch below: the purge takes a slot index plus the
+   *  itemId at it, and before this an operator had to dig both out of
+   *  guild_banks by hand.
+   *
+   *  Reads the SAME ungated snapshot the purge mutates through
+   *  (sim.guildBankInfoForGuild), never a second book read, so a listing and the
+   *  refusal that follows it agree slot for slot; adminGuildBankView then drops
+   *  the per-copy instance payload, which is where the operator boundary is (see
+   *  server/admin_guild_bank_view.ts). A pure live-map read plus a clone: no db,
+   *  no mutation, nothing marked dirty. */
+  adminGuildBankState(guildId: number): AdminGuildBankView | null {
+    if (!Number.isInteger(guildId) || guildId <= 0) return null;
+    const info = this.sim.guildBankInfoForGuild(guildId);
+    return info === null ? null : adminGuildBankView(info);
+  }
+
+  /** The OPERATOR escape hatch for a dormant guild bank slot (the admin route
+   *  in server/admin.ts). A slot holding an item a later content change flagged
+   *  soulbound / noMarketList / transfer-locked is refused in BOTH directions,
+   *  so it can never be withdrawn, guildBankHoldings stays non-zero forever,
+   *  and the guild can never disband. No player action clears it; this does.
+   *
+   *  Runs through runGuildBankOp like every other book mutation, so the removal
+   *  gets its bank_ledger row (op 'admin_purge', carrying the item id, count,
+   *  and the REAL instance payload as evidence) and its per-session unflushed
+   *  delta, and rides the same fenced escrow save. There is no standalone book
+   *  write by design.
+   *
+   *  ATTRIBUTION: the ledger row's ACCOUNT is the acting operator
+   *  (`actorAccountId`), never the carrier's owner, so the evidence trail names
+   *  who ordered the removal rather than a bystander. Its character column is
+   *  the carrier (the column is NOT NULL and an operator may hold no character
+   *  at all); an `admin_purge` row is therefore the one shape where account and
+   *  character belong to different people, which is the signal, not a defect.
+   *  The operator's REASON rides the audited guild_moderation_actions row the
+   *  admin route writes beside this (the rename precedent).
+   *
+   *  THE CARRIER: books persist only inside a character's fenced escrow
+   *  transaction, so the purge needs a live session to ride. It uses a session
+   *  of the TARGET GUILD (officer-plus first, any member otherwise), never an
+   *  unrelated player's, so the dirty mark and the fence-out revert stay among
+   *  that guild's own sessions. With nobody from the guild online there is no
+   *  carrier and the purge is refused rather than mutating a live book it could
+   *  not persist. Membership is a FRESH DATABASE READ (see
+   *  guildBankSaveCarrier): it used to be the session stamp, on the reasoning
+   *  that a stale carrier is harmless because it only lends its transaction,
+   *  which is true right up to the arm that matters: a REFUSED escrow
+   *  quarantines and DISCONNECTS the carrier, so a stamp lagging a kick would
+   *  put a player who is no longer in the guild on a rollback-and-kick path for
+   *  an operator's act.
+   *
+   *  OPERATOR-VISIBLE CONSEQUENCE, stated because it is not obvious: a purge
+   *  rides a live guild member's save. In the rare refusal arm that member's
+   *  session is rolled back and disconnected (they reconnect and lose nothing
+   *  durable, but they ARE kicked). The dashboard says so before the operator
+   *  confirms.
+   *
+   *  DURABILITY IS AWAITED, not optimistic: a fenced-out escrow save REVERTS
+   *  the purge (revertOwnGuildBookOps replays the admin_purge delta backward
+   *  onto the live book, exactly as it does a player withdraw), and a REFUSED
+   *  escrow rolls the whole transaction back and quarantines the carrier, so
+   *  answering before the save landed would tell an operator a slot is cleared
+   *  while the copy is on its way back. This awaits the save and reports
+   *  'save_failed' unless the book actually still lacks the copy afterwards. */
+  async adminPurgeGuildBankSlot(
+    guildId: number,
+    slotIndex: number,
+    expectItemId: string,
+    actorAccountId: number,
+  ): Promise<
+    | { ok: true; removed: { itemId: string; count: number }; carrierCharacterId: number }
+    | {
+        ok: false;
+        reason: 'no_book' | 'no_carrier' | 'not_dormant' | 'save_failed' | 'delete_in_flight';
+      }
+  > {
+    if (!Number.isInteger(guildId) || guildId <= 0) return { ok: false, reason: 'no_book' };
+    // The guild-delete window refuses every book mutation (runGuildBankOp
+    // pre-empts the operator arm too), so pre-check it here rather than let the
+    // purge read back as 'that slot is not a stuck item'.
+    //
+    // Its OWN reason, not save_failed: nothing was attempted, so nothing was
+    // saved and nothing was rolled back, and telling an operator their change
+    // "was rolled back" describes an event that did not happen. What actually
+    // happened is that the guild is being deleted right now, which is both a
+    // different instruction (the bank is going away; do not retry the purge)
+    // and a different state (no mutation, no ledger row, no dirty mark).
+    // Effectively unreachable, because a guild only takes the window after
+    // proving its bank EMPTY and a dormant slot is exactly what keeps that
+    // guard failing; kept because the window's contract is stated over every
+    // op, not over the player ones.
+    if (this.guildBankDeleteWindows.has(guildId)) {
+      console.error(
+        `guild bank admin purge for guild ${guildId} refused: a guild delete is in flight for it`,
+      );
+      return { ok: false, reason: 'delete_in_flight' };
+    }
+    // The book-loaded gate (the holdings read fails closed on an absent book).
+    if (this.sim.guildBankHoldings(guildId) === null) return { ok: false, reason: 'no_book' };
+    const carrier = await this.guildBankSaveCarrier(guildId);
+    if (!carrier) return { ok: false, reason: 'no_carrier' };
+    let purged: InvSlot | null = null;
+    this.runGuildBankOp(carrier, { guildId, actorAccountId }, 'admin_purge', () => {
+      purged = this.sim.purgeDormantGuildBankSlot(guildId, slotIndex, expectItemId);
+    });
+    // Read through an explicitly typed local: the assignment above happens
+    // inside a callback, which the control-flow analysis cannot see.
+    const removedSlot = purged as InvSlot | null;
+    // Null means the sim refused: no such index, the slot does not hold the
+    // named item, or it is an ordinary withdrawable copy. Nothing mutated, so
+    // the observer diffed empty too.
+    if (removedSlot === null) return { ok: false, reason: 'not_dormant' };
+    const removed = { itemId: removedSlot.itemId, count: removedSlot.count };
+    // The witness for the durability check below, taken from the SPECIFIC copy
+    // that was removed rather than from a total item count: a concurrent
+    // withdraw of an UNRELATED item inside the save window would otherwise
+    // lower the total and make a reverted purge read as a success.
+    const copiesAfterOp = this.guildBankCopiesOf(guildId, removedSlot);
+    try {
+      await this.saveCharacter(carrier);
+    } catch (err) {
+      // The live book is purged and the dirty mark survives, so a later save
+      // still converges; the operator is told it did not land YET, which is the
+      // honest answer to "is this guild disbandable now".
+      console.error(`guild bank admin purge save failed for guild ${guildId}:`, err);
+      return { ok: false, reason: 'save_failed' };
+    }
+    // A fence-out inside that save reverts (or reloads away) the removal, so
+    // confirm against live state rather than trusting the call returned. The
+    // witness is THIS COPY (item id, craft provenance, instance payload), not
+    // the book's total item count: totals move for reasons that have nothing to
+    // do with this purge, and a concurrent withdraw of another item would then
+    // make a REVERTED purge look like a success, which is the one direction a
+    // destructive tool must never err in. A concurrent deposit of an identical
+    // copy can still make this read conservative (reporting save_failed on a
+    // purge that did land); erring toward "go and check" is the right way round.
+    const copiesNow = this.guildBankCopiesOf(guildId, removedSlot);
+    if (copiesAfterOp === null || copiesNow === null || copiesNow > copiesAfterOp) {
+      console.error(
+        `guild bank admin purge for guild ${guildId} did not survive its escrow save (fence-out or reload)`,
+      );
+      return { ok: false, reason: 'save_failed' };
+    }
+    console.warn(
+      `guild bank admin purge: account ${actorAccountId} removed ${removed.count}x ${removed.itemId} from guild ${guildId} (carried by character ${carrier.characterId})`,
+    );
+    return { ok: true, removed, carrierCharacterId: carrier.characterId };
+  }
+
+  /** How many copies of ONE specific slot identity (item id, craft provenance,
+   *  and instance payload) a guild's live book holds, or null when no book is
+   *  loaded. The durability witness for the operator purge: it answers "is THIS
+   *  copy still gone", which a total item count cannot.
+   *
+   *  Both sides of the comparison are LIVE book reads, so structural payload
+   *  equality is the right predicate here; the JSON-shaped canonical form in
+   *  src/sim/guild_bank.ts exists for the live-vs-DURABLE comparison instead. */
+  private guildBankCopiesOf(guildId: number, slot: InvSlot): number | null {
+    const info = this.sim.guildBankInfoForGuild(guildId);
+    if (info === null) return null;
+    let copies = 0;
+    for (const held of info.slots) {
+      if (held.itemId !== slot.itemId) continue;
+      if ((held.craftedRecipeId ?? null) !== (slot.craftedRecipeId ?? null)) continue;
+      if (!itemInstancePayloadsEqual(held.instance, slot.instance)) continue;
+      copies += held.count;
+    }
+    return copies;
+  }
+
+  /** A live session that can carry guild `guildId`'s book into a fenced escrow
+   *  save: an officer-plus member first (the rank that already moves this book
+   *  every day), else any member. Null when nobody from the guild is online.
+   *
+   *  Membership comes from a FRESH database read (socialDb.guildMembersFresh,
+   *  which deliberately bypasses the roster cache in server/guild_roster_cache.ts),
+   *  not the session stamp and not a TTL-cached roster answer. The stamp can lag
+   *  a kick or a leave, and carrying is NOT a free favour: if the escrow save is
+   *  refused, the carrier's session is QUARANTINED and DISCONNECTED (the
+   *  rollback arm), so a stale read would put a player who is no longer even a
+   *  member of the guild on a rollback-and-kick path for an operator's act. One
+   *  indexed read per operator purge is the right price for that. A read
+   *  failure answers null (fail closed: no carrier, no purge) rather than
+   *  falling back to the stamp.
+   *
+   *  Which BOOK gets flushed does not depend on this choice: the flush is
+   *  driven by the session's own `dirtyGuildBanks` mark, which runGuildBankOp
+   *  set for the target guild. The carrier only lends its escrow transaction;
+   *  it is never charged, credited, or named as the actor. */
+  private async guildBankSaveCarrier(guildId: number): Promise<ClientSession | null> {
+    let rankByCharacterId: Map<number, GuildRank>;
+    try {
+      const members = await this.socialDb.guildMembersFresh(guildId);
+      rankByCharacterId = new Map(members.map((m) => [m.id, m.rank]));
+    } catch (err) {
+      console.error(`guild bank carrier lookup failed for guild ${guildId}:`, err);
+      return null;
+    }
+    let fallback: ClientSession | null = null;
+    for (const session of this.sessionsByCharacterId.values()) {
+      const rank = rankByCharacterId.get(session.characterId);
+      if (rank === undefined) continue;
+      if (rank === 'leader' || rank === 'officer') return session;
+      fallback ??= session;
+    }
+    return fallback;
+  }
+
+  async loadRifts(): Promise<void> {
+    try {
+      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now());
+    } catch (err) {
+      console.error('failed to load shared Rift state:', err);
     }
   }
 
@@ -3513,8 +5691,82 @@ export class GameServer {
     return this.sim.rekeyMarketSeller(characterId, oldName, newName);
   }
 
+  /**
+   * Push a helm-visibility preference onto a LIVE session, if the character has
+   * one. Returns whether anything was in world to push to.
+   *
+   * The appearance redesign writes helm visibility straight into the stored
+   * state blob (consumeAppearanceReroll), and a character who is IN WORLD while
+   * that lands still holds the old value in memory: its 30 s autosave would
+   * write it straight back. So the route mirrors the write onto the session
+   * through the same Sim entry the paperdoll's `set_helm` command uses; the
+   * value then rides the entity wire to every viewer at once, and the autosave
+   * agrees with the row instead of fighting it.
+   */
+  setHelmHiddenForCharacter(characterId: number, hidden: boolean): boolean {
+    let pushed = false;
+    for (const s of this.clients.values()) {
+      if (s.characterId !== characterId) continue;
+      this.sim.setHelmHidden(hidden, s.pid);
+      pushed = true;
+    }
+    return pushed;
+  }
+
+  /**
+   * Push a freshly saved look onto a LIVE session, if the character has one.
+   *
+   * The redesign route is allowed while the character is in world, and it used
+   * to apply only its helm half live: the look stayed the old body for the
+   * player and every peer until relog, while the roster row it was saved from
+   * showed the new one. Setting the entity field is NOT enough on its own:
+   * `EntityWireCache.appJson` is minted once per entity and the identity only
+   * re-splices when the rest of the identity moves, so the memo would serve
+   * the old string for the rest of the session. Busting both (appJson and the
+   * diffed base identity string) makes the next tick re-serialize, bump idVer,
+   * and re-send the full record to every viewer; the self record follows
+   * through the `maybeRaw('app')` diff for the same reason.
+   */
+  applyAppearanceForCharacter(
+    characterId: number,
+    appearance: Record<string, unknown> | null,
+  ): boolean {
+    let pushed = false;
+    for (const s of this.clients.values()) {
+      if (s.characterId !== characterId) continue;
+      const e = this.sim.entities.get(s.pid);
+      if (!e) continue;
+      e.modularAppearance = appearance;
+      this.bustAppearanceWireMemo(e.id);
+      pushed = true;
+    }
+    return pushed;
+  }
+
+  /** Invalidate the per-entity appearance memo + identity diff so the next
+   *  tick re-serializes and re-ships the full record (see above). */
+  private bustAppearanceWireMemo(entityId: number): void {
+    const cache = this.wireCache.get(entityId);
+    if (!cache) return; // never broadcast yet; the first serialize is fresh
+    cache.appJson = null;
+    cache.baseIdJson = '';
+  }
+
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMailOwner(characterId, oldName, newName);
+  }
+
+  // Character deletion (R43): the purge runs against the LIVE books, never the
+  // persisted blobs alone. flushPeriodicSaves re-persists this in-memory market
+  // and mail every AUTOSAVE_SECONDS, so a blob-only edit would be clobbered
+  // within half a minute; the caller follows these with saveMarket/saveMail so
+  // the purge reaches Postgres through the same serial writer.
+  purgeMarketSeller(characterId: number, name: string): boolean {
+    return this.sim.purgeMarketSeller(characterId, name);
+  }
+
+  purgeMailOwner(characterId: number, name: string): boolean {
+    return this.sim.purgeMailOwner(characterId, name);
   }
 
   // Close every open play_sessions row; called on graceful shutdown so the
@@ -3630,6 +5882,20 @@ export class GameServer {
     this.perfCaptureSimTicks += ticksRun;
     if (ticksRun > 1) this.perfCaptureCatchUpCallbacks++;
     this.perfCaptureMaxTicksPerCallback = Math.max(this.perfCaptureMaxTicksPerCallback, ticksRun);
+  }
+
+  // Flush the per-pass selfWireJson bucket accumulators into the profiler,
+  // beside the bcastSelf total they decompose. A method (not inline in the
+  // loop callback) so the flush BODY is testable directly, and the loop-side
+  // wiring (this call site next to the bcastSelf add, plus the per-pass
+  // selfWireNs.clear) is source-pinned by the same suite
+  // (tests/self_wire_phase_breakdown.test.ts), so deleting either cannot
+  // silently zero or inflate the admin table.
+  private flushSelfWirePhases(): void {
+    if (!this.perfDetailActive) return;
+    for (const [phase, ns] of this.selfWireNs) {
+      this.tickProfiler.add(phase, Number(ns) / 1e6);
+    }
   }
 
   // Resolve (and memoize) the registered profiler bucket for a mob template. A
@@ -3830,8 +6096,9 @@ export class GameServer {
           name: a.name,
           kind: a.kind,
           value: a.value,
-          remaining: round2(a.remaining),
-          duration: a.duration,
+          remaining: a.permanent ? 0 : round2(a.remaining),
+          duration: a.permanent ? 0 : a.duration,
+          permanent: a.permanent,
         })),
       });
     }
@@ -3876,11 +6143,103 @@ export class GameServer {
     return state ? state.level : null;
   }
 
+  // Force-close every live session for the account. A bearer token is a reusable
+  // wire credential, not a per-socket identity: an earlier revision tried to spare
+  // the caller's own session by comparing the live socket's auth token against the
+  // request's bearer token, but a stolen/shared token authenticates identically on
+  // both, so that comparison could just as easily spare an attacker's connection.
+  // Kick unconditionally; a legitimate caller's own other tab reconnects with the
+  // fresh credentials the same as any other client would.
   disconnectAccount(accountId: number, reason: string): void {
     for (const session of [...this.clients.values()]) {
       if (session.accountId !== accountId) continue;
       void this.kickSession(session, reason, 'moderation action');
     }
+  }
+
+  // R35 GM professions tooling: a fresh serializeCharacter of a LIVE
+  // character (the stored blob lags the 30s autosave), or null when the
+  // character is not online on this realm process (the liveLevelForCharacter
+  // idiom above).
+  adminCharacterState(characterId: number): CharacterState | null {
+    const session = this.sessionByCharacterId(characterId);
+    return session ? this.sim.serializeCharacter(session.pid) : null;
+  }
+
+  // R35: the cheap online predicate the restore pre-checks use. A full
+  // serializeCharacter as an online test is synchronous game-loop work
+  // thrown away; the inspector alone needs the snapshot.
+  adminCharacterOnline(characterId: number): boolean {
+    return this.sessionByCharacterId(characterId) !== null;
+  }
+
+  // R35 GM restore: mint a lost item back onto a LIVE character through the
+  // sim's normal grant hub (grants reaching addItem always land). The count
+  // is re-clamped defensively even though the admin handler validates it
+  // (the dev_give 1..20 clamp); EVERY non-integer (NaN and finite fractions
+  // alike) clamps to 1, deliberately stricter than a Math.floor would be,
+  // because a non-integer here means the validator was bypassed.
+  adminRestoreItem(
+    characterId: number,
+    itemId: string,
+    count: number,
+  ): 'ok' | 'offline' | 'invalid_item' {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session) return 'offline';
+    if (!Object.hasOwn(ITEMS, itemId)) return 'invalid_item';
+    const clamped = Number.isInteger(count)
+      ? Math.max(1, Math.min(RESTORE_ITEM_MAX_COUNT, count))
+      : 1;
+    // movement: a support restore re-mints a copy the player already obtained
+    // once (and already had counted), so crediting it again would inflate a
+    // player-visible number from a support ticket. The safer default for a
+    // verb named restore.
+    this.sim.addItem(itemId, clamped, session.pid, { movement: true });
+    // Close the audit-durability window: the audit row is already committed,
+    // so the grant must not wait up to AUTOSAVE_SECONDS to become durable (a
+    // crash inside that window would leave a row for a grant that vanished).
+    // Fire-and-forget, the deed-unlock durability pattern. A fenced-out save
+    // (same-account takeover rotated the lease) resolves false without
+    // throwing: the audited grant died with the displaced session's memory,
+    // so say so loudly instead of letting the generic fence warn swallow it.
+    void this.saveCharacter(session)
+      .then((landed) => {
+        if (!landed) {
+          console.error(
+            `restore-item for ${session.name}: audited grant did not persist (save fenced by a same-account takeover); re-check via the inspector and re-issue if missing`,
+          );
+        }
+      })
+      .catch((err) => console.error(`restore-item save failed for ${session.name}:`, err));
+    return 'ok';
+  }
+
+  // R35 GM restore: re-mint a lost tool-effect slot row on a LIVE character.
+  // The sim action owns validation, tool-rarity charge sizing, and the
+  // success event the player sees; it is server-admin-only by design (the
+  // free-grant incident), so this runtime method is its ONLY caller.
+  adminRestoreToolEffectSlot(
+    characterId: number,
+    professionId: string,
+    effectId: string,
+  ): 'ok' | 'offline' | 'invalid_request' | 'no_tool' | 'already_slotted' {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session) return 'offline';
+    const result = restoreToolEffectSlotAction(this.sim.ctx, professionId, effectId, session.pid);
+    if (result === 'ok') {
+      // Same audit-durability and fence-visibility reasoning as
+      // adminRestoreItem above.
+      void this.saveCharacter(session)
+        .then((landed) => {
+          if (!landed) {
+            console.error(
+              `restore-slot for ${session.name}: audited grant did not persist (save fenced by a same-account takeover); re-check via the inspector and re-issue if missing`,
+            );
+          }
+        })
+        .catch((err) => console.error(`restore-slot save failed for ${session.name}:`, err));
+    }
+    return result;
   }
 
   // Force-disconnect the live session (if any) for a character the requesting
@@ -4068,19 +6427,67 @@ export class GameServer {
       );
       return;
     }
+    const cmd = this.messageCommand(msg);
+    // Economy telemetry: sample the acting player's copper across this one
+    // dispatch, so a command's own credit or debit is attributed to its
+    // economic surface with no sim-side signal and no gameplay effect. Two
+    // O(1) map reads, and the 20 Hz movement lane is skipped outright since an
+    // input frame can never move copper. The skip reads isInputFrame, NOT
+    // cmd === 'input': messageCommand reports `cmd` first, so a frame of
+    // {"t":"input","cmd":"x"} is dispatched as movement while reporting a
+    // different name. Sampled AFTER the catch as well as the happy path: a
+    // command that threw halfway may still have moved coin.
+    const copperBefore = this.isInputFrame(msg) ? undefined : this.sim.meta(session.pid)?.copper;
     // a malformed payload must never take down the server for everyone
     try {
       this.dispatchMessage(session, msg, raw, receivedAtMs);
     } catch (err) {
-      const cmd = this.messageCommand(msg);
       console.error(`bad message from ${session.name} (cmd: ${cmd}):`, err);
     }
+    if (copperBefore !== undefined) this.recordCopperFlow(session, cmd, copperBefore);
+  }
+
+  /**
+   * Book the acting player's copper delta from one command dispatch onto the
+   * bounded-cardinality flow counters. Deliberately NOT a complete ledger, in
+   * two ways. A credit that lands on a THIRD party (a party fair-split to a
+   * non-acting looter) is never booked at all, having no dispatch of its own to
+   * attribute it to. A tick-driven payout to the acting player is worse than
+   * unbooked: it lands between two dispatches and is then MISATTRIBUTED to
+   * whichever command happens to be sampled next. Operators read these series
+   * as per-surface trend, never as a sum that reconciles against total coin in
+   * the world. server/economy_telemetry.ts carries the same warning.
+   */
+  private recordCopperFlow(session: ClientSession, command: string, before: number): void {
+    // A session that left during its own dispatch (logout) has no meta to read
+    // back; skip rather than book a phantom drain of the player's whole purse.
+    const after = this.sim.meta(session.pid)?.copper;
+    if (after === undefined || after === before) return;
+    const source = copperFlowSourceForCommand(command);
+    if (after > before) gameMetricsCounters().copperCredited(source, after - before);
+    else gameMetricsCounters().copperSpent(source, before - after);
   }
 
   private messageCommand(msg: unknown): string {
     if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return 'unknown';
     const record = msg as Record<string, unknown>;
-    return String(record.cmd ?? record.t ?? 'unknown');
+    // TOTAL BY CONSTRUCTION, no coercion. `cmd` and `t` are client-supplied, and
+    // String() THROWS on an object whose toString is not callable, so a frame of
+    // {"cmd":{"toString":1}} used to die here. This runs outside the
+    // malformed-payload try in handleMessage, so a throw would escape the very
+    // guard that exists to keep one bad frame from reaching the process handler,
+    // taking the anomaly observation and the command-lane token down with it.
+    const raw = record.cmd ?? record.t;
+    return typeof raw === 'string' ? raw : 'unknown';
+  }
+
+  /** True for a movement frame, keyed on the SAME field dispatchMessage routes
+   *  movement on (`t`), never on the `cmd`-first name messageCommand reports: a
+   *  frame of {"t":"input","cmd":"x"} is dispatched as movement, so anything
+   *  that skips work for the 20 Hz lane has to agree with the dispatcher. */
+  private isInputFrame(msg: unknown): boolean {
+    if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return false;
+    return (msg as Record<string, unknown>).t === 'input';
   }
 
   /** Draw a post-parse lane token (R5). On a drop the frame is discarded,
@@ -4106,6 +6513,37 @@ export class GameServer {
   private consumeListRead(session: ClientSession, nowSec: number): boolean {
     if (consumeListReadToken(session.listReadGuard, nowSec)) return true;
     gameMetricsCounters().wsMessageDropped('list_read');
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
+  /** Draw a guild-bank op guard token (Guild Bank Phase 3 QA): every allowed
+   *  op can write a keep-forever bank_ledger row, so ops above the
+   *  far-above-human budget are dropped and tally into the same abuse window
+   *  as every other shed frame, making a sustained ledger-write flood
+   *  kickable. Returns whether to run the op. */
+  private consumeGuildBankOp(session: ClientSession, nowSec: number): boolean {
+    if (consumeGuildBankOpToken(session.guildBankOpGuard, nowSec)) return true;
+    gameMetricsCounters().wsMessageDropped('guild_bank');
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
+  /** Draw a cosmetic-set guard token (Reliquary border review): a title or
+   *  border change bumps idVer, so every allowed set broadcasts the FULL
+   *  identity record to every in-range viewer before the distance tier can
+   *  thin it. Sets above the far-above-human budget are dropped and tally
+   *  into the same abuse window as every other shed frame. Returns whether to
+   *  run the set. */
+  private consumeCosmeticOp(session: ClientSession, nowSec: number): boolean {
+    if (consumeCosmeticOpToken(session.cosmeticOpGuard, nowSec)) return true;
+    gameMetricsCounters().wsMessageDropped('cosmetic');
     if (tallyDrop(session.msgRate, nowSec) === 'kick') {
       gameMetricsCounters().wsRateKick();
       void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
@@ -4175,7 +6613,11 @@ export class GameServer {
       // A released spirit turns with the camera like the living; only a corpse that
       // has not yet released (dead and not a ghost) keeps its facing frozen. Without
       // this the server drops the ghost's mouselook facing and its run feels inverted.
-      if (frame.facing !== null && (!e.dead || e.ghost)) {
+      // A stun locks facing too (issue #2426): the offline kernel already blocks its
+      // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
+      // this out-of-band channel and must be rejected here, the authoritative side,
+      // not trusted to a client that could simply keep sending it.
+      if (frame.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
         e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
@@ -4199,8 +6641,16 @@ export class GameServer {
       }
       if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
       const text = msg.text.trim();
-      if (canAttemptModerationCommands(session) && this.moderation.handleChatCommand(session, text))
+      // Staff moderation rides the chat case but is COMMAND work (target
+      // resolution plus an audited DB write per action), so a claimed
+      // moderation text pays the command lane exactly like /unstuck below
+      // it; a lane-refused frame is dropped whole and tallies toward the
+      // flood-kick verdict (the /unstuck audit finding's sibling).
+      if (canAttemptModerationCommands(session) && parseModerationChatCommand(text)) {
+        if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) return;
+        this.moderation.handleChatCommand(session, text);
         return;
+      }
       if (/^\/unstuck\s*$/i.test(text)) {
         this.sendUnstuckBlocked(session, 'spectating');
         return;
@@ -4248,10 +6698,39 @@ export class GameServer {
       this.sendCommandOutcome(session, msg, false);
       return;
     }
+    // The Rift forge trio shipped sim+wire complete with no client UI, so the
+    // arms stay closed until the realm explicitly opts in (RIFT_FORGE_ENABLED=1;
+    // rationale in server/rift_forge_gate.ts): a crafted frame must not buy
+    // progression the stock client cannot reach. Refused ABOVE the heavy-self
+    // dirty flag below, so a blocked command cannot force a re-diff either.
+    if (refusedRiftForgeCommand(msg.cmd)) {
+      // Label-free by contract (game_signals.ts): the stock client never sends
+      // these, so the counter is the ops signal that a modified client probes
+      // the closed forge (and that a realm forgot the flag once the UI ships).
+      gameMetricsCounters().riftForgeRefused();
+      this.sendCommandOutcome(session, msg, false);
+      return;
+    }
     // A command that can change a heavy self field forces the next snapshot to
     // re-diff those fields (combat-only commands like cast/target/attack do not,
     // which is what keeps the gating a win during a fight).
     if (typeof msg.cmd === 'string' && HEAVY_SELF_CMDS.has(msg.cmd)) session.selfHeavyDirty = true;
+    // The viewer's own market commands re-arm the market wire gate so their
+    // search/list/buy/cancel/collect feedback lands on the next snapshot
+    // instead of waiting out the MARKET_WIRE_HZ cadence.
+    if (typeof msg.cmd === 'string' && MARKET_WIRE_PROMPT_CMDS.has(msg.cmd)) {
+      session.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    }
+    // Same prompt re-arm for the commission board gate.
+    if (typeof msg.cmd === 'string' && CORDER_WIRE_PROMPT_CMDS.has(msg.cmd)) {
+      session.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
+    }
+    // Same re-arm for the viewer's own mail commands (send/take/delete/read):
+    // their mailbox feedback lands on the next snapshot instead of waiting out
+    // the MAIL_WIRE_HZ cadence.
+    if (typeof msg.cmd === 'string' && MAIL_WIRE_PROMPT_CMDS.has(msg.cmd)) {
+      session.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
+    }
     switch (command) {
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
@@ -4293,6 +6772,9 @@ export class GameServer {
       case 'tab':
         sim.tabTarget(pid);
         break;
+      case 'tabPrev':
+        sim.tabTargetPrev(pid);
+        break;
       case 'targetNearest':
         sim.targetNearestEnemy(pid);
         break;
@@ -4301,6 +6783,9 @@ export class GameServer {
         break;
       case 'targetNearestFriendly':
         sim.targetNearestFriendly(pid);
+        break;
+      case 'stopAutoAttackOnTargetSwitch':
+        sim.setStopAutoAttackOnTargetSwitch(!!msg.enabled, pid);
         break;
       case 'attack':
         sim.startAutoAttack(pid);
@@ -4335,7 +6820,16 @@ export class GameServer {
           for (const [k, v] of Object.entries(msg.allocation as Record<string, unknown>)) {
             if (typeof v === 'number') allocation[k] = v;
           }
-          sim.setTownFocus(allocation, pid);
+          // #1144: the payment tier picks which RESPEC_TIER_CONFIG row prices
+          // the re-spec. Untrusted input, so it is checked against the real
+          // config keys rather than cast; a missing/malformed tier (an older
+          // client, or a hand-crafted frame) falls back to 'time', the free
+          // tier, so it never charges a client that never chose a tier.
+          const tier: RespecPaymentTier =
+            typeof msg.tier === 'string' && Object.hasOwn(RESPEC_TIER_CONFIG, msg.tier)
+              ? (msg.tier as RespecPaymentTier)
+              : 'time';
+          sim.setTownFocus(allocation, tier, pid);
         }
         break;
       case 'lootRoll':
@@ -4401,12 +6895,14 @@ export class GameServer {
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
-          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
-          else sim.equipItem(msg.item, pid);
+            typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          // `bagSlot`, not `slot`: on this token `slot` is already the equip slot.
+          const bag = Number.isInteger(msg.bagSlot) ? Number(msg.bagSlot) : undefined;
+          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid, bag);
+          else sim.equipItem(msg.item, pid, undefined, bag);
         }
         break;
       case 'inv_move':
@@ -4416,34 +6912,71 @@ export class GameServer {
           sim.moveInventoryItem(msg.from, msg.to, pid);
         }
         break;
+      case 'inv_sort':
+        // The one-shot bag clean-up. No payload: the sim re-derives the whole
+        // arrangement from the live inventory, so there is nothing to trust.
+        sim.sortInventory(pid);
+        break;
       case 'unequip_item':
-        // ALL_EQUIP_SLOTS, not the frozen EQUIP_SLOTS: the latter omits the
-        // additive 'offhand' slot, so any offhand unequip was silently dropped here.
-        if (
-          typeof msg.slot === 'string' &&
-          (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-        ) {
-          sim.unequipItem(msg.slot as EquipSlot, pid);
+        if (typeof msg.slot === 'string' && isEquipSlot(msg.slot)) {
+          sim.unequipItem(msg.slot, pid);
         }
         break;
       case 'use':
         if (typeof msg.item === 'string') {
-          const result = sim.useItem(msg.item, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          const result = sim.useItem(msg.item, pid, slot);
           if (result?.type === 'mechChroma') this.noteAccountMechChroma(session, result.chromaId);
         }
         break;
       case 'discard':
         if (typeof msg.item === 'string') {
-          sim.discardItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.discardItem(
+            msg.item,
+            typeof msg.count === 'number' ? msg.count : undefined,
+            pid,
+            slot,
+          );
+        }
+        break;
+      case 'lock_item':
+        // Always a named slot (issue 3042): a lock toggle mutates ONE specific
+        // bag copy in place, never an id-only bulk action, so a missing/invalid
+        // slot is simply refused inside the sim (selectedInventorySlot).
+        if (typeof msg.item === 'string' && typeof msg.locked === 'boolean') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.setItemLocked(msg.item, msg.locked, pid, slot);
         }
         break;
       case 'buy':
+        // The options bag third, pid fourth (the one explicit shape; see
+        // Sim.buyItem). A non-number count is dropped like sell's, a hostile
+        // number reaches the sim's sanitize and denies there.
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(msg.npc, msg.item, pid);
+          sim.buyItem(
+            msg.npc,
+            msg.item,
+            {
+              count: typeof msg.count === 'number' ? msg.count : undefined,
+              bulk: msg.bulk === true,
+            },
+            pid,
+          );
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
-          sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid, slot);
         }
         break;
       case 'buyback':
@@ -4457,10 +6990,13 @@ export class GameServer {
           );
         break;
       case 'harvest_node':
+        // `confirmUse` (R40): strict boolean-true, the `commission` idiom; a
+        // missing or malformed flag reads unconfirmed, the fail-safe arm (a
+        // 'prompt' slot skips its effect and keeps the charge).
         this.sendCommandOutcome(
           session,
           msg,
-          typeof msg.node === 'string' && sim.harvestNode(msg.node, pid),
+          typeof msg.node === 'string' && sim.harvestNode(msg.node, msg.confirmUse === true, pid),
         );
         break;
       case 'craft_item':
@@ -4468,7 +7004,13 @@ export class GameServer {
         // check (the dispatch type-guard rule); anything else reads as false.
         // The sim honors it only for eligible equipment outputs and mints the
         // bindOnTrade arm itself, so nothing here trusts client data.
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        // Phase 3 optional `count`: finite numbers only; sim clamps to batch
+        // max and mats-fit (default 1 when omitted or non-numeric).
+        if (typeof msg.recipe === 'string') {
+          const count =
+            typeof msg.count === 'number' && Number.isFinite(msg.count) ? Math.floor(msg.count) : 1;
+          sim.craftItem(msg.recipe, msg.commission === true, pid, count);
+        }
         break;
       // Enchanting profession commands (Professions 2.0): the sim
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
@@ -4494,11 +7036,7 @@ export class GameServer {
           // to undefined, which is the bagged arm. The sim then re-validates that
           // the named slot is actually wearing this item id and, without the
           // confirm flag below, that the worn copy is not already enchanted.
-          const worn =
-            typeof msg.slot === 'string' &&
-            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
-              ? (msg.slot as EquipSlot)
-              : undefined;
+          const worn = typeof msg.slot === 'string' && isEquipSlot(msg.slot) ? msg.slot : undefined;
           // `confirm` (#2415): the explicit consent to replace an existing
           // enchant. A strict boolean-true check (the dispatch type-guard
           // rule, the craft_item `commission` precedent); anything else reads
@@ -4516,7 +7054,13 @@ export class GameServer {
         }
         break;
       case 'salvage_item':
-        if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          // Same bag-index parsing as disenchant_item: an unrecognized slot reads
+          // as undefined (the legacy id-only path), never as index 0, and the sim
+          // re-validates it against ITS inventory.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.salvageItem(msg.item, pid, slot);
+        }
         break;
       case 'unbind_item':
         // Maker's Bond unbind service (Professions 2.0): the sim
@@ -4527,17 +7071,60 @@ export class GameServer {
         // inv/purse mirrors on the next snapshot.
         if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
+      // Commission order board (Professions 2.0, issue #1298): the sim
+      // resolvers re-validate every field (recipe/eligibility/scope/state/
+      // range/space, nothing trusted from the client); the outcome reaches
+      // this client as the pid-scoped text-free commissionOrderResult event,
+      // a HEAVY_SELF_EVENTS member so a delivery's bag change re-diffs the
+      // crafter's own inv mirror on the next snapshot (the requester's side
+      // rides the ordinary addItemInstance loot event). The durable order
+      // list itself converges through the `corder` self-delta for every
+      // affected viewer, not through this event: the actor on the next
+      // snapshot (their own command re-arms the corder gate), passive
+      // viewers within one CORDER_WIRE_HZ window.
+      case 'open_commission_order':
+        if (typeof msg.recipe === 'string' && (msg.scope === 'open' || msg.scope === 'crafter')) {
+          sim.openCommissionOrder(
+            msg.recipe,
+            msg.scope,
+            typeof msg.crafter === 'string' ? msg.crafter : undefined,
+            pid,
+          );
+        }
+        break;
+      case 'cancel_commission_order':
+        if (typeof msg.order === 'number') sim.cancelCommissionOrder(msg.order, pid);
+        break;
+      case 'accept_commission_order':
+        if (typeof msg.order === 'number') sim.acceptCommissionOrder(msg.order, pid);
+        break;
+      case 'deliver_commission_order':
+        if (typeof msg.order === 'number') sim.deliverCommissionOrder(msg.order, pid);
+        break;
       case 'rift_upgrade_item':
-        if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.upgradeRiftItem(msg.item, pid, slot);
+        }
         break;
       case 'rift_enchant_item':
         if (typeof msg.item === 'string' && typeof msg.stat === 'string') {
-          sim.enchantRiftItem(msg.item, msg.stat, pid);
+          sim.enchantRiftItem(
+            msg.item,
+            msg.stat,
+            pid,
+            Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
+          );
         }
         break;
       case 'rift_socket_gem':
         if (typeof msg.item === 'string' && typeof msg.gem === 'string') {
-          sim.socketRiftGem(msg.item, msg.gem, pid);
+          sim.socketRiftGem(
+            msg.item,
+            msg.gem,
+            pid,
+            Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
+          );
         }
         break;
       case 'place_mobile_station':
@@ -4551,6 +7138,35 @@ export class GameServer {
         // of craftingIdentityFor's JSON), so no dirty-marking is needed here.
         if (typeof msg.recipe === 'string') sim.trainRecipe(msg.recipe, pid);
         break;
+      case 'slot_tool_effect':
+        // UNGATED since the acquisition craft shipped: slotting now consumes
+        // a crafted charm from the sender's own bags through
+        // resolveSlotToolEffect (the one mint authority), so the command is
+        // no longer its own acquisition path (the dev gate that closed the
+        // free-grant incident retired with the free grant itself). Every
+        // refusal answers with the pid-scoped text-free toolEffectResult
+        // event, a HEAVY_SELF_EVENTS member, so the consumed charm re-diffs
+        // the self inventory mirror on the next snapshot.
+        //
+        // `mode` is passed THROUGH unchanged rather than normalized here: the
+        // sim's guard is the single definition of what a legal mode is, and
+        // laundering an unrecognized value into `undefined` would hand it the
+        // default and turn a refusal into a success (the two hosts would then
+        // disagree about the same message). The cast names the sim's own
+        // union rather than `never` so the compiler keeps tracking the
+        // parameter type; the runtime pass-through is identical.
+        if (typeof msg.profession === 'string' && typeof msg.effect === 'string') {
+          sim.slotToolEffect(msg.profession, msg.effect, msg.mode as ToolEffectConfirmMode, pid);
+        }
+        break;
+      case 'recharge_tool_effect':
+        // The R39/R30 recharge: owner-performed, priced sim-side off the
+        // sender's own bags and slot (nothing trusted from the frame), the
+        // outcome carried by the same toolEffectResult event as the slot.
+        if (typeof msg.profession === 'string') {
+          sim.rechargeToolEffect(msg.profession, pid);
+        }
+        break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
@@ -4558,7 +7174,11 @@ export class GameServer {
         if (typeof msg.item === 'string') {
           const socket =
             typeof msg.socket === 'number' && Number.isInteger(msg.socket) ? msg.socket : undefined;
-          sim.equipBag(msg.item, socket, pid);
+          // The bag index the client named, re-validated in the sim against ITS
+          // OWN inventory: an unrecognized value reads as undefined (the legacy
+          // id-only path), never as index 0.
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.equipBag(msg.item, socket, pid, slot);
         }
         break;
       case 'unequip_bag':
@@ -4605,7 +7225,8 @@ export class GameServer {
       // Riding skill purchase: player buys Riding from Marla for 80g. The Sim
       // re-validates NPC identity, range, level, and funds.
       case 'learn_riding':
-        if (typeof msg.npc === 'number') sim.learnRidingFor(msg.npc, pid);
+        if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
+          sim.learnRidingFor(msg.npc, pid);
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
@@ -4628,6 +7249,13 @@ export class GameServer {
       // and the combat auto-unsheathe rule.
       case 'stow_weapon':
         sim.toggleWeaponStow(pid);
+        break;
+      // Paperdoll eye toggle: cosmetic helmet-visibility preference. Explicit
+      // boolean (not a toggle) so it is idempotent: the client sends the state
+      // its paperdoll is showing. Persistence is the character save's job
+      // (CharacterState.helmHidden), never a client-side store.
+      case 'set_helm':
+        sim.setHelmHidden(msg.hidden === true, pid);
         break;
       // Per-character action-bar layout upload (untrusted client input). Validate
       // + bound the payload; a malformed/oversized layout is dropped silently
@@ -4671,15 +7299,28 @@ export class GameServer {
       case 'chat': {
         if (typeof msg.text !== 'string') break;
         const text = msg.text.trim();
-        if (
-          canAttemptModerationCommands(session) &&
-          this.moderation.handleChatCommand(session, text)
-        )
+        // Staff moderation is COMMAND work riding the chat case (target
+        // resolution plus an audited DB write per action): a claimed
+        // moderation text pays the command lane exactly like /unstuck
+        // below, so a compromised staff account cannot flood /kick or
+        // /ban at wire rate with zero tokens drawn on any lane. The parse
+        // predicate claims the SAME texts handleChatCommand claims, so
+        // ordinary chat (and /who, /unstuck) never pays this draw.
+        if (canAttemptModerationCommands(session) && parseModerationChatCommand(text)) {
+          if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) break;
+          this.moderation.handleChatCommand(session, text);
           break;
+        }
         // Recovery is a gameplay command, not broadcast chat. Keep it usable
         // while muted and outside the chat token bucket, then route through the
-        // same authoritative system as the dedicated Settings action.
+        // same authoritative system as the dedicated Settings action. It still
+        // pays the COMMAND lane the dedicated action pays: riding the chat
+        // case skipped the top-of-dispatch draw (classifyMsgLane says 'chat'),
+        // so without this a /unstuck chat frame reached the sim with zero
+        // tokens drawn on any lane and never tallied toward the flood-kick
+        // verdict (the release-merge audit's finding).
         if (/^\/unstuck\s*$/i.test(text)) {
+          if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) break;
           sim.unstuck(pid);
           break;
         }
@@ -4698,6 +7339,13 @@ export class GameServer {
         // generous than the ladder, the ladder's cooldown messaging still
         // fires on the subset the lane passes.
         if (!this.consumeLane(session, 'chat', receivedAtMs / 1000)) break;
+        const generalCandidate = classifyOnlineGeneralChat(text, session.rememberedChat.channel);
+        const configuredGeneral =
+          generalCandidate !== null && session.generalChatRateLimit !== null;
+        // Reserve the ordinary chat token before any quota DB work. This sheds
+        // attempts already in the generic cooldown without touching Postgres;
+        // a quota refusal refunds the reservation, so it cannot escalate that
+        // independent all-chat limiter.
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
@@ -4721,6 +7369,14 @@ export class GameServer {
         // "!" community commands (lfg/wts/...): broadcast in-world + cross-post to
         // Discord, then stop (not normal chat).
         if (text.startsWith('!') && this.handleRelayCommand(session, text)) break;
+        if (configuredGeneral && generalCandidate) {
+          this.admitGeneralChat(
+            session,
+            generalCandidate.canonicalText,
+            session.chatChannelSequence,
+          );
+          break;
+        }
         // guild and officer chat are persistent + cross-zone, so they live in
         // the server's SocialService rather than the sim (no guild concept).
         // MMO convention: /g is guild; /general remains world chat.
@@ -4731,7 +7387,7 @@ export class GameServer {
           const match = gm ?? om;
           if (!match) break;
           const body = match[1];
-          session.rememberedChat = { channel };
+          this.rememberChatChannel(session, { channel });
           const route = gm
             ? this.social.guildChat(this.actorFor(session), body)
             : this.social.officerChat(this.actorFor(session), body);
@@ -4761,7 +7417,10 @@ export class GameServer {
             });
             break;
           }
-          session.rememberedChat = { channel: 'whisper', target: session.lastWhisperFrom };
+          this.rememberChatChannel(session, {
+            channel: 'whisper',
+            target: session.lastWhisperFrom,
+          });
           this.logChat(session, sim.chat(`/w ${session.lastWhisperFrom} ${rm[1]}`, pid));
           break;
         }
@@ -4871,8 +7530,22 @@ export class GameServer {
       case 'pet_auto_water_jet':
         if (typeof msg.enabled === 'boolean') sim.setPetAutoWaterJet(msg.enabled, pid);
         break;
+      case 'pet_special':
+        if (session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION) sim.petSpecial(pid);
+        break;
+      case 'pet_auto_special':
+        if (
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION &&
+          typeof msg.enabled === 'boolean'
+        ) {
+          sim.setPetAutoSpecial(msg.enabled, pid);
+        }
+        break;
       case 'pet_feed':
-        if (typeof msg.item === 'string') sim.feedPet(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.feedPet(msg.item, pid, slot);
+        }
         break;
       case 'pet_heal':
         sim.healPet(pid);
@@ -4936,8 +7609,68 @@ export class GameServer {
         void this.sendSocialSnapshot(session.characterId);
         break;
       case 'guild_create':
-        if (typeof msg.name === 'string')
-          void this.social.guildCreate(this.actorFor(session), msg.name).catch(logSocialErr);
+        if (typeof msg.name === 'string') {
+          // The creation-fee gate, BEFORE any DB work (Guild Bank Phase 3):
+          // a founder whose sim purse cannot cover GUILD_CREATION_FEE_COPPER
+          // is refused right here, so a refused create never touches the
+          // database. RESERVE-AT-GATE (Phase 3 QA, revising the original
+          // create-then-charge decision in state.md): the fee is deducted
+          // SYNCHRONOUSLY here, in the same tick as the gate check, and
+          // refunded on every refusal arm (guildCreate returning false) or
+          // error. Charging after the commit left a deterministic exploit: a
+          // client could pipeline guild_create with a spend so the deferred
+          // clamped charge collected residue, or log out before the commit
+          // and pay nothing. A crash between this reserve and the commit
+          // loses at most the fee for at most one autosave window, the
+          // deliberate trade. The English literal is re-localized client-side
+          // (src/ui/server_i18n.ts guild.createFee, pinned byte-for-byte in
+          // tests/server_i18n.test.ts).
+          const meta = this.sim.meta(pid);
+          if (!meta || meta.copper < GUILD_CREATION_FEE_COPPER) {
+            this.sendChatNotice(
+              session,
+              `You need ${GUILD_CREATION_FEE_GOLD} gold to found a guild.`,
+            );
+            break;
+          }
+          // At most one reservation per character: a pipelined second create
+          // while one is in flight is dropped (the double-click race), so the
+          // success/refund arms can never mismatch reservations.
+          if (this.pendingGuildCreateFees.has(session.characterId)) break;
+          const purseBefore = meta.copper;
+          const charged = this.sim.chargeGuildCreationFeeFor(pid);
+          // What the PURSE actually did, read back from the sim rather than
+          // inferred from `charged`: the create_fee row records both, so a
+          // charge the sim reported taking that the purse never gave up is a
+          // finding instead of an arithmetic identity.
+          const pursePaid = (this.sim.meta(pid)?.copper ?? purseBefore) - purseBefore;
+          if (charged < GUILD_CREATION_FEE_COPPER) {
+            // The purse check above passed but the charge came back short: the
+            // pid resolved meta-only (no live entity) or a state edge. Never
+            // found a discounted or free guild: return whatever was taken and
+            // refuse with the same line.
+            if (charged > 0) this.sim.refundGuildCreationFeeFor(pid, charged);
+            this.sendChatNotice(
+              session,
+              `You need ${GUILD_CREATION_FEE_GOLD} gold to found a guild.`,
+            );
+            break;
+          }
+          this.pendingGuildCreateFees.set(session.characterId, {
+            accountId: session.accountId,
+            amount: charged,
+            pursePaid,
+          });
+          void this.social
+            .guildCreate(this.actorFor(session), msg.name)
+            .then((created) => {
+              if (!created) this.refundGuildCreateFee(session.characterId);
+            })
+            .catch((err) => {
+              logSocialErr(err);
+              this.refundGuildCreateFee(session.characterId);
+            });
+        }
         break;
       case 'guild_invite':
         if (typeof msg.name === 'string')
@@ -5045,6 +7778,32 @@ export class GameServer {
       case 'arena_augment': {
         if (typeof msg.augment === 'string' && msg.augment.length <= 64)
           sim.arenaAugmentPick(msg.augment, pid);
+        break;
+      }
+
+      // Thornhollow Fields (5v5 capture-the-flag). The sim owns every rule; the resets
+      // surface the changed queue/match state on the next snapshot instead of
+      // the throttled BG_WIRE_HZ tick (the arena staleness fix).
+      case 'bg_queue':
+        sim.bgQueueJoin(pid);
+        session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      case 'bg_respond':
+        // The client sends a real boolean; anything else is a malformed frame
+        // and must not be read as an accept.
+        if (typeof msg.accept !== 'boolean') break;
+        sim.bgRespond(msg.accept, pid);
+        break;
+      case 'bg_leave':
+        sim.bgQueueLeave(pid);
+        session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      case 'bg_flag':
+        sim.bgFlagAction(pid);
+        session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      case 'dev_bg_start': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
         break;
       }
 
@@ -5181,13 +7940,28 @@ export class GameServer {
       }
       case 'saveLoadout': {
         const hasAlloc = Object.hasOwn(msg, 'alloc');
+        // Strict === true, never a truthy coerce: an absent or malformed field must
+        // read as "do not capture", so a crafted frame cannot opt a player in.
+        const captureGear = msg.captureGear === true;
         if (hasAlloc) {
           const alloc = parseTalentAllocation(msg.alloc);
           if (typeof msg.name === 'string' && alloc) {
-            sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid, alloc);
+            sim.saveLoadout(
+              msg.name,
+              Array.isArray(msg.bar) ? msg.bar : [],
+              pid,
+              alloc,
+              captureGear,
+            );
           }
         } else if (typeof msg.name === 'string') {
-          sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid);
+          sim.saveLoadout(
+            msg.name,
+            Array.isArray(msg.bar) ? msg.bar : [],
+            pid,
+            undefined,
+            captureGear,
+          );
         }
         break;
       }
@@ -5211,10 +7985,15 @@ export class GameServer {
             armorClass: msg.armorClass,
             primaryStat: msg.primaryStat,
             rarity: msg.rarity,
+            sort: msg.sort,
             page: typeof msg.page === 'number' ? msg.page : 0,
+            collapseLowest: msg.collapseLowest,
           }),
           pid,
         );
+        break;
+      case 'market_sell_price_check':
+        sim.marketSellPriceCheck(typeof msg.item === 'string' ? msg.item : null, pid);
         break;
       case 'market_list':
         if (
@@ -5225,6 +8004,21 @@ export class GameServer {
           Number.isFinite(msg.price)
         ) {
           sim.marketList(msg.item, msg.count, msg.price, pid);
+        }
+        break;
+      case 'market_list_instance':
+        // The instance object is only an equality needle: the sim re-resolves
+        // it against the sender's own bags and escrows the actual held copy's
+        // payload, so no wire-supplied field ever enters the book directly.
+        if (
+          typeof msg.item === 'string' &&
+          typeof msg.price === 'number' &&
+          Number.isFinite(msg.price) &&
+          typeof msg.instance === 'object' &&
+          msg.instance !== null &&
+          !Array.isArray(msg.instance)
+        ) {
+          sim.marketListInstance(msg.item, msg.price, msg.instance as ItemInstancePayload, pid);
         }
         break;
       case 'market_buy':
@@ -5247,10 +8041,10 @@ export class GameServer {
           msg.items.length > 3 // MAIL_MAX_ATTACHMENTS; the Sim re-validates
         )
           break;
-        const items: { itemId: string; count: number }[] = [];
+        const items: { itemId: string; count: number; instance?: ItemInstancePayload }[] = [];
         let itemsOk = true;
         for (const raw of msg.items as unknown[]) {
-          const slot = raw as { itemId?: unknown; count?: unknown } | null;
+          const slot = raw as { itemId?: unknown; count?: unknown; instance?: unknown } | null;
           if (
             !slot ||
             typeof slot.itemId !== 'string' ||
@@ -5260,7 +8054,20 @@ export class GameServer {
             itemsOk = false;
             break;
           }
-          items.push({ itemId: slot.itemId, count: Math.floor(slot.count) });
+          // The instance is only an equality needle (the market_list_instance
+          // rule): the sim re-resolves it against the sender's own bags and
+          // escrows the actual held copy's payload.
+          const instance =
+            slot.instance !== null &&
+            typeof slot.instance === 'object' &&
+            !Array.isArray(slot.instance)
+              ? (slot.instance as ItemInstancePayload)
+              : undefined;
+          items.push({
+            itemId: slot.itemId,
+            count: Math.floor(slot.count),
+            ...(instance ? { instance } : {}),
+          });
         }
         if (!itemsOk) break;
         // Player-written subject/body flow through the same gates as chat
@@ -5373,12 +8180,87 @@ export class GameServer {
         recordBankOp('buy_slots', session, before, sim.bankInfoFor(pid));
         break;
       }
+      // Guild Bank: the officer-plus shared treasury + item store. Shape-only
+      // checks here (the bank_* idiom): the Sim owns every gameplay rule
+      // (banker proximity, officer-plus rank via the session membership stamp,
+      // quest-bind, treasury cap, table price, capacity). `slot` is a container
+      // index, `count` optional (omit = whole stack), `amount` copper. Every op
+      // runs through runGuildBankOp: the before/after guildBankInfoFor diff is
+      // the ONE success signal, feeding both the fire-and-forget bank_ledger
+      // rows (container='guild') and the dirty mark that schedules the book
+      // for the fenced escrow save. A refusal diffs empty: no row, no mark.
+      case 'guild_bank_deposit_gold':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
+        if (typeof msg.amount === 'number') {
+          const amount = msg.amount;
+          this.runGuildBankOp(session, { pid }, 'deposit_gold', () =>
+            sim.guildBankDepositGoldFor(pid, amount),
+          );
+        }
+        break;
+      case 'guild_bank_withdraw_gold':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
+        if (typeof msg.amount === 'number') {
+          const amount = msg.amount;
+          this.runGuildBankOp(session, { pid }, 'withdraw_gold', () =>
+            sim.guildBankWithdrawGoldFor(pid, amount),
+          );
+        }
+        break;
+      case 'guild_bank_deposit':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
+        if (typeof msg.slot === 'number') {
+          const slot = msg.slot;
+          const count = typeof msg.count === 'number' ? msg.count : undefined;
+          this.runGuildBankOp(session, { pid }, 'deposit', () =>
+            sim.guildBankDepositFor(pid, slot, count),
+          );
+        }
+        break;
+      case 'guild_bank_withdraw':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
+        if (typeof msg.slot === 'number') {
+          const slot = msg.slot;
+          const count = typeof msg.count === 'number' ? msg.count : undefined;
+          this.runGuildBankOp(session, { pid }, 'withdraw', () =>
+            sim.guildBankWithdrawFor(pid, slot, count),
+          );
+        }
+        break;
+      case 'guild_bank_buy_slots':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
+        this.runGuildBankOp(session, { pid }, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
+        break;
+      // The activity log READ (no mutation, no sim call). It shares the guild
+      // bank op guard rather than getting a second bucket: it is the same
+      // window, the same officer, and the same abuse shape, and the honest
+      // client asks at most once per its own TTL, so a legitimate session never
+      // notices while a flooder is stopped by machinery that already exists.
+      case 'guild_bank_log':
+        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
+        this.sendGuildBankLog(session, pid);
+        break;
       // Book of Deeds: select/clear the displayed title. The sim validator
       // owns every rule (deed earned + title reward; null clears; invalid
       // input is a silent no-op); the server only shape-checks the payload.
+      // Both cosmetic sets draw from ONE bucket (consumeCosmeticOp): each
+      // accepted change re-wires the full identity record to every in-range
+      // viewer, so alternating between the two must not buy twice the budget.
       case 'deed_set_title':
+        if (!this.consumeCosmeticOp(session, receivedAtMs / 1000)) break;
         if (msg.deedId === null || typeof msg.deedId === 'string') {
           sim.setActiveTitle(msg.deedId, pid);
+        }
+        break;
+      // Book of Deeds: select/clear the displayed nameplate border. Same
+      // division of labour as the title above (the sim validator owns every
+      // rule: deed earned + border reward; null clears; invalid input is a
+      // silent no-op), so the server only shape-checks the payload, and the
+      // same shared cosmetic bucket meters it.
+      case 'deed_set_border':
+        if (!this.consumeCosmeticOp(session, receivedAtMs / 1000)) break;
+        if (msg.deedId === null || typeof msg.deedId === 'string') {
+          sim.setActiveBorder(msg.deedId, pid);
         }
         break;
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
@@ -5396,6 +8278,7 @@ export class GameServer {
         ) {
           const e = sim.entities.get(pid);
           if (e) {
+            cancelProfessionSessionOnDisplacement(sim.ctx, e);
             const p = sim.groundPos(msg.x, msg.z);
             e.pos = p;
             e.prevPos = { ...p };
@@ -5409,6 +8292,13 @@ export class GameServer {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.item === 'string') {
           const count = typeof msg.count === 'number' ? msg.count : 1;
           sim.addItem(msg.item, Math.max(1, Math.min(20, count | 0)), pid);
+        }
+        break;
+      }
+      case 'dev_profiler_invulnerable': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') {
+          const entity = sim.entities.get(pid);
+          if (entity) entity.profilerInvulnerable = true;
         }
         break;
       }
@@ -5616,6 +8506,7 @@ export class GameServer {
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
+    const activeConsecrations = this.sim.activeConsecrations;
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -5679,9 +8570,18 @@ export class GameServer {
     // cutoff. Timed into bcastGridNs (the shared build once), the same counter
     // that brackets the per-session lookup+filter work below.
     const sharedStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
-    const candidates = buildSharedInterestCandidates(this.sim.grid, anchors, INTEREST_QUERY_RADIUS);
+    const candidates = buildSharedInterestCandidates(
+      this.sim.grid,
+      anchors,
+      INTEREST_QUERY_RADIUS,
+      {
+        radius: BG_MATCH_DROP_RADIUS,
+        covers: isBgPos,
+      },
+    );
     if (this.perfDetailActive) this.bcastGridNs += process.hrtime.bigint() - sharedStart;
     const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
+    const bgQueryLimitSq = BG_MATCH_DROP_RADIUS * BG_MATCH_DROP_RADIUS;
 
     // Build each session's snapshot from its shared candidate list, still guarded
     // per session so one throw cannot starve the rest.
@@ -5691,6 +8591,10 @@ export class GameServer {
         const ents: string[] = [];
         const keep: number[] = [];
         const present = new Set<number>();
+        // Resolved ONCE per viewer per pass (a map lookup, no allocation): the
+        // pid list of this viewer's own battleground team, which decides who
+        // rides the raised match radius below.
+        const bgTeam = this.bgTeamPidsFor(anchorEntity);
         const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         for (const e of candidates.forSession(session.pid)) {
           // Re-apply the exact viewer-relative cutoff the single grid query used
@@ -5701,10 +8605,11 @@ export class GameServer {
           const dx = e.pos.x - anchorEntity.pos.x;
           const dz = e.pos.z - anchorEntity.pos.z;
           const d2 = dx * dx + dz * dz;
-          if (d2 > queryLimitSq) continue;
-          // bcVisits counts the exact per-viewer in-range set (self included),
-          // byte-identical to the old scan: increment only AFTER the exact-d2
-          // cutoff, never on the padded per-cell candidate list.
+          if (d2 > (isBgPos(anchorEntity.pos.x) ? bgQueryLimitSq : queryLimitSq)) continue;
+          // bcVisits counts the exact per-viewer in-range set (self included):
+          // increment only AFTER the exact-d2 cutoff, never on the padded
+          // per-cell candidate list. Band viewers use the wider battleground
+          // cutoff, so their counts are larger than an open-world viewer's.
           if (this.perfDetailActive) this.bcVisits++;
           if (e.id === anchorEntity.id) continue;
           if (!this.canObserveEntity(anchorEntity, e, d2)) continue;
@@ -5714,7 +8619,11 @@ export class GameServer {
           const limitSq =
             anchorEntity.targetId === e.id
               ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
-              : interestLimitSq(e, known !== undefined);
+              : bgWideInterestApplies(anchorEntity, e, bgTeam)
+                ? known !== undefined
+                  ? BG_MATCH_DROP_RADIUS * BG_MATCH_DROP_RADIUS
+                  : BG_MATCH_INTEREST_RADIUS * BG_MATCH_INTEREST_RADIUS
+                : interestLimitSq(e, known !== undefined);
           if (d2 > limitSq) continue;
           present.add(e.id);
           const cache = this.wireCacheFor(e, stableTimerWire);
@@ -5758,7 +8667,7 @@ export class GameServer {
           ents.push(auraChanged ? cache.liteAuraJson : cache.liteJson);
         }
         // forget entities that left interest, so a re-entry sends identity again
-        for (const [id] of session.sentEnts) {
+        for (const id of session.sentEnts.keys()) {
           if (!present.has(id)) session.sentEnts.delete(id);
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
@@ -5772,11 +8681,18 @@ export class GameServer {
         );
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
+        // Ground-AoE warnings (frost rings, temporal hourglasses) are anonymous
+        // ground effects, not entities: they carry a position, radius and timer
+        // and no caster identity or team, and a player must be able to react to
+        // one wherever it lands. They therefore keep the widened match horizon
+        // inside the band, unlike the enemy PLAYERS above, whose records the
+        // narrowed rule holds to the open-world radii.
+        const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
         const frostRings = activeFrostRings
           .filter((ring) => {
             const dx = ring.x - anchorEntity.pos.x;
             const dz = ring.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + ring.radius;
+            const limit = aoeBase + ring.radius;
             return dx * dx + dz * dz <= limit * limit;
           })
           .map(
@@ -5788,7 +8704,7 @@ export class GameServer {
           .filter((hourglass) => {
             const dx = hourglass.x - anchorEntity.pos.x;
             const dz = hourglass.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
+            const limit = aoeBase + hourglass.radius;
             return dx * dx + dz * dz <= limit * limit;
           })
           .map(
@@ -5797,10 +8713,27 @@ export class GameServer {
           );
         const temporalHourglassesJson =
           temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
+        const consecrations = activeConsecrations
+          .filter((consecration) => {
+            const dx = consecration.x - anchorEntity.pos.x;
+            const dz = consecration.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (consecration) =>
+              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
+          );
+        const consecrationsJson =
+          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
+        const petSpecialWireJson =
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION
+            ? `,"psw":${PET_SPECIAL_WIRE_VERSION}`
+            : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>
@@ -5814,6 +8747,16 @@ export class GameServer {
       this.lastWireSweepTick = tick;
       this.sweepWireCache();
     }
+  }
+
+  // The pid list of the viewer's OWN battleground team, or null when the viewer
+  // is not a player in a live match. Returns the sim's own array by reference:
+  // read-only here, and this runs once per viewer per broadcast pass.
+  private bgTeamPidsFor(viewer: Entity): readonly number[] | null {
+    if (viewer.kind !== 'player' || !isBgPos(viewer.pos.x)) return null;
+    const match = this.sim.bgMatchFor(viewer.id);
+    if (!match) return null;
+    return match.teams[1].includes(viewer.id) ? match.teams[1] : match.teams[0];
   }
 
   private canObserveEntity(viewer: Entity, e: Entity, d2: number): boolean {
@@ -5833,7 +8776,9 @@ export class GameServer {
     if (!cache) {
       cache = {
         tick: -1,
+        baseIdJson: '',
         idJson: '',
+        appJson: null,
         baseDynJson: '',
         idVer: 0,
         baseDynVer: 0,
@@ -5846,6 +8791,28 @@ export class GameServer {
     return cache;
   }
 
+  /**
+   * The authored modular look as JSON, minted at most ONCE per entity.
+   *
+   * `app` is by far the heaviest identity field (~0.6 KB for a default look,
+   * 1489 bytes at the ceiling the sanitizer's allowlists imply, measured by
+   * tests/appearance_wire_bounds.test.ts rather than compared at runtime) and the only one
+   * that a session normally never changes: it is stamped at join from the
+   * character's own column, and the sole thing that moves it is a redesign the
+   * player just paid a token for (applyAppearanceForCharacter, which busts this
+   * memo explicitly). Both wire paths therefore serialize
+   * it here and reuse the string: the peer path splices it into the cached
+   * identity JSON (wireCacheFor), the self path ships it through bcastSelf's
+   * `maybeRaw` delta channel. Returns null when the entity has no authored
+   * look, which is also what keeps the key sparse for pre-creator characters.
+   */
+  private appearanceWireJson(e: Entity): string | null {
+    if (!e.modularAppearance) return null;
+    const cache = this.entityWireCacheFor(e);
+    if (cache.appJson === null) cache.appJson = JSON.stringify(e.modularAppearance);
+    return cache.appJson;
+  }
+
   // Identity and non-aura dynamics are serialized once per entity/tick. The
   // negotiated legacy and stable aura variants are then built lazily, at most
   // once each, and shared by every compatible recipient.
@@ -5854,10 +8821,16 @@ export class GameServer {
     const t0 = this.perfDetailActive ? process.hrtime.bigint() : 0n;
     if (cache.tick !== this.sim.tickCount) {
       cache.tick = this.sim.tickCount;
-      const idJson = JSON.stringify(identityFields(e));
+      const baseIdJson = JSON.stringify(identityFields(e));
       const baseDynJson = JSON.stringify(dynamicFields(e, false));
-      if (idJson !== cache.idJson) {
-        cache.idJson = idJson;
+      if (baseIdJson !== cache.baseIdJson) {
+        cache.baseIdJson = baseIdJson;
+        // The look is spliced rather than composed into identityFields so the
+        // per-tick stringify above never walks it (see appearanceWireJson).
+        // Splicing here, inside the change arm, means even the concat only runs
+        // when the rest of the identity actually moved.
+        const appJson = this.appearanceWireJson(e);
+        cache.idJson = appJson === null ? baseIdJson : jsonWithField(baseIdJson, 'app', appJson);
         cache.idVer++;
       }
       if (baseDynJson !== cache.baseDynJson) {
@@ -5937,41 +8910,58 @@ export class GameServer {
     anchorSession: ClientSession = session,
     vcupDue = false,
   ): string {
+    // Per-bucket attribution for bcastSelf (SELF_WIRE_PHASES): one clock read
+    // per bucket boundary, active only during a detailed capture, accumulated
+    // across every session of the pass into selfWireNs and flushed beside the
+    // bcastSelf total. The steady-state loop pays a single null check.
+    let selfLapMark = this.perfDetailActive ? process.hrtime.bigint() : 0n;
+    const selfLap = this.perfDetailActive
+      ? (bucket: string): void => {
+          const t = process.hrtime.bigint();
+          this.selfWireNs.set(bucket, (this.selfWireNs.get(bucket) ?? 0n) + (t - selfLapMark));
+          selfLapMark = t;
+        }
+      : null;
     const stableTimerWire = session.timerWireVersion === STABLE_TIMER_WIRE_VERSION;
     const self = wireEntity(p, !stableTimerWire);
     Object.assign(self, {
       res: Math.round(p.resource * 10) / 10,
       mres: p.maxResource,
       rtype: p.resourceType,
-      xp: meta.xp,
-      lxp: meta.lifetimeXp,
-      rxp: Math.round(meta.restedXp),
-      prk: meta.prestigeRank,
-      copper: meta.copper,
       gcd: round2(p.gcdRemaining),
       pcd: round2(p.potionCdRemaining),
+      fcd: round2(p.firebottleCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
+      pdev: p.paladinDevotion
+        ? {
+            value: p.paladinDevotion.value,
+            charges: p.paladinDevotion.ascensionCharges,
+            remaining: round2(p.paladinDevotion.ascensionRemaining),
+          }
+        : null,
       target: p.targetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
-      ap: p.attackPower,
-      sp: p.spellPower,
-      sh: p.spellHaste,
-      crit: p.critChance,
-      dodge: p.dodgeChance,
-      blk: p.blockChance,
-      bval: p.blockValue,
-      crat: p.critRating,
-      hrat: p.hasteRating,
-      hirat: p.hitRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
+      // Craft-cast session mirror (self-only, the eat/drk shape): the crafting
+      // window's recipe highlight and batch counter read these authoritatively
+      // online instead of click-time guesses, so the server's batch clamp and
+      // a mid-cast window close/reopen both stay truthful. Null at rest.
+      ccast: p.craftCastRecipeId
+        ? {
+            r: p.craftCastRecipeId,
+            rem: p.craftCastBatchRemaining,
+            tot: p.craftCastBatchTotal,
+          }
+        : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
+      opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
-      ddiff: this.sim.dungeonDifficulty(anchorSession.pid),
     });
     const json = JSON.stringify(self);
+    selfLap?.('self.base');
     // heavy, rarely-changing fields ride along only when their serialized
     // form differs from what this session last received; the client treats
     // an absent field as "unchanged" (a fresh session always gets them all)
@@ -5997,6 +8987,42 @@ export class GameServer {
     const maybe = (key: string, value: unknown): void => {
       maybeSerialized(key, JSON.stringify(value ?? null));
     };
+    // Static combat-rating/progression scalars: rarely change (gear/talent swap,
+    // level or XP gain, a copper transaction, a heroic-key toggle), unlike every
+    // other field on this record which was still being rebuilt and stringified
+    // every tick regardless. Delta-guarded like the rest of this record; the
+    // reconciliation-critical fields above (resource, gcd, swing, combo, target,
+    // auto, queued) stay unconditional since they change on most combat ticks.
+    maybe('xp', meta.xp);
+    maybe('lxp', meta.lifetimeXp);
+    maybe('rxp', Math.round(meta.restedXp));
+    maybe('prk', meta.prestigeRank);
+    maybe('copper', meta.copper);
+    maybe('ap', p.attackPower);
+    maybe('sp', p.spellPower);
+    maybe('sh', p.spellHaste);
+    maybe('crit', p.critChance);
+    maybe('dodge', p.dodgeChance);
+    maybe('blk', p.blockChance);
+    maybe('bval', p.blockValue);
+    maybe('crat', p.critRating);
+    maybe('hrat', p.hasteRating);
+    maybe('hirat', p.hitRating);
+    maybe('ddiff', this.sim.dungeonDifficulty(anchorSession.pid));
+    // The viewer's OWN authored look. It cannot come from the entity list (the
+    // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
+    // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),
+    // and near-immutable, so it ships on the first self record and then only if
+    // a redesign moves it.
+    //
+    // A missing look ships an explicit `"app":null` rather than nothing at all,
+    // which costs one 11-byte field once per session for a pre-creator
+    // character and makes clearing symmetric: a peer clears on ABSENCE, but
+    // absence on this record means "unchanged" (see the decode in
+    // src/net/online.ts), so a look pushed to null with nothing sent would clear
+    // for everyone in view and leave the owner looking at their old body for the
+    // rest of the session.
+    maybeRaw('app', this.appearanceWireJson(p) ?? 'null');
     // Dynamic / latency-sensitive fields: diffed every tick. These change from
     // outside this session's own commands/events, party member HP from another
     // player taking damage, cooldowns counting down, an incoming trade/duel,
@@ -6041,14 +9067,34 @@ export class GameServer {
         ).json,
       );
     } else {
-      maybe(
-        'ncd',
-        Object.fromEntries(
-          Object.entries(meta.nodeHarvestReadyAt)
-            .filter(([, until]) => until > this.sim.time)
-            .map(([k, until]) => [k, round2(until - this.sim.time)]),
-        ),
-      );
+      // Fast path first: while NOTHING is cooling (a fresh session, or every
+      // timer elapsed), the projected map is always {}, and the alloc-free
+      // for..in probe replaces the unconditional entries/filter/map/
+      // fromEntries chain (about 2N+4 allocations per player per tick against
+      // a readyAt map that only ever grows within a session). Byte-identical
+      // to maybe('ncd', {}) on the wire. Precondition making for..in exactly
+      // equivalent to the Object.entries filter below: nodeHarvestReadyAt is
+      // always a plain {} built by applyNodeReadiness / the gathering write
+      // site (own enumerable keys only, no prototype chain).
+      let anyCooling = false;
+      for (const k in meta.nodeHarvestReadyAt) {
+        if (meta.nodeHarvestReadyAt[k] > this.sim.time) {
+          anyCooling = true;
+          break;
+        }
+      }
+      if (!anyCooling) {
+        maybeSerialized('ncd', '{}');
+      } else {
+        maybe(
+          'ncd',
+          Object.fromEntries(
+            Object.entries(meta.nodeHarvestReadyAt)
+              .filter(([, until]) => until > this.sim.time)
+              .map(([k, until]) => [k, round2(until - this.sim.time)]),
+          ),
+        );
+      }
     }
     // Charge-limited ability live counts (abilityCharges, the one recharge
     // model: Twinstrike, Double Charge, Frost's second Ice Block): {abilityId:
@@ -6093,6 +9139,7 @@ export class GameServer {
     }
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
+    selfLap?.('self.timers');
     maybe('party', this.partyWire(anchorSession.pid));
     maybe('marks', this.markersWire(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
@@ -6106,6 +9153,21 @@ export class GameServer {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
     }
+    selfLap?.('self.social');
+    // Thornhollow Fields readout at its own UI cadence (BG_WIRE_HZ). The viewer-identical
+    // match core is memoized per tick inside the sim (sharedMatchView), so ten
+    // in-match viewers share one build; only the per-viewer scalars differ.
+    if (this.sim.tickCount - session.lastBgWireTick >= BG_WIRE_INTERVAL_TICKS) {
+      session.lastBgWireTick = this.sim.tickCount;
+      // The live online ladder inside that readout is realm-wide and identical
+      // for every viewer, so it is built once per broadcast pass through the
+      // realm-readout memo and reused (the dfb/vcupb precedent).
+      const ladder = realmReadoutObject(this.bgLadderReadout, this.sim.tickCount, () =>
+        this.sim.bgLadder(),
+      );
+      maybe('bg', this.sim.bgInfoFor(anchorSession.pid, ladder));
+    }
+    selfLap?.('self.bg');
     // Vale Cup readout at its own UI cadence (VC_WIRE_HZ). Dueness (`vcupDue`) is
     // decided once per broadcast pass in broadcastSnapshots and realm-global, so the
     // shared bundle is built once per due pass rather than on each session's own
@@ -6126,9 +9188,11 @@ export class GameServer {
         // liveHidden: this viewer is off in a private practice instance, so the
         // Sowfield live strip carried in the shared fragment must be suppressed for
         // them. Derived from the two values we already hold (the raw shared live is
-        // non-null but this viewer's effective live is null), so VcMatchInfo need
-        // not carry a practice flag; the client reapplies it on recompose and never
-        // surfaces liveHidden on CupInfo. The raw strip still rides vcupb to every
+        // non-null but this viewer's effective live is null), so this per-viewer
+        // suppression needs no flag of its own on the match sub-object
+        // (VcMatchInfo.practice describes the MATCH for the briefing copy, not
+        // this viewer's live-strip visibility); the client reapplies liveHidden
+        // on recompose and never surfaces it on CupInfo. The raw strip still rides vcupb to every
         // viewer (it is public match state, no PII), so a practicer receives the
         // bytes but this per-viewer flag keeps their client from ever rendering it.
         const liveHidden = shared.live !== null && full.live === null;
@@ -6160,6 +9224,7 @@ export class GameServer {
         maybe('vcup', null);
       }
     }
+    selfLap?.('self.vcup');
     // Dungeon Finder at its own UI cadence (DF_WIRE_HZ): the personal `df`
     // blob carries whole-second clocks (queue wait, proposal countdown), so
     // re-evaluating every tick would re-serialize it 20 times per visible
@@ -6179,19 +9244,90 @@ export class GameServer {
         ),
       );
     }
+    selfLap?.('self.df');
     // market info is null unless the player is standing at the Merchant, so it
-    // only rides the wire for players actually browsing the World Market
-    maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    // only rides the wire for players actually browsing the World Market.
+    // Rebuilding that view is a filter plus a page over the WHOLE listing book,
+    // so it runs at its own cadence (MARKET_WIRE_HZ; the viewer's own market
+    // commands re-arm the gate for next-snapshot feedback) and, within the
+    // cadence, only when something it reads actually changed: the sim's browse
+    // revision (listings or collections), the viewer's query object (replaced
+    // wholesale by marketSearch, so identity is the change signal), or the
+    // staleness backstop coming due. Profiled: on a grown book the unconditional
+    // per-tick rebuild was the dominant bcastSelf cost.
+    const marketDue =
+      this.sim.tickCount - session.lastMarketWireTick >= MARKET_WIRE_INTERVAL_TICKS ||
+      sent.market === undefined;
+    if (marketDue) {
+      session.lastMarketWireTick = this.sim.tickCount;
+      const browseRev = this.sim.marketBrowseRevFor(anchorSession.pid);
+      if (browseRev === null) {
+        maybe('market', null);
+        session.lastMarketBrowseRev = null;
+      } else if (
+        sent.market === undefined ||
+        browseRev !== session.lastMarketBrowseRev ||
+        meta.marketQuery !== session.lastMarketQueryRef ||
+        meta.sellPriceItemId !== session.lastSellPriceItemIdRef ||
+        this.sim.tickCount - session.lastMarketRebuildTick >= MARKET_BROWSE_REFRESH_TICKS
+      ) {
+        session.lastMarketQueryRef = meta.marketQuery;
+        session.lastSellPriceItemIdRef = meta.sellPriceItemId;
+        session.lastMarketRebuildTick = this.sim.tickCount;
+        maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+        // Stamp AFTER the rebuild: marketInfoFor can advance the revision as a
+        // read side effect (the legacy name-keyed collection merge), and a
+        // pre-rebuild stamp would leave this one behind, costing a redundant
+        // rebuild on the next due pass.
+        session.lastMarketBrowseRev = this.sim.marketBrowseRevFor(anchorSession.pid) ?? browseRev;
+      }
+    }
     // the lightweight collect-indicator bit streams ALWAYS (the mailU pattern),
     // so the minimap badge lights anywhere while proceeds/items wait
     maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);
-    maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
+    selfLap?.('self.market');
+    // The Ravenpost mailbox view rides the market gate's exact shape: on the
+    // MAIL_WIRE_HZ cadence (re-armed by the viewer's own mail commands), only
+    // when the sim's mail revision moved since the last build, with
+    // MAIL_REFRESH_TICKS as the staleness backstop. The full projection
+    // (letter bodies included) used to re-serialize at 20 Hz for every player
+    // at a raven pillar; nothing in it carries a sub-second clock. Null (not
+    // at a pillar) still ships promptly on the cadence so the window closes.
+    const mailDue =
+      this.sim.tickCount - session.lastMailWireTick >= MAIL_WIRE_INTERVAL_TICKS ||
+      sent.mail === undefined;
+    if (mailDue) {
+      session.lastMailWireTick = this.sim.tickCount;
+      const mailRev = this.sim.mailRevFor(anchorSession.pid);
+      if (mailRev === null) {
+        maybe('mail', null);
+        session.lastMailRev = null;
+      } else if (
+        sent.mail === undefined ||
+        mailRev !== session.lastMailRev ||
+        this.sim.tickCount - session.lastMailRebuildTick >= MAIL_REFRESH_TICKS
+      ) {
+        session.lastMailRebuildTick = this.sim.tickCount;
+        maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
+        session.lastMailRev = mailRev;
+      }
+    }
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
+    selfLap?.('self.mail');
     // bank info is null unless the player is standing at a banker, so it only
     // rides the wire for players actually browsing their deposit box (the mail
     // pattern). Not heavy-gated: it appears from proximity, not this session's
     // own dirty-marking commands.
     maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
+    // guild bank info follows the same pattern with a stricter gate: null
+    // unless the player is alive, at a banker, AND stamped into a guild whose
+    // book is loaded (sim guildBankInfoFor; ANY rank sees it, the snapshot's
+    // canEdit flag marks officer-plus), so the guildless and walked-away/dead/
+    // departed members all read null. Not heavy-gated for the same reason as
+    // bank: it can change from OTHER members' deposits, not just this
+    // session's own commands.
+    maybe('guildBank', this.sim.guildBankInfoFor(anchorSession.pid));
+    selfLap?.('self.bank');
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
@@ -6208,12 +9344,14 @@ export class GameServer {
     // does while lastSent is empty) the key delta-elides away for them. Per-tick
     // like lroll, and like lroll it costs one pendingLootRolls scan per session.
     maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
+    selfLap?.('self.loot');
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
     maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
     maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));
+    selfLap?.('self.delve');
     // per-player read, so kept per-tick like the other small maps above. Wire
     // key `prof` and IWorld member `professionsState` are the settled names
     // for the professions facet (#1164, src/sim/professions/CLAUDE.md). `gprof`
@@ -6229,6 +9367,34 @@ export class GameServer {
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    selfLap?.('self.prof');
+    // Commission order board (issue #1298): the viewer's projection (their
+    // requests, any order they accepted, and the open board); this is how
+    // BOTH sides of an accept/deliver converge, not the
+    // commissionOrderResult event. NOT a small read: it walks the whole
+    // realm-global board and every open-scope order is in every viewer's
+    // projection, so it rides the market recipe: its own cadence
+    // (CORDER_WIRE_HZ; the viewer's own commission commands re-arm the
+    // gate), a rebuild-only-on-change check against the board revision
+    // (viewer-independent, so no per-viewer signal is needed), and a
+    // staleness backstop.
+    const corderDue =
+      this.sim.tickCount - session.lastCorderWireTick >= CORDER_WIRE_INTERVAL_TICKS ||
+      sent.corder === undefined;
+    if (corderDue) {
+      session.lastCorderWireTick = this.sim.tickCount;
+      const boardRev = this.sim.commissionOrderBoardRev;
+      if (
+        sent.corder === undefined ||
+        boardRev !== session.lastCorderBoardRev ||
+        this.sim.tickCount - session.lastCorderRebuildTick >= CORDER_BOARD_REFRESH_TICKS
+      ) {
+        session.lastCorderBoardRev = boardRev;
+        session.lastCorderRebuildTick = this.sim.tickCount;
+        maybe('corder', this.sim.commissionOrdersFor(anchorSession.pid));
+      }
+    }
+    selfLap?.('self.corder');
     // The viewer's own most recent enchanting-action outcomes (Professions
     // 2.0), or null. Small per-player reads diffed per tick like the other
     // scalars above (a successful action already refreshed the self inventory via
@@ -6244,11 +9410,18 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
-    // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
-    // every mount whose reins item sits in bags or bank. A handful of short
-    // strings whose serialized form only changes on a loot/bank move, so the
-    // per-tick diff is negligible. Wire key `mntOwn`.
-    maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+    // Slotted tool effects (IWorld `toolEffectSlots`). Wire key `tslot`; see
+    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts. Empty for
+    // every player who has never slotted one, so after the first snapshot of a
+    // session (which carries `"tslot":[]`, as every registered key does while
+    // lastSent is empty) the key delta-elides away for almost everyone. The
+    // charge counter moves only on a harvest that actually spends one, so this
+    // is a cheap diff rather than a per-tick churn. The empty arm compares the
+    // constant '[]' directly (byte-identical to maybe(...)): stringifying the
+    // shared frozen empty projection per player per tick bought nothing.
+    const tslotRows = this.sim.toolEffectSlotsFor(anchorSession.pid);
+    if (tslotRows.length === 0) maybeSerialized('tslot', '[]');
+    else maybe('tslot', tslotRows);
     // Riding skill: persisted, so the client knows whether to show the riding
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).
@@ -6258,11 +9431,19 @@ export class GameServer {
     // self deltas are authoritative and clear stale client mirrors with false/null.
     maybe('mntLesson', this.sim.mountLessonActiveFor(anchorSession.pid));
     maybe('mntRace', this.sim.mountRaceViewFor(anchorSession.pid));
-    // Book of Deeds: the Renown total and the selected title id, cheap
-    // scalars diffed per tick (grants land from sim sites that never mark
-    // this session dirty, and the title echo must not wait on the heavy gate).
+    // Book of Deeds: the Renown total and the two selected cosmetic ids
+    // (title and nameplate border), cheap scalars diffed per tick (grants land
+    // from sim sites that never mark this session dirty, and neither cosmetic
+    // echo must wait on the heavy gate).
     maybe('renown', meta.renown);
     maybe('atitle', meta.activeTitle);
+    maybe('aborder', meta.activeBorder);
+    // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to
+    // whole minutes so the serialized form changes about once a minute and the
+    // delta gate drops it from every other tick; the sheet displays minutes at
+    // most, so no read loses precision.
+    maybe('ptime', Math.floor(livePlaytimeSeconds(meta, this.sim.time) / 60) * 60);
+    selfLap?.('self.craft');
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety
@@ -6278,11 +9459,27 @@ export class GameServer {
       session.lastWireRev = meta.wireRev;
       maybe('inv', meta.inventory);
       maybe('bags', meta.bags);
+      // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
+      // every mount whose reins item sits in bags or bank. Its inputs are
+      // meta.inventory (heavy-gated above) and meta.bank.inventory, which is
+      // NOT itself behind this gate; the gating is safe anyway because the
+      // only writers of the bank inventory are the deposit and withdraw
+      // commands, and both are in HEAVY_SELF_CMDS, so every input change
+      // marks this session heavy dirty. The staggered modulo refresh is the
+      // backstop, with the known family caveat that broadcastSnapshots runs
+      // outside the catch-up loop, so under sustained catch-up the stride
+      // can skip a pid's modulo slot and the backstop stretches; the dirty
+      // flag, not the modulo, is what carries correctness here. Wire key
+      // `mntOwn`.
+      maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);
       maybe('cosmetics', anchorSession.accountCosmetics);
-      maybe('qlog', [...meta.questLog.values()]);
+      // questProgressForWire strips the server-only per-object interact ledger:
+      // the client never reads it, and this snapshot's build + stringify is the
+      // dominant avoidable broadcast cost, so it does not carry bookkeeping.
+      maybe('qlog', [...meta.questLog.values()].map(questProgressForWire));
       maybe('qdone', [...meta.questsDone]);
       maybe('milestones', [...meta.unlockedMilestones]);
       // Book of Deeds: the earned map (deed id -> utcDay) and the COMPLETE
@@ -6301,6 +9498,20 @@ export class GameServer {
         visited: [...meta.deedStats.visited],
         dungeonClears: meta.deedStats.dungeonClears,
       });
+      // Reliquary sparse blob only: firstFind (with its folded obtain tally) /
+      // illuminatedPages / marks / recent, omit-empty. Item ownership stays on
+      // dstats.itemsDiscovered; never a second full discovery array.
+      // Heavy-gated: reliquaryUnlock is a HEAVY_SELF_EVENTS member so a fill
+      // re-diffs on the next snapshot without saveCharacter.
+      // maybeRaw, not maybe: this is the same shape the realm readouts use, a
+      // value serialized ONCE by a memo instead of per session per tick.
+      // reliquaryWireJson caches on the state's own revision, so a staggered
+      // refresh for a player whose Reliquary has not moved (the overwhelming
+      // case) reuses the string rather than walking and re-stringifying the
+      // whole blob just to hand the delta gate bytes it already has. The output
+      // is byte-identical to the JSON.stringify path it replaces, so lastSent
+      // comparisons are unchanged across the swap.
+      maybeRaw('reliq', reliquaryWireJson(meta.reliquary));
       // talents/spec/loadouts: the client recomputes its known abilities from this.
       maybe('tal', {
         alloc: meta.talents,
@@ -6321,7 +9532,10 @@ export class GameServer {
       // strand the client on the sport kit).
       maybe('sport', meta.sportRole ? { role: meta.sportRole } : null);
     }
-    return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
+    selfLap?.('self.heavy');
+    const assembled = extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
+    selfLap?.('self.assemble');
+    return assembled;
   }
 
   // Global party-frame aggregates (aggro holders + incoming heals), scanned once
@@ -6450,6 +9664,9 @@ export class GameServer {
   // duel result, arena win) and enqueue a card for the Discord bot to post. The
   // drain endpoint resolves which players are linked and tags them; the queue
   // dedupes so one moment yields one card.
+  //
+  // This is also the tick's ONE observer pass over the event list, so the
+  // per-band harvest counter rides it rather than adding a second O(n) walk.
   private detectActivity(events: SimEvent[]): void {
     const now = Date.now();
     // Deed unlocks accumulate per session and record AFTER the loop, behind a
@@ -6481,30 +9698,119 @@ export class GameServer {
           const ids = deedUnlocks.get(s);
           if (ids) ids.push(ev.deedId);
           else deedUnlocks.set(s, [ev.deedId]);
-          // Marquee unlocks fan out to guildmates and followers; retro
-          // unlocks NEVER broadcast (a veteran's first login after rollout
-          // must not spam their guild).
-          if (ev.retro !== true) this.maybeBroadcastDeedUnlock(s, ev.deedId);
+          // Marquee unlocks fan out to guildmates and followers, and
+          // feed-worthy unlocks (titles, borders, the first koi) to the
+          // Discord activity feed; retro unlocks NEVER fan out anywhere (a
+          // veteran's first login after rollout must not spam their guild or
+          // the feed).
+          if (ev.retro !== true) this.fanOutDeedUnlock(s, ev.deedId, now);
         }
+      }
+      // Reliquary first-ever page Illumination (Phase 18). The sim gates
+      // illuminatedPageId on the sticky per-character illuminatedPages set,
+      // so its presence means FIRST-EVER illumination for this character: a
+      // repeat completion after catalog growth emits no illuminatedPageId,
+      // and the on-join retro seed pass carries retro: true and must never
+      // marquee (the deedUnlocked retro rule). Marquee only: no Discord feed
+      // arm (only border deeds reach the feed, and the flagship illumination
+      // deeds reach it through their titles), no character_deeds write, and
+      // no forced save (membership authority stays the sparse self blob; the
+      // wire pins in tests/reliquary_wire.test.ts hold this arm to that).
+      if (
+        ev.type === 'reliquaryUnlock' &&
+        ev.pid !== undefined &&
+        ev.illuminatedPageId !== undefined &&
+        ev.retro !== true
+      ) {
+        const s = this.clients.get(ev.pid);
+        if (s) this.fanOutIllumination(s, ev.illuminatedPageId);
+      }
+      // Economy telemetry: one granted node harvest, counted under the ZONE
+      // of the node that yielded it (R3) and the node's own tool TIER (R31, so
+      // a starter-zone bare-hands faucet reads apart from the tool-gated veins
+      // beside it). Bots emit this too and are counted like anyone else,
+      // deliberately: the series exists to show where the world is harvesting.
+      if (ev.type === 'gatherResult') {
+        gameMetricsCounters().harvest(harvestBandForNode(ev.nodeId), harvestTierForNode(ev.nodeId));
+      }
+      // Fishing telemetry: the three outcome events the sim emits (catch,
+      // got-away, empty hook), each carrying the session's pinned water zone
+      // and the effective band, plus the cast itself and the rod training fee.
+      // Same no-session-filter reasoning as the harvest arm above.
+      //
+      // A cast has no dedicated event: it is the generic castStart with the
+      // fishing ability, and the zone lives on the CASTER (the rod gate pinned
+      // it at cast start), so this arm resolves both from the entity rather
+      // than from the event. It is the denominator for every rate below.
+      // Observed post-tick: a cast cancelled in the SAME tick it started has
+      // already cleared the pin, so that cast falls back to the position
+      // zone and the band reads post-tick state, and a caster who left the
+      // world that same tick is not counted at all. Both are accepted over
+      // a dedicated wire event.
+      if (ev.type === 'castStart' && ev.ability === FISHING_CAST_ID) {
+        const caster = this.sim.entities.get(ev.entityId);
+        const casterMeta = this.sim.players.get(ev.entityId);
+        if (caster && casterMeta) {
+          gameMetricsCounters().fishingCast(
+            caster.fishCastZoneId || zoneAt(caster.pos.x, caster.pos.z).id,
+            fishingBandLabel(effectiveFishingBand(casterMeta)),
+          );
+        }
+      }
+      if (ev.type === 'fishingResult') {
+        gameMetricsCounters().fishingCatch(ev.zoneId, fishingBandLabel(ev.band), isKoi(ev.itemId));
+      }
+      if (ev.type === 'fishingGotAway') {
+        gameMetricsCounters().fishingGotAway(ev.zoneId, fishingBandLabel(ev.band));
+      }
+      if (ev.type === 'fishingEarlyReel') {
+        gameMetricsCounters().fishingEarlyReel(ev.zoneId, fishingBandLabel(ev.band));
+      }
+      if (ev.type === 'fishingEmptyHook') {
+        gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));
+      }
+      // One rod training fee paid. Only the ok arm charges (Sim.trainRecipe
+      // debits exactly once and a duplicate resolves train_already_known), so
+      // the ok check is what makes this a payment count and not an attempt
+      // count. The fee amount is static content, published as woc_rod_fee_copper.
+      if (ev.type === 'trainResult' && ev.ok && isRodFeeRecipe(ev.recipeId)) {
+        gameMetricsCounters().rodFeePaid(ev.recipeId);
       }
       if (ev.type === 'levelup' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);
-        if (session) session.metricsMaxLevel = Math.max(session.metricsMaxLevel, ev.level);
-      }
-      if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
-        const s = this.clients.get(ev.pid);
-        if (s) {
-          void trackReachedLevel5(
-            s.characterId,
-            {
-              clientIp: s.ip,
-              clientUserAgent: s.userAgent,
-              fbp: s.fbp,
-              fbc: s.fbc,
-            },
-            s.sourceUrl,
-          );
+        if (session) {
+          session.metricsMaxLevel = Math.max(session.metricsMaxLevel, ev.level);
+          // EVERY levelup, not just the milestone arms below: this is the server's
+          // real-time knowledge of the move. The characters row the bot reads still
+          // carries the old level until the next save, which enqueues again from
+          // saveCharacter, so an early drain re-reads once the row catches up.
+          enqueueLinkChange({ accountId: session.accountId, kinds: ['flex'] }, now);
+          recordLevelUp(session, ev.level);
         }
+      }
+      if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        const entity = this.sim.entities.get(ev.pid);
+        // Skip when the entity is gone rather than defaulting the level: the
+        // level is the gate that bounds ftue_events growth, so it must never
+        // fail open (the death arm has the same direction).
+        if (s && entity)
+          recordFtueQuest(
+            s,
+            ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done',
+            ev.questId,
+            entity.level,
+          );
+      }
+      if (ev.type === 'death' && this.clients.has(ev.entityId)) {
+        const s = this.clients.get(ev.entityId);
+        if (s) recordFtueDeath(s, this.sim, ev.entityId, ev.killerId);
+      }
+      if (ev.type === 'levelup' && (ev.level === 2 || ev.level === 5) && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        // Level 2 and 5 ad conversions, email-enriched for match quality
+        // (ua_capi.ts); other levels no-op inside the module.
+        if (s) trackLevelMilestoneCapi(s, ev.level);
       }
       if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
@@ -6540,6 +9846,53 @@ export class GameServer {
           `rareloot:${ev.rollId}`,
           now,
         );
+      } else if (ev.type === 'masterwork' && ev.pid !== undefined) {
+        // A masterwork proc: the professions moment the rareloot arm above
+        // cannot see (a craft fires no loot roll). The ACCOUNT-scoped dedupe
+        // key (unlike rareloot's per-drop rollId) collapses a crafting
+        // session to at most one card per dedupe TTL, and the card rides the
+        // same deed_broadcasts opt-out as the deed fan-out below: masterwork
+        // procs REPEAT (3 to 15 percent of crafts), so unlike the once-ever
+        // levelup/rareloot arms, publishing them to a third-party channel
+        // needs the player-controllable gate. Fire-and-forget off the loop
+        // (the fanOutDeedUnlock shape); identity captured before the await.
+        // Bots have no session, so this.clients.get filters them naturally.
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        // The dedupe key is claimed SYNCHRONOUSLY, ahead of the opt-out read:
+        // procs repeat, and a check inside the enqueue would fire one db read
+        // per proc while all but one card is provably discarded (a same-tick
+        // burst would even pass a plain pre-check together). Claimed = this
+        // proc owns the TTL window; the enqueue then carries a null key.
+        const { accountId, name } = s;
+        if (!claimDedupeKey(`masterwork:${accountId}`, now)) continue;
+        const profileUrl = this.profileUrlFor(name);
+        const itemName = ITEMS[ev.itemId]?.name ?? ev.itemId;
+        void getDeedBroadcasts(accountId)
+          .then((enabled) => {
+            if (!enabled) return;
+            enqueueActivity(
+              {
+                kind: 'masterwork',
+                accountIds: [accountId],
+                names: [name],
+                realm: REALM,
+                profileUrl,
+                itemName,
+              },
+              null,
+              now,
+            );
+          })
+          .catch((err) => {
+            // The claim gated work that FAILED: release it, or one db blip
+            // silently drops this account's cards for the whole TTL. The
+            // claim stamp rides along so a LATE rejection cannot delete a
+            // window a newer claimant owns, and the release re-stamps with
+            // a short retry backoff rather than deleting outright (R60).
+            releaseDedupeKey(`masterwork:${accountId}`, now);
+            console.error('masterwork activity failed:', err);
+          });
       } else if (ev.type === 'duelEnd') {
         const w = this.sessionByName(ev.winnerName);
         const l = this.sessionByName(ev.loserName);
@@ -6704,6 +10057,24 @@ export class GameServer {
     }
   }
 
+  // Every pid whose throttled `bg` readout a respawn in this batch invalidated:
+  // the full membership of each respawning fighter's match, since the readout
+  // carries the match-wide `dead` column (see BG_RESPAWN_EVENT). Returns null
+  // when no respawn in the batch belongs to a match, so the ordinary batch pays
+  // one type comparison per event and allocates nothing.
+  private bgRespawnRefreshPids(events: SimEvent[]): Set<number> | null {
+    let pids: Set<number> | null = null;
+    for (const ev of events) {
+      if (ev.type !== BG_RESPAWN_EVENT || ev.pid === undefined) continue;
+      const match = this.sim.bgMatchFor(ev.pid);
+      if (!match) continue;
+      pids ??= new Set<number>();
+      for (const p of match.teams[0]) pids.add(p);
+      for (const p of match.teams[1]) pids.add(p);
+    }
+    return pids;
+  }
+
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
@@ -6744,6 +10115,13 @@ export class GameServer {
     // tracking context and never the event; the once-per-batch flair stamp above is the
     // only event mutation and correctly precedes this serialization.
     const fragments = serializeEventFragments(events);
+    // Resolved once per batch, applied per session below against that session's
+    // ANCHOR pid (so a spectator watching a fighter refreshes with them).
+    const bgRespawnRefresh = this.bgRespawnRefreshPids(events);
+    // A pet acts for its owner, so combat-event delivery resolves each side to
+    // its controller before comparing against the viewer or viewer party.
+    const ownerOf = (entityId: number): number | null =>
+      this.sim.entities.get(entityId)?.ownerId ?? null;
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -6760,12 +10138,15 @@ export class GameServer {
           anchorPid = target.pid;
           anchorPos = targetEntity.pos;
         }
+        // A wave raised somebody in this session's match: the match-wide `dead`
+        // column just changed for everyone, not only the fighter who stood up.
+        if (bgRespawnRefresh?.has(anchorPid)) session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty)) continue;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -6819,6 +10200,19 @@ export class GameServer {
               // force it fresh next snapshot instead of leaving the Arena
               // window showing the pre-match rating for up to 10s.
               if (ev.type === 'arenaEnd') session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+              // Same staleness fix for the Thornhollow Fields readout: queue churn,
+              // match lifecycle, and flag plays refresh `bg` next snapshot.
+              if (BG_WIRE_RESET_EVENTS.has(ev.type))
+                session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+              // A sticky /bg must not outlive the match it belongs to. The
+              // party precedent this channel copies is not equivalent: a party
+              // disband is occasional, a battleground ending is CERTAIN, so
+              // leaving the stickiness set would route the next plain line of
+              // every fighter after every match into "You are not in a
+              // battleground." Drop back to say, and only from bg.
+              if (ev.type === 'bgEnd' && session.rememberedChat.channel === 'battleground') {
+                this.rememberChatChannel(session, { channel: 'say' });
+              }
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
               if (
@@ -6985,6 +10379,18 @@ export class GameServer {
       this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
       return null;
     }
+    // The spawn-control dev commands (spawn/despawn/killtarget) are staff-only
+    // even where ALLOW_DEV_COMMANDS is on: on a shared PBE realm any tester may
+    // self-serve gear and travel, but conjuring or deleting mobs reshapes the
+    // world every other tester is standing in. The client hides the Spawns tab
+    // for non-staff; this is the authoritative check behind that advert.
+    if (
+      /^\/(?:dev\s+(?:spawn|despawn|killtarget)|devspawn|devdespawn|devkilltarget)\b/i.test(text) &&
+      !session.isAdmin
+    ) {
+      this.sendChatNotice(session, '[dev] Spawn controls require an administrator account.');
+      return null;
+    }
     if (!text.startsWith('/')) {
       const body = text;
       if (!body.trim()) return null;
@@ -7016,6 +10422,11 @@ export class GameServer {
           return this.sim.chat(`/w ${session.rememberedChat.target} ${body}`, pid);
         case 'party':
           return this.sim.chat(`/p ${body}`, pid);
+        // Sticky like every other channel. Out of a match the sim answers with
+        // its own "not in a battleground" refusal, the same way a plain line
+        // sticky to party does once the party is gone.
+        case 'battleground':
+          return this.sim.chat(`/bg ${body}`, pid);
         case 'general':
           return this.sim.chat(`/general ${body}`, pid);
         case 'world':
@@ -7032,12 +10443,20 @@ export class GameServer {
     const sent = this.sim.chat(text, pid);
     if (sent) {
       if (sent.channel === 'whisper') {
-        if (sent.target) session.rememberedChat = { channel: 'whisper', target: sent.target };
+        if (sent.target) {
+          this.rememberChatChannel(session, { channel: 'whisper', target: sent.target });
+        }
       } else {
-        session.rememberedChat = { channel: sent.channel };
+        this.rememberChatChannel(session, { channel: sent.channel });
       }
     }
     return sent;
+  }
+
+  /** Every sticky-channel write advances the fence the async General path checks. */
+  private rememberChatChannel(session: ClientSession, value: RememberedChat): void {
+    session.chatChannelSequence++;
+    session.rememberedChat = value;
   }
 
   private logChat(session: ClientSession, sent: import('../src/sim/sim').SentChat | null): void {
@@ -7050,6 +10469,40 @@ export class GameServer {
       channel: sent.channel,
       message: sent.message,
     });
+  }
+
+  private admitGeneralChat(
+    session: ClientSession,
+    canonicalText: string,
+    channelSequence: number,
+  ): void {
+    // Capture the whole authority context before the await. A reconnect
+    // changes ws, a leave changes membership, and any newer channel selection
+    // advances chatChannelSequence, so no stale completion can broadcast or
+    // rewrite the sticky channel a later command chose. Resolution semantics
+    // (refunds, dropped accounting, refusal events) live in the quota module.
+    const { accountId, characterId, pid, ws } = session;
+    void resolveGeneralChatAdmission(
+      this.generalChatQuota.admit(accountId, session.generalChatRateLimit),
+      {
+        sessionCurrent: () =>
+          !session.left &&
+          !session.linkdead &&
+          this.clients.get(pid) === session &&
+          session.ws === ws &&
+          session.characterId === characterId,
+        refundChatToken: () => this.refundChatToken(session),
+        deliver: () => {
+          const sent = this.sim.chat(canonicalText, pid);
+          if (sent && session.chatChannelSequence === channelSequence) {
+            this.rememberChatChannel(session, { channel: 'general' });
+          }
+          this.logChat(session, sent);
+        },
+        notify: (event) => this.send(session, { t: 'events', list: [event] }),
+        recordOutcome: (outcome) => gameMetricsCounters().generalChatQuota(outcome),
+      },
+    );
   }
 
   // One-off, player-facing chat notice (reuses the generic error event path the
@@ -7082,29 +10535,77 @@ export class GameServer {
     this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
   }
 
-  // Fan a non-retro marquee deed unlock out to the earner's online guildmates
-  // and followers unless the account opted out (accounts.deed_broadcasts).
-  // Fire-and-forget off the loop (the daily-reward observer pattern): the
-  // opt-out read and the audience resolution are async DB work the tick never
-  // awaits, and a failure logs without touching gameplay. The earner's own
-  // toast is client-side from the sim event; no frame is sent to them here.
-  private maybeBroadcastDeedUnlock(session: ClientSession, deedId: string): void {
+  // Fan a non-retro deed unlock out to its two audiences, the earner's online
+  // guildmates and followers (marquee deeds) and the Discord activity feed
+  // (title + border deeds and the first koi, via discordFeedDeed's
+  // fail-closed gate),
+  // unless the account opted out (accounts.deed_broadcasts, ONE read serving
+  // both audiences; a Discord post is a wider audience than the guild marquee,
+  // so the opt-out covers it a fortiori). Fire-and-forget off the loop (the
+  // daily-reward observer pattern): the opt-out read and the audience
+  // resolution are async DB work the tick never awaits, and a failure logs
+  // without touching gameplay. The earner's own toast is client-side from the
+  // sim event; no frame is sent to them here. Session identity is captured
+  // BEFORE the await so a leave between tick and resolution changes nothing.
+  private fanOutDeedUnlock(session: ClientSession, deedId: string, now: number): void {
     const def = DEEDS[deedId];
-    if (!def || !isMarqueeDeed(def)) return;
+    if (!def) return;
     // Hidden deeds are invisible until earned, EXISTENCE included (the
     // deeds_records contract every third-party surface honors): a reward can
     // make one marquee, but the fan-out would hand its id and name to viewers
-    // who have not earned their own copy.
-    if (isHiddenDeedId(deedId)) return;
-    void getDeedBroadcasts(session.accountId)
+    // who have not earned their own copy. discordFeedDeed applies the same
+    // contract fail-closed for the feed card.
+    const marquee = isMarqueeDeed(def) && !isHiddenDeedId(deedId);
+    const feed = discordFeedDeed(deedId);
+    if (!marquee && !feed) return;
+    const { accountId, characterId, name } = session;
+    const profileUrl = this.profileUrlFor(name);
+    void getDeedBroadcasts(accountId)
       .then((enabled) => {
         if (!enabled) return;
-        return this.social.broadcastDeedUnlock(
-          { characterId: session.characterId, name: session.name },
-          deedId,
-        );
+        if (feed) {
+          enqueueActivity(
+            {
+              kind: 'deed',
+              accountIds: [accountId],
+              names: [name],
+              realm: REALM,
+              profileUrl,
+              deedId,
+              ...feed,
+            },
+            `deed:${accountId}:${deedId}`,
+            now,
+          );
+        }
+        if (marquee) {
+          return this.social.broadcastDeedUnlock({ characterId, name }, deedId);
+        }
       })
       .catch((err) => console.error('deed broadcast failed:', err));
+  }
+
+  // Fan a non-retro FIRST-EVER Reliquary page Illumination out to the
+  // earner's online guildmates and followers, the fanOutDeedUnlock marquee
+  // audience; there is no Discord feed arm for illuminations. Fail-closed on
+  // the page id (the isPubliclyListableDeedId reasoning): production runs a
+  // mixed-version fleet, so a NEWER page's id can reach an older process, and
+  // broadcasting it would hand viewers an id their catalog cannot place. The
+  // accounts.deed_broadcasts flag is the ONE social-broadcast consent
+  // surface, so the opt-out covers this broadcast exactly as it covers deed
+  // marquees. Fire-and-forget off the loop (the fanOutDeedUnlock pattern):
+  // session identity is captured BEFORE the await so a leave between tick and
+  // resolution changes nothing, a failure logs without touching gameplay, and
+  // the earner's own banner is client-side from the sim event.
+  private fanOutIllumination(session: ClientSession, pageId: string): void {
+    if (!Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId)) return;
+    const { accountId, characterId, name } = session;
+    void getDeedBroadcasts(accountId)
+      .then((enabled) => {
+        if (!enabled) return;
+        return this.social.broadcastIllumination({ characterId, name }, pageId);
+      })
+      .catch((err) => console.error('illumination broadcast failed:', err));
   }
 
   private sendDailyRewardPointsGained(session: ClientSession, points: number): void {
@@ -7233,6 +10734,10 @@ export class GameServer {
       });
     }
     return false;
+  }
+
+  private refundChatToken(session: ClientSession): void {
+    session.chatTokens = Math.min(CHAT_RATE_BURST, session.chatTokens + 1);
   }
 
   private isChatMuted(session: ClientSession): boolean {

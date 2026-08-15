@@ -33,6 +33,15 @@ export interface VcupBriefingPlayer {
 export interface VcupBriefingView {
   /** True only while cupInfo.match.phase === 'briefing'. */
   visible: boolean;
+  /** False for practice and bot-backfilled bouts: the rules panel then shows
+   *  an unrated note. Structural (fixed at match creation), so it lives in
+   *  the sig. */
+  rated: boolean;
+  /** True only for a private practice bout: the unrated note then uses the
+   *  blanket practice copy (no Cup deed credits at all, debut included),
+   *  instead of the backfill copy that names only the skill deeds. Structural,
+   *  in the sig. */
+  practice: boolean;
   nationA: VcNationId;
   nationB: VcNationId;
   awayPalette: boolean;
@@ -60,6 +69,8 @@ export interface VcupBriefingView {
 
 const INACTIVE: VcupBriefingView = {
   visible: false,
+  rated: true,
+  practice: false,
   nationA: 'vale',
   nationB: 'vale',
   awayPalette: false,
@@ -100,13 +111,23 @@ export function buildVcupBriefingView(info: CupInfo | null): VcupBriefingView {
   const kit = SPORT_KITS[myRole ?? 'allrounder'].map((abilityId) => ({ abilityId }));
   const format = Math.max(teamA.length, teamB.length);
 
-  // Structural, language-independent identity: nations, my side/role, and the
-  // per-fighter pid/name/role/me/bot. The moving parts (briefingLeft, every
-  // `ready` flag, iAmReady) are intentionally excluded so they ride elided
-  // writes instead of forcing a skeleton rebuild.
+  // Version-skew guards, both failing SAFE: an older server readout without
+  // these fields must not claim a rated bout is unrated (absent rated stays
+  // true) and must not claim practice (absent practice stays false, the
+  // milder backfill copy).
+  const rated = m.rated !== false;
+  const practice = m.practice === true;
+
+  // Structural, language-independent identity: rated and practice (fixed at
+  // match creation; they pick the unrated-note row and its copy), nations, my
+  // side/role, and the per-fighter pid/name/role/me/bot. The moving parts
+  // (briefingLeft, every `ready` flag, iAmReady) are intentionally excluded so
+  // they ride elided writes instead of forcing a skeleton rebuild.
   const skel = (players: typeof m.teamA): unknown[] =>
     players.map((p) => [p.pid, p.name, p.role, p.me ? 1 : 0, p.bot ? 1 : 0]);
   const sig = JSON.stringify([
+    rated ? 1 : 0,
+    practice ? 1 : 0,
     m.nationA,
     m.nationB,
     m.awayPalette ? 1 : 0,
@@ -119,6 +140,8 @@ export function buildVcupBriefingView(info: CupInfo | null): VcupBriefingView {
 
   return {
     visible: true,
+    rated,
+    practice,
     nationA: m.nationA,
     nationB: m.nationB,
     awayPalette: m.awayPalette,

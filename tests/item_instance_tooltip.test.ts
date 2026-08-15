@@ -321,8 +321,8 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
 // output lands on a non-junk kind. If either side ever drifts (a junk-kind
 // recipe output, a gathered material moved off 'junk'), the wording of its
 // signed copies silently flips, so both sides are pinned against the live
-// content tables. Fish are out of scope by construction: they share kind
-// 'food' with crafted meals but fishing never signs a catch.
+// content tables. Raw fishing catches are also kind junk (cooking reagents)
+// but fishing never signs a catch, so they stay out of the signed partition.
 describe('isGatheredProvenanceKind partition over the live content', () => {
   it('every signable gathered item id resolves to a gathered-kind def', () => {
     const gatheredIds = [

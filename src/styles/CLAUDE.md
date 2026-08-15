@@ -61,8 +61,8 @@ the throw (#2499, #2502).
   `translateX(-50%)` drags the window half offscreen; `tests/mobile_window_transform.test.ts`).
   Literal mobile layout values are pinned by `tests/mobile_window_layout.test.ts` and
   `tests/fct_mobile_css.test.ts`.
-- **Bug fixes are test-first:** a failing test that reproduces the bug (the guard tests
-  above take new pins), then the smallest change that turns it green.
+- **Bug fixes are test-first** (root `CLAUDE.md` owns the workflow); the guard tests above
+  are where the new pins land.
 
 ## Token system + NO magic values in painters
 - **Tokens, not literals.** Colors, accents, and tunables live as `--color-*` / `--fx-*`
@@ -70,11 +70,17 @@ the throw (#2499, #2502).
   CSS vars and NEVER hard-codes a hex/px/color in TS; thresholds and cadences (the
   100/250/500ms frame dividers, breakpoints) are named constants. The 2D-CANVAS painters
   (`map`/`minimap`/`delve`) resolve `--color-*` via `getComputedStyle` and CACHE the result
-  (a 2D context can only read a CSS var this way; the minimap caches for the whole session,
-  with a documented hook to invalidate on a future theme/contrast toggle), never per-marker.
+  (a 2D context can only read a CSS var this way), never per-marker. The minimap's vector
+  palette remains session-cached with its documented future invalidation hook. Separately,
+  `MapMarkerArtCache` re-samples its baked-sprite tokens on coalesced theme and forced-colors
+  signals, then re-rasterizes only if a token value changed, never from a painter redraw.
   Documented exceptions: `nameplate_painter` is positioned DOM divs that move pre-existing
-  renderer hex literals verbatim (not tokens); `arena_window` renders DOM from the
-  stylesheet, not canvas. Guarded by the per-painter no-magic source scans (e.g.
+  renderer hex literals verbatim (not tokens); `deed_border_view.ts` is the sanctioned home
+  of the Book of Deeds border accent colors, because the nameplate canvas cannot read a
+  custom property per plate per frame, and the portrait ring receives those same literals
+  through the painter rather than duplicating them in `hud.css`
+  (`tests/deed_border_accent.test.ts` pins the single source); `arena_window` renders DOM
+  from the stylesheet, not canvas. Guarded by the per-painter no-magic source scans (e.g.
   `tests/auras_painter.test.ts`, `tests/minimap_painter.test.ts`,
   `tests/action_bar_painter.test.ts`) and `tests/focus_visible_guard.test.ts`; there is no
   single central no-magic guard, each migrated painter scans its own source.

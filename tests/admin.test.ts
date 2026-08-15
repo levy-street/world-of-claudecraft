@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layers so no Postgres is needed; the router logic is under test.
 vi.mock('../server/db', () => ({
+  DATABASE_URL: 'postgres://test:test@127.0.0.1:1/test',
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   findAccount: vi.fn(),
   touchLogin: vi.fn(),
@@ -31,10 +32,17 @@ vi.mock('../server/admin_db', async () => {
     listSharedIps: vi.fn(),
     accountDetail: vi.fn(),
     associationsForIp: vi.fn(),
+    characterProfessionsRow: vi.fn(),
     clientPerfSummary: vi.fn(),
     clientPerfRaw: vi.fn(),
   };
 });
+vi.mock('../server/admin_guilds_db', () => ({
+  listAdminGuilds: vi.fn(),
+  adminGuildDetail: vi.fn(),
+  listAdminGuildHistory: vi.fn(),
+  renameAdminGuild: vi.fn(),
+}));
 vi.mock('../server/auth', () => ({
   verifyPassword: vi.fn(async () => false),
   newToken: vi.fn(() => 'b'.repeat(64)),
@@ -42,8 +50,12 @@ vi.mock('../server/auth', () => ({
   MIN_PASSWORD_LENGTH: 6,
   MAX_PASSWORD_LENGTH: 128,
 }));
+vi.mock('../server/account', () => ({
+  verifyLoginTwoFactor: vi.fn(async () => false),
+}));
 vi.mock('../server/moderation_db', () => ({
   forceCharacterRename: vi.fn(),
+  recordProfessionsRestore: vi.fn(),
   moderationQueue: vi.fn(),
   moderationReportsForAccount: vi.fn(),
   ignoreReport: vi.fn(),
@@ -85,15 +97,20 @@ vi.mock('../server/staff_db', () => ({
   roleChangeHistory: vi.fn(async () => []),
 }));
 
+import { verifyLoginTwoFactor } from '../server/account';
 import {
   configureAdminPlayersCap,
   handleAdminApi,
   parsePageParams,
+  resetAdminGeneralChatRateLimitDepsForTests,
   resetAdminPlayersCapForTests,
+  setAdminGeneralChatRateLimitDepsForTests,
 } from '../server/admin';
+import { resetAdminActivityCacheForTests } from '../server/admin_activity_cache';
 import {
   accountDetail,
   associationsForIp,
+  characterProfessionsRow,
   clientPerfRaw,
   clientPerfSummary,
   escapeLike,
@@ -104,6 +121,13 @@ import {
   overviewCounts,
   type PerfRawRow,
 } from '../server/admin_db';
+import {
+  adminGuildDetail,
+  listAdminGuildHistory,
+  listAdminGuilds,
+  renameAdminGuild,
+} from '../server/admin_guilds_db';
+import { resetAdminGuildListReadsForTests } from '../server/admin_guilds_read';
 import { resetOverviewCacheForTests } from '../server/admin_overview_cache';
 import { hashPassword, verifyPassword } from '../server/auth';
 import type { CalibrationHistogram, SuspiciousPlayer } from '../server/bot_detector/contract';
@@ -137,9 +161,11 @@ import {
   muteAccountChat,
   reactivateAccountAudited,
   recordPasswordReset,
+  recordProfessionsRestore,
   resetChatStrikesAudited,
 } from '../server/moderation_db';
-import { resetAuthFailures } from '../server/ratelimit';
+import { resetModerationQueueCacheForTests } from '../server/moderation_queue_cache';
+import { authFailureCount, resetAuthFailures } from '../server/ratelimit';
 import {
   adminRolesForAccount,
   listStaff,
@@ -221,25 +247,45 @@ const fakeGameState = {
     histograms: [] as CalibrationHistogram[],
   })),
   liveAccountIds: () => new Set([9]),
+  liveCharacterIds: () => new Set([8]),
   liveSharedIps: vi.fn<() => LiveSharedIp[]>(() => []),
   disconnectAccount: vi.fn(),
   muteAccountChat: vi.fn(),
   reloadChatFilter: vi.fn(async () => {}),
   liftChatMuteLive: vi.fn(),
   resetChatStrikesLive: vi.fn(),
+  applyGeneralChatRateLimitLive: vi.fn(),
   isIpBlocked: vi.fn(() => false),
   reloadBlockedIps: vi.fn(async () => {}),
   disconnectByIp: vi.fn(),
+  // The guild bank operator read (the legacy ladder arm of
+  // GET /admin/api/guilds/:id/bank). Null is "no loaded book" for that guild.
+  adminGuildBankState: vi.fn((_guildId: number): Record<string, unknown> | null => null),
+  adminCharacterState: vi.fn((): Record<string, unknown> | null => ({})),
+  adminCharacterOnline: vi.fn(() => true),
+  adminRestoreItem: vi.fn((): 'ok' | 'offline' | 'invalid_item' => 'ok'),
+  adminRestoreToolEffectSlot: vi.fn(
+    (): 'ok' | 'offline' | 'invalid_request' | 'no_tool' | 'already_slotted' => 'ok',
+  ),
+  social: { guildRenamed: vi.fn() },
 };
 const fakeGame = fakeGameState as typeof fakeGameState & Parameters<typeof handleAdminApi>[2];
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // The overview branch reads through the shared TTL memo (admin_overview_cache),
-  // whose refresh IS the mocked overviewCounts here; start every test cold so one
-  // test's cached value never leaks into the next.
+  // The overview/activity/moderation-queue branches all read through shared TTL
+  // memos whose refresh IS the mocked admin_db/moderation_db function here; start
+  // every test cold so one test's cached value never leaks into the next.
   resetOverviewCacheForTests();
+  resetAdminActivityCacheForTests();
+  resetModerationQueueCacheForTests();
+  resetAdminGuildListReadsForTests();
   resetAdminPlayersCapForTests();
+  resetAdminGeneralChatRateLimitDepsForTests();
+  setAdminGeneralChatRateLimitDepsForTests({
+    set: async (input) => ({ before: null, after: input.rateLimit, changed: true }),
+    isAdminAccount: async () => false,
+  });
   // The per-account failed-login throttle (server/ratelimit.ts) is real, module-level
   // state; reset it so one test's failures never leak into the next.
   resetAuthFailures();
@@ -585,8 +631,40 @@ describe('admin api auth', () => {
       fakeGame,
     );
 
-    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 50);
+    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 50, 'id', 'desc');
     expect(res.statusCode).toBe(200);
+  });
+
+  it('passes an allowlisted sort/dir through to the accounts query and rejects a bogus column', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(listAccounts).mockResolvedValue({ rows: [], total: 0, page: 1, limit: 25 });
+
+    const sorted = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/accounts?sort=character_count&dir=asc',
+      }),
+      sorted,
+      fakeGame,
+    );
+    expect(sorted.statusCode).toBe(200);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'character_count', 'asc');
+
+    vi.mocked(listAccounts).mockClear();
+    const bogus = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/accounts?sort=id;%20DROP%20TABLE%20accounts&dir=asc',
+      }),
+      bogus,
+      fakeGame,
+    );
+    expect(bogus.statusCode).toBe(200);
+    // An unrecognized sort column falls back to the safe default, never the raw value.
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'id', 'desc');
   });
 
   it('passes pagination, search, and sorting through to the characters query', async () => {
@@ -895,6 +973,11 @@ describe('admin api auth', () => {
   it('serves the moderation queue to admins with online account context', async () => {
     vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
+    // moderation_queue_cache.ts's base read is online-blind by design (see its
+    // header): the underlying moderationQueue is always called with an EMPTY
+    // set, and the live online status (fakeGameState.liveAccountIds => Set([9])
+    // below) is merged in afterward, never baked into what moderationQueue
+    // itself returns.
     vi.mocked(moderationQueue).mockResolvedValue([
       {
         accountId: 9,
@@ -906,7 +989,7 @@ describe('admin api auth', () => {
         latestReportAt: new Date().toISOString(),
         latestReason: 'spam',
         characterNames: ['Badactor'],
-        online: true,
+        online: false,
       },
     ]);
     const res = fakeRes();
@@ -918,8 +1001,11 @@ describe('admin api auth', () => {
     );
 
     expect(res.statusCode).toBe(200);
-    expect(moderationQueue).toHaveBeenCalledWith(new Set([9]));
+    expect(moderationQueue).toHaveBeenCalledWith(new Set());
     expect(res.body.data.rows[0].openReports).toBe(4);
+    // fakeGameState.liveAccountIds() returns Set([9]) (below), so the cache's
+    // live merge marks account 9 online even though the base row was not.
+    expect(res.body.data.rows[0].online).toBe(true);
   });
 
   it('serves perf summaries and raw rows through existing admin auth', async () => {
@@ -938,6 +1024,7 @@ describe('admin api auth', () => {
         avgEffectiveRenderScale: 0.9,
       },
       byPreset: [],
+      byGfxTier: [],
       byGpu: [],
       byBrowser: [],
       byOs: [],
@@ -993,9 +1080,11 @@ describe('admin api auth', () => {
       chatMutedUntil: null,
       chatMuteReason: '',
       chatStrikes: 0,
+      generalChatRateLimit: null,
       isAi: false,
       isStreamer: false,
       streamerLinks: {},
+      cheaterMark: null,
       lastLoginIp: null,
       playtimeSeconds: 0,
       characters: [],
@@ -1016,7 +1105,7 @@ describe('admin api auth', () => {
     expect(res.body.data.account.online).toBe(true);
   });
 
-  it('includes the in-memory online state in account detail without another query', async () => {
+  it('includes the in-memory online state and General chat policy in account detail', async () => {
     vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(accountDetail).mockResolvedValue({
@@ -1031,9 +1120,11 @@ describe('admin api auth', () => {
       chatMutedUntil: null,
       chatMuteReason: '',
       chatStrikes: 0,
+      generalChatRateLimit: null,
       isAi: false,
       isStreamer: false,
       streamerLinks: {},
+      cheaterMark: null,
       lastLoginIp: null,
       playtimeSeconds: 0,
       characters: [],
@@ -1050,6 +1141,7 @@ describe('admin api auth', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body.data.online).toBe(true);
+    expect(res.body.data.generalChatRateLimit).toBeNull();
     expect(accountDetail).toHaveBeenCalledWith(9);
   });
 
@@ -1270,6 +1362,219 @@ describe('admin api auth', () => {
       9,
       'A moderator requires one of your characters to be renamed.',
     );
+  });
+});
+
+describe('legacy guild administration parity', () => {
+  function authenticate(roles: string[] = ['superadmin']): void {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'admin', roles } as never);
+  }
+
+  it('serves list, detail, and retained history with the legacy response shapes', async () => {
+    authenticate();
+    vi.mocked(listAdminGuilds).mockResolvedValue({
+      rows: [{ id: 4, name: 'Keepers' }],
+      total: 1,
+      page: 2,
+      limit: 10,
+    } as never);
+    vi.mocked(adminGuildDetail).mockResolvedValue({
+      guild: { id: 4, name: 'Keepers' },
+      members: [{ characterId: 8, characterName: 'Alice' }],
+    } as never);
+    vi.mocked(listAdminGuildHistory).mockResolvedValue([
+      { id: 1, oldName: 'Old Name', newName: 'Keepers' },
+    ] as never);
+
+    const list = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/guilds?search=Keep&page=2&limit=10&sort=created_at&dir=desc',
+      }),
+      list,
+      fakeGame,
+    );
+    expect(list.statusCode).toBe(200);
+    expect(listAdminGuilds).toHaveBeenCalledWith('Keep', 2, 10, 'created_at', 'desc');
+
+    const detail = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4' }),
+      detail,
+      fakeGame,
+    );
+    expect(detail.body.data.members).toEqual([
+      { characterId: 8, characterName: 'Alice', online: true },
+    ]);
+
+    const historyResponse = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/history' }),
+      historyResponse,
+      fakeGame,
+    );
+    expect(historyResponse.body.data).toEqual({
+      rows: [{ id: 1, oldName: 'Old Name', newName: 'Keepers' }],
+    });
+  });
+
+  it('serves the guild bank operator read, and 404s a guild whose book is not loaded', async () => {
+    // The LEGACY arm of GET /admin/api/guilds/:id/bank (its RouteDef twin is
+    // covered in tests/server/admin.test.ts). Both run one shared body, so what
+    // this proves is that the ladder reaches it at all and answers the same
+    // envelope: a route present only in the RouteDef table would 404 here for
+    // every operator running with API_DISPATCH=legacy.
+    authenticate();
+    const state = {
+      treasury: 12_345,
+      capacity: 30,
+      purchasedSlots: 30,
+      usedSlots: 1,
+      dormantSlots: 1,
+      slots: [{ index: 0, itemId: 'final_argument_greatblade', count: 1, dormant: true }],
+    };
+    fakeGameState.adminGuildBankState.mockReturnValueOnce(state);
+
+    const loaded = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      loaded,
+      fakeGame,
+    );
+    expect(fakeGameState.adminGuildBankState).toHaveBeenCalledWith(4);
+    expect(loaded.statusCode).toBe(200);
+    expect(loaded.body.data).toEqual({ guildId: 4, ...state });
+
+    fakeGameState.adminGuildBankState.mockReturnValueOnce(null);
+    const missing = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      missing,
+      fakeGame,
+    );
+    expect(missing.statusCode).toBe(404);
+    expect(missing.body.error).toBe('that guild has no loaded bank');
+  });
+
+  it('denies the guild bank read to a role without moderation.read', async () => {
+    // The central fail-closed gate runs before the ladder arm, so the live sim
+    // is never read for an operator who may not see a guild's property.
+    authenticate(['support-only-unknown-role']);
+    const denied = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/bank' }),
+      denied,
+      fakeGame,
+    );
+    expect(denied.statusCode).toBe(403);
+    expect(fakeGameState.adminGuildBankState).not.toHaveBeenCalled();
+  });
+
+  it('returns 503 before a third distinct legacy member-count read can occupy the pool', async () => {
+    authenticate();
+    const resolvers: Array<
+      (value: { rows: never[]; total: number; page: number; limit: number }) => void
+    > = [];
+    vi.mocked(listAdminGuilds).mockImplementation(
+      async (_search, _page, _limit) =>
+        new Promise<{ rows: never[]; total: number; page: number; limit: number }>((resolve) => {
+          resolvers.push(resolve);
+        }) as never,
+    );
+
+    const firstResponse = fakeRes();
+    const first = handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?sort=member_count&page=1' }),
+      firstResponse,
+      fakeGame,
+    );
+    const secondResponse = fakeRes();
+    const second = handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?sort=member_count&page=2' }),
+      secondResponse,
+      fakeGame,
+    );
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(2));
+
+    const rejected = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?sort=member_count&page=3' }),
+      rejected,
+      fakeGame,
+    );
+    expect(rejected.statusCode).toBe(503);
+    expect(rejected.body).toEqual({
+      success: false,
+      data: null,
+      error: 'guild list busy, try again',
+    });
+    expect(listAdminGuilds).toHaveBeenCalledTimes(2);
+
+    // The admission control exists for the aggregating sort, so the default
+    // name-sorted directory must still load while that class is saturated.
+    const directoryResponse = fakeRes();
+    const directory = handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=1' }),
+      directoryResponse,
+      fakeGame,
+    );
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(3));
+
+    resolvers.forEach((resolve, index) => {
+      resolve({ rows: [], total: 0, page: index + 1, limit: 25 });
+    });
+    await directory;
+    expect(directoryResponse.statusCode).not.toBe(503);
+    await Promise.all([first, second]);
+  });
+
+  it('renames through the legacy arm and denies a viewer before the write', async () => {
+    authenticate();
+    vi.mocked(renameAdminGuild).mockResolvedValue({
+      result: {
+        guildId: 4,
+        oldName: 'Old Name',
+        newName: 'Keepers',
+        memberCharacterIds: [8],
+      },
+    });
+
+    const renamed = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/guilds/4/rename',
+        body: { name: 'Keepers', reason: 'offensive name' },
+      }),
+      renamed,
+      fakeGame,
+    );
+    expect(renamed.statusCode).toBe(200);
+    expect(renameAdminGuild).toHaveBeenCalledWith(4, 'Keepers', 'offensive name', 7);
+    expect(fakeGame.social.guildRenamed).toHaveBeenCalledWith(4, 'Old Name', 'Keepers', [8]);
+
+    vi.mocked(renameAdminGuild).mockClear();
+    vi.mocked(adminRolesForAccount).mockResolvedValueOnce({
+      username: 'admin',
+      roles: ['viewer'],
+    });
+    const denied = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/guilds/4/rename',
+        body: { name: 'Denied Name', reason: 'reason' },
+      }),
+      denied,
+      fakeGame,
+    );
+    expect(denied.statusCode).toBe(403);
+    expect(renameAdminGuild).not.toHaveBeenCalled();
   });
 });
 
@@ -1541,9 +1846,11 @@ describe('admin api chat filter', () => {
       chatMutedUntil: null,
       chatMuteReason: '',
       chatStrikes: 0,
+      generalChatRateLimit: null,
       isAi: false,
       isStreamer: false,
       streamerLinks: {},
+      cheaterMark: null,
       lastLoginIp: null,
       playtimeSeconds: 0,
       characters: [],
@@ -2258,6 +2565,122 @@ describe('admin login: per-account failed-login throttle (distributed brute forc
   });
 });
 
+// Regression coverage for BUG #15: the legacy handleLogin arm verified only
+// password + staff role and skipped the account's TOTP second factor entirely
+// (unlike POST /api/login, server/auth_routes.ts loginHandler), so an operator
+// with 2FA enabled could sign into the highest-privilege surface in the app
+// with a bare password.
+describe('admin login: two-factor', () => {
+  it('returns twoFactorRequired without a token when 2FA is on and no code is supplied', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2020-01-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({ twoFactorRequired: true });
+    expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+  });
+
+  it('401s an invalid 2FA code and records a failure', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2020-01-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    vi.mocked(verifyLoginTwoFactor).mockResolvedValueOnce(false);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw', code: '000000' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(401);
+    expect(res.body.error).toBe('invalid authentication code');
+    expect(authFailureCount()).toBe(1);
+  });
+
+  it('200s and issues a token for a good 2FA code', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2020-01-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    vi.mocked(verifyLoginTwoFactor).mockResolvedValueOnce(true);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw', code: '123456' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({
+      token: 'b'.repeat(64),
+      username: 'alice',
+      roles: ['viewer'],
+      permissions: expect.arrayContaining(['analytics.read', 'support.read', 'accounts.read']),
+    });
+  });
+
+  it('never challenges a staff account without 2FA enabled (no regression)', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect((res.body.data as { token?: string }).token).toBe('b'.repeat(64));
+    expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+  });
+});
+
 describe('staff role change live effects', () => {
   const postRoles = (body: unknown) =>
     fakeReq({ method: 'POST', token: VALID_TOKEN, url: '/admin/api/staff/roles', body });
@@ -2300,5 +2723,238 @@ describe('staff role change live effects', () => {
 
     expect(res.statusCode).toBe(200);
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
+  });
+});
+
+describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
+  beforeEach(() => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+  });
+
+  it('serves the professions inspector through the legacy arm', async () => {
+    vi.mocked(characterProfessionsRow).mockResolvedValue({
+      id: 42,
+      name: 'Merlin',
+      class: 'mage',
+      level: 12,
+      accountId: 9,
+      username: 'alice',
+      state: { gatheringProficiency: { mining: 5 } },
+      updatedAt: '2026-06-01T00:00:00Z',
+    });
+    vi.mocked(fakeGame.adminCharacterState).mockReturnValue(null);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/characters/42/professions' }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.name).toBe('Merlin');
+    expect(res.body.data.live).toBe(false);
+    expect(res.body.data.gathering).toContainEqual({ professionId: 'mining', proficiency: 5 });
+  });
+
+  it('restore-item audits FIRST then mints, mirroring the RouteDef arm', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    vi.mocked(fakeGame.adminRestoreItem).mockReturnValue('ok');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-item',
+        body: { itemId: 'copper_mining_pick', count: 2, reason: 'lost to a bug' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 42,
+      adminAccountId: 7,
+      action: 'restore_item',
+      detail: 'copper_mining_pick x2',
+      reason: 'lost to a bug',
+    });
+    expect(fakeGame.adminRestoreItem).toHaveBeenCalledWith(42, 'copper_mining_pick', 2);
+    const auditOrder = vi.mocked(recordProfessionsRestore).mock.invocationCallOrder[0];
+    const mintOrder = vi.mocked(fakeGame.adminRestoreItem).mock.invocationCallOrder[0];
+    expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('restore-slot refuses an offline character BEFORE any audit write', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(false);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-slot',
+        body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('character is not online on this realm');
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+    expect(fakeGame.adminRestoreToolEffectSlot).not.toHaveBeenCalled();
+  });
+
+  // API_DISPATCH=legacy is the one-flag production rollback, so the legacy
+  // arm needs the same behavioral coverage as the RouteDef twin: a drift
+  // here surfaces exactly during an incident.
+  it('restore-slot audits FIRST then mints, mirroring the RouteDef arm', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    vi.mocked(fakeGame.adminRestoreToolEffectSlot).mockReturnValue('ok');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-slot',
+        body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 42,
+      adminAccountId: 7,
+      action: 'restore_slot',
+      detail: 'mining/gatherers_cache',
+      reason: 'row vanished',
+    });
+    expect(fakeGame.adminRestoreToolEffectSlot).toHaveBeenCalledWith(
+      42,
+      'mining',
+      'gatherers_cache',
+    );
+    const auditOrder = vi.mocked(recordProfessionsRestore).mock.invocationCallOrder[0];
+    const mintOrder = vi.mocked(fakeGame.adminRestoreToolEffectSlot).mock.invocationCallOrder[0];
+    expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('maps every sim refusal to the SAME prose the RouteDef arm sends', async () => {
+    const cases = [
+      ['no_tool', 'the character owns no tool for that profession'],
+      ['already_slotted', 'that profession already has a slotted effect'],
+      ['invalid_request', 'that effect cannot be slotted on that profession'],
+    ] as const;
+    for (const [result, prose] of cases) {
+      vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+      vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+      vi.mocked(fakeGame.adminRestoreToolEffectSlot).mockReturnValue(result);
+      const res = fakeRes();
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          token: VALID_TOKEN,
+          url: '/admin/api/moderation/characters/42/restore-slot',
+          body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+        }),
+        res,
+        fakeGame,
+      );
+      expect(res.statusCode, result).toBe(400);
+      expect(res.body.error, result).toBe(prose);
+    }
+  });
+
+  it('refuses an invalid body with the validator prose BEFORE any audit write', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-item',
+        body: { itemId: 'copper_mining_pick', count: 25, reason: 'over the cap' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('count must be a whole number between 1 and 20');
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+
+  it('maps the post-audit offline race to its own prose (the row honestly says requested)', async () => {
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    vi.mocked(fakeGame.adminRestoreToolEffectSlot).mockReturnValue('offline');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-slot',
+        body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('character went offline before the restore landed');
+    expect(recordProfessionsRestore).toHaveBeenCalled();
+  });
+
+  it('a live snapshot suppresses the blob fetch on the legacy arm too', async () => {
+    vi.mocked(characterProfessionsRow).mockResolvedValue({
+      id: 42,
+      name: 'Merlin',
+      class: 'mage',
+      level: 12,
+      accountId: 9,
+      username: 'alice',
+      updatedAt: '2026-06-01T00:00:00Z',
+    } as never);
+    vi.mocked(fakeGame.adminCharacterState).mockReturnValue({
+      gatheringProficiency: { mining: 43.5 },
+    } as never);
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/characters/42/professions' }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.live).toBe(true);
+    expect(res.body.data.gathering).toContainEqual({ professionId: 'mining', proficiency: 43.5 });
+    // The measured point of the CASE arm: a live read must pass
+    // includeState=false so the widest TOAST column never detoasts.
+    expect(characterProfessionsRow).toHaveBeenCalledWith(42, false);
+  });
+});
+
+describe('admin api R35 restore-item invalid_item arm (LEGACY dispatch arm)', () => {
+  it('maps a runtime invalid_item to its own prose, never the offline race', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(recordProfessionsRestore).mockResolvedValue({ accountId: 9 });
+    vi.mocked(fakeGame.adminCharacterOnline).mockReturnValue(true);
+    vi.mocked(fakeGame.adminRestoreItem).mockReturnValue('invalid_item');
+    const res = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/moderation/characters/42/restore-item',
+        body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+      }),
+      res,
+      fakeGame,
+    );
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('unknown item id');
   });
 });

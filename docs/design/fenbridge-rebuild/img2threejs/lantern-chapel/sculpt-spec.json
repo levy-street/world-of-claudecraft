@@ -1,0 +1,4099 @@
+{
+  "targetName": "Fenbridge Lantern Chapel",
+  "targetId": "fenbridge-lantern-chapel",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 36,
+    "aspect": 1.78,
+    "orientation": {
+      "yaw": 35,
+      "pitch": -12,
+      "roll": 0
+    },
+    "positionHint": [8, 6, 11],
+    "note": "Orthographic-like multi-view sheet; review each admitted elevation independently and do not project baked pixels."
+  },
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 2,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "exterior-only timber chapel and archive",
+      "primaryDomain": "object",
+      "formLanguage": ["architectural", "hard-surface", "pointed-arch", "asymmetric roofline"],
+      "structureKind": [
+        "layered exterior shell",
+        "repeated facade modules",
+        "open bell subassembly"
+      ],
+      "motionPotential": ["static world building", "future bell sway", "future lantern sway"],
+      "materialFamilies": [
+        "damp stone",
+        "rain-dark timber",
+        "oxidized teal shingles",
+        "forged iron",
+        "aged brass",
+        "emissive glazing",
+        "parchment"
+      ],
+      "notes": "Four admitted elevations support the exterior chapel and archive; inaccessible interiors are intentionally excluded."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 6,
+        "microFeatureGroups": 13,
+        "materialLayers": 6,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The tall bell gable, steep sagged roof, pointed portal, archive niche, and exterior lamps make the chapel silhouette and service role distinct.",
+        "Lancets, shingles, stone courses, trim, and chains need grouped repetition to fit the 3,400-triangle target.",
+        "Four views expose all exterior elevations, but generated minor trim counts are treated as cadence rather than literal geometry."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The chapel needs macro nave masses, meso service assemblies, and mapped micro trim to retain identity at gameplay distance."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "resolvedUncertainties": [
+      "Front, side, and hero views control the bell gable and archive niche; the rear view controls the plain rear timber bay and circular window.",
+      "Generated views vary minor lantern and finial placement; implement a restrained repeated bracket system without copying inconsistent counts.",
+      "Archive papers remain shallow, closed, and abstract with no readable writing; no interior is visible behind the portal or lancets.",
+      "The roof sag is approximated with pitched masses and stepped course offsets rather than dense curved tessellation."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Thirteen observed details map to component local features or material local overrides.",
+      "details": [
+        {
+          "id": "moss-footing",
+          "kind": "stain",
+          "description": "Moss follows the lowest stone joints and corner buttress contacts.",
+          "region": {
+            "x": 0.25,
+            "y": 0.76,
+            "width": 0.5,
+            "height": 0.16,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "stone albedo and roughness",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "stone/moss-footing"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "buttressed-stone-courses",
+          "kind": "seam",
+          "description": "Uneven damp-stone blocks and heavier corner buttresses seat the nave.",
+          "region": {
+            "x": 0.16,
+            "y": 0.7,
+            "width": 0.62,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "foundation relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "foundation/buttressed-stone-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "timber-truss-rhythm",
+          "kind": "ridge",
+          "description": "Dark posts and diagonal gable braces divide the timber wall bays.",
+          "region": {
+            "x": 0.28,
+            "y": 0.25,
+            "width": 0.45,
+            "height": 0.45,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "nave frame relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "nave-shell/timber-truss-rhythm"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "sagged-shingle-courses",
+          "kind": "seam",
+          "description": "Teal shingles overlap in many horizontal rows across a shallow sagged roof.",
+          "region": {
+            "x": 0.22,
+            "y": 0.12,
+            "width": 0.63,
+            "height": 0.38,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "roof relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-silhouette/sagged-shingle-courses"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "pointed-portal-frame",
+          "kind": "ridge",
+          "description": "Nested pointed arch trim frames the closed accessible double door.",
+          "region": {
+            "x": 0.39,
+            "y": 0.39,
+            "width": 0.25,
+            "height": 0.32,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "portal silhouette and relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-portal/pointed-portal-frame"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.97
+        },
+        {
+          "id": "diamond-gable-window",
+          "kind": "linework",
+          "description": "A small diamond amber window with dark cross mullions sits above the portal.",
+          "region": {
+            "x": 0.46,
+            "y": 0.28,
+            "width": 0.12,
+            "height": 0.12,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "front focal light",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-portal/diamond-gable-window"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "weathered-bell-and-clapper",
+          "kind": "contour",
+          "description": "A flared brass bell and clapper hang in an open timber gable.",
+          "region": {
+            "x": 0.44,
+            "y": 0.08,
+            "width": 0.12,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "bell tower negative space",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "bell-gable/weathered-bell-and-clapper"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "lancet-mullion-rhythm",
+          "kind": "linework",
+          "description": "Repeated pointed amber lancets carry dark vertical mullions.",
+          "region": {
+            "x": 0.43,
+            "y": 0.52,
+            "width": 0.36,
+            "height": 0.24,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "window repetition and scale",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lancet-window-system/lancet-mullion-rhythm"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "ledger-and-scroll-relief",
+          "kind": "ridge",
+          "description": "The protected side niche contains shallow ledger slabs and rolled parchment cylinders.",
+          "region": {
+            "x": 0.37,
+            "y": 0.57,
+            "width": 0.2,
+            "height": 0.18,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "archive service cue",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "archive-niche/ledger-and-scroll-relief"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+          "confidence": 0.91
+        },
+        {
+          "id": "grave-lamp-finials",
+          "kind": "contour",
+          "description": "Pointed grave-lamp caps and bracket ends repeat at exterior corners.",
+          "region": {
+            "x": 0.1,
+            "y": 0.45,
+            "width": 0.78,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "chapel silhouette accents",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lantern-finial-system/grave-lamp-finials"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png",
+          "confidence": 0.87
+        },
+        {
+          "id": "lantern-cage-bars",
+          "kind": "linework",
+          "description": "Dark cage bars contain small amber lantern cores at the facade edges.",
+          "region": {
+            "x": 0.16,
+            "y": 0.49,
+            "width": 0.7,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "lantern material separation",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lantern-finial-system/lantern-cage-bars"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "rain-chain-links",
+          "kind": "linework",
+          "description": "Short dark rain-chain drops descend from side and rear eaves.",
+          "region": {
+            "x": 0.2,
+            "y": 0.5,
+            "width": 0.65,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "eave drainage silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "rain-chain-system/rain-chain-links"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/rear.png",
+          "confidence": 0.88
+        },
+        {
+          "id": "blank-archive-faces",
+          "kind": "linework",
+          "description": "Archive papers use fold and edge lines only, never readable text.",
+          "region": {
+            "x": 0.24,
+            "y": 0.6,
+            "width": 0.2,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "parchment facade treatment",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "parchment/blank-archive-faces"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/side.png",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "note": "Architectural object; character anatomy does not apply."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/lantern-chapel/zones/hero.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "A floor-seated 7 by 8.6 by 7 yard exterior chapel reads from four views through its steep teal roof, open bell gable, pointed portal, lancet glow, and archive niche while remaining under the 3,400-triangle target and 4,600 hard ceiling."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 6,
+      "microFeatureGroups": 10,
+      "materialLayers": 6,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "nave-bell-silhouette",
+        "name": "Steep nave roof and narrow open bell gable",
+        "required": true,
+        "qualityCriteria": [
+          "The long low nave remains subordinate to the tall front bell gable and pointed finial."
+        ],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": [
+          "chapel reads as a generic cottage",
+          "bell opening collapses into a solid block"
+        ]
+      },
+      {
+        "id": "pointed-service-front",
+        "name": "Pointed accessible portal and front stair",
+        "required": true,
+        "qualityCriteria": [
+          "The closed pointed portal, flanking lancets, and dry steps form a clear service approach on +Z."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["door loses pointed identity", "steps or lanterns obstruct the approach"]
+      },
+      {
+        "id": "lancet-light-rhythm",
+        "name": "Repeated amber lancet and lantern rhythm",
+        "required": true,
+        "qualityCriteria": [
+          "Dark mullions and cage bars contain every warm core across front and side bays."
+        ],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": [
+          "unframed emissive panels wash out the wall",
+          "window cadence becomes uniform rectangles"
+        ]
+      },
+      {
+        "id": "archive-service-niche",
+        "name": "Protected exterior archive display",
+        "required": true,
+        "qualityCriteria": [
+          "The side niche clearly carries blank ledgers and map rolls without implying an explorable interior."
+        ],
+        "evidenceRefs": ["side", "hero"],
+        "failureModes": [
+          "archive cue disappears",
+          "readable pseudo-text or open interior is introduced"
+        ]
+      },
+      {
+        "id": "chapel-construction-surface",
+        "name": "Stone, timber, shingle, bell, and parchment material separation",
+        "required": true,
+        "qualityCriteria": [
+          "Semantic vertex colors keep damp stone, dark timber, teal roof, metal, warm light, and parchment distinct under neutral relighting."
+        ],
+        "evidenceRefs": ["front", "side", "rear", "hero"],
+        "failureModes": [
+          "materials collapse into one brown mass",
+          "baked lighting is projected as albedo"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "nave length, roof height, and bell-gable height ratios",
+      "pointed portal and bell negative-space silhouettes",
+      "front and side lancet count and spacing rhythm",
+      "archive niche projection and parchment grouping",
+      "teal, timber, stone, metal, parchment, and amber value separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not model an explorable interior or opening behind warm panels.",
+      "Do not flatten the bell opening, pointed portal, archive ledge, or stair into textures.",
+      "Every inventoried detail maps to a named feature or override.",
+      "Group shingles, lancets, finials, and chains under the triangle ceiling.",
+      "Keep the +Z service apron clear."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "steep nave and open bell-gable silhouette",
+      "pointed portal and clear steps",
+      "amber lancet rhythm",
+      "protected exterior archive niche"
+    ],
+    "niceToHave": ["individual shingle drift", "bell lip patina", "fine rain streaks"],
+    "fpsTarget": 60,
+    "reviewViewpoints": ["front", "side", "rear", "front-three-quarter"]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "chapel-bell-profile",
+      "name": "Steep nave and open bell-gable silhouette",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["nave-shell", "roof-silhouette", "bell-gable"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "pointed-portal-approach",
+      "name": "Pointed portal and accessible front stair",
+      "tier": "critical",
+      "passIds": ["blockout", "structural-pass"],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": ["front-portal"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "lancet-window-rhythm",
+      "name": "Contained amber lancet rhythm",
+      "tier": "critical",
+      "passIds": ["structural-pass", "material-pass"],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": ["lancet-window-system"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "archive-niche-read",
+      "name": "Exterior ledger and rolled-map display",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.72,
+      "mustPass": true,
+      "componentRefs": ["archive-niche"],
+      "evidenceRefs": ["side", "hero"]
+    },
+    {
+      "id": "bell-lantern-hierarchy",
+      "name": "Bell, lantern, and diamond-window focal hierarchy",
+      "tier": "critical",
+      "passIds": ["material-pass", "surface-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["bell-gable", "lantern-finial-system", "front-portal"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "chapel-construction-cadence",
+      "name": "Truss, shingle, stone, and chain cadence",
+      "tier": "important",
+      "passIds": ["structural-pass", "surface-pass"],
+      "minimumScore": 0.68,
+      "mustPass": false,
+      "componentRefs": ["foundation", "nave-shell", "roof-silhouette", "rain-chain-system"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    },
+    {
+      "id": "archive-no-writing",
+      "name": "Abstract blank archive papers",
+      "tier": "important",
+      "passIds": ["material-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["archive-niche"],
+      "evidenceRefs": ["side", "hero"]
+    },
+    {
+      "id": "moss-weathering-restraint",
+      "name": "Moss and wetness stay at footing and drainage contacts",
+      "tier": "important",
+      "passIds": ["surface-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["foundation", "rain-chain-system"],
+      "evidenceRefs": ["front", "side", "rear"]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": []
+  },
+  "lookDevTargets": {
+    "qualityPriority": "gameplay-distance-stylized-vertex-color",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 512,
+      "preferredTextureResolution": 512,
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "acceptedLimitation": "Generated pixels contain studio lighting; use them for palette and finish evidence only, with independent shared normal and roughness maps at runtime."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim or environment light",
+        "exposure",
+        "tone mapping",
+        "background",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "flat value range",
+        "missing contact shadow",
+        "reference lighting copied without separating material readability"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Front, side, and hero views control the bell gable and archive niche; the rear view controls the plain rear timber bay and circular window.",
+    "Generated views vary minor lantern and finial placement; implement a restrained repeated bracket system without copying inconsistent counts.",
+    "Archive papers remain shallow, closed, and abstract with no readable writing; no interior is visible behind the portal or lancets.",
+    "The roof sag is approximated with pitched masses and stepped course offsets rather than dense curved tessellation."
+  ],
+  "coordinateFrame": {
+    "front": "+Z faces the chapel service apron",
+    "up": "+Y",
+    "right": "+X",
+    "scaleReference": "world yards; 7 W by 8.6 H by 7 D"
+  },
+  "silhouette": {
+    "boundingShape": "long low timber nave under a steep sagged gable with a narrow open bell tower rising at the front",
+    "aspectRatios": [
+      "height/width 1.229",
+      "height/depth 1.229",
+      "bell gable about 30 percent above the nave roof"
+    ],
+    "symmetry": "nave is mostly bilateral; archive niche, chimney, and lamp placement are intentionally asymmetric",
+    "dominantCurves": [
+      "steep pointed front gable",
+      "shallow sag along the long roof ridge",
+      "curled bell-cap trim"
+    ],
+    "negativeSpaces": [
+      "open bell bay",
+      "lantern cages",
+      "archive shelf recess",
+      "front stair gaps"
+    ],
+    "landmarks": [
+      "pointed double door",
+      "diamond gable light",
+      "three side lancets",
+      "archive parchment panel"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "bell gable height",
+        "pointed portal",
+        "flanking lancets",
+        "front stair and lamps"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "side",
+      "view": "side",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "nave depth",
+        "three lancet rhythm",
+        "archive niche",
+        "roof sag and rain chain"
+      ],
+      "confidence": 0.94
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["plain rear timber gable", "circular rear light", "rear footing and chain"],
+      "confidence": 0.9
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "overall identity",
+        "portal depth",
+        "archive projection",
+        "roof and bell relationship"
+      ],
+      "confidence": 0.97
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Lantern Chapel exterior assembly",
+      "level": "macro",
+      "role": "container",
+      "importance": 1,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "material-only",
+      "topologyRationale": "Transform container only; all visible volume belongs to child exterior assemblies.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 7,
+        "height": 8.6,
+        "depth": 7,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "compound",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural"
+    },
+    {
+      "id": "foundation",
+      "name": "Low damp-stone foundation and buttresses",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Discrete stone blocks and buttresses form a rigid, floor-seated base.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 5.8,
+        "height": 1.05,
+        "depth": 5.9,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 0.525, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "stone",
+      "materialLayers": ["stone"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "buttressed-stone-courses",
+          "kind": "seam",
+          "placement": "perimeter and front stair cheeks",
+          "geometryEffect": "staggered blocks plus corner buttresses",
+          "materialEffect": "dark cavities and moss",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(78, 86, 80, 1)",
+        "secondaryAlbedo": "rgba(116, 119, 107, 1)",
+        "materialClass": "stone",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "nave-shell",
+      "name": "Closed timber nave shell",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Planar wall bays and framed gables form a discrete constructed exterior shell.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 5.25,
+        "height": 4.25,
+        "depth": 5.8,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 2.9, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "timber-truss-rhythm",
+          "kind": "ridge",
+          "placement": "front and side wall bays",
+          "geometryEffect": "raised vertical posts and diagonal gable braces",
+          "materialEffect": "rain-dark timber edges",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "roof-silhouette",
+      "name": "Steep asymmetric teal nave roof",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid pitched slopes with a shallow longitudinal sag define the chapel silhouette.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 6.1,
+        "height": 2.4,
+        "depth": 6.35,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 5.55, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "roof",
+      "materialLayers": ["roof"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "sagged-shingle-courses",
+          "kind": "seam",
+          "placement": "two long roof slopes",
+          "geometryEffect": "layered teal courses with a shallow central sag",
+          "materialEffect": "oxidized teal edge variation",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(45, 133, 133, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.88
+      }
+    },
+    {
+      "id": "front-portal",
+      "name": "Pointed front portal and service steps",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "extrude",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Nested pointed frames, closed door slabs, and masonry steps project from the front wall.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "nave-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.45,
+        "height": 3.7,
+        "depth": 0.75,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [-0.4, 2.25, 3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "pointed-portal-frame",
+          "kind": "ridge",
+          "placement": "front +Z facade",
+          "geometryEffect": "nested pointed arch frame around closed plank doors",
+          "materialEffect": "timber and iron separation",
+          "confidence": 0.9
+        },
+        {
+          "id": "diamond-gable-window",
+          "kind": "linework",
+          "placement": "above front portal",
+          "geometryEffect": "diamond amber panel with dark cross mullions",
+          "materialEffect": "contained warm glow",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "bell-gable",
+      "name": "Open bell gable and weathered bell",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid timber uprights and a small pitched cap create an open negative space around the bell.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "roof-silhouette",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.2,
+        "height": 2.6,
+        "depth": 0.95,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [-1.45, 7.15, 1.55],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "weathered-bell-and-clapper",
+          "kind": "contour",
+          "placement": "open upper bell gable",
+          "geometryEffect": "small flared bell body and visible clapper",
+          "materialEffect": "aged brass against dark frame",
+          "confidence": 0.9
+        },
+        {
+          "id": "bell-gable-finial",
+          "kind": "contour",
+          "placement": "roof peak",
+          "geometryEffect": "stacked pointed finial and curled trim",
+          "materialEffect": "brass tip",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(155, 118, 45, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.92
+      }
+    },
+    {
+      "id": "lancet-window-system",
+      "name": "Repeated amber lancet windows",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Pointed panels and frames repeat across planar nave walls without cutting open an interior.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "nave-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.62,
+        "height": 1.45,
+        "depth": 0.13,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 3.1, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "warm",
+      "materialLayers": ["warm"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "lancet-mullion-rhythm",
+          "kind": "linework",
+          "placement": "front flanks and three side bays",
+          "geometryEffect": "repeated pointed amber panels with dark mullions",
+          "materialEffect": "contained amber glow",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(255, 164, 58, 1)",
+        "secondaryAlbedo": "rgba(255, 221, 119, 1)",
+        "materialClass": "glass",
+        "materialClassConfidence": 0.85
+      }
+    },
+    {
+      "id": "archive-niche",
+      "name": "Protected exterior chronicle display",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A shallow roofed case and ledge carry attached ledgers, map rolls, and parchment shapes.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "nave-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.55,
+        "height": 1.55,
+        "depth": 0.42,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [-2.75, 2.3, 0.55],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "parchment",
+      "materialLayers": ["parchment"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "ledger-and-scroll-relief",
+          "kind": "ridge",
+          "placement": "protected side facade niche",
+          "geometryEffect": "shallow ledgers, rolled map cylinders, and parchment panel",
+          "materialEffect": "no readable marks",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["side", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(211, 190, 140, 1)",
+        "secondaryAlbedo": "rgba(165, 138, 95, 1)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.78
+      }
+    },
+    {
+      "id": "lantern-finial-system",
+      "name": "Wax lantern brackets and grave-lamp finials",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Repeated small cages and pointed caps project from roof and porch edges at silhouette-relevant positions.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "nave-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.55,
+        "height": 1.25,
+        "depth": 0.55,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 3.6, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "grave-lamp-finials",
+          "kind": "contour",
+          "placement": "outer roof and porch corners",
+          "geometryEffect": "small pointed finial clusters and hanging cage silhouettes",
+          "materialEffect": "iron/brass accents",
+          "confidence": 0.9
+        },
+        {
+          "id": "lantern-cage-bars",
+          "kind": "linework",
+          "placement": "front and side brackets",
+          "geometryEffect": "dark cage bars enclosing warm cores",
+          "materialEffect": "warm/metal contrast",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(155, 118, 45, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.92
+      }
+    },
+    {
+      "id": "rain-chain-system",
+      "name": "Eave rain-chain system",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.86,
+      "confidence": 0.9,
+      "primitive": "tube",
+      "topologyClass": "fiber-strand",
+      "topologyRationale": "Thin linked drops descend from visible eave anchors and terminate at the stone footing.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with visible construction seams",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.024,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared Fenbridge surface maps",
+        "normalStrategy": "computed vertex normals with hard trim seams"
+      },
+      "parent": "roof-silhouette",
+      "attachment": {
+        "parentId": "roof-silhouette",
+        "parentSocket": "eave-chain-anchors",
+        "localStart": [2.7, -0.1, 2.8],
+        "localEnd": [2.7, -2.15, 2.8],
+        "contactType": "overlap",
+        "overlap": 0.05,
+        "gapTolerance": 0.01,
+        "evidenceRefs": ["front", "rear"]
+      },
+      "dimensions": {
+        "length": 2.2,
+        "radius": 0.035,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [2.75, 2.2, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; layout owns shipping collision."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "rain-chain-links",
+          "kind": "linework",
+          "placement": "rear and side eaves",
+          "geometryEffect": "short descending chain cadence terminating above stone",
+          "materialEffect": "dark iron",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.17,
+        "microRoughness": 0.07,
+        "bumpAmplitude": 0.03,
+        "normalPattern": "semantic shared normal cell",
+        "displacementPattern": "none",
+        "occlusionPattern": "arch, buttress, and frame contacts",
+        "edgeWearPattern": "restrained exposed trim wear",
+        "notes": "Generated studio lighting is excluded from albedo."
+      },
+      "evidenceRefs": ["front", "side", "rear"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(155, 118, 45, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.92
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "stone",
+      "name": "Damp moss-lined chapel stone",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#4E5650",
+      "color": "#4E5650",
+      "albedo": {
+        "dominant": "#4E5650",
+        "secondary": ["#74776B"],
+        "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#4E5650", "#74776B"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.15,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "grain, stone, shingle, or parchment breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.92,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher; worn crowns read lower roughness"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.18,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "moss-footing",
+          "region": "lowest blocks and buttress contacts",
+          "color": "#59613A",
+          "roughness": 0.97,
+          "dirtAmount": 0.22,
+          "cavityBias": true,
+          "evidenceRefs": ["front", "side", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the stone Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "timber",
+      "name": "Rain-dark nave timber",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34271E",
+      "color": "#34271E",
+      "albedo": {
+        "dominant": "#34271E",
+        "secondary": ["#765236"],
+        "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#765236"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.15,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "grain, stone, shingle, or parchment breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.83,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher; worn crowns read lower roughness"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "wet-lower-frame",
+          "region": "lower posts and door step edges",
+          "color": "#1D1713",
+          "roughness": 0.76,
+          "streak": "gravity-down",
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the timber Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "roof",
+      "name": "Oxidized teal chapel shingles",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#176269",
+      "color": "#176269",
+      "albedo": {
+        "dominant": "#176269",
+        "secondary": ["#2D8585"],
+        "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#176269", "#2D8585"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.15,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "grain, stone, shingle, or parchment breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.79,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher; worn crowns read lower roughness"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "damp-shingle-edges",
+          "region": "lower course edges and sagged ridge",
+          "color": "#103A3C",
+          "roughness": 0.84,
+          "evidenceRefs": ["side", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the roof Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "metal",
+      "name": "Forged iron and aged bell brass",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34383A",
+      "color": "#34383A",
+      "albedo": {
+        "dominant": "#34383A",
+        "secondary": ["#9B762D"],
+        "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#34383A", "#9B762D"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.15,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "grain, stone, shingle, or parchment breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.44,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher; worn crowns read lower roughness"
+      },
+      "metalness": {
+        "base": 0.78,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response."
+      },
+      "wear": {
+        "edgeWear": 0.11,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "weathered-bell",
+          "region": "bell lip and clapper",
+          "color": "#9B762D",
+          "roughness": 0.38,
+          "patinaColor": "#59613A",
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the metal Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "warm",
+      "name": "Contained amber glazing and lantern cores",
+      "type": "emissive-standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#FFA43A",
+      "color": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#FFDD77"],
+        "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.15,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "grain, stone, shingle, or parchment breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.28,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher; worn crowns read lower roughness"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.04,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "lantern-and-lancet-core",
+          "region": "behind mullions and cage bars only",
+          "emissive": "#FFDD77",
+          "emissiveIntensity": 1.05,
+          "roughness": 0.25,
+          "evidenceRefs": ["front", "side", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the warm Fenbridge semantic authoring bucket."
+    },
+    {
+      "id": "parchment",
+      "name": "Unwritten ledgers and rolled maps",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#D3BE8C",
+      "color": "#D3BE8C",
+      "albedo": {
+        "dominant": "#D3BE8C",
+        "secondary": ["#A58A5F"],
+        "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
+      },
+      "colorVariation": {
+        "palette": ["#D3BE8C", "#A58A5F"],
+        "pattern": "semantic vertex colors multiplied by shared atlas grain",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.16
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.15,
+          "role": "broad value grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "grain, stone, shingle, or parchment breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.86,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "cavities remain rougher; worn crowns read lower roughness"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.22,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.27,
+        "contactShadowBias": 0.32,
+        "notes": "Independent cavity and contact response."
+      },
+      "wear": {
+        "edgeWear": 0.05,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.07,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "blank-archive-faces",
+          "region": "display niche papers and closed ledger edges",
+          "color": "#D3BE8C",
+          "roughness": 0.9,
+          "markingPolicy": "abstract folds only; no readable writing",
+          "evidenceRefs": ["side", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is the palette authority.",
+        "Normal and roughness support remain independent channels."
+      ],
+      "notes": "Mapped to the parchment Fenbridge semantic authoring bucket."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "chapel-shingle-courses",
+      "componentRef": "roof-silhouette",
+      "realization": "grouped-geometry",
+      "buildsGeometry": true,
+      "geometry": "staggered low-profile course boxes",
+      "instances": 34,
+      "distribution": "six long courses across both roof slopes with restrained sag offsets",
+      "evidenceRefs": ["side", "hero"]
+    },
+    {
+      "id": "lancet-and-lamp-modules",
+      "componentRef": "lancet-window-system",
+      "realization": "instanced-cluster",
+      "buildsGeometry": true,
+      "geometry": "pointed amber panel, dark frame, mullion, and cage variants",
+      "instances": 9,
+      "distribution": "front flanks, three side bays, diamond gable, and exterior brackets",
+      "evidenceRefs": ["front", "side", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": ["foundation", "nave-shell", "roof-silhouette", "bell-gable"],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "front-portal",
+        "lancet-window-system",
+        "archive-niche",
+        "lantern-finial-system",
+        "rain-chain-system"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "foundation",
+        "nave-shell",
+        "roof-silhouette",
+        "front-portal",
+        "bell-gable",
+        "lancet-window-system",
+        "archive-niche",
+        "lantern-finial-system",
+        "rain-chain-system"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "foundation",
+        "nave-shell",
+        "roof-silhouette",
+        "front-portal",
+        "bell-gable",
+        "lancet-window-system",
+        "archive-niche",
+        "lantern-finial-system",
+        "rain-chain-system"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "foundation",
+        "nave-shell",
+        "roof-silhouette",
+        "front-portal",
+        "bell-gable",
+        "lancet-window-system",
+        "archive-niche",
+        "lantern-finial-system",
+        "rain-chain-system"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Make material and form readable under neutral turntable lighting plus optional reference lighting.",
+      "componentRefs": [
+        "foundation",
+        "nave-shell",
+        "roof-silhouette",
+        "front-portal",
+        "bell-gable",
+        "lancet-window-system",
+        "archive-niche",
+        "lantern-finial-system",
+        "rain-chain-system"
+      ],
+      "acceptance": [
+        "lightingFromPhoto identifies key light direction/color/intensity, fill light, rim or environment light, and ambient color.",
+        "Exposure, tone mapping, background color/gradient, shadow softness, and contact shadow behavior are specified.",
+        "Lighting does not hide geometry/material gaps and screenshots can be compared fairly to the reference.",
+        "Neutral, grazing, and reference-matched lighting checks distinguish material errors from lighting errors.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Make the model ready for future animation, transformation, physics, or destruction.",
+      "componentRefs": [
+        "foundation",
+        "nave-shell",
+        "roof-silhouette",
+        "front-portal",
+        "bell-gable",
+        "lancet-window-system",
+        "archive-niche",
+        "lantern-finial-system",
+        "rain-chain-system"
+      ],
+      "acceptance": [
+        "Macro and movable meso components have stable pivot nodes.",
+        "Sockets, collider proxies, and destruction metadata are present for future runtime actions.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "foundation",
+        "nave-shell",
+        "roof-silhouette",
+        "front-portal",
+        "bell-gable",
+        "lancet-window-system",
+        "archive-niche",
+        "lantern-finial-system",
+        "rain-chain-system"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:19.276413+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.330065+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.377166+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.425491+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.476530+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.525306+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.573396+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:19.276413+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.330065+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.377166+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.425491+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.476530+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed surface-pass for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.525306+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed lighting-pass for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.573396+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.84,
+        "formDetail": 0.79,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "chapel-bell-profile",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed steep nave and open bell-gable silhouette at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "pointed-portal-approach",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed pointed portal and accessible front stair at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "lancet-window-rhythm",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed contained amber lancet rhythm at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-niche-read",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed exterior ledger and rolled-map display at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "bell-lantern-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed bell, lantern, and diamond-window focal hierarchy at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "chapel-construction-cadence",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed truss, shingle, stone, and chain cadence at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "archive-no-writing",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed abstract blank archive papers at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "moss-weathering-restraint",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed moss and wetness stay at footing and drainage contacts at 0.74 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/lantern-chapel-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.79."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.612711+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for lantern_chapel.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/lantern_chapel-comparison.png"
+      ]
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full merged two-material GLB with bell, portal, archive, lancets, and silhouette trim"
+    },
+    {
+      "tier": "far",
+      "distance": 32,
+      "strategy": "same GLB; Low tier may shed shared maps and decorative emissive intensity, never collision-bearing form"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "silhouette-and-service-readability",
+    "targetTriangles": 3400,
+    "hardTriangleCeiling": 4600,
+    "hardByteCeiling": 307200,
+    "maxShippingPrimitives": 2,
+    "maxShippingMaterials": 2,
+    "embeddedTextures": 0,
+    "nativeDimensionsYards": [7, 8.6, 7],
+    "placementCount": 1,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Group shingles, lancets, finials, and chains before simplifying any bell, portal, archive, or stair silhouette."
+  },
+  "lightingFromPhoto": [
+    "Neutral upper-front-left key separates pointed arches and roof slopes without becoming albedo.",
+    "Broad fill preserves dark timber wall detail and archive papers.",
+    "Soft neutral rim outlines the bell gable, roof curl, lamps, and rain chains; ACES-like tone mapping at exposure 1.",
+    "Neutral gray background and soft contact shadow prove floor seating; a grazing pass checks shingle, stone, and arch relief."
+  ],
+  "proceduralStrategy": [
+    "Block exact foundation, nave, roof, and bell-gable proportions with +Z front.",
+    "Add pointed portal, steps, repeated lancets, archive niche, lamps, finials, and rain chains as named exterior systems.",
+    "Represent shingles and small repeated trim as grouped geometry under semantic vertex colors.",
+    "Use shared independent normal and roughness maps at runtime; never project generated studio lighting.",
+    "Merge semantic buckets only in the shared finalizer and preserve authored sockets."
+  ],
+  "animationAnchors": [
+    "root pivot node supports whole-object translation, rotation, scale, and visibility changes",
+    "component pivot groups support later local transforms without rebuilding geometry"
+  ],
+  "destructionAnchors": [
+    "actionProfile.destruction.fractureGroup marks detachable or breakable component sets",
+    "component seams and sockets define plausible break points instead of random explosions"
+  ],
+  "risks": [
+    "Sub-1k crops make tiny ledger, bolt, and shingle counts approximate cadence rather than exact inventory.",
+    "Generated views vary minor lamp and finial placement; the spec uses a restrained stable system.",
+    "The img2threejs blockout still requires browser comparison evidence before later passes unlock."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Lantern Chapel stylized exterior timber chapel bell gable procedural low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 2.632304791455,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

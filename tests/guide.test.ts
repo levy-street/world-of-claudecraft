@@ -2,8 +2,12 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
+// The English the /c/ public sheet resolves a mark id to. Imported here so the
+// generator's own hand table cannot drift away from what the sheet says.
+import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
 import { BIND_ACTIONS } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
@@ -23,6 +27,7 @@ import {
   GUIDE_PROF_PAGES,
   GUIDE_PROF_RING,
   GUIDE_PROF_STATIONS,
+  GUIDE_RELIQUARY,
   GUIDE_WARLOCK_PETS,
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
@@ -31,6 +36,7 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage } from '../src/guide/pages/professions';
+import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
   GUIDE_BASE,
@@ -43,14 +49,13 @@ import {
 } from '../src/guide/routes';
 import { buildIndex, rank } from '../src/guide/search';
 import { DEEDS } from '../src/sim/content/deeds';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import {
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
   CRAFT_RING,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
   GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   PERK_THRESHOLDS,
@@ -58,7 +63,12 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
+import {
+  TIER2_TOOL_GATE_PROFICIENCY,
+  TIER3_TOOL_GATE_PROFICIENCY,
+} from '../src/sim/content/vendor_row_gates';
+import { ABILITIES, CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -96,8 +106,14 @@ import {
   tierForSkill,
   tierProgressMultiplier,
 } from '../src/sim/professions/wheel';
+import {
+  TIER4_TOOL_WIELD_PROFICIENCY,
+  TIER5_TOOL_WIELD_PROFICIENCY,
+  WIELD_REQUIREMENT_BY_TIER,
+} from '../src/sim/professions/wield_gate';
+import type { DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
-import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -123,6 +139,17 @@ const generatedSource = readFileSync(
   new URL('../src/guide/content.generated.ts', import.meta.url),
   'utf8',
 );
+
+// The player-facing prose that would spoil a hidden deed on any public surface: its name, its
+// criteria, and (when it grants one) the title text the secret rewards. The title text is in
+// scope because it spoils as much as the name and it is what actually leaked: the deeds arm
+// filtered hidden defs, but a Reliquary title relic published the reward text anyway. Callers
+// that also forbid the bare id prepend it; the module scan below deliberately does not.
+const hiddenDeedProse = (d: DeedDef): string[] => [
+  d.name,
+  d.desc,
+  ...(d.reward?.kind === 'title' ? [d.reward.text] : []),
+];
 
 describe('Guide routes', () => {
   it('treats the base and empty sub as the home route', () => {
@@ -160,7 +187,19 @@ describe('Guide routes', () => {
     expect(topbarRoutes().some((r) => r.id === 'classes')).toBe(true);
     expect(topbarRoutes().some((r) => r.id === 'home')).toBe(false);
     const groups = groupedRoutes();
-    expect(groups.map((g) => g.group)).toEqual(['start', 'compendium', 'reference']);
+    // The old single 'compendium' bucket reached seventeen entries once Rifts and Mounts
+    // landed; it is split by what a reader came for. Every group must be non-empty (a
+    // group with no routes is dropped by groupedRoutes, so a typo would silently vanish).
+    expect(groups.map((g) => g.group)).toEqual([
+      'start',
+      'world',
+      'character',
+      'endgame',
+      'compete',
+      'reference',
+    ]);
+    for (const g of groups)
+      expect(g.routes.length, `group "${g.group}" is empty`).toBeGreaterThan(0);
     expect(hrefFor('')).toBe(GUIDE_BASE);
     expect(hrefFor('classes')).toBe('/wiki/classes');
   });
@@ -207,6 +246,11 @@ describe('Guide entry wiring', () => {
     }
   });
 
+  // Registration only proves a module exists. tests/guide_route_render.test.ts renders
+  // every route and checks it produces a readable page (one h1, no unresolved key, no
+  // stray placeholder); it lives in its own file because the bestiary and models pages
+  // paint procedural icons through a canvas and so need a DOM environment.
+
   it('lists every route and class-detail page in the sitemap', () => {
     const origin = 'https://worldofclaudecraft.com';
     for (const r of GUIDE_ROUTES) {
@@ -250,11 +294,23 @@ describe('Guide generated class content', () => {
     expect(GUIDE_CLASSES).toHaveLength(9);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
-      expect(['rage', 'mana', 'energy']).toContain(c.resource);
+      expect(['rage', 'mana', 'energy', 'focus']).toContain(c.resource);
       expect(c.roles.length).toBeGreaterThan(0);
       expect(c.specs.length).toBeGreaterThan(0);
       expect(c.signatureAbilities.length).toBeGreaterThan(0);
       expect(c.abilities.length).toBeGreaterThanOrEqual(c.signatureAbilities.length);
+      for (const ability of c.abilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} is hidden from players`,
+        ).not.toBe(true);
+      }
+      for (const ability of c.signatureAbilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} signature is hidden from players`,
+        ).not.toBe(true);
+      }
       for (const s of c.specs) {
         expect(['tank', 'healer', 'dps']).toContain(s.role);
         expect(s.signature.length).toBeGreaterThan(0);
@@ -516,6 +572,34 @@ describe('Guide bestiary completeness', () => {
     expect(marshCard).not.toContain('#fam-burrower');
     expect(html).toContain('#fam-burrower');
   });
+
+  // The bug this pins actually shipped. The page keyed every curated string AND the card's
+  // DOM id off z.biome, which is not unique: The Farshore renders in the vale biome, so it
+  // inherited Eastbrook Vale's blurb, hub greeting, speaker and place notes, and minted a
+  // second id="zone-vale" that broke the map anchor. world.ts now resolves a per-zone key
+  // stem (ZONE_KEY_STEM, biome as the fallback). A stem collision is invisible by eye once
+  // there are fourteen zones, so it is pinned here instead: one anchor per zone, all distinct.
+  it('gives every zone its own card anchor, so no zone can inherit another zone copy', () => {
+    setLanguage('en');
+    const html = worldPage.render({ params: [], sub: 'world', titleKey: 'guide.nav.world' });
+    const ids = [...html.matchAll(/id="(zone-[a-z0-9_]+)"/g)].map((m) => m[1]);
+    expect(ids.length, 'one card anchor per zone').toBe(GUIDE_ZONES.length);
+    expect(new Set(ids).size, `duplicate zone anchor: ${ids.join(', ')}`).toBe(ids.length);
+    // Every map band links to an anchor that exists on the page (a stem typo would
+    // otherwise scroll nowhere).
+    for (const href of [...html.matchAll(/href="#(zone-[a-z0-9_]+)"/g)].map((m) => m[1])) {
+      expect(ids, `map band links to a missing anchor #${href}`).toContain(href);
+    }
+    // The two vale-biome zones are the regression case: distinct anchors, distinct blurbs.
+    expect(ids).toContain('zone-vale');
+    expect(ids).toContain('zone-farshore');
+    const vale = html.slice(html.indexOf('id="zone-vale"'));
+    const farshore = html.slice(html.indexOf('id="zone-farshore"'));
+    const blurbOf = (s: string) => /class="guide-zone-blurb">([^<]*)</.exec(s)?.[1] ?? '';
+    expect(blurbOf(vale)).not.toBe('');
+    expect(blurbOf(farshore)).not.toBe('');
+    expect(blurbOf(farshore)).not.toBe(blurbOf(vale));
+  });
 });
 
 // The Book of Deeds page renders entirely from GUIDE_DEEDS, derived from the sim DEEDS table.
@@ -529,8 +613,12 @@ describe('Guide deeds spoiler safety', () => {
     // filter were deleted, a hidden deed's id and name would appear here and fail the assert.
     const hidden = Object.values(DEEDS).filter((d) => d.hidden);
     expect(hidden.length).toBeGreaterThan(0); // the catalog has hidden deeds; this guard is meaningful
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
     for (const d of hidden) {
-      for (const needle of [d.id, d.name, d.desc]) {
+      for (const needle of [d.id, ...hiddenDeedProse(d)]) {
         expect(
           generatedSource.includes(needle),
           `hidden deed "${d.id}" leaked "${needle}" into content.generated.ts`,
@@ -722,9 +810,160 @@ describe('Guide deeds spoiler safety', () => {
     const route = GUIDE_ROUTES.find((r) => r.id === 'deeds');
     expect(route?.sub).toBe('deeds');
     expect(route?.navKey).toBe('guide.nav.deeds');
-    expect(route?.group).toBe('compendium');
+    // 'compendium' was retired when it grew to seventeen entries and split; the Book of
+    // Deeds is endgame content, so it sits with the dungeons, delves and rifts.
+    expect(route?.group).toBe('endgame');
+  });
+});
+
+// The Reliquary wiki page: spoiler-safe catalog of pages and relic names only.
+// Freshness of GUIDE_RELIQUARY is covered by the shared generator freshness gate;
+// these pins lock field allowlist, catalog parity, and render wiring.
+describe('Guide Reliquary spoiler-safe catalog', () => {
+  it('emits exactly the live RELIQUARY_PAGES ids in catalog order', () => {
+    expect(GUIDE_RELIQUARY.map((p) => p.id)).toEqual(RELIQUARY_PAGES.map((p) => p.id));
+    expect(GUIDE_RELIQUARY.length).toBe(RELIQUARY_PAGES.length);
+    expect(GUIDE_RELIQUARY.length).toBeGreaterThanOrEqual(28);
   });
 
+  it('bakes only allowlisted fields (no progress, clears, firstFind, or sources)', () => {
+    // excludeFromCompletion joined at Phase 21 QA: catalog data, not player
+    // state, and rule 7 requires the wiki to LABEL an outside-completion page.
+    const pageFields = new Set(['id', 'shelf', 'name', 'relics', 'excludeFromCompletion']);
+    const relicFields = new Set(['kind', 'name']);
+    for (const page of GUIDE_RELIQUARY) {
+      for (const k of Object.keys(page)) {
+        expect(pageFields.has(k), `page "${page.id}" unexpected field "${k}"`).toBe(true);
+      }
+      expect(page.relics.length, `page "${page.id}" empty`).toBeGreaterThan(0);
+      for (const relic of page.relics) {
+        for (const k of Object.keys(relic)) {
+          expect(relicFields.has(k), `page "${page.id}" relic unexpected "${k}"`).toBe(true);
+        }
+        expect(relic.name.length).toBeGreaterThan(0);
+      }
+    }
+    // Stronger: personal / progress tokens never appear as field names in the blob.
+    const blob = JSON.stringify(GUIDE_RELIQUARY);
+    for (const leak of [
+      'firstFind',
+      'clears',
+      'owned',
+      'recent',
+      'clearSource',
+      'itemId',
+      'markId',
+    ]) {
+      expect(blob.includes(`"${leak}"`), `leaked field token ${leak}`).toBe(false);
+    }
+  });
+
+  it('labels exactly the two outside-completion pages, and renders tag plus note for each', () => {
+    // The generated blob carries the flag for exactly the live flagged set
+    // (a third flagged page must surface here the moment it is authored)...
+    expect(
+      GUIDE_RELIQUARY.filter((p) => p.excludeFromCompletion !== undefined).map((p) => [
+        p.id,
+        p.excludeFromCompletion,
+      ]),
+    ).toEqual([
+      ['horizons_vault_of_ages', 'retired'],
+      ['horizons_riftbound', 'personal'],
+    ]);
+    // ...and the rendered catalog SHOWS the label: the tag beside the page
+    // heading and the explanatory note, one pair per flagged page, resolved
+    // through t() (never hardcoded English), with none on ordinary pages.
+    const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(2);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(2);
+    expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
+    expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
+    expect(html).toContain(t('guide.reliquaryPage.retiredNote'));
+    expect(html).toContain(t('guide.reliquaryPage.personalNote'));
+    // The note sits inside the flagged page's own section (reach, not mere
+    // presence): the vault section carries the retired pair.
+    const vault = html.match(
+      /<section[^>]*id="reliquary-horizons_vault_of_ages"[\s\S]*?<\/section>/,
+    )?.[0];
+    expect(vault, 'vault section').toBeTruthy();
+    expect(vault).toContain(t('guide.reliquaryPage.retiredTag'));
+    expect(vault).toContain(t('guide.reliquaryPage.retiredNote'));
+  });
+
+  it('every generated mark name equals the shipped English the sheet resolves', () => {
+    // The generator keeps its OWN hand table of mark names
+    // (RELIQUARY_MARK_GUIDE_NAMES in scripts/wiki/build_content.mjs), so the
+    // wiki could print a name the /c/ sheet never says. Anchor the two
+    // together on RELIQUARY_MARK_ENGLISH, which the character-sheet cross-pin
+    // already binds to the live MOBS display names: through that pin this
+    // reaches MOBS transitively, without re-deriving it here.
+    //
+    // The generated relics carry {kind, name} only (no markId, by the field
+    // allowlist above), so the id comes from the live catalog page at the SAME
+    // index: the emit walks page.relics in order, which the id-order pin above
+    // already holds.
+    let checked = 0;
+    const nonSlain: string[] = [];
+    for (const guidePage of GUIDE_RELIQUARY) {
+      const live = RELIQUARY_PAGES.find((p) => p.id === guidePage.id);
+      expect(live, `live page for ${guidePage.id}`).toBeDefined();
+      if (!live) continue;
+      expect(guidePage.relics.length, `${guidePage.id} relic count`).toBe(live.relics.length);
+      for (let i = 0; i < live.relics.length; i++) {
+        const relic = live.relics[i];
+        if (relic.kind !== 'mark') continue;
+        const expected = RELIQUARY_MARK_ENGLISH.get(relic.markId);
+        expect(expected, `${relic.markId} has shipped English`).toBeDefined();
+        expect(guidePage.relics[i]?.name, `${guidePage.id}:${relic.markId}`).toBe(expected);
+        checked += 1;
+        if (!relic.markId.startsWith('slain:')) nonSlain.push(relic.markId);
+      }
+    }
+    // Floor at today's measured catalog: 19 rare-slain proofs plus the 10
+    // profession marks. A page that stopped emitting marks would otherwise
+    // make every assertion above vacuous.
+    expect(checked).toBeGreaterThanOrEqual(29);
+    // And the sweep really spans the whole table FAMILY, not just the slain
+    // namespace the Rares page contributes: masterwork and gather_event rows
+    // are checked too, so a generator edit scoped to one family cannot hide.
+    expect(nonSlain.some((id) => id.startsWith('masterwork:'))).toBe(true);
+    expect(nonSlain.some((id) => id.startsWith('gather_event:'))).toBe(true);
+  });
+
+  it('pins the reliquary route wiring to literals', () => {
+    const route = GUIDE_ROUTES.find((r) => r.id === 'reliquary');
+    expect(route?.sub).toBe('reliquary');
+    expect(route?.navKey).toBe('guide.nav.reliquary');
+    // 'endgame' since the release's sidebar regroup retired the catch-all
+    // compendium group: the page files beside deeds/dungeons/delves/rifts.
+    expect(route?.group).toBe('endgame');
+    expect(pageFor('reliquary')).toBe(reliquaryPage);
+  });
+
+  it('renders shelves and every page name without inventing player progress chrome', () => {
+    setLanguage('en');
+    const html = reliquaryPage.render({
+      params: [],
+      sub: 'reliquary',
+      titleKey: 'guide.nav.reliquary',
+    });
+    expect(html).toContain(t('guide.nav.reliquary'));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.conquerors' as never));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.professions' as never));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.horizons' as never));
+    for (const page of GUIDE_RELIQUARY) {
+      expect(html).toContain(page.name);
+    }
+    // Pure catalog helper covers the same rows the page composes.
+    const sections = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    // Exact class token (not the h3's guide-reliquary-page-h prefix).
+    expect((sections.match(/class="guide-block guide-reliquary-page"/g) ?? []).length).toBe(
+      GUIDE_RELIQUARY.length,
+    );
+  });
+});
+
+describe('Guide deeds page render (continued)', () => {
   it('renders the whole page: correct per-category counts, no hidden or boss leak', () => {
     setLanguage('en');
     // GuidePage.render requires a PageContext; this page renders the same for any ctx
@@ -760,8 +999,14 @@ describe('Guide deeds spoiler safety', () => {
     // sanctioned Chronicler flavor
     expect(html).toContain('Saul');
     // no hidden deed and no boss:true name reaches the rendered page
-    for (const d of Object.values(DEEDS).filter((x) => x.hidden)) {
-      for (const needle of [d.id, d.name, d.desc]) {
+    const hidden = Object.values(DEEDS).filter((x) => x.hidden);
+    expect(hidden.length).toBeGreaterThan(0);
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
+    for (const d of hidden) {
+      for (const needle of [d.id, ...hiddenDeedProse(d)]) {
         expect(html.includes(needle), `hidden "${d.id}" leaked "${needle}"`).toBe(false);
       }
     }
@@ -939,15 +1184,19 @@ describe('Guide module-graph spoiler containment', () => {
 
     // And no hidden deed prose rides ANY module the guide graph reaches (a
     // future aggregate or a copied table would re-leak the secret without
-    // touching content/deeds.ts). Bare ids are tolerated by maintainer
-    // judgment: deed_image_ids.ts carries them for the committed crest art,
-    // and an id alone spoils nothing.
+    // touching content/deeds.ts), reward titles included. Bare ids are
+    // tolerated by maintainer judgment: deed_image_ids.ts carries them for the
+    // committed crest art, and an id alone spoils nothing.
     const hidden = Object.values(DEEDS).filter((d) => d.hidden);
     expect(hidden.length).toBeGreaterThan(0);
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
     for (const file of reached) {
       const source = readFileSync(file, 'utf8');
       for (const d of hidden) {
-        for (const needle of [d.name, d.desc]) {
+        for (const needle of hiddenDeedProse(d)) {
           expect(
             source.includes(needle),
             `hidden deed "${d.id}" prose leaked into guide-reachable ${file.slice(repoRoot.length)}`,
@@ -975,6 +1224,19 @@ describe('Guide deeds cross-page surfaces', () => {
     });
     // the key glyph and the label render inside one table row
     expect(html).toContain('<kbd>Shift+Z</kbd></td><td>Book of Deeds</td>');
+  });
+
+  it('lists The Reliquary bind on the controls page, matching the in-game default', () => {
+    setLanguage('en');
+    const reliquaryBind = BIND_ACTIONS.find((a) => a.id === 'reliquary');
+    expect(reliquaryBind?.defaults).toEqual(['Shift+KeyX']);
+    expect(t('guide.controls.reliquary')).toBe('The Reliquary');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+X</kbd></td><td>The Reliquary</td>');
   });
 
   it('cross-links the deeds catalog from the dungeons page', () => {
@@ -1008,6 +1270,129 @@ describe('Guide deeds cross-page surfaces', () => {
     }
   });
 
+  it('never leaks a boss personal name into the reliquary page PROSE', () => {
+    // The same withhold-the-name standard, extended to the newest public
+    // guide surface. The catalog sections legitimately carry some boss names
+    // (the raid page IS 'Nythraxis Raid'; relic names like 'Fangknife of
+    // Zulgar' name their boss), so the scan strips the embedded
+    // reliquaryCatalogSections output verbatim and holds the REMAINDER (the
+    // guide-authored prose, headings, and any future intro copy) to the
+    // withhold-the-name rule for EVERY boss, no carve-out: a per-name
+    // allowlist here would excuse exactly the prose the dungeons-page pin
+    // below exists to protect.
+    setLanguage('en');
+    const html = reliquaryPage.render({
+      params: [],
+      sub: 'reliquary',
+      titleKey: 'guide.nav.reliquary',
+    });
+    const catalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    // Premise: the strip really removed the catalog block, so the prose
+    // remainder is what is scanned (an embedding change would make the scan
+    // silently re-cover catalog names and fail on the raid pages).
+    expect(html.includes(catalogHtml)).toBe(true);
+    const prose = html.replace(catalogHtml, '');
+    for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
+      const personalName = boss.name.split(',')[0];
+      expect(
+        prose.includes(personalName),
+        `boss personal name "${personalName}" leaked into the reliquary page prose`,
+      ).toBe(false);
+    }
+  });
+
+  it('never leaks a boss personal name into the dungeons page card copy', () => {
+    // Regression pin: wildheartBody once named the Wildheart Basin boss outright
+    // ("...to face Zulgar"), breaking with every sibling body's withhold-the-name
+    // idiom (sanctumBody, raidBody, sagaPeaksBody). The full-name scan the deeds
+    // page uses would have missed it (the leak was the bare personal name, not the
+    // comma-joined title), so this checks the personal name segment on its own.
+    setLanguage('en');
+    const html = dungeonsPage.render({
+      params: [],
+      sub: 'dungeons',
+      titleKey: 'guide.nav.dungeons',
+    });
+    for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
+      const personalName = boss.name.split(',')[0];
+      expect(
+        html.includes(personalName),
+        `boss personal name "${personalName}" leaked into the dungeons page`,
+      ).toBe(false);
+    }
+  });
+
+  it('never leaks the Wildheart Basin boss name in a translated locale either', async () => {
+    // Follow-up regression pin (review on PR #2903): the first fix only reworded the
+    // English catalog value plus the eager en/en_CA/en_XA bundles, leaving every
+    // translated overlay still naming the boss. Drive every translated locale that
+    // carries this key, the same way a real translated visitor would
+    // (ensureLocaleLoaded before render), and check for that LOCALE's own personal-name
+    // form, not just the English "Zulgar": a second review round on this PR found the
+    // first version of this test only covered 6 of the 17 fixed overlays and compared
+    // every locale against the English name, so a translated overlay that leaked the
+    // localized form (zh_CN "祖尔加", zh_TW "祖爾加", ja_JP "ズルガー", ko_KR "줄가르",
+    // or the Cyrillic ru_RU "Зулгар") would have passed silently. The Latin-script
+    // locales below (including inflected forms like cs_CZ "Zulgarovi" and pl_PL
+    // "Zulgarowi") all still contain the "Zulgar" substring, so one shared check
+    // covers them; the four non-Latin scripts get their own literal.
+    const wildheartBoss = Object.values(MOBS).find((m) => m.id === 'wildheart_high_priest');
+    expect(wildheartBoss, 'wildheart_high_priest mob missing from content').toBeTruthy();
+    const personalName = (wildheartBoss?.name ?? '').split(',')[0];
+    expect(personalName).toBe('Zulgar');
+    const forbiddenByLocale: Partial<Record<SupportedLanguage, string>> = {
+      cs_CZ: personalName,
+      da_DK: personalName,
+      de_DE: personalName,
+      es: personalName,
+      fr_FR: personalName,
+      id_ID: personalName,
+      it_IT: personalName,
+      nl_NL: personalName,
+      pl_PL: personalName,
+      pt_BR: personalName,
+      ru_RU: 'Зулгар',
+      sv_SE: personalName,
+      tr_TR: personalName,
+      vi_VN: personalName,
+      ja_JP: 'ズルガー',
+      ko_KR: '줄가르',
+      zh_CN: '祖尔加',
+      zh_TW: '祖爾加',
+    };
+    for (const [locale, forbidden] of Object.entries(forbiddenByLocale) as [
+      SupportedLanguage,
+      string,
+    ][]) {
+      await ensureLocaleLoaded(locale);
+      setLanguage(locale);
+      const html = dungeonsPage.render({
+        params: [],
+        sub: 'dungeons',
+        titleKey: 'guide.nav.dungeons',
+      });
+      expect(
+        html.includes(forbidden),
+        `boss personal name "${forbidden}" leaked into the ${locale} dungeons page`,
+      ).toBe(false);
+      // The reliquary page holds the same standard per locale (its English-only
+      // sibling above records why prose-only): the catalog strip is recomputed
+      // HERE because section headings localize, so the block differs per locale.
+      const reliquaryHtml = reliquaryPage.render({
+        params: [],
+        sub: 'reliquary',
+        titleKey: 'guide.nav.reliquary',
+      });
+      const localeCatalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
+      expect(reliquaryHtml.includes(localeCatalogHtml), locale).toBe(true);
+      expect(
+        reliquaryHtml.replace(localeCatalogHtml, '').includes(forbidden),
+        `boss personal name "${forbidden}" leaked into the ${locale} reliquary page prose`,
+      ).toBe(false);
+    }
+    setLanguage('en');
+  });
+
   it('documents the new default binds on the controls page', () => {
     setLanguage('en');
     const html = controlsPage.render({
@@ -1030,6 +1415,70 @@ describe('Guide deeds cross-page surfaces', () => {
     expect(defaults.get('discord')).toEqual(['KeyU']);
     expect(defaults.get('petAttack')).toEqual(['Ctrl+Digit1']);
     expect(defaults.get('petAggressive')).toEqual(['Ctrl+Digit5']);
+  });
+});
+
+// Five shipped keybound features (Professions, Target Buffs and Debuffs, Dungeon Finder,
+// Mount/Dismount, Sheathe) were entirely absent from the controls reference table. Each row
+// mirrors the game's real default bind (src/game/keybinds.ts), so a changed shipped default
+// reds this test instead of silently drifting the public reference.
+describe('Guide controls reference completeness', () => {
+  it('documents Professions, Target Buffs/Debuffs, Dungeon Finder, Mount, and Sheathe', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+P</kbd></td><td>Professions</td>');
+    expect(html).toContain('<kbd>Shift+J</kbd></td><td>Target buffs and debuffs</td>');
+    expect(html).toContain('<kbd>Shift+I</kbd></td><td>Dungeon Finder</td>');
+    expect(html).toContain('<kbd>`</kbd></td><td>Mount / Dismount</td>');
+    expect(html).toContain('<kbd>Z</kbd></td><td>Sheathe/Unsheathe Weapon</td>');
+  });
+
+  // Second wave of absent rows, found by auditing the whole table against BIND_ACTIONS:
+  // swimming had no key at all, the battleground flag action was undocumented on a page
+  // that describes flag play, damage meters were missing, and the Pet group showed five
+  // of six binds. Same contract as above: a changed shipped default reds this test rather
+  // than silently drifting the public reference.
+  it('documents Swim Down, the arrow-key alternates, the flag action, meters, and Pet: Mark', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>LCtrl</kbd></td><td>Swim down while you are in the water (hold)');
+    expect(html).toContain('<kbd>Arrow Keys</kbd>');
+    expect(html).toContain('<kbd>Shift+F</kbd></td><td>Take the enemy flag in Thornhollow Fields');
+    expect(html).toContain('<kbd>Shift+H</kbd></td><td>Damage meters');
+    expect(html).toContain('<kbd>Ctrl+6</kbd></td><td>Pet: Mark');
+    expect(html).toContain('<kbd>Shift+Tab</kbd></td><td>Cycle target backward');
+  });
+
+  it('keeps the second-wave binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('dive')).toEqual(['ControlLeft']);
+    expect(defaults.get('bgFlag')).toEqual(['Shift+KeyF']);
+    expect(defaults.get('meters')).toEqual(['Shift+KeyH']);
+    expect(defaults.get('targetPet')).toEqual(['Ctrl+Digit6']);
+    expect(defaults.get('targetPrev')).toEqual(['Shift+Tab']);
+    // The arrow keys are the SECOND default of the four movement actions, which is the
+    // whole claim the Arrow Keys row makes.
+    expect(defaults.get('forward')).toEqual(['KeyW', 'ArrowUp']);
+    expect(defaults.get('back')).toEqual(['KeyS', 'ArrowDown']);
+    expect(defaults.get('turnLeft')).toEqual(['KeyA', 'ArrowLeft']);
+    expect(defaults.get('turnRight')).toEqual(['KeyD', 'ArrowRight']);
+  });
+
+  it('keeps those five binds in step with the game defaults', () => {
+    const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
+    expect(defaults.get('professions')).toEqual(['Shift+KeyP']);
+    expect(defaults.get('targetAuras')).toEqual(['Shift+KeyJ']);
+    expect(defaults.get('dungeonFinder')).toEqual(['Shift+KeyI']);
+    expect(defaults.get('mount')).toEqual(['Backquote']);
+    expect(defaults.get('sheathe')).toEqual(['KeyZ']);
   });
 });
 
@@ -1063,6 +1512,23 @@ describe('Guide model stills', () => {
         `missing still on disk: "${url}" (run \`npm run wiki:stills\`)`,
       ).toBe(true);
     }
+  });
+
+  it('ships a visible 320px WebP for the dedicated Gloomshade still', async () => {
+    const gloomshade = GUIDE_WARLOCK_PETS.find((pet) => pet.id === 'gloomshade');
+    expect(gloomshade?.model).toBe('mob_gloomshade');
+    expect(gloomshade?.still).toBe('/guide-stills/mob_gloomshade.webp');
+    const bytes = readFileSync(publicPath(gloomshade?.still ?? ''));
+    expect(bytes.byteLength).toBeGreaterThan(2048);
+    expect(bytes.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(bytes.toString('ascii', 8, 12)).toBe('WEBP');
+    const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    expect(decoded.info).toMatchObject({ width: 320, height: 320, channels: 4 });
+    let visiblePixels = 0;
+    for (let offset = 3; offset < decoded.data.length; offset += 4) {
+      if (decoded.data[offset] > 0) visiblePixels++;
+    }
+    expect(visiblePixels).toBeGreaterThan(1000);
   });
 
   it('has no orphan WebP (every committed still is referenced by a figure)', () => {
@@ -1335,16 +1801,22 @@ describe('Guide professions gathering accuracy', () => {
         ).length;
         expect(row.count).toBe(simCount);
       }
-      expect(g.respawnSeconds).toBe(120);
+      // Re-minted from 120 alongside the node-count expansion: the wiki prints
+      // this straight out of NODE_HARVEST_TABLE, and the two moved together so
+      // the per-zone harvest ceiling stayed flat (gathering.ts).
+      expect(g.respawnSeconds).toBe(240);
     }
-    // Spot pin: Thornpeak ships one tier-3 node per gathering type.
+    // Spot pin: Thornpeak ships two tier-3 nodes per gathering type. Was one,
+    // and doubled with the respawn so a tier-3 gatherer's rate held; the number
+    // matters here because tier 3 is the only tier that finishes the climb to
+    // proficiency 100.
     const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
     const t3 = mining?.nodes?.find((n) => n.tier === 3);
     expect(t3).toEqual({
       zone: 'Thornpeak Heights',
       tier: 3,
       toolTier: 3,
-      count: 1,
+      count: 2,
       material: 'Osmium Ore',
     });
   });
@@ -1370,19 +1842,175 @@ describe('Guide professions gathering accuracy', () => {
           ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,
         );
       }
+      // R22 wield column: land tools above tier 1 publish the frozen wield
+      // requirement; tier 1 and every fishing rod publish none (rods are the
+      // structural exemption, wield_gate.ts). This is a MIRROR (generator and
+      // expectation both read the same constants); the absolute literal pins
+      // live in tests/professions_tool_gate.test.ts (85/100) and
+      // tests/delve_shop.test.ts (24/56 and every gate).
+      if (use.professionId !== 'fishing' && use.tier >= 2) {
+        expect(rows[0].wieldProficiency, `${itemId} wield requirement`).toBe(
+          WIELD_REQUIREMENT_BY_TIER[use.tier],
+        );
+      } else {
+        expect(rows[0].wieldProficiency, `${itemId} must publish no wield`).toBeUndefined();
+      }
+      // The Marks route publishes its clears gate exactly as the delve
+      // counter enforces it, and the tier-4 rows all sit on clears:3, which
+      // is what keeps the English "three delve clears" in
+      // guide.profPages.toolCraftedOrMarks honest.
+      const shopRows = Object.values(DELVE_SHOPS)
+        .flat()
+        .filter((e) => e.itemId === itemId);
+      // First-match-wins on both sides (the generator's marksRowFor scans the
+      // same way), so a tool stocked twice at different gates would agree
+      // invisibly: require uniqueness before trusting the mirror.
+      expect(shopRows.length, `${itemId} must appear on at most one delve counter`).toBeLessThan(2);
+      const shopRow = shopRows[0];
+      if (shopRow) {
+        expect(rows[0].priceMarks, `${itemId} Marks price`).toBe(shopRow.marks);
+        if (shopRow.gate === 'heroicClear') {
+          expect(rows[0].marksHeroicClear, `${itemId} heroic gate`).toBe(true);
+          expect(rows[0].marksClears).toBeUndefined();
+        } else {
+          expect(shopRow.gate, `${itemId} gate must be the pinned clears rung`).toBe('clears:3');
+          expect(rows[0].marksClears, `${itemId} clears gate`).toBe(3);
+          expect(rows[0].marksHeroicClear).toBeUndefined();
+        }
+      } else {
+        expect(rows[0].priceMarks).toBeUndefined();
+        expect(rows[0].marksClears).toBeUndefined();
+        expect(rows[0].marksHeroicClear).toBeUndefined();
+      }
     }
     // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
-    // at 150c, all at Trader Wilkes.
+    // at 150c, all bought; Stormreel t4 and Tidewrought t5 crafted, so they
+    // carry no price at all.
     const fishing = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing');
     expect(fishing?.tools.map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
       ['Simple Fishing Pole', 1, 20],
       ['Ironreel Fishing Rod', 2, 60],
       ['Silverstream Fishing Rod', 3, 150],
+      ['Stormreel Fishing Rod', 4, null],
+      ['Tidewrought Fishing Rod', 5, null],
     ]);
+    // Every rung says where it comes from, and the two routes are exclusive:
+    // a bought rod names a counter, a crafted one names the craft that makes
+    // it. Before the crafted rods existed this loop demanded a vendor for
+    // every row, which a crafted rod can never satisfy.
+    let bought = 0;
+    let crafted = 0;
     for (const rod of fishing?.tools ?? []) {
-      expect(
-        rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
-      ).toBe(true);
+      if (rod.priceCopper === null) {
+        expect(rod.vendors, `${rod.name} is crafted and must be on no counter`).toEqual([]);
+        // The published row carries no item id, so the recipe is resolved
+        // through the display name the row does carry.
+        expect(rod.craftedBy, `${rod.name} must name its craft`).toBe(
+          ALL_RECIPES.find((r) => ITEMS[r.resultItemId]?.name === rod.name)?.professionId,
+        );
+        expect(rod.craftedBy).toBe('engineering');
+        crafted += 1;
+      } else {
+        expect(
+          rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
+          `${rod.name} must name its stockist`,
+        ).toBe(true);
+        bought += 1;
+      }
+      // Each bought rung above the first is also sold in the zone whose water
+      // asks for it, so no zone demands tackle no local counter carries.
+      if (rod.tier === 2) {
+        expect(
+          rod.vendors.some((v) => v.name === 'Provisioner Hale'),
+          'the marsh must stock the rod its own water takes',
+        ).toBe(true);
+      }
+      if (rod.tier === 3) {
+        expect(
+          rod.vendors.some((v) => v.name === 'Quartermaster Bree'),
+          'the peaks must stock the rod their own water takes',
+        ).toBe(true);
+      }
+    }
+    expect([bought, crafted]).toEqual([3, 2]);
+  });
+
+  it('publishes the tool-gate thresholds through placeholders in EVERY locale', () => {
+    // The tools note states the two gate thresholds. It takes them as {tier2} /
+    // {tier3} rather than as literals so a retune moves the published prose in
+    // all 19 languages at once; a fill that dropped the tokens would republish
+    // frozen numbers, and nothing else would notice, because the value would
+    // still be present and translated.
+    setLanguage('en');
+    const en = t('guide.profPages.toolsNote', {
+      tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
+      tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
+    });
+    expect(en).toContain(String(TIER2_TOOL_GATE_PROFICIENCY));
+    expect(en).toContain(String(TIER3_TOOL_GATE_PROFICIENCY));
+    expect(en, 'no token left unspliced').not.toMatch(/\{[A-Za-z0-9_]+\}/);
+    // The crafted rungs' thresholds ride the prose as ENGLISH LITERALS (the
+    // long-translated key keeps its token set, R64), so pin the exact
+    // crafted-rung clause to the frozen wield table: a retune fails here
+    // instead of rotting in the prose, and the clause scope keeps an
+    // unrelated 100 elsewhere in the note from ever satisfying this.
+    expect(en).toContain(
+      `${TIER4_TOOL_WIELD_PROFICIENCY} and ${TIER5_TOOL_WIELD_PROFICIENCY} for the two crafted rungs`,
+    );
+    // The Marks-route cells name their gates as English words, so tie the
+    // wording to the live gate IN THE SAME BREATH: if the delve counter's
+    // tier-4 rung ever leaves clears:3, this line reds together with the
+    // wording below, not in a different test a fixer can satisfy alone.
+    expect(
+      Object.values(DELVE_SHOPS)
+        .flat()
+        .find((e) => e.itemId === 'thorium_mining_pick')?.gate,
+    ).toBe('clears:3');
+    // The delve name in the wording derives from the shipped delve, so a sim
+    // rename reds this pin against the prose literal instead of rotting six
+    // English strings plus five locale fills with a green suite (R66).
+    const litany = GUIDE_DELVES.find((d) => d.id === 'drowned_litany')?.name.replace(/^The /, '');
+    expect(litany, 'the Litany ships under its known name').toBe('Drowned Litany');
+    expect(t('guide.profPages.toolCraftedOrMarks', { craft: 'X', marks: '24' })).toContain(
+      `three ${litany} clears`,
+    );
+    expect(t('guide.profPages.toolCraftedOrMarksHeroic', { craft: 'X', marks: '56' })).toContain(
+      `Heroic ${litany} clear`,
+    );
+
+    // Every shipped locale, read off the resolved bundles: both tokens present
+    // AND neither threshold spelled out as a literal. The second half is what a
+    // reword silently leaves behind, since the row stays "translated" and no
+    // i18n gate ever marks it pending.
+    const dir = resolve(process.cwd(), 'src/ui/i18n.resolved.generated');
+    // Locale bundles only: the directory also holds the barrel, the lazy
+    // loader map, and the pending slice.
+    const INFRA = new Set(['index.ts', 'loaders.ts', 'pending.ts']);
+    const locales = readdirSync(dir).filter((f) => f.endsWith('.ts') && !INFRA.has(f));
+    expect(locales.length).toBeGreaterThan(15);
+    for (const file of locales) {
+      const source = readFileSync(`${dir}/${file}`, 'utf8');
+      const at = source.indexOf('toolsNote');
+      expect(at, `${file} carries toolsNote`).toBeGreaterThan(-1);
+      // Bounded by the value's own line, not a magic width: a window wider
+      // than the longest translation reaches into following keys, and the
+      // direction of that looseness is a FALSE PASS.
+      const lineEnd = source.slice(at).indexOf('\n');
+      const value = source.slice(at, lineEnd === -1 ? undefined : at + lineEnd);
+      expect(value, `${file} keeps {tier2Prof}`).toContain('{tier2Prof}');
+      expect(value, `${file} keeps {tier3Prof}`).toContain('{tier3Prof}');
+      // The half a placeholder check alone cannot see: a fill that spelled the
+      // numbers out would keep the tokens elsewhere in the sentence and still
+      // publish frozen values. Neither threshold may appear as a literal.
+      const withoutTokens = value.replace(/\{[^}]*\}/g, '');
+      // Whole-number match, not a substring: an unrelated figure that merely
+      // CONTAINS the threshold digits (a 240-second respawn, say) must not trip
+      // this, or a future prose edit fails for the wrong reason.
+      for (const threshold of [TIER2_TOOL_GATE_PROFICIENCY, TIER3_TOOL_GATE_PROFICIENCY]) {
+        expect(withoutTokens, `${file} spells out ${threshold}`).not.toMatch(
+          new RegExp(`(^|[^0-9])${threshold}([^0-9]|$)`),
+        );
+      }
     }
   });
 
@@ -1393,9 +2021,25 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.biteMinSec).toBe(3);
     expect(f.biteMaxSec).toBe(8);
     expect(f.rodBiteReductionSec).toBe(1.5);
-    expect(f.reelWindowSec).toBe(3);
+    expect(f.reelWindowSec).toBe(2.5);
     expect(f.reelRodBonusSec).toBe(0.75);
     expect(f.sessionCapSec).toBe(15);
+    // The biteBody prose quotes DERIVED figures (worst wait and reel window
+    // per rod tier) as English literals; derive them here from the published
+    // constants so a rhythm retune reds the prose too, not just the numbers
+    // above (the QA lens found the derivations otherwise unpinned).
+    setLanguage('en');
+    const bite = t('guide.profPages.fish.biteBody', {
+      min: '3',
+      max: '8',
+      reel: '2.5',
+      cap: '15',
+      rod: '1.5',
+      reelRod: '0.75',
+    });
+    expect(bite).toContain(`down to ${f.biteMaxSec - f.rodBiteReductionSec} seconds`);
+    expect(bite).toContain(`${f.reelWindowSec + f.reelRodBonusSec} second window`);
+    expect(bite).toContain(`the Silverstream to ${f.biteMaxSec - 2 * f.rodBiteReductionSec} with`);
     expect(f.schedule).toEqual(
       FISHING_GAIN_SCHEDULE.map((row) => ({ below: row.belowProficiency, gain: row.gain })),
     );
@@ -1429,14 +2073,17 @@ describe('Guide professions gathering accuracy', () => {
         expect(pubZone?.rows.reduce((sum, r) => sum + r.pct, 0)).toBe(100);
       }
     }
-    // The koi odds stay flat across bands: 3 percent in the Vale and marsh,
-    // 4 in Thornpeak (its odds never scale with skill).
-    for (const band of f.bandTables) {
-      for (const zone of band.zones) {
+    // The koi odds are the one row that reads skill and nothing else: the same
+    // 1 / 3 / 6 percent in every zone, rising with the band.
+    let koiRowsChecked = 0;
+    for (const [band, published] of f.bandTables.entries()) {
+      for (const zone of published.zones) {
         const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
-        expect(koi?.pct).toBe(zone.zone === 'Thornpeak Heights' ? 4 : 3);
+        expect(koi?.pct, `${zone.zone} band ${band}`).toBe([1, 3, 6][band]);
+        koiRowsChecked += 1;
       }
     }
+    expect(koiRowsChecked).toBe(9);
   });
 
   it('publishes the exact shared curve, cast, and rare-event numbers', () => {
@@ -1468,6 +2115,39 @@ describe('Guide professions gathering accuracy', () => {
     // The corpse specimen chance: the rare+ share of the corpse rarity roll
     // at its fixed baseline (40 * 0.4 / 100 = 16 percent).
     expect(c.specimenChancePct).toBe(16);
+  });
+
+  it('ties the gatherDeeds prose counts to the deed catalog (phase 24)', () => {
+    // The two per-zone deed families the gatherDeeds prose counts. A new zone
+    // that authors either deed (the zone-4 pass) moves the count here and must
+    // reword the prose in the same change, or these arms go red.
+    const firstCast = Object.values(DEEDS).filter(
+      (d) => d.trigger.kind === 'visit' && d.trigger.markId.startsWith('fish:'),
+    );
+    const chronicles = Object.values(DEEDS).filter(
+      (d) =>
+        d.trigger.kind === 'visits' &&
+        d.trigger.markIds.length > 0 &&
+        d.trigger.markIds.every((m) => m.startsWith('gather:')),
+    );
+    const words: Record<number, string> = {
+      5: 'five',
+      6: 'six',
+      7: 'seven',
+      8: 'eight',
+      12: 'twelve',
+    };
+    const castWord = words[firstCast.length];
+    expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
+    expect(guideStrings.profPages.gatherDeeds.fishing).toContain(
+      `each of ${castWord} zones' waters`,
+    );
+    const chronWord = words[chronicles.length];
+    expect(chronWord, `unmapped gatherer-chronicle count ${chronicles.length}`).toBeDefined();
+    const chronSentence = `${(chronWord as string)[0].toUpperCase()}${(chronWord as string).slice(1)} zones keep a gatherer's chronicle page apiece`;
+    for (const trade of ['mining', 'logging', 'herbalism'] as const) {
+      expect(guideStrings.profPages.gatherDeeds[trade]).toContain(chronSentence);
+    }
   });
 });
 
@@ -1538,15 +2218,12 @@ describe('Guide professions enchanting and economy accuracy', () => {
     );
   });
 
-  it('publishes the exact fees, throttle, masterwork odds, and market cut', () => {
+  it('publishes the exact fees, masterwork odds, and market cut', () => {
     const e = GUIDE_PROF_ECONOMY;
     expect(e.craftFeeCopperPerBudgetPoint).toBe(CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
     expect(e.craftFeeCopperPerBudgetPoint).toBe(2);
-    expect(e.actionThrottle).toEqual({
-      windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
-      maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
-    });
-    expect(e.actionThrottle).toEqual({ windowSeconds: 60, maxActions: 10 });
+    // Craft Cast System Phase 5: shared actionThrottle removed from guide data.
+    expect('actionThrottle' in e).toBe(false);
     expect(e.marketCutPct).toBe(Math.round(MARKET_CUT * 100));
     expect(e.marketCutPct).toBe(5);
     expect(e.listingDepositCopper).toBe(MARKET_LISTING_DEPOSIT_COPPER);
@@ -1634,6 +2311,75 @@ describe('Guide professions pages and routes', () => {
       expect((html.match(/<h1>/g) ?? []).length, `page "${id}" h1 count`).toBe(1);
       expect(html).not.toContain('guide-notfound');
     }
+    // The tool table's Use at column renders end to end: the header cell, the
+    // wield numbers, the ungated fallback, and BOTH Marks-gate source cells
+    // (the data-level mirror above cannot see a header/cell desync or a
+    // swapped gate string; this can).
+    const mining = professionsPage.render(ctx(['mining']));
+    expect(mining).toContain(`<th scope="col">${t('guide.profPages.colWield')}</th>`);
+    expect(mining).toContain(`<td>${t('guide.profPages.wieldNone')}</td>`);
+    // Tie each gate WORDING to its own tool's row, not just to the page: a
+    // swapped heroic/clears key pair in toolSource keeps both strings on the
+    // page (mining has one tool at each gate) and only a per-row assertion
+    // reds on the inversion.
+    const rowFor = (name: string): string =>
+      mining.match(
+        new RegExp(`<tr>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    // Delve name derived as in the wording pin above: a sim rename must red
+    // these rows rather than leave stale prose green.
+    const litanyRow = GUIDE_DELVES.find((d) => d.id === 'drowned_litany')?.name.replace(
+      /^The /,
+      '',
+    );
+    expect(rowFor('Osmium Mining Pick'), 'tier-4 row names its clears gate').toContain(
+      `three ${litanyRow} clears`,
+    );
+    expect(rowFor('Glyphsteel Mining Pick'), 'tier-5 row names its Heroic gate').toContain(
+      `Heroic ${litanyRow} clear`,
+    );
+    // The rendered wield NUMBER in its own COLUMN, not just the artifact
+    // field: the data mirror pins the corpus, so a page that renders the
+    // wrong value in the cell would otherwise ship silently (the QA mutation
+    // pass proved it), and a bare toContain would survive a column swap. The
+    // Use at column is the fourth cell (Tool, Tier, Quality, Use at, ...).
+    const wieldCell = (name: string): string =>
+      rowFor(name).match(/<td[^>]*>[\s\S]*?<\/td>/g)?.[3] ?? '';
+    expect(wieldCell('Osmium Mining Pick'), 'tier-4 wield column holds its number').toBe(
+      `<td>${TIER4_TOOL_WIELD_PROFICIENCY}</td>`,
+    );
+    expect(wieldCell('Glyphsteel Mining Pick'), 'tier-5 wield column holds its number').toBe(
+      `<td>${TIER5_TOOL_WIELD_PROFICIENCY}</td>`,
+    );
+    // Two guide-prof-tables render on the page (nodes first, tools second);
+    // anchor on the Use at header so the parity check reads the TOOLS table.
+    const toolsTable = mining
+      .split('<table')
+      .find((seg) => seg.includes(`<th scope="col">${t('guide.profPages.colWield')}</th>`));
+    expect(toolsTable, 'tools table present').toBeDefined();
+    const thCount = (toolsTable?.match(/<thead><tr>([\s\S]*?)<\/tr>/)?.[1].match(/<th[\s>]/g) ?? [])
+      .length;
+    expect(thCount, 'header column count').toBe(6);
+    // EVERY body row, not just the first: a conditional cell in a later row
+    // would slip past a first-row-only parity check.
+    const bodyRows =
+      toolsTable?.match(/<tbody>([\s\S]*?)<\/tbody>/)?.[1].match(/<tr>[\s\S]*?<\/tr>/g) ?? [];
+    // Exact row count from the corpus, not a floor: a table collapsing to one
+    // row must red, and the corpus mirror above pins the corpus to ITEMS.
+    expect(bodyRows.length, 'tools table renders every ladder rung').toBe(
+      GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.tools.length,
+    );
+    for (const row of bodyRows) {
+      expect((row.match(/<td/g) ?? []).length, 'body row column count agrees with header').toBe(6);
+    }
+    // The mobile min-width floor is a two-sided contract: the markup carries
+    // the scoped class and the guide stylesheet declares a min-width for it.
+    // src/guide/styles.css sits outside every src/styles CSS guard, so this
+    // is its one pin (the fix round scoped the floor away from the shared
+    // .guide-prof-table after it crushed narrow tables).
+    expect(toolsTable, 'tools table carries its scoped width class').toContain('guide-tools-table');
+    const guideCss = readFileSync(resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
+    expect(guideCss).toMatch(/\.guide-tools-table\s*\{[^}]*min-width:/);
     // The craft page really renders its recipe rows.
     const weapon = professionsPage.render(ctx(['weaponcrafting']));
     expect(weapon).toContain('Osmium Warblade');

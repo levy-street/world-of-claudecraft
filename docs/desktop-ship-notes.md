@@ -202,9 +202,11 @@ node_modules in the asar, all seven fuses set.
 3. Upload to the update host directory (keep exact filenames):
    - mac: `world-of-claudecraft-<v>-mac-universal.dmg` (download page),
      `...-mac-universal.zip` + `.zip.blockmap` + `latest-mac.yml` (updater).
-   - win: the combined NSIS installer electron-builder emits by default for
-     x64+arm64 (see `docs/desktop-release.md` for the buildUniversalInstaller
-     detail) plus its `.exe.blockmap` and `latest.yml`.
+   - win: `world-of-claudecraft-<v>-win-x64.exe` and `...-win-arm64.exe` (one
+     installer per arch: `build.nsis.buildUniversalInstaller: false`, see
+     `docs/desktop-release.md`), each with its `.exe.blockmap`, plus the one
+     `latest.yml` both artifacts list in (Windows update-info filenames carry
+     no arch suffix). The download page links x64 only.
    - linux: `...-linux-x86_64.AppImage` (x64) and `...-linux-arm64.AppImage`,
      the debs (`...-amd64.deb`, `...-arm64.deb`) for the download page, and BOTH
      per-arch feed files `latest-linux.yml` (x64) and `latest-linux-arm64.yml`

@@ -6,7 +6,7 @@ tunes against real numbers. It is MEASUREMENT-ONLY: zero gameplay change, zero v
 change (one new informational toast is the sole player-visible addition), and the
 render-budget governor's behavior is preserved bit-for-bit on every tier.
 
-Worktree at authoring: /Users/fernando/Documents/wocc-player-perf, branch
+Worktree at authoring: worktree wocc-player-perf, branch
 feature/perf-instruments; SHIPPED combined with packet 3 on feature/input-cadence at
 the maintainer's request (one PR off the latest release branch).
 Deliverable: that combined gate-green PR, following the PR template, with baselines.md

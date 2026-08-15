@@ -4,6 +4,8 @@ import {
   erasePlacementIndex,
   eraseStampIndex,
   flattenStamp,
+  pickPlacementIndex,
+  placementPickRadius,
   smoothSamplePoints,
   smoothStamp,
   stampRegion,
@@ -98,6 +100,48 @@ describe('erase hit tests', () => {
     expect(erasePlacementIndex(placements, 1, 0, 6)).toBe(0);
     expect(erasePlacementIndex(placements, 20, 0, 6)).toBe(-1);
     expect(erasePlacementIndex([], 0, 0, 6)).toBe(-1);
+  });
+});
+
+describe('placement pick (Select mode)', () => {
+  const placements: AssetPlacement[] = [
+    { assetId: 'props/a', x: 0, z: 0, rotY: 0, scale: 1, collide: false },
+    { assetId: 'props/big', x: 20, z: 0, rotY: 0, scale: 4, collide: false },
+  ];
+
+  it('REGRESSION: a bigger placement gets a bigger pick radius, mirroring the 3D viewport', () => {
+    // Bug: the 2D Select-mode fallback pick used a FIXED 2-yard radius,
+    // ignoring both the placement's own scale and the current 2D zoom,
+    // unlike the 3D viewport's scale-aware pickPlacement (which widens its
+    // radius to `scale * 2`). At a middling zoom (4 px/yard), a click 3
+    // yards from a scale-1 placement misses, but the same distance from a
+    // scale-4 placement hits, because its own radius has grown to match.
+    expect(pickPlacementIndex(placements, 3, 0, 4)).toBe(-1);
+    expect(pickPlacementIndex(placements, 23, 0, 4)).toBe(1);
+  });
+
+  it('zooming out grows the world-space pick radius (constant on-screen forgiveness)', () => {
+    // Same click, same small placement: at a comfortable zoom it misses, but
+    // zoomed way out the fixed on-screen slop now spans more world yards.
+    expect(pickPlacementIndex(placements, 3, 0, 4)).toBe(-1);
+    expect(pickPlacementIndex(placements, 3, 0, 0.5)).toBe(0);
+  });
+
+  it('the nearest of several eligible placements wins', () => {
+    const two: AssetPlacement[] = [
+      { assetId: 'props/a', x: 0, z: 0, rotY: 0, scale: 1, collide: false },
+      { assetId: 'props/b', x: 1, z: 0, rotY: 0, scale: 1, collide: false },
+    ];
+    expect(pickPlacementIndex(two, 0.6, 0, 4)).toBe(1);
+  });
+
+  it('returns -1 for an empty placement list or a genuine miss', () => {
+    expect(pickPlacementIndex([], 0, 0, 4)).toBe(-1);
+    expect(pickPlacementIndex(placements, 500, 500, 4)).toBe(-1);
+  });
+
+  it('never shrinks below the floor even at extreme zoom-in', () => {
+    expect(placementPickRadius(1, 1000)).toBeGreaterThanOrEqual(1.5);
   });
 });
 

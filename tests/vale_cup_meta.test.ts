@@ -13,7 +13,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
 import type { Sim } from '../src/sim/sim';
-import { endCupMatch, VALE_CUP_BRAM_ID, VC_MATCH_DURATION } from '../src/sim/social/vale_cup';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
+import {
+  endCupMatch,
+  VALE_CUP_BRAM_ID,
+  VC_MATCH_DURATION,
+  vcupRenameGuild,
+} from '../src/sim/social/vale_cup';
 import { GOAL_LINE_EAST_X, PITCH_CENTER } from '../src/sim/vale_cup_layout';
 import {
   addAt,
@@ -360,6 +366,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
   it('rejects a Vale Cup queue join while merely waiting in the Arena queue', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     sim.arenaQueueJoin(a); // alone: waits, not yet matched
     expect(sim.arenaQueue1v1).toContain(a);
     sim.drainEvents();
@@ -372,6 +379,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
     const sim = makeWorld();
     const leader = addAt(sim, 'warrior', 'Leader', 0, -40);
     const member = addAt(sim, 'paladin', 'Member', 3, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, leader);
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, member); // solo: waits
     sim.partyInvite(member, leader);
     sim.partyAccept(member);
@@ -392,6 +400,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
     const a = addAt(sim, 'warrior', 'Ada', 0, -40);
     const c = addAt(sim, 'mage', 'Cee', 10, -40);
     const d = addAt(sim, 'rogue', 'Dee', 14, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     sim.arenaQueueJoin(a);
     expect(sim.arenaQueue1v1).toContain(a);
     const match = startBout(sim, c, d); // an unrelated live rated Vale Cup match
@@ -408,6 +417,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
   it('rejects starting a Vale Cup practice while waiting in the Arena queue', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     sim.arenaQueueJoin(a);
     expect(sim.arenaQueue1v1).toContain(a);
     sim.drainEvents();
@@ -497,6 +507,41 @@ describe('Vale Cup: guild banners and the guild leaderboard', () => {
     expect(board[0].name).toBe('Wheat Kings');
     // myGuild drives the "enter as guild" toggle.
     expect(sim.cupInfoFor(a)!.myGuild).toBe('Wheat Kings');
+  });
+
+  it('preserves queued and active banner identity across a moderation rename', () => {
+    const queuedSim = makeWorld();
+    const queuedPid = addAt(queuedSim, 'warrior', 'Queueing', 0, -40);
+    queuedSim.setPlayerGuild(queuedPid, 'Wheat Kings');
+    queuedSim.vcupQueueJoin(1, 'vale', 'allrounder', true, queuedPid);
+    const queued = queuedSim.vcup.queues[1][0];
+
+    vcupRenameGuild(queuedSim.ctx, queuedPid, 'Wheat Kings', 'Dawn Guard');
+
+    expect(queued.guilds[queuedPid]).toBe('Dawn Guard');
+    expect(queuedSim.entities.get(queuedPid)?.guild).toBe('Wheat Kings');
+
+    const matchSim = makeWorld();
+    const a = addAt(matchSim, 'warrior', 'Ada', 0, -40);
+    const b = addAt(matchSim, 'mage', 'Bo', 4, -40);
+    matchSim.setPlayerGuild(a, 'Wheat Kings');
+    matchSim.setPlayerGuild(b, 'Mire Herons');
+    matchSim.vcupQueueJoin(1, 'vale', 'allrounder', true, a);
+    matchSim.vcupQueueJoin(1, 'mirefen', 'allrounder', true, b);
+    matchSim.tick();
+    const match = matchSim.vcup.match!;
+
+    matchSim.renamePlayerGuild(a, 'Wrong Old Name', 'Ignored Name');
+    expect(match.guildEntry.get(a)).toBe('Wheat Kings');
+    expect(matchSim.entities.get(a)?.guild).toBe('Wheat Kings');
+
+    matchSim.renamePlayerGuild(a, 'Wheat Kings', 'Dawn Guard');
+
+    expect(match.guildEntry.get(a)).toBe('Dawn Guard');
+    expect(matchSim.entities.get(a)?.guild).toBe('Dawn Guard');
+    expect(matchSim.cupInfoFor(a)?.match?.teamA.find((p) => p.pid === a)?.guild).toBe('Dawn Guard');
+    decideForA(matchSim);
+    expect(matchSim.players.get(a)?.vcupGuildWins).toBe(1);
   });
 
   it('does not credit a guild when the player entered privately (banner off)', () => {

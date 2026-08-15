@@ -12,6 +12,7 @@ import {
   TEMPORAL_HOURGLASS_DURATION,
   TEMPORAL_HOURGLASS_HEAL_FRACTION,
 } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const FLAT_X = 700;
 
@@ -21,7 +22,7 @@ function knownIds(spec: 'arcane' | 'fire' | 'frost'): string[] {
 }
 
 function makeChronomancer(): { sim: Sim; mage: Entity } {
-  const sim = new Sim({ seed: 147, playerClass: 'mage' });
+  const sim = new Sim({ seed: 147, playerClass: 'mage', world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(14);
   expect(sim.setSpec('arcane')).toBe(true);
   sim.tick();

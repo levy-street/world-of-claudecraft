@@ -139,6 +139,11 @@ export interface DungeonLayout {
   doorZ?: number;
   /** floor scatter positions, renderer places props here AND collision circles back them */
   clutter?: GridPoint[];
+  /** Authored obstacles with a MEASURED radius, for centrepieces whose footprint
+   * the fixed-radius `clutter`/`pillars` circles cannot express (the Demon
+   * Tower's core is 2.7 yards across). Collision and the renderer read the same
+   * record, so what you bump into is what you see. */
+  obstacles?: Array<{ x: number; z: number; r: number }>;
   /** Illusion (fake) walls: rendered as solid wall panels but NOT backed by a
    * collider (deliberately excluded from layoutColliders), so the player walks
    * THROUGH them into a hidden pocket. Used by rifts to conceal off-path treasure. */
@@ -166,6 +171,11 @@ export interface DungeonLayout {
 // in render/dungeon.ts); InteriorStyle just makes that tinting data-driven.
 export type InteriorKit = 'crypt' | 'bastion' | 'sanctum' | 'temple';
 
+/** Authored Demon Tower environment built on top of a base interior kit. The
+ * sim carries only this stable identity; Three.js construction remains in the
+ * renderer. */
+export type DemonTowerSceneProfile = 'bloodforge' | 'ossuary' | 'void_crown';
+
 /** A generated re-grade of one of the four KayKit interior kits. Sim-layer data
  * (no Three imports); the renderer reads it in DungeonInteriors.build and the fog
  * pass, and the colliders never look at it (geometry comes from the DungeonLayout).
@@ -184,6 +194,13 @@ export interface InteriorStyle {
   floorTint?: number;
   /** Whether the boss dais is a raised platform (as sanctum/temple) or flush. */
   daisRaised?: boolean;
+  /** Per-floor lighting grade. Without it an authored floor inherits the
+   * Infernal Citadel's grade, which pairs very dim fill with a strong rim: that
+   * reads as drama on the citadel's blood-red models and as WASHED-OUT on any
+   * other palette. A floor with its own look sets its own numbers here. */
+  lighting?: { sun: number; hemi: number; env: number; rim: number };
+  /** Optional authored environment layer. Omitted for ordinary rifts. */
+  sceneProfile?: DemonTowerSceneProfile;
 }
 
 function grid(zFrom: number, zTo: number, zStep: number, xs: readonly number[]): GridPoint[] {
@@ -905,5 +922,7 @@ export function layoutColliders(
   }
   // floor clutter props (small circle per scatter point; renderer places matching props)
   for (const c of layout.clutter ?? []) out.push({ type: 'circle', x: c.x, z: c.z, r: 0.8 });
+  // authored centrepieces, at their measured footprint
+  for (const o of layout.obstacles ?? []) out.push({ type: 'circle', x: o.x, z: o.z, r: o.r });
   return out;
 }

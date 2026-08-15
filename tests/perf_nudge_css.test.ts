@@ -30,6 +30,21 @@ describe('performance nudge toast CSS', () => {
     );
   });
 
+  it('reserves the taller stacked slots only where the update card exists', () => {
+    // body.desktop-update-card is stamped by initDesktopUpdateToast exactly
+    // when its bridge capability check passes, so the reservation tracks the
+    // card's existence rather than the runtime probe: those sessions drop the
+    // gpu-notice slot to 216px (the tallest localized coarse-pointer ready
+    // card is ~201px) and this nudge to 272px; everyone else keeps the
+    // 56px/112px stack above.
+    expect(shell).toContain(
+      'body.desktop-update-card #gpu-notice { top: calc(var(--spacing-md) + 216px + env(safe-area-inset-top, 0px)); }',
+    );
+    expect(shell).toContain(
+      'body.desktop-update-card #perf-nudge { top: calc(var(--spacing-md) + 272px + env(safe-area-inset-top, 0px)); }',
+    );
+  });
+
   it('caps its width against small viewports like its sibling', () => {
     expect(shell).toContain('max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));');
   });

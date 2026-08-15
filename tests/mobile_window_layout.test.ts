@@ -38,6 +38,63 @@ describe('mobile window layout CSS', () => {
     );
   });
 
+  it('keeps mobile Daily Rewards in one vertical scroller above the open-window layer', () => {
+    const rewardsWindow = mobileCss.match(
+      /body\.mobile-touch #daily-rewards-window:not\(\.store-active\) \{([^}]*)\}/,
+    );
+    expect(rewardsWindow).not.toBeNull();
+    expect(rewardsWindow?.[1]).toContain(
+      'width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));',
+    );
+
+    const rewardsBody = mobileCss.match(
+      /body\.mobile-touch #daily-rewards-window:not\(\.store-active\) \.dr-body \{([^}]*)\}/,
+    );
+    expect(rewardsBody).not.toBeNull();
+    expect(rewardsBody?.[1]).toContain('columns: initial;');
+    expect(rewardsBody?.[1]).toContain('overflow-x: hidden;');
+    expect(rewardsBody?.[1]).toContain('overflow-y: auto;');
+    expect(rewardsBody?.[1]).toContain('overscroll-behavior: contain;');
+    expect(rewardsBody?.[1]).not.toContain('column-count:');
+    expect(rewardsBody?.[1]).not.toContain('column-count: 2;');
+
+    const spinOverlayZ = Number(
+      mobileCss.match(/body\.mobile-touch \.dr-spin-overlay \{[^}]*z-index: (\d+);/)?.[1],
+    );
+    const openUiZ = Number(
+      mobileCss.match(/body\.mobile-touch\.mobile-window-open #ui \{[^}]*z-index: (\d+);/)?.[1],
+    );
+    const backdropZ = Number(
+      mobileCss.match(
+        /body\.mobile-touch\.mobile-window-open #mobile-window-backdrop \{[^}]*z-index: (\d+);/,
+      )?.[1],
+    );
+    expect(spinOverlayZ).toBeGreaterThan(openUiZ);
+    expect(openUiZ).toBeGreaterThan(backdropZ);
+
+    const components = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(components).toMatch(/\.dr-spin-overlay \{[^}]*z-index: 60;/);
+
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-stage \{[^}]*width: min\(360px, calc\(var\(--app-vw, 100vw\) - 24px\), calc\(var\(--app-vh, 100dvh\) - 24px\)\);/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-wheel-big \{[^}]*width: 300px;[^}]*max-width: 84%;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-wheel-big span \{[^}]*translateY\(-106px\)/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-result \{[^}]*width: 120px;[^}]*height: 120px;[^}]*font-size: 18px;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.dr-spin-pointer \{[^}]*border-left-width: 13px;[^}]*border-right-width: 13px;[^}]*border-top-width: 24px;/,
+    );
+  });
+
   it('hides the mobile bottom action bar only while a truly fullscreen window (bags/char) is open', () => {
     expect(mobileCss).toMatch(
       /body\.mobile-touch\.mobile-fullscreen-window-open #bottom-bar \{[^}]*display: none;/,
@@ -116,5 +173,49 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).toMatch(/body\.mobile-touch \.mkt-filter \{[^}]*max-width: none;/);
     expect(mobileCss).not.toMatch(/body\.mobile-touch \.mkt-(?:search|filter) \{[^}]*\bflex:/);
     expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
+  });
+
+  it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {
+    // The control row lives in components.css beside the rest of the vendor
+    // family; the coarse-pointer floor is the mobile tap-target contract the
+    // desktop chip size must never squeeze away.
+    const components = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(components).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.vendor-qty-btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
+    );
+  });
+
+  it('floors the shared prompt-family action buttons at 40px under a coarse pointer (phase 21 QA)', () => {
+    // The bags/bank/vendor quantity prompts share one recipe; the vendor
+    // custom-amount prompt made those buttons a mobile purchase surface, so
+    // the tap floor lives on the shared .prompt .btn rule in hud.css.
+    const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(
+      /\r\n/g,
+      '\n',
+    );
+    expect(hudCss).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.prompt \.btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
+    );
+  });
+
+  it('clips the mobile action-page indicator instead of wrapping a locale-widened label (#2975)', () => {
+    // hudChrome.mobile.actionPageIndicator's English value is a bare digit, but
+    // a locale can translate it into a real word (ja_JP appends "ページ"). Without
+    // this, the wider string wraps inside the flex column and the circular
+    // badge shows a garbled multi-line stack instead of the page number.
+    const toggle = mobileCss.match(/body\.mobile-touch #mobile-action-page-toggle \{([^}]*)\}/);
+    expect(toggle).not.toBeNull();
+    expect(toggle?.[1]).toContain('overflow: hidden;');
+
+    const indicator = mobileCss.match(
+      /body\.mobile-touch #mobile-action-page-toggle \.mobile-action-page-indicator \{([^}]*)\}/,
+    );
+    expect(indicator).not.toBeNull();
+    expect(indicator?.[1]).toContain('white-space: nowrap;');
+    expect(indicator?.[1]).toContain('overflow: hidden;');
+    expect(indicator?.[1]).toContain('text-overflow: ellipsis;');
   });
 });

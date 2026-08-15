@@ -117,6 +117,10 @@ export const apiErrorStrings = {
     taken_over: 'Your character was taken over by another session.',
     // reuses errors.api.renameBeforeEntering
     rename_required: 'This character must be renamed before entering the world.',
+    // the redesign editor's malformed-look rejection
+    invalid_appearance: 'That appearance could not be saved. Adjust the design and try again.',
+    // the ordinary redesign failure: token already spent, or two racing tabs
+    reroll_unavailable: 'This character does not have a free redesign available.',
   },
   // moderation: enforcement states set by a moderator.
   moderation: {
@@ -180,7 +184,38 @@ export const apiErrorStrings = {
     account_taken: 'That Steam account is already linked to another account.',
     upstream: 'Steam did not respond. Try again in a moment.',
   },
+  // epic: the env-gated Epic link family (server/epic/). Linking mirrors
+  // deed unlocks to Epic achievements; it is never a sign-in method.
+  epic: {
+    disabled: 'Epic linking is not available right now.',
+    invalid_token: 'Epic could not verify this link request. Try again from the desktop app.',
+    banned: 'That Epic account cannot be linked.',
+    already_linked: 'Your account already has a linked Epic account.',
+    account_taken: 'That Epic account is already linked to another account.',
+    upstream: 'Epic did not respond. Try again in a moment.',
+  },
   wallet: {
     handoff_invalid: 'That wallet authorization expired or could not be verified. Try again.',
+  },
+  ota_updates: {
+    invalid_input: 'Invalid input.',
+  },
+  seeker: {
+    native_only: 'Seeker entitlement is available only in the native app.',
+    attestation_failed: 'Device verification failed. Please try again.',
+    solana_artifact_required: 'Use the Solana Store app to continue.',
+    wallet_required: 'Link and verify a wallet first.',
+    genesis_token_required: 'A verified Seeker Genesis Token is required.',
+    genesis_token_claimed: 'That Seeker Genesis Token has already been claimed.',
+    entitlement_required: 'Verified Seeker entitlement is required.',
+    current_ownership_required: 'Current Seeker Genesis Token ownership is required.',
+  },
+  // cheater_mark: the operator-applied public Cheater tag (server/cheater_mark_api.ts).
+  // Operator-facing copy: only the admin dashboard ever receives these codes.
+  cheater_mark: {
+    admin_target: 'Operator accounts cannot be marked.',
+    reason_required: 'A reason is required.',
+    invalid_duration: 'Enter a mark duration of at least one second.',
+    not_marked: 'That account is not marked.',
   },
 };

@@ -5,6 +5,19 @@ import { ClientWorld } from '../src/net/online';
 import { normalizeMoveFacing, parseMoveInputFrame, sanitizeMoveInput } from '../src/sim/move_input';
 
 describe('movement input sanitizing', () => {
+  // The one graded field: how steeply the camera is steering a dive. Absent
+  // means "full rate" everywhere downstream (swimSteerRate), which is what
+  // keeps the dive key, bots and older clients on the original behaviour.
+  it('carries the swim steer, clamped, and leaves it absent when unsent', () => {
+    expect(sanitizeMoveInput({ dv: 1, ss: 0.5 }).swimSteer).toBe(0.5);
+    expect(sanitizeMoveInput({ dv: 1, swimSteer: 0.25 }).swimSteer).toBe(0.25);
+    expect(sanitizeMoveInput({ dv: 1, ss: 4 }).swimSteer).toBe(1);
+    expect(sanitizeMoveInput({ dv: 1, ss: -4 }).swimSteer).toBe(0);
+    expect(sanitizeMoveInput({ dv: 1 }).swimSteer).toBeUndefined();
+    expect(sanitizeMoveInput({ dv: 1, ss: 'fast' }).swimSteer).toBeUndefined();
+    expect(sanitizeMoveInput({ dv: 1, ss: Number.NaN }).swimSteer).toBeUndefined();
+  });
+
   it('accepts compact websocket flags and long controller flags', () => {
     expect(sanitizeMoveInput({ f: 1, turnRight: true, sr: 1 })).toEqual({
       forward: true,
@@ -14,6 +27,8 @@ describe('movement input sanitizing', () => {
       strafeLeft: false,
       strafeRight: true,
       jump: false,
+      dive: false,
+      surface: false,
     });
   });
 
@@ -32,6 +47,8 @@ describe('movement input sanitizing', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      dive: false,
+      surface: false,
     });
     expect(parsed.facing).toBeNull();
   });
@@ -87,6 +104,8 @@ describe('agent movement channel', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      dive: false,
+      surface: false,
     });
     expect(input.controllerFacingOverride()).toBe(8);
 
@@ -96,6 +115,9 @@ describe('agent movement channel', () => {
   });
 
   it('sanitizes ClientWorld movement before it reaches the websocket sender', () => {
+    // Kept bespoke on purpose (issue #2088): only moveInput is needed here,
+    // unlike the shared tests/helpers/bare_client.ts bareClient(), which sets
+    // every declared field.
     const client: any = Object.create(ClientWorld.prototype);
     client.moveInput = {
       forward: false,
@@ -105,6 +127,8 @@ describe('agent movement channel', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: false,
+      dive: false,
+      surface: false,
     };
     client.mouselookFacing = null;
 
@@ -118,6 +142,8 @@ describe('agent movement channel', () => {
       strafeLeft: false,
       strafeRight: true,
       jump: false,
+      dive: false,
+      surface: false,
     });
     expect(client.mouselookFacing).toBeNull();
 

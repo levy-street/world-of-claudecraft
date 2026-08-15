@@ -6,8 +6,9 @@
 // objects, which carry URLs and file paths the page has no business seeing).
 
 // Build the payload for one 'desktop-update-event' IPC send. Returns null for
-// event types the renderer does not need.
-function updateEventPayload(type, raw) {
+// event types the renderer does not need. `raw` is optional: the bare
+// notification types carry no data at all.
+function updateEventPayload(type, raw = undefined) {
   if (type === 'available' || type === 'downloaded') {
     const version = typeof raw?.version === 'string' ? raw.version.slice(0, 64) : '';
     return { type, version };
@@ -17,6 +18,12 @@ function updateEventPayload(type, raw) {
       ? Math.max(0, Math.min(100, Math.round(raw.percent)))
       : 0;
     return { type, percent };
+  }
+  if (type === 'checking' || type === 'not-available' || type === 'error') {
+    // Bare notifications: the renderer only needs that they happened. 'error'
+    // deliberately carries no message (a failed check is never user-facing
+    // text; the renderer just clears a stuck checking/downloading card).
+    return { type };
   }
   return null;
 }

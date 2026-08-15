@@ -2,7 +2,12 @@
 // keeping entity spawn, static collision, and interaction under one authority.
 
 import { EASTBROOK_LAYOUT } from '../eastbrook_layout';
-import { assertCanonicalEastbrookNoticeboardDef, type NoticeboardDef } from '../types';
+import { FENBRIDGE_LAYOUT } from '../fenbridge_layout';
+import {
+  assertCanonicalEastbrookNoticeboardDef,
+  type MusterBoardDef,
+  type NoticeboardDef,
+} from '../types';
 
 export type { NoticeboardDef } from '../types';
 
@@ -27,6 +32,24 @@ const EASTBROOK_NOTICEBOARD = {
 assertCanonicalEastbrookNoticeboardDef(EASTBROOK_NOTICEBOARD);
 
 export const NOTICEBOARDS: readonly NoticeboardDef[] = Object.freeze([EASTBROOK_NOTICEBOARD]);
+
+const fenbridgeMusterBoard = FENBRIDGE_LAYOUT.civic.musterBoard;
+
+/** Non-interactive boards still live in active-world services so rendering,
+ * capture evidence, and static collision all read the same optional record. */
+export const MUSTER_BOARDS: readonly MusterBoardDef[] = Object.freeze([
+  {
+    id: fenbridgeMusterBoard.id,
+    assetId: fenbridgeMusterBoard.assetId,
+    x: fenbridgeMusterBoard.position.x,
+    z: fenbridgeMusterBoard.position.z,
+    rotation: fenbridgeMusterBoard.rotation,
+    width: fenbridgeMusterBoard.nativeDimensions.width,
+    depth: fenbridgeMusterBoard.nativeDimensions.depth,
+    height: fenbridgeMusterBoard.nativeDimensions.height,
+    frontStandingPoint: { ...fenbridgeMusterBoard.frontStandingPoint },
+  } satisfies MusterBoardDef,
+]);
 
 /** Resolve only an authored active-world board and validate any untyped boundary. */
 export function noticeboardDefByEntityId(

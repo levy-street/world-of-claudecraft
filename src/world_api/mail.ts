@@ -19,6 +19,9 @@ export interface MailMessageView {
   subject: string;
   body: string;
   copper: number; // attached coin still waiting in the letter
+  /** Attachment stacks. An instanced parcel's `instance` here is the DISPLAY
+   *  projection (signer/enchant/rolled, the market browse-row trim); the full
+   *  payload arrives with mailTake. */
   items: InvSlot[]; // attached parcels still waiting in the letter
   read: boolean;
 }

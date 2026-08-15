@@ -8,6 +8,7 @@
 // Sim layer: no DOM/Three imports. This file is types only.
 
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
+import type { CombatExitMemory } from '../instance_exit_memory';
 import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, RiftTier } from '../types';
 
@@ -95,16 +96,6 @@ export interface RiftEvent {
   } | null;
 }
 
-/** The whole wire/persistence footprint of a rift instance. Both hosts turn this
- * into identical content via rift_gen. `origin` is the instance-space anchor the
- * floor's local coordinates are offset by (see rift/runs.ts). */
-export interface RiftDescriptor {
-  seed: number;
-  baseLevel: number;
-  floorIndex: number;
-  origin: { x: number; z: number };
-}
-
 /** One placed creature, instance-local. `color`/`scale` are per-run re-grades of
  * the base template so the same creature reads differently across rifts; when
  * omitted the template's own values are used. `level` is already resolved. */
@@ -138,7 +129,8 @@ export type RiftObjectKind =
   | 'boulder' // a pushable strength boulder
   | 'boulder_pad' // the socket a boulder must be pushed onto
   | 'seq_rune' // a numbered rune in a Simon-style step-in-order sequence
-  | 'infernal_orb'; // an authored altar orb: dormant until its miniboss dies, then opens the gate
+  | 'infernal_orb' // an authored altar orb: dormant until its miniboss dies, then opens the gate
+  | 'tower_core'; // the Demon Tower centrepiece: the wave anchor at the middle of every arena
 
 /** A placed interactable, instance-local. `descent` sinks the party to the next
  * floor; `exit` returns them to the overworld; `chest` is the floor reward; the
@@ -157,8 +149,18 @@ export interface RiftObjectPlan {
  * - `rune_pylons`: light every pylon (walk-on).
  * - `ice_slide`: slide across the ice sheet and stop on the goal tile (FFX/Pokemon).
  * - `boulder_push`: shove every strength boulder onto its socket pad (Pokemon Strength).
- * - `sequence`: step the runes in the shown order (Simon / pattern memory). */
-export type RiftPuzzleKind = 'none' | 'rune_pylons' | 'ice_slide' | 'boulder_push' | 'sequence';
+ * - `sequence`: step the runes in the shown order (Simon / pattern memory).
+ * - `demon_waves`: the Demon Tower's floor gate. The core sends `waveCount` packs
+ *   (rift/tower_waves.ts); the ascent opens when the last demon, plus any boss the
+ *   final wave released, is dead. Driven by rift/tower.ts, which flips
+ *   `puzzleSolved` exactly like a full set of lit pylons. */
+export type RiftPuzzleKind =
+  | 'none'
+  | 'rune_pylons'
+  | 'ice_slide'
+  | 'boulder_push'
+  | 'sequence'
+  | 'demon_waves';
 
 export interface RiftPuzzle {
   kind: RiftPuzzleKind;
@@ -269,6 +271,12 @@ export interface RiftInstance {
   startedAt: number;
   finishedAt: number | null;
   outcome: RiftInstanceOutcome;
+  /** True once the run is SPOILED: any mob killed, or the off-path cache
+   * plundered. A progressed run never recycles and binds its members WoW-raid
+   * style (enterRift routes them back and never into a sibling instance).
+   * Survives descent (floor teardown must not erase progress); reset only when
+   * the slot itself is freed. */
+  progressed: boolean;
   /** Snapshot of the event artifact at entry. Never changes mid-race. */
   upgrade: RiftUpgradeManifest | null;
   seed: number;
@@ -317,6 +325,16 @@ export interface RiftInstance {
   minibossId: number | null;
   orbId: number | null;
   orbActive: boolean;
+  /** Demon Tower state (inert on every other rift). `towerWave` is the index of
+   * the NEXT wave the core will release, so it equals the floor's wave count once
+   * the floor has sent everything. `towerWaveMobIds` holds the demons currently
+   * on the floor, `towerBossId` the boss the last wave released (the floor-5
+   * gatekeeper, or the summit's Demon Lord, which additionally takes the run's
+   * `bossId`), and `towerCoreId` the centrepiece object the waves erupt from. */
+  towerWave: number;
+  towerWaveMobIds: number[];
+  towerBossId: number | null;
+  towerCoreId: number | null;
   /** Overworld position to return the player to when they leave. */
   returnPos: { x: number; z: number };
   emptyFor: number;
@@ -344,7 +362,13 @@ export interface RiftInstance {
    * deathZoneStrike mechanics). Each zone starts with a `remaining` fuse equal
    * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
    * Cleared on boss death or floor reset. */
-  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number }>;
+  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number; total: number }>;
+  /** Recently-exited-mid-combat memory (issue #2653): a player who left this run
+   * through the beacon/exit while a mob was actively fighting them has their
+   * dropped threat snapshotted here for a short window. Re-entering before it
+   * lapses resumes the fight instead of granting a free, unengaged reset
+   * (rift/runs.ts). Session state, cleared with the claim. */
+  combatExitMemory: CombatExitMemory;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

@@ -1,0 +1,172 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/palisade-wing-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones",
+  "detailInventory": {
+    "scanMethod": "labeled-turnaround-component-zones",
+    "targetMinDetails": 8,
+    "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+    "details": [
+      {
+        "id": "stake-sawtooth",
+        "kind": "contour",
+        "description": "Alternating sharpened stake tips form the dominant sawtooth edge.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "alternating-point-heights"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "stake-seams",
+        "kind": "seam",
+        "description": "Narrow dark seams remain visible between individual stakes.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "repetition readability",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "ten-stake-rhythm"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/front.png",
+        "confidence": 0.895
+      },
+      {
+        "id": "end-post-mass",
+        "kind": "bevel",
+        "description": "End posts are visibly heavier and more squared than the stake row.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "module termination",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "heavy-end-caps"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/side.png",
+        "confidence": 0.89
+      },
+      {
+        "id": "rail-pair",
+        "kind": "linework",
+        "description": "Upper and lower rails bind the full wall span.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "structural read",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "upper-and-lower-rails"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/rear.png",
+        "confidence": 0.885
+      },
+      {
+        "id": "iron-band-fasteners",
+        "kind": "fastener",
+        "description": "Dark iron bands wrap the terminal posts.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "fortification detail",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "end-post-bands"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/hero.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "rope-wraps",
+        "kind": "ridge",
+        "description": "Rope lashings cross the rail/post junctions.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "joinery",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "rope-lashing-lines"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/hero.png",
+        "confidence": 0.875
+      },
+      {
+        "id": "teal-marker-cloth",
+        "kind": "contour",
+        "description": "A small teal tab marks one terminal post.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "Fenbridge color cue",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "weathered-teal-tab"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/side.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "dark-ground-bases",
+        "kind": "stain",
+        "description": "Stake feet darken where timber meets damp ground.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "weathering",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "split-grain-and-dark-bases"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/palisade-wing/zones/rear.png",
+        "confidence": 0.865
+      }
+    ]
+  },
+  "authoringInstruction": "Complete: every observed detail maps to an authored component.localFeatures or material.localOverrides key in sculpt-spec.json."
+}

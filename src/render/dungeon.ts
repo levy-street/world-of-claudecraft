@@ -45,7 +45,7 @@ import {
 } from '../sim/rift/authored';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
 import { DAIS_PLATFORM_HEIGHT } from './dais_lift';
 import {
@@ -56,19 +56,29 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
+import { buildDemonTowerEnvironment } from './demon_tower_scene';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
-import { sharedUniforms } from './gfx';
+import { attachSceneGroupGated } from './gated_scene_attach';
+import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
+import { riftHazardPalette } from './rift_visual_core';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
+import { applySurfaceDetail } from './worn_stone';
 
-const FLAME_EMISSIVE_HIGH = 2.2;
+const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
 // dungeon torch point lights: pumped + hung low so warm pools break up the
 // floor (the daylight rig is dropped underground; torches carry the scene)
 const DUNGEON_LIGHT_Y = 6.4;
 const DUNGEON_LIGHT_INTENSITY = 46;
 const DUNGEON_LIGHT_DISTANCE = 34;
+const FLOOR_GLOW_DECAL_RADIUS = 6.6;
+const HAZARD_GLOW_OVERSCAN = 1.15;
 
 const MODULE_SCALE = 2; // KayKit walls are 4u tall/long -> 8u at our room scale
 const FLOOR_CELL = 4; // kit floor tiles are 4x4 at MODULE_SCALE 1
@@ -411,7 +421,7 @@ export function loadKitModules(names: readonly string[]): Promise<void> {
 // kit + Halloween-bits modules stream in (and their shaders compile) the moment
 // the camera nears a dungeon door, which is the on-approach freeze at the Fallen
 // Chapel. assetsReady() now genuinely covers everything buildInterior needs.
-if (typeof window !== 'undefined') registerPreload(ensureDungeonAssets());
+if (typeof window !== 'undefined') registerDeferredPreload(() => ensureDungeonAssets());
 
 // ---------------------------------------------------------------------------
 // Deterministic placement helpers
@@ -464,11 +474,6 @@ class Placements {
   }
 }
 
-interface ToggleMat {
-  mat: THREE.Material;
-  depthWrite: boolean;
-}
-
 interface ArenaWallFootprint {
   x: number;
   z: number;
@@ -492,8 +497,9 @@ interface PendingArenaWalls {
 
 interface ArenaHideable {
   group: THREE.Group;
-  mats: ToggleMat[];
+  mats: OccluderFadeMat[];
   hidden: boolean;
+  alpha: number;
   footprint: ArenaWallFootprint;
 }
 
@@ -671,7 +677,13 @@ export class DungeonInteriors {
     private scene: THREE.Scene,
     private lowGfx: boolean,
     private flames: THREE.Mesh[],
-    private fireLights: THREE.PointLight[],
+    private fireLights: FireLightSink,
+    // The renderer's live compile gate. A live interior build (first dungeon
+    // approach, delve module, rift floor) attaches through it hidden until its
+    // programs are linked: the boot prewarm covers the base pack materials,
+    // but the lazily minted tinted grades (tintedMats) and bespoke shaders
+    // otherwise link synchronously at first draw.
+    private compileGate?: (target: THREE.Object3D) => Promise<unknown>,
   ) {}
 
   // Instantiate every distinct interior material once so the startup prewarm's
@@ -736,7 +748,7 @@ export class DungeonInteriors {
       }>;
       // Rift hazards render as molten lava instead of the delve's blackwater; the
       // sim damage model is shared, only the palette differs.
-      hazardStyle?: 'blackwater' | 'lava';
+      hazardStyle?: 'blackwater' | 'lava' | 'tower_lava' | 'soul' | 'void';
       // Rift ice-slide zone (frictionless slick you skate across to the goal
       // sigil): a pale frost sheet over this rect, purely cosmetic.
       iceZone?: { x: number; z: number; hw: number; hd: number } | null;
@@ -759,6 +771,7 @@ export class DungeonInteriors {
         fireLights: this.fireLights,
       });
       group.position.set(ox, 0, oz);
+      group.userData.renderCategory = 'dungeon';
       this.scene.add(group);
       return group;
     }
@@ -789,13 +802,38 @@ export class DungeonInteriors {
     const daisRaised = opts?.style?.daisRaised;
     const group = new THREE.Group();
     const p = new Placements();
-    const arenaWalls = isArenaVariant(variant) ? this.pendingArenaWalls(layout, ox, oz) : undefined;
+    let towerDecorReady: Promise<void> | null = null;
+    // Every standard-layout interior routes its outer walls through the
+    // hideable-wall path (formerly arena-only), so any wall crossing the
+    // eye-to-camera segment fades to 20% opacity instead of blanking the view.
+    const arenaWalls = this.pendingArenaWalls(layout, ox, oz);
 
     // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
     // replace the single-room shell entirely. Walls come from the SAME segment
     // helper the sim derives collision from, so they cannot drift apart.
+    if (opts?.style?.sceneProfile) {
+      buildDemonTowerEnvironment(
+        group,
+        layout,
+        opts.style.sceneProfile,
+        this.lowGfx,
+        (x, z, color, y, scale) => this.addInfernalLight(group, x, z, color, y, scale),
+      );
+      if (layout.decor?.length) towerDecorReady = ensureInfernalDecorAssets(layout.decor);
+    }
+
+    // A shellPolygon floor with authored decor (the Demon Tower arenas) draws its
+    // props through the SAME builder the citadel uses; only the wall/floor shell
+    // differs, so there is no second decor path to keep in sync.
+    if (!opts?.style?.sceneProfile && !layout.rooms && layout.decor?.length) {
+      await ensureInfernalDecorAssets(layout.decor);
+      buildInfernalDecor(group, layout.decor, torch, (x, z, color, y, scale) =>
+        this.addInfernalLight(group, x, z, color, y, scale),
+      );
+    }
+
     if (layout.rooms) {
-      await ensureInfernalDecorAssets();
+      await ensureInfernalDecorAssets(layout.decor);
       this.placeAuthoredFloor(p, layout, variant);
       this.placeAuthoredWalls(p, layout, variant);
       this.placeAuthoredRelief(group, layout);
@@ -845,11 +883,15 @@ export class DungeonInteriors {
         floor: opts?.style?.floorTint ?? (variant === 'lastkeep' ? KEEP_FLOOR_TINT : undefined),
       });
       group.position.set(ox, 0, oz);
+      group.userData.renderCategory = 'dungeon';
       this.scene.add(group);
       return group;
     }
 
-    this.placeFloor(p, layout, variant);
+    // Tower scene profiles already provide one continuous authored surface.
+    // Stacking the modular tile kit under it creates coplanar depth fights that
+    // pop as large dark patches when the camera moves.
+    if (!opts?.style?.sceneProfile) this.placeFloor(p, layout, variant);
     this.placeWalls(p, layout, variant, arenaWalls);
     this.placePillarsAndTorches(group, p, layout, variant, torch);
     this.placeTombs(p, layout, variant);
@@ -890,24 +932,59 @@ export class DungeonInteriors {
       }
     }
 
-    this.emit(group, p, variant);
+    this.emit(group, p, variant, {
+      wall: opts?.style?.wallTint,
+      floor: opts?.style?.floorTint,
+    });
     if (arenaWalls) {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
     }
     group.position.set(ox, 0, oz);
-    this.scene.add(group);
+    group.userData.renderCategory = 'dungeon';
+    await attachSceneGroupGated(this.scene, group, this.compileGate);
+    // Tower shell, hazards and landmarks attach before network-backed dressing
+    // settles, so a cold cache never leaves an actionable invisible arena. The
+    // authored props stream into the already-visible root; if the root retired
+    // while loading, the parent check prevents stale lights/nodes from leaking.
+    if (towerDecorReady) {
+      void towerDecorReady
+        .then(() => {
+          if (!group.parent) return;
+          buildInfernalDecor(group, layout.decor ?? [], torch, (x, z, color, y, scale) =>
+            this.addInfernalLight(group, x, z, color, y, scale),
+          );
+        })
+        .catch(() => undefined);
+    }
     return group;
   }
 
-  update(camX: number, camY: number, camZ: number, eyeX: number, eyeY: number, eyeZ: number): void {
+  /**
+   * Prune wall hideables owned by a retired interior root, so the per-frame
+   * fade scan does not grow across rift floor rebuilds.
+   */
+  retireHideables(doomed: ReadonlySet<THREE.Object3D>): void {
+    for (let i = this.arenaHideables.length - 1; i >= 0; i--) {
+      if (doomed.has(this.arenaHideables[i].group)) this.arenaHideables.splice(i, 1);
+    }
+  }
+
+  update(
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    dt: number,
+    reducedMotion = false,
+  ): void {
     for (const h of this.arenaHideables) {
       const hide = arenaWallSegmentHits(h.footprint, eyeX, eyeY, eyeZ, camX, camY, camZ);
-      if (hide === h.hidden) continue;
       h.hidden = hide;
-      for (const m of h.mats) {
-        m.mat.colorWrite = !hide;
-        m.mat.depthWrite = hide ? false : m.depthWrite;
-      }
+      if (occluderFadeSettled(h.alpha, hide)) continue;
+      h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
+      applyOccluderFade(h.mats, h.alpha);
     }
   }
 
@@ -984,7 +1061,7 @@ export class DungeonInteriors {
   private placeBlackwaterPools(
     group: THREE.Group,
     hazards: Array<{ x: number; z: number; r: number; rx?: number; rz?: number }>,
-    style: 'blackwater' | 'lava' = 'blackwater',
+    style: 'blackwater' | 'lava' | 'tower_lava' | 'soul' | 'void' = 'blackwater',
     liftAt?: (x: number, z: number) => number,
   ): void {
     // Rift lava reuses the delve blackwater overlay with a molten palette: the
@@ -992,9 +1069,18 @@ export class DungeonInteriors {
     // hazard reads identically, only the colour changes. Bands can be ellipses
     // (rx/rz), so the disc is a unit circle scaled to match the sim footprint.
     const pal =
-      style === 'lava'
-        ? { pool: 0xd83410, poolOpacity: 0.9, rim: 0xffca4a, glow: 0xff5a1e }
-        : { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f };
+      style === 'blackwater'
+        ? {
+            pool: 0x0a1a12,
+            poolOpacity: 0.82,
+            rim: 0x3fae5a,
+            rimOpacity: 0.5,
+            glow: 0x2f8f4f,
+            poolY: 0.12,
+            rimY: 0.14,
+            glowY: 0.3,
+          }
+        : riftHazardPalette(style);
     for (const h of hazards) {
       const rx = h.rx ?? h.r;
       const rz = h.rz ?? h.r;
@@ -1003,41 +1089,56 @@ export class DungeonInteriors {
         new THREE.CircleGeometry(1, 28)
           .rotateX(-Math.PI / 2)
           .scale(rx, 1, rz)
-          .translate(h.x, 0.12 + y0, h.z),
+          .translate(h.x, pal.poolY + y0, h.z),
         new THREE.MeshBasicMaterial({
           color: pal.pool,
           transparent: true,
           opacity: pal.poolOpacity,
           depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -3,
+          polygonOffsetUnits: -3,
         }),
       );
       pool.renderOrder = 1; // floats over the floor tiles
+      pool.userData.riftHazard = 'pool';
       group.add(pool);
       // A hot/bog rim so the edge of the hazard is unmistakable.
       const rim = new THREE.Mesh(
         new THREE.RingGeometry(0.82, 1, 32)
           .rotateX(-Math.PI / 2)
           .scale(rx, 1, rz)
-          .translate(h.x, 0.14 + y0, h.z),
+          .translate(h.x, pal.rimY + y0, h.z),
         new THREE.MeshBasicMaterial({
           color: pal.rim,
           transparent: true,
-          opacity: 0.5,
+          opacity: pal.rimOpacity,
           side: THREE.DoubleSide,
           depthWrite: false,
-          blending: THREE.AdditiveBlending,
+          polygonOffset: true,
+          polygonOffsetFactor: -4,
+          polygonOffsetUnits: -4,
+          blending: style === 'tower_lava' ? THREE.NormalBlending : THREE.AdditiveBlending,
         }),
       );
       rim.renderOrder = 2;
+      rim.userData.riftHazard = 'rim';
       group.add(rim);
-      this.addTorchGlow(
+      const glow = this.addTorchGlow(
         group,
         h.x,
         h.z,
         pal.glow,
-        (style === 'lava' ? 0.55 : 0.3) + y0,
-        Math.max(rx, rz) * 0.6,
+        pal.glowY + y0,
+        style === 'tower_lava' ? 1 : Math.max(rx, rz) * 0.6,
       );
+      if (glow && style === 'tower_lava') {
+        glow.scale.set(
+          (rx * HAZARD_GLOW_OVERSCAN) / FLOOR_GLOW_DECAL_RADIUS,
+          1,
+          (rz * HAZARD_GLOW_OVERSCAN) / FLOOR_GLOW_DECAL_RADIUS,
+        );
+      }
     }
   }
 
@@ -1311,6 +1412,13 @@ export class DungeonInteriors {
     } else {
       mat = new THREE.MeshStandardMaterial({ color: 0x777788, roughness: 0.95 });
     }
+    // The dungeon packs are flat-palette GLBs (solid-color swatch textures),
+    // so the walls read as untextured plastic under the interior lights. The
+    // shared triplanar stone family (which replaced the old UV-space rock
+    // detail normal here) gives every pack material grain, AO-band grime, and
+    // the high/ultra parallax height response.
+    if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial)
+      applySurfaceDetail(mat as THREE.MeshStandardMaterial, 'stone');
     this.packMats.set(pack, mat);
     return mat;
   }
@@ -1342,6 +1450,10 @@ export class DungeonInteriors {
       | THREE.MeshLambertMaterial
       | THREE.MeshStandardMaterial;
     base.color.multiply(new THREE.Color(tint));
+    // Material.clone() drops the onBeforeCompile hook, so the tinted clone
+    // re-applies the stone layer (identity-keyed guard: clones are fresh).
+    if ((base as THREE.MeshStandardMaterial).isMeshStandardMaterial)
+      applySurfaceDetail(base as THREE.MeshStandardMaterial, 'stone');
     mat = base;
     this.tintedMats.set(key, mat);
     return mat;
@@ -1420,14 +1532,29 @@ export class DungeonInteriors {
 
   private emitArenaHideable(group: THREE.Group, pending: PendingArenaWall, variant: Variant): void {
     const wallGroup = new THREE.Group();
-    const mats: ToggleMat[] = [];
+    const mats: OccluderFadeMat[] = [];
+    const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, matrices] of pending.placements.byKind) {
       const asset = moduleAssets.get(kind);
       if (!asset) {
         console.warn(`dungeon: unknown arena wall module kind '${kind}'`);
         continue;
       }
-      const material = this.material(asset.pack).clone();
+      // Hideable walls bypass emit(), so the marsh's wet-mossy grade is picked
+      // here the same way emit() would before the per-wall clone.
+      const base =
+        isMarsh && WALL_PILLAR_KINDS.has(kind)
+          ? this.marshMaterial(asset.pack, 'wall')
+          : isMarsh && RECEIVER_KINDS.has(kind)
+            ? this.marshMaterial(asset.pack, 'floor')
+            : this.material(asset.pack);
+      // Program-preserving clone: the pack material carries the triplanar
+      // stone surface-detail layer (see this.material), and a bare clone()
+      // drops onBeforeCompile, so every hideable arena wall would draw as flat
+      // untextured plastic AND link its own program on first sight. The
+      // sibling tintedMaterial re-applies the same layer by hand for the same
+      // reason; this site takes the shared helper.
+      const material = cloneMaterialWithHooks(base);
       // Hideable walls bypass emit(), so the Drowned Court's wet-stone tint is
       // applied to this per-wall clone directly (structural stone only: the
       // banners keep their true colors, same scoping as the marsh tint).
@@ -1436,13 +1563,17 @@ export class DungeonInteriors {
           new THREE.Color(DROWNED_WALL_TINT),
         );
       }
-      mats.push({ mat: material, depthWrite: material.depthWrite });
+      mats.push(occluderFadeMat(material));
       const mesh = new THREE.InstancedMesh(asset.geo, material, matrices.length);
       for (let i = 0; i < matrices.length; i++) mesh.setMatrixAt(i, matrices[i]);
       mesh.instanceMatrix.needsUpdate = true;
       mesh.computeBoundingSphere();
+      // Shadow parity with the pre-hideable look: arena variants keep their
+      // wall shadows; every other interior's shell walls stay shadowless, the
+      // same as when emit() merged them (CASTER_KINDS has no wall kinds).
       mesh.castShadow =
-        !this.lowGfx && (CASTER_KINDS.has(kind) || ARENA_WALL_CASTER_KINDS.has(kind));
+        !this.lowGfx &&
+        (CASTER_KINDS.has(kind) || (isArenaVariant(variant) && ARENA_WALL_CASTER_KINDS.has(kind)));
       mesh.receiveShadow = RECEIVER_KINDS.has(kind);
       wallGroup.add(mesh);
     }
@@ -1452,6 +1583,7 @@ export class DungeonInteriors {
       group: wallGroup,
       mats,
       hidden: false,
+      alpha: 1,
       footprint: pending.footprint,
     });
   }
@@ -2086,9 +2218,11 @@ export class DungeonInteriors {
     colorHex: number,
     y = 0.07,
     scale = 1,
-  ): void {
-    if (this.lowGfx) return;
-    this.glowDecalGeo ??= new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2);
+  ): THREE.Mesh | null {
+    if (this.lowGfx) return null;
+    this.glowDecalGeo ??= new THREE.CircleGeometry(FLOOR_GLOW_DECAL_RADIUS, 20).rotateX(
+      -Math.PI / 2,
+    );
     this.glowDecalTex ??= radialGlowTexture();
     let mat = this.glowDecalMats.get(colorHex);
     if (!mat) {
@@ -2107,6 +2241,7 @@ export class DungeonInteriors {
     glow.scale.setScalar(scale);
     glow.renderOrder = 1; // after the floor it floats over
     group.add(glow);
+    return glow;
   }
 
   /** A real, budgeted light plus its baked floor pool for the authored citadel.

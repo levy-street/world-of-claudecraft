@@ -3,10 +3,10 @@
 // with the .cjs exports (same convention as shell_guards.d.cts).
 
 export interface UpdateEventPayload {
-  type: 'available' | 'downloaded' | 'progress';
+  type: 'available' | 'downloaded' | 'progress' | 'checking' | 'not-available' | 'error';
   version?: string;
   percent?: number;
 }
 
-export function updateEventPayload(type: string, raw: unknown): UpdateEventPayload | null;
+export function updateEventPayload(type: string, raw?: unknown): UpdateEventPayload | null;
 export function shouldNotifyProgress(lastPercent: number, percent: unknown): boolean;

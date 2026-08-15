@@ -128,7 +128,7 @@ function unspawnableReason(x: number, z: number, amphibious: boolean): string | 
   const height = groundHeight(x, z, SEED);
   const floor = amphibious ? waterLevel() - 0.5 : waterLevel() + 0.4;
   if (height < floor) return `below the spawn floor (h=${height.toFixed(2)} < ${floor})`;
-  const surface = waterLevelAt(x, z);
+  const surface = waterLevelAt(x, z, SEED);
   if (!amphibious && surface !== -Infinity && height < surface + 0.4) {
     return `submerged in a lake (h=${height.toFixed(2)} < ${surface + 0.4})`;
   }

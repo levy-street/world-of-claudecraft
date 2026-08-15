@@ -39,25 +39,31 @@ Der er plads til alle her:
 
 ## Kom i gang
 
-Du skal bruge [Node.js 26](https://nodejs.org/) og npm, de versioner som CI og
-produktions-imaget bruger. Ældre majorversioner er ikke testet. Til
-multiplayer-serveren skal du også bruge [Docker](https://www.docker.com/) til at
-køre Postgres.
+Du skal bruge [Node.js 26](https://nodejs.org/) og **pnpm 10.34.x** (præcis pin står i `package.json` under `packageManager`, i dag `pnpm@10.34.5`). Ældre Node-majorversioner er ikke testet. Til multiplayer-serveren bør du også have [Docker](https://www.docker.com/) til at køre Postgres.
+
+**Corepack er ikke påkrævet.** Installer pnpm én gang med den npm, der følger med Node. Samme fremgangsmåde på macOS, Linux og Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Point git at the repository hooks (once per clone)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
 git config core.hooksPath .githooks
 
-# 4. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` virker stadig efter en pnpm-installation (Node leverer npm), men **installation og lockfile-opdateringer skal gå gennem pnpm**. Commit ikke en `package-lock.json`; den eneste sandhedskilde er `pnpm-lock.yaml`.
 
 Det er nok til at spille offline-verdenen og arbejde på de fleste ting. For at
 køre hele online-stacken skal du først have et databasekodeord i dit miljø:
@@ -65,13 +71,13 @@ køre hele online-stacken skal du først have et databasekodeord i dit miljø:
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
 
 Hvis du planlægger at køre hele gaten nedenfor, så installér den browser, den
-styrer, én gang: `npx playwright install chromium`.
+styrer, én gang: `pnpm exec playwright install chromium`.
 
 [README](../../README.md) indeholder den fulde guide til at hoste, udvikle og
 spille, og `CLAUDE.md`-filerne rundt omkring i repoet dokumenterer
@@ -102,13 +108,7 @@ API, mens `@typescript/native` leverer `tsc`-binæren. Ting, du bør vide:
   `--singleThreaded` slår al parallelitet fra. Et ad hoc-tjek af en enkelt fil
   (`npx tsc somefile.ts`) fejler, når mappen indeholder en `tsconfig.json`;
   angiv `--ignoreConfig` for den gamle adfærd.
-- **Lockfil.** Generér kun `package-lock.json` igen med
-  `npx npm@10 install --package-lock-only`: filen bruger npm-10-semantik, og
-  nyere npm-majorversioner (inklusive den npm 11, som CI's Node 26 leverer)
-  dropper i stilhed `svelte-check`s indlejrede optional-peer-poster, hvilket
-  bringer `npm ci` ud af sync i CI. Et almindeligt `npm ci` er sikkert på enhver
-  npm-majorversion. Bekræft efter regenereringen, at `npm ci --dry-run` er i
-  sync både under npm 10 og under din arbejdsstations npm.
+- **Lockfil.** Lockfilen er `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9). Opdater den kun med `pnpm install`, `pnpm add` eller `pnpm update` fra repo-roden (redigér den aldrig i hånden). Commit `pnpm-lock.yaml` sammen med `package.json`-ændringer. CI installerer med `pnpm install --frozen-lockfile`; en forældet lockfil fejler lukket. Indfør ikke en anden lockfil (`package-lock.json` / yarn.lock): duale lockfiler divergerer stille og er forbudt. Peer-dependency-støj fra valgfrie wallet/solana-træer tolereres via `.npmrc` (`strict-peer-dependencies=false`); løsn det ikke yderligere uden at måle.
 - **Hvornår det skal tages op igen.** Slå det dobbelte alias sammen til én
   enkelt `typescript`-afhængighed, når BEGGE gælder: det stabile JS-API i
   TypeScript 7.1 er udkommet (TypeScript 7.0 leverer slet intet JS-API;
@@ -162,7 +162,7 @@ Dette er de bærende regler i kodebasen. Den fulde detalje findes i
   koordinatorfiler. Data, som rendereren eller HUD'en læser, går over
   `IWorld`-grænsefladen (`src/world_api/`) og implementeres i både offline- og
   online-verdenen; et nyt simuleringssystem lander bag `SimContext`; et nyt
-  REST-endpoint er et rutemodul, du kan stilladsere med `npm run new:endpoint`.
+  REST-endpoint er et rutemodul, du kan stilladsere med `pnpm run new:endpoint`.
 - **Rediger ikke genererede filer i hånden** såsom `*.generated.ts`. Generér dem
   igen gennem build'et.
 - **Husstil for tekst: ingen lange tankestreger, korte tankestreger eller
@@ -179,7 +179,7 @@ Formateringen står [Biome](https://biomejs.dev/) for, konfigureret i
 `biome.json`: 2 mellemrums indrykning, linjer på 100 kolonner, enkelte
 anførselstegn, afsluttende kommaer. Formatér kun de filer, du har rørt
 (`npx @biomejs/biome check --write <your-file.ts>`), og tjek dem med
-`npm run ci:changed`. CI kontrollerer kun ændrede filer, så lad være med at
+`pnpm run ci:changed`. CI kontrollerer kun ændrede filer, så lad være med at
 omformatere resten af træet: en kørsel på tværs af hele repoet trækker
 mangeårig gæld frem, som ikke er din at rette.
 
@@ -188,12 +188,12 @@ mangeårig gæld frem, som ikke er din at rette.
 Kør repositoriets gate lokalt. Det er den samme kontrakt, som CI håndhæver:
 
 ```bash
-npm run gate
+pnpm run gate
 ```
 
 Mens du itererer, kan du køre en enkelt suite (`npx vitest run tests/sim.test.ts`)
-og `npm run ci:changed` for formateringen; `npm test` kører det hele, og kortet
-over suiterne findes i `tests/CLAUDE.md`. Hele `npm run gate` dækker friskheden
+og `pnpm run ci:changed` for formateringen; `pnpm test` kører det hele, og kortet
+over suiterne findes i `tests/CLAUDE.md`. Hele `pnpm run gate` dækker friskheden
 af genererede artefakter, malware-scanningen, formateringen af ændrede filer,
 konformitetstjekket af lydeffekter, hele testsuiten, en regressionsrunde i en
 rigtig browser, det strenge typetjek samt client-, server- og headless-build'ene.
@@ -218,13 +218,13 @@ gennem en kort tjekliste. Udfyld den venligst:
 - Beskriv **hvad** der blev ændret, og **hvorfor**.
 - Link et eventuelt relateret issue (for eksempel "Closes #123").
 - Tilføj **skærmbilleder eller et klip for UI-ændringer**, på desktop og mobil.
-- Bekræft, at `npm run gate` består, og at nye spillervendte strenge følger
+- Bekræft, at `pnpm run gate` består, og at nye spillervendte strenge følger
   politikken om engelsk først for bidragydere nedenfor.
 
 På din PR kører CI formatering og linting over dine ændrede filer, hele
 testsuiten fordelt på fire parallelle shards, en regressionsrunde i browseren
 samt typetjekket plus client-, server- og headless-build'ene. Det svarer til det,
-`npm run gate` kører lokalt, så en grøn gate er en god forudsigelse af en grøn
+`pnpm run gate` kører lokalt, så en grøn gate er en god forudsigelse af en grøn
 PR.
 
 En grøn CI-kørsel og en komplet tjekliste er, hvad vi kigger efter, før vi
@@ -261,7 +261,7 @@ engelske kilde.
 - Spillervendt tekst, der udsendes fra `src/sim/` eller `server/`, som forbliver
   sprogagnostiske, skal lokaliseres igen ved klientgrænsen i samme ændring.
   Guard-testen `npx vitest run tests/localization_fixes.test.ts` håndhæver dette.
-- Efter du har tilføjet eller ændret en streng, så kør `npm run i18n:gen`, og
+- Efter du har tilføjet eller ændret en streng, så kør `pnpm run i18n:gen`, og
   commit de regenererede bundles i samme ændring. Både gaten og CI sammenligner
   de committede artefakter med en frisk regenerering, så en forældet bundle får
   build'et til at fejle.
@@ -284,7 +284,7 @@ ikke at skrive nogen spilkode for at gøre det:
    `src/ui/server_i18n.ts`, talenttekst i `talent_i18n`-modulerne, og
    admin-dashboardet har sit eget sæt under `src/admin/i18n.locales/`.
 2. Forbedr eksisterende oversættelser, eller udfyld dem, der læses akavet.
-3. Kør `npm run i18n:gen`, commit de regenererede bundles sammen med din
+3. Kør `pnpm run i18n:gen`, commit de regenererede bundles sammen med din
    overlay-ændring, kør derefter lokaliseringssuiterne
    (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
    og åbn en PR. Et typetjek alene fortæller dig ikke, om en nøgle mangler, da

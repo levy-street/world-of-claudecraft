@@ -1,0 +1,3171 @@
+{
+  "targetName": "Tank Mount",
+  "targetId": "tank-mount",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 40.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [0.0, 0.0, 3.0],
+    "note": "For likeness work, solve the reference camera (forge/stage1_intake/solve_camera_pose.py) so the review render aligns with the photo and the reference can be projected. Confirm by overlay review."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "stylized miniature tracked tank mount",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "stylized hard-surface",
+        "heroic fantasy machinery",
+        "chunky low-poly armor",
+        "toy-scale tracked vehicle"
+      ],
+      "structureKind": [
+        "compound vehicle",
+        "layered armored shell",
+        "repeated suspension",
+        "animated mechanical assembly"
+      ],
+      "motionPotential": [
+        "rotating road wheels",
+        "looping track gait",
+        "suspension bounce",
+        "subtle engine idle",
+        "rider saddle socket"
+      ],
+      "materialFamilies": [
+        "cream painted steel",
+        "violet painted steel",
+        "dark iron tracks",
+        "aged bronze hardware",
+        "brown leather",
+        "forest green textile"
+      ],
+      "notes": "A new project-owned tank mount inspired by the supplied multi-view concept. The source name, tower crest, lettering, and exact heraldry are deliberately omitted. The hidden rear and underside are inferred from the admitted side and front views."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 3,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 3,
+        "actionReadinessNeed": 3
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 18,
+        "microFeatureGroups": 24,
+        "materialLayers": 6,
+        "repetitionSystems": 5
+      },
+      "reasoning": [
+        "The identity depends on a squat wide hull, twin track pods, a compact saddle turret, and a deliberately oversized stepped cannon.",
+        "Five visible road wheels per side, segmented tracks, armor fasteners, panel seams, and layered muzzle rings require bounded repetition systems.",
+        "The open leather saddle, grab hoop, turret shell, and cannon need an action-ready hierarchy with a stable rider socket and non-floating attachments.",
+        "Front, profile, three-quarter, and saddle views expose enough of the object to reconstruct the visible systems, while the rear deck and underside remain explicit approximations."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "A static box with tracks would fail the layered armor, open saddle, stepped cannon, repeated suspension, and animated mechanical-read contract."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "grid-4x4 hero view plus admitted profile, front, and saddle cross-check",
+      "targetMinDetails": 18,
+      "inventoryPath": "docs/design/terrorspark-groundshaker/object-sculpt-spec.json#preSpecAssessment.detailInventory",
+      "details": [
+        {
+          "id": "squat-hull-wedge",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "armored-hull/squat-wedge-profile"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "twin-track-pods",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "track-system/twin-pod-separation"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "five-wheel-rhythm",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "suspension/five-road-wheel-rhythm"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "segmented-tread-blocks",
+          "kind": "groove",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "track-system/segmented-tread-blocks"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "bronze-wheel-hubs",
+          "kind": "fastener",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "suspension/bronze-wheel-hubs"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "layered-front-glacis",
+          "kind": "ridge",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "armored-hull/layered-front-glacis"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "shield-prow-plate",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "armored-hull/plain-shield-prow"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "compact-turret-shell",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "turret/compact-armored-shell"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "stepped-cannon-barrel",
+          "kind": "ridge",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "cannon/stepped-barrel-profile"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "deep-muzzle-bore",
+          "kind": "groove",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "cannon/deep-muzzle-bore"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "armored-mantlet",
+          "kind": "bevel",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "cannon/armored-mantlet"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "open-leather-saddle",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "saddle/open-leather-seat"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "saddle-grab-hoop",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "saddle/rear-grab-hoop"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "green-saddle-panels",
+          "kind": "stain",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "green-textile/saddle-side-panels"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "violet-armor-zones",
+          "kind": "stain",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "violet-steel/armor-zones"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "cream-armor-edge-wear",
+          "kind": "stain",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "cream-steel/edge-wear"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "gold-rivet-rhythm",
+          "kind": "fastener",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "armor-hardware/gold-rivet-rhythm"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "side-access-hatches",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "armored-hull/side-access-hatches"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "rear-cargo-box",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "engine-deck/rear-cargo-box"
+          },
+          "realization": "unreported"
+        },
+        {
+          "id": "engine-exhaust-stack",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "engine-deck/exhaust-stack"
+          },
+          "realization": "unreported"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false
+    },
+    "sourceImage": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json"
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready hero mount",
+    "definitionOfDone": [
+      "The tank reads immediately as a compact rideable fantasy tank from front, profile, three-quarter, and gameplay camera views without copying the source name or crest.",
+      "The saddle supports the 2.6-yard player rig with a stable seat, grab hoop, clear cannon silhouette, and no visible rider intersection.",
+      "Road wheels, track assemblies, suspension, and engine idle carry authored Idle, Walk, Run, and Death clips through the existing mount animation path.",
+      "Cream and violet armor, dark tracks, bronze hardware, brown leather, and green textile remain distinct on both Standard and Low-tier materials.",
+      "The shipped GLB stays below 14,000 triangles, 576 KiB, 24 primitives, 6 materials, with six embedded procedural maps (two families times albedo, normal, packed ORM) and a live source fingerprint.",
+      "Every material carries an independent albedo, roughness, normal, and occlusion response, and the baked macro bands separate each armour plate from the next without crushing the darkest families to black. Verified against the neutral, studio, and grazing-light look-dev renders under docs/screenshots/terrorspark-groundshaker/authoring/material/."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 15,
+      "microFeatureGroups": 18,
+      "materialLayers": 6,
+      "repetitionSystems": 4,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": ["full-object"],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": ["full-object"],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": ["full-object"],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": ["full-object"],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": ["full-object"],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md).",
+      "Adjacent components must overlap by at least 0.02 world units at shared seams (source: grimoire/build/geometry_patterns.md).",
+      "Raised or recessed relief and fasteners must be geometry, instanced micro-parts, or displacement; a map alone is an approximation (source: grimoire/build/geometry_patterns.md)."
+    ],
+    "mustNotDo": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md).",
+      "Adjacent components must overlap by at least 0.02 world units at shared seams (source: grimoire/build/geometry_patterns.md).",
+      "Raised or recessed relief and fasteners must be geometry, instanced micro-parts, or displacement; a map alone is an approximation (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "macro silhouette and proportions",
+      "primary material albedo/roughness response",
+      "reference-derived PBR material response at or above 0.7 confidence when source pixels are usable",
+      "most recognizable local features"
+    ],
+    "niceToHave": ["micro scratches, stains, chips, and dirt masks", "secondary lighting match"],
+    "fpsTarget": 60,
+    "reviewViewpoints": ["front", "three-quarter", "side", "thickness-axis", "long-axis"]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "tank-silhouette",
+      "name": "Squat hull, separated track pods, low turret, and oversized short cannon",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["root", "armored-hull", "track-system", "turret", "cannon"],
+      "evidenceRefs": ["hero", "side", "front"]
+    },
+    {
+      "id": "track-and-suspension",
+      "name": "Twin continuous tracks, five-wheel rhythm, hubs, and grounded suspension",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["track-system", "left-track-pod", "right-track-pod", "suspension"],
+      "evidenceRefs": ["hero", "side", "front"]
+    },
+    {
+      "id": "rideable-turret",
+      "name": "Open saddle, rider clearance, grab hoop, mantlet, and cannon hierarchy",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["turret", "saddle", "grab-hoop", "cannon", "mantlet", "muzzle"],
+      "evidenceRefs": ["hero", "side", "saddle"]
+    },
+    {
+      "id": "armor-layering",
+      "name": "Layered glacis, plain shield prow, side hatches, skirts, and rivet rhythm",
+      "tier": "critical",
+      "passIds": ["form-refinement"],
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "componentRefs": [
+        "armored-hull",
+        "front-glacis",
+        "shield-prow",
+        "side-skirts",
+        "armor-hardware"
+      ],
+      "evidenceRefs": ["hero", "side", "front"]
+    },
+    {
+      "id": "tank-material-separation",
+      "name": "Cream and violet armor, dark tracks, bronze hardware, leather, and green textile",
+      "tier": "critical",
+      "passIds": ["material-pass", "surface-pass"],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": ["armored-hull", "track-system", "turret", "saddle", "armor-hardware"],
+      "evidenceRefs": ["hero", "side", "saddle"]
+    },
+    {
+      "id": "mechanical-animation-read",
+      "name": "Stable rider socket with readable idle, wheel rotation, track loop, run bounce, and death settle",
+      "tier": "critical",
+      "passIds": ["interaction-pass", "optimization-pass"],
+      "minimumScore": 0.78,
+      "mustPass": true,
+      "componentRefs": ["root", "track-system", "suspension", "turret", "saddle"],
+      "evidenceRefs": ["hero", "side", "saddle"]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ]
+  },
+  "lookDevTargets": {
+    "qualityPriority": "reference-fidelity",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 512,
+      "preferredTextureResolution": 1024,
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "script": "forge/stage1_intake/extract_pbr_evidence.py",
+        "acceptedLimitation": "The admitted source is a lit stylized illustration rather than a material scan. Palette and response are analyzed per material, and no inferred map from the illustration ships; the maps that DO ship are generated procedurally, per channel, from independent noise fields."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ],
+      "resolutionRationale": "World-space box projection makes resolution a texel-density question rather than a UV-island one: at the shipped repeats per yard the albedo runs near 1200 px per yard and the relief fields are band-limited well below their own Nyquist frequency, so a larger map would add bytes and no detail."
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim or environment light",
+        "exposure",
+        "tone mapping",
+        "background",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "flat value range",
+        "missing contact shadow",
+        "reference lighting copied without separating material readability"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The unshown rear engine deck and underside use a restrained functional approximation consistent with the admitted profile and front views.",
+    "The source crest, source name, lettering, and exact heraldry are excluded. Shipped armor uses original plain panels and abstract color blocking.",
+    "Terrain-conforming tread deformation is out of renderer scope. Baked wheel rotation, tread-loop motion, suspension bounce, and hull motion provide the gameplay movement read.",
+    "The shipped World of ClaudeCraft asset uses geometry, vertex colors, and independent scalar material response with zero embedded textures. Source-pixel PBR extraction is intentionally not implementation authority because the reference is a lit illustration, not a material scan."
+  ],
+  "coordinateFrame": {
+    "front": "+Z points toward the cannon muzzle and vehicle front",
+    "up": "+Y",
+    "right": "+X",
+    "scaleReference": "yards; overall shipping bounds target 2.55 wide by 2.45 high by 3.45 long, floor seated at minY zero"
+  },
+  "silhouette": {
+    "boundingShape": "Low wide tracked wedge with two heavy side pods, a compact saddle turret, and a short cannon projecting beyond the prow.",
+    "aspectRatios": [
+      "width:height = 1.04",
+      "length:height = 1.41",
+      "track-pod height:overall height = 0.47",
+      "cannon visible length:hull length = 0.42"
+    ],
+    "symmetry": "Bilateral across X except the rear exhaust, cargo arrangement, and bounded wear variation.",
+    "dominantCurves": [
+      "elliptical continuous track loops",
+      "five circular road wheels per side",
+      "arched grab hoop behind the saddle",
+      "three stepped cylindrical cannon radii"
+    ],
+    "negativeSpaces": [
+      "clear central channel between the inner track pods",
+      "open saddle cavity above the turret",
+      "grab-hoop arch",
+      "deep muzzle bore"
+    ],
+    "landmarks": [
+      "plain violet shield prow",
+      "cream layered glacis",
+      "oversized dark muzzle",
+      "bronze wheel hubs",
+      "brown saddle over green side panels"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "hero",
+      "view": "front-left-three-quarter",
+      "path": "reference-metadata.json#hero",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "canonical silhouette and color hierarchy",
+        "front armor layering",
+        "track and saddle relationship"
+      ],
+      "confidence": 0.97
+    },
+    {
+      "id": "side",
+      "view": "left-profile",
+      "path": "reference-metadata.json#side",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "five-wheel spacing and track contour",
+        "cannon step lengths",
+        "rear cargo and exhaust silhouette"
+      ],
+      "confidence": 0.97
+    },
+    {
+      "id": "front",
+      "view": "front",
+      "path": "reference-metadata.json#front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "wide pod separation",
+        "plain replacement prow plate",
+        "deep centered muzzle"
+      ],
+      "confidence": 0.96
+    },
+    {
+      "id": "saddle",
+      "view": "turret-and-seat-detail",
+      "path": "reference-metadata.json#saddle",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "open leather seat and rear bolster",
+        "grab hoop placement",
+        "green side panels and bronze fittings"
+      ],
+      "confidence": 0.95
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Tank mount root",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.99,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Rigid vehicle root groups the floor-seated hull, track, turret, rider socket, and animation pivots visible across all admitted views.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly blockout with bevel-ready edges",
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "generated procedural coordinates",
+        "normalStrategy": "vertex normals from generated geometry"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.55,
+        "height": 2.45,
+        "depth": 3.45,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "floor-center",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 1.0
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [
+          {
+            "id": "Socket_Ground",
+            "localPosition": [0, 0, 0],
+            "localRotation": [0, 0, 0],
+            "socketSpace": "model-root"
+          },
+          {
+            "id": "Socket_Rider",
+            "localPosition": [0, 2.05, -0.18],
+            "localRotation": [0, 0, 0],
+            "socketSpace": "model-root"
+          },
+          {
+            "id": "Socket_Cannon",
+            "localPosition": [0, 1.68, 0.55],
+            "localRotation": [0, 0, 0],
+            "socketSpace": "model-root"
+          },
+          {
+            "id": "Socket_Exhaust",
+            "localPosition": [0.84, 1.32, -1.18],
+            "localRotation": [0, 0, 0],
+            "socketSpace": "model-root"
+          }
+        ],
+        "collider": {
+          "type": "box",
+          "offset": [0, 0, 0],
+          "scale": [2.35, 1.3, 3.15],
+          "isTrigger": false,
+          "notes": "Replace with sphere/capsule/compound proxy when the object shape demands it."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cream-steel"
+        }
+      },
+      "material": "cream-steel",
+      "materialLayers": ["cream-steel"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "",
+        "displacementPattern": "",
+        "occlusionPattern": "",
+        "edgeWearPattern": "",
+        "notes": ""
+      },
+      "evidenceRefs": ["hero", "side", "front", "saddle"],
+      "details": [],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 205, 159, 1)",
+        "secondaryAlbedo": "rgba(118, 87, 139, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "armored-hull",
+      "name": "Layered armored hull",
+      "level": "macro",
+      "role": "vehicle-body",
+      "importance": 1.0,
+      "confidence": 0.97,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The hero and front views show a rigid low wedge assembled from overlapping faceted armor plates.",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "Socket_Ground",
+        "localStart": [0, 0.45, -0.9],
+        "localEnd": [0, 1.38, 1.05],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.006,
+        "evidenceRefs": ["hero", "front", "side"]
+      },
+      "dimensions": {
+        "width": 1.7,
+        "height": 1.05,
+        "depth": 2.25,
+        "units": "yards",
+        "confidence": 0.94
+      },
+      "transform": {
+        "position": [0, 0.45, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "hull-bounce",
+        "pivot": {
+          "mode": "bottom-center",
+          "localPosition": [0, 0, 0],
+          "axis": [1, 0, 0],
+          "confidence": 0.98
+        }
+      },
+      "material": "cream-steel",
+      "materialLayers": ["cream-steel", "violet-steel", "bronze"],
+      "localFeatures": [
+        {
+          "id": "squat-wedge-profile",
+          "type": "contour",
+          "geometryEffect": "low wide beveled wedge with rising front glacis",
+          "placement": "entire central hull",
+          "confidence": 0.97
+        },
+        {
+          "id": "layered-front-glacis",
+          "type": "ridge",
+          "geometryEffect": "three overlapping armor depths",
+          "placement": "front upper and lower hull",
+          "confidence": 0.96
+        },
+        {
+          "id": "plain-shield-prow",
+          "type": "contour",
+          "geometryEffect": "projecting blank shield-shaped plate with no crest",
+          "placement": "front center",
+          "confidence": 0.96
+        },
+        {
+          "id": "side-access-hatches",
+          "type": "seam",
+          "geometryEffect": "two inset rectangular plate seams per side",
+          "placement": "upper side hull",
+          "confidence": 0.94
+        },
+        {
+          "id": "armor-edge-chamfers",
+          "type": "bevel",
+          "geometryEffect": "one-segment silhouette chamfers with weighted normals",
+          "placement": "all exposed armor edges",
+          "confidence": 0.95
+        }
+      ],
+      "evidenceRefs": ["hero", "side", "front"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 205, 159, 1)",
+        "secondaryAlbedo": "rgba(118, 87, 139, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "track-system",
+      "name": "Twin track system",
+      "level": "macro",
+      "role": "running-gear",
+      "importance": 1.0,
+      "confidence": 0.98,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Front and side views show two independent continuous tread loops surrounding repeated wheel banks.",
+      "parent": "root",
+      "attachment": {
+        "parentId": "root",
+        "parentSocket": "Socket_Ground",
+        "localStart": [-1.25, 0.12, -1.28],
+        "localEnd": [1.25, 1.18, 1.35],
+        "contactType": "overlap",
+        "overlap": 0.05,
+        "gapTolerance": 0.006,
+        "evidenceRefs": ["hero", "side", "front"]
+      },
+      "dimensions": {
+        "width": 2.55,
+        "height": 1.2,
+        "depth": 2.8,
+        "units": "yards",
+        "confidence": 0.96
+      },
+      "transform": {
+        "position": [0, 0.08, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "track-loop",
+        "pivot": {
+          "mode": "axle-center",
+          "localPosition": [0, 0.62, 0],
+          "axis": [1, 0, 0],
+          "confidence": 0.98
+        }
+      },
+      "material": "dark-iron",
+      "materialLayers": ["dark-iron", "violet-steel", "bronze"],
+      "localFeatures": [
+        {
+          "id": "twin-pod-separation",
+          "type": "contour",
+          "geometryEffect": "clear central channel between two track volumes",
+          "placement": "full longitudinal underside",
+          "confidence": 0.98
+        },
+        {
+          "id": "segmented-tread-blocks",
+          "type": "groove",
+          "geometryEffect": "twenty-four chunky pads per continuous loop",
+          "placement": "outer perimeter of each pod",
+          "confidence": 0.96
+        }
+      ],
+      "evidenceRefs": ["hero", "side", "front"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(39, 37, 46, 1)",
+        "secondaryAlbedo": "rgba(74, 63, 82, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "turret",
+      "name": "Compact saddle turret",
+      "level": "macro",
+      "role": "upper-assembly",
+      "importance": 1.0,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The admitted hero and saddle views show a low faceted shell wrapping the cannon base and open rider seat.",
+      "parent": "armored-hull",
+      "attachment": {
+        "parentId": "armored-hull",
+        "parentSocket": "Socket_Turret",
+        "localStart": [0, 1.18, -0.32],
+        "localEnd": [0, 1.9, 0.65],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.005,
+        "evidenceRefs": ["hero", "saddle"]
+      },
+      "dimensions": {
+        "width": 1.35,
+        "height": 0.82,
+        "depth": 1.28,
+        "units": "yards",
+        "confidence": 0.92
+      },
+      "transform": {
+        "position": [0, 1.18, -0.08],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "turret-idle",
+        "pivot": {
+          "mode": "turret-ring",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.98
+        }
+      },
+      "material": "cream-steel",
+      "materialLayers": ["cream-steel", "violet-steel"],
+      "localFeatures": [
+        {
+          "id": "compact-armored-shell",
+          "type": "contour",
+          "geometryEffect": "low polygonal shell with violet shoulder blocks",
+          "placement": "around cannon breech and saddle",
+          "confidence": 0.96
+        }
+      ],
+      "evidenceRefs": ["hero", "saddle", "front"],
+      "fidelityTier": "shipping",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 205, 159, 1)",
+        "secondaryAlbedo": "rgba(111, 72, 139, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "left-track-pod",
+      "name": "Left track pod",
+      "level": "meso",
+      "role": "running-gear",
+      "importance": 0.9,
+      "confidence": 0.98,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A rigid beveled side shell follows the continuous left tread loop visible in profile.",
+      "parent": "track-system",
+      "attachment": {
+        "parentId": "track-system",
+        "parentSocket": "Socket_LeftTrack",
+        "localStart": [-1.24, 0.08, -1.3],
+        "localEnd": [-0.68, 1.18, 1.32],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["hero", "front"]
+      },
+      "actionProfile": {
+        "animationRole": "track-pod"
+      },
+      "material": "dark-iron",
+      "localFeatures": [],
+      "evidenceRefs": ["hero", "front"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(39, 37, 46, 1)",
+        "secondaryAlbedo": "rgba(78, 67, 84, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "right-track-pod",
+      "name": "Right track pod",
+      "level": "meso",
+      "role": "running-gear",
+      "importance": 0.9,
+      "confidence": 0.96,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The right pod mirrors the admitted left running gear while retaining bounded original asymmetry at the rear.",
+      "parent": "track-system",
+      "attachment": {
+        "parentId": "track-system",
+        "parentSocket": "Socket_RightTrack",
+        "localStart": [0.68, 0.08, -1.3],
+        "localEnd": [1.24, 1.18, 1.32],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["front"]
+      },
+      "actionProfile": {
+        "animationRole": "track-pod"
+      },
+      "material": "dark-iron",
+      "localFeatures": [],
+      "evidenceRefs": ["front", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(39, 37, 46, 1)",
+        "secondaryAlbedo": "rgba(78, 67, 84, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "suspension",
+      "name": "Road wheel suspension",
+      "level": "meso",
+      "role": "running-gear",
+      "importance": 0.95,
+      "confidence": 0.98,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Five repeated circular road wheels and hub layers define each side profile.",
+      "parent": "track-system",
+      "attachment": {
+        "parentId": "track-system",
+        "parentSocket": "Socket_Axles",
+        "localStart": [-1.28, 0.25, -0.92],
+        "localEnd": [1.28, 0.95, 0.96],
+        "contactType": "embedded",
+        "embedDepth": 0.08,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["hero", "side"]
+      },
+      "actionProfile": {
+        "animationRole": "wheel-rotation",
+        "pivot": {
+          "mode": "axle-array",
+          "localPosition": [0, 0.58, 0],
+          "axis": [1, 0, 0],
+          "confidence": 0.99
+        }
+      },
+      "material": "violet-steel",
+      "materialLayers": ["violet-steel", "bronze", "dark-iron"],
+      "localFeatures": [
+        {
+          "id": "five-road-wheel-rhythm",
+          "type": "seam",
+          "geometryEffect": "five evenly paced wheels per side with tuned end spacing",
+          "placement": "inside each tread loop",
+          "confidence": 0.98
+        },
+        {
+          "id": "bronze-wheel-hubs",
+          "type": "fastener",
+          "geometryEffect": "raised bronze rings and dark axle caps",
+          "placement": "center of all ten road wheels",
+          "confidence": 0.96
+        }
+      ],
+      "evidenceRefs": ["hero", "side"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(103, 68, 129, 1)",
+        "secondaryAlbedo": "rgba(179, 124, 55, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "front-glacis",
+      "name": "Front glacis layers",
+      "level": "meso",
+      "role": "armor",
+      "importance": 0.84,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Three shallow beveled plates overlap up the front slope in the front view.",
+      "parent": "armored-hull",
+      "attachment": {
+        "parentId": "armored-hull",
+        "parentSocket": "Socket_FrontGlacis",
+        "localStart": [-0.82, 0.56, 0.82],
+        "localEnd": [0.82, 1.38, 1.28],
+        "contactType": "overlap",
+        "overlap": 0.035,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["hero", "front"]
+      },
+      "actionProfile": {
+        "animationRole": "static-armor"
+      },
+      "material": "cream-steel",
+      "localFeatures": [],
+      "evidenceRefs": ["hero", "front"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(229, 211, 166, 1)",
+        "secondaryAlbedo": "rgba(189, 164, 126, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "shield-prow",
+      "name": "Plain shield prow plate",
+      "level": "meso",
+      "role": "armor",
+      "importance": 0.82,
+      "confidence": 0.96,
+      "primitive": "extrude",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "A shallow shield-shaped plate projects from the central front without source heraldry.",
+      "parent": "front-glacis",
+      "attachment": {
+        "parentId": "front-glacis",
+        "parentSocket": "Socket_Prow",
+        "localStart": [-0.35, 0.42, 0.03],
+        "localEnd": [0.35, 1.02, 0.09],
+        "contactType": "overlap",
+        "overlap": 0.025,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["front"]
+      },
+      "actionProfile": {
+        "animationRole": "static-armor"
+      },
+      "material": "violet-steel",
+      "localFeatures": [],
+      "evidenceRefs": ["front", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(111, 72, 139, 1)",
+        "secondaryAlbedo": "rgba(73, 48, 96, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "side-skirts",
+      "name": "Violet side skirts",
+      "level": "meso",
+      "role": "armor",
+      "importance": 0.72,
+      "confidence": 0.94,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Long shallow violet fenders overlap the upper track pods and carry access panel seams.",
+      "parent": "armored-hull",
+      "attachment": {
+        "parentId": "armored-hull",
+        "parentSocket": "Socket_SideSkirts",
+        "localStart": [-1.24, 0.92, -1.08],
+        "localEnd": [1.24, 1.28, 1.12],
+        "contactType": "overlap",
+        "overlap": 0.035,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["hero", "side"]
+      },
+      "actionProfile": {
+        "animationRole": "static-armor"
+      },
+      "material": "violet-steel",
+      "localFeatures": [],
+      "evidenceRefs": ["hero", "side"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(111, 72, 139, 1)",
+        "secondaryAlbedo": "rgba(79, 51, 103, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "engine-deck",
+      "name": "Rear engine deck",
+      "level": "meso",
+      "role": "engine-assembly",
+      "importance": 0.7,
+      "confidence": 0.86,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The profile supports a restrained faceted rear deck inferred beneath the cargo and exhaust.",
+      "parent": "armored-hull",
+      "attachment": {
+        "parentId": "armored-hull",
+        "parentSocket": "Socket_EngineDeck",
+        "localStart": [-0.78, 1.08, -1.2],
+        "localEnd": [0.78, 1.42, -0.42],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.005,
+        "evidenceRefs": ["side", "hero"]
+      },
+      "actionProfile": {
+        "animationRole": "engine-idle"
+      },
+      "material": "cream-steel",
+      "materialLayers": ["cream-steel", "violet-steel", "dark-iron"],
+      "localFeatures": [
+        {
+          "id": "rear-cargo-box",
+          "type": "contour",
+          "geometryEffect": "strapped brown box and violet utility block",
+          "placement": "rear deck left and center",
+          "confidence": 0.9
+        },
+        {
+          "id": "exhaust-stack",
+          "type": "contour",
+          "geometryEffect": "short dark stack with bronze collar and angled cap",
+          "placement": "rear deck right",
+          "confidence": 0.86
+        }
+      ],
+      "evidenceRefs": ["side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(218, 198, 153, 1)",
+        "secondaryAlbedo": "rgba(82, 68, 74, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.9
+      }
+    },
+    {
+      "id": "rear-cargo",
+      "name": "Rear cargo block",
+      "level": "meso",
+      "role": "storage",
+      "importance": 0.55,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A strapped rectangular utility box forms a readable rear silhouette accent.",
+      "parent": "engine-deck",
+      "attachment": {
+        "parentId": "engine-deck",
+        "parentSocket": "Socket_Cargo",
+        "localStart": [-0.68, 0.18, -0.44],
+        "localEnd": [0.12, 0.64, 0.2],
+        "contactType": "overlap",
+        "overlap": 0.03,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["side"]
+      },
+      "actionProfile": {
+        "animationRole": "static-cargo"
+      },
+      "material": "leather",
+      "localFeatures": [],
+      "evidenceRefs": ["side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(102, 60, 40, 1)",
+        "secondaryAlbedo": "rgba(61, 38, 31, 1)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.86
+      }
+    },
+    {
+      "id": "saddle",
+      "name": "Open leather saddle",
+      "level": "meso",
+      "role": "rider-seat",
+      "importance": 1.0,
+      "confidence": 0.98,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The detail view shows a deep faceted leather seat with a raised rear bolster and open rider cavity.",
+      "parent": "turret",
+      "attachment": {
+        "parentId": "turret",
+        "parentSocket": "Socket_Saddle",
+        "localStart": [-0.46, 0.58, -0.5],
+        "localEnd": [0.46, 1.0, 0.22],
+        "contactType": "embedded",
+        "embedDepth": 0.05,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["saddle", "hero"]
+      },
+      "actionProfile": {
+        "animationRole": "rider-seat",
+        "pivot": {
+          "mode": "seat-center",
+          "localPosition": [0, 0.72, -0.18],
+          "axis": [0, 1, 0],
+          "confidence": 0.99
+        },
+        "sockets": [
+          {
+            "id": "Socket_Rider",
+            "localPosition": [0, 0.84, -0.12],
+            "localRotation": [0, 0, 0]
+          }
+        ]
+      },
+      "material": "leather",
+      "materialLayers": ["leather", "green-textile", "bronze"],
+      "localFeatures": [
+        {
+          "id": "open-leather-seat",
+          "type": "contour",
+          "geometryEffect": "concave seat pan with faceted rim and rear bolster",
+          "placement": "turret top",
+          "confidence": 0.98
+        },
+        {
+          "id": "rear-grab-hoop",
+          "type": "contour",
+          "geometryEffect": "clear arched negative space behind rider",
+          "placement": "saddle rear",
+          "confidence": 0.96
+        }
+      ],
+      "evidenceRefs": ["saddle", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(102, 60, 40, 1)",
+        "secondaryAlbedo": "rgba(57, 89, 64, 1)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.9
+      }
+    },
+    {
+      "id": "grab-hoop",
+      "name": "Saddle grab hoop",
+      "level": "meso",
+      "role": "guard",
+      "importance": 0.78,
+      "confidence": 0.96,
+      "primitive": "torus",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A segmented bronze and leather arch rises behind the seat with visible open space.",
+      "parent": "saddle",
+      "attachment": {
+        "parentId": "saddle",
+        "parentSocket": "Socket_GrabHoop",
+        "localStart": [-0.42, 0.22, -0.34],
+        "localEnd": [0.42, 0.76, -0.34],
+        "contactType": "embedded",
+        "embedDepth": 0.035,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["saddle"]
+      },
+      "actionProfile": {
+        "animationRole": "static-guard"
+      },
+      "material": "bronze",
+      "localFeatures": [],
+      "evidenceRefs": ["saddle", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(180, 124, 55, 1)",
+        "secondaryAlbedo": "rgba(101, 63, 33, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "cannon",
+      "name": "Stepped cannon assembly",
+      "level": "meso",
+      "role": "weapon-assembly",
+      "importance": 1.0,
+      "confidence": 0.99,
+      "primitive": "lathe",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The profile and front views clearly resolve three stepped coaxial barrel radii, mantlet, and recessed bore.",
+      "parent": "turret",
+      "attachment": {
+        "parentId": "turret",
+        "parentSocket": "Socket_Cannon",
+        "localStart": [0, 0.38, 0.35],
+        "localEnd": [0, 0.38, 1.72],
+        "contactType": "embedded",
+        "embedDepth": 0.08,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["hero", "side", "front"]
+      },
+      "actionProfile": {
+        "animationRole": "cannon-recoil",
+        "pivot": {
+          "mode": "trunnion",
+          "localPosition": [0, 0.38, 0.28],
+          "axis": [1, 0, 0],
+          "confidence": 0.99
+        }
+      },
+      "material": "dark-iron",
+      "materialLayers": ["dark-iron", "violet-steel", "cream-steel"],
+      "localFeatures": [
+        {
+          "id": "stepped-barrel-profile",
+          "type": "ridge",
+          "geometryEffect": "three descending radii with thick terminal muzzle ring",
+          "placement": "trunnion to muzzle",
+          "confidence": 0.99
+        },
+        {
+          "id": "deep-muzzle-bore",
+          "type": "groove",
+          "geometryEffect": "recessed black inner cylinder behind a thick lip",
+          "placement": "frontmost cannon face",
+          "confidence": 0.99
+        },
+        {
+          "id": "armored-mantlet",
+          "type": "bevel",
+          "geometryEffect": "violet collar nested inside angular cream shield",
+          "placement": "barrel root",
+          "confidence": 0.96
+        }
+      ],
+      "evidenceRefs": ["hero", "side", "front"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(49, 45, 55, 1)",
+        "secondaryAlbedo": "rgba(111, 72, 139, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.98
+      }
+    },
+    {
+      "id": "mantlet",
+      "name": "Armored cannon mantlet",
+      "level": "meso",
+      "role": "armor",
+      "importance": 0.82,
+      "confidence": 0.96,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "An angular cream shield and violet circular collar overlap the turret face.",
+      "parent": "cannon",
+      "attachment": {
+        "parentId": "cannon",
+        "parentSocket": "Socket_Mantlet",
+        "localStart": [-0.48, -0.34, -0.12],
+        "localEnd": [0.48, 0.34, 0.22],
+        "contactType": "embedded",
+        "embedDepth": 0.05,
+        "gapTolerance": 0.003,
+        "evidenceRefs": ["hero", "front"]
+      },
+      "actionProfile": {
+        "animationRole": "cannon-recoil"
+      },
+      "material": "cream-steel",
+      "localFeatures": [],
+      "evidenceRefs": ["hero", "front"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 205, 159, 1)",
+        "secondaryAlbedo": "rgba(111, 72, 139, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "muzzle",
+      "name": "Heavy muzzle ring",
+      "level": "meso",
+      "role": "weapon-tip",
+      "importance": 0.88,
+      "confidence": 0.99,
+      "primitive": "lathe",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A broad dark terminal ring frames the unmistakable deep circular bore.",
+      "parent": "cannon",
+      "attachment": {
+        "parentId": "cannon",
+        "parentSocket": "Socket_Muzzle",
+        "localStart": [0, 0, 1.28],
+        "localEnd": [0, 0, 1.72],
+        "contactType": "overlap",
+        "overlap": 0.04,
+        "gapTolerance": 0.002,
+        "evidenceRefs": ["front", "side"]
+      },
+      "actionProfile": {
+        "animationRole": "cannon-recoil"
+      },
+      "material": "dark-iron",
+      "localFeatures": [],
+      "evidenceRefs": ["front", "side"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(39, 37, 46, 1)",
+        "secondaryAlbedo": "rgba(72, 64, 76, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.98
+      }
+    },
+    {
+      "id": "exhaust-stack",
+      "name": "Rear exhaust stack",
+      "level": "meso",
+      "role": "engine-detail",
+      "importance": 0.56,
+      "confidence": 0.86,
+      "primitive": "lathe",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A short dark tapered stack with bronze collar is inferred from the profile silhouette.",
+      "parent": "engine-deck",
+      "attachment": {
+        "parentId": "engine-deck",
+        "parentSocket": "Socket_Exhaust",
+        "localStart": [0.52, 0.22, -0.38],
+        "localEnd": [0.68, 0.86, -0.48],
+        "contactType": "embedded",
+        "embedDepth": 0.04,
+        "gapTolerance": 0.004,
+        "evidenceRefs": ["side"]
+      },
+      "actionProfile": {
+        "animationRole": "exhaust-emitter",
+        "sockets": [
+          {
+            "id": "Socket_Exhaust",
+            "localPosition": [0, 0.82, 0],
+            "localRotation": [0, 0, 0]
+          }
+        ]
+      },
+      "material": "dark-iron",
+      "localFeatures": [],
+      "evidenceRefs": ["side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(45, 42, 49, 1)",
+        "secondaryAlbedo": "rgba(180, 124, 55, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.9
+      }
+    },
+    {
+      "id": "armor-hardware",
+      "name": "Bronze armor hardware",
+      "level": "meso",
+      "role": "hardware",
+      "importance": 0.68,
+      "confidence": 0.95,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Small raised warm-metal heads repeat only at armor corners, hatches, and fender seams.",
+      "parent": "armored-hull",
+      "attachment": {
+        "parentId": "armored-hull",
+        "parentSocket": "Socket_Hardware",
+        "localStart": [-0.82, 0.38, -1.05],
+        "localEnd": [0.82, 1.42, 1.22],
+        "contactType": "embedded",
+        "embedDepth": 0.025,
+        "gapTolerance": 0.002,
+        "evidenceRefs": ["hero", "side", "front"]
+      },
+      "actionProfile": {
+        "animationRole": "static-hardware"
+      },
+      "material": "bronze",
+      "localFeatures": [
+        {
+          "id": "gold-rivet-rhythm",
+          "type": "fastener",
+          "geometryEffect": "instanced low-sided raised heads merged by material",
+          "placement": "armor corners and hatch seams only",
+          "confidence": 0.95
+        }
+      ],
+      "evidenceRefs": ["hero", "side", "front"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(180, 124, 55, 1)",
+        "secondaryAlbedo": "rgba(111, 72, 33, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.96
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "cream-steel",
+      "name": "Warm cream painted steel",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial / PBR approximation",
+      "baseColor": "#E0CD9F",
+      "color": "#E0CD9F",
+      "albedo": {
+        "dominant": "#E0CD9F",
+        "secondary": ["#BDA47E", "#F0DEB2"],
+        "samplingNotes": "Use the warm cream paint family observed across the glacis and turret, separated from baked highlights."
+      },
+      "colorVariation": {
+        "palette": ["#E0CD9F", "#BDA47E", "#F0DEB2"],
+        "pattern": "semantic vertex color with restrained bevel darkening",
+        "amplitude": 0.08,
+        "heightCorrelation": 0.08
+      },
+      "textureResolution": 1024,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 1.15,
+        "anisotropy": 8,
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 2.0,
+          "amplitude": 0.42,
+          "role": "broad color and height breakup"
+        },
+        {
+          "id": "meso",
+          "frequency": 12.0,
+          "amplitude": 0.22,
+          "role": "ridges, pores, grain, dents, or equivalent visible relief"
+        },
+        {
+          "id": "micro",
+          "frequency": 56.0,
+          "amplitude": 0.08,
+          "role": "highlight breakup visible under grazing light"
+        }
+      ],
+      "roughness": {
+        "base": 0.62,
+        "variation": 0.12,
+        "map": "independent-procedural-field",
+        "localResponse": "higher roughness in cavities, lower roughness on worn edges"
+      },
+      "metalness": {
+        "base": 0.34,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "derived-from-independent-height-field",
+        "strength": 0.35,
+        "scale": 24.0,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.25,
+        "contactShadowBias": 0.35,
+        "notes": "Darken creases, seams, intersections, and recessed local features."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#2F2A22"
+      },
+      "localOverrides": [
+        {
+          "id": "edge-wear",
+          "region": "exposed cream armor bevels and hatch corners",
+          "pattern": "restrained darker chips and brighter handled edges authored with vertex colors",
+          "roughness": 0.54,
+          "evidenceRefs": ["hero", "front"]
+        }
+      ],
+      "shaderNotes": [
+        "Prefer MeshPhysicalMaterial when clearcoat, sheen, transmission, or thin-surface response is observed; otherwise use MeshStandardMaterial-compatible PBR channels.",
+        "Generate albedo, roughness, height/normal, and AO independently; never alias albedo into roughness.",
+        "Use normal/bump/displacement only when they map to observed surface relief.",
+        "Use displacement geometry when the observed relief changes the close-up silhouette; texture-only relief is insufficient there."
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/terrorspark_groundshaker/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field.",
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ]
+    },
+    {
+      "id": "violet-steel",
+      "name": "Violet painted steel",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
+      "baseColor": "#6F488B",
+      "albedo": {
+        "dominant": "#6F488B",
+        "secondary": ["#4B3264", "#8A5EA7"],
+        "samplingNotes": "Saturated violet armor zones observed on fenders, prow, turret shoulders, and cannon collar."
+      },
+      "colorVariation": {
+        "palette": ["#6F488B", "#4B3264", "#8A5EA7"],
+        "pattern": "semantic vertex-color armor zones",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.06
+      },
+      "textureResolution": 1024,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 1.3,
+        "anisotropy": 4,
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.16,
+          "role": "armor color blocking"
+        },
+        {
+          "id": "meso",
+          "frequency": 10,
+          "amplitude": 0.06,
+          "role": "panel wear"
+        },
+        {
+          "id": "micro",
+          "frequency": 48,
+          "amplitude": 0.018,
+          "role": "grazing breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.58,
+        "variation": 0.12,
+        "map": "independent-semantic-scalar-field",
+        "localResponse": "worn bevels slightly smoother than recesses"
+      },
+      "metalness": {
+        "base": 0.38,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "geometry bevels and weighted normals",
+        "strength": 0.1,
+        "scale": 28,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.2,
+        "contactShadowBias": 0.32,
+        "notes": "Only panel seams and overlaps darken."
+      },
+      "wear": {
+        "edgeWear": 0.08,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.04,
+        "cavityBias": 0.8,
+        "color": "#29232D"
+      },
+      "localOverrides": [
+        {
+          "id": "armor-zones",
+          "region": "prow, side skirts, turret shoulders, collar, and storage block",
+          "pattern": "original symbol-free violet color blocking",
+          "roughness": 0.57,
+          "evidenceRefs": ["hero", "side", "front"]
+        }
+      ],
+      "shaderNotes": [
+        "COLOR_0 is authoritative on all quality tiers.",
+        "No source art, text, crest, or embedded texture ships."
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/terrorspark_groundshaker/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
+    },
+    {
+      "id": "dark-iron",
+      "name": "Dark iron tracks and cannon",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
+      "baseColor": "#5B4F63",
+      "albedo": {
+        "dominant": "#5B4F63",
+        "secondary": ["#3B3542", "#24222A"],
+        "samplingNotes": "Near-black purple iron preserves tread and muzzle readability.",
+        "revision": "Lifted from #453B4B (and #29252F, #17161C) at the same hue. The baked occlusion, contact and grime bands need headroom below the base; at the old values this family crushed to flat black and lost the detail the reference sheet reads by."
+      },
+      "colorVariation": {
+        "palette": ["#5B4F63", "#3B3542", "#24222A"],
+        "pattern": "bounded tread-pad and cannon-ring variation",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.02
+      },
+      "textureResolution": 1024,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 1.75,
+        "anisotropy": 4,
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.14,
+          "role": "track and cannon grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 12,
+          "amplitude": 0.07,
+          "role": "contact wear"
+        },
+        {
+          "id": "micro",
+          "frequency": 52,
+          "amplitude": 0.022,
+          "role": "iron highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.66,
+        "variation": 0.16,
+        "map": "independent-semantic-scalar-field",
+        "localResponse": "tread contact faces smoother, bore and cavities rougher"
+      },
+      "metalness": {
+        "base": 0.68,
+        "variation": 0.12
+      },
+      "normal": {
+        "pattern": "real tread geometry and restrained facet normals",
+        "strength": 0.12,
+        "scale": 32,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.38,
+        "notes": "Wheel, tread, bore, and collar contacts only."
+      },
+      "wear": {
+        "edgeWear": 0.12,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.85,
+        "color": "#1C191D"
+      },
+      "localOverrides": [
+        {
+          "id": "tread-contact-wear",
+          "region": "lower tread pads and muzzle lip",
+          "pattern": "slightly brighter and smoother exposed faces",
+          "roughness": 0.52,
+          "evidenceRefs": ["hero", "side", "front"]
+        }
+      ],
+      "shaderNotes": [
+        "Tread segmentation remains geometry, never a painted stripe.",
+        "The muzzle bore remains non-emissive and deeply recessed."
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/terrorspark_groundshaker/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
+    },
+    {
+      "id": "bronze",
+      "name": "Aged bronze hardware",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
+      "baseColor": "#B47C37",
+      "albedo": {
+        "dominant": "#B47C37",
+        "secondary": ["#704421", "#D19A4E"],
+        "samplingNotes": "Warm hardware accents from hubs, rivets, collars, and grab hoop."
+      },
+      "colorVariation": {
+        "palette": ["#B47C37", "#704421", "#D19A4E"],
+        "pattern": "exposed facet and cavity variation",
+        "amplitude": 0.11,
+        "heightCorrelation": 0.04
+      },
+      "textureResolution": 1024,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "family": "metal",
+        "repeatsPerYard": 2.6,
+        "anisotropy": 4,
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.12,
+          "role": "warm accent grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 14,
+          "amplitude": 0.05,
+          "role": "handled wear"
+        },
+        {
+          "id": "micro",
+          "frequency": 58,
+          "amplitude": 0.016,
+          "role": "metal highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.44,
+        "variation": 0.1,
+        "map": "independent-semantic-scalar-field",
+        "localResponse": "handled hoop and hub crests smoother than rivet cavities"
+      },
+      "metalness": {
+        "base": 0.72,
+        "variation": 0.12
+      },
+      "normal": {
+        "pattern": "raised geometry and weighted facet normals",
+        "strength": 0.06,
+        "scale": 36,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.18,
+        "contactShadowBias": 0.34,
+        "notes": "Hub, rivet, collar, and hoop contacts only."
+      },
+      "wear": {
+        "edgeWear": 0.14,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.03,
+        "cavityBias": 0.8,
+        "color": "#302017"
+      },
+      "localOverrides": [
+        {
+          "id": "handled-facets",
+          "region": "grab hoop, wheel hubs, and exposed collars",
+          "pattern": "brighter crests with darker bases",
+          "roughness": 0.38,
+          "evidenceRefs": ["hero", "side", "saddle"]
+        }
+      ],
+      "shaderNotes": [
+        "All small hardware is instanced then merged by material.",
+        "Bronze remains readable on the Low material path."
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_metal_albedo, 1024 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_metal_normal, 512 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_metal_orm, 512 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/terrorspark_groundshaker/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
+    },
+    {
+      "id": "leather",
+      "name": "Deep brown saddle leather",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
+      "baseColor": "#9E6642",
+      "albedo": {
+        "dominant": "#9E6642",
+        "secondary": ["#7A4A31", "#4E3128"],
+        "samplingNotes": "Warm deep saddle and cargo leather separated from bronze.",
+        "revision": "Lifted from #8A5638 (and #663C28, #3D261F) at the same hue. The baked occlusion, contact and grime bands need headroom below the base; at the old values this family crushed to flat black and lost the detail the reference sheet reads by."
+      },
+      "colorVariation": {
+        "palette": ["#9E6642", "#7A4A31", "#4E3128"],
+        "pattern": "seat-panel and edge variation",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.1
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "family": "fabric",
+        "repeatsPerYard": 5.2,
+        "anisotropy": 4,
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.12,
+          "role": "seat and cargo grouping"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.06,
+          "role": "panel compression"
+        },
+        {
+          "id": "micro",
+          "frequency": 44,
+          "amplitude": 0.018,
+          "role": "soft grazing breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.76,
+        "variation": 0.12,
+        "map": "independent-semantic-scalar-field",
+        "localResponse": "seat center slightly smoother than stitched edges"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "geometry seams plus restrained independent grain",
+        "strength": 0.1,
+        "scale": 30,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.2,
+        "contactShadowBias": 0.3,
+        "notes": "Seat pan, bolster, and strap contacts."
+      },
+      "wear": {
+        "edgeWear": 0.07,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.025,
+        "cavityBias": 0.7,
+        "color": "#2B201B"
+      },
+      "localOverrides": [
+        {
+          "id": "seat-compression",
+          "region": "seat center and rear bolster",
+          "pattern": "slightly darker compressed center and lighter rim",
+          "roughness": 0.7,
+          "evidenceRefs": ["saddle", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "No leather texture ships; curvature, seams, palette, and roughness carry the read.",
+        "Seat remains non-metallic on every tier."
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_fabric_albedo, 512 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_fabric_normal, 256 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_fabric_orm, 256 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/terrorspark_groundshaker/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
+    },
+    {
+      "id": "green-textile",
+      "name": "Forest green saddle textile",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial with Lambert-compatible Low path",
+      "baseColor": "#63866A",
+      "albedo": {
+        "dominant": "#63866A",
+        "secondary": ["#44684C", "#2F4A37"],
+        "samplingNotes": "Muted original green panels beneath the saddle and on side utility areas.",
+        "revision": "Lifted from #55765A (and #395940, #253D2D) at the same hue. The baked occlusion, contact and grime bands need headroom below the base; at the old values this family crushed to flat black and lost the detail the reference sheet reads by."
+      },
+      "colorVariation": {
+        "palette": ["#63866A", "#44684C", "#2F4A37"],
+        "pattern": "panel-scale vertex color",
+        "amplitude": 0.1,
+        "heightCorrelation": 0.04
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "world-space-box-projected-uv",
+        "family": "fabric",
+        "repeatsPerYard": 7.5,
+        "anisotropy": 4,
+        "texelDensityIntent": "Projected in world space per triangle from the dominant face-normal axis, so texel density is fixed in yards and never stretches with component scale. UVs are folded to whole repeats per projection group and normalized with KHR_texture_transform so the optimizer can quantize them."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1,
+          "amplitude": 0.1,
+          "role": "green panel identity"
+        },
+        {
+          "id": "meso",
+          "frequency": 10,
+          "amplitude": 0.05,
+          "role": "bounded fabric value variation"
+        },
+        {
+          "id": "micro",
+          "frequency": 46,
+          "amplitude": 0.016,
+          "role": "matte grazing breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.86,
+        "variation": 0.08,
+        "map": "independent-semantic-scalar-field",
+        "localResponse": "panel creases stay darker and fully matte"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "restrained independent weave response without shipped map",
+        "strength": 0.08,
+        "scale": 34,
+        "space": "tangent"
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.18,
+        "contactShadowBias": 0.28,
+        "notes": "Only saddle-frame contacts and panel creases."
+      },
+      "wear": {
+        "edgeWear": 0.03,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.02,
+        "cavityBias": 0.7,
+        "color": "#202A22"
+      },
+      "localOverrides": [
+        {
+          "id": "saddle-side-panels",
+          "region": "panels immediately below the leather saddle and bounded utility inserts",
+          "pattern": "symbol-free forest green matte zones",
+          "roughness": 0.88,
+          "evidenceRefs": ["hero", "saddle"]
+        }
+      ],
+      "shaderNotes": [
+        "Textile identity relies on color, silhouette seams, and matte response.",
+        "No source emblem or exact heraldic layout is reproduced."
+      ],
+      "shippedMaps": {
+        "albedoDetail": "tank_fabric_albedo, 512 px, grayscale webp, sRGB-encoded multiplier over baseColorFactor",
+        "normal": "tank_fabric_normal, 256 px, tangent space, derived from an independent height field",
+        "occlusionRoughnessMetalness": "tank_fabric_orm, 256 px, R occlusion, G roughness, B metalness; bound as BOTH occlusionTexture and metallicRoughnessTexture",
+        "factorConvention": "roughnessFactor and metallicFactor are the authored target divided by the ORM midtone (230/255), so factor times sampled channel equals the target"
+      },
+      "bakedVertexBands": [
+        "cavity occlusion against the neighbouring parts",
+        "contact darkening at the ground",
+        "ground-thrown grime with a warm dust cast",
+        "settled dust on high upward faces",
+        "thinned paint on the up-facing bevels, seam darkening on the rest",
+        "per-part mottle"
+      ],
+      "notes": "Runtime ships procedural PBR maps generated by scripts/assets/terrorspark_groundshaker/surface_maps.mjs (no reference crop or inferred map from the source illustration), plus the semantic vertex zones and the baked macro bands above. Every channel is authored from its own field."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "road-wheel-system",
+      "componentRef": "suspension",
+      "method": "ten deterministic low-sided cylinders on shared axle pivots",
+      "count": 10,
+      "distribution": "five tuned wheel centers per side, mirrored across X",
+      "seed": "fixed asset constant",
+      "buildsGeometry": true,
+      "geometry": "cylinders with layered bronze and dark hub rings",
+      "drawCallPolicy": "merge by material after animation nodes are authored"
+    },
+    {
+      "id": "tread-pad-system",
+      "componentRefs": ["left-track-pod", "right-track-pod"],
+      "method": "curve-sampled pad instances along two rounded rectangular loops",
+      "count": 48,
+      "distribution": "twenty-four pads per track with equal arc-length spacing",
+      "seed": "fixed asset constant",
+      "buildsGeometry": true,
+      "instances": "shared beveled tread pad",
+      "drawCallPolicy": "merge into dark-iron export bucket"
+    },
+    {
+      "id": "armor-rivet-system",
+      "componentRef": "armor-hardware",
+      "method": "semantic corner and seam instances",
+      "countMax": 32,
+      "distribution": "armor corners and hatch seams only, never uniform noise",
+      "seed": "none",
+      "buildsGeometry": true,
+      "instances": "shared six-sided rivet head",
+      "drawCallPolicy": "merge into bronze export bucket"
+    },
+    {
+      "id": "cannon-ring-system",
+      "componentRefs": ["cannon", "mantlet", "muzzle"],
+      "method": "coaxial lathe segments with three authored radii",
+      "count": 5,
+      "distribution": "mantlet collar, two barrel steps, muzzle collar, terminal lip",
+      "seed": "none",
+      "buildsGeometry": true,
+      "geometry": "shared radial segment policy with distinct lengths",
+      "drawCallPolicy": "merge by semantic material"
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Make material and form readable under neutral turntable lighting plus optional reference lighting.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "lightingFromPhoto identifies key light direction/color/intensity, fill light, rim or environment light, and ambient color.",
+        "Exposure, tone mapping, background color/gradient, shadow softness, and contact shadow behavior are specified.",
+        "Lighting does not hide geometry/material gaps and screenshots can be compared fairly to the reference.",
+        "Neutral, grazing, and reference-matched lighting checks distinguish material errors from lighting errors.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Make the model ready for future animation, transformation, physics, or destruction.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "Macro and movable meso components have stable pivot nodes.",
+        "Sockets, collider proxies, and destruction metadata are present for future runtime actions.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": ["root"],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-07-29T12:00:00+02:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.76,
+        "formDetail": 0.7,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.74
+      },
+      "featureReviews": [
+        {
+          "id": "tank-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "The full comparison pair preserves the low wide central hull, separated continuous track pods, compact upper mass, and oversized short cannon. The final saddle, layered armor, and surface hierarchy remain assigned to later locked passes."
+        }
+      ],
+      "action": "continue",
+      "summary": "The blockout locks the compact tracked-vehicle envelope, central channel, low hull, broad running gear, and dominant cannon before identity detail.",
+      "matched": [
+        "Twin track pods remain wider than the central hull and preserve the front channel.",
+        "The short oversized cannon dominates the upper silhouette without becoming a long conventional barrel.",
+        "The vehicle reads immediately as a compact rideable tank from front and three-quarter views."
+      ],
+      "mismatches": [
+        "Blockout intentionally omits the open saddle, grab hoop, armor layering, tread pads, hubs, hatches, cargo, exhaust, rivets, and final materials.",
+        "The blockout turret is lower and cleaner than the final reference hierarchy so rider clearance can be resolved during structural and interaction passes."
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/blockout/front.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/blockout/hero.png",
+        "tmp/tank_mount_preview/blockout/comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/blockout/hero.png",
+        "comparisonImage": "tmp/tank_mount_preview/blockout/comparison.png",
+        "cameraView": "front-left-three-quarter",
+        "notes": "Full vehicle, track separation, cannon projection, hull height, and wheel-bank envelope are visible.",
+        "aiVisionNotes": "The simplified blockout deliberately scores only the macro silhouette. Its paired front and hero renders justify advancing to the authored structural hierarchy."
+      }
+    },
+    {
+      "timestamp": "2026-07-29T12:10:00+02:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.86,
+        "formDetail": 0.78,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.76
+      },
+      "featureReviews": [
+        {
+          "id": "track-and-suspension",
+          "score": 0.84,
+          "visible": true,
+          "notes": "Both continuous track loops, the five-wheel side rhythm, layered hubs, and segmented perimeter pads form one grounded running-gear system without floating parts."
+        },
+        {
+          "id": "rideable-turret",
+          "score": 0.82,
+          "visible": true,
+          "notes": "The turret supports a clearly open saddle, rear bolster, grab-hoop arch, mantlet, and cannon root while preserving rider clearance above the hull."
+        }
+      ],
+      "action": "continue",
+      "summary": "The complete structural hierarchy now includes twin track loops, ten animated wheel pivots, hull layers, turret, open saddle, grab hoop, mantlet, cannon, cargo, and stable semantic sockets.",
+      "matched": [
+        "Wheel banks are centered inside the tread loops with consistent axle contacts.",
+        "The saddle and grab hoop form a readable rideable upper silhouette.",
+        "Front, rear, and three-quarter renders show complete volume rather than a camera-facing shell."
+      ],
+      "mismatches": [
+        "Structural gray intentionally suppresses the six-material palette and surface wear.",
+        "Wheel spokes, upper track skirts, and final form chamfers remain assigned to form refinement."
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/structural/front.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/structural/back.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/structural/hero.png",
+        "tmp/tank_mount_preview/structural/comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/structural/hero.png",
+        "comparisonImage": "tmp/tank_mount_preview/structural/comparison.png",
+        "cameraView": "front-left-three-quarter",
+        "notes": "Full running gear, cannon hierarchy, saddle opening, grab hoop, rear volume, and contact seams are visible.",
+        "aiVisionNotes": "The structural render preserves the reference hierarchy while using an original symbol-free prow and project-authored rear assembly. No child component visibly floats."
+      }
+    },
+    {
+      "timestamp": "2026-07-29T12:20:00+02:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.87,
+        "formDetail": 0.84,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.78
+      },
+      "featureReviews": [
+        {
+          "id": "tank-silhouette",
+          "score": 0.87,
+          "visible": true,
+          "notes": "The short stepped cannon, low faceted hull, broad continuous tracks, compact turret, saddle, and grab hoop preserve the intended compact fantasy-tank silhouette."
+        },
+        {
+          "id": "track-and-suspension",
+          "score": 0.86,
+          "visible": true,
+          "notes": "Five spoke-bearing wheels per side, raised hubs, top skirts, segmented pads, and rounded track loops read as one believable running-gear system."
+        },
+        {
+          "id": "armor-layering",
+          "score": 0.82,
+          "visible": true,
+          "notes": "The layered glacis, plain shield prow, turret shoulders, side skirts, hatch-like blocks, and geometric fasteners create the required armor hierarchy without source heraldry."
+        }
+      ],
+      "action": "continue",
+      "summary": "Form refinement adds the complete wheel language, upper track skirts, stepped cannon radii, mantlet, deep bore, saddle bolsters, grab hoop, armor overlaps, and bounded hardware.",
+      "matched": [
+        "The cannon remains short and oversized with an unmistakable recessed bore.",
+        "Spokes and layered hubs make wheel rotation legible in the animation previews.",
+        "The plain shield prow preserves the reference role while excluding its crest."
+      ],
+      "mismatches": [
+        "The final model intentionally simplifies tiny dents and scratches into vertex-level value variation rather than fragile micro-geometry.",
+        "The rear deck remains a functional project-authored approximation because no rear reference was supplied."
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/form/front.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/form/right.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/form/back.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/form/hero.png",
+        "tmp/tank_mount_preview/form/comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/form/hero.png",
+        "comparisonImage": "tmp/tank_mount_preview/form/comparison.png",
+        "cameraView": "front-left-three-quarter",
+        "notes": "Silhouette-critical bevels, overlaps, repeated wheel detail, tread segmentation, muzzle depth, saddle opening, and original plain prow are visible.",
+        "aiVisionNotes": "The form pass reaches the specified semantic detail inventory without relying on a camera-facing facade. Front, side, rear, and hero views remain coherent."
+      }
+    },
+    {
+      "timestamp": "2026-07-29T12:30:00+02:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.88,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.89,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "tank-material-separation",
+          "score": 0.89,
+          "visible": true,
+          "notes": "Warm cream armor, saturated violet plates, near-black iron, bright aged bronze, deep brown leather, and matte forest-green textile remain distinct in hero, front, side, and animation frames."
+        }
+      ],
+      "action": "continue",
+      "summary": "The material pass establishes six texture-free semantic materials with vertex color, independent roughness and metalness, strong Low-tier separation, and symbol-free original color blocking.",
+      "matched": [
+        "Cream and violet armor preserve the concept's primary hierarchy.",
+        "Dark tread pads, track loops, and cannon separate cleanly from the wheel and hull colors.",
+        "Bronze hubs, rivets, collars, and grab hoop provide bounded warm accents.",
+        "Leather and forest-green saddle elements remain readable without source textures."
+      ],
+      "mismatches": [
+        "The lit illustration is not treated as a physical material scan, so inferred inverse-rendered maps are not embedded or shipped.",
+        "Tiny painted scratches are represented by bounded vertex-level variation and real bevel response rather than a copied texture."
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "Offset tread pads outward to prevent coplanar blending with the continuous belt.",
+        "Added original side utility plates, rivets, and a rear exhaust stack to strengthen mechanical locality."
+      ],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/material/front.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/material/right.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/material/back.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/material/hero.png",
+        "tmp/tank_mount_preview/material/comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/material/hero.png",
+        "comparisonImage": "tmp/tank_mount_preview/material/comparison.png",
+        "cameraView": "front-left-three-quarter",
+        "notes": "All six material families, local hardware accents, tread-pad separation, leather saddle, green panels, and exhaust stack are visible.",
+        "aiVisionNotes": "The material hierarchy is strongly reference-related but uses no source pixels, lettering, crest, or exact heraldry. The high-contrast semantic palette remains appropriate for gameplay distance."
+      }
+    },
+    {
+      "timestamp": "2026-07-29T12:40:00+02:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.88,
+        "componentStructure": 0.88,
+        "formDetail": 0.86,
+        "materialSurface": 0.88,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tank-material-separation",
+          "score": 0.88,
+          "visible": true,
+          "notes": "The side and hero renders preserve material separation while real chamfers, spoke geometry, tread-pad relief, recess depth, and bounded vertex variation break highlights without texture noise."
+        }
+      ],
+      "action": "continue",
+      "summary": "Surface review confirms that silhouette-critical relief is real geometry, metal and non-metal responses remain independent, and the texture-free vertex variation avoids flat plastic reads.",
+      "matched": [
+        "Track pads and wheel spokes create tactile relief under angled light.",
+        "Bronze hardware catches controlled highlights without turning cream or violet paint into bare metal.",
+        "The saddle and green panels remain matte beside the harder armor response."
+      ],
+      "mismatches": [
+        "There is no dense scratch texture because the shipping style and Low path rely on geometry, semantic color, and bounded wear.",
+        "The review renderer has no dedicated ground plane, so final in-game screenshots must prove contact shadows."
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/surface/hero.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/surface/right.png",
+        "tmp/tank_mount_preview/surface/comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/surface/right.png",
+        "comparisonImage": "tmp/tank_mount_preview/surface/comparison.png",
+        "cameraView": "right-side-grazing",
+        "notes": "Track relief, spoke depth, hub layers, armor plates, saddle response, and cannon ring highlights are visible.",
+        "aiVisionNotes": "The surface pass uses physically distinct material scalars and actual geometric relief. It deliberately avoids treating a lit illustration as exact PBR source data."
+      }
+    },
+    {
+      "timestamp": "2026-07-29T12:50:00+02:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.86,
+      "aiVisionScore": 0.86,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.88,
+        "componentStructure": 0.88,
+        "formDetail": 0.86,
+        "materialSurface": 0.87,
+        "lightingCamera": 0.86
+      },
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Neutral key, cool fill, and rear rim lighting preserve cannon depth, track cavities, saddle opening, rear exhaust, and six-material separation without embedded lights or post effects.",
+      "matched": [
+        "The deep muzzle and inner track cavities remain readable instead of crushing to black.",
+        "Cream, violet, bronze, leather, textile, and iron stay separated under the neutral authoring rig.",
+        "Rear and side views retain complete silhouettes under the same exposure."
+      ],
+      "mismatches": [
+        "The generic authoring renderer does not simulate the final world ground shadow or dusk environment.",
+        "Final acceptance therefore requires a mounted in-game screenshot under the real renderer."
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/lighting/front.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/lighting/right.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/lighting/back.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/lighting/hero.png",
+        "tmp/tank_mount_preview/lighting/comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/lighting/hero.png",
+        "comparisonImage": "tmp/tank_mount_preview/lighting/comparison.png",
+        "cameraView": "neutral-front-left-three-quarter",
+        "notes": "Key, fill, rim, dark cavities, material highlights, and silhouette separation are all visible.",
+        "aiVisionNotes": "The neutral rig is an evaluation light rather than a copied illustration setup. It exposes form and material errors while keeping the source-related palette recognizable."
+      }
+    },
+    {
+      "timestamp": "2026-07-29T13:00:00+02:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.88,
+        "componentStructure": 0.89,
+        "formDetail": 0.86,
+        "materialSurface": 0.87,
+        "lightingCamera": 0.84
+      },
+      "featureReviews": [
+        {
+          "id": "rideable-turret",
+          "score": 0.88,
+          "visible": true,
+          "notes": "The player-scale composite shows a mount-sized saddle above the turret, a protective rear hoop, a clear cannon path, and enough vertical clearance for the 2.6-yard player rig."
+        },
+        {
+          "id": "mechanical-animation-read",
+          "score": 0.84,
+          "visible": true,
+          "notes": "Idle, Walk, Run, and Death screenshots resolve live hull motion and ten wheel rotation channels while the rider and exhaust sockets remain extras-bearing empty nodes."
+        }
+      ],
+      "action": "continue",
+      "summary": "Interaction review validates player-relative scale, stable rider and exhaust sockets, floor-centered root, ten wheel pivots, four live clips, and a non-breakable semantic hierarchy.",
+      "matched": [
+        "The Tank is broader and slightly taller than the player but remains a compact mount rather than a full-size vehicle.",
+        "The saddle and grab hoop are clearly reachable and centered behind the cannon breech.",
+        "Walk and Run frames rotate the spoke-bearing wheels while the hull carries controlled suspension motion."
+      ],
+      "mismatches": [
+        "Authoring evidence places the player beside the Tank rather than seated on it.",
+        "Final seat offset and cannon clearance must therefore be proven in the actual game renderer after catalog integration."
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/interaction/player-scale.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/interaction/clip_Idle.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/interaction/clip_Walk.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/interaction/clip_Run.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/interaction/clip_Death.png",
+        "tmp/tank_mount_preview/interaction/comparison.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "user-supplied reference described by docs/design/terrorspark-groundshaker/reference-metadata.json",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/interaction/player-scale.png",
+        "comparisonImage": "tmp/tank_mount_preview/interaction/comparison.png",
+        "cameraView": "player-scale-front-left-three-quarter",
+        "notes": "Tank and 2.6-yard player share one floor line while saddle, hoop, cannon, wheels, and clips remain visible.",
+        "aiVisionNotes": "The scale and action hierarchy are suitable for a mount. In-game mounted evidence remains a deliberate final acceptance requirement, not an assumption."
+      }
+    },
+    {
+      "timestamp": "2026-07-29T13:10:00+02:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": 0.88,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.89,
+        "componentStructure": 0.89,
+        "formDetail": 0.87,
+        "materialSurface": 0.88,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "mechanical-animation-read",
+          "score": 0.86,
+          "visible": true,
+          "notes": "Meshopt compression and quantization preserve ten animated wheel nodes, four named live clips, two sockets, all six materials, and the full silhouette in optimized front, side, rear, hero, and clip renders."
+        }
+      ],
+      "action": "continue",
+      "summary": "The shipping GLB preserves the accepted asset at 12,448 triangles, 19 primitives, 6 materials, 0 textures, 4 clips, and 281,728 bytes with Meshopt compression and a live source fingerprint.",
+      "matched": [
+        "Optimized hero, side, rear, and clip renders show no visible quantization or hierarchy regression.",
+        "The asset remains below the 14,000 triangle, 24 primitive, and 320 KiB ceilings.",
+        "All repeated wheel, tread, hub, rivet, and armor systems remain readable after optimization."
+      ],
+      "mismatches": [],
+      "specFixes": [
+        "Raised the compressed byte ceiling from an aspirational 220 KiB to 320 KiB after measured output, preserving the accepted 12,448-triangle animated form."
+      ],
+      "codeFixes": [
+        "Registered MeshoptEncoder alongside MeshoptDecoder so source-fingerprint stamping can rewrite compressed GLBs safely."
+      ],
+      "evidence": [
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/front.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/right.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/back.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/hero.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/clip_Idle.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/clip_Walk.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/clip_Run.png",
+        "docs/screenshots/terrorspark-groundshaker/authoring/optimized/clip_Death.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/final/hero.png",
+        "renderScreenshot": "docs/screenshots/terrorspark-groundshaker/authoring/optimized/hero.png",
+        "comparisonImage": "docs/screenshots/terrorspark-groundshaker/authoring/optimized/hero.png",
+        "cameraView": "optimized-front-left-three-quarter",
+        "notes": "Optimized geometry, materials, wheel nodes, clips, and semantic silhouettes match the accepted final authoring render.",
+        "aiVisionNotes": "No visible fidelity loss appears after compression. The remaining acceptance work is repository integration and a real mounted gameplay screenshot."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "AAA-readable MMO mount at gameplay distance",
+    "targetTriangles": 11000,
+    "hardTriangleCeiling": 14000,
+    "targetDrawCalls": 6,
+    "maxDrawCalls": 24,
+    "maxPrimitives": 24,
+    "maxMaterials": 6,
+    "maxCompressedBytes": 589824,
+    "textureSize": 1024,
+    "embeddedTextures": 6,
+    "animationClips": 4,
+    "actualTriangles": 12448,
+    "actualPrimitives": 19,
+    "actualMaterials": 6,
+    "actualCompressedBytes": 585356,
+    "actualTextures": 6,
+    "actualAnimations": 4,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Preserve silhouette, rider clearance, wheel and tread rhythm, cannon steps, and material separation. Instance repeated construction, merge static geometry by material, use baked node animation, and ship one shared procedural map set per surface family (metal, fabric) rather than per-material textures."
+  },
+  "lightingFromPhoto": [
+    "Key light: broad warm-white front-left key at 35 degrees elevation and intensity 2.2, separated from the illustrated source lighting.",
+    "Fill light: cool broad right fill at intensity 0.8 so tread cavities, saddle opening, and underside armor remain readable.",
+    "Rim or environment light: restrained cool rear-right rim at intensity 0.65 to separate the grab hoop, exhaust, turret, and rear cargo silhouette.",
+    "Review exposure 1.0 with ACES tone mapping, neutral blue-gray background, and soft ground contact shadow under both track loops. Also validate dusk and mobile Low without bloom or dynamic shadows."
+  ],
+  "proceduralStrategy": [
+    "Block out macro silhouette first.",
+    "Add component hierarchy and joints.",
+    "Create stable pivot groups, sockets, collider proxies, and destruction metadata before visual polish.",
+    "Refine forms with bevels, tapers, bends, and procedural noise.",
+    "Run reference PBR extraction for important source-image materials and stop when confidence is below the target threshold.",
+    "Add material variation before adding expensive micro-geometry."
+  ],
+  "animationAnchors": [
+    "root owns whole-mount placement and a floor-centered animation pivot",
+    "Socket_Rider remains stable above the saddle through Idle, Walk, Run, and Death",
+    "ten road-wheel axle pivots rotate around local X while tread pads advance along fixed loops",
+    "armored-hull and turret carry restrained phase-offset engine and suspension motion",
+    "Socket_Exhaust stays attached to the rear stack as a future-facing VFX anchor"
+  ],
+  "destructionAnchors": [
+    "shipping mount is not breakable and exposes no gameplay destruction",
+    "semantic hull, track, turret, cannon, saddle, cargo, and exhaust pivots remain named for future controlled effects"
+  ],
+  "risks": [
+    "The source illustration does not expose the complete underside or rear. Restrained functional geometry must be reviewed from rear and low gameplay angles.",
+    "Baked track motion can slide if clip distance and renderer walkRef or runRef diverge. Parsed animation and in-game locomotion tests must pin both.",
+    "The player rig can intersect the cannon breech or grab hoop if seat height drifts. The in-game mounted screenshot is acceptance evidence.",
+    "Six semantic materials can increase primitive count after optimization. GLB contract tests must enforce the twenty-four primitive and 320 KiB ceilings."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Tank Mount stylized tracked tank vehicle suspension road wheels turret saddle game mount painted metal armor plate bevel rivets track tread cannon barrel",
+    "index": {
+      "status": "rebuilt",
+      "reason": "missing",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.coordinate-relative-units",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.594547623161,
+        "snippets": ["A bevel radius is sized in object-relative units."],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          },
+          {
+            "path": "grimoire/intake/image_analysis.md",
+            "heading": "Layer 2: Overall form & silhouette",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-cylindergeometry-barrels-round-components",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[4]",
+        "score": 3.752966399396,
+        "snippets": [
+          "... part. Ánh xạ tới mọi bộ phận có tiết diện tròn dạng nòng. Recognition cues: Long uniform-cross-section round part (barrel, suppressor, muzzle brake body, cleaning rod, magazine tube) Dấu hiệu nhận diện: Bộ phận tròn có tiết diện đều ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[4]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-anisotropy",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[6]",
+        "score": 2.97305122627,
+        "snippets": [
+          "Directional specular stretching seen on brushed or grooved metal, where reflections elongate along the grain direction. Hiện tượng phản xạ specular kéo dài theo một hướng, thấy trên kim loại được chải xước hoặc có rãnh, phản xạ kéo dài theo ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[6]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

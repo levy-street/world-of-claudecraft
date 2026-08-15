@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "layout": {
+    "width": 512,
+    "height": 512,
+    "columns": 4,
+    "rows": 4
+  },
+  "base": {
+    "path": "public/textures/fenbridge_surface_atlas.webp",
+    "width": 512,
+    "height": 512,
+    "sha256": "527a4afd4116ff8ee2d70a5a6af8db1e93ed17f388f48cb77c199d51b5bbb5c9",
+    "byteCeiling": 262144
+  },
+  "normal": {
+    "path": "public/textures/fenbridge_surface_normal.webp",
+    "width": 512,
+    "height": 512,
+    "sha256": "d68714b1925f792840fd1b6dd90d682c5bc2e7a474177105e3a9bb12a017cef9",
+    "byteCeiling": 196608
+  },
+  "roughness": {
+    "path": "public/textures/fenbridge_surface_roughness.webp",
+    "width": 512,
+    "height": 512,
+    "sha256": "ea442943770ba8b7fc06783654ef34f6f2a7aee7d1e272a6d26800b31d410b4a",
+    "byteCeiling": 131072
+  },
+  "totalByteCeiling": 458752
+}

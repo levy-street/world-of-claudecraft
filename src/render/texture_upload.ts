@@ -38,19 +38,24 @@ export interface TextureUploadTarget {
 export interface ChunkedTextureUploadOptions {
   maxChunkBytes?: number;
   beforeChunk?: () => Promise<void>;
+  uploadChunk?: (texture: THREE.Texture) => void | Promise<void>;
 }
 
 /**
- * Upload a DataTexture one bounded set of rows at a time. Three's DataTexture
- * updateRanges allocate the texture once, then issue texSubImage2D only for
- * selected rows. Yielding between batches prevents a 2k half-float HDRI from
- * becoming one 16 MB, frame-blocking driver call during zone streaming.
+ * Upload a DataTexture one bounded set of rows at a time when update ranges are
+ * available. Three's updateRanges allocate the texture once, then issue
+ * texSubImage2D only for selected rows. The installed three (0.185) ships the
+ * range API natively, so plain DataTextures take the bounded path; the
+ * single-upload arm remains for hosts or stubs without it, where beforeChunk
+ * still paces the start and uploadChunk lets the renderer serialize that
+ * indivisible call with other WebGL work.
  */
 export async function uploadDataTextureInChunks(
   target: TextureUploadTarget,
   texture: THREE.Texture,
   options: ChunkedTextureUploadOptions = {},
 ): Promise<number> {
+  const uploadChunk = options.uploadChunk ?? ((nextTexture) => target.initTexture(nextTexture));
   const dataTexture = texture as THREE.DataTexture;
   const image = dataTexture.image as
     | { data?: TexturePixelData; width?: number; height?: number }
@@ -67,7 +72,7 @@ export async function uploadDataTextureInChunks(
     Number(data.length) !== expectedComponents
   ) {
     await options.beforeChunk?.();
-    target.initTexture(texture);
+    await uploadChunk(texture);
     return 1;
   }
 
@@ -80,12 +85,12 @@ export async function uploadDataTextureInChunks(
   );
   const rowsPerChunk = Math.max(1, Math.floor(maxChunkBytes / rowBytes));
 
-  // Three r165, pinned by the v0.28 release, predates texture update ranges.
-  // Preserve a valid upload there and retain bounded uploads when the active
-  // Three version exposes the range API.
+  // Every three from the 0.185 train onward exposes texture update ranges
+  // natively (r165, pinned through v0.35, predated them); keep the one valid
+  // full upload for any texture or host without the range API.
   if (!supportsUpdateRanges(dataTexture)) {
     await options.beforeChunk?.();
-    target.initTexture(dataTexture);
+    await uploadChunk(dataTexture);
     return 1;
   }
 
@@ -101,7 +106,7 @@ export async function uploadDataTextureInChunks(
       dataTexture.addUpdateRange(row * rowComponents, rowComponents);
     }
     dataTexture.needsUpdate = true;
-    target.initTexture(dataTexture);
+    await uploadChunk(dataTexture);
     chunks++;
   }
   return chunks;

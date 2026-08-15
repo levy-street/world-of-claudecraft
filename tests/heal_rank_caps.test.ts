@@ -28,7 +28,8 @@ function fmtEffects(effects: AbilityDef['effects']): string {
       const any = e as Record<string, unknown>;
       if ('min' in any && 'max' in any) return `${e.type} ${any.min}-${any.max}`;
       if ('total' in any) return `${e.type} ${any.total}/${any.duration}`;
-      if ('amount' in any) return `${e.type} ${any.amount}`;
+      if ('amount' in any) return `${e.type} ${any.amount}/${any.duration}`;
+      if ('duration' in any) return `${e.type} ${any.duration}`;
       return e.type;
     })
     .join(' + ');
@@ -47,6 +48,25 @@ function ladder(id: string): Row[] {
 }
 
 const EXPECTED: Record<string, Row[]> = {
+  // ---- chronomancer
+  temporal_mend: [
+    { level: 5, cost: 45, effects: 'heal 62-74' },
+    { level: 12, cost: 70, effects: 'heal 105-125' },
+    { level: 18, cost: 95, effects: 'heal 150-178' },
+    { level: 20, cost: 110, effects: 'heal 218-258' }, // NEW cap rank
+  ],
+  temporal_echo: [
+    { level: 8, cost: 40, effects: 'heal 24-30 + temporalEcho 15' },
+    { level: 12, cost: 60, effects: 'heal 40-50 + temporalEcho 15' },
+    { level: 18, cost: 85, effects: 'heal 58-70 + temporalEcho 15' },
+    { level: 20, cost: 90, effects: 'heal 84-102 + temporalEcho 15' }, // NEW cap rank
+  ],
+  temporal_barrier: [
+    { level: 5, cost: 50, effects: 'absorb 55/10' },
+    { level: 12, cost: 75, effects: 'absorb 100/10' },
+    { level: 18, cost: 105, effects: 'absorb 160/10' },
+    { level: 20, cost: 120, effects: 'absorb 232/10' }, // NEW cap rank
+  ],
   // ---- priest
   lesser_heal: [
     { level: 1, cost: 30, effects: 'heal 47-58' },
@@ -67,10 +87,10 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 75, effects: 'hot 205/15' }, // revalued cap (was 140)
   ],
   power_word_shield: [
-    { level: 6, cost: 45, effects: 'absorb 48' },
-    { level: 12, cost: 70, effects: 'absorb 90' },
-    { level: 18, cost: 100, effects: 'absorb 145' },
-    { level: 20, cost: 130, effects: 'absorb 210' }, // NEW cap rank
+    { level: 6, cost: 45, effects: 'absorb 48/30' },
+    { level: 12, cost: 70, effects: 'absorb 90/30' },
+    { level: 18, cost: 100, effects: 'absorb 145/30' },
+    { level: 20, cost: 130, effects: 'absorb 210/30' }, // NEW cap rank
   ],
   prayer_of_healing: [
     { level: 10, cost: 130, effects: 'aoeHeal 100-122' },
@@ -106,11 +126,15 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 72, effects: 'heal 75-90 + hot 71/21' }, // NEW cap rank
   ],
   // ---- paladin
+  // The paladin overhaul owns Mending Light's mana curve: it tuned the rank costs
+  // down (35/50/65) against its own Devotion economy and left the cap rank's
+  // throughput at 190-222, so the release's 50/70/117 + 275-322 retune does not
+  // apply to this class any more.
   holy_light: [
     { level: 1, cost: 25, effects: 'heal 42-51' },
-    { level: 8, cost: 50, effects: 'heal 76-90' },
-    { level: 14, cost: 70, effects: 'heal 122-144' },
-    { level: 20, cost: 117, effects: 'heal 275-322' }, // revalued cap (was 190-222)
+    { level: 8, cost: 35, effects: 'heal 76-90' },
+    { level: 14, cost: 50, effects: 'heal 122-144' },
+    { level: 20, cost: 65, effects: 'heal 190-222' },
   ],
   flash_of_light: [
     { level: 12, cost: 35, effects: 'heal 62-76' },
@@ -130,8 +154,18 @@ describe('heal rank cap retune (2026-07)', () => {
   }
 
   it('every new or revalued cap rank sits at level 20: leveling is untouched', () => {
-    for (const rows of Object.values(EXPECTED)) {
-      expect(rows[rows.length - 1].level).toBe(20);
+    for (const id of Object.keys(EXPECTED)) {
+      const rows = ladder(id);
+      expect(rows[rows.length - 1].level, id).toBe(20);
+    }
+  });
+
+  it('Chronomancy cap additions are actual rank 4 rows', () => {
+    for (const id of ['temporal_mend', 'temporal_echo', 'temporal_barrier']) {
+      expect(
+        def(id).ranks?.map((rank) => rank.rank),
+        id,
+      ).toEqual([2, 3, 4]);
     }
   });
 });

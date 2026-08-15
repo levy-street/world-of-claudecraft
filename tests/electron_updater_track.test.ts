@@ -130,16 +130,30 @@ describe('initUpdater track wiring', () => {
     expect(fake.channelSets).toEqual([]);
   });
 
-  it('logs and survives a failed download (no unhandled rejection)', async () => {
+  it('logs and survives a failed download, and clears the renderer card', async () => {
     const fake = makeFakeAutoUpdater();
     fake.downloadUpdate = vi.fn(() => Promise.reject(new Error('feed host down')));
-    const { deps, log } = makeDeps(fake, PROD);
+    const { deps, log, sent } = makeDeps(fake, PROD);
     initUpdater(deps);
     fake.emit('update-available', { version: '0.23.0', wocApiOrigin: PROD });
     // Let the rejected downloadUpdate() promise settle through its .catch.
     await Promise.resolve();
     await Promise.resolve();
     expect(log.warn).toHaveBeenCalledWith('[updater] download failed', 'feed host down');
+    expect(sent).toEqual([{ type: 'available', version: '0.23.0' }, { type: 'error' }]);
+  });
+
+  it('forwards checking / not-available / error as bare renderer payloads', () => {
+    const fake = makeFakeAutoUpdater();
+    const { deps, sent } = makeDeps(fake, PROD);
+    initUpdater(deps);
+    fake.emit('checking-for-update', undefined);
+    expect(sent).toEqual([{ type: 'checking' }]);
+    fake.emit('update-not-available', { version: '0.22.0' });
+    expect(sent).toEqual([{ type: 'checking' }, { type: 'not-available' }]);
+    fake.emit('error', new Error('feed host down'));
+    // The error payload must stay bare: no message ever reaches the page.
+    expect(sent).toEqual([{ type: 'checking' }, { type: 'not-available' }, { type: 'error' }]);
   });
 });
 

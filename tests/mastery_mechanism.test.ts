@@ -33,8 +33,9 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const base = abilitiesKnownAt('paladin', 20, undefined).find(
       (a) => a.def.id === 'retribution_aura',
     );
-    const baseThorns = base?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
-    expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(5);
+    const baseThorns = base?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
+    // Rank 3 at level 20 (the aura ranks 5 -> 12 -> 22 at levels 7, 13 and 18).
+    expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(22);
 
     const retMods = computeTalentModifiers(
       'paladin',
@@ -44,27 +45,34 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const ret = abilitiesKnownAt('paladin', 20, retMods).find(
       (a) => a.def.id === 'retribution_aura',
     );
-    const retThorns = ret?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
-    // 5 * 1.2 (ret meleeDmgPct 0.2) = 6, not 5 (the pre-fix regression left it at 5).
-    expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
+    const retThorns = ret?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
+    // 22 * 1.2 (ret meleeDmgPct 0.2) = 26, not 22 (the pre-fix regression left it unscaled).
+    expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(26);
   });
 
-  it('Resolve Unbroken strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
-    // The active Talents V2 row buffs a percent stat buff; with damage mods no longer
-    // scaling percent buffs, it must ride buffPct. The row's 50% modifier scales the
-    // +5% base buff to the authored +7.5%, without rounding the percentage to 8%.
-    const mods = computeTalentModifiers(
-      'priest',
-      { spec: null, rows: { 17: 'pri_r17_improved_fortitude' } },
+  it('a mastery strengthens a fractional rate buff (Subtlety on Stealth) without rounding it', () => {
+    // The buffPct counterpart to the thorns case above: a mastery that STRENGTHENS a
+    // buff must scale a rate-shaped value as a fraction, not round it like a flat
+    // magnitude (stealth is deliberately absent from INTEGRAL_BUFF_KINDS).
+    // Chosen because Subtlety's mastery is the live buffPct-on-a-rate pair in the
+    // content, and 0.5 -> 0.75 is only correct unrounded: rounding lands on 1 and
+    // silently doubles the buff, which is exactly the F1 regression.
+    const stealthValue = (mods: ReturnType<typeof computeTalentModifiers> | undefined): number => {
+      const ability = abilitiesKnownAt('rogue', 20, mods).find((a) => a.def.id === 'stealth');
+      const buff = ability?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'stealth');
+      if (!buff || !('value' in buff)) throw new Error('missing stealth selfBuff');
+      return buff.value;
+    };
+
+    expect(stealthValue(undefined)).toBeCloseTo(0.5, 6);
+
+    const subtlety = computeTalentModifiers(
+      'rogue',
+      { spec: 'subtlety', ranks: {}, choices: {} },
       20,
     );
-    const fortitude = abilitiesKnownAt('priest', 20, mods).find(
-      (a) => a.def.id === 'power_word_fortitude',
-    );
-    const buff = fortitude?.effects.find(
-      (e) => e.type === 'buffTarget' && e.kind === 'buff_sta_pct',
-    );
-    expect(buff && 'value' in buff ? buff.value : null).toBe(7.5);
+    // 0.5 * 1.5 (subtlety buffPct 0.5) = 0.75, NOT Math.round(0.75) = 1.
+    expect(stealthValue(subtlety)).toBeCloseTo(0.75, 6);
   });
 });
 
@@ -267,7 +275,7 @@ describe('crit-damage masteries are scoped to their channel (F4)', () => {
   });
 });
 
-describe('Demonology damage redirect is not double-modified (F7)', () => {
+describe('Necromancy Graveguard redirect is not double-modified (F7)', () => {
   it("a source's Defensive Stance cut is applied once, not again on the pet's share", () => {
     const sim = new Sim({ seed: 1, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
@@ -275,8 +283,8 @@ describe('Demonology damage redirect is not double-modified (F7)', () => {
     const wl = sim.entities.get(sim.playerId) as Entity;
     wl.maxHp = wl.hp = 1_000_000;
     wl.resource = wl.maxResource;
-    // Bring up the demon: the summon is a multi-second cast, so tick past it.
-    sim.castAbility('summon_voidwalker', sim.playerId);
+    // Bring up the Graveguard: the summon is a multi-second cast, so tick past it.
+    sim.castAbility('raise_graveguard', sim.playerId);
     for (let i = 0; i < 20 * 12 && sim.player.castingAbility; i++) sim.tick();
     const pet = sim.petOf(sim.playerId) as Entity;
     expect(pet).toBeTruthy();
@@ -312,7 +320,7 @@ describe('Demonology damage redirect is not double-modified (F7)', () => {
     const wl = sim.player;
     wl.maxHp = wl.hp = 1_000_000;
     wl.resource = wl.maxResource;
-    sim.castAbility('summon_voidwalker');
+    sim.castAbility('raise_graveguard');
     for (let i = 0; i < 20 * 12 && wl.castingAbility; i++) sim.tick();
     const pet = sim.petOf(sim.playerId) as Entity;
     expect(pet).toBeTruthy();

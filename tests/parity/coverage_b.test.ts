@@ -55,17 +55,24 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(ev.some((e) => e.type === 'lockpickStep')).toBe(true);
   });
 
-  it('delve_lockpick_fail: idling past the step clock jams the chest and opens the exit', () => {
-    const rec = run('delve_lockpick_fail');
+  it('delve_lockpick_tries_exhausted: idling past the step clock still opens the chest at the LOW consolation tier (issue #2585)', () => {
+    const rec = run('delve_lockpick_tries_exhausted');
     const sim = rec.sim as any;
     const ev = rec.allEvents as Ev[];
-    // The attempt engaged, then the server clock (not the client) burned the single try.
+    // The attempt engaged, then the server clock (not the client) burned the single
+    // try. Tries running out grants the chest instead of jamming it, but this is NOT
+    // a solve: the reward is capped at the base `low` tier, not the Premium ante's tier.
     expect(ev.some((e) => e.type === 'lockpickSession')).toBe(true);
-    expect(ev.some((e) => e.type === 'lockpickEnd' && e.outcome === 'fail')).toBe(true);
-    // The chest jams (lost until the delve is re-cleared) but the surface exit still opens.
+    expect(ev.some((e) => e.type === 'lockpickEnd' && e.outcome === 'success')).toBe(true);
+    const loot = ev.find((e) => e.type === 'delveChestLoot') as any;
+    expect(loot).toBeDefined();
+    expect(loot.lootTier).toBe('low');
+    expect(loot.bountiful).toBe(false);
     const r = sim.delveRunForPlayer(sim.playerId);
     const chestId = rec.notes.chestId as number;
-    expect(r.objectState[chestId].attemptAvailable).toBe(false);
+    expect(r.objectState[chestId].attemptAvailable).toBe(false); // consumed by the grant
+    expect(r.objectState[chestId].looted).toBe(true);
+    expect(r.objectState[chestId].lootedTier).toBe('low');
     expect(r.surfaceExitId).not.toBeNull();
     expect(r.objectState[r.surfaceExitId].open).toBe(true);
   });
@@ -183,9 +190,9 @@ describe('coverage: each scenario fires its subsystem', () => {
     // with b winning the contest reads identically), so pin each holder.
     const held = (pid: number) => sim.countItem('greyjaw_hide_boots', pid) as number;
     expect(held(a)).toBe(0); // the master looter assigned all three away
-    expect(held(b)).toBe(2); // direct grant + the contest win below
+    expect(held(b)).toBe(1); // direct grant only
     expect(held(c)).toBe(1); // direct grant only
-    expect(held(d)).toBe(0); // rolled below the tie, so won nothing
+    expect(held(d)).toBe(1); // rolled at the tie, then won the tie-break below
     // The deduped assignment never reopened as a roll.
     expect(evs.some((e) => e.type === 'lootRoll' && e.rollId === rollIds[1])).toBe(false);
 
@@ -202,19 +209,20 @@ describe('coverage: each scenario fires its subsystem', () => {
     const needRolls = evs
       .filter((e) => e.type === 'loot' && e.pid === a && /^Need Roll - /.test(text(e)))
       .map((e) => Number(/^Need Roll - (\d+)/.exec(text(e))?.[1]));
-    // Re-seeded 1091 -> 1326 by the v0.32.0 base merge: the tie SHAPE is preserved
-    // (the same two rollers level at the same 97), only the third roll and the
-    // tie-break's winner moved, because this branch's content shifts the shared rng
-    // and not master-loot logic itself.
-    expect(needRolls).toEqual([97, 97, 85]); // b and c tie at the top, d below
-    // The tie-break picked b, and that outcome is the one observable effect of the
+    // Re-seeded 1091 -> 1326 by the v0.32.0 base merge, then 1326 -> 1383 by the
+    // quest-dedupe content pass, then 1383 -> 247 by the Galecrest unspawnable-quest
+    // camp fix: the tie SHAPE is preserved (two rollers level at the top), only
+    // which rollers tie, the third roll, and the tie-break's winner move, because
+    // these branches shift the shared rng and never master-loot logic itself.
+    expect(needRolls).toEqual([46, 60, 60]); // c and d tie at the top, b below
+    // The tie-break picked d, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a
     // named one of them wins exactly once per party member is the claim.
     expect(
       evs.filter(
         (e) =>
-          e.type === 'loot' && text(e) === `Bbb wins [[i:greyjaw_hide_boots]] (${needRolls[1]})`,
+          e.type === 'loot' && text(e) === `Ddd wins [[i:greyjaw_hide_boots]] (${needRolls[1]})`,
       ).length,
     ).toBe(4); // announced once to each party member
 
@@ -458,6 +466,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // the moment each arm fired; the CC does not persist to the end without a tick).
     expect(n.stompStunLanded).toBe(true);
     expect(n.fearLanded).toBe(true);
+    // The terrify tank exemption: the boss's current aggro target never fears.
+    expect(n.tankFearLanded).toBe(false);
     // War Stomp + terrify each emit an 'unleashes' combat-log line (>= 2 total).
     expect(
       ev.filter(
@@ -524,14 +534,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // pulseGroundAoE hit >=2 distinct in-radius targets (rng.range once per target).
     const aoeMobIds = rec.notes.aoeMobIds as number[];
     const consTargets = new Set(
-      ev
-        .filter(
-          (e) =>
-            e.type === 'damage' &&
-            typeof e.ability === 'string' &&
-            e.ability.toLowerCase().includes('holy ground'),
-        )
-        .map((e) => e.targetId),
+      ev.filter((e) => e.type === 'damage' && e.ability === 'Holy Ground').map((e) => e.targetId),
     );
     expect(aoeMobIds.filter((id) => consTargets.has(id)).length).toBeGreaterThanOrEqual(2);
   });

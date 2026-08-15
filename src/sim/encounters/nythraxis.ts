@@ -31,6 +31,11 @@ import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
 import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
 import { heroicLockoutId, instanceLockoutMetas } from '../instances/dungeons';
+import {
+  hasInteractObjectCredit,
+  interactObjectCreditKey,
+  recordInteractObjectCredit,
+} from '../quests/interact_object_credit';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat, SUMMONED_ADD_THREAT_SEED, threatEntries } from '../threat';
@@ -1401,12 +1406,28 @@ export function interactObjectForQuests(ctx: SimContext, obj: Entity, meta: Play
       }
       // The interact objective itself (and its one-time vision) only credits once.
       if (qp.counts[objectiveIndex] >= questObjectiveRequired(quest, qp, objectiveIndex)) return;
+      // ...and only once per DISTINCT object. The objective is keyed on the item
+      // id and this path leaves the object lootable on purpose (party sharing +
+      // the ritual circle's guardian re-summon above), so without this ledger one
+      // object satisfies a multi-count objective by itself: pressing interact
+      // three times on the nearest watchbell finished "The Three Bells" without
+      // walking the coast. Checked after the re-summon so a lost Bound Guardian
+      // stays reachable.
+      const creditKey = interactObjectCreditKey(objectiveIndex, obj.pos);
+      if (hasInteractObjectCredit(qp, creditKey)) {
+        ctx.error(meta.entityId, 'You have already done this one.');
+        return;
+      }
       const shared = sharedNythraxisObjectParticipants(ctx, meta, obj, qp.questId, objectiveIndex);
       for (const member of shared) {
         const memberQp = member.questLog.get(qp.questId);
         if (memberQp?.state !== 'active') continue;
         const required = questObjectiveRequired(quest, memberQp, objectiveIndex);
         if (memberQp.counts[objectiveIndex] >= required) continue;
+        // A party member who already took this object's credit does not take it
+        // twice, even when a groupmate re-triggers the shared interact.
+        if (hasInteractObjectCredit(memberQp, creditKey)) continue;
+        recordInteractObjectCredit(memberQp, creditKey);
         memberQp.counts[objectiveIndex]++;
         member.counters.questProgress++;
         ctx.emit({

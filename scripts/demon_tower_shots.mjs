@@ -1,0 +1,220 @@
+// Demon Tower PR screenshots: the tower door in Thornpeak Heights and a floor
+// three authored arenas mid-wave, on desktop and a landscape phone viewport.
+//
+// Drives the real offline game through window.__game (the pattern every other
+// shot script here uses) rather than faking a scene: the arena, the core, the
+// waves, and the demons are all produced by the shipping sim + renderer, so a
+// broken wiring shows up in the capture instead of being hidden by a fixture.
+//
+// Needs `npm run dev` on :5173. Writes PNGs into docs/screenshots/demon-tower/.
+
+import { mkdirSync } from 'node:fs';
+import path from 'node:path';
+import puppeteer from 'puppeteer-core';
+import { BROWSER_PATH } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
+
+const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173/';
+const OUT = path.resolve('docs/screenshots/demon-tower');
+
+const DESKTOP = { width: 1600, height: 900, deviceScaleFactor: 1 };
+const MOBILE = { width: 932, height: 430, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** Wait until the game global and first rendered scene are both live. */
+async function waitForGame(page) {
+  await page.waitForFunction(() => !!window.__game?.sim, { timeout: 90000, polling: 500 });
+  await page.waitForFunction(
+    () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+    { timeout: 90000, polling: 250 },
+  );
+}
+
+/** Require the loading curtain to remain absent for a full two seconds. A zone
+ * stream can arm it one task after teleport, so a single hidden sample races. */
+async function waitForSceneSettled(page) {
+  await page.waitForFunction(
+    () => {
+      const el = document.querySelector('#loading-screen');
+      const visible = el?.classList.contains('visible') ?? false;
+      const state = window;
+      if (visible) {
+        state.__towerShotHiddenSince = 0;
+        return false;
+      }
+      state.__towerShotHiddenSince ||= performance.now();
+      return performance.now() - state.__towerShotHiddenSince >= 2000;
+    },
+    { timeout: 90000, polling: 100 },
+  );
+}
+
+/** Put the player at the tower door and settle the camera. */
+async function gotoTowerDoor(page) {
+  return page.evaluate(() => {
+    const sim = window.__game.sim;
+    const p = sim.player;
+    sim.setPlayerLevel(20);
+    p.devGod = true;
+    // The door is minted lazily on the first overworld rift trigger; tick once
+    // so it exists, then walk the player onto it.
+    sim.tick();
+    const door = [...sim.entities.values()].find(
+      (e) => e.templateId === 'rift_portal' && e.riftSeed === 0x70b30000,
+    );
+    if (!door) return { ok: false, why: 'no tower door' };
+    p.pos = { x: door.pos.x, y: door.pos.y, z: door.pos.z - 9 };
+    p.prevPos = { ...p.pos };
+    p.facing = 0;
+    for (let i = 0; i < 4; i++) sim.tick();
+    return { ok: true, x: door.pos.x, z: door.pos.z };
+  });
+}
+
+/** Enter the tower and advance to `floorIndex`, leaving a live wave on screen. */
+async function enterTowerFloor(page, floorIndex, cameraDistance) {
+  return page.evaluate(
+    (target, distance) => {
+      const game = window.__game;
+      const sim = game.sim;
+      const p = sim.player;
+      p.devGod = true;
+      sim.enterRift(0x70b30000, 28, p.id);
+      const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+      if (!inst) return { ok: false, why: 'no instance' };
+      // Climb by clearing floors outright; we only want the CAMERA on `target`.
+      let guard = 0;
+      while (inst.floorIndex < target && guard++ < 400) {
+        for (let i = 0; i < 22; i++) sim.tick();
+        for (const id of inst.towerWaveMobIds) {
+          const e = sim.entities.get(id);
+          if (e) {
+            e.hp = 0;
+            e.dead = true;
+          }
+        }
+        if (inst.towerBossId !== null) {
+          const b = sim.entities.get(inst.towerBossId);
+          if (b) {
+            b.hp = 0;
+            b.dead = true;
+          }
+        }
+        if (inst.descentOpen && inst.descentId !== null) {
+          const d = sim.entities.get(inst.descentId);
+          if (d) {
+            p.pos = { ...d.pos };
+            p.prevPos = { ...p.pos };
+          }
+        }
+      }
+      // Let the floor send a live wave, then stand the player INSIDE the arena,
+      // south of the core and facing it, so the shot frames the centrepiece and
+      // the ring of demons rather than the outside of the wall.
+      for (let i = 0; i < 26; i++) sim.tick();
+      const core = inst.towerCoreId != null ? sim.entities.get(inst.towerCoreId) : null;
+      if (core) {
+        // Frame from a safe off-axis position: a straight south view put the
+        // generated Core between the chase camera and the whole arena. The
+        // diagonal keeps the centrepiece, hazards and two architectural wings in
+        // one shot without placing the camera behind a shell wall.
+        const yaw = Math.PI / 4;
+        p.pos = { x: core.pos.x - 6, y: core.pos.y, z: core.pos.z - 6 };
+        p.prevPos = { ...p.pos };
+        p.facing = yaw;
+        game.input.camYaw = yaw;
+        game.input.camPitch = 0.42;
+        game.input.camDist = distance;
+        game.renderer.camDist = distance;
+      }
+      for (let i = 0; i < 8; i++) sim.tick();
+      return {
+        ok: true,
+        floor: inst.floorIndex + 1,
+        wave: inst.towerWave,
+        alive: inst.towerWaveMobIds.filter((id) => {
+          const e = sim.entities.get(id);
+          return e && !e.dead;
+        }).length,
+      };
+    },
+    floorIndex,
+    cameraDistance,
+  );
+}
+
+async function shoot(page, name) {
+  mkdirSync(OUT, { recursive: true });
+  // The headless swiftshader path raises a "no GPU acceleration" notice; that is
+  // an artifact of the capture environment, not of this change, so it never
+  // belongs in a committed shot.
+  await page.evaluate(() => {
+    document.querySelector('.tut-skip')?.click();
+    for (const b of document.querySelectorAll('button')) {
+      const label = (b.textContent ?? '').trim().toLowerCase();
+      // "dismiss" is the software-rendering notice; "confirm" is the camera
+      // prompt, which can re-appear after a reload. Neither belongs in a shot.
+      if (label === 'dismiss' || label === 'confirm') b.click();
+    }
+  });
+  await sleep(1600);
+  await page.screenshot({ path: path.join(OUT, `${name}.png`) });
+  console.log(`  wrote ${name}.png`);
+}
+
+async function run(label, viewport, floors) {
+  const browser = await puppeteer.launch({
+    executablePath: BROWSER_PATH,
+    args: ['--use-angle=swiftshader', '--no-sandbox', '--enable-unsafe-swiftshader'],
+    defaultViewport: viewport,
+  });
+  const page = await browser.newPage();
+  page.on('pageerror', (e) => console.log(`  [pageerror] ${e.message}`));
+  await page.goto(GAME_URL, { waitUntil: 'networkidle2', timeout: 90000 });
+  await enterOfflineGame(page, {});
+  await waitForGame(page);
+  await sleep(1500);
+
+  const door = await gotoTowerDoor(page);
+  console.log(`${label} door:`, JSON.stringify(door));
+  if (!door.ok) throw new Error(`tower door setup failed: ${door.why}`);
+  // Teleporting into a previously unseen overworld cell starts a second media
+  // readiness pass. The evidence shot must prove the rendered landmark, never
+  // capture that transient loading overlay.
+  await waitForGame(page);
+  await waitForSceneSettled(page);
+  await shoot(page, `after-${label}-door`);
+
+  // One reload per floor: climbing in-place would leave the previous floor's
+  // corpses and an already-advanced wave counter in the shot.
+  for (const floor of floors) {
+    await page.reload({ waitUntil: 'networkidle2', timeout: 90000 });
+    await enterOfflineGame(page, {});
+    await waitForGame(page);
+    await sleep(1500);
+    const info = await enterTowerFloor(page, floor - 1, viewport.isMobile ? 10 : 7);
+    console.log(`${label} floor${floor}:`, JSON.stringify(info));
+    if (!info.ok || info.floor !== floor || info.alive < 1) {
+      throw new Error(`tower floor ${floor} setup failed: ${JSON.stringify(info)}`);
+    }
+    await waitForGame(page);
+    await waitForSceneSettled(page);
+    await shoot(page, `after-${label}-floor${floor}`);
+  }
+
+  await browser.close();
+}
+
+const ALL_FLOORS = [1, 2, 3];
+const MOBILE_FLOORS = ALL_FLOORS;
+const SHOT_MODE = process.argv[2] ?? 'all';
+
+if (SHOT_MODE === 'doors') {
+  await run('desktop', DESKTOP, []);
+  await run('mobile', MOBILE, []);
+} else {
+  if (SHOT_MODE === 'all' || SHOT_MODE === 'desktop') await run('desktop', DESKTOP, ALL_FLOORS);
+  if (SHOT_MODE === 'all' || SHOT_MODE === 'mobile') await run('mobile', MOBILE, MOBILE_FLOORS);
+}
+console.log(`done -> ${OUT}`);

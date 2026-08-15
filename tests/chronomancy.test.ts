@@ -11,9 +11,10 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function chronoMage(level = 20) {
-  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   expect(sim.setSpec('arcane')).toBe(true);
   sim.tick();
@@ -222,13 +223,16 @@ describe('Temporal Barrier', () => {
     sim.tick();
     let shield = p.auras.find((a) => a.id === 'temporal_barrier');
     expect(shield?.kind).toBe('absorb');
-    // Rank 3 base 160, scaled by the Chronoweave mastery (x1.15 at level 20)
+    // Rank 4 base 232, scaled by the Chronoweave mastery (x1.15 at level 20)
     // like the heals, plus 25 percent of the caster's spell power (PR #2154's
-    // barrier scaling; the autoEquip level-20 mage carries 40 spell power, so
-    // 184 + 10 = 194).
-    expect(shield?.value).toBe(194);
+    // barrier scaling; the autoEquip level-20 mage carries 40 spell power).
+    // Issue #1803: the Chronoweave healPct reaches the Spell Power rider too,
+    // not just the base: base round(232 * 1.15) = 267, rider
+    // round(40 * 0.25 * 1.15) = 12, total 279 (an unscaled rider of 10 would
+    // under-deliver the mastery's advertised percentage).
+    expect(shield?.value).toBe(279);
     // Absorption channels through the normal pipeline: a 100 hit leaves hp
-    // untouched and the shell at 94.
+    // untouched and the shell at 179.
     const mob = addHostile(sim);
     const hp0 = p.hp;
     (
@@ -246,7 +250,7 @@ describe('Temporal Barrier', () => {
     ).dealDamage(mob, p, 100, false, 'physical', null, 'hit');
     expect(p.hp).toBe(hp0);
     shield = p.auras.find((a) => a.id === 'temporal_barrier');
-    expect(shield?.value).toBe(94);
+    expect(shield?.value).toBe(179);
     // A same-caster recast REPLACES to full (the documented absorb rule).
     p.cooldowns.delete('temporal_barrier');
     (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
@@ -255,7 +259,7 @@ describe('Temporal Barrier', () => {
     sim.tick();
     const shields = p.auras.filter((a) => a.id === 'temporal_barrier');
     expect(shields.length).toBe(1); // never stacks with itself
-    expect(shields[0].value).toBe(194); // fresh full shell
+    expect(shields[0].value).toBe(279); // fresh full shell
     // Expiry: ride past the 10s window and the shell is gone.
     collect(sim, 10.5);
     expect(p.auras.some((a) => a.id === 'temporal_barrier')).toBe(false);
@@ -285,7 +289,12 @@ describe('persistence and loadouts', () => {
     const { sim } = chronoMage();
     const state = sim.serializeCharacter(sim.playerId);
     expect(state?.talents?.spec).toBe('arcane');
-    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    const sim2 = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('mage', 'Persistida', { state: state ?? undefined });
     sim2.tick();
     const meta = (

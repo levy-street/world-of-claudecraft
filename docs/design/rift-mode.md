@@ -7,8 +7,9 @@ content artifact and the event's atomic first-clear claim.
 
 ## Runtime flow
 
-1. `rift/portals.ts` selects an explicitly eligible new-world zone and opens a
-   deterministic C/B/A/S portal on a deterministic 2-4 hour schedule.
+1. `rift/portals.ts` keeps one deterministic C/B/A/S portal open in EVERY
+   eligible new-world zone, cycling hourly (a zone's next portal opens one
+   cycle after the previous one opened).
 2. The existing procedural generator creates the draft and remains authoritative
    for layouts, colliders, mechanics, and safe spawn points.
 3. `rift/upgrader_draft.ts` immediately builds a validated heuristic upgrade. The
@@ -16,8 +17,13 @@ content artifact and the event's atomic first-clear claim.
 4. Entry freezes the artifact (`contentLocked`) and allocates one independent
    instance per group. Every competing instance receives the same artifact hash.
 5. `rift/race.ts` performs the single-threaded check-and-write first-clear claim.
-   The winner receives race rewards; all other instances for that event are
-   notified, ejected to their saved overworld return positions, and torn down.
+   The winner receives the race rewards; every other instance keeps running and
+   completes as the race loser when its own boss falls, with an egress but NO
+   completion loot (no gear ladder, no sealed cache, no first-clear extras): a
+   loser keeps only what dropped off the mobs. The first mob kill marks an
+   instance PROGRESSED, which binds its members to it WoW-raid style; unspoiled
+   instances recycle when their members regroup, so a freshly formed party
+   shares one clean run.
 6. `rift/persistence.ts` saves portal deadlines, event history, winner metadata,
    scheduler state, and upgrade artifacts. Runtime party instances are never
    restored after a realm restart.
@@ -98,3 +104,18 @@ enchantment, sockets, and gems. Their rolled stats apply while equipped, survive
 save/load and wire round-trips, and are rebuilt from bounded inputs at load rather
 than trusted from JSONB. Gear can be upgraded, enchanted, socketed, unequipped
 without losing its payload, or salvaged back into power-scaled Rift Essence.
+
+The forge (upgrade, enchant, socket) has no shipped client UI yet, so the
+authoritative server refuses its three wire commands unless the realm opts in
+with RIFT_FORGE_ENABLED=1 (server/rift_forge_gate.ts, pinned by
+tests/rift_forge_gate.test.ts). Absent UI is not a gate: a crafted frame
+reaches the wire regardless, and players used exactly that path for premature
+progression before the gate landed. The sim methods stay live offline and in
+tests; only the online dispatch arms are closed. Each refused attempt books
+the woc_rift_forge_refused_total counter, the ops signal that probing
+continues (or that a realm forgot the flag once the UI ships).
+
+Note for whoever ships the forge UI: send the three commands through
+ClientWorld's cmdWithOutcome (not the fire-and-forget cmd sender), because a
+realm with the flag still off refuses with only a commandOutcome ok:false
+ack, and a rid-less sender would surface that as pure silence to the player.

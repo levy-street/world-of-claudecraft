@@ -18,7 +18,7 @@ vi.mock('../server/db', () => ({
 
 import { saveCharacterAndMarketState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
-import { RANKED_ARENA_WIN_HONOR } from '../src/sim/pvp';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -48,6 +48,8 @@ function joinServer(
   const session = server.join(fc.ws as any, characterId, characterId, name, cls, null);
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
+  // Every case in this suite exercises arena queueing, gated at ARENA_MIN_LEVEL.
+  server.sim.setPlayerLevel(ARENA_MIN_LEVEL, session.pid);
   return session;
 }
 
@@ -181,12 +183,12 @@ describe('arena: online integration (GameServer)', () => {
     expect(snapA.self.arena.ladder).toEqual(snapA.self.arena.ladders['1v1']);
   });
 
-  it('resolves a disconnect win before leave saves so a near-simultaneous winner leave persists honor', async () => {
+  it('resolves a disconnect win before leave saves so a near-simultaneous winner leave persists the win', async () => {
     const fcA = fakeWs();
     const fcB = fakeWs();
     const sa = joinServer(server, fcA, 30, 'Deserter', 'warrior');
     const sb = joinServer(server, fcB, 31, 'Victor', 'mage');
-    server.sim.utcDay = '2026-07-11';
+    server.sim.resetDay = '2026-07-11';
     teleport(server.sim, sa.pid, 0, -40);
     teleport(server.sim, sb.pid, 4, -40);
     server.handleMessage(sa, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));
@@ -195,14 +197,20 @@ describe('arena: online integration (GameServer)', () => {
     expect(server.sim.arenaMatchFor(sa.pid)?.state).toBe('active');
 
     await server.leave(sa, 'disconnect');
-    expect(server.sim.meta(sb.pid)!.honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
+    // A forfeit (an opponent disconnect) pays no Honor (src/sim/social/arena.ts's
+    // reason !== 'forfeit' guard), but the win still lands before the leave save,
+    // so it must survive a near-simultaneous winner leave same as Honor would.
+    expect(server.sim.meta(sb.pid)!.honor).toBe(0);
+    expect(server.sim.meta(sb.pid)!.arenaWins).toBe(1);
     await server.leave(sb, 'disconnect');
 
     const victorSave = vi
       .mocked(saveCharacterAndMarketState)
       .mock.calls.find(([characterId]) => characterId === sb.characterId);
-    expect(victorSave?.[2].honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
-    expect(victorSave?.[2].lifetimeHonor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
+    // honor/lifetimeHonor are omitted from the saved state entirely while both
+    // are still 0 (serializeCharacter), which a forfeit win leaves untouched.
+    expect(victorSave?.[2].honor).toBeUndefined();
+    expect(victorSave?.[2].arenaWins).toBe(1);
   });
 
   // Regression coverage for the stale Arena window: ARENA_WIRE_HZ throttles the

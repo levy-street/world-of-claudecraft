@@ -1,5 +1,5 @@
 // The Guild trend letter over the live GameServer wire (Professions 2.0):
-// the offline delivery suite (tests/professions_trend.test.ts)
+// the offline delivery suite (tests/professions_trend_*.test.ts)
 // pins the sweep through the real Sim, but nothing pinned that the SERVER-side
 // sweep books the letter and that the raven's mailArrived routes to only the
 // owning session over the real pump (sim.tick() returning the buffered

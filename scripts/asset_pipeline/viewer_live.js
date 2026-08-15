@@ -12,6 +12,7 @@
 import {
   EffectComposer,
   GLTFLoader,
+  KTX2Loader,
   MeshoptDecoder,
   OrbitControls,
   OutputPass,
@@ -51,6 +52,7 @@ let scenePref = (() => {
 })();
 
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+let ktx2Attached = false;
 const texLoader = new THREE.TextureLoader();
 const KNIGHT = 'public/models/chars/players/knight.glb';
 
@@ -277,6 +279,13 @@ window.LiveViewer = {
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    if (!ktx2Attached) {
+      // Shipped GLBs carry KTX2 textures; transcoder served by the library server.
+      ktx2Attached = true;
+      const ktx2 = new KTX2Loader().setTranscoderPath('/basis/');
+      ktx2.detectSupport(renderer);
+      loader.setKTX2Loader(ktx2);
+    }
     const scene = new THREE.Scene();
     const sceneLights = makeLights(scene);
     const sceneLightBase = sceneLights.map((l) => l.intensity);
@@ -761,8 +770,11 @@ window.LiveViewer = {
       gizmo.setSpace('local');
       gizmo.setSize(0.9);
       gizmo.enabled = false;
-      gizmo.visible = false;
-      scene.add(gizmo);
+      // r169+: TransformControls is no longer an Object3D; the scene gets its
+      // helper, and visibility toggles target the helper.
+      const gizmoHelper = gizmo.getHelper();
+      gizmoHelper.visible = false;
+      scene.add(gizmoHelper);
       session.gizmo = gizmo;
       let gizmoMode = null; // null | 'translate' | 'rotate'
       gizmo.addEventListener('dragging-changed', (e) => {
@@ -797,11 +809,11 @@ window.LiveViewer = {
           gizmo.attach(heldWeapon.scene);
           gizmo.setMode(gizmoMode);
           gizmo.enabled = true;
-          gizmo.visible = true;
+          gizmoHelper.visible = true;
         } else {
           gizmo.detach();
           gizmo.enabled = false;
-          gizmo.visible = false;
+          gizmoHelper.visible = false;
         }
       };
       const setGizmoMode = (mode) => {

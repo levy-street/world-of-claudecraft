@@ -39,6 +39,27 @@ describe('repairStoredBindings', () => {
     expect(obj.strafeLeft).toEqual(['KeyQ']);
   });
 
+  it('also drops the v0.24.0-window meters:KeyZ leftover alongside the strafe signature', () => {
+    // The same v0.24.0 overhaul window that persisted Q/E on slot10/11 also
+    // persisted Damage Meters on KeyZ. Signature A must clear it too, or the
+    // stale KeyZ stays bound and evicts Sheathe/Unsheathe Weapon's default.
+    const obj = repairStoredBindings({
+      strafeLeft: [null, null],
+      strafeRight: [null, null],
+      slot10: ['KeyQ', 'Minus'],
+      slot11: ['KeyE', 'Equal'],
+      meters: ['KeyZ', null],
+    });
+    expect('meters' in obj).toBe(false);
+  });
+
+  it('leaves a deliberate meters:KeyZ rebind alone when the strafe signature is absent', () => {
+    // Without the rest of the v0.24.0 fingerprint, a stored meters:KeyZ is
+    // ordinary player intent (a deliberate remap), not corruption.
+    const obj = repairStoredBindings({ meters: ['KeyZ', null] });
+    expect(obj.meters).toEqual(['KeyZ', null]);
+  });
+
   it('drops an evicted meters binding when targetFriendly still holds KeyH', () => {
     // targetFriendly absent -> defaults to KeyH.
     const a = repairStoredBindings({ meters: [null, null] });

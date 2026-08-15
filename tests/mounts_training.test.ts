@@ -13,15 +13,28 @@ import {
   MOUNT_RACE_START_PLATFORM,
   STABLE_PADDOCK,
 } from '../src/sim/content/mounts';
-import { QUESTS } from '../src/sim/data';
+import { BUILTIN_WORLD, NPCS, QUESTS } from '../src/sim/data';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { MOUNT_TRAIN_FEE_COPPER } from '../src/sim/mounts_training';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
+// This file drives only the mount-training tutorial/quest mechanic (see the file
+// header) through marlaOf(), which looks up exactly one live NPC entity,
+// stablemaster_marla. Nothing here spawns, targets, or picks up a camp mob or a
+// ground object, so this world keeps zero of each instead of the full
+// BUILTIN_WORLD every bare `new Sim(...)` used to construct.
+const MOUNTS_TRAINING_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: { stablemaster_marla: NPCS.stablemaster_marla },
+  groundObjects: [],
+};
+
 const RIDING_LESSONS_QUEST_ID = 'q_riding_lessons';
-const makeSim = (seed = 1) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+const makeSim = (seed = 1) =>
+  new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: MOUNTS_TRAINING_TEST_WORLD });
 
 function marlaOf(sim: Sim) {
   const marla = [...sim.entities.values()].find(
@@ -318,6 +331,7 @@ describe('riding lesson, abandon paths', () => {
       playerClass: 'warrior',
       autoEquip: true,
       noPlayer: true,
+      world: MOUNTS_TRAINING_TEST_WORLD,
     });
     const restoredPid = restored.addPlayer('warrior', 'Rider', { state: state! });
     restored.tick();
@@ -408,7 +422,13 @@ describe('riding lesson, abandon paths', () => {
   });
 
   it('leaving mid-session abandons it (removePlayer teardown)', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+      world: MOUNTS_TRAINING_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Rider');
     const meta = sim.players.get(pid)!;
     const e = sim.entities.get(pid)!;
@@ -443,6 +463,44 @@ describe('riding lesson, the training summon gate', () => {
   });
 });
 
+describe('riding_training and the phase 21 count axis', () => {
+  it('a hostile count on the riding-service row denies BEFORE the delegation, charging nothing', () => {
+    // Sanitize sits above the teachesRiding delegate (Q20: hostile counts
+    // deny on EVERY row): without this order a crafted {count: 0} frame
+    // would silently complete the full 800000c purchase, laundering hostile
+    // input into a charge no legitimate client sent.
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    const meta = metaOf(sim);
+    meta.copper = 810_000;
+    standAtMarla(sim);
+    const marla = marlaOf(sim);
+    for (const hostile of [0, Number.NaN]) {
+      sim.buyItem(marla.id, 'riding_training', { count: hostile }, sim.playerId);
+      const events = sim.tick();
+      expect(
+        events.some((e) => e.type === 'error' && e.text === 'That item is not for sale.'),
+        `count ${hostile}`,
+      ).toBe(true);
+      expect(meta.ridingTrained ?? false, `count ${hostile}`).toBe(false);
+      expect(meta.copper, `count ${hostile}`).toBe(810_000);
+    }
+  });
+
+  it('a VALID count above 1 on the riding-service row still trains exactly once (force-1 by delegation)', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    const meta = metaOf(sim);
+    meta.copper = 810_000;
+    standAtMarla(sim);
+    sim.buyItem(marlaOf(sim).id, 'riding_training', { count: 5 }, sim.playerId);
+    sim.tick();
+    expect(meta.ridingTrained).toBe(true);
+    // One purchase, one 800000c debit: never five.
+    expect(meta.copper).toBe(10_000);
+  });
+});
+
 describe('new-player path: buy riding at Marla, then complete the lesson', () => {
   it('full E2E: untrained -> buy riding_training -> quest -> lesson -> buy reins', () => {
     const sim = makeSim();
@@ -468,13 +526,13 @@ describe('new-player path: buy riding at Marla, then complete the lesson', () =>
     // (b) buyItem riding_training deducts exactly 800_000
     //     and grants ridingTrained; leaves exactly 10_000 copper.
     standAtMarla(sim);
-    sim.buyItem(marla.id, 'riding_training', sim.playerId);
+    sim.buyItem(marla.id, 'riding_training', undefined, sim.playerId);
     sim.tick();
     expect(meta.ridingTrained).toBe(true);
     expect(meta.copper).toBe(10_000);
 
     // (c) Buying riding_training again is refused (already trained); no copper change.
-    sim.buyItem(marla.id, 'riding_training', sim.playerId);
+    sim.buyItem(marla.id, 'riding_training', undefined, sim.playerId);
     const alreadyEvents = sim.tick();
     expect(alreadyEvents.some((e) => e.type === 'error')).toBe(true);
     expect(meta.copper).toBe(10_000);
@@ -494,7 +552,7 @@ describe('new-player path: buy riding at Marla, then complete the lesson', () =>
 
     // (f) reins_valorsteed costs 100_000 but we only have 10_000: need +90_000.
     meta.copper += 90_000; // now 100_000
-    sim.buyItem(marla.id, 'reins_valorsteed', sim.playerId);
+    sim.buyItem(marla.id, 'reins_valorsteed', undefined, sim.playerId);
     sim.tick();
     expect(meta.copper).toBe(0);
     expect(meta.inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(true);

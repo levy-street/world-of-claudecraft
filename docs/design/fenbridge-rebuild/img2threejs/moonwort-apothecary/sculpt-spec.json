@@ -1,0 +1,1888 @@
+{
+  "targetName": "Fenbridge Moonwort Apothecary",
+  "targetId": "fenbridge-moonwort-apothecary",
+  "schemaVersion": "2.1",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/hero.png",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js exterior building",
+    "geometryTerms": [
+      "silhouette",
+      "assembled solid",
+      "extruded profile",
+      "curled eave",
+      "surface relief",
+      "negative space"
+    ],
+    "materialTerms": ["albedo", "roughness", "normal response", "ambient occlusion", "emissive"],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "environment light",
+      "contact shadow",
+      "ACES tone mapping"
+    ],
+    "descriptionRule": "Describe observable exterior components in object space and mark inferred hidden routing as approximation."
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "crooked exterior-only apothecary hut",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "stylized low-poly",
+        "crooked timber construction",
+        "witch-adjacent swamp craft"
+      ],
+      "structureKind": [
+        "closed timber shell",
+        "curled layered roof",
+        "attached sales facade",
+        "exterior botanical display"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed herbalist socket",
+        "nonblocking attached displays"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "copper",
+        "herbs and violet glass"
+      ],
+      "notes": "Bottle and botanical counts use one deterministic representative arrangement where generated views vary."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 3,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 12,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The curled roof and centered x=0 doorway establish the macro read.",
+        "The sales shelf, bottles, herbs, fungi and still are independent exterior identity systems.",
+        "Exact plant species, contents and hidden pipe routing are not claimed."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The compact shell needs explicit layered service systems before two-bucket merge."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "roof-curl-silhouette",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "curled-eave-tips"
+          }
+        },
+        {
+          "id": "front-dormer",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-dormer-window"
+          }
+        },
+        {
+          "id": "sales-window",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "potion-sales-shelf"
+          }
+        },
+        {
+          "id": "bottle-row",
+          "kind": "gloss",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "chunky-bottle-row"
+          }
+        },
+        {
+          "id": "hanging-herbs",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "drying-herb-bundles"
+          }
+        },
+        {
+          "id": "mushroom-planters",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "violet-mushroom-planters"
+          }
+        },
+        {
+          "id": "copper-still",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "copper-alembic-stack"
+          }
+        },
+        {
+          "id": "gutter-drainage",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "gutter-downspouts"
+          }
+        },
+        {
+          "id": "wet-timber-grain",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/wet-timber-grain"
+          }
+        },
+        {
+          "id": "violet-glow",
+          "kind": "emissive",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-emissive/violet-fenlight-accent"
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false
+    }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "A floor-seated 7 by 7.2 by 6 yard shell reads as Moonwort Apothecary from all four views and keeps the centered x=0 entrance and service apron clear."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "apothecary-silhouette",
+        "name": "Crooked roof and compact hut",
+        "required": true,
+        "qualityCriteria": ["Curled tips, front dormer and vent remain legible."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
+      },
+      {
+        "id": "sales-display",
+        "name": "Potion sales window",
+        "required": true,
+        "qualityCriteria": ["Awning, shelf and bottles stay attached and exterior."],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["service cue is absent"]
+      },
+      {
+        "id": "herbal-craft",
+        "name": "Herbs, fungi and copper still",
+        "required": true,
+        "qualityCriteria": [
+          "Botanical, glass and copper systems remain readable without loose clutter."
+        ],
+        "evidenceRefs": ["front", "side", "rear"],
+        "failureModes": ["craft cues flatten"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Teal, timber, copper, botanical and violet separation",
+        "required": true,
+        "qualityCriteria": ["The two-bucket merge preserves semantic colors and restrained glow."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["display reads as uniform noise"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "curled roof tips",
+      "centered x=0 doorway",
+      "sales shelf depth",
+      "still silhouette",
+      "violet accent restraint"
+    ],
+    "antiShallowSpecRules": [
+      "Do not use a straight generic gable.",
+      "Keep sales and craft scenery outside a closed shell."
+    ],
+    "mustNotDo": ["No interior cutaway.", "No readable labels.", "No loose apron clutter."]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "curled teal roof",
+      "centered doorway",
+      "bottle shelf",
+      "herbs and mushrooms",
+      "copper still"
+    ],
+    "niceToHave": ["gutter elbows", "fixed barrel arrangement"],
+    "reviewViewpoints": ["front", "left-side", "rear", "front-three-quarter"]
+  },
+  "coordinateFrame": {
+    "front": "+Z",
+    "up": "+Y",
+    "right": "+X",
+    "units": "world-yards",
+    "scaleReference": "native bounds 7 x 7.2 x 6"
+  },
+  "assumptions": [
+    "The result is a stylized game-ready approximation.",
+    "Bottle and herb counts are fixed where generated views vary.",
+    "Hidden downspout and still connections use short exterior-only inferred runs."
+  ],
+  "silhouette": {
+    "boundingShape": "compact offset timber hut under a tall concave teal gable with strong upturned tips",
+    "aspectRatios": [
+      "width:height about 0.97",
+      "depth:width about 0.86",
+      "service display width:facade width about 0.36"
+    ],
+    "symmetry": "roof roughly bilateral; storefront, still, herbs and barrels intentionally asymmetric",
+    "dominantCurves": [
+      "concave roof ridge",
+      "curled eave tips",
+      "bulbous alembic body",
+      "mushroom caps"
+    ],
+    "negativeSpaces": [
+      "porch step approach",
+      "open bottle shelf gaps",
+      "space beneath hanging herb bundles"
+    ],
+    "landmarks": [
+      "curled teal roof",
+      "front dormer",
+      "centered arched door",
+      "bottle shelf",
+      "copper still",
+      "violet fungi"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/front.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["centered door", "dormer", "bottle shelf", "mushroom planters", "still"],
+      "confidence": 0.97
+    },
+    {
+      "id": "side",
+      "view": "left-side",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/side.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["deep sales shelf", "herb bundles", "building depth", "barrel platform"],
+      "confidence": 0.94
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/rear.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["rear wall bays", "rear herb rail", "foundation", "roof depth"],
+      "confidence": 0.93
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/hero.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["complete volume", "curled roof", "clear approach", "material hierarchy"],
+      "confidence": 0.97
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "building-shell",
+      "name": "Offset timber hut and stone-piling base",
+      "level": "macro",
+      "role": "building-shell",
+      "importance": 1,
+      "confidence": 0.97,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A closed set of planar timber wall bays sits on a low stone and piling foundation.",
+      "parent": null,
+      "dimensions": {
+        "width": 6.6,
+        "height": 4.35,
+        "depth": 5.4,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [0, 2.35, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "centered-door-and-steps",
+          "type": "contour",
+          "geometryEffect": "arched door and three broad steps align exactly at local x=0",
+          "placement": "front center",
+          "confidence": 1
+        },
+        {
+          "id": "offset-wall-bays",
+          "type": "seam",
+          "geometryEffect": "dark vertical wall boards are divided by crooked timber posts",
+          "placement": "all facades",
+          "confidence": 0.92
+        }
+      ],
+      "evidenceRefs": ["front", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(78, 86, 80, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "roof-system",
+      "name": "Curled teal roof, dormer and vent",
+      "level": "macro",
+      "role": "roof-shell",
+      "importance": 1,
+      "confidence": 0.95,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Layered faceted roof bands create the visibly concave ridge and separate kicked end trim.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 6.9,
+        "height": 2.9,
+        "depth": 5.8,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [0, 4.35, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "curled-eave-tips",
+          "type": "contour",
+          "geometryEffect": "stepped roof shells and trim rise at all four corners",
+          "placement": "gable and eave endpoints",
+          "confidence": 0.92
+        },
+        {
+          "id": "front-dormer-window",
+          "type": "contour",
+          "geometryEffect": "small pointed dormer with amber pane grid",
+          "placement": "front roof center",
+          "confidence": 0.97
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(29, 23, 19, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.86
+      }
+    },
+    {
+      "id": "front-service",
+      "name": "Centered porch and potion sales shelf",
+      "level": "meso",
+      "role": "service-facade",
+      "importance": 0.96,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The porch, shallow awning and shelf are attached rigid exterior volumes around the closed facade.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 5.8,
+        "height": 3.1,
+        "depth": 1,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [0, 1.7, 2.75],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "potion-sales-shelf",
+          "type": "contour",
+          "geometryEffect": "three attached shelves sit below a shallow pale rain awning",
+          "placement": "front-right bay",
+          "confidence": 0.96
+        },
+        {
+          "id": "clear-player-apron",
+          "type": "contour",
+          "geometryEffect": "steps and standing area remain free of bottles and planters",
+          "placement": "front x=0 approach",
+          "confidence": 0.94
+        }
+      ],
+      "evidenceRefs": ["front", "side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(118, 82, 54, 1)",
+        "secondaryAlbedo": "rgba(165, 138, 95, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "bottle-display",
+      "name": "Chunky potion bottle display",
+      "level": "meso",
+      "role": "display-system",
+      "importance": 0.9,
+      "confidence": 0.91,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A bounded row of repeated low-sided bottle bodies and necks is fixed to the shelf.",
+      "parent": "front-service",
+      "dimensions": {
+        "width": 2.4,
+        "height": 1.4,
+        "depth": 0.5,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [1.7, 1.6, 3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "chunky-bottle-row",
+          "type": "gloss",
+          "geometryEffect": "five fixed faceted bottle bodies alternate height and violet, teal and amber color",
+          "placement": "two sales shelf levels",
+          "confidence": 0.91
+        },
+        {
+          "id": "violet-crystal-cluster",
+          "type": "emissive",
+          "geometryEffect": "one small octahedral cluster punctuates the bottle row",
+          "placement": "lower shelf",
+          "confidence": 0.9
+        }
+      ],
+      "evidenceRefs": ["front", "side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(98, 105, 165, 1)",
+        "secondaryAlbedo": "rgba(48, 228, 209, 1)",
+        "materialClass": "glass",
+        "materialClassConfidence": 0.82
+      }
+    },
+    {
+      "id": "botanical-display",
+      "name": "Drying herbs and mushroom planters",
+      "level": "meso",
+      "role": "botanical-display",
+      "importance": 0.91,
+      "confidence": 0.92,
+      "primitive": "instanced-cluster",
+      "topologyClass": "fiber-strand",
+      "topologyRationale": "Herb bundles are repeated tapered stems while mushrooms use bounded stem-and-cap modules.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 6,
+        "height": 2.4,
+        "depth": 1,
+        "units": "yards",
+        "confidence": 0.88
+      },
+      "transform": {
+        "position": [0, 1.7, 2.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "drying-herb-bundles",
+          "type": "linework",
+          "geometryEffect": "fixed three-stem bundles hang from facade and side rails",
+          "placement": "door and shelf outer posts",
+          "confidence": 0.94
+        },
+        {
+          "id": "violet-mushroom-planters",
+          "type": "contour",
+          "geometryEffect": "two attached low pots carry broad faceted violet caps",
+          "placement": "front-left porch foot",
+          "confidence": 0.9
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(88, 123, 61, 1)",
+        "secondaryAlbedo": "rgba(98, 105, 165, 1)",
+        "materialClass": "unknown",
+        "materialClassConfidence": 0.78
+      }
+    },
+    {
+      "id": "still-and-drainage",
+      "name": "Copper still, gutters and rain barrel",
+      "level": "meso",
+      "role": "craft-hardware",
+      "importance": 0.86,
+      "confidence": 0.88,
+      "primitive": "lathe",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The still is a stacked faceted vessel while gutters are short rigid exterior runs grouped as one craft-hardware system.",
+      "parent": "building-shell",
+      "dimensions": {
+        "width": 2,
+        "height": 2.8,
+        "depth": 1.2,
+        "units": "yards",
+        "confidence": 0.82
+      },
+      "transform": {
+        "position": [-2.7, 1.5, 2.2],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "copper-alembic-stack",
+          "type": "contour",
+          "geometryEffect": "bulb, narrow neck and cap form one readable copper still silhouette",
+          "placement": "front-left exterior bench",
+          "confidence": 0.94
+        },
+        {
+          "id": "gutter-downspouts",
+          "type": "linework",
+          "geometryEffect": "short angular dark-metal pipes descend at facade corners",
+          "placement": "front and rear eaves",
+          "confidence": 0.87
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(155, 118, 45, 1)",
+        "secondaryAlbedo": "rgba(52, 56, 58, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.93
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "fenbridge-opaque",
+      "name": "Merged Fenbridge opaque vertex-color material",
+      "type": "standard-with-low-lambert-path",
+      "shaderModel": "MeshStandardMaterial on Standard/Ultra and semantic vertex-color Lambert-compatible Low path",
+      "baseColor": "#FFFFFF",
+      "albedo": {
+        "dominant": "semantic COLOR_0",
+        "secondary": [
+          "dark timber",
+          "damp stone",
+          "teal shingles",
+          "copper",
+          "herbs",
+          "potion glass"
+        ],
+        "samplingNotes": "Reference values define semantic families; no studio highlight is copied into albedo."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#4E5650", "#176269", "#9B762D", "#587B3D", "#6269A5"],
+        "pattern": "bounded semantic vertex-color regions",
+        "amplitude": 0.11
+      },
+      "roughness": {
+        "base": 0.84,
+        "variation": 0.22,
+        "map": "independent shared Fenbridge roughness atlas"
+      },
+      "metalness": {
+        "base": 0.04,
+        "variation": 0.25
+      },
+      "normal": {
+        "pattern": "independent shared Fenbridge normal atlas",
+        "strength": 0.18
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.22,
+        "contactShadowBias": 0.34
+      },
+      "localOverrides": [
+        {
+          "id": "wet-timber-grain",
+          "region": "wall boards, shelf and porch members",
+          "pattern": "axial grain with darker damp lower band",
+          "roughness": 0.87,
+          "evidenceRefs": ["front", "rear"]
+        },
+        {
+          "id": "bottle-gloss",
+          "region": "faceted potion bottle bodies",
+          "pattern": "low-roughness exposed facets without transmission",
+          "roughness": 0.24,
+          "evidenceRefs": ["front", "hero"]
+        },
+        {
+          "id": "copper-wear",
+          "region": "alembic bulb, neck and cap",
+          "pattern": "warmer worn convex facets and darker joints",
+          "roughness": 0.46,
+          "evidenceRefs": ["front", "side"]
+        }
+      ]
+    },
+    {
+      "id": "fenbridge-emissive",
+      "name": "Merged Fenbridge warm and violet emissive material",
+      "type": "standard-emissive",
+      "shaderModel": "MeshStandardMaterial emissive bucket",
+      "baseColor": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#6269A5", "#90FFF0"],
+        "samplingNotes": "Warm windows dominate; violet/teal magic remains a small accent."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77", "#6269A5", "#90FFF0"],
+        "pattern": "semantic pane and crystal regions",
+        "amplitude": 0.1
+      },
+      "roughness": {
+        "base": 0.28,
+        "variation": 0.08,
+        "map": "independent scalar policy"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "geometry facets only",
+        "strength": 0.01
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.08,
+        "contactShadowBias": 0.18
+      },
+      "localOverrides": [
+        {
+          "id": "violet-fenlight-accent",
+          "region": "one crystal/fungus cluster and selected bottle",
+          "emissiveColor": "#756FC4",
+          "emissiveIntensity": 0.72,
+          "roughness": 0.22,
+          "evidenceRefs": ["front", "hero"]
+        },
+        {
+          "id": "amber-window-glow",
+          "region": "door, dormer and wall panes",
+          "emissiveColor": "#FFB14A",
+          "emissiveIntensity": 1.2,
+          "roughness": 0.28,
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "bottle-system",
+      "componentRef": "bottle-display",
+      "method": "fixed repeated faceted bottle modules",
+      "countMax": 7,
+      "distribution": "two attached sales shelf levels",
+      "buildsGeometry": true,
+      "geometry": "cylinder body and neck",
+      "drawCallPolicy": "merge by semantic bucket"
+    },
+    {
+      "id": "herb-system",
+      "componentRef": "botanical-display",
+      "method": "fixed three-stem bundles",
+      "countMax": 5,
+      "distribution": "facade and side rail",
+      "buildsGeometry": true,
+      "geometry": "tapered low-sided stems plus tie band",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    },
+    {
+      "id": "roof-course-system",
+      "componentRef": "roof-system",
+      "method": "bounded offset roof bands",
+      "count": 3,
+      "distribution": "front and rear slopes",
+      "buildsGeometry": true,
+      "geometry": "faceted roof shells",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    }
+  ],
+  "lookDevTargets": {
+    "qualityPriority": "game-ready-reference-informed",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "acceptedLimitation": "studio-lit concept pixels are material-family evidence, not exact PBR recovery"
+      }
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "environment light",
+        "exposure",
+        "ACES tone mapping",
+        "contact shadow"
+      ],
+      "mustAvoid": ["ambient-only lighting", "violet accent overpowering service silhouette"]
+    },
+    "screenshotReview": [
+      "Compare front and hero roof curl.",
+      "Check centered doorway and open apron.",
+      "Check bottle, herb, copper and violet separation on Low and Ultra."
+    ]
+  },
+  "lightingFromPhoto": [
+    "Neutral upper-left key reveals curled roof courses and copper facets; exposure 1.0 with ACES tone mapping.",
+    "Soft frontal fill keeps herbs and bottle silhouettes readable against dark timber.",
+    "Neutral environment rim plus floor contact shadow proves foundation seating and shelf depth."
+  ],
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.7,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Review only grouped identity systems from the same comparison pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "wrong roof curl",
+      "missing service display",
+      "unresolved apron obstruction"
+    ],
+    "codeRefineTriggers": ["implementation diverges from sound spec", "budget exceeded"],
+    "stopCriteria": ["all critical features reach 0.70", "new input required"],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "repo preview renderer",
+      "fallbackCapture": "browser screenshot",
+      "minimumEvidence": "reference, render, comparison sheet and feature scores",
+      "reviewPairRule": "match admitted crop and camera",
+      "acceptanceAuthority": "agent visual review"
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "moonwort-silhouette",
+      "name": "Compact shell, curled teal roof, dormer and vent",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["building-shell", "roof-system"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "centered-entry",
+      "name": "Accessible x=0 doorway and clear steps",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["building-shell", "front-service"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "potion-sales-display",
+      "name": "Exterior shelf, awning, bottles and violet crystal",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["front-service", "bottle-display"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "botanical-craft-read",
+      "name": "Drying herbs, mushrooms, still and drainage",
+      "tier": "critical",
+      "passIds": ["form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["botanical-display", "still-and-drainage"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    },
+    {
+      "id": "apothecary-material-read",
+      "name": "Teal, timber, copper, botanical, glass and restrained glow separation",
+      "tier": "critical",
+      "passIds": ["material-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["roof-system", "bottle-display", "botanical-display", "still-and-drainage"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "fixed-display-counts",
+      "name": "Representative bottle and herb counts remain deterministic",
+      "tier": "important",
+      "passIds": ["form-refinement", "optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["bottle-display", "botanical-display"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Exterior-only model stays within 4,300 triangles and 300 KiB",
+      "tier": "important",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["building-shell"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Lock native bounds and curled silhouette.",
+      "componentRefs": ["building-shell", "roof-system"],
+      "acceptance": ["Compact hut and curled roof match front and hero."]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build centered entry and exterior service hierarchy.",
+      "componentRefs": [
+        "front-service",
+        "bottle-display",
+        "botanical-display",
+        "still-and-drainage"
+      ],
+      "acceptance": ["Every system stays attached and x=0 approach remains clear."]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Add observed bottle, herb, fungi, still and gutter forms.",
+      "componentRefs": ["roof-system", "bottle-display", "botanical-display", "still-and-drainage"],
+      "acceptance": ["Every inventoried component detail has geometry."]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Apply semantic colors and two-bucket response.",
+      "componentRefs": [
+        "building-shell",
+        "roof-system",
+        "bottle-display",
+        "botanical-display",
+        "still-and-drainage"
+      ],
+      "acceptance": ["Low and Ultra preserve service-material separation."]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Verify doorway, porch and service apron clearance.",
+      "componentRefs": ["building-shell", "front-service"],
+      "acceptance": ["No display geometry blocks the x=0 entrance standing point."]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Merge and verify shipping budgets.",
+      "componentRefs": ["building-shell"],
+      "acceptance": ["At most two primitives, no interior, at most 4,300 triangles and 300 KiB."]
+    }
+  ],
+  "sculptPipeline": {
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "passGateMode": "locked-sequential",
+    "nextRequiredEvidence": [],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed"
+  },
+  "actionReadiness": {
+    "contract": "Static exterior hierarchy with stable herbalist and entrance sockets; collision remains runtime-owned.",
+    "defaultRigType": "static-town-asset",
+    "rootMotionNode": "building-shell",
+    "requiredComponentFields": ["semantic id", "parent", "native transform"],
+    "transformChannels": ["root translate", "root rotate", "visibility", "material state"],
+    "authoringRules": ["No detachable display clutter.", "No shipping collision mesh."],
+    "destructionPolicy": {
+      "defaultBreakable": false
+    }
+  },
+  "performanceBudget": {
+    "targetTriangles": 3200,
+    "hardTriangleCeiling": 4300,
+    "hardByteCeiling": 307200,
+    "maxShippingPrimitives": 2,
+    "texturePolicy": "three shared external Fenbridge support maps; no embedded raster texture"
+  },
+  "proceduralStrategy": [
+    "Build the closed shell and low foundation from boxes.",
+    "Approximate roof curl with bounded faceted bands and kicked trim.",
+    "Use deterministic repeated bottles, herbs and mushroom modules.",
+    "Merge all geometry into opaque and emissive shipping buckets."
+  ],
+  "risks": [
+    "Small bottle and herb counts vary between generated views.",
+    "Botanical species and bottle contents are intentionally abstract.",
+    "Studio-lit colors inform semantic material families rather than exact PBR maps."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Moonwort Apothecary crooked roof herbs bottles fungi copper alembic procedural low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  },
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:19.660190+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.708667+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.758119+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.804915+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.853345+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:19.660190+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for moonwort_apothecary.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.708667+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for moonwort_apothecary.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.758119+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for moonwort_apothecary.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.804915+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for moonwort_apothecary.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.853345+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.83,
+        "formDetail": 0.76,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.73
+      },
+      "featureReviews": [
+        {
+          "id": "moonwort-silhouette",
+          "visible": true,
+          "score": 0.78,
+          "notes": "Independent visual audit passed compact shell, curled teal roof, dormer and vent at 0.78 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible x=0 doorway and clear steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "potion-sales-display",
+          "visible": true,
+          "score": 0.77,
+          "notes": "Independent visual audit passed exterior shelf, awning, bottles and violet crystal at 0.77 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "botanical-craft-read",
+          "visible": true,
+          "score": 0.74,
+          "notes": "Independent visual audit passed drying herbs, mushrooms, still and drainage at 0.74 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "apothecary-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, copper, botanical, glass and restrained glow separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-display-counts",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed representative bottle and herb counts remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,300 triangles and 300 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for moonwort_apothecary.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.76."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:19.889298+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for moonwort_apothecary.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/moonwort_apothecary-comparison.png"
+      ]
+    }
+  ]
+}

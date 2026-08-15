@@ -29,6 +29,14 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: 'The wax seal holds until the order is yours to claim.',
     enough: 'You already have the Fenbridge muster order.',
   },
+  // Murloc huts are torched with a firebottle (q_deepfen_purge), never looted;
+  // interaction.ts routes a hut click to the firebottle handler before the
+  // pickup path, so these lines are defensive coverage of the deny arm (the
+  // every-object-has-lines guard in tests/sim_quests_economy.test.ts).
+  murloc_hut: {
+    deny: 'You have no reason to torch that.',
+    enough: 'These huts are already smouldering.',
+  },
   lost_caravan_goods: {
     deny: "You aren't authorized to salvage these goods yet.",
     enough: 'You already have enough caravan goods.',
@@ -180,11 +188,3 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     enough: 'Every coastal watchbell has been rung.',
   },
 };
-
-export function groundPickupDeny(itemId: string, itemName: string): string {
-  return GROUND_PICKUP_LINES[itemId]?.deny ?? `You cannot take the ${itemName} yet.`;
-}
-
-export function groundPickupEnough(itemId: string): string {
-  return GROUND_PICKUP_LINES[itemId]?.enough ?? 'You have enough of those.';
-}

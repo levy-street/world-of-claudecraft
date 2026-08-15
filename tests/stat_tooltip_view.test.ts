@@ -49,6 +49,7 @@ describe('statEffectText number formatting + key selection', () => {
       'maxMana',
       'healthRegen',
       'manaRegen',
+      'manaRegenCombat',
     ] as const) {
       expect(statEffectText({ kind, value: 24 }, deps)).toBe(
         `hudChrome.statInfo.effects.${kind}(value=24)`,
@@ -237,7 +238,7 @@ describe('statTooltipHtml', () => {
     expect(html).toContain('&lt;i&gt;x&lt;/i&gt;&amp;&#39;&quot;');
   });
 
-  it('colors every effect kind tt-green iff it is a gain, tt-stat otherwise (full 12-kind partition)', () => {
+  it('colors every effect kind tt-green iff it is a gain, tt-stat otherwise (full 13-kind partition)', () => {
     // The class decision (GAIN_KINDS) is the one piece of logic the view adds over
     // the model, so pin it for ALL kinds, not just a sample. EXPECTED_GREEN states the
     // contract independently of the source set, so moving any kind across the partition
@@ -253,6 +254,7 @@ describe('statTooltipHtml', () => {
       'spellCritPct',
       'healthRegen',
       'manaRegen',
+      'manaRegenCombat',
       'damageReduction',
       'dpsFromAp',
     ];

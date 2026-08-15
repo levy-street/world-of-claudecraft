@@ -548,10 +548,13 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'xp_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
   // party_below_target measures the target frame, its #tf-debuffs strip, the
   // party container, and (on mobile) the rows wrapper + move zone (five rect
@@ -597,6 +600,35 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
     reflowAllow: {},
   },
+  // reliquary_tracker is the same painter contract on the same budget: ONE
+  // constructor innerHTML write for the whole skeleton, every refresh write
+  // facet-routed (the fill-flash class rides toggleClass), and the three
+  // setAttribute/removeAttribute pairs only on a chip-mode transition.
+  {
+    file: 'reliquary_tracker_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
+    reflowAllow: {},
+  },
+  // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write
+  // only when the STRUCTURAL sig changes (new match / roster change). Every
+  // per-frame write is facet-routed.
+  {
+    file: 'hud/battleground/battleground_scoreboard_painter.ts',
+    // The expanded/pinned state now rides ONE elided applier (applyExpanded),
+    // so the three raw classList calls and the raw aria-expanded write are gone;
+    // what is left is the four build-time role/aria-live attributes on the two
+    // self-mounted roots plus the one skeleton innerHTML.
+    allow: { '.innerHTML': 1, '.setAttribute': 4 },
+    reflowAllow: {},
+  },
+  // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
+  // death or an expiry only (the per-frame update elides on the pure core's
+  // reference equality); the setAttribute runs once at mount.
+  {
+    file: 'hud/battleground/battleground_kill_feed_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 1 },
+    reflowAllow: {},
+  },
 ];
 
 // BUCKET 2 of 3: the src/ui painters that are NOT facet-routed because they draw to a 2D
@@ -624,9 +656,21 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // canvas.dataset.portrait, 4 accesses around one async image decode, two of them writes at
 // the start of a decode and two of them reads that abandon a decode whose unit changed;
 // perf_graph is handed both its context and its color and reaches for neither.
+// battleground_atlas_marks_painter is handed its context AND its projection and owns no
+// element at all: it is the mark read the M-map plate and the minimap's cached battleground
+// raster share, so it resolves nothing and reads nothing.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/battleground/battleground_atlas_marks_painter.ts', allow: {}, reflowAllow: {} },
+  // the M-map Thornhollow Fields plan: canvas-only, redrawn on the map cadence;
+  // like minimap it caches its one --color-* group resolve for the session
+  {
+    file: 'hud/battleground/battleground_map_painter.ts',
+    allow: {},
+    reflowAllow: { getComputedStyle: 1 },
+  },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'perf_graph_painter.ts', allow: {}, reflowAllow: {} },
@@ -684,6 +728,14 @@ interface ColdPainter {
 }
 
 const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
+  // One app-viewport rect when the player starts dragging an aura in setup mode. The cached
+  // rect converts pointer moves to persisted normalized X/Y values; the controller owns no
+  // clock and performs no layout read during ordinary combat painting.
+  {
+    file: 'aura_overlay_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   // The scroll pair is the shape repeated across the windows: read the position before a
   // rebuild, write it back after, so the list does not jump under the player. Legitimate and
   // stable, granted per file, and the count is what makes a THIRD read in the same file (the
@@ -693,6 +745,35 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
     driverAllow: {},
   },
+  // The gather-node hover tip (the phase 14 QA's countdown clock): pointer
+  // -driven repaints plus ONE 1 Hz interval armed only while a COOLDOWN tip
+  // is shown, disposed on hide and by the ready flip. Its tick re-enters
+  // the same paint the pointer path uses, and that paint elides whole on
+  // unchanged HTML, so the size pair below (the viewport clamp) and the
+  // getUiScale read run only when the rendered m:ss actually moved: at
+  // most once per second over a single five-line tooltip. The second
+  // getUiScale count is the import specifier (the matcher counts the
+  // reference on purpose).
+  {
+    file: 'gather_node_tooltip_controller.ts',
+    reflowAllow: { '.offsetWidth': 1, '.offsetHeight': 1, getUiScale: 2 },
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: 'the respawn countdown tick: while a cooldown tip is shown, re-read the world and repaint the m:ss line so a stationary hover drains live and flips to Ready. Armed only while shown over a cooling node, cleared on hide, on the ready flip, and when the node stops resolving; its per-tick body is the shown guard, one pure model rebuild, and the shared paintAt.',
+        stopsAt: {
+          paintAt:
+            'the SAME paint every pointer-driven repaint takes, whose writes and both forced reads elide whole when the rendered HTML did not change; the tick adds nothing of its own on the way there.',
+        },
+        writeAllow: {},
+        queryAllow: {},
+        idlAllow: {},
+        reflowAllow: {},
+      },
+    ],
+  },
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
@@ -701,9 +782,18 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
   {
     file: 'crafting_window.ts',
-    reflowAllow: { '.scrollTop': 2, '.scrollLeft': 2 },
+    // Three scroll regions carried across the rebuild, capture + write-back
+    // each: .crafting-body, the identity card's capped .profession-skill-list
+    // (desktop), and the card itself (the MOBILE scroller; hud.mobile.css
+    // lifts the list cap), plus the .crafting-tabs horizontal pair (the
+    // bags_window/bank_window shape, one region deeper).
+    reflowAllow: { '.scrollTop': 6, '.scrollLeft': 2 },
     driverAllow: {},
   },
+  // Same scroll pair as the vendor family's cold windows above: read the
+  // position before the rebuild, write it back after, so the order list
+  // does not jump under the player on their own action's repaint.
+  { file: 'commission_order_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
   // countdown tick. Page cadence rather than frame cadence, and both no-op while closed.
   {
@@ -745,6 +835,7 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     ],
   },
   { file: 'deeds_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
   // of one attempt, generation-guarded and cleared on stop. The fastest module-owned driver
@@ -797,11 +888,24 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     },
     driverAllow: {},
   },
+  // One map-canvas projection read at the bounded map-paint boundary. Pointer hover and
+  // touch hit tests consume only the controller-owned cache, so no pointer event can force
+  // layout.
+  {
+    file: 'hud/map/map_marker_interaction_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
   { file: 'hud/vendor/heroic_vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/unbind_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/vendor/warfare_vendor_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   // A body/wrap rect pair, read once when the mail body is laid out to fit.
   { file: 'mailbox_window.ts', reflowAllow: { '.getBoundingClientRect': 2 }, driverAllow: {} },
   // The trigger + popover rect pair that positions a filter popover, plus the two border
@@ -817,6 +921,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'options_window.ts', reflowAllow: {}, driverAllow: { requestIdleCallback: 3 } },
   { file: 'professions_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'spellbook_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The root, trigger, and popover rects position the target-aura configurator inside the
+  // viewport. They run only when the player opens or changes that configurator, or when an
+  // open configurator receives a viewport resize event, never from the aura paint cadence.
+  {
+    file: 'target_auras_window.ts',
+    reflowAllow: { '.getBoundingClientRect': 3 },
+    driverAllow: {},
+  },
   // The tree height-cap fit: the root's max-height (read through the shared getUiScale
   // helper as well, which is why the proxy token is granted here), then the body and root
   // tops and the footer height, then one scrollHeight to decide whether the body scrolls.
@@ -1211,6 +1323,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     const controllers = ON_DISK_PAINTERS.filter((f) => f.endsWith('_controller.ts'));
     expect(controllers.length, 'the HUD controllers vanished from the sweep').toBeGreaterThan(10);
     expect(controllers).toContain('hud/chat/chat_geometry_controller.ts');
+    expect(COLD_PAINTERS).toContain('hud/map/map_marker_interaction_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/fiesta/fiesta_controller.ts');
   });
 
@@ -1369,6 +1482,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // empty slice, or a `drivers` list quietly deleted from an entry, reports zero violations
     // over zero callbacks and reads as a pass.
     expect(sweep.scanned).toEqual([
+      'gather_node_tooltip_controller.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
       'hud/delve/lockpick_window.ts#0',
@@ -1392,6 +1506,11 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // and this exact-list pin is what stops it being cheap: a cut added anywhere in any bucket
     // shows up as a new row and fails until it is argued for in the diff.
     expect(sweep.cuts, 'the one declared reachability cut stopped reaching anything').toEqual([
+      // The countdown tick cuts at the SHARED paint the pointer path takes,
+      // whose writes and forced reads elide whole on unchanged HTML (argued
+      // in the entry's why/stopsAt above): the tick body itself is the
+      // shown guard plus one pure model rebuild.
+      'gather_node_tooltip_controller.ts: paintAt',
       'daily_rewards_window.ts: renderCurrent',
     ]);
     expect(
@@ -2449,7 +2568,12 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           queued: false,
           procGlow: false,
           empowered: false,
+          ascensionSpender: false,
+          ascensionCostLabel: '',
+          fateConsumeReady: false,
+          fateSentenceReady: false,
           ariaLabel: 'A',
+          ariaDescription: '',
           keybindLabel: 'K',
         },
       ],
@@ -2521,6 +2645,7 @@ function actionBarDeps(): ActionBarDeps {
 function idleWorld(): ActionBarWorldInput {
   return {
     player: {
+      id: 1,
       autoAttack: false,
       dead: false,
       resource: 100,
@@ -2528,12 +2653,13 @@ function idleWorld(): ActionBarWorldInput {
       gcdRemaining: 0,
       potionCdRemaining: 0,
       queuedOnSwing: null,
-      stealthed: false,
       auras: [],
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,
     inventory: [],
+    stealthed: false,
+    entities: [],
   };
 }
 

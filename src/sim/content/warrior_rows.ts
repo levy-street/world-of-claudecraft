@@ -19,12 +19,20 @@ export const WARRIOR_ROWS: RowTree = [
     level: 5,
     options: [
       {
+        // Option id is FROZEN (`war_row_double_charge`) so saved picks survive the
+        // content swap, per the change protocol in docs/design/class-design-rules.md.
+        // Was Double Charge (`charge` bonusCharges: 1). Charges recharge in PARALLEL
+        // here (every spend starts its own timer, see combat/casting_lifecycle.ts), so
+        // the second stored use came back on the same 15 sec as the first: two 25-yard
+        // gap closers and two 1 sec stuns per cooldown. That was the dominant warrior
+        // PvP pick and the reason this row was re-cut.
         id: 'war_row_double_charge',
-        name: 'Double Charge',
-        description: 'Your Charge stores 2 uses, so you can charge twice in a row.',
-        // LIVE: the ability-charge system (casting_lifecycle + updateTimers)
-        // keyed off the resolved bonusCharges.
-        effect: { ability: [{ ability: 'charge', bonusCharges: 1 }] },
+        name: 'Intervene',
+        description:
+          'Grants Intervene: rush to a friendly player, shielding them from a small amount of damage for 6 sec.',
+        // LIVE: grants the friendly-target charge (targetType 'friendly' + absorb);
+        // the charge dispatch skips rage and combat entry for a friendly rush.
+        effect: { grant: { ability: 'intervene' } },
       },
       {
         id: 'war_row_pursuit',
@@ -105,10 +113,10 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_lingering_dread',
         name: 'Lingering Dread',
         description:
-          'Enemies feared by your Intimidating Shout can endure 20% of their health in damage before the fear breaks.',
+          'Enemies feared by your Intimidating Shout can endure 10% of their health in damage before the fear breaks.',
         // LIVE: arms the breakThreshold on the aoeFear apply (the threshold
         // arm in combat/damage.ts soaks damage before the classic snap).
-        effect: { global: { fearBreakPct: 0.2 } },
+        effect: { global: { fearBreakPct: 0.1 } },
       },
     ],
   },

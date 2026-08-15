@@ -16,7 +16,11 @@
 // DOM-free and i18n-free: rows carry raw ids (nation/role/bracket) the painter
 // localizes; the render-skip sig is text-independent (ids + numbers only).
 
-import { SPORT_ROLES, VC_NATION_IDS } from '../sim/content/vale_cup';
+import {
+  SPORT_ROLES,
+  VC_ALLROUNDER_ONLY_MAX_BRACKET,
+  VC_NATION_IDS,
+} from '../sim/content/vale_cup';
 import type { SportRole, VcBracket, VcNationId } from '../sim/types';
 import type { CupInfo, PartyInfo } from '../world_api';
 
@@ -81,6 +85,10 @@ export type VcupView =
       nation: VcNationId | null;
       roles: VcupRoleRow[];
       role: SportRole;
+      /** True for the 1v1/2v2 brackets, where the sim seats every fighter as
+       *  All-Rounder regardless of the pick (normalizeRole): the painter shows
+       *  the note so the keeper deeds' 3v3+ gate is explicit (issue 2767). */
+      smallBracketRoles: boolean;
       standing: { wins: number; losses: number; draws: number };
       action: VcupAction;
       live: VcupLivePanel | null;
@@ -152,13 +160,18 @@ export function buildVcupView(input: VcupViewInput): VcupView {
     disabled: picksLocked,
   }));
 
-  // Every role is allowed in every bracket (a 1v1 keeper is a legitimate,
-  // if brave, choice); the role stays changeable while waiting in the queue.
+  // Every role stays pickable in every bracket and changeable while waiting in
+  // the queue, but the sim seats 1v1/2v2 fighters as All-Rounder regardless of
+  // the pick (normalizeRole in src/sim/social/vale_cup.ts), so those brackets
+  // get an explicit note instead of a silently ignored keeper pick. The
+  // threshold is the SAME constant normalizeRole reads, so note and rule
+  // cannot drift.
   const roles: VcupRoleRow[] = SPORT_ROLES.map((id) => ({
     id,
     selected: id === role,
     disabled: inMatch,
   }));
+  const smallBracketRoles = bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET;
 
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === playerId;
@@ -236,6 +249,9 @@ export function buildVcupView(input: VcupViewInput): VcupView {
     info.practicing,
     party && [party.leader, partySize],
     practice,
+    // Redundant with `bracket` today (a pure function of it), pinned here so a
+    // future re-derivation from a non-sig input cannot leave a stale note.
+    smallBracketRoles,
   ]);
 
   return {
@@ -248,6 +264,7 @@ export function buildVcupView(input: VcupViewInput): VcupView {
     nation,
     roles,
     role,
+    smallBracketRoles,
     standing: info.standing,
     action,
     live,

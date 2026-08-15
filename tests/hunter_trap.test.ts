@@ -1,111 +1,192 @@
 import { describe, expect, it } from 'vitest';
+import { lineOfSightClear } from '../src/sim/colliders';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { GroundAoE } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
-// G6 (fix/talents2-balance-pass): Rime Snare becomes a real trap. The
-// maintainer's spec: placed at the hunter's feet, arms, and freezes the FIRST
-// single enemy that touches it, instead of the old 30yd aimed 8yd-radius
-// instant root+stun nova. Rides the groundAoEs collection with a hunterTrap
-// rider, the Ring of Frost pattern.
+type TestSim = Sim & {
+  ctx: { groundAoEs: GroundAoE[] };
+  addEntity(entity: Entity): void;
+  nextId: number;
+};
 
-type AnySim = Sim & { ctx: { groundAoEs: GroundAoE[] } };
-
-function setup(): { sim: AnySim; p: Entity } {
-  const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true }) as AnySim;
-  sim.setPlayerLevel(10);
-  expect(sim.applyTalents({ spec: null, rows: { 8: 'hun_r8_frost_trap' } })).toBe(true);
-  const p = sim.player;
-  p.resource = p.maxResource;
-  return { sim, p };
+function setup(rows: Record<number, string> = {}): TestSim {
+  const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true }) as TestSim;
+  sim.setPlayerLevel(20);
+  expect(sim.applyTalents({ spec: 'marksmanship', rows })).toBe(true);
+  sim.player.resource = sim.player.maxResource;
+  return sim;
 }
 
-function addMobAt(sim: AnySim, x: number, z: number): Entity {
-  const mob = createMob(20_000 + sim.ctx.groundAoEs.length, MOBS.forest_wolf, 8, {
+function addMobAt(sim: TestSim, x: number, z: number): Entity {
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
     x,
     y: sim.player.pos.y,
     z,
   });
   mob.hostile = true;
   mob.aiState = 'idle';
+  mob.moveSpeed = 0;
   mob.maxHp = 100_000;
   mob.hp = mob.maxHp;
-  (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+  sim.addEntity(mob);
   return mob;
 }
 
-function trapEntries(sim: AnySim): GroundAoE[] {
-  return sim.ctx.groundAoEs.filter((g) => g.hunterTrap !== undefined);
-}
-
-function frozen(mob: Entity): boolean {
-  return mob.auras.some((aura) => aura.id === 'frost_trap_freeze');
-}
-
-describe('G6: Rime Snare is an armed single-target trap at your feet', () => {
-  it('places at the hunter, arms, then freezes the first enemy that touches it', () => {
-    const { sim, p } = setup();
-    sim.castAbility('frost_trap');
-    sim.tick();
-    const traps = trapEntries(sim);
-    expect(traps).toHaveLength(1);
-    expect(traps[0].pos.x).toBeCloseTo(p.pos.x, 1);
-    expect(traps[0].pos.z).toBeCloseTo(p.pos.z, 1);
-
-    // An enemy standing on it BEFORE it arms is not frozen.
-    const early = addMobAt(sim, traps[0].pos.x, traps[0].pos.z);
-    sim.tick();
-    expect(frozen(early)).toBe(false);
-
-    // After the arm delay the same contact springs it.
-    for (let i = 0; i < 40; i++) sim.tick();
-    expect(frozen(early)).toBe(true);
-    expect(trapEntries(sim)).toHaveLength(0); // sprung traps are consumed
-  });
-
-  it('an armed trap shimmers its ground indicator periodically', () => {
-    const { sim } = setup();
-    sim.castAbility('frost_trap');
-    const events: { type?: string; fx?: string; school?: string }[] = [];
-    const anySim = sim as unknown as { emit(e: (typeof events)[number]): void };
-    const orig = anySim.emit.bind(sim);
-    anySim.emit = (e) => {
-      events.push(e);
-      return orig(e);
+function clearPoint(sim: TestSim, distance: number): { x: number; z: number } {
+  for (let step = 0; step < 16; step++) {
+    const angle = (step * Math.PI) / 8;
+    const candidate = {
+      x: sim.player.pos.x + Math.sin(angle) * distance,
+      z: sim.player.pos.z + Math.cos(angle) * distance,
     };
-    for (let i = 0; i < 120; i++) sim.tick(); // arm + three shimmer windows
-    const shimmers = events.filter(
-      (e) => e.type === 'spellfxAt' && e.fx === 'nova' && e.school === 'frost',
-    );
-    expect(shimmers.length).toBeGreaterThanOrEqual(2);
+    if (lineOfSightClear(sim.cfg.seed, sim.player.pos, candidate)) return candidate;
+  }
+  throw new Error('test fixture could not find a clear ranged lane');
+}
+
+function trapEntries(sim: TestSim): GroundAoE[] {
+  return sim.ctx.groundAoEs.filter((effect) => effect.hunterTrap !== undefined);
+}
+
+function advance(sim: Sim, ticks: number): SimEvent[] {
+  const events: SimEvent[] = [];
+  for (let tick = 0; tick < ticks; tick++) events.push(...sim.tick());
+  return events;
+}
+
+function rooted(mob: Entity): boolean {
+  return mob.auras.some((aura) => aura.id === 'frostjaw_trap_freeze');
+}
+
+describe('Frostjaw Trap', () => {
+  it('places at the selected enemy or the hunter, arms, and then triggers', () => {
+    const sim = setup();
+    sim.castAbility('frostjaw_trap');
+    sim.tick();
+    const trap = trapEntries(sim)[0];
+    expect(trap.pos.x).toBeCloseTo(sim.player.pos.x, 1);
+    expect(trap.pos.z).toBeCloseTo(sim.player.pos.z, 1);
+
+    const early = addMobAt(sim, trap.pos.x, trap.pos.z);
+    sim.tick();
+    expect(rooted(early)).toBe(false);
+
+    advance(sim, 20);
+    expect(rooted(early)).toBe(true);
+    expect(trapEntries(sim)).toHaveLength(0);
   });
 
-  it('freezes only ONE enemy even with several in the radius', () => {
-    const { sim } = setup();
-    sim.castAbility('frost_trap');
+  it('uses the selected enemy as its placement center', () => {
+    const sim = setup();
+    const selected = addMobAt(sim, sim.player.pos.x, sim.player.pos.z + 20);
+    sim.targetEntity(selected.id);
+    const selectedPos = { ...selected.pos };
+
+    sim.castAbility('frostjaw_trap');
+    sim.tick();
+
+    const trap = trapEntries(sim)[0];
+    expect(trap.pos.x).toBeCloseTo(selectedPos.x, 1);
+    expect(trap.pos.z).toBeCloseTo(selectedPos.z, 1);
+  });
+
+  it('roots one enemy and slows every enemy in the trigger area', () => {
+    const sim = setup();
+    sim.castAbility('frostjaw_trap');
     sim.tick();
     const trap = trapEntries(sim)[0];
     const first = addMobAt(sim, trap.pos.x, trap.pos.z);
     const second = addMobAt(sim, trap.pos.x + 0.5, trap.pos.z);
-    for (let i = 0; i < 40; i++) sim.tick();
-    expect([first, second].filter(frozen)).toHaveLength(1);
+
+    advance(sim, 20);
+
+    expect([first, second].filter(rooted)).toHaveLength(1);
+    expect(
+      [first, second].filter((mob) => mob.auras.some((aura) => aura.kind === 'slow')),
+    ).toHaveLength(2);
   });
 
-  it('one trap at a time: a new trap replaces the old one', () => {
-    const { sim, p } = setup();
-    sim.castAbility('frost_trap');
+  it('lets Binding Payload root the full trigger area', () => {
+    const sim = setup({ 11: 'hun_r11_binding_payload' });
+    sim.castAbility('frostjaw_trap');
+    sim.tick();
+    const trap = trapEntries(sim)[0];
+    const first = addMobAt(sim, trap.pos.x, trap.pos.z);
+    const second = addMobAt(sim, trap.pos.x + 0.5, trap.pos.z);
+
+    advance(sim, 20);
+
+    expect([first, second].filter(rooted)).toHaveLength(2);
+  });
+
+  it('links Trapcraft and Chain Reaction to the authoritative trigger', () => {
+    const sim = setup({
+      14: 'hun_r14_trapcraft',
+      20: 'hun_r20_chain_reaction',
+    });
+    sim.player.resource = 0;
+    sim.player.cooldowns.set('trailbreak', 20);
+    sim.castAbility('frostjaw_trap');
+    sim.tick();
+    const trap = trapEntries(sim)[0];
+    const first = addMobAt(sim, trap.pos.x, trap.pos.z);
+    const second = addMobAt(sim, trap.pos.x + 0.5, trap.pos.z);
+
+    advance(sim, 20);
+
+    expect(sim.player.resource).toBeGreaterThanOrEqual(20);
+    expect(sim.player.cooldowns.get('trailbreak')).toBeLessThanOrEqual(15);
+    expect(first.auras.some((aura) => aura.id.startsWith('hunter_chain_mark'))).toBe(true);
+    expect(second.auras.some((aura) => aura.id.startsWith('hunter_chain_mark'))).toBe(true);
+    expect(sim.player.auras.find((aura) => aura.id === 'hunter_chain_reaction_uses')?.stacks).toBe(
+      3,
+    );
+  });
+
+  it('echoes the next three Focus spenders between Chain Reaction marks', () => {
+    const sim = setup({ 20: 'hun_r20_chain_reaction' });
+    const center = clearPoint(sim, 20);
+    const first = addMobAt(sim, center.x, center.z);
+    const second = addMobAt(sim, center.x + 0.5, center.z);
+    sim.targetEntity(first.id);
+    sim.castAbility('frostjaw_trap');
+    sim.tick();
+    advance(sim, 20);
+    sim.player.resource = sim.player.maxResource;
+    sim.player.gcdRemaining = 0;
+
+    sim.castAbility('arcane_shot');
+    const events = advance(sim, 40);
+
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'damage',
+        targetId: second.id,
+        ability: 'Chain Reaction',
+      }),
+    );
+    expect(sim.player.auras.find((aura) => aura.id === 'hunter_chain_reaction_uses')?.stacks).toBe(
+      2,
+    );
+  });
+
+  it('replaces the previous trap when a new one is placed', () => {
+    const sim = setup();
+    sim.castAbility('frostjaw_trap');
     sim.tick();
     expect(trapEntries(sim)).toHaveLength(1);
-    p.cooldowns.delete('frost_trap');
-    p.gcdRemaining = 0;
-    p.resource = p.maxResource;
-    p.pos.x += 10;
-    sim.castAbility('frost_trap');
+    sim.player.cooldowns.delete('frostjaw_trap');
+    sim.player.gcdRemaining = 0;
+    sim.player.pos.x += 10;
+
+    sim.castAbility('frostjaw_trap');
     sim.tick();
+
     const traps = trapEntries(sim);
     expect(traps).toHaveLength(1);
-    expect(traps[0].pos.x).toBeCloseTo(p.pos.x, 1);
+    expect(traps[0].pos.x).toBeCloseTo(sim.player.pos.x, 1);
   });
 });

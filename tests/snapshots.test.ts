@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
@@ -23,16 +24,26 @@ vi.mock('../server/db', () => ({
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
+import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosmetic_op_guard';
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
+import { gameMetricsCounters } from '../server/http/game_signals';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import {
+  emptyPriestMarkerState,
+  priestMarkerStateForAuras,
+} from '../src/sim/combat/priest/presentation';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
+import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -40,6 +51,17 @@ import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+import { deedBorderSlug } from '../src/ui/deed_border_view';
+import { playtimeParts } from '../src/ui/playtime_view';
+import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
+import {
+  bareClient,
+  broadcast,
+  type FakeClient,
+  fakeWs,
+  joinServer,
+  lastSnap,
+} from './helpers/bare_client';
 
 // Wire round-trip fixtures only read the player entity they build, never ambient
 // world content, so strip camps/npcs/ground objects to keep each direct Sim cheap
@@ -71,38 +93,7 @@ const DELTA_KEYS = [
   'corpse',
 ];
 
-interface FakeClient {
-  sent: any[];
-  ws: any;
-}
-
 type SnapshotApplier = { applySnapshot(snapshot: unknown): void };
-
-function fakeWs(): FakeClient {
-  const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
-}
-
-function lastSnap(sent: any[]): any {
-  for (let i = sent.length - 1; i >= 0; i--) {
-    if (sent[i].t === 'snap') return sent[i];
-  }
-  return null;
-}
-
-function joinServer(
-  server: GameServer,
-  fc: FakeClient,
-  characterId: number,
-  name: string,
-  cls: PlayerClass = 'warrior',
-  meta: Parameters<GameServer['join']>[7] = {},
-): ClientSession {
-  const session = server.join(fc.ws, characterId, characterId, name, cls, null, false, meta);
-  if ('error' in session) throw new Error(session.error);
-  session.blockListLoaded = true;
-  return session;
-}
 
 function eventTexts(sent: any[]): string[] {
   return sent
@@ -111,65 +102,95 @@ function eventTexts(sent: any[]): string[] {
     .map((ev) => ev.text);
 }
 
-function broadcast(server: GameServer): void {
-  (server as any).broadcastSnapshots();
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
-}
-
 function feedEventFrame(client: ClientWorld, frame: unknown): void {
   (client as any).onMessage(JSON.stringify(frame));
 }
 
 describe('self stat wire round-trip', () => {
+  it('mirrors Paladin Devotion and Ascension state from the authoritative server', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Oathkeeper', 'paladin');
+    const player = (server as any).sim.entities.get(session.pid);
+    player.paladinDevotion.value = 7;
+    player.paladinDevotion.ascensionCharges = 3;
+    player.paladinDevotion.ascensionRemaining = 18.25;
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.pdev).toEqual({ value: 7, charges: 3, remaining: 18.25 });
+
+    const client = bareClient(session.pid, { playerClass: 'paladin' });
+    (client as any).applySnapshot(snap);
+    expect(client.player.paladinDevotion).toMatchObject({
+      value: 7,
+      ascensionCharges: 3,
+      ascensionRemaining: 18.25,
+    });
+  });
+
+  it('mirrors compact Ascension charges for a remote Paladin visual', () => {
+    const sim = new Sim({ seed: 27, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 4;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+
+    const wire = wireEntity(sim.player);
+    expect(wire.pasc).toBe(4);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 4,
+      ascensionRemaining: 1,
+    });
+
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...wire, pasc: 0 }],
+    });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+    });
+  });
+
+  it('omits idle Ascension charges from the wire and clears them on decode', () => {
+    const sim = new Sim({ seed: 27, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 4;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+    const active = wireEntity(sim.player);
+    expect(active.pasc).toBe(4);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [active] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion?.ascensionCharges).toBe(4);
+
+    // Idle charges are omitted entirely (omit-when-default, like the fields
+    // around it), and decoding the ABSENT field must clear the mirrored
+    // charges: a decode gated on presence would leave an expired Ascension's
+    // orbiting seals on the remote paladin forever.
+    sim.player.paladinDevotion!.ascensionCharges = 0;
+    const idle = wireEntity(sim.player);
+    expect('pasc' in idle).toBe(false);
+    (client as any).applySnapshot({ t: 'snap', ents: [idle] });
+    expect(client.entities.get(sim.playerId)?.paladinDevotion).toMatchObject({
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+    });
+  });
+
+  it('preserves talent-expanded Ascension charge counts for remote Paladins', () => {
+    const sim = new Sim({ seed: 28, playerClass: 'paladin', autoEquip: true });
+    sim.player.paladinDevotion!.ascensionCharges = 7;
+    sim.player.paladinDevotion!.ascensionRemaining = 20;
+    const wire = wireEntity(sim.player);
+
+    const client = bareClient(sim.playerId + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+
+    expect(client.entities.get(sim.playerId)?.paladinDevotion?.ascensionCharges).toBe(7);
+  });
+
   it('mirrors Warrior shield block stats from the live equip command path', () => {
     const server = new GameServer();
     const fc = fakeWs();
@@ -187,7 +208,7 @@ describe('self stat wire round-trip', () => {
     expect(snap.self.blk).toBeGreaterThan(0);
     expect(snap.self.bval).toBe(6);
 
-    const client = bareClient(session.pid, 'warrior');
+    const client = bareClient(session.pid, { playerClass: 'warrior' });
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
     internals.applySnapshot(snap);
     expect(client.player.offhandItemId).toBe('eastbrook_buckler');
@@ -519,6 +540,66 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+describe('channel target over the wire', () => {
+  it('lets a late observer reconstruct the Drain Life tether from snapshot state', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warlock' });
+    const caster = sim.player;
+    caster.castingAbility = 'drain_life';
+    caster.channeling = true;
+    caster.castRemaining = 3.25;
+    caster.castTotal = 5;
+    caster.castTargetId = 91;
+
+    const wire = wireEntity(caster);
+    expect(wire.castTgt).toBe(91);
+
+    const client = bareClient(caster.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(caster.id)!;
+    expect(mirrored.castingAbility).toBe('drain_life');
+    expect(mirrored.channeling).toBe(true);
+    expect(mirrored.castTargetId).toBe(91);
+    expect(mirrored.castRemaining).toBe(3.25);
+  });
+});
+
+describe('pet signature skill over the wire', () => {
+  it('mirrors the visible cooldown and autocast state used by the pet bar', () => {
+    const pet = createMob(9301, MOBS.gloomshade, 20, { x: 0, y: 0, z: 0 });
+    pet.ownerId = 42;
+    pet.petSkillTimer = 12.35;
+    pet.petAutoSkill = true;
+
+    const wire = wireEntity(pet);
+    expect(wire.ps).toBe(12.35);
+    expect(wire.px).toBe(1);
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(pet.id)!;
+    expect(mirrored.petSkillTimer).toBe(12.35);
+    expect(mirrored.petAutoSkill).toBe(true);
+  });
+
+  it('keeps a ready manual signature skill sparse and resets stale mirror state', () => {
+    const pet = createMob(9302, MOBS.emberkin, 20, { x: 0, y: 0, z: 0 });
+    pet.ownerId = 42;
+    const readyWire = wireEntity(pet);
+    expect(readyWire).not.toHaveProperty('ps');
+    expect(readyWire).not.toHaveProperty('px');
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...readyWire, ps: 4, px: 1 }],
+    });
+    (client as any).applySnapshot({ t: 'snap', ents: [readyWire] });
+    const mirrored = client.entities.get(pet.id)!;
+    expect(mirrored.petSkillTimer).toBe(0);
+    expect(mirrored.petAutoSkill).toBe(false);
+  });
+});
+
 // Operator-set account flair (the [AI] mark + an official streamer's links). The
 // wire keys `ai` and `slk` ARE the protocol, so pin both halves together: the REAL
 // server emit (wireEntity) into the REAL client mirror (applySnapshot). Pinning only
@@ -774,6 +855,89 @@ describe('combat ratings over the wire', () => {
   });
 });
 
+// The static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) used to ride the unconditional
+// base self object every tick for every player, unlike every other heavy field
+// on the same record. They now go through the same `maybe(...)` delta gate
+// (server/game.ts), so an unchanged value elides from the wire entirely; the
+// decoder (src/net/online.ts) falls back to the prior mirrored value instead
+// of a hardcoded default when the key is absent.
+describe('static combat-rating/progression scalars ride the delta gate', () => {
+  const SCALAR_KEYS = [
+    'ap',
+    'sp',
+    'sh',
+    'crit',
+    'dodge',
+    'blk',
+    'bval',
+    'crat',
+    'hrat',
+    'hirat',
+    'xp',
+    'lxp',
+    'rxp',
+    'prk',
+    'copper',
+    'ddiff',
+  ] as const;
+
+  it('rides the first snapshot, elides once quiet, and resends only the field that actually moved', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 91, 'Ratings');
+    const meta = server.sim.meta(session.pid)!;
+    const p = server.sim.entities.get(session.pid)!;
+
+    // A fresh session has an empty lastSent, so every one of these rides the
+    // very first snapshot, same as every other maybe() delta key.
+    broadcast(server);
+    const first = lastSnap(fc.sent);
+    for (const key of SCALAR_KEYS) {
+      expect(first.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
+    }
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(first);
+    expect(client.player.attackPower).toBe(p.attackPower);
+    expect(client.player.critChance).toBe(p.critChance);
+    expect(client.player.dodgeChance).toBe(p.dodgeChance);
+    expect(client.copper).toBe(meta.copper);
+    expect(client.xp).toBe(meta.xp);
+
+    // The mechanism this PR adds: a second, no-op broadcast with nothing about
+    // combat ratings or progression changed must OMIT every one of these keys
+    // (fewer bytes built and shipped per player per tick), and applying that
+    // delta-less snapshot must NOT reset the mirrored values to a default.
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    for (const key of SCALAR_KEYS) {
+      expect(quiet.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
+    }
+    (client as any).applySnapshot(quiet);
+    expect(client.player.attackPower).toBe(p.attackPower);
+    expect(client.player.critChance).toBe(p.critChance);
+    expect(client.player.dodgeChance).toBe(p.dodgeChance);
+    expect(client.copper).toBe(meta.copper);
+    expect(client.xp).toBe(meta.xp);
+
+    // A real gear change bumps attackPower: only `ap` rides on the next
+    // snapshot, proving the gate detects a genuine change precisely (not just
+    // that it stays quiet), while every other scalar in the cohort keeps eliding.
+    p.attackPower += 25;
+    fc.sent.length = 0;
+    broadcast(server);
+    const changed = lastSnap(fc.sent);
+    expect(changed.self.ap).toBe(p.attackPower);
+    for (const key of SCALAR_KEYS) {
+      if (key === 'ap') continue;
+      expect(changed.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
+    }
+    (client as any).applySnapshot(changed);
+    expect(client.player.attackPower).toBe(p.attackPower);
+  });
+});
+
 describe('delta snapshots', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -792,13 +956,94 @@ describe('delta snapshots', () => {
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
     // first snapshot (even the null-valued ones like party/trade/bank); every
     // key in ALL_DELTA_KEYS
-    for (const key of ALL_DELTA_KEYS) {
+    for (const key of DENSE_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
     expect(snap.self.party).toBeNull();
     expect(snap.self.trade).toBeNull();
     expect(Array.isArray(snap.self.inv)).toBe(true);
     expect(Array.isArray(snap.ents)).toBe(true);
+  });
+
+  it('round-trips lifetime played time minute-quantized on ptime', () => {
+    // The encoder floors to whole minutes (still in seconds on the wire) so
+    // the serialized form only changes about once a minute and the delta gate
+    // drops the key from every other tick; the decoder mirrors it verbatim.
+    const meta = server.sim.players.get(session.pid)!;
+    meta.totalPlayedSeconds = 3725; // 1h 2m 5s baseline, sim.time still ~0
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ptime).toBe(3720);
+
+    const client = bareClient(session.pid);
+    (client as unknown as SnapshotApplier).applySnapshot(snap);
+    expect(client.playtimeSeconds).toBe(3720);
+
+    // Unchanged within the same minute: the next snapshot omits the key, and
+    // the delta-guarded decode keeps the prior mirror instead of wiping it.
+    broadcast(server);
+    const snap2 = lastSnap(fc.sent);
+    expect(snap2.self).not.toHaveProperty('ptime');
+    (client as unknown as SnapshotApplier).applySnapshot(snap2);
+    expect(client.playtimeSeconds).toBe(3720);
+
+    // The elapsed-session arm: once the sim clock crosses the next whole
+    // minute the quantized value re-ships and tracks the live total.
+    (server.sim as { time: number }).time += 61;
+    broadcast(server);
+    const snap3 = lastSnap(fc.sent);
+    expect(snap3.self.ptime).toBe(3780);
+    (client as unknown as SnapshotApplier).applySnapshot(snap3);
+    expect(client.playtimeSeconds).toBe(3780);
+
+    // Cross-host display agreement, pinned ABSOLUTELY on both sides (3725s
+    // baseline + 61s session = 1h 3m): the offline formula serves unfloored
+    // seconds while the online mirror is minute-quantized, and the sheet's
+    // minute-flooring parts split must render both identically. The offline
+    // arm anchors on the session's own meta (not Sim.primary, which is only
+    // coincidentally the same character in this harness), and the literal
+    // expectation keeps the pin decisive inside this file even if
+    // playtimeParts itself regresses.
+    expect(playtimeParts(client.playtimeSeconds)).toEqual({ days: 0, hours: 1, minutes: 3 });
+    expect(playtimeParts(livePlaytimeSeconds(meta, server.sim.time))).toEqual({
+      days: 0,
+      hours: 1,
+      minutes: 3,
+    });
+  });
+
+  it('round-trips the Hunter reactive window as remaining seconds', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    player.overpowerUntil = server.sim.time + 4.25;
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.opUntil).toBe(1);
+    expect(snap.self.opRem).toBe(4.25);
+
+    const client = bareClient(session.pid, { playerClass: 'hunter' });
+    const now = vi.spyOn(performance, 'now').mockReturnValue(10_000);
+    (client as unknown as SnapshotApplier).applySnapshot(snap);
+    expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(4.25);
+    expect(client.reactiveAbilityWindowRemaining('another_ability')).toBe(0);
+    now.mockReturnValue(12_500);
+    expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(1.75);
+    now.mockReturnValue(14_250);
+    expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(0);
+
+    const releaseSnapshot = structuredClone(snap);
+    delete releaseSnapshot.self.opRem;
+    (client as unknown as SnapshotApplier).applySnapshot(releaseSnapshot);
+    expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(0);
+
+    player.overpowerUntil = -1;
+    broadcast(server);
+    const expiredSnapshot = lastSnap(fc.sent);
+    expect(expiredSnapshot.self.opUntil).toBe(0);
+    expect(expiredSnapshot.self.opRem).toBe(0);
+    (client as unknown as SnapshotApplier).applySnapshot(expiredSnapshot);
+    expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(0);
+    now.mockRestore();
   });
 
   it('mirrors account-wide cosmetic unlocks from self snapshots', () => {
@@ -864,21 +1109,15 @@ describe('delta snapshots', () => {
     for (const key of DELTA_KEYS) {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
-    // the always-on fields are still present every snapshot
-    for (const key of [
-      'x',
-      'z',
-      'hp',
-      'mhp',
-      'res',
-      'gcd',
-      'pcd',
-      'swing',
-      'xp',
-      'copper',
-      'target',
-    ]) {
+    // the always-on fields are still present every snapshot. xp/copper moved
+    // behind the delta gate alongside the rest of the static combat-rating/
+    // progression cohort (server/game.ts), so they are no longer in this list.
+    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'pcd', 'swing', 'target']) {
       expect(snap.self).toHaveProperty(key);
+    }
+    // xp/copper are unchanged since the first broadcast, so they delta-elide here.
+    for (const key of ['xp', 'copper']) {
+      expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
   });
 
@@ -902,53 +1141,6 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.potionCdRemaining).toBeCloseTo(95.5, 1);
-  });
-
-  it('mirrors Hallowed Wall armor from the live Protection cast-slot path', () => {
-    const paladinServer = new GameServer();
-    const paladinFc = fakeWs();
-    const paladinSession = joinServer(paladinServer, paladinFc, 20, 'Holytest', 'paladin');
-    paladinServer.sim.setPlayerLevel(20, paladinSession.pid);
-    expect(paladinServer.sim.setSpec('protection', paladinSession.pid)).toBe(true);
-
-    const player = paladinServer.sim.entities.get(paladinSession.pid)!;
-    player.resource = player.maxResource;
-    player.hp = player.maxHp;
-    const baseArmor = player.stats.armor;
-    const target = createMob(9001, MOBS.deeprock_kobold, 20, {
-      x: player.pos.x,
-      y: player.pos.y,
-      z: player.pos.z + 12,
-    });
-    target.maxHp = target.hp = 1_000_000;
-    (paladinServer.sim as unknown as { addEntity(e: typeof target): void }).addEntity(target);
-    player.targetId = target.id;
-
-    const known = paladinServer.sim.meta(paladinSession.pid)!.known;
-    const slot = known.findIndex((entry) => entry.def.id === 'holy_shield');
-    expect(slot).toBeGreaterThanOrEqual(0);
-
-    paladinServer.handleMessage(
-      paladinSession,
-      JSON.stringify({ t: 'cmd', cmd: 'castSlot', slot }),
-    );
-    for (let i = 0; i < 200 && paladinServer.sim.ctx.pendingProjectiles.length > 0; i++) {
-      paladinServer.sim.tick();
-    }
-
-    broadcast(paladinServer);
-    const snap = lastSnap(paladinFc.sent);
-    expect(snap.self.auras).toContainEqual(
-      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
-    );
-    expect(snap.self.stats.armor).toBe(baseArmor + 150);
-
-    const client = bareClient(paladinSession.pid, 'paladin');
-    (client as unknown as SnapshotApplier).applySnapshot(snap);
-    expect(client.player.auras).toContainEqual(
-      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
-    );
-    expect(client.player.stats.armor).toBe(baseArmor + 150);
   });
 
   it('includes live aura and movement diagnostics in admin online rows', () => {
@@ -1133,7 +1325,7 @@ describe('delta snapshots', () => {
     mageServer.sim.setPlayerLevel(5, mage.pid);
 
     broadcast(mageServer);
-    const client = bareClient(mage.pid, 'mage');
+    const client = bareClient(mage.pid, { playerClass: 'mage' });
     (client as any).applySnapshot(lastSnap(mageFc.sent));
     mageFc.sent.length = 0;
     broadcast(mageServer);
@@ -1342,7 +1534,7 @@ describe('delta snapshots', () => {
     broadcast(server);
     const snapNew = lastSnap(fc2.sent);
     // a fresh session always receives the full self state: every registered delta key
-    for (const key of ALL_DELTA_KEYS) {
+    for (const key of DENSE_DELTA_KEYS) {
       expect(snapNew.self, `self.${key} missing for fresh session`).toHaveProperty(key);
     }
     // the veteran session still gets deltas only
@@ -1664,7 +1856,7 @@ describe('online movement input lifetime', () => {
       JSON.stringify({
         t: 'input',
         seq: 1,
-        mi: { f: 0, b: 0, tl: 1, tr: 0, sl: 0, sr: 0, j: 0 },
+        mi: { f: 0, b: 0, tl: 1, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
       }),
     );
     const meta = server.sim.meta(session.pid)!;
@@ -1982,10 +2174,12 @@ describe('client-side delta merge', () => {
         strafeLeft: false,
         strafeRight: false,
         jump: false,
+        dive: false,
+        surface: false,
       });
       expect(client.flushInput(100)).toBe(true);
       expect(sent).toEqual([
-        { t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } },
+        { t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 } },
       ]);
 
       expect(client.flushInput(105)).toBe(false);
@@ -1999,8 +2193,48 @@ describe('client-side delta merge', () => {
       expect(sent.at(-1)).toEqual({
         t: 'input',
         seq: 2,
-        mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0 },
+        mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0, dv: 0, sf: 0 },
       });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  // The camera swim steer is the one graded movement field, and it rides along
+  // only when it actually grades something: absent means full rate on the far
+  // side (swimSteerRate), so a land frame — and a full-rate keyboard dive — must
+  // stay byte-identical to what this client always sent.
+  it('sends the swim steer only while it grades the dive', () => {
+    const client = bareClient(1);
+    const sent: any[] = [];
+    (client as any).ws = {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      const last = () => sent[sent.length - 1].mi;
+      Object.assign(client.moveInput, { forward: true });
+      expect(client.flushInput(100)).toBe(true);
+      expect(last().ss).toBeUndefined(); // walking: unchanged payload
+
+      Object.assign(client.moveInput, { dive: true, swimSteer: 1 });
+      expect(client.flushInput(200)).toBe(true);
+      expect(last().dv).toBe(1);
+      expect(last().ss).toBeUndefined(); // full rate is the default
+
+      Object.assign(client.moveInput, { swimSteer: 0.5 });
+      expect(client.flushInput(300)).toBe(true);
+      expect(last().ss).toBe(0.5); // ...and a feathered one is carried
+
+      // A steer CHANGE is a movement change: the signature has to notice, or
+      // the rate would stick at whatever the last sent frame said.
+      Object.assign(client.moveInput, { swimSteer: 0.5 });
+      expect(client.flushInput(400)).toBe(false);
+      Object.assign(client.moveInput, { swimSteer: 1 });
+      expect(client.flushInput(500)).toBe(true);
+      expect(last().ss).toBeUndefined();
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }
@@ -2037,6 +2271,36 @@ describe('client-side delta merge', () => {
     });
     const aura = client.entities.get(2)?.auras.find((a) => a.kind === 'sunder');
     expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
+  });
+
+  it('always wires Druid engine bank stages, including zero and one', () => {
+    // The sparsity rule omits stacks below 2, but the engine banks teach their
+    // live stage (auras_view badge + aura_effect tooltip) at 0 and 1 too, and
+    // the decode side cannot tell "absent because 1" from "absent because 0".
+    const sim = new Sim({ seed: 33, playerClass: 'druid', autoEquip: true });
+    for (const stacks of [0, 1] as const) {
+      sim.player.auras = [
+        {
+          id: 'moontide',
+          name: 'Moontide',
+          kind: 'moontide',
+          remaining: 3600,
+          duration: 3600,
+          value: 0,
+          stacks,
+          sourceId: sim.playerId,
+          school: 'nature',
+        },
+      ];
+      const wire = wireEntity(sim.player) as { auras?: { id: string; stacks?: number }[] };
+      const wired = wire.auras?.find((a) => a.id === 'moontide');
+      expect(wired?.stacks, `the wire must carry the ${stacks}-stage bank`).toBe(stacks);
+
+      const client = bareClient(sim.playerId + 1000);
+      (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(sim.player)] });
+      const mirrored = client.entities.get(sim.playerId)?.auras.find((a) => a.id === 'moontide');
+      expect(mirrored?.stacks, `the mirror must read the ${stacks}-stage bank`).toBe(stacks);
+    }
   });
 
   it('reconstructs charge-limited aura charges from the wire (Thunder Ward)', () => {
@@ -2148,6 +2412,101 @@ describe('client-side delta merge', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [w] });
     const aura = client.entities.get(e.id)?.auras.find((a) => a.id === 'pri_searing_light');
     expect(aura?.empowerAbilities).toEqual(['smite']);
+  });
+
+  it('round-trips Priest relationship and Gloomtithe presentation state online', () => {
+    const sim = new Sim({ seed: 29, playerClass: 'priest', autoEquip: true });
+    const e = sim.player;
+    e.auras.push(
+      {
+        id: 'priest_doctrine',
+        name: 'Doctrine',
+        kind: 'doctrine',
+        remaining: 30,
+        duration: 30,
+        value: 0.3,
+        sourceId: e.id,
+        school: 'holy',
+      },
+      {
+        id: 'seraphic_vigil',
+        name: 'Seraphic Vigil',
+        kind: 'heal_echo',
+        remaining: 30,
+        duration: 30,
+        value: 180,
+        sourceId: e.id,
+        school: 'holy',
+      },
+      {
+        id: 'priest_gloomtithe',
+        name: 'Gloomtithe',
+        kind: 'gloomtithe',
+        remaining: 15,
+        duration: 15,
+        value: 0,
+        stacks: 5,
+        sourceId: e.id,
+        school: 'shadow',
+      },
+      {
+        id: 'priest_effigy',
+        name: 'Effigy',
+        kind: 'hex',
+        remaining: 18,
+        duration: 18,
+        value: 0.3,
+        sourceId: e.id,
+        school: 'shadow',
+      },
+    );
+
+    const client = bareClient(e.id + 1000, { playerClass: 'priest' });
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    const mirrored = client.entities.get(e.id);
+    if (!mirrored) throw new Error('online priest missing');
+
+    expect(priestMarkerStateForAuras(mirrored.auras, emptyPriestMarkerState())).toEqual({
+      doctrine: true,
+      vigil: true,
+      dirge: false,
+      effigy: true,
+      gloomtitheStacks: 5,
+      summonReady: true,
+    });
+  });
+
+  it('round-trips the Lingering Dread marker and clears it in place when the wire omits it', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const e = sim.entities.get(sim.playerId)!;
+    const fearAura: Aura = {
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: e.id,
+      school: 'shadow',
+      breakThreshold: 25,
+    };
+    e.auras.push(fearAura);
+    const wired = wireEntity(e) as { auras: { id: string; bt?: 1 }[] };
+    expect(wired.auras.find((a) => a.id === 'fear_incap')?.bt).toBe(1);
+
+    const client = bareClient(e.id + 1000);
+    const apply = (): void => {
+      const snap = JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] }));
+      (client as any).applySnapshot(snap);
+    };
+    apply();
+    const mirrored = client.entities.get(e.id)!.auras.find((a) => a.id === 'fear_incap')!;
+    expect(mirrored.breakThreshold).toBe(1);
+
+    fearAura.breakThreshold = undefined;
+    apply();
+    expect(client.entities.get(e.id)!.auras.find((a) => a.id === 'fear_incap')).toBe(mirrored);
+    expect(mirrored.breakThreshold).toBeUndefined();
   });
 
   it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {
@@ -2394,6 +2753,73 @@ describe('guild nameplate wire', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [base] });
     expect(client.entities.get(7)?.guild).toBe('');
   });
+
+  it('patches only the matching social guild from a structured rename event', () => {
+    const client = bareClient(99);
+    client.socialInfo = {
+      friends: [],
+      blocks: [],
+      ignores: [],
+      guild: {
+        id: 7,
+        name: 'Silver Hand',
+        rank: 'member',
+        motd: '',
+        motdSetBy: '',
+        members: [],
+        events: [],
+      },
+    };
+    (client as any).socialDirty = false;
+    const internals = client as unknown as { onMessage(raw: string): void };
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'events',
+        list: [{ type: 'guildRenamed', guildId: 7, newName: 'Dawn Guard' }],
+      }),
+    );
+
+    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.consumeSocialChanged()).toBe(true);
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'events',
+        list: [{ type: 'guildRenamed', guildId: 8, newName: 'Wrong Guild' }],
+      }),
+    );
+    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.consumeSocialChanged()).toBe(false);
+  });
+
+  it('stamps the live server entity and emits one event without a social snapshot', () => {
+    const server = new GameServer();
+    const socialSnapshot = vi.spyOn(server as any, 'sendSocialSnapshot');
+    const socket = fakeWs();
+    const session = joinServer(server, socket, 71, 'Brae');
+    server.sim.setPlayerGuild(session.pid, 'Silver Hand');
+    socialSnapshot.mockClear();
+    socket.sent.length = 0;
+
+    server.social.guildRenamed(7, 'Silver Hand', 'Dawn Guard', [session.characterId]);
+
+    expect(server.sim.entities.get(session.pid)?.guild).toBe('Dawn Guard');
+    expect(socket.sent).toContainEqual({
+      t: 'events',
+      list: [{ type: 'guildRenamed', guildId: 7, newName: 'Dawn Guard' }],
+    });
+    expect(socialSnapshot).not.toHaveBeenCalled();
+  });
+
+  it('reports only socket-connected character ids to cheap admin reads', () => {
+    const server = new GameServer();
+    const connected = joinServer(server, fakeWs(), 81, 'Connected');
+    const linkdead = joinServer(server, fakeWs(), 82, 'Linkdead');
+    linkdead.linkdead = true;
+
+    expect(server.liveCharacterIds()).toEqual(new Set([connected.characterId]));
+  });
 });
 
 // The Book of Deeds active title rides the identity wire (key `title`, a deed
@@ -2485,6 +2911,11 @@ describe('active title wire (Book of Deeds)', () => {
     (client as any).connected = true;
     (client as any).ws = { readyState: 1, send: (p: string) => outbox.push(p) };
     client.setActiveTitle('prog_veteran');
+    // Asserted HERE, between the select and the clear: the send writes NO
+    // optimistic local copy (the mirror only moves when the server echo
+    // lands), so a refused pick can never leave a phantom worn title on the
+    // client. After the trailing clear this would read null either way.
+    expect(client.activeTitle).toBeNull();
     client.setActiveTitle(null);
     expect(outbox.map((p) => JSON.parse(p))).toEqual([
       { t: 'cmd', cmd: 'deed_set_title', deedId: 'prog_veteran' },
@@ -2613,6 +3044,449 @@ describe('active title wire (Book of Deeds)', () => {
     expect(client.deedsEarned.size).toBe(0);
     expect(client.activeTitle).toBeNull();
     expect(client.renown).toBe(0);
+  });
+});
+
+// The Book of Deeds nameplate border rides the identity wire (key `border`, a
+// deed id, never the reward slug and never display text) so other players'
+// borders reach nameplates/inspect. Emitted only when non-null (mobs and
+// borderless players pay zero bytes); the sim validator (src/sim/deeds.ts
+// setActiveBorder) is the only writer. Every arm is the exact sibling of the
+// active-title suite above, plus the cross-kind rejection both ways: the two
+// cosmetics share one earned set and one reward field, so a validator that
+// checked "has a reward" instead of "has a reward of MY kind" would let a
+// title ride the border wire.
+describe('active border wire (Book of Deeds)', () => {
+  // prog_prestige_10 rewards { kind: 'border', slug: 'prestige_laurels' };
+  // prog_veteran rewards a title. The pair is what makes the kind checks
+  // below decisive (tests/deeds_content.test.ts pins the four border deeds).
+  const BORDER_DEED = 'prog_prestige_10';
+  const TITLE_DEED = 'prog_veteran';
+
+  it('carries the border deed id through wireEntity only when set', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+    const meta = sim.players.get(pid)!;
+    expect(wireEntity(e).border).toBeUndefined();
+
+    // earn a border-reward deed, then select it through the sim setter
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    sim.setActiveBorder(BORDER_DEED, pid);
+    expect(wireEntity(e).border).toBe(BORDER_DEED);
+
+    // clearing the border drops the key, so the frame disappears for viewers
+    sim.setActiveBorder(null, pid);
+    expect(wireEntity(e).border).toBeUndefined();
+  });
+
+  it('rejects a cross-kind deed in BOTH directions and never crosses the two wire fields', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Crosskind');
+    const e = sim.entities.get(pid)!;
+    const meta = sim.players.get(pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    meta.deedsEarned.set(TITLE_DEED, '2026-07-08');
+
+    // an EARNED title deed is not a border: the border setter refuses it
+    sim.setActiveBorder(TITLE_DEED, pid);
+    expect(meta.activeBorder).toBeNull();
+    expect(wireEntity(e).border).toBeUndefined();
+
+    // and an EARNED border deed is not a title: the title setter refuses it
+    sim.setActiveTitle(BORDER_DEED, pid);
+    expect(meta.activeTitle).toBeNull();
+    expect(wireEntity(e).title).toBeUndefined();
+
+    // each accepts its own kind, and neither write lands on the other's field
+    sim.setActiveBorder(BORDER_DEED, pid);
+    sim.setActiveTitle(TITLE_DEED, pid);
+    expect(wireEntity(e).border).toBe(BORDER_DEED);
+    expect(wireEntity(e).title).toBe(TITLE_DEED);
+  });
+
+  it('restores entity.border on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, border: BORDER_DEED }] });
+    expect(client.entities.get(7)?.border).toBe(BORDER_DEED);
+
+    // a later full record without `border` means "borderless" -> reset to null
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.border).toBeNull();
+  });
+
+  it('server dispatch shape-checks the payload and routes through the sim validator', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Bordered');
+    const sim = server.sim;
+    const meta = sim.players.get(session.pid)!;
+    const e = sim.entities.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    // The sim validator refuses a non-string too, so a state-only assertion
+    // cannot tell the server's shape check apart from the sim's: it stays
+    // green with the check deleted. Spy on the CALL, which is exactly what the
+    // shape check exists to prevent.
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+
+    // a non-string, non-null payload never reaches the sim (silent no-op)
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: 42 }));
+    expect(setter).not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+
+    // a raw frame naming an UNEARNED border deed DOES reach the sim (a string
+    // clears the shape check) and is refused there by the validator
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: 'dgn_deepward' }),
+    );
+    expect(setter).toHaveBeenCalledWith('dgn_deepward', session.pid);
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+    setter.mockRestore();
+
+    // the earned border-reward deed is accepted and echoes on the snapshot
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.aborder).toBe(BORDER_DEED);
+  });
+
+  it('the ClientWorld send frame round-trips through the server dispatch (key lockstep)', () => {
+    // Same reasoning as the title arm: drive the REAL ClientWorld send path and
+    // feed the produced frame verbatim into server.handleMessage, so a key
+    // rename on EITHER side reddens here instead of silently no-oping.
+    const outbox: string[] = [];
+    const client = bareClient(1);
+    (client as any).connected = true;
+    (client as any).ws = { readyState: 1, send: (p: string) => outbox.push(p) };
+    client.setActiveBorder(BORDER_DEED);
+    // Same as the title arm, and asserted at the same point: no optimistic
+    // local copy, so the mirror stays null between the select and the echo.
+    expect(client.activeBorder).toBeNull();
+    client.setActiveBorder(null);
+    expect(outbox.map((p) => JSON.parse(p))).toEqual([
+      { t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED },
+      { t: 'cmd', cmd: 'deed_set_border', deedId: null },
+    ]);
+
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Lockstep');
+    const meta = server.sim.players.get(session.pid)!;
+    const e = server.sim.entities.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    server.handleMessage(session, outbox[0]); // the client-built select frame
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    expect(e.border).toBe(BORDER_DEED);
+    server.handleMessage(session, outbox[1]); // the client-built clear frame
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+  });
+
+  it('a null payload through the server dispatch clears the border and echoes null', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cleared');
+    const sim = server.sim;
+    const meta = sim.players.get(session.pid)!;
+    const e = sim.entities.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: null }),
+    );
+    expect(meta.activeBorder).toBeNull();
+    expect(e.border).toBeNull();
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.aborder).toBeNull();
+  });
+
+  it('a second client sees the first client entity border after the re-wire', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const a = joinServer(server, fcA, 1, 'Wearer');
+    const fcB = fakeWs();
+    const b = joinServer(server, fcB, 2, 'Viewer');
+    const sim = server.sim;
+    sim.players.get(a.pid)!.deedsEarned.set(BORDER_DEED, '2026-07-08');
+
+    // before the border: B's view of A carries no `border` key
+    broadcast(server);
+    const viewerB = bareClient(b.pid);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.border ?? null).toBeNull();
+
+    // A selects the border; the identity change re-wires A as a full record on
+    // the next tick (the per-entity wire cache re-serializes at most once per
+    // sim tick, so the tick between command and broadcast mirrors production)
+    server.handleMessage(
+      a,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    sim.tick();
+    fcB.sent.length = 0;
+    broadcast(server);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.border).toBe(BORDER_DEED);
+
+    // A clears; the identity JSON loses the key, so A re-wires as a full
+    // record WITHOUT `border` and B's mirror must return to null (the ?? null
+    // default in the apply, not a stale carry-over)
+    server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: null }));
+    sim.tick();
+    fcB.sent.length = 0;
+    broadcast(server);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.border).toBeNull();
+  });
+
+  it('a fresh player wires a null border that decodes faithfully', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Fresh');
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    // empty-value fidelity on the wire (the delta-key presence test only
+    // proves the key rides the first snapshot)
+    expect(snap.self.aborder).toBeNull();
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.activeBorder).toBeNull();
+  });
+
+  it('cannot redirect the write to another player: pid comes from the session, not the payload', () => {
+    // This is currently safe only because dispatch binds `const pid = session.pid`
+    // once and never rebinds it in the switch. Nothing else in the suite would
+    // notice if a future edit read a pid from the message, so pin it here. BOTH
+    // players earn the deed, so the only thing deciding whose border is written
+    // is the resolved pid, not the validator.
+    const server = new GameServer();
+    const attacker = joinServer(server, fakeWs(), 1, 'Attacker');
+    const victim = joinServer(server, fakeWs(), 2, 'Victim');
+    const sim = server.sim;
+    const attackerMeta = sim.players.get(attacker.pid)!;
+    const victimMeta = sim.players.get(victim.pid)!;
+    attackerMeta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    victimMeta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    for (const field of [
+      'pid',
+      'playerId',
+      'target',
+      'targetPid',
+      'id',
+      'entityId',
+      'characterId',
+      'sessionId',
+    ]) {
+      server.handleMessage(
+        attacker,
+        JSON.stringify({
+          t: 'cmd',
+          cmd: 'deed_set_border',
+          deedId: BORDER_DEED,
+          [field]: victim.pid,
+        }),
+      );
+    }
+    expect(
+      victimMeta.activeBorder,
+      'no message field may redirect the write to the victim',
+    ).toBeNull();
+    expect(sim.entities.get(victim.pid)!.border).toBeNull();
+    // every accepted write landed on the session owner instead
+    expect(attackerMeta.activeBorder).toBe(BORDER_DEED);
+  });
+
+  it('admits only null or a string: object, array, boolean, and an absent key never reach the sim', () => {
+    // The existing dispatch arm pins the number case (deedId: 42); this covers
+    // the other non-string shapes plus an OMITTED key (undefined, not null),
+    // which falls through to a no-op rather than clearing. A real border is
+    // seated first so a shape that slipped through and cleared it would show.
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Shapes');
+    const meta = server.sim.players.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: BORDER_DEED }),
+    );
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+    for (const deedId of [{}, { deedId: BORDER_DEED }, [BORDER_DEED], [], true, false]) {
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId }));
+    }
+    // an omitted key is undefined, which is neither null nor a string
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border' }));
+    expect(setter, 'only null or a string may reach the sim validator').not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBe(BORDER_DEED); // the worn border survived every one
+    setter.mockRestore();
+  });
+
+  it('earns col_reliquary_rank_5 and wears it end to end (the Eternal Spoils acceptance id)', () => {
+    // The acceptance criterion names col_reliquary_rank_5, but the wire arms above
+    // use prog_prestige_10 (its cross-kind sibling makes the kind rejection
+    // decisive). This composes the real rank-5 id through the whole earn -> select
+    // -> wire -> slug chain so the named criterion is demonstrated, not just derived.
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Curator');
+    const e = sim.entities.get(pid)!;
+    const meta = sim.players.get(pid)!;
+    const RANK5 = 'col_reliquary_rank_5';
+    expect(sim.ctx.grantDeed(meta, RANK5)).toBe(true); // the real grant path
+    sim.setActiveBorder(RANK5, pid);
+    expect(meta.activeBorder).toBe(RANK5);
+    expect(wireEntity(e).border).toBe(RANK5);
+    expect(deedBorderSlug(RANK5)).toBe('reliquary_gilt');
+  });
+});
+
+// The two Book of Deeds cosmetic sets share ONE per-session token bucket
+// (server/cosmetic_op_guard.ts). Both `title` and `border` are identityFields
+// members, so an accepted set bumps idVer and re-wires the FULL identity
+// record to every in-range viewer BEFORE the distance-tier thinning, and the
+// command lane alone would allow that at 30/s. These arms drive the REAL
+// dispatch, and drive the guard's clock through Date.now (which is where
+// handleMessage stamps its receive time) rather than reaching into the bucket.
+describe('cosmetic set rate guard (one bucket for title and border)', () => {
+  const BORDER_DEED = 'prog_prestige_10';
+  const TITLE_DEED = 'prog_veteran';
+  const NOW_MS = 1_700_000_000_000;
+  let clock: ReturnType<typeof vi.spyOn> | null = null;
+
+  const freezeAt = (ms: number): void => {
+    clock?.mockRestore();
+    clock = vi.spyOn(Date, 'now').mockReturnValue(ms) as ReturnType<typeof vi.spyOn>;
+  };
+
+  afterEach(() => {
+    clock?.mockRestore();
+    clock = null;
+  });
+
+  /** A joined session holding both cosmetic deeds, with the clock frozen so
+   *  every frame below lands in the same second (the command lane's own burst
+   *  is 60, far above these counts, so a refusal here is the cosmetic guard). */
+  const wearer = () => {
+    freezeAt(NOW_MS);
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Flooder');
+    const meta = server.sim.players.get(session.pid)!;
+    meta.deedsEarned.set(BORDER_DEED, '2026-07-08');
+    meta.deedsEarned.set(TITLE_DEED, '2026-07-08');
+    return { server, session, meta };
+  };
+
+  const setBorder = (server: GameServer, session: ClientSession, id: string | null): void => {
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_border', deedId: id }));
+  };
+  const setTitle = (server: GameServer, session: ClientSession, id: string | null): void => {
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: id }));
+  };
+
+  it('pins the budget against disagreeing literals', () => {
+    // The arms below spend COSMETIC_OP_BURST tokens, so they would follow a
+    // silent budget change; these literals are what makes them decisive.
+    expect(COSMETIC_OP_BURST).toBe(10);
+    expect(COSMETIC_OP_REFILL_PER_SECOND).toBe(1);
+  });
+
+  it('lets a whole burst of alternating sets through, every one landing', () => {
+    const { server, session, meta } = wearer();
+    // Checked after EVERY frame: a guard that dropped one mid-burst would be
+    // invisible to an end-state assertion on an even count.
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) {
+      const wanted = i % 2 === 0 ? BORDER_DEED : null;
+      setBorder(server, session, wanted);
+      expect(meta.activeBorder, `set ${i} of the burst was dropped`).toBe(wanted);
+    }
+  });
+
+  it('stops changing state past the budget, and the sim setter stops being called', () => {
+    const { server, session, meta } = wearer();
+    for (let i = 0; i < COSMETIC_OP_BURST - 1; i++) setBorder(server, session, BORDER_DEED);
+    // The last token buys the state we then hold frozen through the flood.
+    setBorder(server, session, BORDER_DEED);
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+
+    // A state-only assertion cannot tell a dropped frame from one the sim
+    // validator refused, so spy on the CALL: past the budget the frame never
+    // reaches the sim at all.
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+    for (let i = 0; i < 12; i++) setBorder(server, session, null);
+    expect(setter).not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBe(BORDER_DEED);
+    setter.mockRestore();
+  });
+
+  it('draws BOTH commands from the same bucket (titles exhaust it for borders)', () => {
+    const { server, session, meta } = wearer();
+    // Spend the whole budget on titles only.
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) {
+      setTitle(server, session, i % 2 === 0 ? TITLE_DEED : null);
+    }
+    expect(meta.activeTitle).toBeNull(); // the even-count burst ends cleared
+
+    // A perfectly valid border set now finds the shared bucket empty: two
+    // buckets would let an alternating flooder buy twice the re-wire budget.
+    const setter = vi.spyOn(server.sim, 'setActiveBorder');
+    setBorder(server, session, BORDER_DEED);
+    expect(setter).not.toHaveBeenCalled();
+    expect(meta.activeBorder).toBeNull();
+    setter.mockRestore();
+  });
+
+  it('refills one op per second of received time, and no more', () => {
+    const { server, session, meta } = wearer();
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) setBorder(server, session, BORDER_DEED);
+    setBorder(server, session, null);
+    expect(meta.activeBorder).toBe(BORDER_DEED); // drained: the clear was dropped
+
+    freezeAt(NOW_MS + 1000); // exactly one refilled token
+    setBorder(server, session, null);
+    expect(meta.activeBorder).toBeNull();
+    setBorder(server, session, BORDER_DEED);
+    expect(meta.activeBorder).toBeNull(); // and nothing beyond that one
+  });
+
+  it('books a cosmetic drop-cause metric when the bucket refuses a set', () => {
+    // The refusal path in consumeCosmeticOp books wsMessageDropped('cosmetic')
+    // and tallies into the abuse window; both could be deleted with every other
+    // arm in this describe still green. Spy on the shared counters singleton
+    // (gameMetricsCounters returns activeCounters) AFTER the burst so it only
+    // sees the post-drain refusal.
+    const { server, session } = wearer();
+    for (let i = 0; i < COSMETIC_OP_BURST; i++) setBorder(server, session, BORDER_DEED);
+    const dropped = vi.spyOn(gameMetricsCounters(), 'wsMessageDropped');
+    setBorder(server, session, null); // bucket empty: refused, so booked
+    expect(dropped).toHaveBeenCalledWith('cosmetic');
+    dropped.mockRestore();
   });
 });
 
@@ -3247,33 +4121,52 @@ describe('online mount command and race-event transport', () => {
 
 // The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
-// source, so any unregistered delta key reddens this gate. All but two ride
+// source, so any unregistered delta key reddens this gate. All but three ride
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
 // fragments, each serialized at most once per tick by a realm-readout memo and
-// shared across viewers), not plain `maybe(...)`. The count is the union of the
-// release's realm-readout keys and the procedural-dungeon branch's rift delta keys.
+// shared across viewers), and `reliq` is `maybeRaw(...)` too but for a different
+// memo: a PER-CHARACTER blob serialized once per state revision
+// (reliquaryWireJson), never shared across viewers. The count is the union of the
+// release's realm-readout keys, the procedural-dungeon branch's rift delta keys,
+// and the 16 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present self
+// record and behind this same delta gate, since they change far less often than
+// the reconciliation-critical fields (resource, gcd, swing, combo, target...)
+// that stay unconditional.
 const ALL_DELTA_KEYS = [
+  'aborder',
   'achg',
   'achr',
+  'ap',
+  'app',
   'arena',
   'atitle',
   'bags',
   'bank',
+  'bg',
+  'blk',
   'buyback',
+  'bval',
   'cardDuel',
   'cds',
+  'copper',
+  'corder',
   'corpse',
   'cosmetics',
   'cprof',
+  'crat',
+  'crit',
   'dclears',
   'dcomp',
   'dcompanion',
+  'ddiff',
   'deeds',
   'delveDaily',
   'denc',
   'df',
   'dfb',
   'dmarks',
+  'dodge',
   'drun',
   'dstats',
   'duel',
@@ -3281,13 +4174,17 @@ const ALL_DELTA_KEYS = [
   'ench',
   'equip',
   'gprof',
+  'guildBank',
   'hbl',
+  'hirat',
   'honor',
+  'hrat',
   'inv',
   'lhonor',
   'lockouts',
   'lroll',
   'lrollg',
+  'lxp',
   'mail',
   'mailU',
   'market',
@@ -3302,20 +4199,36 @@ const ALL_DELTA_KEYS = [
   'mst',
   'ncd',
   'party',
+  'prk',
   'prof',
+  'ptime',
   'qdone',
   'qlog',
+  'reliq',
   'renown',
+  'rxp',
   'salv',
+  'sh',
+  'sp',
   'sport',
   'stats',
   'tal',
   'tfocus',
   'trade',
+  'tslot',
   'vcup',
   'vcupb',
   'weapon',
+  'xp',
 ] as const;
+
+/** The delta keys a FRESH session is guaranteed to receive on its first
+ *  snapshot. Every registered key but one: `app` is the authored modular look,
+ *  and a character created before the creator (or by a client that posts no
+ *  appearance) has none, so it stays sparse on the wire the way `eq`/`eqi` do
+ *  on the entity record. Its own round trip is pinned in
+ *  tests/appearance_broadcast.test.ts, including that it ships exactly once. */
+const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app');
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
 // string IS the protocol (contract #4): a terse key renamed on one side passes tsc
@@ -3328,7 +4241,9 @@ const ALL_DELTA_KEYS = [
 // they merge into one `cupInfo` (per-viewer remainder on vcup, realm-wide fragment
 // on vcupb), so neither key alone equals the full CupInfo target.
 const TERSE_TO_IWORLD: Record<string, string> = {
+  aborder: 'activeBorder',
   achg: 'abilityCharges',
+  ap: 'attackPower',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
   bags: 'bags',
@@ -3337,16 +4252,21 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cds: 'cooldowns',
+  corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
+  crat: 'critRating',
+  crit: 'critChance',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
+  ddiff: 'dungeonDifficulty',
   deeds: 'deedsEarned',
   denc: 'lastDisenchantResult',
   df: 'dungeonFinderInfo',
   dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
+  dodge: 'dodgeChance',
   drun: 'delveRun',
   dstats: 'deedStats',
   duel: 'duelInfo',
@@ -3354,6 +4274,9 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ench: 'lastEnchantResult',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
+  guildBank: 'guildBankInfo',
+  hirat: 'hitRating',
+  hrat: 'hasteRating',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
@@ -3376,14 +4299,18 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   party: 'partyInfo',
   prk: 'prestigeRank',
   prof: 'professionsState',
+  ptime: 'playtimeSeconds',
   qdone: 'questsDone',
   qlog: 'questLog',
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
+  sh: 'spellHaste',
+  sp: 'spellPower',
   sport: 'sportRole',
   tfocus: 'townFocus',
+  tslot: 'toolEffectSlots',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -3432,6 +4359,11 @@ function dirtyEveryDeltaField(): {
   sim.enterDelve('collapsed_reliquary', 'normal', lp);
   const p = sim.entities.get(lp)!;
 
+  // An authored modular look (app). Sparse on the wire (a character created
+  // before the creator has none), so the fixture stamps one, exactly as the
+  // join path does from the character's own column.
+  p.modularAppearance = { gender: 'female', hair: 'highbun' };
+
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
   run.companion = { companionId: 'companion_tessa', entityId: mp };
@@ -3441,7 +4373,11 @@ function dirtyEveryDeltaField(): {
   if (merchant) merchant.pos = { ...p.pos };
   // `mktU`: credit a pending collection so the collect-indicator bit is 1 (the
   // name key merges into the canonical seller key on first read).
-  (sim.market as any).marketCollections.set(meta.name, { copper: 95, items: [] });
+  (sim.market as any).marketCollections.set(meta.name, {
+    copper: 95,
+    items: [],
+    sales: emptySaleLog(),
+  });
   // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
   // player. `mailU` is already non-zero: every fresh character got the one-time
   // Ravenpost welcome letter (delay 0) at join.
@@ -3452,6 +4388,16 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // `guildBank`: guildBankInfoFor additionally needs a guild membership stamp
+  // (any rank; officer-plus here also exercises canEdit true over the wire)
+  // and a loaded guild book (the banker relocated above covers proximity);
+  // a non-empty treasury + slot makes the mirror distinguishable.
+  sim.setPlayerGuildMembership(lp, { guildId: 7, rank: 'officer' });
+  sim.loadGuildBank(7, {
+    treasury: 12345,
+    inventory: [{ itemId: 'wolf_fang', count: 4 }],
+    purchasedSlots: 30, // opened (24) + one expansion: a valid ladder position
+  });
 
   // Direct PlayerMeta fields.
   // The reins item both dirties `inv` further and flips `mntOwn` (the owned
@@ -3479,6 +4425,21 @@ function dirtyEveryDeltaField(): {
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0 };
+  // tslot: a REAL slotted effect, not the empty default. Without this the key
+  // rides the first snapshot as `[]`, which is not null, so it passes the
+  // "dirtied to a non-default value" loop below vacuously and nothing anywhere
+  // proves a slot reaches a client. Written straight onto meta (this fixture
+  // predates the acquisition craft's charm-consuming command and stays a
+  // direct write on purpose: the wire shape under test is the DELTA, not the
+  // mint) at the charges a common tier-1 pick mints.
+  meta.toolEffectSlots = {
+    mining: {
+      effectId: 'gatherers_cache',
+      durability: 12,
+      maxDurability: 20,
+      confirmMode: 'always',
+    },
+  };
   meta.craftSkills.armorcrafting = 31;
   meta.craftSkills.weaponcrafting = 29;
   meta.archetype = {
@@ -3488,6 +4449,7 @@ function dirtyEveryDeltaField(): {
     attunedPairs: ['weaponcrafting+armorcrafting'],
     switchCount: 2,
     amendsProgress: 4,
+    isJackOfAllTrades: false,
   };
   // An ACTIVE mobile crafting station (`mst`): set directly on the
   // meta slot (the placement command's specialization gate is pinned in
@@ -3524,8 +4486,10 @@ function dirtyEveryDeltaField(): {
   };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
-  // sets, and a clear record, a renown total, and an active title
-  // (prog_veteran carries a title reward, so the sim setter would accept it).
+  // sets, and a clear record, a renown total, an active title
+  // (prog_veteran carries a title reward, so the sim setter would accept it)
+  // and an active nameplate border (prog_prestige_10 carries a border reward,
+  // the other reward kind, so a swapped kind check would redden).
   meta.deedsEarned.set('prog_first_steps', '2026-07-01');
   meta.deedsEarned.set('prog_veteran', '2026-07-08');
   meta.deedStats.counters.kills = 7;
@@ -3534,6 +4498,22 @@ function dirtyEveryDeltaField(): {
   meta.deedStats.dungeonClears.hollow_crypt = 2;
   meta.renown = 15;
   meta.activeTitle = 'prog_veteran';
+  meta.activeBorder = 'prog_prestige_10';
+  // Reliquary sparse blob (`reliq`): one catalogued first-find with BOTH of the
+  // entry's fields (clears provenance and the Phase 17 obtain tally, which
+  // rides folded onto the entry rather than as a fourth top-level key) plus a
+  // capped recent, so the codec pin is non-vacuous (empty {} would pass
+  // first-snapshot only).
+  //
+  // Through the real WRITE SEAMS, never by hand-mutating the state: the wire
+  // blob is memoized per state revision, and only these functions bump it. A
+  // hand-mutated fixture is a lie that happens to work, because it sits before
+  // this session's first memo build; move it after one and the fixture would
+  // silently stop reaching the wire. tests/reliquary_wire.test.ts made the same
+  // move for the same reason. (The clear meter feeding the stamp is the
+  // dungeonClears assignment in the deed-stats block above.)
+  noteRelicItemFind(meta, 'cryptbone_helm');
+  noteRelicObtain(meta, 'cryptbone_helm', 3);
   // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
   meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
@@ -3652,6 +4632,7 @@ describe('full self-state snapshot delta fixture', () => {
       attunedPairs: ['weaponcrafting+armorcrafting'],
       switchCount: 0,
       amendsProgress: 0,
+      isJackOfAllTrades: false,
     };
     // Reagents for the warplate helm.
     meta.inventory = [
@@ -3682,6 +4663,7 @@ describe('full self-state snapshot delta fixture', () => {
       session,
       JSON.stringify({ t: 'cmd', cmd: 'craft_item', recipe: recipe.id }),
     );
+    completeCraftCast(server.sim as never, session.pid);
     expect(server.sim.countItem(recipe.resultItemId, session.pid)).toBe(1);
   });
 
@@ -3820,10 +4802,22 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.tradeInfo as any)?.otherPid).toBe(memberPid); // trade -> tradeInfo
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
+    expect(client.bgInfo).not.toBeNull(); // bg -> bgInfo (queue/standing readout)
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
+    // guild bank mirror: the membership-gated boundary clone survives the wire
+    // whole, canEdit included (the client renders read-only panes from it)
+    expect(client.guildBankInfo).toEqual({
+      treasury: 12345,
+      slots: [{ itemId: 'wolf_fang', count: 4 }],
+      capacity: 30,
+      purchasedSlots: 30,
+      nextExpansionPrice: 50000, // rung-2 literal
+      canEdit: true,
+    });
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
     // only: the curate-phase master roll is master-looter-only, and roll 1 (a plain
@@ -3862,6 +4856,21 @@ describe('full self-state snapshot delta fixture', () => {
       herbalism: 0,
       fishing: 0,
     }); // gprof -> gatheringProficiency
+    // tslot -> toolEffectSlots: the projected row shape, so a decode onto the
+    // wrong field or a renamed wire key reddens here rather than silently
+    // leaving the HUD empty. craftedBy is deliberately not projected; what
+    // crosses instead is the R48 selfCrafted boolean (false here: the
+    // fixture's direct meta write recorded no crafter).
+    expect(client.toolEffectSlots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 20,
+        confirmMode: 'always',
+        selfCrafted: false,
+      },
+    ]);
     // ncd -> nodeHarvestableByMe: the cooling-down node reads not-ready, an
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
@@ -3934,6 +4943,15 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.deedStats.dungeonClears).toEqual({ hollow_crypt: 2 });
     expect(client.renown).toBe(15); // renown (same name both sides, no rename)
     expect(client.activeTitle).toBe('prog_veteran'); // atitle -> activeTitle
+    expect(client.activeBorder).toBe('prog_prestige_10'); // aborder -> activeBorder
+    // reliq fans out to reliquaryFirstFind / Marks / Recent (asserted directly like
+    // tal; no TERSE_TO_IWORLD rename). Sparse blob only; not a second discovery set.
+    // Phase 17 wire shape change: pageId dropped from the entry, the obtain
+    // tally folded onto it. The mirror splits `count` back out into
+    // reliquaryObtainCounts, so the entry itself carries clears alone.
+    expect(client.reliquaryFirstFind.cryptbone_helm).toEqual({ clears: 2 });
+    expect(client.reliquaryObtainCounts).toEqual({ cryptbone_helm: 3 });
+    expect(client.reliquaryRecent).toEqual(['cryptbone_helm']);
     // tal -> talents / talentSpec / loadouts / activeLoadout
     expect(client.talents).toEqual({ spec: 'arms', rows: {} });
     expect(client.talentSpec).toBe('arms');
@@ -3958,6 +4976,38 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.cupInfo?.role).toBe('keeper'); // per-viewer field, arrived on vcup
     expect(Object.keys(client.cupInfo?.queueSizes ?? {}).sort()).toEqual(['1', '2', '3', '4', '5']); // realm-wide field, arrived on vcupb
     expect(client.cupInfo?.live).toBeNull(); // no live match in the fixture
+  });
+
+  it('mirrors canEdit FALSE for a member-rank viewer (the read-only arm over the real wire)', () => {
+    // The fixture above rides canEdit true (officer). This is the negative the
+    // feature exists for: a plain member's snapshot must arrive non-null with
+    // canEdit false, and a demotion mid-session must flip the live mirror
+    // without nulling it.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 91, 'Grunt');
+    const sim = server.sim;
+    const p = sim.entities.get(session.pid)!;
+    const banker = sim.entities.get(sim.bankerIds[0])!;
+    banker.pos = { ...p.pos };
+    sim.setPlayerGuildMembership(session.pid, { guildId: 9, rank: 'officer' });
+    sim.loadGuildBank(9, {
+      treasury: 777,
+      inventory: [{ itemId: 'wolf_fang', count: 4 }],
+      purchasedSlots: 24,
+    });
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.guildBankInfo?.canEdit).toBe(true);
+    // The demotion re-stamp: same guild, member rank. The stream must STAY
+    // (read-only view), only the edit verdict flips.
+    sim.setPlayerGuildMembership(session.pid, { guildId: 9, rank: 'member' });
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.guildBankInfo).not.toBeNull();
+    expect(client.guildBankInfo?.canEdit).toBe(false);
+    expect(client.guildBankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
   });
 
   it('keeps the live ride distinct from the persisted mount pick on self snapshots', () => {
@@ -4091,9 +5141,23 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 62 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(62);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(62);
+  it('ALL_DELTA_KEYS contains exactly 86 unique keys in sorted order', () => {
+    // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
+    // commission order board's corder key (issue #1298), +1: the character
+    // sheet's lifetime played-time key ptime, for 67, then +16: the static
+    // combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/crat/
+    // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
+    // self record and behind this same delta gate, for 83, then +1 reliq
+    // (Reliquary Phase 3 sparse blob), +1 aborder (the Book of Deeds nameplate
+    // border echo, atitle's sibling), and +1 `app` (the release's authored
+    // modular look, which cannot come from the entity list because the
+    // broadcast loop skips the viewer's own entity, and which is heavy and
+    // immutable so it rides this channel instead of re-serializing per tick),
+    // for 86. Every v0.36.0 sync conflicts here because each side pins its own
+    // additions alone; the merged tree carries all of them, and this number
+    // came from a run on the merged tree.
+    expect(ALL_DELTA_KEYS).toHaveLength(86);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(86);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4112,11 +5176,61 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
+    expect(scraped.has('reliq')).toBe(true); // Reliquary Phase 3 sparse self blob
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
-    // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62.
-    expect(scraped.size).toBe(62);
+    // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
+    // plus the packet's slotted-tool-effects key tslot for 63, the
+    // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
+    // for 65, this branch's commission order board key corder
+    // (issue #1298) for 66, and the character sheet's lifetime played-time
+    // key ptime for 67, then the 16 static combat-rating/progression scalars
+    // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
+    // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
+    // border echo aborder for 85, and the authored modular look `app` for 86.
+    expect(scraped.size).toBe(86);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
+  });
+
+  it('mntOwn is encoded INSIDE the heavy self gate (its inputs sit behind it)', () => {
+    // The owned-mounts walk (full inventory AND bank scan with an ITEMS
+    // lookup per slot, per viewer per pass) rode outside the gate at the
+    // v0.32.0 merge; a straight revert to the ungated position stays green
+    // on every wire-observing sweep (an unchanged value elides either way),
+    // so the placement itself is pinned two ways: the source order here, and
+    // the call-elision spy below, which observes the WORK the gate exists to
+    // skip rather than the bytes it cannot change.
+    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+    const gateAt = raw.indexOf('if (heavyDue) {');
+    const mntOwnAt = raw.indexOf("maybe('mntOwn'");
+    const siblingAt = raw.indexOf("maybe('qdone'");
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(mntOwnAt).toBeGreaterThan(gateAt);
+    expect(mntOwnAt).toBeLessThan(siblingAt);
+  });
+
+  it('a non-heavy pass never runs the owned-mounts walk; a heavy-dirty one does', () => {
+    // The behavioral half of the placement pin above: the gate's whole point
+    // is skipping the walk, so spy on the CALL. A quiet pass (not dirty,
+    // same wireRev, off the staggered refresh slot) must not invoke
+    // ownedMountsFor; flipping selfHeavyDirty must.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 61, 'Rider');
+    broadcast(server); // the join's own heavy pass, so the gate state settles
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('missing meta');
+    session.selfHeavyDirty = false;
+    session.lastWireRev = meta.wireRev;
+    // Step off the staggered refresh slot so heavyDue is false for certain.
+    while ((server.sim.tickCount + session.pid) % 40 === 0) server.sim.tick();
+    const walk = vi.spyOn(server.sim, 'ownedMountsFor');
+    broadcast(server);
+    expect(walk).not.toHaveBeenCalled();
+    session.selfHeavyDirty = true;
+    broadcast(server);
+    expect(walk).toHaveBeenCalledWith(session.pid);
+    walk.mockRestore();
   });
 
   it('TERSE_TO_IWORLD pins the terse-key to IWorld-name renames in sorted membership', () => {
@@ -4135,6 +5249,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       dcomp: 'companionUpgrades',
       dclears: 'delveClears',
       atitle: 'activeTitle',
+      aborder: 'activeBorder',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
       mntLesson: 'mountLessonActive',
@@ -4158,11 +5273,17 @@ describe('delta-key contract pins (anti-drift)', () => {
     // past the sorted-membership and delta-key-or-scalar checks; pin it out here.
     expect('vcup' in TERSE_TO_IWORLD).toBe(false);
     expect('vcupb' in TERSE_TO_IWORLD).toBe(false);
+    // reliq fans out to three IWorld members (firstFind / marks / recent), so it
+    // is asserted directly and must never grow a single-target rename entry.
+    expect('reliq' in TERSE_TO_IWORLD).toBe(false);
     // sorted-membership pin: adding or renaming an entry must be a deliberate,
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());
-    // every entry is either a delta key or one of the always-present self scalars
-    const SELF_SCALARS = new Set(['blk', 'bval', 'res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
+    // every entry is either a delta key or one of the always-present self scalars.
+    // blk/bval/lxp/rxp/prk moved into ALL_DELTA_KEYS alongside the rest of the
+    // static combat-rating/progression cohort, so only res/mres/rtype are left
+    // always-present here.
+    const SELF_SCALARS = new Set(['res', 'mres', 'rtype']);
     for (const terse of Object.keys(TERSE_TO_IWORLD)) {
       expect(
         (ALL_DELTA_KEYS as readonly string[]).includes(terse) || SELF_SCALARS.has(terse),
@@ -4500,6 +5621,79 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(mirror.unbreakableControl).toBe(true);
   });
 
+  it('round-trips the break-threshold armed marker so the dread band renders online', () => {
+    // The v0.34.0 merge audit: the release added the presence-only bt emit
+    // (server/game.ts WireAura) for the Lingering Dread victim band, but no
+    // client decode existed, so the band (ability_vfx/painter.ts, gated on
+    // breakThreshold !== undefined) could never render for online mirrors.
+    // Presence-only both ways: the value never crosses the wire.
+    const talentedFear: Aura = {
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: 0,
+      school: 'shadow',
+      breakThreshold: 120,
+    };
+    const { wire, mirror } = roundTrip(talentedFear);
+    expect(wireAura(wire, 'fear_incap').bt).toBe(1);
+    expect('breakThreshold' in wireAura(wire, 'fear_incap')).toBe(false); // presence-only: no value leak
+    expect(mirror.breakThreshold).not.toBeUndefined();
+
+    // And the negative arm: an untalented fear (no threshold) stays unmarked
+    // and mirrors to undefined, so the band gate stays closed.
+    const plainFear: Aura = { ...talentedFear, breakThreshold: undefined };
+    const plain = roundTrip(plainFear);
+    expect('bt' in wireAura(plain.wire, 'fear_incap')).toBe(false);
+    expect(plain.mirror.breakThreshold).toBeUndefined();
+  });
+
+  it('clears the armed marker through the in-place decode arm when bt drops', () => {
+    // The 20 Hz path: a persisting aura re-uses its mirrored record through
+    // the sameAuraShape fast path (aura identity unchanged between
+    // snapshots), which is the ONE arm where `= undefined` carries clearing
+    // semantics: a fear_incap slot re-armed by an untalented fear must lose
+    // the band, not wear a stale one. roundTrip cannot reach this arm (it
+    // builds a fresh client per call), so this drives two snapshots into
+    // one client by hand.
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
+    const pid = sim.addPlayer('warrior', 'Dreaded');
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: 0,
+      school: 'shadow',
+      breakThreshold: 120,
+    });
+    const client = bareClient(999);
+    (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
+    const armed = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    expect(armed.breakThreshold).not.toBeUndefined();
+
+    // Same aura identity, threshold gone: the in-place arm must CLEAR it.
+    e.auras[e.auras.length - 1].breakThreshold = undefined;
+    (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
+    const mirrored = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    // The fast path updates the SAME record object; assert both the clear
+    // and the reuse, so this pin cannot silently slide onto the fresh-array
+    // arm if the shape check ever changes.
+    expect(mirrored).toBe(armed);
+    expect(mirrored.breakThreshold).toBeUndefined();
+  });
+
   it('round-trips the imbue judgement range (value2/value3), value omitted when 0', () => {
     const imbue: Aura = {
       id: 'holy_might',
@@ -4507,22 +5701,20 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
       kind: 'imbue',
       remaining: 300,
       duration: 300,
-      value: 0, // imbue carries its numbers in value2/value3, so value stays 0...
+      value: 0,
       value2: 8,
       value3: 12,
       sourceId: 0,
       school: 'holy',
     };
     const { wire, mirror } = roundTrip(imbue);
-    expect('value' in wireAura(wire, 'holy_might')).toBe(false); // ...and is omitted (decodes 0)
+    expect('value' in wireAura(wire, 'holy_might')).toBe(false);
     expect(wireAura(wire, 'holy_might').value2).toBe(8);
     expect(wireAura(wire, 'holy_might').value3).toBe(12);
     expect(mirror.value2).toBe(8);
     expect(mirror.value3).toBe(12);
     const desc = auraEffectDescriptor(mirror);
-    expect(desc?.key).toBe('hudChrome.auraEffect.imbueRange');
-    expect(desc?.nums?.min).toBe(8);
-    expect(desc?.nums?.max).toBe(12);
+    expect(desc?.key).toBe('hudChrome.auraEffect.imbue');
   });
 
   it('tolerates an old-server wire aura with no value (backward compatible -> 0)', () => {
@@ -4908,6 +6100,54 @@ describe('Temporal Hourglass snapshot parity', () => {
   });
 });
 
+describe('Consecration snapshot parity', () => {
+  it('mirrors active holy ground and clears zones missing from the next snapshot', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      consecrations: [{ id: 'consecration:1:20', x: 3, z: 5, r: 8, dur: 9, rem: 6.5 }],
+    });
+    expect(client.activeConsecrations).toEqual([
+      { id: 'consecration:1:20', x: 3, z: 5, radius: 8, duration: 9, remaining: 6.5 },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeConsecrations).toEqual([]);
+  });
+
+  it('interest-scopes holy ground with its authoritative remaining lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Lightwire', 'paladin');
+    const caster = server.sim.entities.get(session.pid)!;
+    (server.sim as any).groundAoEs.push({
+      sourceId: caster.id,
+      pos: { x: caster.pos.x + 4, y: caster.pos.y, z: caster.pos.z },
+      radius: 8,
+      min: 22,
+      max: 28,
+      remaining: 6.5,
+      interval: 1,
+      tickTimer: 0.5,
+      school: 'holy',
+      ability: 'Consecration',
+      consecration: { id: `consecration:${caster.id}:10`, duration: 9 },
+    });
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).consecrations).toEqual([
+      expect.objectContaining({
+        id: `consecration:${caster.id}:10`,
+        r: 8,
+        dur: 9,
+        rem: 6.5,
+      }),
+    ]);
+  });
+});
+
 describe('authoritative interaction command outcomes', () => {
   it.each([
     ['loot', { id: -1 }],
@@ -4975,8 +6215,157 @@ describe('authoritative interaction command outcomes', () => {
   });
 });
 
-describe('negotiated stable timer wire v2', () => {
-  const timerV2 = { timerWireVersion: 2 } as unknown as Parameters<GameServer['join']>[7];
+describe('negotiated Warlock pet-special wire v1', () => {
+  it('advertises the button only to capable clients and disables hidden legacy autocast', () => {
+    const server = new GameServer();
+    const legacyWire = fakeWs();
+    const capableWire = fakeWs();
+    const legacy = joinServer(server, legacyWire, 1, 'Legacy', 'warlock');
+    const capable = joinServer(server, capableWire, 2, 'Capable', 'warlock', {
+      petSpecialWireVersion: 1,
+    } as Parameters<GameServer['join']>[7]);
+    const legacyOwner = server.sim.entities.get(legacy.pid)!;
+    const capableOwner = server.sim.entities.get(capable.pid)!;
+
+    summonPet(server.sim.ctx, legacyOwner, 'gloomshade');
+    summonPet(server.sim.ctx, capableOwner, 'gloomshade');
+    const legacyPet = petOf(server.sim.ctx, legacy.pid)!;
+    const capablePet = petOf(server.sim.ctx, capable.pid)!;
+    expect(legacyPet.petAutoSkill).toBe(false);
+    expect(capablePet.petAutoSkill).toBe(true);
+
+    const legacyTarget = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      x: legacyPet.pos.x,
+      y: legacyPet.pos.y,
+      z: legacyPet.pos.z + 12,
+    });
+    const capableTarget = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      x: capablePet.pos.x,
+      y: capablePet.pos.y,
+      z: capablePet.pos.z + 12,
+    });
+    server.sim.addEntity(legacyTarget);
+    server.sim.addEntity(capableTarget);
+    legacyOwner.targetId = legacyTarget.id;
+    capableOwner.targetId = capableTarget.id;
+
+    server.handleMessage(legacy, JSON.stringify({ t: 'cmd', cmd: 'pet_special' }));
+    expect(legacyPet.petSkillTimer).toBe(0);
+    expect(
+      Math.hypot(legacyTarget.pos.x - legacyPet.pos.x, legacyTarget.pos.z - legacyPet.pos.z),
+    ).toBe(12);
+    server.handleMessage(capable, JSON.stringify({ t: 'cmd', cmd: 'pet_special' }));
+    expect(capablePet.petSkillTimer).toBe(15);
+    expect(
+      Math.hypot(capableTarget.pos.x - capablePet.pos.x, capableTarget.pos.z - capablePet.pos.z),
+    ).toBeCloseTo(2.8, 1);
+
+    server.handleMessage(
+      legacy,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: true }),
+    );
+    expect(petOf(server.sim.ctx, legacy.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: false }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: 'true' }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(false);
+    server.handleMessage(
+      capable,
+      JSON.stringify({ t: 'cmd', cmd: 'pet_auto_special', enabled: true }),
+    );
+    expect(petOf(server.sim.ctx, capable.pid)?.petAutoSkill).toBe(true);
+
+    broadcast(server);
+    const legacySnap = lastSnap(legacyWire.sent);
+    const capableSnap = lastSnap(capableWire.sent);
+    expect(legacySnap.psw).toBeUndefined();
+    expect(capableSnap.psw).toBe(1);
+
+    const legacyClient = bareClient(legacy.pid, { playerClass: 'warlock' });
+    const capableClient = bareClient(capable.pid, { playerClass: 'warlock' });
+    (legacyClient as any).applySnapshot(legacySnap);
+    (capableClient as any).applySnapshot(capableSnap);
+    expect(legacyClient.petSpecialCommandsSupported).toBe(false);
+    expect(capableClient.petSpecialCommandsSupported).toBe(true);
+
+    (capableClient as any).applySnapshot({ ...capableSnap, psw: 2 });
+    expect(capableClient.petSpecialCommandsSupported).toBe(false);
+  });
+
+  it('disarms a legacy restored special pet before the first server tick', () => {
+    const source = new Sim({ seed: 991, playerClass: 'warlock', noPlayer: true });
+    const sourcePid = source.addPlayer('warlock', 'Source');
+    source.setPlayerLevel(20, sourcePid);
+    const sourceOwner = source.entities.get(sourcePid)!;
+    summonPet(source.ctx, sourceOwner, 'gloomshade');
+    const state = source.serializeCharacter(sourcePid)!;
+    state.pet = serializePet(source.ctx, sourcePid);
+
+    const server = new GameServer();
+    const wire = fakeWs();
+    const joined = server.join(wire.ws, 3, 3, 'LegacyRestore', 'warlock', state);
+    if ('error' in joined) throw new Error(joined.error);
+
+    expect(petOf(server.sim.ctx, joined.pid)?.petAutoSkill).toBe(false);
+  });
+
+  it('refreshes pet-special capability on linkdead resume and disarms a downgrade', () => {
+    const server = new GameServer();
+    const firstWire = fakeWs();
+    const original = joinServer(server, firstWire, 4, 'ResumeDemonist', 'warlock', {
+      petSpecialWireVersion: 1,
+    } as Parameters<GameServer['join']>[7]);
+    const owner = server.sim.entities.get(original.pid)!;
+    summonPet(server.sim.ctx, owner, 'gloomshade');
+    const pet = petOf(server.sim.ctx, original.pid)!;
+    expect(pet.petAutoSkill).toBe(true);
+
+    firstWire.ws.readyState = 3;
+    expect(server.socketClosed(original, firstWire.ws)).toBe(true);
+    const legacyWire = fakeWs();
+    const legacyResume = server.join(legacyWire.ws, 4, 4, 'ResumeDemonist', 'warlock', null);
+    if ('error' in legacyResume) throw new Error(legacyResume.error);
+    expect(legacyResume).toBe(original);
+    expect(legacyResume.petSpecialWireVersion).toBe(0);
+    expect(owner.petSpecialCommandsSupported).toBe(false);
+    expect(pet.petAutoSkill).toBe(false);
+    legacyWire.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(legacyWire.sent).psw).toBeUndefined();
+
+    legacyWire.ws.readyState = 3;
+    expect(server.socketClosed(legacyResume, legacyWire.ws)).toBe(true);
+    const capableWire = fakeWs();
+    const capableResume = server.join(
+      capableWire.ws,
+      4,
+      4,
+      'ResumeDemonist',
+      'warlock',
+      null,
+      false,
+      { petSpecialWireVersion: 1 } as Parameters<GameServer['join']>[7],
+    );
+    if ('error' in capableResume) throw new Error(capableResume.error);
+    expect(capableResume).toBe(original);
+    expect(capableResume.petSpecialWireVersion).toBe(1);
+    expect(owner.petSpecialCommandsSupported).toBe(true);
+    capableWire.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(capableWire.sent).psw).toBe(1);
+  });
+});
+
+describe('negotiated stable timer wire v3', () => {
+  const timerV3 = {
+    timerWireVersion: STABLE_TIMER_WIRE_VERSION,
+  } as unknown as Parameters<GameServer['join']>[7];
 
   function testAura(id: string, remaining: number, value = 7): Aura {
     return {
@@ -5019,10 +6408,53 @@ describe('negotiated stable timer wire v2', () => {
     expect(second.self.ncd.legacy_node).toBeLessThan(30);
   });
 
+  it('round-trips permanent auras through legacy and stable server snapshots', () => {
+    for (const stable of [false, true]) {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const session = joinServer(
+        server,
+        fc,
+        stable ? 21 : 20,
+        stable ? 'StablePermanent' : 'LegacyPermanent',
+        'paladin',
+        stable ? timerV3 : undefined,
+      );
+      const player = server.sim.entities.get(session.pid)!;
+      const permanent = testAura('devotion_ward', Number.POSITIVE_INFINITY, 0.05);
+      permanent.kind = 'buff_dr';
+      permanent.school = 'holy';
+      permanent.permanent = true;
+      player.auras = [permanent];
+
+      broadcast(server);
+      const snapshot = lastSnap(fc.sent);
+      expect(snapshot.self.auras[0]).toMatchObject({
+        id: 'devotion_ward',
+        perm: 1,
+      });
+      expect(snapshot.self.auras[0]).not.toHaveProperty('exp');
+      if (stable) expect(snapshot.self.auras[0]).not.toHaveProperty('rem');
+      else {
+        expect(snapshot.self.auras[0].dur).toBeGreaterThan(0);
+        expect(snapshot.self.auras[0].rem).toBe(snapshot.self.auras[0].dur);
+      }
+
+      const client = bareClient(session.pid, { playerClass: 'paladin' });
+      (client as any).applySnapshot(snapshot);
+      expect(client.player.auras[0]).toMatchObject({
+        id: 'devotion_ward',
+        permanent: true,
+        remaining: Number.POSITIVE_INFINITY,
+        duration: Number.POSITIVE_INFINITY,
+      });
+    }
+  });
+
   it('sends a complete stable first snapshot, then ages omitted timers across skipped ticks', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Stable', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Stable', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     const meta = server.sim.meta(session.pid)!;
     player.auras = [];
@@ -5041,7 +6473,7 @@ describe('negotiated stable timer wire v2', () => {
 
     broadcast(server);
     const first = lastSnap(fc.sent);
-    expect(first.tw).toBe(2);
+    expect(first.tw).toBe(STABLE_TIMER_WIRE_VERSION);
     expect(first.self.auras[0]).toMatchObject({ id: 'stable_aura', exp: 10 });
     expect(first.self.auras[0]).not.toHaveProperty('rem');
     expect(first.self.cds.stable_cast).toBe(5);
@@ -5121,7 +6553,7 @@ describe('negotiated stable timer wire v2', () => {
   it('re-sends aura refreshes, reorder, values, stacks, and charges without timer churn', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'AuraMutations', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'AuraMutations', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     const firstAura = testAura('first', 10, 2);
@@ -5156,7 +6588,7 @@ describe('negotiated stable timer wire v2', () => {
   it('keeps rate-aware cooldown deadlines stable through Temporal Hourglass acceleration', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Accelerated', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Accelerated', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     player.auras.push({
@@ -5213,7 +6645,7 @@ describe('negotiated stable timer wire v2', () => {
   it('freezes retained auras while dead, then resumes absolute decay after resurrection', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Paused', 'mage', timerV2);
+    const session = joinServer(server, fc, 1, 'Paused', 'mage', timerV3);
     const player = server.sim.entities.get(session.pid)!;
     player.auras = [];
     player.auras.push(testAura('retained', 8));
@@ -5258,12 +6690,12 @@ describe('negotiated stable timer wire v2', () => {
     expect(client.player.auras[0].remaining).toBeCloseTo(frozenRemaining - 0.1, 5);
   });
 
-  it('keeps legacy and v2 entity variants isolated and builds each at most once per tick', () => {
+  it('keeps legacy and stable entity variants isolated and builds each at most once per tick', () => {
     const server = new GameServer();
     const stableWs = fakeWs();
     const legacyWs = fakeWs();
     const subjectWs = fakeWs();
-    const stable = joinServer(server, stableWs, 1, 'StableViewer', 'warrior', timerV2);
+    const stable = joinServer(server, stableWs, 1, 'StableViewer', 'warrior', timerV3);
     joinServer(server, legacyWs, 2, 'LegacyViewer');
     const subject = joinServer(server, subjectWs, 3, 'Subject', 'mage');
     const subjectEntity = server.sim.entities.get(subject.pid)!;
@@ -5314,7 +6746,7 @@ describe('negotiated stable timer wire v2', () => {
     const stableWs = fakeWs();
     const legacyWs = fakeWs();
     const targetWs = fakeWs();
-    const stableSpectator = joinServer(server, stableWs, 1, 'StableSpec', 'mage', timerV2);
+    const stableSpectator = joinServer(server, stableWs, 1, 'StableSpec', 'mage', timerV3);
     const legacySpectator = joinServer(server, legacyWs, 2, 'LegacySpec', 'mage');
     const target = joinServer(server, targetWs, 3, 'Observed', 'mage');
     for (let i = 0; i < 5; i++) server.sim.tick();
@@ -5331,7 +6763,7 @@ describe('negotiated stable timer wire v2', () => {
     const stableSnap = lastSnap(stableWs.sent);
     const legacySnap = lastSnap(legacyWs.sent);
     expect(stableSnap.self.id).toBe(target.pid);
-    expect(stableSnap.tw).toBe(2);
+    expect(stableSnap.tw).toBe(STABLE_TIMER_WIRE_VERSION);
     expect(stableSnap.self.auras[0]).toHaveProperty('exp');
     expect(stableSnap.self.cds.observed_cast).toBeCloseTo(server.sim.time + 5, 5);
     expect(legacySnap.self.id).toBe(target.pid);
@@ -5356,14 +6788,14 @@ describe('negotiated stable timer wire v2', () => {
       'warrior',
       null,
       false,
-      timerV2,
+      timerV3,
     );
     if ('error' in stableResult) throw new Error(stableResult.error);
     expect(stableResult).toBe(original);
-    expect((stableResult as any).timerWireVersion).toBe(2);
+    expect((stableResult as any).timerWireVersion).toBe(STABLE_TIMER_WIRE_VERSION);
     stableWs.sent.length = 0;
     broadcast(server);
-    expect(lastSnap(stableWs.sent).tw).toBe(2);
+    expect(lastSnap(stableWs.sent).tw).toBe(STABLE_TIMER_WIRE_VERSION);
 
     stableWs.ws.readyState = 3;
     expect(server.socketClosed(stableResult, stableWs.ws)).toBe(true);
@@ -5377,7 +6809,7 @@ describe('negotiated stable timer wire v2', () => {
     expect(lastSnap(fallbackWs.sent).tw).toBeUndefined();
   });
 
-  it('falls back to legacy decode solely when the snapshot has no v2 marker', () => {
+  it('falls back to legacy decode solely when the snapshot has no stable marker', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'OldServer', 'mage');
@@ -5408,14 +6840,14 @@ describe('negotiated stable timer wire v2', () => {
     const server = new GameServer();
     const viewerWs = fakeWs();
     const subjectWs = fakeWs();
-    const viewer = joinServer(server, viewerWs, 1, 'MovingViewer', 'mage', timerV2);
+    const viewer = joinServer(server, viewerWs, 1, 'MovingViewer', 'mage', timerV3);
     const subject = joinServer(server, subjectWs, 2, 'MovingSubject', 'mage');
     const subjectEntity = server.sim.entities.get(subject.pid)!;
     subjectEntity.auras = [testAura('moving_aura', 20)];
 
     broadcast(server);
     const first = lastSnap(viewerWs.sent);
-    const client = bareClient(viewer.pid, 'mage');
+    const client = bareClient(viewer.pid, { playerClass: 'mage' });
     (client as any).applySnapshot(first);
     expect(client.entities.get(subject.pid)?.auras[0].remaining).toBe(20);
 
@@ -5448,7 +6880,7 @@ describe('negotiated stable timer wire v2', () => {
     const server = new GameServer();
     const viewerWs = fakeWs();
     const subjectWs = fakeWs();
-    const viewer = joinServer(server, viewerWs, 1, 'DeferredViewer', 'mage', timerV2);
+    const viewer = joinServer(server, viewerWs, 1, 'DeferredViewer', 'mage', timerV3);
     const subject = joinServer(server, subjectWs, 2, 'DeferredSubject', 'mage');
     const viewerEntity = server.sim.entities.get(viewer.pid)!;
     const subjectEntity = server.sim.entities.get(subject.pid)!;

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   bindTouchDoubleTap,
   bindTouchTap,
@@ -6,6 +6,14 @@ import {
   DOUBLE_TAP_MS,
   TAP_SLOP_PX,
 } from '../src/ui/touch_tap';
+
+// Safety net for the fake-timer tests below: if one of them fails its
+// assertion partway through, this still restores real timers so the
+// failure does not leak fake timers into a sibling test (mirrors
+// tests/admin/guilds_page.test.ts).
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 // Minimal fake element: collects listeners and lets a test dispatch raw
 // events, the house pattern for DOM-touching UI tests (no jsdom).

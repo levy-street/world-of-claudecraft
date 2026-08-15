@@ -76,6 +76,8 @@ export const API_ERROR_KEYS = {
   'character.already_in_world': 'apiError.character.already_in_world',
   'character.taken_over': 'apiError.character.taken_over',
   'character.rename_required': 'apiError.character.rename_required',
+  'character.invalid_appearance': 'apiError.character.invalid_appearance',
+  'character.reroll_unavailable': 'apiError.character.reroll_unavailable',
 
   // moderation: enforcement states set by a moderator.
   'moderation.suspended_until': 'apiError.moderation.suspended_until',
@@ -116,7 +118,29 @@ export const API_ERROR_KEYS = {
   'steam.already_linked': 'apiError.steam.already_linked',
   'steam.account_taken': 'apiError.steam.account_taken',
   'steam.upstream': 'apiError.steam.upstream',
+  // epic: the env-gated Epic link family (server/epic/).
+  'epic.disabled': 'apiError.epic.disabled',
+  'epic.invalid_token': 'apiError.epic.invalid_token',
+  'epic.banned': 'apiError.epic.banned',
+  'epic.already_linked': 'apiError.epic.already_linked',
+  'epic.account_taken': 'apiError.epic.account_taken',
+  'epic.upstream': 'apiError.epic.upstream',
   'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
+  'ota_updates.invalid_input': 'apiError.ota_updates.invalid_input',
+  'seeker.native_only': 'apiError.seeker.native_only',
+  'seeker.attestation_failed': 'apiError.seeker.attestation_failed',
+  'seeker.solana_artifact_required': 'apiError.seeker.solana_artifact_required',
+  'seeker.wallet_required': 'apiError.seeker.wallet_required',
+  'seeker.genesis_token_required': 'apiError.seeker.genesis_token_required',
+  'seeker.genesis_token_claimed': 'apiError.seeker.genesis_token_claimed',
+  'seeker.entitlement_required': 'apiError.seeker.entitlement_required',
+  'seeker.current_ownership_required': 'apiError.seeker.current_ownership_required',
+
+  // cheater_mark: the operator-applied public Cheater tag (server/cheater_mark_api.ts).
+  'cheater_mark.admin_target': 'apiError.cheater_mark.admin_target',
+  'cheater_mark.reason_required': 'apiError.cheater_mark.reason_required',
+  'cheater_mark.invalid_duration': 'apiError.cheater_mark.invalid_duration',
+  'cheater_mark.not_marked': 'apiError.cheater_mark.not_marked',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

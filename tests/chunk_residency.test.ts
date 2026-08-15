@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   type ChunkGrid,
   fogFarForBuiltGround,
+  GROUND_VIEW_CONE_MARGIN,
   type GroundPendingAt,
+  type GroundViewCone,
+  groundViewConeHalfAngle,
   nearestPendingGroundDistance,
   orderCellsForEntry,
   UNBUILT_GROUND_FOG_GUARD,
@@ -242,6 +245,134 @@ describe('outdoor fog clamp on unbuilt ground', () => {
       MAX_OUTDOOR_FOG_FAR,
     );
     expect(fogFarForBuiltGround(GRID, all, 0, 0, 80)).toBe(80);
+  });
+});
+
+describe('the view wedge (turning on the spot must not move the horizon)', () => {
+  // A 9x9 lattice of the real 60-yard cells centred on the origin, so the
+  // camera at (0, 0) sits in the middle of cell (4, 4) and every distance below
+  // is an exact cell edge. -Z is "ahead" for a forward of (0, -1).
+  const SYNTH: ChunkGrid = { size: 60, countX: 9, countZ: 9, originX: -270, originZ: -270 };
+  const onlyCell =
+    (pendX: number, pendZ: number): GroundPendingAt =>
+    (cx, cz) =>
+      cx === pendX && cz === pendZ;
+  const cone = (forwardX: number, forwardZ: number): GroundViewCone => ({
+    forwardX,
+    forwardZ,
+    halfAngle: groundViewConeHalfAngle(Math.PI / 3, 16 / 9),
+  });
+  // Cell (4, 1) spans z -210..-150, so its near edge is 150 yd from the origin.
+  const AHEAD = onlyCell(4, 1);
+  const BEHIND = onlyCell(4, 7);
+  const REQUEST = 500;
+
+  it('covers the whole frame corner and never opens past a right angle', () => {
+    const tanY = Math.tan(Math.PI / 6);
+    const corner = Math.atan(Math.hypot(tanY * (16 / 9), tanY));
+    expect(groundViewConeHalfAngle(Math.PI / 3, 16 / 9)).toBeCloseTo(
+      corner + GROUND_VIEW_CONE_MARGIN,
+      10,
+    );
+    // The corner, not the horizontal edge: a cell at the top of frame is inside.
+    expect(corner).toBeGreaterThan(Math.atan(tanY * (16 / 9)));
+    // Two half-planes only exclude the region behind the camera below 90 deg.
+    expect(groundViewConeHalfAngle(Math.PI * 0.98, 4)).toBeLessThan(Math.PI / 2);
+    expect(groundViewConeHalfAngle(Math.PI / 3, 16 / 9, 10)).toBeLessThan(Math.PI / 2);
+  });
+
+  it('clamps against unbuilt ground the camera is looking at, exactly as radially', () => {
+    const radial = fogFarForBuiltGround(SYNTH, AHEAD, 0, 0, REQUEST);
+    expect(radial).toBe(150 - UNBUILT_GROUND_FOG_GUARD);
+    expect(fogFarForBuiltGround(SYNTH, AHEAD, 0, 0, REQUEST, cone(0, -1))).toBe(radial);
+  });
+
+  it('ignores unbuilt ground behind the camera, which can never show a hole', () => {
+    // The whole bug in two assertions: the same pending cell, the same spot,
+    // only the heading differs.
+    expect(fogFarForBuiltGround(SYNTH, BEHIND, 0, 0, REQUEST, cone(0, 1))).toBe(
+      150 - UNBUILT_GROUND_FOG_GUARD,
+    );
+    expect(fogFarForBuiltGround(SYNTH, BEHIND, 0, 0, REQUEST, cone(0, -1))).toBe(REQUEST);
+  });
+
+  it('keeps ground off to the side but still in frame', () => {
+    // Cell (6, 1): x 90..150, z -210..-150, so its nearest corner sits about 31
+    // degrees off a forward of (0, -1) and inside the frame.
+    const offAxis = onlyCell(6, 1);
+    const bearing = (Math.atan2(90, 150) * 180) / Math.PI;
+    expect(bearing).toBeLessThan(45);
+    expect(fogFarForBuiltGround(SYNTH, offAxis, 0, 0, REQUEST, cone(0, -1))).toBeLessThan(REQUEST);
+  });
+
+  it('falls back to the radial answer without a usable direction', () => {
+    for (const isPending of [AHEAD, BEHIND]) {
+      const radial = fogFarForBuiltGround(SYNTH, isPending, 0, 0, REQUEST);
+      expect(fogFarForBuiltGround(SYNTH, isPending, 0, 0, REQUEST, null)).toBe(radial);
+      expect(fogFarForBuiltGround(SYNTH, isPending, 0, 0, REQUEST, cone(0, 0))).toBe(radial);
+    }
+  });
+
+  it('can only ever widen the horizon, never tighten it', () => {
+    // Skipping cells can only push the nearest pending distance out, and the
+    // clamp is monotone in it, so no heading may serve less than the radial
+    // answer. Pins the whole family rather than the two headings above.
+    const eastbrookOnly = pendingOutside(new Set(['eastbrook_vale']));
+    for (const camera of CAMERAS) {
+      const radial = fogFarForBuiltGround(
+        GRID,
+        eastbrookOnly,
+        camera.x,
+        camera.z,
+        MAX_OUTDOOR_FOG_FAR,
+      );
+      for (let i = 0; i < 16; i++) {
+        const yaw = (i * 2 * Math.PI) / 16;
+        const served = fogFarForBuiltGround(
+          GRID,
+          eastbrookOnly,
+          camera.x,
+          camera.z,
+          MAX_OUTDOOR_FOG_FAR,
+          cone(Math.sin(yaw), Math.cos(yaw)),
+        );
+        expect(served, `(${camera.x}, ${camera.z}) at yaw ${i}`).toBeGreaterThanOrEqual(radial);
+      }
+    }
+  });
+
+  it('breaks the yaw coupling at the Eastbrook spawn that the report was about', () => {
+    // Measured live before the fix, standing on the spawn and turning on the
+    // spot against a 700-yard request: 170 yards served with the binding chunk
+    // 90 degrees off the view axis, 235 with it 179 degrees off, i.e. squarely
+    // behind the camera. Everything past that horizon is the coarse vista mesh,
+    // which carries no splat texture and takes no shadows.
+    const eastbrookOnly = pendingOutside(new Set(['eastbrook_vale']));
+    const spawn = { x: 2, z: -2 };
+    const served = [];
+    for (let i = 0; i < 16; i++) {
+      const yaw = (i * 2 * Math.PI) / 16;
+      served.push(
+        fogFarForBuiltGround(
+          GRID,
+          eastbrookOnly,
+          spawn.x,
+          spawn.z,
+          MAX_OUTDOOR_FOG_FAR,
+          cone(Math.sin(yaw), Math.cos(yaw)),
+        ),
+      );
+    }
+    // Radially every heading was pinned at the one binding chunk.
+    expect(fogFarForBuiltGround(GRID, eastbrookOnly, spawn.x, spawn.z, MAX_OUTDOOR_FOG_FAR)).toBe(
+      170,
+    );
+    // Facing away from it the player now gets the world back, by a wide margin
+    // rather than a few yards.
+    expect(Math.max(...served)).toBeGreaterThan(4 * 170);
+    // And the headings that DO face it still clamp: this widens the horizon,
+    // it does not remove the no-holes guarantee.
+    expect(Math.min(...served)).toBe(170);
   });
 });
 

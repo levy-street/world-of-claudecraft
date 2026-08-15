@@ -15,6 +15,7 @@ import {
 } from '../src/sim/combat/auras';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { manaRegenPer2s } from '../src/sim/mana_regen';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
@@ -266,7 +267,12 @@ describe('auras: updateRegen', () => {
     const p = sim.player;
     const meta = sim.players.get(p.id) as PlayerMeta;
     p.inCombat = false;
-    p.hp = Math.max(1, p.maxHp - 500);
+    // A big synthetic pool: eating now stacks with natural regen (#1608), so a
+    // realistic deficit would cap out (and stop emitting a food-sourced heal)
+    // partway through 9 ticks. Inflate maxHp so the deficit stays open for the
+    // whole window regardless of the stamina-scaled natural tick's own rate.
+    p.maxHp = 10_000;
+    p.hp = p.maxHp - 5000;
     p.eating = {
       itemId: 'food',
       kind: 'food',
@@ -319,6 +325,47 @@ describe('auras: updateRegen', () => {
     const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
     expect(heals).toHaveLength(1);
     expect(heals[0]).toMatchObject({ source: 'food', sfxTick: true, amount: 0 });
+  });
+});
+
+describe('auras: updateRegen mana (Spirit in and out of combat)', () => {
+  const makeMage = (seed = 99): Sim => new Sim({ seed, playerClass: 'mage', autoEquip: true });
+
+  // Regenerate one 40-tick boundary tick from an empty mana bar at a given
+  // five-second-rule state and return how much mana came back.
+  const regenOnce = (
+    fiveSecondRule: number,
+  ): { gained: number; spi: number; level: number; pct: number } => {
+    const sim = makeMage();
+    const p = sim.player;
+    const meta = sim.players.get(p.id) as PlayerMeta;
+    p.resource = 0;
+    p.fiveSecondRule = fiveSecondRule;
+    sim.tickCount = 40; // a multiple of 40 so the regen body runs
+    updateRegen(sim.ctx, p, meta);
+    return {
+      gained: p.resource,
+      spi: p.stats.spi,
+      level: p.level,
+      pct: sim.ctx.playerMods(meta).global.manaRegenPct,
+    };
+  };
+
+  it('restores the full Spirit amount once past the five-second rule', () => {
+    const { gained, spi, level, pct } = regenOnce(6);
+    expect(gained).toBe(manaRegenPer2s(spi, level, pct, 6));
+    expect(gained).toBeGreaterThan(0);
+  });
+
+  it('still restores a reduced share while the five-second rule is active (in combat)', () => {
+    const { gained, spi, level, pct } = regenOnce(0);
+    // Spirit now matters in combat: the old behavior regenerated nothing here.
+    expect(gained).toBeGreaterThan(0);
+    expect(gained).toBe(manaRegenPer2s(spi, level, pct, 0));
+  });
+
+  it('regenerates strictly less in combat than out of combat', () => {
+    expect(regenOnce(0).gained).toBeLessThan(regenOnce(6).gained);
   });
 });
 

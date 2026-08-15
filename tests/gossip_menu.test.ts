@@ -14,6 +14,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -34,6 +35,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -50,6 +52,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -66,6 +69,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -74,7 +78,7 @@ describe('gossipMenuIsEmpty', () => {
     ).toBe(false);
   });
 
-  it('stays non-empty for a vendor, market, heroic vendor, delve board, or Vale Cup NPC', () => {
+  it('stays non-empty for a vendor, market, heroic or WARFARE vendor, delve board, or Vale Cup NPC', () => {
     expect(
       gossipMenuIsEmpty({
         questCount: 0,
@@ -82,6 +86,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: true,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -95,6 +100,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: true,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -108,6 +114,24 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: true,
+        hasWarfareVendor: false,
+        hasDelveBoard: false,
+        hasVcup: false,
+        hasCardMaster: false,
+        hasTraining: false,
+      }),
+    ).toBe(false);
+    // The WARFARE quartermaster alone. Its own dimension, because the shop row
+    // sits BESIDE the generic goods row, so a flagged NPC whose stock list is
+    // empty has this field alone keeping the menu open.
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: false,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasWarfareVendor: true,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
@@ -121,6 +145,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: true,
         hasVcup: false,
         hasCardMaster: false,
@@ -134,6 +159,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: true,
         hasCardMaster: false,
@@ -147,6 +173,7 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: true,
@@ -161,10 +188,48 @@ describe('gossipMenuIsEmpty', () => {
         hasVendor: false,
         hasMarket: false,
         hasHeroicVendor: false,
+        hasWarfareVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
         hasTraining: true,
+      }),
+    ).toBe(false);
+  });
+
+  it('a flagged NPC with stock offers BOTH rows, so both dimensions can be true at once', () => {
+    // Round-2 review finding: the WARFARE shop used to SUPPRESS the generic
+    // goods row for a flagged NPC, which silently removed selling and buyback
+    // at FURY, a shipped NPC that already had one. The two rows now coexist
+    // (with distinct labels), so this combination is the live shape and the
+    // menu must read non-empty on either dimension alone as well.
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: true,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasWarfareVendor: true,
+        hasDelveBoard: false,
+        hasVcup: false,
+        hasCardMaster: false,
+        hasTraining: false,
+      }),
+    ).toBe(false);
+    // The goods row alone (an unflagged NPC with stock) still keeps it open.
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: true,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasWarfareVendor: false,
+        hasDelveBoard: false,
+        hasVcup: false,
+        hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
   });

@@ -1,36 +1,45 @@
-// Server-authoritative Unstuck countdown and graveyard release.
+// Server-authoritative Unstuck countdown and graveyard teleport.
 //
 // Unstuck is intentionally not a short-range teleport. An eligible player may
 // start it from any valid world position. If they remain idle and undisturbed
-// for the countdown, the outcome depends on whether they were alive when they
-// asked:
-//  - alive: they die and rise as a ghost at the nearest graveyard. Their corpse
-//    is abandoned, so the only way back is the Pale Keeper and The Keeper's Toll.
-//  - dead or a ghost: the death loop has nothing left to take, so they are pulled
-//    to the nearest graveyard and raised there on exactly the Pale Keeper's terms
-//    (a fifth of their pools plus The Keeper's Toll). This is the escape hatch for
-//    a spirit that cannot reach its corpse or an angel; it saves the walk, not the
-//    toll, so it is never the cheap way out of a death.
-// Either way the price is paid, and neither outcome can be reached by an attempt
-// that started on the other side of the life/death line (see cancelReason).
+// for the countdown they are moved to the nearest graveyard, which is the one
+// point in every zone guaranteed to be reachable open ground. Unstuck never
+// kills and never leaves a corpse:
+//  - alive: they are simply moved there, still alive, with their pools intact.
+//  - dead or a ghost: they are moved there and raised on the Pale Keeper's hp
+//    terms (a fifth of their pools). This is the escape hatch for a spirit that
+//    cannot reach its corpse or an angel.
+// Either way the price is Unstuck Sickness (all attributes -75%, level-scaled up
+// to 5 minutes), and neither outcome can be reached by an attempt that started on
+// the other side of the life/death line (see cancelReason).
 
+import { resolvePosition } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import {
+  bgOriginAt,
   INSTANCE_X_BASE,
   isArenaPos,
+  isBgPos,
   isDelvePos,
   isRiftPos,
   riftInstanceOrigin,
   zoneAt,
 } from './data';
 import { delveModuleZOffset } from './delves/runs';
+import { PLAYER_BODY_RADIUS } from './pathfind';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { releasePlayerSpiritForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
+import { bgCarryingFlag, bgTeamOf, bgUnstuckDestination } from './social/battleground';
+import {
+  applyUnstuckSickness,
+  moveToGraveyardForUnstuck,
+  reviveAtGraveyardForUnstuck,
+} from './spirit';
 import {
   DT,
   type Entity,
+  emptyMoveInput,
   isConsuming,
   type UnstuckArea,
   type UnstuckBlockedReason,
@@ -58,10 +67,11 @@ export interface PendingUnstuck {
   damageTaken: number;
   lastAnnouncedSecond: number;
   /**
-   * Whether the invoker was dead or a ghost when the countdown began. It decides
-   * the outcome (release vs revive) and makes a crossing of the life/death line
-   * IN EITHER DIRECTION a cancel, so an attempt can never resolve as the outcome
-   * the player did not ask for.
+   * Whether the invoker was dead or a ghost when the countdown began. A crossing of the
+   * life/death line IN EITHER DIRECTION is a cancel, so an attempt can never resolve as
+   * the outcome the player did not ask for. That matters most in the living-to-dead
+   * direction: without it, dying mid-countdown would be answered by a graveyard revive,
+   * which would make a pre-started /unstuck a cheaper alternative to the death loop.
    */
   startedDead: boolean;
 }
@@ -118,6 +128,22 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   }
   if (isDelvePos(pos.x)) return null;
 
+  if (isBgPos(pos.x)) {
+    const match = ctx.bgMatches.get(pid);
+    if (!match || match.slot !== bgOriginAt(pos.z).slot) return null;
+    const origin = bgOriginAt(pos.z);
+    return located(
+      {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+      pos,
+      origin,
+    );
+  }
+
   const claimId = ctx.instanceClaimIdAt(pos);
   if (claimId !== null) {
     const instance = ctx.instances.find(
@@ -160,16 +186,16 @@ function hasMoveInput(meta: PlayerMeta): boolean {
   return input.forward || input.back || input.strafeLeft || input.strafeRight || input.jump;
 }
 
-function forcedMovement(p: Entity): boolean {
+function forcedAction(p: Entity): boolean {
   return (
     p.chargeTargetId !== null ||
     p.followTargetId !== null ||
-    p.auras.some((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate') ||
-    Math.hypot(p.vx, p.vy, p.vz) > POSITION_EPS
+    p.auras.some((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate')
   );
 }
 
 function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
+  if (ctx.bgMatches.has(pid) && isBgPos(p.pos.x)) return false;
   return (
     ctx.duels.has(pid) ||
     ctx.arenaMatches.has(pid) ||
@@ -192,10 +218,18 @@ function isFrozenCorpse(p: Entity): boolean {
   return p.dead && !p.ghost;
 }
 
-function motionBlock(p: Entity): UnstuckBlockedReason | null {
+function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
+  if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
+  const resolved = resolvePosition(ctx.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS;
+}
+
+function motionBlock(ctx: SimContext, p: Entity): UnstuckBlockedReason | null {
   if (isFrozenCorpse(p)) return null;
+  if (forcedAction(p)) return 'moving';
+  if (battlegroundWallTrap(ctx, p)) return null;
   if (!p.onGround || p.jumping) return 'falling';
-  if (forcedMovement(p)) return 'moving';
+  if (Math.hypot(p.vx, p.vy, p.vz) > POSITION_EPS) return 'moving';
   return null;
 }
 
@@ -203,9 +237,10 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (p.jailed) return 'jailed';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (isStunned(p) || isRooted(p)) return 'controlled';
-  const motion = motionBlock(p);
+  const motion = motionBlock(ctx, p);
   if (motion) return motion;
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
+  if (bgCarryingFlag(ctx, p.id)) return 'competitive';
   if (competitive(ctx, p.id, p)) return 'competitive';
   if (ctx.tradeFor(p.id)) return 'trading';
   if (!unstuckLocationAt(ctx, p.id, p.pos)) return 'invalid_area';
@@ -274,21 +309,23 @@ function cancelReason(
   if (meta.counters.damageTaken > pending.damageTaken) return 'damaged';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
+  if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
   if (
     hasMoveInput(meta) ||
-    Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
-    Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE
+    (pending.area.kind !== 'battleground' &&
+      (Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
+        Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE))
   )
     return 'moved';
-  // Crossing the life/death line either way invalidates the attempt: a living
-  // player who died must not silently get the revive, and a player who was raised
-  // mid-countdown no longer needs one.
+  // Crossing the life/death line either way invalidates the attempt: a living player who
+  // died must take the ordinary death loop rather than a discounted graveyard revive, and a
+  // player who was raised mid-countdown no longer needs one.
   if ((p.dead || p.ghost) !== pending.startedDead) return 'state_changed';
   if (
     p.jailed ||
     isStunned(p) ||
     isRooted(p) ||
-    motionBlock(p) !== null ||
+    motionBlock(ctx, p) !== null ||
     competitive(ctx, p.id, p) ||
     ctx.tradeFor(p.id)
   )
@@ -330,6 +367,38 @@ export function cancelPendingUnstuckForDisconnect(
   return cancelUnstuck(ctx, meta, pending, 'disconnected', emitEvent);
 }
 
+function completeBattlegroundUnstuck(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  p: Entity,
+): UnstuckPosition | null {
+  const destination = bgUnstuckDestination(ctx, p.id);
+  if (!destination) return null;
+  const match = ctx.bgMatches.get(p.id);
+  const team = match ? bgTeamOf(match, p.id) : 0;
+  p.pos = destination;
+  p.prevPos = { ...p.pos };
+  p.facing = team === 0 ? 0 : Math.PI;
+  p.prevFacing = p.facing;
+  ctx.rebucket(p);
+  Object.assign(meta.moveInput, emptyMoveInput());
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
+  p.targetId = null;
+  p.autoAttack = false;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
+  if (!p.dead && !p.ghost) applyUnstuckSickness(ctx, p);
+  return unstuckLocationAt(ctx, p.id, p.pos)?.point ?? null;
+}
+
 function completeUnstuck(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -337,27 +406,27 @@ function completeUnstuck(
   pending: PendingUnstuck,
 ): void {
   meta.pendingUnstuck = null;
-  // A living player pays the ordinary price: they die here and rise as a ghost,
-  // corpse abandoned. Someone who was ALREADY dead has nothing left to lose that
-  // way, so they are pulled to the graveyard and raised on the Pale Keeper's terms.
+  // Both outcomes land on the same graveyard and charge the same Unstuck Sickness; they
+  // differ only in whether a revive is needed on arrival. A living player is never killed.
   const wasDead = p.dead || p.ghost;
-  if (wasDead) {
-    reviveAtGraveyardForUnstuck(ctx, p.id);
-  } else {
-    ctx.handleDeath(p, null);
-    releasePlayerSpiritForUnstuck(ctx, p.id);
+  const battlegroundDestination =
+    pending.area.kind === 'battleground' ? completeBattlegroundUnstuck(ctx, meta, p) : null;
+  if (!battlegroundDestination) {
+    if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id);
+    else moveToGraveyardForUnstuck(ctx, p.id);
   }
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
 
-  const destination = unstuckLocationAt(ctx, p.id, p.pos)?.point ?? {
-    ...p.pos,
-    localX: p.pos.x,
-    localZ: p.pos.z,
-  };
+  const destination = battlegroundDestination ??
+    unstuckLocationAt(ctx, p.id, p.pos)?.point ?? {
+      ...p.pos,
+      localX: p.pos.x,
+      localZ: p.pos.z,
+    };
   ctx.emit({
     type: 'unstuck',
     phase: 'completed',
-    reason: wasDead ? 'revived_at_graveyard' : 'nearest_graveyard',
+    reason: battlegroundDestination || !wasDead ? 'moved_to_graveyard' : 'revived_at_graveyard',
     area: pending.area,
     origin: pending.origin,
     destination,

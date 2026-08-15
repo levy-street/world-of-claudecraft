@@ -606,6 +606,8 @@ describe('air control cannot manufacture speed', () => {
       strafeLeft: false,
       strafeRight: false,
       jump: true,
+      dive: false,
+      surface: false,
     };
     Object.assign(meta.moveInput, input);
     sim.tick();

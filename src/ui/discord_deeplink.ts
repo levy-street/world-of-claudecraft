@@ -13,9 +13,6 @@ export const LFG_PARAM = 'lfg';
 /** Query-string key carrying the relay command id (lfg / wts / ...). */
 export const LFG_CMD_PARAM = 'c';
 
-/** localStorage key the pending intent is stashed under across the login redirect. */
-export const LFG_INTENT_KEY = 'woc_lfg_intent';
-
 /** How long a stashed intent stays valid (so a stale tab never whispers later). */
 export const LFG_INTENT_TTL_MS = 30 * 60 * 1000;
 

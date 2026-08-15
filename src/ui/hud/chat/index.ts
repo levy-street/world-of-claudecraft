@@ -6,3 +6,4 @@ export * from './chat_line';
 export * from './chat_timestamp';
 export * from './chat_window';
 export * from './chat_window_controller';
+export * from './deed_chat_line';

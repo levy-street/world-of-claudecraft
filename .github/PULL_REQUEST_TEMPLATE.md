@@ -53,7 +53,8 @@ or strike them through (`~like this~`) when they don't.
 
 ### Quality
 
-- [ ] **The full gate passes.** `npm run gate` is green. I added or updated decisive
+- [ ] **The gate passes.** `node scripts/gate_select.mjs` is green (or `npm run gate` for
+      the full suite). I added or updated decisive
       tests for changed behavior and recorded any manual checks above.
 
 ### Cross-platform

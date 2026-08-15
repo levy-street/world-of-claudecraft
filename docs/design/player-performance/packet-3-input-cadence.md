@@ -11,7 +11,7 @@ steady-state drop at offered rate r against the 40/s refill is (r - 40) / r once
 (at exactly 30 the unconditional timer arm makes the drop share timer-phase
 dependent), 33 percent at 60 fps, 50 percent at 80 msg/s).
 
-Worktree: /Users/fernando/Documents/wocc-input-cadence, branch feature/input-cadence
+Worktree: worktree wocc-input-cadence, branch feature/input-cadence
 (off release/v0.30.0; LOCAL ONLY: never pushed and no PR without the maintainer's
 explicit go).
 Deliverable: a PR off the latest release branch (when the maintainer okays it),
@@ -277,7 +277,7 @@ R10. Dedicated kick reason with matcher lockstep, enforced by byte pins (the S3
 R11. Bot-detector verdict: no contract change, both copies untouched, coupling is
     positive, and the lane rules above are what keep it that way. Verified against
     BOTH copies (the private overlay at private/bot_detector/ in the main tree and
-    /Users/fernando/Documents/wocc-bot-protection; src trees byte-identical at
+    worktree wocc-bot-protection; src trees byte-identical at
     authoring; this worktree carries only server/bot_detector/contract.ts plus stub,
     and the #bot-detector build alias resolves to the stub here, which nothing in
     this packet needs): the detector consumes only ALLOWED, parsed traffic

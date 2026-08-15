@@ -9,8 +9,9 @@ import {
   wildheartFieldHeight,
 } from '../sim/wildheart_field';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
+import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { radialGlowTexture } from './textures';
 import { buildWildheartTerrain } from './wildheart_terrain';
@@ -56,7 +57,7 @@ const loadedWildheartGltf = new Map<WildheartPropKind, WildheartGltf | null>();
 
 if (typeof window !== 'undefined') {
   for (const [kind, url] of Object.entries(WILDHEART_ASSET_URL) as [WildheartPropKind, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url)
         .then((gltf: WildheartGltf) => {
           gltf.scene.traverse((child) => {
@@ -272,7 +273,7 @@ function buildProp(kind: WildheartPropKind): THREE.Object3D {
 export interface WildheartFieldInteriorDeps {
   lowGfx: boolean;
   flames: THREE.Mesh[];
-  fireLights: THREE.PointLight[];
+  fireLights: FireLightSink;
 }
 
 let flameGeometry: THREE.BufferGeometry | null = null;

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // The priest's Light halo: per-visual geometry (PR: halo must not clip the
 // canon mage-model hat). Pins the halo.ts cache doctrine (geometry keyed by
 // radius, material keyed by color, both shared and never disposed) and the
@@ -65,6 +65,7 @@ describe('class halo geometry', () => {
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
       loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       releaseGltf: vi.fn(),
     }));
     const { charactersReady } = await import('../src/render/characters/assets');
@@ -83,6 +84,19 @@ describe('class halo geometry', () => {
     // change re-lists the casters with shadows on, the halo stays out of the
     // caster list, and its material stays in the ghost-restore snapshot
     const originalMat = halo.material;
+    type MaterialPassPeek = { applyVisualMaterials(): void };
+    const materialPass = vi.spyOn(visual as unknown as MaterialPassPeek, 'applyVisualMaterials');
+    visual.setGhost(false);
+    visual.setGhost(false);
+    expect(materialPass).not.toHaveBeenCalled();
+    visual.setGhost(true);
+    visual.setGhost(true);
+    visual.setGhost(false);
+    visual.setGhost(false);
+    expect(materialPass).toHaveBeenCalledTimes(2);
+    expect(halo.material).toBe(originalMat);
+    materialPass.mockRestore();
+
     visual.setShadow(true);
     expect(halo.castShadow).toBe(false);
     visual.setWeapon('bogoak_staff');

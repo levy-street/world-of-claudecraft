@@ -94,6 +94,7 @@ const CHROME_MAIN_PREFIXES = [
   'game.',
   'highscores.',
   'hud.',
+  'hudChrome.',
   'itemUi.',
   'loading.',
   'meta.',

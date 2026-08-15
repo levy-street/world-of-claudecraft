@@ -1,0 +1,128 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/moonwort-apothecary-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones",
+  "detailInventory": {
+    "scanMethod": "four admitted component-zone crops with hero cross-check",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "roof-curl-silhouette",
+        "kind": "contour",
+        "description": "Steep teal roof bows downward at center and curls strongly upward at both gable tips.",
+        "region": { "x": 0.08, "y": 0.02, "width": 0.84, "height": 0.46, "units": "normalized" },
+        "scale": "macro",
+        "affects": "primary silhouette",
+        "mapsTo": { "type": "component.localFeatures", "ref": "curled-eave-tips" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "front-dormer",
+        "kind": "contour",
+        "description": "A small pointed timber dormer with amber grid projects from the front roof slope.",
+        "region": { "x": 0.34, "y": 0.2, "width": 0.28, "height": 0.27, "units": "normalized" },
+        "scale": "meso",
+        "affects": "front focal point",
+        "mapsTo": { "type": "component.localFeatures", "ref": "front-dormer-window" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "sales-window",
+        "kind": "contour",
+        "description": "A shallow pale awning shelters an exterior wooden shelf to the right of the centered door.",
+        "region": { "x": 0.51, "y": 0.46, "width": 0.36, "height": 0.31, "units": "normalized" },
+        "scale": "meso",
+        "affects": "service read",
+        "mapsTo": { "type": "component.localFeatures", "ref": "potion-sales-shelf" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/front.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "bottle-row",
+        "kind": "gloss",
+        "description": "Five to seven chunky colored bottles alternate round bodies and narrow necks on the sales shelf.",
+        "region": { "x": 0.56, "y": 0.54, "width": 0.3, "height": 0.17, "units": "normalized" },
+        "scale": "micro",
+        "affects": "potion identity",
+        "mapsTo": { "type": "component.localFeatures", "ref": "chunky-bottle-row" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/hero.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "hanging-herbs",
+        "kind": "linework",
+        "description": "Long green and violet herb bundles hang from facade posts and the side shelf canopy.",
+        "region": { "x": 0.08, "y": 0.42, "width": 0.84, "height": 0.37, "units": "normalized" },
+        "scale": "meso",
+        "affects": "botanical craft cue",
+        "mapsTo": { "type": "component.localFeatures", "ref": "drying-herb-bundles" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/side.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "mushroom-planters",
+        "kind": "contour",
+        "description": "Two low planters carry broad violet mushroom caps near the porch foot.",
+        "region": { "x": 0.05, "y": 0.68, "width": 0.34, "height": 0.24, "units": "normalized" },
+        "scale": "meso",
+        "affects": "ground-level identity",
+        "mapsTo": { "type": "component.localFeatures", "ref": "violet-mushroom-planters" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "copper-still",
+        "kind": "contour",
+        "description": "A bulbous copper alembic, neck and small cap stand on the left exterior bench.",
+        "region": { "x": 0.03, "y": 0.43, "width": 0.2, "height": 0.39, "units": "normalized" },
+        "scale": "meso",
+        "affects": "apothecary silhouette",
+        "mapsTo": { "type": "component.localFeatures", "ref": "copper-alembic-stack" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/front.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "gutter-drainage",
+        "kind": "linework",
+        "description": "Dark metal gutters terminate in angular downspouts at both front corners.",
+        "region": { "x": 0.0, "y": 0.25, "width": 1, "height": 0.58, "units": "normalized" },
+        "scale": "meso",
+        "affects": "swamp weathering function",
+        "mapsTo": { "type": "component.localFeatures", "ref": "gutter-downspouts" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/hero.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "wet-timber-grain",
+        "kind": "linework",
+        "description": "Dark vertical wall boards use restrained axial grain with damp lower value shifts.",
+        "region": { "x": 0.15, "y": 0.4, "width": 0.7, "height": 0.48, "units": "normalized" },
+        "scale": "micro",
+        "affects": "timber response",
+        "mapsTo": { "type": "material.localOverrides", "ref": "fenbridge-opaque/wet-timber-grain" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/rear.png",
+        "confidence": 0.84
+      },
+      {
+        "id": "violet-glow",
+        "kind": "emissive",
+        "description": "One crystal or fungus cluster provides a restrained violet accent among otherwise warm windows.",
+        "region": { "x": 0.5, "y": 0.52, "width": 0.2, "height": 0.2, "units": "normalized" },
+        "scale": "micro",
+        "affects": "magical accent",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "fenbridge-emissive/violet-fenlight-accent"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/moonwort-apothecary/zones/front.png",
+        "confidence": 0.9
+      }
+    ]
+  },
+  "uncertainty": [
+    "Bottle and herb counts differ subtly between generated views; one deterministic representative layout is authoritative for shipping.",
+    "Plant species and bottle contents cannot be identified and stay abstract.",
+    "Rear pipe connectivity is partially occluded and uses a short exterior-only inferred run."
+  ]
+}

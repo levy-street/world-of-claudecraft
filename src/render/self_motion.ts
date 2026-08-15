@@ -26,6 +26,7 @@
 // against a real lagging Sim.
 
 import { moverHeight, resolveMovement } from '../sim/colliders';
+import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 
@@ -181,6 +182,8 @@ export class SelfMotionPredictor {
     strafeLeft: false,
     strafeRight: false,
     jump: false,
+    dive: false,
+    surface: false,
   };
   private readonly out: Vec3Like = { x: 0, y: 0, z: 0 };
 
@@ -254,7 +257,10 @@ export class SelfMotionPredictor {
    * path, which shares the same selfRenderPosition so the handoff is seamless).
    */
   step(self: Entity, frame: SelfMotionFrame, authoritativeDiscontinuity = false): Vec3Like | null {
-    if (!frame.enabled) {
+    // Valkyr's Calling is server-driven movement. Let authoritative snapshot
+    // interpolation render the full ascent and approach instead of predicting
+    // ordinary grounded input over it.
+    if (!frame.enabled || hasValkyrsCallingFlightAura(self)) {
       this.reset();
       return null;
     }
@@ -297,6 +303,8 @@ export class SelfMotionPredictor {
         onGround: true,
         jumping: false,
         fallStartY: ay,
+        swimStroke: 0,
+        swimDiving: false,
       };
       this.actor = actor;
       this.acc = 0;
@@ -342,6 +350,15 @@ export class SelfMotionPredictor {
     inp.strafeLeft = frame.moveInput.strafeLeft;
     inp.strafeRight = frame.moveInput.strafeRight;
     inp.jump = frame.moveInput.jump;
+    // The vertical half of swimming is held intent too, and predicting it is
+    // what makes a camera-steered dive answer the mouse instead of the round
+    // trip: without these the depth column only ever moved on the server's
+    // echo, so aiming the view down felt like a request rather than a control.
+    // The kernel branch is the same one the server runs (swimVerticalPass), and
+    // it is inert unless the body is actually in water.
+    inp.dive = frame.moveInput.dive;
+    inp.surface = frame.moveInput.surface;
+    inp.swimSteer = frame.moveInput.swimSteer;
     // A blocked step needs NO special handling, and must never get any. The
     // kernel runs the same swept static collision as the server, so when the
     // display stops at a wall it is already RIGHT and the authoritative anchor

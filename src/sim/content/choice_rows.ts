@@ -9,7 +9,7 @@ import {
   SHAMAN_CHOICE_ROWS,
   WARLOCK_CHOICE_ROWS,
 } from './choice_rows_classic';
-import { accumulateTalentEffect, type TalentEffect, type TalentModifiers } from './talents';
+import type { TalentEffect } from './talents';
 import { WARRIOR_ROWS } from './warrior_rows';
 
 export const CHOICE_ROW_LEVELS = [5, 8, 11, 14, 17, 20] as const;
@@ -95,36 +95,4 @@ export function validateRows(
     }
   }
   return { ok: true };
-}
-
-export function repairRows(
-  cls: PlayerClass,
-  level: number,
-  rows: ChoiceRowAllocation | undefined | null,
-): ChoiceRowAllocation {
-  const out: ChoiceRowAllocation = {};
-  if (!rows) return out;
-  for (const [rawLevel, optionId] of Object.entries(rows)) {
-    const rowLevel = Number(rawLevel);
-    if (!Number.isInteger(rowLevel) || !isChoiceRowLevel(rowLevel)) continue;
-    if (typeof optionId !== 'string' || optionId.length === 0) continue;
-    const cand = { ...out, [rowLevel]: optionId };
-    if (validateRows(cls, level, cand).ok) out[rowLevel] = optionId;
-  }
-  return out;
-}
-
-export function accumulateRowEffects(
-  mods: TalentModifiers,
-  cls: PlayerClass,
-  rows: ChoiceRowAllocation | undefined | null,
-): void {
-  if (!rows) return;
-  for (const [rawLevel, optionId] of Object.entries(rows)) {
-    const rowLevel = Number(rawLevel);
-    if (!Number.isInteger(rowLevel) || !isChoiceRowLevel(rowLevel)) continue;
-    const row = rowForLevel(cls, rowLevel);
-    const option = row?.options.find((candidate) => candidate.id === optionId);
-    if (option) accumulateTalentEffect(mods, option.effect, 1);
-  }
 }

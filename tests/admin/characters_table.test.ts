@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
@@ -14,6 +14,9 @@ const rows: CharacterRow[] = [
     level: 60,
     accountId: 1,
     username: 'viggo',
+    guildId: 8,
+    guildName: 'The Fellowship',
+    guildRank: 'leader',
     copper: 12345,
     xp: 999,
     createdAt: '2026-01-01T00:00:00Z',
@@ -23,20 +26,56 @@ const rows: CharacterRow[] = [
 
 describe('CharactersTable', () => {
   it('renders rows and shows the sort arrow on the active column', () => {
-    render(CharactersTable, { rows, sort: 'level', dir: 'desc', onSort: () => {} });
+    render(CharactersTable, {
+      rows,
+      sort: 'level',
+      dir: 'desc',
+      onSort: () => {},
+      onInspectProfessions: () => {},
+    });
     expect(screen.getByText('Aragorn')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'The Fellowship' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('page=guilds&guildId=8'),
+    );
+    expect(screen.getByText(t('guilds.rank.leader'))).toBeInTheDocument();
     expect(screen.getByText(/▼/)).toBeInTheDocument();
   });
 
   it('calls onSort with the clicked column', async () => {
     const onSort = vi.fn();
-    render(CharactersTable, { rows, sort: 'level', dir: 'desc', onSort });
+    render(CharactersTable, {
+      rows,
+      sort: 'level',
+      dir: 'desc',
+      onSort,
+      onInspectProfessions: () => {},
+    });
     await fireEvent.click(screen.getByText(new RegExp(t('characters.colName'))));
     expect(onSort).toHaveBeenCalledWith('name');
   });
 
+  it('asks the parent to open the professions inspector for the clicked row', async () => {
+    const onInspectProfessions = vi.fn();
+    render(CharactersTable, {
+      rows,
+      sort: 'level',
+      dir: 'desc',
+      onSort: () => {},
+      onInspectProfessions,
+    });
+    await fireEvent.click(screen.getByRole('button', { name: t('characters.professionsButton') }));
+    expect(onInspectProfessions).toHaveBeenCalledWith(rows[0]);
+  });
+
   it('shows the empty message for no rows', () => {
-    render(CharactersTable, { rows: [], sort: 'level', dir: 'desc', onSort: () => {} });
+    render(CharactersTable, {
+      rows: [],
+      sort: 'level',
+      dir: 'desc',
+      onSort: () => {},
+      onInspectProfessions: () => {},
+    });
     expect(screen.getByText(t('characters.empty'))).toBeInTheDocument();
   });
 });

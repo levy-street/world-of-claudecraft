@@ -17,6 +17,10 @@ const WINNING_WARRIOR_KIT = [
   'raging_gale',
   'raised_guard',
   'pummel',
+  // Seething Fury: restored to the plain kit after the v2 talent integration
+  // orphaned it (the v1 war_berserker_rage grant was deleted, nothing re-homed
+  // the ability, and abilitiesKnownAt could never return it).
+  'berserker_rage',
   'execute',
   'furious_mending',
   'iron_resolve',
@@ -118,9 +122,9 @@ describe('v0.26 winning Warrior release contracts', () => {
         mastery: {
           name: 'Recompense',
           description:
-            'Increases all threat you generate by 30% and your armor by 10%. Vanguard: your Stamina is increased by 40% and you gain armor equal to 70% of your Strength.',
+            'Increases all threat you generate by 80% and your armor by 10%. Vanguard: your Stamina is increased by 40% and you gain armor equal to 70% of your Strength.',
           effect: {
-            global: { threatPct: 0.3 },
+            global: { threatPct: 0.8 },
             stats: { armorPct: 0.1, staPct: 0.4, armorFromStrPct: 0.7 },
           },
         },

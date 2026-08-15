@@ -1,0 +1,128 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/crooked-reed-inn-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones",
+  "detailInventory": {
+    "scanMethod": "four admitted component-zone crops with hero cross-check",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "bent-roof-ridge",
+        "kind": "contour",
+        "description": "Tall teal gable roof sags gently at midspan and kicks upward at both tips.",
+        "region": { "x": 0.02, "y": 0.02, "width": 0.96, "height": 0.47, "units": "normalized" },
+        "scale": "macro",
+        "affects": "roof silhouette",
+        "mapsTo": { "type": "component.localFeatures", "ref": "bent-ridge-profile" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/front.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "layered-teal-eaves",
+        "kind": "ridge",
+        "description": "Three stepped shingle bands and a thick timber fascia form the front eave.",
+        "region": { "x": 0.08, "y": 0.19, "width": 0.84, "height": 0.26, "units": "normalized" },
+        "scale": "meso",
+        "affects": "roof depth",
+        "mapsTo": { "type": "component.localFeatures", "ref": "layered-eave-courses" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/hero.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "raised-porch-undercroft",
+        "kind": "contour",
+        "description": "Porch deck is visibly raised on short stone-capped timber piles with open gaps below.",
+        "region": { "x": 0.05, "y": 0.61, "width": 0.9, "height": 0.35, "units": "normalized" },
+        "scale": "macro",
+        "affects": "grounding and negative space",
+        "mapsTo": { "type": "component.localFeatures", "ref": "open-piling-undercroft" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/front.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "rope-rail-net",
+        "kind": "linework",
+        "description": "Rope rails span turned porch posts and a bundled fishing net sags between left posts.",
+        "region": { "x": 0.04, "y": 0.58, "width": 0.42, "height": 0.34, "units": "normalized" },
+        "scale": "meso",
+        "affects": "porch service character",
+        "mapsTo": { "type": "component.localFeatures", "ref": "rope-rail-and-net" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/front.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "provision-rain-awning",
+        "kind": "contour",
+        "description": "A shallow teal canvas awning shelters the side-facing exterior counter.",
+        "region": { "x": 0.31, "y": 0.48, "width": 0.47, "height": 0.28, "units": "normalized" },
+        "scale": "meso",
+        "affects": "service silhouette",
+        "mapsTo": { "type": "component.localFeatures", "ref": "counter-rain-awning" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/side.png",
+        "confidence": 0.94
+      },
+      {
+        "id": "hanging-reed-bundle",
+        "kind": "contour",
+        "description": "An unreadable bound reed bundle hangs from a projecting timber gallows.",
+        "region": { "x": 0.78, "y": 0.27, "width": 0.2, "height": 0.38, "units": "normalized" },
+        "scale": "meso",
+        "affects": "inn identity landmark",
+        "mapsTo": { "type": "component.localFeatures", "ref": "reed-bundle-sign" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/front.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "dormer-window-grid",
+        "kind": "linework",
+        "description": "A single centered dormer contains a chunky three-by-two amber window grid.",
+        "region": { "x": 0.37, "y": 0.2, "width": 0.25, "height": 0.26, "units": "normalized" },
+        "scale": "meso",
+        "affects": "front focal point",
+        "mapsTo": { "type": "component.localFeatures", "ref": "dormer-window-grid" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "chimney-masonry-courses",
+        "kind": "seam",
+        "description": "The left roof chimney is built from broad dark-stone courses with a projecting cap.",
+        "region": { "x": 0.08, "y": 0.0, "width": 0.18, "height": 0.35, "units": "normalized" },
+        "scale": "meso",
+        "affects": "asymmetric skyline",
+        "mapsTo": { "type": "component.localFeatures", "ref": "chimney-cap-courses" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/front.png",
+        "confidence": 0.96
+      },
+      {
+        "id": "wet-timber-grain",
+        "kind": "linework",
+        "description": "Vertical wall boards and porch members show restrained dark axial grain and dampened lower values.",
+        "region": { "x": 0.12, "y": 0.43, "width": 0.75, "height": 0.43, "units": "normalized" },
+        "scale": "micro",
+        "affects": "timber material response",
+        "mapsTo": { "type": "material.localOverrides", "ref": "fenbridge-opaque/wet-timber-grain" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/hero.png",
+        "confidence": 0.84
+      },
+      {
+        "id": "warm-window-glow",
+        "kind": "emissive",
+        "description": "Dormer and facade glazing use restrained amber panes behind dark timber muntins.",
+        "region": { "x": 0.2, "y": 0.35, "width": 0.65, "height": 0.33, "units": "normalized" },
+        "scale": "meso",
+        "affects": "night service readability",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "fenbridge-emissive/amber-window-glow"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/hero.png",
+        "confidence": 0.97
+      }
+    ]
+  },
+  "uncertainty": [
+    "The whole turnaround sheet failed fragmented-mask admission; only the four isolated crops are authoritative.",
+    "The unseen roof underside and reed-bundle rear thickness are inferred as simple low-poly volumes.",
+    "Barrel, crate and rope counts vary by view; the shipping model uses a fixed representative attached arrangement."
+  ]
+}

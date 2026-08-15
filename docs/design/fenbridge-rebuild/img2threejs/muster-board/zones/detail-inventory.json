@@ -1,0 +1,172 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/muster-board-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones",
+  "detailInventory": {
+    "scanMethod": "labeled-turnaround-component-zones",
+    "targetMinDetails": 8,
+    "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+    "details": [
+      {
+        "id": "teal-roof-cap",
+        "kind": "ridge",
+        "description": "A shallow teal cap roof projects beyond the post frame.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "weather protection silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "teal-weather-cap"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "post-finials",
+        "kind": "contour",
+        "description": "Both tall posts end in dark faceted finials.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "vertical silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "tall-post-finials"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/hero.png",
+        "confidence": 0.895
+      },
+      {
+        "id": "panel-inset-shadow",
+        "kind": "stain",
+        "description": "The notice surface is deeply inset behind the frame.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "depth",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "deep-panel-inset"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/rear.png",
+        "confidence": 0.89
+      },
+      {
+        "id": "iron-panel-frame",
+        "kind": "linework",
+        "description": "Iron bars bind the upper and lower panel edges.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "civic construction",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "ironbound-panel-edge"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/hero.png",
+        "confidence": 0.885
+      },
+      {
+        "id": "three-notice-layout",
+        "kind": "seam",
+        "description": "Three differently scaled notices overlap across the face.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "information density",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "three-paper-layout"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/front.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "wax-seal-fasteners",
+        "kind": "fastener",
+        "description": "A red wax seal pins the upper area of each notice.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "muster identity",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "three-wax-seals"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/hero.png",
+        "confidence": 0.875
+      },
+      {
+        "id": "paper-edge-wear",
+        "kind": "chip",
+        "description": "Uneven parchment edges keep the notices visibly separate.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "paper material",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "paper-edge-and-wax-seals"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/front.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "teal-side-lantern",
+        "kind": "emissive",
+        "description": "A single teal lantern hangs outside the left post.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "night landmark",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "side-teal-lantern"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/muster-board/zones/rear.png",
+        "confidence": 0.865
+      }
+    ]
+  },
+  "authoringInstruction": "Complete: every observed detail maps to an authored component.localFeatures or material.localOverrides key in sculpt-spec.json."
+}

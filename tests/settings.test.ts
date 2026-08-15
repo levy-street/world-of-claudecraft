@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clickMoveButtonLabel,
   normalizeClickMoveButton,
@@ -8,8 +8,12 @@ import {
 
 function installStorage(): void {
   const map = new Map<string, string>();
-  (globalThis as any).localStorage = {
-    getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
+  const storage: Storage = {
+    get length() {
+      return map.size;
+    },
+    key: (index: number) => Array.from(map.keys())[index] ?? null,
+    getItem: (k: string) => map.get(k) ?? null,
     setItem: (k: string, v: string) => {
       map.set(k, v);
     },
@@ -18,9 +22,40 @@ function installStorage(): void {
     },
     clear: () => map.clear(),
   };
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: storage,
+  });
 }
 
-beforeEach(() => installStorage());
+function installTouchDefault(matches: boolean): void {
+  if (typeof window === 'undefined') {
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: {},
+    });
+  }
+  if (typeof document !== 'undefined') document.body.classList.remove('native-app');
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: (query: string) =>
+      ({
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+        addListener: () => undefined,
+        removeListener: () => undefined,
+        dispatchEvent: () => false,
+      }) as MediaQueryList,
+  });
+}
+
+beforeEach(() => {
+  installStorage();
+  installTouchDefault(false);
+});
 
 describe('Settings', () => {
   it('defaults fresh sessions and initial logins to the medium graphics preset', () => {
@@ -73,6 +108,10 @@ describe('Settings', () => {
     expect(s.get('shadowQuality')).toBe(SETTING_RANGES.shadowQuality.def);
     expect(s.get('renderScale')).toBe(1);
     expect(s.get('fullscreen')).toBe(1);
+    // Borderless fullscreen, matching the desktop shell's own prefs default:
+    // the shell opens that way, so a fresh profile must not disagree with the
+    // window it is already looking at.
+    expect(s.get('displayMode')).toBe(1);
     expect(s.get('clickToMove')).toBe(0);
     expect(s.get('clickToMoveButton')).toBe(0);
     expect(s.get('cameraFov')).toBe(SETTING_RANGES.cameraFov.def);
@@ -104,6 +143,15 @@ describe('Settings', () => {
     expect(s.set('cameraFov', 75)).toBe(75);
   });
 
+  it('clamps a stored historical Insane shadow dial (2) down to High on load', () => {
+    // The Shadow Quality ladder is capped at High (the 4096 map): the retired
+    // Insane rung persisted 2, which must come back as High, not survive.
+    localStorage.setItem('woc_settings', JSON.stringify({ shadowQuality: 2 }));
+    const s = new Settings();
+    expect(SETTING_RANGES.shadowQuality.max).toBe(1);
+    expect(s.get('shadowQuality')).toBe(1);
+  });
+
   it('clamps out-of-range values to the slider bounds', () => {
     const s = new Settings();
     expect(s.set('cameraSpeed', 99)).toBe(SETTING_RANGES.cameraSpeed.max);
@@ -115,6 +163,10 @@ describe('Settings', () => {
     expect(s.set('effectsQuality', 99)).toBe(SETTING_RANGES.effectsQuality.max);
     expect(s.set('shadowQuality', -1)).toBe(SETTING_RANGES.shadowQuality.min);
     expect(s.set('fullscreen', -1)).toBe(0);
+    // displayMode is a two-value picker stored as a number: anything outside
+    // [0, 1] clamps rather than reaching the shell as an unknown mode.
+    expect(s.set('displayMode', -1)).toBe(0);
+    expect(s.set('displayMode', 4)).toBe(1);
     // Interface Mode (0 Auto, 1 Desktop, 2 Touch) clamps to its 0..2 bounds.
     expect(s.set('interfaceMode', 99)).toBe(SETTING_RANGES.interfaceMode.max);
     expect(s.set('interfaceMode', -1)).toBe(SETTING_RANGES.interfaceMode.min);
@@ -150,10 +202,15 @@ describe('Settings', () => {
     a.set('cameraSpeed', 0.4);
     a.set('musicVolume', 0.2);
     a.set('fullscreen', 0);
+    a.set('displayMode', 0);
     const b = new Settings();
     expect(b.get('cameraSpeed')).toBe(0.4);
     expect(b.get('musicVolume')).toBe(0.2);
     expect(b.get('fullscreen')).toBe(0);
+    // The chosen window mode outlives the session: the shell restores its own
+    // window at launch and the boot reflection re-reads it, but a player who
+    // never opens options must still find their choice on the row.
+    expect(b.get('displayMode')).toBe(0);
   });
 
   it('persists boolean settings across instances', () => {
@@ -185,6 +242,75 @@ describe('Settings', () => {
 
     fresh.set('showOwnNameplate', false);
     expect(new Settings().get('showOwnNameplate')).toBe(false);
+  });
+
+  it('defaults Time Played revealed and persists concealing it across instances', () => {
+    // The character sheet's privacy eye and the Options row both write this
+    // per-device display preference; a blob saved before the setting existed
+    // resolves the same default-on path.
+    const fresh = new Settings();
+    expect(fresh.get('showPlaytime')).toBe(true);
+
+    fresh.set('showPlaytime', false);
+    expect(new Settings().get('showPlaytime')).toBe(false);
+  });
+
+  it('defaults the dedicated-GPU preference on and persists an opt-out across instances', () => {
+    // Default true preserves today's shipped behavior (the desktop shell forces
+    // the dedicated GPU). The stored shell field is the INVERSE opt-out, so this
+    // key reads false exactly when the shell is told to opt out; the boot
+    // reflection and the options write arm each invert once.
+    const fresh = new Settings();
+    expect(fresh.get('forceHighPerfGpu')).toBe(true);
+
+    fresh.set('forceHighPerfGpu', false);
+    expect(new Settings().get('forceHighPerfGpu')).toBe(false);
+
+    // and back: an opt-out is not sticky once the player re-enables the row
+    new Settings().set('forceHighPerfGpu', true);
+    expect(new Settings().get('forceHighPerfGpu')).toBe(true);
+  });
+
+  it('defaults Discord Rich Presence on and persists an opt-out across instances', () => {
+    // Default true is the phase 10 decision: presence is on out of the box, and
+    // Discord's own activity-sharing setting still gates who sees it. Same
+    // polarity on both sides of the bridge, so the stored value IS what the
+    // shell is told (no inversion, unlike the GPU preference above).
+    const fresh = new Settings();
+    expect(fresh.get('discordPresence')).toBe(true);
+
+    fresh.set('discordPresence', false);
+    expect(new Settings().get('discordPresence')).toBe(false);
+
+    new Settings().set('discordPresence', true);
+    expect(new Settings().get('discordPresence')).toBe(true);
+  });
+
+  it('defaults other-player nameplates off for fresh mobile sessions', () => {
+    installTouchDefault(true);
+
+    const fresh = new Settings();
+
+    expect(localStorage.getItem('woc_settings')).toBeNull();
+    expect(fresh.get('showPlayerNameplates')).toBe(false);
+  });
+
+  it('keeps other-player nameplates on by default for fresh desktop sessions', () => {
+    const fresh = new Settings();
+
+    expect(localStorage.getItem('woc_settings')).toBeNull();
+    expect(fresh.get('showPlayerNameplates')).toBe(true);
+  });
+
+  it('lets saved other-player nameplate preferences override the device default', () => {
+    installTouchDefault(true);
+    localStorage.setItem('woc_settings', JSON.stringify({ showPlayerNameplates: true }));
+    expect(new Settings().get('showPlayerNameplates')).toBe(true);
+
+    installStorage();
+    installTouchDefault(false);
+    localStorage.setItem('woc_settings', JSON.stringify({ showPlayerNameplates: false }));
+    expect(new Settings().get('showPlayerNameplates')).toBe(false);
   });
 
   it('defaults footstep sounds off and persists re-enabling across instances', () => {
@@ -293,6 +419,41 @@ describe('Settings', () => {
     snap.cameraSpeed = 99;
     expect(s.get('cameraSpeed')).not.toBe(99);
   });
+
+  it('patches multiple validated settings atomically with one persistence write', () => {
+    const s = new Settings();
+    const write = vi.spyOn(localStorage, 'setItem');
+
+    const applied = s.patch({
+      graphicsPreset: 99,
+      terrainDetail: -1,
+      showFps: true,
+    });
+
+    expect(applied.graphicsPreset).toBe(SETTING_RANGES.graphicsPreset.max);
+    expect(applied.terrainDetail).toBe(SETTING_RANGES.terrainDetail.min);
+    expect(applied.showFps).toBe(true);
+    expect(s.all()).toEqual(applied);
+    expect(write).toHaveBeenCalledTimes(1);
+    expect(new Settings().get('graphicsPreset')).toBe(SETTING_RANGES.graphicsPreset.max);
+  });
+
+  it('rejects an invalid patch without changing memory or persistence', () => {
+    const s = new Settings();
+    const before = s.all();
+    const write = vi.spyOn(localStorage, 'setItem');
+
+    expect(() =>
+      s.patch({
+        cameraSpeed: 0.4,
+        showFps: 'yes' as unknown as boolean,
+      }),
+    ).toThrow(TypeError);
+
+    expect(s.all()).toEqual(before);
+    expect(write).not.toHaveBeenCalled();
+    expect(new Settings().all()).toEqual(before);
+  });
 });
 
 describe('Interface & Comfort settings pack', () => {
@@ -314,7 +475,19 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showDailyRewardsChest')).toBe(true);
     expect(s.get('showSecondaryActionBar')).toBe(false);
     expect(s.get('showThirdActionBar')).toBe(false);
+    expect(s.get('hideUnusedActionSlots')).toBe(false);
     expect(s.get('invertLookY')).toBe(false);
+  });
+
+  // Issue 2429: hide the empty-slot chrome (background/border/keybind label) on
+  // desktop action-bar slots with no ability or item bound. Off by default (the
+  // classic look, unchanged out of the box).
+  it('defaults hideUnusedActionSlots off and persists enabling it across instances', () => {
+    const a = new Settings();
+    expect(a.get('hideUnusedActionSlots')).toBe(false);
+    a.set('hideUnusedActionSlots', true);
+    const b = new Settings();
+    expect(b.get('hideUnusedActionSlots')).toBe(true);
   });
 
   it('clamps the comfort sliders to their documented bounds', () => {

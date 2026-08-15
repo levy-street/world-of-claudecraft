@@ -57,3 +57,16 @@ describe('startServer wires the game loop into /livez liveness (source pin)', ()
     expect(mainSrc).toContain('lastTickAt: () => game.lastTickAt(),');
   });
 });
+
+describe('startServer wires the discord bot counters exporter (source pin)', () => {
+  const mainSrc = readFileSync('server/main.ts', 'utf8');
+
+  it('registers the bot counters metrics on the live registry, as an ACTIVE call', () => {
+    // Same seam and same reasoning as the liveness pin above: the exporter suite
+    // builds its own private Registry, so deleting this one boot line would leave
+    // every metrics test green while /metrics rendered none of the
+    // woc_discord_bot_* series in production. The `^\s*` anchor rejects a
+    // commented-out call.
+    expect(mainSrc).toMatch(/^\s*registerDiscordBotMetrics\(httpMetrics\.registry\);/m);
+  });
+});

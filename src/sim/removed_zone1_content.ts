@@ -1,5 +1,6 @@
+import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import type { CharacterState } from './sim';
-import type { InvSlot } from './types';
+import { cloneInvSlot, type InvSlot } from './types';
 
 export const REMOVED_ZONE1_QUEST_IDS = [
   'q_mogger_tracks',
@@ -59,16 +60,40 @@ export function sanitizeRemovedZone1Content(state: CharacterState): {
 } {
   const questLog = state.questLog
     .filter((quest) => !REMOVED_QUESTS.has(quest.questId))
-    .map((quest) => ({
-      questId: quest.questId,
-      counts: [...quest.counts],
-      state: quest.state,
-      ...(quest.selection === undefined ? {} : { selection: quest.selection }),
-      ...(quest.resolvedCounts === undefined ? {} : { resolvedCounts: [...quest.resolvedCounts] }),
-    }));
+    .map((quest) => {
+      // Carried through the migration: dropping it would hand a mid-quest player
+      // back the interact credits they already spent. Sanitized rather than
+      // spread raw, because this runs on the login path BEFORE the load-side
+      // normalization in Sim.addPlayer, so it is the first reader of the raw
+      // JSONB: a tampered `creditedObjects: null` must not throw here and lock
+      // the character out (this same function is also on the save path).
+      const creditedObjects = sanitizeCreditedObjects(quest.creditedObjects);
+      return {
+        questId: quest.questId,
+        counts: [...quest.counts],
+        state: quest.state,
+        ...(quest.selection === undefined ? {} : { selection: quest.selection }),
+        ...(quest.resolvedCounts === undefined
+          ? {}
+          : { resolvedCounts: [...quest.resolvedCounts] }),
+        ...(creditedObjects === undefined ? {} : { creditedObjects }),
+        ...(quest.burnedObjects === undefined
+          ? {}
+          : {
+              // Drop pre-stable-key rows (a legacy {id, at} save) here too, so the
+              // sanitized state written back to the DB never carries a keyless stamp.
+              burnedObjects: quest.burnedObjects
+                .filter((b) => typeof b.key === 'string')
+                .map((b) => ({ key: b.key, at: b.at })),
+            }),
+        ...(quest.rev === undefined ? {} : { rev: quest.rev }),
+      };
+    });
   const questsDone = state.questsDone.filter((questId) => !REMOVED_QUESTS.has(questId));
-  const inventory = state.inventory.filter(keepItem).map((slot) => ({ ...slot }));
-  const vendorBuyback = state.vendorBuyback?.filter(keepItem).map((slot) => ({ ...slot }));
+  // cloneInvSlot, not a shallow spread: buyback and bag rows can carry instance
+  // payloads whose mutable maps must not alias between input and migrated state.
+  const inventory = state.inventory.filter(keepItem).map(cloneInvSlot);
+  const vendorBuyback = state.vendorBuyback?.filter(keepItem).map(cloneInvSlot);
 
   const changed =
     questLog.length !== state.questLog.length ||

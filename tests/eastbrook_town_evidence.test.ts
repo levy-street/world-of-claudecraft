@@ -152,8 +152,8 @@ const profiles = EASTBROOK_TOWN_CAPTURE_PROFILES as readonly CaptureProfile[];
 const views = EASTBROOK_TOWN_CAPTURE_VIEWS as readonly CaptureView[];
 const perfScenarioContracts = EASTBROOK_TOWN_PERF_SCENARIOS as readonly PerfScenarioContract[];
 const PNG_SIGNATURE = '89504e470d0a1a0a';
-const EXPECTED_TOWN_COLOR = { calls: 18, triangles: 29_644 };
-const EXPECTED_TOWN_SHADOW = { calls: 9, triangles: 28_048 };
+const EXPECTED_TOWN_COLOR = { calls: 18, triangles: 29_436 };
+const EXPECTED_TOWN_SHADOW = { calls: 9, triangles: 27_840 };
 // The full 15-view x 2-profile Eastbrook rebuild-v1 matrix (60 images) was
 // captured and accepted for rebuild v1. After the polish-v2 pass superseded
 // that layout, v1 was pruned to the four matched hero views at the

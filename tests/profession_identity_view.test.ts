@@ -3,6 +3,9 @@ import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import {
   buildAttunementPreview,
   buildProfessionIdentityView,
+  orderSkillsForCard,
+  type ProfessionSkillRow,
+  uniformSkillChips,
 } from '../src/ui/profession_identity_view';
 
 const baseIdentity = {
@@ -100,6 +103,83 @@ describe('buildProfessionIdentityView', () => {
     expect(row).toMatchObject({ skill: 74, tier: 2, pointsToNextTier: 1 });
   });
 
+  it('orderSkillsForCard sorts major, hobby, dormant knowledge, rest, ring-stable in groups', () => {
+    // The 264px cap shows about five of ten rows; in raw ring order the two
+    // Material-pair majors sat at ring indices 8 and 9, below the fold. The
+    // sort is stable, so ring order decides within each group: weaponcrafting
+    // (ring 8) precedes armorcrafting (ring 9) among the majors, and cooking
+    // (ring 2) precedes jewelcrafting (ring 7) among dormant knowledge.
+    const view = buildProfessionIdentityView(baseIdentity);
+    expect(orderSkillsForCard(view.skills).map((row) => row.craftId)).toEqual([
+      'weaponcrafting',
+      'armorcrafting',
+      'leatherworking',
+      'cooking',
+      'jewelcrafting',
+      'engineering',
+      'alchemy',
+      'tailoring',
+      'inscription',
+      'enchanting',
+    ]);
+    // The MODEL's own skills stay in CRAFT_RING order: the professions
+    // window's craft ROW LIST maps identity.skills positionally into
+    // model.crafts, so the card's presentation sort must be a copy, never an
+    // in-place mutation (the regression the final gate caught: the
+    // professions_view crafts pin and the window's craft-icon row order
+    // reddened when the sort mutated the shared array).
+    expect(view.skills[0].craftId).toBe('engineering');
+    expect(view.skills[9].craftId).toBe('armorcrafting');
+    // The unattuned card is one role group, so the stable sort leaves it in
+    // pure ring order (the collapse caption depends on nothing here).
+    const unattuned = buildProfessionIdentityView({
+      ...baseIdentity,
+      activeArchetype: null,
+      pairedMajor: null,
+      hobbyCraft: null,
+      attunedPairs: [],
+    });
+    expect(orderSkillsForCard(unattuned.skills)[0].craftId).toBe('engineering');
+    expect(orderSkillsForCard(unattuned.skills)[9].craftId).toBe('armorcrafting');
+  });
+
+  it('collapses uniform role/cap chips on the unattuned card and never on the attuned one', () => {
+    // Unattuned: every row is role unattuned / ceiling rare by construction,
+    // so the card-level caption replaces ten repeated chip pairs.
+    const unattuned = buildProfessionIdentityView({
+      ...baseIdentity,
+      activeArchetype: null,
+      pairedMajor: null,
+      hobbyCraft: null,
+      attunedPairs: [],
+    });
+    expect(unattuned.uniform).toEqual({ role: 'unattuned', ceiling: 'rare' });
+    // Attuned always mixes (two majors beside hobby/dormant rows): no collapse.
+    expect(buildProfessionIdentityView(baseIdentity).uniform).toBeNull();
+  });
+
+  it('uniformSkillChips requires BOTH dimensions uniform (per-dimension negatives)', () => {
+    const row = (role: ProfessionSkillRow['role'], ceiling: ProfessionSkillRow['ceiling']) => ({
+      craftId: 'cooking',
+      skill: 0,
+      tier: 0,
+      pointsToNextTier: 25,
+      role,
+      ceiling,
+      dormantKnowledge: false,
+    });
+    expect(uniformSkillChips([row('unattuned', 'rare'), row('unattuned', 'rare')])).toEqual({
+      role: 'unattuned',
+      ceiling: 'rare',
+    });
+    // Same role, mixed ceiling: no collapse.
+    expect(uniformSkillChips([row('dormant', 'common'), row('dormant', 'rare')])).toBeNull();
+    // Mixed role, same ceiling: no collapse.
+    expect(uniformSkillChips([row('hobby', 'rare'), row('unattuned', 'rare')])).toBeNull();
+    // No rows: nothing to state once.
+    expect(uniformSkillChips([])).toBeNull();
+  });
+
   it('keeps the tutorial hint until the first tier-1 crossing, then never shows it again', () => {
     const zero = Object.fromEntries(Object.keys(baseIdentity.craftSkills).map((id) => [id, 0]));
     const withCooking = (skill: number) =>
@@ -129,6 +209,32 @@ describe('buildAttunementPreview', () => {
       // switchCount defaults to 0, so the return cost is the base 5.
       returnCost: 5,
     });
+  });
+
+  it('a remembered quested hobby wins over the skill default for its pair', () => {
+    // The pair-transition restore (professions/hobby_memory.ts) will set the
+    // remembered hobby, so the pre-commit preview must promise the same.
+    const preview = buildAttunementPreview(
+      'weaponcrafting+armorcrafting',
+      baseIdentity.craftSkills,
+      1,
+      { 'weaponcrafting+armorcrafting': 'tailoring' },
+    );
+    expect(preview?.hobbyCraft).toBe('tailoring');
+    // A record for a DIFFERENT pair changes nothing here.
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 1, {
+        'tailoring+leatherworking': 'cooking',
+      })?.hobbyCraft,
+    ).toBe('leatherworking');
+  });
+
+  it('an invalid remembered hobby falls back to the skill default (the restore rule)', () => {
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 0, {
+        'weaponcrafting+armorcrafting': 'weaponcrafting', // a major, never a candidate
+      })?.hobbyCraft,
+    ).toBe('leatherworking');
   });
 
   it('escalates the return cost with the switch count (requiredAmendsProgress)', () => {

@@ -28,6 +28,8 @@
 // mirror aura {stacks:undefined} derive identical output.
 
 import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
+import { isCancelableAura } from '../sim/combat/aura_cancel';
+import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 
@@ -53,14 +55,47 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
   'berserker_stance',
   'defensive_stance',
 ]);
+/** Thornhollow Fields' carried-flag buff (src/sim/social/battleground.ts
+ *  `CARRIED_FLAG_AURA_ID`, named here as a literal the same way icons.ts names
+ *  the rune ids). Exported because the buff bar's cancel affordance has to
+ *  recognize it: cancelling THIS buff is a gameplay action (it drops the flag),
+ *  not a cosmetic un-buff. */
+export const CARRIED_FLAG_AURA_ID = 'bg_carried_flag';
 // Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
-const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
+// The carried-flag buff is a MODE for the same reason: you have the flag until
+// you do not, and the sim only backs it with a longer-than-any-match duration so
+// nothing can expire it out from under the carry. A countdown under either would
+// be a lie the player reads as "this is about to leave me".
+const TOGGLE_IDS: ReadonlySet<string> = new Set([
+  'ghost_wolf',
+  'beacon_of_light',
+  CARRIED_FLAG_AURA_ID,
+]);
+// Auras the low graphics tier's buff cap may NEVER shed (auras_painter.ts).
+// The cap's fairness rule is "spend the budget on buffs, a debuff always
+// renders", which rests on buffs being cosmetic. That is false for an aura whose
+// icon IS an affordance: the carried-flag buff is the only way to drop the flag
+// on purpose, it is applied at the pickup so it sits LAST in application order,
+// and a flat first-N cap would therefore shed it first, on the one tier, from
+// the one player who needs it. Hiding it is hiding an action, which the
+// gameplay-neutral-graphics invariant forbids (docs/design/graphics-settings-fairness.md).
+const NEVER_SHED_IDS: ReadonlySet<string> = new Set([CARRIED_FLAG_AURA_ID]);
 // The inverse override: an aura that rides a TOGGLE_KIND but is a genuine timed
 // buff worth a countdown. Greater Invisibility reuses the rogue-stealth machinery
 // for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
 // buff, not a toggle, so it must show its remaining time like any other buff.
 const TIMED_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
+
+/** Whether cancelling this aura performs a GAMEPLAY action rather than merely
+ *  dropping a buff, so a touch host must confirm it before it fires. Today that
+ *  is exactly the carried-flag buff: on a touch device the cancel gesture is a
+ *  long press, which is also the tooltip-peek gesture, so an unconfirmed cancel
+ *  would drop the flag mid-run by accident. Desktop right-click is deliberate
+ *  and stays instant. */
+export function auraCancelNeedsConfirm(auraId: string): boolean {
+  return auraId === CARRIED_FLAG_AURA_ID;
+}
 
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {
@@ -99,12 +134,15 @@ export interface AuraInput {
   value: number;
   // Optional effect-descriptor inputs (DoT/HoT tick interval, secondary values, magic
   // school). Present on the offline Sim aura; the online ClientWorld mirror may omit
-  // them, in which case auraEffectDescriptor falls back to its defaults.
+  // them, in which case auraEffectDescriptor falls back to its defaults. A newer
+  // server's unknown AuraKind safely omits the effect line until this client knows it.
   value2?: number;
   value3?: number;
   tickInterval?: number;
   school?: AuraSchool;
   stacks?: number;
+  /** Party-frame-only relative pool badge for Mending Current. */
+  poolPct?: number;
   // Remaining charges on a charge-limited aura (e.g. Lightning Shield's 3 reflects). Present
   // on the offline Sim aura and mirrored over the wire; undefined for ordinary auras. When
   // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
@@ -122,6 +160,10 @@ export interface AuraInput {
   // Encounter-owned control cannot be canceled by the player. Mirrored over the
   // online aura wire so the cancel affordance matches the authoritative sim.
   unbreakableControl?: true;
+  // The other arm of the same rule: a penalty no player counter may shed (the recovery
+  // sicknesses). Also mirrored over the wire (terse `und`), so the cancel affordance
+  // cannot offer what the sim's cancel path would refuse.
+  undispellable?: true;
 }
 
 /** The entity fields the core reads: just its aura list. */
@@ -130,20 +172,20 @@ export interface AurasEntityInput {
 }
 
 /** Injected host helpers. The core produces localized text without importing the i18n
- *  runtime (testable with spies); each fires its key/lookup every frame so an in-game
- *  language switch lands on the next tick. */
+ *  runtime (testable with spies). Localized lookups normally run every frame; a view
+ *  with effectHtmlCacheVersion reuses effect HTML until that locale version changes. */
 export interface AurasDeps {
   /** The icon identity the painter resolves to a background-image URL (host:
-   *  `ABILITIES[id] ? id : 'aura_' + kind`). */
+   *  the cached generated-aura resolver in hud.ts). */
   iconId(aura: AuraInput): string;
   /** The localized aura display name, for the tooltip (host: `ABILITIES[id] ?
    *  abilityDisplayName(...) : auraDisplayNameFromSource(name)`). */
   auraName(aura: AuraInput): string;
   /** The formatted stack count (host: `formatNumber(stacks, {maximumFractionDigits:0})`). */
   formatStacks(stacks: number): string;
-  /** The one-line aura effect-summary HTML the tooltip prepends (or '' when the aura has
-   *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
-   *  localized, esc'd HTML from the pure aura_effect descriptor. */
+  /** The localized, escaped tooltip body the tooltip prepends (or '' when unavailable).
+   *  The host may include the source ability description plus the one-line runtime
+   *  aura-effect summary; the i18n-free core never calls t(). */
   auraEffectHtml(aura: AuraInput): string;
   /** The localized single-letter duration unit suffixes the compact label appends
    *  (host: `t('hudChrome.unitFrame.durationUnitSeconds'/'...Minutes'/'...Hours'/
@@ -187,6 +229,10 @@ export interface AuraSlotState {
   name: string;
   /** Raw seconds remaining, for the tooltip (read live by the pooled closure). */
   remaining: number;
+  /** Full authored duration, used by the detailed target-aura window's progress bar. */
+  duration?: number;
+  /** Caster entity id, used by the detailed target-aura window's source label. */
+  sourceId?: number;
   /** Whether this aura is the player's own cancelable buff (mode 'buffs', not a debuff):
    *  the buff bar offers right-click-cancel, a target's debuff strip is read-only. */
   cancelable: boolean;
@@ -199,6 +245,17 @@ export interface AuraSlotState {
   /** Whether the aura is about to run out (drives the `expiring` blink class). Always
    *  false for toggles/permanents, which show no countdown either. */
   expiring: boolean;
+  /** Whether this aura reads as a MODE rather than a timed effect (a form, a
+   *  stance, stealth, Ghost Wolf, the carried flag). It already suppresses the
+   *  countdown label; the painter also suppresses the tooltip's
+   *  seconds-remaining line for it, because the sim backs every one of these
+   *  with a long finite duration (3600s, or a whole match) that is scaffolding,
+   *  not information. Printing it is the same lie `durationText` avoids. */
+  toggle: boolean;
+  /** Whether the low graphics tier's buff cap may never shed this aura, because
+   *  its icon is an ACTIONABLE affordance rather than cosmetic upkeep
+   *  (`NEVER_SHED_IDS`). Debuffs already have this property via `isDebuff`. */
+  alwaysRender: boolean;
 }
 
 /** The whole strip's derived state: the reused slot pool plus the active count. Both
@@ -208,6 +265,19 @@ export interface AuraSlotState {
 export interface AurasState {
   slots: AuraSlotState[];
   count: number;
+}
+
+interface AuraEffectHtmlCache {
+  version: unknown;
+  id: string;
+  kind: AuraKind;
+  value: number;
+  value2: number | undefined;
+  value3: number | undefined;
+  tickInterval: number | undefined;
+  school: AuraSchool | undefined;
+  stacks: number | undefined;
+  html: string;
 }
 
 export interface AurasView {
@@ -255,10 +325,14 @@ function makeSlotState(): AuraSlotState {
     stacksText: '',
     name: '',
     remaining: 0,
+    duration: undefined,
+    sourceId: undefined,
     cancelable: false,
     effectHtml: '',
     own: false,
     expiring: false,
+    toggle: false,
+    alwaysRender: false,
   };
 }
 
@@ -274,15 +348,21 @@ function makeSlotState(): AuraSlotState {
  * the painter renders yours first and bigger. Implemented as two passes over the
  * SAME aura list (own, then the rest): no sort, no per-frame allocation, and the
  * relative order within each group stays the sim-application order.
+ *
+ * opts.effectHtmlCacheVersion enables per-slot tooltip HTML caching. The version
+ * must change whenever localized output can change; descriptor inputs are compared
+ * directly, so countdown-only ticks keep the cached HTML allocation-free.
  */
 export function createAurasView(
   mode: AuraMode,
   deps: AurasDeps,
-  opts?: { ownFirst?: boolean },
+  opts?: { ownFirst?: boolean; effectHtmlCacheVersion?: () => unknown },
 ): AurasView {
   const slots: AuraSlotState[] = [];
+  const effectHtmlCache: Array<AuraEffectHtmlCache | undefined> = [];
   const state: AurasState = { slots, count: 0 };
   const ownFirst = opts?.ownFirst === true;
+  const effectHtmlCacheVersion = opts?.effectHtmlCacheVersion;
 
   return {
     tick(entity: AurasEntityInput): AurasState {
@@ -290,6 +370,7 @@ export function createAurasView(
       // Frame-constant, so read once per tick instead of per aura (it still re-reads each frame,
       // so an in-game language switch lands on the next tick).
       const units = deps.durationUnits();
+      const effectVersion = effectHtmlCacheVersion?.();
       const fill = (a: AuraInput, own: boolean): void => {
         // Temporal Echo marks are shown only to the chronomancer who placed them
         // (owner 2026-07-12): another caster's echo still heals in the sim but never
@@ -305,31 +386,92 @@ export function createAurasView(
         if (mode === 'debuffs' && !debuff) return;
         if (mode === 'buffs' && debuff) return;
         // Grow the pool only when this frame needs a slot it has never held before.
-        if (count >= slots.length) slots.push(makeSlotState());
+        if (count >= slots.length) {
+          slots.push(makeSlotState());
+          effectHtmlCache.push(undefined);
+        }
         const slot = slots[count];
         slot.key = a.id;
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
-        const toggle = (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id);
+        const toggle =
+          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id) || isPersistentEngineAura(a.id)) &&
+          !TIMED_IDS.has(a.id);
         slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
         // Toggles show no countdown, so they never blink either.
         slot.expiring = !toggle && isAuraExpiring(a.remaining, a.duration);
+        slot.toggle = toggle;
+        slot.alwaysRender = NEVER_SHED_IDS.has(a.id);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
         // badge shows a stack count, and only when it stacks past 1.
         slot.stacksText =
-          a.charges !== undefined
-            ? deps.formatStacks(a.charges)
-            : a.stacks && a.stacks > 1
-              ? deps.formatStacks(a.stacks)
-              : '';
+          a.poolPct !== undefined
+            ? deps.formatStacks(a.poolPct)
+            : a.charges !== undefined
+              ? deps.formatStacks(a.charges)
+              : a.stacks !== undefined && (a.stacks > 1 || isPersistentEngineAura(a.id))
+                ? deps.formatStacks(a.stacks)
+                : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
+        slot.duration = a.duration;
+        slot.sourceId = a.sourceId;
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
-        // (mode 'debuffs') is read-only, so nothing there is cancelable.
-        slot.cancelable = mode === 'buffs' && !debuff && a.unbreakableControl !== true;
-        slot.effectHtml = deps.auraEffectHtml(a);
+        // (mode 'debuffs') is read-only, so nothing there is cancelable. The
+        // removability term routes through isCancelableAura, the same predicate the
+        // sim's cancel path answers to (combat/aura_cancel.ts, which folds in
+        // isPlayerRemovableAura), so the affordance can never offer a cancel the
+        // server would refuse: the encounter-control and undispellable arms ride
+        // the wire (ub / und) for exactly this reader.
+        slot.cancelable = mode === 'buffs' && isCancelableAura(a);
+        const cachedEffect = effectHtmlCache[count];
+        if (
+          !effectHtmlCacheVersion ||
+          !cachedEffect ||
+          cachedEffect.version !== effectVersion ||
+          cachedEffect.id !== a.id ||
+          cachedEffect.kind !== a.kind ||
+          cachedEffect.value !== a.value ||
+          cachedEffect.value2 !== a.value2 ||
+          cachedEffect.value3 !== a.value3 ||
+          cachedEffect.tickInterval !== a.tickInterval ||
+          cachedEffect.school !== a.school ||
+          cachedEffect.stacks !== a.stacks
+        ) {
+          const html = deps.auraEffectHtml(a);
+          slot.effectHtml = html;
+          if (effectHtmlCacheVersion) {
+            if (cachedEffect) {
+              cachedEffect.version = effectVersion;
+              cachedEffect.id = a.id;
+              cachedEffect.kind = a.kind;
+              cachedEffect.value = a.value;
+              cachedEffect.value2 = a.value2;
+              cachedEffect.value3 = a.value3;
+              cachedEffect.tickInterval = a.tickInterval;
+              cachedEffect.school = a.school;
+              cachedEffect.stacks = a.stacks;
+              cachedEffect.html = html;
+            } else {
+              effectHtmlCache[count] = {
+                version: effectVersion,
+                id: a.id,
+                kind: a.kind,
+                value: a.value,
+                value2: a.value2,
+                value3: a.value3,
+                tickInterval: a.tickInterval,
+                school: a.school,
+                stacks: a.stacks,
+                html,
+              };
+            }
+          }
+        } else {
+          slot.effectHtml = cachedEffect.html;
+        }
         slot.own = own;
         count++;
       };

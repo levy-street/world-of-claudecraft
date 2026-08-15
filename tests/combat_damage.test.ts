@@ -283,3 +283,96 @@ describe('combat/damage handleDeath', () => {
     expect(pet.hp).toBe(hpBefore - 5);
   });
 });
+
+describe('combat/damage death recap', () => {
+  it('carries the killing mob and its ability on the playerDeath event', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    const mob = spawnHostileMob(sim, 'forest_wolf', 5);
+    p.hp = 1;
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, mob, p, 100, false, 'physical', 'Bite', 'hit');
+
+    const events = sim.drainEvents();
+    const recap = events.find((e) => e.type === 'playerDeath' && (e as any).pid === p.id) as any;
+    expect(recap).toBeTruthy();
+    expect(recap.killerId).toBe(mob.id);
+    expect(recap.killerAbility).toBe('Bite');
+    // Exactly one death event, never a duplicate sim-side notice line too.
+    expect(events.filter((e) => e.type === 'log' && (e as any).pid === p.id)).toHaveLength(0);
+  });
+
+  it('carries the killing mob with no ability for a plain melee swing', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    const mob = spawnHostileMob(sim, 'forest_wolf', 5);
+    p.hp = 1;
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, mob, p, 100, false, 'physical', null, 'hit');
+
+    const events = sim.drainEvents();
+    const recap = events.find((e) => e.type === 'playerDeath' && (e as any).pid === p.id) as any;
+    expect(recap).toBeTruthy();
+    expect(recap.killerId).toBe(mob.id);
+    expect(recap.killerAbility).toBeUndefined();
+  });
+
+  it('carries the killing player (not run through the mob-name matcher) in a PvP kill', () => {
+    const sim = new Sim({ seed: 1717, playerClass: 'warrior', noPlayer: true, autoEquip: true });
+    const killerId = sim.addPlayer('warrior', "Kill'er");
+    const victimId = sim.addPlayer('warrior', 'Victim');
+    sim.setPlayerLevel(20, killerId);
+    sim.setPlayerLevel(20, victimId);
+    const killer = sim.entities.get(killerId) as AnyEntity;
+    const victim = sim.entities.get(victimId) as AnyEntity;
+    victim.hp = 1;
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, killer, victim, 100, false, 'physical', "Dragon's Breath", 'hit');
+
+    const events = sim.drainEvents();
+    const recap = events.find(
+      (e) => e.type === 'playerDeath' && (e as any).pid === victim.id,
+    ) as any;
+    expect(recap).toBeTruthy();
+    // Both the killer's name and the ability name may contain an apostrophe:
+    // carried as separate structured fields, never spliced into one sentence
+    // and re-split by a regex.
+    expect(recap.killerId).toBe(killer.id);
+    expect(recap.killerAbility).toBe("Dragon's Breath");
+  });
+
+  it('carries the environmental cause with no killer entity', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, null, p, 1000, false, 'physical', 'Falling', 'hit', true);
+
+    const events = sim.drainEvents();
+    const recap = events.find((e) => e.type === 'playerDeath' && (e as any).pid === p.id) as any;
+    expect(recap).toBeTruthy();
+    expect(recap.killerId).toBeUndefined();
+    expect(recap.killerAbility).toBe('Falling');
+  });
+
+  it('falls back to no killer id or ability when neither is known', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    sim.drainEvents();
+
+    handleDeath(sim.ctx, p, null);
+
+    const events = sim.drainEvents();
+    const recap = events.find((e) => e.type === 'playerDeath' && (e as any).pid === p.id) as any;
+    expect(recap).toBeTruthy();
+    expect(recap.killerId).toBeUndefined();
+    expect(recap.killerAbility).toBeUndefined();
+  });
+});

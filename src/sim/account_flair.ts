@@ -81,10 +81,6 @@ const HOST_SETS: Record<StreamerPlatform, ReadonlySet<string>> = {
   youtube: new Set(STREAMER_HOSTS.youtube),
 };
 
-export function isStreamerPlatform(value: unknown): value is StreamerPlatform {
-  return typeof value === 'string' && (STREAMER_PLATFORMS as readonly string[]).includes(value);
-}
-
 /**
  * The security boundary. Returns the normalized href, or null when the value is
  * not a plain https URL on one of that platform's own hostnames. Rejects other

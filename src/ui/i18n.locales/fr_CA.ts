@@ -11,6 +11,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_CA: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.tradeAlreadyTrading': 'Ce joueur est déjà en train de faire un échange.',
   'guide.professions.craftMasteryBody':
     "Quelques attentes honnêtes : la montée jusqu'au plafond de 125 d'un métier demande au moins 125 fabrications réussies, chaque fabrication à gain complet vous faisant progresser d'exactement un point, et en pratique un peu plus au fur et à mesure que les recettes s'estompent entre les échelons du formateur. La fabrication elle-même est rapide ; c'est l'approvisionnement qui constitue le vrai voyage, alors prévoyez quelques soirées dédiées à la récolte et à l'artisanat par métier.\n\nLes métiers de récolte atteignent leur plafond de 100 au fil d'une progression normale si vous récoltez en voyageant, bien que le dernier tronçon réclame les noeuds de haut palier du grand nord. La Pêche est la longue route par conception : selon son propre barème de gain, 200 points de maîtrise représentent plus de trois mille prises. Grand Pêcheur est un titre qui se gagne au fil d'une saison de soirées tranquilles, pas d'une fin de semaine.",
   'download.macCta': 'Telecharger la version macOS',
@@ -141,8 +142,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Réinitialise la recharge de Pas scintillant, Voile de givre et Invisibilité accrue. (Talent de mage)',
   'entities.abilities.greater_invisibility.name': 'Invisibilité accrue',
-  'entities.abilities.greater_invisibility.description':
-    'Disparais pendant 20 s : enlève 2 effets de dégâts périodiques et réduit de 90% les dégâts que tu subis tant que tu es invisible et pour un court moment après. (Talent de mage)',
   'entities.abilities.hot_streak.name': 'Suite flamboyante',
   'entities.abilities.hot_streak.description':
     "Passif : deux coups critiques de suite avec tes sorts de Feu (Boule de feu, Trait de feu, Brûlure, Explosion pyrotechnique ou Choc de flammes) rendent ta prochaine Explosion pyrotechnique ou ton prochain Choc de flammes instantané et gratuit. Les sorts qui dépensent cet effet comptent pour la suite SUIVANTE, même les incantations gratuites; Choc de flammes ne compte qu'une fois, peu importe le nombre d'ennemis touchés, et seul le premier impact peut compter. (Feu)",
@@ -293,6 +292,40 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': 'Accroît les points de vie maximum de {pct}%',
   'hudChrome.statInfo.desc.parry':
     'Vos chances de parer entièrement une attaque de mêlée de front, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
+  'hudChrome.chatQuota.limitReached':
+    'Limite du clavardage Général atteinte. Réessayez dans {seconds}.',
+  'hudChrome.chatQuota.pending':
+    "Votre message précédent dans le clavardage Général est toujours en cours d'envoi. Réessayez dans un instant.",
+  'hudChrome.chatQuota.unavailable':
+    "Le clavardage Général est temporairement indisponible. Réessayez d'ici peu.",
   'hudChrome.interfaceTabs.chat': 'Clavardage',
   'hudChrome.options.mouseoverCast': 'Lancement au survol sur les cadres de groupe',
+  'hud.errors.marketListBound': 'Cet objet est lié et ne peut pas être inscrit au marché.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Cet objet est lié et ne peut pas être envoyé par la poste.',
+  'hud.prompts.guildInviteCancelled':
+    'Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.',
+  'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
+  'hudChrome.bags.itemAriaLocked': '{item}, quantité {count}, barré',
+  'hudChrome.bags.itemLockedLine': 'Barré',
+  'hudChrome.bags.lockItem': "Barrer l'objet",
+  'hudChrome.bags.unlockItem': "Débarrer l'objet",
+  'hudChrome.crafting.reagentLocked': 'Un composant pour cela est barré.',
+  'hudChrome.enchanting.salvageLocked': 'Cet objet est barré.',
+  'hudChrome.otaUpdate.applying': 'Actualización descargada. Reiniciando el juego para aplicarla.',
+  'hudChrome.otaUpdate.continueAnyway': 'Continuar sin actualizar',
+  'hudChrome.otaUpdate.downloading': 'Descargando actualización: {percent}',
+  'hudChrome.otaUpdate.incompatible':
+    'Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.',
+  'hudChrome.otaUpdate.progressLabel': 'Progreso de descarga de la actualización',
+  'hudChrome.otaUpdate.title': 'Actualización del juego',
+  'apiError.cheater_mark.admin_target': "Les comptes d'opérateur ne peuvent pas être marqués.",
+  'apiError.cheater_mark.invalid_duration': "Entrez une durée de marquage d'au moins une seconde.",
+  'auth.designCodeHint':
+    'Copiez ce code pour sauvegarder ou partager cette apparence. Collez un code ici et importez-le pour la charger.',
+  'auth.designCodeCopyManual':
+    'La copie automatique est bloquée ici. Le code est sélectionné; copiez-le avec votre clavier.',
+  'auth.designCodeErrVersion': "Ce code d'apparence vient d'une version plus récente du jeu.",
+  'auth.designCodeErrMalformed':
+    "Ce code d'apparence est endommagé. Copiez le code au complet et réessayez.",
 };

@@ -22,6 +22,7 @@ import {
   validateAction,
   validatePlayerClass,
 } from './protocol';
+import { ownedPetDamageForReward } from './reward_credit';
 
 interface EnvConfig {
   frameSkip: number; // sim ticks per env step (20 ticks = 1 second)
@@ -106,14 +107,17 @@ class Env {
     if (!this.sim || !this.prev) throw new Error('call reset first');
     const sim = this.sim;
     applyAction(sim, action);
-    for (let i = 0; i < this.config.frameSkip; i++) sim.tick();
+    let ownedPetDamage = 0;
+    for (let i = 0; i < this.config.frameSkip; i++) {
+      ownedPetDamage += ownedPetDamageForReward(sim.tick(), sim.entities, sim.playerId);
+    }
     this.stepCount++;
 
     const c = sim.counters;
     const r = this.config.rewards;
     const reward =
       (c.xpGained - this.prev.xpGained) * r.xp +
-      (c.damageDealt - this.prev.damageDealt) * r.damageDealt +
+      (c.damageDealt - this.prev.damageDealt + ownedPetDamage) * r.damageDealt +
       (c.damageTaken - this.prev.damageTaken) * r.damageTaken +
       (c.kills - this.prev.kills) * r.kill +
       (c.deaths - this.prev.deaths) * r.death +

@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { isBlocked, resolveMovement, resolvePosition } from '../src/sim/colliders';
+import {
+  bankerChestSpots,
+  colliderInternalsForTest,
+  isBlocked,
+  resolveMovement,
+  resolvePosition,
+} from '../src/sim/colliders';
 import { BUILTIN_WORLD, PLAYER_START, setActiveWorldContent } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { BlockerDef, PlacedAsset, WorldContent } from '../src/sim/types';
@@ -92,5 +98,143 @@ describe('placement collideRadius override', () => {
     const res = resolvePosition(SEED, 3, 60, 0.5);
     const d = Math.hypot(res.x, res.z - 60);
     expect(d).toBeGreaterThanOrEqual(5.5 - 1e-6); // pushed to override + body radius
+  });
+});
+
+describe('station furniture colliders follow the active bundle', () => {
+  const furnitureNear = (x: number, z: number, r: number): { x: number; z: number }[] =>
+    colliderInternalsForTest
+      .staticWorldColliders(SEED)
+      .filter(
+        (c) =>
+          c.type === 'circle' &&
+          Math.hypot((c as { x: number }).x - x, (c as { z: number }).z - z) < r,
+      )
+      .map((c) => ({ x: (c as { x: number }).x, z: (c as { z: number }).z }));
+  const circlesNear = (x: number, z: number, r: number): number => furnitureNear(x, z, r).length;
+
+  it('a bundle without services gets NO builtin station furniture', () => {
+    const anchor = BUILTIN_WORLD.services?.stations?.[0]?.pos;
+    if (!anchor) throw new Error('builtin stations missing');
+    setActiveWorldContent(world({}));
+    const withStations = circlesNear(anchor.x, anchor.z, 8);
+    expect(withStations).toBeGreaterThan(0);
+    // Same map, services stripped: the furniture must vanish with them (the
+    // old builtin read left invisible anvils on every custom map).
+    setActiveWorldContent(world({ services: undefined }));
+    expect(circlesNear(anchor.x, anchor.z, 8)).toBeLessThan(withStations);
+  });
+
+  it('the furniture veto reads the ACTIVE npcs: an npc on the anchor suppresses furniture', () => {
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin stations missing');
+    const custom = {
+      id: 's_veto_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 0, z: -960 },
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    setActiveWorldContent(world({ services: { ...builtin, stations: [custom] } }));
+    const before = furnitureNear(0, -960, 10);
+    expect(before.length).toBeGreaterThan(0);
+    // The SAME bundle plus a custom npc standing ON one of the furniture
+    // spots: the never-wall-off-an-npc veto must read the active npcs and
+    // suppress that piece. A builtin-NPCS read cannot see this npc and
+    // changes nothing.
+    setActiveWorldContent(
+      world({
+        services: { ...builtin, stations: [custom] },
+        npcs: {
+          ...BUILTIN_WORLD.npcs,
+          npc_veto_probe: { pos: { x: before[0].x, z: before[0].z } },
+        } as unknown as WorldContent['npcs'],
+      }),
+    );
+    expect(furnitureNear(0, -960, 10).length).toBeLessThan(before.length);
+  });
+
+  it('the furniture veto reads the ACTIVE graveyards the same way', () => {
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin stations missing');
+    const custom = {
+      id: 's_grave_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 0, z: -960 },
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    setActiveWorldContent(world({ services: { ...builtin, stations: [custom] } }));
+    const before = furnitureNear(0, -960, 10);
+    expect(before.length).toBeGreaterThan(0);
+    setActiveWorldContent(
+      world({
+        services: {
+          ...builtin,
+          stations: [custom],
+          graveyards: [...(builtin.graveyards ?? []), { x: before[0].x, z: before[0].z }],
+        } as typeof builtin,
+      }),
+    );
+    expect(furnitureNear(0, -960, 10).length).toBeLessThan(before.length);
+  });
+
+  it('a custom station collides at ITS anchor', () => {
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin stations missing');
+    const custom = {
+      id: 's_custom_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 0, z: -960 }, // the open simulation lane: nothing else here
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    setActiveWorldContent(world({ services: { ...builtin, stations: [custom] } }));
+    const pieces = furnitureNear(0, -960, 10);
+    expect(pieces.length).toBeGreaterThan(0);
+    // The OBSERVABLE production path once, through the cached grid isBlocked
+    // reads (the internals drive above never touches staticColliderGrid):
+    // a furniture piece blocks in THIS bundle's grid, and the same point is
+    // open in a services-stripped bundle's grid (per-content cache keying).
+    expect(isBlocked(SEED, pieces[0].x, pieces[0].z, 0.4)).toBe(true);
+    setActiveWorldContent(world({ services: undefined }));
+    expect(isBlocked(SEED, pieces[0].x, pieces[0].z, 0.4)).toBe(false);
+  });
+});
+
+describe('the banker chest follows the ACTIVE npc roster', () => {
+  const noBankerNpcs = (): WorldContent['npcs'] =>
+    Object.fromEntries(
+      Object.entries(BUILTIN_WORLD.npcs).filter(([, n]) => !(n as { banker?: true }).banker),
+    ) as WorldContent['npcs'];
+
+  it('a bundle whose roster has no banker gets NO chest (and no ghost OBB)', () => {
+    // Builtin control first: the vale bursar's strongbox resolves.
+    setActiveWorldContent(null);
+    const builtinSpots = bankerChestSpots(SEED);
+    expect(builtinSpots.length).toBeGreaterThan(0);
+    // Same map, bankers stripped from the roster: the pre-fix builtin-NPCS
+    // walk would still emit every builtin chest into a world whose bankers
+    // do not exist.
+    setActiveWorldContent(world({ npcs: noBankerNpcs() }));
+    expect(bankerChestSpots(SEED)).toHaveLength(0);
+  });
+
+  it("a custom map's OWN banker gets a chest at ITS anchor", () => {
+    const npcs = {
+      ...noBankerNpcs(),
+      custom_banker: {
+        id: 'custom_banker',
+        name: 'Custom Banker',
+        pos: { x: 0, z: -960 }, // the open simulation lane
+        facing: 0,
+        banker: true,
+      },
+    } as unknown as WorldContent['npcs'];
+    setActiveWorldContent(world({ npcs }));
+    const spots = bankerChestSpots(SEED);
+    expect(spots).toHaveLength(1);
+    expect(spots[0].anchorX).toBe(0);
+    expect(spots[0].anchorZ).toBe(-960);
   });
 });

@@ -3,6 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Maintainer report (Twin Gavels): both stuns spent, then the second charge
 // waited a WHOLE extra cooldown behind the first. Charge-limited abilities now
@@ -12,9 +13,14 @@ import type { Entity } from '../src/sim/types';
 // (fear/polymorph/root keep theirs).
 
 function setup(): { sim: Sim; p: Entity; mob: Entity } {
-  const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
-  sim.setPlayerLevel(10);
-  expect(sim.applyTalents({ spec: null, rows: { 8: 'pal_r8_fist_of_justice' } })).toBe(true);
+  const sim = new Sim({
+    seed: 7,
+    playerClass: 'paladin',
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  });
+  sim.setPlayerLevel(11);
+  expect(sim.applyTalents({ spec: null, rows: { 11: 'pal_r11_double_sentence' } })).toBe(true);
   const p = sim.player;
   const mob = createMob(20_000, MOBS.forest_wolf, 8, {
     x: p.pos.x + 3,
@@ -39,7 +45,7 @@ function tickSeconds(sim: Sim, p: Entity, seconds: number): void {
   }
 }
 
-describe('parallel per-charge recharge (Twin Gavels)', () => {
+describe('parallel per-charge recharge (Double Sentence)', () => {
   it('each spent charge returns its own cooldown after ITS spend', () => {
     const { sim, p } = setup();
     sim.castAbility('hammer_of_justice');
@@ -63,7 +69,12 @@ describe('parallel per-charge recharge (Twin Gavels)', () => {
   });
 
   it('player stuns are exempt from PvP diminishing returns', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'paladin',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const anySim = sim as unknown as {
       diminishedCrowdControlDuration(
         source: Entity,

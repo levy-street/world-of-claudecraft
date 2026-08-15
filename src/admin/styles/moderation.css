@@ -109,9 +109,9 @@
   .mod-confirm {
     margin: 10px 0;
     padding: 10px;
-    border: 1px solid #8a6f2d;
+    border: 1px solid var(--callout-border);
     border-radius: 4px;
-    background: #171207;
+    background: var(--callout-bg);
   }
   .mod-confirm h4 {
     font-family: var(--title-font);
@@ -138,9 +138,9 @@
   .mod-confirm button {
     min-width: 78px;
     padding: 6px 12px;
-    background: linear-gradient(#2a2112, #15100b);
+    background: linear-gradient(var(--btn-grad-from-hover), var(--btn-grad-to-hover));
     color: var(--text);
-    border: 1px solid #6f5a2a;
+    border: 1px solid var(--callout-border);
     border-radius: 3px;
     cursor: pointer;
     font-size: 12px;

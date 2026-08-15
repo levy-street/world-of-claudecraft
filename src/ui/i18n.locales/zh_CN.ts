@@ -13,16 +13,48 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formName.form_cat': '狼形态',
+  'guide.gear.slotOffhand': '副手',
+  'guide.glossary.claudiumTerm': 'Claudium',
+  'guide.glossary.riftTerm': '裂隙',
+  'guide.howToPlay.step0Title': '进入游戏',
+  'guide.interfacePage.framePetTitle': '你的宠物',
+  'guide.interfacePage.winBagsTitle': '背包（B）',
+  'guide.riftsPage.rankFmt': '{rank} 级',
+  'hudChrome.comboMeter.label': '连击点',
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.controller.zoomIn': '放大',
+  'hudChrome.controller.zoomOut': '缩小',
+  'hudChrome.crafting.durationChip': '{seconds}秒',
+  'hudChrome.keybinds.dive': '下潜',
+  'hudChrome.materialHint.usedBy': '用于制作{crafts}。',
+  'hudChrome.partyFrames.showPets': '显示宠物',
+  'hudChrome.pvp.bracket1v1': '1v1',
+  'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.warfareShop.buyAria': '以 {honor} 购买 {item}',
+  'itemUi.market.saleBuyer': '售予{buyer}',
+  'hudChrome.deeds.recentJumpAria': '跳转到{name}',
+  'hudChrome.targetAuras.all': '全部',
+  'hudChrome.actionBar.done': '完成',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '暂离',
+  'hudChrome.nameplate.cheaterTag': '< 作弊者 >',
   'hudChrome.discord.roleTag.legend': '传奇',
   'hudChrome.discord.roleTag.shill': '布道者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟练度',
+  'guide.profPages.wieldNone': '不限',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '请找{name}接取《{quest}》。',
+  'itemUi.vendor.qtyMultiple': '{count}个',
+  'itemUi.vendor.buyCountAria': '以 {price} 购买 {count} 个 {item}',
+  'itemUi.vendor.buyCountAriaWithRequirement': '以 {price} 购买 {count} 个 {item}。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '购买',
   'entities.items.eastbrook_greatsword.name': '东溪巨剑',
   'entities.items.highwatch_greatsword.name': '高望巨剑',
   'entities.items.highwatch_wallshield.name': '高望壁盾',
@@ -56,6 +88,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.die_by_sword.description':
     '防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。',
   'entities.abilities.die_by_sword.name': '剑在人在',
+  'entities.abilities.intervene.name': '援护',
+  'entities.abilities.intervene.description':
+    '冲向一名友方玩家，为其抵挡 {damage} 点伤害，持续 6 秒。',
   'entities.abilities.emboldening_roar.description':
     '发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）',
   'entities.abilities.emboldening_roar.name': '鼓舞怒吼',
@@ -71,8 +106,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_leap.description':
     '跃向目标区域，在落地时对附近的敌人造成 {damage} 点伤害。',
   'entities.abilities.heroic_leap.name': '英勇飞跃',
-  'entities.abilities.intimidating_shout.description':
-    '一声骇人的怒吼，使 8 码内至多 5 个敌人恐惧逃散 8 秒。伤害可能打破效果。',
+  'entities.abilities.intimidating_shout.description': '一声骇人的怒吼，使 8 米内至多 5 名敌人在恐惧中逃窜 4 秒。伤害可能打断该效果。',
   'entities.abilities.intimidating_shout.name': '破胆怒吼',
   'entities.abilities.iron_resolve.description':
     '咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 4 点伤害，持续最多 10 秒。（防护）',
@@ -132,15 +166,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.tab': '抉择',
   'hudChrome.talentRows.readoutSummary': '天赋：{head}，已选择 {spent}/{total} 行。',
   'entities.abilities.aspect_of_the_wild.name': '野牙伪装',
-  'entities.abilities.avenging_wrath.name': '复仇之翼',
+  'entities.abilities.avenging_wrath.name': '复仇之怒',
   'entities.abilities.berserk.name': '赤红迷雾',
   'entities.abilities.blink.name': '闪烁步',
   'entities.abilities.bloodlust.name': '战鼓',
   'entities.abilities.chain_lightning.name': '叉状闪电',
   'entities.abilities.chaos_bolt.name': '毁灭箭',
-  'entities.abilities.cleansing_verdict.name': '净化裁决',
-  'entities.abilities.cleansing_verdict.description':
-    '净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。',
   'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
   'entities.abilities.cone_of_cold.name': '寒霜横扫',
   'entities.abilities.curse_of_exhaustion.name': '铅沉妖咒',
@@ -148,15 +179,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最后祈祷',
   'entities.abilities.deterrence.name': '鬃刺守卫',
-  'entities.abilities.divine_shield.name': '圣光守护',
   'entities.abilities.earthbind.name': '攫握大地',
   'entities.abilities.evocation.name': '以太之井',
   'entities.abilities.frenzied_regeneration.name': '野性愈合',
   'entities.abilities.frost_trap.name': '霜纹陷阱',
   'entities.abilities.ghostly_strike.name': '幽魂打击',
-  'entities.abilities.hammer_of_wrath.name': '鸣钟之锤',
+  'entities.abilities.hammer_of_wrath.name': '愤怒之锤',
   'entities.abilities.healing_stream.name': '泉涌',
-  'entities.abilities.holy_wrath.name': '圣徒之怒',
   'entities.abilities.howl_of_terror.name': '恐惧嚎叫',
   'entities.abilities.ice_block.name': '寒冰棺',
   'entities.abilities.inner_focus.name': '静心',
@@ -186,6 +215,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     '吞噬一个魔法效果（敌人的增益或盟友的减益），并恢复你最大生命值的6%。',
   'hudChrome.abilityError.shieldRequired': '你必须装备一面盾牌。',
+  'hudChrome.arenaGate.minLevelNote': '需要等级 {level}',
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '关闭 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分区',
@@ -450,6 +480,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.checkoutWalletUnsupported': '此钱包无法签署和发送 Solana 交易。',
   'hudChrome.claudium.checkoutNotSettled': '交易已发送，但 Claudium 尚未到账，请稍后重试。',
   'hudChrome.itemHeroicTag': '[英雄]',
+  'hudChrome.itemHeroicLabel': '英雄',
   'hudChrome.readyCheck.notInPartyError': '你必须加入队伍才能发起就绪确认。',
   'hudChrome.readyCheck.inProgressError': '就绪确认已在进行中。',
   'entities.abilities.collective_reversal.name': '集体逆转',
@@ -570,6 +601,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '等级 {level} {family}',
   'hudChrome.mobTooltip.hostile': '敌对',
   'hudChrome.mobTooltip.friendly': '友方',
+  'hudChrome.mobTooltip.elite': '精英',
+  'hudChrome.mobTooltip.boss': '首领',
   'hudChrome.targetFrame.unlock': '移动目标框',
   'hudChrome.targetFrame.lock': '锁定目标框',
   'hudChrome.playerFrame.unlock': '移动玩家框',
@@ -595,6 +628,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': '显示法力、怒气和能量',
   'hudChrome.partyFrames.showAbsorbs': '显示吸收护盾',
   'hudChrome.partyFrames.showAuras': '显示增益和减益',
+  'hudChrome.partyFrames.petHealth': '宠物{name}，生命值{pct}',
   'hudChrome.partyFrames.showSelf': '显示你的框体',
   'hudChrome.frameReset.label': '重置框体位置',
   'hudChrome.options.playerFrameScale': '玩家框缩放',
@@ -602,6 +636,104 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.aurasOnPlayerFrame': '增益显示在玩家框',
   'hud.core.mapCanvasLabel': '地图',
   'hud.core.mapSummary': '{zone}的地图。',
+  'hud.core.mapMarkerDescription': '{area}。{markers}',
+  'hud.core.mapMarkerEmpty': '没有可见的重要标记。',
+  'hud.core.mapMarkerLocated': '{marker}：{direction}，{distance}。',
+  'hud.core.mapMarkerLocatedCount': '{marker}：{count}个；{direction}，{distance}。',
+  'hud.core.mapMarkerMore': '另有 {count} 个标记。',
+  'hud.core.mapMarkerDirections.center': '中央',
+  'hud.core.mapMarkerDirections.north': '北方',
+  'hud.core.mapMarkerDirections.northeast': '东北方',
+  'hud.core.mapMarkerDirections.east': '东方',
+  'hud.core.mapMarkerDirections.southeast': '东南方',
+  'hud.core.mapMarkerDirections.south': '南方',
+  'hud.core.mapMarkerDirections.southwest': '西南方',
+  'hud.core.mapMarkerDirections.west': '西方',
+  'hud.core.mapMarkerDirections.northwest': '西北方',
+  'hud.core.mapMarkerDistances.near': '附近',
+  'hud.core.mapMarkerDistances.medium': '中等距离',
+  'hud.core.mapMarkerDistances.far': '远处',
+  'hud.core.mapMarkerLabels.you': '你',
+  'hud.core.mapMarkerLabels.availableQuest': '可接任务',
+  'hud.core.mapMarkerLabels.readyQuest': '可交任务',
+  'hud.core.mapMarkerLabels.repeatQuest': '可重复任务',
+  'hud.core.mapMarkerLabels.cooldownQuest': '冷却中的任务',
+  'hud.core.mapMarkerLabels.questObjective': '任务目标区域',
+  'hud.core.mapMarkerLabels.readyOre': '可采集矿点',
+  'hud.core.mapMarkerLabels.readyWood': '可采伐木材点',
+  'hud.core.mapMarkerLabels.readyHerb': '可采集草药点',
+  'hud.core.mapMarkerLabels.readyLockedOre': '可采集矿点，工具未解锁',
+  'hud.core.mapMarkerLabels.readyLockedWood': '可采伐木材点，工具未解锁',
+  'hud.core.mapMarkerLabels.readyLockedHerb': '可采集草药点，工具未解锁',
+  'hud.core.mapMarkerLabels.cooldownOre': '已枯竭的矿点',
+  'hud.core.mapMarkerLabels.cooldownWood': '已枯竭的木材点',
+  'hud.core.mapMarkerLabels.cooldownHerb': '已枯竭的草药点',
+  'hud.core.mapMarkerLabels.cooldownLockedOre': '已枯竭的矿点，工具未解锁',
+  'hud.core.mapMarkerLabels.cooldownLockedWood': '已枯竭的木材点，工具未解锁',
+  'hud.core.mapMarkerLabels.cooldownLockedHerb': '已枯竭的草药点，工具未解锁',
+  'hud.core.mapMarkerLabels.station': '制作站：{name}',
+  'hud.core.mapMarkerLabels.service': '服务：{name}',
+  'hud.core.mapMarkerLabels.partyMember': '队伍成员：{name}',
+  'hud.core.mapMarkerLabels.deadPartyMember': '已死亡的队伍成员：{name}',
+  'hud.core.mapMarkerLabels.partyMemberGeneric': '队伍成员',
+  'hud.core.mapMarkerLabels.deadPartyMemberGeneric': '已死亡的队伍成员',
+  'hud.core.mapMarkerLabels.friend': '好友：{name}',
+  'hud.core.mapMarkerLabels.guildMember': '公会成员：{name}',
+  'hud.core.mapMarkerLabels.pointOfInterest': '地标：{name}',
+  'hud.core.mapMarkerLabels.dungeonEntrance': '地下城入口：{name}',
+  'hud.core.mapMarkerLabels.dungeonExit': '地下城出口',
+  'hud.core.mapMarkerLabels.delveEntrance': '探秘入口：{name}',
+  'hud.core.mapMarkerLabels.worldPassage': '通往{zone}的通道',
+  'hud.core.mapMarkerLabels.riftEntrance': '裂隙入口：{name}',
+  'hud.core.mapMarkerLabels.hostileEnemy': '敌对目标',
+  'hud.core.mapMarkerLabels.aggressiveEnemy': '正在攻击你的敌人',
+  'hud.core.mapMarkerLabels.lootableEnemy': '可拾取战利品的敌人',
+  'hud.core.mapMarkerLabels.corpse': '你的尸体',
+  'hud.core.mapMarkerLabels.deathZone': '危险区域',
+  'hud.core.mapMarkerLabels.teammate': '队友',
+  'hud.core.mapMarkerLabels.deadTeammate': '已死亡的队友',
+  'hud.core.mapMarkerLabels.flagCarrier': '携带旗帜的队友',
+  'hud.core.mapMarkerLabels.ownFlagStand': '己方旗座',
+  'hud.core.mapMarkerLabels.enemyFlagStand': '敌方旗座',
+  'hud.core.mapMarkerLabels.riftDescent': '裂隙下行通道',
+  'hud.core.mapMarkerLabels.riftReturnBeacon': '返回信标',
+  'hud.core.mapMarkerLabels.riftReturnExit': '返回出口',
+  'hud.core.mapMarkerLabels.ranked': '{marker}，阶级 {rank}',
+  'hud.core.mapMarkerLabels.riftTreasureAvailable': '可开启的宝藏',
+  'hud.core.mapMarkerLabels.riftTreasureLocked': '已上锁的宝藏',
+  'hud.core.mapMarkerLabels.riftTreasureOpened': '已开启的宝藏',
+  'hud.core.mapMarkerLabels.riftTreasureJammed': '已卡住的宝藏',
+  'hud.core.mapMarkerLabels.riftCacheAvailable': '可开启的裂隙宝箱',
+  'hud.core.mapMarkerLabels.riftCacheLocked': '已上锁的宝箱',
+  'hud.core.mapMarkerLabels.riftCacheOpened': '已开启的宝箱',
+  'hud.core.mapMarkerLabels.riftCacheJammed': '已卡住的宝箱',
+  'hud.core.mapMarkerLabels.pylonUnlit': '未点亮的塔柱',
+  'hud.core.mapMarkerLabels.pylonLit': '已点亮的塔柱',
+  'hud.core.mapMarkerLabels.sequenceRuneUnlit': '未点亮的序列符文',
+  'hud.core.mapMarkerLabels.sequenceRuneLit': '已点亮的序列符文',
+  'hud.core.mapMarkerLabels.iceGoal': '冰面目标',
+  'hud.core.mapMarkerLabels.boulderPad': '巨石目标点',
+  'hud.core.mapMarkerLabels.boulderMovable': '可移动的巨石',
+  'hud.core.mapMarkerLabels.boulderPlaced': '已就位的巨石',
+  'hud.core.mapMarkerLabels.gateSealed': '封闭的大门',
+  'hud.core.mapMarkerLabels.gateOpen': '开启的大门',
+  'hud.core.mapMarkerLabels.switchReady': '可用的开关',
+  'hud.core.mapMarkerLabels.switchOn': '已启动的开关',
+  'hud.core.mapMarkerLabels.orbDormant': '休眠的法球',
+  'hud.core.mapMarkerLabels.orbActive': '已激活的法球',
+  'hud.core.mapMarkerLabels.rollerHazard': '滚轮陷阱',
+  'hud.core.mapMarkerLabels.delvePassageSealed': '封闭的通道',
+  'hud.core.mapMarkerLabels.delvePassageOpen': '开启的通道',
+  'hud.core.mapMarkerLabels.delveSurfaceExit': '地表出口',
+  'hud.core.mapMarkerLabels.delveCacheLocked': '已上锁的探秘宝箱',
+  'hud.core.mapMarkerLabels.delveCacheReady': '探秘宝箱已就绪',
+  'hud.core.mapMarkerLabels.delveCacheActive': '探秘宝箱已激活',
+  'hud.core.mapMarkerLabels.delveCacheOpened': '已开启的探秘宝箱',
+  'hud.core.mapMarkerLabels.delveReliquaryLocked': '已上锁的圣物匣',
+  'hud.core.mapMarkerLabels.delveReliquaryReady': '圣物匣已就绪',
+  'hud.core.mapMarkerLabels.delveReliquaryActive': '圣物匣仪式进行中',
+  'hud.core.mapMarkerLabels.delveReliquaryOpened': '已开启的圣物匣',
+  'hud.core.mapMarkerLabels.bountiful': '丰裕的{marker}',
   'hudChrome.castBar.playerAria': '你的施法条',
   'hudChrome.castBar.targetAria': '目标施法条',
   'hudChrome.skipLinks.chat': '跳转到聊天',
@@ -613,6 +745,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyLabel': '你的队伍',
   'hudChrome.unitFrame.partyChip': '小队',
   'hudChrome.unitFrame.playerLabel': '你的角色',
+  'hudChrome.unitFrame.petLabel': '你的宠物',
   'hudChrome.unitFrame.targetAnnounce': '目标：{name}',
   'hudChrome.unitFrame.targetLabel': '你的目标',
   'seo.officialLabel': 'World of ClaudeCraft 官方网站',
@@ -692,6 +825,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '隐藏离线公会成员',
   'hudChrome.social.billboard.label': '公会公告板',
   'hudChrome.social.billboard.empty': '公告板上还没有内容。',
+  'hudChrome.social.billboard.loginLine': '公会公告板：{text}',
   'hudChrome.social.billboard.setBy': '由 {name} 设置',
   'hudChrome.social.billboard.save': '保存',
   'hudChrome.social.billboard.placeholder': '给公会写一条消息',
@@ -776,6 +910,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': '你必须在城镇中才能设置专注。',
   'hudChrome.townFocus.increaseAria': '增加对{component}的专注',
   'hudChrome.townFocus.decreaseAria': '减少对{component}的专注',
+  'hudChrome.townFocus.respecTierLabel': '重新分配速度',
+  'hudChrome.townFocus.respecTierTimeOption': '免费（花费时间）',
+  'hudChrome.townFocus.respecTierPartialOption': '更快（少量花费）',
+  'hudChrome.townFocus.respecTierInstantOption': '即时（全额花费）',
+  'hudChrome.townFocus.respecCostFree': '免费',
+  'hudChrome.townFocus.respecCostLine': '花费 {coin} 和 {materials}',
   'hudChrome.theme.preset': '界面主题',
   'hudChrome.theme.customColors': '自定义颜色',
   'hudChrome.theme.reset': '重置',
@@ -804,14 +944,135 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '荣誉：{amount}',
   'hudChrome.warfare.honorFloat': '+{amount} 荣誉',
+  'hudChrome.warfare.honorFloatReason': '+{amount} 荣誉（{reason}）',
   'hudChrome.warfare.honorGain': '你获得了 {amount} 点荣誉（{reason}）。',
   'hudChrome.warfare.notEnoughHonor': '荣誉不足。',
   'hudChrome.warfare.reasons.arenaWin': '竞技场胜利',
+  'hudChrome.warfare.reasons.arenaComplete': '竞技场参战',
   'hudChrome.warfare.reasons.fiestaKill': '嘉年华击倒',
   'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年华',
   'hudChrome.warfare.reasons.fiestaWin': '嘉年华胜利',
+  'hudChrome.warfare.reasons.battlegroundWin': '荆谷原野胜利',
+  'hudChrome.warfare.reasons.battlegroundFirstWin': '荆谷原野每日首胜',
+  'hudChrome.warfare.reasons.battlegroundComplete': '荆谷原野参战',
+  'hudChrome.warfare.reasons.battlegroundKill': '荣誉击杀',
+  'hudChrome.warfare.reasons.battlegroundAssist': '助攻击杀',
+  'hudChrome.warfare.floatReasons.kill': '击杀',
+  'hudChrome.warfare.floatReasons.assist': '助攻',
+  'hudChrome.warfare.floatReasons.firstWin': '首胜',
+  'hudChrome.warfareShop.gossipOption': '浏览战争套装',
+  'hudChrome.warfareShop.gossipOptionAria': '浏览 {name} 提供的战争套装商店',
+  'hudChrome.warfareShop.jewelry': '饰品',
+  'hudChrome.warfareShop.weapons': '武器',
+  'hudChrome.warfareShop.owned': '已拥有',
+  'hudChrome.warfareShop.buyOwnedAria': '以 {honor} 购买 {item}，已拥有',
+  'hudChrome.warfareShop.buyConfirmBody': '用 {honor} 购买 {item}？荣誉购买后无法退款。',
+  'hudChrome.keybinds.bgFlag': '战场夺旗动作',
+  'hudChrome.pvp.mobileLabel': 'PvP',
+  'hudChrome.bg.title': '荆谷原野',
+  'hudChrome.bg.blurb':
+    '两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方三次者赢得战场。',
+  'hudChrome.bg.modeTag': '5v5夺旗战',
+  'hudChrome.bg.offlineNote': '荆谷原野正在同步。待王国响应后即可排队。',
+  'hudChrome.bg.ratingSummary': '评分。{wins}胜 / {losses}负 / {draws} 平',
+  'hudChrome.bg.careerCaptures': '生涯夺旗:{count}',
+  'hudChrome.bg.enterQueue': '加入队列',
+  'hudChrome.bg.enterQueueParty': '加入队列({count}人小队)',
+  'hudChrome.bg.leaveQueue': '离开队列',
+  'hudChrome.bg.searching': '搜索中。队列 {count}/{size}。',
+  'hudChrome.bg.queuedParty': '{count}人小队。',
+  'hudChrome.bg.queueNote':
+    '两队各五人。夺取敌方军旗并送回己方要塞。先夺得3次者获胜。可组满5人小队一同排队;拾取疾行符文,并利用掩体甩开追兵。',
+  'hudChrome.bg.matchInProgress': '战斗进行中。{crimson}:{azure}。',
+  'hudChrome.bg.ladderAllTime': '天梯。历史总榜',
+  'hudChrome.bg.noRanked': '尚无勇士上榜。争当第一。',
+  'hudChrome.bg.ladderOnline': '天梯。当前在线',
+  'hudChrome.bg.noChallengers': '当前没有勇士在线。争当第一。',
+  'hudChrome.bg.playerClassTitle': '{name}。{className}',
+  'hudChrome.bg.playerLevelClassTitle': '{name}。{level}级{className}',
+  'hudChrome.bg.crimson': '赤红队',
+  'hudChrome.bg.azure': '蔚蓝队',
+  'hudChrome.bg.formUp': '列队:{seconds}',
+  'hudChrome.bg.firstTo': '先夺得{caps}次旗帜',
+  'hudChrome.bg.flagState.home': '旗帜在要塞',
+  'hudChrome.bg.flagState.carried': '旗帜被夺!',
+  'hudChrome.bg.flagState.dropped': '旗帜落地',
+  'hudChrome.bg.respawnIn': '下一波:{seconds}秒后复活',
+  'hudChrome.bg.killFeed': '{killer}击杀了{victim}',
+  'hudChrome.bg.killFeedFallen': '{victim}倒下了',
+  'hudChrome.bg.resultVictory': '胜利!',
+  'hudChrome.bg.resultDefeat': '战败',
+  'hudChrome.bg.resultDraw': '平局',
+  'hudChrome.bg.leavingIn': '{seconds}秒后离开战场',
+  'hudChrome.bg.foundBanner': '战斗已就绪。你为{team}而战!',
+  'hudChrome.bg.countdownBanner': '荆谷原野{seconds}秒后开战',
+  'hudChrome.bg.startBanner': '夺取旗帜!',
+  'hudChrome.bg.flagTakenLog': '{name}夺走了{team}的旗帜!',
+  'hudChrome.bg.flagDroppedLog': '{team}的旗帜掉落了。',
+  'hudChrome.bg.flagReturnedLog': '{team}的旗帜已归还。',
+  'hudChrome.bg.dropFlagConfirmTitle': '丢下旗帜？',
+  'hudChrome.bg.dropFlagConfirmBody': '你正携带敌方旗帜。丢下后旗帜会留在地上，双方都可以拾取。',
+  'hudChrome.bg.dropFlagConfirmAccept': '丢下旗帜',
+  'hudChrome.bg.yourTeamTitle': '你的队伍',
+  'hudChrome.bg.boardToggleLabel': '比赛记分板。按回车键固定展开完整榜单。',
+  'hudChrome.bg.levelRequirement': '你需要达到{level}级才能解锁此战场的排队。',
+  'hudChrome.bg.board.kills': '击杀',
+  'hudChrome.bg.board.assists': '助攻',
+  'hudChrome.bg.board.deaths': '死亡',
+  'hudChrome.bg.board.captures': '夺旗',
+  'hudChrome.bg.capturedTeamBanner': '{takers}夺取了{team}的旗帜!{crimson}:{azure}',
+  'hudChrome.bg.flagTakenBanner': '{takers}夺走了{team}的旗帜!',
+  'hudChrome.bg.flagReturnedBanner': '{team}的旗帜已归还!',
+  'hudChrome.bg.capturedLog': '{name}夺取了{team}的旗帜。比分{crimson}:{azure}。',
+  'hudChrome.bg.victoryBanner': '胜利!荆谷原野{crimson}:{azure}。评分{rating}({delta})',
+  'hudChrome.bg.defeatBanner': '战败。荆谷原野{crimson}:{azure}。评分{rating}({delta})',
+  'hudChrome.bg.drawBanner': '荆谷原野平局{crimson}:{azure}。评分{rating}({delta})',
+  'hudChrome.bg.endLog': '荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。',
+  'hudChrome.bg.endBannerDetail': '荆谷原野{crimson}:{azure}。评分{rating}({delta})',
+  'hudChrome.bg.endedTimer': '时间到',
+  'hudChrome.bg.endedForfeit': '本场比赛以弃权告终',
+  'hudChrome.bg.endedTimerLog': '比赛时间耗尽,由比分较高的一方拿下战场。',
+  'hudChrome.bg.endedForfeitLog': '本场比赛以弃权告终。',
+  'hudChrome.bg.firstWinBonusLine': '每日首胜:+{honor}荣誉',
+  'hudChrome.bg.firstWinBonusLog': '每日首胜:你额外获得{honor}点荣誉。',
+  'hudChrome.bg.timeWarningMinutes': '还剩{minutes}分钟',
+  'hudChrome.bg.timeWarningOneMinute': '还剩一分钟',
+  'hudChrome.bg.timeWarningMinutesLog': '本场战斗还剩{minutes}分钟。',
+  'hudChrome.bg.timeWarningOneMinuteLog': '本场战斗还剩一分钟。',
+  'hudChrome.bg.map.crimsonKeep': '绯红要塞',
+  'hudChrome.bg.map.azureKeep': '蔚蓝要塞',
+  'hudChrome.bg.map.ruinCourtyard': '废墟庭院',
+  'hudChrome.bg.map.graveyard': '墓地',
+  'guide.nav.thornhollow': '荆谷原野',
+  'guide.thornhollowPage.heading': '荆谷原野',
+  'guide.thornhollowPage.intro':
+    '一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。',
+  'guide.thornhollowPage.queueHeading': '排队参战',
+  'guide.thornhollowPage.queueBody': '荆谷原野在 20 级开启，且队伍中每位成员都必须达到该等级，队伍才能报名。打开 PvP 按钮并选择荆谷原野标签页，也就是它默认打开的那一页，然后独自进入队列，或者带上至多五人的队伍一同报名：队伍始终会被安排在同一方，其余席位则由独自报名的勇士补满。当十人就绪时，比赛会把双方安置在各自的堡垒进行短暂集结，随后旗帜才会启用。若一支四人或五人的队伍原本只会遇上清一色的独行报名者，配对会把这场比赛稍作保留，看看是否会有第二支队伍出现，因此这种规模的队伍有时要多等片刻，大门才会开启。那点等待很短，并且最终总会让步，所以没有人会因此卡在队列里。',
+  'guide.thornhollowPage.fieldHeading': '战场地形',
+  'guide.thornhollowPage.fieldBody':
+    '一片有围墙的露天战场,被隔成三个区域:两队各自的前场,以及夹在中间的废墟中庭。两道横贯全场的隔墙划出边界,穿行区域之间必须经过争夺点:宽阔的正门,或是骑跨在隔墙上的门楼小屋,其错位的两扇门逼你绕过伏击死角。每座要塞除正门外全部封死,夺旗进出只有这一个口;正门前还有一道矮壁垒挡住直冲的路线。中庭里有空心的中央废墟与两枚侧翼疾行符文,另外两枚守在两旗的接近路上。每个正门的中庭入口处还有一枚战斗或守护符文(短时间内提升伤害或减免伤害):两个符文台开局同面,每次拾取后翻面。',
+  'guide.thornhollowPage.flagsHeading': '旗帜',
+  'guide.thornhollowPage.flagsBody':
+    '每座要塞守着本队军旗。夺取敌旗并送到己方旗座即可得分;先夺得三次者获胜,超时的战斗按比分定胜负。旗手阵亡时旗帜就地掉落:敌人可以再次拾起,而本队队员只需靠近便能立即将其送回。军旗也绝不藏身:拾旗会解除潜行,旗手若以任何方式隐身,旗帜都会当场掉落。',
+  'guide.thornhollowPage.respawnBody':
+    '死亡保留经典仪式:尸体停在原地,直到你亲自释放灵魂;灵魂会在你方主堡旁的围栏墓地中升起,并被结界束缚,直到你方下一波复活潮。复活潮会同时唤起所有等待的灵魂;两队的复活潮刻意错开,战斗永远不会同时完全重置。这里没有跑尸,也没有灵魂医者的交易:释放、等潮、再战。',
+  'guide.thornhollowPage.pickupNote':
+    '拾旗永远需要主动按下战场动作键:没有人会因为跑过旗帜而意外成为旗手。',
+  'guide.thornhollowPage.respawnHeading': '战场阵亡',
+  'guide.thornhollowPage.carrierHeading': '扛旗',
+  'guide.thornhollowPage.carrierBody':
+    '扛着敌旗太久的旗手会越来越脆弱,承受的伤害持续增加,直到旗帜被夺回、掉落或归还。抱旗躲藏是败招;把旗送回家才是胜途。',
+  'guide.thornhollowPage.ladderHeading': '天梯',
+  'guide.thornhollowPage.ladderBody': '每场比赛都会牵动一份与角色绑定的持久战场评级，无论胜负，而历代榜单则为国度的勇士们排定名次。',
   'hudChrome.charSheet.offense': '攻击',
   'hudChrome.charSheet.defense': '防御',
+  'hudChrome.charSheet.playtimeLabel': '游戏时长',
+  'hudChrome.charSheet.playtimeParts': '{major}{minor}',
+  'hudChrome.charSheet.playtimeUnderMinute': '不到一分钟',
+  'hudChrome.charSheet.playtimeHidden': '已隐藏',
+  'hudChrome.charSheet.showPlaytimeAria': '显示游戏时长',
+  'hudChrome.charSheet.hidePlaytimeAria': '隐藏游戏时长',
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
   'hudChrome.statInfo.names.spellPower': '法术强度',
   'hudChrome.statInfo.names.critRating': '暴击等级',
@@ -843,7 +1104,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.agi': '提高你的反应和准度，强化你的多项战斗属性。',
   'hudChrome.statInfo.desc.sta': '强健你的体魄，提高你的最大生命值以及休息时恢复生命值的速度。',
   'hudChrome.statInfo.desc.int': '扩大施法者的法力值上限，并提高其造成法术暴击的几率。',
-  'hudChrome.statInfo.desc.spi': '加快施法者在脱离战斗、休息时恢复法力值的速度。',
+  'hudChrome.statInfo.desc.spi': '加快施法者法力回复的速度。大部分在脱离战斗休息时流回，还有一部分即使在战斗中也会持续回复。',
   'hudChrome.statInfo.desc.armor':
     '减轻受到的物理打击。对等级较低的攻击者减伤效果更强，最高减伤上限为75%。',
   'hudChrome.statInfo.desc.attackPower': '强化你的武器攻击。每14点攻击强度可提高1点每秒伤害。',
@@ -946,6 +1207,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.sheathe': '收起/拔出武器',
   'hudChrome.keybinds.targetFriendly': '选中最近友方',
   'hudChrome.keybinds.targetFriendlyNext': '切换友方目标',
+  'hudChrome.keybinds.targetPrev': '反向切换目标',
   'hudChrome.petFeed.disabledFullHp': '宠物生命值已满',
   'hudChrome.petFeed.disabledNoFood': '你的背包中没有可以治疗宠物的食物',
   'hudChrome.options.clickMoveLeft': '左键',
@@ -957,16 +1219,53 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': '最低',
   'hudChrome.options.browserEffectsNote':
     '自动模式会根据你的浏览器和设备调低高开销的 CSS 特效（模糊、光晕、背景动画）。如果界面感觉卡顿，可手动降低。',
+  'hudChrome.options.graphicsApply': '应用图形设置',
+  'hudChrome.options.graphicsApplying': '正在应用图形设置...',
+  'hudChrome.options.graphicsApplied': '图形设置已应用。',
+  'hudChrome.options.graphicsSaved': '图形设置已保存。当前渲染器已与这些设置一致。',
+  'hudChrome.options.graphicsFailed': '无法应用图形设置。之前的图形设置仍然有效。',
+  'hudChrome.options.graphicsRetry': '重试图形设置',
+  'hudChrome.options.graphicsFatal': '图形恢复失败。请重新加载游戏以继续。',
+  'hudChrome.options.graphicsReload': '重新加载游戏',
+  'hudChrome.options.graphicsDraftChanged': '图形更改已准备好应用。',
+  'hudChrome.options.gfxSectionQuality': '画质',
+  'hudChrome.options.gfxSectionWorld': '世界细节',
+  'hudChrome.options.gfxSectionLighting': '光照与特效',
+  'hudChrome.options.gfxViewDistance': '视野距离',
+  'hudChrome.options.gfxWaterQuality': '水面质量',
+  'hudChrome.options.gfxCharacterDetail': '角色细节',
+  'hudChrome.options.gfxAmbientOcclusion': '环境光遮蔽',
+  'hudChrome.options.gfxBloom': '泛光',
+  'hudChrome.options.gfxAntiAliasing': '抗锯齿',
+  'hudChrome.options.gfxDynamicLights': '动态光源',
+  'hudChrome.options.gfxParticleEffects': '粒子特效',
+  'hudChrome.options.gfxHalf': '半',
+  'hudChrome.options.gfxEffectsNote':
+    '环境光遮蔽、泛光与抗锯齿依赖后期处理链：当“特效与光照”为低时，处理链关闭，这些选项不起作用。',
+  'hudChrome.options.gfxSectionCamera': '镜头',
+  'hudChrome.options.gfxSectionDisplay': '显示',
+  'hudChrome.options.gfxSectionSystem': '系统',
+  'hudChrome.options.gfxSectionTouch': '触控操作',
+  'hudChrome.options.gfxCustomNote':
+    '调整任一细节旋钮会将画质预设切换为“高级”：一套基于“高”画质基础、以当前预设所示等级为起点的自定义组合。',
   'hudChrome.options.footstepSounds': '脚步声',
   'hudChrome.options.interfaceSounds': '界面与反馈音效',
   'hudChrome.options.clickFeedback': '点击标记',
   'hudChrome.options.startAttackOnAbility': '使用技能时自动攻击',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': '切换目标时停止自动攻击',
   'hudChrome.options.walkByAutoloot': '路过自动拾取',
   'hudChrome.options.lockCursorOnRotate': '旋转时锁定光标',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     '拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。',
   'hudChrome.options.showWalletOnCharacterScreen': '在角色界面显示钱包',
+  'hudChrome.options.showPlaytime': '在角色界面显示游戏时长',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',
+  'hudChrome.options.forceHighPerfGpu': '使用独立游戏显卡',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。',
+  'hudChrome.options.discordPresence': 'Discord 游戏状态',
+  'hudChrome.options.discordPresenceNote':
+    '游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。',
   'hudChrome.options.showDevBadges': '显示开发者徽章',
   'hudChrome.options.showOwnNameplate': '显示我的姓名板',
   'hudChrome.options.showPlayerNameplates': '显示玩家姓名板',
@@ -976,6 +1275,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '显示物品等级',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showThirdActionBar': '显示第三动作条',
+  'hudChrome.options.hideUnusedActionSlots': '隐藏未使用的动作栏位',
+  'hudChrome.options.lockActionBars': '锁定动作条',
   'hudChrome.options.showDailyRewardsChest': '显示每日奖励宝箱',
   'hudChrome.options.mobileCameraJoystick': '摄像机摇杆',
   'hudChrome.options.mobileLeftHanded': '左手布局',
@@ -983,6 +1284,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.itemScoreLine': '评分 {score}',
   'hudChrome.landing.highContrast': '高对比度',
   'hudChrome.landing.highContrastAria': '切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰',
+  'hudChrome.landing.browserSupport.title': '提示：不受支持的浏览器',
+  'hudChrome.landing.browserSupport.body':
+    '此浏览器中性能可能会下降。为获得最佳体验，请下载适用于 Windows、macOS 或 Linux 的桌面客户端。想在浏览器中游玩？Chrome 性能最佳，Firefox 和 Safari 也受支持。',
+  'hudChrome.landing.browserSupport.getDesktopApp': '获取桌面客户端',
+  'hudChrome.landing.browserSupport.continueInBrowser': '继续在浏览器中游玩',
+  'hudChrome.landing.browserSupport.dismissAria': '关闭不受支持浏览器的提示',
+  'hudChrome.talents.newBuildWithGear': '新建配置（同时保存装备）',
+  'hudChrome.talents.gearNotHeld': '你已不再拥有该配置保存的 {n} 件装备。',
+  'hudChrome.talents.gearCopyGone': '有 {n} 件装备不是该配置锁定的那一件。',
+  'hudChrome.talents.gearTakenByOtherSlot': '有 {n} 件装备需要你没有的另一件副本。',
+  'hudChrome.talents.gearRestored': '已从此配置恢复 {n} 件装备。',
   'hudChrome.talents.defaultBuildName': '配置 {n}',
   'hudChrome.tips.joinChannels': '提示：输入 /join world 或 /join lfg，与全服玩家聊天。',
   'meta.builtOn': '构建于 {date}',
@@ -1162,6 +1474,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'auth.passwordPlaceholder': '请输入密码',
   'auth.email': '邮箱',
   'auth.emailError': '请输入有效的邮箱地址。',
+  'auth.marketingOptIn': '向我发送游戏新闻和更新邮件（可选）',
   'auth.recovery.title': '添加找回邮箱',
   'auth.recovery.body':
     '设置一个邮箱地址，以便您可以找回自己的账户。我们仅在您需要重置密码时，用它来确认您是本账户的所有者。',
@@ -1243,6 +1556,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '若要在此处看到钱包，请保持 Solflare Wallet 等浏览器钱包扩展处于启用状态。',
   'wallet.mobileAppHelp':
     '选择 Phantom 或 Solflare。钱包应用会请求批准。请保持游戏打开，完成后返回游戏。',
+  'wallet.seekerAppHelp':
+    '使用 Seed Vault Wallet 继续。在 Seed Vault 中查看连接和验证请求，然后返回游戏。',
   'wallet.standaloneAppHelp':
     '主屏幕应用暂不支持连接钱包。若要使用 Phantom 或 Solflare，请在 Safari 或 Chrome 中打开 World of ClaudeCraft。',
   'wallet.openAppTitle': '在 {wallet} 中继续',
@@ -1500,6 +1815,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'character.takeOverConfirm': '这将使该角色从另一个会话断开并切换到此处。是否继续？',
   'character.renameRequired': '需要改名',
   'character.delete': '删除',
+  'character.redesign': '重新设计',
+  'character.redesignHint':
+    '该角色创建于新角色编辑器之前。你有一次免费重新设计的机会，保存时即会消耗。',
+  'character.redesignTitle': '重新设计{name}',
+  'character.redesignSave': '保存新外观',
+  'character.redesignCancel': '保留当前外观',
   'character.rename': '改名',
   'character.newNamePlaceholder': '新角色名称',
   'character.tabCharacters': '角色',
@@ -1594,6 +1915,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.secondsRemaining': '剩余 {seconds} 秒',
   'hud.core.enteringZone': '进入 {zone}。',
   'hud.core.welcomeZone': '欢迎来到 {zone}！',
+  'hud.core.riftLabel': '{name}',
+  'hud.core.riftLabelRanked': '{name} ({rank})',
   'hud.core.levelBanner': '{level} 级！',
   'hud.core.levelLog': '你已达到 {level} 级！',
   'hud.core.xpGain': '你获得 {amount} 点经验。',
@@ -1605,7 +1928,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatTab': '聊天',
   'hud.core.combatLogTab': '战斗记录',
   'hud.core.chatPlaceholder':
-    '说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合）',
+    '说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合，! 显示社区指令）',
   'hud.core.communityLinks': '社区链接',
   'hud.core.mobileControls': '移动端控制',
   'hud.core.mobileMove': '移动',
@@ -1616,7 +1939,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': '更多',
   'hud.core.mobileMoreAria': '显示更多菜单',
   'hud.core.mobileSocial': '社交',
-  'hud.core.mobileArena': '竞技场',
   'hud.core.mobileMenu': '菜单',
   'hud.core.mobileSettings': '设置',
   'hud.core.mobileUse': '使用',
@@ -1646,17 +1968,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.options.graphicsPresetMedium': '中',
   'hud.options.graphicsPresetHigh': '高',
   'hud.options.graphicsPresetUltra': '超高',
+  'hud.options.graphicsPresetInsane': '极致',
   'hud.options.graphicsPresetAdvanced': '高级',
   'hud.options.terrainDetail': '地形细节',
   'hud.options.foliageDensity': '植被密度',
   'hud.options.effectsQuality': '特效和光照',
   'hud.options.shadowQuality': '阴影质量',
+  'hud.options.surfaceDetail': '表面细节',
+  'hud.options.surfaceDetailBasic': '基础',
+  'hud.options.surfaceDetailFull': '完整',
   'hud.options.terrainLow': '低',
   'hud.options.terrainHigh': '高',
   'hud.options.touchOpacity': '触控控件透明度',
   'hud.options.invertLook': '反转视角（触控）',
   'hud.options.graphicsReloadNote': '图形质量和地形细节会在重新加载后生效。',
   'hud.options.reloadNow': '立即重新加载',
+  'hud.options.displayMode': '显示模式',
+  'hud.options.displayModeBorderless': '无边框全屏',
+  'hud.options.displayModeWindowed': '窗口',
   'hud.options.fullscreen': '全屏',
   'hud.options.touchLookSpeed': '触屏视角速度',
   'hud.options.joystickSize': '摇杆大小',
@@ -1698,6 +2027,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.options.mouseCamera': '鼠标镜头',
   'hud.options.keybindHelpMouseCamera':
     '鼠标镜头关闭：A/D 转向，拖动环绕（经典）。开启：WASD 按镜头方向移动，A/D 平移。点击按键格可重新绑定；Esc 取消。',
+  'hud.keybinds.actions.arena': 'PvP(荆谷原野与竞技场)',
   'hud.keybinds.categories.movement': '移动',
   'hud.keybinds.categories.targeting': '目标',
   'hud.keybinds.categories.interface': '界面',
@@ -1720,7 +2050,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': '切换姓名板',
   'hud.keybinds.actions.meters': '伤害统计',
   'hud.keybinds.actions.social': '好友与公会',
-  'hud.keybinds.actions.arena': '竞技场（灰烬斗技场）',
   'hud.keybinds.actions.chat': '打开聊天',
   'hud.keybinds.actions.attack': '攻击',
   'hud.keybinds.actions.actionBarSlot': '动作条 {slot}',
@@ -1743,6 +2072,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.meters.close': '关闭统计',
   'hud.chat.rightClickName': '右键点击 {name}',
   'hud.chat.templates.party': '[队伍] {name}：{message}',
+  'hud.chat.templates.battleground': '[战场] {name}：{message}',
   'hud.chat.templates.yell': '{name}大喊：{message}',
   'hud.chat.templates.whisper': '{name}悄悄说：{message}',
   'hud.chat.templates.toWhisper': '对{name}说：{message}',
@@ -1792,6 +2122,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.joinParty': '加入队伍',
   'hud.prompts.guildInvite': '{name} 邀请你加入 {guild}。',
   'hud.prompts.joinGuild': '加入公会',
+  'hud.prompts.guildInviteCancelled': '由于公会已重命名，一项待处理的公会邀请已取消。',
+  'hud.prompts.guildRenamed': '你的公会已被管理团队重命名为 {name}。',
   'hud.prompts.tradeRequest': '{name} 想与你交易。',
   'hud.prompts.openTrade': '打开交易',
   'hud.prompts.duelRequest': '{name} 向你发起了决斗挑战！',
@@ -1802,6 +2134,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': '未命中',
   'hud.combat.floatingDodge': '闪避',
   'hud.combat.floatingResist': '抵抗',
+  'hud.combat.floatingHealFull': '已满',
   'hud.combat.attack': '攻击',
   'hud.combat.damageDone': '你的{ability}击中{target}，造成 {amount} 点伤害。',
   'hud.combat.damageDoneCrit': '你的{ability}对{target}造成暴击，造成 {amount} 点伤害。',
@@ -1814,12 +2147,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': '你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。',
   'hud.combat.healOther': '你的{ability}为{target}恢复 {amount} 点生命。',
   'hud.combat.healOtherCrit': '你的{ability}对{target}造成暴击治疗，恢复 {amount} 点生命。',
+  'hud.combat.healSelfFull': '你的{ability}生效了，但你的生命值已满。',
+  'hud.combat.floatingHealAbsorbed': '被吸收',
+  'hud.combat.healSelfAbsorbed': '你的{ability}被你身上的枯萎吞噬了。',
+  'hud.combat.healOtherAbsorbed': '你的{ability}被{target}身上的枯萎吞噬了。',
+  'hud.combat.healOtherFull': '你的{ability}在{target}身上生效了，但目标的生命值已满。',
   'hud.combat.death': '{name}死亡。',
   'hud.combat.auraGain': '你获得了 {name}。',
   'hud.combat.auraFade': '{name}从你身上消失。',
   'hud.combat.auraAfflicted': '{target}受到了 {name} 影响。',
   'hud.combat.auraGainOther': '{target}获得了 {name}。',
   'hud.system.playerDeath': '你已经死亡。',
+  'hud.system.deathRecapKillerAbility': '你已经死亡。被{killer}的{ability}击杀。',
+  'hud.system.deathRecapKiller': '你已经死亡。被{killer}击杀。',
+  'hud.system.deathRecapAbility': '你已经死亡。死于{ability}。',
+  'hud.system.deathRecapFalling': '你已经死亡。你摔死了。',
+  'hud.system.deathRecapDrowned': '你已经死亡。你淹死了。',
+  'hud.system.deathRecapCauterized': '你已经死亡。灼烧术的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢复、身体完整。',
   'hud.system.ignoringChat': '已屏蔽来自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再屏蔽 {name}。',
@@ -1860,6 +2204,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.outOfRange': '超出范围。',
   'hud.errors.noTarget': '你没有目标。',
   'hud.errors.tooClose': '太近了！',
+  'hud.errors.mustTargetAlly': '你必须选定一名友方目标。',
   'hud.errors.facing': '你必须面向目标。',
   'hud.errors.targetHealthBelow': '该技能要求目标生命值低于 {percent}%。',
   'hud.errors.dagger': '你必须装备匕首。',
@@ -1897,6 +2242,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': '请先完成交易再加入队列。',
   'hud.errors.arenaQueueInstance': '你不能在副本内加入队列。',
   'hud.errors.tradeInProgress': '已有交易正在进行。',
+  'hud.errors.tradeAlreadyTrading': '该玩家已在交易中。',
   'hud.errors.tradeTooFar': '目标太远，无法交易。',
   'hud.errors.tradeExpired': '交易请求已过期。',
   'hud.errors.tradeFailed': '交易失败：物品或金钱已不可用。',
@@ -2015,6 +2361,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '会长',
   'hud.social.ranks.officer': '官员',
   'hud.social.ranks.member': '成员',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '老兵',
   'hud.social.guildHeadOne': '你是{rank}，{count}名成员',
   'hud.social.guildHeadMany': '你是{rank}，{count}名成员',
   'hud.trade.title': '与 {name} 交易',
@@ -2046,7 +2394,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你会与在线且评级最接近的挑战者匹配，然后传送到沙场。获胜即可攀升；先认输者（1 点生命值）落败。结束后会回到你排队的位置。',
   'hud.arena.ladderAllTime': '排名 - 历史',
   'hud.arena.ladderOnline': '排名 - 在线',
-  'hud.arena.ratingSummary': '评级 - {wins} 胜 / {losses} 负',
+  'hud.arena.ratingSummary': '评级 - {wins} 胜 / {losses} 负 / {draws} 平',
   'hud.arena.statusCountdown': '做好准备...',
   'hud.arena.statusReturning': '正在返回世界... {seconds}',
   'hud.arena.statusFight': '战斗到认输！',
@@ -2104,10 +2452,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.gathering': '采集',
   'abilityUi.cast.thunzharrStormcall': '风暴召唤',
   'abilityUi.cast.demonHeal': '恶魔治疗',
+  'abilityUi.cast.rift_arcane_execution': '虚空裂隙',
+  'abilityUi.cast.rift_arcane_strike': '奥术湮灭',
+  'abilityUi.cast.rift_brute_execution': '碎地之力',
+  'abilityUi.cast.rift_brute_strike': '终极审判',
+  'abilityUi.cast.rift_ember_execution': '岩浆泉',
+  'abilityUi.cast.rift_ember_strike': '核心熔毁',
+  'abilityUi.cast.rift_frost_execution': '冰川之墓',
+  'abilityUi.cast.rift_frost_strike': '绝对零度',
+  'abilityUi.cast.rift_necro_execution': '灵魂之墓',
+  'abilityUi.cast.rift_necro_strike': '死亡判决',
+  'abilityUi.cast.rift_storm_execution': '避雷针',
+  'abilityUi.cast.rift_storm_strike': '风暴召唤者之怒',
+  'abilityUi.cast.rift_tide_execution': '深渊之口',
+  'abilityUi.cast.rift_tide_strike': '粉碎深渊',
+  'abilityUi.cast.rift_venom_execution': '毒液池',
+  'abilityUi.cast.rift_venom_strike': '蜘蛛母后之印',
   'questUi.tracker.title': '任务',
   'questUi.tracker.complete': '完成',
   'questUi.tracker.showOnMap': '在地图上显示{name}',
   'questUi.tracker.hideFromMap': '在地图上隐藏{name}',
+  'questUi.tracker.unknownQuest': '未知任务（{id}）',
   'questUi.log.title': '任务日志',
   'questUi.log.close': '关闭任务日志',
   'questUi.log.summary': '进行中：{active} / 已完成：{completed}',
@@ -2117,6 +2482,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.log.activeStatus': '进行中',
   'questUi.log.readyStatus': '完成',
   'questUi.log.completedStatus': '已完成',
+  'questUi.log.repeatableStatus': '可重复',
+  'questUi.log.cooldownStatus': '稍后可再次接取',
   'questUi.log.returnTo': '返回 {name} 处',
   'questUi.log.abandon': '放弃任务',
   'questUi.log.abandonConfirmTitle': '放弃任务',
@@ -2128,6 +2495,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.greetingFallback': '你好。',
   'questUi.dialog.availableQuestAria': '可接任务：{name}',
   'questUi.dialog.readyQuestAria': '可交付任务：{name}',
+  'questUi.dialog.repeatableQuestAria': '可重复任务：{name}',
   'questUi.dialog.browseGoods': '让我看看你的货物。',
   'questUi.dialog.browseGoodsAria': '查看 {name} 的货物',
   'questUi.dialog.worldMarket': '让我看看世界市场。',
@@ -2159,6 +2527,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '该任务发布者不在附近。',
   'questUi.errors.turnInMissing': '该任务交付点不在附近。',
   'questUi.errors.tooFar': '距离太远。',
+  'questUi.errors.escortAway': '你要护送的人现在不在原处，稍后就会回来。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '银',
   'itemUi.money.copperShort': '铜',
@@ -2192,6 +2561,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.armor': '护甲',
   'itemUi.kind.quest': '任务物品',
   'itemUi.kind.junk': '杂物',
+  'itemUi.kind.fineMaterial': '优质材料',
+  'itemUi.kind.material': '材料',
   'itemUi.kind.food': '食物',
   'itemUi.kind.drink': '饮料',
   'itemUi.kind.tool': '工具',
@@ -2219,7 +2590,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFood': '使用：在 {seconds} 秒内恢复 {amount} 点生命值。进食时必须保持坐下。',
   'itemUi.tooltip.useDrink': '使用：在 {seconds} 秒内恢复 {amount} 点法力值。饮水时必须保持坐下。',
   'itemUi.tooltip.questItem': '任务物品',
+  'itemUi.tooltip.questRelated': '任务：{quest}',
+  'itemUi.tooltip.questRules': '无法出售、存入银行或交易。',
+  'itemUi.tooltip.questOrphaned': '当前没有进行中的任务需要此物品。',
   'itemUi.tooltip.classes': '职业：{classes}',
+  'itemUi.tooltip.maxStack': '最大堆叠：{count}',
   'itemUi.tooltip.sellPrice': '出售价格：{money}',
   'itemUi.tooltip.clickBuy': '点击购买',
   'itemUi.tooltip.clickSell': '点击出售',
@@ -2233,6 +2608,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFishing': '使用：在附近水域钓鱼。',
   'itemUi.tooltip.useHealingPotion': '使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。',
   'itemUi.tooltip.useManaPotion': '使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。',
+  'itemUi.tooltip.useElixir':
+    '使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。战斗中可用。',
+  'itemUi.tooltip.useElixirAura': '使用：获得{aura}效果，持续 {minutes} 分钟。战斗中可用。',
   'itemUi.tooltip.clickUseInstant': '点击在战斗中立即使用',
   'itemUi.tooltip.clickUse': '点击使用',
   'itemUi.tooltip.clickBuyback': '点击回购',
@@ -2241,6 +2619,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.empty': '你的背包是空的。',
   'itemUi.bags.itemAria': '{item}，数量 {count}',
   'itemUi.bags.stackCount': 'x{count}',
+  'itemUi.bags.unknownItem': '未知物品',
+  'itemUi.bags.unknownItemAria': '未知物品 {id}，数量 {count}',
+  'itemUi.bags.unknownItemAriaMasterwork': '未知物品 {id}，数量 {count}，杰作',
+  'itemUi.bags.unknownItemAriaEnchanted': '未知物品 {id}，数量 {count}，已附魔的副本',
+  'itemUi.bags.unknownItemAriaBound': '未知物品 {id}，数量 {count}，已绑定的副本',
+  'itemUi.bags.unknownItemAriaInstanced': '未知物品 {id}，数量 {count}，带工匠印记的物品',
   'itemUi.bags.destroyTitle': '摧毁 {item}',
   'itemUi.bags.destroyConfirm': '摧毁',
   'itemUi.bags.destroyCancel': '取消',
@@ -2250,6 +2634,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.close': '关闭商人',
   'itemUi.vendor.hint': '此窗口打开时，点击背包中的物品即可出售。',
   'itemUi.vendor.buyAria': '以 {price} 购买 {item}',
+  'itemUi.vendor.buyAriaWithRequirement': '以 {price} 购买 {item}。{requirement}',
   'itemUi.vendor.buybackTitle': '回购',
   'itemUi.vendor.buybackEmpty': '没有物品',
   'itemUi.vendor.buybackAria': '以 {price} 回购 {item}',
@@ -2257,6 +2642,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellQuantityInput': '要出售的数量',
   'itemUi.vendor.sellQuantityConfirm': '出售',
   'itemUi.vendor.sellQuantityCancel': '取消',
+  'itemUi.vendor.qtyRowAria': '购买数量',
+  'itemUi.vendor.qtyMultipleAria': '每次购买 {count} 份',
+  'itemUi.vendor.qtyCustom': '自定义',
+  'itemUi.vendor.qtyCustomAria': '选择自定义购买数量',
+  'itemUi.vendor.buyQuantityTitle': '购买多少 {item}？最多 {max}。',
+  'itemUi.vendor.buyQuantityInput': '要购买的数量',
   'itemUi.vendor.sellJunk': '出售杂物',
   'itemUi.vendor.sellJunkAria': '以 {price} 出售所有杂物',
   'itemUi.vendor.sellJunkHint': '出售背包中除任务物品外的所有灰色物品。',
@@ -2307,6 +2698,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterBagAll': '全部背包',
   'itemUi.market.filterRarity': '稀有度',
   'itemUi.market.filterRarityAll': '全部稀有度',
+  'itemUi.market.filterSort': '排序',
+  'itemUi.market.sortName': '名称 (A-Z)',
+  'itemUi.market.sortPriceAsc': '价格：从低到高',
+  'itemUi.market.collapseLowest': '仅显示最低价',
   'itemUi.market.weaponSword': '剑',
   'itemUi.market.weaponDagger': '匕首',
   'itemUi.market.weaponStaff': '法杖',
@@ -2325,6 +2720,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '购买',
   'itemUi.market.reclaim': '取回',
   'itemUi.market.buyAria': '以 {price} 购买 {item}',
+  'itemUi.market.buyConfirmTitle': '确认购买',
+  'itemUi.market.buyConfirmBody': '以 {price} 购买 {item}？',
+  'itemUi.market.buyConfirmBodyStack': '以 {price} 购买 {item} x{count}（每个 {each}）？',
+  'itemUi.market.buyConfirmAccept': '购买',
+  'itemUi.market.buyConfirmCancel': '取消',
+  'itemUi.market.buyChanged': '该上架在你确认前发生了变化。请核对价格后重试。',
   'itemUi.market.reclaimAria': '取回 {item}',
   'itemUi.market.sellNote':
     '从背包上架货物。物品售出时商人抽取 {cut}%。你正在使用 {used}/{max} 个上架位。',
@@ -2332,11 +2733,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.quantity': '数量',
   'itemUi.market.quantityOf': '共 {count}',
   'itemUi.market.priceEach': '单价',
+  'itemUi.market.lowestPriceLabel': '当前最低上架价格',
+  'itemUi.market.lowestPriceNone': '该物品目前没有在售的上架。',
   'itemUi.market.listButton': '上架到世界市场',
   'itemUi.market.minPriceError': '价格至少为 1 铜币。',
   'itemUi.market.collectEmpty': '没有待领取内容。销售收益和过期上架会在这里领取。',
   'itemUi.market.collectNote': '商人为你保管的收益和退回货物。',
   'itemUi.market.saleProceeds': '销售收益',
+  'itemUi.market.saleOlder': '另有 {count} 笔较早的交易，已计入总额。',
   'itemUi.market.collectAll': '全部领取',
   'itemUi.logs.listedItem': '已将 {item} 以 {money} 上架到世界市场。',
   'itemUi.logs.sellerSold': '{buyer} 以 {money} 买走了你的 {item}。向商人领取 {proceeds}。',
@@ -2414,17 +2818,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     '化身为炽烈火球，移动速度提高 {buff}%。变形期间无法攻击或施放法术。再次施放可恢复正常形态。',
   'entities.abilities.rain_of_fire.name': '烈火之雨',
-  'entities.abilities.rain_of_fire.description':
-    '在目标区域降下烈火之雨，持续 4 秒，每秒灼烧敌人并造成 {damage} 点火焰伤害。',
+  'entities.abilities.rain_of_fire.description': '消耗 3 点毁坏，向目标区域降下火雨，在 4 秒内每秒造成 {damage} 点火焰伤害，2 级时延长至 6 秒。毁灭性会让第一波立刻落下。',
   'entities.abilities.volley.name': '乱射',
-  'entities.abilities.volley.description':
-    '向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。',
+  'entities.abilities.volley.description': '向一片 8 米的区域降下箭雨，持续 3 秒。区域内的敌人每 0.5 秒受到 {damage} 点物理伤害。伤害随远程攻击强度提升。',
   'entities.abilities.hurricane.name': '飓风',
   'entities.abilities.hurricane.description':
     '在目标区域召唤飓风，持续 6 秒，每秒重击敌人并造成 {damage} 点自然伤害。',
-  'entities.abilities.earthquake.name': '地震',
-  'entities.abilities.earthquake.description':
-    '撼动目标区域，持续 6 秒，每 1.5 秒重击敌人并造成 {damage} 点自然伤害。',
+  'entities.abilities.earthquake.name': '断层苏醒',
+  'entities.abilities.earthquake.description': '撼动一片 8 米的区域，持续 6 秒，每 1.5 秒造成 {damage} 点自然伤害。伤害随法术强度提升。元素：在 5 点雷霆时，伤害提高 100% 并消耗全部雷霆。',
   'entities.abilities.flamestrike.name': '烈焰风暴',
   'entities.abilities.flamestrike.description':
     '在目标区域召唤一次烈焰爆发，对爆炸范围内的敌人造成 {damage} 点火焰伤害。',
@@ -2479,13 +2880,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.name': '鬼步',
   'entities.abilities.evasion.description': '使你的躲闪几率提高 50%，持续 15 秒。',
   'entities.abilities.slice_and_dice.name': '割喉节奏',
-  'entities.abilities.slice_and_dice.description':
-    '终结技，使近战攻击速度提高 30%。每个连击点都会延长持续时间。',
+  'entities.abilities.slice_and_dice.description': '终结技，将近战攻击速度提高 30%，持续 12 秒外加每点连击点 4 秒（5 点连击点：32 秒）。',
   'entities.abilities.sprint.name': '疾足',
   'entities.abilities.sprint.description': '使你的移动速度提高 70%，持续 15 秒。',
   'entities.abilities.kidney_shot.name': '下作一击',
-  'entities.abilities.kidney_shot.description':
-    '终结技，使目标昏迷。每个连击点使持续时间延长 1 秒。',
+  'entities.abilities.kidney_shot.description': '终结技，昏迷目标 1 秒外加每点连击点 1 秒（5 点连击点：6 秒）。',
   'entities.abilities.ambush.name': '潜伏突袭',
   'entities.abilities.ambush.description':
     '伏击目标，造成 250% 武器伤害加 {damage}。必须处于潜行并位于目标背后。需要匕首。奖励 1 个连击点。',
@@ -2500,6 +2899,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.name': '击腹拳',
   'entities.abilities.cheap_shot.description':
     '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。奖励 2 个连击点。',
   'entities.abilities.sap.name': '闷棍',
   'entities.abilities.sap.description':
     '使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。',
@@ -2507,11 +2908,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     '以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。',
   'entities.abilities.expose_armor.name': '护甲突破',
-  'entities.abilities.expose_armor.description':
-    '终结技，暴露目标，使其护甲降低 {damage}，持续 30 秒。',
+  'entities.abilities.expose_armor.description': '终结技，破开目标的防护 30 秒：每消耗 1 点连击点使其护甲降低 2%（5 点连击点：{damage}%）。',
   'entities.abilities.rupture.name': '血流不止',
-  'entities.abilities.rupture.description':
-    '终结技，撕裂目标，使其流血，在 16 秒内受到 {damage} 点伤害。',
+  'entities.abilities.rupture.description': '终结技，撕裂目标：其每 2 秒流血一次，持续 6 秒外加每点连击点 2 秒（5 点连击点：16 秒，共 {damage} 点伤害）。',
   'entities.abilities.vanish.name': '烟遁',
   'entities.abilities.vanish.description':
     '从视野中消失，即使在战斗中也能进入暮帷状态。隐身时你的移动速度降低 50%。持续最多 10 秒。',
@@ -2525,10 +2924,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     '使目标失明，导致其神志不清地四处游荡，持续 8 秒。任何伤害都会打破效果。',
   'entities.abilities.seal_of_righteousness.name': '誓约烙印',
-  'entities.abilities.seal_of_righteousness.description':
-    '使你充满神圣能量，持续 30 秒，使每次近战挥击造成 {damage} 点额外神圣伤害。可用裁决释放。',
+  'entities.abilities.seal_of_righteousness.description': '以神圣之力充盈你 30 秒，使你的每一次近战挥击额外造成 {damage} 点神圣伤害。',
   'entities.abilities.holy_light.name': '愈疗之光',
-  'entities.abilities.holy_light.description': '为一个友方目标恢复 {damage} 点生命值。',
+  'entities.abilities.holy_light.description': '迅速治疗一个友方目标 {damage} 点生命。恢复生命会产生 1 点虔诚，即便没有专精也是如此。辉光共鸣或烈日回击会让它变为瞬发。',
   'entities.abilities.devotion_aura.name': '坚定光环',
   'entities.abilities.devotion_aura.description': '使你的护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.judgement.name': '裁决',
@@ -2539,118 +2937,99 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标施加祝福，使攻击强度提高 {buff}，持续 5 分钟。',
   'entities.abilities.divine_protection.name': '信仰守护',
   'entities.abilities.divine_protection.description':
-    '一道守护结界吸收 {damage} 点伤害，持续 10 秒。',
+    '神圣结界吸收最大生命值的{damage}%伤害，持续{duration}秒。持久守护会提高结界吸收量。',
   'entities.abilities.hammer_of_justice.name': '碎裂法槌',
   'entities.abilities.hammer_of_justice.description': '使目标昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '临终圣礼',
-  'entities.abilities.lay_on_hands.description':
-    '巨大的治疗涌流：恢复 {damage} 点生命值。10 分钟冷却时间。',
+  'entities.abilities.lay_on_hands.description': '一股磅礴的涌流，恢复你最大生命值的 {damage}%，并在恢复生命时产生 1 点虔诚。冷却 10 分钟。',
   'entities.abilities.holy_taunt.name': '神圣挑衅',
   'entities.abilities.holy_taunt.description':
     '嘲讽目标：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。',
   'entities.abilities.flash_of_light.name': '圣光愈合',
-  'entities.abilities.flash_of_light.description':
-    '一道快速而高效的圣光爆发，为一个友方目标恢复 {damage} 点生命值。',
+  'entities.abilities.flash_of_light.description': '一道迅捷而高效的圣光，治疗一个友方目标 {damage} 点生命。恢复生命会产生 1 点虔诚，即便没有专精也是如此。',
   'entities.abilities.exorcism.name': '驱逐仪式',
   'entities.abilities.exorcism.description': '以神圣怒火驱逐邪恶，造成 {damage} 点神圣伤害。',
   'entities.abilities.consecration.name': '神圣领域',
-  'entities.abilities.consecration.description':
-    '奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。',
+  'entities.abilities.consecration.description': '净化你脚下的土地，持续 9 秒，每秒造成 {damage} 点神圣伤害并产生高额威胁。首次命中产生 1 点虔诚。信仰守卫站在其中时受到的伤害降低 10%。升华会提高其伤害。',
   'entities.abilities.righteous_fury.name': '炽燃誓约',
-  'entities.abilities.righteous_fury.description':
-    '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
+  'entities.abilities.righteous_fury.description': '被动地将你的神圣伤害所产生的威胁提高 30%。仅限信仰守卫。',
   'entities.abilities.retribution_aura.name': '报偿光环',
   'entities.abilities.retribution_aura.description':
-    '以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。',
+    '以神圣能量环绕你和队伍成员，直到死亡或被替换。近战攻击受影响盟友的敌人将受到{buff}点神圣伤害，受影响的盟友普通攻击额外造成{buff}点神圣伤害。替换你自己的壁垒坚定。另一名圣骑士施放报偿光环时将刷新而非叠加。',
   'entities.abilities.tame_beast.name': '野性羁绊',
   'entities.abilities.tame_beast.description':
     '开始驯服一只野兽作为你的伙伴。它必须不高于你的等级，且不能是精英。你的宠物会跟随你、攻击敌人，并保持自己的威胁值。同一时间只能拥有一只宠物。',
   'entities.abilities.dismiss_pet.name': '遣散伙伴',
   'entities.abilities.dismiss_pet.description': '将你的宠物放归野外。',
   'entities.abilities.raptor_strike.name': '剖膛一击',
-  'entities.abilities.raptor_strike.description':
-    '一次强力近战攻击，使伤害提高 {damage}。在你的下一次挥击时触发。',
+  'entities.abilities.raptor_strike.description': '以 10% 武器伤害外加 {damage} 点进行打击。命中可恢复 15 点集中，并给予 1 层狩猎势能。伤害通过武器伤害随攻击强度提升。',
   'entities.abilities.aspect_of_the_hawk.name': '鹞鹰之姿',
-  'entities.abilities.aspect_of_the_hawk.description':
-    '化为鹞鹰之姿，使攻击强度提高 {buff}，持续 30 分钟。',
+  'entities.abilities.aspect_of_the_hawk.description': '化身为鹞的形态，将你的攻击强度提高 {buff}，持续 30 分钟。',
   'entities.abilities.serpent_sting.name': '毒液倒刺',
-  'entities.abilities.serpent_sting.description': '钉刺目标，在 15 秒内造成 {damage} 点自然伤害。',
+  'entities.abilities.serpent_sting.description': '在 15 秒内共造成 {damage} 点自然伤害，每 3 秒一次。伤害随远程攻击强度提升。',
   'entities.abilities.arcane_shot.name': '凶邪射击',
-  'entities.abilities.arcane_shot.description': '瞬发射击，造成 {damage} 点奥术伤害。',
+  'entities.abilities.arcane_shot.description': '射击目标，造成 {damage} 点奥术伤害。伤害随远程攻击强度提升。',
   'entities.abilities.concussive_shot.name': '震颤射击',
-  'entities.abilities.concussive_shot.description':
-    '使目标眩晕迟缓，造成 {damage} 点伤害，并使移动速度降低 50%，持续 4 秒。',
-  'entities.abilities.mongoose_bite.name': '反噬獠牙',
-  'entities.abilities.mongoose_bite.description':
-    '在目标躲闪后反击，造成武器伤害加 {damage}。无法被躲闪。',
+  'entities.abilities.concussive_shot.description': '射击目标，造成 {damage} 点物理伤害并使其减速 50%，持续 4 秒。伤害随远程攻击强度提升。',
+  'entities.abilities.mongoose_bite.name': '裂创',
+  'entities.abilities.mongoose_bite.description': '以 45% 武器伤害外加 {damage} 点进行打击。若目标身上带有你的血钩之伤，则立即造成 1 跳伤口伤害，并将该伤口刷新至 12 秒。伤害通过武器伤害随攻击强度提升。',
   'entities.abilities.wing_clip.name': '束缚斩',
-  'entities.abilities.wing_clip.description':
-    '造成伤口，造成 {damage} 点伤害，并使敌人移动速度降低 40%，持续 10 秒。',
+  'entities.abilities.wing_clip.description': '劈砍目标，造成 {damage} 点物理伤害并使其减速 40%，持续 10 秒。伤害随攻击强度提升。',
   'entities.abilities.aspect_of_the_monkey.name': '松貂之姿',
-  'entities.abilities.aspect_of_the_monkey.description':
-    '化为松貂之姿，使躲闪几率提高 8%，持续 30 分钟。',
+  'entities.abilities.aspect_of_the_monkey.description': '化身为貂的形态，将你的躲闪几率提高 8%，持续 30 分钟。',
   'entities.abilities.aspect_of_the_cheetah.name': '骏马之姿',
-  'entities.abilities.aspect_of_the_cheetah.description':
-    '化为骏马之姿，使移动速度提高 30%，持续 30 分钟。',
+  'entities.abilities.aspect_of_the_cheetah.description': '化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。',
   'entities.abilities.aimed_shot.name': '引弓长射',
-  'entities.abilities.aimed_shot.description': '一次精心引弓的射击，造成 {damage} 点伤害。',
+  'entities.abilities.aimed_shot.description': '射击目标，造成 {damage} 点物理伤害。伤害随远程攻击强度提升。',
   'entities.abilities.rapid_fire.name': '狂热引弓',
-  'entities.abilities.rapid_fire.description': '使你的攻击速度提高 40%，持续 15 秒。',
-  'entities.abilities.smite.name': '惩击',
-  'entities.abilities.smite.description': '惩击敌人，造成 {damage} 点神圣伤害。',
+  'entities.abilities.rapid_fire.description':
+    '在2.4秒内射出6发箭矢，期间可以移动。每发造成{damage}点物理伤害，并随远程攻击强度提高。',
+  'entities.abilities.smite.name': '涤净圣歌',
+  'entities.abilities.smite.description': '造成 {damage} 点神圣伤害。伤害随法术强度提升。戒律：为每一名相连的盟友治疗相当于伤害 30% 的生命。若没有盟友相连，则为生命最低的小队成员治疗 15%。',
   'entities.abilities.lesser_heal.name': '低语祈祷',
-  'entities.abilities.lesser_heal.description': '为一个友方目标恢复 {damage} 点生命值。',
+  'entities.abilities.lesser_heal.description': '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。',
   'entities.abilities.power_word_fortitude.name': '坚毅连祷',
-  'entities.abilities.power_word_fortitude.description': '使目标的耐力提高 {buff}，持续 30 分钟。',
+  'entities.abilities.power_word_fortitude.description': '将每位小队成员的耐力提高 {buff}%，持续 30 分钟。',
   'entities.abilities.shadow_word_pain.name': '腐朽挽歌',
-  'entities.abilities.shadow_word_pain.description': '黑暗之语在 18 秒内造成 {damage} 点暗影伤害。',
+  'entities.abilities.shadow_word_pain.description': '在 18 秒内共造成 {damage} 点暗影伤害，每 3 秒一次。伤害随法术强度提升。暗影：伤害提高 10%，且你的塑像上每跳都会给予 1 点幽暗贡赋。',
   'entities.abilities.power_word_shield.name': '守护圣咏',
-  'entities.abilities.power_word_shield.description':
-    '保护目标，吸收 {damage} 点伤害，持续 30 秒。',
+  'entities.abilities.power_word_shield.description': '为一个友方目标护盾，在 30 秒内吸收 {damage} 点伤害。戒律还会将该目标与你的神圣伤害相连，持续 30 秒。',
   'entities.abilities.renew.name': '萦绕恩泽',
-  'entities.abilities.renew.description': '在 15 秒内为目标恢复 {damage} 点生命值。',
+  'entities.abilities.renew.description': '在 15 秒内治疗目标 {damage} 点生命，每 3 秒一次。治疗量随法术强度提升。',
   'entities.abilities.mind_blast.name': '碎心术',
-  'entities.abilities.mind_blast.description': '震击目标的心灵，造成 {damage} 点暗影伤害。',
+  'entities.abilities.mind_blast.description': '造成 {damage} 点暗影伤害。伤害随法术强度提升。暗影会以你的腐朽挽歌把一个目标绑定为它的塑像，给予 1 点幽暗贡赋，并将 30% 的伤害回响至至多 3 名其他带有你腐朽挽歌的敌人。',
   'entities.abilities.heal.name': '庄严祈祷',
-  'entities.abilities.heal.description': '缓慢但强大的祈祷，为一个友方目标恢复 {damage} 点生命值。',
+  'entities.abilities.heal.description': '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。',
   'entities.abilities.mind_flay.name': '悲苦连祷',
-  'entities.abilities.mind_flay.description':
-    '用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。',
+  'entities.abilities.mind_flay.description': '引导 3 秒，每秒造成 {damage} 点暗影伤害。伤害随法术强度提升。',
   'entities.abilities.flash_heal.name': '紧急祈祷',
-  'entities.abilities.flash_heal.description': '快速祈祷，为一个友方目标恢复 {damage} 点生命值。',
+  'entities.abilities.flash_heal.description': '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。',
   'entities.abilities.lightning_bolt.name': '电弧箭',
-  'entities.abilities.lightning_bolt.description': '投掷一道闪电，造成 {damage} 点自然伤害。',
+  'entities.abilities.lightning_bolt.description': '造成 {damage} 点自然伤害。伤害随法术强度提升。元素：命中可给予 1 点雷霆。',
   'entities.abilities.rockbiter_weapon.name': '缚石武器',
-  'entities.abilities.rockbiter_weapon.description':
-    '以大地之怒灌注你的武器：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。',
+  'entities.abilities.rockbiter_weapon.description': '为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 40% 护甲和 20% 耐力，受到的伤害降低 15%，免疫生物的致命一击，并产生 2.75 倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。',
   'entities.abilities.healing_wave.name': '治愈之水',
-  'entities.abilities.healing_wave.description': '为一个友方目标恢复 {damage} 点生命值。',
-  'entities.abilities.chain_heal.name': '治疗链',
+  'entities.abilities.healing_wave.description': '治疗一个友方目标 {damage} 点生命。治疗量随法术强度提升。恢复：将完整治疗量的 50% 在过量治疗之前存为治愈涌流，持续 12 秒，至多为目标最大生命值的 30%。',
+  'entities.abilities.chain_heal.name': '层叠治愈',
   'entities.abilities.chain_heal.description':
-    '大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）',
+    '治疗一个友方目标{damage}点，随后跳跃至多2名12码内的盟友，每次跳跃治疗量为上一目标的50%。每名被跳跃到的盟友会消耗你剩余的治愈湍流，并立即治疗其消耗量的125%。初始治疗量随法术强度提高。（恢复专精招牌）',
   'entities.abilities.earth_shock.name': '大地震击',
-  'entities.abilities.earth_shock.description':
-    '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。',
+  'entities.abilities.earth_shock.description': '造成 {damage} 点自然伤害。伤害随法术强度提升。元素：在 5 点雷霆时，伤害提高 125% 并消耗全部雷霆。磐岩之缚：迫使目标攻击你 3 秒。',
   'entities.abilities.lightning_shield.name': '雷霆护罩',
-  'entities.abilities.lightning_shield.description':
-    '以爆裂闪电环绕自身：近战攻击者会受到 {buff} 点自然伤害，最多 3 次充能且每 5 秒最多触发一次。',
+  'entities.abilities.lightning_shield.description': '以闪电环绕你 10 分钟。接下来针对你的 3 次近战攻击会对攻击者造成 {buff} 点自然伤害，最多每 5 秒一次。',
   'entities.abilities.flame_shock.name': '余烬震击',
-  'entities.abilities.flame_shock.description':
-    '用火焰灼烧目标，造成 {damage} 点伤害，并在 12 秒内额外造成 {overTime}。',
+  'entities.abilities.flame_shock.description': '造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
-  'entities.abilities.flametongue_weapon.description':
-    '用元素之火灌注你的武器：每次挥击额外造成 {damage} 点火焰伤害，持续 5 分钟。',
+  'entities.abilities.flametongue_weapon.description': '为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点火焰伤害。',
   'entities.abilities.frost_shock.name': '凛霜震击',
-  'entities.abilities.frost_shock.description':
-    '立即以冰霜冲击目标，造成 {damage} 点冰霜伤害，并使其移动速度降低 50%，持续 8 秒。',
+  'entities.abilities.frost_shock.description': '造成 {damage} 点冰霜伤害并使目标减速 50%，持续 8 秒。伤害随法术强度提升。',
   'entities.abilities.frostbrand_weapon.name': '缚霜武器',
   'entities.abilities.frostbrand_weapon.description':
     '为你的武器附上刺骨寒霜：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。',
   'entities.abilities.ghost_wolf.name': '影狼',
-  'entities.abilities.ghost_wolf.description': '化身为影狼，使移动速度提高 40%，持续 10 分钟。',
+  'entities.abilities.ghost_wolf.description': '化为影狼，移动速度提高 40%。再次施放即可变回你平常的形态。',
   'entities.abilities.stormstrike.name': '先祖打击',
-  'entities.abilities.stormstrike.description':
-    '将风暴导入武器，立即攻击并造成武器伤害加 {damage}。',
+  'entities.abilities.stormstrike.description': '以武器伤害外加 {damage} 点进行打击，并将战魂节律推进 2 段。伤害通过武器伤害随攻击强度提升。',
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敌人发射暗影箭，造成 {damage} 点暗影伤害。',
   'entities.abilities.demon_skin.name': '邪魔硬皮',
@@ -2666,8 +3045,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_agony.description':
     '以痛苦诅咒目标：在 24 秒内造成 {damage} 点暗影伤害。',
   'entities.abilities.drain_life.name': '吞噬',
-  'entities.abilities.drain_life.description':
-    '吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。',
+  'entities.abilities.drain_life.description': '吞噬目标的生命力，每秒造成 {damage} 点暗影伤害，并将其中的 70% 转化为生命传给你。痛苦则改为全部转化。当引导在你的主邪眼之上时，它会在开始时消耗全部命运丝线，而每一根丝线都会让每一跳额外产生 1 点谴罪。',
   'entities.abilities.fear.name': '惊惧',
   'entities.abilities.fear.description':
     '使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。',
@@ -2675,7 +3053,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.searing_pain.description':
     '以痛苦烈焰灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
   'entities.abilities.shadowburn.name': '暮火',
-  'entities.abilities.shadowburn.description': '立即以灼热暗影轰击目标，造成 {damage} 点暗影伤害。',
+  'entities.abilities.shadowburn.description': '消耗 1 点毁坏，对生命值低于 20% 的敌人施以处决，造成 {damage} 点暗影伤害。若被标记的目标在 5 秒内死亡，则返还其毁坏。',
   'entities.abilities.wrath.name': '野性弹',
   'entities.abilities.wrath.description': '投掷一道自然能量箭，造成 {damage} 点自然伤害。',
   'entities.abilities.healing_touch.name': '野性愈合',
@@ -2694,17 +3072,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '将目标缠绕在原地，最多持续 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形态',
   'entities.abilities.bear_form.description':
-    '变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
+    '变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
     '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
+  'entities.abilities.challenging_roar.description':
+    '发出挑衅的咆哮：10 码内的每个敌人都被嘲讽，其对你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。',
+  'entities.abilities.challenging_roar.name': '挑衅咆哮',
   'entities.abilities.growl.name': '威吓',
   'entities.abilities.growl.description':
     '对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。',
   'entities.abilities.cat_form.name': '狼形态',
-  'entities.abilities.cat_form.description':
-    '变形为狼：攻击强度随等级提高，攻击使用能量和连击点，产生的威胁值降低 29%。再次施放可返回施法者形态。',
-  'entities.abilities.claw.name': '爪击',
+  'entities.abilities.cat_form.description': '将你化为一头狼：敏捷随你的等级提升，攻击强度 +8 外加每级 2 点，你的攻击消耗能量与连击点，并且你产生的威胁降低 29%。再次施放即可变回施法形态。',
+  'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。',
   'entities.abilities.ferocious_bite.name': '血噬',
@@ -2733,8 +3113,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '震荡击',
   'entities.abilities.bash.description': '昏迷目标 2 秒。仅限巨熊形态。',
   'entities.abilities.faerie_fire.name': '巫光',
-  'entities.abilities.faerie_fire.description':
-    '使目标的护甲降低 {damage}%，持续 40 秒。无法与削甲叠加。',
+  'entities.abilities.faerie_fire.description': '将目标的护甲降低 {damage}%，持续 40 秒。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目标陷入深度睡眠，最多持续 8 秒。任何伤害都会将其唤醒。',
@@ -2749,9 +3128,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': '狼血',
   'entities.abilities.tigers_fury.description':
     '使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
-  'entities.abilities.rip.name': '割裂',
-  'entities.abilities.rip.description':
-    '终结技，在 12 秒内造成 {damage} 点流血伤害。消耗连击点。仅限狼形态。',
+  'entities.abilities.rip.name': '血隙',
+  'entities.abilities.rip.description': '终结技，使目标每 2 秒流血一次，持续 24 秒：36 点伤害外加每消耗 1 点连击点 24 点（5 点连击点：共 {damage} 点）。仅限狼形态。',
   'entities.abilities.mortal_strike.name': '致残打击',
   'entities.abilities.mortal_strike.description':
     '凶狠打击，造成武器伤害外加 {damage} 点伤害。（武器专精标志技能）',
@@ -2767,11 +3145,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserker_rage.name': '沸腾之怒',
   'entities.abilities.berserker_rage.description': '进入沸腾之怒，产生 20 点怒气。（战士天赋）',
   'entities.abilities.summon_imp.name': '召唤烬裔',
-  'entities.abilities.summon_imp.description':
-    '召唤一只听从术士命令的烬裔。烬裔会从远处向你的敌人投掷灰烬箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
+  'entities.abilities.summon_imp.description': '召唤一只听从术士号令的烬裔。烬裔会从远处向你的敌人施放邪能箭。召唤新的恶魔会遣散你当前的恶魔。你同一时间只能拥有一只恶魔。',
   'entities.abilities.summon_voidwalker.name': '召唤幽影',
-  'entities.abilities.summon_voidwalker.description':
-    '召唤一只听从术士命令的幽影。幽影是一种坚韧的恶魔，会嘲讽你的敌人并承受打击。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
+  'entities.abilities.summon_voidwalker.description': '召唤一只听从术士号令的幽影。这只结实的恶魔会嘲讽敌人，并用深渊锁链把远处的普通敌人拽回攻击范围。首领无法被拉扯。召唤新的恶魔会遣散你当前的恶魔。你同一时间只能拥有一只恶魔。',
   'entities.abilities.summon_succubus.name': '召唤暮裔',
   'entities.abilities.summon_succubus.description':
     '召唤一只听从术士命令的暮裔。暮裔是一种脆弱的恶魔，会快速出手并在近战中造成重创。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
@@ -2782,8 +3158,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     '召唤一只听从术士命令的战魔。战魔是一种坚韧的近战恶魔，会冲入战斗并独当一面。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
   'entities.abilities.summon_infernal.name': '召唤焚炎巨像',
-  'entities.abilities.summon_infernal.description':
-    '将一只焚炎巨像束缚于你的意志之下，这是一头庞大的破坏巨兽，拥有毁灭性的近战能力，以及所有恶魔中最深厚的生命与护甲。漫长的冷却时间限制了它的原始威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
+  'entities.abilities.summon_infernal.description': '将一尊焚炎巨像召至目标区域，落地时造成 58-72 点火焰伤害。它会战斗 30 秒且不会取代你的恶魔，每 2 秒灼烧附近的敌人，并每 1 秒产生 1 点毁坏。',
   'entities.abilities.summon_doomguard.name': '召唤亡魂裔',
   'entities.abilities.summon_doomguard.description':
     '将一只亡魂裔束缚于你的意志之下，这是一种精英恶魔，会从远处倾泻沉重的暗影伤害。漫长的冷却时间限制了它的毁灭性威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
@@ -2797,8 +3172,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     '在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
-  'entities.abilities.rake.description':
-    '一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
+  'entities.abilities.rake.description': '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限狼形态。',
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
@@ -2807,13 +3181,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
   'entities.abilities.holy_shield.name': '神圣之盾',
   'entities.abilities.holy_shield.description':
-    '以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）',
+    '获得30%格挡，并获得一层吸收护盾，吸收量为最大生命值的{damage}%，持续{duration}秒，同时释放一股威胁脉冲。神圣升华会强化并延长这层防御。',
   'entities.abilities.bestial_wrath.name': '狂野怒火',
-  'entities.abilities.bestial_wrath.description':
-    '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',
+  'entities.abilities.bestial_wrath.description': '给予 3 层兽群凶性。你在 20 秒内的下一次释放野兽，其击打与拍击伤害提高 50%，且其狂乱持续 12 秒而非 8 秒。（野兽控制标志技能）',
   'entities.abilities.trueshot_aura.name': '强击光环',
-  'entities.abilities.trueshot_aura.description':
-    '鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）',
+  'entities.abilities.trueshot_aura.description': '将 30 米内盟友的攻击强度提高 10%，持续 30 分钟。（射击标志技能）',
   'entities.abilities.wyvern_sting.name': '翼龙钉刺',
   'entities.abilities.wyvern_sting.description':
     '从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）',
@@ -2826,32 +3198,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
   'entities.abilities.cold_blood.name': '冷血',
-  'entities.abilities.cold_blood.description':
-    '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）',
+  'entities.abilities.cold_blood.description': '凝聚你的杀意，使你的下一次攻击必定爆击。（刺杀标志技能）',
   'entities.abilities.blade_flurry.name': '剑刃乱舞',
-  'entities.abilities.blade_flurry.description':
-    '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）',
+  'entities.abilities.blade_flurry.description': '掀起一阵刀刃的乱舞，将攻击速度提高 20%，持续 12 秒。（战斗标志技能）',
   'entities.abilities.hemorrhage.name': '出血',
-  'entities.abilities.hemorrhage.description':
-    '攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）',
+  'entities.abilities.hemorrhage.description': '以武器伤害外加 {damage} 点击打敌人，造成持续 12 秒的流血伤害，并使其所受的流血伤害提高 40%。给予 1 点连击点。每第 2 次使用增加 1 层幽暗（最多 3 层）。（敏锐标志技能）',
   'entities.abilities.power_infusion.name': '能量灌注',
-  'entities.abilities.power_infusion.description':
-    '向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）',
-  'entities.abilities.holy_nova.name': '神圣新星',
-  'entities.abilities.holy_nova.description':
-    '引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）',
-  'entities.abilities.shadowform.name': '暗影形态',
-  'entities.abilities.shadowform.description':
-    '进入暗影形态，强化暗影魔法直到你切换回来。再次施放可返回普通形态。（暗影专精招牌）',
+  'entities.abilities.power_infusion.description': '为一个友方目标涂敷圣油，将伤害、治疗与施法速度提高 20%，持续 15 秒。',
+  'entities.abilities.holy_nova.name': '旭日圣咏',
+  'entities.abilities.holy_nova.description': '治疗 10 米内的盟友 {damage} 点生命，并对同一区域内的敌人造成 24 至 30 点神圣伤害。两者皆随法术强度提升。（神圣基础技能）',
+  'entities.abilities.shadowform.name': '暮色帷幕',
+  'entities.abilities.shadowform.description': '进入暮色帷幕，将你的暗影伤害提高 25%。再次施放即可离开暮色帷幕。（暗影标志技能）',
   'entities.abilities.elemental_mastery.name': '元素掌握',
-  'entities.abilities.elemental_mastery.description':
-    '呼唤元素掌握，使你的下一个法术变为瞬发。（元素专精招牌）',
+  'entities.abilities.elemental_mastery.description': '在 12 秒内，电弧箭给予 2 点雷霆。你的下一次电弧箭或叉状闪电为瞬发，而你下一次完整的雷霆兑现伤害提高 25%。（元素标志技能）',
   'entities.abilities.siphon_life.name': '生命虹吸',
   'entities.abilities.siphon_life.description':
     '虹吸敌人的生命，在30秒内造成{damage}点暗影伤害，并按造成的伤害治疗你。（痛苦专精招牌）',
   'entities.abilities.conflagrate.name': '燃尽',
-  'entities.abilities.conflagrate.description':
-    '吞噬敌人身上的献祭，将其点燃并造成{damage}点火焰伤害。（毁灭专精招牌）',
+  'entities.abilities.conflagrate.description': '将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 2 层充能。（毁灭标志技能）',
   'entities.abilities.moonkin_form.name': '枭兽形态',
   'entities.abilities.moonkin_form.description':
     '进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）',
@@ -2859,14 +3223,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
-  'entities.abilities.swiftmend.description':
-    '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
+  'entities.abilities.swiftmend.description': '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
   'entities.abilities.crusader_strike.name': '十字军打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
-  'entities.abilities.metamorphosis.name': '恶魔变形',
-  'entities.abilities.metamorphosis.description':
-    '化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）',
+  'entities.abilities.metamorphosis.name': '巫妖形态',
+  'entities.abilities.metamorphosis.description': '化为一具巫妖，持续 20 秒，生成 3 块灵魂碎片，并将你的法术伤害与施法速度提高 20%。你的亡灵造成的伤害提高 50%，行动速度加快 20%，而灵魂之枪会贯穿其目标，以其伤害的 50% 击中至多 2 名附近的敌人。（死灵术标志技能）',
   'entities.items.worn_sword.name': '斑驳短剑',
   'entities.items.gnarled_staff.name': '沼橡法杖',
   'entities.items.rusty_dagger.name': '生锈匕首',
@@ -2960,6 +3322,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_dust.name': '铃音之尘',
   'entities.items.arcane_essence.name': '铃音精华',
   'entities.items.arcane_shard.name': '铃音碎片',
+  'entities.items.gatherers_cache.name': '采集者储囊',
+  'entities.items.artisans_eye.name': '匠人之眼',
+  'entities.items.sharp_claw.name': '锋利的爪',
+  'entities.items.curved_tusk.name': '弯曲的獠牙',
+  'entities.items.pristine_claw.name': '完美的爪',
   'entities.items.linen_scrap.name': '亚麻碎布',
   'entities.items.fen_muster_order.name': '芬桥集结令',
   'entities.items.mire_prowler_pelt.name': '泥沼潜伏者毛皮',
@@ -3022,6 +3389,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': '山脊潜伏者毛皮',
   'entities.items.old_cragmaws_pelt.name': '老裂颚的毛皮',
   'entities.items.cragmaw_huntcord.name': '裂颚的狩猎腰索',
+  'entities.items.cragmaw_huntquiver.name': '裂颚的狩猎箭袋',
   'entities.items.glowing_wax.name': '发光蜡块',
   'entities.items.ogre_war_totem.name': '食人魔战争图腾',
   'entities.items.storm_core.name': '风暴核心',
@@ -3099,6 +3467,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': '泥颚鳞甲背心',
   'entities.items.moggers_copper_cudgel.name': '莫格的铜头短棒',
   'entities.items.moggers_shiv.name': '莫格的短刀',
+  'entities.items.moggers_hide_quiver.name': '莫格的兽皮箭袋',
   'entities.items.moggers_stomper_boots.name': '莫格的践踏靴',
   'entities.items.necromancers_legwraps.name': '哀织腿缠',
   'entities.items.necromancers_soulsteps.name': '哀织魂步',
@@ -3123,6 +3492,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': '墓骨肩甲',
   'entities.items.deathlords_dread_visage.name': '冢主恐惧面甲',
   'entities.items.gravewyrm_gauntlets.name': '墓龙护手',
+  'entities.items.gravewyrm_bone_quiver.name': '墓龙骨箭袋',
   'entities.items.gravewyrm_mantle.name': '墓龙披肩',
   'entities.items.mistveil_cord.name': '雾幕束带',
   'entities.items.mistveil_grips.name': '雾幕握套',
@@ -3162,6 +3532,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': '深沼钳咬鱼人',
   'entities.mobs.mire_widow.name': '泥沼寡妇蛛',
   'entities.mobs.mirefen_broodmother.name': '蛛母',
+  'entities.mobs.spider_egg.name': '蛛母之卵',
+  'entities.mobs.widow_hatchling.name': '寡妇蛛幼体',
+  'entities.mobs.drowned_warlord.name': '溺亡督军',
+  'entities.mobs.brakka_wallbreaker.name': '破墙者布拉卡',
+  'entities.mobs.threnos_first_voice.name': '初声瑟雷诺斯',
+  'entities.items.firebottle.name': '火油瓶',
+  'entities.items.murloc_hut.name': '泥鳍茅屋',
+  'entities.items.restless_skull.name': '不宁颅骨',
+  'entities.items.vanguard_bone.name': '先锋之骨',
   'entities.mobs.drowned_dead.name': '溺亡死者',
   'entities.mobs.fen_troll.name': '泥沼巨魔',
   'entities.mobs.grubjaw.name': '贪食者格鲁布颚',
@@ -3207,12 +3586,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.varkas_boneguard.name': '瓦尔卡斯骨卫',
   'entities.mobs.emberkin.name': '烬裔',
   'entities.mobs.gloomshade.name': '幽影',
-  'entities.mobs.duskborn.name': '暮裔',
   'entities.mobs.grix_the_tunnelking.name': '隧道之王格里克斯',
-  'entities.mobs.spellhound.name': '噬法猎犬',
-  'entities.mobs.warfiend.name': '战魔',
   'entities.mobs.pyre_colossus.name': '焚炎巨像',
-  'entities.mobs.wraithborn.name': '亡魂裔',
   'entities.mobs.choirmother_selthe.name': '唱诗母塞尔瑟',
   'entities.mobs.drowned_templeguard.name': '溺亡神殿卫',
   'entities.mobs.drowned_votary.name': '溺亡信徒',
@@ -3349,7 +3724,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '潭水饮尽月光，{className}，又将溺者吐还。我守望那道门户已有三十夜——而今夜，它开了。',
   'entities.quests.q_prof_intro.title': '人人都有一技之长',
   'entities.quests.q_prof_intro.text':
-    '东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子西南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。',
+    '东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。',
   'entities.quests.q_prof_intro.completion':
     '看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。',
   'entities.quests.q_prof_intro.objectives.0.label': '已开采矿脉',
@@ -3390,7 +3765,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '让不宁骸骨安息',
   'entities.quests.q_supplies.title': '被盗的补给',
   'entities.quests.q_supplies.text':
-    '强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去东南山丘的营地夺回4个补给箱。',
+    '强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西南山丘的营地夺回4个补给箱。',
   'entities.quests.q_supplies.completion': '我的箱子！几乎没有划痕。你真让人惊喜。',
   'entities.quests.q_supplies.objectives.0.label': '被盗补给箱',
   'entities.quests.q_whispers.title': '地下低语',
@@ -3516,7 +3891,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '生锈香炉',
   'entities.quests.q_no_rest.title': '芦苇中不得安息',
   'entities.quests.q_no_rest.text':
-    '香炉上的仪式会让溺亡者在湿地触及之处复起。我们还无法破除它，只能先少给敌人14名士兵。',
+    '香炉上的仪式会让溺亡者复起，如今它已唤起一个强大到足以统领他们的存在。守望者称他为溺亡督军，只要他还占据沉没的礼拜堂，死者便阵列不散。打倒他，{playerName}，其余的自会溃散回泥沼。',
   'entities.quests.q_no_rest.completion': '你给了死者比他们主人更多的怜悯。拿着，你早已应得。',
   'entities.quests.q_no_rest.objectives.0.label': '让溺亡死者安息',
   'entities.quests.q_trolls.title': '泥沼坟丘',
@@ -3600,7 +3975,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalker_cloaks.objectives.0.label': '山脊潜猎者毛皮',
   'entities.quests.q_old_cragmaw.title': '老裂颚',
   'entities.quests.q_old_cragmaw.text':
-    '山民给我斥候找到的爪印起过名字：老裂颚，一只满身伤疤的暴君巨猫，熬死了自己族群的三代。潜猎者涌上我的道路，就是因为它，{playerName}。它的巢穴在南路上方的西侧山脊。带个帮手去，了结那老魔头。',
+    '山民给我斥候找到的爪印起过名字：老裂颚，一只满身伤疤的暴君巨猫，熬死了自己族群的三代。潜猎者涌上我的道路，就是因为它，{playerName}。它的巢穴在南路上方的东侧山脊。带个帮手去，了结那老魔头。',
   'entities.quests.q_old_cragmaw.completion':
     '它终于倒下了。山民曾发誓那只猫会比城墙活得还久。如今潜猎者会守在高处的雪原了，{playerName}，我的巡逻队走这条路也不必再流血。整条山脊都因你安静了下来。',
   'entities.quests.q_old_cragmaw.objectives.0.label': '击败老裂颚',
@@ -3673,14 +4048,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '这笔迹...我在东溪莫森的魔典里见过。每座坟后都是同一只手，{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': '击败龙教狂热者',
-  'entities.quests.q_cult_orders.objectives.1.label': '龙教命令',
   'entities.quests.q_necromancers.title': '护命匣之环',
   'entities.quests.q_necromancers.text':
     '命令提到一圈护命匣，{playerName}，灵魂容器围着圣所供养它。杀8名死灵法师，带回3个完整护命匣。',
   'entities.quests.q_necromancers.completion':
     '愿圣光宽恕我们。里面装着谷地和湿地的死者，所有被收割的灵魂。{playerName}，他们从来不是在组建军队，而是在征收贡赋。',
   'entities.quests.q_necromancers.objectives.0.label': '击败龙教死灵法师',
-  'entities.quests.q_necromancers.objectives.1.label': '仪式护命匣',
   'entities.quests.q_revenants.title': '亡魂战场',
   'entities.quests.q_revenants.text':
     '圣所路东有片古战场，上一支攻山军的先锋已埋两百年。邪教叫醒了他们，穿着锈甲。{playerName}，让12个归土。',
@@ -3736,7 +4109,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravewyrm.objectives.0.label': '击败墓龙科祖尔',
   'entities.quests.q_mogger.title': '莫格必须倒下',
   'entities.quests.q_mogger.text':
-    '莫格劈裂货车，踏平栅栏，杀死的牲口足以让半个谷地空掉。不要独自面对它。带两名强壮同伴去东边草地，把那蛮兽彻底放倒。',
+    '莫格劈裂货车，踏平栅栏，杀死的牲口足以让半个谷地空掉。不要独自面对它。带两名强壮同伴去西边草地，把那蛮兽彻底放倒。',
   'entities.quests.q_mogger.completion':
     '莫格终于死了。东溪的田地更安全了，而你离开谷地时又多了一个值得传颂的故事。',
   'entities.quests.q_mogger.objectives.0.label': '击败莫格',
@@ -4145,7 +4518,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_codfather.name': '鳕鱼教父',
   'entities.quests.q_the_codfather.title': '鳕鱼教父',
   'entities.quests.q_the_codfather.text':
-    '鳕鱼教父不只是一条鱼，{playerName}，它是个冷血杀手。老人们发誓说它拿湿地徘徊者当早饭，就连米尔芬寡妇也会因恐惧而不敢在深沼浅滩附近结网。那片水域归它统治。拿上鱼竿，把那个老恶魔从它的水域里拖出来，我就承认你入了这个家族。',
+    '鳕鱼教父不只是一条鱼，{playerName}，它是个冷血杀手。老人们发誓说它拿湿地徘徊者当早饭，就连米尔芬寡妇也会因恐惧而不敢在深沼浅滩附近结网。那片水域归它统治，而沼泽水域非得用一根铁轮钓竿不可，我柜台上就有卖。拿上一根，把那个老恶魔从它的水域里拖出来，我就承认你入了这个家族。',
   'entities.quests.q_the_codfather.completion':
     '湿地诸圣在上……鳕鱼教父本尊。看看那些胡须。芬桥会把这次收获讲上一整年，{playerName}。',
   'entities.quests.q_the_codfather.objectives.0.label': '鳕鱼教父',
@@ -4170,6 +4543,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄徽记',
   'hudChrome.raidLockout.heroicName': '英雄难度：{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被锁定至英雄难度的{name}。',
+  'hudChrome.riftTracker.title': '裂隙',
+  'hudChrome.riftTracker.floor': '第 {current} 层，共 {total} 层',
+  'hudChrome.riftTracker.closesIn': '裂隙将在 {time} 后关闭',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
   'entities.items.morthens_cryptforged_hauberk.name': '莫尔森的墓铸锁甲',
   'entities.items.shadowpulse_handwraps.name': '暗影脉冲裹手',
   'entities.items.bonechill_striders.name': '骨寒行者之靴',
@@ -4198,6 +4576,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewyrm_claws.name': '墓龙护爪',
   'entities.items.gravescale_girdle.name': '墓鳞腰带',
   'entities.items.wyrmchoir_handwraps.name': '龙唱裹手',
+  'entities.items.basin_stalkers_tunic.name': '盆地潜猎者外衣',
+  'entities.items.verdant_heart_vestment.name': '翠心法衣',
+  'entities.items.sunbone_ritual_hauberk.name': '日骨仪式锁甲',
+  'entities.items.greatfang_of_the_basin.name': '盆地巨牙',
+  'entities.items.sunbone_oracles_crown.name': '日骨先知之冠',
+  'entities.items.bloodmane_war_legguards.name': '血鬃战争腿甲',
   'entities.items.deathless_greatblade.name': '不死巨刃',
   'entities.items.soulforged_warplate.name': '铸魂战甲',
   'entities.items.stormcallers_focus.name': '唤雷之核',
@@ -4232,7 +4616,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_restless_dead.objectives.0.label': '符文骨片',
   'entities.quests.q_nythraxis_graves.title': '被遗忘者的坟墓',
   'entities.quests.q_nythraxis_graves.text':
-    '我以前见过这些标记，就在北方战场周围的三座旧坟上。奥德伦队长葬在东侧高地，马尔里克大祭司在中央破路旁，皇家刺客沃斯则在西侧峭壁边。触碰每座坟墓并倾听，{playerName}。死者或许记得生者遗忘的事。',
+    '我以前见过这些标记，就在北方战场周围的三座旧坟上。奥德伦队长葬在西侧高地，马尔里克大祭司在西侧边缘更往南处，皇家刺客沃斯则在东侧峭壁边。触碰每座坟墓并倾听，{playerName}。死者或许记得生者遗忘的事。',
   'entities.quests.q_nythraxis_graves.completion':
     '奥德伦依旧忠诚，马尔里克拒绝接受死亡，而沃斯比任何人都更早看见危险。他们三人都侍奉同一位被遗忘的国王。',
   'entities.quests.q_nythraxis_graves.objectives.0.label': '奥德伦队长之墓的幻象',
@@ -4240,7 +4624,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.2.label': '皇家刺客沃斯之墓的幻象',
   'entities.quests.q_nythraxis_sealed_crypt.title': '废弃墓穴',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    '幻象指向西侧峭壁中的废弃墓穴。古老传说称，那座墓穴曾安置一位国王。也许在马尔里克的仪式把他扭曲成不死之物后，荆峰将他封在了下面。进入墓穴，看看里面还剩下什么。',
+    '幻象指向东侧峭壁中的废弃墓穴。古老传说称，那座墓穴曾安置一位国王。也许在马尔里克的仪式把他扭曲成不死之物后，荆峰将他封在了下面。进入墓穴，看看里面还剩下什么。',
   'entities.quests.q_nythraxis_sealed_crypt.completion':
     '钥石的两半合在了一起，而沃斯的日记写明了它们封印之物：尼思拉克西斯国王的印戒。如果日记属实，那枚印戒就是通往他陵墓的钥匙。',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.0.label': '墓穴钥石上半部',
@@ -4417,7 +4801,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。',
   'entities.quests.q_fs_bram_come_home.objectives.0.label': '已护送渔民布拉姆平安回到鸥港',
   'entities.quests.q_fs_bram_come_home.text':
-    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。',
+    '晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在南岸。把他领回家，交到我手上。',
   'entities.quests.q_fs_bram_come_home.title': '布拉姆回家',
   'entities.quests.q_fs_hold_the_riftfields.completion':
     '少了十个，雇工们已经在争谁第一个下田了。这撑不了多久，裂隙从不会安分太久，但吃得上饭的镇子，就是守得住的镇子。',
@@ -4502,7 +4886,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label': '已护送学徒雯恩平安抵达极光台阶',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
+    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
   'entities.quests.q_fv_seeing_wren_home.title': '送雯恩回家',
   'entities.quests.q_fv_silent_trapline.completion':
     '梅芙派你来的？哈。十一年了，那女人还当沼泽会吃了我。唔……今年她也许还真说对了。看看它把我的陷阱线糟蹋成什么样了。',
@@ -4856,6 +5240,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.glimmerfin_koi.name': '日辉锦鲤',
   'entities.items.ironreel_fishing_rod.name': '铁轮钓竿',
   'entities.items.silverstream_fishing_rod.name': '银溪钓竿',
+  'entities.items.stormreel_fishing_rod.name': '风暴轮钓竿',
+  'entities.items.tidewrought_fishing_rod.name': '潮铸钓竿',
   'entities.items.raw_bog_eel.name': '生沼泽鳗鱼',
   'entities.items.raw_frostgill_trout.name': '生霜鳃鳟鱼',
   'entities.items.raw_marsh_pike.name': '生沼泽狗鱼',
@@ -4918,14 +5304,26 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_log.name': '高松原木',
   'entities.items.goldleaf_herb.name': '金叶草',
   'entities.items.sunpetal_herb.name': '阳瓣草',
+  // 优质材料：工具等级高于材料时采集所得（D8）。前缀统一为“优质”。
+  'entities.items.fine_copper_ore.name': '优质铜矿石',
+  'entities.items.fine_iron_ore.name': '优质铁矿石',
+  'entities.items.fine_thorium_ore.name': '优质锇矿石',
+  'entities.items.fine_ironbark_log.name': '优质铁皮木原木',
+  'entities.items.fine_ashwood_log.name': '优质灰木原木',
+  'entities.items.fine_elderwood_log.name': '优质高松原木',
+  'entities.items.fine_silverleaf_herb.name': '优质润光叶草',
+  'entities.items.fine_goldleaf_herb.name': '优质金叶草',
+  'entities.items.fine_sunpetal_herb.name': '优质阳瓣草',
   'hud.core.chatChannels.add': '添加聊天频道',
   'hud.core.chatChannels.addTitle': '添加频道',
   'hud.core.chatChannels.close': '关闭{channel}标签',
+  'hud.core.chatChannels.moveHint': '重新排列{channel}标签：拖动，或使用 Alt+左和 Alt+右',
   'hud.core.chatChannels.names.general': '综合',
   'hud.core.chatChannels.names.guild': '公会',
   'hud.core.chatChannels.names.lfg': '组队',
   'hud.core.chatChannels.names.officer': '官员',
   'hud.core.chatChannels.names.party': '小队',
+  'hud.core.chatChannels.names.battleground': '战场',
   'hud.core.chatChannels.names.say': '说话',
   'hud.core.chatChannels.names.world': '世界',
   'hud.core.chatChannels.names.yell': '大喊',
@@ -4974,6 +5372,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'fiesta.augment.aug_warlords_might.desc': '+25%物理伤害和+10%暴击。成为威胁本身。',
   'fiesta.augment.aug_warlords_might.name': '军阀之力',
   'fiesta.augment.choose': '选择一项强化',
+  'fiesta.augment.cardAria': '{name}（{category}）：{description}',
   'fiesta.banner.augmentGained': '获得强化：{name}！',
   'fiesta.banner.powerup': '{name}！',
   'fiesta.banner.wave': '第{wave}/{total}波——选择一项强化！',
@@ -4986,7 +5385,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'Fiesta平局！难分高下！',
   'fiesta.end.loss': 'Fiesta失败！再来一局！',
   'fiesta.end.win': 'Fiesta获胜！🎉 多么尽兴的狂欢！',
-  'fiesta.enterQueue': '加入Fiesta！',
   'fiesta.error.leaderOnly': '只有队长才能为你的队伍排入{label}队列。',
   'fiesta.error.noAugment': '你现在没有可以选择的强化。',
   'fiesta.error.notOnOffer': '那项强化不在可选之列。',
@@ -5002,8 +5400,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': '巨像',
   'fiesta.powerup.pow_moon_boots.name': '月行靴',
   'fiesta.powerup.pow_speed_demon.name': '极速恶魔',
-  'fiesta.practice': '🎉 对战机器人练习',
-  'fiesta.practiceNote': '离线练习：生成3个AI机器人并将你排入2v2 Fiesta队列。再次点击即可停止。',
   'fiesta.queue.join': '你加入了2v2 Fiesta队列。准备好狂欢吧……',
   'fiesta.queue.leave': '你离开了2v2 Fiesta队列。',
   'fiesta.queue.teamLeave': '你的队伍离开了2v2 Fiesta队列。',
@@ -5071,6 +5467,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': '重置',
   'hudChrome.chatWindow.note':
     '拖动聊天标签栏可移动窗口，拖动右下角手柄可调整大小。重置可恢复到默认位置和大小。',
+  'hudChrome.chatQuota.limitReached': '综合聊天已达到限额。请在 {seconds} 后重试。',
+  'hudChrome.chatQuota.pending': '上一条综合聊天消息仍在发送中。请稍候再试。',
+  'hudChrome.chatQuota.unavailable': '综合聊天暂时不可用。请稍后再试。',
   'hudChrome.compass.E': '东',
   'hudChrome.compass.N': '北',
   'hudChrome.compass.NE': '东北',
@@ -5079,6 +5478,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': '东南',
   'hudChrome.compass.SW': '西南',
   'hudChrome.compass.W': '西',
+  'hudChrome.emoteEditor.close': '关闭表情',
   'hudChrome.emoteEditor.done': '完成',
   'hudChrome.emoteEditor.title': '表情',
   'hudChrome.emotes.bow': '鞠躬',
@@ -5096,12 +5496,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '挥手',
   'hudChrome.emoteWheel.edit': '编辑',
   'hudChrome.emoteWheel.label': '表情',
+  'hudChrome.meters.move': '拖动以移动此统计面板',
+  'hudChrome.meters.resize': '拖动以调整此统计面板大小',
+  'hudChrome.meters.dock': '将此统计停靠回统计窗口',
+  'hudChrome.meters.separate': '分离{meter}',
+  'hudChrome.meters.regroup': '合并{meter}',
   'hudChrome.meters.breakdownOther': '其他（{count}）',
   'hudChrome.meters.melee': '近战',
   'hudChrome.meters.minutesSeconds': '{m}分{s}秒',
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
+  'hudChrome.meters.breakdownRow': '{value}（{percent}）',
+  'hudChrome.meters.threatFallback': '无实时仇恨：显示对{name}造成的伤害',
+  'hudChrome.meters.breakdownSummary': '{tab}：{value}',
+  'hudChrome.meters.percent': '{value}%',
+  'hudChrome.meters.petAbility': '{pet}：{ability}',
   'hudChrome.meters.autoShowHint':
     '一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。',
   'hudChrome.mobile.actionPageToggle': '切换动作页',
@@ -5156,6 +5566,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '剩余 {count} 秒',
   'hudChrome.plurals.secondsRemaining.many': '剩余 {count} 秒',
   'hudChrome.plurals.secondsRemaining.other': '剩余 {count} 秒',
+  'hudChrome.plurals.playtimeDays.one': '{count} 天',
+  'hudChrome.plurals.playtimeDays.few': '{count} 天',
+  'hudChrome.plurals.playtimeDays.many': '{count} 天',
+  'hudChrome.plurals.playtimeDays.other': '{count} 天',
+  'hudChrome.plurals.playtimeHours.one': '{count} 小时',
+  'hudChrome.plurals.playtimeHours.few': '{count} 小时',
+  'hudChrome.plurals.playtimeHours.many': '{count} 小时',
+  'hudChrome.plurals.playtimeHours.other': '{count} 小时',
+  'hudChrome.plurals.playtimeMinutes.one': '{count} 分钟',
+  'hudChrome.plurals.playtimeMinutes.few': '{count} 分钟',
+  'hudChrome.plurals.playtimeMinutes.many': '{count} 分钟',
+  'hudChrome.plurals.playtimeMinutes.other': '{count} 分钟',
   'hudChrome.plurals.playersMatching.one': '查询：{realm}上有{count}名玩家匹配“{query}”。',
   'hudChrome.plurals.playersMatching.few': '查询：{realm}上有{count}名玩家匹配“{query}”。',
   'hudChrome.plurals.playersMatching.many': '查询：{realm}上有{count}名玩家匹配“{query}”。',
@@ -5222,6 +5644,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': '唤风肩甲',
   'entities.items.bonewrought_greatsword.name': '骨铸巨剑',
   'entities.items.direfang_greatblade.name': '恐牙巨刃',
+  'entities.items.direfang_quiver.name': '恐牙箭袋',
   'entities.items.bonewrought_bulwark.name': '骨铸壁垒',
   'entities.items.wraithfire_orb.name': '魂焰宝珠',
   'hud.chat.context.convertToRaid': '转换为团队',
@@ -5304,6 +5727,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     '每个恢复码只能使用一次。请妥善保管：如果你丢失了身份验证器应用，它们是你唯一的找回方式。',
   'hudChrome.account.twoFactorDownloadCodes': '下载恢复码',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} 恢复码',
+  'hudChrome.account.recoveryCodesFileAccount': '账户：{username}',
+  'hudChrome.account.recoveryCodesFileHint': '如果你无法访问身份验证器应用，每个代码只能使用一次。',
+  'hudChrome.account.recoveryCodesFileWarn': '请将此文件保存在安全且私密的地方。',
   'hudChrome.account.twoFactorDone': '完成',
   'hudChrome.account.twoFactorDisableHint': '请输入你的密码以关闭双重验证。你的恢复码将被作废。',
   'hudChrome.account.twoFactorDisableBtn': '关闭双重验证',
@@ -5330,9 +5757,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': '护甲',
   'hudChrome.bags.filterConsumable': '消耗品',
   'hudChrome.bags.filterMaterial': '材料',
+  'hudChrome.bags.filterTool': '工具',
   'hudChrome.bags.filterMount': '坐骑',
   'hudChrome.bags.filterQuest': '任务',
   'hudChrome.bags.sortAria': '排序背包物品',
+  'hudChrome.bags.sortButton': '整理',
+  'hudChrome.bags.sortButtonAria': '整理背包',
+  'hudChrome.bags.sortButtonHint': '合并堆叠并按类型分组物品',
   'hudChrome.bags.sortRecent': '最近',
   'hudChrome.bags.sortQuality': '品质',
   'hudChrome.bags.sortName': '名称',
@@ -5348,6 +5779,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': '一款可在浏览器中免费畅玩的经典风格 MMO。',
   'guide.skipToContent': '跳至正文',
   'guide.loading': '加载中……',
+  'guide.controls.targetPrev': '反向切换目标',
   'guide.controls.targetFriendly': '选中最近的友方',
   'guide.deedsPage.cat.chronicle': '编年史',
   'guide.deedsPage.cat.collection': '收藏',
@@ -5362,8 +5794,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.catalogBody':
     '这里列出了功绩之书所能容纳的每一个功绩，按类别整理。隐秘的功绩被特意略去，等待你自己去发现。在游戏内打开功绩之书，即可查看每个功绩的具体要求。',
   'guide.deedsPage.catalogHeading': '功绩全录',
-  'guide.deedsPage.chroniclesBody':
-    '每个区域都保有自己的编年史，这是一组由当地记录者收集的功绩，他们自愿承担起记录每一位过路旅人的责任。东溪谷的Saul是其中的第一位。一部编年史分为若干章节，你可以按任意顺序来完成它们。',
+  'guide.deedsPage.chroniclesBody': '每个区域都保有自己的编年史，那是一位本地编年史家汇集的一批功绩，他自愿担起记录每一位途经旅人的职责。东溪谷地的索尔是其中第一位，奥斯里克·芬恩在迷沼深处的芬桥保管沼泽编年史，而岑姿则在高瞭之上记录山峰编年史。一部编年史分为若干章节，你可以按任何适合自己的顺序逐一推进。',
   'guide.deedsPage.chroniclesHeading': '编年史',
   'guide.deedsPage.colRenown': '名望',
   'guide.deedsPage.colReward': '奖励',
@@ -5375,12 +5806,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': '功绩如何运作',
   'guide.deedsPage.intro':
     '功绩之书记录着你在这个世界所做的一切，从走出新手山谷的第一步，到王国所能提供的最艰难的战斗。一边游玩一边赢得功绩，佩戴它们授予的头衔，看着你的名望不断攀升。',
-  'guide.deedsPage.renownBody':
-    '名望是功绩之书背后的分数。你赢得的每个功绩都价值固定的点数，而你的总分只增不减，因此清闲的一周绝不会让你失去已有的成绩。少数功绩取决于运气而非技巧，而壮举则自成一份荣誉，因此这两者都不提供任何名望。不带名望的功绩仍会计入功绩之书的完成度，只是从不计分。',
+  'guide.deedsPage.renownBody': '名望是功绩之书背后的分数。你所获得的每一项功绩都值一个固定的数额，而你的总数只会上升，因此清闲的一周绝不会让你失去阵地。其中少数靠的是运气而非本事，另一些收藏类功绩本身即是回报，而壮举则是另一种荣誉，所以这几类都不值任何名望。没有名望的功绩仍计入你这本书的完成度；它们只是从不计分。壮举是唯一的例外，被完全排除在计数之外。',
   'guide.deedsPage.renownHeading': '名望',
   'guide.deedsPage.rewardBorder': '边框',
   'guide.deedsPage.rewardsBody':
-    '这些奖励纯粹是为了炫耀，而这正是它们的意义所在。有些功绩会授予你可佩戴的头衔，或是为你的名字增添装饰的边框，绝不会给出任何让你的英雄变强的东西。在功绩之书中选择你想要的头衔，它便会显示在你的铭牌上、聊天中和排行榜上，供所有人观看。',
+    '这些奖励纯粹是为了炫耀，而这正是它们的意义所在。有些功绩会授予你可佩戴的头衔，或是为你的名字增添装饰的边框，绝不会给出任何让你的英雄变强的东西。在功绩之书中选择你想要的头衔与边框：头衔会显示在你的铭牌上、聊天中和排行榜上，供所有人观看，而边框会以自己的颜色环绕你的铭牌与头像。',
   'guide.deedsPage.rewardsHeading': '头衔与边框',
   'guide.deedsPage.standingsNote':
     '各王国会统计所有账号累积的名望：排行榜按账号的累计名望排名，每个功绩在你所有角色中只计一次，且榜上只显示名望，因此不带名望的功绩即使计入你的功绩之书，也绝不会影响排名。想知道谁位居何处，请在游戏内打开排行榜并转到它的名望标签页；排名在那里，而不在维基上。',
@@ -5405,16 +5835,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.delvesPage.lockpickBody':
     '有些门扉与宝箱处于封锁状态，开启它们更像是一场小小的胆识考验，而非属性比拼：干净而沉稳地解开锁，你得到的奖励会优于慌乱仓促的开法。这并非强制，但谨慎的探秘者收获更丰。',
   'guide.delvesPage.lockpickHeading': '锁与它们守护的东西',
-  'guide.delvesPage.marksBody':
-    '完成探秘会获得探秘印记，这是一种与你的钱币分开存放的货币。在看守人处花费它们，即可强化你的同伴，并取得别处遍寻不见的装备。',
+  'guide.delvesPage.marksBody': '清理探秘可获得探秘印记，这是一种与你的金钱分开保管的货币。把它们花在守护者那里，用以强化你的同伴，并换取别处找不到的装备。\n\n印记对你一天中最初的几趟给予最多回报。每天前三次通关全额支付，此后探秘依然给予回报，只是不那么稳定，其中较难的层级比较容易的层级更能维持。这个计数每天翻新，所以没必要把一处探秘刷到榨干：明天再来，好的回报率依旧等着你。',
   'guide.delvesPage.marksHeading': '探秘印记',
   'guide.delvesPage.partyLabel': '供一到两人',
   'guide.delvesPage.tiersBody':
     '一座探秘提供不止一档难度。更高的那档会让敌人更强，并随机附带一种词缀，作为回报，产出也更丰厚。它还要求你先积累几个等级，才会放你进入。',
   'guide.delvesPage.tiersHeading': '难度',
   'guide.delvesPage.tiersLabel': '难度',
-  'guide.delvesPage.whatBody':
-    '探秘是一座专为你以及至多一名盟友打造的小型副本，一份不会被打扰的私人副本。你从世界中由探秘看守人看守的面板处开启它，潜入其中，一路打穿几间房间，最后在唯一的守护者处收尾。每次探秘都很短，本就是为反复挑战而设，因此每当开放世界没什么可做时，探秘都是一份稳定的进度来源。',
+  'guide.delvesPage.whatBody': '探秘是一处小型的独立地下城，只为你和至多一位盟友而生成，是一份不会被人打扰的私人副本。你从世界中由探秘守护者看管的告示板启动它，往下潜入，一路打穿几间屋子，最后终结于唯一一名守卫。那名守卫之后等着什么，各处探秘并不相同：有的把战利品封在一把锁后面，有的则要你完成一场仪式。每趟都很快，而且本就为重复而设，因此每当开放世界枯竭时，探秘都是一份可靠的进展。',
   'guide.delvesPage.whatHeading': '探秘是什么',
   'guide.delvesPage.whereBody':
     '第一座探秘，坍塌的圣物库，位于东溪谷地起始山谷的圣物库山丘。哈尔文修士在那里看守面板，只要你准备好了，他便会送你下去。他的巡守并未止步于此：越过泥沼湿地北缘的巨魔土丘，这位看守人又为已经站稳脚跟的探秘者开放了溺亡连祷。',
@@ -5427,6 +5855,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.world': '世界',
   'guide.nav.quests': '任务',
   'guide.nav.deeds': '功绩之书',
+  'guide.nav.reliquary': '圣物库',
+  'guide.reliquaryPage.intro':
+    '圣物库是你已收录的独特战利品博物馆：地下城追逐装备、专业奖杯、坐骑、武器外观与头衔。它与功绩之书的关系，就像奖杯厅与成就簿的关系。',
+  'guide.reliquaryPage.howHeading': '收藏如何运作',
+  'guide.reliquaryPage.howBody':
+    '在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。少数页面标注“绝版”或“专属”：它们不计入达成，不会阻碍书架或全库的完成。实时发现会弹出提示并刷新已打开的窗口；进度按角色计算，武器外观除外（账号外观）。',
+  'guide.reliquaryPage.ranksHeading': '策展人等级',
+  'guide.reliquaryPage.ranksBody':
+    '策展人等级随已收录的独特圣物上升，仅授予装饰性头衔与边框。不会提供战斗强度、掉落率或保底。账号武器外观不计策展人等级，因此声望保持角色持久。绝版与专属页面上的圣物同样不计入等级。',
+  'guide.reliquaryPage.retiredTag': '绝版',
+  'guide.reliquaryPage.personalTag': '专属',
+  'guide.reliquaryPage.retiredNote':
+    '这些圣物已无法再获得。此页致敬仍持有它们的老兵，不计入达成或策展人等级。',
+  'guide.reliquaryPage.personalNote': '每个角色只能持有自己的一件。此页不计入达成或策展人等级。',
+  'guide.reliquaryPage.catalogHeading': '页面目录',
+  'guide.reliquaryPage.catalogBody':
+    '每一页已编写的圣物库页面及其圣物名称。此列表仅含防剧透名称：请在游戏中打开圣物库查看你的进度、通关次数与剪影。',
+  'guide.reliquaryPage.spoilerNote':
+    '个人首次发现记录、通关次数以及已有/未有状态保留在游戏客户端。维基从不发布玩家收藏。',
+  'guide.reliquaryPage.shelfHeading': '{label}（{count}）',
+  'guide.reliquaryPage.shelf.conquerors': '征服者',
+  'guide.reliquaryPage.shelf.professions': '专业',
+  'guide.reliquaryPage.shelf.horizons': '远景',
   'guide.nav.delves': '探秘',
   'guide.nav.dungeons': '地下城与团队副本',
   'guide.nav.reference': '参考',
@@ -5460,9 +5911,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.home.ctaPlay': '立即游玩',
   'guide.home.ctaLearn': '游戏入门',
   'guide.home.what.heading': '易于上手的经典 MMO',
-  'guide.home.what.pillarPlayTitle': '在浏览器中畅玩',
-  'guide.home.what.pillarPlayBody':
-    '无需下载,无需启动器。创建一个角色,几秒钟内便能进入游戏世界,电脑和手机皆可。',
+  'guide.home.what.pillarPlayTitle': '打开网站即可开玩',
+  'guide.home.what.pillarPlayBody': '无需下载，无需启动器。创建一个角色，几秒之内你就置身世界之中，无论是在电脑还是手机上。如果你想要，也有原生应用可用。',
   'guide.home.what.pillarClassesTitle': '九大职业,三种定位',
   'guide.home.what.pillarClassesBody':
     '坦克、治疗,还是输出,任你选择。每个职业都贴合自身的原型设计,还能用天赋打造出专属于你的玩法。',
@@ -5536,72 +5986,70 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.questsBody':
     '从头顶带有标记的人物处接取任务,完成目标,再交还任务以获得经验、金币和装备。屏幕上的任务追踪器会让你随时看清目标。',
   'guide.howToPlay.deathTitle': '死亡并非终点',
-  'guide.howToPlay.deathBody':
-    '若你倒下，你的身体会留在倒下之处，而你会化作鬼魂在最近的墓地复起。让灵魂跑回你的身体旁，即可就地复活、毫无惩罚；也可以接受墓地的灵魂医者，以一阵短暂的虚弱为代价立即复生。全新的英雄可以完全免除这份虚弱，而你所拥有或挣得的一切，永远不会失去。',
+  'guide.howToPlay.deathBody': '若你倒下，尸体会留在倒下的地方，而你会在最近的墓地化为幽魂站起。让灵魂跑回自己的尸体，就能原地复活且毫无惩罚；或者接受墓地的苍白守护者，立刻复活，代价是一段短暂的虚弱。全新的英雄完全免受这份虚弱，而你拥有或赢得的一切从不会失去。游戏还会告诉你死于什么：聊天栏中的一行会点出是谁打出了致命一击，这通常是弄清哪里出了问题的最快途径。',
   'guide.howToPlay.groupingTitle': '携手同行',
   'guide.howToPlay.groupingBody':
     '邀请他人组队,即可共享任务进度并挑战地下城。世界中的大部分内容都可单人完成,因此组队是一种选择,而非负担。',
   'guide.howToPlay.onlineTitle': '在线或离线',
   'guide.howToPlay.onlineBody':
     '在共享的在线世界与其他所有人一同游玩，或在浏览器中开启一个即开即玩的离线世界来熟悉门道。',
-  'guide.howToPlay.reassure':
-    '天赋在 10 级解锁，只要脱离战斗便可随时重置，所以你早期的选择绝非一成不变。放心大胆地尝试吧。',
+  'guide.howToPlay.reassure': '天赋从 5 级开始，一共六排，分别在 5、8、11、14、17 和 20 级各开一排。每一排都是三选一，只要脱离战斗且不在竞技场比赛中，你随时可以重置，所以早期的选择绝非一成不变。放心大胆地尝试吧。',
   'guide.howToPlay.controlsLink': '查看完整操作键参考',
-  'guide.controls.intro':
-    '电脑端的默认按键。除了始终用于打开游戏菜单的 Esc 之外，每一项绑定都可以在游戏选项中更改，而且一项绑定可以是像 Shift+Z 这样的修饰键组合。',
+  'guide.controls.intro': '桌面端的默认按键。这里的每一项绑定都可以在游戏菜单的“按键绑定”面板中修改，只有 Esc 例外，它始终用来打开该菜单。每个操作最多可容纳两个按键，一个主键和一个备用键，绑定也可以是像 Shift+Z 这样的组合键。它还可以是鼠标按键：中键是 M3，拇指键是 M4 和 M5，更多按键依次往上排。左键和右键仍保留给镜头、点击移动以及点击世界中的物件。',
   'guide.controls.keyHeader': '按键',
   'guide.controls.actionHeader': '操作',
   'guide.controls.groupMovement': '移动',
   'guide.controls.groupCombat': '目标选择与战斗',
   'guide.controls.groupInterface': '界面',
   'guide.controls.controllerBody':
-    '手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角。',
+    '手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角，还可以将一个按键绑定为拉近或拉远镜头（默认未绑定）。',
   'guide.controls.controllerHeading': '使用手柄',
   'guide.controls.cycleFriendly': '循环选择友方目标',
+  'guide.controls.targetAuras': '目标增益和减益效果',
   'guide.controls.gameMenu': '打开游戏菜单与选项',
   'guide.controls.groupCamera': '镜头',
   'guide.controls.talents': '天赋',
-  'guide.controls.arena': '竞技场',
+  'guide.controls.professions': '专业',
+  'guide.controls.arena': 'PvP 窗口（竞技场与荆谷原野）',
   'guide.controls.leaderboard': '排行榜',
   'guide.controls.deeds': '功绩之书',
+  'guide.controls.reliquary': '圣物库',
+  'guide.controls.sheathe': '收起/拔出武器',
   'guide.controls.crafting': '制作',
   'guide.controls.valeCup': '溪谷杯',
+  'guide.controls.mount': '骑乘 / 下骑',
   'guide.controls.calendar': '活动日历',
+  'guide.controls.dungeonFinder': '地下城查找器',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities': '使用动作条技能（数字键行；第二条动作条位于小键盘）',
   'guide.controls.groupPet': '宠物指令',
   'guide.controls.petBar': '宠物栏：攻击、停止、嘲讽、防御、攻击性（猎人或术士的宠物在场时可用）',
-  'guide.controls.attackMoveNote':
-    '还有一项默认关闭的功能：在选项中启用攻击移动后，会保留一个按键（选项开启时为 A），按下它便会朝你的光标走去，并对光标下的敌人，或途中遇到的第一个敌人展开攻击。',
+  'guide.controls.attackMoveNote': '攻击移动在你开启之前一直处于关闭状态：打开“按键绑定”面板，把它打开，上方的 A 一行便开始生效。当光标位于游戏世界上方时，它会让你朝光标走去，并向光标下的敌人开火，或者向沿途遇到的第一个敌对目标开火。该选项开启期间，A 执行的是这一攻击移动而不是向左转，所以请改用左方向键转向，“向左转”默认也带着这个键，或者给“向左转”另外指定一个你自己的按键。',
   'guide.controls.mobileHeading': '移动端操作',
   'guide.controls.mobileBody':
     '在手机和平板上会自动出现触控操作：左侧是移动摇杆，在其他任意位置拖动即可环顾四周，用两根手指捏合可缩放镜头，屏幕上还有用于使用技能和打开菜单的按钮。左上角的一个小箭头可以显示或隐藏菜单按钮，那里的“更多”按钮则收纳着你其余的窗口。',
   'guide.settingsPage.heading': '设置和性能',
   'guide.settingsPage.intro':
     '把画面调到最美，或把帧数拉到最高。三套现成方案，外加每个图形选项的真实作用。',
-  'guide.settingsPage.wherePath':
-    '本页的一切都在游戏里：按 Esc 打开选项。菜单会以一个汇集要点的概览页打开，各个类别列在旁边的导轨上：下面提到的设置位于“显示”组中的“图形”、“界面”和“辅助功能”之下，而“性能监视器”则在“系统”之下。更快的办法是，在顶部的搜索框中输入名称，直接跳转过去。',
+  'guide.settingsPage.wherePath': '本页所述的一切都在游戏里：按 Esc 打开游戏菜单。它以按钮形式列出各个面板：按键绑定、手柄、图形、界面、光环、音频和性能浮层，下方还有维基、脱困、登出和返回游戏，联机游玩时“报告缺陷”也会加入这份列表。图形与界面涵盖了这里描述的几乎全部内容。',
   'guide.settingsPage.fairnessTitle': '公平源自设计',
-  'guide.settingsPage.fairnessBody':
-    '这里没有任何选项会拿画面换战力。调低设置只会舍弃视觉上的修饰，绝不会砍掉你作战所需的信息：从“低”到“超高”，你的减益效果、施法条、队伍血量和伤害数字完全一致。用配置一般的机器游玩，绝不会吃亏。',
+  'guide.settingsPage.fairnessBody': '这里没有任何选项拿美观去换取实力。较低的设置只会舍弃外观上的润色，绝不会舍弃你赖以战斗的信息：你的减益、施法条、小队生命值和伤害数字，从 Low 到 Insane 完全一致。用一台普通的机器游玩从来不是劣势。',
   'guide.settingsPage.loadoutsHeading': '三套现成方案',
   'guide.settingsPage.loadoutsIntro':
     '先从最像你设备的那套方案开始，然后每次只调一个选项，直到感觉合适为止。',
   'guide.settingsPage.recommended': '推荐',
   'guide.settingsPage.whyLabel': '推荐理由：',
-  'guide.settingsPage.tagReload': '需重新加载',
+  'guide.settingsPage.tagReload': '按“应用”',
   'guide.settingsPage.fpsTitle': '帧数优先',
   'guide.settingsPage.fpsTagline': '适合较老的笔记本、核显设备，以及用电池游玩的场合。',
   'guide.settingsPage.fpsWhy':
     '图形质量是总开关，渲染质量则是效果最猛的滑块：调到 70% 时，世界只需绘制大约一半的像素，而界面依旧清晰锐利。',
   'guide.settingsPage.balancedTitle': '均衡',
   'guide.settingsPage.balancedTagline': '大多数设备的最佳平衡点，也是我们的默认建议。',
-  'guide.settingsPage.balancedWhy':
-    '“中”档就有真实的阴影和完整的材质，“高”档再加上环境光遮蔽和泛光。只要低于“超高”，内置保护机制就会在激烈战斗掉帧时自动兜底，所以均衡方案不必时刻盯着，也能一直流畅。',
+  'guide.settingsPage.balancedWhy': 'Medium 带来真实的阴影和完整的材质，High 又在其上加入环境光遮蔽与泛光。内建的安全网在每一档都保持张开，因此 Balanced 无需你照看便能扛过一场热闹的战斗。',
   'guide.settingsPage.visualsTitle': '极致画质',
   'guide.settingsPage.visualsTagline': '为高性能台式机准备的截图模式。',
-  'guide.settingsPage.visualsWhy':
-    '“超高”会以显示器支持的最高分辨率渲染，并启用最丰富的光照。它还会关闭内置保护机制，而且仅限桌面端：手机和应用端最高到“高”为止。',
+  'guide.settingsPage.visualsWhy': 'Ultra 会以你显示器所能提供的最高分辨率、最丰富的光照进行渲染。其上还有 Insane，那是全部开满的展示档：这一档必须你亲手选择，因为无论你的机器多强，游戏都不会替你选它。',
   'guide.settingsPage.value50to70': '50% 到 70%',
   'guide.settingsPage.value90to100': '90% 到 100%',
   'guide.settingsPage.value100': '100%',
@@ -5609,19 +6057,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.valueOnOptional': '开启（可选）',
   'guide.settingsPage.howHeading': '这些选项如何生效',
   'guide.settingsPage.factDetectTitle': '游戏会先自动调校',
-  'guide.settingsPage.factDetectBody':
-    '首次启动时，游戏会检测你的设备并选好合适的档位：性能一般的手机是“低”，强力台式机则是“超高”。你自己做出的任何选择永远优先。',
+  'guide.settingsPage.factDetectBody': '首次启动时，游戏会读取你的设备并为你存下一个合理的档位。所有手机和平板都从 Low 起步，好让你直接进入世界，老旧或软件渲染的显卡同样如此。强劲的台式机从 Ultra 起步，若这台机器看起来显存吃紧则从 High 起步。游戏无法判定的一律停在 Medium。你自己做出的任何选择永远优先，并且会保留下来。',
   'guide.settingsPage.factReloadTitle': '两类选项',
-  'guide.settingsPage.factReloadBody':
-    '图形质量和“高级”下的各个选项要在重新加载后才会生效，需要时面板会提供“立即重新加载”按钮。其余选项在你改动的那一刻立即生效。',
+  'guide.settingsPage.factReloadBody': '图形面板编辑的是一份草稿。更改“图形质量”或任意细节旋钮，然后按“应用”，游戏就会在你所站之处重建世界，无需重新加载。按钮旁的那行字会告诉你何时完成。其他所有选项，无论在该面板还是别处，都在你更改的那一刻生效，只有彻底失败的重建才会转而向你提供一个重新加载按钮。',
   'guide.settingsPage.factGovernorTitle': '内置保护机制',
-  'guide.settingsPage.factGovernorBody':
-    '在“超高”以下的所有档位，大型战斗骤然吃紧时，游戏会悄悄暂时精简草地、特效和光照，随后再恢复原样。选择“超高”，就等于告诉游戏你宁可保留每一处细节。',
-  'guide.settingsPage.advancedHeading': '“高级”预设：自由搭配',
-  'guide.settingsPage.advancedBody':
-    '“高级”以“高”档位为起点，额外解锁四个独立选项，让你把帧数花在真正看得出差别的地方：地形细节、植被密度、特效和光照，以及阴影质量。这些选项和图形质量一样，重新加载后才会生效。',
-  'guide.settingsPage.advancedMixes':
-    '两套人气搭配：把阴影质量保持在“高”、特效和光照调到“低”，画面干净利落、没有泛光，跑起来也轻快；或者反过来，保留泛光，让阴影更柔和。',
+  'guide.settingsPage.factGovernorBody': '每一档都保持安全网张开：当一场大战陡然升温时，游戏会悄悄稀疏草地、特效和光照片刻，随后再将它们复原。Ultra 与 Insane 只是会等得久得多才这么做，所以高端预设绝不会因为单独一帧变慢而受到打扰。',
+  'guide.settingsPage.advancedHeading': '细节旋钮与 Advanced 混搭',
+  'guide.settingsPage.advancedBody': '你不必选择 Advanced 才能看到细节旋钮。图形面板始终以两张卡片展示它们：世界细节包含地形细节、植被密度、表面细节、视野距离、水面质量和角色细节，光照与特效包含特效与光照、阴影质量、环境光遮蔽、泛光、抗锯齿、动态光源和粒子效果。在固定预设之下，每个旋钮都会大致显示该预设所处的位置。',
+  'guide.settingsPage.advancedMixes': '两种常用混搭：把阴影质量保持在高，并把特效与光照调到 Low，可得到清爽无光晕、运行轻快的画面；或者反过来，保留泛光并柔化阴影。混搭之前有一点需要知道：环境光遮蔽、泛光和抗锯齿与特效与光照挂在同一条链上，因此那个旋钮处于 Low 时，它们便无从运作。',
   'guide.settingsPage.tableHeading': '每个图形选项，逐一说明',
   'guide.settingsPage.colSetting': '选项',
   'guide.settingsPage.colDoes': '作用',
@@ -5643,8 +6086,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowTerrainDetail':
     '细腻混合的地表纹理，或更简洁、更省性能的地形外观，二选一。',
   'guide.settingsPage.rowFoliageDensity': '决定角色周围的草地长多远、长多密。',
-  'guide.settingsPage.rowEffectsQuality':
-    '控制泛光、环境光遮蔽，以及有多少火把和法术能投射真实光照。在“高级”各选项中，这一项省下的性能最多。',
+  'guide.settingsPage.rowEffectsQuality': '泛光、环境光遮蔽，以及有多少火把和法术投出真实光照。细节旋钮中单项节省最大的一个，也是其余光照旋钮所依赖的那个开关。',
   'guide.settingsPage.rowShadowQuality': '决定阴影的锐利程度。“低”仍保留阴影，只是边缘更柔和。',
   'guide.settingsPage.rowFrostedPanels':
     '在窗口背后加一层毛玻璃模糊。效果漂亮，但也正是性能较弱的浏览器最吃力的那类特效；想要经典的清爽外观就保持关闭。',
@@ -5652,21 +6094,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '移除界面动画，让窗口即刻显示。它首先是一项无障碍选项，顺带还有一点性能收益。',
   'guide.settingsPage.rowPerfOverlay':
     '在屏幕上实时显示 FPS、帧时间等数据。调校本页选项时先打开它，调完再隐藏。',
-  'guide.settingsPage.tableFoot':
-    '在找视距滑块或 FPS 上限？不用找了：可视距离已包含在各画质档位里，帧率则与你的显示器保持同步。',
+  'guide.settingsPage.tableFoot': '在找帧数上限？没什么可找的：帧的节奏跟随你的显示器。绘制距离是一个单独的旋钮，即世界细节卡片中的“视野距离”，每个预设都会替你设定它，直到你亲自调动为止。',
   'guide.settingsPage.mobileTitle': '手机与平板',
-  'guide.settingsPage.mobileBody':
-    '移动端会替你多打理一些：游戏自动选择档位，把分辨率稍微压低以兼顾电量和发热，最高的几个档位也仅在桌面端开放。上面的方案依然适用，只是手机最高到“高”为止。',
-  'guide.settingsPage.touchBody':
-    '在触屏设备上，选项还会多出一组专属的舒适度设置：摇杆大小与灵敏度、屏幕按钮的大小与不透明度、左手镜像布局、可选的镜头摇杆，以及反转触控视角，让屏幕来适应你的双手，而不是反过来。',
+  'guide.settingsPage.mobileBody': '在手机或平板上，游戏会让你从 Low 起步。所有触屏设备首次启动时都会落在这一档，这是刻意为之，好让你进入世界开始游玩；随时可以在图形面板中自行调高。在安卓浏览器上整条阶梯都向你敞开，你的选择也会保留。在 iPhone 和 iPad 上你依然可以选择最高的几档预设，按下“应用”后它们会立即生效，但游戏会在你下次启动时把你退回 High，因为 iOS 可能在构建这么大的场景时终止标签页。下载的应用更为收紧：它的预设列表止于 High，各项系统旋钮也被隐藏，因为应用会自行管理它们。',
+  'guide.settingsPage.touchBody': '在触屏上，图形面板会多出一张专属的触控操作卡片：摇杆大小与死区、屏幕按键大小、操作控件的不透明度、可选的镜头摇杆、供左手玩家使用的镜像布局，以及反转的触控视角，好让屏幕迁就你的双手，而不是反过来。',
   'guide.settingsPage.audioTitle': '声音与语言',
-  'guide.settingsPage.audioBody':
-    '选项窗口并不只关乎画面。音频标签页为音效、音乐和语音提供各自独立的音量控制，界面部分则带有一个语言选择器，可以当场重新本地化整个界面，无需重新加载。',
+  'guide.settingsPage.audioBody': '选项窗口并非只有画面。音频中有三个音量滑块，分别对应音效、音乐和语音，此外还有一个音乐开关，以及四个针对最容易听腻的声音的开关：NPC 语音、脚步声、界面音效和点击反馈。界面面板的“常规”标签页带有语言选择器，可当场重新本地化整个界面，无需重新加载，还有为窗口装饰准备的主题选择器。',
   'guide.combat.intro':
     '战斗遵循经典 MMO 中熟悉的规则。你完全不必钻研这些就能玩得很好,这里只是介绍一下战斗大致的运作方式。',
   'guide.combat.hitTitle': '并非每次攻击都能命中',
-  'guide.combat.hitBody':
-    '攻击可能未命中，也可能被躲闪，敌人的攻击同样如此；而法术则可能被彻底抵抗。与等级相近的敌人作战，才能让你的攻击稳稳命中；等级差距越大，你就越常挥向空气。',
+  'guide.combat.hitBody': '攻击可能落空，也可能被闪避，敌人的攻击同样如此。另有两种应对只属于玩家：战士可以用招架卸开一击，持盾的战士或圣骑士可以将其化作格挡，两者都只对来自正面的攻击有效。世界中的生物两者皆不会，所以挥向怪物的一击要么命中，要么落空，要么被闪避。法术自有其规则，从不落空：它们会被抵抗。与自己等级相近的敌人战斗，才是让你的攻击落到实处的关键；等级差距越大，你挥空的次数就越多。',
   'guide.combat.mitigationTitle': '护甲与生命值让你屹立不倒',
   'guide.combat.mitigationBody':
     '护甲能减轻物理打击，因此更好的护甲是你近战续航能力的主要来源。魔法则是另一回事：你要靠更深厚的生命值池与彻底抵抗法术的几率来扛过法术，而非依靠护甲。重甲职业能卸去更多打击，但没有什么能让你刀枪不入。',
@@ -5674,8 +6111,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.combat.resourcesBody':
     '战士在激战中积攒怒气,潜行者消耗稳步回复的能量,施法者则管理着一池法力。掌握自己的资源,便是玩好职业的一半。',
   'guide.combat.growTitle': '你每升一级都会变得更强',
-  'guide.combat.growBody':
-    '每次升级都会让你更加坚韧，并解锁新的技能，一路直至 {cap} 级的等级上限。做任务是升级最快的途径；狩猎、地下城与探秘则能加以补充。',
+  'guide.combat.growBody': '每一级都会让你更耐打，并解锁新的技能，一路直到 {cap} 级的上限。任务是向上攀升最快的途径；狩猎、地下城、探秘，以及你一路上经营的专业，则补足其余。',
   'guide.glossary.intro': '本指南及聊天中所用术语的快速参考。',
   'guide.glossary.aggroTerm': '仇恨',
   'guide.glossary.aggroDef': '敌人的注意力。产生威胁值最高的玩家会吸引仇恨并遭到攻击。',
@@ -5707,7 +6143,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a2':
     '不需要。没有它也能完整畅玩游戏。可选的社区代币仅增添外观装饰，以及每日奖励奖池的一份分成，绝不影响战力或进度。',
   'guide.faqPage.q3': '可以在手机上玩吗?',
-  'guide.faqPage.a3': '可以。游戏可在移动端浏览器中通过触控操作运行,同时也提供桌面端启动器。',
+  'guide.faqPage.a3': '可以。游戏能在任何现代移动浏览器中以触控操作运行，也有应用：iOS 与安卓版本，以及一款会自行保持更新的 Windows、macOS 和 Linux 桌面应用。',
   'guide.faqPage.q4': '可以离线或单人游玩吗?',
   'guide.faqPage.a4':
     '可以。有即开即玩的单人离线模式，而除地下城、团队副本和世界首领之外，在线世界也完全可以单人通关。',
@@ -5730,6 +6166,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.resourceName.rage': '怒气',
   'guide.resourceName.mana': '法力',
   'guide.resourceName.energy': '能量',
+  'guide.resourceName.focus': '集中',
   'guide.classPage.back': '所有职业',
   'guide.classPage.roleLabel': '定位',
   'guide.classPage.resourceLabel': '资源',
@@ -5782,19 +6219,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.family.reptile.name': '爬行类',
   'guide.family.reptile.desc': '冷血的猎手，带着独有的嘶声与撕咬，与温血的野兽截然不同。',
   'guide.worldPage.heading': '世界',
-  'guide.worldPage.intro':
-    'World of ClaudeCraft 是一片连绵不绝、需你徒步穿越的大陆，三大区域由南向北依次铺展。这里没有快速旅行，因此旅途本身便是冒险的一部分。',
+  'guide.worldPage.intro': 'World of ClaudeCraft 是一片你要靠双脚走遍的连续大陆。古道自南向北穿过起始山谷、沼泽和山峰，并越过它们继续攀升，通向其后的洼地以及地图顶端的雪境。自那条路向西展开一列更高等级的国度，向东另有一列，谷地东岸外还有一座岛屿。这里没有快速旅行，没有飞行路线，也没有马车：每一段路程都靠步行或骑乘完成，所以抵达本身就是冒险的一部分。\n\n这片大地也记录着时间。昼夜循环依照一只你所在世界人人共享的真实时钟运转，因此天空会为你们所有人同时从黎明经正午走向黄昏与夜色，月亮循着盈亏来去，地面上的光影也随之变化。小地图周围的表盘，就是你读取时辰的地方。',
   'guide.worldPage.hub': '大本营',
   'guide.worldPage.valeBlurb': '青翠的起始山谷，新英雄在东溪镇周边的野狼与盗匪身上磨砺技艺。',
   'guide.worldPage.marshBlurb':
     '一片被洪水淹没、迷雾与废墟交织的国度。泥鳍涌入浅滩，水下有更古老之物蠢蠢欲动，由桥镇芬桥镇守望着。',
-  'guide.worldPage.peaksBlurb':
-    '风蚀的山脊与古老的矿坑向上攀升，通往这片王国中最寒冷、最高处的危险之地，由高守哨站镇守。',
+  'guide.worldPage.peaksBlurb': '被风削蚀的山脊和古老的矿场向上攀升，直抵起始之路上最严酷的危险，由高瞭前哨据守。',
   'guide.questsPage.heading': '任务',
   'guide.questsPage.intro': '任务是这个世界的核心，也是升级最快的途径。下面介绍它们的运作方式。',
   'guide.questsPage.acceptTitle': '寻找与接受',
-  'guide.questsPage.acceptBody':
-    '头顶带有标记的人物有活儿要交给你。与他们对话即可接受任务。在东溪镇，红溪元帅正等着交付《门前之狼》，这是你最早能接取的任务之一。',
+  'guide.questsPage.acceptBody': '头顶带有标记的人有活儿要交给你，而标记会告诉你是哪一类。金色感叹号表示一个你现在就能接下的任务，金色问号表示一个你已完成、可以交付的任务。在姓名牌上你还会看到灰色问号，它表示你正在做那个任务但尚未完成。可重复的活计使用同样的标记，只是呈蓝色：亮蓝色感叹号是你做过、可以再接的差事，同样的标记若显得黯淡，则表示它仍在等待期内。除灰色之外的每一种标记都会显示在姓名牌、小地图和世界地图上，因此你能隔着半座城发现活儿。在东溪镇，红溪元帅正带着“门前之狼”等着你，那是你最早能接的任务之一。',
   'guide.questsPage.objectivesTitle': '目标',
   'guide.questsPage.objectivesBody':
     '击杀特定敌人、收集物品，或与世界中的某物互动。屏幕上的追踪器会随你的行动记录进度。若你改变主意，可以从任务日志中放弃一个任务，之后再从其发布者处重新接取。',
@@ -5812,9 +6246,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.heading': '地下城与团队副本',
   'guide.dungeonsPage.intro':
     '当开放世界已不能满足你时，召集一支队伍，踏入副本：一份专为你的队伍生成的地下城私有副本。',
-  'guide.dungeonsPage.party': '地下城专为五人小队打造。终局团队副本则容纳十人。',
-  'guide.dungeonsPage.soloLead':
-    '每座地下城都配有一段可单人完成的前置引导任务，让你始终清楚自己为何而来。',
+  'guide.dungeonsPage.party': '地下城是为五人小队设计的。终局团队副本则是十人。如果你手边凑不齐四位朋友，地下城查找器会为它排队的那些副本组建队伍。下方每张卡片上的等级区间，是这段副本所面向的等级，而不是门上的锁：没有什么能阻止你提前进入或稍后再来，只不过地下城查找器只会把你安排进与你等级相称的副本。',
+  'guide.dungeonsPage.soloLead': '动身之前先在附近的城镇打听打听：那里的任务发布者会派发终点就在这些厅堂之中的任务链，带着一条进去，意味着这趟副本收益翻倍。',
   'guide.dungeonsPage.levelAround': '约 {n} 级',
   'guide.dungeonsPage.levelExact': '{n} 级',
   'guide.dungeonsPage.raidSize': '十人，{n} 级',
@@ -5826,12 +6259,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeName': '沉没神殿',
   'guide.dungeonsPage.templeBody': '沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。',
   'guide.dungeonsPage.sanctumName': '墓龙圣所',
-  'guide.dungeonsPage.resetBody':
-    '在队伍仍持有已认领副本时切换难度，旧的认领会保留一段时间后自行清除。队长也可以立即放弃它们：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才能进行，且副本内不能有任何人（无论生死）留守，两次重置之间还隔着一段短暂的冷却。带着错误的难度来到门口，游戏会在开打之前直接提醒你。团队副本永远不会以这种方式重置；它遵循自己的锁定规则。',
+  'guide.dungeonsPage.resetBody': '在队伍仍占用着副本时切换难度，旧的占用会滞留一阵，然后自行释放。队长也可以让它们一次性释放：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才生效，只有在里面不再有任何人（无论活着还是倒下）时才生效，只有在里面每具尸体都被拾取干净之后才生效，而且两次重置之间隔着一段短暂的冷却。若你们带着错误的难度来到门口，游戏会在副本开始前告知。团队副本从不以这种方式重置；适用的是它自己的锁定规则。',
   'guide.dungeonsPage.resetTitle': '重置你的副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。',
   'guide.dungeonsPage.wildheartBody':
-    '一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。',
+    '一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。',
   'guide.dungeonsPage.raidName': '终局团队副本',
   'guide.dungeonsPage.raidBody':
     '在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。',
@@ -5878,28 +6310,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.rejuvenation': '瞬发施放，持续治疗盟友，让你可以继续行动。',
   'guide.abilityHook.renew': '随时间持续跳动的治疗，适合施放后继续移动。',
   'guide.abilityHook.rockbiter_weapon': '为你的武器附魔，让每一次近战挥击更重。',
-  'guide.abilityHook.seal_of_righteousness': '为你的挥击附加神圣伤害，再用裁决将其释放出去。',
+  'guide.abilityHook.seal_of_righteousness': '为你的近战挥击附上额外的神圣伤害。',
   'guide.abilityHook.serpent_sting': '施加一道毒液，随时间造成自然流血伤害。',
   'guide.abilityHook.shadow_bolt': '向目标施放一道暗影箭，是你的常用输出。',
   'guide.abilityHook.shadow_word_pain':
     '在敌人身上贴一道暗影腐蚀，然后任由它持续跳动，你去做别的。',
   'guide.abilityHook.sinister_strike': '你可靠的一击，积攒连击点供之后消耗。',
   'guide.abilityHook.smite': '一道神圣箭矢，用于从远处削减目标。',
-  'guide.abilityHook.summon_imp': '召唤一只烬裔，从远处向敌人投掷火焰箭。',
+  'guide.abilityHook.summon_imp': '召来一只烬裔，从远处向敌人施放邪能箭。',
   'guide.abilityHook.thorns': '守护盟友，让近战攻击者在打击时反伤自己。',
   'guide.abilityHook.thunder_clap': '打击你周围的一切，并减缓它们的攻击速度。',
   'guide.abilityHook.wrath': '从远处向目标投出一道自然箭矢，是你的常用输出。',
-  'guide.arenaPage.augmentsNote':
-    '增幅和强化只在本场比赛中有效。它们关乎的是趣味、即兴的临场构筑，而非长久的强势，因此没人能靠花钱赢得胜利。',
-  'guide.arenaPage.coliseumBody':
-    '斗技场是王国的竞技场，你将在排名赛中对阵其他玩家，一对一或二对二皆可。每个组别都各自记录排名，因此一场胜利便能让你在那条天梯上攀升，让全王国的人都看得见。打开竞技场窗口，即可独自或与你的搭档一同报名参加某个组别。',
+  'guide.arenaPage.coliseumBody': '斗兽场是国度的竞技场，你在那里与其他玩家进行评级比赛，一对一或二对二。每个组别各自保有自己的排名，因此一场胜利会让你在那道阶梯上攀升，供整个国度观看。评级玩法在 15 级开启，这一条对你的搭档同样适用：只要你们其中一人未达标，队列就保持关闭，直到你们两人都符合条件为止。整个玩家对战玩家都藏在一个标着 PvP 的按钮之后：打开它并选一个标签页，荆谷原野、一对一或二对二，然后独自或与搭档一同报名。你在排队或比赛期间，其余标签页都保持锁定，因此你绝不可能同时身处两个队列。',
   'guide.arenaPage.coliseumHeading': '灰烬角斗场',
   'guide.arenaPage.duelsBody':
     '可以向你遇到的任何玩家发起一场友好的决斗。除了荣誉，没有任何东西被押上，因此这是了解某种对局，或友好地一较高下的最简单方式。',
   'guide.arenaPage.duelsHeading': '决斗',
-  'guide.arenaPage.fiestaBody':
-    '嘉年华是一种快节奏的二对二混战，以一场连续不断的对局进行，每位战斗者都被拉到同一起跑线上。随着战斗推进，你会选取增幅，即时重塑你套路的快速强化，因此没有哪两场比赛的玩法会完全相同。',
-  'guide.arenaPage.fiestaHeading': '二对二嘉年华',
   'guide.arenaPage.heading': '竞技场与 PvP',
   'guide.arenaPage.intro':
     '想要与其他玩家一较高下吗？玩家对战内置其中，而且始终由你选择，绝不会被强加于你。',
@@ -5927,8 +6353,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.petsNote': '术士召唤恶魔与自己并肩作战，每一只都擅长不同的活儿。',
   'guide.dungeonsPage.levelBand': '{min} 至 {max} 级',
   'guide.dungeonsPage.partySize': '{n} 名玩家',
-  'guide.faqPage.a10':
-    '等级上限为 {cap} 级。从那时起，你可以打五人地下城和十人团队副本，再以英雄模式重新挑战它们以换取升级版战利品，在世界首领崛起时与他一战，在竞技场中检验自己，带着一位伙伴一同深入探秘，并在功绩之书中追逐功绩，以攀升王国的排名。',
+  'guide.faqPage.a10': '上限是 {cap} 级。从那里开始，你可以跑五人地下城和十人团队副本，以英雄模式再度挑战以获取升级过的战利品，沿着裂隙一层层深入，在世界首领现身时与之一战，在竞技场或荆谷原野战场上检验自己，打一个赛季的谷地杯，带上一名同伴潜入探秘，把一门专业一路做到杰作制作，收集坐骑，并在功绩之书中追逐功绩以攀升排行榜。',
   'guide.faqPage.a11':
     '邀请你遇到的任何人组队，在聊天中询问，或在地下城门口组队。世界的大部分内容都可以单人完成，所以组队是一种选择，而非要求。',
   'guide.faqPage.a9':
@@ -5956,8 +6381,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.heroicDef':
     '地下城或团队副本的更高难度版本，为装备精良的终局队伍调校。英雄难度的首领会掉落升级版战利品，最终首领还会付给英雄徽记。',
   'guide.glossary.heroicTerm': '英雄',
-  'guide.glossary.loadoutDef':
-    '一套保存下来的天赋布局。多存几套，便能在不同构筑之间切换，而不必一点一点地重新投入天赋点。',
+  'guide.glossary.loadoutDef': '一套已保存的天赋配置，最多可存十套。每一套都会记住它的各排选择和它的动作条，也可以记住你当时穿着的装备，因此切换构筑只需一次点击，而不必逐排重做。',
   'guide.glossary.loadoutTerm': '配置',
   'guide.glossary.mobDef': '世界中任何由电脑控制的生物，无论友好还是敌对。mobile 的缩写。',
   'guide.glossary.mobTerm': '小怪',
@@ -5972,7 +6396,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.soulboundDef':
     '一件从你获得那一刻起便与你的角色绑定的物品。它无法交易、无法邮寄、无法卖给商人，也无法在市场上挂单。',
   'guide.glossary.soulboundTerm': '灵魂绑定',
-  'guide.glossary.specDef': '专精：随着你投入天赋，你让职业倾向的方向，比如治疗或输出。',
+  'guide.glossary.specDef': '专精：你在 5 级为自己的职业选定的道路，例如治疗或输出。它确定你的定位，授予一个标志性技能和一份持久的精通，并且即使你重置天赋，它也会一直留在你身上。',
   'guide.glossary.specTerm': '专精',
   'guide.glossary.spiritHealerDef':
     '悬浮在每座墓地上空的看护者，能让你的鬼魂就地复生，代价是一阵短暂的虚弱。',
@@ -5985,13 +6409,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': '竞技场与 PvP',
   'guide.nav.talents': '天赋',
   'guide.nav.wishIKnew': '我希望早点知道的事',
-  'guide.petHook.wraithborn': '一只精英施法者，从远处倾泻沉重的暗影伤害。',
-  'guide.petHook.warfiend': '一名耐打的近战猛士，能召唤它之后就是全能的选择。',
-  'guide.petHook.spellhound': '一名暗影游击手，专门纠缠敌方施法者。',
-  'guide.petHook.emberkin': '一只远程火焰箭恶魔，从安全距离外消磨敌人。',
+  'guide.petHook.emberkin': '一只远程恶魔，其标志性的邪能箭能从安全距离消磨敌人。',
   'guide.petHook.pyre_colossus': '一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。',
-  'guide.petHook.duskborn': '一只快速的近战恶魔，输出凶猛，但承压能力很差。',
-  'guide.petHook.gloomshade': '一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。',
+  'guide.petHook.gloomshade': '一只结实的坦克恶魔，会嘲讽，并用深渊锁链把逃跑的普通敌人拽回攻击范围；首领会抵抗这一拉扯。',
   'guide.related': '相关内容',
   'guide.search.label': '搜索',
   'guide.search.noResults': '无匹配结果',
@@ -6016,24 +6436,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.tag.ranged': '远程',
   'guide.tag.simple': '简单',
   'guide.tag.solo': '适合单人',
-  'guide.talentsPage.choiceNote':
-    '每棵天赋树上都有那么几点是一个岔路口，而非单纯的买入：节点会给出两三个选项，由你择一而定。下一次重置会重新打开这个选择，就像树上的其他一切一样。',
+  'guide.talentsPage.choiceNote': '每一排都是一个岔路口：它提供三个选项，而你要在其中择一而定。你下一次重置会重新打开这些选择中的每一个。',
   'guide.talentsPage.heading': '天赋与专精',
-  'guide.talentsPage.howBody':
-    '天赋在 10 级开放，随着你向等级上限攀升，会持续获得天赋点。你在职业的天赋面板中分配它们，越深的层级会随着你的投入和升级而解锁，你还可以保存多套配置，在不同构筑之间切换。',
+  'guide.talentsPage.howBody': '天赋在 5 级开启，正是你选择专精的那一级。随着你升级，还会陆续开启五排，分别在 8、11、14、17 和 20 级各一排，因此最后一排恰好落在等级上限。你在职业的天赋面板中做出选择，位置在“专精”标签页旁边的“抉择”标签页。',
   'guide.talentsPage.howHeading': '它们如何运作',
   'guide.talentsPage.intro':
     '天赋是你让职业成为自己专属的方式。它们是可选的、宽容的，也很容易更改，所以你可以放心地尝试。',
-  'guide.talentsPage.resetNote':
-    '只要脱离战斗、且不在竞技场比赛中，你随时都可以重置天赋，所以早期的选择绝不会成为陷阱。尽管尝试，看看你喜欢什么，随心改主意。',
+  'guide.talentsPage.resetNote': '只要你脱离战斗且不在竞技场比赛中，随时都可以重置天赋，所以早期的选择绝不会成为陷阱。重置会清空你的各排选择且分文不取，而你的专精保持原样，因此重置绝不会在副本进行到一半时夺走你的定位。战场是例外，在那里你可以在两场战斗之间更改构筑。尽管去尝试，看看自己喜欢什么，也尽可放心改变主意。',
   'guide.talentsPage.resetTitle': '一切都不是永久的',
   'guide.talentsPage.shareNote':
     '一套完成的构筑可以复制为一段简短、可分享的代码交给朋友，对方将其直接粘贴进自己的天赋面板即可载入。',
-  'guide.talentsPage.specsBody':
-    '每个职业都有几种专精，各有自己的定位和标志性的侧重。在天赋面板中选择其一，会授予一项标志性技能，以及一份属于它自己的持久精通。这里是它们全部的大致面貌。打开某个职业可查看其全部技能。',
+  'guide.talentsPage.specsBody': '每个职业都有若干专精，各有各的定位和标志性侧重。你在 5 级于天赋面板中选定其一。它授予一个标志性技能和一份持久的精通，其中大多数还会加上契合该定位的被动加成，同时它也是你在地下城查找器中报名的定位。以下是它们全部的概貌。打开某个职业即可查看其完整技能组。',
   'guide.talentsPage.specsHeading': '各职业的专精',
-  'guide.talentsPage.whatBody':
-    '随着你升级，你会获得天赋点，用于为技能和属性投入细小而永久的强化。它们塑造一个职业的手感，使其倾向于更高的输出、更坚实的防御，或更强的治疗。',
+  'guide.talentsPage.whatBody': '你的天赋是一段简短的抉择阶梯，而不是一堆点数。每一排开启时会提供三个选项，而你恰好取其一。它们塑造一个职业的手感，使其偏向更高的伤害、更坚实的防御或更强的治疗。',
   'guide.talentsPage.whatHeading': '天赋的作用',
   'guide.toc.heading': '本页内容',
   'guide.wishPage.heading': '我希望早点知道的事',
@@ -6043,8 +6458,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.wishPage.i2Body':
     '当你倒下时，你会化作鬼魂在最近的墓地复起。跑回你的身体旁即可免费复活，或者接受灵魂医者的立即复生，以一阵短暂的虚弱换取这份便利。经验、装备和钱币都绝不会损失，所以放心去冒险、去学习。',
   'guide.wishPage.i2Title': '死亡几乎不会让你付出代价',
-  'guide.wishPage.i3Body':
-    '它们在 10 级解锁，只要脱离战斗便可随时重置，所以你早期的选择绝不是永久的。',
+  'guide.wishPage.i3Body': '你的第一个天赋在 5 级到来，而六排中的每一排都是三选一，因此一套构筑不过是一眼便能尽收的几个决定。只要你脱离战斗且不在竞技场比赛中，随时都可以重置，所以早早做出的选择不会把你锁死。',
   'guide.wishPage.i3Title': '天赋不是陷阱',
   'guide.wishPage.i4Body':
     '任务是升级最快的途径，还会带你走遍整个世界。当你不确定该去哪里时，找到下一个标记。',
@@ -6063,24 +6477,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.wishPage.i8Title': '战斗间隙稍作休整',
   'guide.wishPage.intro':
     '几条朴实的真相，能帮新玩家省去许多犹豫不决。这些都不是必读内容，但每一条都有帮助。',
-  'guide.worldPage.mapHeading': '向北之路',
-  'guide.worldPage.mapSub':
-    '三片区域，自南向北，每一片的等级都更高一级。跟着任务线走，这片土地便会带你从山谷一路抵达群峰。',
+  'guide.worldPage.mapHeading': '这条路与路那头的国度',
+  'guide.worldPage.mapSub': '任务路线自南向北纵贯地图中部：山谷、沼泽、山峰，再越过它们通向洼地与雪境。其余国度是沿着这条路展开，而非在它之后，经由沼泽路东西两侧的传送门抵达，远岸岛则从谷地东岸前往。把你挡在远方国度之外的是它们的等级区间，而不是路途：其中五处共享最高的区间，因此一旦你准备就绪，便可按任意顺序逐一挑战。远岸岛是例外，那是一片你可以早早造访的低等级土地。',
   'guide.worldPage.places': '值得一看的地点',
   'guide.worldPage.residents': '你将遇见的人',
-  'guide.arenaPage.powerupsBody':
-    '激战正酣时，发光的能量球还会落入竞技场，谁先抢到便归谁。它们刻意夸张到极致，且只持续片刻：极速恶魔让你瞬间快得令人目眩，巨像将你膨胀成步履蹒跚的庞然大物，月靴带来低重力的弹跳腾跃，狂战士则让你猛然涌起一股暴怒。',
-  'guide.arenaPage.powerupsTitle': '竞技场中的强化道具',
-  'guide.arenaPage.waveGoldBody': '中段一波：双刃组合，你的构筑在此开始成型、绽放光彩。',
-  'guide.arenaPage.waveGoldTitle': '黄金',
-  'guide.arenaPage.wavePrismaticBody':
-    '最后一波：足以定义构筑、炸裂屏幕的爆发，意在以最酣畅淋漓的方式让你直呼离谱。',
-  'guide.arenaPage.wavePrismaticTitle': '棱彩',
-  'guide.arenaPage.waveSilverBody': '开场一波：干净利落的单项属性提升，磨砺你职业的基本功。',
-  'guide.arenaPage.waveSilverTitle': '白银',
-  'guide.arenaPage.wavesBody':
-    '嘉年华的每一场对局都会随着进程递给你全新的选择，比赛持续得越久，可选的强化就愈发大胆。你从一波构筑到下一波，每次从寥寥几个选项中挑选其一，并在这场对局余下的时间里一直保留它。',
-  'guide.arenaPage.wavesTitle': '增幅分波登场',
   'guide.bestiary.flavor.gravecaller_cultist':
     '死亡邪教身披长袍的仆从，他们的勾当玷污了从谷地到峰巅的每一处坟墓。他们聚集之处，死者难以安息。',
   'guide.bestiary.flavor.grubjaw':
@@ -6092,8 +6492,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.shardlord_kazzix':
     '一个化作魁梧身形的风暴元素，徘徊在风暴岩之上遥远的峭壁间，身上的心石值得你冒着雷电去夺取。',
   'guide.bestiary.notedLabel': '值得一提',
-  'guide.combat.ccBody':
-    '控制是一类特殊的减益，会限制目标能做的事：眩晕、定身与减速，让人无法施法的沉默，缴械，恐惧，以及能让敌人暂时无害的变形。对其他玩家使用时，控制会随着重复而失去锋芒：同一类控制若重复施加得太快，效果会先减弱、继而彻底失效；而从潜行中打出的开场眩晕，会与其后的眩晕分开计算，因此没有人能被无休止地连控。这个世界的生物则没有这般记性：控制落在它们身上，每一次都是十足威力；不过许多最强大的敌人，包括有名的精英和其中最强的首领，则根本无法被控制。',
+  'guide.combat.ccBody': '控制是一类特殊的减益，它限制目标能做的事：昏迷、定身和减速、打断施法的沉默、缴械、恐惧，以及让对手片刻之间无害的变形。对上其他玩家时，大多数控制会因重复而递减：恐惧、变形、定身和法术学派封锁若过快地再次施加，持续时间会缩短，随后彻底失效，因此没有人会被永远压制。昏迷是刻意的例外，因为它本就短暂且背后有实打实的冷却，所以重复施加从不会缩短它，尽管缩减控制时长的装备依然会削减它。世界中的生物并无这般记仇：对它们而言，控制从不会因重复而减弱，不过许多最强大的敌人，其中有名的精英和最强的首领，根本无法被控制。',
   'guide.combat.deathBody':
     '若你的生命值归零，你便会当场倒下，你的身体会留在那里。释放你的灵魂，你会化作鬼魂在最近的墓地复起：比生者的脚步更快，敌人无法伤及，却也无法战斗、拾取，或与悬浮在墓碑上方的灵魂医者以外的任何人交谈。接下来由你选择。让鬼魂跑回你的身体旁，你便会就地复活，恢复部分生命与法力，毫无任何惩罚。或者接受灵魂医者的立即复生，就地起身，代价是复活后遗症：一段对你全身的暂时削弱，你越是历练深厚，它持续得越久，而全新的角色则完全免受其扰。若你倒在地下城之中，你的灵魂会在门外的墓地等候；让鬼魂走回门口，你便会在入口处复活。探秘则是例外：在那里倒下，你只会被重新扶起、置于探秘的入口处，不过第二次倒下就会结束这趟探秘。无论走哪条路，你都不会损失经验、装备或钱币。战斗间隙，坐下来进食饮水，让下一场战斗从满状态开始。',
   'guide.combat.deathTitle': '当你倒下时',
@@ -6108,12 +6507,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.cryptLeadTitle': '一扇死者本该让它紧闭的门',
   'guide.dungeonsPage.heroicBody':
     '每座五人地下城，连同团队副本本身，都有一个等在等级上限之后的英雄版本。同样的厅堂，为装备精良的终局队伍重新打造：一切都打得更疼，没有什么能靠双腿甩开，首领更是对眩晕与减速完全免疫。先超越普通版本再来；英雄难度默认你已经做到了。',
-  'guide.dungeonsPage.heroicHowBody':
-    '在你的队伍占据副本之前先选好难度：输入 /dungeon heroic，或在小队菜单上切换地下城难度开关。这一选择由全队共享，并在门口锁定，因此一次挑战会一直保持它开启时的难度。',
-  'guide.dungeonsPage.heroicLockoutBody':
-    '普通地下城一天想刷多少都行。英雄难度则需要耐心：每座地下城每天只奖励一次英雄通关，团队副本也按难度各自保留每日锁定。已经通关的副本对它自己的队伍始终开放，因此没有人会被挡在自己挣得的战利品之外。',
-  'guide.dungeonsPage.heroicRewardsBody':
-    '英雄难度的首领掉落你熟悉的战利品，但经过升级，并在提示框中标注“英雄”；每次挑战的最终首领还会额外掉落别处找不到的史诗装备。最后这一击也会为每位参与者留下英雄徽记：一种在高守哨站的军需官维克斯处花费的货币，他所备的戒指和吊坠是这个王国里仅有的珠宝。',
+  'guide.dungeonsPage.heroicHowBody': '在队伍占用副本之前先选好难度：输入 /dungeon heroic，或在自己的头像菜单中选择“设置地下城难度”。独自一人时由你自己设定；在队伍中只有队长可以设定，而这一选择对所有人生效并在门口锁定，因此一段副本会始终保持它被占用时的样子。',
+  'guide.dungeonsPage.heroicLockoutBody': '普通地下城可以整天地跑。英雄难度则要求耐心：最终首领的击杀会把这趟副本中的所有人限制为该地下城每天一次英雄通关，而团队副本对每种难度各保有一份每日锁定。在联机的国度上，所有每日锁定都会在该国度自己的夜间重置时刻一并解除，因此在那个时刻之前不久完成的一趟，与刚过之后完成的一趟，会落在两个不同的日子里；若改在浏览器中离线游玩，锁定则只是在你自己击杀之后一天到期。已经通关的五人副本仍对它自己的队伍开放，可用于跑尸和拾取，因此没有人会被挡在自己在那里挣得的收获之外。团队副本更为严格：一旦它的击杀锁定了你，门便会关闭直到重置，而唯一回到里面的途径，是由恰好在那趟锁定他们的副本中倒下的人跑尸带入，因此活着走出去的团队成员，就是这一天都走出去了。离开竞技场之前请收齐你的战利品。这些锁定各自属于挣得它的那个角色，因此在主力角色上的一次通关，并不妨碍你其他角色的自由。',
+  'guide.dungeonsPage.heroicRewardsBody': '英雄难度的首领掉落你熟悉的战利品，只是经过升级并在提示中标注为“英雄”，而每段副本的最终首领还会额外掉落别处找不到的史诗物品。那最后一次击杀也会为每位参与者留下英雄印记：一种在高瞭的军需官维克斯处使用的货币，他的柜台是一排戒指和吊坠，除了来自英雄深处的证明之外，别无他物能够购得。',
   'guide.dungeonsPage.heroicRewardsTitle': '英雄徽记与升级版战利品',
   'guide.dungeonsPage.heroicTitle': '英雄模式',
   'guide.dungeonsPage.templeLoreBody':
@@ -6133,36 +6529,32 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.economy.mailBody':
     '每座主城都立着一根雕成渡鸦的石柱：那是渡鸦邮驿的邮箱，这个王国的信件服务。站在柱旁，便可按名字写信给任何角色，无论对方在线还是久未登录，并支付少许邮资，在信中附上钱币或货物。渡鸦要飞上一小段时间；当它降落时，一个信封指示标会提醒收件人有东西在等着。',
   'guide.economy.mailHow':
-    '领取则是同样的流程反过来：站在任意石柱旁阅读你的信件，把信中所附收入钱袋与背包。信件不会永远等候，所以要赶在渡鸦对你失去耐心之前领取。有两样东西邮驿一概拒收：灵魂绑定的物品与任务物品，它们只随你本人同行。另外，漂亮地交还一个任务之后，记得留意石柱；有些任务发布者是会写信的。',
+    '领取则是同样的流程反过来：站在任意石柱旁阅读你的信件，把信中所附收入钱袋与背包。信件不会永远等候，所以要赶在渡鸦对你失去耐心之前领取。有几样东西邮驿一概拒收：灵魂绑定的物品、任务物品，以及已绑定或将随交易绑定的物品，它们只随你本人同行。另外，漂亮地交还一个任务之后，记得留意石柱；有些任务发布者是会写信的。',
   'guide.economy.mailTitle': '渡鸦邮驿',
   'guide.economy.marketBody':
     '商人经营着世界市场，这是一个由玩家驱动的交易所，你可以在此与素未谋面的人买卖。与东溪镇的商人交谈，或与高守哨站上的拍卖师沃斯交谈，即可将它打开：两位管理者服务于同一个共享市场。商人还会在那里长期挂售自己的一批货物，因此即便没有其他玩家上架，也总有东西可买。',
   'guide.economy.marketBrowse':
     '浏览：翻看列表或按名称搜索，找到正在出售的商品。每条挂单都会显示货物、卖家，以及整组货物的要价。',
-  'guide.economy.marketCollect':
-    '收取：当你的货物售出后，所得钱款会在商人处等你领取。回去收取钱币，连同任何未售出而退回的货物。商人会从每笔成交中抽取少许佣金。',
-  'guide.economy.marketPost':
-    '挂单：从背包中选一组货物，定下价格并挂出。在有人买下之前，货物会由商人代为保管。未售出的挂单过一段时间后会退还给你，若你改变主意，也可以提前取回其中一件。',
+  'guide.economy.marketCollect': '收取：当你的货物售出时，收益会在商人处等着你。回去领取金币，连同任何未售出而退回的东西。商人会从每笔完成的交易中抽取一小部分。“收取”标签页会逐项列出等着你的东西，每笔完成的交易一行，写明货物、买家以及你赚到的数目，因此在你取走金币之前，就能确切看到卖出了什么。',
+  'guide.economy.marketPost': '上架：从背包中挑出一摞，定下你的价格，然后挂上去。货物由商人保管，直到有人买下为止。未售出的挂单过一阵会回到你手上，若你改变主意，也可以提前取回其中一件。上架本身是免费的，因此一个乐观的价格只会花掉你一点时间。',
   'guide.economy.marketPricing':
     '定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。',
   'guide.economy.marketTitle': '世界市场',
   'guide.economy.marksBody':
     '你存下的不只有钱币。探秘会产出探秘印记，只能在探秘看守人处花费，用于同伴升级和别处找不到的装备。英雄难度的地下城则会在最终首领身上留下英雄徽记，在高守哨站的英雄军需官处花费，换取这个王国其他任何角落都买不到的珠宝。这两者都绝不会与你的钱币混在一起。',
-  'guide.economy.marksTitle': '印记与徽记：钱币之外的货币',
+  'guide.economy.marksTitle': '印记与荣誉：金钱之外的货币',
   'guide.economy.tradeBody':
     '你可以与站在身旁的任何人面对面交易。双方将物品与钱币放入一个共享窗口，唯有两人都确认后才会完成交换，因此谁也不会吃亏。这是把掉落物递给朋友或敲定一笔买卖最简单的方式。',
   'guide.economy.tradeTitle': '与其他玩家交易',
   'guide.economy.vendorsBody':
     '城镇与哨站里星罗棋布地分布着商人，各有各的营生。补给商贩备有食物与饮品，武器匠与护甲匠经营装备，军需官则备有实用的旅行用具。走到其中一位面前，便能看到他们出售的东西。',
   'guide.economy.vendorsTitle': '商人与他们的存货',
-  'guide.gear.consumablesElixirs':
-    '合剂会在你冒险时给予一段临时增益，是想再多拼一把时的一点小优势。',
+  'guide.gear.consumablesElixirs': '合剂在你冒险途中授予一段临时的强化，是当你想再往前推进一点时能帮上忙的一点优势。它们不与药水共享冷却，因此你可以喝下一瓶，同时仍留着一瓶治疗药水备用。同一属性的两瓶合剂不会叠加，最后喝下的那瓶才是留下的那瓶。',
   'guide.gear.consumablesFood':
     '食物与饮品会在你坐下休息、于两战之间恢复时为你回血回蓝。进食恢复生命，饮水恢复法力，如此休息分文不取。打完一场硬仗后先坐下几秒钟，别带着半残的血量冲进下一场。',
   'guide.gear.consumablesIntro':
     '有些物品一次性使用，换来即时的好处。它们是廉价的保险，不妨随身备上几个。',
-  'guide.gear.consumablesPotions':
-    '药水在你使用的那一刻便能恢复生命或法力，即便在激战中也可以，这让它们成为开怪失误时的救命稻草。它们共享一段较短的冷却，所以要选好一个绝佳时机来用。',
+  'guide.gear.consumablesPotions': '药水在你使用的那一刻恢复生命或法力，即便身处战斗之中也是如此，因此当一次拉怪出了岔子时，它们便是关键的救命手段。所有药水共享同一段长约数分钟的冷却，因此每场战斗你只有一个好时机，而不是一连串。它们恢复的量也少于坐下进食或饮水，这正是不坐下所付出的代价。药水按世界的每一段路程分级，所以请带上为你这个等级打造的那一级：一瓶低级的旧药水，在长成的角色身上不过是一星半点。',
   'guide.gear.consumablesTitle': '消耗品',
   'guide.gear.cosmeticsApply':
     '在角色界面的外观一栏设置你当前的造型，并在已解锁的所有外观之间自由切换。',
@@ -6172,8 +6564,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '其中少数来自一个神秘的外观宝箱，那是一份封缄的奖励，开启时会随机滚出三种品质等级中的一种，并授予与之匹配的外观。它纯粹为了好看：里面没有任何东西能让你变强，只会让你更赏心悦目。',
   'guide.gear.cosmeticsRanks':
     '外观也有自己的稀有度层级，越稀有的越值得一追。赢得更高的层级也会解锁它之下的那些外观。',
-  'guide.gear.cosmeticsSkins':
-    '有两条外观线可供收集。大多数职业都有几款备选外观，是对该职业造型的全新演绎，专属于你、可供穿戴。与之相伴的还有炫彩：那是一组组带名号的双色配色方案，能将外观彻底重涂，从素雅的金属色到明艳的帝王色，应有尽有。',
+  'guide.gear.cosmeticsSkins': '你角色的外观分为两条线。大多数职业都有数种备选外观，那是对职业造型的一番全新演绎，供你穿戴。与之并列的是配色：一组组有名有姓的双色方案，能把一副造型彻底重涂，从沉稳的金属色直到明亮的帝国色调。',
   'guide.gear.cosmeticsTitle': '外观与装饰',
   'guide.gear.fishingBody':
     '钓鱼是一种悠闲的调剂。装备好钓竿，向开阔的水域抛竿，再把上钩之物收线钓起。你大多会钓到可以直接食用的鱼，偶尔有几件能卖几个铜板的杂物，时不时还会有一条珍贵的稀有渔获。你能钓到什么，取决于你垂钓的水域。',
@@ -6197,8 +6588,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': '精良',
   'guide.gear.qualityTitle': '品质一览',
   'guide.gear.qualityUncommon': '优良',
-  'guide.gear.setsBody':
-    '有些护甲成套出现，数件装备在外观与战斗风格上浑然一体。同时穿戴足够多的同套部件，套装便会苏醒，在每件单品自身属性之外额外授予加成，而你穿的部件越多，加成就越强。少数这样的套系会在你升级途中作为珍贵掉落现身；其中最了不起的那些则来自接近等级上限的最高难度组队内容，因此凑齐一整套是经典的终局目标。',
+  'guide.gear.setsBody': '有些护甲成套出现，几件部件被裁制得看上去与战斗起来浑然一体。同时穿上一套中足够多的部件，套装便会苏醒，在每件部件自身属性之上再授予加成，而你穿得越多它就越强。少数这样的套装会在你升级途中作为令人垂涎的战利品出现，而其中最上乘的来自接近等级上限的最艰难的团队内容，因此凑齐一整套是经典的终局目标。与其他玩家的战斗也有自己成套的系列，用荣誉一件一件购得；它们苏醒所需的件数与掉落套装不同，而且它们的加成只在敌人是另一名玩家时才会响应。',
   'guide.gear.setsTitle': '套装与套装效果',
   'guide.gear.slotChest': '胸部',
   'guide.gear.slotFeet': '脚部',
@@ -6210,14 +6600,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotNeck': '颈部',
   'guide.gear.slotShoulder': '肩部',
   'guide.gear.slotWaist': '腰部',
-  'guide.gear.slotsBody':
-    '你有一个武器栏、七个护甲栏和三个珠宝栏：一个颈部和两个手指。每个职业只能使用特定的武器，并穿戴不超过其自身重量级别的护甲，即布甲、皮甲或锁甲，因此适合你的升级装备，正是为你的职业打造的那些。珠宝则完全没有重量之分：任何职业都能佩戴自己挣得的任何珠宝。在此之内，用你找到的最好物件填满每一个栏位。',
+  'guide.gear.slotsBody': '你有一个主手武器栏位、一个副手栏位、七个护甲栏位和三个饰品栏位：颈部和两根手指。每个职业只能使用特定的武器，并且只穿到自身重量级别的护甲，布甲、皮甲或锁甲，因此适合你的升级正是为你的职业打造的那些。饰品全无重量之分：任何职业都能戴上自己挣来的饰品。在此范围之内，用你能找到的最好的部件填满每一个栏位。',
   'guide.gear.slotsTitle': '你能装备什么',
   'guide.gear.soulboundBody':
     '许多珍贵的装备都是灵魂绑定的，从你获得的那一刻起便与你的角色绑定。灵魂绑定的物品无法交易、无法邮寄、无法卖给商人，也无法在市场上挂单；它如今是你故事的一部分，无人能替你携带。',
+  'guide.gear.uniqueTitle': '装备唯一：同一件传说只能穿一件',
+  'guide.gear.uniqueBody':
+    '传说物品是装备唯一的：你的角色同一时间只能穿戴某件传说物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、银行或市场里，但试图同时穿戴两份会被拒绝。物品提示上还带有金色的"装备唯一"标签，让你在围绕两件传说规划配装之前就能看到这条规则。',
   'guide.gear.soulboundTitle': '灵魂绑定：唯你独有',
-  'guide.gear.sourcesBody':
-    '早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，制作者能把采集来的材料打造成可穿戴的装备，玩家市场则让你能从其他冒险者那里买东西。而在山顶，两种特殊货币能买到别处绝无仅有的装备：探秘看守人处的探秘印记，以及英雄军需官处的英雄徽记。',
+  'guide.gear.sourcesBody': '你早期的升级大多来自任务奖励，所以完成任务比刷怪更划算。敌人被你击败时会掉落装备，城镇中的商人售卖扎实的基础货色，工匠把采集来的材料做成可穿戴的部件，而玩家市场让你能从其他冒险者那里购买。在山顶之上，有三种靠付出挣来的货币能买到别处找不到的装备：探秘守护者处的探秘印记、英雄军需官处的英雄印记，以及荣誉军需官处的荣誉。',
   'guide.gear.sourcesTitle': '装备从何而来',
   'guide.gear.upgradeBody':
     '用一件全新的升级换下旧装备，比你穿着已经过时的行头打得再完美都更有意义。当有更好的东西掉落或任务给予时，拿下它。别把好物品留到以后。',
@@ -6250,6 +6641,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.progression.bandLabel': '{min} 至 {max} 级',
   'guide.progression.capBody':
     '每升一级都会让你更加坚韧，并带来新的技能，一路直至 {cap} 级的等级上限。',
+  'guide.progression.capEndgameBody':
+    '裂隙是唯一真正等到满级才开放的内容。它们按自己的节奏在各处国度中撕裂开来，分为 C 到 S 的等阶，而全服的每一支队伍都在争当率先封印它的那一队。探秘的告示板同样一直都在，等你的装备跟上之后，它更高的难度也值得再走一趟。',
   'guide.progression.capJourneyBody':
     '{cap} 级是上限，是升级的终点，却非成长的尽头。从那时起，你可以打普通与英雄难度的地下城和团队副本，在世界首领崛起时与他一战，追逐更好的装备，并在竞技场中检验自己。',
   'guide.progression.capTitle': '抵达 {cap} 级',
@@ -6257,16 +6650,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '每一场战斗、每一个任务、每一步北行，都会让你的英雄更强。这里讲的是升级如何运作，以及登顶之后是什么让你持续成长。',
   'guide.progression.journeyBody':
     '整个世界是一片连绵不绝的大陆，三大区域由南向北铺展，每一处的等级都更高一层。你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。',
+  'guide.progression.journeyBodyCount':
+    '整个世界是一片连绵不绝的大陆，共有 {zones} 个区域。其中三个是你升级时走的那条路，由南向北铺展：你从翠绿的山谷启程，一路穿过湿地，最终止步于寒冷的高耸峰巅。循着任务指引而行，这片土地便会带你从一处走向下一处。山谷海岸之外还有一座小岛，供低等级时前往；其余的国度都自那同一条路旁展开，是为已经走完这段攀登的角色准备的。',
   'guide.progression.journeyTitle': '北行之旅',
   'guide.progression.noRush':
     '不必着急。这个世界供你按自己的节奏尽情享受，所以尽管漫步，接下吸引你的任务，让你的英雄在旅途中渐渐成长。',
   'guide.progression.prestigeBody':
     '即便到了等级上限，经验依然在累积。它会注入一个纯装饰性的虚拟等级，让你的经验条不断攀升，也会注入一个长期的威望等级，只要你到了那一步，就可以从角色面板中领取。跨过累计经验的重大里程碑，还会在你的功绩之书中赢得功绩，并附带会显示在角色面板上的装饰性称号与姓名板边框。这一切都纯属可选，绝不赋予战力，只是你走过这条路的印记。',
-  'guide.progression.restedBody':
-    '走进客栈并保持脱离战斗，你的角色便会在等待时积攒充分休息的经验。每座城镇都有一间客栈。下次你外出作战时，那一池经验会为你的击杀带来额外加成，直至耗尽。在客栈里稍作停留从来都不是浪费时间，它会加快你接下来一段的升级。',
+  'guide.progression.restedBody': '走进一家旅店并保持脱离战斗，你的角色便会在等待期间积累充分休息的经验。每座城镇都有一家。下次你外出作战时，这份积蓄会为你的击杀额外加成，直到用尽为止。在旅店中的一段停歇从来不是虚度的光阴；它会加快你下一段升级的路程。这份积蓄有上限，因此过上一夜所积攒的与住上很久大致相当，而一旦你抵达等级上限，便再没有等级条可填，充分休息的经验也就不再积累。',
   'guide.progression.restedTitle': '充分休息的经验',
-  'guide.progression.xpBody':
-    '你通过完成任务、击败敌人以及通关探秘来赚取经验。任务给的经验远多于其他途径，所以循着任务指引走是升级最快的方式。沿途的击杀与探秘则补足其余部分。',
+  'guide.progression.xpBody': '你通过完成任务、击败敌人、清理探秘以及经营一门专业来获得经验：只要这份活计仍在教给你东西，采集与制作就会在它们所传授的手艺技能之外，另行支付角色经验。任务给予的远多于其他一切，因此沿着任务路线走是向上攀升最快的途径，而一路上的击杀、探秘和采集则补足其余。',
   'guide.progression.xpTitle': '如何获得经验',
   'guide.questsPage.sagaBody':
     '主线剧情是一场漫长的追查。一个死亡邪教正在这片国度的坟墓间行动，你每揭开一个篇章，便又向北指明一个区域。你绝不会一次性面对整个阴谋；你抽出一根线头，它便引向握着下一头的那只手。',
@@ -6290,20 +6683,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sideWardenBody':
     '在剧情之外，the Vale 与湿地的法警和守望者们还会发布一份常驻的赏金阶梯。一个敌人接一个敌人地往上爬，就像你之前的每一位赏金猎人赢得自己的位置那样。这是踏实的升级，也是一趟遍历各区域最恶劣捣乱分子的巡礼。',
   'guide.questsPage.sideWardenTitle': '扬名立万',
-  'guide.questsPage.typeGatherBody':
-    '从世界中或敌人的掉落里收集物品：草药、矿石、邪教阴森的材料。有些物件只会从特定的敌人身上掉落，所以狩猎与搜罗总是相伴而行。',
+  'guide.questsPage.typeGatherBody': '从世界中或敌人掉落之物里收集物品：草药、矿石、某个教派阴森的试剂。有些部件只会从特定敌人身上掉落，因此狩猎与收获是一体的。地上属于某个任务的东西，只有在你确实接了那个任务时才会交给你；若你没接，或者你已经够数了，它们也会如实相告。有些任务在你接取时还会交给你一件工具：留意背包，并按任务文本所述来使用它。若某个任务需要更早一步给过你的工具，那么在你不再持有时接取它便会重新发给你，因此丢失工具不会让整条任务链走进死胡同。',
   'guide.questsPage.typeGatherTitle': '采集',
   'guide.questsPage.typeGroupBody':
     '主线剧情的每个篇章都终结于一扇地下城之门。前置引导可单人完成，但对一个篇章反派的最后一击，是为五人小队准备的。',
   'guide.questsPage.typeGroupTitle': '组队收尾',
-  'guide.questsPage.typeInteractBody':
-    '使用、净化或读取世界中某个固定之物：一座被玷污的坟墓、一块刻在岸边岩石上的警示、一扇封印的地穴之门。走到标记处，对它采取行动。',
+  'guide.questsPage.typeInteractBody': '使用、净化或阅读世界中某个固定的东西：一座被亵渎的坟墓、刻在岸边岩石上的警告、一扇封死的墓室门。走到标记旁并对它进行操作。当一个任务要求若干个时，它指的是若干个不同的：每个物件只会为你记录一次，因此请去找下一个，而不要对同一个用两次。你对物件进行操作时它并不会被消耗，因此你队伍里的每个人都能从它那里各自取得自己的进度。',
   'guide.questsPage.typeInteractTitle': '互动',
   'guide.questsPage.typeMusterBody':
     '有些任务会让你在向北推进前召集一座城镇：削弱城门处的威胁，并收集守卫者所需之物。这些都是击杀与收集类目标，服务于你身处其故事之中的人们，让你与他们一同前行。',
   'guide.questsPage.typeMusterTitle': '召集防御',
-  'guide.questsPage.typeSlayBody':
-    '击败一定数量的指定敌人，以此疏散一群野兽，或瓦解一个邪教的盘踞。你最早的任务之一，清除东溪路上的野狼，便属于此类。',
+  'guide.questsPage.typeSlayBody': '通过击败指定数量的标记敌人来削减一群野兽，或打破某个教派的掌控。你最早的任务之一，清理东溪镇道路上的狼群，就属于这一类。时不时地，某个任务会唤醒它自己的目标：上次经过时看着只是布景的东西，会在你接下相关任务后长出姓名牌，成为可以攻击的对象，所以不妨回头再看一眼。',
   'guide.questsPage.typeSlayTitle': '讨伐',
   'guide.questsPage.typesBody':
     '大多数任务都属于几种熟悉的样式之一。屏幕上的追踪器会清楚地说明每个任务的要求，让你绝不会一头雾水。',
@@ -6317,6 +6707,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanLfg': '寻求组队。',
   'guide.social.chanLfgBody':
     '一个需自行加入、覆盖全服的频道，用于寻找一起打地下城的人。打开它的标签页即可加入。',
+  'guide.social.chanBattleground': '战场。',
+  'guide.social.chanBattlegroundBody':
+    '与战场中的所有战士交谈，双方阵营都能看到。仅在比赛进行时可用。',
   'guide.social.chanParty': '小队。',
   'guide.social.chanPartyBody': '与你队伍中的每一个人交谈，无论你们相隔多远。',
   'guide.social.chanSay': '说。',
@@ -6329,21 +6722,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一个需自行加入、覆盖全服的频道。打开它的标签页即可加入，你便能看到并触及在线的每一个人。',
   'guide.social.chanYell': '喊话。',
   'guide.social.chanYellBody': '比“说”更响亮的版本，传得稍远一些，足以跨过一整座营地。',
-  'guide.social.chatBody':
-    '聊天分为若干频道，各自显示在自己的标签页上。输入一条消息即可在当前频道发送，或用斜杠命令把某一句引向别处。以下是你可以发言的频道：',
+  'guide.social.chatBody': '聊天窗口一开始有两个始终存在的视图，一个是汇总所有发言的记录，另一个是战斗记录。除此之外，你可以用加号按钮添加自己想要的标签页，每个频道一个，在电脑上还可以把它们拖成任意顺序（用 Alt 加左右方向键可以从键盘移动当前标签页）；右键点击某个标签页即可再次关闭它，而你的排列会在多次登录之间被记住。在频道标签页中输入会发往该频道，而斜杠命令则可以在不切换标签页的情况下把一行发往别处。此外还有一个密语标签页，把你发出和收到的每一条密语汇集在一处，在那里输入就等于回复最后写给你的那个人。以下是你可以发言的频道：',
   'guide.social.chatHeading': '聊天频道',
-  'guide.social.etiquetteBody':
-    '组队是一种选择，而非负担。加入时打声招呼，只对你真正会用的装备掷“需求”，离开前先知会队伍一声。一点点礼貌大有裨益，而且大多数玩家都乐于有伴同行。管理员会维持秩序，而不肯让他人好好享受游戏的玩家，可能会被关进牢房，直到管理员放他出来。',
+  'guide.social.etiquetteBody': '组队是一种选择，而不是苦差。加入时打声招呼，只对你确实会用的装备投“需求”，动身离开之前先告知队伍。一点点礼貌能走得很远，而大多数玩家也乐于有人作伴。',
   'guide.social.etiquetteHeading': '组队礼仪',
   'guide.social.friendsBody':
     '把玩家加入好友列表，便能看到他们何时在线、身在何处，这样他们一登入你就能立刻组队。',
-  'guide.social.friendsHeading': '好友与屏蔽',
-  'guide.social.guildBody':
-    '公会是一个跨越登录会话、你所归属的长久玩家团体。创建一个公会，或接受邀请加入，你同一时间只能身处一个公会。成员各持一种等级：一位会长、若干官员，以及成员。',
-  'guide.social.guildChatBody':
-    '归属于一个公会会给你一个私密的公会聊天频道，并将你的公会伙伴显示在一份共享的名册上，所以线上总有熟悉的面孔。',
+  'guide.social.friendsHeading': '好友、屏蔽与拉黑',
+  'guide.social.guildBody': '公会是一个跨越多次登录、你所归属的长久玩家群体。创建公会需要创建者一次性支付 1 金的费用，或者你也可以直接接受邀请加入，而你同一时间只能身处一个公会。成员各有职衔：会长、干事以及成员。',
+  'guide.social.guildChatBody': '身属一个公会会给你一条私密的公会聊天频道，以及一份共享的会员名册。较新的成员会佩戴“新兵”标记，资历长久的则佩戴“老兵”标记，用以取代朴素的成员标签，而干事和会长则始终显示自己的职衔；当你只想看看此刻谁在线时，也可以隐藏离线的名字。干事和会长还可以把一条简短的公告置顶在公会标签页的顶端，它会在你下次登录时在聊天记录中念给你听，大多数公会正是这样发布本周的安排。',
   'guide.social.guildHeading': '公会',
-  'guide.social.ignoreBody': '若有人骚扰你，把他们加入屏蔽列表，你便不会再看到他们的聊天。',
+  'guide.social.ignoreBody': '如果有人絮叨得超出你的意愿，把他加入屏蔽列表，他的公开发言便不会再传到你这里。屏蔽只是一项聊天设置，它绝不会把任何人从你的好友列表中移除。',
   'guide.social.intro':
     '世界的大部分内容都可单人完成，但这款游戏生来就是为了与他人同玩。这里讲的是如何交谈、组队，以及找到属于你的伙伴。',
   'guide.social.lootBody': '组队之后，队长会设定战利品如何分配。规则将钱币与物品分开处理：',
@@ -6410,8 +6799,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.stats.spBody':
     '法术强度是施法者与攻击强度相对应的属性：它会提升你法术造成的伤害。智力为其供能，施法者装备与增益还会在此之上额外叠加，因此施法者关注法术强度，正如近战斗士关注攻击强度。',
   'guide.stats.spTitle': '法术强度',
-  'guide.stats.spiBody':
-    '精神主宰施法者在停下施法时（也就是战斗间隙的大部分时间）法力回复的快慢。与智力一样，它服务于法力职业，对其他职业则意义不大。',
+  'guide.stats.spiBody': '精神主宰施法者法力回复的快慢。只有在几秒钟未曾消耗之后，它才会足额支付，而其中一部分即使在施法途中也会持续流动，因此精神在战斗中从来不是死重，尽管一位全力倾泻的施法者终究还是会见底。停下来喘口气是一个真真切切的法力抉择，战斗之中与战斗之间同样如此。与智力一样，精神服务于用法力的职业，对其余职业则意义不大。',
   'guide.stats.spiTitle': '精神',
   'guide.stats.staBody':
     '耐力是你的持久之本。耐力越高，生命池越大，并加快你脱离战斗、休息时回复的生命。每个职业都想要一些。',
@@ -6438,11 +6826,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.duskGreeter': '守护者塞尔文，古辉镇',
   'guide.worldPage.duskPlaceNotes':
     '古辉镇聚居在巨树之下。暮落洞穴与其瞭望台是入口，也是初见山谷的地方；古木林地与星落盆地守着宁静的南方；沉没王庭在东面藏着草木蔓生的废墟；辉光深处与水晶浅滩则在北方闪着微光。',
-  'guide.family.murloc.name': '蛙鳍族',
-  'guide.family.murloc.desc': '湖岸与潮池间呱呱叫的鱼人族群，谁涉水靠得太近，它们便会一拥而上。',
-  'guide.family.kobold.name': '林间小妖',
-  'guide.family.kobold.desc':
-    '在林间空地与树篱下窜来窜去的拾荒者和小妖精，单个不过讨人嫌，聚成一群才成祸患。',
   'guide.family.demon.name': '恶魔',
   'guide.family.demon.desc':
     '来自裂隙彼端的入侵者，浑身是火焰与怨毒。只要有一只现身，裂口就绝不会远。',
@@ -6793,6 +7176,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': '攻击速度和施法速度提高 {pct}%',
   'hudChrome.auraEffect.dmgDone': '造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': '造成的伤害降低 {pct}%',
+  'hudChrome.auraEffect.carriedFlag': '你正携带敌方旗帜。取消该增益即可丢下旗帜。',
   'hudChrome.auraEffect.elementalConvergencePrimed': '你的下一个不同元素学派法术将触发元素汇聚',
   'hudChrome.auraEffect.heatingUp':
     '你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发',
@@ -6900,12 +7284,33 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。',
   'entities.itemSets.vale_arcanist.name': '谷地秘法师法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻击速度和施法速度提高 15%。',
+  'entities.itemSets.warfare_ashstalker.name': '灰烬追猎者装备',
+  'entities.itemSets.warfare_ashstalker.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_ashstalker.bonus4': '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_ashstalker.bonus7': '战争攻击与防御等级提高 80。击杀敌对玩家可获得灰烬之步，使移动速度提高 40%，持续 6 秒。',
+  'entities.itemSets.warfare_cinderweave.name': '烬织法衣',
+  'entities.itemSets.warfare_cinderweave.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_cinderweave.bonus4': '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_cinderweave.bonus7': '战争攻击与防御等级提高 80。你的法术有 15% 的几率给予余烬守护，在 8 秒内吸收 120 点伤害。',
+  'entities.itemSets.warfare_furyforged.name': '怒铸战装',
+  'entities.itemSets.warfare_furyforged.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_furyforged.bonus4': '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_furyforged.bonus7': '战争攻击与防御等级提高 80。击杀敌对玩家可获得不破之誓，在 10 秒内吸收 200 点伤害。',
+  'entities.itemSets.warfare_stormbound.name': '缚雷法衣',
+  'entities.itemSets.warfare_stormbound.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_stormbound.bonus4': '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_stormbound.bonus7': '战争攻击与防御等级提高 80。你的法术有 15% 的几率给予余烬守护，在 8 秒内吸收 120 点伤害。',
+  'entities.itemSets.warfare_thornhide.name': '荆棘皮甲',
+  'entities.itemSets.warfare_thornhide.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_thornhide.bonus4': '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_thornhide.bonus7': '战争攻击与防御等级提高 80。你的法术有 15% 的几率给予荆棘守护，使躲闪提高 15%，持续 6 秒。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
   'entities.itemSets.wyrmshadow.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 点，致命一击几率提高 2%。',
   'entities.itemSets.wyrmshadow.bonus4':
     '你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 25%，持续 8 秒。',
   'hudChrome.itemSoulbound': '灵魂绑定',
+  'hudChrome.itemUniqueEquipped': '装备唯一',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中时几率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成伤害的法术几率（{chance}%）：{effect}',
@@ -7039,14 +7444,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '收购',
   'hudChrome.discord.relay.help.label': '求助',
   'hudChrome.crafting.title': '制作',
+  'hudChrome.crafting.dialogOption': '制作',
+  'hudChrome.crafting.dialogOptionAria': '打开{craft}制作窗口',
   'hudChrome.crafting.close': '关闭制作',
-  'hudChrome.crafting.craft': '制作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
   'hudChrome.crafting.empty': '尚无已知配方。',
   'hudChrome.crafting.resultAria': '制作{name}',
   'hudChrome.crafting.craftedToast': '已制作:{name}',
   'hudChrome.crafting.craftedToastQty': '已制作:{name} x{qty}',
   'hudChrome.crafting.insufficientMaterials': '你没有足够的材料。',
+  'hudChrome.crafting.reagentLocked': '该配方所需的材料已锁定。',
   'hudChrome.crafting.unknownRecipe': '该配方不存在。',
   'hudChrome.crafting.comboRequires': '调谐要求：{craftA} + {craftB}，阶级 {tier}。',
   'hudChrome.crafting.comboMet': '已就绪。',
@@ -7081,6 +7488,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.identity.colSkill': '技能',
   'hudChrome.crafting.identity.colRole': '定位',
   'hudChrome.crafting.identity.colCap': '上限',
+  'hudChrome.crafting.identity.allCrafts': '所有专业',
+  'hudChrome.crafting.identity.skillListAria': '专业技能',
   'hudChrome.crafting.identity.tutorial':
     '第一个阶级：将一门技艺提升到技能 {skill}。成功完成配方会提升对应技艺，且不会抹去其他知识。',
   'hudChrome.crafting.identity.nearTier': '{craft}距离下一阶级还差 {points} 点技能。',
@@ -7121,10 +7530,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.classicDesc': '按住鼠标右键并移动鼠标来转动镜头。',
   'hudChrome.cameraPrompt.changeLater': '稍后可在 Esc 菜单的“按键绑定”中更改。',
   'hudChrome.cameraPrompt.confirm': '确认',
-  'desktop.update.downloading': '正在下载更新 {version}...',
-  'desktop.update.ready': '更新 {version} 已就绪。退出游戏时将自动安装，也可立即重启。',
+  'desktop.update.checkingTitle': '正在检查更新...',
+  'desktop.update.checkingBody': '游戏会自动保持最新版本。',
+  'desktop.update.uptodateTitle': '当前已是最新版本。',
+  'desktop.update.downloadingTitle': '正在下载更新 {version}...',
+  'desktop.update.downloadingBody': '可以继续游戏，更新将在退出游戏时安装。',
+  'desktop.update.readyTitle': '更新 {version} 已就绪',
+  'desktop.update.readyBody': '退出游戏时将自动安装，也可立即重启。',
   'desktop.update.restart': '立即重启',
   'desktop.update.later': '稍后',
+  'desktop.update.dismiss': '关闭',
+  'desktop.update.whatsNew': '在浏览器中查看更新内容',
+  'desktop.notify.updateReadyTitle': '更新 {version} 已就绪',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就绪',
+  'desktop.notify.updateReadyBody': '重启 World of ClaudeCraft 以应用更新。',
+  'desktop.notify.partyInviteTitle': '组队邀请',
+  'desktop.notify.partyInviteBody': '{name} 邀请你加入队伍。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '游戏画面已停止响应。要重新加载吗？',
   'desktop.crash.reload': '重新加载',
@@ -7132,8 +7553,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
+  'gpuNotice.bodyDiscreteInactive':
+    '游戏没有使用独立（游戏）显卡，而是运行在节能显卡上，因此性能会下降。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
   'gpuNotice.bodyWeb':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。',
+  'gpuNotice.hybridBodyWindows':
+    '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。',
+  'gpuNotice.hybridBodyLinux':
+    '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。',
+  'gpuNotice.hybridBodyOther':
+    '本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请检查浏览器和操作系统的显卡设置以启用它。桌面版会自动选择独立显卡。',
   'gpuNotice.dismiss': '关闭',
   'perfNudge.integratedGpu':
     '游戏正在集成（节能）显卡上运行。如果这台电脑还配有独立游戏显卡，请在 Windows 的 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择游戏显卡。',
@@ -7216,6 +7645,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'editor.selection.radiusHint': '“自动”根据资源缩放推导碰撞半径；拖动滑块可覆盖它。',
   'editor.layers.blocker': '空气墙',
   'editor.status.blockerCapReached': '已达到空气墙上限（{max}）。新墙未被添加。',
+  'editor.status.campCapReached': '已达到营地上限（{max}）。新营地未被添加。',
   'editor.help.tool.blocker': '拖动绘制在试玩中阻挡移动的隐形墙。',
   'editor.inspector.label': '工具选项',
   'editor.brush.title': '笔刷',
@@ -7609,6 +8039,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_aether_hover_cycle.name': '点火钥匙：以太骑士悬浮机车',
   'entities.items.reins_shadowjump_toad.name': '影跃蟾蜍卡玛影的缰绳',
   'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
+  'entities.items.reins_drakemaw_raptor.name': '龙喉迅猛龙的缰绳',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆阔步大火鸡的缰绳',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
@@ -7686,13 +8117,32 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '该请求过大。请减少数据后重试。',
   'apiError.body.unsupported_media_type': '不支持的请求格式。',
   'apiError.deeds.invalid_input': '输入无效。',
+  'apiError.ota_updates.invalid_input': '输入无效。',
   'apiError.steam.disabled': 'Steam 关联当前不可用。',
   'apiError.wallet.handoff_invalid': '钱包授权已过期或无法验证。请重试。',
+  'apiError.seeker.native_only': 'Seeker 权益仅可在原生应用中使用。',
+  'apiError.seeker.attestation_failed': '设备验证失败。请重试。',
+  'apiError.seeker.solana_artifact_required': '请使用 Solana Store 版应用继续。',
+  'apiError.seeker.wallet_required': '请先关联并验证钱包。',
+  'apiError.seeker.genesis_token_required': '需要已验证的 Seeker Genesis Token。',
+  'apiError.seeker.genesis_token_claimed': '该 Seeker Genesis Token 已被领取。',
+  'apiError.seeker.entitlement_required': '需要已验证的 Seeker 权益。',
+  'apiError.seeker.current_ownership_required': '需要当前持有 Seeker Genesis Token。',
+  'apiError.cheater_mark.admin_target': '管理员账号无法被标记。',
+  'apiError.cheater_mark.reason_required': '必须填写原因。',
+  'apiError.cheater_mark.invalid_duration': '标记时长至少需为 1 秒。',
+  'apiError.cheater_mark.not_marked': '该账号未被标记。',
   'apiError.steam.invalid_ticket': 'Steam 无法验证此关联请求。请在桌面客户端中重试。',
   'apiError.steam.banned': '该 Steam 账号无法关联。',
   'apiError.steam.already_linked': '你的账号已关联一个 Steam 账号。',
   'apiError.steam.account_taken': '该 Steam 账号已关联到另一个账号。',
   'apiError.steam.upstream': 'Steam 未响应。请稍后重试。',
+  'apiError.epic.disabled': 'Epic 关联当前不可用。',
+  'apiError.epic.invalid_token': 'Epic 无法验证此关联请求。请在桌面客户端中重试。',
+  'apiError.epic.banned': '该 Epic 账号无法关联。',
+  'apiError.epic.already_linked': '你的账号已关联一个 Epic 账号。',
+  'apiError.epic.account_taken': '该 Epic 账号已关联到另一个账号。',
+  'apiError.epic.upstream': 'Epic 未响应。请稍后重试。',
   'apiError.db.conflict': '该更改与另一次更新发生冲突。请重试。',
   'apiError.rate_limit.exceeded': '请求过于频繁。请在 {seconds} 后重试。',
   'apiError.internal.error': '我们这边出了点问题。请重试。',
@@ -7728,6 +8178,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.character.already_in_world': '角色已在世界中。',
   'apiError.character.taken_over': '你的角色已被另一个会话接管。',
   'apiError.character.rename_required': '此角色必须先改名才能进入世界。',
+  'apiError.character.invalid_appearance': '无法保存该外观。请调整设计后重试。',
+  'apiError.character.reroll_unavailable': '此角色没有可用的免费重新设计。',
   'apiError.moderation.suspended_until': '此账号被停用至 {date}。',
   'apiError.moderation.suspended': '该账号已被暂停。',
   'apiError.moderation.banned': '此账号已被封禁。',
@@ -7790,6 +8242,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noRecipient': '这里没有叫这个名字的邮箱主人。',
   'hudChrome.mailbox.result.tooManyParcels': '一封信最多可携带 {count} 个包裹。',
   'hudChrome.mailbox.result.noMailQuestItems': '你不能邮寄任务物品。',
+  'hudChrome.mailbox.result.noMailBound': '该物品已绑定，无法邮寄。',
   'hudChrome.mailbox.result.notEnoughItems': '你没有那么多可寄送的物品。',
   'hudChrome.mailbox.result.cantAffordPostage': '你付不起邮资。',
   'hudChrome.mailbox.result.recipientBoxFull': '对方的邮箱已满。',
@@ -7889,8 +8342,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.raidCall.note': '守卫吹响号角：组队前往地穴与团队副本。',
   'hudChrome.calendar.events.marketDay.title': '集市日',
   'hudChrome.calendar.events.marketDay.note': '商人正等着新货。今天很适合逛逛世界市场。',
-  'hudChrome.calendar.events.fiestaNight.title': '狂欢之夜',
-  'hudChrome.calendar.events.fiestaNight.note': '今晚 2v2 狂欢擂台的人气最旺。',
   'hudChrome.calendar.events.arenaClash.title': '竞技场之战',
   'hudChrome.calendar.events.arenaClash.note': '决斗者涌向灰烬斗兽场。排队开打，向天梯进发。',
   'hudChrome.calendar.events.fishingDerby.title': '钓鱼大赛',
@@ -7913,6 +8364,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '你钓上了：{name}',
   'hudChrome.gathering.biteLine': '有东西上钩了！',
   'hudChrome.gathering.gotAwayLine': '它跑掉了。',
+  'hudChrome.gathering.earlyReelLine': '收线太早了，还没有鱼上钩。',
   'hudChrome.gathering.nodeName.ore': '矿脉',
   'hudChrome.gathering.nodeName.wood': '林木',
   'hudChrome.gathering.nodeName.herb': '草药丛',
@@ -7922,7 +8374,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.mining': '你需要{tier}阶采矿镐才能开采这条矿脉。',
   'hudChrome.gathering.toolTierUnmet.logging': '你需要{tier}阶伐木斧才能砍伐这片林木。',
   'hudChrome.gathering.toolTierUnmet.herbalism': '你需要{tier}阶草药镰才能采集这片草药丛。',
+  'hudChrome.gathering.toolTierUnmet.fishing': '你需要{tier}阶钓竿才能在这片水域垂钓。',
   'hudChrome.gathering.toolTierUnmetCorpse': '你需要{tier}阶采集工具才能取得最上等的材料。',
+  'hudChrome.gathering.wieldUnmet.mining': '你需要采矿{skill}才能挥动背包里已有的采矿镐。',
+  'hudChrome.gathering.wieldUnmet.logging': '你需要伐木{skill}才能挥动背包里已有的伐木斧。',
+  'hudChrome.gathering.wieldUnmet.herbalism': '你需要草药学{skill}才能使用背包里已有的草药镰。',
+  'hudChrome.gathering.wieldUnmetCorpse': '你需要采集技能{skill}才能让最上等的工具派上用场。',
   'hudChrome.gathering.requiresTool.mining': '需要采矿镐',
   'hudChrome.gathering.requiresTool.logging': '需要伐木斧',
   'hudChrome.gathering.requiresTool.herbalism': '需要草药镰',
@@ -7940,6 +8397,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.mining': '开采最高{tier}阶的矿脉所需。',
   'hudChrome.gathering.toolTooltip.unlocks.logging': '砍伐最高{tier}阶的林木所需。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism': '采集最高{tier}阶的草药丛所需。',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing': '在最高{tier}阶的水域垂钓所需。',
   'hudChrome.gathering.toolTooltip.use.mining': '使用：开采附近的矿脉。',
   'hudChrome.gathering.toolTooltip.use.logging': '使用：砍伐附近的林木。',
   'hudChrome.gathering.toolTooltip.use.herbalism': '使用：采集附近的草药丛。',
@@ -7950,8 +8408,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.rodBand': '钓鱼技能达到{skill}后可解锁更丰富的渔获。',
   'hudChrome.gathering.downgradeMark': '背包已满：这份收获未能留下采集者的印记。',
   'hudChrome.gathering.downgradeFind': '背包已满：一件完美的收获溜走了。',
+  'hudChrome.gathering.emptyHookNote': '空钩',
   'hudChrome.gathering.stateReady': '可采集',
   'hudChrome.gathering.stateCooldown': '恢复中',
+  'hudChrome.gathering.stateCooldownTimed': '{time}后恢复',
+  'hudChrome.gathering.fineGradePreview': '使用当前工具采集可获得优质品级。',
   'gatherEvent.pristineVein': '{finder}挖到了一条纯净的矿脉！',
   'gatherEvent.ancientHeartwood': '{finder}砍倒了一棵远古心木！',
   'gatherEvent.moonlitBloom': '{finder}发现了一朵月光之花！',
@@ -7983,12 +8444,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.tailoring': '裁缝',
   'hudChrome.craftName.leatherworking': '制皮',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentFineSub': '（消耗 {count} 个优质品级）',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': '折叠Protect Yumi血条',
   'yumi.hud.expand': '展开Protect Yumi血条',
-  'guide.arenaPage.yumiHeading': '守护Yumi',
-  'guide.arenaPage.yumiBody':
-    'Protect Yumi是一种在迷宫中进行的团队目标模式：每队守护自己的猫咪使魔，同时猎杀对方的。两只猫咪会不时闪现到迷宫的新角落，战斗在防守、追猎与寻回之间不断摇摆。可选择3对3或5对5排队；阵亡只会让你短暂离场。',
   'yumi.queue.join': '你加入了Protect Yumi队列。守好你的使魔……',
   'yumi.queue.leave': '你离开了Protect Yumi队列。',
   'yumi.queue.teamLeave': '你的队伍离开了Protect Yumi队列。',
@@ -7997,7 +8456,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'yumi.log.start': 'Protect Yumi！保卫你的使魔，猎杀敌方的使魔。',
   'yumi.bracket3': 'Yumi 3v3',
   'yumi.bracket5': 'Yumi 5v5',
-  'yumi.enterQueue': '加入Protect Yumi！',
   'yumi.hud.title': '守护YUMI',
   'yumi.hud.getReady': '做好准备……',
   'yumi.hud.teleportIn': 'Yumi将在{s}秒后传送',
@@ -8011,7 +8469,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'yumi.end.win': '胜利！Yumi安全了！',
   'yumi.end.loss': '战败！你的Yumi倒下了。',
   'hudChrome.crafting.comboRequirementUnmet': '你没有达到该配方所需组合的两项制造技能等级。',
-  'hudChrome.crafting.throttled': '你制作得太快了，请稍等片刻后再试。',
   'hudChrome.crafting.recipeNotLearned': '你还没有学会这个配方。',
   'hudChrome.crafting.noBagSpace': '背包空间不足，无法存放制作的物品。',
   // Professions 2.0 (M16 non-Latin fills).
@@ -8040,9 +8497,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkToast': '杰作！{name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}制作出了杰作{name}！',
   'hudChrome.crafting.tierUpToast': '{craft}提升至阶级 {tier}！',
+  'hudChrome.crafting.skillUpToast': '{skill}技能提升至 {level}！',
+  'hudChrome.crafting.skillUpSubtext': '技能提升至 {level}！',
   'hudChrome.crafting.makersMark': '制作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}，数量 {count}，带工匠印记的物品',
   'hudChrome.bags.itemAriaMasterwork': '{item}，数量 {count}，杰作',
+  'hudChrome.bags.itemAriaQuest': '{item}，数量 {count}，任务物品',
+  'hudChrome.bags.filterQuestCountAria': '任务，{count} 件物品',
+  'hudChrome.bags.noQuestItems': '背包中没有任务物品。',
   'hudChrome.crafting.gatheredBy': '采集者：{name}',
   'hudChrome.crafting.masterworkSeal': '杰作',
   'hudChrome.crafting.stationRequired': '必须位于{station}才能制作该物品。',
@@ -8056,12 +8518,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionPageIndicator': '第{page}页',
   'hudChrome.mobile.spellbookPageLabel': '页{page}',
   'hudChrome.mobile.hideKeyboard': '隐藏键盘',
-  'hudChrome.mobile.chatPlaceholder': '说点什么...',
+  'hudChrome.mobile.chatPlaceholder': '说点什么...（! 显示社区指令）',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
   'hudChrome.keybinds.categoryPet': '宠物',
   'hudChrome.keybinds.petAttack': '宠物：攻击',
   'hudChrome.keybinds.petStop': '宠物：停止',
+  'hudChrome.keybinds.targetPet': '宠物：选中',
   'hudChrome.keybinds.petTaunt': '宠物：嘲讽',
   'hudChrome.keybinds.petDefensive': '宠物：防御',
   'hudChrome.keybinds.petAggressive': '宠物：攻击性',
@@ -8083,6 +8546,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.nation.copperdig': '铜矿坑',
   'hudChrome.vcup.awayNote': '若双方举同一面旗帜，客队将使用反转配色。',
   'hudChrome.vcup.rolesHeading': '运动位置',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    '在1对1和2对2赛级中，所有选手都以全能型出场。要求3对3或更大赛级的功绩在此无法达成。',
   'hudChrome.vcup.role.allrounder.name': '全能型',
   'hudChrome.vcup.role.allrounder.desc': '样样都会：踢球、长传，还有一记正当的肩撞。',
   'hudChrome.vcup.role.striker.name': '前锋',
@@ -8114,6 +8579,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.boardWins': '{count} 胜',
   'hudChrome.vcup.practice': '与机器人练习赛',
   'hudChrome.vcup.practiceNote': '立即在母猪场开始一场完整的机器人比赛。',
+  'hudChrome.vcup.practiceUnratedNote': '练习赛不计入评级：战绩与功绩之书进度均不计算。',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.indicatorQueued': '溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人',
   'hudChrome.vcup.indicatorLive': '溪谷杯',
@@ -8154,6 +8620,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.rule5': '任何人都可以走上前，在看台上为你助威。',
   'hudChrome.vcup.briefing.kitHeading': '你的技能',
   'hudChrome.vcup.briefing.kitNote': '比赛期间，这些动作将取代你的职业技能。',
+  'hudChrome.vcup.briefing.unratedNote':
+    '场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    '这是练习赛，因此不计入评级：战绩不会变动，功绩之书进度也不计算。',
   'hudChrome.vcup.briefing.rosterHeading': '出场名单',
   'hudChrome.vcup.briefing.you': '你',
   'hudChrome.vcup.briefing.bot': '电脑',
@@ -8298,6 +8768,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '织烬裹腿',
   'entities.items.cinderweave_handwraps.name': '织烬裹手',
   'entities.items.cinderweave_slippers.name': '织烬便鞋',
+  'entities.items.thornhide_headdress.name': '荆棘兜帽',
+  'entities.items.thornhide_mantle.name': '荆棘披肩',
+  'entities.items.thornhide_vestment.name': '荆棘法衣',
+  'entities.items.thornhide_cinch.name': '荆棘腰带',
+  'entities.items.thornhide_leggings.name': '荆棘护腿',
+  'entities.items.thornhide_gloves.name': '荆棘护手',
+  'entities.items.thornhide_boots.name': '荆棘软靴',
   'entities.items.final_oath_medallion.name': '最终誓约勋章',
   'entities.items.razorwind_torque.name': '剃风颈环',
   'entities.items.cinder_sigil_pendant.name': '烬印坠饰',
@@ -8313,6 +8790,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.name': '怒焰',
   'entities.npcs.fury.title': '荣誉军需官',
   'entities.npcs.fury.greeting': '战场黄沙铭记每一场胜利。愿你妥善运用这份荣誉。',
+  'entities.npcs.warmarshal_draven_kole.name': '战帅德拉文·科尔',
+  'entities.npcs.warmarshal_draven_kole.title': '战争军备库总管',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    '我只收荣誉这一种货币，战争军备库由我看守。在战场上挣得你的军阶，我便为你披上迎接下一战的甲胄。',
   'guide.economy.bankBody':
     '每座主城都设有镀金保险箱的分号，它是这片大陆的银行商号。与那里的司库交谈即可打开你的保险库：一处背包之外的私人储物空间，伴随角色终身。无论你下次造访哪家分号，寄存的物品都会安然等候。',
   'guide.economy.bankHow':
@@ -8336,6 +8817,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositHint': '点击存入',
   'hudChrome.bank.depositPartialHint': 'Shift+点击存入部分数量',
   'hudChrome.bank.cannotDeposit': '无法存入银行',
+  'hudChrome.bank.cannotDepositNow': '暂时无法存入',
   'hudChrome.bank.depositQuantityTitle': '存入 {item}',
   'hudChrome.bank.depositQuantityInput': '要存入的数量',
   'hudChrome.bank.depositQuantityConfirm': '存入',
@@ -8346,6 +8828,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '排序银行物品',
   'hudChrome.bank.searchAria': '按名称搜索银行物品',
   'hudChrome.bank.depositAll': '存入所有材料',
+  'hudChrome.bank.depositAllTooltip':
+    '将背包中的所有制作材料和废品一次性存入银行。采集工具、已装备的装备、任务物品和消耗品不会受到影响。',
   'hudChrome.bank.depositAllDone': '已存入材料：{count}。',
   'hudChrome.bank.depositAllFull': '已存入材料：{count}。银行已满。',
   'hudChrome.bank.depositAllNone': '银行已满：未存入任何物品。',
@@ -8363,6 +8847,51 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。',
   'hudChrome.bank.bonusSectionAria': '奖励银行格子及获取方式',
+  'hudChrome.bank.tabsAria': '银行标签页',
+  'hudChrome.bank.personalTab': '个人',
+  'hudChrome.bank.guildTab': '公会',
+  'hudChrome.bank.guildCapacityAria': '公会银行格已用：{used}/{total}',
+  'hudChrome.bank.guildEmpty': '公会银行是空的。',
+  'hudChrome.bank.guildTreasury': '公会金库',
+  'hudChrome.bank.guildDepositGold': '存入金钱',
+  'hudChrome.bank.guildWithdrawGold': '取出金钱',
+  'hudChrome.bank.guildDepositGoldTitle': '向公会金库存入金钱',
+  'hudChrome.bank.guildWithdrawGoldTitle': '从公会金库取出金钱',
+  'hudChrome.bank.guildGoldAvailable': '可用：{amount}',
+  'hudChrome.bank.guildBuyConfirm': '花费公会金库的 {price} 购买 {count} 个额外的公会银行格子吗？',
+  'hudChrome.bank.guildBuyNote': '由公会金库支付',
+  'hudChrome.bank.guildTreasuryShort': '金库不足',
+  'hudChrome.bank.guildOpenBank': '开启公会银行',
+  'hudChrome.bank.guildOpenConfirm': '花费 {price} 开启公会银行吗？这笔费用由你自己支付。',
+  'hudChrome.bank.guildOpenAccept': '开启',
+  'hudChrome.bank.guildOpenNote': '由你自己支付，而非公会金库',
+  'hudChrome.bank.guildPurseShort': '金钱不足',
+  'hudChrome.bank.guildReadOnlyNote': '只有公会官员才能更改公会银行。',
+  'hudChrome.bank.guildUnopenedNote': '公会银行尚未开通。',
+  'hudChrome.bank.guildDormantNote': '锁定的物品无法取出，并会阻止解散公会。',
+  'hudChrome.bank.guildDormantHint': '该物品已锁定在公会银行中，无法取出。',
+  'hudChrome.bank.guildDormantAria': '{item}，数量 {count}，无法取出',
+  'hudChrome.bank.guildUnknownItem': '未知物品',
+  'hudChrome.bank.guildDepositHint': '点击存入公会银行',
+  'hudChrome.bank.guildCannotDeposit': '无法放入公会银行',
+  'hudChrome.bank.guildGoldCannotMove': '目前无法转移该金额。',
+  'hudChrome.bank.guildViewsAria': '公会银行视图',
+  'hudChrome.bank.guildContentsTab': '内容',
+  'hudChrome.bank.guildLogTab': '日志',
+  'hudChrome.bank.logAria': '公会银行活动日志',
+  'hudChrome.bank.logNote': '最近 {count} 条公会银行操作。',
+  'hudChrome.bank.logLoading': '正在加载公会银行日志...',
+  'hudChrome.bank.logEmpty': '公会银行中尚未存入或取出任何物品。',
+  'hudChrome.bank.logUnavailable': '目前无法读取公会银行日志。',
+  'hudChrome.bank.logFormerMember': '一位已离开的公会成员',
+  'hudChrome.bank.logDepositItem': '{actor} 存入了 {count} 个 {item}',
+  'hudChrome.bank.logWithdrawItem': '{actor} 取出了 {count} 个 {item}',
+  'hudChrome.bank.logDepositMoney': '{actor} 存入了 {amount}',
+  'hudChrome.bank.logWithdrawMoney': '{actor} 取出了 {amount}',
+  'hudChrome.bank.logBuySlots': '{actor} 花费 {amount} 购买了银行扩容',
+  'hudChrome.bank.logOpenBank': '{actor} 花费 {amount} 开启了公会银行',
+  'hudChrome.bank.logCharterFee': '{actor} 支付了 {amount} 的公会创建费用',
+  'hudChrome.bank.logAdminPurge': '管理员移除了 {count} 个 {item}',
   'entities.mobs.yumi_cat.name': '由美',
   'hudChrome.itemTooltip.riftTier': '{tier}级裂隙物品',
   'hudChrome.itemTooltip.riftUpgrade': '裂隙强化 {level}/{max}',
@@ -8467,6 +8996,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.proposalTitle': '找到队伍：{name}',
   'hudChrome.finder.proposalRole': '你的职责：{role}',
   'hudChrome.finder.accepted': '{accepted}/{size} 已确认',
+  'hudChrome.bgOffer.title': '荆谷原野已准备就绪',
+  'hudChrome.bgOffer.backfillTitle': '荆谷原野需要一名战士',
+  'hudChrome.bgOffer.backfillBody':
+    '这场战斗已经开始。你将加入人数不足的一方，本场对战不会改变你的评分。',
+  'hudChrome.bgOffer.accepted': '已确认 {accepted}/{size}',
+  'hudChrome.bgOffer.remaining': '剩余 {seconds} 秒确认',
+  'hudChrome.bgOffer.accept': '接受',
+  'hudChrome.bgOffer.decline': '拒绝',
+  'hudChrome.bgOffer.acceptedWait': '等待其他人确认...',
   'hudChrome.finder.remaining': '剩余 {seconds} 秒确认',
   'hudChrome.finder.accept': '接受',
   'hudChrome.finder.decline': '拒绝',
@@ -8515,12 +9053,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.soul_rend': '灵魂撕裂（被标记者需分散并接受治疗）',
   'hudChrome.finder.mech.deathless_rage': '不死之怒（需在护符石处打断）',
   'hudChrome.finder.mech.wardstones': '护符石引导（阶段转换）',
+  'hudChrome.finder.mech.dread_curse': '恐惧诅咒（仅英雄难度，累加坦克轮换减益）',
   'hudChrome.steam.link': '关联 Steam',
   'hudChrome.steam.unlink': '取消关联 Steam',
   'hudChrome.steam.linked': '已关联 Steam 账号 {id}',
   'hudChrome.steam.benefits':
     '在桌面客户端中关联你的 Steam 账号，将你获得的功绩同步为 Steam 成就。',
   'hudChrome.steam.noTicket': 'Steam 未提供关联凭据。请先启动 Steam，然后重试。',
+  'hudChrome.epic.link': '关联 Epic',
+  'hudChrome.epic.unlink': '取消关联 Epic',
+  'hudChrome.epic.linked': '已关联 Epic 账号 {id}',
+  'hudChrome.epic.benefits':
+    '在 Epic 桌面客户端中关联你的 Epic 账号，将你获得的功绩同步为 Epic 成就。',
+  'hudChrome.epic.noProof': 'Epic 未提供关联凭据。请从 Epic Games Store 启动，然后重试。',
+  'hudChrome.epic.title': 'Epic',
   'hudChrome.deeds.title': '功绩之书',
   'hudChrome.deeds.close': '关闭功绩之书',
   'hudChrome.deeds.searchPlaceholder': '搜索功绩',
@@ -8552,18 +9098,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.earnedDate': '获得于 {date}',
   'hudChrome.deeds.hiddenBadge': '隐藏',
   'hudChrome.deeds.titleChip': '头衔奖励',
+  'hudChrome.deeds.borderChip': '边框奖励',
   'hudChrome.deeds.watch': '追踪',
   'hudChrome.deeds.unwatch': '取消追踪',
   'hudChrome.deeds.watchFull': '追踪列表已满（最多 {cap} 项）',
   'hudChrome.deeds.watchAria': '在界面追踪器中追踪{name}',
   'hudChrome.deeds.unwatchAria': '停止追踪{name}',
+  'hudChrome.deeds.cosmeticsSection': '头衔与边框',
   'hudChrome.deeds.titlesSection': '头衔',
   'hudChrome.deeds.titlesAria': '选择要展示的头衔',
   'hudChrome.deeds.titlesNone': '无头衔',
   'hudChrome.deeds.titlesEmpty': '获得带头衔的功绩后即可解锁此栏。',
+  'hudChrome.deeds.bordersSection': '边框',
+  'hudChrome.deeds.bordersNone': '无边框',
+  'hudChrome.deeds.bordersEmpty': '获得带边框的功绩后即可解锁此栏。',
   'hudChrome.deeds.unlockedBanner': '达成功绩：{name}',
   'hudChrome.deeds.unlockedTitleHint': '获得新头衔：{title}。可在功绩之书中选用。',
-  'hudChrome.deeds.retroSummary': '你的编年史已更新：补录 {count} 项功绩。',
+  'hudChrome.deeds.unlockedBorderHint': '获得新边框：{name}。可在功绩之书中佩戴。',
+  'hudChrome.plurals.deedsRetroSummary.one': '你的编年史已更新：补录 {count} 项功绩。',
+  'hudChrome.plurals.deedsRetroSummary.few': '你的编年史已更新：补录 {count} 项功绩。',
+  'hudChrome.plurals.deedsRetroSummary.many': '你的编年史已更新：补录 {count} 项功绩。',
+  'hudChrome.plurals.deedsRetroSummary.other': '你的编年史已更新：补录 {count} 项功绩。',
   'hudChrome.deeds.broadcastLine': '{name} 达成了功绩：{deed}',
   'hudChrome.deeds.rarityLine': '{percent} 的冒险者已达成',
   'hudChrome.deeds.trackerLabel': '功绩',
@@ -8573,6 +9128,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.charTitleLabel': '头衔',
   'hudChrome.deeds.charTitleNone': '未选择头衔',
   'hudChrome.deeds.charOpenBook': '功绩之书',
+  'hudChrome.deeds.charBorderWorn': '{name}（佩戴中）',
   'hudChrome.deeds.lbTab': '名望',
   'hudChrome.deeds.lbTitleCol': '头衔',
   'hudChrome.deeds.lbScopeNote':
@@ -8580,7 +9136,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.lbSelfAccount': '你的账号：第 {rank} 名，位居前 {percent}%，名望 {renown}',
   'hudChrome.deeds.lbSelfRank': '你的账号：第 {rank} 名，位居前 {percent}%',
   'hudChrome.deeds.lbEmpty': '暂无上榜的编年史家。',
-  'hudChrome.deeds.broadcastsLabel': '与公会和好友分享功绩达成',
+  'hudChrome.deeds.broadcastsLabel':
+    '与公会成员和关注者分享功绩达成，并向 Discord 动态分享功绩与杰作卡片',
   'guide.deedsPage.catHeading': '{label}（{count}）',
   'guide.deedsPage.colName': '功绩',
   'guide.deedsPage.featTag': '壮举',
@@ -8599,8 +9156,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.professions': '提示：采集与制造类生活技能可以与你的战斗职业同时培养。',
   'loading.tips.loadouts': '提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。',
   'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
+  'loading.tips.reliquary': '提示：圣物库逐架记录你收集的独特战利品。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。',
+  // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
+  'hudChrome.actionBar.editKeys': '编辑动作条按键',
+  'hudChrome.actionBar.editKeysHint': '点击动作条上的一个槽位，然后按下按键进行绑定。',
+  'hudChrome.actionBar.bannerHint': '点击一个槽位，然后按下按键进行绑定。完成后点击“完成”。',
+  'hudChrome.actionBar.bannerCapturing': '按下按键以绑定该槽位……',
+  'hudChrome.actionBar.boundToKey': '已绑定至 {key}。',
+  'hudChrome.actionBar.reset': '重置',
+  'hudChrome.actionBar.cancel': '取消',
+  'hudChrome.actionBar.resetConfirmTitle': '重置动作条按键？',
+  'hudChrome.actionBar.resetConfirmBody':
+    '第一条动作条将恢复为默认按键，第二条和第三条动作条将变为未绑定状态。此操作无法撤销。',
   'hudChrome.mobile.mounts': '坐骑',
   'hudChrome.mounts.title': '坐骑',
   'hudChrome.mounts.close': '关闭',
@@ -8619,7 +9191,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': '以太骑士悬浮机车',
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
+  'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
+  'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一只坚毅耐久的蜗牛，可提升旅行速度。',
@@ -8631,6 +9207,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    '一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐骑',
   'hudChrome.mounts.emptyStableHint': '升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。',
   'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。',
@@ -8649,6 +9227,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountRace.finished': '完成！用时 {seconds} 秒！',
   'hudChrome.mountRace.timeout': '比赛失败',
   'hudChrome.mountRace.progress': '障碍 {n} / {total}',
+  'hudChrome.mountRace.go': '出发！',
+  'hudChrome.mountRace.timeLeft': '{seconds}秒',
   // Baseline class interrupts.
   'entities.abilities.pummel.name': '碎颚击',
   'entities.abilities.pummel.description': '打断目标的施法，并在4秒内封锁该法术学派。',
@@ -8657,13 +9237,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.counterspell.name': '破法',
   'entities.abilities.counterspell.description': '反制目标的施法，并在6秒内封锁该法术学派。',
   'entities.abilities.counter_shot.name': '静默射击',
-  'entities.abilities.counter_shot.description': '一记快射，打断目标的施法，并在4秒内封锁该学派。',
+  'entities.abilities.counter_shot.description': '打断目标，并使其在 4 秒内无法施放该系法术。',
   'entities.abilities.rebuke.name': '谴喝',
   'entities.abilities.rebuke.description': '打断目标的施法，并在4秒内封锁该法术学派。',
   'entities.abilities.skull_bash.name': '头槌',
   'entities.abilities.skull_bash.description': '猛然头槌，打断目标的施法，并在4秒内封锁该学派。',
-  'entities.abilities.spell_lock.name': '封口令',
-  'entities.abilities.spell_lock.description': '在施法中沉默目标，并在5秒内封锁该法术学派。',
+  'entities.abilities.spell_lock.name': '深渊封口',
+  'entities.abilities.spell_lock.description': '打断敌人的施法，并使其在 4 秒内无法施放该系法术。',
   'guide.bestiary.flavor.sethrael_palecoil':
     '一条骨色苍白的巨蛇，游弋于微光湖的深处暗礁，是它所占据水域的沉默守卫。与它共享此湖的泅水者，鲜有能再浮出水面的。',
   'guide.combat.metersBody':
@@ -8675,8 +9255,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '屏幕上有一个宝箱按钮，点击即可打开每日奖励窗口。每天都会列出几项任务：完成任务、在灰烬斗技场中作战、赢下一场溪谷杯比赛，还提供一次免费的转盘抽奖，这些都能为当天的排名累积积分；当日积分最高者会共享一个奖池，面向持有可选社区代币的玩家。这一切都不会赋予游戏中的战力。窗口本身会写明当天的规则与参赛资格，展示排行榜，并保留你的历史记录。',
   'guide.economy.dailyTitle': '每日奖励',
   'guide.footer.linksLabel': '游玩与社区链接',
-  'guide.gear.bagsBody':
-    '你拾取的一切都装在一个共用的背包里，你可以通过装备包袋来扩充它。你的背包窗口设有四个包袋插槽：点击背包中的一个包袋，将它塞入空闲插槽，每个佩戴的包袋都会增加各自的容量。简易包袋是廉价的商人货，更宽敞的会从野兽身上掉落，而最上乘的出自地下城首领，因此你的负重空间会随着装备一同增长。',
+  'guide.gear.bagsBody': '你捡到的一切都装在同一个背囊里，而你通过装备背包来扩充它。你的背包窗口有四个背包栏位：点击背囊中的一个背包，即可把它塞进空着的栏位，你所背的每个背包都会加上它自己的空间。简朴的背包是廉价的商人货，更宽敞的从野兽身上掉落，最精良的则来自地下城首领，因此你的负重空间会与装备同步成长。任何可堆叠之物都会在提示中标明一个栏位能放多少，你正是借此提前知道，一次像样的药水采买将会占去你两个栏位。',
   'guide.gear.bagsTitle': '包袋与负重空间',
   'guide.glossary.lockoutDef':
     '对最丰厚的可重复奖励设下的每日上限。每个英雄地下城每天只结算一次通关，团队副本的普通与英雄难度分别计算，而拾取世界首领便会开始你自己的锁定。已通关的五人副本对其原队伍仍保持开放；被锁上的团队副本之门要等到重置才会重新打开。',
@@ -8701,13 +9280,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.craftHowTitle': '制作窗口',
   'guide.search.typeAbility': '技能',
   'guide.search.typeDeed': '功绩',
-  'guide.settingsPage.autolootBody':
-    '不想逐个点击尸体？有一个默认关闭的界面选项，会在你路过自己击杀的目标时自动拾取它们身上的战利品。',
-  'guide.settingsPage.factSearchBody':
-    '不确定某个选项在哪里？在菜单顶部的搜索框中输入即可。它也能理解常见的说法，因此输入 fps 就能找到 FPS 显示，选中一条结果便会直接跳转到该设置并将其高亮。',
-  'guide.settingsPage.factSearchTitle': '搜索一找即得',
-  'guide.social.calendarBody':
-    '按 I 打开活动日历。它会标出王国中值得围绕安排的日子，从每周的团队副本召集到嘉年华之夜，也是公会安排日程之处：会长和官员可以在上面预定活动，每位成员都能在同一页面上看到它们。',
+  'guide.search.typeRelic': '圣物',
+  'guide.search.typeReliquaryPage': '圣物库页面',
+  'guide.settingsPage.autolootBody': '不想逐个点击尸体？界面面板“战斗”标签页中默认关闭的“路过自动拾取”，会在你从自己击杀的目标旁走过时把战利品一并收走。',
+  'guide.settingsPage.factSearchBody': '这里没有搜索框，因此了解菜单的结构会很有帮助。图形以卡片排布：质量、世界细节、光照与特效、镜头、显示和系统，触屏设备上还有触控操作。界面则分为四个标签页：常规、窗口、聊天和战斗。若某项设置改变的是世界如何绘制，它就在图形里；若改变的是界面向你展示什么，它就在界面里。',
+  'guide.settingsPage.factSearchTitle': '某项设置的所在之处',
+  'guide.social.calendarBody': '按 I 打开活动日历。它标出值得围绕其安排计划的国度日程，每周的团队集结、集市日、竞技场对抗和钓鱼大赛，以及每月的探秘日和月门共祷，那里也是公会保管日程的地方：会长和干事可以在上面登记活动，而每位成员都会在同一页上看到它们。国度日程是聚在一起的号召，而不是加成；不会因为某一天被标出，你的角色就有任何变化。',
   'guide.social.calendarHeading': '活动日历',
   'guide.social.communityBody':
     '以感叹号开头输入一行聊天，即可发起一次社区呼叫：!lfg 寻找队伍，!wts 与 !wtb 进行交易，!recruit 为你的公会招人，!event 宣告一场团队副本或聚会，!help 请求援手。你一输入这个符号，就会弹出一份呼叫菜单。每次呼叫都会在世界中广播，并同步到社区 Discord，因此它能触及那些甚至尚未登录的玩家。社区呼叫是在线游玩的一部分。',
@@ -8718,10 +9296,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
   // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.helpUnstuckSickness':
+    '脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。',
   'hudChrome.unstuck.menuButton': '脱困',
   'hudChrome.unstuck.help': '脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。',
+  'hudChrome.unstuck.movedToGraveyard': '你已被移动到最近的墓地。脱困后遗症正压在你身上。',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    '你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。',
   'hudChrome.unstuck.started':
     '将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。',
   'hudChrome.unstuck.countdown': '脱困：{seconds}',
@@ -8746,13 +9329,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.standStillAnywhere': '请先停下再使用脱困。',
   'hudChrome.unstuck.busy': '请先完成当前动作再使用脱困。',
   'hudChrome.unstuck.unavailable': '当前状态下无法使用脱困。',
+  // Wiki launcher confirm (M16 non-Latin fills).
+  'hudChrome.wiki.confirmTitle': '打开维基？',
+  'hudChrome.wiki.confirmBody': '将在浏览器中打开 World of ClaudeCraft 维基，游戏会继续运行。',
+  'hudChrome.wiki.confirmOpen': '打开维基',
+  'hudChrome.wiki.confirmCancel': '取消',
   'guide.abilityHook.revenge': '横扫你前方的敌人，并可能在躲闪或招架后不消耗资源。',
   'guide.abilityHook.hamstring': '妨碍敌人的移动，使其无法逃脱。',
   'game.talents.choicesTab': '抉择',
   'game.talents.readout.rowsSummary': '天赋：{head}，已选择 {picked}/{unlocked} 行选项。',
   'game.talents.rowUnlockToast': '新的天赋抉择已解锁！',
   'game.talents.rowUnlocks': '在 {level} 级解锁',
-  'hudChrome.fct.absorbed': '吸收 {amount}',
+  'hudChrome.fct.absorbed': '已吸收（{amount}）',
   'entities.abilities.temporal_mend.name': '时光缝合',
   'entities.abilities.temporal_mend.description':
     '将盟友向前拉动一瞬，在身体安定于更健康的未来形态时治疗{damage}点生命值。(时光术特色技能)',
@@ -8762,21 +9350,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '时光回响',
   'entities.abilities.temporal_echo.description':
     '以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。',
-  'entities.abilities.aura_surge.name': '曙光弹射',
-  'entities.abilities.aura_surge.description':
-    '掷出曙光铸造的盾牌，造成{damage}点神圣伤害并使首要目标沉默2秒，随后弹射至10码内最多2个额外敌人，每次弹射造成75%伤害。（圣骑士天赋）',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激励30码内的盟友，使其攻击强度提高45、攻击速度提高5%，持续5分钟。（猎人天赋）',
-  'entities.abilities.avenging_wrath.description':
-    '召唤复仇之力，使你的攻击强度提高60、法术强度提高30，持续20秒。（圣骑士天赋）',
+  'entities.abilities.avenging_wrath.description': '展开由金色神圣之力凝成的实体羽翼，获得 10 点虔诚，并在 15 秒内使你的技能所产生的虔诚翻倍。同时将你造成的伤害与治疗提高 20%。破晓者：使愤怒之锤可对任何目标使用。',
   'entities.abilities.berserk.description': '使你的攻击强度提高70，持续15秒。（德鲁伊天赋）',
   'entities.abilities.blink.description': '使你向前传送15码并解除定身效果。（法师天赋）',
-  'entities.abilities.bloodlust.description':
-    '使30码内的盟友陷入狂乱，攻击速度提高30%，持续15秒。（萨满天赋）',
-  'entities.abilities.chain_lightning.description':
-    '向目标区域投掷闪电，对附近的敌人造成{damage}点伤害。（萨满天赋）',
-  'entities.abilities.chaos_bolt.description':
-    '投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）',
+  'entities.abilities.bloodlust.description': '将 30 米内小队或团队盟友的攻击、施法与引导速度提高 30%，持续 15 秒。受影响的盟友在 10 分钟内无法再次从战鼓或时间加速中获益。（萨满天赋）',
+  'entities.abilities.chain_lightning.description': '击中 10 米内至多 3 名敌人，每名造成 {damage} 点自然伤害。元素：命中可给予 1 点雷霆。伤害随法术强度提升。',
+  'entities.abilities.chaos_bolt.description': '消耗 3 点毁坏，掷出一发沉重的混乱之火，造成 {damage} 点火焰伤害。毁灭性使其施法时间缩短 30%。',
   'entities.abilities.cloak_of_shadows.description':
     '以暗影包裹你，在5秒内吸收420点伤害。（潜行者天赋）',
   'entities.abilities.curse_of_exhaustion.description':
@@ -8785,31 +9366,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '攻击敌人并造成{damage}点暗影伤害，随后使其恐惧3秒。（术士天赋）',
   'entities.abilities.deep_freeze.description':
     '将目标深度冻结，造成 {damage} 点冰霜伤害并使其昏迷 4 秒。（法师天赋）',
-  'entities.abilities.desperate_prayer.description': '立即为你恢复{damage}点生命值。（牧师天赋）',
+  'entities.abilities.desperate_prayer.description': '立即为自己治疗最大生命值的30%。',
   'entities.abilities.deterrence.description':
     '使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）',
-  'entities.abilities.divine_shield.description':
-    '以神圣之力保护你，在8秒内吸收900点伤害。（圣骑士天赋）',
-  'entities.abilities.earthbind.description': '将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）',
+  'entities.abilities.earthbind.description': '将目标点 4 米内的敌人定身 2 秒，随后使其减速 40%，持续 6 秒。（萨满天赋）',
   'entities.abilities.evocation.description': '快速恢复法力。（法师天赋）',
   'entities.abilities.frenzied_regeneration.description':
     '在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）',
   'entities.abilities.frost_trap.description':
     '冻结目标区域内的敌人3秒，使其无法移动或行动。（猎人天赋）',
-  'entities.abilities.ghostly_strike.description':
-    '攻击敌人，造成武器伤害加{damage}点伤害，短暂提高躲闪并获得1个连击点。（潜行者天赋）',
-  'entities.abilities.hammer_of_wrath.description':
-    '向受伤的敌人投掷神圣之锤，造成{damage}点神圣伤害。只能对生命值低于20%的目标使用。（圣骑士天赋）',
+  'entities.abilities.ghostly_strike.description': '以武器伤害外加 {damage} 点击打敌人，并将你的躲闪几率提高 15%，持续 7 秒。给予 1 点连击点。（潜行者天赋）',
+  'entities.abilities.hammer_of_wrath.description': '掷出一柄神圣之锤，造成 {damage} 点伤害并产生 1 点虔诚。可在目标生命值低于 20% 时使用，或在神圣升华或复仇之怒期间使用。破晓之怒会额外给予一次可对任何目标使用的施放，它无视当前的冷却，且伤害提高 20%。升华使其伤害提高 30%。',
   'entities.abilities.healing_stream.description':
     '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
-  'entities.abilities.holy_wrath.description':
-    '释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）',
   'entities.abilities.howl_of_terror.description':
     '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
   'entities.abilities.ice_block.description':
     '将你封入寒冰之中，吸收大量伤害，持续 8 秒。（法师天赋）',
-  'entities.abilities.inner_focus.description':
-    '使你的下一个法术不消耗资源。持续60秒。（牧师天赋）',
+  'entities.abilities.inner_focus.description': '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',
   'entities.abilities.innervate.description':
     '生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）',
   'entities.abilities.mend_pet.name': '修补',
@@ -8817,16 +9391,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在 15 秒内为友方目标治疗 {damage} 点生命值。（猎人天赋）',
   'entities.abilities.meteor.description':
     '在目标区域召唤一颗陨石，造成{damage}点火焰伤害，随后使区域内的敌人在6秒内每2秒受到12至18点火焰伤害。（法师天赋）',
-  'entities.abilities.mind_sear.description':
-    '在目标区域引导暗影能量，每秒对附近的敌人造成{damage}点伤害。（牧师天赋）',
+  'entities.abilities.mind_sear.description': '引导 3 秒，每秒对目标区域 8 米内的敌人造成 {damage} 点暗影伤害。伤害随法术强度提升。（牧师天赋）',
   'entities.abilities.multi_shot.description':
     '向目标区域射出散射箭，对8码内的敌人造成{damage}点物理伤害。（猎人天赋）',
-  'entities.abilities.prayer_of_healing.description':
-    '为附近的盟友恢复{damage}点生命值。（牧师天赋）',
+  'entities.abilities.prayer_of_healing.description': '治疗 30 米内的盟友 {damage} 点生命。治疗量随法术强度提升。（神圣）',
   'entities.abilities.presence_of_mind.description':
     '使你的下一个有施法时间的法术立即完成。持续 60 秒。（法师天赋）',
-  'entities.abilities.psychic_scream.description':
-    '使附近的敌人恐惧，最多持续4秒。受到伤害可能打破该效果。（牧师天赋）',
+  'entities.abilities.psychic_scream.description': '使 8 米内的敌人陷入恐惧，最多持续 4 秒。伤害可能打断该效果。',
   'entities.abilities.shadowstep.description': '穿过暗影，向你的目标迈进。（潜行者天赋）',
   'entities.abilities.silence.description': '使目标沉默4秒。（牧师天赋）',
   'entities.abilities.tranquility.description':
@@ -8914,7 +9485,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '立即结束闪烁步、霜幕和强效隐形术的冷却时间。（法师天赋）',
   'entities.abilities.greater_invisibility.name': '强效隐形术',
   'entities.abilities.greater_invisibility.description':
-    '消失 20 秒：移除 2 个持续伤害效果，并使你在隐形期间及结束后短时间内受到的伤害降低 90%。（法师天赋）',
+    '消失 20 秒并移除 2 个持续伤害效果。隐形结束时，受到的伤害降低 90%，持续 2 秒。（法师天赋）',
   'entities.abilities.hot_streak.name': '炽热连击',
   'entities.abilities.hot_streak.description':
     '被动：你的火焰法术（火球术、火焰冲击、灼烧、炎爆术或烈焰风暴）连续造成两次暴击后，下一次炎爆术或烈焰风暴变为瞬发且不消耗法力。消耗技能会计入下一次连击，包括免费施法；烈焰风暴无论命中多少敌人都只计一次，且只有首次冲击会被计入。（火焰）',
@@ -9009,6 +9580,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.fields.amount': '数量',
   'devCommand.fields.count': '数量',
   'devCommand.fields.difficulty': '难度',
+  'devCommand.fields.floor': '楼层',
+  'devCommand.raidFloorOption': '{floor}：{name}',
   'devCommand.fields.dungeon': '地下城',
   'devCommand.fields.gold': '金币',
   'devCommand.fields.item': '物品',
@@ -9051,8 +9624,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
   'hud.combat.floatingParry': '招架',
   'hud.combat.parried': '{target}招架了你的{ability}。',
+  'hud.combat.floatingEvade': '回避',
+  'hud.combat.evaded': '{target}回避了你的{ability}。',
+  'hud.combat.floatingBlock': '{amount} 格挡',
+  'hud.combat.blockedDone': '{target}格挡了你的{ability}，造成 {amount} 点伤害。',
+  'hud.combat.blockedTaken': '你格挡了{source}的攻击，受到 {amount} 点伤害。',
   'hudChrome.options.mouseoverCast': '队伍头像上鼠标悬停施法',
   'hudChrome.options.showTargetOfTarget': '显示目标的目标',
+  'hudChrome.options.showPetFrame': '显示你的宠物',
   'hudChrome.options.stickyTarget': '点击地面时保留目标',
   'hudChrome.unitFrame.targetOfTargetLabel': '目标的目标',
   'hudChrome.mobile.professions': '专业',
@@ -9336,6 +9915,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.apprentice_wren.name': '学徒雯恩',
   'entities.mobs.barrow_wight.name': '古冢尸妖',
   'entities.mobs.castaway_navigator.name': '领航员苏莉',
+  'entities.mobs.dragonkin_egg.name': '龙裔卵',
+  'entities.mobs.dragonkin_whelp.name': '龙裔幼崽',
+  'entities.mobs.dragonkin_broodguard.name': '龙裔巢卫',
+  'entities.mobs.drakemaw_broodlord.name': '龙喉巢主',
   'entities.mobs.cindraleth_maw_matriarch.name': '辛德拉蕾丝，龙喉之母',
   'entities.mobs.drowned_deckhand.name': '溺亡水手',
   'entities.mobs.fisher_bram.name': '渔民布拉姆',
@@ -9349,10 +9932,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
+  'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖尔加的獠牙匕首',
+  'entities.items.fanglords_beastspear.name': '獠牙领主的兽矛',
+  'entities.items.bloodmane_warleggings.name': '血鬃战争护腿',
+  'entities.items.vineclaw_stalking_breeches.name': '藤爪潜行马裤',
+  'entities.items.sunbone_ritual_sarong.name': '日骨仪式纱笼',
   'entities.items.amberfall_sap_bucket.name': '采脂桶',
   'entities.items.ashbone_war_brand.name': '灰骨战印',
   'entities.items.aurora_mote.name': '极光微尘',
@@ -9450,14 +10038,222 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '荒野生长护腿',
   'entities.items.wildsoul_maul.name': '荒野之魂重锤',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'guide.profPages.toolsNote':
+    '每处资源点都需要对应行业的工具放在背包里，第 1 级也不例外：没有镐就采不到矿，没有鱼竿就钓不到鱼。商人阶梯覆盖第 1 到 3 级，每个聚落只出售自己周边地形用得上的等级，因此第 1 级工具在每个区域聚落都有售，更高的等级则在需要它们的矿脉附近出售。购买这些更高等级时，商人还会要求你在该行业中具备熟练度，第 2 级需要 {tier2Prof}，第 3 级需要 {tier3Prof}，商品行会注明该要求。工具只需放在背包中即可，没有装备栏也没有耐久度，因此每件都是一次性购买，你已经拥有的工具会一直有效。只有等级会影响限制：同等级中更稀有的工具并不会多开放任何东西。不过稀有度并不只是颜色，它会让镶嵌的工具效果持续更久，装在鱼竿上还会加宽收线时机。\n\n更好的工具带来三样东西，而不是两样。它开放更高等级的地形，缩短采集时间，还会提升产出：用等级高于该区域自身材料的工具开采矿脉，收获的将是精制品级而非普通品级。该矿脉必须是这个区域的完整品级矿脉，因此区域为旅行者保留的简易矿脉依然产出普通材料。精制材料正是制作工具配方所消耗的东西，而且在任何配方或工单要求普通版本的地方，精制品级都可以顶替，所以升级永远不会让你陷入困境：只是你的铜矿石会以精制铜矿石的形式到手。\n\n在商人阶梯之上，每个行业还有两件制作工具，第 4 级和第 5 级，由工程师在工具工坊制作，或在溺诵秘所的柜台用秘境印记购买。任何商人都不会用金币出售它们。钓鱼有自己的一对鱼竿，它们需要向工具匠学习，而非一开始就会。目前没有任何资源点或水域需要超过第 3 级，因此最高的两级买到的是速度、品级和更宽松的收线时机而非准入资格，等更高等级的地形出现时，它们将成为入场券。',
+  'hudChrome.professions.toolEffectName.quickeningCharm': '回春符',
+  'hudChrome.professions.toolEffectName.artisansEye': '匠人之眼',
+  'hudChrome.professions.toolEffectName.gatherersCache': '采集者储囊',
+  'hudChrome.professions.toolEffectTooltip.kind': '工具符咒',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '充能期间每次采集产出+1。',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    '充能期间将收获品级提升1个工具等级。',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm': '缩短其触发的资源节点重生计时。',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    '在专业窗口中将其镶嵌到采矿、伐木或草药学工具上。镶嵌后即消耗。',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    '普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。',
+  'hudChrome.professions.toolEffectTooltip.landOnly': '无法镶嵌到鱼竿上。',
+  'hudChrome.professions.toolEffectTooltip.openProfessions': '打开专业窗口，将其镶嵌到采集工具上。',
+  'hudChrome.professions.toolEffectSlotButton': '镶嵌{effect}',
+  'hudChrome.professions.toolEffectRechargeButton': '充能',
+  'hudChrome.professions.toolEffectNoGain': '{effect}已镶嵌且能量充盈。',
+  'hudChrome.professions.toolEffectRechargeToolCapped':
+    '携带更好的{profession}工具才能继续为{effect}充能。',
+  'hudChrome.professions.toolEffectSlotted': '{effect}已镶嵌到{profession}。',
+  'hudChrome.professions.toolEffectSlotInvalid': '{effect}无法镶嵌在那里。',
+  'hudChrome.professions.toolEffectNoTool': '你需要先拥有真正的{profession}工具。',
+  'hudChrome.professions.toolEffectNoCharm': '背包里需要一枚制作好的{effect}。',
+  'hudChrome.professions.toolEffectRecharged': '{effect}已充能：消耗{material}x{count}。',
+  'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}上没有镶嵌任何效果。',
+  'hudChrome.professions.toolEffectRechargeFull': '{effect}已充满能量。',
+  'hudChrome.professions.toolEffectRechargeMaterials': '为{effect}充能需要{material}x{count}。',
+  'hudChrome.professions.craftingProgress': '正在制作：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.disenchantingProgress': '正在分解：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.enchantingProgress': '正在附魔：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.salvagingProgress': '正在回收：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.rechargingToolEffectProgress':
+    '正在为工具效果充能：还剩{remaining}秒，共{total}秒。',
+  'hudChrome.professions.toolEffectSpent': '已耗尽，需要充能',
+  'hudChrome.professions.toolEffectDepleted': '工具效果已耗尽',
+  'hudChrome.professions.toolEffectRechargePrice': '充能：{material} x{count}',
+  'hudChrome.professions.toolEffectModeAsk': '每次使用前询问',
+  'hudChrome.professions.toolEffectModePrompt': '每次使用前会询问',
+  'hudChrome.professions.toolEffectConfirmTitle': '使用{effect}？',
+  'hudChrome.professions.toolEffectConfirmBody':
+    '本次采集消耗 1 次充能（剩余 {charges} 次）？拒绝后仍会采集，只是没有加成。',
+  'hudChrome.professions.toolEffectConfirmAccept': '消耗充能',
+  'hudChrome.professions.toolEffectConfirmDecline': '直接采集',
+  'hudChrome.professions.toolEffectCharges': '剩余 {charges} / {max} 次',
+  // The Reliquary chrome (Phase 4): M16 non-Latin fills for wordy English keys.
+  'hudChrome.mobile.reliquary': '圣物库',
+  'hudChrome.reliquary.title': '圣物库',
+  'hudChrome.reliquary.close': '关闭圣物库',
+  'hudChrome.reliquary.countLabel': '{owned}/{total} 件圣物',
+  'hudChrome.reliquary.completionAria': '已填入圣物：{owned}/{total}',
+  'hudChrome.reliquary.curatorRank': '策展人等级 {rank}',
+  'hudChrome.reliquary.curatorUnranked': '未评级策展人',
+  'hudChrome.reliquary.recentLabel': '最近发现：',
+  'hudChrome.reliquary.nearlyLabel': '即将完成：',
+  'hudChrome.reliquary.nearlyJumpAria': '打开{name}，已填入 {owned}/{total}',
+  'hudChrome.reliquary.shelvesAria': '圣物库书架',
+  'hudChrome.reliquary.navOverview': '总览',
+  'hudChrome.reliquary.navConquerors': '征服者',
+  'hudChrome.reliquary.navProfessions': '专业',
+  'hudChrome.reliquary.navHorizons': '远景',
+  'hudChrome.reliquary.navCountAria': '{shelf}：已填入 {owned}/{total} 件圣物',
+  'hudChrome.reliquary.shelfEmpty': '此书架尚无页面。',
+  'hudChrome.reliquary.pageComplete': '已点亮',
+  'hudChrome.reliquary.clearsLabel': '{count} 次通关',
+  'hudChrome.reliquary.srankClearsLabel': '{count} 次S级通关',
+  'hudChrome.reliquary.retiredLabel': '绝版',
+  'hudChrome.reliquary.personalLabel': '专属',
+  'hudChrome.reliquary.backToShelf': '返回书架',
+  'hudChrome.reliquary.gridAria': '{name} 的圣物',
+  'hudChrome.reliquary.pageProgressAria': '页面进度：已填入 {owned}/{total} 件圣物',
+  'hudChrome.reliquary.cellOwnedAria': '{name}，已收录',
+  'hudChrome.reliquary.cellMissingAria': '{name}，尚未获得',
+  'hudChrome.reliquary.ownedTooltipStatus': '已收录于圣物库',
+  'hudChrome.reliquary.missingTooltipStatus': '尚未获得',
+  'hudChrome.reliquary.firstFindClears': '首次获得于第 {count} 次通关',
+  'hudChrome.reliquary.unlockToast': '圣物已收录：{name}',
+  'hudChrome.reliquary.illuminateBanner': '页面已点亮：{name}',
+  'hudChrome.reliquary.illuminateToast': '{name} 上的每一件圣物均已填满。',
+  'hudChrome.reliquary.illuminationBroadcastLine': '{name} 点亮了圣物库页面：{page}',
+  'hudChrome.reliquary.recentJumpAria': '打开{name}所在的页面',
+  'hudChrome.reliquary.recentEmpty': '尚无发现。此后收录的圣物都会出现在这里。',
+  'hudChrome.reliquary.nearlyEmpty': '即将完成的页面会汇集于此。',
+  'hudChrome.reliquary.stripNoMatch': '此处没有符合搜索条件的内容。',
+  'hudChrome.reliquary.shelfRecent': '最新发现：{name}',
+  'hudChrome.reliquary.shelfNoFinds': '此书架尚未收录任何圣物。',
+  'hudChrome.reliquary.shelfOpenAria': '打开{name}书架，已填入 {owned}/{total}',
+  'hudChrome.reliquary.sharedUniquesNote':
+    '总计中每件圣物只计一次；书架与页面的数字按格位统计，出现在多个页面上的圣物会被每个页面分别计入。',
+  'hudChrome.plurals.reliquaryToGo.one': '还差 {count} 件',
+  'hudChrome.plurals.reliquaryToGo.few': '还差 {count} 件',
+  'hudChrome.plurals.reliquaryToGo.many': '还差 {count} 件',
+  'hudChrome.plurals.reliquaryToGo.other': '还差 {count} 件',
+  'hudChrome.plurals.reliquaryRetroSummary.one': '你的圣物库已更新：补录 {count} 件圣物。',
+  'hudChrome.plurals.reliquaryRetroSummary.few': '你的圣物库已更新：补录 {count} 件圣物。',
+  'hudChrome.plurals.reliquaryRetroSummary.many': '你的圣物库已更新：补录 {count} 件圣物。',
+  'hudChrome.plurals.reliquaryRetroSummary.other': '你的圣物库已更新：补录 {count} 件圣物。',
+  // 中文没有可数名词的复数变化，四个分支使用同一句话。
+  'hudChrome.plurals.reliquaryObtainedTimes.one': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryObtainedTimes.few': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryObtainedTimes.many': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryObtainedTimes.other': '已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.one': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.few': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.many': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedObtainedAria.other': '{name}，已收录，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.one':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.few':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.many':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
+  'hudChrome.plurals.reliquaryCellOwnedClearsObtainedAria.other':
+    '{name}，已收录，首次获得于第 {clears} 次通关，已获得 {count} 次',
+  'hudChrome.reliquary.curatorRankName1': '见习策展人',
+  'hudChrome.reliquary.curatorRankName2': '战利品保管者',
+  'hudChrome.reliquary.curatorRankName3': '大师策展人',
+  'hudChrome.reliquary.curatorRankName4': '大策展人',
+  'hudChrome.reliquary.curatorRankName5': '永恒策展人',
+  'hudChrome.reliquary.rankUpBanner': '策展人等级 {rank}：{name}',
+  'hudChrome.reliquary.rankUpToast': '已达到策展人等级 {rank}：{name}',
+  'hudChrome.reliquary.borderWearableNote': '可在功绩之书中佩戴 {name} 边框。',
+  'hudChrome.reliquary.sigilCaption': '策展人印记',
+  'hudChrome.reliquary.markFind.masterwork_first': '首件杰作',
+  'hudChrome.reliquary.markFind.masterwork_weaponcrafting': '武器锻造杰作',
+  'hudChrome.reliquary.markFind.masterwork_armorcrafting': '护甲锻造杰作',
+  'hudChrome.reliquary.markFind.masterwork_tailoring': '裁缝杰作',
+  'hudChrome.reliquary.markFind.masterwork_leatherworking': '制皮杰作',
+  'hudChrome.reliquary.markFind.masterwork_engineering': '工程学杰作',
+  'hudChrome.reliquary.markFind.gather_event_pristine_vein': '完美矿脉',
+  'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古木心材',
+  'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': '月华花蕾',
+  'hudChrome.reliquary.markFind.gather_event_perfect_specimen': '完美标本',
+  'hudChrome.reliquary.markFind.slain_old_greyjaw': '斩杀：老灰颚',
+  'hudChrome.reliquary.markFind.slain_mogger': '斩杀：莫格',
+  'hudChrome.reliquary.markFind.slain_grix_the_tunnelking': '斩杀：隧道之王格里克斯',
+  'hudChrome.reliquary.markFind.slain_captain_verlan': '斩杀：维尔兰队长',
+  'hudChrome.reliquary.markFind.slain_wraithbinder_maldrec': '斩杀：缚魂者玛尔德雷克',
+  'hudChrome.reliquary.markFind.slain_mirejaw_the_ravenous': '斩杀：贪食者泥颚',
+  'hudChrome.reliquary.markFind.slain_sloomtooth_the_drowned': '斩杀：溺亡者涝牙',
+  'hudChrome.reliquary.markFind.slain_sister_nhalia': '斩杀：娜莉娅修女',
+  'hudChrome.reliquary.markFind.slain_grubjaw': '斩杀：贪食者格鲁布颚',
+  'hudChrome.reliquary.markFind.slain_ironvein_foreman': '斩杀：铁脉工头',
+  'hudChrome.reliquary.markFind.slain_brutok_skullsmasher': '斩杀：碎颅者布鲁托克',
+  'hudChrome.reliquary.markFind.slain_voskar_emberwing': '斩杀：炽翼沃斯卡',
+  'hudChrome.reliquary.markFind.slain_marrowlord_varkas': '斩杀：髓王瓦尔卡斯',
+  'hudChrome.reliquary.markFind.slain_old_cragmaw': '斩杀：老裂颚',
+  'hudChrome.reliquary.markFind.slain_shardlord_kazzix': '斩杀：碎片领主卡兹克斯',
+  'hudChrome.reliquary.markFind.slain_gleamstag': '斩杀：辉光雄鹿',
+  'hudChrome.reliquary.markFind.slain_old_marrowshell': '斩杀：老甲髓',
+  'hudChrome.reliquary.markFind.slain_aurelhorn': '斩杀：金角，鹿群之首',
+  'hudChrome.reliquary.markFind.slain_drakemaw_broodlord': '斩杀：龙喉巢主',
+  'hudChrome.reliquary.accountScopeBadge': '账号',
+  'hudChrome.reliquary.accountScopeNote': '账号收藏：此账号下所有角色均可解锁。',
+  'hudChrome.reliquary.charCompletionLabel': '圣物库',
+  'hudChrome.reliquary.charCompletion': '{owned}/{total}',
+  'hudChrome.reliquary.charRankLabel': '策展人',
+  'hudChrome.reliquary.charOpen': '圣物库',
+  // The Reliquary (Phase 15): the always-on HUD tracker and its pin control.
+  // The tracker hints mirror the deed-tracker wording above.
+  'hudChrome.reliquary.trackerLabel': '圣物库',
+  'hudChrome.reliquary.collapseHint': '折叠圣物库追踪器',
+  'hudChrome.reliquary.expandHint': '展开圣物库追踪器',
+  'hudChrome.reliquary.openWindowHint': '打开圣物库',
+  'hudChrome.reliquary.pin': '固定',
+  'hudChrome.reliquary.unpin': '取消固定',
+  'hudChrome.reliquary.pinFull': '追踪器已满（最多 {cap} 个页面）',
+  'hudChrome.reliquary.pinAria': '将{name}固定到界面追踪器',
+  'hudChrome.reliquary.unpinAria': '取消固定{name}',
+  'hudChrome.reliquary.rarityLine': '{percent} 的收藏家已发现',
+  'hudChrome.reliquary.pageRarityLine': '{percent} 的收藏家已点亮',
+  'hudChrome.reliquary.cellAriaWithRarity': '{base}，{rarity}',
+  'hudChrome.reliquary.cellAriaWithAccountScope': '{base}，{scope}',
+  // The Reliquary (Phase 13): source lines, the shared unknown-relic label, and
+  // the search / found-status filter chrome.
+  'hudChrome.reliquary.unknownRelic': '未记录的圣物',
+  'hudChrome.reliquary.sourceBossDungeon': '由{dungeon}的{boss}掉落',
+  'hudChrome.reliquary.sourceBoss': '由{boss}掉落',
+  'hudChrome.reliquary.sourceZone': '在{zone}获得',
+  'hudChrome.reliquary.sourceProfession': '通过{profession}获得',
+  'hudChrome.reliquary.sourceDeed': '功绩“{deed}”奖励',
+  'hudChrome.reliquary.sourceVendor': '由{vendor}出售',
+  'hudChrome.reliquary.sourceBossZone': '由{zone}的{boss}掉落',
+  'hudChrome.reliquary.sourceDelve': '在探秘“{delve}”中获得',
+  'hudChrome.reliquary.sourceRift': '通关{rank}级裂隙时掉落',
+  'hudChrome.reliquary.sourceQuest': '任务“{quest}”奖励',
+  'hudChrome.reliquary.sourceStore': '在 WOC 商店购买',
+  'hudChrome.reliquary.sourceActivityCorpseHarvest': '采集生物尸体时获得',
+  'hudChrome.reliquary.sourceActivityMasterworkCraft': '制作杰作时获得',
+  'hudChrome.reliquary.sourceActivityRiftFirstClear': '授予率先通关分级裂隙的队伍全体成员',
+  'hudChrome.reliquary.cellMissingSourceAria': '{name}，尚未获得，{source}',
+  'hudChrome.reliquary.cellOwnedClearsAria': '{name}，已收录，首次获得于第 {count} 次通关',
+  'hudChrome.reliquary.searchPlaceholder': '搜索圣物',
+  'hudChrome.reliquary.searchAria': '按名称搜索圣物库',
+  'hudChrome.reliquary.searchEmpty': '没有符合搜索条件的圣物。',
+  'hudChrome.reliquary.filterEmpty': '没有符合此筛选条件的圣物。',
+  'hudChrome.reliquary.filterGroupAria': '按获得情况筛选圣物',
+  'hudChrome.reliquary.filterAll': '全部',
+  'hudChrome.reliquary.filterOwned': '已收录',
+  'hudChrome.reliquary.filterMissing': '尚未获得',
+  'hudChrome.reliquary.gridKeyboardHint': '使用方向键在圣物之间移动，Home 键和 End 键跳到首尾。',
+  'hudChrome.plurals.reliquarySearchResults.one': '共 {count} 条结果。',
+  'hudChrome.plurals.reliquarySearchResults.few': '共 {count} 条结果。',
+  'hudChrome.plurals.reliquarySearchResults.many': '共 {count} 条结果。',
+  'hudChrome.plurals.reliquarySearchResults.other': '共 {count} 条结果。',
   'entities.items.resonant_thread.name': '共鸣丝线',
   'entities.items.resonant_hide.name': '共鸣兽皮',
   'entities.items.resonant_links.name': '共鸣锁环',
   'entities.items.resonant_steel.name': '共鸣钢材',
   'entities.items.resonant_timber.name': '共鸣木材',
   'hud.errors.tradeBound': '该物品已绑定，无法交易。',
+  'hud.errors.marketListBound': '该物品已绑定，无法上架。',
   'hudChrome.enchantName.enchant_weapon_might': '武器附魔 - 威力',
   'hudChrome.enchantName.enchant_weapon_intellect': '武器附魔 - 法术强度',
+  'hudChrome.enchantName.enchant_offhand_stamina': '副手附魔 - 耐力',
   'hudChrome.enchantName.enchant_helmet_fortitude': '头盔附魔 - 坚韧',
   'hudChrome.enchantName.enchant_neck_spirit': '项链附魔 - 精神',
   'hudChrome.enchantName.enchant_shoulder_agility': '肩甲附魔 - 敏捷',
@@ -9514,9 +10310,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': '你没有那件物品。',
   'hudChrome.enchanting.notDisenchantable': '你无法分解那件物品。',
   'hudChrome.enchanting.notSalvageable': '你无法拆解那件物品。',
-  'hudChrome.enchanting.disenchantThrottled': '你分解得太快了，请稍等片刻后再试。',
-  'hudChrome.enchanting.salvageThrottled': '你拆解得太快了，请稍等片刻后再试。',
-  'hudChrome.enchanting.enchantThrottled': '你附魔得太快了，请稍等片刻后再试。',
+  'hudChrome.enchanting.salvageLocked': '该物品已锁定。',
   'hudChrome.enchanting.enchantWrongSlot': '该附魔无法施加于那件物品。',
   'hudChrome.enchanting.enchantUnknown': '该附魔不存在。',
   'hudChrome.enchanting.enchantInsufficient': '你没有该附魔所需的材料。',
@@ -9568,13 +10362,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '击败森林狼',
   'entities.quests.q_prof_amends_outfitter.title': '重续经纬',
   'entities.quests.q_prof_amends_outfitter.text':
-    '到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满西边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。',
+    '到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。',
   'entities.quests.q_prof_amends_outfitter.completion':
     '又稳了。制皮和裁缝作为主修技艺回到你手中。这一次，在你游荡之前先量两次。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': '已剿除墨网潜伏者',
   'entities.quests.q_prof_amends_apothecary.title': '重回灶台',
   'entities.quests.q_prof_amends_apothecary.text':
-    '瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去东边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。',
+    '瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。',
   'entities.quests.q_prof_amends_apothecary.completion':
     '这才是那股老味道。炼金术和烹饪重新回到你的灶台上，成为主修技艺。这一次多留一阵吧。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '已猎杀野猪',
@@ -9722,6 +10516,58 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': '你付不起解绑费用。',
   'hudChrome.unbind.outOfRange': '你必须站在工作台旁才能解绑。',
   'hudChrome.unbind.noSpace': '背包空间不足，无法存放解绑后的物品。',
+  // Commission order board (issue #1298, M16 non-Latin fills added with the keys).
+  'hudChrome.commissionBoard.title': '委托订单',
+  'hudChrome.commissionBoard.close': '关闭委托订单',
+  'hudChrome.commissionBoard.openButton': '订单',
+  'hudChrome.commissionBoard.openButtonAria': '打开委托订单板',
+  'hudChrome.commissionBoard.intro': '委托一位工匠为你制作一件物品，或接下别人发布的订单。',
+  'hudChrome.commissionBoard.formTitle': '发布委托',
+  'hudChrome.commissionBoard.recipeLabel': '物品',
+  'hudChrome.commissionBoard.recipeEmpty': '你还不会制作任何可委托的装备配方。',
+  'hudChrome.commissionBoard.scopeLabel': '谁可以接单',
+  'hudChrome.commissionBoard.scopeOpen': '任何人（公开板）',
+  'hudChrome.commissionBoard.scopeCrafter': '指定工匠',
+  'hudChrome.commissionBoard.crafterNameLabel': '工匠名称',
+  'hudChrome.commissionBoard.crafterNamePlaceholder': '角色名称',
+  'hudChrome.commissionBoard.openSubmit': '发布订单',
+  'hudChrome.commissionBoard.sectionMine': '我的委托',
+  'hudChrome.commissionBoard.sectionToCraft': '我承接的委托',
+  'hudChrome.commissionBoard.sectionBoard': '公开委托板',
+  'hudChrome.commissionBoard.boardEmpty': '目前没有公开的委托订单。',
+  'hudChrome.commissionBoard.mineEmpty': '你还没有发布任何委托。',
+  'hudChrome.commissionBoard.toCraftEmpty': '你目前没有承接任何人的委托。',
+  'hudChrome.commissionBoard.rowFor': '{item}，委托人：{requester}',
+  'hudChrome.commissionBoard.rowTargeted': '{item}，委托人：{requester}（指定工匠：{crafter}）',
+  'hudChrome.commissionBoard.acceptedBy': '已由{name}接单',
+  'hudChrome.commissionBoard.statusOpen': '待接单',
+  'hudChrome.commissionBoard.statusAccepted': '已接单',
+  'hudChrome.commissionBoard.statusDelivered': '已交付',
+  'hudChrome.commissionBoard.statusCancelled': '已取消',
+  'hudChrome.commissionBoard.statusExpired': '已过期',
+  'hudChrome.commissionBoard.cancelButton': '取消',
+  'hudChrome.commissionBoard.acceptButton': '接单',
+  'hudChrome.commissionBoard.deliverButton': '交付',
+  'hudChrome.commissionBoard.deliverHint': '先制作出委托的物品（勾选委托选项），再回到这里交付。',
+  'hudChrome.commissionBoard.opened': '你发布了一份{item}的委托订单。',
+  'hudChrome.commissionBoard.cancelled': '你取消了{item}的委托订单。',
+  'hudChrome.commissionBoard.accepted': '你接下了{item}的委托订单。',
+  'hudChrome.commissionBoard.delivered': '你将{item}交付给了{name}。',
+  'hudChrome.commissionBoard.denyUnknownRecipe': '该配方不存在。',
+  'hudChrome.commissionBoard.denyNotCommissionEligible': '该配方无法委托制作。',
+  'hudChrome.commissionBoard.denyUnknownCrafter': '未找到该名称的角色。',
+  'hudChrome.commissionBoard.denySelfCrafter': '你不能委托自己。',
+  'hudChrome.commissionBoard.denyTooManyOpen': '你的待接单委托订单已达上限。',
+  'hudChrome.commissionBoard.denyUnknownOrder': '该委托订单已不存在。',
+  'hudChrome.commissionBoard.denyOrderNotOpen': '该委托订单已不再开放。',
+  'hudChrome.commissionBoard.denySelfOrder': '你不能接下自己发布的委托订单。',
+  'hudChrome.commissionBoard.denyNotEligibleCrafter': '该委托订单是发给另一位工匠的。',
+  'hudChrome.commissionBoard.denyNotYourOrder': '这不是你的委托订单。',
+  'hudChrome.commissionBoard.denyOrderNotAccepted': '该委托订单尚未被接单。',
+  'hudChrome.commissionBoard.denyNotYourAcceptance': '你并未接下该委托订单。',
+  'hudChrome.commissionBoard.denyNotCrafted': '请先制作出委托物品（勾选委托选项）。',
+  'hudChrome.commissionBoard.denyOutOfRange': '你必须靠近委托人才能交付委托。',
+  'hudChrome.commissionBoard.denyNoSpace': '委托人的背包空间不足。',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '制作之轮',
@@ -9853,9 +10699,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     '节点的位置、阶级、所需工具与产出；每个节点在你采集后{respawn}秒才会为你本人刷新。',
   'guide.profPages.toolsHeading': '工具',
-  'guide.profPages.toolsNote':
-    '每一处节点都需要背包里备有对应行业的工具，1阶节点也不例外：没有采矿镐就采不到矿石，没有鱼竿就钓不上鱼。商人阶梯覆盖1到3阶，各主城均有备货；工具只需放在背包里即可，没有装备栏位，也没有耐久，因此每件都是一次性购置。门槛只看阶级：工具的品质颜色纯属外观。\n\n商人阶梯之上还有两件制作工具，4阶与5阶，由工程师在工坊打造，任何NPC都不出售。目前没有任何节点需要3阶以上的工具，因此它们眼下的价值在于速度：顶级工具能把低阶节点的采集读条压到时间下限；等更高阶的地界开放时，它们便是入场券。',
   'guide.profPages.toolCrafted': '制作获得（{craft}）',
+  'guide.profPages.toolCraftedOrMarks': '由{craft}制作，或用 {marks} 秘境印记购买',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    '由{craft}制作，或在溺亡连祷英雄难度通关后用 {marks} 秘境印记购买',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '无出售',
   'guide.profPages.priceNone': '无出售',
@@ -9871,6 +10718,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': '咬钩与收线',
   'guide.profPages.fish.biteBody':
     '抛竿后{min}到{max}秒之间鱼会咬钩（更好的鱼竿最多缩短{rod}秒等待），收线窗口持续{reel}秒、鱼竿每高一阶再加{reelRod}秒，单次垂钓最长{cap}秒。',
+  'guide.profPages.fish.earlyReelNote': '给性急的手指一个提醒：若在有东西咬钩之前再次按下鱼竿，你就会收回一条空线，这一竿也就此结束。鱼线落水后的第一秒是被宽宥的，因此不慎按了两下并不会让你付出什么代价；过了这一秒，过早按下便是白白浪费一竿。耐心就是这整个玩法：等到咬钩，然后提竿。',
   'guide.profPages.fish.scheduleHeading': '熟练度成长',
   'guide.profPages.fish.scheduleNote':
     '钓鱼成长按熟练度遵循固定档位，且从{cutoff}起，钓上杂物不再有任何成长。',
@@ -9913,9 +10761,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '署名作品',
   'guide.profPages.econ.provenanceBody':
     '精良及以上的成品与发现都带有制作者的署名，而署名完全相同的物品仍可堆叠。',
-  'guide.profPages.econ.throttleHeading': '操作限频',
-  'guide.profPages.econ.throttleBody':
-    '制作、分解、附魔与回收共用一个限频：每{seconds}秒最多{actions}次操作。',
   'guide.profPages.econ.doctrineHeading': '玩家与玩家交易',
   'guide.profPages.econ.doctrineBody':
     '制作装备的强度始终低于团队副本的底线，而上述费用会把货物推向玩家之间的交易，而非商店循环。',
@@ -9955,7 +10800,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。',
   'guide.professions.startHeading': '从哪里开始',
   'guide.professions.startBody':
-    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇西南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。',
+    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。',
   'guide.profPages.yieldsHeading': '一次采集的收获',
   'guide.profPages.yieldsBody':
     '每次采集都会掷出品质，而熟练度决定一切：新手永远采到普通品，熟练度越高，权重越向高品质移动，绝不倒退。到100上限时普通品完全消失：60%优秀、30%精良、8%史诗、2%传说。品质也意味着数量：普通1个，优秀与精良2个，史诗3个，传说4个。精良及以上的收获都会以你的名字署名（Gathered by），封顶时十次采集有四次带着你的名字。',
@@ -9979,7 +10824,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '最稳的生意是消耗品，因为用掉就要再买：药水、熟食与附魔都随使用而消失。杰作是高端市场：无法定制，想要的人只能出高价，而上面的署名就是行走的招牌。原料是第三支柱：分解所得的奥术材料、直接从拆解者流向附魔师的各类Resonant次级材料，以及追逐杰作触发的工匠愿意溢价收购的署名采集品。',
   'guide.profPages.econ.marketHeading': '世界市场与抽成',
   'guide.profPages.econ.marketBody':
-    '世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。重要限制：市场只经手无标记的普通货，署名、杰作、附魔或已绑定的副本一律不收，这些特殊物品只能面对面通过交易窗口转手。',
+    '世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。特殊物品同样欢迎：署名、杰作或附魔的副本会以单件挂单上架，提示中带着完整的身份与署名，且绝不与普通堆叠混同。唯一拒收的是已绑定的副本：被制作者之约锁定（或仍待绑定）的物品既不能上市也不能邮寄，绑定无法被洗白。特殊物品请自行定价；普通挂单只能告诉你普通版的行情。',
   'guide.profPages.econ.collectorsHeading': '收藏家、战利品与故事的价格',
   'guide.profPages.econ.collectorsBody':
     '商人看不见出处：署名物品卖给NPC只值普通价，签名的溢价只存在于玩家之间。名家署名的横财矿石、一块Prime Cut、一柄署着已退隐工匠之名的杰作之刃，价格全凭记忆开价。功业之书里的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen与Glimmer of Hope都是零声望的收藏印记，只为证明那一刻发生在你身上。出处不买属性也不赢战斗，它是这游戏里美好日子的存根。',
@@ -10039,7 +10884,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '钓鱼按区域供应招牌食材：Eastbrook Vale的镜鳟与河鲈，Mirefen Marsh的沼狗鱼与泥鳗，Thornpeak Heights的霜鳃鳟与板鳍鲤，每一档都烹本档的鱼。屠夫的一侧来自尸体采集：野味肉，以及精良采集掷出的署名Prime Cut（大烤肉的核心）。草药调味，梣木熏鳗，Cooking Salt在Marlow摊位8铜一袋。',
   'guide.profPages.craftProse.cooking.ladderHeading': '从肉干到大烤肉',
   'guide.profPages.craftProse.cooking.ladderBody':
-    "Salted Jerky是野外配方：初始即会、一条蛛腿、随处可做。训练师梯子在广场西侧的Eastbrook厨房：免费档技能0（河鲈、Hunter's Game Skewer、Herbed Marsh Pike），中档技能25每个25银（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良档技能50每个1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：熏鳗与炖肉每次两份，宴会拼盘三份。",
+    "Salted Jerky是野外配方：初始即会、一条蛛腿、随处可做。训练师梯子在广场东侧的Eastbrook厨房：免费档技能0（河鲈、Hunter's Game Skewer、Herbed Marsh Pike），中档技能25每个25银（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良档技能50每个1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：熏鳗与炖肉每次两份，宴会拼盘三份。",
   'guide.profPages.craftProse.cooking.routeHeading': '专精而非杰作，以及通往125之路',
   'guide.profPages.craftProse.cooking.routeBody':
     '烹饪是杰作故事里诚实的例外：菜肴没有属性可提升，永不触发，也不必追。这门手艺的精通在于75的专精：每样食材省五分之一（批量菜上叠加极快），外加移动野外厨房，让宴席在副本门口出锅。边钓边做，两门技能互相供养：免费档到25，中档到50，精良档到75；此后精良菜衰减为半速与四分之一，到上限约再做150次。Marlow的订单每30分钟收八块野味肉。技能50记下Seasoned Chef，125是Grandmaster Cooking头衔。',
@@ -10075,9 +10920,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '两种行动推动技能：分解与施加附魔，每次成功最多一点，按工作的分量折算：普通分解与纯粉尘附魔算普通活；优秀分解与精华附魔算优秀活；精良分解与所有Runed或Greater附魔算精良活；史诗与传说分解更高。熟悉的精通衰减按25点层级作用：普通活在技能75变灰，优秀活在100，精良活恰在125上限。附魔另有一份仁慈：高于命途上限的输入向下取整而非归零，宣誓前史诗分解按精良计而非一无所获；若附魔沦为休眠，一切按普通活计，爬升停在75；作为爱好则精良活仍有收益，只是75之后变慢。',
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出处与市场',
   'guide.profPages.craftProse.enchanting.marketBody':
-    '施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。世界市场只经手无标记的普通货，附魔与署名件都面对面交易；材料才是可上市的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
+    '施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。附魔与署名件如今也能上架：每件以单件挂单出售，物品提示会显示附魔与制作者印记，渡鸦邮驿同样可以寄送；材料依旧是稳定的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
   'hudChrome.corpseHarvest.components.meat': '兽肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
+  'hudChrome.materialHint.cookingCatch': '烹饪材料。必须先烹饪后才能食用。',
+  'hudChrome.materialHint.fineGrade':
+    '优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。',
   'hudChrome.materialHint.arcaneDust': '附魔材料。分解普通和优秀品质的装备可得。',
   'hudChrome.materialHint.arcaneEssence': '附魔材料。分解精良品质的装备可得。',
   'hudChrome.materialHint.arcaneShard': '附魔材料。分解史诗和传说品质的装备可得。',
@@ -10109,6 +10957,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmAccept': '替换',
   'hudChrome.bags.itemAriaEnchanted': '{item}，数量 {count}，已附魔的副本',
   'hudChrome.bags.itemAriaBound': '{item}，数量 {count}，已绑定的副本',
+  'hudChrome.bags.itemAriaLocked': '{item}，数量 {count}，已锁定',
+  'hudChrome.bags.itemLockedLine': '已锁定',
+  'hudChrome.bags.unlockItem': '解锁物品',
   'hudChrome.itemTooltip.enchantedFallback': '已附魔',
   'devCommand.actions.kit.description': '为该专精穿上圣所前20级预设装备，背包优先。仅限装备。',
   'devCommand.actions.kit.label': '装备新晋20级预设',
@@ -10127,5 +10978,1870 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toWorld': '世界地图',
   'hudChrome.continentMap.toggleAria': '在世界地图和地区地图之间切换',
   'hudChrome.continentMap.levels': '等级 {min} 到 {max}',
+  'hudChrome.continentMap.toZone': '地区地图',
   'hudChrome.enchanting.wornTagIndexed': '已装备（{slot}{index}）',
+  'hudChrome.targetAuras.title': '目标光环',
+  'hudChrome.targetAuras.keybindLabel': '目标增益和减益效果',
+  'hudChrome.targetAuras.debuffs': '减益',
+  'hudChrome.targetAuras.buffs': '增益',
+  'hudChrome.targetAuras.unlock': '移动目标光环窗口',
+  'hudChrome.targetAuras.lock': '锁定目标光环窗口',
+  'hudChrome.targetAuras.configureRows': '设置目标光环',
+  'hudChrome.targetAuras.fewerRows': '减少光环行数',
+  'hudChrome.targetAuras.moreRows': '增加光环行数',
+  'hudChrome.targetAuras.visibleRows': '首选光环行数：{count}',
+  'hudChrome.targetAuras.showSources': '显示光环施放者',
+  'hudChrome.targetAuras.hideSources': '隐藏光环施放者',
+  'hudChrome.targetAuras.ownAura': '你的光环',
+  'hudChrome.targetAuras.opacity': '光环不透明度：{percent}',
+  'hudChrome.auraOverlay.title': '光环',
+  'hudChrome.auraOverlay.currentClass': '当前职业：{class}',
+  'hudChrome.auraOverlay.previewHint': '使用“设置位置”移动光环，避免挡住菜单。',
+  'hudChrome.auraOverlay.noProcs': '此角色没有可用的支持触发效果。',
+  'hudChrome.auraOverlay.enabled': '显示光环',
+  'hudChrome.auraOverlay.icon': '法术图标',
+  'hudChrome.auraOverlay.arcs': '侧边弧形',
+  'hudChrome.auraOverlay.groundRing': '地面圆环',
+  'hudChrome.auraOverlay.groundRingSpellOrder': '地面圆环：法术顺序',
+  'hudChrome.auraOverlay.crescentsSpellOrder': '侧边弧形：法术顺序',
+  'hudChrome.auraOverlay.size': '大小',
+  'hudChrome.auraOverlay.iconSize': '图标大小',
+  'hudChrome.auraOverlay.crescentBlockSize': '弧形区块大小',
+  'hudChrome.auraOverlay.groundRingBlockSize': '地面圆环区块大小',
+  'hudChrome.auraOverlay.opacity': '不透明度',
+  'hudChrome.auraOverlay.color': '颜色',
+  'hudChrome.auraOverlay.allOn': '全部开启',
+  'hudChrome.auraOverlay.allOff': '全部关闭',
+  'hudChrome.auraOverlay.reposition': '设置位置',
+  'hudChrome.auraOverlay.positioning': '定位：{aura}',
+  'hudChrome.auraOverlay.selectAura': '光环',
+  'hudChrome.auraOverlay.done': '完成',
+  'hudChrome.auraOverlay.moveLeft': '向左移动',
+  'hudChrome.auraOverlay.moveUp': '向上移动',
+  'hudChrome.auraOverlay.moveDown': '向下移动',
+  'hudChrome.auraOverlay.moveRight': '向右移动',
+  'hudChrome.auraOverlay.moveEarlier': '将法术向内移动',
+  'hudChrome.auraOverlay.moveLater': '将法术向外移动',
+  'hudChrome.auraOverlay.screenPosition': '屏幕位置',
+  'hudChrome.auraOverlay.spellOrder': '法术顺序',
+  'hudChrome.auraOverlay.reset': '重置位置',
+  'hudChrome.auraOverlay.spellPosition': '法术顺序 {position} / {count}',
+  'hudChrome.auraOverlay.procs.revenge': '复仇！',
+  'hudChrome.auraOverlay.procs.battleTrance': '战斗冥想',
+  'hudChrome.auraOverlay.procs.overpowerCharge': '赤手充能',
+  'hudChrome.auraOverlay.procs.suddenDeath': '猝死',
+  'hudChrome.auraOverlay.procs.victoryRush': '乘胜追击',
+  'hudChrome.auraOverlay.procs.enrage': '狂乱：激怒',
+  'hudChrome.auraOverlay.procs.heatingUp': '热身',
+  'hudChrome.auraOverlay.procs.arcaneCharge': '奥术充能',
+  'hudChrome.auraOverlay.procs.aetherRush': '以太奔涌',
+  'itemUi.vendor.buyStack': '购买 {count} 个',
+  'itemUi.vendor.buyStackAria': '以 {price} 购买 {count} 个 {item}',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '制作',
+  'abilityUi.cast.disenchanting': '分解',
+  'abilityUi.cast.enchanting_apply': '附魔',
+  'abilityUi.cast.salvaging': '拆解',
+  'abilityUi.cast.tool_recharge': '充能',
+  'hudChrome.crafting.crafting': '制作中',
+  'hudChrome.crafting.create': '制作',
+  'hudChrome.crafting.createAll': '全部制作',
+  'hudChrome.crafting.createAllAria': '按当前材料可制作的最大数量制作该配方',
+  'hudChrome.crafting.qtyRowAria': '制作数量',
+  'hudChrome.crafting.qtyDecreaseAria': '减少制作数量（当前 {count}）',
+  'hudChrome.crafting.qtyIncreaseAria': '增加制作数量（当前 {count}）',
+  'hudChrome.crafting.qtyValueAria': '制作数量，{count}',
+  'hudChrome.crafting.batchRemaining': '剩余 {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '还剩 {remaining} 个，共 {total} 个',
+  'hudChrome.crafting.durationAria': '施放时间：{seconds} 秒',
+  'hudChrome.crafting.progressAria': '制作进度',
+  'hudChrome.crafting.announceStart': '正在制作 {name}',
+  'hudChrome.crafting.announceComplete': '已完成制作 {name}',
+  'hudChrome.crafting.announceCancel': '制作已取消',
+  'hudChrome.crafting.busy': '你正忙着。',
+  'hudChrome.enchanting.disenchantBusy': '你正忙着。',
+  'hudChrome.enchanting.salvageBusy': '你正忙着。',
+  'hudChrome.enchanting.enchantBusy': '你正忙着。',
+  'guide.profPages.econ.castPaceHeading': '读条时间与金币消耗',
+  'guide.profPages.econ.castPaceBody':
+    '专业动作需要真实读条时间：简单的野外配方不到两秒，高阶阶梯配方则需要数秒；分解、附魔、拆解与工具效果充能各自有固定的短读条。中途取消不会损失材料。每次成功制作还会按物品预算支付铜币费用。加上材料、工作台与技能上限，这种节奏在不设额外动作配额的情况下，也能让市场保持健康。各技能区间的精确读条时间见下表。',
+  'guide.profPages.econ.castPaceField': '无技能要求的野外配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill25': '技能25以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill50': '技能50以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill75': '技能75以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceCombo': '顶级与组合配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceEnchantFamily': '分解、附魔与拆解：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceRecharge': '工具效果充能：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceBatch': '批量制作：单次最多 {count} 件，逐件施放',
+  'auth.earrings': '穿孔饰品',
+  'auth.jewelMaterial': '首饰材质',
+  'auth.jewelDefault': '原样',
+  'auth.jewelGold': '黄金',
+  'auth.jewelSilver': '白银',
+  'auth.jewelBone': '骨质',
+  'auth.jewelIron': '玄铁',
+  'auth.jewelCopper': '紫铜',
+  'auth.jewelBronze': '青铜',
+  'auth.jewelObsidian': '黑曜石',
+  'auth.jewelJade': '翡翠',
+  'auth.jewelAmethyst': '紫水晶',
+  'auth.jewelRuby': '红宝石',
+  'auth.jewelPearl': '珍珠',
+  'auth.jewelTurquoise': '绿松石',
+  'auth.earNone': '无',
+  'auth.earStud': '耳钉',
+  'auth.earBone': '骨饰',
+  'auth.earBonehoop': '骨环',
+  'auth.earMoon': '新月',
+  'auth.earMoonstar': '月华之星',
+  'auth.earRunic': '符文石',
+  'auth.earChain': '串珠坠',
+  'auth.earSeptum': '鼻环',
+  'auth.earWarden': '守望者之铁',
+  'auth.earHoop': '圆环',
+  'auth.earCuff': '耳骨夹',
+  'auth.earFeather': '羽毛',
+  'auth.beard': '胡须',
+  'auth.face': '脸型',
+  'auth.bodyShoulders': '肩膀',
+  'auth.bodyChest': '胸部',
+  'auth.bodyHips': '臀部',
+  'auth.bodyHands': '手部大小',
+  'auth.bodyElbows': '手肘',
+  'auth.bodyKnees': '膝盖',
+  'auth.bodyFeet': '脚部',
+  'auth.faceNose': '鼻子',
+  'auth.faceEyes': '眼睛大小',
+  'auth.faceJaw': '下颌',
+  'auth.faceBrow': '眉骨',
+  'auth.faceCheeks': '脸颊',
+  'auth.faceChin': '下巴',
+  'auth.mouth': '嘴巴',
+  'auth.mouthNeutral': '普通',
+  'auth.mouthLips': '丰唇',
+  'auth.mouthSmile': '微笑',
+  'auth.mouthFrown': '皱眉',
+  'auth.mouthWide': '宽阔',
+  'auth.mouthPout': '撅嘴',
+  'auth.mouthGrin': '咧嘴笑',
+  'auth.mouthOpen': '张开',
+  'auth.mouthAwe': '惊讶',
+  'auth.faceEars': '耳朵',
+  'auth.faceSmirk': '坏笑',
+  'auth.eyeShape': '眼型',
+  'auth.eyeColor': '瞳色',
+  'auth.earShape': '耳型',
+  'auth.lashes': '睫毛',
+  'auth.lashesOn': '开启',
+  'auth.lashesOff': '关闭',
+  'auth.lashColor': '睫毛颜色',
+  'auth.lipstick': '口红',
+  'auth.blush': '腮红',
+  'auth.eyeshadow': '眼影',
+  'auth.makeupNone': '无',
+  'auth.shadeRose': '玫瑰色',
+  'auth.shadeCoral': '珊瑚色',
+  'auth.shadeRuby': '宝石红',
+  'auth.shadeBerry': '莓果色',
+  'auth.shadePlum': '李子色',
+  'auth.shadeNude': '裸色',
+  'auth.shadePeach': '蜜桃色',
+  'auth.shadeWarm': '暖调',
+  'auth.shadeMauve': '藕荷色',
+  'auth.shadeSmoke': '烟灰色',
+  'auth.shadeBronze': '古铜色',
+  'auth.shadeTeal': '青色',
+  'auth.randomize': '随机外观',
+  'auth.randomizeShort': '随机',
+  'auth.helmPreview': '显示头盔',
+  'auth.style': '风格',
+  'auth.resetLook': '重置外观',
+  'auth.resetShort': '重置',
+  'auth.shareTab': '分享',
+  'auth.designCode': '外观代码',
+  'auth.designCodeHint': '复制此代码即可保存或分享这个造型。将代码粘贴到此处并导入即可加载造型。',
+  'auth.copyCode': '复制代码',
+  'auth.importCode': '导入',
+  'auth.designCodeCopied': '外观代码已复制。',
+  'auth.designCodeCopyManual': '此处无法自动复制。代码已选中，请使用键盘复制。',
+  'auth.designCodeImported': '造型已导入。',
+  'auth.designCodeImportedPartial': '造型已导入。此版本无法识别的数值已被跳过。',
+  'auth.designCodeErrEmpty': '请先粘贴外观代码。',
+  'auth.designCodeErrHeader': '这看起来不像外观代码。',
+  'auth.designCodeErrVersion': '该外观代码来自更新的游戏版本。',
+  'auth.designCodeErrMalformed': '该外观代码已损坏。请复制完整代码后重试。',
+  'auth.browFlat': '平直',
+  'auth.browArched': '拱形',
+  'auth.browThin': '细眉',
+  'auth.browBushy': '浓眉',
+  'auth.browWorried': '八字',
+  'auth.browSharp': '锐利',
+  'auth.browRound': '圆润',
+  'auth.eyeRound': '圆眼',
+  'auth.eyeAlmond': '杏眼',
+  'auth.eyeNarrow': '细眼',
+  'auth.eyeWide': '大眼',
+  'auth.eyeSharp': '锐眼',
+  'auth.eyeDroopy': '垂眼',
+  'auth.eyeSleepy': '睡眼',
+  'auth.eyeWideset': '宽间距',
+  'auth.eyeCat': '猫眼',
+  'auth.eyeDoe': '鹿眼',
+  'auth.earRound': '圆耳',
+  'auth.earPointed': '尖耳',
+  'auth.earSmall': '小耳',
+  'auth.earWide': '宽耳',
+  'auth.hairBald': '光头',
+  'auth.hairBuzz': '寸头',
+  'auth.hairCrew': '板寸',
+  'auth.hairPompadour': '飞机头',
+  'auth.hairMessy': '凌乱刺发',
+  'auth.hairMohawk': '莫西干',
+  'auth.hairFauxhawk': '假莫西干',
+  'auth.hairAfro': '爆炸头',
+  'auth.hairTopknot': '头顶发髻',
+  'auth.hairCrewcut': '层次板寸',
+  'auth.hairSidepart': '经典侧分',
+  'auth.hairCurlycap': '短卷发',
+  'auth.hairSweptback': '中长后梳',
+  'auth.hairWarriorbraid': '战士辫',
+  'auth.hairCurtains': '中分窗帘',
+  'auth.hairLayered': '及肩层次',
+  'auth.hairMullet': '厚重鲻鱼头',
+  'auth.hairLongpart': '长直中分',
+  'auth.hairPixie': '精灵短发',
+  'auth.hairSweptpixie': '侧梳精灵短发',
+  'auth.hairQuiff': '蓬松背头',
+  'auth.hairHighbun': '高发髻',
+  'auth.hairLowbun': '低发髻',
+  'auth.hairBraidcrown': '编发皇冠',
+  'auth.hairCurlyafro': '卷发爆炸头',
+  'auth.hairChinbob': '齐下巴波波头',
+  'auth.hairBluntbangs': '齐刘海波波头',
+  'auth.hairWavybob': '波浪波波头',
+  'auth.hairAsymbob': '不对称波波头',
+  'auth.hairHighpony': '高马尾',
+  'auth.hairSidepony': '侧马尾',
+  'auth.hairHalfbun': '半扎丸子头',
+  'auth.hairCurls': '蓬松卷发',
+  'auth.hairLongwavy': '长卷波浪发',
+  'auth.hairLongcenterpart': '长发中分',
+  'auth.hairTwinbraids': '双麻花辫',
+  'auth.hairLowpony': '低马尾',
+  'auth.hairFantasybraid': '奇幻长辫',
+  'auth.outfit': '套装颜色',
+  'auth.outfitClassic': '经典',
+  'auth.outfitCrimson': '绯红',
+  'auth.outfitEmber': '余烬',
+  'auth.outfitGold': '金色',
+  'auth.outfitForest': '森林绿',
+  'auth.outfitEmerald': '翡翠绿',
+  'auth.outfitTeal': '青色',
+  'auth.outfitAzure': '蔚蓝',
+  'auth.outfitRoyal': '宝蓝',
+  'auth.outfitViolet': '紫罗兰',
+  'auth.outfitMagenta': '洋红',
+  'auth.outfitRose': '玫瑰',
+  'auth.outfitOnyx': '玛瑙黑',
+  'auth.outfitIvory': '象牙白',
+  'auth.outfitGilded': '鎏金',
+  'auth.outfitBonewrought': '骸骨铸造',
+  'auth.outfitObsidian': '黑曜石',
+  'auth.outfitVerdigris': '铜绿',
+  'auth.outfitBloodforged': '血锻',
+  'auth.beardNone': '无',
+  'auth.beardStubble': '胡茬',
+  'auth.beardScruff': '短须',
+  'auth.beardMutton': '大鬓角',
+  'auth.beardGoatee': '山羊胡',
+  'auth.beardChinpuff': '下巴胡',
+  'auth.beardStache': '胡子',
+  'auth.beardHorseshoe': '马蹄胡',
+  'auth.beardShortbox': '方形胡',
+  'auth.beardFull': '络腮胡',
+  'auth.beardVikingb': '编织胡',
+  'auth.beardWizard': '法师长须',
+  'auth.beardStubbleBeard': '浓密胡茬',
+  'auth.customize': '自定义',
+  'auth.body': '体型',
+  'auth.genderMale': '男性',
+  'auth.genderFemale': '女性',
+  'auth.hair': '发型',
+  'auth.brows': '眉毛',
+  'auth.skinTone': '肤色',
+  'auth.hairColor': '发色',
+  'auth.lightness': '明暗',
+  'auth.colorWheelAria': '{label}色轮：拖动以选择色相和饱和度',
+  'auth.lightnessAria': '{label}明暗',
+  'auth.customColor': '自定义',
+  'auth.colorPresetAria': '{label}预设 {n}',
+  'auth.browNone': '无',
+  'auth.browSoft': '柔和',
+  'auth.browThick': '浓密',
+  'auth.browAngled': '上扬',
+  'hudChrome.paperdoll.hideHelmAria': '隐藏头盔',
+  'hudChrome.paperdoll.showHelmAria': '显示头盔',
+  'hudChrome.options.waterRipples': '水面涟漪（尾波）',
+  'hudChrome.breath.label': '呼吸',
+  'hudChrome.breath.drowning': '溺水！',
+  'abilityUi.resources.devotion': '虔诚',
+  'abilityUi.resources.focus': '集中值',
+  'abilityUi.tooltip.requiresStealthSkulduggery': '需要潜行（幽暝达到3层或暗影缠身期间无需潜行）',
+  'abilityUi.tooltip.ruinCost': '{cost} 点毁灭',
+  'classDetails.resources.focus': '集中值',
+  'devCommand.actions.biskit.description': '为该专精在所有槽位穿上最佳史诗装备。仅限装备。',
+  'devCommand.actions.biskit.label': '装备20级最佳配装',
+  'entities.abilities.abyssal_rift.description':
+    '在选定地点撕开一道裂隙，将8码内的敌人拉向其中心，造成{damage}点暗影伤害，并使其昏迷2秒。首领会受到伤害，但可抵抗拉扯与昏迷。',
+  'entities.abilities.abyssal_rift.name': '深渊裂隙',
+  'entities.abilities.aegis_first_dawn.description':
+    '引导 5 秒，创造一个半径 10 米的神圣穹顶。穹顶内的盟友每秒受到治疗，且受到的伤害降低 50%。完成引导时释放最终治疗，并使移动速度提高 30%，持续 4 秒。',
+  'entities.abilities.aegis_first_dawn.name': '初曙圣盾',
+  'entities.abilities.ambush.specNote_subtlety':
+    '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可从任意角度使用：该次使用不消耗能量，消耗全部3层幽暝，开启持续6秒的暗影缠身，并造成双倍伤害。',
+  'entities.abilities.ancestor_return.description':
+    '呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）',
+  'entities.abilities.ancestor_return.name': '先祖归来',
+  'entities.abilities.army_of_the_dead.description':
+    '开启墓穴传送门，在你选择的统御仆从之外额外召唤一名骷髅战士、骸骨法师和墓翼，持续 20 秒。',
+  'entities.abilities.army_of_the_dead.name': '亡者军团',
+  'entities.abilities.aura_mastery.description':
+    '持续 8 秒，强化小队中所有激活的虔诚光环和报偿光环。壁垒虔诚使伤害降低 15%；报偿造成 15 点神圣伤害。多次使用只会刷新效果，不会叠加。',
+  'entities.abilities.aura_mastery.name': '神圣协律',
+  'entities.abilities.backstab.specNote_assassination':
+    '每次打击累积1层毒祭（最多6层）并返还15点能量。毒祭达到6层时，长眠变为蚀毒撕裂（一次性造成你的流血效果的全部剩余伤害）。',
+  'entities.abilities.bastion_rite.description':
+    '使受到的物理伤害降低 20%，格挡几率提高 20%，持续 6 秒。升华将持续时间延长至 10 秒。',
+  'entities.abilities.bastion_rite.name': '壁垒仪式',
+  'entities.abilities.bastion_sweep.description':
+    '用装备的盾牌横扫前方 180 度范围内的敌人，造成 {damage} 点高仇恨神圣伤害并产生 1 点虔诚。升华使伤害提高 30%，半径扩大至 8 米。',
+  'entities.abilities.bastion_sweep.name': '壁垒横扫',
+  'entities.abilities.beacon_of_light.description':
+    '将一名小队成员标记为你的圣光道标。你对 60 米内另一名小队成员造成的有效直接治疗，有 50% 也会治疗道标目标。范围治疗和周期性治疗不会传递。持续至你或目标死亡。',
+  'entities.abilities.beacon_of_light.name': '圣光道标',
+  'entities.abilities.bloodhook.description':
+    '冲向 8 至 25 码外的敌人，撕开一道主要伤口，在 12 秒内造成 24 点流血伤害。（野战技艺招牌技能）',
+  'entities.abilities.bloodhook.name': '血钩',
+  'entities.abilities.bloodtrail_assault.description':
+    '持续 12 秒，强化血钩、撕伤、榴片炸弹以及宠物的后续攻击。',
+  'entities.abilities.bloodtrail_assault.name': '血迹突袭',
+  'entities.abilities.body_blow.description':
+    '沉重的一击，造成130%武器伤害外加10点。奖励2个连击点，并使红线加深1格（最多4格）。（战斗专精）',
+  'entities.abilities.body_blow.name': '大摆拳',
+  'entities.abilities.bone_armor.description': '以骸骨环绕自身，吸收相当于最大生命值 20% 的伤害。',
+  'entities.abilities.bone_armor.name': '骸骨护甲',
+  'entities.abilities.cheap_shot.specNote_subtlety':
+    '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。',
+  'entities.abilities.choir_of_deliverance.description':
+    '引导6秒，每2秒为30码内的队伍成员恢复{damage}点生命值。治疗量随法术强度提高。',
+  'entities.abilities.choir_of_deliverance.name': '救赎圣咏团',
+  'entities.abilities.cinderhide.description':
+    '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',
+  'entities.abilities.cinderhide.name': '熔渣皮肤',
+  'entities.abilities.claw.specNote_feral': '每次命中累积1层古血（最多3层）。',
+  'entities.abilities.cold_focus.description':
+    '持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）',
+  'entities.abilities.cold_focus.name': '冷静专注',
+  'entities.abilities.corpse_explosion.description':
+    '优先牺牲骸骨法师，其次是骷髅战士，只有在别无选择时才牺牲墓翼。同类仆从中先选择剩余持续时间最短者，再选择最虚弱者，对目标地点的敌人造成 {damage} 点暗影伤害。',
+  'entities.abilities.corpse_explosion.name': '尸骸爆裂',
+  'entities.abilities.coven.description':
+    '在最多4名附近敌人身上制造持续15秒的次级邪眼。它们以50%的效率补充共享谴罪池，并承受裁决35%的回响伤害。',
+  'entities.abilities.coven.name': '巫契',
+  'entities.abilities.cruel_pact.description':
+    '牺牲最大生命值的12%以生成20点谴罪。生命值不高于15%时无法使用。',
+  'entities.abilities.cruel_pact.name': '残酷契约',
+  'entities.abilities.cursed_accomplice.description':
+    '未选择友方玩家时连接你的咒眼，使其凝视生成2点谴罪；连接友方玩家时，该玩家对邪眼目标造成伤害会生成3点。每2秒最多触发一次。',
+  'entities.abilities.cursed_accomplice.name': '受咒同谋',
+  'entities.abilities.dark_pact.description':
+    '牺牲当前生命值的10%，在8秒内吸收相当于最大生命值30%的伤害。',
+  'entities.abilities.dark_pact.name': '血契',
+  'entities.abilities.dawn_devotion.description':
+    '使你和小队成员的攻击强度提高 40 点，持续 30 分钟。会替换你自己的辉光或恩典虔诚，但可与其他圣骑士的虔诚及战士的战吼共存。',
+  'entities.abilities.dawn_devotion.name': '黎明虔诚',
+  'entities.abilities.dawnfall.description':
+    '对附近敌人造成 {damage} 点神圣伤害并产生 1 点虔诚。命中至少一个敌人会使终末敕令的剩余冷却时间缩短 2 秒。升华会提高其伤害和作用半径。',
+  'entities.abilities.dawnfall.name': '黎明坠击',
+  'entities.abilities.dawns_embrace.description':
+    '施放一次强力治疗并产生 1 点虔诚。辉光共鸣使其法力消耗降低 50%，施法时间缩短至 1.5 秒。升华使其变为瞬发，且治疗量提高 35%。',
+  'entities.abilities.dawns_embrace.name': '黎明之拥',
+  'entities.abilities.devotion_ward.description':
+    '使你和小队成员受到的伤害降低 5%，持续至死亡或被替换。只有此光环与报偿光环会彼此替换；辉光、黎明和恩典虔诚可以共存。',
+  'entities.abilities.devotion_ward.name': '壁垒虔诚',
+  'entities.abilities.divine_ascension.description':
+    '消耗 20 点虔诚，获得 5 次升华充能，最多持续 45 秒。标记的技能会消耗一次充能并获得额外效果。',
+  'entities.abilities.divine_ascension.name': '神圣升华',
+  'entities.abilities.elemental_trance.description':
+    '进入元素恍惚状态，持续15秒：受到的伤害降低30%，你造成的所有伤害的20%转化为法力值。（战魂特色技能）',
+  'entities.abilities.elemental_trance.name': '元素恍惚',
+  'entities.abilities.evil_eye.description':
+    '将一名敌人标记为诅咒焦点。移动邪眼会保留谴罪，但不会刷新其20秒的持续时间。',
+  'entities.abilities.evil_eye.name': '邪眼',
+  'entities.abilities.eviscerate.specNote_assassination':
+    '毒祭达到6层时，此按钮变为蚀毒撕裂：这次打击立即引爆你的流血效果的全部剩余伤害，施加一个新的蚀毒伤口，并恢复20点能量。',
+  'entities.abilities.eviscerate.specNote_combat':
+    '以4个或更多连击点命中会开启红线，持续8秒：邪恶斩击变为大摆拳，此按钮变为眼前一黑（造成45点伤害，每个连击点额外造成35点，你累积的每格红线使伤害提高25%，并恢复25点能量）。在红线结束前将其打出。',
+  'entities.abilities.faithforged_guard.description':
+    '在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。',
+  'entities.abilities.faithforged_guard.name': '圣光之债',
+  'entities.abilities.ferocious_bite.specNote_feral':
+    '每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。',
+  'entities.abilities.fieldcraft_reentry.description':
+    '被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）',
+  'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
+  'entities.abilities.final_edict.description':
+    '发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放神圣爆炸。',
+  'entities.abilities.final_edict.name': '终末敕令',
+  'entities.abilities.flurry_of_knives.description':
+    '掷出飞刀鞭笞6码内的所有敌人，造成{damage}点物理伤害，并获得2个连击点。（潜行者天赋）',
+  'entities.abilities.flurry_of_knives.name': '刀刃乱舞',
+  'entities.abilities.frostjaw_trap.description':
+    '在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。',
+  'entities.abilities.frostjaw_trap.name': '霜颚陷阱',
+  'entities.abilities.funeral_harvest.description':
+    '当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。',
+  'entities.abilities.funeral_harvest.name': '葬魂收割',
+  'entities.abilities.galeheart_weapon.description':
+    '为武器灌注疾风。每第三次命中的武器攻击会回响两次，并触发风暴施法。',
+  'entities.abilities.galeheart_weapon.name': '风心武器',
+  'entities.abilities.garrote.specNote_subtlety':
+    '从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。',
+  'entities.abilities.grace_devotion.description':
+    '你和小队成员每 5 秒恢复 15 点法力，且法力消耗降低 3%，持续 30 分钟。会替换你自己的辉光或黎明虔诚，但可与其他圣骑士的虔诚共存。',
+  'entities.abilities.grace_devotion.name': '恩典虔诚',
+  'entities.abilities.guardian_covenant.description':
+    '保护一名友方目标和你自己，使受到的伤害降低20%，持续8秒。未选中友方目标时，默认对你自己施放。',
+  'entities.abilities.guardian_covenant.name': '守护契约',
+  'entities.abilities.hammer_of_grace.description':
+    '立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。',
+  'entities.abilities.hammer_of_grace.name': '恩典之锤',
+  'entities.abilities.hex_of_violence.description':
+    '诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。',
+  'entities.abilities.hex_of_violence.name': '暴行咒',
+  'entities.abilities.hour_of_judgment.description':
+    '对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。',
+  'entities.abilities.hour_of_judgment.name': '审判时刻',
+  'entities.abilities.hunting_momentum.description':
+    '被动：剖膛一击会获得1层狩猎势能，持续8秒，最多3层。达到3层时，反噬獠牙的打击伤害提高45%，并消耗所有层数。（野战技艺）',
+  'entities.abilities.hunting_momentum.name': '狩猎势能',
+  'entities.abilities.hushbrand.description': '打断施法，并使目标在 4 秒内无法施放该系法术。',
+  'entities.abilities.hushbrand.name': '寂静烙印',
+  'entities.abilities.knockout_blow.description':
+    '以一记击倒终结红线：造成45点伤害，每个连击点额外造成35点，你累积的每格红线使伤害提高25%，并恢复25点能量。在红线耗尽前使用，否则这记击倒就会作废。（战斗专精）',
+  'entities.abilities.knockout_blow.name': '眼前一黑',
+  'entities.abilities.life_covenant.description':
+    '使一名盟友受到的伤害降低 40%，持续 6 秒。升华期间还会给予一个可吸收 120 点伤害的护盾，且不消耗充能。',
+  'entities.abilities.life_covenant.name': '生命契约',
+  'entities.abilities.lifespring_weapon.description':
+    '为武器灌注生命之水，使愈合水流的注入量提高20%。',
+  'entities.abilities.lifespring_weapon.name': '活泉武器',
+  'entities.abilities.litany_of_guilt.description':
+    '诅咒你的主要邪眼8秒。每次获得谴罪时会释放冲击波，对8码内最多4名其他敌人造成伤害，每秒最多触发一次。',
+  'entities.abilities.litany_of_guilt.name': '罪责祷文',
+  'entities.abilities.maledict_gaze.description':
+    '你的咒眼每2.5秒攻击所选的主要邪眼目标，造成暗影伤害。附身邪眼会使其攻击速度加倍。',
+  'entities.abilities.maledict_gaze.name': '咒眼凝视',
+  'entities.abilities.marrowbreak.description':
+    '消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为吸收相当于最大生命值18%的伤害，持续8秒，并返还15点怒气。',
+  'entities.abilities.marrowbreak.name': '碎髓',
+  'entities.abilities.martyrs_aegis.description': '使一名盟友受到的伤害降低 40%，持续 8 秒。',
+  'entities.abilities.martyrs_aegis.name': '殉道者圣盾',
+  'entities.abilities.maul.specNote_feral':
+    '每次命中累积1层古血；古血达到3层时，此按钮变为碎髓：一次高威胁打击，造成78至96点伤害；生命值低于一半时，改为吸收相当于你最大生命值18%的伤害，并返还15点怒气。',
+  'entities.abilities.measured_shot.description':
+    '一记从容瞄准的射击，造成 {damage} 点物理伤害，并在命中时产生 20 点集中值。',
+  'entities.abilities.measured_shot.name': '审慎射击',
+  'entities.abilities.mercy_lance.description':
+    '对一名敌人造成 {damage} 点神圣伤害，并在造成伤害时产生 1 点虔诚。升华期间消耗 1 次充能，使其必定暴击。',
+  'entities.abilities.mercy_lance.name': '慈悲圣枪',
+  'entities.abilities.moonfire.specNote_balance': '让它持续燃烧：月种可将其延长6秒。',
+  'entities.abilities.moonlash.description':
+    '消耗3层月潮，造成{damage}点奥术伤害的强力打击：伤害之选。与日醒消耗同一份月潮，二者只能选其一。',
+  'entities.abilities.moonlash.name': '月涌',
+  'entities.abilities.moonseed.description':
+    '仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长6秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。',
+  'entities.abilities.moonseed.name': '月种',
+  'entities.abilities.needle_of_fate.description':
+    '刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。',
+  'entities.abilities.needle_of_fate.name': '命运之针',
+  'entities.abilities.oath_chain.description':
+    '立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。',
+  'entities.abilities.oath_chain.name': '誓约锁链',
+  'entities.abilities.ossuary_mark.description':
+    '为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
+  'entities.abilities.ossuary_mark.name': '骸骨印记',
+  'entities.abilities.overbloom.description':
+    '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。',
+  'entities.abilities.overbloom.name': '盛放',
+  'entities.abilities.pack_command.description':
+    '命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。',
+  'entities.abilities.pack_command.name': '兽群号令',
+  'entities.abilities.pack_rally.description':
+    '进入骏马之姿，并激励附近盟友，使其移动速度提高 30%、攻击与施法速度提高 10%，持续 10 秒。',
+  'entities.abilities.pack_rally.name': '兽群集结',
+  'entities.abilities.possess_evil_eye.description':
+    '咒术者附身你的主要邪眼15秒，并生成35点谴罪。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导；裁决造成的伤害提高25%。延迟回响造成60%的伤害，并在17至20级间逐步降至30%。',
+  'entities.abilities.possess_evil_eye.name': '附身邪眼',
+  'entities.abilities.primal_exaltation.description':
+    '解放你的专精力量，持续12秒，强化其常规循环。（萨满祭司天赋）',
+  'entities.abilities.primal_exaltation.name': '原初升华',
+  'entities.abilities.radiant_chorus.description':
+    '为附近盟友恢复 {damage} 点生命值并产生 1 点虔诚。有效治疗至少 2 名盟友会获得辉光共鸣：你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 50%，施法时间缩短至 1.5 秒。升华会提高辉光圣歌的治疗量和作用半径。',
+  'entities.abilities.radiant_chorus.name': '辉光圣歌',
+  'entities.abilities.radiant_devotion.description':
+    '使你和小队成员的法术强度提高 20 点，持续 30 分钟。会替换你自己的黎明或恩典虔诚，但可与其他圣骑士的虔诚共存。',
+  'entities.abilities.radiant_devotion.name': '辉光虔诚',
+  'entities.abilities.raise_bone_mage.description':
+    '消耗2枚灵魂碎片，将一名永久远程骸骨法师加入你的2槽统御。只能有一名为你效命。它的攻击使目标受到的魔法伤害提高5%，持续6秒；收割号令将此弱点提高至8%。',
+  'entities.abilities.raise_bone_mage.name': '唤醒骸骨法师',
+  'entities.abilities.raise_graveguard.description':
+    '唤醒一名永久的防御型伙伴。墓卫会自动嘲讽，通过墓域为你拦截20%的伤害；收割号令会使其嘲讽并在4秒内受到的伤害降低30%。',
+  'entities.abilities.raise_graveguard.name': '唤醒墓卫',
+  'entities.abilities.raise_gravewing.description':
+    '消耗2枚灵魂碎片，将一只永久墓翼加入你的2槽统御。只能有一只为你效命。它每5秒对附近敌人造成65%的顺劈伤害，收割号令使所有被击中的敌人在5秒内受到的伤害提高8%。',
+  'entities.abilities.raise_gravewing.name': '唤醒墓翼',
+  'entities.abilities.raise_skeletal_warrior.description':
+    '消耗1枚灵魂碎片，将一名永久骷髅战士加入你的2槽统御。只能有一名为你效命。它每6秒对附近敌人造成45%的顺劈伤害，收割号令会使目标减速40%，持续4秒。',
+  'entities.abilities.raise_skeletal_warrior.name': '唤醒骷髅战士',
+  'entities.abilities.rake.specNote_feral': '每次命中累积1层古血（最多3层）。',
+  'entities.abilities.reaping_command.description':
+    '消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。',
+  'entities.abilities.reaping_command.name': '收割号令',
+  'entities.abilities.recall_the_fallen.description':
+    '使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。',
+  'entities.abilities.recall_the_fallen.name': '唤回逝者',
+  'entities.abilities.redharvest.description':
+    '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。',
+  'entities.abilities.redharvest.name': '血收',
+  'entities.abilities.regrowth.specNote_restoration': '种下新的绽放会累积1层繁茂（最多5层）。',
+  'entities.abilities.rejuvenation.specNote_restoration':
+    '种下新的绽放会累积1层繁茂（最多5层）。繁茂达到5层时，迅捷治愈变为盛放。',
+  'entities.abilities.rip.specNote_feral': '命中的这一击累积1层古血（最多3层）。',
+  'entities.abilities.ruinous_brand.description':
+    '为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。',
+  'entities.abilities.ruinous_brand.name': '毁灭烙印',
+  'entities.abilities.sacred_challenge.description':
+    '迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。',
+  'entities.abilities.sacred_challenge.name': '神圣挑衅',
+  'entities.abilities.sacred_form.description':
+    '进入持续至死亡的神圣状态，使治疗效果提高 10%、法术暴击几率提高 5%，产生的仇恨降低 50%。仅限黎明愈者。',
+  'entities.abilities.sacred_form.name': '神圣形态',
+  'entities.abilities.sacrifice_undead.description': '摧毁一名统御仆从，恢复最大生命值的 25%。',
+  'entities.abilities.sacrifice_undead.name': '献祭亡灵',
+  'entities.abilities.sacrilegious_march.description':
+    '移动速度提高35%，但每秒牺牲最大生命值的2%。再次施放可取消。生命值降至20%时会自动关闭。',
+  'entities.abilities.sacrilegious_march.name': '亵渎行军',
+  'entities.abilities.scouring_mercy.description':
+    '以神圣之力净化一名敌人，或立即救治一名友方目标。教义专属技能。',
+  'entities.abilities.scouring_mercy.name': '涤罪慈悲',
+  'entities.abilities.sentence.description':
+    '消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。',
+  'entities.abilities.sentence.name': '裁决',
+  'entities.abilities.seraphic_vigil.description':
+    '为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。',
+  'entities.abilities.seraphic_vigil.name': '炽天使守望',
+  'entities.abilities.shellskin.description': '受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。',
+  'entities.abilities.shellskin.name': '甲壳之肤',
+  'entities.abilities.shrapnel_charge.description':
+    '用榴片轰击目标及其附近敌人，随后从主要目标扩散一道短暂的流血。',
+  'entities.abilities.shrapnel_charge.name': '榴片炸弹',
+  'entities.abilities.sinister_strike.specNote_assassination': '累积1层毒祭（最多6层）。',
+  'entities.abilities.sinister_strike.specNote_combat':
+    '红线期间，此按钮变为大摆拳：造成130%武器伤害外加10点，奖励2个连击点，并使红线加深1格（最多4格）。',
+  'entities.abilities.solar_invocation.description':
+    '立即为一名盟友恢复 {damage} 点生命值，或对一名敌人造成中等神圣伤害。任一用途都会产生 1 点虔诚。升华期间，治疗施法还会治疗目标 10 米内的友方玩家，治疗量为原来的一半。',
+  'entities.abilities.solar_invocation.name': '烈阳祈唤',
+  'entities.abilities.solar_step.description': '使你的移动速度提高 150%，持续 2 秒。',
+  'entities.abilities.solar_step.name': '烈阳步',
+  'entities.abilities.soul_harvest.description':
+    '撕扯敌人的灵魂，造成 {damage} 点暗影伤害，并生成 1 枚灵魂碎片，最多 5 枚。',
+  'entities.abilities.soul_harvest.name': '精华收割',
+  'entities.abilities.soul_lance.description':
+    '掷出一柄幽魂之枪，造成 {damage} 点暗影伤害。对带有你的骸骨印记的目标，其中50%的伤害会累积至印记。',
+  'entities.abilities.soul_lance.name': '灵魂之枪',
+  'entities.abilities.soulwell.description':
+    '召唤一口灵魂之井，持续3分钟。脱离战斗时，小队成员最多可补充3枚灵魂石。灵魂石可恢复最大生命值的25%，并与药水共享冷却。',
+  'entities.abilities.soulwell.name': '灵魂之井',
+  'entities.abilities.stampede.description':
+    '召唤3只野兽，持续12秒。每只野兽每2秒攻击一次，造成{damage}点物理伤害。显示的伤害已计入你远程攻击强度的8%，但尚未计入宠物伤害加成。野兽在召唤时会锁定兽群凶性层数，每层使其伤害提高10%。兽群奔袭处于冷却时，成功施放兽群号令有20%几率重置其冷却；连续5次未触发后必定重置。野兽存在期间无法重置。（兽群之主）',
+  'entities.abilities.stampede.name': '兽群奔袭',
+  'entities.abilities.starfire.specNote_balance':
+    '月翼形态下，每次完成施法累积1层月潮（最多3层）。月潮达到3层时，此按钮变为日醒：瞬发打击，造成160至190点自然伤害，并在9秒内额外灼烧75点，恢复35点法力并消耗全部3层。',
+  'entities.abilities.stealth.specNote_subtlety':
+    '你从暮帷中使用的每个先制技累积1层幽暝（最多3层）。',
+  'entities.abilities.stoneward.description':
+    '使一名盟友获得6层、持续60秒的保护。受到伤害时消耗一层，恢复5%最大生命值，每3秒最多触发一次。（萨满祭司天赋）',
+  'entities.abilities.stoneward.name': '石之守护',
+  'entities.abilities.stormsurge.description':
+    '被动：先祖打击冷却时，消耗风暴施法有25%几率重置其冷却。连续失败4次后必定重置。（战魂）',
+  'entities.abilities.stormsurge.name': '风暴涌动',
+  'entities.abilities.summon_tithefiend.description':
+    '消耗幽暗什一来召唤一只临时存在的什一魔，追猎你的塑像。晚祷专属技能。',
+  'entities.abilities.summon_tithefiend.name': '召唤什一魔',
+  'entities.abilities.sun_gods_verdict.description':
+    '以太阳神裁决审判一名敌人，持续 30 秒。终末敕令和黎明坠击成功命中时会刻下一层印记。施加第三层印记的技能决定判决：终末敕令对罪人释放毁灭性伤害；黎明坠击引爆裁决，对附近敌人造成伤害并使其昏迷 1.5 秒。',
+  'entities.abilities.sun_gods_verdict.name': '太阳神裁决',
+  'entities.abilities.sunlance.description':
+    '消耗3层月潮，造成{damage}点自然伤害，并在9秒内额外灼烧{overTime}点，同时恢复35点法力：法力之选。与月涌消耗同一份月潮，二者只能选其一。',
+  'entities.abilities.sunlance.name': '日醒',
+  'entities.abilities.sunward_disc.description':
+    '需要盾牌。掷出一面辉光飞盾，命中后在附近敌人之间弹射。每次造成伤害都会产生 1 点虔诚。烈阳反击使向阳飞盾不消耗法力、无视冷却时间且伤害提高 20%。升华会强化 5 次弹射。',
+  'entities.abilities.sunward_disc.name': '向阳飞盾',
+  'entities.abilities.swipe.specNote_feral': '每次命中累积1层古血（最多3层）。',
+  'entities.abilities.thieves_chorus.description':
+    '一声呼哨激励你的队伍，使攻击、施法和引导速度提高10%，持续10秒。近期受过群体加速激励的盟友过于疲惫，无法受益。（潜行者天赋）',
+  'entities.abilities.thieves_chorus.name': '盗贼合唱',
+  'entities.abilities.thunder_reservoir.description':
+    '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
+  'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
+  'entities.abilities.tidecall.description':
+    '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',
+  'entities.abilities.tidecall.name': '潮汐召唤',
+  'entities.abilities.trailbreak.description':
+    '向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。',
+  'entities.abilities.trailbreak.name': '断迹',
+  'entities.abilities.umbral_anchor.description':
+    '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',
+  'entities.abilities.umbral_anchor.name': '暗影锚',
+  'entities.abilities.unholy_command.description':
+    '消耗 3 枚灵魂碎片号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。',
+  'entities.abilities.unholy_command.name': '邪秽号令',
+  'entities.abilities.unleash_beast.description':
+    '释放满层兽群凶性，对主要目标发动重击并拍击周围敌人，随后使宠物短暂进入顺劈狂乱。',
+  'entities.abilities.unleash_beast.name': '释放野兽',
+  'entities.abilities.unleash_weapon.description':
+    '释放当前的武器灌注。焰烙造成54至64点火焰伤害，获得30%法术强度加成，并获得2层雷霆。风心用武器攻击，推进战魂节律，并使攻击速度提高20%，持续6秒。缚石造成75%武器伤害，迫使目标攻击你，并使你受到的伤害降低20%，持续4秒。活泉消耗目标身上的愈合水流，立即治疗其剩余治疗量的125%，并使8秒内下一次受到的伤害降低，降低量等于实际恢复生命值的50%。',
+  'entities.abilities.unleash_weapon.name': '释放武器',
+  'entities.abilities.valkyrs_calling.description':
+    '升上空中，在飞向敌人期间免疫伤害。2 秒后降临目标区域，造成 {damage} 点神圣伤害并产生 1 点虔诚。升华会使冲击伤害提高 50% 并消耗 1 次充能。',
+  'entities.abilities.valkyrs_calling.name': '瓦尔基里的召唤',
+  'entities.abilities.veilbound_march.description':
+    '进入灵体状态 4 秒，移动速度提高 40%，护甲提高 30%，并免疫定身、减速和位移。你穿过的敌人会获得持续 6 秒的帷幕印记，每秒受到神圣伤害，对你造成的伤害降低 20%，并对你产生额外仇恨。第一个印记会产生 1 点虔诚。行军结束时，附近带有印记的敌人会受到最终爆发伤害。升华使爆发伤害提高 50%，并将他们轻微拉向你。',
+  'entities.abilities.veilbound_march.name': '帷幕行军',
+  'entities.abilities.veilbound_mark.description':
+    '每秒受到神圣伤害，对施加印记的圣骑士造成的伤害降低 20%，并对该圣骑士产生额外仇恨。',
+  'entities.abilities.veilbound_mark.name': '帷幕印记',
+  'entities.abilities.veilstep.description': '朝面向的方向穿越帷幕。',
+  'entities.abilities.veilstep.name': '帷幕步',
+  'entities.abilities.veilstrike.description':
+    '持续6秒：你的暮帷先制技无需潜行即可从任意角度使用，你造成的伤害提高10%，且期间的第一次潜伏突袭造成双倍伤害。（敏锐专精）',
+  'entities.abilities.veilstrike.name': '罩影突袭',
+  'entities.abilities.venom_dart.description':
+    '弹出一枚毒镖，造成{damage}点自然伤害。获得1个连击点。',
+  'entities.abilities.venom_dart.name': '毒镖',
+  'entities.abilities.venom_dart.specNote_assassination':
+    '累积1层毒祭，并使你的蚀毒伤口延长6秒（伤口持续时间不会超过20秒）。',
+  'entities.abilities.venomrend.description':
+    '消耗你的6层毒祭：造成100点伤害，每个连击点额外造成55点，立即引爆你的流血效果的全部剩余伤害，随后施加一个新的蚀毒伤口（20秒内造成120点伤害）。恢复20点能量。（刺杀专精）',
+  'entities.abilities.venomrend.name': '蚀毒撕裂',
+  'entities.abilities.vicarious_suffering.description':
+    '连接苦痛8秒，受到敌对攻击时最多生成15点谴罪。对自己使用时受到的伤害降低20%；对盟友使用时最多将20%的伤害转移给你，但不会使你的生命值降至15%以下。',
+  'entities.abilities.vicarious_suffering.name': '苦痛转承',
+  'entities.abilities.vowkeeper_strike.description':
+    '发动高仇恨攻击并产生 1 点虔诚。成功命中有 20% 几率获得持续 8 秒的烈阳反击；每次成功格挡有 25% 几率触发。烈阳反击会强化你的下一次向阳飞盾、恩典之锤或治愈之光。升华还会给予一个小型吸收护盾。',
+  'entities.abilities.vowkeeper_strike.name': '守誓者打击',
+  'entities.abilities.warspirit_cadence.description':
+    '被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）',
+  'entities.abilities.warspirit_cadence.name': '战魂节律',
+  'entities.abilities.wildheart.description': '立即恢复最大生命值的 30%。',
+  'entities.abilities.wildheart.name': '野性之心',
+  'entities.abilities.wrath.specNote_balance':
+    '月翼形态下，每次完成施法累积1层月潮（最多3层）。月潮达到3层时，月种变为月涌，天陨变为日醒。',
+  'entities.items.boneglass_shiv.name': '骨璃小刀',
+  'entities.items.duskwhisper.name': '黄昏低语',
+  'entities.items.marrowpoint.name': '穿髓尖刃',
+  'entities.items.rimefang.name': '霜牙',
+  'entities.items.soul_stone.name': '灵魂石',
+  'entities.mobs.graveguard.name': '墓卫',
+  'entities.mobs.necromancy_bone_mage.name': '骸骨法师',
+  'entities.mobs.necromancy_gravewing.name': '墓翼',
+  'entities.mobs.necromancy_skeletal_warrior.name': '骷髅战士',
+  'entities.quests.q_divine_tome.completion':
+    '礼拜堂庭院终于安静下来。你已经可以学习经文了，{playerName}，但唤回仪式不能在温暖的礼拜堂中吟诵。必须前往生死帷幕薄弱之处。我会把圣典带到北方的泥沼沼泽。到那里来找我，我们将完成这场仪式。',
+  'entities.quests.q_divine_tome.objectives.0.label': '让躁动骸骨安息',
+  'entities.quests.q_divine_tome.text':
+    '圣光在你体内并非静默不语，{playerName}。我看着你让亡者安息，也相信你已经准备好学习极少有圣骑士能够掌握的仪式：唤回仪式，以此将逝去的灵魂召回人世。仪式经文记载在我保管的缚晓圣典中，但只要躁动的亡者仍在这片土地上游荡，书本便带不来祝福。再让 6 具躁动骸骨归于尘土，我便开始教你。',
+  'entities.quests.q_divine_tome.title': '缚晓圣典',
+  'entities.quests.q_rite_of_redemption.completion':
+    '跪下，{playerName}，大声念出经文。就是这样。你感觉到了吗？你手中的圣光不再只能治愈生者，也能召回已经离世的人。请明智地使用它。将灵魂召回一场毫无希望的战斗是残忍，而非仁慈。起身吧，救赎者。',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': '让溺亡死者安息',
+  'entities.quests.q_rite_of_redemption.text':
+    '你果然跟随我进入了沼泽，{playerName}。很好。缚晓圣典就在这里，而这片积水之地正适合吟诵其中的经文：没有哪里比亡者不肯长眠之处更接近生死之间的帷幕。但那些溺亡者会在吟诵中途把你的声音拖入水底。先清理出适合仪式的地方：让 8 名溺亡死者安息，然后我们一同将此地圣化。',
+  'entities.quests.q_rite_of_redemption.title': '唤回仪式',
+  'game.hud.lowFocus': '集中值不足',
+  'guide.abilityHook.ancestor_return': '在战斗外长时间施法后，使所有阵亡的小队或团队成员复活。',
+  'guide.abilityHook.avenging_wrath':
+    '获得 10 点虔诚，并在接下来的十五秒内使技能产生的虔诚值翻倍。',
+  'guide.abilityHook.bastion_sweep': '用盾牌横扫一群敌人，夺取仇恨并积累虔诚。',
+  'guide.abilityHook.chain_lightning': '攻击一个目标并跳向附近两名敌人，整次施法产生一层雷霆。',
+  'guide.abilityHook.consecration': '以持续的神圣伤害和仇恨占据周围地面。',
+  'guide.abilityHook.evil_eye': '标记一个敌人，使其行动与承受的苦难为你积累谴罪。',
+  'guide.abilityHook.galeheart_weapon': '为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。',
+  'guide.abilityHook.hammer_of_justice': '以短暂而可靠的昏迷阻止一名敌人。',
+  'guide.abilityHook.hammer_of_wrath': '从远处处决一名受伤的敌人，或在圣翼激活时处决任意敌人。',
+  'guide.abilityHook.holy_shield': '消耗虔诚，获得主动格挡时段、吸收护盾和仇恨脉冲。',
+  'guide.abilityHook.lay_on_hands': '在盟友濒临倒下时为其恢复大量生命值。',
+  'guide.abilityHook.lifespring_weapon': '为武器灌注复苏之水，强化持续的治疗节奏。',
+  'guide.abilityHook.measured_shot': '一记从容瞄准的远程射击，为你的强力攻击恢复集中值。',
+  'guide.abilityHook.moonseed': '在月翼形态下，推进一层月潮并延长月光风暴。',
+  'guide.abilityHook.oath_chain': '将远处的敌人拉入队伍并减缓其逃离速度。',
+  'guide.abilityHook.pack_command': '命令你的伙伴发动攻击，并积攒凶性以释放野兽。',
+  'guide.abilityHook.primal_exaltation': '短暂释放与你专精相符的元素力量。',
+  'guide.abilityHook.stampede':
+    '召唤三只野兽攻击12秒。叠满兽群凶性后使用，可让它们在整个召唤期间保持最高伤害加成。',
+  'guide.abilityHook.stoneward': '升起充能石盾，将受到的伤害转化为恢复。',
+  'guide.abilityHook.stormsurge': '消耗风暴施法机会后，有时会提前恢复先祖打击。',
+  'guide.abilityHook.thunder_reservoir': '积蓄雷电，直到大地震击或断层震荡能释放满额威力。',
+  'guide.abilityHook.tidecall': '立即治疗一名盟友，并注入满额愈合水流。',
+  'guide.abilityHook.veilbound_march': '穿过敌群并留下印记，削弱其对你造成的伤害并牢牢锁定仇恨。',
+  'guide.abilityHook.warspirit_cadence': '将稳定的武器节奏转化为风心回响和一次瞬发法术机会。',
+  'guide.arenaPage.honorBody':
+    '荣誉是与其他玩家交战所用的货币。你可以在灰烬角斗场以及荆谷原野上赚取它，它与你的钱币分开存放，永远不会混在一起，你的角色面板会显示你手上持有多少。它只有一种用途：战争套装。',
+  'guide.arenaPage.honorFinalNote':
+    '荣誉购买是最终的。用钱币买下的东西还能从商人的回购列表里买回来，但荣誉购买永远不会出现在那里，而战争套装在你买下的那一刻便已灵魂绑定，因此它再也无法交易、邮寄，或以任何形式退回。商店正因如此才要你确认一次：按下之前，请把那件装备看清楚。',
+  'guide.arenaPage.honorHeading': '荣誉',
+  'guide.arenaPage.quartermastersBody':
+    '两位军需官守着同样的货架，就近交易即可。荣誉军需官怒焰站在东溪谷，战争军备库总管战帅德拉文·科尔则守着高望的柜台。他们备的都是战争品级：五个护甲系列，外加所有系列共用的项链、戒指与武器。',
+  'guide.arenaPage.rewardsBody':
+    '一场排位胜利会发放荣誉，也就是玩家对战的货币，而落败除了评分之外不会让你付出任何代价。荣誉意在奖励真刀真枪的对局：同一天里再次击败同一个对手或同一支队伍不会再有额外收益，连胜一整天后每场胜利的收益也会随之略微下降，而对手认输的比赛虽然照样影响评分，却完全不给荣誉。这一天属于荣誉自己，它按自己的时钟翻篇，而不随王国的副本重置。',
+  'guide.arenaPage.rewardsHeading': '排位对战能带来什么',
+  'guide.arenaPage.warfareBody':
+    '每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备在地下城首领面前一文不值。',
+  'guide.arenaPage.warfareHeading': '战争套装',
+  'guide.arenaPage.warfareTradeBody':
+    '这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它所带来的一切都只花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。',
+  'guide.classPage.formLine.form_cat': '近战输出形态：像盗贼一样使用能量与连击点，威胁值也低得多。',
+  'guide.classPage.formLine.form_travel':
+    '赶路形态：在地面上快得多，但在你变回原形之前无法使用其他技能。',
+  'guide.classPage.formName.form_bear': '巨熊形态',
+  'guide.classPage.formName.form_travel': '迅捷形态',
+  'guide.classPage.formsHeading': '变形',
+  'guide.classPage.formsMoonwing':
+    '平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。',
+  'guide.classPage.formsNote':
+    '德鲁伊靠变形作战。大多数德鲁伊技能都归属于某一种形态，因此你当前所处的形态决定了你能施放什么，而变形本身会消耗少量法力。无论是否身处战斗，你都可以随时变形，次数不限。',
+  'guide.classPage.mageEleHeading': '水元素',
+  'guide.classPage.mageEleJet':
+    '水流喷射在宠物栏上有属于自己的按钮：点击它，就能把一道寒流锁定在某个敌人身上；右键点击它（在移动端为长按），则让水元素在冷却结束后自行施放。',
+  'guide.classPage.mageEleNote':
+    '冰霜法师能学会召唤水元素，这个远程同伴会自行向你的目标投掷水箭。它像猎人的野兽或术士的恶魔一样听命于宠物栏，不过它并不是用来替你拉住目标的。',
+  'guide.classPage.mageEleSummon': '一个冰霜法术，把水元素召唤到你身边，并让它扑向你的目标。',
+  'guide.classPage.mageLore':
+    '法师驾驭火焰与冰霜摧毁敌人，召唤水元素，将威胁冻在原地，甚至扭曲时间本身来庇护和治疗同伴。',
+  'guide.combat.allyRezBody':
+    '你并不总是得自己走回去。拥有复活法术的盟友可以把你扶起来，它会以一个提示的形式送到你面前，由你接受或拒绝；放着不管它就会过期，所以趁它还在时给个答复。接受之后，你会带着一部分生命与法力，在施法的那位朋友身旁站起来。有些治疗者可以一次向倒下的整支队伍发出邀请，不过你们每个人仍要各自回应自己的提示。荆谷原野是唯一的例外：那里没有任何复活法术能触及你，你只能等待己方的下一波复活潮。',
+  'guide.combat.allyRezTitle': '盟友何时能把你扶起来',
+  'guide.combat.breathBody':
+    '深水可以游泳，你也可以潜到水面之下。当你的头没入水中时，屏幕上方附近会出现一条蓝色的呼吸条并不断减少；浮出水面后，它回满的速度远快于消耗的速度。若在水下把它耗尽，你就会开始溺水，每秒失去一大块生命值，直到重新呼吸到空气为止，所以长时间下潜时务必留意那条呼吸条。死亡会清空它，因此跑尸总是从满满的一口气开始。',
+  'guide.combat.climbBody':
+    '岩架并不是墙。跳向某个高得踩不上去的东西时，你的角色会在跳跃接近顶点时抓住边沿，并翻身上去，不需要按下任何专门的按键。凡是你自己就能跨过的低矮障碍，都会被平平常常地略过；完整的引体上翻只留给高过你头顶的边沿。这个动作很短，而且在进行时会接管你的操控，因此你无法中途改变方向。若在翻越途中被击晕，你会松手坠落，坠落距离从起跳的地面算起；而击晕或定身会让翻越根本无法开始，这一点在你想从一场恶战的困境中脱身时很值得记住。',
+  'guide.combat.climbTitle': '翻上岩架',
+  'guide.combat.fatigueBody':
+    '大海没有围墙。世界本就打算让你游过去的那些水域，也就是陆地与陆地之间的海峡与水湾，以及内陆的湖泊，无论花多久横渡都很安全。可若你从岸边一路游进真正的外海，它就会开始榨干你的体力：先是出现一则警告，你有足够的时间掉头，之后大海便会造成不断加重、任何手段都无法阻止的伤害，直到你朝陆地折返为止。在离岸那么远的地方溺死或力竭而亡，都和其他任何死亡一样需要释放灵魂，所以请把地平线当作风景，而不是目的地。',
+  'guide.combat.hazardsTitle': '水也能要你的命',
+  'guide.combat.threatTitle': '敌人会打谁',
+  'guide.combat.unstuckBody':
+    '如果世界把你困在了出不来的地方，请输入 /unstuck。你需要脱离战斗、站定不动，不被击晕或定身束缚，也不在决斗或竞技场比赛之中：一段短暂的倒计时随即开始，移动或受到伤害都会取消它。倒计时走完后，你会被放到最近的墓地。它绝不会杀死你，也不会留下尸体；若你本已倒下，它会就地把你复活。代价是脱困后遗症，一段时间内削弱你的全部属性，等到你能再次使用这条指令时它已经消退；而且和守护者的代价一样，它对全新的角色完全网开一面。',
+  'guide.combat.unstuckTitle': '当你真的被困住时',
+  'guide.commandsPage.abilities': '你已经学会的技能。',
+  'guide.commandsPage.afk':
+    '把自己标记为暂离，并可附上一条留言，任何密语你的人都会收到它作为自动回复。不带留言再输入一次即可清除；任何其他聊天也会清除它。',
+  'guide.commandsPage.aliasBody':
+    '大多数指令都有简写，而同一行中列出的每一种写法作用完全相同：/w、/t 和 /tell 是同一条指令。尖括号里的词是必填的，方括号里的词是可选的，而指令本身的大小写从来无关紧要。',
+  'guide.commandsPage.arena':
+    '你在灰烬角斗场两个组别中的战绩：1v1 与 2v2 各自的评分、胜场、负场与胜率。',
+  'guide.commandsPage.assist':
+    '把目标切换为指定玩家正在选中的目标。不写名字时，则协助你当前选中的那位玩家。它在世界各处都能触及你的队伍与团队，以及近到你能看见的任何人。',
+  'guide.commandsPage.attack': '自动攻击是否正在进行、打的是谁，以及你挥击一次需要多久。',
+  'guide.commandsPage.bags': '你正携带的东西，按品质从高到低排列，钱币列在最后。',
+  'guide.commandsPage.bangBody':
+    '有几条指令以感叹号开头，而不是斜杠。它们会向全王国宣告某件事，并同时发布到社区 Discord，因此没有登录的人也能看到。它们属于在线游玩的一部分。',
+  'guide.commandsPage.bangHeading': '社区指令',
+  'guide.commandsPage.bangList':
+    '这一组包括：!lfg 寻求组队，!wts 与 !wtb 出售和收购，!recruit 公会招募，!event 发起团队活动或聚会，以及 !help 求助。先输入指令，再写上你的留言。',
+  'guide.commandsPage.block':
+    '更强硬的版本：它还会拦下对方的密语、邀请与邮件，并让你们在 /who 中彼此隐形。列表形式会打印出你屏蔽了哪些人。',
+  'guide.commandsPage.buffs': '你身上的增益与减益，以及每一项剩余的时间。',
+  'guide.commandsPage.buyback': '你最近卖给商人、目前仍能买回来的东西。',
+  'guide.commandsPage.casting': '你正在施放或引导什么，还剩多久。',
+  'guide.commandsPage.channelsIntro':
+    '综合频道触及整个王国，你一登录就身在其中。世界与 LFG 则需要自行加入：先加入，然后才能在里面阅读和发言。',
+  'guide.commandsPage.cmdHeader': '指令',
+  'guide.commandsPage.combat': '你是否身处战斗中，以及何时会脱离战斗。',
+  'guide.commandsPage.combo': '你当前持有多少连击点。',
+  'guide.commandsPage.completed': '你已经交付的任务，按你完成它们的先后顺序排列。',
+  'guide.commandsPage.consider': '与你相比，目标的等级意味着多大的危险。',
+  'guide.commandsPage.consumable': '此刻正作用在你身上的食物与饮品，以及各自还剩多久。',
+  'guide.commandsPage.cooldowns': '你有哪些技能正在冷却，最快就绪的排在最前。',
+  'guide.commandsPage.dnd': '请勿打扰：与暂离类似，只是发给你的密语会被拦下，而不是送达。',
+  'guide.commandsPage.doesHeader': '它的作用',
+  'guide.commandsPage.dungeonMode': '在普通与英雄难度之间切换你的地下城。',
+  'guide.commandsPage.dungeonReset': '放弃你自己名下的空副本，也就是改完难度之后要做的那件事。',
+  'guide.commandsPage.dungeons':
+    '每一座地下城，连同它的门所在的区域、它所设计的队伍人数，以及你当前设定的难度。',
+  'guide.commandsPage.emotesBody':
+    '社交表情动作也是指令：/wave、/bow、/cheer、/dance、/laugh 等等，每一个都会展示给说话范围内的所有人。加上一个名字就能把它指向某人，例如“/wave Aleph”，而 /me 则可以表达列表里没有的任何动作。',
+  'guide.commandsPage.emotesHeading': '表情动作',
+  'guide.commandsPage.emotesMore': '更多关于表情动作与结伴同行的内容',
+  'guide.commandsPage.falling': '你是否腾空、离地多高，以及这一落会不会摔疼。',
+  'guide.commandsPage.follow':
+    '自动跟随另一位玩家。不写名字时，跟随你当前的目标。移动、施法、战斗、切换目标，或对方跑远，都会结束跟随，而且战斗中无法开始跟随。',
+  'guide.commandsPage.form': '你所处的变形形态或战斗姿态。',
+  'guide.commandsPage.gAlias':
+    '一个有两种含义的简写，因此值得记住：离线时它发往综合频道，在线时它是你的公会频道。确定要说综合频道时，请输入 /general 或 /1。',
+  'guide.commandsPage.gear': '你已装备的全部物品，逐个部位列出，空着的部位一目了然。',
+  'guide.commandsPage.general': '全王国的综合频道。',
+  'guide.commandsPage.gold': '你的钱袋里有些什么。',
+  'guide.commandsPage.graveyard': '如果你倒在此处，灵魂会回到哪里。',
+  'guide.commandsPage.groupChannels': '频道',
+  'guide.commandsPage.groupCombat': '战斗中',
+  'guide.commandsPage.groupParty': '队伍与组队',
+  'guide.commandsPage.groupPeople': '其他玩家',
+  'guide.commandsPage.groupRecovery': '脱困与状态',
+  'guide.commandsPage.groupSelf': '你的角色',
+  'guide.commandsPage.groupState': '你此刻如何',
+  'guide.commandsPage.groupTalking': '交谈',
+  'guide.commandsPage.groupWorld': '世界与旅行',
+  'guide.commandsPage.guild': '与你的公会交谈。仅限在线游玩，而且你需要身在一个公会中。',
+  'guide.commandsPage.help': '把指令列表打印到你的聊天框里。',
+  'guide.commandsPage.helpTipBody':
+    '在游戏中输入 /help、/commands，或者只打一个 /?，整份指令列表就会打印到你的聊天框里。指令打错时，游戏会告诉你它无法识别，并把你指回 /help。',
+  'guide.commandsPage.helpTipTitle': '游戏自己也记着这份列表',
+  'guide.commandsPage.ignore':
+    '让某位玩家的公开聊天和他头顶的聊天气泡对你隐藏。他的密语、掷骰、邀请与邮件仍会送达。列表形式会打印出你屏蔽了哪些人的聊天。',
+  'guide.commandsPage.inspect': '查看一位在线玩家的等级、职业与生命值。',
+  'guide.commandsPage.intro': '你可以输入到聊天框里的每一条指令，按用途分组，并附上它们的简写。',
+  'guide.commandsPage.invite': '按名字邀请一位在线玩家加入你的队伍，无论他站得多远。',
+  'guide.commandsPage.join':
+    '加入或离开一个可选频道。可加入的有 world 与 lfg 两个，单独输入 /join 会把它们列出来。为其中之一打开一个聊天标签页，也会替你加入它。',
+  'guide.commandsPage.lfg': '在 LFG 频道里发言，人们在这里寻找队伍。请先加入它。',
+  'guide.commandsPage.listings':
+    '你自己在世界市场上的挂单，包括要价、每一件还剩多久，以及你还能再挂多少。',
+  'guide.commandsPage.manaRegen': '对法力使用者而言：你脱离战斗后的法力回复是否已经重新开始跳动。',
+  'guide.commandsPage.me':
+    '以第三人称写下自由的动作文字，因此“/me 凝视着喷泉”会显示为你的名字后面跟着这个动作。你附近的所有人都能看到。',
+  'guide.commandsPage.nearby': '离你最近的活物，由近及远。',
+  'guide.commandsPage.officer': '你公会的官员频道，向官员与会长开放。仅限在线游玩。',
+  'guide.commandsPage.overpower': '对战士而言：敌人闪避所打开的血手窗口是否仍然可用。',
+  'guide.commandsPage.partyChat': '与你队伍或团队中的每一个人交谈。',
+  'guide.commandsPage.partyRoster':
+    '后面不跟留言时，它会改为打印你的队伍名单：每位成员的等级、职业与生命值，并标出队长。',
+  'guide.commandsPage.peopleNote':
+    '/who 名单，以及你屏蔽聊天与屏蔽的名单，都由服务器保管，因此这些只在在线游玩时可用。',
+  'guide.commandsPage.pet': '你宠物的名字、等级、族系与生命值。',
+  'guide.commandsPage.petTaunt': '你宠物的嘲讽冷却，以及它是否被设为自行施放。',
+  'guide.commandsPage.played': '这个角色本次登录以来在世界中待了多久。',
+  'guide.commandsPage.playtime': '这个角色累计被游玩了多久，涵盖每一次登录。',
+  'guide.commandsPage.pois': '你当前区域的地标，由近及远，并附上到每一处的距离。',
+  'guide.commandsPage.potion': '战斗药水的共享冷却，它与你的技能冷却是分开的。',
+  'guide.commandsPage.quests': '你进行中的任务日志，以及每个目标的进度。',
+  'guide.commandsPage.queued': '已经蓄势待发、将在你下一次近战挥击时打出的技能。',
+  'guide.commandsPage.range': '你的目标离你多远，以及这个距离是否在近战范围之内。',
+  'guide.commandsPage.ready':
+    '由队伍或团队的队长发起准备确认，其他每个人都会收到一个提示来回答是或否。',
+  'guide.commandsPage.reply': '回复最后密语你的那个人，无需再次输入他的名字。',
+  'guide.commandsPage.roll':
+    '掷一个随机数，除非你指定上限或范围，否则从 1 到 100。你的队伍会看到结果；你不在队伍中时，则是附近的所有人。掷骰由服务器完成，因此没人能作假。',
+  'guide.commandsPage.savedMana':
+    '对处于变形状态的法力使用者而言：变形期间被寄存起来的法力，会在你变回原形时归还给你。',
+  'guide.commandsPage.say':
+    '对站在你附近的玩家说话。不带斜杠的普通一行，会发往你当前选中的聊天标签页，而“说”正是你一开始所在的那一个。',
+  'guide.commandsPage.selfIntro':
+    '这些会在你的聊天框里打印出一行只有你看得到的私人信息。什么都不会广播出去，因此在战斗中途使用也很安全。',
+  'guide.commandsPage.session': '你登录以来做过的事：击杀、死亡、伤害与经验。',
+  'guide.commandsPage.sit': '就地坐下，以及重新站起来。只要你移动、施法或挨了一下，就会自动站起。',
+  'guide.commandsPage.slashBody':
+    '凡是你在聊天框里输入、以斜杠开头的内容，都是指令，而不是你说出口的话。按下回车后，它要么执行一个动作（跟随某人、邀请某人、掷骰），要么打印出一行只有你看得到的私人信息。',
+  'guide.commandsPage.speed': '与正常奔跑相比你移动得有多快，以及是否有什么东西把你定住了。',
+  'guide.commandsPage.stats':
+    '一行角色概要：等级、职业、生命值、你的资源、攻击强度、暴击几率与护甲。',
+  'guide.commandsPage.stickyBody':
+    '你选中的是哪个聊天标签页，决定了不带斜杠的普通一行会发往何处。选中世界标签页后，你下一行没有前缀的话就会发往世界频道，所以动手打字前先瞄一眼标签页。斜杠指令永远优先于标签页，因此无论当前是哪个标签页，/w Bob 你好 都会密语 Bob；而在密语标签页上，普通的一行会回复最后密语你的那个人。',
+  'guide.commandsPage.talents': '你的专精，以及你的六个天赋行里已经选好了几行。',
+  'guide.commandsPage.target': '你当前的目标：名字、等级、它是什么，以及生命值。',
+  'guide.commandsPage.targetBuffs': '你目标身上的光环，每一项都标注为增益或减益。',
+  'guide.commandsPage.threat': '正在与你交战的敌人当前都盯着谁。',
+  'guide.commandsPage.unfollow': '停止跟随。',
+  'guide.commandsPage.unknownBody':
+    '游戏无法识别的指令会返回一条未知指令的提示，而且不会被说出口，因此打错字绝不会落到你正在聊天的那个频道里。连续发得太快的指令会被限流：稍微放慢一点，它们就又能通过了。有些指令需要一个作用对象，所以没有选中任何人时使用 /follow，或者没人密语过你时使用 /reply，游戏都会如实告诉你。',
+  'guide.commandsPage.unknownHeading': '如果一条指令不起作用',
+  'guide.commandsPage.unstuck':
+    '被世界困住时的那条出路。站定不动熬过一段短暂的倒计时，你就会被移动到最近的墓地；若你已经倒下，还会在那里被复活。事后你会带着脱困后遗症虚弱一阵子，因此它是最后的手段，而不是捷径。',
+  'guide.commandsPage.where': '你所站的区域、它的等级范围，以及你的坐标。',
+  'guide.commandsPage.whisper':
+    '向一位在线玩家发送私聊消息。只要不会指向多个玩家，你把名字的大小写打成什么样都能对上。',
+  'guide.commandsPage.who':
+    '列出在线的玩家。附上一段文字，即可只留下名字或所在区域包含该文字的人。',
+  'guide.commandsPage.world': '在世界频道发言，前提是你已经加入了它。',
+  'guide.commandsPage.xp': '查看你的等级，以及本级已经走了多远。',
+  'guide.commandsPage.yell': '放声呼喊，让远在说话范围之外的玩家也能听见。',
+  'guide.commandsPage.zones': '按旅行顺序列出每一个区域及其等级范围，并标出你正身处的那一个。',
+  'guide.controls.attackMove': '攻击移动（需先在选项中开启）',
+  'guide.controls.bgFlag': '在荆谷原野夺取敌方战旗',
+  'guide.controls.jumpSwim': '跳跃；身在水中时上浮',
+  'guide.controls.meters': '伤害统计（伤害、治疗与威胁）',
+  'guide.controls.moveAlt': '移动与转身（同样的四个操作，使用第二套按键）',
+  'guide.controls.onBarBinding':
+    '你也可以直接在动作条上绑定按键：在“按键绑定”面板中选择“编辑动作条按键”，然后点击动作条上的某个格子，再按下你想要的键。设置完毕后点击“完成”。这一项仅限桌面端，因为它需要一块实体键盘。',
+  'guide.controls.petMark': '宠物：标记，选中你自己的宠物（等同于点击它的头像框）',
+  'guide.controls.swimDown': '身在水中时下潜（按住）',
+  'guide.controls.swimNote':
+    '游泳用到两个键：按住空格上浮，按住左 Ctrl 下沉。向前游动时把镜头压低同样会下潜，所以你可以用视角来掌控自己的深度。左 Ctrl 是默认按键中唯一一个单独的修饰键，而在绑定按键时，单独按下的修饰键会被忽略，因此若要重新绑定“下潜”，请挑一个不是修饰键的按键。',
+  'guide.deedsPage.bookBody':
+    '功绩之书把每一个功绩归入可以随手切换的类别，并配有搜索框，以及“全部”“已获得”“未获得”和“即将完成”几种筛选。靠近顶部的“最近”一栏收着你最新解锁的功绩，点击其中一条便会直接跳到它的卡片；点击别人发在聊天里的功绩名，同样如此。它旁边的“即将完成”会指出你最接近达成的那寥寥几个。在线上世界里，每个功绩还带着自己的稀有度，也就是已经获得它的冒险者比例，让你一眼看出哪些寻常、哪些是真正的攀登；离线世界没有可供统计的人口，因此不显示稀有度。侧栏的末尾是头衔与边框的架子，那里有两个挑选栏：一个选你佩戴的头衔，一个选环绕你铭牌的边框。',
+  'guide.deedsPage.bookHeading': '走进功绩之书',
+  'guide.delvesPage.lockpickAnteBody':
+    '在碰到锁之前，你先定下条件。取三根撬锁针，便留有失手的余地，但箱子只付出最朴素的奖赏；取两根，是折中的交易；只取一根，一次干净利落的开锁将付出最丰厚的回报。手上的撬锁针越少，每一步之间可供思考的时间就越短；而若最后一根也折断，锁便彻底卡死：那口箱子就此失去，直到你再通关一次这处探秘为止。',
+  'guide.delvesPage.riteBody':
+    '并非每一次探秘都以一把锁收尾。溺亡连祷改为以一场仪式作结：守护者倒下之后，圣物匣周围的神龛会依次亮起，要你把这个顺序答回去。开始之前你先选定它的难度，与撬锁针索要的正是同一份交易。最温和的一档会为你把序列重播不止一次，也给你不止一次尝试，但它会压低圣物匣的回报；最严苛的一档只展示一次顺序，只给你一次机会，也是通往最丰厚奖赏的唯一途径。',
+  'guide.delvesPage.riteHeading': '当一次探秘以仪式收尾',
+  'guide.dungeonsPage.finderBoardBody':
+    '更想自己挑选同伴？队长可以改为把队伍发布到预组板上，并标注这一趟是为了什么：首次通关、任务、全清、学习本，或是速刷。其他玩家提交申请，由队长决定谁能同行。板上没有自由填写的招募文字，只有这些标签；列表中还有一项只走板子，只接受发布招募，而不进入自动队列。',
+  'guide.dungeonsPage.finderBody':
+    '你不必在聊天里扯着嗓子凑人。打开地下城查找器，看看它能为哪些副本排队，勾出你愿意去的，选好你要担任的定位，然后加入队列。查找器会按坦克、治疗与输出的正确搭配组出一支完整队伍，再同时向所有人发出邀请；队伍全员接受的那一刻，你便被编入其中。列表上不只有五人本：十人团队副本也在这里排队，两种难度都有，不过查找器从不检查你是否已挣得进入的资格，因此副本门口依然可能把你挡回来。王国里并非每一处副本都在它的名单上，所以在指望它带你去某座地下城之前，先看一眼。',
+  'guide.dungeonsPage.finderOfferBody':
+    '组好的队伍只在一小段时间内向你发出邀请，所以请尽快作答。让邀请过期或干脆拒绝，查找器会把你暂时挡在队列之外，过一会儿才让你重新排队，免得一支只答了一半的队伍拖住所有人。',
+  'guide.dungeonsPage.finderRolesBody':
+    '在你选定专精之前，可选的定位来自你的职业；有了专精之后，则来自你当前激活的专精，所以一个治疗排的就是治疗。过了天赋开放的那个等级，查找器会要求你先选好专精，否则根本不给你定位。列表上的每处副本还各有自己的等级区间，比副本门口的要求更紧，排队队伍中的每一名成员都必须落在区间之内：需要队伍拖着走的角色，查找器不会给它座位。',
+  'guide.dungeonsPage.finderTitle': '寻找一支队伍',
+  'guide.dungeonsPage.formatsNote':
+    '地下城与团队副本是三种副本形式之一。探秘是供一到两人进行的短小下潜；而裂隙是在世界中自行撕开的裂口，会把一支队伍投进一座每次都全新生成的地下城。',
+  'guide.economy.guildBankNote':
+    '在你个人的银行之外，公会还守着一座自己的金库，在同一位司库处开启，并从同一个窗口的一个标签页进入：一份共享的钱币储备，加上一处集中存放货物的仓库。每位成员都可以查看它，而能把东西存进取出的只有官员。社交页面有更详细的说明。',
+  'guide.economy.honorBody':
+    '与其他玩家作战会带来第三种货币：荣誉。赢下一场排位竞技场对决可以获得荣誉，而在荆谷原野打满一整场比赛，无论胜负都会发放荣誉，所以原野上的一场苦战永远不算白打。荣誉积攒在你的角色面板上，绝不与你的钱币混在一起。你可以在荣誉军需官处花掉它，也就是东溪镇的 FURY 与高守哨站的 Warmarshal Draven Kole，两人共用同一批存货：整套战争护甲系列、饰品与武器，都只有荣誉买得到。这些购买是最终的，装备在你买下的那一刻便绑定于你，所以确认之前先把它读清楚。竞技场页面讲的是荣誉本身如何挣得。',
+  'guide.editorPage.buildBody':
+    '工具排在左侧的边栏上，每个按钮上都写着自己的单字母快捷键。选中一件，直接在眼前的地图上动手。Ctrl+Z 撤销，Ctrl+Y 重做，所以你的任何尝试都不是覆水难收。',
+  'guide.editorPage.buildTitle': '你能造些什么',
+  'guide.editorPage.helpBody':
+    '顶栏的“帮助”会打开一份参考，涵盖每一件工具、键盘快捷键与鼠标操作，并且随时可以重新播放那段引导教程。剩下的就是自己动手摆弄：撤销永远只有一个按键之遥，而“导出”会给你一份地图副本，让你随时都能回到这里。',
+  'guide.editorPage.helpTitle': '熟悉这些工具',
+  'guide.editorPage.intro':
+    '一个属于你自己的地图编辑器，就在浏览器里。塑造大地，栽上道具与营地，然后跳进你做出来的成品，四处走一走。',
+  'guide.editorPage.playtestBody':
+    '“试玩”会把地图交给游戏，让你以一名战士的身份落进其中。你造的一切都在脚下：营地会刷出怪物，空气墙拦得住人，带碰撞的摆放物会把你挤到一边。看够了就回到编辑器，接着干活。',
+  'guide.editorPage.playtestTitle': '游玩你的地图',
+  'guide.editorPage.sandboxBody':
+    '自定义地图绝不会改动别人正在玩的那个游戏。一次试玩在你自己的浏览器中离线运行，从不与服务器说话，所以其中发生的一切都碰不到你的角色，也碰不到共享的世界。',
+  'guide.editorPage.sandboxTitle': '一个沙盒，而非正式世界',
+  'guide.editorPage.saveBody':
+    'Ctrl+S 保存，而只要还有未保存的改动，“保存”按钮上就会带着一个圆点。没有账号，编辑器照样能用：地图存在你自己的浏览器里，自动保存可以随手打开，“导出”会把一张地图写成一个普通的 JSON 文件，“导入”则能原样读回来。\n\n用你的游戏账号登录之后，保存还会同时送到服务器，于是你的地图会跟着你换到另一台机器上。“打开”窗口有两个标签页，一个装着这个浏览器里的草稿，另一个装着存到你账号上的地图。如果编辑器显示离线标记，请在另一个标签页登录游戏，然后重新加载编辑器。',
+  'guide.editorPage.saveTitle': '保存你的作品',
+  'guide.editorPage.shareBody':
+    '保存到账号上的地图一开始都是私有的。在“打开”窗口里，你可以发布其中一张，让任何人都能翻到它，也可以随时再取消发布。同一个窗口中的“公开地图”标签页，可以浏览其他玩家发布的一切：“打开”会载入一张，让你看看它是怎么做出来的，“派生”则会把一份私有副本放进你自己的列表，随你怎么改。副本就是一张新地图：编辑它绝不会碰到原作。\n\n一个账号能留存的地图数量是有上限的，所以把那些玩腻的实验作品收拾干净吧。\n',
+  'guide.editorPage.shareTitle': '发布与派生',
+  'guide.editorPage.toolBlockerBody':
+    '拖出阻挡移动却什么都不显示的空气墙，用来悄悄封住一道你想关上的边界。',
+  'guide.editorPage.toolBlockerTitle': '空气墙',
+  'guide.editorPage.toolCampBody':
+    '布置在试玩中会活过来的怪物营地，并定下试玩时把玩家放下的那个位置。',
+  'guide.editorPage.toolCampTitle': '营地与出生点',
+  'guide.editorPage.toolLandBody':
+    '用一支笔刷抬升、下压、平滑与压平地面，笔刷的大小与强度随时都能改。',
+  'guide.editorPage.toolLandTitle': '塑造大地',
+  'guide.editorPage.toolPlaceBody':
+    '把内置资源目录里的部件放到地面上，然后移动、旋转、缩放与复制它们。摆放物可以带上碰撞，让玩家绕着走而不是穿过去；改变主意时，擦除工具能把一件摆放物从地图上重新拿掉。',
+  'guide.editorPage.toolPlaceTitle': '放置道具',
+  'guide.editorPage.toolRegionBody':
+    '用区域工具框选地形与已放置的资源，再把这份选择粘到地图上的别处。',
+  'guide.editorPage.toolRegionTitle': '复制整片区域',
+  'guide.editorPage.toolSurfaceBody':
+    '在区域默认地表之上绘制生态地被，并设定地图所声明的那片湖泊的水位。',
+  'guide.editorPage.toolSurfaceTitle': '绘制与放水',
+  'guide.editorPage.uploadBody':
+    '登录之后，“上传”按钮可以把一个属于你自己的 GLB 模型加进资源浏览器，与内置目录并排摆着，像其他道具一样随时放置。上传的模型存在你的账号上，会计入体积与存储上限，不再需要时可以从资源浏览器里删掉。',
+  'guide.editorPage.uploadTitle': '带上你自己的模型',
+  'guide.editorPage.viewsBody':
+    '3D 视口用真正的游戏渲染器绘制你的地图，所见即所得：拖动环绕，滚轮缩放。2D 俯视图是平面示意图，更适合挪动据点、墓地与兴趣点之类的区域标记，也更适合在动手雕刻之前先框定一大片地方。切换按钮就在顶栏。',
+  'guide.editorPage.viewsTitle': '同一张地图的两种视图',
+  'guide.editorPage.whereBody':
+    '编辑器是一个独立于游戏的页面，位于 /editor。它打开时是一张全新的、尚未命名的地图，由你早已熟悉的这个世界搭起来，所以你脚下从一开始就是真实的土地。首次到访时会运行一段简短的引导教程，顶栏的“帮助”随时可以再来一遍。',
+  'guide.editorPage.whereTitle': '在哪里找到它',
+  'guide.faqPage.a12':
+    '有一个可选的外观商店。它只卖模样：第一赛季兵器库的武器皮肤，用商店货币 Claudium 购买。里面没有任何东西会增加属性、战力或进度，一款皮肤也绝不会改变你的武器如何打出伤害，所以每一件真正要紧的装备，依然只来自游玩本身。',
+  'guide.faqPage.a13':
+    '浏览器版本什么都不用准备：打开网站就能玩。如果你更想要一个应用，游戏官网的下载页备有 Windows、macOS 与 Linux 的桌面端下载。iOS 与 Android 原生应用正在路上；在它们到来之前，手机或平板可以用浏览器版本游玩，触控操作一应俱全。每一个版本登录的都是同一个账号、同一批世界，所以你的角色会一路跟着你。',
+  'guide.faqPage.a14':
+    '一台笔记本、台式机、手机或平板上的较新浏览器。首次启动时，游戏会读一读你的设备，挑一个相配的画质档位，从“低”到“超高”；而你自己做出的选择永远优先。鼠标键盘、触控与手柄都可以用。设置页面与操作页面有更细的说明。',
+  'guide.faqPage.a15':
+    '只有在线游玩才需要。离线世界什么都不问：在开始界面选择“离线”，按下“开始游戏”即可。在线账号是免费的，需要一个用户名、一个密码，以及一个用来找回账号的邮箱，你的角色会保存在服务器上。有了账号之后，你还可以在选项中开启双重验证。',
+  'guide.faqPage.a16':
+    '在线游玩发生在一个个世界上，而每个世界都是这个游戏的一份完整副本，有自己的玩家、自己的世界市场、自己的排名。登录时，世界列表会显示每个世界有多热闹，从“清闲”到“满员”，你可以挑一个安静的图个宽敞，或挑一个热闹的图个人气。你的角色住在创建它的那个世界上，而你也可以在不止一个世界里各留角色。',
+  'guide.faqPage.q12': '有内购商店吗？',
+  'guide.faqPage.q13': '在哪里可以下载客户端？',
+  'guide.faqPage.q14': '运行它需要什么配置？',
+  'guide.faqPage.q15': '我需要一个账号吗？',
+  'guide.faqPage.q16': '什么是世界？',
+  'guide.gear.bagsSort':
+    '背包乱起来的时候，背包窗口里的“整理”按钮一按就能收拾妥当。同一种东西的零散堆叠会被合并到一起，所有物品也会按一个好读的顺序重新排开：先是武器与护甲，然后是背包、消耗品、工具与坐骑，接着是制作材料，每一种精细品级都紧挨着它的普通版本，再往后是任务物品，灰色废品排在最末，好让你一眼看清哪些该卖。整理绝不会凭空造出或弄丢任何东西，只是重新排列，所以任何时候按下去都是安全的。',
+  'guide.gear.bindOnTradeBody':
+    '同一个道理还有更温和的一种：有些东西是交易绑定，也就是说它们只能易手一次，之后便归接下它的人所有。受人委托打造的成品，会在制作者交出去的那一刻绑定。受这条规则约束的副本绝不会登上市场，也不会走邮驿，因为那两处都是匿名的；它只能当面交接，否则就不成交，而一旦交出去，它就绑定了。提示会写明一件物品遵循哪一条规则，所以打算转卖之前先看一眼。',
+  'guide.gear.cosmeticsWeapons':
+    '武器皮肤是第三条线，它改变的是你手中所持之物，而不是持有它的人。一款皮肤会重涂一整类武器，因此这份模样会跟着你当前装备的剑、法杖或弓走，也绝不触碰武器的属性、攻击距离或速度。皮肤按账号解锁，而不是按角色解锁，并且和其他外观一样，分成一个个收藏系列与稀有度层级。它们出自兵器库的赛季收藏，而不是在世界中拾得；设置皮肤同样在兵器库里进行，每类武器一款，而不是在外观那一栏中设定。站在你身边的每一个人，都能看见你所佩的皮肤。',
+  'guide.gear.offhandBody':
+    '副手能拿什么，取决于你的职业。盾牌放在那里，宝珠或典籍之类的手持法器也放在那里，猎人的箭袋同样如此。能够双持的职业则会在副手放上第二把武器。双手武器通常要占去两只手，所以装备一把双手武器会让副手原本拿着的东西下场，除非你的专精正是少数几个能同时挥舞两把双手武器的那种。',
+  'guide.gear.requiredLevelBody':
+    '有些装备还带着一个需求等级，写在提示上。任何等级的你都可以拾取、买下或收下这样一件装备，但在达到那个等级之前都穿不上它。这个要求跟着装备的来源走，而不只看它的颜色，所以在自己等级上赢来的一件稀有装备通常立刻就能穿；而来自远高于你等级之处的转手货，则要在你的背包里等你追上它。',
+  'guide.gear.soulboundBodyBound':
+    '少数特殊奖励是灵魂绑定的，从你挣到它的那一刻起便与你的角色绑在一起。灵魂绑定的物品无法交易、邮寄、卖给商人，也无法上架到市场；它只属于你一个人。这守住了英雄徽记之类的珍贵凭证，也覆盖每一件用荣誉买来的战争装备，因此一套玩家对战的行头，只会由挣得它的那个角色穿在身上。你从世界中赢来的大多数装备，依然可以自由交易、出售或分享。',
+  'guide.gear.sourcesHonor':
+    '荣誉是与其他玩家作战换来的报酬，而荣誉军需官（东溪镇的 FURY 与高守哨站的 Warmarshal Draven Kole）守着只有荣誉买得到的战争商店：整套的护甲系列、饰品，以及任何钱币商人都不进货的武器。竞技场页面讲的是荣誉本身如何挣得。',
+  'guide.gear.sourcesRifts':
+    '到了等级上限，裂隙又添上一处来源，而裂隙是一场竞速：最先通关的那支队伍赢得它的奖励。这份首杀会在这一趟留下的所有东西之外额外给出装备，其中包括一枚按你职业定位打造的 Riftbound 指环，这是一枚在世界的其他任何地方都找不到的戒指。第二个完成的队伍照样跑完了自己的这一趟，通关的记录也归他们；他们失去的只有首杀奖励。裂隙页面讲的是这场竞速本身。',
+  'guide.glossary.chronicleDef':
+    '一个区域自有的一套功绩，由当地的编年史者收拢成一个个章节。这些章节你可以按任意顺序去完成。',
+  'guide.glossary.chronicleTerm': '编年史',
+  'guide.glossary.claudiumDef': 'WOC 商店的货币，只花在外观上，别无他用。它绝不购买战力或进度。',
+  'guide.glossary.commissionDef':
+    '为别人打造的一件成品。制作者把它标记为委托，它便会绑定到交易中收下它的人身上；日后工位主管可以收一笔费用，再把它解绑。',
+  'guide.glossary.commissionTerm': '委托与制作者之约',
+  'guide.glossary.fatigueDef':
+    '向外海游得够远，海水便开始抽走你的力气：先是一声警告，随后伤害不断加重，直到你转身游回陆地。',
+  'guide.glossary.fatigueTerm': '疲劳',
+  'guide.glossary.finderDef':
+    '这个窗口收录了各座地下城与团队副本，为你排队快速匹配，并列出正在招人的预组队伍。默认按 Shift+I 打开。',
+  'guide.glossary.finderTerm': '地下城查找器',
+  'guide.glossary.fiveSecondDef':
+    '自你上一次消耗法力算起满五秒，法力才会以完整速度回复。在那之前它并不会完全停下，而是以较慢的速度继续回复。正因如此，施法者会控制自己的节奏，而不是一味地全力倾泻。',
+  'guide.glossary.fiveSecondTerm': '五秒规则',
+  'guide.glossary.honorDef':
+    '与其他玩家作战换来的报酬：竞技场的胜利、荆谷原野的胜场以及荣誉击杀都会往上累加。你可以用它换取战争套装。',
+  'guide.glossary.honorTerm': '荣誉',
+  'guide.glossary.itemLevelDef':
+    '一个概括装备强弱的数字，想快速比较两件装备时很好用。在选项中开启“显示物品等级”，就能在提示中看到它。只有来源明确的装备才带着它，因此商人处的普通货色与新手装备什么都不显示，缺了这个数字属于正常，而不是出了毛病。',
+  'guide.glossary.itemLevelTerm': '物品等级',
+  'guide.glossary.marksDef':
+    '可反复挑战的终局内容在战利品之外发放的两种奖励。探秘产出探秘印记，可在探秘商店换取装备，并强化你的同伴；英雄难度地下城产出英雄徽记，可在英雄军需官处换取装备。',
+  'guide.glossary.marksTerm': '探秘印记与英雄徽记',
+  'guide.glossary.masterworkDef':
+    '一件成品的最上乘版本，技艺娴熟的制作者时不时便会打出一件，取代那份普通副本。杰作永远刻着它制作者的名字。',
+  'guide.glossary.masterworkTerm': '杰作',
+  'guide.glossary.mountDef':
+    '你骑着穿越大地、走得更快的坐骑生物。你要做的几乎任何别的事都会把你请下来：游泳、进入战斗、采集与制作，全都会让你重新站回地上。',
+  'guide.glossary.mountTerm': '坐骑',
+  'guide.glossary.offHandDef':
+    '第二个手部栏位。它可以拿一面盾牌，或提灯、箭袋之类的手持物品；只有当你的职业与专精能够双持时，才能在那里拿上第二把武器。',
+  'guide.glossary.offHandTerm': '副手',
+  'guide.glossary.premadeDef':
+    '由某位玩家亲手拉起、并发布在地下城查找器板上的队伍，而不是快速匹配队列替你拼出来的那一种。',
+  'guide.glossary.premadeTerm': '预组队伍',
+  'guide.glossary.reinsDef':
+    '就是坐骑本身的那件物品。把一副缰绳留在背包或银行里，那匹坐骑便是你的；使用它就能骑上去。缰绳可以交易、邮寄，也可以卖给其他玩家。',
+  'guide.glossary.reinsTerm': '缰绳',
+  'guide.glossary.requiredLevelDef':
+    '你必须先达到这个等级，才能穿上或握住一件装备。在你还没到之前，提示会用红色标出它。',
+  'guide.glossary.requiredLevelTerm': '需求等级',
+  'guide.glossary.ridingDef':
+    '让你能够骑乘的那门技能。20 级时在马厩总管处一次性买下，此后便永远留在你的角色身上。',
+  'guide.glossary.ridingTerm': '骑术',
+  'guide.glossary.riftDef':
+    '在各个区域中自行撕开的一道裂口，向下通往一处按这道裂隙自己的种子全新生成的副本，一层接着一层。裂隙分为 C、B、A、S 四个等级。入口过一阵子便不再接纳新的队伍，而全服第一支抵达最底层的队伍，才是唯一能将它封上的那一支。',
+  'guide.glossary.riftRankDef':
+    '裂隙身上的那个字母，C、B、A 或 S，也是决定它有多难的唯一因素。裂隙绝不会随你队伍的人数缩放，因此等级本身就是全部的难度阶梯：C 最温和，S 最凶险，而每一个等级都是为一支队伍准备的。',
+  'guide.glossary.riftRankTerm': '等级（裂隙）',
+  'guide.glossary.setBonusDef':
+    '同时穿着同一护甲系列的数件装备所换来的额外奖励。提示会数一数你身上穿了这套的几件，穿得越多，解锁的效果也越多。',
+  'guide.glossary.setBonusTerm': '套装效果',
+  'guide.glossary.talentRowDef':
+    '天赋分六行到来，分别在 5、8、11、14、17 和 20 级各开一行。每一行给出三个选项，你从中挑走一个，因此没有需要攒起来或花出去的点数。',
+  'guide.glossary.talentRowTerm': '天赋行',
+  'guide.glossary.toolCharmDef':
+    '一种制作出来的护符，可在专业窗口中嵌进采矿、伐木或采药工具，让它们的收获更好。嵌入会消耗掉护符，效果持续固定的次数。次数用尽之后，你用材料为那个槽位续充，而不是再做一枚新的护符。',
+  'guide.glossary.toolCharmTerm': '工具护符',
+  'guide.glossary.unstuckDef':
+    '从游戏菜单里使用“脱困”所要付出的代价。站着别动，等倒计时走完，它会把你放在最近的墓地，而此后一段时间里，你会带着一层临时的虚弱。',
+  'guide.glossary.unstuckTerm': '脱困虚弱',
+  'guide.glossary.warfareDef':
+    '玩家对战的装备那一面。军需官用荣誉出售成套的战争护甲，而它们所带的战争评级，只在与其他玩家的战斗中作数。',
+  'guide.glossary.warfareTerm': '战争',
+  'guide.glossary.worldDef':
+    '在线游戏的一份共享副本，有自己的玩家、自己的市场与自己的排名。本指南也把它叫作位面，而你的角色，住在创建它的那个世界上。',
+  'guide.glossary.worldTerm': '世界',
+  'guide.groups.character': '你的角色',
+  'guide.groups.compete': '玩家对战',
+  'guide.groups.endgame': '组队内容',
+  'guide.groups.world': '这个世界',
+  'guide.home.world.farshoreBlurb':
+    '沙洲另一头的一座岛屿，天空在裂野之上撕裂开来，而鸥港为每一次破口鸣响它的钟。',
+  'guide.home.world.farshoreName': '远岸',
+  'guide.home.world.galeBlurb': '海崖与呼啸的丘陵，这里的风从不停歇，而烛港把门关得紧紧的。',
+  'guide.home.world.galeName': '疾风崖',
+  'guide.home.world.gardenBlurb':
+    '一片树篱迷宫般的国度，至今仍被谁也没见过的园丁修剪着，入口就在篱苑镇与它的喷泉庭院之后。',
+  'guide.home.world.gardenName': '常青园',
+  'guide.home.world.hauntBlurb': '巨树华盖之下的闹鬼森林，绞湖镇的提灯是这条路上唯一诚实的光。',
+  'guide.home.world.hauntName': '怨灵林',
+  'guide.home.world.jungleBlurb':
+    '棕榈、白沙与聒噪的飞鸟，海滨小镇漂流港在沙滩上守着一堆不灭的篝火。',
+  'guide.home.world.jungleName': '棕榈湾',
+  'guide.home.world.levelsCap': '{level} 级',
+  'guide.home.world.nightBlurb': '一片繁星午夜的国度，花朵照亮小径，月栖镇彻夜守望。',
+  'guide.home.world.nightName': '夜绽花野',
+  'guide.howToPlay.step0Body':
+    '离线游玩什么都不需要：在开始界面选择“离线”，再按“开始游戏”。想和大家一起玩，就注册一个免费账号（一个用户名、一个密码，以及一个用于找回账号的邮箱），或登录你已有的账号，然后从服务器列表里挑一个服务器。',
+  'guide.howToPlay.worldsBody':
+    '在线游玩发生在各个服务器上，每个服务器都是一份完整的游戏副本，有自己的玩家、自己的世界市场，也有自己的排名。服务器列表会显示每个服务器有多繁忙，从“低”到“已满”，所以你可以挑一个清静的落得宽敞，也可以挑一个热闹的不缺同伴。你的角色属于你创建它的那个服务器，而你可以在不止一个服务器上保留角色。',
+  'guide.howToPlay.worldsTitle': '选择服务器',
+  'guide.interfacePage.actionBarsBody':
+    '经验条上方是三排各十一个技能格，第一排最前端还有一个专用的攻击按钮。一开始只有第一排：需要更多空间时，可在选项里开启第二排和第三排，而第三排要求先开启第二排。键盘顶部的数字键触发第一排，额外的动作条默认绑定小键盘。\n\n技能来自你的法术书（P）：把技能从书里拖到某个格子上，或者用它那一行的开关把它放进第一个空格。物品也一样，所以一叠药水或一卷绷带都可以住在格子里，用按键使用。\n\n把某一排排布成你喜欢的样子之后，你可以锁定它。锁定会拒绝拖动、放置和清空，同时技能照常好用，这样战斗中的一次误点也不会打乱你的按钮。\n\n还有两条较小的条会在用得上时加入进来：宠物条，包含攻击、停止、嘲讽、防御和主动，对应 Ctrl 加 1 到 5；以及供会切换姿态或形态的职业使用的姿态条。',
+  'guide.interfacePage.actionBarsTitle': '你的动作条',
+  'guide.interfacePage.aurasBody':
+    '你自己的增益会在右上角小地图旁排成一行小图标，每一个都在倒数剩余时间，你的减益则排在它们下方一行。右键点击自己的某个增益即可取消它。\n\n有一个选项可以把你的增益行移到自己的单位框体上，把整个角落都留给减益。\n\n目标的增益和减益一起显示在它框体下方的一条区域里。想要更宽敞时，Shift+J 会打开单独的“目标增益与减益”窗口，你可以移动它、只筛选增益或只筛选减益，并让它一直开着。',
+  'guide.interfacePage.aurasTitle': '增益与减益',
+  'guide.interfacePage.barsBody':
+    '你施法或引导时，施法条会出现在屏幕中央、动作条正上方，并带着法术的名称与剩余时间。你的目标在它自己的框体上也有一条施法条，好让你看清接下来会发生什么并作出应对。\n\n施法条下方是一条细细的挥击条，它在你两次武器挥击之间填充，让近战或远程攻击者看清下一次自动攻击何时落下。\n\n你的经验条横贯动作条下方的整个宽度，被刻成一段一段，其中较亮的一截表示你已经存下的休息经验。\n\n潜入水下时，屏幕顶部会出现一条蓝色的呼吸条。头没在水里时它会一直下降，耗尽后会闪红并让你开始溺水，而你一浮出水面它就迅速回满。空格键让你上浮，下潜键（默认为 Ctrl）带你潜得更深。\n\n伤害与治疗会以小小的数字从命中之处向上飘起，让你不必读文字也能看懂一场战斗。聊天框里的“战斗”标签页保留着完整的文字记录。',
+  'guide.interfacePage.barsTitle': '各类条、计时与战斗文字',
+  'guide.interfacePage.chatBody':
+    '屏幕左下角。按回车开始输入，再按一次回车发送。\n\n有两个标签页始终在那里：“聊天”，是你身边所说一切的合并记录；以及“战斗”，是你这场战斗的文字记录。加号按钮可以添加更多，每个频道一个：说话、大喊、队伍、综合、世界、寻求组队、公会和官员，另外还有一个密语标签页，把你发出和收到的每一条密语都聚在一处。在某个频道标签页里输入，就会直接发往那个频道，不必再重打命令。\n\n整个聊天框可以拖到别的位置，也可以调整大小，而且它会记住你把它留在了哪里。',
+  'guide.interfacePage.chatTitle': '聊天框',
+  'guide.interfacePage.framePartyBody':
+    '队伍成员在左侧、你的目标框体下方逐行排列，每人一行。某位成员走出距离时，他那一行会变暗；行上会显示值得你反应的效果，还可以在旁边显示他的宠物。每一行带多少生命值文字由你决定：不显示、百分比、具体数值，或者两者都要。',
+  'guide.interfacePage.framePartyTitle': '你的队伍',
+  'guide.interfacePage.framePetBody':
+    '猎人、术士，以及任何放出了宠物的人，都会在自己的框体旁得到一个小框体，显示宠物的名字、等级和生命值。点击那个框体即可选中你的宠物，用键盘按 Ctrl+6 也是一样。',
+  'guide.interfacePage.frameSelfBody':
+    '屏幕底部中央，紧挨着你的动作条。头像、等级、生命值和你的资源，战斗中带一个标记，休息时带一个休息标记，会积攒连击点的职业还带着一排连击点。点击这个框体就会选中你自己。',
+  'guide.interfacePage.frameSelfTitle': '你自己的框体',
+  'guide.interfacePage.frameTargetBody':
+    '左上角，在你选中某个目标的那一刻出现，取消选中后又消失。同样是头像与状态条，此外较难缠的敌人会带上精英标记，还有一条显示你的目标正在施放什么的施法条，以及一排它身上的效果。',
+  'guide.interfacePage.frameTargetTitle': '你的目标',
+  'guide.interfacePage.frameTotBody':
+    '目标框体旁的一个小框体，显示你的目标此刻正打着谁。要分辨一只怪物是在打你的坦克还是冲你来了，这是最快的办法。它默认隐藏，需要你在选项里开启。',
+  'guide.interfacePage.frameTotTitle': '你目标的目标',
+  'guide.interfacePage.framesBody':
+    '单位框体就是一张头像加上旁边的几条状态条：生命条总是有的，单位拥有资源时还有一条资源条，另外是名字和等级标记。伤害护盾会以较亮的一段叠加在生命条之上，让你看着护盾先被耗尽，生命值才开始下降。',
+  'guide.interfacePage.framesMoveBody':
+    '你的框体、目标框体和队伍框体都可以移动。每个框体角上都有一个小小的移动按钮：解开它，把框体拖到你想要的位置，再锁上，这样一次误点就挪不动它。如果挪到了让你后悔的地方，选项里的“重置框体位置”会把它们统统弹回最初的位置。',
+  'guide.interfacePage.framesTitle': '单位框体',
+  'guide.interfacePage.glanceBody':
+    '界面沿着屏幕四周排布，把中间让给世界。你自己的框体、你的动作条和你的经验条排在底部。你的目标和你的队伍在左上角。小地图和区域名在右上角，各类追踪器从它们下方沿右侧排下来。聊天框在左下角，右下角则是一排小方块按钮。\n\n其余的一切都是你可以打开和关上的窗口。大多数窗口有自己的按键，大多数在右下角那排按钮里也有一个按钮，而每一个都可以再按一次它自己的按键，或者按 Esc 关掉。',
+  'guide.interfacePage.glanceTitle': '界面一览',
+  'guide.interfacePage.intro':
+    '一张屏幕地图：你界面上的每个框体、每条状态条和每个按钮各司何职，以及每个按键打开的是哪个窗口。',
+  'guide.interfacePage.keyWindowsBody':
+    '下面每一个都有自己的默认按键，并在右下角那排按钮里有一个按钮。再按一次该按键，或者按 Esc，即可关闭。',
+  'guide.interfacePage.keyWindowsTitle': '用按键打开的窗口',
+  'guide.interfacePage.lootBody':
+    '与一具你应得的尸体互动，战利品窗口就会打开，列出掉落的东西。点击某一行即可取走。\n\n在队伍里，按照队伍的拾取规则，一件好掉落会转而在你的屏幕上弹出一个掷骰提示：想自己用就选“需求”，打算拿去卖就选“贪婪”，愿意让给别人就选“放弃”。随后一个小面板会在倒计时期间显示谁已经掷过、又选了什么。\n\n拾取规则本身住在一个自己的小窗口里。队长可以在那里更改规则，其他人看到的是同一个只读窗口，所以规则从来不是秘密。\n\n有些尸体身上还能采集材料。可以采时，战利品窗口的底部会出现一个“采集”区域，你想要的每种材料都有一个可以勾选的方框。',
+  'guide.interfacePage.lootTitle': '战利品与掷骰',
+  'guide.interfacePage.mapBody':
+    'M 打开世界地图：整块大陆铺展开来，上面有你自己的箭头、各个区域及其名称、你周围的兴趣点、传送门，还有你已经发现的采集资源点。你的队伍也会显示在上面。在探秘里，地图会切换成你目前已探索房间的示意图。\n\n右侧、小地图下方，一叠追踪器让你不必打开任何窗口就能盯住手头的事：你追踪的任务及其目标、你的功绩进度、你所在的探秘，以及你正在参与的任何裂隙。想把屏幕空间要回来时，任务追踪器可以折叠。',
+  'guide.interfacePage.mapTitle': '世界地图与你的追踪器',
+  'guide.interfacePage.minimapBody':
+    '右上角：一张圆形小地图，上方是区域名，下方是你的坐标，外面环着一圈标出一天时辰的表盘。\n\n有话要说时，它上面会冒出一些小小的指示：有未读信件在等你时是一只信封，有售出所得或退回的货物在商人处等你时是一枚硬币，还有一个列出你团队副本锁定的按钮。',
+  'guide.interfacePage.minimapTitle': '小地图',
+  'guide.interfacePage.mobileBody':
+    '触屏控制会自行出现，布局也会按你的屏幕自己调整：小手机上是紧凑排布，大屏手机上是标准排布，平板上则更宽松些。\n\n你的技能排成一圈，而不是一排数字：攻击按钮旁边是五个动作按钮，还有一个翻页开关，可以让这一圈轮换到你其余的格子，三条动作条全部开启后最多有七页。围着它们的是触屏玩家最常伸手去按的按钮：切换目标、使用面前的东西、跳跃，另外还有一排可以拉出来的消耗品，会自动从你身上带着的东西里补齐。\n\n屏幕底缘依次是聊天、社交、任务、设置和更多。“更多”会打开一个托盘，装着其余的窗口，包括你的角色、地下城查找器、PvP、溪谷杯、表情和维基。这里的窗口会铺满整个屏幕，而不是浮在上面。\n\n移动单位框体是桌面端的事：在触屏上，布局会替你把它们安排好。',
+  'guide.interfacePage.mobileTitle': '在手机或平板上',
+  'guide.interfacePage.playerCardBody':
+    '角色属性面板上有一个按钮，可以生成一张玩家名片：一张带着你角色特写的图片，配上你身上的装备和你的属性，随时可以保存或分享。它是用来炫耀一套新装备的快照，不会改变游戏里的任何东西。',
+  'guide.interfacePage.playerCardTitle': '你的玩家名片',
+  'guide.interfacePage.railBody':
+    '在屏幕右下角，离小地图远远的地方，是一排小方块按钮，一个窗口一个，分作并排的两列短栏。它们大多印着自己的默认按键。\n\n它们涵盖你的角色、法术书、天赋、任务日志、功绩之书、专业、世界地图、背包、制作、PvP、地下城查找器、溪谷杯、纸牌对决、排行榜、表情、音乐、好友与公会、这份维基，以及游戏菜单。另有几个只在用得上时才加入其中。',
+  'guide.interfacePage.railTitle': '按钮栏',
+  'guide.interfacePage.scopeBody':
+    '本页提到的每一个按键都是默认设置，而且每一个都可以重新绑定。完整的按键表在“操作键”页面，而改变界面外观与行为的选项在“设置和性能”页面。Esc 关闭最上层的窗口，什么都没打开时则打开游戏菜单。',
+  'guide.interfacePage.scopeTitle': '按键，以及在哪里更改',
+  'guide.interfacePage.wikiBody':
+    '在游戏里，这份维基只有一步之遥。右下角那排按钮里有它的一个按钮，Esc 游戏菜单里有它的一行，在手机上它住在“更多”托盘里。因为打开它就等于把你交给浏览器，这个按钮总会先请你确认，所以战斗中的一次误触绝不会把你拽出战斗。游戏会在它背后继续运行。',
+  'guide.interfacePage.wikiTitle': '维基按钮',
+  'guide.interfacePage.winBagsBody':
+    '你带着的一切，装在一个有四个背包插槽的包里。顶部的分类标签可以把它收窄到武器、护甲、消耗品、材料、工具、任务物品或坐骑，搜索框则按名称过滤。排序下拉菜单会按最近获得、品质或名称重排你正在看的东西，这个选择会在会话之间记住。另有一个单独的“整理”按钮，一按就把包里真正的格子理顺，并清掉分类标签和搜索，让你看到整理好的整个背包。',
+  'guide.interfacePage.winCharBody':
+    '一侧是你已装备的装备，另一侧是你的属性以及它们所支撑的数值，每个数值上都有提示，说明它对你的职业有什么用。这里还带着你的终身游戏时长，旁边有一只小眼睛，在你不愿示人时可以把这个数字藏起来；生成玩家名片的按钮也在这里。',
+  'guide.interfacePage.winCharTitle': '角色属性面板（C）',
+  'guide.interfacePage.winCraftingBody':
+    '你的配方、每个配方需要什么，以及以你此刻带着的材料现在能做出什么。',
+  'guide.interfacePage.winCraftingTitle': '制作（T）',
+  'guide.interfacePage.winDeedsBody':
+    '你做过之事的记录、它们给你带来的头衔与名望，以及还有哪些尚未完成。',
+  'guide.interfacePage.winDeedsTitle': '功绩之书（Shift+Z）',
+  'guide.interfacePage.winFinderBody':
+    '你可以排队的组队内容目录。勾选你想要的活动，独自加入队列，或为自己的队伍发布一条招募，等队伍凑齐时接受即可。',
+  'guide.interfacePage.winFinderTitle': '地下城查找器（Shift+I）',
+  'guide.interfacePage.winMetersBody':
+    '你和身边所有人的伤害、治疗与仇恨，分段保存，方便你回看上一场战斗。治疗与仇恨面板可以拉出来单独放着。',
+  'guide.interfacePage.winMetersTitle': '伤害统计（Shift+H）',
+  'guide.interfacePage.winMoreBody':
+    '世界地图（M）、PvP 窗口（G）、溪谷杯（Y）、排行榜（K）、活动日历（I）和表情轮盘（X）都以同样的方式工作。',
+  'guide.interfacePage.winMoreTitle': '还有几个',
+  'guide.interfacePage.winProfessionsBody':
+    '你学会了哪些行业、每一门有多熟练，以及每一门还能走多远。',
+  'guide.interfacePage.winProfessionsTitle': '专业（Shift+P）',
+  'guide.interfacePage.winQuestLogBody':
+    '你接下的每一个任务、它的故事、它的目标和你的进度，还可以把其中任意内容标到地图上，并挑选你的追踪器跟随哪些任务。',
+  'guide.interfacePage.winQuestLogTitle': '任务日志（L）',
+  'guide.interfacePage.winSocialBody':
+    '分为好友、你的公会及其成员名册、你的团队，以及你已忽略或拉黑的玩家等标签页。',
+  'guide.interfacePage.winSocialTitle': '好友与公会（O）',
+  'guide.interfacePage.winSpellbookBody':
+    '你职业的每一个技能，已学会的和还没到的，按顺序排开。你正是在这里把技能拖到动作条上的。',
+  'guide.interfacePage.winSpellbookTitle': '法术书（P）',
+  'guide.interfacePage.winTalentsBody':
+    '在这里选择你的专精，还有你的六个天赋行：每行提供三个选项，以及每个选项的作用。尚未到达的行会与当前可选的行并排显示。',
+  'guide.interfacePage.winTalentsTitle': '天赋（N）',
+  'guide.interfacePage.worldWindowsBody':
+    '有些窗口你从不为它按键：你和合适的人交谈、或点击合适的东西时，它们自己就打开了。\n\n商人会打开商人窗口，里面有供你选购的存货，还有一个回购标签页，留着你最近卖掉的东西，以防你是卖错了。职业训练师会打开你现在能学什么、后面还有什么等着你的列表。\n\n银行职员会打开你的金库，这个保险箱里的额外格子可以花钱再买。如果你的公会开设了公会银行，那里的第二个标签页会显示它：每位成员即使没有取出的权限也能看看里面有什么，所以没人需要开口打听公会存着什么；各个等级决定谁可以存入、取出和调动公会的金币，而日志记录着每一次进出。\n\n渡鸦邮驿的邮箱会打开你的信件，一个标签页放已经到的，另一个是寄信的表单，连附件一起。商人处的世界市场有自己的窗口：一个标签页浏览和购买，另一个上架你自己的货物，第三个收取已经卖掉的所得。与另一位玩家面对面交易，则会打开一个交易窗口，双方各占一侧。',
+  'guide.interfacePage.worldWindowsTitle': '世界为你打开的窗口',
+  'guide.mountsPage.breaksBody':
+    '水永远赢。骑进任何深到要游泳的地方，你会立刻落地，因为没有哪只地面坐骑会游泳；而死亡会把你摔在原地。战斗中、死亡或以灵魂形态往回赶的路上，以及荆谷原野比赛的任何阶段，你都无法召唤坐骑：那场比赛从集结到最后的据点争夺全程徒步。召唤到一半走进战斗或走进水里，同样会中断召唤。\n\n你做的大多数事情也会把你放下来。挥出攻击、开始施法、采集资源点、钓鱼、制作、附魔和回收，都会在你起手的那一刻让你下马，所以每遇到一处矿脉都要做好跳下来的准备。召唤坐骑还会解除你正维持的任何变形形态：你永远不会既变着形又骑着坐骑。',
+  'guide.mountsPage.breaksHeading': '什么会让你重新落回地上',
+  'guide.mountsPage.collectBody':
+    '除了玛拉的柜台，缰绳是找来的，而不是买来的。它们出自五人地下城和团队副本英雄难度的最终首领，也出自裂隙的完成奖励，而你结束的裂隙越难，它可能留下的缰绳就越稀有。它们按设计就是稀有的收获，没有哪一趟必定给你一副，所以搜寻坐骑的稳妥办法，是把这份搜寻顺路带进你本来就要跑的副本里。本页不会告诉你哪只坐骑挂在哪个首领身上：那一部分留给你自己去弄明白。',
+  'guide.mountsPage.collectHeading': '更稀有的坐骑从何而来',
+  'guide.mountsPage.firstBody':
+    '英勇战马是全世界唯一一只出售的坐骑。学会骑术之后，玛拉会以 10 金把英勇战马的缰绳卖给你，那副缰绳从此归你所有。其余每一只坐骑都要在世界里赢来，所以几乎每位骑手都是从这匹马开始的。',
+  'guide.mountsPage.firstHeading': '你的第一只坐骑',
+  'guide.mountsPage.goodsBody':
+    '坐骑是一件物品，因此它也是经济可以流转的东西。只要缰绳还在你的背包或银行里，这只坐骑就属于你；不过存进银行的缰绳只保住所有权，并不能让你骑：要召唤这头坐骑，你得把缰绳带在身上。玩家的缰绳不带灵魂绑定，因此除非物品本身另有说明，它们可以交易、可以邮寄，也可以像其他任何收获一样在世界市场上架。出手之前有两件事值得先知道：任何商人都不会回购一副缰绳，所以坐骑是一笔你要么留着、要么转手，却无法套现的购买；另外，如果缰绳在你骑乘时离手，坐骑会跟着一起走，而你会被就地放下。',
+  'guide.mountsPage.goodsHeading': '缰绳只是寻常货物',
+  'guide.mountsPage.heading': '坐骑与骑乘',
+  'guide.mountsPage.intro':
+    '坐骑是穿越世界的更快方式，仅此而已。你在马厩学会骑乘，买下第一副缰绳，此后每一条路都会变短。',
+  'guide.mountsPage.learnBody':
+    '骑术是一门只需买一次的技能，它在 {level} 级开启。马厩总管玛拉·希琴在丘陵上经营着疾风崖马厩，她出售骑术训练，价钱是 80 金。正是这一次购买让你得以骑上坐骑，而且它会永远伴着你。\n\n学会之后，玛拉还有一个任务给你：骑术课。接下它，跟着标记走到起始拱门后方那块发光的方砖上，然后按“开始比赛”。她会借给你一匹训练用英勇战马来上这堂课，所以课程本身分文不取。跑完赛道、完成它，再回到她那里领取你的金币和经验。借出的战马课后会回到马厩，所以这堂课教给你的是骑术本身，而不是白送你一匹马。',
+  'guide.mountsPage.learnHeading': '学习骑乘',
+  'guide.mountsPage.raceBody':
+    '玛拉围场里的障碍赛道随时向任何人开放，并不只在上课时才能跑。骑上坐骑，站到拱门后方那块发光的方砖上，然后按“开始比赛”。倒计时会让你原地待命，接着计时开始：越过全部七道障碍，并在时间走完之前从拱门骑出去。\n\n只有当你确实凌空越过横杆时，这道障碍才算数，所以轻轻松松从旁边骑过去什么也清不掉。你可以按任意顺序、从任意一侧越过它们，漏掉一道也不是世界末日：绕回来再跳一次就是。死亡、下马或离开围场都会结束这次挑战，而没有什么拦着你再来一次。这里没有费用、没有冷却，除了成绩本身也没有奖品，而且任意多的骑手可以同时跑这条赛道，互不妨碍。',
+  'guide.mountsPage.raceHeading': '马厩赛道',
+  'guide.mountsPage.rideBody':
+    '这里没有坐骑窗口，也不用设定最爱的坐骑，因为缰绳就是坐骑。从背包里或从动作条格子上使用一副缰绳，你就骑上了那只坐骑。召唤需要一点时间，是一段短短的呼唤而非瞬发，所以它救不了你一次糟糕的拉怪。下马是瞬时的，而且从不会被阻止。\n\n再次使用你正骑着的那副缰绳，就会把这只坐骑收起来。骑乘时使用另一副缰绳，会直接换乘过去，中间不必再召唤一次。“骑乘 / 下骑”键（默认是反引号键）永远只负责让你下来：它是下马的路，不是上马的路。唯一的例外是骑术课，在那里同一个键会召唤玛拉借给你的战马，因为借来的马没有缰绳可点。在手机或平板上，“更多”托盘里的坐骑按钮两个方向都管用。',
+  'guide.mountsPage.rideHeading': '上马与下马',
+  'guide.mountsPage.speedBody':
+    '速度是坐骑之间唯一的差别。你从玛拉处买来的英勇战马定下了基础脚程，而你在世界里收集到的坐骑都跑得比它快：缰绳越稀有，骑起来越快，并且是分成几个清晰的档位，而不是平滑地往上滑。没有第二阶骑术可以训练，之后也没有升级可以购买。骑术你只付一次钱，从此以后，你用的是哪副缰绳，就决定了你走得多快。',
+  'guide.mountsPage.speedHeading': '速度与档位',
+  'guide.mountsPage.whatBody':
+    '坐骑是你骑乘的野兽，而它给你的东西就是速度。没有护甲，没有伤害，没有属性：它带着你更快地掠过地面，跳跃时也蹦得高一点，这就是这笔交易的全部。游戏里的每一只坐骑都是地面坐骑，所以没有飞行，它们也都不会游泳。',
+  'guide.mountsPage.whatHeading': '坐骑是什么',
+  'guide.mountsPage.whereBody':
+    '疾风崖马厩标注在疾风崖的地图上，位于断崖与沉船滩之间的丘陵上。玛拉站在马厩旁，面朝赛场。',
+  'guide.mountsPage.whereHeading': '在哪里找到她',
+  'guide.nav.commands': '斜杠命令',
+  'guide.nav.editor': '世界编辑器',
+  'guide.nav.interface': '界面与 HUD',
+  'guide.nav.mounts': '坐骑与骑乘',
+  'guide.nav.rifts': '裂隙',
+  'guide.profPages.econ.commissionsBoardNote':
+    '走进一份委托有两条路：你在上方的板上发布订单，把活儿送到工匠面前；或者工匠干脆自己决定为你做一件。两者最终都归于同一份绑定。',
+  'guide.profPages.econ.orderBoardBody':
+    '你不必在聊天里满世界找工匠。打开你的制作窗口，委托订单板就在它的标题栏里，一点即到。任何人都可以在那里发布订单：说明你想要做的配方，然后要么留作公开，让任何工匠都能接下，要么指定给某一位工匠，那样便只有他能接手。工匠在板上浏览之后接下订单，而接单即是承诺，所以一份活儿在同一时间只会有一个人在做。\n\n发布时不会扣下任何东西：订单既不预留金币也不预留材料，因此价格和由谁提供材料仍留在你们两人之间商定，和任何委托历来的谈法一样。只要订单还开着，你可以取消自己发布的订单，而无人接下的订单会在一天后自行过期。工匠一旦接下，就只有交付才能了结它。\n\n交付是当面进行的。工匠以委托的方式做出这件物品，来到你面前，亲手交给你，所以请留出一个背包格子来接收。送到手里的东西遵循下方的普通委托规则，通过制作者之约绑定给你。',
+  'guide.profPages.econ.orderBoardHeading': '委托订单板',
+  'guide.profPages.ench.charmsBody':
+    '采集者的护符也出自附魔。你的附魔技能达到 25 后，Tinker Gizzel会在Eastbrook的工具工坊传授两者：为一次采集多加一个单位产出的采集者储囊，以及提升采上来之物品级的匠人之眼。每一枚都只制作一次，然后嵌进采矿镐、斧或镰刀，只在真正被它改善的采集上消耗一次充能。\n\n补充充能才是这门手艺持续赚钱的地方。充能由工具的主人恢复，而不是由上门的附魔师来做；当那位主人正是署名这枚护符的附魔师时，补充只需一半材料，若还带着附魔专精则更少。因此隔着柜台卖出的护符只是一锤子买卖，而嵌在你自己工具上的那些，才是养起来便宜的。完整的充能与材料阶梯见任意一门采集专业页面的“工具效果”一节。',
+  'guide.profPages.ench.charmsHeading': '给采集者工具的护符',
+  'guide.profPages.ench.enchantsNoteOffhand':
+    '附魔分三个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。进阶层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有两个去处，两个护符配方各要五个，以及工具效果补充的最高一档，所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文锋刃（武器，力量，消耗共鸣钢片），符文印记（武器，智力，共鸣木片），符文织纹（胸甲，精神，共鸣线段），符文皮甲（护腿，敏捷，共鸣皮料），符文锁链（头盔，耐力，共鸣链片）。每件还各需两个铃音精华；对于同时拥有基础与进阶附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文皮甲则是唯一的护腿敏捷附魔。确切加成详见下方表格。',
+  'guide.profPages.faq.a10':
+    '护符是一种嵌入式的工具效果：附魔师的手艺，安在采集工具里，改善它采上来的东西。采集者储囊为一次采集多加一个单位，匠人之眼提升它的品级，而Tinker Gizzel会在Eastbrook的工具工坊向附魔技能达到 25 的人传授两者。只有当护符真正改变了结果时才会消耗一次充能，所以它无法改善的那一次采集不会让你有任何损耗；插槽还可以设成每次使用前询问，方便你一次一次地拿主意。\\n\\n一枚新护符在普通品质工具上带有 20 次充能，稀有度每高一阶再加 10 次，所以史诗工具起始便是 50 次。用尽了也不会毁掉护符：由工具的主人为插槽补充，每份奥术材料补 10 次充能，材料取决于他携带的工具与这个插槽历来被填过的最好工具之中更好的那件（普通或优秀工具用铃音之尘，精良工具用铃音精华，史诗工具用铃音碎片）。补充前把好工具存进银行绝不会让它更便宜，只会在同样价钱下更少；而带着较差的工具嵌入一枚新护符，才是回到更便宜一档的办法。署名这枚护符的附魔师为自己的护符补充只付一半，带着附魔专精则更少。',
+  'guide.profPages.faq.a9':
+    '把它发布到委托订单板上。打开制作窗口，从它的标题栏打开订单板，说明你想要做的配方：把订单留作公开，让任何工匠都能接下，或者指定给某位你已经认识的工匠。接单便意味着这位工匠承诺了这份活儿，而一份订单在同一时间只会由一个人握着。\n\n发布时不会扣下金币和材料，所以价格与由谁提供材料请你们自行商定，就像委托历来的谈法一样。只要订单还开着，你可以取消自己发布的订单，而无人接下的订单会在一天后过期。交付是当面的：东西做好时，带着一个空背包格站到你的工匠身边。它到手时会通过制作者之约绑定给你，任何工位的大师都可以按常规费用为你解绑。',
+  'guide.profPages.faq.q10': '什么是护符？充能用尽之后又会怎样？',
+  'guide.profPages.faq.q9': '我要怎么请别人替我制作东西？',
+  'guide.profPages.findingNodesNote':
+    '你不必全靠眼睛去找。区域里的每一处资源点，只要地图正显示着那片地面，都会画在区域地图上，你经过时也会出现在小地图上，因此一条采集路线可以在出发之前就在地图界面上规划好。你的工具还够不着的资源点是标出来而不是藏起来：它留在原处，只是标记被划掉并变暗，好让你看见自己正在为之训练的那片地。在桌面端，把鼠标悬停在世界里的矿脉、林木或草丛上，会说出它的名字、告诉你它需要哪种工具，而且在你采过之后，还会以秒为单位为你自己倒数它的重生时间。触屏上没有悬停可言，于是小地图上的标记讲的是同一件事。',
+  'guide.profPages.specimenBodyFamilies':
+    '采集时请留出一点背包空间：一件署名的意外之喜需要属于它自己的空位，或者一个可以并进去的同款署名堆叠；若实在放不下，产出仍然会到手，只是署名就此失去。尸体采集也有属于自己的一份大奖机制：每种被采集的材料大约有 {pct}% 的几率掷出精良或更高品质。能给出完美标本的族群（兽皮、丝线、毒液、利爪、兽肉）会让普通产出保持朴素，另外在旁边铸出那件署名标本；其余三种，尖牙、布料与獠牙，则直接把署名打在产出本身上。',
+  'guide.professions.focusBodyTiers':
+    '每座主城都为过路的采集者备有一块城镇专注面板：站在城镇里，从小地图旁打开它，把 10 点专注点数的预算摊到你在意的那些材料种类上。某种材料每投入 5 点，它的采集品级就提升一档（最多两档），而每一点都会让它的产量增加 10%；未获专注的材料绝不会因此变差。\n\n你的分配会跟随你的角色走遍各地，日后任何一次回到城镇都可以重新调整，快慢由你决定。慢慢来是免费的：每移动 1 点，重新调整需要 1 分钟。花点小钱可以加快，每点 15 秒，另加每点 5 铜与 1 个铃音之尘；全额付费则立刻完成，每点 25 铜与 5 个铃音之尘。只有你实际移动的点数才算钱，所以挪动一个点很便宜，而打开面板又原样关上，在任何档位下都分文不取。',
+  'guide.professions.harvestBodyFamilies':
+    '采集并不止步于资源节点。许多被击杀的野兽都可以被采集一次，先到先得：兽皮、尖牙、利爪、獠牙、丝线、毒液、布料与兽肉，与它的普通战利品一并直接取自尸体，一次按键就会同时打开两者。当一头野兽身上不止一种可用材料时，如何取舍便由你决定：把它能给的全部取走，或专注于更少的材料，换取你所取之物明显更精细的品级。\n\n在能产出标本的族群身上掷出精良或更高的采集品质时，除普通产出之外还会额外获得一件署名的完美标本（一块Pristine Hide、一份Pristine Silk、一枚Pristine Venom Gland、一只Pristine Claw或一份Prime Cut），并在你的功绩之书中记下A Perfect Specimen。任何角色都可以采集，无需训练；而你拥有的任何采集工具，无论属于哪一门行业，都会计入最上等材料的判定。',
+  'guide.professions.toolEffectsBody':
+    '采集工具身上有一个插槽，而附魔师的护符正是嵌进去的东西。采集者储囊会为一次采集的产出多加一个单位；匠人之眼则提升它采上来之物的品级。Eastbrook的工坊宗师Tinker Gizzel会把两者传授给附魔技能达到 25 的附魔师，两者也都在他的工坊里制作。\\n\\n新嵌入的护符在普通品质工具上带有 20 次充能，工具稀有度每高一阶再加 10 次，所以同一枚护符嵌在史诗采矿镐上时起始便是 50 次。只有当护符真正改变了结果时才会消耗一次充能，对它没能改善的采集绝不扣减；插槽还可以设成每次使用前询问，让护符一直等到你说“使用一次充能”为止。嵌入一枚新护符，会围绕你当时携带的工具把这个插槽重铸一遍，因此它填到的是那件工具所能容纳的量，而不是退回从前的某个高点；而一次什么都不会改变的重嵌会被挡回来，不会白白吃掉护符。\\n\\n充能用尽并不会毁掉护符：由工具的主人为插槽补充，每花一份奥术材料补 10 次充能；至于它要哪种材料，取决于你携带的工具与这个插槽历来被填过的最好工具之中更好的那件：普通或优秀工具用铃音之尘，精良工具用铃音精华，史诗工具用铃音碎片。把好工具留在银行并不会换来更便宜的补充，只会在同样价钱下更少；真正降到更便宜一档的老实办法，是带着较差的工具嵌入一枚新护符，把插槽在那里重铸。如果插槽的上限高过你当前工具能填到的量，补充会停在那件工具的上限处，并提醒你带上更好的那一件。若你正是署名这枚护符的附魔师，补充只需一半材料，若你还专精附魔则更少；其他人一律付全价。补充是一段短读条，和这门手艺的其余部分一样。',
+  'guide.professions.toolEffectsHeading': '工具效果',
+  'guide.progression.ridingBody':
+    '骑术是攀登尽头等着你的东西之一。到了 {level} 级，一位马厩总管会用一笔相当可观的金币把这门技能教给你，而训练赛道上的一堂课会为你挣来第一副缰绳。坐骑不带来任何力量；它只是把世界变小了一些，而在向北长途跋涉之后，这本身就是一种奖赏。',
+  'guide.progression.ridingTitle': '学习骑乘',
+  'guide.questsPage.availableBody':
+    '任务是成串出现的。大多数任务要等你交掉前一个之后才会给出，许多还要求一个最低等级，所以今天没什么可给你的 NPC，等你再升几级、或者结掉手上正做的那个任务之后，也许就有一大堆了。少数任务另有自己的条件，比如骑术课，要买下骑术技能之后才会开启。组队任务会一上来就说明白，列出它建议你带上几名玩家。有些活计可以重复：等上一阵之后可以再接，而任务发布者头顶的标记会告诉你什么时候又轮回来了。',
+  'guide.questsPage.availableTitle': '为什么这个 NPC 没有任务给你',
+  'guide.questsPage.cardMasterBody':
+    '东溪镇里有一位 NPC 发的是牌，而不是差事。找牌局大师聊聊，从他的菜单里选出“纸牌对决”，你就会加入一个队列，与下一位等待中的玩家配对。任何职业都可以坐下来玩，等级和装备完全不作数。你们各自从自己那副二十张的牌组出牌，牌面一到十，手上同时握着四张，每一轮再抽一张：点数大的赢下这一轮，两张一样的牌算作平局，双方都不得分。先赢两轮者赢下这一场，所以一场对决是三局两胜。每一轮都有时限，若你九十秒不出牌，这一场就判给对方，除非当时还没有任何一轮分出胜负，那样它便直接作废，无人取胜。你自己中途走开，结果也一样。加入队列时你必须站在牌局大师身边，但一旦配上对手，牌桌会自行打开，你在任何地方都能玩。它需要两个人，所以离线世界从不提供它。',
+  'guide.questsPage.cardMasterTitle': '并非每个 NPC 都有任务：牌局大师',
+  'guide.questsPage.typeEscortBody':
+    '有人需要被护送着走过一段危险的路。接下任务，到路口找到等在那里的人，与他交谈便可动身。他会按自己的步调走，你在旁边跟上；沿途潜伏的麻烦冲着的是他，并不总是冲着你。跟紧一点：敌人会一波波地伏击这段路，只有把一波清掉，队伍才会继续前进。你无法攻击被护送的人，但可以为他治疗；万一他倒下了，这一趟只是重置一次，你可以再来。带着他活着走到另一头，而你也在他身旁，任务便会记功。',
+  'guide.questsPage.typeEscortTitle': '护送',
+  'guide.riftsPage.boundBody':
+    '你的队伍在裂隙里拿下的第一个击杀，会把这一趟定下来。从那一刻起，你就被绑定在这一份副本上：无论因为什么走出去，再回来时进的都是你离开的那一趟，绝不会进别人的，也绝不会开一趟新的。在第一个击杀之前，什么都还没定，所以还在集结的队伍可以重新会合、一起走进去，不会在身后留下一堆半开的副本。',
+  'guide.riftsPage.boundHeading': '一旦见了血',
+  'guide.riftsPage.floorsHeading': '层层向下',
+  'guide.riftsPage.groupBody':
+    '带上一支队伍。裂隙不会因为进去的人少就手下留情：里面没有任何东西会去数你们站着几个人，所以传送门上写的是什么等级，你打的就是什么等级，无论你们是五个人还是一个人。门口确实会放你独自进去，也确实有人这么试过，但裂隙在每一个等级上都是团队内容，而且从第一个房间起它就诚实地告诉你这一点。你的小队会拿到属于自己的一份副本，别的队伍不会闯进你的这一趟。若是倒下了，你可以化作鬼魂走回来，等里面的战斗停下再收拾自己。',
+  'guide.riftsPage.groupHeading': '谁该进去',
+  'guide.riftsPage.heading': '裂隙',
+  'guide.riftsPage.intro':
+    '裂隙不是一扇你走过去的门，而是世界本身裂开的一道口子。踏进去，你会得到一段谁都没跑过的下行之路：层数、怪物，以及等在最底下的那个东西，全都是为这一道裂隙当场生成的，所以同样的等级，两次也绝不会走出一样的过程。',
+  'guide.riftsPage.levelNote':
+    '裂隙属于终局内容。无论哪个等级的裂隙，你都必须达到等级上限，也就是 {n} 级，才能踏进去。',
+  'guide.riftsPage.openBody':
+    '裂隙撕开的地方，是王国更外围的那些区域，而不是初始的山谷，而且整个王国都会听到消息：一道裂隙出现的那一刻，聊天栏就会有一行字报出它的等级和所在的区域。每个符合条件的区域大约每小时轮到一次裂隙，已经立着一道裂隙的区域会先等着，而不是再开第二道。没人去封的裂隙，会在几个小时后自行坍塌，这件事王国同样会听说。裂隙被封印过的区域会安静下来，直到下一轮轮到它，所以看到通报时，趁消息还新鲜就动身，是值得的。',
+  'guide.riftsPage.openHeading': '裂隙在哪里开启，多久开一次',
+  'guide.riftsPage.raceBody':
+    '王国里的每一支队伍都可以同时攻打同一道裂隙，各打各的那一份副本，但只有第一个把最底下那个东西放倒的队伍才能封印它。有队伍获胜时，全王国都会听到他们的名字和用时，入口也随之在他们身后关闭。输掉这场竞速并不会结束你的这一趟：你的副本仍然开着，最底下那个东西照样会倒在你手上，你也照样能靠自己走出来。你失去的，是通关本该带来的一切。首领不会为第二名留下任何东西，所以你带回家的，只有一路向下时从小怪身上掉出来的东西，再无其他。功绩之书仍然会记下这次通关，因为那东西确实是你放倒的。这是游戏里唯一一场你可能输掉、却连赢家的面都见不着的竞速。',
+  'guide.riftsPage.raceHeading': '首杀之争',
+  'guide.riftsPage.ranksBody':
+    '每一道裂隙都有 C、B、A 或 S 的等级，等级会写在通报里，所以你还没出城就知道自己要去面对什么。C 最温和，B 和 A 逐级攀升，而 S 是一道裂隙所能达到的最难。等级是唯一的旋钮。它决定各层有多凶狠，除此之外再没有别的东西由它决定，所以 C 级裂隙并不是一道更小的裂隙，而是同样形状的一趟路，只是手下留了情。',
+  'guide.riftsPage.ranksHeading': '四个等级',
+  'guide.riftsPage.rewardsBody':
+    '真正给报酬的，是封印一道裂隙，而不只是活着从里面出来。抢先把裂隙打下来，它的报酬就对得起与它等级相当的副本内容，所以更高的等级值得你跑更难的一趟。封印还会把一枚裂隙之戒交到在场每个人手里，按你职业的定位裁剪打造，并且专属于你，同时在你的背包里留下裂隙精华和裂隙宝石。除了归途之外，最底下那个东西还会留下一口封着的储藏，你的队伍可以撬开它取走额外的战利品，用的正是你在探秘宝箱那里熟悉的锁簧之径撬锁，所以干净沉稳地撬，比慌乱赶工赚得更多。这些第二名的队伍一样都拿不到：输掉的竞速只留给你一路向下时从小怪身上掉出来的东西。功绩之书是唯一的例外，无论输赢它都会记下你的通关，其中一个功绩为封闭你的第一道裂隙，另一个为放倒一道 S 级裂隙。',
+  'guide.riftsPage.rewardsHeading': '你能带走什么',
+  'guide.riftsPage.trackerBody':
+    '在里面时，屏幕上的一小条会帮你保持方向：你在第几层、总共几层，以及一个实时倒计时。这个倒计时要看仔细，因为它数的不是你这一趟剩下的时间，而是外面世界里的入口对新队伍关闭的时间。只要你已经进来了，你的小队就能按自己的节奏把这道裂隙打完，花多久都行。',
+  'guide.riftsPage.trackerHeading': '屏幕上的追踪条',
+  'guide.riftsPage.whatBody':
+    '地下城是地方。它们一直待在原处，你会一遍遍地学它们，直到每一个角落都了然于心。探秘是你从告示板开始的一段短促而私人的下行，为一两个人裁剪。裂隙两者都不是：它自行开启，就在世界之中，毫无预兆，而里面的一切都是在它开启的那一刻生成的。没人能给你一条路线，因为没人下过这一道。它和另外两者一样是独立副本，所以你在里面找到的东西只属于你和你的队伍；但它是游戏里唯一一种主动来找你、而不是等着被找到的副本内容。',
+  'guide.riftsPage.whatHeading': '裂隙是什么',
+  'guide.settingsPage.advancedLadder':
+    '只要动了其中任何一个，画质预设就会切换到“高级”，并以你当时正看着的那些档位为起点，因此你的自定义搭配是从你已经看到的样子开始，而不是从零开始。调得满意了，按“应用”。“高级”排在预设列表的最后正是这个道理：它是专家档，你自己的那套搭配就住在那里。',
+  'guide.settingsPage.ifAurasOnPlayerFrame':
+    '除了光环条之外，也把你的增益和减益显示在你自己的单位框体上。',
+  'guide.settingsPage.ifChatFontScale': '聊天文字的大小。',
+  'guide.settingsPage.ifChatIntro': '聊天窗口读起来是什么样。聊天窗口本身的重置也放在这里。',
+  'guide.settingsPage.ifChatOpacity': '聊天背景有多实。',
+  'guide.settingsPage.ifChatTimestamps': '为每一行聊天加上时间，可选 12 小时制或 24 小时制。',
+  'guide.settingsPage.ifCombatIntro': '你的技能栏如何表现，以及战斗会在屏幕上放些什么。',
+  'guide.settingsPage.ifCompactChat': '收紧聊天行距，让一屏能装下更多内容。',
+  'guide.settingsPage.ifDailyChest': '每日奖励宝箱是否显示在你的 HUD 上。',
+  'guide.settingsPage.ifExtraBars':
+    '显示第二排动作条，开启第二排之后还能再开第三排。即使这些排处于隐藏状态，其中的格子依然可以用快捷键触发。',
+  'guide.settingsPage.ifFctScale': '从目标身上飘出的伤害与治疗数字的大小。',
+  'guide.settingsPage.ifFramesIntro':
+    '你自己的框体、你的目标框体，以及整个队伍布局。队伍那一组还带有缩放、宽度、高度、间距和列数滑块，方便把团队网格塞进你的屏幕；标签页底部的“重置”按钮会把每一个框体放回最初的位置。',
+  'guide.settingsPage.ifGeneralIntro':
+    '缩放、对比度，以及界面会显示关于你的哪些信息。语言和主题选择器也在这个标签页的顶部。',
+  'guide.settingsPage.ifGroundReticle': '在你瞄准一个地面施放的法术时，显示地面圆圈。',
+  'guide.settingsPage.ifHideUnused': '隐藏空的动作格，只绘制你真正会用到的按钮。',
+  'guide.settingsPage.ifHighContrastBackground':
+    '在起始界面和角色界面背后使用更朴素、对比度更高的背景。',
+  'guide.settingsPage.ifHighContrastText':
+    '更粗、对比度更高的界面文字。它首先是一项无障碍选项，在明亮的屏幕上也非常好用。',
+  'guide.settingsPage.ifHudOpacity': 'HUD 面板盖在背后的世界上时有多实。',
+  'guide.settingsPage.ifInvertLookY': '翻转鼠标视角的上下方向。',
+  'guide.settingsPage.ifLockBars': '锁定你的技能栏，免得不小心把技能从格子里拖出来。',
+  'guide.settingsPage.ifMouseoverCast':
+    '让治疗或友方法术落在你鼠标悬停的那个队伍框体上，而不改变你当前的目标。',
+  'guide.settingsPage.ifPartyHealthText':
+    '队伍血条上写什么：不显示、百分比、当前生命，或当前与最大生命。',
+  'guide.settingsPage.ifPartyShowAuras':
+    '队伍框体上是否显示增益和减益。相应的开关还涵盖资源条、吸收盾、宠物，以及你自己是否出现在队伍列表里。',
+  'guide.settingsPage.ifPartySort': '队伍成员的排列顺序：入队顺序、职责或名字。',
+  'guide.settingsPage.ifPartyStyle':
+    '队伍布局：“自动”跟随你的队伍规模，“经典”是传统的竖排，“团队”把所有人压进紧凑网格。',
+  'guide.settingsPage.ifPetFrame': '为你的宠物显示一个框体。',
+  'guide.settingsPage.ifPlayerFrameScale': '你自己单位框体的大小。',
+  'guide.settingsPage.ifShowAttackButton': '在你的动作条上放一个明确的“攻击”按钮。',
+  'guide.settingsPage.ifShowItemLevel':
+    '在每个物品提示框里加上一行物品等级。默认关闭，以保留只显示属性的经典提示框。',
+  'guide.settingsPage.ifShowOwnNameplate':
+    '把你自己的头顶铭牌完全按别人看到的样子画出来，装饰也一并显示。想要经典视角就把它关掉。',
+  'guide.settingsPage.ifShowPlayerNameplates':
+    '显示其他玩家的铭牌。关闭能让拥挤的大本营清爽不少，而无论开关，你当前的目标始终清晰可辨。',
+  'guide.settingsPage.ifShowPlaytime':
+    '在角色面板上显示你的终身游戏时长。默认开启，面板上还有一个眼睛按钮，可以按设备切换显示，直播或截图时很方便。无论显不显示，总时长都照常累计。',
+  'guide.settingsPage.ifStartAttack':
+    '使用技能时是否同时开始自动攻击。默认开启，也是大多数玩家熟悉的经典行为。',
+  'guide.settingsPage.ifStickyTarget': '点击空地时保留当前目标，而不是把它清空。',
+  'guide.settingsPage.ifStopAutoAttack':
+    '切换目标时是否停下你的挥击。默认关闭，因此你的攻击会延续到新目标身上。',
+  'guide.settingsPage.ifTargetFrameScale': '你目标框体的大小。',
+  'guide.settingsPage.ifTargetOfTarget':
+    '显示你的目标正在攻击谁，这是判断坦克有没有拉住的经典办法。',
+  'guide.settingsPage.ifTooltipScale': '提示框文字的大小，在小屏幕或超大屏幕上都很实用。',
+  'guide.settingsPage.ifUiScale':
+    '一次性缩放整个界面。它会在你松开滑块时生效，这样拖动的过程中，光标下的窗口不会乱跑。',
+  'guide.settingsPage.ifWalkByAutoloot': '走过自己击杀的尸体时，顺手把战利品收走。默认关闭。',
+  'guide.settingsPage.ifWallet': '角色界面上是否显示你的钱包。玩家名片也有一个对应的开关。',
+  'guide.settingsPage.interfaceFoot':
+    '这还不是全部。每个标签页里的滑块和开关，都比这里列得出来的多，所以打开它看一遍，从上往下读一读吧。这五分钟花得很值。',
+  'guide.settingsPage.interfaceHeading': '“界面”面板',
+  'guide.settingsPage.interfaceIntro':
+    '界面是游戏里最大的一个面板，分成四个标签页。这里面没有任何东西会改变世界能对你做什么：它改变的是显示给你什么、显示得多大。下面这些行最值得了解。',
+  'guide.settingsPage.keybindsBody':
+    '按键列表只是那个面板的一半。它上面还有一排开关，决定你的鼠标如何驾驭这个游戏：鼠标镜头、旋转视角时是否锁定光标、点击移动以及由哪个鼠标键触发、攻击移动、左手触控布局，还有聊天的脏话过滤。',
+  'guide.settingsPage.keybindsHeading': '“按键绑定”面板',
+  'guide.settingsPage.keybindsMouseBody':
+    '那里有两件事很容易被忽略。鼠标按键可以像键盘按键一样绑定，所以滚轮点击和拇指键都能承载技能，而左右键则保留给镜头和点击世界。此外，你可以直接从动作条上绑定：在这里打开条上绑定模式，然后点一个格子，按下你想要的键。',
+  'guide.settingsPage.panelsMoreBody':
+    '本页没有列表说明的那两个面板，同样值得一看。“光环”是你调整那些大幅屏幕提示的地方，它们会在你职业的触发效果就绪时亮起：哪些要显示、大小、颜色、不透明度，以及摆在屏幕的什么位置。“性能监视器”则是你调校本页选项时打开、调完再隐藏的那个读数。',
+  'guide.settingsPage.rowAmbientOcclusion':
+    '表面交界处那层柔和的接触阴影。可选关闭、半分辨率或全分辨率。',
+  'guide.settingsPage.rowAntiAliasing':
+    '抚平远处几何体的锯齿边缘。开销很小，多数机器都值得保持开启。',
+  'guide.settingsPage.rowBloom': '明亮光源、火焰和法术特效周围那圈柔和的辉光。',
+  'guide.settingsPage.rowCameraSpeed': '用鼠标环顾四周时，镜头转动得有多快。',
+  'guide.settingsPage.rowCharacterDetail':
+    '其他角色在多远之外仍保留完整的动画骨骼，再往外才降级为更简单的版本。数值越高，在拥挤的大本营里看着越舒服，开销也越大。',
+  'guide.settingsPage.rowDynamicLights': '有多少火把、篝火和法术会向周围的场景投出真实光照。',
+  'guide.settingsPage.rowFullscreen': '让游戏铺满整个屏幕。',
+  'guide.settingsPage.rowInterfaceMode':
+    '你用的是桌面界面，还是屏幕上的触控操作。“自动”会读取你的设备，你也可以强制指定其中一种：带键盘的平板可以用桌面布局，触屏笔记本也可以用触控操作。',
+  'guide.settingsPage.rowOverflowXp':
+    '在满级之后，你的经验条是继续用溢出经验填充，还是改为显示经典的满级静态文字。',
+  'guide.settingsPage.rowParticleEffects': '法术、天气和环境粒子效果最多可以做到多浓。',
+  'guide.settingsPage.rowSurfaceDetail':
+    '石料与铺装上那层磨损细节，从关闭一直到完整的视差效果。这是城镇街道的那个旋钮：保留得越多，一条铺装街道画起来就越吃力。',
+  'guide.settingsPage.rowTouchLookSpeed': '滑动视角的同一项设置，只有在触屏设备上才会出现。',
+  'guide.settingsPage.rowViewDistance':
+    '世界在淡出之前能向远处绘制多远。每个预设都会替你设好，直到你自己动它为止。',
+  'guide.settingsPage.rowWaterQuality': '湖泊、河流和外海如何着色，从平坦省性能一直到完全反射。',
+  'guide.settingsPage.rowWaterRipples':
+    '游泳时在你身后荡开的尾迹与涟漪。默认关闭，也是唯一一项真会吃帧数的水效；无论开关，水花和气泡都不受影响。',
+  'guide.settingsPage.valueUltraOrInsane': '“超高”，想要全都要就选“极致”',
+  'guide.social.blockBody':
+    '屏蔽是更重的手段，用来对付那些不肯放过你的人。屏蔽会切断对方的组队邀请、密语和邮件，也切断他们的聊天，让你们两人在 /who 中互相隐形，若对方在你的好友列表里，也会被移出去。在对方名字上右键从菜单里选择屏蔽，或者使用 /block；/unblock 可以解除，/blocklist 会列出名单上都有谁。',
+  'guide.social.chatMore': '关于聊天窗口和界面其余部分的更多内容',
+  'guide.social.discordLinkBody':
+    '游戏内的 Discord 面板也能反着用。把你的 Discord 账号关联上去，你在那边拥有的社区身份组便会跟着你进入这个世界：头顶一个彩色的名字，以及在管理身份组的聊天行上加一个标记，这样你随时都能分辨出真正的管理员和只是借了个名头的人。关联还会记录一个随你参与度攀升的状态。这一切都不会在游戏里给你任何权力。',
+  'guide.social.finderBoardBody':
+    '查找器还维护着一块预组队伍的告示板。队长发布一条带标签的招募，说明这一趟是做什么的，从初次探访到直接全通都有，你申请加入，由队长审核通过。自动队列负责填充各个地下城和终局团队副本，普通与英雄各一档；而告示板还能挂出单人的前置任务那一趟，队列绝不会替你排它；探秘和野外出行则要你自己张罗。无论走哪条路，查找器都只负责把队伍搭起来：走到门口、设定难度、谈好战利品规则，仍然是你们自己的事。',
+  'guide.social.finderBody':
+    '你不必在“寻求组队”频道里喊人才能凑齐一趟。打开地下城查找器，选好你想跑的内容和你愿意承担的职责，独自或者带着现成的队伍加入队列。查找器会一直等到职责配齐，然后同时向所有人发出邀请：一个弹窗请你们每个人确认，最后一个人点下同意的瞬间，队伍就成立了。拒绝邀请或者让它超时，会让你先进入一小段冷却，之后才会再收到下一次邀请，好让这条队伍一直往前走。',
+  'guide.social.finderHeading': '寻找队伍',
+  'guide.social.finderMore': '看看每个地下城里都有什么',
+  'guide.social.guildBankBody':
+    '公会也有属于自己的金库。走到某个大本营城镇的银行管理员面前，打开你的银行，切换到“公会”标签页：在那里你会看到一份钱币金库，以及公会共同拥有的物品仓储。每位成员都能打开来看看里面有什么，面板也会清清楚楚地写明谁能做得更多。只有会长和官员可以动手，把钱币和货物存进去、再发放出来，而每一笔存取都会写进公会可以查阅的日志，所以没有任何东西会不留记录地被搬走。',
+  'guide.social.guildBankHeading': '公会银行',
+  'guide.social.guildBankRulesBody':
+    '物品仓储一开始是关着的。由一名官员自掏腰包把它开出来，之后公会可以用金库里的钱把它扩大。任务物品、一切灵魂绑定的东西，以及世界市场不收的装备，都进不去，规则与邮件和市场一致，所以公会银行装的是那些仍然可以易手的货物。',
+  'guide.social.guildBoardBody':
+    '公会同样会被排名。排行榜窗口在玩家榜之外还留有一块公会榜，按成员们共同赚得的成绩为公会排名，所以一个热闹的公会能看到自己身处何位。',
+  'guide.social.jailBody':
+    '管理员维持着秩序，凡是不让别人好好玩游戏的玩家，都可能被送进牢房。刑期一定有固定的长度，尽管管理员可以提前结束它；而且无论你是否保持登录，它都按时钟照走。',
+  'guide.social.jailHeading': '管理员与牢房',
+  'guide.social.moderationBody':
+    '如果有玩家举止出格，右键他的名字并选择“举报玩家”。挑一个原因，从骚扰到刷屏再到作弊，写上一句发生了什么，然后发送：这份举报会送到管理员那里去看。举报是给他们的一张便条，本身并不是处罚。发出它并不会禁言、踢出或关押任何人，也不会有回复告诉你处理结果如何。等待期间，屏蔽对方可以先止住麻烦。',
+  'guide.social.moderationHeading': '举报玩家',
+  'guide.social.realmsBody':
+    '联机游玩运行在一个个服务器上，每个服务器都是各自独立的地方，有各自的玩家。开玩之前你要从服务器列表里挑一个，每一行都会显示这个服务器此刻有多热闹，从“低”“中”“高”一直到“已满”，当前没有开启的服务器则显示“离线”。“低”意味着空间充裕，“高”意味着人气十足；达到上限的服务器会显示“已满”，并在有人退出之前拒绝新的登录，所以挑一个朋友所在的、或者还有空位的地方吧。',
+  'guide.social.realmsHeading': '服务器',
+  'guide.social.realmsScopeBody':
+    '你做的一切都留在你选定的那个服务器上：你的角色、好友列表、公会和世界市场都在那里，你在游戏内打开的公会榜与玩家榜也只统计这一个服务器，而网站上的榜单则会把所有服务器汇总起来。每个服务器还有自己的每日团队副本重置，按各自的本地时间进行。',
+  'guide.stats.hitBody':
+    '命中等级来自你的装备及其套装奖励。它让你的攻击更少落空，也让你的法术更少被抵抗；面对比你等级更高的敌人时，它最能发挥价值，因为那里正是落空堆积得最快的地方。你的面板上把它写作“命中等级”。',
+  'guide.stats.hitTitle': '命中等级',
+  'guide.stats.parryBody':
+    '招架是战士自己的防御：有几率把一次近战打击整个挡开、不受任何伤害，并随力量成长。只有从正面袭来的攻击才会被招架，这也是你该始终面向正在打你的东西的又一个理由。其他职业面板上的这一行，会一直停在零。',
+  'guide.stats.parryTitle': '招架',
+  'guide.stats.warfareBody':
+    '战争是唯一一项只在对抗其他玩家时才作数的属性：它提高你对他们造成的伤害，也降低你从他们那里受到的伤害，你的面板会把这两半写在同一行上。面对生物时它毫无作用。它来自你用荣誉换购的战争装备，因此它是参与 PvP 的回报，而不是升级途中该去追求的东西。',
+  'guide.stats.warfareTitle': '战争',
+  'guide.talentsPage.loadoutNote':
+    '你不必只认准一套配点。在面板里保存一套具名的配置，它会连同天赋选择和你的动作条一起记住，因此切换到另一套只需点一下，遵循的规则与重置相同：脱离战斗，且不在竞技场比赛之中。',
+  'guide.thornhollowPage.rewardsBody':
+    '每一场打完的比赛都会给荣誉：获胜给得更多，落败或平局也有一份安慰；此外你每拿下一个击杀、每协助一次，都会额外得到少量荣誉，所以在远离旗帜的地方厮杀同样值得。每天的首胜还会额外给一份奖励，只要这份奖励还等着你，面板就会告诉你。这个“每天”属于荣誉自己，它按自己的时钟翻篇，而不跟着王国的副本重置走。反复遇上同一支队伍，从第二次起比赛本身给的荣誉会减少，但很快就会稳定在一个下限，而不会一路跌到零；被判弃权的比赛则一点都不给。赚到的荣誉可以在任意一位战争军需官处消费。',
+  'guide.thornhollowPage.rewardsHeading': '一场比赛给什么',
+  'guide.worldPage.farshoreBlurb':
+    '一座满是鸥鸣与咸风的海岛，浮在东溪谷东岸之外；裂隙在这里毫无预兆地撕开，而渔镇鸥港守着自己的这片海岸。',
+  'guide.worldPage.farshoreGreeter': '守钟人塔姆，登岸口',
+  'guide.worldPage.farshoreGreeting':
+    '你是从沙洲堤道过来的？那你是这一周里的头一个，守望者肯定想亲眼瞧瞧你。',
+  'guide.worldPage.farshorePlaceNotes':
+    '鸥港是岛上唯一的城镇，也是它的堡垒。登岸口是沙洲堤道上岸的地方，岬角上立着一口警钟；守望草甸占着镇子东南的高地，一位裂察在那里聆听下一次裂开；碎裂断崖在岛的南端豁然裂开；裂野则是鸥港以东那片被摧残的麦田，至今仍爬满了从那道裂口涌出来的东西。',
+  'guide.worldPage.mountsBody':
+    '骑乘是唯一能把世界变小的东西，而它首先是一堂课，其次才是一匹马。到了 20 级，马厩总管玛拉会收下你：你从她那里买下骑术，而骑乘课本身是免费的，那是一段跳跃赛道，你骑着借来的坐骑绕她的围场跑一圈。通过之后把这堂课交还，你的第一匹英勇战马就归你了，从此你在王国里赶路会明显快上不少。速度是坐骑给你的全部：更稀有的那些来自最难的内容，跑得还要更快，但它们都不会改变你在战斗中的强弱。用你操作设置里绑定的按键上下坐骑。战斗中无法上马，而挥动武器、施放法术、涉水，或是在战斗中倒下，都会让你重新落回地面。',
+  'guide.worldPage.mountsMore': '关于坐骑的一切',
+  'guide.worldPage.mountsTitle': '坐骑',
+  'guide.worldPage.riftBody':
+    '有什么东西不断在这个王国身上撕开口子。裂隙传送门会自行在世界各处开启，绝不会出现在起始之路的那三片区域，但在它们之外的每一片王国土地以及远岸上都会出现，而每当一道裂隙撕开，整个王国都会听到消息。每一道传送门都带着一个等级，等级越高，这段下行之路越难，也越丰厚。传送门是一场共享的事件：任何队伍都可以踏进去，并各自得到属于自己的一趟，但首杀永远只属于一支队伍，所以一道新鲜的裂隙值得你赶紧动身。进入它需要 20 级，而如果没人及时应答，裂隙会自行坍塌。',
+  'guide.worldPage.riftMore': '关于裂隙的一切',
+  'guide.worldPage.riftTitle': '裂隙传送门',
+  'guide.worldPage.travelBody':
+    '王国里的每一条路，都得靠走或者骑。这里没有飞行路线，没有马车，也没有传送网络：地图是一整块相连的陆地，每一处连接都是你可以踩上去的东西。山脊把一片土地与下一片隔开，两地共享一道山脊时，道路便会翻过一处山口。不过并非每一处边界都是这样。北面有一条长长的堤道，载着道路从帷幕幽谷跨过水面，通往更北的雪国；而回到南边，有一道细细的天然沙洲，名叫沙洲堤道，自东溪谷海岸向东延伸，直抵远岸岛上的登岸口，那座岛根本没有陆上边界。整个地表世界里恰好只有一道真正的门户：荆峰高处的一层暮色之幕，通往帷幕幽谷。幽谷的南侧山脊被封死，没有山口可以穿过，所以那层幕正是你最初进去的方式，而回程时它会在你身后合上。\n\n无论你倒在哪里，走回来的路都不长。每一片区域至少有一座墓地，一位灵魂医者悬在墓碑上方，释放出的灵魂会在最近的那一座升起。\n\n地图不会终结于一堵看不见的墙。陆地会一路铺展成海滩与岬角，然后没入开阔的水面。世界本就打算让你游过去的那些地方，也就是两片土地之间的海峡与湖泊，都平静而安全。若你偏要向外海进发，距离本身会把你劝回来：你会被警告一次，再警告一次，而如果你还继续游，大海就会把你耗到死。下潜也有它自己的限度，因为你的气在水下会用尽，所以水一提醒你，就浮上来换口气、掉头回去吧。',
+  'guide.worldPage.travelTitle': '四处走动',
+  'hud.errors.notEnoughDevotion': '虔诚值不足！',
+  'hud.pet.abyssalChain': '深渊锁链',
+  'hud.pet.abyssalChainDesc':
+    '命令幽影将 8 码以外、20 码以内的普通敌人拖回自己身边。首领无法被拖拽。冷却时间 15 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。',
+  'hud.pet.abyssalChainTitle': '深渊锁链',
+  'hud.pet.autocastOff': '自动施放已关闭。右键点击、长按或按 Shift+Enter 可开启。',
+  'hud.pet.autocastOn': '自动施放已开启。右键点击、长按或按 Shift+Enter 可关闭。',
+  'hud.pet.felbolt': '邪能箭',
+  'hud.pet.felboltDesc':
+    '命令烬裔向你的目标额外发射一枚邪能弹。冷却时间 8 秒。右键点击、长按或按 Shift+Enter 可切换自动施放。',
+  'hud.pet.felboltTitle': '邪能箭',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    '符合条件的伤害产生 {value} 点定罪值，每 {interval} 秒最多一次',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    '吸取生命正在消耗 {stacks} 层命运丝线，每跳额外产生 {doom} 点定罪值',
+  'hudChrome.auraEffect.afflictionEye':
+    '恶咒凝视每 {interval} 秒攻击一次；此邪眼上的效果产生 {pct}% 的定罪值',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    '此邪眼上的效果产生 {doomPct}% 的定罪值；宣判在此回响并造成 {echoPct}% 伤害',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} 层命运丝线：宣判伤害提高 {sentencePct}%，或使吸取生命每跳额外产生 {doom} 点定罪值',
+  'hudChrome.auraEffect.afflictionJudgment':
+    '主邪眼产生的定罪值提高 {eyePct}%；宣判伤害提高 {sentencePct}%，第一次返还 {refund} 点定罪值',
+  'hudChrome.auraEffect.afflictionLitany':
+    '获得定罪值时，对 {radius} 码内最多 {targets} 个敌人造成 {damage} 点暗影伤害，每秒最多一次',
+  'hudChrome.auraEffect.afflictionPossession': '强化命运之针、吸取生命、恶咒凝视和宣判',
+  'hudChrome.auraEffect.afflictionVicarious':
+    '转移或降低 {pct}% 的受到伤害，并可产生最多 {max} 点定罪值',
+  'hudChrome.auraEffect.afflictionViolence':
+    '剩余 {charges} 次报复；敌人攻击会产生 {doom} 点定罪值并反击 {damage} 点暗影伤害',
+  'hudChrome.auraEffect.aoeEcho':
+    '剩余 {charges} 次回响：单体技能对附近最多 {targets} 个敌人造成 {pct}% 伤害',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} 层奥术充能：以太涌动伤害提高 {damagePct}%，施法加快 {castPct}%，法力消耗变为 {costMult} 倍',
+  'hudChrome.auraEffect.bleedVuln': '受到的流血伤害提高 {pct}%',
+  'hudChrome.auraEffect.brainFreeze': '下一次冰风暴瞬发且无视冷却时间',
+  'hudChrome.auraEffect.castShield': '施法不会因受到伤害而中断或延迟',
+  'hudChrome.auraEffect.cauterizeFatigue': '灸灼无法再次阻止致命伤害',
+  'hudChrome.auraEffect.cooldownCap': '此时间窗已使用 {used}/{cap} 秒冷却缩减',
+  'hudChrome.auraEffect.dawnsWrath': '制裁之锤：无生命限制 · +1次 · 冷却0 · 伤害+{pct}%',
+  'hudChrome.auraEffect.desolation':
+    '剩余 {charges} 层：下一次混乱箭施法加快 {castPct}%，或下一次火焰之雨立即落下',
+  'hudChrome.auraEffect.duskEconomy': '技能的能量消耗降低{pct}%',
+  'hudChrome.auraEffect.duskfireClaim': '目标死亡时获得 {value} 点毁灭',
+  'hudChrome.auraEffect.elementalTrance':
+    '受到的伤害降低{pct}%。你造成的所有伤害的{mana}%转化为法力值',
+  'hudChrome.auraEffect.energyRegen': '能量恢复速度提高 {pct}%',
+  'hudChrome.auraEffect.enrage':
+    '造成的伤害提高 {damagePct}%，攻击速度提高 {hastePct}%，移动速度提高 {movePct}%',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '剩余 {charges} 层：冰枪术视目标为冻结状态，并造成 {pct}% 的冻结伤害',
+  'hudChrome.auraEffect.forbiddenReflectionLock': '禁忌映像暂时无法再次准备',
+  'hudChrome.auraEffect.forbiddenReflectionReady': '下一个符合条件的术士冷却技能可再次施放',
+  'hudChrome.auraEffect.formLich': '灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害',
+  'hudChrome.auraEffect.formMetamorph': '恶魔形态：体型增大 {pct}%；其他加成由独立增益提供',
+  'hudChrome.auraEffect.formMoonkin': '月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%',
+  'hudChrome.auraEffect.formShadow': '幽幕形态：暗影伤害提高 {pct}%',
+  'hudChrome.auraEffect.freeExecute': '下一个符合条件的斩杀技能不消耗资源',
+  'hudChrome.auraEffect.funeralHarvestLock': '葬礼收割暂时无法再次生成灵魂碎片',
+  'hudChrome.auraEffect.galeheartWeapon':
+    '完成战魂的{steps}连击节奏后，该次打击回响{count}次，每次造成其伤害{pct}%的自然伤害',
+  'hudChrome.auraEffect.gloam':
+    '幽暝：第{stacks}/{max}层。从暮帷中使用的先制技各累积1层。达到{max}层时，你的先制技无需潜行即可使用，下一次先制技免费施放，消耗全部3层并开启暗影缠身',
+  'hudChrome.auraEffect.healEcho': '生命值低于 {threshold}% 时恢复 {value} 点生命值',
+  'hudChrome.auraEffect.hunterFerocity': '{stacks} 层兽群凶性：你的宠物造成的伤害提高 {pct}%',
+  'hudChrome.auraEffect.icicles': '{value}/{max} 根冰刺；达到 {max} 根时可施放冰川尖刺',
+  'hudChrome.auraEffect.internalCooldown': '计时结束前此效果无法再次触发',
+  'hudChrome.auraEffect.leadenHexLock': '铅沉妖术暂时无法再次定身此目标',
+  'hudChrome.auraEffect.mendingCurrent': '储存 {value} 点治疗量，随时间释放或由湍流愈合消耗',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    '储存相当于最大生命值 {pct}% 的治疗量，供湍流愈合消耗',
+  'hudChrome.auraEffect.moontide':
+    '月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层',
+  'hudChrome.auraEffect.necromancyDeathEcho': '旧版本遗留的死亡回响；当前没有技能会消耗它',
+  'hudChrome.auraEffect.necromancyHarvestMark': '目标死亡时可生成 1 个灵魂碎片',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    '储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片',
+  'hudChrome.auraEffect.nextAttackCrit': '下一次攻击必定暴击',
+  'hudChrome.auraEffect.oldBlood':
+    '古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：狼形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
+  'hudChrome.auraEffect.overpowerCharge': '{stacks} 层充能：下一次致残打击伤害提高 {pct}%',
+  'hudChrome.auraEffect.perfectMoment': '以太飞弹不会消耗奥术充能',
+  'hudChrome.auraEffect.petDamage': '宠物造成的伤害提高 {pct}%',
+  'hudChrome.auraEffect.petHaste': '宠物的行动速度提高 {pct}%',
+  'hudChrome.auraEffect.physicalReduction': '受到的物理伤害降低 {pct}%',
+  'hudChrome.auraEffect.pyreGuardian':
+    '每 {ruinInterval} 秒产生 {ruin} 点毁灭，并每 {damageInterval} 秒对 {radius} 码内敌人造成 {damage} 点火焰伤害',
+  'hudChrome.auraEffect.radiantResonance':
+    '你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒',
+  'hudChrome.auraEffect.redline':
+    '红线：第{stacks}/{max}格。每次大摆拳增加1格。眼前一黑每格伤害提高{pct}%，使用后结束红线。若计时先行结束，这记击倒就会作废',
+  'hudChrome.auraEffect.resourceCount': '{value}/{max}',
+  'hudChrome.auraEffect.resourceSap': '每 {interval} 秒恢复 {value} 点当前资源',
+  'hudChrome.auraEffect.ruinousBrand':
+    '剩余 {charges} 次复制：直接法术在此复制 {otherPct}% 伤害；若此目标也是主目标则复制 {selfPct}%',
+  'hudChrome.auraEffect.sated': '无法再获得团队急速效果',
+  'hudChrome.auraEffect.solarReprisal':
+    '你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发',
+  'hudChrome.auraEffect.sourceVuln': '受到施加此效果的施法者造成的伤害提高 {pct}%',
+  'hudChrome.auraEffect.spellDamage': '法术伤害提高 {pct}%',
+  'hudChrome.auraEffect.spellHaste': '施法速度提高 {pct}%',
+  'hudChrome.auraEffect.stasis': '免疫所有效果且无法行动',
+  'hudChrome.auraEffect.suddenDeath': '下一次斩杀不消耗怒气并无视生命值要求',
+  'hudChrome.auraEffect.sureCrit': '接下来 {charges} 个伤害技能必定暴击',
+  'hudChrome.auraEffect.sweepingStrikes': '单体攻击还会对附近 {targets} 个敌人造成 {pct}% 伤害',
+  'hudChrome.auraEffect.temporalEcho':
+    '施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%',
+  'hudChrome.auraEffect.veiledEdge': '你的下一次潜伏突袭造成双倍伤害',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    '暗影缠身：你的暮帷先制技可在明处以任意角度使用，造成的伤害提高{pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    '毒祭：第{stacks}/{max}层。卑劣突刺、邪恶斩击与毒镖各累积1层。达到{max}层时，长眠变为蚀毒撕裂',
+  'hudChrome.auraEffect.verdance':
+    '繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放',
+  'hudChrome.auraEffect.warlockAnchor': '在 {range} 码内再次施放可返回此处并消耗锚点',
+  'hudChrome.auraEffect.wintersChill': '剩余 {charges} 层：符合条件的法术视此目标为冻结状态',
+  'hudChrome.paladin.ascensionLastAnnouncement': '升华的最后一次充能',
+  'hudChrome.paladin.ascensionSpenderAria': '动作栏第 {slot} 格：{ability}。消耗一次升华充能。',
+  'hudChrome.paladin.devotion': '虔诚',
+  'hudChrome.paladin.devotionAscensionCharges': '虔诚值 {value}/{max}。升华充能：{charges}。',
+  'hudChrome.paladin.devotionAscensionLast': '虔诚值 {value}/{max}。升华的最后一次充能。',
+  'hudChrome.paladin.devotionValue': '虔诚值 {value}/{max}',
+  'hudChrome.procOverlay.ruinMeter': '毁灭',
+  'hudChrome.procOverlay.ruinStatus': '毁灭 {value}/{max}',
+  'hudChrome.procOverlay.soulFragmentsMeter': '灵魂碎片',
+  'hudChrome.statInfo.effects.manaRegenCombat': '战斗中每5秒约恢复 {value} 点法力',
+  'hudChrome.warlock.doomEmptyStatus': '{value}/{max} 谴罪。',
+  'hudChrome.warlock.doomLabel': '谴罪',
+  'hudChrome.warlock.doomMeterLock': '锁定痛苦资源条',
+  'hudChrome.warlock.doomMeterUnlock': '移动痛苦资源条',
+  'hudChrome.warlock.doomStatus': '{value}/{max} 谴罪；剩余 {remaining}。',
+  'hudChrome.warlock.fateThreadsConsumeReady': '三层命运丝线：吞噬可将其编织为额外的谴罪。',
+  'hudChrome.warlock.fateThreadsLabel': '命运丝线',
+  'hudChrome.warlock.fateThreadsSentenceReady': '三层命运丝线：裁决可消耗它们以提高18%的伤害。',
+  'hudChrome.warlock.fateThreadsStatus': '{value}/{max} 命运丝线。',
+  'itemUi.tooltip.useHealingPotionPct':
+    '使用：立即恢复最大生命值的 {percent}%。战斗中可用。2 分钟冷却。',
+  'guide.controls.clickMoveNote':
+    '点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。',
+  'guide.deedsPage.platformBody':
+    '如果你在桌面客户端中关联了 Steam 或 Epic Games 账号，你所获得的功绩会向外同步为该账号上的成就。游戏世界始终是准绳：功绩在这里挣得，记录在你的角色身上，成就随后跟上。并非每一项功绩都有对应的成就；若某个成就没有立刻到账，它会在你下次登录时补上。关联永远只是关联，绝不是一种登录方式。',
+  'guide.deedsPage.platformHeading': 'Steam 与 Epic 成就',
+  'guide.faqPage.a17':
+    '同一个账号在每个服务器上最多可以有十个角色，而你也可以在不止一个服务器上拥有角色。想删掉某个角色，就在角色列表里删除它：该角色必须不在世界中，而且你要输入它的名字来确认，所以手一滑绝不会让你失去一位英雄。删除是永久的。那个角色的随身家当会随它而去，它在世界市场上的挂单会被撤下，渡鸦邮驿的信箱也会被清空。',
+  'guide.faqPage.a18':
+    '你自己改不了，所以起名时挑一个中意的。名字为 2 到 16 个字母，以字母开头，允许空格、连字符和撇号；无论大小写怎么写，每个名字在它所在的服务器上都是唯一的。违反行为准则的名字会被拒绝。唯一一次会被要求改名，是管理员要求你改。注销账号可能会把它的名字释放给其他玩家，而单纯一阵子不玩绝不会：闲置的账号照样保留它的名字。',
+  'guide.faqPage.a19':
+    '你的角色会在世界中停留大约五分钟，游戏也会自行尝试重连，所以信号中断、合上笔记本或刷新页面，通常都能让你回到原处、回到同一场对局里。也正因为你的角色确实还站在那儿，掉线并不是逃离战斗的办法。从游戏菜单里选择“退出登录”，则会立即离开，不必等完那段时间。',
+  'guide.faqPage.a20':
+    '在在线游戏中，用 Esc 打开菜单，选择“报告错误”。描述发生了什么，然后发送：你所在的服务器、你的角色，以及你当时站在哪里，都会自动一同附上，还有你的版本与设备信息；你也可以勾选“包含截图”，附上你当时看到的画面。如果你接连发送好几份，可能会被要求稍等片刻再发下一份。',
+  'guide.faqPage.q17': '我可以拥有多少个角色？可以删除角色吗？',
+  'guide.faqPage.q18': '我可以更改角色的名字吗？',
+  'guide.faqPage.q19': '如果我掉线了会怎么样？',
+  'guide.faqPage.q20': '我发现了一个错误，该怎么报告？',
+  'guide.howToPlay.charactersBody':
+    '一个账号在每个服务器上最多可以保留十个角色，所以你尽可以多试几个职业，不必舍弃什么。删除则是一件需要下决心的事：角色必须不在世界中，游戏还会让你输入它的名字才肯放行。被删除的角色一去不返，它在世界市场上的挂单和渡鸦邮驿里的信件也会随它一并消失。',
+  'guide.howToPlay.charactersTitle': '你的角色',
+  'guide.howToPlay.connectionBody':
+    '信号中断、合上屏幕或刷新页面，都不会把你踢下线。你的角色会在世界中被保留大约五分钟，游戏则自行重连，你会回到同一场对局的同一个地方。这也意味着掉线并不是脱离战斗的办法：你的角色仍然站在那里。从游戏菜单退出登录会立刻离开，不必等待；在同一个账号上登录另一个角色也是一样。',
+  'guide.howToPlay.connectionTitle': '如果你掉线了',
+  'guide.howToPlay.namesBody':
+    '名字长 2 到 16 个字母，以字母开头，可以包含空格、连字符和撇号。同一个服务器上不会有两个角色重名，而大小写并不能让一个名字空出来：如果 Ashwind 已被占用，ashwind 同样被占用。你自己的写法会被原样保留。挑一个你会一直喜欢的名字吧，因为它会一直伴着这个角色。',
+  'guide.howToPlay.namesTitle': '为你的英雄起名',
+  'guide.faqPage.a6Count':
+    '{cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，从最初的山谷，一直到专为满级角色打造的地带。',
+  'guide.home.faq.a4Count':
+    '等级上限为 {cap} 级，需通过任务、地下城与探索横跨各处区域达成。全世界共有 {zones} 个区域，其中最遥远的几处专为满级角色打造。',
+  'guide.home.world.subCount':
+    '一片连绵不绝的大陆，共 {zones} 个区域，从静谧的山谷、沉没的沼泽，到余烬荒原、冰封高地与树篱迷宫花园。',
+  'guide.combat.threatBody':
+    '每个敌人都在心里记着一笔账，算清是谁最惹恼了它。伤害会加到账上，治疗同样如此：一次治疗会把威胁值加到正与被治疗者交战的那些敌人身上，并在它们之间分摊，因此最安全的治疗，是治疗那位已经被坦克拉稳的同伴。坦克会开启防御姿态或防护形态，让自己产生的一切威胁成倍增加，而德鲁伊的狼形态则相反，会甩掉威胁；嘲讽则把施放者直接抬到账目顶端，并在几秒内把敌人钉在他身上。敌人不会在有人刚刚超过坦克的那一瞬间就转火：要把它拉走需要明显的领先，远程需要的领先幅度又比近战更大，因此起手时稍有耐心，就能让战斗留在它该在的地方。',
+  'guide.classPage.formLine.form_bear':
+    '坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。',
+  'guide.riftsPage.floorsBody':
+    '一道裂隙有若干层，每一层都是当场生成的；而通往下一层的路，要等这一层跟你算清了账才会打开：清掉层里还活着的东西，解开它横在你路上的机关，向下的通道便会撕裂而开。最后一层以一名首领收尾。每一层都有自己的性格，所以一趟下来，你可能刚走出严寒，转身就踏进余烬之中，聊天栏会在你抵达每一层时报出它的名字。这一趟究竟有几层，看你屏幕上的追踪条。有些裂隙开启的则是一处手工搭建的场景，它有自己固定的长度，而不是生成出来的下行之路。',
+  // Performance diagnostics panel chrome. Technical report prose remains English.
+  'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.title': 'ClaudeCraft 性能医生',
+  'hudChrome.perf.diagnostics.subtitle': '针对游戏的扫描，提供证据和代码级修复建议。',
+  'hudChrome.perf.diagnostics.aria.liveMeasurements': '实时性能测量',
+  'hudChrome.perf.diagnostics.aria.scanProgress': '诊断扫描进度',
+  'hudChrome.perf.diagnostics.aria.findings': '按优先级排序的诊断结果',
+  'hudChrome.perf.diagnostics.controls.minimize': '最小化',
+  'hudChrome.perf.diagnostics.controls.expand': '展开',
+  'hudChrome.perf.diagnostics.controls.start': '开始 15 秒扫描',
+  'hudChrome.perf.diagnostics.controls.refreshCensus': '刷新场景统计',
+  'hudChrome.perf.diagnostics.controls.copyReport': '复制清晰报告',
+  'hudChrome.perf.diagnostics.controls.downloadReport': '下载报告',
+  'hudChrome.perf.diagnostics.controls.scanning': '扫描中...',
+  'hudChrome.perf.diagnostics.controls.scanAnother': '扫描另一个区域',
+  'hudChrome.perf.diagnostics.controls.reportLogged': '报告已记录到控制台',
+  'hudChrome.perf.diagnostics.controls.copied': '已复制',
+  'hudChrome.perf.diagnostics.controls.copyBlocked': '复制受阻：报告已记录',
+  'hudChrome.perf.diagnostics.controls.retestLowGraphics': '使用低画质重新测试',
+  'hudChrome.perf.diagnostics.instruction':
+    '为获得最佳信号，请进入离线游戏，在卡顿区域移动并旋转镜头，然后在扫描期间触发造成卡顿的效果。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenRestart':
+    '此标签页隐藏时扫描已暂停。返回后扫描将重新开始。',
+  'hudChrome.perf.diagnostics.status.restoredRestart':
+    '标签页已恢复。正在重新开始一次干净的 15 秒活跃游戏采集。',
+  'hudChrome.perf.diagnostics.status.worldLoaded': '世界已加载。正在等待第一个可操作帧。',
+  'hudChrome.perf.diagnostics.status.pausedHiddenContinue':
+    '此标签页隐藏时扫描已暂停。请返回游戏以继续。',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.one':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.collectingRemaining.other':
+    '正在采集活跃游戏：剩余 {seconds} 秒',
+  'hudChrome.perf.diagnostics.status.waitingFrames':
+    '正在等待有代表性的游戏帧：{current}/{minimum}',
+  'hudChrome.perf.diagnostics.status.collectingNow': '正在采集活跃游戏：现在请穿过问题区域。',
+  'hudChrome.perf.diagnostics.status.ready': '已准备扫描。按开始并重现卡顿。',
+  'hudChrome.perf.diagnostics.status.waitingWorld':
+    '正在等待游戏世界。请选择离线游戏或进入一个在线角色。',
+  'hudChrome.perf.diagnostics.metrics.waitingRenderer': '渲染器：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingCensus': '场景统计：等待中',
+  'hudChrome.perf.diagnostics.metrics.waitingHitch': '卡顿归因：进入世界时已启用',
+  'hudChrome.perf.diagnostics.metrics.recent':
+    '最近  {fps} FPS | p95 {p95} 毫秒 | >50 毫秒 {longFrames}',
+  'hudChrome.perf.diagnostics.metrics.render':
+    '渲染  提交 {submit} 毫秒 | 世界 {world} 毫秒 | 实体 {entities} 毫秒',
+  'hudChrome.perf.diagnostics.metrics.scene':
+    '场景   {calls} 次调用 | {triangles} 个三角形 | {views} 个视图',
+  'hudChrome.perf.diagnostics.metrics.hitches':
+    '卡顿 {hitches} | 着色器 {shaders} | 上传 {uploads} | 视图 {views}',
+  'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
+  'hudChrome.perf.diagnostics.metrics.waitingValue': '等待中',
+  'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100：{headline}',
+  'hudChrome.perf.diagnostics.healthyNoFindings':
+    '未触发可执行的阈值。如果短暂卡顿仍然影响体验，请沿着触发卡顿的准确移动路径重新运行扫描。',
+  'hudChrome.perf.diagnostics.findingMeta': '{severity} | {confidence} 置信度',
+  'hudChrome.perf.diagnostics.sections.evidence': '证据',
+  'hudChrome.perf.diagnostics.sections.tryNow': '立即尝试',
+  'hudChrome.perf.diagnostics.sections.codeFix': '代码修复',
+  'hudChrome.perf.diagnostics.sections.source': '相关源文件',
+  'hudChrome.perf.diagnostics.severity.critical': '严重',
+  'hudChrome.perf.diagnostics.severity.warning': '警告',
+  'hudChrome.perf.diagnostics.severity.info': '信息',
+  'hudChrome.perf.diagnostics.confidence.high': '高',
+  'hudChrome.perf.diagnostics.confidence.medium': '中',
+  'hudChrome.perf.diagnostics.confidence.low': '低',
+  'hudChrome.perf.diagnostics.diagnosis.noProblemTitle': '未检测到明显性能问题',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.one':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.findings.other':
+    '最近 10 秒在 {fps} FPS、帧 p95 为 {p95} 时发现 {findings} 项可处理问题。',
+  'hudChrome.perf.diagnostics.diagnosis.summary.healthy':
+    '最近 10 秒保持 {fps} FPS，帧 p95 为 {p95}。游戏、浏览器、GPU、内存、资源和网络均未触发阈值。',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hardwareAcceleration': '正在使用软件渲染',
+  'hudChrome.perf.diagnostics.diagnosis.titles.integratedGpu': '游戏正在使用集成显卡',
+  'hudChrome.perf.diagnostics.diagnosis.titles.highDpi': '高分辨率渲染开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.forcedHighGraphics': '强制高画质正在降低性能',
+  'hudChrome.perf.diagnostics.diagnosis.titles.lowMemory': '设备可用内存较低',
+  'hudChrome.perf.diagnostics.diagnosis.titles.browserStalls': '检测到浏览器或扩展程序停顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.heapPressure': '检测到浏览器内存压力',
+  'hudChrome.perf.diagnostics.diagnosis.titles.contextLoss': '图形上下文已重置',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gpuSubmit': 'GPU 提交是主要帧瓶颈',
+  'hudChrome.perf.diagnostics.diagnosis.titles.sceneDraw': '场景绘制开销超过当前画质预算',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shadowPass': '阴影通道占用大量绘制调用',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererWorld': '世界渲染器更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererEntities': '实体视图更新受 CPU 限制',
+  'hudChrome.perf.diagnostics.diagnosis.titles.rendererNameplates': '姓名牌绘制开销较大',
+  'hudChrome.perf.diagnostics.diagnosis.titles.simCpu': '模拟工作占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.hudCpu': 'HUD 更新占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': '事件处理占用帧时间',
+  'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': '游戏过程中正在编译着色器',
+  'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': '纹理上传导致游戏卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': '实体视图创建导致卡顿',
+  'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': '仍有未归因的长帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': '资源处理延迟了游戏启动',
+  'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': '浏览器长任务正在阻塞帧',
+  'hudChrome.perf.diagnostics.diagnosis.titles.networkLatency': '网络传输延迟了可见响应',
+  'hudChrome.perf.diagnostics.diagnosis.titles.snapshotApply': '快照处理正在阻塞客户端',
+  'hudChrome.perf.diagnostics.diagnosis.titles.generic': '性能规则 {rule} 需要处理',
+  'hudChrome.perf.diagnostics.diagnosis.causes.environment':
+    '检测到的浏览器、GPU、内存或设备设置可能在游戏渲染前限制性能。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.graphics':
+    '本次采集测得的图形工作超过当前帧预算或场景预算。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.cpu':
+    '某个 CPU 阶段占用了足以错过帧预算的主线程时间。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.loading':
+    '资源准备或首次使用工作发生在可见游戏或启动路径中。',
+  'hudChrome.perf.diagnostics.diagnosis.causes.network':
+    '网络传输或客户端快照处理延迟了最新可操作状态。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.environment':
+    '环境规则 {rule} 与此设备和浏览器匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.gpuSubmit':
+    'WebGL 提交 p95 为 {submit}，占渲染器 p95 的 {share}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.frame':
+    '最近窗口测得 {fps} FPS，帧 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCalls':
+    '场景使用 {calls} 次绘制调用，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneTriangles':
+    '场景提交 {triangles} 个三角形，目标为 {target}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.sceneCategory':
+    '场景类别 {category} 贡献 {calls} 次调用和 {triangles} 个测量三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.censusNeeded': '刷新场景统计以识别主要渲染类别。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.shadow':
+    '阴影通道提交 {calls} 次调用，占基线的 {share}，共 {triangles} 个三角形。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.cpuPhase': '测得阶段 {phase} 的 p95 为 {p95}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.hitch':
+    '记录的 {total} 次卡顿中，有 {count} 次与原因 {cause} 匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.assets':
+    '预加载门为 {tasks} 个已注册任务等待了 {wait}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.failedAssets': '失败的资源组：{groups}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.longTasks':
+    '测得 {count} 个长任务，p95 为 {p95}，最大值为 {max}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.network':
+    '快照间隔为 {interval}，最新快照年龄为 {age}，输入回显 p95 为 {echo}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.snapshot':
+    '快照解析和应用 p95 为 {work}；网络间隔 p95 为 {gap}。',
+  'hudChrome.perf.diagnostics.diagnosis.evidence.generic': '诊断规则 {rule} 与本次采集匹配。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.environment':
+    '修正检测到的环境设置，重新启动，然后重复相同扫描。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.graphics':
+    '以低画质重复相同镜头路径，确认图形压力。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.cpu':
+    '分别在静止和移动时重复扫描，以隔离 CPU 阶段。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.loading':
+    '重复相同路线或首次使用操作，确认卡顿发生时机。',
+  'hudChrome.perf.diagnostics.diagnosis.tryNow.network':
+    '在离线游戏中使用相同移动和镜头路径进行比较。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.environment':
+    '让检测到的备用路径遵守共享图形和内存预算。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.graphics':
+    '使用现有渲染预算、实例化、材质共享、LOD 和隐藏工作跳过机制。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.cpu':
+    '分析指定阶段，移除重复工作和分配，并保持游戏行为。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.loading':
+    '通过现有启动和流式预算预加载、池化或分摊已识别的首次使用工作。',
+  'hudChrome.perf.diagnostics.diagnosis.codeFix.network':
+    '降低传输或快照处理成本，同时不削弱权威服务器模型。',
+  'hudChrome.perf.diagnostics.report.title': 'World of ClaudeCraft 性能诊断',
+  'hudChrome.perf.diagnostics.report.statusLine': '状态：{status}（{score}/100）',
+  'hudChrome.perf.diagnostics.report.capturedLine': '采集时间：{captured}',
+  'hudChrome.perf.diagnostics.report.topFindingLine': '首要问题：{finding}',
+  'hudChrome.perf.diagnostics.report.summaryLine': '摘要：{summary}',
+  'hudChrome.perf.diagnostics.report.gpuLine': 'GPU：{gpu}',
+  'hudChrome.perf.diagnostics.report.graphicsLine': '画质：{tier}，渲染比例 {scale}',
+  'hudChrome.perf.diagnostics.report.recentLine':
+    '最近：{fps} FPS，p95 {p95}，{longFrames} 帧超过 50 毫秒，共测量 {frames} 帧',
+  'hudChrome.perf.diagnostics.report.resultHeading': '结果',
+  'hudChrome.perf.diagnostics.report.noThreshold': '本次采集未触发可处理阈值。',
+  'hudChrome.perf.diagnostics.report.findingHeading': '{index}. {title}',
+  'hudChrome.perf.diagnostics.report.findingMeta': '严重程度：{severity}。置信度：{confidence}。',
+  'hudChrome.perf.diagnostics.report.rawSnapshotHeading': '原始快照',
+  'hudChrome.perf.diagnostics.report.notAvailable': '不可用',
+  'hudChrome.perf.diagnostics.report.status.critical': '严重',
+  'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
+  'hudChrome.perf.diagnostics.report.status.healthy': '正常',
+  'hudChrome.reliquary.progressText': '{owned}/{total}',
+  'guide.talentsPage.loadoutGearNote':
+    '一套布局还能连装备一起记住。保存时选择同时保存装备的那一项，它便会记录你当时穿戴的装备，于是 PvP 套装与地下城套装之间只隔一次点击，而不是十六次。它记住的是那件具体的物品，而非仅仅名称，因此附魔过的戒指绝不会被背包里挨着的普通同名戒指悄悄顶替。切换回来时找不到的部件会被原样跳过并告知你，所以哪怕有一件已存入银行或挂上市场，其余装备照样会穿戴上身。',
+  'guide.thornhollowPage.leavingHeading':
+    '中途离场，以及补位',
+  'guide.thornhollowPage.leavingBody':
+    '比赛进行中退出即为逃跑，而排名阶梯不能奖励在落后时拔掉插头的人：逃跑者当场记下这场失利与随之而来的评分损失，若正携旗则将旗帜掉落，其队伍则少一人继续作战。最后这一点正是空位的由来。当一场比赛缺人时，队列可以把这个位置让给正在等待的人，而这始终是一份你可以接受或拒绝的邀请，而不是径直把你传送过去；拒绝不需付出任何代价，位置会顺延给下一位。只有单人排队者会被询问，因此一同排队的小队绝不会被拆散去填补空缺。',
+  'guide.thornhollowPage.backfillNote':
+    '接下补位的席位是刻意不带风险的：你落入的是一份与你无关的比分，因此无论胜负，这场比赛都不会触动你的战场评分，中途离开也不欠任何代价。当一场比赛已接近尾声、新来者再也无法改变结果时，邀请也就不再发出，所以你绝不会被安置进别人的结局里。',
+  'hudChrome.bags.lockItem': '锁定物品',
+  'hudChrome.otaUpdate.applying': '更新已下载。正在重新启动游戏以应用更新。',
+  'hudChrome.otaUpdate.continueAnyway': '暂不更新，继续游戏',
+  'hudChrome.otaUpdate.downloading': '正在下载更新：{percent}',
+  'hudChrome.otaUpdate.incompatible': '需要更新后才能进行游戏。下载完成后将立即应用。',
+  'hudChrome.otaUpdate.progressLabel': '更新下载进度',
+  'hudChrome.otaUpdate.title': '游戏更新',
+  'entities.mobs.tower_imp.name': '烬火幼魔',
+  'entities.mobs.tower_hellhound.name': '地狱犬',
+  'entities.mobs.tower_pact_reaver.name': '契约劫掠者',
+  'entities.mobs.tower_brimstone_zealot.name': '硫火狂信徒',
+  'entities.mobs.tower_soulbinder.name': '缚魂者',
+  'entities.mobs.tower_iron_defiler.name': '钢铁亵渎者',
+  'entities.mobs.tower_abyss_knight.name': '深渊骑士',
+  'entities.mobs.tower_dread_harbinger.name': '恐惧先驱',
+  'entities.mobs.tower_gloom_bat.name': '幽暗蝠',
+  'entities.mobs.tower_cinder_crawler.name': '烬火爬行者',
+  'entities.mobs.tower_bone_acolyte.name': '骸骨侍祭',
+  'entities.mobs.tower_shade_dancer.name': '暗影舞者',
+  'entities.mobs.tower_flame_herald.name': '烈焰使者',
+  'entities.mobs.tower_rot_hulk.name': '腐化巨躯',
+  'entities.mobs.tower_blood_matron.name': '鲜血主母',
+  'entities.mobs.tower_void_sentinel.name': '虚空哨兵',
+  'entities.mobs.tower_boss_flesh_shaper.name': '塑肉者戈尔',
+  'entities.mobs.tower_boss_ash_tyrant.name': '灰烬暴君辛德拉克斯',
+  'entities.mobs.tower_boss_gatekeeper.name': '守门者瓦斯卡',
+  'entities.mobs.tower_boss_demon_lord.name': '无缚之塔玛尔格拉斯',
+  'sim.rift.towerWave': '恶魔核心发出嚎叫。第{wave}波，共{total}波。',
+  'sim.rift.ascendFloor': '你向上进入{name}。',
+  'sim.rift.towerBossWave': '核心裂开，一个更加可怕的存在从中走出。',
+  'sim.rift.towerFloorClear': '恶魔核心破裂。向上的道路已经开启。',
+  'sim.rift.towerCleared': '恶魔核心黯灭。高塔属于你了。',
+  'worldContent.demonTowerName': '恶魔之塔',
+  'worldContent.demonTowerBloodforgeName': '恶魔之塔：血铸熔炉',
+  'worldContent.demonTowerOssuaryName': '恶魔之塔：锁链骨堂',
+  'worldContent.demonTowerVoidCrownName': '恶魔之塔：虚空之冠',
+  'worldContent.demonTowerCoreName': '恶魔核心',
+  'worldContent.demonTowerAscentName': '高塔升途',
 };

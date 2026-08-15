@@ -209,12 +209,12 @@ describe('talent proc engine', () => {
     const proc: ProcDef = {
       id: 'test_refund',
       name: 'Test Refund',
-      trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
+      trigger: { on: 'castNth', n: 1, abilities: ['final_edict'] },
       responses: [{ kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' }],
     };
     const { p, ctx } = fakePlayer([proc]);
     p.cooldowns.set('exorcism', 12);
-    onCastCompleted(ctx, p, 'judgement');
+    onCastCompleted(ctx, p, 'final_edict');
     expect(p.cooldowns.has('exorcism')).toBe(false);
   });
 });

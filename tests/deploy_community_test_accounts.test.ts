@@ -15,9 +15,12 @@ describe('community test account deploy contract', () => {
     expect(envExample).not.toMatch(/^PROVISION_TEST_ACCOUNTS=1$/m);
   });
 
-  it('documents the paired, reversible public-test profile', () => {
+  it('documents the reversible public-test profile without the retired rift flag', () => {
     expect(deploy).toContain('PROVISION_TEST_ACCOUNTS=1');
-    expect(deploy).toContain('COMMUNITY_TEST_RIFTS=1');
+    // Rift density no longer has a flag: one portal per eligible zone is the
+    // policy everywhere, so the deploy guide must not resurrect the toggle.
+    expect(deploy).not.toContain('COMMUNITY_TEST_RIFTS=1');
+    expect(compose).not.toContain('COMMUNITY_TEST_RIFTS');
     expect(deploy).toMatch(/newly created accounts/i);
     expect(deploy).toContain('ALLOW_DEV_COMMANDS');
     expect(deploy).toContain('RIFT_RUNTIME_ASSETS');

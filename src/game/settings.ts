@@ -2,6 +2,8 @@
 // Esc options menu. Pure + persisted to localStorage; main.ts applies each
 // value to the live subsystem (Input / GameAudio / MusicDirector / Renderer).
 
+import { parseStoredJson } from './local_storage_json';
+
 // Camera default is 0.7: the old fixed speed (1.0) was near the top of the
 // reasonable range and drew complaints, so out of the box it's calmer while
 // the slider still reaches 1.25 for players who liked it fast.
@@ -17,11 +19,15 @@ export const SETTING_RANGES = {
   // localStorage during startup because tier choice controls preload. def is MEDIUM (a safe
   // middle, also the Reset target): on a player's FIRST run main.ts probes the device and
   // PERSISTS a device-appropriate preset over this default when the GPU is recognized
-  // (resolveDefaultGraphicsPreset in gfx.ts), so a weak phone is not stuck on a tier it cannot
-  // run and a strong desktop is not capped below what it can drive. A masked/inconclusive device
-  // stays on this medium default and keeps re-detecting on later boots (see graphicsDefaultApplied).
+  // (resolveDefaultGraphicsPreset in gfx.ts), so a phone is not stuck on a tier it cannot enter
+  // the world at and a strong desktop is not capped below what it can drive. EVERY touch device
+  // resolves to LOW there, so a phone is persisted at 1 on its first boot and never re-detected.
+  // A masked/inconclusive DESKTOP stays on this medium default and keeps re-detecting on later
+  // boots (see graphicsDefaultApplied).
   // An explicit player choice (stored here) is never overridden.
-  graphicsPreset: { min: 1, max: 5, def: 2 },
+  // max 6: 1 low .. 4 ultra, 5 advanced, 6 insane (the everything-on showcase;
+  // manual opt-in only, hardware detection never selects it).
+  graphicsPreset: { min: 1, max: 6, def: 2 },
   // Adaptive browser-effects tier for the DOM/CSS layer (distinct from the WebGL
   // graphicsPreset above). 0 = Auto: detect the engine (Chromium/WebKit/Gecko),
   // version and desktop-vs-mobile and tone down the most GPU-expensive CSS
@@ -30,10 +36,35 @@ export const SETTING_RANGES = {
   // 3 = Minimal. Purely presentational; never touches the sim. See browser_env.ts.
   browserEffects: { min: 0, max: 3, def: 0 },
   // Advanced-only: 0 keeps terrain/foliage cheap, 1 enables high terrain.
-  terrainDetail: { min: 0, max: 1, def: 1 },
-  foliageDensity: { min: 0, max: 1, def: 1 },
+  // Advanced-preset sub-settings (only read when graphicsPreset is 5). The
+  // historical rows were binary 0/1; round 10 extended them to level ladders
+  // (0 Low, 0.5 Medium, 1 High, 2 Insane; effectsQuality and shadowQuality
+  // stop at 1) mapped
+  // in gfx.ts settingsFor. Backward compatible by construction: a stored 0
+  // still means Low and a stored 1 still means High.
+  terrainDetail: { min: 0, max: 2, def: 1 },
+  foliageDensity: { min: 0, max: 2, def: 1 },
   effectsQuality: { min: 0, max: 1, def: 1 },
+  // Capped at High (the 4096 map): the retired Insane rung's 8192x8192 shadow
+  // target was a ~256 MB-class GPU allocation redrawn every frame. A stored
+  // historical 2 clamps to 1 on load, and gfx.ts maps it to the High base too.
   shadowQuality: { min: 0, max: 1, def: 1 },
+  // The worn-surface triplanar layer dial (0 Off, 0.5 Basic, 1 Full, 2
+  // Insane), new in round 10: the town-street frame-cost dial.
+  surfaceDetail: { min: 0, max: 2, def: 1 },
+  // Round-12 per-effect dials (Advanced-preset sub-settings like the block
+  // above; the options panel shows them for every preset and switches to
+  // Advanced when one is edited). The binaries read 0 Off / 1 On;
+  // ambientOcclusion adds the 0.5 half-resolution middle; the two ladders
+  // reuse the 0/0.5/1/2 level scale mapped onto whole render tiers.
+  antiAliasing: { min: 0, max: 1, def: 1 },
+  bloomQuality: { min: 0, max: 1, def: 1 },
+  ambientOcclusion: { min: 0, max: 1, def: 1 },
+  viewDistance: { min: 0, max: 2, def: 1 },
+  waterQuality: { min: 0, max: 2, def: 1 },
+  characterDetail: { min: 0, max: 1, def: 1 },
+  dynamicLights: { min: 0, max: 1, def: 1 },
+  particleEffects: { min: 0, max: 1, def: 1 },
   // vertical camera field of view in degrees. def 60 keeps the shipped look;
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
@@ -45,6 +76,13 @@ export const SETTING_RANGES = {
   cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
+  // Desktop-shell window mode: 1 = borderless fullscreen (what the shell opens
+  // with, matching its prefs-store default), 0 = a normal resizable window.
+  // Only the desktop shell can act on it, so its options row replaces the
+  // browser Fullscreen toggle there and never renders anywhere else; the two
+  // are separate keys because a player who leaves fullscreen in the desktop app
+  // has not changed what the web build should do on the same machine.
+  displayMode: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn
   // off for the classic static "MAX LEVEL" text (Max-Level XP Overflow)
   showOverflowXp: { min: 0, max: 1, def: 1 },
@@ -177,6 +215,19 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default (issue #1358): the classic MMO default is that switching
+  // targets while auto-attacking carries the swing over to the new target
+  // (Tab, click, nearest-enemy, assist, any method). Turning this on flips
+  // that: every target switch disengages auto-attack instead. Mirrored onto
+  // the authoritative sim via setStopAutoAttackOnTargetSwitch (see
+  // src/sim/targeting.ts), since the sim stays authoritative for auto-attack.
+  stopAutoAttackOnTargetSwitch: { def: false },
+  // off by default: lock the action bar slots against drag-to-move,
+  // drag-to-replace, and clear (right-click / shift+clear-key) so an
+  // accidental click-and-drag mid-fight can't move or wipe a slot. Abilities
+  // still fire from keybinds and clicks while locked (see ui/action_bar_lock.ts
+  // and the hud.ts drag/drop/clear wiring it gates).
+  lockActionBars: { def: false },
   // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
   // Turning it off (or right-clicking the Attack button) removes it from the bar,
   // freeing slot 0 and its keybind to hold a normal assignable action.
@@ -208,6 +259,11 @@ export const BOOL_SETTINGS = {
   partyFrameShowResource: { def: true },
   partyFrameShowAbsorbs: { def: true },
   partyFrameShowAuras: { def: true },
+  // on by default: a thin pet health sliver on the row of any party member who has a
+  // pet out (hunter / warlock / mage). The pet is read from the client's own entity
+  // roster, so it appears only for pets in interest range, which is far wider than
+  // any ability's reach. Clicking the sliver selects that pet.
+  partyFrameShowPets: { def: true },
   partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
@@ -240,6 +296,11 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
+  // on by default: reveal the lifetime "Time Played" value on the character
+  // sheet. The sheet's eye button flips this per device (screenshot / stream
+  // privacy); the total keeps accruing either way, this only controls whether
+  // THIS client displays it.
+  showPlaytime: { def: true },
   // on by default: render your OWN overhead nameplate (name, level, guild, hp,
   // $WOC holder tier, dev badge, linked-Discord PFP) exactly as other players see
   // it, so Discord linking and other flair changes have immediate visual feedback.
@@ -291,6 +352,10 @@ export const BOOL_SETTINGS = {
   // tracker is collapsed to just its header. Toggled by clicking the tracker
   // header (the quest-tracker convention); kept here so the choice persists.
   deedTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen Reliquary tracker is
+  // collapsed to just its header. Toggled by clicking the tracker header (the
+  // quest-tracker convention); kept here so the choice persists.
+  reliquaryTrackerCollapsed: { def: false },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
@@ -304,15 +369,52 @@ export const BOOL_SETTINGS = {
   // 23..33). main.ts enforces that this row can only remain enabled while the
   // secondary row is visible. Mobile exposes the same slots through ring pages.
   showThirdActionBar: { def: false },
+  // off by default (the classic look, unchanged out of the box): strips the black
+  // background, border, and keybind label from desktop action-bar slots that hold
+  // no ability or item, via a body class main.ts toggles (issue 2429). The fixed
+  // Attack slot and any bound slot are unaffected, so the emptied-out look never
+  // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
+  // and consumables); the slots stay in place and keybind-reachable either way.
+  hideUnusedActionSlots: { def: false },
+  // OFF by default: the interactive water wake/ripple height-field
+  // (render/water_simulation.ts) that swimmers, waders and splashes disturb.
+  // Purely decorative — bubbles, splash particles and the scrolling water
+  // normal maps are all independent of it — and measured-cheap (2 passes over
+  // a <=128x128 field), but it is the one water effect that runs extra GPU
+  // passes per frame, so the player who wants the quietest water gets it as
+  // an opt-in rather than an opt-out.
+  waterRipples: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  // on by default: the pet health strip under the player frame (hunter / warlock /
+  // mage). It paints only while the player actually HAS a pet, so the six petless
+  // classes never see it and the default costs them nothing. Purely a display
+  // preference read by the HUD's pet-frame update; the pet already rides the wire
+  // as an ordinary owned mob entity.
+  showPetFrame: { def: true },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
+  // on by default (today's behavior, unchanged out of the box): mirrors the desktop
+  // shell's GPU preference store, whose stored field is the INVERSE opt-out. The
+  // shell asks the OS for the dedicated gaming GPU at launch; a MUXless laptop panel
+  // cannot always drive it, so the row is an escape hatch. Desktop-only: the options
+  // row renders only when the installed shell exposes the preference over the bridge
+  // (see game/desktop_gpu_pref_sync.ts), and the shell store, not this key, is the
+  // source of truth: this value is reflected from it at boot and takes effect on the
+  // next launch, never the running one.
+  forceHighPerfGpu: { def: true },
+  // on by default (the phase 10 decision): publish the current zone as a Discord
+  // Rich Presence activity while playing. Discord's own activity-sharing setting
+  // still gates whether anyone sees it, and the desktop options row is the in-game
+  // off switch. Inert outside the desktop shell: the row renders only when the
+  // installed shell exposes the presence bridge (see game/discord_presence.ts),
+  // and nothing else reads the key.
+  discordPresence: { def: true },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and
@@ -338,11 +440,36 @@ interface Range {
 const STORE_KEY = 'woc_settings';
 const NUMERIC_KEYS = Object.keys(SETTING_RANGES) as NumericSettingKey[];
 const BOOL_KEYS = Object.keys(BOOL_SETTINGS) as BoolSettingKey[];
+// Mirrors PHONE_TOUCH_QUERY in mobile_controls.ts without importing that DOM-heavy
+// module into the pure settings core.
+const DEFAULT_TOUCH_INTERFACE_QUERY =
+  '(pointer: coarse) and (hover: none), (pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
 
 function clampNumeric(key: NumericSettingKey, v: number): number {
   const r = SETTING_RANGES[key];
   if (!Number.isFinite(v)) return r.def;
   return Math.min(r.max, Math.max(r.min, v));
+}
+
+function defaultTouchInterface(): boolean {
+  try {
+    if (typeof document !== 'undefined' && document.body.classList.contains('native-app'))
+      return true;
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia(DEFAULT_TOUCH_INTERFACE_QUERY).matches;
+  } catch {
+    return false;
+  }
+}
+
+function defaultBoolSetting(
+  key: BoolSettingKey,
+  values: Pick<GameSettings, 'interfaceMode'>,
+): boolean {
+  if (key !== 'showPlayerNameplates') return BOOL_SETTINGS[key].def;
+  if (values.interfaceMode >= 2) return false;
+  if (values.interfaceMode >= 1) return true;
+  return !defaultTouchInterface();
 }
 
 export type ClickMoveMouseButton = 0 | 2;
@@ -363,12 +490,7 @@ export class Settings {
   }
 
   private load(): GameSettings {
-    let stored: unknown = null;
-    try {
-      stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null');
-    } catch {
-      /* corrupt */
-    }
+    const stored = parseStoredJson(STORE_KEY);
     const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {
@@ -377,7 +499,7 @@ export class Settings {
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];
-      out[key] = typeof v === 'boolean' ? v : BOOL_SETTINGS[key].def;
+      out[key] = typeof v === 'boolean' ? v : defaultBoolSetting(key, out);
     }
     return out;
   }
@@ -396,6 +518,32 @@ export class Settings {
 
   all(): GameSettings {
     return { ...this.values };
+  }
+
+  /** Validate every value, apply the whole patch, then persist the settings blob once. */
+  patch(patch: Partial<GameSettings>): GameSettings {
+    const staged: Record<string, boolean | number> = {};
+    for (const [key, value] of Object.entries(patch)) {
+      if ((BOOL_KEYS as readonly string[]).includes(key)) {
+        if (typeof value !== 'boolean') {
+          throw new TypeError(`Invalid boolean setting: ${key}`);
+        }
+        staged[key] = value;
+        continue;
+      }
+      if ((NUMERIC_KEYS as readonly string[]).includes(key)) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          throw new TypeError(`Invalid numeric setting: ${key}`);
+        }
+        staged[key] = clampNumeric(key as NumericSettingKey, value);
+        continue;
+      }
+      throw new TypeError(`Unknown setting: ${key}`);
+    }
+
+    this.values = { ...this.values, ...staged } as GameSettings;
+    this.save();
+    return this.all();
   }
 
   /** Clamp + store a value; returns the value actually applied. */
@@ -422,13 +570,14 @@ export class Settings {
   reset(keys?: readonly (keyof GameSettings)[]): void {
     if (!keys) {
       for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
-      for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+      for (const key of BOOL_KEYS) this.values[key] = defaultBoolSetting(key, this.values);
       this.save();
       return;
     }
     for (const key of keys) {
       if ((BOOL_KEYS as readonly string[]).includes(key as string)) {
-        this.values[key as BoolSettingKey] = BOOL_SETTINGS[key as BoolSettingKey].def;
+        const boolKey = key as BoolSettingKey;
+        this.values[boolKey] = defaultBoolSetting(boolKey, this.values);
       } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
         this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
       }

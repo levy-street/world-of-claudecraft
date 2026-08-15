@@ -129,21 +129,42 @@ describe('game watchdog install', () => {
   });
 
   // /livez can now answer 503, which makes it a public wedge oracle unless the edge
-  // hides it; /metrics exposes operational internals. The 404 block must sit on BOTH
-  // vhosts (site and admin domain), with the same path list, or one edge stays open.
-  // split() counts occurrences, so a drift between the two heredocs fails here.
+  // hides it; /metrics exposes operational internals; /internal/* is the bot and deploy
+  // internal API, reachable today with nothing but a shared secret header in front of it,
+  // so the edge 404 is defense in depth on top of that secret rather than the gate, and
+  // it also keeps the internal surface's 404-vs-401 behavior differences off the public
+  // edge. The 404 block must sit on BOTH vhosts (site and admin domain), with the same
+  // path list, or one edge stays open. split() counts occurrences, so a drift between
+  // the two heredocs fails here.
   it('hides the ops endpoints at the public edge, identically on both domains', () => {
+    expect(userData.split('@ops path /livez /readyz /metrics /internal/*')).toHaveLength(3);
+    // Both lines are deliberate. The first pins the full matcher; the second counts the
+    // same two occurrences THROUGH ITS PREFIX, which is what proves no third, stale
+    // short-form copy survives anywhere in the file. Without it a leftover
+    // `@ops path /livez /readyz /metrics` line (the exact shape this change replaced,
+    // and the shape a by-hand retrofit would re-add) would push this count to 4 and
+    // still leave the first assertion green.
     expect(userData.split('@ops path /livez /readyz /metrics')).toHaveLength(3);
     expect(userData.split('respond 404')).toHaveLength(3);
   });
 
   // user-data.sh writes that block at first boot only, so a host provisioned before
   // it existed keeps proxying /livez publicly, and /livez can now answer 503: a
-  // public oracle for exactly when the world loop is down. The runbook must carry
-  // the by-hand retrofit (matcher, validate, reload) or the fix never reaches a
-  // host that is already running.
+  // public oracle for exactly when the world loop is down. The same host also proxies
+  // /internal/*, whose only gate is a shared secret header, and whose 404-vs-401
+  // behavior differences are themselves a public signal; the edge 404 is defense in
+  // depth over that secret, not a replacement for it. The runbook must carry the
+  // by-hand retrofit (matcher, validate, reload) or the fix never reaches a host that
+  // is already running.
   it('documents the by-hand Caddy retrofit for an already-provisioned host', () => {
-    expect(deployDoc).toContain('@ops path /livez /readyz /metrics');
+    // Counted, not just contained, mirroring the user-data.sh pins above: the doc
+    // carries TWO @ops snippets (the first-boot Caddyfile mirror and the
+    // retrofit), and a bare toContain is satisfied by either, so the first-boot
+    // mirror reverting to the short form would hand an operator a snippet that
+    // leaves /internal/* public while this stayed green. The prefix count catches
+    // a stale short-form copy riding back in (it would push the count to 4).
+    expect(deployDoc.split('@ops path /livez /readyz /metrics /internal/*')).toHaveLength(3);
+    expect(deployDoc.split('@ops path /livez /readyz /metrics')).toHaveLength(3);
     expect(deployDoc).toContain('respond @ops 404');
     expect(deployDoc).toContain('sudo caddy validate --config /etc/caddy/Caddyfile');
     expect(deployDoc).toContain('sudo systemctl reload caddy');
@@ -171,22 +192,22 @@ describe('update runbook guards', () => {
   // documented gate that cannot run on a fresh host is not a gate.
   it('runs the type-check drift gate, with devDependencies actually installed', () => {
     expect(deployDoc).toContain('npx tsc --noEmit');
-    expect(deployDoc).toContain('npm ci');
+    expect(deployDoc).toContain('pnpm install --frozen-lockfile');
     // The two substrings above are satisfiable by two unrelated lines. The gate only
-    // works if `npm ci` (to get devDependencies) and `npx tsc --noEmit` run TOGETHER
-    // inside node:26-slim, because a deploy host has neither Node nor devDependencies.
-    // Pin the whole invocation as one contiguous block so a split can never pass. It
-    // must sweep every .env and .git out of the copy (the host .env holds every
-    // production secret, and a nested clone's .env or .git config can carry tokens),
-    // and pass --ignore-scripts so dependency install hooks cannot run as root with
-    // network access: losing either turns the type-check into a secret-exfiltration
-    // surface on every deploy. The --memory/--memory-swap bound keeps the gate,
-    // which runs on the live box before the game stops, from creating the host
-    // memory pressure the game service's mem_limit exists to prevent.
+    // works if `pnpm install` (to get devDependencies) and `npx tsc --noEmit` run
+    // TOGETHER inside node:26-slim, because a deploy host has neither Node nor
+    // devDependencies. Pin the whole invocation as one contiguous block so a split
+    // can never pass. It must sweep every .env and .git out of the copy (the host
+    // .env holds every production secret, and a nested clone's .env or .git config
+    // can carry tokens), and pass --ignore-scripts so dependency install hooks
+    // cannot run as root with network access: losing either turns the type-check
+    // into a secret-exfiltration surface on every deploy. The --memory/--memory-swap
+    // bound keeps the gate, which runs on the live box before the game stops, from
+    // creating the host memory pressure the game service's mem_limit exists to prevent.
     expect(deployDoc).toContain(
       [
         'sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:26-slim \\',
-        "  sh -c 'cp -a /src/. /app && find /app \\( -name .git -o -name .env \\) -prune -exec rm -rf {} + && npm ci --ignore-scripts --no-audit --no-fund && npx tsc --noEmit'",
+        "  sh -c 'cp -a /src/. /app && find /app \\( -name .git -o -name .env \\) -prune -exec rm -rf {} + && npm install -g pnpm@10.34.5 && pnpm install --frozen-lockfile --ignore-scripts && npx tsc --noEmit'",
       ].join('\n'),
     );
   });

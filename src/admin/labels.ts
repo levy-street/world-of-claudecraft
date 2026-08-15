@@ -16,6 +16,18 @@ export function reasonLabel(reason: string): string {
   );
 }
 
+const GUILD_RANK_KEYS: Record<string, string> = {
+  leader: 'guilds.rank.leader',
+  officer: 'guilds.rank.officer',
+  member: 'guilds.rank.member',
+};
+
+export function guildRankLabel(rank: string | null): string {
+  if (!rank) return t('common.emptyValue');
+  const key = GUILD_RANK_KEYS[rank];
+  return key ? t(key) : rank;
+}
+
 // Audit-log action kind (server enum) -> localized label + badge variant. ONE table,
 // shared by the account-scoped ModerationHistory component and the realm-wide
 // ModerationHistoryPage, which each used to carry their own copy of this switch: a
@@ -23,10 +35,12 @@ export function reasonLabel(reason: string): string {
 // unlabelled "Other action", which defeats the point of auditing it.
 //
 // The keys are the union of server/moderation_db.ts MODERATION_ACTIONS (the closed set
-// written to account_moderation_actions.action) and the ip_blocks history kinds
-// (block / unblock), which only the realm-wide page can surface.
-// tests/admin/moderation_action_labels.test.ts pins the table against MODERATION_ACTIONS
-// so the next new kind cannot silently regress to "Other action".
+// written to account_moderation_actions.action), the ip_blocks history kinds
+// (block / unblock), and the guild audit kinds (server/admin_db.ts
+// GUILD_MODERATION_ACTIONS: guild_rename and guild_bank_purge), the last two
+// groups of which only the realm-wide page can surface.
+// tests/admin/moderation_action_labels.test.ts pins the table against BOTH closed
+// sets so the next new kind cannot silently regress to "Other action".
 export type ModerationBadgeVariant = 'default' | 'neutral' | 'warn' | 'bad' | 'success';
 
 export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
@@ -34,6 +48,8 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   kill: 'moderationHistory.actionKill',
   jail: 'moderationHistory.actionJail',
   unjail: 'moderationHistory.actionUnjail',
+  spectate: 'moderationHistory.actionSpectate',
+  unspectate: 'moderationHistory.actionUnspectate',
   suspend: 'moderationHistory.actionSuspend',
   unsuspend: 'moderationHistory.actionUnsuspend',
   ban: 'moderationHistory.actionBan',
@@ -53,10 +69,31 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   unblock: 'moderationHistory.actionIpUnblock',
   reactivate: 'moderationHistory.actionReactivate',
   chat_strikes_reset: 'moderationHistory.actionResetChatStrikes',
+  general_chat_rate_limit: 'moderationHistory.actionGeneralChatRateLimit',
+  // R35 GM restores: audited but not punitive, so they stay on the neutral
+  // badge variant (the set_ai / note reasoning).
+  restore_item: 'moderationHistory.actionRestoreItem',
+  restore_slot: 'moderationHistory.actionRestoreSlot',
+  cheater_mark: 'moderationHistory.actionCheaterMark',
+  cheater_mark_lift: 'moderationHistory.actionCheaterMarkLift',
+  // Realm-scoped rather than account-scoped: written by the guild backoffice into
+  // guild_moderation_actions, surfaced only by the realm-wide page. The closed
+  // set is server/admin_db.ts GUILD_MODERATION_ACTIONS, pinned in
+  // tests/admin/moderation_action_labels.test.ts alongside the account set.
+  guild_rename: 'moderationHistory.actionGuildRename',
+  guild_bank_purge: 'moderationHistory.actionGuildBankPurge',
 };
 
 const BAD_ACTIONS = new Set(['ban', 'block', 'daily_rewards_ban', 'daily_rewards_ip_ban']);
-const WARN_ACTIONS = new Set(['suspend', 'chat_mute', 'reset_password', 'kick', 'kill', 'jail']);
+const WARN_ACTIONS = new Set([
+  'suspend',
+  'chat_mute',
+  'reset_password',
+  'kick',
+  'kill',
+  'jail',
+  'cheater_mark',
+]);
 const GOOD_ACTIONS = new Set([
   'unban',
   'unsuspend',
@@ -67,6 +104,7 @@ const GOOD_ACTIONS = new Set([
   'daily_rewards_ip_unban',
   'reactivate',
   'chat_strikes_reset',
+  'cheater_mark_lift',
 ]);
 
 export function moderationActionLabel(action: string): string {

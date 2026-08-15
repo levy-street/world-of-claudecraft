@@ -64,6 +64,10 @@ describe('targetRankView', () => {
     expect(css).toContain('url("/ui/ranks/elite-dragon-frame.webp")');
     expect(ruleBody('#target-frame.boss .portrait canvas')).not.toContain('display: none;');
     expect(hud).toContain('const faceUrl = targetPortraitUrl(');
+    expect(hud).toContain("const isMobEntity = entity.kind === 'mob';");
+    expect(hud).toContain('this.drawNonPlayerPortrait(this.targetPortraitEl, target);');
+    expect(hud).toContain('this.drawNonPlayerPortrait(this.totPortraitEl, tot);');
+    expect(hud).toContain('this.drawNonPlayerPortrait(this.petPortraitEl, pet);');
     const levelChip = ruleBody('#target-frame.boss .level-chip');
     expect(levelChip).toContain('transform: translateX(-50%);');
     expect(levelChip).not.toContain('display: none;');

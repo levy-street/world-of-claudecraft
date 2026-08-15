@@ -3,9 +3,10 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function rig(): { sim: Sim; caster: Entity } {
-  const sim = new Sim({ seed: 73, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({ seed: 73, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(20);
   expect(sim.applyTalents({ spec: 'frost', rows: { 11: 'mag_r11_rings_of_frost' } })).toBe(true);
   const caster = sim.player;

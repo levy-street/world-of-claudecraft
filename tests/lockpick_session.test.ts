@@ -93,7 +93,8 @@ describe('lockpick controller (I2b module), success', () => {
     expect(st.lootOwnerId).toBe(sim.playerId); // picker owns the loot (no front-run)
     expect(st.pendingLoot.length).toBeGreaterThan(0);
     expect(run.surfaceExitId).not.toBeNull(); // exit opened on success
-    expect(sim.delveMarksFor(sim.playerId)).toBeGreaterThan(marksBefore); // bonus marks granted
+    // base in-window clear (+1) + premium ante bonus (+2)
+    expect(sim.delveMarksFor(sim.playerId)).toBe(marksBefore + 3);
 
     const events = sim.tick();
     expect(
@@ -102,7 +103,8 @@ describe('lockpick controller (I2b module), success', () => {
     expect(
       events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'success'),
     ).toBeDefined();
-    expect(events.find((e) => e.type === 'lockpickBonus')).toBeDefined();
+    // The event carries the actually granted (in-window premium) bonus Marks.
+    expect(events.find((e) => e.type === 'lockpickBonus' && (e as any).marks === 2)).toBeDefined();
   });
 
   it('lockpickViewFor returns the fogged projection the lockpickState accessor delegates to', () => {
@@ -122,7 +124,7 @@ describe('lockpick controller (I2b module), success', () => {
 });
 
 describe('lockpick controller (I2b module), fail / abandon', () => {
-  it('tickLockpickTimeout burns the single premium try -> chest jams + surface exit opens', () => {
+  it('tickLockpickTimeout burns the single premium try -> chest still opens, but only at the LOW consolation tier (issue #2585)', () => {
     const sim = makeSim(7);
     const { run, chestId } = setup(sim);
     lockpick.lockpickEngage(sim.ctx, chestId, 1); // premium: one try
@@ -133,11 +135,22 @@ describe('lockpick controller (I2b module), fail / abandon', () => {
     lockpick.tickLockpickTimeout(sim.ctx, run);
 
     expect(run.lockpick).toBeNull();
-    expect(run.objectState[chestId].attemptAvailable).toBe(false); // jammed (lost until re-clear)
-    expect(run.objectState[chestId].looted).toBeFalsy();
+    // Running out of tries no longer jams the final delve chest: the boss is
+    // already dead, so the player still gets the reward and keeps the run's
+    // clear credit instead of losing the chest and having to re-clear the
+    // delve. This was NOT a solve though, so the grant is capped at the base
+    // `low` tier, never the Premium ante's loot tier: idling out a high ante
+    // must never beat actually picking the lock.
+    expect(run.objectState[chestId].attemptAvailable).toBe(false); // consumed by the grant, not a jam
+    expect(run.objectState[chestId].looted).toBe(true);
+    expect(run.objectState[chestId].lootedTier).toBe('low');
     expect(run.surfaceExitId).not.toBeNull(); // the party is never stranded
+    const events = sim.tick();
     expect(
-      sim.tick().find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'fail'),
+      events.find((e) => e.type === 'lockpickEnd' && (e as any).outcome === 'success'),
+    ).toBeDefined();
+    expect(
+      events.find((e) => e.type === 'delveChestLoot' && (e as any).chestId === chestId),
     ).toBeDefined();
   });
 

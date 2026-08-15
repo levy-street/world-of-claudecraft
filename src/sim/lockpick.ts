@@ -147,8 +147,6 @@ export interface VisibleCell {
   kind: CellKind;
 }
 
-const NON_ABORT = (a: PickAction): a is Exclude<PickAction, 'abort'> => a !== 'abort';
-
 /** Reverse the delta back to its action (used by solvers/tests). */
 export function deltaToAction(delta: number): Exclude<PickAction, 'abort'> {
   for (const a of PICK_ACTIONS) if (ACTION_DELTA[a] === delta) return a;
@@ -400,5 +398,3 @@ export function visibleCells(spec: LockSpec, col: number, window: number): Visib
   }
   return cells;
 }
-
-export { NON_ABORT };

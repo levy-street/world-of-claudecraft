@@ -10,7 +10,10 @@
 //
 // Output:
 //   public/audio/voice/<voiceNpc>/<lineKey>.mp3   the audio (served at /audio/voice/…)
-//   src/game/voice_manifest.generated.ts          lineKey -> public path (runtime lookup)
+//   src/game/voice_manifest.generated.ts          lineKey -> public path (runtime lookup),
+//                                                  the path carries a `?v=<hash12>` content
+//                                                  hash so server/static_cache.ts can cache
+//                                                  the clip immutably instead of no-cache
 //
 // Idempotent: existing mp3s are skipped unless --force. The key is read from the
 // environment / local .env; never commit it.
@@ -20,6 +23,7 @@ import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { EXTRA_LINES, yellKey } from './voices/extra_lines.mjs';
 import { voiceIdFor } from './voices/npc_voice_prompts.mjs';
+import { buildVoiceManifestEntries } from './voices/voice_manifest.mjs';
 
 const API = 'https://api.elevenlabs.io';
 const TTS_MODEL = 'eleven_multilingual_v2'; // quality model — generation is one-time
@@ -151,7 +155,6 @@ for (const e of Object.values(ESCORTS ?? {})) {
 // Encounter dialogue (yells/bubbles) that isn't on any content record.
 for (const e of EXTRA_LINES) lines.push({ key: e.key, text: e.text, voiceNpc: e.voiceNpc });
 
-const publicPathFor = (line) => `/audio/voice/${line.voiceNpc}/${line.key}.mp3`;
 const diskPathFor = (line) => path.join(voiceDir, line.voiceNpc, `${line.key}.mp3`);
 
 let made = 0;
@@ -192,10 +195,7 @@ for (const line of lines) {
 
 // Regenerate the manifest from whatever audio actually exists on disk, so runtime
 // never points at a missing clip even after a partial run.
-const entries = {};
-for (const line of lines) {
-  if (existsSync(diskPathFor(line))) entries[line.key] = publicPathFor(line);
-}
+const entries = buildVoiceManifestEntries(lines, diskPathFor);
 const sorted = Object.fromEntries(
   Object.keys(entries)
     .sort()

@@ -6,9 +6,16 @@
 // keyed by ITEM ID in the table below so the hint is DATA the painter reads,
 // never a branch inside the tooltip builder.
 //
-// Deliberately scoped to these eight ids ONLY. Every other item keeps its
-// existing tooltip byte-for-byte; this is not a general item-description
-// mechanism (the def-driven lines above it already cover use/quest/set text).
+// Deliberately scoped to the ids in the table below ONLY. Every other item
+// keeps its existing tooltip byte-for-byte; this is not a general
+// item-description mechanism (the def-driven lines above it already cover
+// use/quest/set text).
+//
+// The nine fine gathered grades (D8) were added for the same reason as the
+// eight enchanting materials, and it bites harder for them: a fine grade is
+// both a hard gate on the crafted tool recipes and a silent stand-in for its
+// ordinary version, and nothing else in the client said either. They SHARE one
+// key, because the sentence is identical for all nine.
 // The source wordings track the sim's own routing rules:
 // DISENCHANT_MATERIAL_BY_QUALITY (src/sim/professions/enchanting.ts) for the
 // three arcane tiers, and ARMOR_SECONDARY_BY_TYPE / TIMBER_WEAPON_TYPES
@@ -29,6 +36,15 @@ export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
   resonant_links: 'hudChrome.materialHint.resonantLinks',
   resonant_steel: 'hudChrome.materialHint.resonantSteel',
   resonant_timber: 'hudChrome.materialHint.resonantTimber',
+  fine_copper_ore: 'hudChrome.materialHint.fineGrade',
+  fine_iron_ore: 'hudChrome.materialHint.fineGrade',
+  fine_thorium_ore: 'hudChrome.materialHint.fineGrade',
+  fine_ironbark_log: 'hudChrome.materialHint.fineGrade',
+  fine_ashwood_log: 'hudChrome.materialHint.fineGrade',
+  fine_elderwood_log: 'hudChrome.materialHint.fineGrade',
+  fine_silverleaf_herb: 'hudChrome.materialHint.fineGrade',
+  fine_goldleaf_herb: 'hudChrome.materialHint.fineGrade',
+  fine_sunpetal_herb: 'hudChrome.materialHint.fineGrade',
 };
 
 /** The hint key for one item id, or undefined for every other item. */

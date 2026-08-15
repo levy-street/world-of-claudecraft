@@ -33,6 +33,7 @@ function modsFor(
     buffPct: 0,
     castWhileMoving: false,
     damagePushbackImmune: false,
+    ignoreStealthRequirement: false,
     bonusCharges: 0,
     addEffects: [],
     ...mod,
@@ -71,12 +72,12 @@ describe('ability tooltip data reflects selected talents', () => {
   it('a buff-strengthening talent (buffPct) raises the resolved buff value', () => {
     // Improved Devotion Aura / Aspect of the Hawk / Fortitude scale the buff's value,
     // which the tooltip's resolved buff line reads (the static description can't show it).
-    const base = resolved('paladin', 'devotion_aura', emptyModifiers())!;
+    const base = resolved('paladin', 'devotion_ward', emptyModifiers())!;
     const baseBuff = base.effects.find((e) => e.type === 'buffTarget') as { value: number };
     expect(baseBuff.value).toBeGreaterThan(0);
-    const known = resolved('paladin', 'devotion_aura', modsFor('devotion_aura', { buffPct: 0.2 }))!;
+    const known = resolved('paladin', 'devotion_ward', modsFor('devotion_ward', { buffPct: 0.2 }))!;
     const buff = known.effects.find((e) => e.type === 'buffTarget') as { value: number };
-    expect(buff.value).toBe(Math.round(baseBuff.value * 1.2));
+    expect(buff.value).toBeCloseTo(baseBuff.value * 1.2, 10);
   });
 
   it('a damage talent raises the resolved effect damage', () => {

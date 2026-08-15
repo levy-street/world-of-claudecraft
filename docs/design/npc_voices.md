@@ -317,6 +317,19 @@ encouragement offered. Age 40s, male.
 
 **Voice test:** *"Proof of the heroic depths buys the finest rings and pendants in Highwatch. Show me your marks."*
 
+### Warmarshal Draven Kole: *Master of the Warfare Stores*
+**Visual:** knight (helmet, cape, 1H sword), war crimson (#7d2f3f), quartermaster row.
+
+Cold, parade-ground authority: a hard, level baritone that states terms rather
+than offers them, every sentence landing like an order already given. Age 40s to
+50s, male. **No designed voice of his own yet:** he currently borrows FURY's
+through `VOICE_ALIAS`, since he sells the identical WARFARE stock in the same
+register, so his lines ship mute until a key is available to design and render
+this description. Promote him to his own `VOICE_PROMPTS` entry then, and keep him
+audibly colder and more senior than FURY's arena herald.
+
+**Voice test:** *"Honor is the only coin I take, and the Warfare stores are mine to guard."*
+
 ### Marla Hitchen: *Stablemaster*
 **Visual:** villager, saddle brown (#8b5a2b), riding paddock.
 
@@ -849,7 +862,7 @@ as though the ceiling were low. Steady reassurance, no warmth wasted. Age 40s to
 **Voice test:** *"Choose your tier, and I'll hold the rope until you return."*
 
 ### FURY: *Honor Quartermaster*
-**Visual:** villager, blood red (#b52a2a), arena sands.
+**Visual:** knight (helmet, cape, 1H sword), blood red (#b52a2a), arena sands.
 
 Harsh, metallic, half-shouted voice like a herald over a crowd, brutal and
 clipped, consonants struck rather than spoken. Every line sounds like the

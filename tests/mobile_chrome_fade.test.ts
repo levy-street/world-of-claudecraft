@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   CHROME_FADE_IDLE_CLASS,
   CHROME_FADE_IDLE_MS,
@@ -22,6 +22,10 @@ function fakeTimers() {
 }
 
 describe('startChromeFade', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('dims the target after the idle threshold', () => {
     const timers = fakeTimers();
     const target = fakeTarget();

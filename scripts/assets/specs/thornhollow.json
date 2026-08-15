@@ -1,0 +1,27 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/thornhollow/city/wall_tower.glb",
+      "out": "models/city/wall_tower.glb",
+      "type": "static"
+    },
+    {
+      "src": "tmp/asset_src/thornhollow/medieval_village_v2/CastleBase_03.glb",
+      "out": "models/medieval_village_v2/buildings/CastleBase_03.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/thornhollow/medieval_village_v2/CastleStairs_03.glb",
+      "out": "models/medieval_village_v2/buildings/CastleStairs_03.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/thornhollow/medieval_village_v2/Stairs_01.glb",
+      "out": "models/medieval_village_v2/buildings/Stairs_01.glb",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
+}

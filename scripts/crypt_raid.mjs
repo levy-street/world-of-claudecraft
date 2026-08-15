@@ -288,7 +288,7 @@ async function main() {
           b.cmd({ cmd: 'cast', ability: 'power_word_shield' });
         }
       }
-      // paladin keeps a seal up for judgement
+      // Paladin keeps its melee seal active while using the ranged support hammer.
       if (b.cls === 'paladin' && !(b.self.auras ?? []).some((a) => a.kind === 'imbue')) {
         b.cmd({ cmd: 'cast', ability: 'seal_of_righteousness' });
       }
@@ -318,8 +318,7 @@ async function main() {
           if ((b.self.gcd ?? 0) <= 0 && !b.self.cast) {
             if (b.cls === 'warrior' && (b.self.res ?? 0) >= 15)
               b.cmd({ cmd: 'cast', ability: 'heroic_strike' });
-            if (b.cls === 'paladin' && (b.self.res ?? 0) >= 30)
-              b.cmd({ cmd: 'cast', ability: 'judgement' });
+            if (b.cls === 'paladin') b.cmd({ cmd: 'cast', ability: 'hammer_of_grace' });
             if (b.cls === 'mage' && (b.self.res ?? 0) >= 30)
               b.cmd({ cmd: 'cast', ability: 'fireball' });
             if (b.cls === 'hunter' && (b.self.res ?? 0) >= 25)

@@ -130,6 +130,22 @@ describe('hoverCursorKind', () => {
 });
 
 describe('activePvpOpponentIds', () => {
+  it('clears and refills a caller-owned set', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const ids = new Set([99]);
+    const result = activePvpOpponentIds(
+      {
+        playerId: 1,
+        player,
+        duelInfo: { otherPid: 2, otherName: 'Duelist', state: 'active' },
+      },
+      ids,
+    );
+
+    expect(result).toBe(ids);
+    expect([...ids]).toEqual([2]);
+  });
+
   it('includes active duel and every arena enemy', () => {
     const player = stubEntity({ id: 1, kind: 'player' });
     const ids = activePvpOpponentIds({
@@ -142,13 +158,14 @@ describe('activePvpOpponentIds', () => {
         rating: 1500,
         wins: 0,
         losses: 0,
+        draws: 0,
         format: '1v1',
         standings: {
-          '1v1': { rating: 1500, wins: 0, losses: 0 },
-          '2v2': { rating: 1500, wins: 0, losses: 0 },
-          fiesta: { rating: 1500, wins: 0, losses: 0 },
-          yumi3: { rating: 1500, wins: 0, losses: 0 },
-          yumi5: { rating: 1500, wins: 0, losses: 0 },
+          '1v1': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          '2v2': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          fiesta: { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          yumi3: { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          yumi5: { rating: 1500, wins: 0, losses: 0, draws: 0 },
         },
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
@@ -188,13 +205,14 @@ describe('activePvpOpponentIds', () => {
       rating: 1500,
       wins: 0,
       losses: 0,
+      draws: 0,
       format: 'yumi3' as const,
       standings: {
-        '1v1': { rating: 1500, wins: 0, losses: 0 },
-        '2v2': { rating: 1500, wins: 0, losses: 0 },
-        fiesta: { rating: 1500, wins: 0, losses: 0 },
-        yumi3: { rating: 1500, wins: 0, losses: 0 },
-        yumi5: { rating: 1500, wins: 0, losses: 0 },
+        '1v1': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+        '2v2': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+        fiesta: { rating: 1500, wins: 0, losses: 0, draws: 0 },
+        yumi3: { rating: 1500, wins: 0, losses: 0, draws: 0 },
+        yumi5: { rating: 1500, wins: 0, losses: 0, draws: 0 },
       },
       ladder: [],
       ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
@@ -253,13 +271,14 @@ describe('activePvpOpponentIds', () => {
         rating: 1500,
         wins: 0,
         losses: 0,
+        draws: 0,
         format: '1v1',
         standings: {
-          '1v1': { rating: 1500, wins: 0, losses: 0 },
-          '2v2': { rating: 1500, wins: 0, losses: 0 },
-          fiesta: { rating: 1500, wins: 0, losses: 0 },
-          yumi3: { rating: 1500, wins: 0, losses: 0 },
-          yumi5: { rating: 1500, wins: 0, losses: 0 },
+          '1v1': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          '2v2': { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          fiesta: { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          yumi3: { rating: 1500, wins: 0, losses: 0, draws: 0 },
+          yumi5: { rating: 1500, wins: 0, losses: 0, draws: 0 },
         },
         ladder: [],
         ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },

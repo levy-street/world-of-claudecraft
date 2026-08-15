@@ -8,7 +8,8 @@ no-emoji rule), the module-first doctrine, the commands, the UI / a11y / i18n ru
 conventions (Conventional Commits WITH a scope, and every commit carries a body), and the
 default task workflow: base the work on the latest `release/**` branch rather than `main`,
 use a separate worktree, add tests with every `src/sim/` or `server/` change, and deliver a
-mergeable PR gated locally with `npm run gate`. Before calling an implementation complete,
+mergeable PR gated locally with `node scripts/gate_select.mjs` (the pre-merge bar; `npm run
+gate` is the deeper full suite). Before calling an implementation complete,
 run the QA gate described in `docs/qa-gate.md`. When this guide and `CLAUDE.md` disagree,
 **`CLAUDE.md` wins.** Do not keep a second copy of those rules here; this file holds only the
 Gemini-session notes that have no home in `CLAUDE.md`.

@@ -43,7 +43,11 @@ describe('enchanting_view: disenchant toast mapping', () => {
   });
   it('maps every reason to its own error toast', () => {
     expect(disenchantResultToast({ ok: false, reason: 'throttled' })).toEqual({
-      key: 'hudChrome.enchanting.disenchantThrottled',
+      key: 'hudChrome.enchanting.disenchantBusy',
+      sink: 'error',
+    });
+    expect(disenchantResultToast({ ok: false, reason: 'busy' })).toEqual({
+      key: 'hudChrome.enchanting.disenchantBusy',
       sink: 'error',
     });
     expect(disenchantResultToast({ ok: false, reason: 'not_disenchantable' }).key).toBe(
@@ -112,7 +116,7 @@ describe('enchanting_view: salvage toast mapping', () => {
   });
   it('maps every reason to its own error toast', () => {
     expect(salvageResultToast({ ok: false, reason: 'throttled' }).key).toBe(
-      'hudChrome.enchanting.salvageThrottled',
+      'hudChrome.enchanting.salvageBusy',
     );
     expect(salvageResultToast({ ok: false, reason: 'not_salvageable' }).key).toBe(
       'hudChrome.enchanting.notSalvageable',
@@ -139,7 +143,7 @@ describe('enchanting_view: apply-enchant toast mapping', () => {
   });
   it('maps every reason to its own error toast', () => {
     expect(applyEnchantResultToast({ ok: false, reason: 'throttled' }).key).toBe(
-      'hudChrome.enchanting.enchantThrottled',
+      'hudChrome.enchanting.enchantBusy',
     );
     expect(applyEnchantResultToast({ ok: false, reason: 'wrong_slot' }).key).toBe(
       'hudChrome.enchanting.enchantWrongSlot',

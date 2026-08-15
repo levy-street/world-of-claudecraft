@@ -9,7 +9,8 @@ import type { MountKey } from '../sim/content/mounts';
 // ownership, combat gate) in src/sim/mounts.ts.
 export interface IWorldMounts {
   /** The owned subset of the catalog, in catalog order: any mount whose
-   *  reins item sits in bags or bank (soulbound). A fresh player owns nothing. */
+   *  reins item sits in bags or bank (ownership travels with the item; reins
+   *  are not soulbound). A fresh player owns nothing. */
   ownedMounts(): readonly MountKey[];
   /** Whether the player has purchased the riding skill from Marla (80g).
    *  Required before summoning any mount. */

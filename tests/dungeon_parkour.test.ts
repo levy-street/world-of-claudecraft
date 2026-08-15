@@ -37,6 +37,8 @@ const IDLE: MoveInput = {
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
 };
 
 function simWithPlayerAt(x: number, z: number, facing: number): Sim {

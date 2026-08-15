@@ -19,9 +19,7 @@ import {
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
-
-type AnyEntity = Entity & Record<string, any>;
+import type { Aura, Entity, SimEvent } from '../src/sim/types';
 
 function makeSim(seed = 5252): Sim {
   return new Sim({ seed, playerClass: 'priest', autoEquip: true });
@@ -43,25 +41,31 @@ function aura(kind: Aura['kind'], value: number, extra: Partial<Aura> = {}): Aur
 }
 
 // A distinct healer player (source) so it never aliases the healed target.
-function addHealer(sim: Sim): AnyEntity {
-  const pid = (sim as any).addPlayer('priest', 'Healer') as number;
-  return (sim as any).entities.get(pid) as AnyEntity;
+function addHealer(sim: Sim): Entity {
+  const pid = sim.addPlayer('priest', 'Healer');
+  const healer = sim.entities.get(pid);
+  if (!healer) throw new Error('expected added healer entity');
+  return healer;
 }
 
 // Register a hostile mob already in combat, with an explicit hate table, so it
 // qualifies as an "aware" mob for healingThreat.
-function awareMob(sim: Sim, threatOn: number[]): AnyEntity {
-  const p = (sim as any).player as AnyEntity;
-  const mob = createMob((sim as any).nextId++, MOBS.forest_wolf, 5, {
+function awareMob(sim: Sim, threatOn: number[]): Entity {
+  const p = sim.player;
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, 5, {
     x: p.pos.x + 50,
     y: p.pos.y,
     z: p.pos.z + 50,
-  }) as AnyEntity;
+  });
   mob.hostile = true;
   mob.inCombat = true;
   for (const id of threatOn) mob.threat.set(id, 10);
-  (sim as any).addEntity(mob);
+  sim.addEntity(mob);
   return mob;
+}
+
+function isHeal2Event(event: SimEvent): event is Extract<SimEvent, { type: 'heal2' }> {
+  return event.type === 'heal2';
 }
 
 describe('heal: healingTakenMult (Mortal Wound)', () => {
@@ -174,8 +178,8 @@ describe('heal: critVulnBonus (Find Weakness)', () => {
 describe('heal: applyHeal', () => {
   it('is a no-op on a dead target AND spends no rng draw (guard precedes the crit draw)', () => {
     const sim = makeSim();
-    const src = sim.player as AnyEntity;
-    const tgt = sim.player as AnyEntity;
+    const src = sim.player;
+    const tgt = sim.player;
     tgt.dead = true;
     tgt.hp = 10;
     let draws = 0;
@@ -190,8 +194,8 @@ describe('heal: applyHeal', () => {
 
   it('spends exactly one rng draw (the crit roll) on a live-target heal', () => {
     const sim = makeSim();
-    const src = sim.player as AnyEntity;
-    const tgt = sim.player as AnyEntity;
+    const src = sim.player;
+    const tgt = sim.player;
     tgt.maxHp = 10000;
     tgt.hp = 1000;
     let draws = 0;
@@ -205,15 +209,16 @@ describe('heal: applyHeal', () => {
 
   it('forced crit applies the *1.5 multiplier', () => {
     const sim = makeSim();
-    const src = sim.player as AnyEntity;
-    const tgt = sim.player as AnyEntity;
+    const src = sim.player;
+    const tgt = sim.player;
     tgt.maxHp = 100000;
     tgt.hp = 1000;
     src.stats.int = 5000; // spellCrit = 0.05 + 5000*0.0008 = 4.05 -> chance always passes
     sim.drainEvents();
     applyHeal(sim.ctx, src, tgt, 1000, 'Heal');
     expect(tgt.hp).toBe(1000 + 1500); // round(1000 * 1.5)
-    const ev = sim.drainEvents().find((e) => e.type === 'heal2') as any;
+    const ev = sim.drainEvents().find(isHeal2Event);
+    if (!ev) throw new Error('expected heal2 landing event');
     expect(ev.crit).toBe(true);
     expect(ev.amount).toBe(1500);
     expect(ev.ability).toBe('Heal');
@@ -221,8 +226,8 @@ describe('heal: applyHeal', () => {
 
   it('forced non-crit applies no crit multiplier', () => {
     const sim = makeSim();
-    const src = sim.player as AnyEntity;
-    const tgt = sim.player as AnyEntity;
+    const src = sim.player;
+    const tgt = sim.player;
     tgt.maxHp = 100000;
     tgt.hp = 1000;
     src.stats.int = -1000; // spellCrit = 0.05 - 0.8 = -0.75 -> chance always fails
@@ -232,22 +237,53 @@ describe('heal: applyHeal', () => {
 
   it('clamps healing to the missing health (overheal is free)', () => {
     const sim = makeSim();
-    const src = sim.player as AnyEntity;
-    const tgt = sim.player as AnyEntity;
+    const src = sim.player;
+    const tgt = sim.player;
     tgt.maxHp = 5000;
     tgt.hp = 4900;
     src.stats.int = -1000; // no crit, so the clamp is the only thing trimming the heal
     sim.drainEvents();
     applyHeal(sim.ctx, src, tgt, 1000, 'Heal');
     expect(tgt.hp).toBe(5000); // clamped to maxHp
-    const ev = sim.drainEvents().find((e) => e.type === 'heal2') as any;
+    const ev = sim.drainEvents().find(isHeal2Event);
+    if (!ev) throw new Error('expected heal2 landing event');
     expect(ev.amount).toBe(100); // only the effective (non-overheal) portion
+  });
+
+  it('emits a real zero-amount landing on a full-health out-of-combat player without threat', () => {
+    const sim = makeSim();
+    const src = addHealer(sim);
+    const tgt = sim.player;
+    const mob = awareMob(sim, [tgt.id]);
+    tgt.hp = tgt.maxHp;
+    src.stats.int = -1000; // no crit, so the emitted landing is stable.
+
+    sim.drainEvents();
+    const healed = applyHeal(sim.ctx, src, tgt, 1000, 'Lesser Heal');
+
+    expect(healed).toBe(0);
+    expect(tgt.hp).toBe(tgt.maxHp);
+    expect(tgt.inCombat).toBe(false);
+    const ev = sim.drainEvents().find(isHeal2Event);
+    if (!ev) throw new Error('expected heal2 landing event');
+    expect(ev).toEqual(
+      expect.objectContaining({
+        type: 'heal2',
+        sourceId: src.id,
+        targetId: tgt.id,
+        amount: 0,
+        crit: false,
+        ability: 'Lesser Heal',
+      }),
+    );
+    expect(ev.cueOnly).toBeUndefined();
+    expect(mob.threat.has(src.id)).toBe(false);
   });
 
   it('chains crit * hex(source) * mortalWound(target) before the absorb soak', () => {
     const sim = makeSim();
-    const src = sim.player as AnyEntity;
-    const tgt = sim.player as AnyEntity;
+    const src = sim.player;
+    const tgt = sim.player;
     tgt.maxHp = 100000;
     tgt.hp = 1000;
     src.stats.int = 5000; // forced crit
@@ -265,7 +301,7 @@ describe('heal: healingThreat fan-out', () => {
   it('does nothing when the source is not a player', () => {
     const sim = makeSim();
     const mobSrc = awareMob(sim, []); // a mob source
-    const tgt = sim.player as AnyEntity;
+    const tgt = sim.player;
     const m = awareMob(sim, [tgt.id]);
     healingThreat(sim.ctx, mobSrc, tgt, 500);
     expect(m.threat.has(mobSrc.id)).toBe(false);
@@ -274,7 +310,7 @@ describe('heal: healingThreat fan-out', () => {
   it('does nothing when healed <= 0', () => {
     const sim = makeSim();
     const src = addHealer(sim);
-    const tgt = sim.player as AnyEntity;
+    const tgt = sim.player;
     const m = awareMob(sim, [tgt.id]);
     healingThreat(sim.ctx, src, tgt, 0);
     expect(m.threat.has(src.id)).toBe(false);
@@ -283,7 +319,7 @@ describe('heal: healingThreat fan-out', () => {
   it('splits effective-healing threat EVENLY across every aware mob', () => {
     const sim = makeSim();
     const src = addHealer(sim);
-    const tgt = sim.player as AnyEntity;
+    const tgt = sim.player;
     const m1 = awareMob(sim, [tgt.id]);
     const m2 = awareMob(sim, [tgt.id]);
     const m3 = awareMob(sim, [tgt.id]);
@@ -298,7 +334,7 @@ describe('heal: healingThreat fan-out', () => {
   it('ignores mobs that are dead / friendly / out of combat / have an empty hate table', () => {
     const sim = makeSim();
     const src = addHealer(sim);
-    const tgt = sim.player as AnyEntity;
+    const tgt = sim.player;
     const dead = awareMob(sim, [tgt.id]);
     dead.dead = true;
     const friendly = awareMob(sim, [tgt.id]);
@@ -316,14 +352,14 @@ describe('heal: healingThreat fan-out', () => {
 describe('heal: threatEntryMatchesEntity', () => {
   it('matches when the entity is directly in the hate table', () => {
     const sim = makeSim();
-    const tgt = sim.player as AnyEntity;
+    const tgt = sim.player;
     const m = awareMob(sim, [tgt.id]);
     expect(threatEntryMatchesEntity(sim.ctx, m, tgt)).toBe(true);
   });
 
   it('matches a player via a hate-table entry owned by that player (pet branch)', () => {
     const sim = makeSim();
-    const tgt = sim.player as AnyEntity;
+    const tgt = sim.player;
     const pet = awareMob(sim, []);
     pet.ownerId = tgt.id;
     pet.hostile = false;
@@ -334,7 +370,7 @@ describe('heal: threatEntryMatchesEntity', () => {
 
   it('does not match a player with no owned hate-table entry', () => {
     const sim = makeSim();
-    const tgt = sim.player as AnyEntity;
+    const tgt = sim.player;
     const other = awareMob(sim, []);
     const m = awareMob(sim, [other.id]); // holds an unrelated mob
     expect(threatEntryMatchesEntity(sim.ctx, m, tgt)).toBe(false);

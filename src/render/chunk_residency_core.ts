@@ -18,6 +18,21 @@
 // radius is only correct for the disc: against rectangles it reports a clamp
 // that is too generous, which means visible holes. The query here is an exact
 // bounded outward ring walk, correct for both.
+//
+// The query is also DIRECTIONAL, and that is load bearing. The clamp exists so
+// the player never sees a hole, and a hole is only ever seen where the camera
+// is pointed: unbuilt ground behind the camera costs the view nothing. Asking
+// radially made the horizon a function of camera YAW, because a third-person
+// camera orbits its player and the binding chunk swings around with it.
+// Measured from the Eastbrook spawn, standing still and rotating on the spot
+// against a 700 yard request: 170 yards served with the binder 90 degrees off
+// the view axis, and 235 with the binder at 179 degrees, i.e. directly behind
+// the camera. Everything past that horizon hands off to the coarse vista mesh,
+// which carries no splat texture and takes no shadows, so rotating in place
+// visibly deleted mid-field scenery and its shadows. Restricting the walk to
+// the wedge the camera can actually see keeps the no-holes guarantee (the only
+// ground that can show a hole is ground in frame) and makes the horizon
+// independent of where the player happens to be looking.
 
 import { MAX_OUTDOOR_FOG_FAR, MIN_OUTDOOR_FOG_FAR } from './zone_streaming';
 
@@ -48,6 +63,98 @@ export interface ChunkGrid {
  * itself against a hole that is never going to fill.
  */
 export type GroundPendingAt = (cx: number, cz: number) => boolean;
+
+/**
+ * The horizontal wedge of world the camera can see, as a direction plus a
+ * half-angle measured off it. Ground outside this wedge cannot show a hole, so
+ * it must not clamp the horizon.
+ *
+ * `forwardX`/`forwardZ` are the camera's forward direction projected to XZ and
+ * need not be normalized; a zero-length direction disables the restriction
+ * (every cell is considered) rather than rejecting everything, so a caller that
+ * cannot supply a direction degrades to the old radial answer.
+ */
+export interface GroundViewCone {
+  readonly forwardX: number;
+  readonly forwardZ: number;
+  /** Half-angle off the forward axis, in radians. */
+  readonly halfAngle: number;
+}
+
+/**
+ * Slack added to the camera's own half-angle, in radians (15 degrees).
+ *
+ * The clamp is applied the same frame it is computed but CONSUMED a frame later
+ * (subsystemCullFar reads the value updateAmbience refreshes further down the
+ * same sync), so the wedge has to lead the camera by a frame of rotation: 15
+ * degrees is 450 deg/s at 30 fps, faster than any sustained turn.
+ *
+ * A single-frame mouse flick can out-turn any fixed margin, which is why this
+ * is a lead and not the safety net. The net is the far vista mesh standing
+ * under the detail horizon: on the arm where the clamp actually gates scenery,
+ * ground that has not arrived reads as coarse terrain, never as a hole, so
+ * being one frame late costs a frame of coarse ground rather than a void. Wider
+ * would be worse, not safer: every extra degree re-admits off-screen ground to
+ * the clamp, which is the coupling this exists to break.
+ */
+export const GROUND_VIEW_CONE_MARGIN = Math.PI / 12;
+
+/**
+ * The bounding half-angle of a perspective frustum (its CORNER, not its
+ * horizontal edge, so the wedge covers the whole frame) plus the lead margin.
+ *
+ * Capped just under a right angle: the wedge is expressed as two half-planes,
+ * which only exclude the region behind the camera while the half-angle stays
+ * below 90 degrees. A wider request would silently start clamping against
+ * ground the player has their back to, which is the bug this exists to stop.
+ */
+export function groundViewConeHalfAngle(
+  fovYRadians: number,
+  aspect: number,
+  margin = GROUND_VIEW_CONE_MARGIN,
+): number {
+  const tanY = Math.tan(Math.max(0, fovYRadians) / 2);
+  const tanX = tanY * Math.max(0, aspect);
+  const corner = Math.atan(Math.hypot(tanX, tanY));
+  return Math.min(corner + Math.max(0, margin), Math.PI / 2 - 1e-3);
+}
+
+/**
+ * True when a cell's rectangle lies wholly outside the view wedge.
+ *
+ * The wedge is the intersection of two half-planes through the camera, so a
+ * rectangle entirely on the outside of EITHER of them is disjoint from it. That
+ * is a sound rejection rather than a complete one (a rectangle can straddle
+ * both boundaries beyond the wedge and still be kept), and incompleteness only
+ * keeps a cell that could have been skipped, which is the safe direction: the
+ * worst case is the old radial answer.
+ */
+function coneRejectsCell(
+  cone: GroundViewCone,
+  apexX: number,
+  apexZ: number,
+  minX: number,
+  minZ: number,
+  maxX: number,
+  maxZ: number,
+): boolean {
+  const length = Math.hypot(cone.forwardX, cone.forwardZ);
+  if (!(length > 0)) return false;
+  const ux = cone.forwardX / length;
+  const uz = cone.forwardZ / length;
+  const sin = Math.sin(cone.halfAngle);
+  const cos = Math.cos(cone.halfAngle);
+  // Inward normals of the wedge's two boundary rays.
+  const leftX = ux * sin + uz * cos;
+  const leftZ = uz * sin - ux * cos;
+  const rightX = ux * sin - uz * cos;
+  const rightZ = ux * cos + uz * sin;
+  // Support point of the axis-aligned cell along each normal: the rectangle is
+  // outside a half-plane exactly when even its furthest corner falls short.
+  const outside = (nx: number, nz: number): boolean =>
+    nx * ((nx > 0 ? maxX : minX) - apexX) + nz * ((nz > 0 ? maxZ : minZ) - apexZ) < 0;
+  return outside(leftX, leftZ) || outside(rightX, rightZ);
+}
 
 /** Cell column containing world x. May fall outside [0, countX). */
 export function chunkCellX(grid: ChunkGrid, x: number): number {
@@ -80,6 +187,10 @@ function distanceToCell(grid: ChunkGrid, cx: number, cz: number, x: number, z: n
  * first hit instead of scanning the grid. The clamped case (the one that costs
  * the player anything) is therefore the cheapest case, and the fully built case
  * is bounded by maxDistance rather than by the size of the world.
+ *
+ * With a `cone`, only ground the camera can see is considered. Skipping a cell
+ * can only raise the answer, so the ring bound stays valid; omitting the cone
+ * asks the old radial question.
  */
 export function nearestPendingGroundDistance(
   grid: ChunkGrid,
@@ -87,6 +198,7 @@ export function nearestPendingGroundDistance(
   x: number,
   z: number,
   maxDistance: number,
+  cone?: GroundViewCone | null,
 ): number {
   if (!(maxDistance > 0)) return Number.POSITIVE_INFINITY;
   const camCx = chunkCellX(grid, x);
@@ -108,6 +220,13 @@ export function nearestPendingGroundDistance(
       for (let cx = cxMin; cx <= cxMax; cx += step) {
         if (cx < 0 || cx >= grid.countX) continue;
         if (!isPending(cx, cz)) continue;
+        if (cone) {
+          const minX = grid.originX + cx * grid.size;
+          const minZ = grid.originZ + cz * grid.size;
+          if (coneRejectsCell(cone, x, z, minX, minZ, minX + grid.size, minZ + grid.size)) {
+            continue;
+          }
+        }
         const distance = distanceToCell(grid, cx, cz, x, z);
         if (distance < best) best = distance;
       }
@@ -121,6 +240,10 @@ export function nearestPendingGroundDistance(
  * The chunk-level replacement for the old zone-rectangle clamp: same envelope
  * (floor, ceiling, guard), a unit of work roughly 20x smaller. No geometry is
  * generated by this query.
+ *
+ * Pass the camera's `cone` so only ground that can actually be seen binds the
+ * clamp; without it the answer is radial and the horizon becomes a function of
+ * camera yaw (see the module header).
  */
 export function fogFarForBuiltGround(
   grid: ChunkGrid,
@@ -128,6 +251,7 @@ export function fogFarForBuiltGround(
   cameraX: number,
   cameraZ: number,
   requestedFar: number,
+  cone?: GroundViewCone | null,
 ): number {
   const capped = Math.min(requestedFar, MAX_OUTDOOR_FOG_FAR);
   // Ground past the request cannot bind the clamp, and the guard comes off
@@ -138,6 +262,7 @@ export function fogFarForBuiltGround(
     cameraX,
     cameraZ,
     capped + UNBUILT_GROUND_FOG_GUARD,
+    cone,
   );
   if (!Number.isFinite(nearest)) return capped;
   return Math.max(MIN_OUTDOOR_FOG_FAR, Math.min(capped, nearest - UNBUILT_GROUND_FOG_GUARD));

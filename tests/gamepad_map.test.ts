@@ -4,6 +4,8 @@ import {
   BINDABLE_BUTTONS,
   DEFAULT_GAMEPAD_BINDINGS,
   detectGamepadKind,
+  GAMEPAD_ZOOM_IN,
+  GAMEPAD_ZOOM_OUT,
   GP,
   gamepadButtonLabel,
   risingEdges,
@@ -156,6 +158,14 @@ describe('default layout', () => {
       // (additive or displacing). The default layout binds each slot to one button.
       expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(1);
     }
+  });
+
+  it('ships camera zoom unbound (all 13 default buttons are already claimed)', () => {
+    // Zoom is pad-only and opt-in: there is no free default slot among the
+    // bindable buttons, so a player must remap one deliberately in options.
+    const values = Object.values(DEFAULT_GAMEPAD_BINDINGS);
+    expect(values).not.toContain(GAMEPAD_ZOOM_IN);
+    expect(values).not.toContain(GAMEPAD_ZOOM_OUT);
   });
 });
 

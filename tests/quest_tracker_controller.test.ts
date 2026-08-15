@@ -83,6 +83,41 @@ describe('QuestTrackerController', () => {
     expect(test.html()).toContain('quest-complete');
   });
 
+  it('keeps an unknown quest id tracked at its log position, never a throw (R34)', () => {
+    // The log is server truth: a quest accepted on a current client reaches a
+    // bundle that predates it. The tracker runs every frame inside
+    // hud.update(), so a throw here used to kill the whole HUD tail; and a
+    // SKIP would desync the tracker numbers from the world map badges, which
+    // number every log entry. The unknown entry renders its raw id with no
+    // objectives, and the KNOWN quest behind it keeps number 3.
+    // Built by hand: the progress() helper derives counts from QUESTS, which
+    // is exactly what an unknown id cannot do (the wire sends counts as-is).
+    const ghost = { questId: 'q_ghost_of_v33', state: 'active' as const, counts: [0] };
+    // The prototype-key arm: QUESTS is a prototype-bearing Record, so a bare
+    // truthiness read resolves 'constructor' to a FUNCTION and the objectives
+    // deref throws; only the own-property gate renders it as unknown.
+    const proto = { questId: 'constructor', state: 'active' as const, counts: [0] };
+    const test = harness([progress('q_wolves'), ghost, proto, progress('q_boars', 'ready')]);
+
+    test.controller.update();
+
+    expect(test.html()).toContain('q_ghost_of_v33');
+    // The title SAYS unknown (the questUi.tracker.unknownQuest sentence
+    // carrying the raw id), never a bare content slug on its own.
+    expect(test.html()).toContain('Unknown quest (q_ghost_of_v33)');
+    expect(test.html().indexOf('title:q_wolves')).toBeLessThan(
+      test.html().indexOf('q_ghost_of_v33'),
+    );
+    expect(test.html().indexOf('q_ghost_of_v33')).toBeLessThan(
+      test.html().indexOf('title:q_boars'),
+    );
+    // No objective rows for the unknown entries; the prototype key renders
+    // as its raw id too, never a function deref.
+    expect(test.html()).not.toContain('objective:q_ghost_of_v33');
+    expect(test.html()).toContain('constructor');
+    expect(test.html()).not.toContain('objective:constructor');
+  });
+
   it('clears a stale collapse preference once when the authoritative log empties', () => {
     const test = harness();
     test.setCollapsed(true);

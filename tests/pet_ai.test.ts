@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
+  PET_AGGRESSIVE_RANGE,
   petFollow,
   petPickTarget,
   petRangedAttack,
@@ -8,8 +9,10 @@ import {
   updatePet,
 } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity, type WorldContent } from '../src/sim/types';
+import { STEALTH_DETECTION_MULT } from '../src/sim/threat';
+import { type Aura, dist2d, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 // Direct unit tests for the extracted pet-AI module (P1a). They drive the moved
 // functions through the real Sim.ctx seam (so the still-on-Sim helpers they reach
@@ -26,54 +29,51 @@ const PET_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
-type AnySim = Sim & Record<string, any>;
-type AnyEntity = Entity & Record<string, any>;
-
-function world(): { sim: AnySim; pid: number; owner: AnyEntity } {
+function world(): { sim: Sim; pid: number; owner: Entity } {
   const sim = new Sim({
     seed: 7,
     playerClass: 'hunter',
     noPlayer: true,
     world: PET_TEST_WORLD,
-  }) as AnySim;
+  });
   const pid = sim.addPlayer('hunter', 'Owner');
-  const owner = sim.entities.get(pid) as AnyEntity;
+  const owner = expectDefined(sim.entities.get(pid));
   return { sim, pid, owner };
 }
 
 // Adopt the first wild mob as the player's pet (mirrors a completed tame/summon).
-function adopt(sim: AnySim, pid: number, exclude: number[] = []): AnyEntity {
+function adopt(sim: Sim, pid: number, exclude: number[] = []): Entity {
   for (const e of sim.entities.values()) {
     if (e.kind === 'mob' && !e.dead && e.ownerId === null && !exclude.includes(e.id)) {
       e.ownerId = pid;
       e.hostile = false;
       e.hp = e.maxHp;
-      return e as AnyEntity;
+      return e;
     }
   }
   throw new Error('no wild mob to adopt');
 }
 
-function wildHostile(sim: AnySim, exclude: number[]): AnyEntity {
+function wildHostile(sim: Sim, exclude: number[]): Entity {
   for (const e of sim.entities.values()) {
     if (e.kind === 'mob' && !e.dead && e.ownerId === null && !exclude.includes(e.id)) {
       e.hostile = true;
-      return e as AnyEntity;
+      return e;
     }
   }
   throw new Error('no wild hostile');
 }
 
-function place(e: AnyEntity, x: number, z: number): void {
+function place(e: Entity, x: number, z: number): void {
   e.pos = { x, y: e.pos.y, z };
   e.prevPos = { ...e.pos };
 }
 
 // Banish every entity except the named ones far off the map so a target scan only
 // sees what the test set up (the ctor seeds wild mobs around the player).
-function isolate(sim: AnySim, keep: number[]): void {
+function isolate(sim: Sim, keep: number[]): void {
   for (const e of sim.entities.values()) {
-    if (!keep.includes(e.id)) place(e as AnyEntity, 5000, 5000);
+    if (!keep.includes(e.id)) place(e, 5000, 5000);
   }
 }
 
@@ -82,12 +82,12 @@ function isolate(sim: AnySim, keep: number[]): void {
 // the grid from the live positions before a pick, exactly as a real tick's end-of-tick
 // grid.refresh does (server/sim.ts). Banished entities land in a far cell and the query's
 // live-distance filter drops them; the placed entities land in their real cells.
-function syncGrid(sim: AnySim): void {
+function syncGrid(sim: Sim): void {
   sim.grid.refresh(sim.entities.values());
 }
 
 // A second wild hostile mob, distinct from the first (grows the exclude set).
-function wildHostile2(sim: AnySim, exclude: number[]): [AnyEntity, AnyEntity] {
+function wildHostile2(sim: Sim, exclude: number[]): [Entity, Entity] {
   const first = wildHostile(sim, exclude);
   const second = wildHostile(sim, [...exclude, first.id]);
   return [first, second];
@@ -97,17 +97,17 @@ function wildHostile2(sim: AnySim, exclude: number[]): [AnyEntity, AnyEntity] {
 // inherits its owner's PvP hostility toward the opponent player. Used to prove a hostile
 // PLAYER is a valid petPickTarget candidate (the grid holds every kind, and the admit
 // predicates carry no kind === 'mob' restriction on ownerOffense).
-function startedDuelHunter(): { sim: AnySim; a: number; b: number } {
+function startedDuelHunter(): { sim: Sim; a: number; b: number } {
   const sim = new Sim({
     seed: 7,
     playerClass: 'warrior',
     noPlayer: true,
     world: PET_TEST_WORLD,
-  }) as AnySim;
+  });
   const a = sim.addPlayer('hunter', 'Aleph', { autoEquip: true });
   const b = sim.addPlayer('mage', 'Bet', { autoEquip: true });
   const move = (pid: number, x: number, z: number): void => {
-    const e = sim.entities.get(pid) as AnyEntity;
+    const e = expectDefined(sim.entities.get(pid));
     e.pos = { x, y: groundHeight(x, z, sim.cfg.seed), z };
     e.prevPos = { ...e.pos };
     sim.rebucket(e);
@@ -170,7 +170,7 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     target.aggroTargetId = null; // not engaging the owner or pet
     owner.targetId = null;
     owner.autoAttack = false;
-    const meta = sim.meta(pid)!;
+    const meta = expectDefined(sim.meta(pid));
     meta.lastActiveTick = sim.tickCount; // active: the aggressive auto-pull gate is open
     syncGrid(sim); // the grid, not the entity map, is now the scan source
     expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(target.id);
@@ -185,20 +185,23 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     target.maxHp = 50000;
     target.hp = 50000;
     petRangedAttack(sim.ctx, pet, target, { range: 25, school: 'fire' });
-    const ev = sim.drainEvents() as Array<Record<string, any>>;
+    const ev: SimEvent[] = sim.drainEvents();
     expect(
       ev.some((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.school === 'fire'),
     ).toBe(true);
     // The bolt's damage lands when it reaches the target (projectile_travel), not the
-    // tick it is hurled: advance until it connects.
+    // tick it is hurled: advance until it connects. The bolt now rolls spell resist
+    // on impact (tests/pet_ranged_resist.test.ts pins that arm); pin the hit roll to
+    // succeed so this test stays about the landing damage, not the resist draw.
+    sim.rng.chance = () => true;
     let landed = false;
     for (let i = 0; i < 20 && !landed; i++) {
-      landed = (sim.tick() as Array<Record<string, any>>).some(
-        (e) => e.type === 'damage' && e.sourceId === pet.id && e.school === 'fire',
-      );
+      landed = sim
+        .tick()
+        .some((e) => e.type === 'damage' && e.sourceId === pet.id && e.school === 'fire');
     }
     expect(landed).toBe(true);
-    expect(target.hp).toBeLessThan(target.maxHp); // the bolt never misses (crit-only roll)
+    expect(target.hp).toBeLessThan(target.maxHp); // a landed bolt always damages
   });
 
   it('Water Jet is a real channel that slows, blocks bolts, and breaks out of range', () => {
@@ -327,6 +330,10 @@ describe('pet proximity pull: a pet drags idle wild mobs like its owner', () => 
 // distance tie, is deterministic.
 describe('petPickTarget: grid scan preserves the selection contract', () => {
   const PET_ASSIST_RANGE = 50; // mirrors the module constant (how far the pet scans)
+  // Deliberate literal mirror, and it SHADOWS the imported symbol of the same name for
+  // this block only. Kept as a literal: these cases are about the selection contract at
+  // that distance, so a value derived from the module would make them self-comparisons.
+  // The real constant is pinned to 18 in the stealth-band suite below.
   const PET_AGGRESSIVE_RANGE = 18; // aggressive pets pull idle enemies within this
 
   it('selects the nearest valid hostile inside range (grid path == old full scan)', () => {
@@ -397,7 +404,7 @@ describe('petPickTarget: grid scan preserves the selection contract', () => {
     mob.aggroTargetId = null; // not engaging owner or pet
     owner.targetId = null;
     owner.autoAttack = false;
-    const meta = sim.meta(pid)!;
+    const meta = expectDefined(sim.meta(pid));
     meta.lastActiveTick = sim.tickCount; // active: the aggressive gate is open
     syncGrid(sim);
     // the wider superset radius (50) surfaces this mob, but the `aggressive` predicate
@@ -412,8 +419,8 @@ describe('petPickTarget: grid scan preserves the selection contract', () => {
   it('selects a hostile PLAYER in PvP (the grid holds every kind; no mob-only restriction)', () => {
     const { sim, a, b } = startedDuelHunter();
     expect(sim.duels.get(a)?.state).toBe('active');
-    const owner = sim.entities.get(a) as AnyEntity;
-    const enemy = sim.entities.get(b) as AnyEntity;
+    const owner = expectDefined(sim.entities.get(a));
+    const enemy = expectDefined(sim.entities.get(b));
     const pet = adopt(sim, a); // the hunter's pet
     pet.petMode = 'defensive';
     expect(sim.isHostileTo(pet, enemy)).toBe(true); // pet inherits owner PvP hostility
@@ -475,5 +482,217 @@ describe('petPickTarget: grid scan preserves the selection contract', () => {
     mob.threat.set(owner.id, 1); // ...so admission must ride the owner-threat disjunct
     syncGrid(sim);
     expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(mob.id);
+  });
+});
+
+// Assist against a hostile PLAYER. The ownerOffense clause used to carry exactly two
+// signals: owner.autoAttack, and the target's hate table naming the owner. A player
+// has no hate table, so against a player the threat disjunct was dead by construction
+// and only a melee swing pulled the pet in. A caster attacking an enemy player with
+// spells alone therefore got no pet assist at all, which is what these pin.
+describe('petPickTarget: a defensive pet assists against a hostile PLAYER', () => {
+  // Owner targeting the duel opponent with spells only: no swing, so autoAttack is
+  // false and the hate-table disjunct cannot apply. `inCombat` is the caller-set knob.
+  function spellCasterFixture(): {
+    sim: Sim;
+    owner: Entity;
+    enemy: Entity;
+    pet: Entity;
+    enemyPid: number;
+  } {
+    const { sim, a, b } = startedDuelHunter();
+    const owner = expectDefined(sim.entities.get(a));
+    const enemy = expectDefined(sim.entities.get(b));
+    const pet = adopt(sim, a);
+    pet.petMode = 'defensive';
+    isolate(sim, [a, b, pet.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(enemy, 10, 0);
+    owner.targetId = enemy.id;
+    owner.autoAttack = false;
+    syncGrid(sim);
+    return { sim, owner, enemy, pet, enemyPid: b };
+  }
+
+  it('acquires the hostile player the in-combat owner is targeting without auto-attacking', () => {
+    const { sim, owner, pet, enemyPid } = spellCasterFixture();
+    owner.inCombat = true; // the owner is actually engaged, just not swinging
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+  });
+
+  it('leaves the targeted hostile player alone while the owner is NOT in combat', () => {
+    const { sim, owner, pet } = spellCasterFixture();
+    owner.inCombat = false; // merely targeting an enemy is not an attack
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
+  it('still returns nothing for a PASSIVE pet whose owner fights that hostile player', () => {
+    const { sim, owner, pet } = spellCasterFixture();
+    pet.petMode = 'passive';
+    owner.inCombat = true;
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
+  it('keeps assisting through the whole inCombat LINGER, which is the disclosed cost', () => {
+    // Review catch, pinned rather than left to the PR body: `inCombat` is a
+    // LINGERING flag, not an instantaneous one, so a defensive pet keeps
+    // initiating on the owner's target for the linger window after the fight is
+    // actually over. That is bounded and gated by isHostileTo, and it is the
+    // accepted cost of reading a flag the tick order publishes one tick late,
+    // but it is behavior a future reader should have to change this test to
+    // change, rather than discover.
+    const { sim, owner, pet, enemyPid } = spellCasterFixture();
+    owner.inCombat = true;
+    owner.combatTimer = 0; // freshly engaged; the flag decays over PET_COMBAT_LINGER
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+
+    // The moment the flag actually clears, the assist stops. The flag, not the
+    // timer, is the gate: this is the boundary the fix reads.
+    owner.inCombat = false;
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
+  it('leaves an untargeted hostile player alone even while the owner is in combat', () => {
+    const { sim, owner, pet } = spellCasterFixture();
+    owner.inCombat = true;
+    owner.targetId = null; // the owner-target conjunct is the only per-target signal left
+    // Without this, an in-combat owner would send the pet at every hostile player inside
+    // the 50yd assist scan, not at the one the assist stance is about.
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
+  it('assists on the TARGETED player while the owner trades blows with something else', () => {
+    const { sim, owner, pet, enemyPid } = spellCasterFixture();
+    const elsewhere = wildHostile(sim, [pet.id]);
+    place(elsewhere, 400, 400); // the owner's actual opponent, far outside the pet scan
+    elsewhere.aggroTargetId = owner.id; // so inCombat is genuinely about a DIFFERENT enemy
+    owner.inCombat = true;
+    syncGrid(sim);
+    // Pins the deliberate design decision documented at the ownerOffense site: inCombat
+    // is not target-specific, so "assist my target" beats "assist whatever hit me".
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+  });
+
+  it('does not lend the owner-inCombat signal to the MOB arm (hate table still rules)', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'defensive';
+    const mob = wildHostile(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, mob.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(mob, 12, 0);
+    mob.aggroTargetId = null; // engagingUs closed
+    owner.targetId = mob.id;
+    owner.autoAttack = false; // autoAttack closed
+    owner.inCombat = true; // in combat with something else entirely
+    mob.threat.clear(); // this mob has never heard of the owner
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+    // control: the mob arm still admits on its own signal, the hate table
+    mob.threat.set(owner.id, 1);
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(mob.id);
+  });
+});
+
+// Stealth detection. petCanSeeTarget used to pass the pet's 50yd assist RANGE as the
+// stealth-detection BASE radius, which at the equal-level 0.25 multiplier let a pet
+// see a stealthed player from 12.5yd, roughly three times what any mob manages from
+// its own aggro radius. The base is the pet's aggro-radius analogue instead.
+describe('pet stealth detection sits in the mob band, not triple it', () => {
+  const PET_ASSIST_RANGE = 50; // mirrors the module constant (the old, wrong base)
+  const newRadius = PET_AGGRESSIVE_RANGE * STEALTH_DETECTION_MULT; // 4.5 at equal level
+  const oldRadius = PET_ASSIST_RANGE * STEALTH_DETECTION_MULT; // 12.5, the bug
+  const BETWEEN = 8; // a distance the old base saw and the new one must not
+
+  function stealthAura(): Aura {
+    return {
+      id: 'stealth',
+      name: 'Stealth',
+      kind: 'stealth',
+      remaining: 3600,
+      duration: 3600,
+      value: 0,
+      sourceId: 0,
+      school: 'physical',
+    };
+  }
+
+  // A hunter's pet and a stealthed, equal-level duel opponent it is hostile to.
+  function stealthedOpponent(): {
+    sim: Sim;
+    owner: Entity;
+    enemy: Entity;
+    pet: Entity;
+    enemyPid: number;
+  } {
+    const { sim, a, b } = startedDuelHunter();
+    const owner = expectDefined(sim.entities.get(a));
+    const enemy = expectDefined(sim.entities.get(b));
+    const pet = adopt(sim, a);
+    pet.petMode = 'defensive';
+    pet.level = enemy.level; // equal level: the plain STEALTH_DETECTION_MULT applies
+    enemy.auras.push(stealthAura());
+    isolate(sim, [a, b, pet.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    owner.targetId = enemy.id;
+    owner.autoAttack = true; // admission is settled; only visibility is under test
+    return { sim, owner, enemy, pet, enemyPid: b };
+  }
+
+  it('spans the change: the fixture distance lies strictly between the two radii', () => {
+    // The band bounds below are DERIVED from the same two constants the production code
+    // reads, so on their own they would move with any edit to either. Pin both to their
+    // literal values so the fix's actual claim, 4.5yd rather than 12.5yd, is asserted.
+    expect(PET_AGGRESSIVE_RANGE).toBe(18);
+    expect(STEALTH_DETECTION_MULT).toBe(0.25);
+    expect(newRadius).toBe(4.5);
+    // Without this the two picks below could both pass on an unmoved radius.
+    expect(BETWEEN).toBeGreaterThan(newRadius);
+    expect(BETWEEN).toBeLessThan(oldRadius);
+  });
+
+  it('does NOT acquire a stealthed equal-level player beyond the pet aggro-radius band', () => {
+    const { sim, enemy, pet, owner } = stealthedOpponent();
+    place(enemy, BETWEEN, 0);
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+  });
+
+  it('DOES acquire the same stealthed player once inside that band', () => {
+    const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
+    place(enemy, newRadius - 0.5, 0);
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+  });
+
+  it('unstealthed, the same player at that distance is acquired normally', () => {
+    const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
+    enemy.auras = enemy.auras.filter((a) => a.kind !== 'stealth');
+    place(enemy, BETWEEN, 0);
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+  });
+
+  // The damage path asks the same question and must answer it the same way, or a pet
+  // that cannot see a rogue could still hit them (combat/damage.ts). Probed at the
+  // picker's own boundary rather than somewhere in the band: a damage-side radius that
+  // drifted from the picker's by more than 0.02yd cannot satisfy both halves of this.
+  it('the dealDamage stealth gate turns over at the same boundary as the target picker', () => {
+    const { sim, enemy, pet, owner, enemyPid } = stealthedOpponent();
+    const hpBefore = enemy.hp;
+    place(enemy, newRadius + 0.01, 0); // a hair outside: neither path may touch them
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+    expect(sim.dealDamage(pet, enemy, 10, false, 'physical', null, 'hit')).toBe(0);
+    expect(enemy.hp).toBe(hpBefore);
+    place(enemy, newRadius - 0.01, 0); // a hair inside: both paths must
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(enemyPid);
+    expect(sim.dealDamage(pet, enemy, 10, false, 'physical', null, 'hit')).toBeGreaterThan(0);
+    expect(enemy.hp).toBeLessThan(hpBefore);
   });
 });

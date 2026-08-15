@@ -2,6 +2,7 @@
 // <main> landmark, and keeps title, active-nav, sidebar visibility, document language,
 // and focus in sync on every navigation and language switch.
 
+import { hydrateCrestImageFallbacks } from '../ui/crest_image_fallback';
 import {
   ensureLocaleLoaded,
   getLanguage,
@@ -137,6 +138,8 @@ export class GuideApp {
       this.chrome.setSidebarVisible(!isHome);
       document.body.dataset.guideRoute = route.id;
     }
+
+    hydrateCrestImageFallbacks(this.chrome.mainEl);
 
     const pageTitle = dynamicTitle ?? t(titleKey);
     const brand = t('guide.brand');

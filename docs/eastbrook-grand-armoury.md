@@ -39,7 +39,7 @@ geometry or draw. Supported alternate seeds and localized custom-terrain edits r
 same entrance grade while a solid skirt extends to the deterministic footprint minimum;
 seed `4717`, for example, requires a `0.9766606569`-yard extension. Camera collision derives
 its roof height from the same terrain envelope. Online admission uses layout epoch `3` and
-the strict `auth-world-3` discriminator so clients and servers with different footprint data
+the strict `auth-world-4` discriminator so clients and servers with incompatible content
 fail before credentials or world admission.
 
 ## Visual and production contract
@@ -83,9 +83,9 @@ native-iOS path without per-frame model work or dynamic point lights.
 | Compression | `EXT_meshopt_compression` plus `KHR_mesh_quantization` |
 
 The optimized artifact SHA-256 is
-`dd7542d8cbc0fbd12004366955b8ff7222218944eb98500f24f156e19fd4436f`; its deterministic
+`effeb5b13c9297736dedbac23f57d97538d4e9f735a0eca9a19d15133148f7f0`; its deterministic
 source fingerprint is
-`c484cb30dbe46d4ae5b2991a36974761efa11f7a1661fc05810ae28125481562`.
+`28a4090c199efc463e7c17011f163bac0ba9cc636349561d3324cb1854cf4b3f`.
 The shared runtime atlas SHA-256 is
 `d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b`. Its source image,
 derivation, comparison evidence, and separate asset rights are recorded in

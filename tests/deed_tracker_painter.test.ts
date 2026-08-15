@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // Behavioral pin for the deed-tracker collapse header (src/ui/deed_tracker_painter.ts).
 // The aria-expanded live sync and aria-controls contract were pinned only by source
 // scans; this drives the real painter against a jsdom container and asserts the header

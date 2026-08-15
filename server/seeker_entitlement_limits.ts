@@ -1,0 +1,2 @@
+export const MAX_SEEKER_TOKEN_ACCOUNTS = 500;
+export const MAX_SEEKER_TOKEN_MINTS = 200;

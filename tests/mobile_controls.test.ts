@@ -464,6 +464,7 @@ function installMobileControlDom(): {
   mountButton: FakeElement;
   discordButton: FakeElement;
   donateButton: FakeElement;
+  wikiButton: FakeElement;
   chatButton: FakeElement;
   windowTarget: EventTarget;
 } {
@@ -490,6 +491,7 @@ function installMobileControlDom(): {
     ['mobile-mounts', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
+    ['mobile-wiki', new FakeElement()],
     ['mobile-chat', new FakeElement()],
     // The chat composer, so exitChatReply (value clear + blur) is exercised in the
     // fake DOM: the setActive draft-survival test reads its .value.
@@ -530,6 +532,7 @@ function installMobileControlDom(): {
     mountButton: elements.get('mobile-mounts')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
+    wikiButton: elements.get('mobile-wiki')!,
     chatButton: elements.get('mobile-chat')!,
     windowTarget,
   };
@@ -562,6 +565,7 @@ function mobileCallbacks() {
     onSocial: noop,
     onDiscord: noop,
     onDonate: noop,
+    onWiki: noop,
     onEmotes: noop,
     onArena: noop,
     onDungeonFinder: noop,
@@ -577,6 +581,7 @@ function mobileCallbacks() {
     onDailyRewards: noop,
     onMountToggle: noop,
     onDeeds: noop,
+    onReliquary: noop,
     onProfessions: noop,
     onNameplates: () => false,
     onMusic: () => true,
@@ -1317,6 +1322,29 @@ describe('MobileControls pointer lifecycle', () => {
     donateButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
     expect(donate).toBe(1);
+  });
+
+  it('fires the Wiki callback when the More-tray Wiki button is tapped', () => {
+    const { wikiButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let wiki = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onWiki: () => {
+        wiki += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    wikiButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(wiki).toBe(1);
   });
 
   it('closes the open More modal when tapping outside it', () => {

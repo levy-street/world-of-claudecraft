@@ -16,12 +16,11 @@ PR (see the flag model and Dual-edit below).
 ## Where new code lands (module-first)
 - **New endpoint**: a `RouteDef` in a domain module (`server/<domain>.ts` `export const
   routes`) registered in `registry.ts`, never an inline handler in `main.ts`. Scaffold with
-  `npm run new:endpoint` (RouteDef module typed via `Infer`, paired error code + English
-  `apiError.*` entry + `API_ERROR_KEYS` mapping, `FakeDb` test, registry registration); it
-  inserts at the two `new:endpoint ... above this line` anchor comments in `registry.ts`,
-  keep those intact. Test: `tests/server/<domain>.test.ts`; full rung recipe in
-  `server/CLAUDE.md` (Adding an endpoint). Then add the characterization-spine rows by
-  hand (see Testing seam notes): the scaffold does not emit them.
+  `npm run new:endpoint` (what it emits + the full rung recipe live in `server/CLAUDE.md`,
+  Adding an endpoint); it inserts at the two `new:endpoint ... above this line` anchor
+  comments in `registry.ts`, keep those intact. Test: `tests/server/<domain>.test.ts`.
+  Then add the characterization-spine rows by hand (see Testing seam notes): the scaffold
+  does not emit them.
 - **New cross-cutting behavior**: a new `middleware/*.ts` frame plus a same-named test in
   `tests/server/http/`, mounted route-local in a RouteDef or as a global frame in
   `dispatch.ts`; never inline logic in `dispatch.ts` (`onion_order.test.ts` pins the
@@ -44,6 +43,8 @@ PR (see the flag model and Dual-edit below).
 | `dispatch.ts` | `createApiDispatcher` (the dispatcher-in-front) + `selectApiEntry` (the flag switch). |
 | `config.ts` | `loadConfig` validates env into the boot `Config` once at boot; owns `DispatchMode` and the `API_DISPATCH` flag. |
 | `health.ts` | the ops probes: `/livez` answers 200 while the world loop is completing passes and 503 once the last completed tick is older than `LIVEZ_STALE_MS` (a wedged loop, what the compose healthcheck and `deploy/game_watchdog.sh` act on), with two deliberate carve-outs: DRAINING always reads live (a graceful shutdown must never be misread as a wedge and restarted mid-save) and a cold boot reads from loop start until the first tick lands. `/readyz` is the drain signal (503 while shutting down). `registerLivenessSource` wires the game loop in at boot (pinned by `tests/server/game_boot_order.test.ts`); `/metrics` stays `METRICS_TOKEN`-gated. All three are 404ed at the public edge by Caddy (see DEPLOY.md); never expose `/livez` publicly, a wedge oracle invites kick-them-while-down timing. |
+| `logger.ts` + `redact.ts` + `access_log.ts` | The logging discipline. `logger.ts` is an in-house pino-shaped structured JSON logger (pino is deliberately forbidden here): exactly ONE JSON object per line, `reqId` read from the request-scoped AsyncLocalStorage AT EMIT TIME, never throws, injectable transport. Every record passes `redact.ts` BEFORE serialization: the enumerated secret/PII classes (Authorization/Bearer values, 64-hex tokens, password fields, cookies, OAuth and TOTP secrets, wallet-key shapes, raw byte values, email addresses) are scrubbed recursively, idempotently, without mutating the input. The string rules cover only Bearer + 64-hex shapes, so never log raw `req.url`, headers, or a body wholesale: pass hand-picked fields (guarded by `logger_call_hygiene.test.ts`; `redact.test.ts` and `error_leak.test.ts` pin the rest). `access_log.ts` adapts the MetricSink to one access line per request carrying the `:param` route TEMPLATE, never a concrete id path, with the client IP truncated at the log surface. |
+| `perf_gate.ts` | The pipeline's realtime-neutrality acceptance budget, read by `tests/server/perf_gate.test.ts`: `PIPELINE_ADDED_P99_BUDGET_MS` caps what the onion may add at p99 versus the bare legacy ladder (per-request overhead is time stolen from the next tick on the shared event loop), and `TICK_P95_CEILING_MS` is DERIVED from the sim's `TICK_RATE` via `TICK_P95_CEILING_RATIO` (never re-typed as a literal), so a tick-rate or ratio change fails the gate loudly instead of silently loosening a budget. |
 | `index.ts` | The public barrel: re-exports router / compose / context / schema / errors / error_codes / registry / dispatch + the type contracts. Excludes the seam-reached internals (`path_pattern`, `config`, the individual `middleware/*`). |
 | `middleware/*` | The onion frames (`ls server/http/middleware/` for the live set). GLOBAL, mounted by `dispatch.ts` on every matched route: `with_errors`, `metric_sink`, `origin_check`, `content_type`; `security_headers` runs even earlier, in `main.ts`'s top-level `routeHttpRequest` wrapper so both arms carry it. Everything else (`body`/`raw_body`, the `require_*` guards, `bearer_active_guard`, `turnstile`, `rate_limit`) is ROUTE-LOCAL, composed as each RouteDef declares. Two are built but INTENTIONALLY UNMOUNTED: `cors` (CORS stays in `main.ts`'s single top-level wrapper, shared with the legacy ladder, so it is identical on both arms) and `request_id` (the X-Request-Id echo is deferred to the ladder deletion; mounting it now would break the parity harness, see the note in `dispatch.ts`). Do not double-mount either. |
 

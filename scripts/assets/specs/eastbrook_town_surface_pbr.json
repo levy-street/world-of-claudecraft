@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "id": "eastbrook-surface-pbr",
+  "source": {
+    "path": "public/textures/eastbrook_surface_atlas.webp",
+    "sha256": "d66f2fab603aa83e6c73c6fc4bdde2d545a6d8c1a0d4a58d42a3fb227e5a3f9b",
+    "width": 512,
+    "height": 512,
+    "format": "webp"
+  },
+  "normal": {
+    "path": "public/textures/eastbrook_surface_normal.webp",
+    "url": "/textures/eastbrook_surface_normal.webp",
+    "sha256": "905e7210b9f3d0c7ea252dccb93dc319cc75153ea27968d4ae243ccdd7695424",
+    "width": 512,
+    "height": 512,
+    "format": "webp",
+    "byteCeiling": 131072
+  },
+  "rough": {
+    "path": "public/textures/eastbrook_surface_rough.webp",
+    "url": "/textures/eastbrook_surface_rough.webp",
+    "sha256": "c236f266a99480a437a66b2d54ba86e7ce344f0569d20ba2f45cde53fd75f02e",
+    "width": 512,
+    "height": 512,
+    "format": "webp",
+    "byteCeiling": 131072
+  },
+  "usage": {
+    "normalRole": "tangent-space-normal-opengl-green-up",
+    "roughRole": "grayscale-roughness-equal-channels",
+    "colorSpace": "none",
+    "cellLayoutAuthority": "src/render/eastbrook_surface_atlas.ts EASTBROOK_SURFACE_CELLS",
+    "embeddedInGlbs": false
+  },
+  "processing": {
+    "grid": {
+      "columns": 4,
+      "rows": 4
+    },
+    "cellPixels": 128,
+    "cellPaddingPixels": 4,
+    "heightLuminanceRange": [192, 255],
+    "heightBlur": "3x3-tent-wrapped-within-cell",
+    "normalQuantStep": 6,
+    "normalBlueChannel": "constant-255",
+    "roughnessLuminanceSwing": 0.08,
+    "luminance": {
+      "red": 54,
+      "green": 183,
+      "blue": 19,
+      "divisor": 256
+    },
+    "webp": {
+      "lossless": true,
+      "effort": 6
+    }
+  },
+  "cells": [
+    {
+      "index": 0,
+      "id": "darkStoneBlocks",
+      "surface": "stone",
+      "normalStrength": [2.2, 2.2],
+      "roughnessBase": 0.8
+    },
+    {
+      "index": 1,
+      "id": "lightStoneBlocks",
+      "surface": "stone",
+      "normalStrength": [2.2, 2.2],
+      "roughnessBase": 0.8
+    },
+    {
+      "index": 2,
+      "id": "warmPlaster",
+      "surface": "plaster",
+      "normalStrength": [1.0, 1.0],
+      "roughnessBase": 0.92
+    },
+    {
+      "index": 3,
+      "id": "verticalDarkTimber",
+      "surface": "timber-vertical-grain",
+      "normalStrength": [1.6, 0.8],
+      "roughnessBase": 0.85
+    },
+    {
+      "index": 4,
+      "id": "cobaltRoofShingles",
+      "surface": "roof-tiles",
+      "normalStrength": [2.0, 2.0],
+      "roughnessBase": 0.7
+    },
+    {
+      "index": 5,
+      "id": "darkForgedMetal",
+      "surface": "metal",
+      "normalStrength": [0.9, 0.9],
+      "roughnessBase": 0.5
+    },
+    {
+      "index": 6,
+      "id": "warmGoldMetal",
+      "surface": "metal",
+      "normalStrength": [0.9, 0.9],
+      "roughnessBase": 0.5
+    },
+    {
+      "index": 7,
+      "id": "horizontalWarmTimber",
+      "surface": "timber-horizontal-grain",
+      "normalStrength": [0.8, 1.6],
+      "roughnessBase": 0.85
+    },
+    {
+      "index": 8,
+      "id": "blueCreamCanvas",
+      "surface": "canvas",
+      "normalStrength": [1.0, 1.0],
+      "roughnessBase": 0.9
+    },
+    {
+      "index": 9,
+      "id": "redCreamCanvas",
+      "surface": "canvas",
+      "normalStrength": [1.0, 1.0],
+      "roughnessBase": 0.9
+    },
+    {
+      "index": 10,
+      "id": "darkBrownLeather",
+      "surface": "leather",
+      "normalStrength": [1.2, 1.2],
+      "roughnessBase": 0.85
+    },
+    {
+      "index": 11,
+      "id": "irregularDarkStone",
+      "surface": "stone",
+      "normalStrength": [2.2, 2.2],
+      "roughnessBase": 0.8
+    },
+    {
+      "index": 12,
+      "id": "cyanCrystal",
+      "surface": "crystal",
+      "normalStrength": [0.7, 0.7],
+      "roughnessBase": 0.4
+    },
+    {
+      "index": 13,
+      "id": "cobaltPaintedPlanks",
+      "surface": "painted-planks",
+      "normalStrength": [1.4, 1.4],
+      "roughnessBase": 0.78
+    },
+    {
+      "index": 14,
+      "id": "lightGrayStone",
+      "surface": "stone",
+      "normalStrength": [2.2, 2.2],
+      "roughnessBase": 0.8
+    },
+    {
+      "index": 15,
+      "id": "mediumGrayStone",
+      "surface": "stone",
+      "normalStrength": [2.2, 2.2],
+      "roughnessBase": 0.8
+    }
+  ]
+}

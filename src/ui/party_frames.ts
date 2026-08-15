@@ -1,9 +1,38 @@
 import { isPartyFrameRelevantAura } from '../sim/aura_classify';
-import type { PartyInfo, PartyMemberInfo } from '../world_api';
+import type { PartyInfo, PartyMemberAura, PartyMemberInfo } from '../world_api';
+import type { PartyPetInfo } from './pet_frame_view';
 
-export const PARTY_FRAME_RANGE_YD = 100;
+/**
+ * The distance past which a party/raid row is badged out of range.
+ *
+ * This is the healer's ONLY signal for "can I reach them", so it has to be the
+ * range they can actually cast at, not the range at which the client still knows
+ * the body exists. It was 100, close to the interest radius, while every
+ * friendly-targeted ability in the game is 30: a member anywhere from 30 to 100
+ * yards away showed a clean row and refused every heal with "Out of range",
+ * which is exactly what battleground healers reported.
+ *
+ * Pinned against the real ability table by `tests/party_frames.test.ts`, so
+ * retuning heal range fails the test rather than silently desyncing the badge.
+ *
+ * What it still cannot tell you is LINE OF SIGHT: a member in range behind a
+ * wall reads as reachable and the cast refuses. That is a separate surface, not
+ * something a distance threshold can express.
+ */
+// 40, not 30: the warlock overhaul's cursed_accomplice and
+// vicarious_suffering are friendly casts at 40 yd, and the doctrine test
+// derives this constant from the longest friendly-castable range in the
+// ability table.
+export const PARTY_FRAME_RANGE_YD = 40;
 
-export type PartyFrameMember = PartyMemberInfo & { oor: boolean };
+/** A member row's data. `pet` is attached CLIENT-SIDE from the entity roster
+ *  (findPetsByOwner), not from the party wire: absent when the member has no pet,
+ *  when their pet is outside the client's interest scope, or when the Show Pets
+ *  display option is off. */
+export type PartyFrameMember = PartyMemberInfo & { oor: boolean; pet?: PartyPetInfo };
+
+/** Owner entity id -> that owner's pet. Built once per repaint by the caller. */
+export type PartyPetMap = ReadonlyMap<number, PartyPetInfo>;
 
 export type PartyFrameHealthTextMode = 0 | 1 | 2 | 3;
 export type PartyFrameSortMode = 0 | 1 | 2;
@@ -15,6 +44,7 @@ export interface PartyFrameDisplayConfig {
   showResource: boolean;
   showAbsorbs: boolean;
   showAuras: boolean;
+  showPets: boolean;
   healthText: PartyFrameHealthTextMode;
   sort: PartyFrameSortMode;
   presentation: PartyFrameStyleMode;
@@ -25,6 +55,7 @@ export const DEFAULT_PARTY_FRAME_DISPLAY: PartyFrameDisplayConfig = {
   showResource: true,
   showAbsorbs: true,
   showAuras: true,
+  showPets: true,
   healthText: 1,
   sort: 0,
   presentation: 0,
@@ -33,6 +64,24 @@ export const DEFAULT_PARTY_FRAME_DISPLAY: PartyFrameDisplayConfig = {
 const ROLE_ORDER = { tank: 0, healer: 1, dps: 2 } as const;
 
 export { isPartyFrameRelevantAura as partyFrameAuraIsRelevant };
+
+const PARTY_AURA_PRIORITY: Readonly<Record<string, number>> = {
+  priest_doctrine: 0,
+  seraphic_vigil: 1,
+};
+
+/** Keep relationship-defining Priest cues at the visible edge of clipped desktop
+ * and mobile aura strips while retaining stable server order for every other aura. */
+export function prioritizePartyFrameAuras(auras: readonly PartyMemberAura[]): PartyMemberAura[] {
+  return auras
+    .map((aura, index) => ({ aura, index }))
+    .sort(
+      (a, b) =>
+        (PARTY_AURA_PRIORITY[a.aura.id] ?? 2) - (PARTY_AURA_PRIORITY[b.aura.id] ?? 2) ||
+        a.index - b.index,
+    )
+    .map(({ aura }) => aura);
+}
 
 /** Resolve the persisted presentation choice. Automatic keeps classic five-player
  * frames, then switches to the compact grid when the party is converted to a raid. */
@@ -64,6 +113,7 @@ export function selectPartyFrameMembers(
   playerPos: { x: number; z: number },
   rangeYd = PARTY_FRAME_RANGE_YD,
   config: PartyFrameDisplayConfig = DEFAULT_PARTY_FRAME_DISPLAY,
+  pets?: PartyPetMap,
 ): PartyFrameMember[] {
   return info.members
     .map((member, index) => ({ member, index }))
@@ -81,11 +131,17 @@ export function selectPartyFrameMembers(
     })
     .map(({ member }) => member)
     .filter((m) => config.showSelf || m.pid !== playerId)
-    .map((m) => ({
-      ...m,
-      oor:
-        m.pid !== playerId && !m.dead && Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd,
-    }));
+    .map((m) => {
+      const pet = config.showPets ? pets?.get(m.pid) : undefined;
+      return {
+        ...m,
+        oor:
+          m.pid !== playerId &&
+          !m.dead &&
+          Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd,
+        ...(pet ? { pet } : {}),
+      };
+    });
 }
 
 /**
@@ -112,6 +168,7 @@ export function partyFrameSignature(
   playerPos: { x: number; z: number },
   rangeYd = PARTY_FRAME_RANGE_YD,
   config: PartyFrameDisplayConfig = DEFAULT_PARTY_FRAME_DISPLAY,
+  pets?: PartyPetMap,
 ): string {
   let sig = '';
   let myGroup: 1 | 2 = 1;
@@ -125,9 +182,24 @@ export function partyFrameSignature(
     // The aura strip, appended inline (no intermediate array): a joined/left aura,
     // a kind flip, or a sap-sign flip changes the string and repaints the row.
     if (m.auras) {
-      for (const a of m.auras) sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''};`;
+      for (const a of m.auras) {
+        sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''},${a.poolPct ?? ''};`;
+      }
     }
-    sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}|`;
+    // The pet sliver rides the SAME per-member fold. Without this the pet's health
+    // could move while every wire field stayed put, the signature would not budge,
+    // and updatePartyFrames would short-circuit before repainting: the sliver would
+    // simply freeze at whatever value it first painted.
+    //
+    // The NAME is folded for the same reason and is not decorative: it is the only
+    // thing the sliver's accessible label says besides the percent, and renamePet
+    // can change it with every other field identical. Everything paintPet reads
+    // (name, hp, maxHp, dead) has to be in here, or that read goes stale silently.
+    // Pet names are validated to letters, spaces, apostrophes and hyphens, so they
+    // cannot inject the delimiters this fold uses.
+    const pet = config.showPets ? pets?.get(m.pid) : undefined;
+    sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}`;
+    sig += pet ? `:P${pet.id},${pet.name},${pet.hp}/${pet.maxHp},${pet.dead ? 1 : 0}|` : '|';
   }
-  return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
+  return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.showPets ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
 }

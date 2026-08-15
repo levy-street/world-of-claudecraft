@@ -1,13 +1,13 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DevCommandWindow, type DevCommandWindowDeps } from '../src/ui/dev_command_window';
 
-function makeWindow(available = true) {
+function makeWindow(available = true, accountAdmin = true) {
   const chat = vi.fn();
   const deps: DevCommandWindowDeps = {
     available: () => available,
-    world: () => ({ chat }) as never,
+    world: () => ({ chat, accountAdmin }) as never,
     closeOthers: vi.fn(),
     captureFocus: () => document.activeElement as HTMLElement | null,
     restoreFocus: vi.fn(),
@@ -24,6 +24,21 @@ describe('developer command window', () => {
     const { window } = makeWindow(false);
     expect(window.toggle()).toBe(false);
     expect(document.querySelector('#dev-command-window')).toBeNull();
+  });
+
+  it('offers the Spawns tab to admins and hides it from everyone else', () => {
+    const { window } = makeWindow(true, true);
+    window.toggle();
+    expect(document.querySelector('[data-dev-category="spawns"]')).not.toBeNull();
+    window.close();
+
+    document.body.innerHTML = '<main id="ui"></main>';
+    const { window: nonAdmin } = makeWindow(true, false);
+    nonAdmin.toggle();
+    expect(nonAdmin.isOpen).toBe(true);
+    expect(document.querySelector('[data-dev-category="spawns"]')).toBeNull();
+    // The other tabs are untouched, and clicking one still works.
+    expect(document.querySelector('[data-dev-category="inventory"]')).not.toBeNull();
   });
 
   it('routes actions through world chat and preserves keyboard focus after repaint', () => {
@@ -55,5 +70,32 @@ describe('developer command window', () => {
     expect(fresh?.getAttribute('aria-pressed')).toBe('true');
     expect(document.activeElement).toBe(fresh);
     expect(document.querySelector('[data-dev-action="spawn"]')).not.toBeNull();
+  });
+
+  it('offers Demon Tower floors in Enter Raid and sends the selected direct-entry command', () => {
+    const { chat, window } = makeWindow();
+    window.toggle();
+    document.querySelector<HTMLButtonElement>('[data-dev-category="travel"]')?.click();
+
+    const target = document.querySelector<HTMLSelectElement>('[data-dev-field="raidTarget"]');
+    expect(target).not.toBeNull();
+    expect(Array.from(target?.options ?? []).map((option) => option.value)).toEqual([
+      'nythraxis',
+      'demon_tower',
+    ]);
+    const floor = document.querySelector<HTMLSelectElement>('[data-dev-field="raidFloor"]');
+    expect(Array.from(floor?.options ?? []).map((option) => option.value)).toEqual(['1', '2', '3']);
+    expect(floor?.closest('label')?.textContent).toContain('Floor');
+    expect(Array.from(floor?.options ?? []).map((option) => option.textContent)).toEqual([
+      'Floor 1 of 3: The Demon Tower: The Bloodforge',
+      'Floor 2 of 3: The Demon Tower: The Ossuary of Chains',
+      'Floor 3 of 3: The Demon Tower: The Void Crown',
+    ]);
+    if (!target) throw new Error('Expected the Enter Raid destination selector');
+    target.value = 'demon_tower';
+    if (!floor) throw new Error('Expected the Demon Tower floor selector');
+    floor.value = '3';
+    document.querySelector<HTMLButtonElement>('[data-dev-run="raid"]')?.click();
+    expect(chat).toHaveBeenCalledWith('/dev raid tower 3');
   });
 });

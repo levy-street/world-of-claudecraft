@@ -10,18 +10,29 @@ const VERSION_RE = /^\d+\.\d+\.\d+$/;
 const RELEASE_REF_RE = /(?:^|refs\/heads\/)release\/v?(\d+\.\d+\.\d+)(?:-[a-z0-9][a-z0-9-]*)?$/;
 const MAC_DMG_RE = /world-of-claudecraft-\d+\.\d+\.\d+-mac-universal\.dmg/g;
 const LINUX_APPIMAGE_RE = /world-of-claudecraft-\d+\.\d+\.\d+-linux-x86_64\.AppImage/g;
-const WINDOWS_INSTALLER_RE = /world-of-claudecraft-\d+\.\d+\.\d+-win\.exe/g;
-const DESKTOP_VERSION_RE = /export const DESKTOP_VERSION = '(\d+\.\d+\.\d+)';/;
+// The website download page links the x64 NSIS installer (build.nsis.
+// buildUniversalInstaller is false, issue 2013): a per-arch installer, not
+// the old combined "-win.exe" that folded both arches into one download.
+const WINDOWS_INSTALLER_RE = /world-of-claudecraft-\d+\.\d+\.\d+-win-x64\.exe/g;
+// A page migrated before the per-arch cutover (or hand-edited afterward) can
+// still carry the legacy combined-installer filename. Both prepare and check
+// must recognize it so it gets rewritten/flagged instead of silently surviving
+// a version bump (issue: legacy Windows links bypass the release guard).
+const LEGACY_WINDOWS_INSTALLER_RE = /world-of-claudecraft-\d+\.\d+\.\d+-win\.exe/g;
+// src/game/desktop_download.ts is deliberately absent from this script's
+// surfaces: DESKTOP_VERSION derives from package.json at build time through the
+// __APP_VERSION__ define, so nothing there needs rewriting or checking. The
+// static html hrefs below stay release-owned as the no-JS fallback.
 const GAME_VERSION_RE = /(<div\b[^>]*\bid=["']game-version["'][^>]*>)v[^<]*(<\/div>)/;
 const README_VERSION_BADGE_SOURCE = String.raw`img\.shields\.io/badge/version-(\d+\.\d+\.\d+)-blue`;
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const PATHS = {
   packageJson: 'package.json',
-  packageLock: 'package-lock.json',
+  // pnpm-lock.yaml does not store the package version (unlike package-lock.json),
+  // so release version surfaces do not rewrite or check a lockfile version field.
   gradle: 'android/app/build.gradle',
   pbxproj: 'ios/App/App.xcodeproj/project.pbxproj',
-  desktopModule: 'src/game/desktop_download.ts',
   htmlFiles: ['index.html', 'play.html'],
   readmeRoot: 'README.md',
   readmeDir: 'docs/i18n',
@@ -78,15 +89,6 @@ export function setPackageVersion(packageJson, version) {
   return stringifyJson(pkg);
 }
 
-export function setPackageLockVersion(packageLock, version) {
-  const lock = parseJson(packageLock, 'package-lock.json');
-  lock.version = normalizeVersion(version);
-  if (lock.packages?.['']) {
-    lock.packages[''].version = normalizeVersion(version);
-  }
-  return stringifyJson(lock);
-}
-
 export function setDesktopDownloadVersion(html, version, path) {
   if (!MAC_DMG_RE.test(html)) {
     throw new Error(`${path} is missing a macOS desktop download URL`);
@@ -98,17 +100,8 @@ export function setDesktopDownloadVersion(html, version, path) {
   return html
     .replace(MAC_DMG_RE, `world-of-claudecraft-${normalized}-mac-universal.dmg`)
     .replace(LINUX_APPIMAGE_RE, `world-of-claudecraft-${normalized}-linux-x86_64.AppImage`)
-    .replace(WINDOWS_INSTALLER_RE, `world-of-claudecraft-${normalized}-win.exe`);
-}
-
-export function setDesktopModuleVersion(source, version, path) {
-  if (!DESKTOP_VERSION_RE.test(source)) {
-    throw new Error(`${path} is missing the DESKTOP_VERSION constant`);
-  }
-  return source.replace(
-    DESKTOP_VERSION_RE,
-    `export const DESKTOP_VERSION = '${normalizeVersion(version)}';`,
-  );
+    .replace(WINDOWS_INSTALLER_RE, `world-of-claudecraft-${normalized}-win-x64.exe`)
+    .replace(LEGACY_WINDOWS_INSTALLER_RE, `world-of-claudecraft-${normalized}-win-x64.exe`);
 }
 
 export function setGameVersionText(html, version, path) {
@@ -137,10 +130,8 @@ export function setReadmeVersionBadge(markdown, version, path) {
 export function planReleaseVersion({
   version,
   packageJson,
-  packageLock,
   gradle,
   pbxproj,
-  desktopModule,
   htmlFiles,
   readmeFiles,
 }) {
@@ -161,10 +152,8 @@ export function planReleaseVersion({
 
   return {
     packageJson: setPackageVersion(packageJson, normalized),
-    packageLock: setPackageLockVersion(packageLock, normalized),
     gradle: nativePlan.gradle,
     pbxproj: nativePlan.pbxproj,
-    desktopModule: setDesktopModuleVersion(desktopModule, normalized, PATHS.desktopModule),
     htmlFiles: nextHtmlFiles,
     readmeFiles: nextReadmeFiles,
   };
@@ -172,14 +161,6 @@ export function planReleaseVersion({
 
 function readPackageVersion(packageJson) {
   return parseJson(packageJson, 'package.json').version;
-}
-
-function readPackageLockVersions(packageLock) {
-  const lock = parseJson(packageLock, 'package-lock.json');
-  return {
-    root: lock.version,
-    packageRoot: lock.packages?.['']?.version,
-  };
 }
 
 function readGradleVersionName(gradle) {
@@ -199,10 +180,8 @@ function readGameVersion(html) {
 export function collectReleaseVersionFailures({
   version,
   packageJson,
-  packageLock,
   gradle,
   pbxproj,
-  desktopModule,
   htmlFiles,
   readmeFiles,
 }) {
@@ -212,16 +191,6 @@ export function collectReleaseVersionFailures({
   const pkgVersion = readPackageVersion(packageJson);
   if (pkgVersion !== expected) {
     failures.push(`package.json version is ${pkgVersion}, expected ${expected}`);
-  }
-
-  const lockVersions = readPackageLockVersions(packageLock);
-  if (lockVersions.root !== expected) {
-    failures.push(`package-lock.json root version is ${lockVersions.root}, expected ${expected}`);
-  }
-  if (lockVersions.packageRoot !== expected) {
-    failures.push(
-      `package-lock.json packages[""] version is ${lockVersions.packageRoot}, expected ${expected}`,
-    );
   }
 
   const gradleVersion = readGradleVersionName(gradle);
@@ -243,16 +212,9 @@ export function collectReleaseVersionFailures({
     }
   }
 
-  const desktopVersion = desktopModule.match(DESKTOP_VERSION_RE)?.[1] ?? null;
-  if (desktopVersion !== expected) {
-    failures.push(
-      `${PATHS.desktopModule} DESKTOP_VERSION is ${desktopVersion}, expected ${expected}`,
-    );
-  }
-
   const expectedArtifact = `world-of-claudecraft-${expected}-mac-universal.dmg`;
   const expectedLinuxArtifact = `world-of-claudecraft-${expected}-linux-x86_64.AppImage`;
-  const expectedWindowsArtifact = `world-of-claudecraft-${expected}-win.exe`;
+  const expectedWindowsArtifact = `world-of-claudecraft-${expected}-win-x64.exe`;
   for (const [path, html] of Object.entries(htmlFiles)) {
     const gameVersion = readGameVersion(html);
     if (gameVersion !== expected) {
@@ -268,7 +230,10 @@ export function collectReleaseVersionFailures({
       failures.push(`${path} has a stale Linux desktop download URL, expected ${expected}`);
     }
     WINDOWS_INSTALLER_RE.lastIndex = 0;
-    if (WINDOWS_INSTALLER_RE.test(html) && !html.includes(expectedWindowsArtifact)) {
+    LEGACY_WINDOWS_INSTALLER_RE.lastIndex = 0;
+    const hasWindowsInstallerLink =
+      WINDOWS_INSTALLER_RE.test(html) || LEGACY_WINDOWS_INSTALLER_RE.test(html);
+    if (hasWindowsInstallerLink && !html.includes(expectedWindowsArtifact)) {
       failures.push(`${path} has a stale Windows desktop download URL, expected ${expected}`);
     }
     if (/coming soon/i.test(html)) {
@@ -303,10 +268,8 @@ function readReleaseFiles() {
   const readmePaths = readReadmePaths();
   return {
     packageJson: readFileSync(resolve(ROOT, PATHS.packageJson), 'utf8'),
-    packageLock: readFileSync(resolve(ROOT, PATHS.packageLock), 'utf8'),
     gradle: readFileSync(resolve(ROOT, PATHS.gradle), 'utf8'),
     pbxproj: readFileSync(resolve(ROOT, PATHS.pbxproj), 'utf8'),
-    desktopModule: readFileSync(resolve(ROOT, PATHS.desktopModule), 'utf8'),
     htmlFiles: Object.fromEntries(
       PATHS.htmlFiles.map((path) => [path, readFileSync(resolve(ROOT, path), 'utf8')]),
     ),
@@ -318,10 +281,8 @@ function readReleaseFiles() {
 
 function writeReleaseFiles(plan) {
   writeFileSync(resolve(ROOT, PATHS.packageJson), plan.packageJson);
-  writeFileSync(resolve(ROOT, PATHS.packageLock), plan.packageLock);
   writeFileSync(resolve(ROOT, PATHS.gradle), plan.gradle);
   writeFileSync(resolve(ROOT, PATHS.pbxproj), plan.pbxproj);
-  writeFileSync(resolve(ROOT, PATHS.desktopModule), plan.desktopModule);
   for (const [path, html] of Object.entries(plan.htmlFiles)) {
     writeFileSync(resolve(ROOT, path), html);
   }

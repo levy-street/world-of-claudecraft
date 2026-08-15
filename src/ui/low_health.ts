@@ -3,6 +3,8 @@
 // Kept DOM-free so the intensity curve can be unit-tested directly; the HUD just
 // applies the returned values to a fixed overlay element each frame.
 
+import { clamp01 } from './clamp';
+
 // Below this HP fraction the vignette begins to show; at full HP it is hidden.
 export const LOW_HEALTH_THRESHOLD = 0.35;
 // Peak opacity reached as HP approaches 0 (kept < 1 so the world stays readable).
@@ -31,8 +33,4 @@ export function lowHealthVignette(hp: number, maxHp: number): LowHealthVignette 
   const opacity = t ** 0.8 * MAX_OPACITY;
   const pulseHz = PULSE_HZ_MIN + (PULSE_HZ_MAX - PULSE_HZ_MIN) * t;
   return { active: true, opacity, pulseSeconds: 1 / pulseHz };
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
 }

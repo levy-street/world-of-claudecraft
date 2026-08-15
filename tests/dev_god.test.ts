@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEMON_TOWER_SEED } from '../src/sim/content/rift/demon_tower';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -63,6 +64,53 @@ describe('/dev god cheat', () => {
     expect(before - boss.hp).toBe(10000);
   });
 
+  it('emits one zero-damage presentation event when a mob hits a devGod target', () => {
+    // The renderer keys attacker swing animations and FCT off damage events,
+    // so a silent invulnerability return made every melee mob look like a
+    // passive follower during god-mode playtests. The hit must surface as a
+    // zero-damage event, and ONLY as that event: no threat, deed, or proc
+    // side effects ride along and the target never loses hp.
+    const { sim, pid } = godSim();
+    const p = sim.player;
+    sim.chat('/dev god', pid);
+    const mob = spawnMob(sim);
+    sim.drainEvents();
+    deal(sim, mob, p, 500);
+    const events = sim.drainEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      type: 'damage',
+      sourceId: mob.id,
+      targetId: p.id,
+      amount: 0,
+      school: 'physical',
+    });
+    expect(p.hp).toBe(p.maxHp);
+  });
+
+  it('keeps the zero-damage emit dev-only: no event without the gate, for GMs, or sourceless', () => {
+    // devGod forced on without the dev gate (the production shape): silent.
+    const off = godSim(false);
+    off.sim.player.devGod = true;
+    const offMob = spawnMob(off.sim);
+    off.sim.drainEvents();
+    deal(off.sim, offMob, off.sim.player, 500);
+    expect(off.sim.drainEvents().filter((e) => e.type === 'damage')).toHaveLength(0);
+    // A real GM (not devGod) stays fully silent even with dev commands on.
+    const gm = godSim();
+    gm.sim.player.gm = true;
+    const gmMob = spawnMob(gm.sim);
+    gm.sim.drainEvents();
+    deal(gm.sim, gmMob, gm.sim.player, 500);
+    expect(gm.sim.drainEvents().filter((e) => e.type === 'damage')).toHaveLength(0);
+    // Sourceless damage (an environment tick) has no attacker to animate.
+    const env = godSim();
+    env.sim.chat('/dev god', env.sim.playerId);
+    env.sim.drainEvents();
+    deal(env.sim, null, env.sim.player, 500);
+    expect(env.sim.drainEvents().filter((e) => e.type === 'damage')).toHaveLength(0);
+  });
+
   it('is gated: without dev commands, /dev god does nothing', () => {
     const { sim, pid } = godSim(false);
     sim.chat('/dev god', pid);
@@ -73,6 +121,54 @@ describe('/dev god cheat', () => {
     const before = boss.hp;
     deal(sim, sim.player, boss, 100);
     expect(before - boss.hp).toBe(100); // no amp: plain 100
+  });
+});
+
+describe('profiler-only invulnerability', () => {
+  it('preserves incoming hit presentation without changing outgoing damage', () => {
+    const { sim } = godSim();
+    const player = sim.player;
+    player.profilerInvulnerable = true;
+    const attacker = spawnMob(sim);
+    const target = spawnMob(sim, 60000);
+
+    sim.drainEvents();
+    deal(sim, attacker, player, 500);
+    const events = sim.drainEvents();
+
+    expect(player.hp).toBe(player.maxHp);
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: player.id,
+      amount: 0,
+      school: 'physical',
+    });
+
+    const before = target.hp;
+    deal(sim, player, target, 100);
+    expect(before - target.hp).toBe(100);
+  });
+
+  it('does not grant profiler invulnerability when dev commands are disabled', () => {
+    const { sim } = godSim(false);
+    const player = sim.player;
+    player.profilerInvulnerable = true;
+    const attacker = spawnMob(sim);
+
+    const before = player.hp;
+    deal(sim, attacker, player, 500);
+
+    expect(player.hp).toBe(before - 500);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'damage',
+        sourceId: attacker.id,
+        targetId: player.id,
+        amount: 500,
+      }),
+    );
   });
 });
 
@@ -112,6 +208,48 @@ describe('/dev attune + /dev raid cheats', () => {
     expect(inst!.difficulty).toBe('heroic');
   });
 
+  it('/dev raid tower enters the reserved Demon Tower run at S rank', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev raid tower', pid);
+    const inst = sim.riftInstances.find((candidate) => candidate.partyKey !== null);
+    expect(inst).toBeTruthy();
+    expect(inst?.seed).toBe(DEMON_TOWER_SEED);
+    expect(inst?.baseLevel).toBe(28);
+    expect(inst?.floorIndex).toBe(0);
+  });
+
+  it('/dev raid tower can jump directly between authored floors without leaking floor entities', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev raid tower 3', pid);
+    const inst = sim.riftInstances.find((candidate) => candidate.partyKey !== null);
+    if (!inst) throw new Error('Expected an active Demon Tower instance');
+    const instanceId = inst.instanceId;
+    const summitObjectIds = [...inst.objectIds];
+
+    expect(inst.seed).toBe(DEMON_TOWER_SEED);
+    expect(inst.floorIndex).toBe(2);
+    expect(summitObjectIds.length).toBeGreaterThan(0);
+
+    sim.chat('/dev raid tower 1', pid);
+
+    expect(inst.instanceId).toBe(instanceId);
+    expect(inst.floorIndex).toBe(0);
+    expect(inst.objectIds.length).toBeGreaterThan(0);
+    expect(summitObjectIds.every((id) => !sim.entities.has(id))).toBe(true);
+  });
+
+  it('/dev raid tower clamps requested floors to the authored range', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev raid tower 2', pid);
+    expect(sim.riftInstances.find((candidate) => candidate.partyKey !== null)?.floorIndex).toBe(1);
+
+    sim.chat('/dev raid tower 999', pid);
+    expect(sim.riftInstances.find((candidate) => candidate.partyKey !== null)?.floorIndex).toBe(2);
+
+    sim.chat('/dev raid tower 0', pid);
+    expect(sim.riftInstances.find((candidate) => candidate.partyKey !== null)?.floorIndex).toBe(0);
+  });
+
   it('/dev raid reset clears raid lockouts', () => {
     const { sim, pid } = godSim();
     const meta = sim.players.get(pid)!;
@@ -123,9 +261,11 @@ describe('/dev attune + /dev raid cheats', () => {
   it('is gated: without dev commands, /dev raid does not zone in', () => {
     const { sim, pid } = godSim(false);
     sim.chat('/dev raid heroic', pid);
+    sim.chat('/dev raid tower 3', pid);
     const claimed = (
       sim as unknown as { instances: { dungeonId: string; partyKey: string | null }[] }
     ).instances.some((i) => i.dungeonId === 'nythraxis_boss_arena' && i.partyKey !== null);
     expect(claimed).toBe(false);
+    expect(sim.riftInstances.some((candidate) => candidate.partyKey !== null)).toBe(false);
   });
 });

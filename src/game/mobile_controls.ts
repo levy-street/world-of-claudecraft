@@ -128,6 +128,8 @@ export interface MobileControlCallbacks {
   onDiscord(): void;
   /** Open the project donation page (external link). */
   onDonate(): void;
+  /** Open the public wiki (confirm-first external link, src/ui/wiki_link.ts). */
+  onWiki(): void;
   onEmotes(): void;
   onArena(): void;
   onDungeonFinder(): void;
@@ -146,8 +148,13 @@ export interface MobileControlCallbacks {
   onDailyRewards(): void;
   /** Open the Book of Deeds window, folded into the More tray on mobile. */
   onDeeds(): void;
-  /** Mount / dismount the picked mount directly, in the More tray (the pick
-   *  itself changes in the character sheet's mount picker). */
+  /** Open The Reliquary window, folded into the More tray on mobile. */
+  onReliquary(): void;
+  /** Mount / dismount from the More tray. Dismounts instantly when riding;
+   *  when unmounted, summons the player's first owned mount directly (no
+   *  action-bar or bag detour needed), or falls back to the shared toggle's
+   *  no-op / riding-trained toast when nothing is owned. See
+   *  src/ui/mount_quick_summon.ts for the decision. */
   onMountToggle(): void;
   /** Open the Professions window, folded into the More tray on mobile. */
   onProfessions(): void;
@@ -495,6 +502,7 @@ export class MobileControls {
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
     this.bindButton('mobile-donate', () => this.callbacks.onDonate());
+    this.bindButton('mobile-wiki', () => this.callbacks.onWiki());
     this.bindButton('mobile-emote', () => this.callbacks.onEmotes());
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
     this.bindButton('mobile-dfinder', () => this.callbacks.onDungeonFinder());
@@ -509,6 +517,7 @@ export class MobileControls {
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
     this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
+    this.bindButton('mobile-reliquary', () => this.callbacks.onReliquary());
     this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     const nameplatesBtn = document.getElementById('mobile-nameplates');

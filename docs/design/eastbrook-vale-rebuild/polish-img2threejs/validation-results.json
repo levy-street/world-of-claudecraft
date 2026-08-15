@@ -46,8 +46,8 @@
         "skins": 0,
         "cameras": 0,
         "extensions": ["EXT_meshopt_compression", "KHR_mesh_quantization"],
-        "sha256": "77468359f69efcc61d978ff2e916aa644d16ce8e6d73dbc564654655fdf235c5",
-        "sourceFingerprint": "5b2b9cbdab0d50e1e10a884bc44b1f2c6bcb107da8cca0fae77c21ab15566edd"
+        "sha256": "653b4dab241a4dc00f51ba73d461609451220e28e25d86624641908c0e1a7410",
+        "sourceFingerprint": "5a1e01b515995b32ca552d659276ef5c44b7c0c8b26e23056aa898c45af82dde"
       }
     },
     {
@@ -84,16 +84,16 @@
         "skins": 0,
         "cameras": 0,
         "extensions": ["EXT_meshopt_compression", "KHR_mesh_quantization"],
-        "sha256": "1665f65d6b6dcab10386bf7b475ba83375a76551a07b39be81ffd5133c9feed0",
-        "sourceFingerprint": "79ae005d61b3494e17286167fb210ff77573379c8bc20aeae3f4b62a59d5a2c0"
+        "sha256": "1d3aeae4186809aefe6588b8a137dc876e75c707fb30c4ddf199c66ee2ca3591",
+        "sourceFingerprint": "7836db25ba40d6ab0c3f619b2d96d458be4342193fad83ae877e703420748f92"
       }
     }
   ],
   "commands": {
-    "normal": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --json",
-    "strictQuality": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --strict-quality --json",
-    "pipelineStatus": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage3_build/orchestrate_passes.py status <spec>",
-    "intakeCorrectness": "python3 /Users/fernando/.codex/skills/img2threejs/forge/stage1_intake/check_intake_correctness.py <spec> --json"
+    "normal": "python3 <codex-skills>/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --json",
+    "strictQuality": "python3 <codex-skills>/img2threejs/forge/stage2_spec/validate_sculpt_spec.py <spec> --strict-quality --json",
+    "pipelineStatus": "python3 <codex-skills>/img2threejs/forge/stage3_build/orchestrate_passes.py status <spec>",
+    "intakeCorrectness": "python3 <codex-skills>/img2threejs/forge/stage1_intake/check_intake_correctness.py <spec> --json"
   },
   "intakeCorrectness": {
     "mailbox": {

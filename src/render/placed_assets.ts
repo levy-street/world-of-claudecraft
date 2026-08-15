@@ -162,7 +162,9 @@ export class PlacedAssetsView {
         this.refreshSelection();
       }
     });
-    // Boot-time builds gate the loading screen; live editor adds do not.
+    // Boot-time builds gate the loading screen; live editor adds do not. Eager by
+    // nature: this runs while the world is being built, not at module import, so
+    // `task` is already in flight and there is nothing for the deferred lane to hold.
     if (preload) registerPreload(task);
   }
 
@@ -370,16 +372,4 @@ export class PlacedAssetsView {
     }
     this.selectionRing.position.set(p.x, 0, p.z);
   }
-}
-
-/**
- * Back-compat build-once factory (the pre-live-editing shape): builds a
- * PlacedAssetsView and hands back just its group. Initial GLB loads register
- * with the boot preload gate, matching the old behavior.
- */
-export function buildPlacedAssets(
-  placements: readonly (PlacedAsset | null)[],
-  seed: number,
-): THREE.Group {
-  return new PlacedAssetsView(placements, seed).group;
 }

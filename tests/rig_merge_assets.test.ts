@@ -18,6 +18,34 @@ interface Glb {
   bin: Uint8Array;
 }
 
+interface GlbNode {
+  children?: number[];
+  matrix?: number[];
+  mesh?: number;
+  rotation?: number[];
+  scale?: number[];
+  skin?: number;
+  translation?: number[];
+}
+
+interface GlbPrimitive {
+  attributes: Record<string, number>;
+  material?: number;
+}
+
+interface GlbAnimation {
+  channels?: { target: { node: number } }[];
+}
+
+interface GlbAccessor {
+  bufferView: number;
+  byteOffset?: number;
+  componentType: number;
+  count: number;
+  normalized?: boolean;
+  type: string;
+}
+
 function readGlb(path: string): Glb {
   const buf = readFileSync(path);
   const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
@@ -77,6 +105,23 @@ function inverseBindMatrices(glb: Glb, skinIndex: number): THREE.Matrix4[] {
   return out;
 }
 
+function u8Vec4Accessor(glb: Glb, accessorIndex: number): number[] {
+  const accessor = glb.json.accessors[accessorIndex] as GlbAccessor;
+  expect(accessor.componentType).toBe(5121);
+  expect(accessor.type).toBe('VEC4');
+  const bytes = bufferViewBytes(glb, accessor.bufferView);
+  const bufferView = glb.json.bufferViews[accessor.bufferView];
+  const stride = bufferView.byteStride ?? 4;
+  const base = accessor.byteOffset ?? 0;
+  const values: number[] = [];
+  for (let i = 0; i < accessor.count; i++) {
+    for (let component = 0; component < 4; component++) {
+      values.push(bytes[base + i * stride + component]);
+    }
+  }
+  return values;
+}
+
 // `optimizedScene` runs the merge per URL, so EVERY multi-skin character asset
 // goes through it, not just the player classes. The skeleton mobs are the ones
 // that actually fill a dungeon crowd, so they are exactly what the saving is for
@@ -86,6 +131,7 @@ const RIGS = [
   'players/druid',
   'players/knight',
   'players/mage',
+  'players/mage_classic',
   'players/paladin',
   'players/ranger',
   'players/rogue',
@@ -101,6 +147,72 @@ const RIGS = [
 describe('shipped character rigs satisfy the single-transform rebind law', () => {
   beforeAll(async () => {
     await MeshoptDecoder.ready;
+  });
+
+  it('paladin primitives remain mergeable across GLTFLoader identity wrappers', () => {
+    const glb = readGlb('public/models/chars/players/paladin.glb');
+    const nodes = glb.json.nodes as GlbNode[];
+    const meshes = glb.json.meshes as { primitives: GlbPrimitive[] }[];
+    const parentByNode = new Map<number, number>();
+    for (let parent = 0; parent < nodes.length; parent++) {
+      for (const child of nodes[parent].children ?? []) parentByNode.set(child, parent);
+    }
+    const skinnedNodes: { node: GlbNode & { mesh: number; skin: number }; index: number }[] = [];
+    for (let index = 0; index < nodes.length; index++) {
+      const node = nodes[index];
+      if (node.skin !== undefined && node.mesh !== undefined) {
+        skinnedNodes.push({ node: node as GlbNode & { mesh: number; skin: number }, index });
+      }
+    }
+    const primitives = skinnedNodes.flatMap(({ node }) => meshes[node.mesh].primitives);
+    const animations = (glb.json.animations ?? []) as GlbAnimation[];
+    const animatedNodes = new Set<number>(
+      animations.flatMap((animation) =>
+        (animation.channels ?? []).map((channel) => channel.target.node),
+      ),
+    );
+
+    expect(skinnedNodes).toHaveLength(6);
+    expect(primitives).toHaveLength(12);
+    expect(new Set(primitives.map((primitive) => primitive.material)).size).toBe(2);
+    expect(
+      new Set(primitives.map((primitive) => Object.keys(primitive.attributes).sort().join(',')))
+        .size,
+    ).toBe(1);
+    expect(
+      primitives.reduce(
+        (total, primitive) =>
+          total + (glb.json.accessors[primitive.attributes.POSITION] as GlbAccessor).count,
+        0,
+      ),
+    ).toBe(5_336);
+    const fetchedJoints = new Set(
+      primitives.flatMap((primitive) => {
+        const jointAccessor = glb.json.accessors[primitive.attributes.JOINTS_0] as GlbAccessor;
+        const weightAccessor = glb.json.accessors[primitive.attributes.WEIGHTS_0] as GlbAccessor;
+        expect(jointAccessor.normalized ?? false).toBe(false);
+        expect(weightAccessor.componentType).toBe(5121);
+        expect(weightAccessor.type).toBe('VEC4');
+        expect(weightAccessor.normalized).toBe(true);
+        return u8Vec4Accessor(glb, primitive.attributes.JOINTS_0);
+      }),
+    );
+    expect(new Set(skinnedNodes.map(({ node }) => node.skin)).size).toBe(6);
+    expect(
+      new Set(skinnedNodes.map(({ node }) => glb.json.skins[node.skin].joints.length)).size,
+    ).toBe(1);
+    expect(glb.json.skins[skinnedNodes[0].node.skin].joints).toHaveLength(23);
+    expect(fetchedJoints.size).toBe(21);
+    expect(new Set(skinnedNodes.map(({ index }) => parentByNode.get(index))).size).toBe(1);
+    for (const { node, index } of skinnedNodes) {
+      expect(node.matrix ?? [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]).toEqual([
+        1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+      ]);
+      expect(node.translation ?? [0, 0, 0]).toEqual([0, 0, 0]);
+      expect(node.rotation ?? [0, 0, 0, 1]).toEqual([0, 0, 0, 1]);
+      expect(node.scale ?? [1, 1, 1]).toEqual([1, 1, 1]);
+      expect(animatedNodes.has(index)).toBe(false);
+    }
   });
 
   it.each(RIGS)('%s: every skin rebinds onto the canonical one', (name) => {

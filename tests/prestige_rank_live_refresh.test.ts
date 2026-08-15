@@ -17,7 +17,9 @@ import type { SimEvent } from '../src/sim/types';
 // A ClientWorld with no constructor run (the established bareClient pattern
 // from tests/masterwork_event_mirror.test.ts / tests/snapshots.test.ts).
 // Class-field initializers do not run under Object.create, so prestigeRank
-// only comes to exist once the real event-apply path assigns it.
+// only comes to exist once the real event-apply path assigns it. Kept bespoke
+// on purpose (issue #2088): the shared tests/helpers/bare_client.ts
+// bareClient() always sets prestigeRank, which would defeat this liveness point.
 function bareClient(): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   (c as unknown as { eventQueue: SimEvent[] }).eventQueue = [];

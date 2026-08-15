@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Masterwork zone broadcast (Professions 2.0): a masterwork proc in
 // the overworld emits one pid-scoped `masterworkZone` copy per player in the
@@ -49,6 +49,7 @@ import { Hud } from '../src/ui/hud';
 import { t } from '../src/ui/i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
 import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
@@ -105,7 +106,7 @@ function runScenario(opts?: { crafterInInstanceSpace?: boolean }) {
   rng.setObserver(() => {
     draws++;
   });
-  sim.craftItem(RECIPE_ID, false, crafter);
+  runCraft(sim, RECIPE_ID, false, crafter);
   rng.setObserver(null);
   const events = sim.drainEvents();
   return {
@@ -174,7 +175,9 @@ describe('emit side (Sim.craftItem)', () => {
 // A ClientWorld with no constructor run (the bareClient idiom from
 // tests/masterwork_event_mirror.test.ts): lastMasterwork only exists once the
 // real event-apply path assigns it, so an accidental assignment from the zone
-// copy cannot hide behind an initializer default.
+// copy cannot hide behind an initializer default. Kept bespoke on purpose
+// (issue #2088): the shared tests/helpers/bare_client.ts bareClient() always
+// sets lastMasterwork, which would defeat this liveness point.
 function bareClient(): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   (c as unknown as { eventQueue: SimEvent[] }).eventQueue = [];
@@ -326,6 +329,7 @@ interface MasterworkZoneHudHarness {
     playerId: number;
     craftingIdentity: { synced: boolean };
     craftSkills: Record<string, number>;
+    gatheringProficiency: Record<string, number>;
   };
   renderer: { handleEvent: ReturnType<typeof vi.fn> };
   playEventSfx: ReturnType<typeof vi.fn>;
@@ -346,6 +350,7 @@ function masterworkZoneHud(): MasterworkZoneHudHarness {
     playerId: 9,
     craftingIdentity: { synced: false },
     craftSkills: {},
+    gatheringProficiency: {},
   };
   hud.renderer = { handleEvent: vi.fn() };
   hud.playEventSfx = vi.fn();

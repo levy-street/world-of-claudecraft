@@ -6,6 +6,8 @@ import {
 } from '../src/sim/content/rift/items';
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
+import { RIFT_MECHANIC_SPACING_SEC } from '../src/sim/mob/mechanic_spacing';
+import { RIFT_MECHANIC_WINDUP_SEC } from '../src/sim/mob/rift_escape_window';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
 import {
@@ -299,7 +301,7 @@ describe('rift ranks: rank-gated summons + the boss-add level pin', () => {
 
     // Kit integrity: deathZoneStrike is the S-rank capstone at index 3.
     expect(
-      MOBS['rift_boss_necro'].rankMechanics?.indexOf('deathZoneStrike'),
+      MOBS.rift_boss_necro.rankMechanics?.indexOf('deathZoneStrike'),
       'deathZoneStrike is at index 3',
     ).toBe(3);
   });
@@ -328,6 +330,7 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
       z: sim.player.pos.z,
       radius: 12,
       remaining: 0.05,
+      total: 0.05,
     });
     // One tick: the fuse expires and the zone detonates.
     sim.player.hp = sim.player.maxHp; // restore so only the zone kills
@@ -351,10 +354,33 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     const seed = seedWithFinalBoss('rift_boss_frost');
     const sim = enterAtBossFloor(seed, 25);
     const inst = active(sim);
-    inst.bossDeathZones.push({ x: 0, z: 0, radius: 9, remaining: 5 });
+    inst.bossDeathZones.push({ x: 0, z: 0, radius: 9, remaining: 5, total: 5 });
     // Simulate a floor descent (freeRiftFloorEntities clears zones).
     inst.bossDeathZones = [];
     expect(inst.bossDeathZones, 'zones cleared between floors').toHaveLength(0);
+  });
+
+  it('boss death cancels pending zones and emits riftDeathZoneClear for online mirrors', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 25);
+    const inst = active(sim);
+    inst.bossDeathZones.push({ x: 0, z: 0, radius: 9, remaining: 5, total: 5 });
+    const boss = sim.entities.get(inst.bossId!)!;
+    boss.hp = 0;
+    boss.dead = true;
+    // The per-tick boss-death sweep clears the zones and notifies each
+    // instance member; without the event an online mirror runs the phantom
+    // fuse to a detonation that never comes.
+    let events = [] as ReturnType<typeof sim.tick>;
+    for (let i = 0; i < 40 && !events.some((e) => e.type === 'riftDeathZoneClear'); i++) {
+      events = events.concat(sim.tick());
+    }
+    expect(inst.bossDeathZones, 'zones cleared on boss death').toHaveLength(0);
+    const clear = events.find((e) => e.type === 'riftDeathZoneClear');
+    expect(clear, 'online mirrors are told to drop the phantom zone').toBeDefined();
+    expect((clear as { pid?: number }).pid, 'personal event addressed to the instance member').toBe(
+      sim.player.id,
+    );
   });
 
   it('heroic_s tempo: S death zones cast faster and recycle sooner; A keeps the base tempo', () => {
@@ -389,6 +415,11 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
       sim.player.prevPos = { ...sim.player.pos };
       sim.player.hp = sim.player.maxHp;
       boss.deathZoneCastTimer = 0.01;
+      // The warm-up ticks fired other kit mechanics (aoePulse lands on the
+      // first engaged tick) which armed the shared spacing lock; the zone
+      // under test must fire from a clear lock, as it would in a real fight
+      // once the spacing window has passed.
+      boss.mechanicLockTimer = 0;
       inst.bossDeathZones = [];
       sim.tick();
       return { sim, inst, boss };
@@ -404,6 +435,13 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
       def.castTime * RIFT_S_ZONE_TEMPO - 1 / 20,
       5,
     );
+    // `total` is the driver's own write (the renderer's sweep divides by it):
+    // the full fuse at spawn, never decremented, so it stays a tick above the
+    // ticked-down remaining.
+    expect(s.inst.bossDeathZones[0].total, 'driver stamps total with the full S fuse').toBeCloseTo(
+      def.castTime * RIFT_S_ZONE_TEMPO,
+      5,
+    );
     expect(s.boss.deathZoneCastTimer, 'S cadence recycles sooner').toBeCloseTo(
       (def.every + def.castTime) * RIFT_S_ZONE_TEMPO,
       5,
@@ -412,6 +450,10 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     expect(a.boss.castTotal, 'A cast bar unchanged').toBeCloseTo(def.castTime, 5);
     expect(a.inst.bossDeathZones[0].remaining, 'A fuse unchanged').toBeCloseTo(
       def.castTime - 1 / 20,
+      5,
+    );
+    expect(a.inst.bossDeathZones[0].total, 'driver stamps total with the full A fuse').toBeCloseTo(
+      def.castTime,
       5,
     );
     expect(a.boss.deathZoneCastTimer, 'A cadence unchanged').toBeCloseTo(
@@ -490,6 +532,9 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     sim.player.hp = sim.player.maxHp;
     p2.hp = p2.maxHp;
     boss.deathZoneStrikeTimer = 0.01;
+    // Clear the shared spacing lock the warm-up mechanics armed, so the
+    // barrage under test fires on the very next tick.
+    boss.mechanicLockTimer = 0;
     inst.bossDeathZones = [];
     sim.tick();
     expect(inst.bossDeathZones, 'one zone per living member at S').toHaveLength(2);
@@ -586,10 +631,19 @@ describe('rift ranks: non-lethal mechanic damage cap (heroic_s safety rule)', ()
     sim.player.hp = sim.player.maxHp;
     boss.mechanicDamageMult = 10_000_000; // force the raw roll far beyond max HP
     boss.pulseTimer = 0.01;
-    const events = sim.tick();
-    const hit = events.find(
-      (ev) => ev.type === 'damage' && ev.ability === pulse.name && ev.targetId === sim.player.id,
-    ) as { amount: number } | undefined;
+    // The stamped pulse now telegraphs before detonating (rift_escape_window.ts):
+    // drive through the windup until the blast lands, topping hp and holding
+    // position each tick so the only damage on the landing tick is the pulse.
+    let hit: { amount: number } | undefined;
+    for (let i = 0; i < Math.ceil((RIFT_MECHANIC_WINDUP_SEC + 1) * 20) && !hit; i++) {
+      sim.player.pos = { ...boss.pos, z: boss.pos.z - Math.min(6, pulse.radius - 1) };
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.player.hp = sim.player.maxHp;
+      const events = sim.tick();
+      hit = events.find(
+        (ev) => ev.type === 'damage' && ev.ability === pulse.name && ev.targetId === sim.player.id,
+      ) as { amount: number } | undefined;
+    }
     expect(hit, 'the pulse landed').toBeTruthy();
     const cap = Math.floor(sim.player.maxHp * RIFT_NONLETHAL_MECHANIC_CAP_PCT);
     expect(hit!.amount, 'the cap engaged exactly').toBe(cap);
@@ -1304,19 +1358,113 @@ describe('rift ranks: budget escape and citadel exemption', () => {
     sim.enterRift(seed, 20, sim.player.id);
     const inst = active(sim);
     // The citadel fields a miniboss (ritualist) and a boss (pitlord).
-    // Neither should carry riftMechanicLimit since citadel is exempt.
+    // Neither should carry riftMechanicLimit since citadel is exempt, but BOTH
+    // still carry the shared mechanic spacing (the budget exemption is about
+    // kit size, not about letting mechanics stack).
     if (inst.minibossId !== null) {
       const mini = sim.entities.get(inst.minibossId!)!;
       expect(mini.riftMechanicLimit, 'citadel miniboss is exempt from rank budget').toBeUndefined();
+      expect(mini.riftMechanicSpacing, 'citadel miniboss still spaced').toBe(
+        RIFT_MECHANIC_SPACING_SEC,
+      );
     }
     if (inst.bossId !== null) {
       const boss = sim.entities.get(inst.bossId!)!;
       expect(boss.riftMechanicLimit, 'citadel boss is exempt from rank budget').toBeUndefined();
+      expect(boss.riftMechanicSpacing, 'citadel boss still spaced').toBe(RIFT_MECHANIC_SPACING_SEC);
     }
   });
 
-  it('dodgeability: deathZone castTime satisfies slowedSpeed * castTime >= radius * 1.2 for each boss with in-kit CC', () => {
+  it('every rift-spawned boss is stamped with the shared mechanic spacing; trash is not', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 28); // S rank
+    const inst = active(sim);
+    const boss = sim.entities.get(inst.bossId!)!;
+    expect(boss.riftMechanicSpacing, 'ranked boss stamped').toBe(RIFT_MECHANIC_SPACING_SEC);
+    expect(boss.riftMechanicLimit, 'ranked boss still budget-capped').toBe(
+      RIFT_RANK_MECHANIC_BUDGET.S,
+    );
+    const trash = inst.mobIds
+      .map((id) => sim.entities.get(id))
+      .filter((m): m is Entity => !!m && m.id !== inst.bossId && m.id !== inst.minibossId);
+    for (const m of trash) {
+      expect(m.riftMechanicSpacing, `${m.templateId} trash unstamped`).toBeUndefined();
+    }
+  });
+
+  it('a live spacing lock holds a due death zone; the cast starts once the lock clears', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 28); // S rank: deathZoneCast live
+    const inst = active(sim);
+    const boss = sim.entities.get(inst.bossId!)!;
+    const def = MOBS.rift_boss_frost.deathZoneCast!;
+    killTrash(sim);
+    sim.player.auras.push({
+      id: 'test_absorb',
+      name: 'Test Absorb',
+      kind: 'absorb',
+      remaining: 999,
+      duration: 999,
+      value: 100_000_000,
+      sourceId: sim.player.id,
+      school: 'physical',
+    } as Entity['auras'][number]);
+    boss.deathZoneCastTimer = 999;
+    boss.deathZoneStrikeTimer = 999;
+    sim.player.pos = { ...boss.pos, z: boss.pos.z - 3 };
+    sim.player.prevPos = { ...sim.player.pos };
+    tickAlive(sim, 5); // warm-up: aoePulse fires on first contact and arms the lock
+    expect(boss.mechanicLockTimer, 'warm-up armed the shared lock').toBeGreaterThan(0);
+    boss.deathZoneCastTimer = 0.01; // due now, but the lock is live
+    inst.bossDeathZones = [];
+    let heldTicks = 0;
+    while (boss.castingAbility !== def.castId && heldTicks < 20 * 8) {
+      // While the lock runs the due zone must hold: no cast, no zone placed.
+      if ((boss.mechanicLockTimer ?? 0) > 0) {
+        expect(boss.castingAbility, 'no cast while the lock runs').toBeNull();
+        expect(inst.bossDeathZones, 'no zone while the lock runs').toHaveLength(0);
+      }
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+      heldTicks++;
+    }
+    expect(boss.castingAbility, 'the held zone cast once the lock cleared').toBe(def.castId);
+    expect(inst.bossDeathZones.length, 'the zone was placed at cast start').toBeGreaterThan(0);
+    // It held for roughly the lock remainder, not a full fresh cycle. The
+    // warm-up pulse is a stamped WINDUP fire (rift_escape_window.ts), so the
+    // lock it armed spans the telegraph plus one spacing window.
+    expect(heldTicks * (1 / 20)).toBeLessThanOrEqual(
+      RIFT_MECHANIC_SPACING_SEC + RIFT_MECHANIC_WINDUP_SEC + 0.5,
+    );
+  });
+
+  it('dodgeability: deathZone castTime satisfies slowedSpeed * castTime >= radius * 1.2 for every death-zone boss', () => {
     const RUN_SPEED = 7;
+    // Model per boss: the kit's slow applies for the WHOLE fuse (every aoeSlow
+    // cycles faster than the zone cadence, so it is realistically up), and a
+    // hard immobilize (stun or root) subtracts its full duration on top. The
+    // two COMPOSE when a kit carries both (storm: Static Field + Thunderclap;
+    // venom: Clinging Silk + Web), because a player stunned mid-escape is still
+    // slowed when it breaks. The one deliberate exception is tide's terrify: a
+    // fear MOVES the player at flee speed rather than holding them in place, so
+    // composing it with the slow would double-count; it stays modeled as the
+    // stun-only worst case (the 2026-08 playtest called Abyssal Maw well-timed
+    // at exactly these numbers). This list covers every boss with a
+    // deathZoneCast or deathZoneStrike; missing rows are how the ember, storm,
+    // and arcane fuses shipped unescapable (v0.36.0 player feedback).
+    //
+    // Scope: this is a deliberate HAND MODEL over the authored numbers, not a
+    // replay of the shipped runtime, and it is conservative on both counted
+    // axes: the live sim stretches a spawn-time-impaired anchor's fuse by
+    // impairedZoneFuseMult (rift_escape_window.ts) and suppresses the boss's
+    // OWN control procs while the escape window is open, both of which give
+    // the runner MORE room than modeled here. Base-rank fuses only: the S
+    // tempo (RIFT_S_ZONE_TEMPO) shortens every fuse by the same 0.7 for the
+    // rank players choose for its difficulty, and the playtest's "well timed"
+    // anchors (frost, brute, tide) were S fights of exactly these authored
+    // numbers, so the band is calibrated where it was measured. Known residual
+    // outside the model: a third-party trash mob's stun or root is neither
+    // suppressed by the window nor compensated by the spawn-time stretch.
     const cases: Array<{
       id: string;
       ccMult: number;
@@ -1327,9 +1475,39 @@ describe('rift ranks: budget escape and citadel exemption', () => {
       // frost: aoeSlow mult 0.4
       { id: 'rift_boss_frost', ccMult: 0.4, zone: 'deathZoneCast', minCastTime: 4.0 },
       { id: 'rift_boss_frost', ccMult: 0.4, zone: 'deathZoneStrike', minCastTime: 5.0 },
-      // venom: aoeSlow mult 0.5
-      { id: 'rift_boss_venom', ccMult: 0.5, zone: 'deathZoneCast', minCastTime: 3.2 },
-      { id: 'rift_boss_venom', ccMult: 0.5, zone: 'deathZoneStrike', minCastTime: 4.0 },
+      // ember: stomp stun 1.2s (no slow in kit)
+      {
+        id: 'rift_boss_ember',
+        ccMult: 1,
+        stunDuration: 1.2,
+        zone: 'deathZoneCast',
+        minCastTime: 3.5,
+      },
+      {
+        id: 'rift_boss_ember',
+        ccMult: 1,
+        stunDuration: 1.2,
+        zone: 'deathZoneStrike',
+        minCastTime: 4.0,
+      },
+      // venom: aoeSlow mult 0.5 composed with the 1.0s Web root
+      {
+        id: 'rift_boss_venom',
+        ccMult: 0.5,
+        stunDuration: 1.0,
+        zone: 'deathZoneCast',
+        minCastTime: 4.5,
+      },
+      {
+        id: 'rift_boss_venom',
+        ccMult: 0.5,
+        stunDuration: 1.0,
+        zone: 'deathZoneStrike',
+        minCastTime: 5.0,
+      },
+      // necro: no movement-impairing CC in kit
+      { id: 'rift_boss_necro', ccMult: 1, zone: 'deathZoneCast', minCastTime: 2.5 },
+      { id: 'rift_boss_necro', ccMult: 1, zone: 'deathZoneStrike', minCastTime: 3.0 },
       // brute: stomp stun 1.5s (free_run_time = castTime - 1.5 must cover radius/speed)
       {
         id: 'rift_boss_brute',
@@ -1344,6 +1522,24 @@ describe('rift ranks: budget escape and citadel exemption', () => {
         stunDuration: 1.5,
         zone: 'deathZoneStrike',
         minCastTime: 4.0,
+      },
+      // arcane: aoeSlow mult 0.5 (Temporal Drag)
+      { id: 'rift_boss_arcane', ccMult: 0.5, zone: 'deathZoneCast', minCastTime: 3.5 },
+      { id: 'rift_boss_arcane', ccMult: 0.5, zone: 'deathZoneStrike', minCastTime: 4.0 },
+      // storm: aoeSlow mult 0.55 composed with the 1.5s Thunderclap concuss
+      {
+        id: 'rift_boss_storm',
+        ccMult: 0.55,
+        stunDuration: 1.5,
+        zone: 'deathZoneCast',
+        minCastTime: 4.5,
+      },
+      {
+        id: 'rift_boss_storm',
+        ccMult: 0.55,
+        stunDuration: 1.5,
+        zone: 'deathZoneStrike',
+        minCastTime: 5.0,
       },
       // tide: terrify 2.5s (full fear covers entire old fuse)
       {
@@ -1360,6 +1556,14 @@ describe('rift ranks: budget escape and citadel exemption', () => {
         zone: 'deathZoneStrike',
         minCastTime: 5.0,
       },
+      // Demon Tower summit: no movement-impairing CC is active during the
+      // escape window, so the authored 2.4s fuse clears its 9yd radius.
+      {
+        id: 'tower_boss_demon_lord',
+        ccMult: 1,
+        zone: 'deathZoneCast',
+        minCastTime: 2.4,
+      },
     ];
     for (const { id, ccMult, zone, minCastTime, stunDuration } of cases) {
       const tmpl = MOBS[id] as unknown as Record<string, { castTime: number; radius: number }>;
@@ -1375,6 +1579,17 @@ describe('rift ranks: budget escape and citadel exemption', () => {
         escapeDist,
         `${id}.${zone}: escape dist ${escapeDist.toFixed(2)} >= required ${(def.radius * 1.2).toFixed(2)}`,
       ).toBeGreaterThanOrEqual(def.radius * 1.2);
+    }
+    // Completeness: every mob template carrying a death zone has a row per zone
+    // above. A boss added without one is exactly how the unescapable fuses
+    // shipped the first time.
+    const covered = new Set(cases.map((c) => `${c.id}.${c.zone}`));
+    for (const [id, tmpl] of Object.entries(MOBS)) {
+      for (const zone of ['deathZoneCast', 'deathZoneStrike'] as const) {
+        if ((tmpl as unknown as Record<string, unknown>)[zone]) {
+          expect(covered.has(`${id}.${zone}`), `${id}.${zone} has a dodgeability case`).toBe(true);
+        }
+      }
     }
   });
 });

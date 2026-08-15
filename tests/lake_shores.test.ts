@@ -44,6 +44,8 @@ const mi: MoveInput = {
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
 };
 
 function kernelDeps(seed: number): PlayerMotionDeps {

@@ -1,3 +1,5 @@
+import { compareBagStacks } from '../sim/inventory_sort';
+import { isMaterialItem } from '../sim/material_taxonomy';
 import type { InvSlot, ItemDef } from '../sim/types';
 
 // Pure, DOM-free core for the modular bag filtering system. The HUD is a thin
@@ -12,6 +14,7 @@ export const BAG_CATEGORIES = [
   'armor',
   'consumable',
   'material',
+  'tool',
   'quest',
   'mount',
 ] as const;
@@ -45,12 +48,34 @@ export function bagOrderIsManual(filter: BagFilterState): boolean {
   return filter.sort === 'recent' && bagFilterIsDefault(filter);
 }
 
-// Look up an item definition by id. Injected so the pure core never imports the
-// live ITEMS table (and tests can supply a synthetic one).
+// Total stack count of quest items in the bag: sum of slot.count for every
+// stack whose def is kind==='quest'. Prefer stack count (how many quest pieces
+// the player holds) over unique-stack count so a "Boar Hide x5" chip reads 5,
+// matching the bag cell badge and tracker progress. Unknown/missing defs and
+// non-quest kinds contribute 0. Used by the Quest filter chip count badge.
+export function bagQuestItemCount(inventory: readonly InvSlot[], lookup: ItemLookup): number {
+  let total = 0;
+  for (const slot of inventory) {
+    const item = lookup(slot.itemId);
+    if (item?.kind !== 'quest') continue;
+    total += Math.max(0, Math.floor(slot.count));
+  }
+  return total;
+}
+
+// Look up an item definition by id. Injected for the kind/name/quality arms so
+// tests can supply a synthetic table; the 'material' arm is the one exception,
+// answering from content-derived set membership on the def's id
+// (src/sim/material_taxonomy.ts), so a material fixture must carry a REAL
+// catalog id no matter what table the caller injects.
 export type ItemLookup = (itemId: string) => ItemDef | undefined;
 
 // Shared with the bank filter (bank_filter.ts): the bank reuses the same category
 // predicate so a "material"/"weapon"/... chip means the same thing in both windows.
+// 'material' is the honest derived taxonomy (src/sim/material_taxonomy.ts), not a
+// kind test: grey vendor trash and the unclassified trophies match only 'all', and
+// the implements/charms/cosmetic tokens the old junk-or-tool predicate swept in
+// live under the 'tool' chip instead.
 export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':
@@ -67,7 +92,9 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
         item.kind === 'elixir'
       );
     case 'material':
-      return item.kind === 'junk' || item.kind === 'tool';
+      return isMaterialItem(item);
+    case 'tool':
+      return item.kind === 'tool';
     case 'quest':
       return item.kind === 'quest';
     case 'mount':
@@ -91,9 +118,19 @@ export function qualityRank(item: ItemDef): number {
   return QUALITY_RANK[item.quality ?? 'common'] ?? QUALITY_RANK.common;
 }
 
-// Filter, then sort. Returns a new array; never mutates the input. Sorts are
-// stable (Array.prototype.sort is spec-stable), so ties preserve insertion order
-// and the 'recent' sort is simply the unsorted filtered list.
+// Where a slot with no resolvable def sorts in a quality view: below poor, so
+// server-truth ids this bundle predates (R34) gather at the end rather than
+// interleaving with known items. Shared with bank_filter.ts like qualityRank.
+export const UNKNOWN_QUALITY_RANK = QUALITY_RANK.poor + 1;
+
+// Filter, then sort. Returns a new array; never mutates the input. 'recent'
+// is simply the unsorted filtered list. The quality and name views break
+// their ties with the sim's canonical clean-up ladder (compareBagStacks,
+// src/sim/inventory_sort.ts): before it, ties kept insertion order, which
+// scattered same-item stacks across a quality band and split a fine material
+// grade from its base grade (the "sorted by quality but my elder logs are
+// everywhere" report). The ladder is what the sort button stamps into the
+// real cells, so the derived views and the physical clean-up agree.
 export function applyBagFilter(
   slots: readonly InvSlot[],
   lookup: ItemLookup,
@@ -102,15 +139,27 @@ export function applyBagFilter(
   const query = state.search.trim().toLowerCase();
   const filtered = slots.filter((slot) => {
     const item = lookup(slot.itemId);
-    if (!item) return false;
+    // Stale-client guard (R34): a slot whose id this bundle predates stays
+    // VISIBLE in the everything view (it occupies a real, counted bag slot;
+    // dropping it here is how a stack turns invisible), but a category chip
+    // or a name search excludes it, because with no def there is no kind to
+    // classify and no name to match.
+    if (!item) return state.category === 'all' && !query;
     if (!matchesCategory(item, state.category)) return false;
     if (query && !item.name.toLowerCase().includes(query)) return false;
     return true;
   });
+  // Sort keys tolerate the unknown-def slots the 'all' view now keeps: they
+  // rank below poor and name-sort by their raw id.
   if (state.sort === 'quality') {
-    filtered.sort((a, b) => qualityRank(lookup(a.itemId)!) - qualityRank(lookup(b.itemId)!));
+    const rank = (slot: InvSlot) => {
+      const item = lookup(slot.itemId);
+      return item ? qualityRank(item) : UNKNOWN_QUALITY_RANK;
+    };
+    filtered.sort((a, b) => rank(a) - rank(b) || compareBagStacks(a, b, lookup));
   } else if (state.sort === 'name') {
-    filtered.sort((a, b) => lookup(a.itemId)!.name.localeCompare(lookup(b.itemId)!.name));
+    const name = (slot: InvSlot) => lookup(slot.itemId)?.name ?? slot.itemId;
+    filtered.sort((a, b) => name(a).localeCompare(name(b)) || compareBagStacks(a, b, lookup));
   }
   return filtered;
 }

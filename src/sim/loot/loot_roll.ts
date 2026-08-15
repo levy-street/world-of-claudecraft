@@ -410,7 +410,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
 // apply: disabled, below threshold, a solo looter, or no resolvable looter.
 function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
   const strategies = partyLootStrategiesForMob(ctx, mob);
-  if (!strategies || !strategies.master.enabled) return false;
+  if (!strategies?.master.enabled) return false;
   const def = ITEMS[itemId];
   if (!meetsMasterThreshold(def?.quality, strategies.master.threshold)) return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);
@@ -925,8 +925,9 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
     // the fast arm.
     //
     // "A harvest half" is isHarvestableCorpse, not a tag COUNT (#2513): a corpse
-    // whose every family is unmapped (fen_troll: claw, tusk) owes nobody a
-    // harvest, because the command boundary now refuses one. Counting its tags
+    // whose every family is unmapped (none shipped since #2905 mapped claw and
+    // tusk; the fixtures retag one) owes nobody a harvest, because the command
+    // boundary now refuses one. Counting its tags
     // here would hold the grace window open for 30 seconds waiting on a claim
     // that can never be spent, which is strictly worse than the pre-#2513
     // world, where a player could at least burn the claim and collapse it.

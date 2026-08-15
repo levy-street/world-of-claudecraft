@@ -17,7 +17,7 @@ describe('rogue balance pass', () => {
   it('Shadeslip does not break Duskveil', () => {
     const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 20: 'rog_r20_shadowstep' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 5: 'rog_r5_shadeslip' } })).toBe(true);
     const p = sim.player;
     const mob = createMob(20_000, MOBS.forest_wolf, 10, {
       x: p.pos.x + 10,

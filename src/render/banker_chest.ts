@@ -12,7 +12,7 @@ import { getActiveWorldContent } from '../sim/data';
 import type { Entity, NpcDef } from '../sim/types';
 import { groundHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   eastbrookMaterialUsesAtlas,
   eastbrookSemanticForMaterial,
@@ -33,8 +33,13 @@ let loadedBankerChestGltf: THREE.Group | null = null;
 let preparedBankerChestTemplate: THREE.Group | null = null;
 let fallbackBankerChestTemplate: THREE.Group | null = null;
 
+export function resetBankerChestProfileCaches(): void {
+  preparedBankerChestTemplate = null;
+  fallbackBankerChestTemplate = null;
+}
+
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(BANKER_CHEST_ASSET_URL).then((gltf) => {
       loadedBankerChestGltf = gltf.scene;
     }),

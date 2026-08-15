@@ -285,7 +285,7 @@ async function main() {
     hunter: 'arcane_shot',
     rogue: 'sinister_strike',
     priest: 'smite',
-    paladin: 'judgement',
+    paladin: 'hammer_of_grace',
     warlock: 'shadow_bolt',
     druid: 'wrath',
     shaman: 'lightning_bolt',

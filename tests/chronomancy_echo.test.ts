@@ -1,6 +1,6 @@
 // Chronomancy Phase 2 (docs/prd/mage-chronomancy.md section 13): Temporal Echo.
 // The healer marks ONE ally; while the mark rides, a fraction of the mage's
-// EFFECTIVE Arcane damage heals that ally (35% single-target, 15% area). The mark
+// EFFECTIVE Arcane damage heals that ally (40% single-target, 15% area). The mark
 // also does a small initial heal, is per-caster (sourceId), moves on re-cast, and
 // is cleared on death and on leaving the spec. The conversion draws no rng, never
 // rolls its own crit, and never recurses. Temporal Mend and Temporal Barrier keep
@@ -150,7 +150,7 @@ describe('Temporal Echo: the mark', () => {
 });
 
 describe('Temporal Echo: the Arcane-damage conversion', () => {
-  it('heals the marked ally 35% of single-target Arcane damage', () => {
+  it('heals the marked ally 40% of single-target Arcane damage', () => {
     const { sim, p } = chronoMage();
     const ally = addAlly(sim, 'Sanado');
     const mob = addHostile(sim);
@@ -159,7 +159,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     const hp0 = ally.hp;
     drain(sim);
     deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
-    expect(ally.hp - hp0).toBe(35); // round(100 * 0.35)
+    expect(ally.hp - hp0).toBe(40); // round(100 * 0.40)
   });
 
   it('heals 15% of AREA Arcane damage (the reduced coefficient)', () => {
@@ -198,7 +198,7 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     for (let i = 0; i < 3; i++) {
       const before = ally.hp;
       deal(sim, p, mob, 20, false, 'arcane', 'arcane_missiles', 'hit');
-      expect(ally.hp - before).toBe(7); // round(20 * 0.35) EACH hit
+      expect(ally.hp - before).toBe(8); // round(20 * 0.40) EACH hit
     }
   });
 
@@ -211,12 +211,12 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     const hp0 = ally.hp;
     drain(sim);
     // crit=true carries an already-crit-inflated 100 (the caller resolved the
-    // crit). The conversion uses it verbatim: 35, NOT 35*1.5.
+    // crit). The conversion uses it verbatim: 40, NOT 40*1.5.
     deal(sim, p, mob, 100, true, 'arcane', 'arcane_missiles', 'hit');
-    expect(ally.hp - hp0).toBe(35);
+    expect(ally.hp - hp0).toBe(40);
     const heal = drain(sim).find(
       (e): e is Extract<SimEvent, { type: 'heal2' }> =>
-        e.type === 'heal2' && e.targetId === ally.id && e.amount === 35,
+        e.type === 'heal2' && e.targetId === ally.id && e.amount === 40,
     );
     expect(heal?.crit).toBe(false); // the conversion heal never crits
   });
@@ -264,8 +264,8 @@ describe('Temporal Echo: the Arcane-damage conversion', () => {
     ally.hp = Math.floor(ally.maxHp * 0.5);
     const hp0 = ally.hp;
     deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
-    // Only 20 damage actually landed (the rest is overkill): round(20 * 0.35) = 7.
-    expect(ally.hp - hp0).toBe(7);
+    // Only 20 damage actually landed (the rest is overkill): round(20 * 0.40) = 8.
+    expect(ally.hp - hp0).toBe(8);
   });
 
   it('never heals a dead ally, and the conversion heal cannot re-trigger', () => {
@@ -312,7 +312,7 @@ describe('Temporal Echo: multiple chronomancers stay independent', () => {
     ally.hp = Math.floor(ally.maxHp * 0.5);
     const hp0 = ally.hp;
     deal(sim, p, mob, 100, false, 'arcane', 'arcane_missiles', 'hit');
-    expect(ally.hp - hp0).toBe(35); // one conversion, not two
+    expect(ally.hp - hp0).toBe(40); // one conversion, not two
     expect(ally.auras.filter((a) => a.kind === 'temporal_echo').length).toBe(2); // both remain
   });
 });
@@ -354,7 +354,7 @@ describe('Temporal Echo: determinism and enemy-free healing', () => {
     const a = run();
     const b = run();
     expect(a).toBe(b);
-    expect(a).toBe(5 * Math.round(37 * 0.35)); // 5 * 13 = 65
+    expect(a).toBe(5 * Math.round(37 * 0.4)); // 5 * 15 = 75
   });
 
   it('Temporal Mend and Temporal Barrier still work with no enemy in the world', () => {

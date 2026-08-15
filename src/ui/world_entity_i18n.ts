@@ -101,6 +101,12 @@ const MOB_IDS = [
   'deepfen_spearjaw',
   'mirefen_widowling',
   'spider_egg_sac',
+  // Quest-dedupe pass (zones 1 to 3): the Broodmother clutch and the new elites.
+  'spider_egg',
+  'widow_hatchling',
+  'drowned_warlord',
+  'brakka_wallbreaker',
+  'threnos_first_voice',
   'grave_silt_bulwark',
   'sump_troll_devourer',
   'choir_thrall',
@@ -166,6 +172,10 @@ const MOB_IDS = [
   'ashbone_warcaller',
   'dune_troll',
   'cindraleth_maw_matriarch',
+  'dragonkin_egg',
+  'dragonkin_whelp',
+  'dragonkin_broodguard',
+  'drakemaw_broodlord',
   'gilded_stag',
   'gloam_fox',
   'orchard_treant',
@@ -213,6 +223,27 @@ const MOB_IDS = [
   'rift_pact_acolyte',
   'rift_boss_ritualist',
   'rift_boss_pitlord',
+  // The Demon Tower roster (src/sim/content/rift/tower_mobs.ts).
+  'tower_imp',
+  'tower_hellhound',
+  'tower_pact_reaver',
+  'tower_brimstone_zealot',
+  'tower_soulbinder',
+  'tower_iron_defiler',
+  'tower_abyss_knight',
+  'tower_dread_harbinger',
+  'tower_boss_gatekeeper',
+  'tower_boss_demon_lord',
+  'tower_gloom_bat',
+  'tower_cinder_crawler',
+  'tower_bone_acolyte',
+  'tower_shade_dancer',
+  'tower_flame_herald',
+  'tower_rot_hulk',
+  'tower_blood_matron',
+  'tower_void_sentinel',
+  'tower_boss_flesh_shaper',
+  'tower_boss_ash_tyrant',
   // The Wildheart Basin jungle dungeon (src/sim/content/wildheart.ts).
   'wildheart_stalker',
   'wildheart_ravager',
@@ -243,6 +274,7 @@ const NPC_IDS = [
   'armorer_hode',
   'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'fury', // Honor Quartermaster and WARFARE vendor (Eastbrook, zone 1)
+  'warmarshal_draven_kole', // Master of the Warfare Stores, the WARFARE vendor (Highwatch, zone 3)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
@@ -341,6 +373,7 @@ const QUEST_IDS = [
   'q_hollow',
   'q_sexton',
   'q_gravecallers_trail',
+  'q_divine_tome',
   'q_bandits',
   'q_ringleader',
   'q_fenbridge_muster',
@@ -356,6 +389,7 @@ const QUEST_IDS = [
   'q_drowned',
   'q_drowned_censers',
   'q_no_rest',
+  'q_rite_of_redemption',
   'q_trolls',
   'q_troll_fetishes',
   'q_grubjaw',
@@ -651,6 +685,12 @@ type WorldEntityTranslations = {
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
     noticeboardName: string;
+    demonTowerName: string;
+    demonTowerBloodforgeName: string;
+    demonTowerOssuaryName: string;
+    demonTowerVoidCrownName: string;
+    demonTowerCoreName: string;
+    demonTowerAscentName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -773,6 +813,12 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
       noticeboardName: 'Notice Board',
+      demonTowerName: 'The Demon Tower',
+      demonTowerBloodforgeName: 'The Demon Tower: The Bloodforge',
+      demonTowerOssuaryName: 'The Demon Tower: The Ossuary of Chains',
+      demonTowerVoidCrownName: 'The Demon Tower: The Void Crown',
+      demonTowerCoreName: 'Demon Core',
+      demonTowerAscentName: 'Tower Ascent',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

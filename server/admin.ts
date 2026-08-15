@@ -1,20 +1,47 @@
 import type * as http from 'node:http';
+import { verifyLoginTwoFactor } from './account';
+import { parseAdminAccountSort } from './admin_accounts_sort';
+import {
+  ACTIVITY_WINDOW_DAYS,
+  classDistribution,
+  levelDistribution,
+  registrationsByDay,
+  sessionsByDay,
+} from './admin_activity_cache';
 import {
   accountDetail,
   associationsForIp,
-  classDistribution,
+  characterProfessionsRow,
   clientPerfRaw,
   clientPerfSummary,
   dailyRewardPointEvents,
-  levelDistribution,
   listAccounts,
   listCharacters,
   listModerationActions,
   listSharedIps,
   onlineHistory,
-  registrationsByDay,
-  sessionsByDay,
 } from './admin_db';
+import {
+  type AdminGeneralChatRateLimitDeps,
+  type AdminGeneralChatRateLimitService,
+  createAdminGeneralChatRateLimitService,
+} from './admin_general_chat_rate_limit';
+import type { AdminGuildBankView } from './admin_guild_bank_view';
+import {
+  ADMIN_GUILD_REASON_MAX,
+  type AdminGuildRenameError,
+  adminGuildDetail,
+  listAdminGuildHistory,
+  listAdminGuilds,
+  recordAdminGuildBankPurge,
+  renameAdminGuild,
+} from './admin_guilds_db';
+import {
+  AdminGuildListBusyError,
+  type AdminGuildListRequest,
+  readAdminGuildList,
+} from './admin_guilds_read';
+import { parseAdminGuildSort } from './admin_guilds_sort';
 import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
@@ -37,7 +64,17 @@ import {
   newToken,
   verifyPassword,
 } from './auth';
-import { getBugReportScreenshot, listBugReports } from './bug_report_db';
+import {
+  type BugReportResolution,
+  getBugReportScreenshot,
+  listBugReports,
+  resolveBugReport,
+} from './bug_report_db';
+import {
+  characterProfessionsSheetFromRow,
+  restoreItemBodyError,
+  restoreSlotBodyError,
+} from './character_professions';
 import {
   addFilterWord,
   chatModeratedAccounts,
@@ -48,6 +85,12 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import {
+  CHEATER_MARK_ADMIN_TARGET_CODE,
+  cheaterMarkBodySchema,
+  liftCheaterMarkBodySchema,
+  rethrowCheaterMarkRefusal,
+} from './cheater_mark_api';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -65,8 +108,11 @@ import {
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
+import { type GeneralChatRateLimit, setGeneralChatRateLimit } from './general_chat_quota_db';
 import { ctxAccountId } from './http/context';
+import { HttpError } from './http/errors';
 import { logger } from './http/logger';
+import { withBody } from './http/middleware/body';
 import {
   ADMIN_META,
   type AdminAuthDb,
@@ -86,18 +132,21 @@ import {
   forceCharacterRename,
   ignoreReport,
   liftAccountChatMute,
+  liftAccountCheaterMark,
   moderateAccount,
-  moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
   reactivateAccountAudited,
   recordPasswordReset,
+  recordProfessionsRestore,
   resetChatStrikesAudited,
   setAccountAiFlag,
+  setAccountCheaterMark,
   setAccountStreamerFlair,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
 } from './moderation_db';
+import { readModerationQueue } from './moderation_queue_cache';
 import { providerUsageSnapshot } from './provider_usage';
 import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
 import { REALM } from './realm';
@@ -136,9 +185,14 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 // bad-password response so it never reveals whether the account exists.
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
+// Second factor, mirroring server/auth_routes.ts loginHandler exactly: an account
+// with TOTP enabled (account.totp_enabled_at) must supply a live code or a recovery
+// code before a token is minted. Without one, the response is a 200 CHALLENGE (never
+// a token), so the client shows the code step; with a wrong one it is a 401 that also
+// counts against the same per-account throttle as a bad password.
+const ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE = 'invalid authentication code';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
-const ACTIVITY_WINDOW_DAYS = 30;
 const ANTIBOT_CONFIG_NOTE_MAX = 500;
 const UNSTUCK_DEFAULT_DAYS = 30;
 const UNSTUCK_DEFAULT_LIMIT = 50;
@@ -155,6 +209,196 @@ const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
 const STREAMER_LINKS_REQUIRED = 'a links object is required';
 const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
 const DAILY_REWARD_EVENT_DAY_REQUIRED = 'a valid daily rewards date is required';
+// The guild bank dormant-slot purge refusals. Shared by both dispatch arms so
+// the strings stay byte-identical, and mirrored into the dashboard's
+// ADMIN_ERROR_KEYS matcher (src/admin/i18n.ts) like every other operator error.
+const GUILD_BANK_SLOT_REQUIRED = 'a slot index is required';
+const GUILD_BANK_ITEM_REQUIRED = 'the item id in that slot is required';
+const GUILD_BANK_REASON_REQUIRED = 'a moderation reason is required (500 chars max)';
+const GUILD_BANK_NOT_LOADED = 'that guild has no loaded bank';
+const GUILD_BANK_NO_CARRIER = 'no member of that guild is online to persist the change';
+const GUILD_BANK_SLOT_NOT_DORMANT = 'that slot is not a stuck item';
+const GUILD_BANK_SAVE_FAILED = 'the change could not be saved and was rolled back';
+// The guild-delete window. Deliberately NOT the save_failed line: nothing was
+// attempted, so nothing was saved and nothing was rolled back, and the
+// instruction is the opposite one (the bank is going away with the guild, so
+// there is nothing to retry).
+const GUILD_BANK_DELETING = 'that guild is being deleted, so its bank is closed';
+const GUILD_BANK_PURGE_REFUSED = 'the guild bank change was refused';
+
+const realAdminGeneralChatRateLimitDeps: AdminGeneralChatRateLimitDeps = {
+  set: setGeneralChatRateLimit,
+  isAdminAccount,
+};
+let adminGeneralChatRateLimitService: AdminGeneralChatRateLimitService =
+  createAdminGeneralChatRateLimitService(realAdminGeneralChatRateLimitDeps);
+
+/** Install the narrow General chat policy persistence seam for endpoint tests. */
+export function setAdminGeneralChatRateLimitDepsForTests(
+  deps: AdminGeneralChatRateLimitDeps,
+): void {
+  adminGeneralChatRateLimitService = createAdminGeneralChatRateLimitService(deps);
+}
+
+/** Restore the production General chat policy persistence seam after a unit test. */
+export function resetAdminGeneralChatRateLimitDepsForTests(): void {
+  adminGeneralChatRateLimitService = createAdminGeneralChatRateLimitService(
+    realAdminGeneralChatRateLimitDeps,
+  );
+}
+
+/**
+ * The one general-chat-rate-limit endpoint body, shared verbatim by the legacy
+ * handleAdminApi arm and the routes-table handler. The service validates
+ * bounds, refuses admin targets, and calls the atomic persistence seam once;
+ * that transaction owns the audit row, window reset, and NOTIFY, so no live
+ * state can apply before the durable commit. Applying synchronously afterward
+ * closes the response-to-NOTIFY window for sessions on the handling realm;
+ * LISTEN remains authoritative elsewhere.
+ */
+async function respondGeneralChatRateLimit(
+  res: http.ServerResponse,
+  input: { targetAccountId: number; adminAccountId: number; body: unknown },
+  applyLive: (accountId: number, after: GeneralChatRateLimit | null) => void,
+): Promise<void> {
+  const outcome = await adminGeneralChatRateLimitService.update({
+    accountId: input.targetAccountId,
+    adminAccountId: input.adminAccountId,
+    body: input.body,
+  });
+  if (!outcome.ok) return fail(res, outcome.status, outcome.error);
+  applyLive(input.targetAccountId, outcome.value.after);
+  return ok(res, { ok: true });
+}
+
+function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
+  switch (error) {
+    case 'not_found':
+      return { status: 404, message: 'guild not found' };
+    case 'name_taken':
+      return { status: 409, message: 'guild name is already taken' };
+    case 'same_name':
+      return { status: 400, message: 'guild name must change' };
+    case 'invalid_reason':
+      return { status: 400, message: 'a moderation reason is required (500 chars max)' };
+    case 'member_limit_exceeded':
+      return { status: 409, message: 'guild member limit exceeded' };
+    case 'invalid_name':
+      return { status: 400, message: 'guild name must be 3-24 letters with single spaces' };
+  }
+}
+
+/** The guild bank operator READ, resolved ONCE for both dispatch arms (the
+ *  dual-edit rule), exactly like the purge below it.
+ *
+ *  It exists because the purge is unusable without it: that call names a slot
+ *  INDEX and the itemId at it, and until this landed an operator had to dig
+ *  both out of `guild_banks` with SQL. Reads the live book through the same
+ *  ungated snapshot the purge mutates through, so the listing an operator acts
+ *  on and the refusal they may get back cannot disagree.
+ *
+ *  A missing book reuses the purge's own 404 line rather than minting a second
+ *  one: it is the same fact ("that guild has no loaded bank"), and the dashboard
+ *  already localizes it (error.guildBankNotLoaded). */
+function guildBankStateOutcome(
+  rt: Pick<AdminRuntime, 'adminGuildBankState'>,
+  guildId: number,
+):
+  | { ok: true; body: { guildId: number } & AdminGuildBankView }
+  | { ok: false; status: number; message: string } {
+  const state = rt.adminGuildBankState(guildId);
+  if (!state) return { ok: false, status: 404, message: GUILD_BANK_NOT_LOADED };
+  return { ok: true, body: { guildId, ...state } };
+}
+
+/** The guild bank dormant-slot purge, resolved ONCE for both dispatch arms so
+ *  the legacy ladder and the RouteDef handler can never drift (the dual-edit
+ *  rule). Shape validation, the game call, the audited moderation row, and the
+ *  outcome-to-response mapping all live here; each arm only reads the body,
+ *  supplies the acting operator, and writes the envelope.
+ *
+ *  Three operator inputs, all required: the slot INDEX, the itemId that index
+ *  is believed to hold (a confirmation token, because a purge shifts every
+ *  higher index down by one), and a moderation REASON, held to the same bar as
+ *  the strictly less destructive guild rename beside it. */
+async function purgeGuildBankSlotOutcome(
+  rt: Pick<AdminRuntime, 'adminPurgeGuildBankSlot'>,
+  guildId: number,
+  actorAccountId: number,
+  body: { slot?: unknown; itemId?: unknown; reason?: unknown },
+): Promise<
+  | {
+      ok: true;
+      body: {
+        guildId: number;
+        slotIndex: number;
+        itemId: string;
+        count: number;
+        audited: boolean;
+      };
+    }
+  | { ok: false; status: number; message: string }
+> {
+  const rawSlot = body.slot;
+  if (typeof rawSlot !== 'number' || !Number.isInteger(rawSlot) || rawSlot < 0) {
+    return { ok: false, status: 400, message: GUILD_BANK_SLOT_REQUIRED };
+  }
+  const expectItemId = typeof body.itemId === 'string' ? body.itemId.trim() : '';
+  if (!expectItemId) return { ok: false, status: 400, message: GUILD_BANK_ITEM_REQUIRED };
+  const reason = typeof body.reason === 'string' ? body.reason.trim() : '';
+  if (!reason || reason.length > ADMIN_GUILD_REASON_MAX) {
+    return { ok: false, status: 400, message: GUILD_BANK_REASON_REQUIRED };
+  }
+  const result = await rt.adminPurgeGuildBankSlot(guildId, rawSlot, expectItemId, actorAccountId);
+  if (!result.ok) {
+    switch (result.reason) {
+      case 'no_book':
+        return { ok: false, status: 404, message: GUILD_BANK_NOT_LOADED };
+      case 'no_carrier':
+        return { ok: false, status: 409, message: GUILD_BANK_NO_CARRIER };
+      case 'not_dormant':
+        return { ok: false, status: 400, message: GUILD_BANK_SLOT_NOT_DORMANT };
+      case 'save_failed':
+        return { ok: false, status: 503, message: GUILD_BANK_SAVE_FAILED };
+      case 'delete_in_flight':
+        // 409, not 503: this is a state conflict with a delete that is already
+        // in flight, not a transient failure the operator should retry into.
+        return { ok: false, status: 409, message: GUILD_BANK_DELETING };
+    }
+    // Fail closed: a refusal reason added later must never fall through into
+    // the success return below (which would read `removed` off a refusal).
+    return { ok: false, status: 500, message: GUILD_BANK_PURGE_REFUSED };
+  }
+  // The audited moderation row (the rename precedent): who, why, and when, on
+  // the same history surface an operator already reads. Written AFTER the
+  // removal proved durable, so a reverted purge is never logged as done. A
+  // failed insert cannot un-remove the item, so it is reported, not thrown:
+  // the ledger row is already the machine-readable evidence.
+  let audited = true;
+  try {
+    await adminDb().recordAdminGuildBankPurge({
+      guildId,
+      reason,
+      adminAccountId: actorAccountId,
+      itemId: result.removed.itemId,
+      count: result.removed.count,
+      slotIndex: rawSlot,
+    });
+  } catch (err) {
+    audited = false;
+    console.error(`guild bank purge audit row failed for guild ${guildId}:`, err);
+  }
+  return {
+    ok: true,
+    body: {
+      guildId,
+      slotIndex: rawSlot,
+      itemId: result.removed.itemId,
+      count: result.removed.count,
+      audited,
+    },
+  };
+}
 
 async function dailyRewardEventDay(value: string | null): Promise<string | null> {
   if (value === null) return currentDailyRewardDay();
@@ -317,6 +561,21 @@ function fail(res: http.ServerResponse, status: number, error: string): void {
   json(res, status, { success: false, data: null, error });
 }
 
+async function sendAdminGuildList(
+  res: http.ServerResponse,
+  request: AdminGuildListRequest,
+  load: () => Promise<unknown>,
+): Promise<void> {
+  try {
+    ok(res, await readAdminGuildList(request, load));
+  } catch (err) {
+    if (err instanceof AdminGuildListBusyError) {
+      return fail(res, 503, 'guild list busy, try again');
+    }
+    throw err;
+  }
+}
+
 export interface PageParams {
   page: number;
   limit: number;
@@ -426,6 +685,17 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
   const staff = await adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(res, 403, 'this account does not have admin access');
+  }
+  if (account.totp_enabled_at) {
+    const code = typeof body.code === 'string' ? body.code : '';
+    const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode : '';
+    if (!code && !recoveryCode) {
+      return ok(res, { twoFactorRequired: true });
+    }
+    if (!(await verifyLoginTwoFactor(account, code, recoveryCode))) {
+      recordAuthFailure(username);
+      return fail(res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
+    }
   }
   clearAuthFailures(username);
   await touchLogin(account.id);
@@ -722,6 +992,21 @@ export async function handleAdminApi(
       const ignored = await ignoreReport(Number(ignoreMatch[1]), accountId, body.note);
       return ignored ? ok(res, { ok: true }) : fail(res, 404, 'open report not found');
     }
+    const bugReportResolveMatch = /^\/admin\/api\/bug-reports\/(\d+)\/(resolve|dismiss)$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && bugReportResolveMatch) {
+      const body = await readBody(req);
+      const status: BugReportResolution =
+        bugReportResolveMatch[2] === 'resolve' ? 'resolved' : 'dismissed';
+      const resolved = await resolveBugReport(
+        Number(bugReportResolveMatch[1]),
+        accountId,
+        status,
+        body.note,
+      );
+      return resolved ? ok(res, { ok: true }) : fail(res, 404, 'open bug report not found');
+    }
     const forceRenameMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/force-rename$/.exec(
       path,
     );
@@ -740,6 +1025,83 @@ export async function handleAdminApi(
         return ok(res, { ok: true });
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : 'force rename failed');
+      }
+    }
+
+    // R35 GM restores (professions tooling): validate, require online HERE,
+    // audit row, then the sync live mint (the RouteDef twin's exact order).
+    const restoreItemMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-item$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && restoreItemMatch) {
+      const id = Number(restoreItemMatch[1]);
+      const body = await readBody(req);
+      const bodyError = restoreItemBodyError(body);
+      if (bodyError) return fail(res, 400, bodyError);
+      const itemId = String(body.itemId);
+      const count = Number(body.count);
+      try {
+        if (!game.adminCharacterOnline(id)) {
+          return fail(res, 400, 'character is not online on this realm');
+        }
+        await recordProfessionsRestore({
+          characterId: id,
+          adminAccountId: accountId,
+          action: 'restore_item',
+          detail: `${itemId} x${count}`,
+          reason: body.reason,
+        });
+        const result = game.adminRestoreItem(id, itemId, count);
+        // Defensive twin of the pre-audit body check; reachable only if the
+        // runtime and validator ever disagree about ITEMS.
+        if (result === 'invalid_item') return fail(res, 400, 'unknown item id');
+        if (result !== 'ok') {
+          return fail(res, 400, 'character went offline before the restore landed');
+        }
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'item restore failed');
+      }
+    }
+    const restoreSlotMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && restoreSlotMatch) {
+      const id = Number(restoreSlotMatch[1]);
+      const body = await readBody(req);
+      const bodyError = restoreSlotBodyError(body);
+      if (bodyError) return fail(res, 400, bodyError);
+      const professionId = String(body.professionId);
+      const effectId = String(body.effectId);
+      try {
+        if (!game.adminCharacterOnline(id)) {
+          return fail(res, 400, 'character is not online on this realm');
+        }
+        await recordProfessionsRestore({
+          characterId: id,
+          adminAccountId: accountId,
+          action: 'restore_slot',
+          detail: `${professionId}/${effectId}`,
+          reason: body.reason,
+        });
+        const result = game.adminRestoreToolEffectSlot(id, professionId, effectId);
+        if (result === 'no_tool') {
+          return fail(res, 400, 'the character owns no tool for that profession');
+        }
+        // A restore is for a row that is GONE: an overwrite would destroy the
+        // live row's provenance, confirm mode, and ratcheted ceiling.
+        if (result === 'already_slotted') {
+          return fail(res, 400, 'that profession already has a slotted effect');
+        }
+        if (result === 'invalid_request') {
+          return fail(res, 400, 'that effect cannot be slotted on that profession');
+        }
+        if (result !== 'ok') {
+          return fail(res, 400, 'character went offline before the restore landed');
+        }
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'slot restore failed');
       }
     }
 
@@ -828,6 +1190,22 @@ export async function handleAdminApi(
       }
     }
 
+    const generalChatRateLimitMatch =
+      /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/.exec(path);
+    if (req.method === 'POST' && generalChatRateLimitMatch) {
+      // `await`, not a bare returned promise: a rejected setter must land in
+      // this function's own catch (the 500 'internal error' boundary).
+      return await respondGeneralChatRateLimit(
+        res,
+        {
+          targetAccountId: Number(generalChatRateLimitMatch[1]),
+          adminAccountId: accountId,
+          body: await readBody(req),
+        },
+        (id, after) => game.applyGeneralChatRateLimitLive(id, after),
+      );
+    }
+
     // Account flair: the AI-operated mark and an official streamer's links. Both
     // are cosmetic and non-punitive, so (unlike suspend/ban/chat-mute) there is
     // deliberately NO isAdminAccount guard: marking a staff account as a streamer
@@ -872,6 +1250,57 @@ export async function handleAdminApi(
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
       }
+    }
+
+    const guildRenameMatch = /^\/admin\/api\/guilds\/(\d+)\/rename$/.exec(path);
+    if (req.method === 'POST' && guildRenameMatch) {
+      const body = await readBody(req);
+      const renamed = await renameAdminGuild(
+        Number(guildRenameMatch[1]),
+        typeof body.name === 'string' ? body.name : '',
+        typeof body.reason === 'string' ? body.reason : '',
+        accountId,
+      );
+      if ('error' in renamed) {
+        const failure = guildRenameFailure(renamed.error);
+        return fail(res, failure.status, failure.message);
+      }
+      game.social.guildRenamed(
+        renamed.result.guildId,
+        renamed.result.oldName,
+        renamed.result.newName,
+        renamed.result.memberCharacterIds,
+      );
+      bustAdminGuildBoardCaches();
+      return ok(res, {
+        id: renamed.result.guildId,
+        name: renamed.result.newName,
+      });
+    }
+
+    // The guild bank dormant-slot escape hatch: remove ONE permanently
+    // unwithdrawable copy so the guild can empty its bank and disband. The
+    // removal runs through the same observed book-mutation path every other
+    // guild bank op uses (ledger row op 'admin_purge' + the fenced escrow
+    // save); the sim refuses anything that is not actually dormant.
+    const guildBankPurgeMatch = /^\/admin\/api\/guilds\/(\d+)\/bank\/purge-slot$/.exec(path);
+    if (req.method === 'POST' && guildBankPurgeMatch) {
+      const body = await readBody(req);
+      // Number() on a digit string can still yield 0 or a past-2^53 id here
+      // where the RouteDef arm's requireAdminTarget('guild') loader 422s. That
+      // is the adminIdParamDecode deviation class, and this path is ledgered
+      // for it by name (tests/server/http/known_deviations.ts): it is the first
+      // /admin/api/guilds/* entry, so it was NOT covered by the family the
+      // other :id admin routes sit in. Both arms REFUSE such an id without
+      // touching the live book: adminPurgeGuildBankSlot rejects a non-positive
+      // or non-integer guild id up front. Only the status differs.
+      const outcome = await purgeGuildBankSlotOutcome(
+        game,
+        Number(guildBankPurgeMatch[1]),
+        accountId,
+        body,
+      );
+      return outcome.ok ? ok(res, outcome.body) : fail(res, outcome.status, outcome.message);
     }
 
     // Chat filter: word list + escalation config management. Every edit reloads
@@ -1061,7 +1490,47 @@ export async function handleAdminApi(
     if (path === '/admin/api/accounts') {
       const { page, limit } = parsePageParams(url.searchParams);
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
-      return ok(res, await listAccounts(search, page, limit));
+      const { sort, dir } = parseAdminAccountSort(url.searchParams);
+      return ok(res, await listAccounts(search, page, limit, sort, dir));
+    }
+    if (path === '/admin/api/guilds') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      const search = url.searchParams.get('search') ?? '';
+      const { sort, dir } = parseAdminGuildSort(url.searchParams);
+      return await sendAdminGuildList(res, { search, page, limit, sort, dir }, () =>
+        listAdminGuilds(search, page, limit, sort, dir),
+      );
+    }
+    const guildHistoryMatch = /^\/admin\/api\/guilds\/(\d+)\/history$/.exec(path);
+    if (guildHistoryMatch) {
+      const rows = await listAdminGuildHistory(Number(guildHistoryMatch[1]));
+      return rows === null ? fail(res, 404, 'guild not found') : ok(res, { rows });
+    }
+    // The guild bank operator READ: the live book (treasury, capacity, and the
+    // slot list with its dormant flags) the dormant-slot purge is unusable
+    // without. Same shared outcome helper as the RouteDef arm; the degenerate
+    // digit-string :id class diverges here exactly as it does on the purge
+    // beside it (both ledgered in tests/server/http/known_deviations.ts):
+    // adminGuildBankState refuses a non-positive or non-integer guild id
+    // itself, so this arm 404s where the RouteDef arm 422s and NEITHER reads a
+    // live book.
+    const guildBankStateMatch = /^\/admin\/api\/guilds\/(\d+)\/bank$/.exec(path);
+    if (guildBankStateMatch) {
+      const outcome = guildBankStateOutcome(game, Number(guildBankStateMatch[1]));
+      return outcome.ok ? ok(res, outcome.body) : fail(res, outcome.status, outcome.message);
+    }
+    const guildDetailMatch = /^\/admin\/api\/guilds\/(\d+)$/.exec(path);
+    if (guildDetailMatch) {
+      const detail = await adminGuildDetail(Number(guildDetailMatch[1]));
+      if (!detail) return fail(res, 404, 'guild not found');
+      const onlineIds = game.liveCharacterIds();
+      return ok(res, {
+        guild: detail.guild,
+        members: detail.members.map((member) => ({
+          ...member,
+          online: onlineIds.has(member.characterId),
+        })),
+      });
     }
     if (path === '/admin/api/shared-ips') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1106,7 +1575,7 @@ export async function handleAdminApi(
       });
     }
     if (path === '/admin/api/moderation/queue') {
-      return ok(res, { rows: await moderationQueue(game.liveAccountIds()) });
+      return ok(res, { rows: await readModerationQueue(game.liveAccountIds()) });
     }
     if (path === '/admin/api/moderation/history') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1183,6 +1652,22 @@ export async function handleAdminApi(
       const sort = url.searchParams.get('sort') ?? 'level';
       const dir = url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
       return ok(res, await listCharacters(search, sort, dir, page, limit));
+    }
+    // R35 professions inspector (the RouteDef twin's exact shape: live
+    // serializeCharacter snapshot when online, stored blob otherwise). The
+    // explicit GET check matches every sibling branch in this ladder: the
+    // central ADMIN_ROUTE_PERMISSIONS gate already refuses other methods, but
+    // this branch must not silently start serving one the day someone adds a
+    // POST permission for the path.
+    const characterProfessionsMatch = /^\/admin\/api\/characters\/(\d+)\/professions$/.exec(path);
+    if (req.method === 'GET' && characterProfessionsMatch) {
+      const id = Number(characterProfessionsMatch[1]);
+      // Live snapshot FIRST (the RouteDef twin's exact shape): a live read
+      // discards the blob, so the query skips fetching it.
+      const liveState = game.adminCharacterState(id);
+      const row = await characterProfessionsRow(id, liveState === null);
+      if (!row) return fail(res, 404, 'character not found');
+      return ok(res, characterProfessionsSheetFromRow(row, liveState));
     }
     if (path === '/admin/api/maps') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1290,13 +1775,19 @@ export type AdminRuntime = Pick<
   | 'isIpBlocked'
   | 'liveSharedIps'
   | 'liveAccountIds'
+  | 'liveCharacterIds'
   | 'disconnectAccount'
   | 'muteAccountChat'
   | 'liftChatMuteLive'
   | 'resetChatStrikesLive'
+  | 'applyGeneralChatRateLimitLive'
   // Push an operator's account-flair edit onto the account's live session, so the
   // AI mark / streamer links change without a reconnect.
   | 'applyAccountFlairLive'
+  // Push a Cheater mark change onto the account's live session. Without it a
+  // sanction applied to a logged-in player does nothing until their next login,
+  // which is the session it is most needed in.
+  | 'applyCheaterMarkLive'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -1304,6 +1795,19 @@ export type AdminRuntime = Pick<
   | 'applyAntibotConfig'
   | 'startPerfCapture'
   | 'perfCaptureStatus'
+  // The guild bank dormant-slot escape hatch (guildbank.purge). A live-sim
+  // mutation, so it rides the runtime Pick like every other game-session hook,
+  // beside the live-book READ (moderation.read) an operator discovers the slot
+  // index and its item id with.
+  | 'adminGuildBankState'
+  | 'adminPurgeGuildBankSlot'
+  // R35 GM professions tooling: a live character-state snapshot for the
+  // inspector, and the two audited restores (item mint, slot re-mint).
+  | 'adminCharacterState'
+  | 'adminCharacterOnline'
+  | 'adminRestoreItem'
+  | 'adminRestoreToolEffectSlot'
+  | 'social'
 >;
 
 let runtime: AdminRuntime | null = null;
@@ -1351,6 +1855,22 @@ function adminPlayersCap(): number {
   return playersCapSource ? playersCapSource() : 0;
 }
 
+let adminGuildBoardCacheBustSource: (() => void) | null = null;
+
+/** Inject the leaderboard cache invalidation hook used after a committed rename. */
+export function configureAdminGuildBoardCacheBust(fn: () => void): void {
+  adminGuildBoardCacheBustSource = fn;
+}
+
+/** Clear the leaderboard cache invalidation hook for unit tests. */
+export function resetAdminGuildBoardCacheBustForTests(): void {
+  adminGuildBoardCacheBustSource = null;
+}
+
+function bustAdminGuildBoardCaches(): void {
+  adminGuildBoardCacheBustSource?.();
+}
+
 // The DB reads/writes (plus the login-path auth + rate-limit primitives) the admin
 // route layer needs, bundled behind a test-only setter so they can be driven with a
 // fake and no Postgres; production never calls the setter. The same functions the
@@ -1365,6 +1885,10 @@ function makeRealAdminDb() {
   return {
     accountDetail,
     associationsForIp,
+    characterProfessionsRow,
+    // Cache-backed (the shared admin activity bundle; both dispatch arms read
+    // it): a setAdminDbForTests override still replaces these members outright,
+    // which bypasses the cache and keeps existing fakes exact.
     classDistribution,
     clientPerfRaw,
     clientPerfSummary,
@@ -1372,6 +1896,11 @@ function makeRealAdminDb() {
     levelDistribution,
     listAccounts,
     listCharacters,
+    listAdminGuilds,
+    adminGuildDetail,
+    listAdminGuildHistory,
+    renameAdminGuild,
+    recordAdminGuildBankPurge,
     listModerationActions,
     listSharedIps,
     onlineHistory,
@@ -1383,6 +1912,7 @@ function makeRealAdminDb() {
     sessionsByDay,
     listBugReports,
     getBugReportScreenshot,
+    resolveBugReport,
     listUnstuckReports: (options: Parameters<typeof listUnstuckReportsDb>[1]) =>
       listUnstuckReportsDb(pool, options),
     listUnstuckHotspots: (options: Parameters<typeof listUnstuckHotspotsDb>[1]) =>
@@ -1404,9 +1934,18 @@ function makeRealAdminDb() {
     ignoreReport,
     liftAccountChatMute,
     moderateAccount,
-    moderationQueue,
+    // Cache-backed (the shared moderation queue memo; both dispatch arms read
+    // it and it is bust-wired by moderation_db.ts's setOnModerationQueueChanged
+    // hook): a setAdminDbForTests override still replaces this member outright.
+    moderationQueue: readModerationQueue,
     moderationReportsForAccount,
     muteAccountChat,
+    // The Cheater mark: apply/re-length and lift early. Deliberately NO
+    // remaining-budget read here: the apply arm returns what its own transaction
+    // stored, and a second read could be overtaken by a save-path burn and push
+    // a stale budget onto the live session.
+    setAccountCheaterMark,
+    liftAccountCheaterMark,
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
@@ -1415,9 +1954,13 @@ function makeRealAdminDb() {
     isAdminAccount,
     saveToken,
     reactivateAccountAudited,
+    recordProfessionsRestore,
     touchLogin,
     newToken,
     verifyPassword,
+    // Login second factor: an account with TOTP enabled must supply a live code or
+    // a recovery code before a token is minted (mirrors server/auth_routes.ts).
+    verifyLoginTwoFactor,
     // Admin-initiated password reset: existence check, credential write, sign out
     // every device, and its moderation-history audit row.
     accountById,
@@ -1479,7 +2022,10 @@ export function resetAdminDbForTests(): void {
 // The admin-auth gate reads its two db functions (accountAndScopeForToken and
 // adminRolesForAccount) off the active bundle, so a setAdminDbForTests fake drives
 // it too. AdminDb is a superset of AdminAuthDb, so the getter is assignable.
-const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
+// Exported so sibling admin-surface domain modules (server/ad_spend.ts) mount
+// the SAME gate over the SAME seam, keeping the scope sweep and the
+// setAdminDbForTests injection authoritative for every admin route.
+export const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
 
 /**
  * The four moderation actions the enum route accepts. The central permission gate
@@ -1498,7 +2044,9 @@ const MODERATION_ACTION_SCHEMA = enum_(['suspend', 'unsuspend', 'ban', 'unban'] 
  * POST /admin/api/login: anonymous, its own in-handler rateLimited limiter PLUS the
  * per-account failed-login throttle (mirrors server/auth_routes.ts loginHandler),
  * so a distributed attack spread across many source IPs cannot bypass a lockout by
- * never repeating an IP.
+ * never repeating an IP. Also mirrors loginHandler's second-factor gate: a staff
+ * account with TOTP enabled must supply a live code or a recovery code before a
+ * token is minted, so 2FA is never bypassable for the highest-privilege surface.
  */
 async function loginHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().rateLimited(ctx.req, ADMIN_LOGIN_MAX_PER_MINUTE).allowed) {
@@ -1520,6 +2068,17 @@ async function loginHandler(ctx: Ctx): Promise<void> {
   const staff = await adminDb().adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(ctx.res, 403, 'this account does not have admin access');
+  }
+  if (account.totp_enabled_at) {
+    const code = typeof body.code === 'string' ? body.code : '';
+    const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode : '';
+    if (!code && !recoveryCode) {
+      return ok(ctx.res, { twoFactorRequired: true });
+    }
+    if (!(await adminDb().verifyLoginTwoFactor(account, code, recoveryCode))) {
+      adminDb().recordAuthFailure(username);
+      return fail(ctx.res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
+    }
   }
   adminDb().clearAuthFailures(username);
   await adminDb().touchLogin(account.id);
@@ -1738,11 +2297,92 @@ async function perfTickCaptureHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, useAdminRuntime().startPerfCapture(durationMs));
 }
 
-/** GET /admin/api/accounts: paged account search (search clamped to 64 chars). */
+/** GET /admin/api/accounts: paged, sortable account search (search clamped to 64 chars). */
 async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
-  ok(ctx.res, await adminDb().listAccounts(search, page, limit));
+  const { sort, dir } = parseAdminAccountSort(ctx.url.searchParams);
+  ok(ctx.res, await adminDb().listAccounts(search, page, limit, sort, dir));
+}
+
+/** GET /admin/api/guilds: current-realm guild search with bounded pagination. */
+async function guildsHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const search = ctx.url.searchParams.get('search') ?? '';
+  const { sort, dir } = parseAdminGuildSort(ctx.url.searchParams);
+  await sendAdminGuildList(ctx.res, { search, page, limit, sort, dir }, () =>
+    adminDb().listAdminGuilds(search, page, limit, sort, dir),
+  );
+}
+
+/** GET /admin/api/guilds/:id: minimal roster with a cheap live online merge. */
+async function guildDetailHandler(ctx: Ctx): Promise<void> {
+  const detail = await adminDb().adminGuildDetail(adminTargetId(ctx));
+  if (!detail) return fail(ctx.res, 404, 'guild not found');
+  const onlineIds = useAdminRuntime().liveCharacterIds();
+  ok(ctx.res, {
+    guild: detail.guild,
+    members: detail.members.map((member) => ({
+      ...member,
+      online: onlineIds.has(member.characterId),
+    })),
+  });
+}
+
+/** GET /admin/api/guilds/:id/history: retained moderation rename audit. */
+async function guildHistoryHandler(ctx: Ctx): Promise<void> {
+  const rows = await adminDb().listAdminGuildHistory(adminTargetId(ctx));
+  if (rows === null) return fail(ctx.res, 404, 'guild not found');
+  ok(ctx.res, { rows });
+}
+
+/** POST /admin/api/guilds/:id/rename: atomic rename, audit, then bounded live push. */
+async function guildRenameHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const renamed = await adminDb().renameAdminGuild(
+    adminTargetId(ctx),
+    typeof body.name === 'string' ? body.name : '',
+    typeof body.reason === 'string' ? body.reason : '',
+    ctxAccountId(ctx),
+  );
+  if ('error' in renamed) {
+    const failure = guildRenameFailure(renamed.error);
+    return fail(ctx.res, failure.status, failure.message);
+  }
+  useAdminRuntime().social.guildRenamed(
+    renamed.result.guildId,
+    renamed.result.oldName,
+    renamed.result.newName,
+    renamed.result.memberCharacterIds,
+  );
+  bustAdminGuildBoardCaches();
+  ok(ctx.res, { id: renamed.result.guildId, name: renamed.result.newName });
+}
+
+/** GET /admin/api/guilds/:id/bank: the live book behind the escape hatch (see
+ *  guildBankStateOutcome for the shared body, and
+ *  server/admin_guild_bank_view.ts for what the payload deliberately omits). */
+function guildBankStateHandler(ctx: Ctx): void {
+  const outcome = guildBankStateOutcome(useAdminRuntime(), adminTargetId(ctx));
+  if (!outcome.ok) {
+    fail(ctx.res, outcome.status, outcome.message);
+    return;
+  }
+  ok(ctx.res, outcome.body);
+}
+
+/** POST /admin/api/guilds/:id/bank/purge-slot: the dormant guild bank slot
+ *  escape hatch (see purgeGuildBankSlotOutcome for the shared body). */
+async function guildBankPurgeSlotHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const outcome = await purgeGuildBankSlotOutcome(
+    useAdminRuntime(),
+    adminTargetId(ctx),
+    ctxAccountId(ctx),
+    body,
+  );
+  if (!outcome.ok) return fail(ctx.res, outcome.status, outcome.message);
+  ok(ctx.res, outcome.body);
 }
 
 /** GET /admin/api/shared-ips: paged shared IPs; the online=1 branch reads live. */
@@ -1998,6 +2638,89 @@ async function forceRenameHandler(ctx: Ctx): Promise<void> {
   }
 }
 
+/**
+ * Refuse a Cheater mark aimed at an operator account.
+ *
+ * Admin accounts are exempt for the same reason they are exempt from
+ * suspend/ban/chat-mute (the isAdminAccount guards above): an operator must not be
+ * able to brand another operator, deliberately or by mistyping an account id.
+ * Applied to the LIFT arm as well as the mark arm, so the pair states the same
+ * rule; the cost is that an account marked BEFORE being promoted to staff has to
+ * be demoted before its tag can be lifted through the API.
+ */
+async function refuseAdminCheaterMarkTarget(targetAccountId: number): Promise<void> {
+  if (await adminDb().isAdminAccount(targetAccountId)) {
+    throw new HttpError(400, CHEATER_MARK_ADMIN_TARGET_CODE);
+  }
+}
+
+/**
+ * POST /admin/api/moderation/accounts/:id/cheater-mark: brand an account with the
+ * Cheater tag for a budget of PLAYED seconds, and push it onto the live session.
+ *
+ * A REGISTRY-ONLY route (no legacy handleAdminApi twin), so it follows the
+ * new-endpoint recipe rather than the chat-mute arm beside it: the body is parsed
+ * by withBody and decoded through a typed schema (a shape failure is the
+ * pipeline's 422 validation.failed), and every refusal is a stable
+ * `cheater_mark.*` code through HttpError, never English prose.
+ */
+async function cheaterMarkHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  // Cheap-reject-first: the decode is pure CPU, the operator-target check is a
+  // db read, so a malformed request never buys a query.
+  const decoded = cheaterMarkBodySchema.decode(ctx.body ?? {});
+  if (!decoded.ok) throw decoded;
+  await refuseAdminCheaterMarkTarget(targetAccountId);
+  // No initializer on purpose: 0 is the wire form of "no mark", so a default
+  // here would mean a future non-throwing arm in the catch below silently LIFTS
+  // a live mark. rethrowCheaterMarkRefusal returns never, which is what makes
+  // the definite assignment hold.
+  let storedSeconds: number;
+  try {
+    storedSeconds = await adminDb().setAccountCheaterMark({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: decoded.value.reason,
+      seconds: decoded.value.seconds,
+    });
+  } catch (err) {
+    rethrowCheaterMarkRefusal(err);
+  }
+  // Push the budget the WRITE ITSELF returned, never the requested one (
+  // moderation_db clamps to CHEATER_MARK_MAX_SECONDS) and never a follow-up
+  // read: the unaudited save-path burn is guarded only by
+  // `cheater_mark_seconds > 0`, so it can land between the COMMIT and a second
+  // SELECT. Re-lengthening a live mark would then push the OLD remaining while
+  // the API answered ok, and the operator's correction would silently vanish.
+  rt.applyCheaterMarkLive(targetAccountId, storedSeconds);
+  ok(ctx.res, { ok: true });
+}
+
+/**
+ * POST /admin/api/moderation/accounts/:id/lift-cheater-mark: clear the tag early
+ * and push the lift onto the live session. Registry-only, same recipe as its
+ * sibling above; 0 seconds is the wire form of "no mark".
+ */
+async function liftCheaterMarkHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const decoded = liftCheaterMarkBodySchema.decode(ctx.body ?? {});
+  if (!decoded.ok) throw decoded;
+  await refuseAdminCheaterMarkTarget(targetAccountId);
+  try {
+    await adminDb().liftAccountCheaterMark({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: decoded.value.reason,
+    });
+  } catch (err) {
+    rethrowCheaterMarkRefusal(err);
+  }
+  rt.applyCheaterMarkLive(targetAccountId, 0);
+  ok(ctx.res, { ok: true });
+}
+
 /** POST /admin/api/moderation/accounts/:id/lift-mute: clear a chat mute + live push. */
 async function liftMuteHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
@@ -2096,6 +2819,107 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
 }
 
+/** GET /admin/api/characters/:id/professions: the R35 professions inspector.
+ *  A live character reads a fresh serializeCharacter snapshot (the stored
+ *  blob lags the 30s autosave); an offline one reads the stored blob, whose
+ *  updatedAt tells the operator which clock the node timers anchor to. */
+async function characterProfessionsHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  // Live snapshot FIRST: when one exists the stored blob is discarded, so
+  // the query skips detoasting the widest column in the schema for nothing.
+  const liveState = rt.adminCharacterState(id);
+  const row = await adminDb().characterProfessionsRow(id, liveState === null);
+  if (!row) return fail(ctx.res, 404, 'character not found');
+  ok(ctx.res, characterProfessionsSheetFromRow(row, liveState));
+}
+
+/** POST /admin/api/moderation/characters/:id/restore-item: the R35 GM item
+ *  restore. Order is deliberate: validate (no audit row for an impossible
+ *  grant), require the character online HERE, write the audit row, then the
+ *  sync live mint, so a grant can never exist unaudited; the rare
+ *  leave-between-audit-and-mint race surfaces as an explicit 400 and the
+ *  audit row honestly records the attempt. */
+async function restoreItemHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = restoreItemBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const itemId = String(body.itemId);
+  const count = Number(body.count);
+  try {
+    if (!rt.adminCharacterOnline(id)) {
+      return fail(ctx.res, 400, 'character is not online on this realm');
+    }
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'restore_item',
+      detail: `${itemId} x${count}`,
+      reason: body.reason,
+    });
+    const result = rt.adminRestoreItem(id, itemId, count);
+    // Defensive twin of the pre-audit body check; reachable only if the
+    // runtime and validator ever disagree about ITEMS.
+    if (result === 'invalid_item') return fail(ctx.res, 400, 'unknown item id');
+    if (result !== 'ok') {
+      return fail(ctx.res, 400, 'character went offline before the restore landed');
+    }
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'item restore failed');
+  }
+}
+
+/** POST /admin/api/moderation/characters/:id/restore-slot: the R35 GM
+ *  tool-effect slot re-mint, same ordering contract as restore-item; the
+ *  sim action refuses no_tool (charges are sized by the best owned tool,
+ *  so the tool must be restored first). */
+async function restoreSlotHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  const bodyError = restoreSlotBodyError(body);
+  if (bodyError) return fail(ctx.res, 400, bodyError);
+  const professionId = String(body.professionId);
+  const effectId = String(body.effectId);
+  try {
+    if (!rt.adminCharacterOnline(id)) {
+      return fail(ctx.res, 400, 'character is not online on this realm');
+    }
+    await adminDb().recordProfessionsRestore({
+      characterId: id,
+      adminAccountId: ctxAccountId(ctx),
+      action: 'restore_slot',
+      detail: `${professionId}/${effectId}`,
+      reason: body.reason,
+    });
+    const result = rt.adminRestoreToolEffectSlot(id, professionId, effectId);
+    if (result === 'no_tool') {
+      return fail(ctx.res, 400, 'the character owns no tool for that profession');
+    }
+    // A restore is for a row that is GONE: an overwrite would destroy the
+    // live row's provenance, confirm mode, and ratcheted ceiling.
+    if (result === 'already_slotted') {
+      return fail(ctx.res, 400, 'that profession already has a slotted effect');
+    }
+    // Defense-in-depth only since the phase 18 close: restoreSlotBodyError
+    // now runs the same pure pair-validity policy BEFORE the audit write, so
+    // this arm is reachable only if the validator and the sim action ever
+    // disagree (a content change landing between the two checks).
+    if (result === 'invalid_request') {
+      return fail(ctx.res, 400, 'that effect cannot be slotted on that profession');
+    }
+    if (result !== 'ok') {
+      return fail(ctx.res, 400, 'character went offline before the restore landed');
+    }
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'slot restore failed');
+  }
+}
+
 /** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
 async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
   const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
@@ -2145,6 +2969,25 @@ async function resetPasswordHandler(ctx: Ctx): Promise<void> {
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'password reset failed');
   }
+}
+
+/**
+ * POST /admin/api/accounts/:id/general-chat-rate-limit: set or clear the account's
+ * General-channel-only quota. Same moderation family as suspend/ban/chat-mute, so
+ * the shared service refuses admin targets (clearing stays allowed); the full
+ * endpoint body lives in respondGeneralChatRateLimit, shared with the legacy arm.
+ */
+async function generalChatRateLimitHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  return respondGeneralChatRateLimit(
+    ctx.res,
+    {
+      targetAccountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      body: await readBody(ctx.req),
+    },
+    (id, after) => rt.applyGeneralChatRateLimitLive(id, after),
+  );
 }
 
 /**
@@ -2268,6 +3111,22 @@ async function unstuckReportsHandler(ctx: Ctx): Promise<void> {
 async function bugScreenshotHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { screenshot: await adminDb().getBugReportScreenshot(adminTargetId(ctx)) });
 }
+
+/** POST /admin/api/bug-reports/:id/(resolve|dismiss): close an open bug report, audited. */
+function bugReportResolveHandler(status: BugReportResolution) {
+  return async (ctx: Ctx): Promise<void> => {
+    const body = await readBody(ctx.req);
+    const resolved = await adminDb().resolveBugReport(
+      adminTargetId(ctx),
+      ctxAccountId(ctx),
+      status,
+      body.note,
+    );
+    return resolved ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'open bug report not found');
+  };
+}
+const bugReportResolveHandlerResolved = bugReportResolveHandler('resolved');
+const bugReportResolveHandlerDismissed = bugReportResolveHandler('dismissed');
 
 /** GET /admin/api/characters: paged, sortable character search. */
 async function charactersHandler(ctx: Ctx): Promise<void> {
@@ -2445,6 +3304,54 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'GET',
+    path: '/admin/api/guilds',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: guildsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildDetailHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id/history',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildHistoryHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/guilds/:id/rename',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildRenameHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id/bank',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildBankStateHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/guilds/:id/bank/purge-slot',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildBankPurgeSlotHandler,
+  },
+  {
+    method: 'GET',
     path: '/admin/api/shared-ips',
     surface: 'admin',
     middleware: [requireAdmin],
@@ -2477,6 +3384,30 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'GET',
+    path: '/admin/api/characters/:id/professions',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: characterProfessionsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-item',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: restoreItemHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/restore-slot',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: restoreSlotHandler,
+  },
+  {
+    method: 'GET',
     path: '/admin/api/accounts/:id/daily-rewards-events',
     surface: 'admin',
     middleware: [requireAdmin, requireAdminTarget('account')],
@@ -2490,6 +3421,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: resetPasswordHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/general-chat-rate-limit',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: generalChatRateLimitHandler,
   },
 
   // Account flair: the AI-operated mark and an official streamer's platform links.
@@ -2597,6 +3536,26 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: chatMuteHandler,
+  },
+  // The Cheater mark pair. Registry-only (born after the migration, so no legacy
+  // ladder twin), which is why these two are the only admin routes that mount
+  // withBody: the dual-edit parity rule that keeps the migrated handlers
+  // self-reading does not describe a route with nothing to be in parity with.
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/cheater-mark',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
+    meta: adminTargetMeta('account'),
+    handler: cheaterMarkHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/lift-cheater-mark',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
+    meta: adminTargetMeta('account'),
+    handler: liftCheaterMarkHandler,
   },
   {
     method: 'POST',
@@ -2761,6 +3720,22 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('bugReport')],
     meta: adminTargetMeta('bugReport'),
     handler: bugScreenshotHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/bug-reports/:id/resolve',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('bugReport')],
+    meta: adminTargetMeta('bugReport'),
+    handler: bugReportResolveHandlerResolved,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/bug-reports/:id/dismiss',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('bugReport')],
+    meta: adminTargetMeta('bugReport'),
+    handler: bugReportResolveHandlerDismissed,
   },
   {
     method: 'GET',

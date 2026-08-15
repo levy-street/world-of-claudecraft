@@ -1,0 +1,172 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/boardwalk-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones",
+  "detailInventory": {
+    "scanMethod": "labeled-turnaround-component-zones",
+    "targetMinDetails": 8,
+    "note": "Each observed detail is linked to a concrete component.localFeatures or material.localOverrides key.",
+    "details": [
+      {
+        "id": "plank-gap-lines",
+        "kind": "seam",
+        "description": "Dark narrow gaps separate every deck board.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "surface readability",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "parallel-plank-rhythm"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/front.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "uneven-board-ends",
+        "kind": "contour",
+        "description": "Individual board ends project by small irregular amounts.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "hand-built silhouette",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "uneven-plank-ends"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/side.png",
+        "confidence": 0.895
+      },
+      {
+        "id": "crossbar-shadow",
+        "kind": "linework",
+        "description": "Transverse bearers remain visible in the low side view.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "structural depth",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "under-deck-crossbars"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/rear.png",
+        "confidence": 0.89
+      },
+      {
+        "id": "short-post-rhythm",
+        "kind": "contour",
+        "description": "Sparse short post pairs punctuate both edges.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "path boundary",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "sparse-post-pairs"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/hero.png",
+        "confidence": 0.885
+      },
+      {
+        "id": "rope-catenary",
+        "kind": "contour",
+        "description": "Rope guards sag gently between posts.",
+        "region": {
+          "x": 0.5,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "organic line",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "left-and-right-rope-sags"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/hero.png",
+        "confidence": 0.88
+      },
+      {
+        "id": "iron-pin-glint",
+        "kind": "gloss",
+        "description": "Small iron pin highlights anchor rope to post tops.",
+        "region": {
+          "x": 0,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "joinery",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "rope-fiber-and-pin-glints"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/front.png",
+        "confidence": 0.875
+      },
+      {
+        "id": "moss-corner-clumps",
+        "kind": "stain",
+        "description": "Green moss collects asymmetrically at damp corners.",
+        "region": {
+          "x": 0,
+          "y": 0.5,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "marsh integration",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "moss-edge-clumps"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/rear.png",
+        "confidence": 0.87
+      },
+      {
+        "id": "wet-end-grain",
+        "kind": "ridge",
+        "description": "Board end grain and damp tonal variation break the long span.",
+        "region": {
+          "x": 0.5,
+          "y": 0,
+          "width": 0.5,
+          "height": 0.5,
+          "units": "normalized montage quadrant"
+        },
+        "scale": "meso",
+        "affects": "material age",
+        "mapsTo": {
+          "type": "component.localFeatures-or-material.localOverrides",
+          "ref": "wet-end-grain-and-plank-variation"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/boardwalk/zones/side.png",
+        "confidence": 0.865
+      }
+    ]
+  },
+  "authoringInstruction": "Complete: every observed detail maps to an authored component.localFeatures or material.localOverrides key in sculpt-spec.json."
+}

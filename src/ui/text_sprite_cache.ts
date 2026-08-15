@@ -21,14 +21,12 @@
 // the box has to come from measureText rather than a constant, and the live set
 // has to be bounded and evicted because ally names are player-supplied.
 //
-// THE BOUND AND ITS EVICTION. `beginRedraw` trims the cache back to
-// TEXT_SPRITE_LIMIT in least-recently-used order; a draw during a redraw never
-// evicts. So the cache holds at most TEXT_SPRITE_LIMIT sprites at every redraw
-// boundary, plus whatever that one redraw asked for. That ordering is the whole
-// point: trimming mid-redraw would let a label-heavy redraw evict the sprites it
-// is still drawing and re-rasterize every one of them, every redraw, which is
-// worse than the fillText it replaced. Overshoot is reclaimed by the next
-// `beginRedraw`.
+// THE BOUND AND ITS EVICTION. The default map-label cache uses a redraw-boundary
+// count trim because its known working set fits under TEXT_SPRITE_LIMIT. A
+// caller with DPR-scaled, open-ended labels can also pass a hard backing-store
+// byte budget. That mode evicts least-recently-used sprites immediately after a
+// miss, so neither the count nor RGBA backing bytes can overshoot between
+// redraws. A one-off sprite larger than the budget is drawn but not retained.
 //
 // DOM: needs `document.createElement('canvas')`, so this is a painter-side
 // helper, not a pure core. It stays host-agnostic otherwise (no window, no
@@ -56,6 +54,10 @@ interface TextSprite {
   canvas: HTMLCanvasElement;
   originX: number;
   originY: number;
+  width: number;
+  height: number;
+  advance: number;
+  bytes: number;
 }
 
 /** Ink extents around the anchor, in px: `left`/`right` along the baseline,
@@ -65,6 +67,7 @@ interface TextInk {
   right: number;
   ascent: number;
   descent: number;
+  advance: number;
 }
 
 /** Sprites kept across redraws.
@@ -78,15 +81,19 @@ interface TextInk {
  *  arithmetic against those sources, so raising a cap fails there first):
  *
  *    150  ally names   (server/social.ts FRIEND_LIMIT 50 + GUILD_MEMBER_LIMIT 100)
- *     96  badge digits (nothing caps the active quest log, but a badge number is
+ *      N  badge digits (nothing caps the active quest log, but a badge number is
  *                       an index into it and it is keyed by quest id, so the
- *                       count of quests in the content tables is the ceiling)
+ *                       count of quests in the content tables is the ceiling;
+ *                       the test derives N from the live QUESTS table, and the
+ *                       realm-grid content growth is what carries the total)
  *     11  POI labels   (the widest zone)
  *      3  portal names (the zone with the most dungeon doors)
  *      1  zone title
- *      2  quest-giver glyphs
+ *      3  quest-giver glyphs (gold '?', gold '!', repeat-blue '!'; the
+ *         cooldown variant reuses the blue raster and dims at blit time)
  *   ----
- *    263, rounded up for headroom.
+ *    371 as derived today (tests/text_sprite_cache.test.ts recomputes it
+ *    from the live caps and floors the total, so a shrunken term reddens).
  *
  *  The budget is a ceiling, not a working set: ordinary play resides at a couple
  *  of dozen sprites, and nothing releases them before then (there is deliberately
@@ -96,12 +103,13 @@ interface TextInk {
  *  actually rasterizes: a 16-character ally name 126x43px (21KB of backing
  *  store), a POI label 162x45 (29KB), a portal name 138x44 (24KB), the zone title
  *  154x49 (30KB), a quest-giver glyph 34x48 (6KB), a badge digit 12x20 (1KB). So
- *  the ordinary couple of dozen is around half a megabyte, the 370-label
+ *  the ordinary couple of dozen is around half a megabyte, the 371-label
  *  pathological mix is 5.2MB, and 384 sprites all of them ally names, which
  *  nothing can actually ask for, would be 8.1MB: the same class as a handful of
- *  cached zone terrain canvases. (370 is the worst case the realm grid brought:
- *  more zones means more POI labels and more overworld doors, and the quest
- *  tables grew with them. tests/text_sprite_cache.ts derives it from content.) */
+ *  cached zone terrain canvases. (371 is the worst case the realm grid brought,
+ *  plus the phase 23 repeat glyph: more zones means more POI labels and more
+ *  overworld doors, and the quest tables grew with them.
+ *  tests/text_sprite_cache.ts derives it from content.) */
 export const TEXT_SPRITE_LIMIT = 384;
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
@@ -136,36 +144,103 @@ const FALLBACK_FONT_PX = 12;
 const SPRITE_ALIGN = 'center';
 const SPRITE_BASELINE = 'alphabetic';
 
+/** One cached sprite plus its recency-list links and the text-level bucket
+ *  that owns it, so a hit can move to the list tail and an eviction can unhook
+ *  itself from its own bucket without rebuilding any key. */
+interface SpriteEntry {
+  sprite: TextSprite;
+  text: string;
+  owner: SpriteBucket;
+  prev: SpriteEntry | null;
+  next: SpriteEntry | null;
+}
+
+// The cache key, STRUCTURAL rather than a joined string: one map level per
+// style field, font -> fill -> stroke -> drawn outline width -> text. The old
+// scheme built a key array plus a joined string of a couple hundred bytes on
+// every draw and measure call, HITS INCLUDED, which at tens of nameplates per
+// frame was the client's dominant allocation treadmill; walking the levels
+// with the caller's existing strings allocates nothing. Collision safety is
+// structural: there is no delimiter to inject (a player name carrying any
+// separator is just a longer key at the text level), adjacent fields can never
+// fuse (fill 'ab' + stroke 'c' and fill 'a' + stroke 'bc' part ways at the
+// fill level), and a fill-only label can never alias an outlined one whose
+// stroke token has not resolved yet (undefined and '' are distinct stroke
+// keys). The width level keys outlineWidth, the width actually drawn, so it
+// stays in lockstep with the padding rule below.
+type SpriteBucket = Map<string, SpriteEntry>;
+type WidthLevel = Map<number, SpriteBucket>;
+type StrokeLevel = Map<string | undefined, WidthLevel>;
+type FillLevel = Map<string, StrokeLevel>;
+type FontLevel = Map<string, FillLevel>;
+
 /**
  * A bounded per-(font, fill, outline, text) cache of rasterized labels. One
  * instance per painter; the painter calls `beginRedraw` once per redraw and
  * `draw` per label.
  */
 export class TextSpriteCache {
-  // Insertion order IS the LRU order: a cache hit re-inserts, so the oldest
-  // live key is always the front of the iteration.
-  private readonly sprites = new Map<string, TextSprite>();
+  // The structural key tree plus an intrusive doubly-linked recency list
+  // threaded through the entries. The list keeps EXACT least-recently-used
+  // order with the same bound and hit behavior as the insertion-ordered Map it
+  // replaced (head = oldest, a hit moves its entry to the tail, eviction pops
+  // the head), but a hit is a handful of pointer swaps instead of a per-hit
+  // map delete plus re-insert, so the steady-state hot path does no map churn
+  // and allocates nothing. Emptied text buckets stay in the tree: every fill
+  // and stroke a painter passes is a resolved theme token or a fixed style
+  // constant, so the tree's own footprint is bounded by that closed palette,
+  // never by player-supplied text, and clear() drops it wholesale.
+  private readonly fonts: FontLevel = new Map();
+  private lruHead: SpriteEntry | null = null;
+  private lruTail: SpriteEntry | null = null;
+  private spriteCount = 0;
+  private pixelRatio = 1;
+  private cachedBytes = 0;
+  private readonly spriteLimit: number;
+  private readonly hardByteLimit: number;
+
+  constructor(spriteLimit = TEXT_SPRITE_LIMIT, hardByteLimit = Number.POSITIVE_INFINITY) {
+    this.spriteLimit = Math.max(1, Math.floor(spriteLimit));
+    this.hardByteLimit = Number.isFinite(hardByteLimit)
+      ? Math.max(0, Math.floor(hardByteLimit))
+      : Number.POSITIVE_INFINITY;
+  }
 
   /** Live sprite count. */
   get size(): number {
-    return this.sprites.size;
+    return this.spriteCount;
+  }
+
+  /** RGBA backing-store bytes retained by live sprites. */
+  get bytes(): number {
+    return this.cachedBytes;
   }
 
   /** Drop every sprite. The caller owns the reason: the map painter calls this on
    *  a language switch, where every label re-resolves to a new string and the old
    *  rasters would otherwise sit in the budget until LRU worked them out. */
   clear(): void {
-    this.sprites.clear();
+    this.fonts.clear();
+    this.lruHead = null;
+    this.lruTail = null;
+    this.spriteCount = 0;
+    this.cachedBytes = 0;
+  }
+
+  /** Rasterize future sprites at the destination backing-store density. Existing
+   * sprites are invalid at a different density, so a real change clears once. */
+  setPixelRatio(pixelRatio: number): void {
+    const next = Math.max(1, Math.min(3, Number.isFinite(pixelRatio) ? pixelRatio : 1));
+    if (next === this.pixelRatio) return;
+    this.pixelRatio = next;
+    this.clear();
   }
 
   /** Open a redraw: trim back to the budget, oldest first. Called BEFORE the
    *  redraw's draws so a label-heavy redraw can overshoot rather than thrash
    *  (see the header). */
   beginRedraw(): void {
-    for (const key of this.sprites.keys()) {
-      if (this.sprites.size <= TEXT_SPRITE_LIMIT) return;
-      this.sprites.delete(key);
-    }
+    while (this.spriteCount > this.spriteLimit && this.lruHead) this.evictOldest(this.lruHead);
   }
 
   /**
@@ -199,19 +274,29 @@ export class TextSpriteCache {
     if (text === '') return;
     const sprite = this.sprite(text, style);
     if (!sprite) return;
-    ctx.drawImage(sprite.canvas, Math.round(x - sprite.originX), Math.round(y - sprite.originY));
+    const dx = Math.round((x - sprite.originX) * this.pixelRatio) / this.pixelRatio;
+    const dy = Math.round((y - sprite.originY) * this.pixelRatio) / this.pixelRatio;
+    if (this.pixelRatio === 1) {
+      ctx.drawImage(sprite.canvas, dx, dy);
+    } else {
+      ctx.drawImage(sprite.canvas, dx, dy, sprite.width, sprite.height);
+    }
+  }
+
+  /** Logical advance width for inline layout. This uses the same cached
+   * rasterization as draw(), so steady frames never call a canvas text API. */
+  measureAdvance(text: string, style: TextSpriteStyle): number {
+    if (text === '') return 0;
+    return this.sprite(text, style)?.advance ?? 0;
   }
 
   private sprite(text: string, style: TextSpriteStyle): TextSprite | null {
-    const key = spriteKey(text, style);
-    const cached = this.sprites.get(key);
+    const cached = this.lookup(text, style);
     if (cached) {
-      // Re-insert so the iteration order stays least-recently-used first.
-      this.sprites.delete(key);
-      this.sprites.set(key, cached);
-      return cached;
+      this.touch(cached);
+      return cached.sprite;
     }
-    const sprite = rasterize(text, style);
+    const sprite = rasterize(text, style, this.pixelRatio);
     // A transient 2D-context failure must not be cached: freezing a blank canvas
     // would hide that label for the rest of the session. Skipping this redraw's
     // draw self-heals on the next one.
@@ -221,8 +306,94 @@ export class TextSpriteCache {
     // canvas ignores, so the sprite would freeze in the default black. Draw it
     // this redraw (exactly what the inline fillText did on that frame) but never
     // cache it.
-    if (style.fill !== '' && style.stroke !== '') this.sprites.set(key, sprite);
+    if (style.fill !== '' && style.stroke !== '') {
+      const owner = this.bucketFor(style);
+      const entry: SpriteEntry = { sprite, text, owner, prev: this.lruTail, next: null };
+      owner.set(text, entry);
+      if (this.lruTail) this.lruTail.next = entry;
+      else this.lruHead = entry;
+      this.lruTail = entry;
+      this.spriteCount++;
+      this.cachedBytes += sprite.bytes;
+      if (Number.isFinite(this.hardByteLimit)) this.trimHardBudget();
+    }
     return sprite;
+  }
+
+  /** The hit path. Allocation-free ON PURPOSE: this runs per label per frame
+   *  (nameplate names, levels, guilds and their measure calls all land here),
+   *  so it walks the key levels with the caller's existing strings and builds
+   *  nothing. Keep it that way. */
+  private lookup(text: string, style: TextSpriteStyle): SpriteEntry | undefined {
+    const fills = this.fonts.get(style.font);
+    if (!fills) return undefined;
+    const strokes = fills.get(style.fill);
+    if (!strokes) return undefined;
+    const widths = strokes.get(style.stroke);
+    if (!widths) return undefined;
+    return widths.get(outlineWidth(style))?.get(text);
+  }
+
+  /** Resolve (creating on demand) the text bucket for a style. Miss path only:
+   *  a level created here is retained until clear(). */
+  private bucketFor(style: TextSpriteStyle): SpriteBucket {
+    let fills = this.fonts.get(style.font);
+    if (!fills) {
+      fills = new Map();
+      this.fonts.set(style.font, fills);
+    }
+    let strokes = fills.get(style.fill);
+    if (!strokes) {
+      strokes = new Map();
+      fills.set(style.fill, strokes);
+    }
+    let widths = strokes.get(style.stroke);
+    if (!widths) {
+      widths = new Map();
+      strokes.set(style.stroke, widths);
+    }
+    const width = outlineWidth(style);
+    let bucket = widths.get(width);
+    if (!bucket) {
+      bucket = new Map();
+      widths.set(width, bucket);
+    }
+    return bucket;
+  }
+
+  /** Move a hit to the most-recently-used end of the recency list. */
+  private touch(entry: SpriteEntry): void {
+    const tail = this.lruTail;
+    if (entry === tail || !tail) return;
+    if (entry.prev) entry.prev.next = entry.next;
+    else this.lruHead = entry.next;
+    if (entry.next) entry.next.prev = entry.prev;
+    entry.prev = tail;
+    entry.next = null;
+    tail.next = entry;
+    this.lruTail = entry;
+  }
+
+  /** Unhook the least-recently-used entry from the list and its bucket. */
+  private evictOldest(entry: SpriteEntry): void {
+    this.lruHead = entry.next;
+    if (entry.next) entry.next.prev = null;
+    else this.lruTail = null;
+    // Null the dead entry's links so any future stale touch no-ops rather than corrupting the list.
+    entry.prev = null;
+    entry.next = null;
+    entry.owner.delete(entry.text);
+    this.spriteCount--;
+    this.cachedBytes -= entry.sprite.bytes;
+  }
+
+  private trimHardBudget(): void {
+    while (
+      (this.spriteCount > this.spriteLimit || this.cachedBytes > this.hardByteLimit) &&
+      this.lruHead
+    ) {
+      this.evictOldest(this.lruHead);
+    }
   }
 }
 
@@ -234,19 +405,8 @@ function outlineWidth(style: TextSpriteStyle): number {
   return style.stroke === undefined ? 0 : (style.lineWidth ?? 1);
 }
 
-// The cache key. `text` goes LAST so no separator collision is possible whatever
-// the label says, and the separator is a newline because neither a font
-// shorthand nor a resolved CSS color can contain one (a space could:
-// `rgb(255 209 0)`). The outlined flag is its own field so a fill-only label can
-// never alias one whose outline token has not resolved yet ('').
-function spriteKey(text: string, style: TextSpriteStyle): string {
-  const outlined = style.stroke === undefined ? 'flat' : 'outlined';
-  const stroke = style.stroke ?? '';
-  return [style.font, style.fill, outlined, stroke, outlineWidth(style), text].join('\n');
-}
-
 // Rasterize one label into its own canvas, or null when the 2D context fails.
-function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
+function rasterize(text: string, style: TextSpriteStyle, pixelRatio: number): TextSprite | null {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
@@ -262,8 +422,11 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   const originY = Math.ceil(ink.ascent) + pad;
   // Assigning width/height RESETS every context property (and clears the
   // canvas), so every draw setting below is applied after the resize.
-  canvas.width = Math.max(1, originX + Math.ceil(ink.right) + pad);
-  canvas.height = Math.max(1, originY + Math.ceil(ink.descent) + pad);
+  const width = Math.max(1, originX + Math.ceil(ink.right) + pad);
+  const height = Math.max(1, originY + Math.ceil(ink.descent) + pad);
+  canvas.width = Math.max(1, Math.ceil(width * pixelRatio));
+  canvas.height = Math.max(1, Math.ceil(height * pixelRatio));
+  if (pixelRatio !== 1) ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   ctx.font = style.font;
   ctx.textAlign = SPRITE_ALIGN;
   ctx.textBaseline = SPRITE_BASELINE;
@@ -277,7 +440,15 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   }
   ctx.fillStyle = style.fill;
   ctx.fillText(text, originX, originY);
-  return { canvas, originX, originY };
+  return {
+    canvas,
+    originX,
+    originY,
+    width,
+    height,
+    advance: ink.advance,
+    bytes: canvas.width * canvas.height * 4,
+  };
 }
 
 // Ink extents around the anchor the sprite is drawn on. TWO rules keep a sprite
@@ -306,6 +477,7 @@ function measureInk(ctx: CanvasRenderingContext2D, text: string, font: string): 
     right: Math.max(half, finite(m?.actualBoundingBoxRight, half)),
     ascent: Math.max(px, finite(m?.actualBoundingBoxAscent, px)),
     descent: Math.max(descent, finite(m?.actualBoundingBoxDescent, descent)),
+    advance: finite(m?.width, 0),
   };
 }
 

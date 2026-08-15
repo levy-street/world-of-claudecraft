@@ -177,6 +177,7 @@
     <div id="combat-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
     <div id="target-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
     <div id="chat-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="crafting-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
     <div id="perf-overlay" aria-hidden="true"></div>
     <div id="click-move-marker" class="click-move-marker" aria-hidden="true">
       <span class="ctm-arrow ctm-n"></span>
@@ -185,7 +186,7 @@
       <span class="ctm-arrow ctm-w"></span>
     </div>
     <div id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel" aria-label="Your Mark">
-      <div class="portrait-wrap">
+      <div class="portrait-wrap" id="tf-portrait-wrap">
         <div class="portrait"><canvas id="tf-portrait" width="54" height="54"></canvas></div>
         <div class="level-chip" id="tf-level"></div>
         <div id="tf-elite-tag" data-i18n="hud.core.elite">ELITE</div>
@@ -194,6 +195,7 @@
         <div class="uf-name" id="tf-name"></div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
         <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
+        <div class="uf-discord" id="tf-discord"></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
       </div>
       <div class="uf-buffs" id="tf-debuffs"></div>
@@ -247,7 +249,7 @@
         <!-- Decorative day/night dial: paints the 12h world cycle as a ring of sky
              colors with a "now" marker. aria-hidden like the minimap; the accessible
              time surface is #minimap-clock. -->
-        <canvas id="minimap-daynight" width="60" height="60" aria-hidden="true"></canvas>
+        <canvas id="minimap-daynight" width="88" height="88" aria-hidden="true"></canvas>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
@@ -288,48 +290,129 @@
     <div id="right-tracker-stack">
       <div id="quest-tracker"></div>
       <div id="deed-tracker"></div>
+      <div id="reliquary-tracker"></div>
       <div id="delve-tracker"></div>
+      <div id="rift-tracker"></div>
+    </div>
+
+    <div class="paladin-devotion-frame" id="paladin-devotion-frame" role="group" tabindex="0" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion">
+      <div class="paladin-devotion" id="paladin-devotion" role="progressbar" data-i18n-aria="hudChrome.paladin.devotion" aria-label="Devotion" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0">
+        <div class="paladin-devotion-fill" id="paladin-devotion-fill"></div>
+        <div class="paladin-devotion-label" id="paladin-devotion-label"></div>
+        <div class="paladin-ascension-charges" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <span class="visually-hidden" id="paladin-ascension-status" role="status" aria-live="polite"></span>
     </div>
 
     <div id="bottom-bar">
       <div id="actionbar-row">
         <div id="actionbar-stack">
+          <div id="pet-cluster">
+            <div id="petbar" class="panel"></div>
+            <div id="pet-frame" class="unitframe petframe" role="button" tabindex="0" data-i18n-aria="hudChrome.unitFrame.petLabel" aria-label="Your Pet" style="display: none">
+              <div class="portrait-wrap">
+                <div class="portrait"><canvas id="petf-portrait" width="54" height="54"></canvas></div>
+                <div class="level-chip" id="petf-level"></div>
+              </div>
+              <div class="uf-bars">
+                <div class="uf-name" id="petf-name"></div>
+                <div class="bar hp"><div class="bar-fill" id="petf-hp"></div><div class="bar-text" id="petf-hp-text"></div></div>
+              </div>
+            </div>
+          </div>
           <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
-            <div class="portrait-wrap">
+            <div class="portrait-wrap" id="pf-portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
               <div class="level-chip" id="pf-level">1</div>
-              <div class="combat-flash" id="pf-combat" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat">⚔</div>
-              <div class="rest-indicator" id="pf-rest" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
+              <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
+              <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
             <div class="uf-bars">
               <div class="uf-name" id="pf-name"></div>
-              <div class="combo-row" id="combo-row"></div>
+              <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
             </div>
           </div>
-          <div id="petbar" class="panel"></div>
           <div id="stancebar"></div>
           <div id="actionbar3" class="panel"></div>
           <div id="actionbar2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
         </div>
-        <div id="meters-window" class="panel">
+        <div id="target-auras-window" class="panel mt-panel ta-panel" role="region" aria-labelledby="target-auras-title" style="display: none">
           <div class="panel-title">
-            <span class="mt-tabs">
-              <button class="mt-tab on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
-              <button class="mt-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
-              <button class="mt-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
-            </span>
+            <span id="target-auras-title" class="mt-title-label ta-title" data-i18n="hudChrome.targetAuras.title">Target Auras</span>
+          </div>
+          <div class="ta-target"></div>
+          <div class="ta-filters">
+            <button type="button" class="mt-tab" data-aura-filter="all" data-i18n="hudChrome.targetAuras.all">All</button>
+            <button type="button" class="mt-tab" data-aura-filter="debuffs" data-i18n="hudChrome.targetAuras.debuffs">Debuffs</button>
+            <button type="button" class="mt-tab" data-aura-filter="buffs" data-i18n="hudChrome.targetAuras.buffs">Buffs</button>
+          </div>
+          <div class="ta-sections">
+            <section class="ta-section ta-debuff-section">
+              <div class="ta-section-title">
+                <span class="ta-debuff-label" data-i18n="hudChrome.targetAuras.debuffs">Debuffs</span>
+                <span class="ta-debuff-count"></span>
+              </div>
+              <div class="ta-rows ta-debuff-rows"></div>
+            </section>
+            <section class="ta-section ta-buff-section">
+              <div class="ta-section-title">
+                <span class="ta-buff-label" data-i18n="hudChrome.targetAuras.buffs">Buffs</span>
+                <span class="ta-buff-count"></span>
+              </div>
+              <div class="ta-rows ta-buff-rows"></div>
+            </section>
+          </div>
+        </div>
+        <div id="heal-window" class="panel mt-panel">
+          <div class="panel-title">
+            <span class="mt-title-label" data-i18n="hud.meters.healing">Healing</span>
             <span>
-              <button class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
-              <button class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
-              <button class="x-btn mt-close" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
+              <button type="button" class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
+              <button type="button" class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
+              <button type="button" class="x-btn mt-close" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
             </span>
           </div>
           <div class="mt-view"></div>
           <div class="mt-sub"></div>
+          <div class="mt-hint"></div>
+          <div class="mt-rows"></div>
+        </div>
+        <div id="threat-window" class="panel mt-panel">
+          <div class="panel-title">
+            <span class="mt-title-label" data-i18n="hud.meters.threat">Threat</span>
+            <span>
+              <button type="button" class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
+              <button type="button" class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
+              <button type="button" class="x-btn mt-close" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
+            </span>
+          </div>
+          <div class="mt-view"></div>
+          <div class="mt-sub"></div>
+          <div class="mt-hint"></div>
+          <div class="mt-rows"></div>
+        </div>
+        <div id="meters-window" class="panel mt-panel">
+          <div class="panel-title">
+            <span class="mt-tabs">
+              <button type="button" class="mt-tab on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
+              <button type="button" class="mt-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
+              <button type="button" class="mt-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
+            </span>
+            <span>
+              <button type="button" class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
+              <button type="button" class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
+              <button type="button" class="x-btn mt-close" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
+            </span>
+          </div>
+          <div class="mt-view"></div>
+          <div class="mt-sub"></div>
+          <div class="mt-hint"></div>
           <div class="mt-rows"></div>
         </div>
       </div>
@@ -371,22 +454,27 @@
     <div id="quest-log-window" class="window panel"></div>
     <div id="crafting-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
+    <div id="warfare-window" class="window panel"></div>
     <div id="train-window" class="window panel"></div>
     <div id="unbind-window" class="window panel"></div>
+    <div id="commission-board-window" class="window panel"></div>
     <div id="card-duel-window" class="window panel"></div>
     <div id="town-focus-window" class="window panel"></div>
     <div id="map-window" class="window panel">
       <button class="x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
+      <button type="button" id="map-level-toggle" data-i18n="hudChrome.continentMap.toWorld" data-i18n-title="hudChrome.continentMap.toggleAria" data-i18n-aria="hudChrome.continentMap.toggleAria" title="Switch between the world map and the zone map" aria-label="Switch between the world map and the zone map">World map</button>
       <div id="map-zoom">
         <button class="map-zoom-btn" id="map-zoom-in" data-i18n-title="hud.core.zoomIn" data-i18n-aria="hud.core.zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
         <button class="map-zoom-btn" id="map-zoom-out" data-i18n-title="hud.core.zoomOut" data-i18n-aria="hud.core.zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
       </div>
-      <canvas id="map-canvas" width="560" height="560" role="img" data-i18n-aria="hud.core.mapCanvasLabel" aria-label="Map"></canvas>
+      <canvas id="map-canvas" width="560" height="560" role="img" aria-describedby="map-summary map-marker-summary" data-i18n-aria="hud.core.mapCanvasLabel" aria-label="Map"></canvas>
       <span id="map-summary" class="visually-hidden" role="status" aria-live="polite"></span>
+      <span id="map-marker-summary" class="visually-hidden"></span>
     </div>
     <div id="arena-window" class="window panel"></div>
     <div id="dungeon-finder-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel"></div>
+    <div id="bg-proposal-popup" class="panel"></div>
     <div id="valecup-window" class="window panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
@@ -395,6 +483,7 @@
     <div id="mailbox-window" class="window panel"></div>
     <div id="bank-window" class="window panel"></div>
     <div id="deeds-window" class="window panel"></div>
+    <div id="reliquary-window" class="window panel"></div>
     <div id="professions-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
@@ -411,6 +500,7 @@
         <button class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
         <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
         <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
+        <button type="button" class="micro-btn" id="mm-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="keybind">s-x</span></button>
         <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="keybind">s-p</span></button>
         <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
         <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
@@ -418,7 +508,7 @@
       </div>
       <div id="side-buttons-col-b" class="side-buttons-col">
         <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
-        <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
+        <button class="micro-btn" id="mm-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="keybind">g</span></button>
         <button class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
         <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
         <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
@@ -427,6 +517,7 @@
         <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
         <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
         <button class="micro-btn" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind">u</span></button>
+        <button class="micro-btn" id="mm-wiki" data-i18n-title="nav.wiki" data-i18n-aria="nav.wiki" title="Wiki" aria-label="Wiki" data-icon="wiki"></button>
         <button class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
       </div>
     </div>
@@ -687,6 +778,15 @@
             />
           </div>
 
+          <!-- Marketing opt-in, register mode only (setAuthMode toggles it).
+               Unchecked by default: consent is explicit, never pre-ticked. -->
+          <div class="auth-field auth-optin" id="login-marketing-field" hidden>
+            <label class="auth-optin-label">
+              <input id="login-marketing" name="marketingOptIn" type="checkbox" />
+              <span data-i18n="auth.marketingOptIn">Email me game news and updates (optional)</span>
+            </label>
+          </div>
+
           <!-- Cloudflare Turnstile widget mounts here when configured (src/main.ts). -->
           <div id="cf-turnstile-container" class="auth-turnstile"></div>
 
@@ -803,6 +903,23 @@
                   <div class="cs-wallet-help" id="steam-help" data-i18n="hudChrome.steam.benefits">Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.</div>
                 </div>
               </div>
+              <div class="cs-wallet cs-epic-group" id="cs-epic-group" hidden>
+                <span class="cs-wallet-label" data-i18n="hudChrome.epic.title">Epic</span>
+                <div class="cs-wallet-main">
+                  <div class="cs-wallet-actions">
+                    <button type="button" class="wallet-cta" id="btn-epic-link" data-i18n-title="hudChrome.epic.link" data-i18n-aria="hudChrome.epic.link" title="Link Epic" aria-label="Link Epic" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"></path></svg>
+                      <span id="epic-label" data-i18n="hudChrome.epic.link">Link Epic</span>
+                    </button>
+                    <span class="wallet-status" id="epic-status" aria-live="polite" hidden></span>
+                    <button type="button" class="wallet-mini" id="btn-epic-unlink" data-i18n-title="hudChrome.epic.unlink" data-i18n-aria="hudChrome.epic.unlink" title="Unlink Epic" aria-label="Unlink Epic" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"></path><path d="M3 3l18 18"></path></svg>
+                      <span data-i18n="hudChrome.epic.unlink">Unlink Epic</span>
+                    </button>
+                  </div>
+                  <div class="cs-wallet-help" id="epic-help" data-i18n="hudChrome.epic.benefits">Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.</div>
+                </div>
+              </div>
             </div>
           </header>
           <div class="cs-body">
@@ -829,6 +946,18 @@
               <div id="charselect-news-feed" class="cs-news-feed" aria-live="polite">
                 <div class="news-loading" data-i18n="news.loading">Loading the latest updates...</div>
               </div>
+            </div>
+            <!-- One-shot appearance redesign for pre-creator characters. Docks
+                 where the news panel sits (same class) and replaces it while
+                 open; the 3D stage previews the new look live. -->
+            <div id="charselect-reroll" class="cs-news-panel cs-reroll-panel" role="region" aria-labelledby="charselect-reroll-title" hidden>
+              <div class="cs-news-title" id="charselect-reroll-title"></div>
+              <div id="charselect-reroll-host"></div>
+              <div class="cs-reroll-actions">
+                <button type="button" class="btn btn-primary" id="btn-reroll-save" data-i18n="character.redesignSave">Save New Look</button>
+                <button type="button" class="btn btn-secondary" id="btn-reroll-cancel" data-i18n="character.redesignCancel">Keep Current Look</button>
+              </div>
+              <div id="charselect-reroll-error" class="auth-error" aria-live="polite"></div>
             </div>
           </div>
         </div>
@@ -860,6 +989,7 @@
                 <div class="skin-picker">
                   <div class="skin-picker-header" data-i18n="auth.appearance">Appearance</div>
                   <div id="online-skin-row" class="skin-row" role="list" data-i18n-aria="auth.appearance" aria-label="Appearance"></div>
+                  <div id="charcreate-appearance"></div>
                 </div>
                 <div class="auth-actions cs-form-actions">
                   <button class="btn btn-secondary" id="btn-charcreate-back" data-i18n="auth.back">Back</button>
@@ -922,13 +1052,13 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.31.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.38.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.31.0-win.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.38.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
           </div>
@@ -968,7 +1098,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.31.0</div>
+      <div id="game-version">v0.38.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
@@ -1062,8 +1192,9 @@
         <div id="mobile-extra-grid">
           <button type="button" class="mobile-btn" id="mobile-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="mobile-label" data-i18n="hudChrome.discord.title">Discord</span></button>
           <button type="button" class="mobile-btn" id="mobile-donate" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft" data-icon="donate"><span class="mobile-label" data-i18n="nav.donate">Donate</span></button>
+          <button type="button" class="mobile-btn" id="mobile-wiki" data-i18n-title="nav.wiki" data-i18n-aria="nav.wiki" title="Wiki" aria-label="Wiki" data-icon="wiki"><span class="mobile-label" data-i18n="nav.wiki">Wiki</span></button>
           <button class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>
-          <button class="mobile-btn" id="mobile-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="mobile-label" data-i18n="hud.core.mobileArena">Arena</span></button>
+          <button class="mobile-btn" id="mobile-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="mobile-label" data-i18n="hudChrome.pvp.mobileLabel">PvP</span></button>
           <button class="mobile-btn" id="mobile-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="mobile-label" data-i18n="hudChrome.finder.title">Dungeon Finder</span></button>
           <button class="mobile-btn" id="mobile-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="mobile-label" data-i18n="hudChrome.vcup.mobileLabel">Cup</span></button>
           <button class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>
@@ -1075,6 +1206,7 @@
           <button class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
           <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.dailyRewards.title" data-i18n-aria="hudChrome.dailyRewards.title" title="Daily Rewards" aria-label="Daily Rewards" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Rewards</span></button>
           <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
+          <button type="button" class="mobile-btn" id="mobile-reliquary" data-i18n-title="hudChrome.reliquary.title" data-i18n-aria="hudChrome.reliquary.title" title="The Reliquary" aria-label="The Reliquary" data-icon="crown"><span class="mobile-label" data-i18n="hudChrome.mobile.reliquary">Reliquary</span></button>
           <button type="button" class="mobile-btn" id="mobile-mounts" data-i18n-title="hudChrome.keybinds.mount" data-i18n-aria="hudChrome.keybinds.mount" title="Mount / Dismount" aria-label="Mount / Dismount" data-icon="mount"><span class="mobile-label" data-i18n="hudChrome.mounts.mount">Mount</span></button>
           <button type="button" class="mobile-btn" id="mobile-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="professions"><span class="mobile-label" data-i18n="hudChrome.mobile.professions">Professions</span></button>
           <button class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>

@@ -6,6 +6,8 @@
 // USER choice: it is never gated on data-fx-level, reduce-motion, or the FPS governor.
 // The only input is the player's own persisted preference.
 
+import { safeLocalStorage } from './safe_local_storage';
+
 // The persisted flag's localStorage key. Its own key, like the party-collapse
 // woc_party_collapsed: '1' means hide offline members, '0' means show them. Showing
 // everyone is the default, so a MISSING key (never toggled) reads as "show".
@@ -38,13 +40,5 @@ export function saveGuildHideOffline(
     storage?.setItem(GUILD_HIDE_OFFLINE_STORE_KEY, hide ? '1' : '0');
   } catch {
     /* storage unavailable */
-  }
-}
-
-function safeLocalStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
-  try {
-    return typeof localStorage !== 'undefined' ? localStorage : null;
-  } catch {
-    return null;
   }
 }

@@ -31,12 +31,14 @@ import {
   resolveSportKit,
   SPORT_ROLES,
   VALE_CUP_BALL_TEMPLATE_ID,
+  VC_ALLROUNDER_ONLY_MAX_BRACKET,
   vcNation,
 } from '../content/vale_cup';
 import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -77,11 +79,11 @@ import {
 } from '../vale_cup_layout';
 import {
   arenaCombatants,
-  cloneAbilityCharges,
-  cloneCcDr,
   isArenaQueued,
+  restoreArenaReturnPools,
   snapshotArenaReturnPools,
 } from './arena';
+import { duelFor } from './duel';
 
 // ---------------------------------------------------------------------------
 // Tuning constants (fiesta style: all at the top).
@@ -226,7 +228,14 @@ export interface VcMatch {
   rosterA: VcCombatant[]; // snapshot at start so leavers keep a team sheet
   rosterB: VcCombatant[];
   roles: Record<number, SportRole>;
-  rated: boolean; // false whenever bots are seated: no standing changes
+  // False whenever bots are seated (practice and bot-backfill): no standing
+  // changes and no Vale Cup skill-deed credit (goal/save/clean-sheet sites in
+  // deeds.ts gate on it). The debut/first-match deeds do NOT read this flag:
+  // they gate on cupQueuedBout (practice === null), so a bot-backfilled queued
+  // bout still credits them while a practice bout credits nothing at all.
+  // Deliberate, and surfaced to the player: matchInfoFor ships this flag so the
+  // briefing overlay can say the bout is unrated (issue 2767).
+  rated: boolean;
   ready: Set<number>; // fighters who readied up in the briefing (bots pre-added)
   briefingTimer: number; // s of briefing left before auto-ready ('briefing' only)
   benched: Set<number>; // deserters/vanished fighters; team plays short
@@ -341,7 +350,7 @@ function vcupPlayPhase(match: VcMatch): boolean {
 
 function normalizeRole(role: SportRole | string | undefined, bracket: VcBracket): SportRole {
   // 1v1 and 2v2 default to the all-rounder kit (PRD); unknown roles coerce too.
-  if (bracket <= 2) return 'allrounder';
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return 'allrounder';
   return SPORT_ROLES.includes(role as SportRole) ? (role as SportRole) : 'allrounder';
 }
 
@@ -356,7 +365,7 @@ function ensureSideKeeper(
   roles: Record<number, SportRole>,
   bracket: VcBracket,
 ): void {
-  if (bracket < 3 || pids.length === 0) return;
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET || pids.length === 0) return;
   if (pids.some((pid) => roles[pid] === 'keeper')) return;
   roles[pids[pids.length - 1]] = 'keeper';
 }
@@ -446,7 +455,7 @@ export function vcupQueueJoin(
     ctx.error(id, 'You cannot queue for the arena while dead.');
     return;
   }
-  if (ctx.duels.has(id)) {
+  if (duelFor(ctx, id) !== null) {
     ctx.error(id, 'You cannot queue while dueling.');
     return;
   }
@@ -506,7 +515,7 @@ export function vcupQueueJoin(
       ctx.error(id, `${mMeta.name} is already in the arena queue.`);
       return;
     }
-    if (ctx.duels.has(mPid)) {
+    if (duelFor(ctx, mPid) !== null) {
       ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
       return;
     }
@@ -559,6 +568,27 @@ export function vcupQueueLeave(ctx: SimContext, pid?: number): void {
   const i = queue.indexOf(queued.unit);
   if (i >= 0) queue.splice(i, 1);
   for (const mPid of queued.unit.pids) ctx.emit({ type: 'vcupUnqueued', pid: mPid });
+}
+
+// Preserve the banner selected at queue/match entry when moderation renames
+// the represented guild. This is an identity update, not a leave/rejoin: only
+// exact old-name entries for this pid move, and all queue/match semantics stay
+// untouched.
+export function vcupRenameGuild(
+  ctx: SimContext,
+  pid: number,
+  oldName: string,
+  newName: string,
+): void {
+  for (const bracket of VC_BRACKETS) {
+    for (const unit of ctx.vcup.queues[bracket]) {
+      if (unit.guilds[pid] === oldName) unit.guilds[pid] = newName;
+    }
+  }
+  const matches = [ctx.vcup.match, ...ctx.vcup.practices];
+  for (const match of matches) {
+    if (match?.guildEntry.get(pid) === oldName) match.guildEntry.set(pid, newName);
+  }
 }
 
 /** Silent removal of a leaver's whole unit (the removePlayer teardown arm). */
@@ -758,6 +788,11 @@ function placeCupFighter(
   e: Entity,
   spot: { x: number; z: number; facing: number },
 ): void {
+  // Every kickoff placement is a hard teleport: match start and teardown
+  // arrive pre-cleared through resetForArena, but the golden-goal restart
+  // and the goal reset do not, and a fighter can legally start a gather
+  // cast on the herb node inside the pitch during the celebrate window.
+  cancelProfessionSessionOnDisplacement(ctx, e);
   e.pos = ctx.groundPos(spot.x, spot.z);
   e.prevPos = { ...e.pos };
   e.facing = spot.facing;
@@ -1278,16 +1313,7 @@ function teardownCupMatch(ctx: SimContext, match: VcMatch): void {
     // returnFromArena, issue #1600). recalcPlayerStats already ran inside
     // resetForArena, so maxHp/maxResource are current for the clamp.
     const pools = match.preMatchPools?.get(pid);
-    if (pools) {
-      e.cooldowns = new Map(pools.cooldowns);
-      e.abilityCharges =
-        Object.keys(pools.abilityCharges).length > 0
-          ? cloneAbilityCharges(pools.abilityCharges)
-          : undefined;
-      e.ccDr = cloneCcDr(pools.ccDr);
-      e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
-      e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
-    }
+    if (pools) restoreArenaReturnPools(ctx, e, pools);
     const ret = match.returns.get(pid);
     if (ret) {
       e.pos = ctx.groundPos(ret.x, ret.z);
@@ -1881,6 +1907,13 @@ function policePitch(ctx: SimContext, match: VcMatch): void {
     else if (nearest === dS) nlz = PITCH.zMin - VC_PITCH_EJECT_MARGIN;
     else if (nearest === dE) nlx = PITCH.xMax + VC_PITCH_EJECT_MARGIN;
     else nlx = PITCH.xMin - VC_PITCH_EJECT_MARGIN;
+    // A bystander swept off the pitch is displaced like any other teleport:
+    // a live profession session must not travel with them. No gather node or
+    // fishing spot sits inside the ground any more (a herb patch did until the
+    // Sowfield screen landed in tests/gather_node_placement.test.ts), but every
+    // other non-spell cast still can: crafting, salvage, enchanting and tool
+    // recharge all start wherever the player is standing.
+    cancelProfessionSessionOnDisplacement(ctx, e);
     e.pos = ctx.groundPos(nlx + ox, nlz + oz);
     e.prevPos = { ...e.pos }; // hard teleport: no interpolated streak across the boards
     ctx.rebucket(e);
@@ -2150,6 +2183,8 @@ function matchInfoFor(ctx: SimContext, match: VcMatch, viewerPid: number): VcMat
   return {
     id: match.id,
     phase: match.phase,
+    rated: match.rated,
+    practice: match.practice !== null,
     countdown: match.phase === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
     timeLeft,
     golden: match.golden,

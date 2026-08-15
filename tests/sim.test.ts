@@ -884,3 +884,15 @@ describe('friendly targeting (#133)', () => {
     expect(sim.player.targetId).toBe(77);
   });
 });
+
+describe('action bar layout restore (IWorldActionBar, offline arm)', () => {
+  // IWorldActionBar.takeActionBarLayoutRestore is documented as one-shot at
+  // world entry: consumed once, subsequent calls return undefined. ClientWorld
+  // honors this by nulling out its stored decision; the offline Sim must match.
+  it('returns the resolved value once, then undefined on every later call', () => {
+    const sim = makeSim();
+    expect(sim.takeActionBarLayoutRestore()).toEqual({ source: 'noop' });
+    expect(sim.takeActionBarLayoutRestore()).toBeUndefined();
+    expect(sim.takeActionBarLayoutRestore()).toBeUndefined();
+  });
+});

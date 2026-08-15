@@ -1,0 +1,604 @@
+{
+  "schemaVersion": 1,
+  "batch": "release-art-audit-v036-reliquary-deeds-2026-08-10",
+  "created": "2026-08-10",
+  "worktree": "/Users/fernando/Documents/wocc-release-art-audit-v036",
+  "chromaKey": {
+    "script": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+    "runtime": "python3",
+    "arguments": [
+      "--auto-key border",
+      "--soft-matte",
+      "--transparent-threshold 12",
+      "--opaque-threshold 220",
+      "--despill"
+    ]
+  },
+  "normalization": {
+    "alphaCropThreshold": 8,
+    "fit": "crop alpha>=8 bounds, resize inside 430x430 with Lanczos3, center on transparent 512x512 RGBA canvas",
+    "png": {
+      "compressionLevel": 9,
+      "adaptiveFiltering": false
+    }
+  },
+  "shipping": {
+    "script": "scripts/convert_deed_icons_webp.mjs",
+    "sourceContract": "512x512 RGBA, transparent corners, alpha>=8 padding >=28, center offset <=8, coverage 0.34..0.61",
+    "outputContract": "128x128 transparent WebP, <=15 KiB, alpha>=8 padding >=7, center offset <=2, coverage 0.35..0.60",
+    "webp": {
+      "quality": 82,
+      "alphaQuality": 100,
+      "smartSubsample": true,
+      "effort": 6
+    },
+    "fallbackQuality": 75,
+    "fallbackUsed": false
+  },
+  "visualReview": {
+    "verdict": "accepted",
+    "sheets": [
+      {
+        "path": "tmp/imagegen/release-art-audit-v036/deeds/previews/sources-256.png",
+        "bytes": 1524798,
+        "sha256": "c23964cb98a35b8f63468e81de4413c0b06ddccc1098d9ff2e50414467e4f206",
+        "dimensions": "888x984",
+        "reviewScale": "normalized 512px sources shown at 256px"
+      },
+      {
+        "path": "tmp/imagegen/release-art-audit-v036/deeds/previews/shipping-128.png",
+        "bytes": 341127,
+        "sha256": "24a26d0cedce53e05eeacf8285213b82aae9d235a3f0b14137041fb19a0e57cb",
+        "dimensions": "468x576",
+        "reviewScale": "128px shipping color"
+      },
+      {
+        "path": "tmp/imagegen/release-art-audit-v036/deeds/previews/shipping-40.png",
+        "bytes": 54186,
+        "sha256": "2f5adee89e9656f0f5e7ab834cb25ee441920eb1a86cad05e2de3ebd5c6e6221",
+        "dimensions": "192x288",
+        "reviewScale": "40px shipping color"
+      },
+      {
+        "path": "tmp/imagegen/release-art-audit-v036/deeds/previews/shipping-24-gray.png",
+        "bytes": 23840,
+        "sha256": "1adea9d5b8fd5ca8b4ae0b802ab8f3b9f92ff956d492f765136015940ffe775a",
+        "dimensions": "144x240",
+        "reviewScale": "24px shipping grayscale"
+      }
+    ],
+    "checks": [
+      "one complete centered deed medallion per asset",
+      "shared narrow double dark-metal and aged-gold frame language",
+      "full frame and cardinal points visible with no crop",
+      "distinct Reliquary and encounter identity",
+      "clean transparent exterior and antialiased matte",
+      "no text, letters, numerals, pseudo-writing, watermark, or extra crest",
+      "readable silhouette and value hierarchy at 40px and 24px grayscale"
+    ]
+  },
+  "assets": [
+    {
+      "id": "col_reliquary_complete",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_complete.png",
+          "bytes": 2039943,
+          "sha256": "8ab51d1db5452bbfddbbbb2dff3a56fda1b16840255018c3345bb8b516b7fb80",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_complete.png",
+          "bytes": 1777531,
+          "sha256": "8e6d6b08d5af4b0e63788ae77f5bcff1240e565660c6fb5bac1bf9ae19ab2818",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [63, 25, 1190, 1197],
+            "padding": [63, 25, 63, 56],
+            "centerOffset": [0, -15.5],
+            "coverage": 0.527174286,
+            "visiblePixels": 828990
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_complete.png",
+          "bytes": 340031,
+          "sha256": "dcb330e3e4de2e80756729f9e208295b4c5c5b7d4ae7a760b367e81ebce7c4ec",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [49, 41, 462, 470],
+            "padding": [49, 41, 49, 41],
+            "centerOffset": [0, 0],
+            "coverage": 0.426525116,
+            "visiblePixels": 111811
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_complete.webp",
+          "bytes": 6106,
+          "sha256": "8937f0c0621bff2b322e7225bde70a5e935e445b1174b8c8b12b8b4a28e5c6c4",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [12, 10, 115, 117],
+            "padding": [12, 10, 12, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.434753418,
+            "visiblePixels": 7123
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_conquerors",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_conquerors.png",
+          "bytes": 1878613,
+          "sha256": "65137c204d41e497f16466ef0fdc3bc6915920f960c2dbad6cc40d34283fc389",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_conquerors.png",
+          "bytes": 1497411,
+          "sha256": "f071ce67ef7c4b127bf3d907030d67896e6de52d34889f992d839945d66d46b7",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [111, 61, 1143, 1139],
+            "padding": [111, 61, 110, 114],
+            "centerOffset": [0.5, -26.5],
+            "coverage": 0.441948444,
+            "visiblePixels": 694971
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_conquerors.png",
+          "bytes": 314503,
+          "sha256": "ca3e269bdc486aba45acfd27b52e563f571d096f5adf451ddaf8e2a78aca1e18",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [50, 41, 461, 470],
+            "padding": [50, 41, 50, 41],
+            "centerOffset": [0, 0],
+            "coverage": 0.422195435,
+            "visiblePixels": 110676
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_conquerors.webp",
+          "bytes": 5472,
+          "sha256": "c72b225bf50d3bd99005161bc2d6016a0fca92f64ca8ba3c5f282f7955266b27",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [12, 10, 115, 117],
+            "padding": [12, 10, 12, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.430664063,
+            "visiblePixels": 7056
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_illum_gravewyrm_heroic",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_illum_gravewyrm_heroic.png",
+          "bytes": 2230068,
+          "sha256": "e573fd684b66dbb3b83190aa052348a4b8b8e4acc8f39fbce83d427ac92d1a0d",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_illum_gravewyrm_heroic.png",
+          "bytes": 1933373,
+          "sha256": "7b2891ebc32424ff2841046798fe80b48d71962bbb1e3c6c0fb68bc298fcf57f",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [66, 47, 1184, 1192],
+            "padding": [66, 47, 69, 61],
+            "centerOffset": [-1.5, -7],
+            "coverage": 0.510328035,
+            "visiblePixels": 802499
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_illum_gravewyrm_heroic.png",
+          "bytes": 353130,
+          "sha256": "36a905b520e3e6f61297dd08e973336975ee0947f3a4557877ff57bb02861cc6",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [46, 41, 465, 470],
+            "padding": [46, 41, 46, 41],
+            "centerOffset": [0, 0],
+            "coverage": 0.432727814,
+            "visiblePixels": 113437
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp",
+          "bytes": 5616,
+          "sha256": "ad012a27470b309708481b9d79ec0b3cf28eb7599eff9a67e560a340e6922e1f",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [11, 10, 116, 117],
+            "padding": [11, 10, 11, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.441223145,
+            "visiblePixels": 7229
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_illum_nythraxis_heroic",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_illum_nythraxis_heroic.png",
+          "bytes": 1984544,
+          "sha256": "2ea8e6ca41aba5299116e90fa6a7b1bba5b90801c9ce172fba500e0d57dd4feb",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_illum_nythraxis_heroic.png",
+          "bytes": 1676757,
+          "sha256": "0f9cc86671d431ab6b28c1b2c968b25aab1724ce7bdc0fefe9cd4572d6a61039",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [103, 58, 1146, 1176],
+            "padding": [103, 58, 107, 77],
+            "centerOffset": [-2, -9.5],
+            "coverage": 0.481018953,
+            "visiblePixels": 756410
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_illum_nythraxis_heroic.png",
+          "bytes": 338390,
+          "sha256": "50d1062680fb17adb8c339177869ee8a7e202a9fa147426f8c3343d48615d900",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [55, 41, 455, 470],
+            "padding": [55, 41, 56, 41],
+            "centerOffset": [-0.5, 0],
+            "coverage": 0.427742004,
+            "visiblePixels": 112130
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_illum_nythraxis_heroic.webp",
+          "bytes": 7082,
+          "sha256": "ac5e2a9abbe70447e11866ca46aca496bb3644b11d0695f91af320f6b75f021e",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [13, 10, 113, 117],
+            "padding": [13, 10, 14, 10],
+            "centerOffset": [-0.5, 0],
+            "coverage": 0.436279297,
+            "visiblePixels": 7148
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_illum_thunzharr",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_illum_thunzharr.png",
+          "bytes": 2246702,
+          "sha256": "84e7720b5c1362d5e22b5650b7ba297d9033747bc9b87b77b1a4c18c0ee51c80",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_illum_thunzharr.png",
+          "bytes": 1967421,
+          "sha256": "33719cbb2d4b59080d92dd0ef0753f529e94fc8ef66cd6cb1edeac71670d6f46",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [92, 39, 1162, 1190],
+            "padding": [92, 39, 91, 63],
+            "centerOffset": [0.5, -12],
+            "coverage": 0.507989108,
+            "visiblePixels": 798821
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_illum_thunzharr.png",
+          "bytes": 351679,
+          "sha256": "18fec0983efd9201c033ec09d5626178301c7070ab304c15491585bd5f4cb3c1",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [56, 41, 455, 470],
+            "padding": [56, 41, 56, 41],
+            "centerOffset": [0, 0],
+            "coverage": 0.426208496,
+            "visiblePixels": 111728
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_illum_thunzharr.webp",
+          "bytes": 5460,
+          "sha256": "22057e583c5fa0c822a19503dff162723eb6dc28a8ea9fae2473fc144032580c",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [14, 10, 113, 117],
+            "padding": [14, 10, 14, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.434692383,
+            "visiblePixels": 7122
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_rank_2",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_2.png",
+          "bytes": 1908114,
+          "sha256": "94158df7b2e45dbef25aea973fd2f49f6cfd59fe80392b704a839bce4314afa3",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_rank_2.png",
+          "bytes": 1500635,
+          "sha256": "759c6da7a729f362a11668021f3866103f5a67e38a8a88f6b3e0abdb25b37e61",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [122, 81, 1125, 1113],
+            "padding": [122, 81, 128, 140],
+            "centerOffset": [-3, -29.5],
+            "coverage": 0.421205889,
+            "visiblePixels": 662353
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_rank_2.png",
+          "bytes": 329857,
+          "sha256": "d2b8db175f3d5ee7b9b7626ca34cd03f7fd375c97ef6a7c7f913418f9b2f2d83",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [47, 41, 464, 470],
+            "padding": [47, 41, 47, 41],
+            "centerOffset": [0, 0],
+            "coverage": 0.439285278,
+            "visiblePixels": 115156
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_rank_2.webp",
+          "bytes": 5684,
+          "sha256": "b6bd7bfb7a5b2e04fefff889e393d9e76e6feaf98254ba6e52cd566fedc71014",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [11, 10, 116, 117],
+            "padding": [11, 10, 11, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.447937012,
+            "visiblePixels": 7339
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_rank_3",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_3.png",
+          "bytes": 2156438,
+          "sha256": "50117bb3608e8b66890a1a48ee91dcbfab4410176dd01fef48ff4b9a6f8e9bc2",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_rank_3.png",
+          "bytes": 1896139,
+          "sha256": "281e3bd781708891c4e5e2d0c4a08b20d5ad7b1ae8acefa91353a7d359e26725",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [60, 27, 1192, 1224],
+            "padding": [60, 27, 61, 29],
+            "centerOffset": [-0.5, -1],
+            "coverage": 0.535623803,
+            "visiblePixels": 842277
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_rank_3.png",
+          "bytes": 329522,
+          "sha256": "e46cf8496d4b17ecc878959f6491d315e183cefcfed9ebcda68a36aa279a7fb8",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [52, 41, 458, 470],
+            "padding": [52, 41, 53, 41],
+            "centerOffset": [-0.5, 0],
+            "coverage": 0.415462494,
+            "visiblePixels": 108911
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_rank_3.webp",
+          "bytes": 5552,
+          "sha256": "388f24e016a5abd9fd0d8485ddf75454d962a8d4f67598a04b4b1d2c5a125476",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [13, 10, 114, 117],
+            "padding": [13, 10, 13, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.42376709,
+            "visiblePixels": 6943
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_rank_4",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_4.png",
+          "bytes": 2077507,
+          "sha256": "6c90402b5d3f25b142b9bb38804a145c7032d0058412f684f05688e5e6e621eb",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_rank_4.png",
+          "bytes": 1769908,
+          "sha256": "4dcdcffb11918fa66943b1383316200351749fc7dd5d33091528b50389f026a5",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [86, 40, 1167, 1163],
+            "padding": [86, 40, 86, 90],
+            "centerOffset": [0, -25],
+            "coverage": 0.493205157,
+            "visiblePixels": 775573
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_rank_4.png",
+          "bytes": 342883,
+          "sha256": "ac3538e779c60cb61aeaad2203aaba4486ec7aa0dcaa6ad58c747d63e86131b0",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [49, 41, 462, 470],
+            "padding": [49, 41, 49, 41],
+            "centerOffset": [0, 0],
+            "coverage": 0.43473053,
+            "visiblePixels": 113962
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_rank_4.webp",
+          "bytes": 5568,
+          "sha256": "f6a77f35aeb5e84441aaf0381eecd7a1543b7bfc34f40df1ecc9711404da66f1",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [12, 10, 115, 117],
+            "padding": [12, 10, 12, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.443237305,
+            "visiblePixels": 7262
+          }
+        }
+      }
+    },
+    {
+      "id": "col_reliquary_rank_5",
+      "files": {
+        "raw": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/raw/col_reliquary_rank_5.png",
+          "bytes": 2324071,
+          "sha256": "4bec242ef6efe9cb5ef1bafadda1e46610fcb811f0413c8ec467f484a92137a5",
+          "dimensions": "1254x1254",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "keyed": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/keyed/col_reliquary_rank_5.png",
+          "bytes": 2162264,
+          "sha256": "d578f87a0e49a1faa58be40c3dfad0670ca3d7b71a09beb451c0eb4373383566",
+          "dimensions": "1254x1254",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [31, 13, 1219, 1233],
+            "padding": [31, 13, 34, 20],
+            "centerOffset": [-1.5, -3.5],
+            "coverage": 0.56675417,
+            "visiblePixels": 891230
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/release-art-audit-v036/deeds/sources/col_reliquary_rank_5.png",
+          "bytes": 354508,
+          "sha256": "10c1f2f6e34265d8c2a59f805a475fa94ba78b86cfb92360739031c6214ac03b",
+          "dimensions": "512x512",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [46, 41, 464, 470],
+            "padding": [46, 41, 47, 41],
+            "centerOffset": [-0.5, 0],
+            "coverage": 0.423091888,
+            "visiblePixels": 110911
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/col_reliquary_rank_5.webp",
+          "bytes": 7298,
+          "sha256": "556e3cf12add43ef7594624dc45a1e8876eedfeaca55a866dca052be32875349",
+          "dimensions": "128x128",
+          "channels": 4,
+          "hasAlpha": true,
+          "alpha8": {
+            "bounds": [11, 10, 116, 117],
+            "padding": [11, 10, 11, 10],
+            "centerOffset": [0, 0],
+            "coverage": 0.431396484,
+            "visiblePixels": 7068
+          }
+        }
+      }
+    }
+  ]
+}

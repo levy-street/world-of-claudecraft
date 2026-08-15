@@ -5,6 +5,8 @@
 // from just before a resize/fullscreen transition settles (see options_window.ts).
 import { useTouchInterface } from './mobile_controls';
 
+export const APP_VIEWPORT_SETTLE_DELAYS_MS = [250, 800] as const;
+
 export function syncAppViewport(win: Window = window): void {
   const doc = win.document;
   const vv = win.visualViewport;
@@ -27,4 +29,20 @@ export function syncAppViewport(win: Window = window): void {
   const height = Math.max(1, Math.round(useVisualViewport ? visualHeight : win.innerHeight));
   doc.documentElement.style.setProperty('--app-vw', `${width}px`);
   doc.documentElement.style.setProperty('--app-vh', `${height}px`);
+}
+
+/**
+ * Re-measure once now and again after the browser has settled a live layout-mode
+ * transition. Switching Desktop <-> Touch changes full-screen layer sizing and can
+ * update visualViewport/innerWidth on a later frame; a single synchronous read can
+ * otherwise leave the canvas and body pinned to the old width until a real resize
+ * event or page reload.
+ */
+export function syncSettledAppViewport(
+  sync: () => void = () => syncAppViewport(),
+  schedule: (callback: () => void, delayMs: number) => unknown = (callback, delayMs) =>
+    globalThis.setTimeout(callback, delayMs),
+): void {
+  sync();
+  for (const delayMs of APP_VIEWPORT_SETTLE_DELAYS_MS) schedule(sync, delayMs);
 }

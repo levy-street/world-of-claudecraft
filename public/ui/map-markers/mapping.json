@@ -1,0 +1,425 @@
+{
+  "contract": "woc-map-marker-art-v2",
+  "supersedes": "woc-map-marker-art-v1",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved. No redistribution without permission.",
+  "generator": "OpenAI built-in image generation",
+  "sourceIconSize": 1254,
+  "shippingIconSize": 64,
+  "shippingFormat": "sRGB WebP with alpha",
+  "profiles": {
+    "standard": "Desktop and standard touch portrait.",
+    "compact": "Touch landscape and the explicit compact HUD, compensating for scaled UI chrome."
+  },
+  "targetRenderSizes": {
+    "gatherReady": {
+      "standard": { "minimap": 18, "map": 20 },
+      "compact": { "minimap": 24, "map": 28 }
+    },
+    "gatherCooldown": {
+      "standard": { "minimap": 16, "map": 18 },
+      "compact": { "minimap": 22, "map": 26 }
+    },
+    "dungeon": {
+      "standard": { "minimap": 18, "map": 20 },
+      "compact": { "minimap": 24, "map": 30 }
+    },
+    "station": {
+      "standard": { "minimap": 16, "map": 20 },
+      "compact": { "minimap": 22, "map": 28 }
+    },
+    "service": {
+      "standard": { "minimap": 16, "map": 20 },
+      "compact": { "minimap": 22, "map": 28 }
+    },
+    "quest": {
+      "standard": { "minimap": 20, "map": 24 },
+      "compact": { "minimap": 26, "map": 32 }
+    },
+    "questCooldown": {
+      "standard": { "minimap": 16, "map": 18 },
+      "compact": { "minimap": 22, "map": 26 }
+    },
+    "navigation": {
+      "standard": { "minimap": 18, "map": 22 },
+      "compact": { "minimap": 24, "map": 30 }
+    },
+    "reward": {
+      "standard": { "minimap": 18, "map": 20 },
+      "compact": { "minimap": 24, "map": 28 }
+    }
+  },
+  "runtimeStateOwnership": {
+    "masters": "The 64px masters supply stable marker identity. Quest masters also own actionable available, ready, repeatable, and cooldown state silhouettes.",
+    "loader": "One shared bounded loader precomputes every exact standard and compact raster. It adds the terrain-separating keyline. Gathering cooldown uses a smaller grayscale subject inside a broken 300 degree neutral ring. Tool-locked gathering variants add a bronze padlock independently to both ready and cooldown states. Navigation variants add sealed locks or C, B, A, and S rank rings with one to four notches; S also adds a bottom diamond. Reward variants add locked, active, opened, jammed, and bountiful treatments. Opened and jammed rewards are grayscale; state overlays remain full alpha.",
+    "painters": "Runtime painters own ready glow, labels, hover and hit state, stacking, clipping, tracking emphasis, and dynamic entity state. They select one cached raster and blit it without per-marker image allocation, canvas filtering, or text rendering.",
+    "procedural": "Neutral NPCs and live player, party, enemy, loot, corpse, battleground, and direction markers remain procedural so changing state is never baked into a fixed painting."
+  },
+  "provenance": "docs/achievements/map-marker-art-v2-2026-08-12.md",
+  "historicalProvenance": "docs/achievements/map-marker-art-2026-08-12.md",
+  "entries": [
+    {
+      "id": "dungeon-entrance",
+      "family": "dungeon",
+      "file": "dungeon_entrance.webp",
+      "motif": "Squat sandstone arch with a contained violet portal opening",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-92fb8d44-1548-451d-85b4-3c6ee95cc307.png",
+      "sourceSha256": "dd28296a6273e8c35d0df53dcc54a176f5e1829e9bdb96c0166e12937dc38d76",
+      "promptSha256": "f5a64b1e52cb9b5333ce7206c701405e19e2f0c917a620f6cb2d1228b5cd2b3b",
+      "shippingSha256": "28f1e14469366e15c823540ad869094e40a1caa21c964fd719813eb25cb362fa",
+      "bytes": 2584,
+      "promptRef": "docs/achievements/map-marker-art-2026-08-12.md#dungeon-entrance"
+    },
+    {
+      "id": "dungeon-exit",
+      "family": "dungeon",
+      "file": "dungeon_exit.webp",
+      "motif": "Sandstone arch with a warm passage and bold outward chevron",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-11294a75-d897-4b77-a43a-06c1c2e8c432.png",
+      "sourceSha256": "5277987a1cb4e31fde680fd57dc2562fec35547574a222457ae0eda8d360c769",
+      "promptSha256": "1d00d48c9d44128727ca6315641f79db01bfe5e4d8d7ecb2251fb1a69ad077f1",
+      "shippingSha256": "4253763693dc75ff5adab5312a3664b84aabbfc66a131af06b3de59048f9c830",
+      "bytes": 2372,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#dungeon-exit"
+    },
+    {
+      "id": "gather-ore",
+      "family": "gather",
+      "file": "gather_ore.webp",
+      "motif": "Three-facet mineral outcrop",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-5fcf0838-6cb0-4898-ac15-2e61529287f0.png",
+      "sourceSha256": "3b43300921bdf6dd5568ca7b6b31cca3d0b8c065a05381c8b7acac22a028693c",
+      "promptSha256": "c05e60dc15eb8232f87d07980bb6770a9019f6596bf705a9ede39330f7429cdd",
+      "shippingSha256": "32afbd4bb56dd4e8254faed09304ce9746b388b00c35175187f98fe21adf9ecb",
+      "bytes": 1838,
+      "promptRef": "docs/achievements/map-marker-art-2026-08-12.md#gather-ore"
+    },
+    {
+      "id": "gather-wood",
+      "family": "gather",
+      "file": "gather_wood.webp",
+      "motif": "Two crossed amber logs with broad bright cut ends",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-b2af013f-5f4f-4f58-8e94-f972b52e28b4.png",
+      "sourceSha256": "d1a7e193aa778f7e58cf06b153e9ea83a2215c3d00dfd073e2c9423ee85b96da",
+      "promptSha256": "00d6baff777a679574078aa9b37e31bb943f3a716d9b48ce98819d4711a1db30",
+      "shippingSha256": "1a80702fc7a43ddff51f44d3c0d447cbaf61d905f26ad3fa8315e289fe591b91",
+      "bytes": 2696,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#gather-wood"
+    },
+    {
+      "id": "gather-herb",
+      "family": "gather",
+      "file": "gather_herb.webp",
+      "motif": "Three-leaf medicinal sprig",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-86bff4c7-4811-449c-b927-5f7c22e5aedf.png",
+      "sourceSha256": "334fd6ece51b15b366f91a747b34fe15b2694d071c168e95fa006f67cf366985",
+      "promptSha256": "1de7677a533ad82d46facde2ebbf11ef94640ebe9a2768255033e2117846c31e",
+      "shippingSha256": "0c51c70a735a7ad25863111e47afbcf4bef8cbc1c385dba1689507618a547509",
+      "bytes": 2120,
+      "promptRef": "docs/achievements/map-marker-art-2026-08-12.md#gather-herb"
+    },
+    {
+      "id": "station-forge",
+      "family": "station",
+      "file": "station_forge.webp",
+      "motif": "Blackened-steel anvil with a bright steel face and ember seam",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-baa6fe33-20ba-4d04-9e29-fb42dcd21b56.png",
+      "sourceSha256": "3da0df40f27c9b9d841ab6e16b5427cfd6db4cae4ed9bc380575ab603d74519f",
+      "promptSha256": "58534ce47242caecba0d5f26aeed7005f40e27a17627f586b389a127e59f1eff",
+      "shippingSha256": "706307171fe33aec62a0a48806de6ef1c92c22ee5af0d1dbe58bdea7df2d91ea",
+      "bytes": 1662,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#station-forge"
+    },
+    {
+      "id": "station-kitchens",
+      "family": "station",
+      "file": "station_kitchens.webp",
+      "motif": "Broad iron cauldron with warm stew and oversized handles",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-228c3899-f906-45c8-a967-1242a55f8bc9.png",
+      "sourceSha256": "e4885c27ac3859df748dda39057634d7aa058d37c010ee1d3f94c5892d6607f0",
+      "promptSha256": "a17e7e31695237a3b9562bb26738279b2ed4404d47c1abb0f47f9c663db0c6eb",
+      "shippingSha256": "9a767650b30028de780d70b707344e00aac95d7245ed98a1025f4eac45a211bb",
+      "bytes": 2114,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#station-kitchens"
+    },
+    {
+      "id": "station-apothecary",
+      "family": "station",
+      "file": "station_apothecary.webp",
+      "motif": "Emerald potion bottle with a broad rim and large leaf emblem",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-44db18e2-7e53-485d-9948-749a20188edd.png",
+      "sourceSha256": "c66b306ef9008449a115c5d0477e8a2d16904a8e9556fd8d9c462297e650e315",
+      "promptSha256": "c6dcaaccb5b6460e1b2ee8e3e485b90fcf9564b03cd6acc94ac8b4600c2b588f",
+      "shippingSha256": "9d88cf7375593a1184e290e9407916606fa81b82295ea13b0b9a1ba11791f07b",
+      "bytes": 2008,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#station-apothecary"
+    },
+    {
+      "id": "station-tannery",
+      "family": "station",
+      "file": "station_tannery.webp",
+      "motif": "Warm copper stretched hide without a state-like diagonal stripe",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-f8562d92-f0a3-4e1e-8388-a3030b7e9d1c.png",
+      "sourceSha256": "eb7855ce422c22fcd2313536ec1a17cd2a3574895d10b555f918c9baf894739a",
+      "promptSha256": "b9b961983cefa3ed5a3a8afd7d97de105c67745b0ed59b6c126cef4fccd228cf",
+      "shippingSha256": "78cb0b7a29534c5456c7e7378461420a8d9fb292978af964609830894fdc5c95",
+      "bytes": 1942,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#station-tannery"
+    },
+    {
+      "id": "station-loom",
+      "family": "station",
+      "file": "station_loom.webp",
+      "motif": "Broad A-frame loom with indigo cloth and oversized shuttle",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-70b74ab3-3bc5-43ea-8955-065ef53bc522.png",
+      "sourceSha256": "5cf425d0d0dcf761320f6c12fd229d8ceaa09b1c518ed2393a8310a49b1d21ad",
+      "promptSha256": "1238dc287b0c05067e37b4f106dcae20d36c6a7e08318274c3ad38ccc51cca7b",
+      "shippingSha256": "b4575cb0b9a10036b3332ded9b75f3ec03e61cec619a703c2ec39e5c16bf9f7a",
+      "bytes": 2556,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#station-loom"
+    },
+    {
+      "id": "station-toolworks",
+      "family": "station",
+      "file": "station_toolworks.webp",
+      "motif": "Broad six-tooth brass gear crossed by a stout steel wrench",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-846df831-19c2-4275-973d-91be90735d82.png",
+      "sourceSha256": "a01989ff342e7f6f569a3a1851cb4acb9155603eb992836cb620e823d3de6e93",
+      "promptSha256": "b89c843fb0179d44e0717cb9c556aa8a8bcf9c56589773fc0bb9922b9252266f",
+      "shippingSha256": "62431cb413f43dcd20198de69283cd0d5fbcc171095df8f46e383a08fac762aa",
+      "bytes": 2822,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#station-toolworks"
+    },
+    {
+      "id": "service-mailbox",
+      "family": "service",
+      "file": "service_mailbox.webp",
+      "motif": "Tall courier postbox with an emerging pale envelope",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-3a9f6781-50cb-46fe-9113-aacf945502c1.png",
+      "sourceSha256": "88e1d574c54447019dc9f5ba545deafa77bb5eb18c47ee5b5bace6d1ab67256a",
+      "promptSha256": "797d19d7c090d9cfeb89fe3638619247bd1c357880b066e972430561b1a451c9",
+      "shippingSha256": "dbad81a0ad5297012d133340e507fa7c5e72cc7f13d5bd215251ccc01094de66",
+      "bytes": 1460,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#service-mailbox"
+    },
+    {
+      "id": "service-noticeboard",
+      "family": "service",
+      "file": "service_noticeboard.webp",
+      "motif": "Wide noticeboard with one oversized pinned parchment",
+      "mode": "precise-object-edit",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-64b1a6cc-8be9-4f81-8cd0-312e79554ee2.png",
+      "sourceSha256": "de559fddf4815d0cad8ba4eeb69ac4852ac9e0d20af90b9fda1a71d8b9e336d9",
+      "promptSha256": "00f1de599b83d90672de2560e22df6d951691bd2e578c7e6fc3319b5509f386d",
+      "shippingSha256": "47faba67fe06ef13f543be1a661c7b2ff54f0a552c1d38568111ae72c64c5e20",
+      "bytes": 1228,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#service-noticeboard"
+    },
+    {
+      "id": "quest-available",
+      "family": "quest",
+      "file": "quest_available.webp",
+      "motif": "Gold parchment with a dark exclamation mark and ruby seal",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-cd6910e3-baf1-42ef-91a9-eb318383191e.png",
+      "sourceSha256": "e280ec3de7d1ac64532959e70dd18d0b784ae35e6750c2cbe44f4927f08e31f8",
+      "promptSha256": "13be45d900554ddbc69c2b796b6b3856e25650f339f2b16dc90f40cac6761190",
+      "shippingSha256": "9d97c9c5d1fb73a2d742ee296bd2b8514cda0b7f6b8020ed7fef315be5eef390",
+      "bytes": 2598,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#quest-available"
+    },
+    {
+      "id": "quest-ready",
+      "family": "quest",
+      "file": "quest_ready.webp",
+      "motif": "Pale-gold parchment with a dark question mark and emerald tab",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-f22333b8-9ab5-4614-8453-2574622d1682.png",
+      "sourceSha256": "98803766cd2af93ced0d526f646d6607e9e72c18725e3cb6101a9d9076ccfa0d",
+      "promptSha256": "c54c0ba4b5418edb56121ca4f516ec73ceec614a7c97f7dede3930c12a252108",
+      "shippingSha256": "76dc0a20c464f32028d9c032967468de159a9b8cec62758e9cf77a40a01a692f",
+      "bytes": 2648,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#quest-ready"
+    },
+    {
+      "id": "quest-repeat",
+      "family": "quest",
+      "file": "quest_repeat.webp",
+      "motif": "Open royal-blue repeat ribbon around a gold quest center",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-73631cdf-7468-4379-82c6-7396353f2573.png",
+      "sourceSha256": "6e0dae26d978b55b3c32ba05df0d5cc6e7a133b0bc3bf6a9ab261cb4c5b8ef45",
+      "promptSha256": "9bd035ac0df627d527a20cca726f2eb0a08df6c661ff151b9626bac163cce41c",
+      "shippingSha256": "be13691b5991275e166b5343ab546d22755b83d1e72dff3af40b1d478c458723",
+      "bytes": 3086,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#quest-repeat"
+    },
+    {
+      "id": "quest-cooldown",
+      "family": "questCooldown",
+      "file": "quest_cooldown.webp",
+      "motif": "Broken neutral parchment with an exclamation mark and clock notch",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-15fb1595-df58-465b-a8f7-acb56f45ae36.png",
+      "sourceSha256": "3910808797b2ae3fd6807780c9f20cd8f8c3c586e04d464354ceb0c611546128",
+      "promptSha256": "8b19021513acc81e5926c31b8fe78a0b642011cfb042112826441e4cbeacfdd5",
+      "shippingSha256": "5eb1413f7c9b7f465ccdf86539b73f4ae253b40b7a40c0f9a1844424385639f3",
+      "bytes": 2048,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#quest-cooldown"
+    },
+    {
+      "id": "delve-entrance",
+      "family": "navigation",
+      "file": "delve_entrance.webp",
+      "motif": "Ancient mine arch with descending steps, amber lantern, and teal mineral",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-df9682d1-275d-4caf-a96a-bda92f6e435a.png",
+      "sourceSha256": "9e4d41096ce142d97ae7060935c5e768021b886f562f9dbc302ebf6cab443620",
+      "promptSha256": "2c54f2f13cbd394e85bbf6a25dbe471c0f8c2e2dc46eb2af9ccfbd97ee3c3fd7",
+      "shippingSha256": "31d9fe5d02541ee4d196f26ad19cfd0c7851d90ecfc73dc963eca6ca470546b5",
+      "bytes": 2312,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#delve-entrance"
+    },
+    {
+      "id": "delve-passage",
+      "family": "navigation",
+      "file": "delve_passage.webp",
+      "motif": "Wide crypt passage with sarcophagus lintel, descending slabs, and funerary rune",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-85ec7217-1fa4-4380-8722-e0fae7f08839.png",
+      "sourceSha256": "12f911165738450d2cac372e553077197c4f0309a211a600511a9148df6dc50e",
+      "promptSha256": "d1ca22bd7a03e7c887d546c163c44deaae04c61ed9b1dea460e3e1de1ee5dcce",
+      "shippingSha256": "5742ea658b8c6cb0ff8227ec7f92d618b0ec4a13cbad240034d87394310f8779",
+      "bytes": 2170,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#delve-passage"
+    },
+    {
+      "id": "delve-surface-exit",
+      "family": "navigation",
+      "file": "delve_surface_exit.webp",
+      "motif": "Stone arch with upward steps toward pale daylight",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-604953f0-1875-44bf-9cc3-c6db32d665e5.png",
+      "sourceSha256": "7d89ee53a3b4e027e7766d8e77162f40fbdbc959581b2e93e895e09e41679f18",
+      "promptSha256": "262613dee0cd37179e6279506d7c3a03c2c7d8fcba1b439593328589e2bd3bba",
+      "shippingSha256": "3b94484e18ae28abf56c37fd1c7afc0b6ab8c560e474d52f63d3ee093d48748d",
+      "bytes": 2248,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#delve-surface-exit"
+    },
+    {
+      "id": "rift-entrance",
+      "family": "navigation",
+      "file": "rift_entrance.webp",
+      "motif": "Jagged upright royal-blue rift tear with a black almond core",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-b3bb698b-243d-4f26-9ba7-a524bbe318ca.png",
+      "sourceSha256": "09c15e1091ceda64115a10a4e4ad8b2bfe2ed32f159d077b184924601ed347c3",
+      "promptSha256": "47aac082d4aefbd06b45aa6e8a78c6fdbaf712f4d642c07b5966309f40e36bda",
+      "shippingSha256": "06f6e42b287787a4ef58384cc5d198689141d69d44180fd150218f8b56742bd6",
+      "bytes": 1828,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#rift-entrance"
+    },
+    {
+      "id": "rift-descent",
+      "family": "navigation",
+      "file": "rift_descent.webp",
+      "motif": "Downward rift teardrop with an integrated cyan descent chevron",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-e7904717-e0bd-40f1-9c24-c233cfc6ba1f.png",
+      "sourceSha256": "6665c8af9b4d1515d180148c24a5623eb848ef8b4ef5a0e283869d36d1b7da8e",
+      "promptSha256": "61241a4f0ecd25e6dfe72c3752eb7d3a1ec48f9aa9d2ba775c32145416fc0142",
+      "shippingSha256": "95225a44b6d710120308fa7e883d4af1214e81e804af90d70f4e10b8153b3d8d",
+      "bytes": 2250,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#rift-descent"
+    },
+    {
+      "id": "rift-beacon",
+      "family": "navigation",
+      "file": "rift_beacon.webp",
+      "motif": "Faceted arcane obelisk with a cyan crystal slit and contained blue flame",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-c8e61dde-dc88-45f2-9d96-502327c1d959.png",
+      "sourceSha256": "48324b58bf21cb5bb65394bccde1eecabe19c879bff28cac5ee34d6d84c3ef45",
+      "promptSha256": "15af14d97277ff789f4dbb310e0317920ec5337e64a325800c4d376340a5afe0",
+      "shippingSha256": "797b66013e1ea05ecc9074c9623106cc317931da946390f06c8e0c2de4a3baf5",
+      "bytes": 2186,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#rift-beacon"
+    },
+    {
+      "id": "rift-egress",
+      "family": "navigation",
+      "file": "rift_egress.webp",
+      "motif": "Broken circular portal with a bright center and upper-right outward opening",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-1ae879ea-3ed6-449d-b7b5-e0b07bad38c0.png",
+      "sourceSha256": "26a81047de37a719c9b33dcd5dbaef89994693a9bef6f455b3222632fc69652a",
+      "promptSha256": "d1cef47c9431085cfc1740f28e16377da383072e7ed32c38cdb0271e363ffba7",
+      "shippingSha256": "22fe63eab9c49ada9be7974980671d08e39dca859a9329d930d1001085014091",
+      "bytes": 2880,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#rift-egress"
+    },
+    {
+      "id": "reward-treasure",
+      "family": "reward",
+      "file": "reward_treasure.webp",
+      "motif": "Open ironbound coffer with contained warm golden light",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-218d0d18-c1cc-4204-8d22-553cdf3481f2.png",
+      "sourceSha256": "836c2f0feb8107755da0e166b4921b3469bbb9af35828b71d188943d252faffe",
+      "promptSha256": "88f972df1bdb1d5384fb0784ab710603af91b5d9f38284f1953bf4604a8501e6",
+      "shippingSha256": "85315ff00a576c9d7b469f91161d17d68a416e847bbd0305240a9051015aeb60",
+      "bytes": 2442,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#reward-treasure"
+    },
+    {
+      "id": "reward-locked-cache",
+      "family": "reward",
+      "file": "reward_locked_cache.webp",
+      "motif": "Closed ironbound coffer with an oversized bronze padlock",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-9dd7ab59-c04b-45b3-835d-13e933f6045f.png",
+      "sourceSha256": "04c0507837e4ac9fd9fe10a07d61196d70234bf7244578bcc8da622d6dace941",
+      "promptSha256": "c901f44ac29f956bdfba242fbdf079f7be55d8c3e0f494beb7a060acd617eb08",
+      "shippingSha256": "96b38bf00bb894b629f6e92d378cab984f74bf468d4c5b1152e3002e5b37a4aa",
+      "bytes": 2330,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#reward-locked-cache"
+    },
+    {
+      "id": "reward-reliquary",
+      "family": "reward",
+      "file": "reward_reliquary.webp",
+      "motif": "Tall chapel-shaped reliquary with ivory doors and a teal soul-gem",
+      "mode": "stylized-concept",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff8aa-5688-7033-b4e7-6c2f7999b9fd/exec-f4c3b0e2-ea5c-41a9-ac69-2c996b2e31b2.png",
+      "sourceSha256": "45fc42584d0c65d88afb91fadc7aa148462d8c678c226f61dd6151b83e4c6aae",
+      "promptSha256": "582ab91ce6cd49ce8acbdde4d35ca2b989a6bb3a4c513c5b082df72feb653d99",
+      "shippingSha256": "d1cae63400055d17002d7bf07da1c669beb45096dd0162560510d7f66f627909",
+      "bytes": 2016,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#reward-reliquary"
+    },
+    {
+      "id": "world-passage",
+      "family": "navigation",
+      "file": "world_passage.webp",
+      "motif": "Stone-and-root realm arch with pale-cyan crystal and S-shaped passage seam",
+      "mode": "precise-object-design",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019ff60d-9cde-7fc3-9e2d-12d897a00dde/exec-eb4f38bc-ea10-48c3-9bac-c16c5774689c.png",
+      "sourceSha256": "5e2620e2ee1764d1180b25160cc25f7606eddd82c020e2519a099f066cca830e",
+      "promptSha256": "70d863ec13c182941d26507a8d881598262d007fa5a6ee1b92e60601dd172344",
+      "shippingSha256": "5a7205fe6a7eb812ee3b88e75e9f63d5ea09ef7db7e585de3447b424b27b641e",
+      "bytes": 2422,
+      "promptRef": "docs/achievements/map-marker-art-v2-2026-08-12.md#world-passage"
+    }
+  ]
+}

@@ -15,20 +15,20 @@
 
 import { describe, expect, it } from 'vitest';
 import { handlePickedEntity, hoverCursorKind, isAttackableEntity } from '../src/game/interactions';
-import { ClientWorld } from '../src/net/online';
 import { DUNGEONS, instanceOrigin, NPCS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 const ALDRIC_ID = 'brother_aldric_raid';
 const FINAL_QUEST = 'q_nythraxis_scourges_end';
 const BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 
-// --- harness (mirrors tests/nythraxis_raid.test.ts) -------------------------
+// --- harness (mirrors tests/nythraxis_raid_unit.test.ts) -------------------------
 
-function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+function makeWorld(opts?: { devCommands?: boolean }) {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, ...opts });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -97,8 +97,7 @@ function phaseOneState(): NonNullable<Entity['nythraxis']> {
   } as NonNullable<Entity['nythraxis']>;
 }
 
-// Drive the boss across the phase-1 -> phase-2 threshold, which spawns Aldric.
-function spawnAldric(sim: Sim): { b: Entity; tank: Entity; tankPid: number } {
+function pullNythraxis(sim: Sim): { b: Entity; tank: Entity; tankPid: number } {
   const tankPid = sim.addPlayer('warrior', 'Tank');
   const origin = enterRaid(sim, tankPid);
   const tank = sim.entities.get(tankPid)!;
@@ -113,9 +112,15 @@ function spawnAldric(sim: Sim): { b: Entity; tank: Entity; tankPid: number } {
   b.aggroTargetId = tank.id;
   b.threat.set(tank.id, 1000);
   b.nythraxis = phaseOneState();
-  b.hp = Math.floor(b.maxHp * 0.5); // under the 70% phase-two threshold
-  sim.tick();
   return { b, tank, tankPid };
+}
+
+// Drive the boss across the phase-1 to phase-2 threshold, which spawns Aldric.
+function spawnAldric(sim: Sim): { b: Entity; tank: Entity; tankPid: number } {
+  const pulled = pullNythraxis(sim);
+  pulled.b.hp = Math.floor(pulled.b.maxHp * 0.5);
+  sim.tick();
+  return pulled;
 }
 
 // --- [SPEC] NPC registry contract ------------------------------------------
@@ -179,6 +184,21 @@ describe('[SPEC] the encounter spawns Aldric as an NPC entity', () => {
     const a = aldric(sim)!;
     const inInstance = (sim as any).instances.some((i: any) => i.mobIds.includes(a.id));
     expect(inInstance).toBe(true);
+  });
+
+  it('spawns the same NPC Aldric when /dev hp trips the live 70% transition', () => {
+    const sim = makeWorld({ devCommands: true });
+    const { b, tank, tankPid } = pullNythraxis(sim);
+    tank.targetId = b.id;
+    sim.chat('/dev hp 50', tankPid);
+    expect(b.hp).toBe(Math.floor((b.maxHp * 50) / 100));
+    expect(aldric(sim)).toBeUndefined();
+    sim.tick();
+    const a = aldric(sim);
+    expect(a, 'Aldric should spawn through spawnNythraxisAldric, not /dev spawn').toBeTruthy();
+    expect(a?.kind).toBe('npc');
+    expect(a?.hostile).toBe(false);
+    expect(a?.templateId).toBe(ALDRIC_ID);
   });
 });
 
@@ -244,23 +264,8 @@ describe("[GUARD] turning in Scourge's End at Aldric works server-side", () => {
 // --- [SPEC] online client reconstructs Aldric's quest from NPCS -------------
 
 describe('[SPEC] the online client recognizes Aldric as a quest NPC', () => {
-  function bareClient(pid: number): ClientWorld {
-    const c: any = Object.create(ClientWorld.prototype);
-    c.cfg = { seed: 42, playerClass: 'warrior' };
-    c.entities = new Map();
-    c.missingSince = new Map(); // despawn-grace bookkeeping (set by the real field initializer)
-    c.playerId = pid;
-    c.questLog = new Map();
-    c.questsDone = new Set();
-    c.lastSnapAt = 0;
-    c.snapInterval = 50;
-    c.connected = true;
-    c.eventQueue = [];
-    return c;
-  }
-
   it('reconstructs questIds for an Aldric NPC identity record', () => {
-    const client = bareClient(1);
+    const client = bareClient(1, { cfg: { seed: 42, playerClass: 'warrior' } });
     const wire = {
       id: 7,
       k: 'npc',

@@ -20,6 +20,10 @@
 // unchanged. `playerMods` and `fiestaMatchInfo` STAY on Sim (read by ~13 recalc
 // sites / the presentation surface); this module consumes playerMods via ctx.
 
+import { cleanupPaladinAegis } from '../combat/paladin_aegis';
+import { stripSunGodVerdicts } from '../combat/paladin_sun_verdict';
+import { stripPaladinDevotionsFromSource } from '../combat/paladin_support';
+import { emitRainOfFireStop } from '../combat/warlock_meteor_events';
 import {
   AUGMENTS_BY_ID,
   type AugmentDef,
@@ -41,6 +45,7 @@ import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
 import { awardFiestaKillHonor } from '../pvp';
+import { aurasSurvivingCleanSlate } from '../resurrection';
 import { Rng } from '../rng';
 import type { ArenaMatch, FiestaPowerup, FiestaState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -108,6 +113,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
   const m: TalentModifiers = {
     spec: base.spec,
     role: base.role,
+    selected: { ...base.selected },
     stats: { ...base.stats },
     global: { ...base.global },
     abilities: {},
@@ -162,6 +168,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           buffPct: 0,
           castWhileMoving: false,
           damagePushbackImmune: false,
+          ignoreStealthRequirement: false,
           bonusCharges: 0,
           addEffects: [],
         };
@@ -294,10 +301,16 @@ export function fiestaRespawnTime(deaths: number, elapsed: number): number {
 export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | null): void {
   e.dead = true;
   e.hp = 0;
+  cleanupPaladinAegis(ctx, e.id);
+  stripSunGodVerdicts(ctx, e.id);
+  stripPaladinDevotionsFromSource(ctx, e.id);
   // Fiesta is a clean-slate minigame with its own timed revive: it intentionally strips
-  // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths.
-  e.auras = [];
+  // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths. The
+  // one exception is the operator-applied Cheater mark, which is account state rather
+  // than a carried buff: dying in a minigame must not shed a sanction (resurrection.ts).
+  e.auras = aurasSurvivingCleanSlate(e.auras);
   e.ccDr.clear();
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;
@@ -305,8 +318,22 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   // Hidden per-cast state ends with the cast it belongs to (the
   // parity samplers rely on inert values outside a live cast).
   e.gatherCastNodeId = '';
+  e.gatherCastToolRarity = '';
+  e.gatherCastEffectConfirmed = false;
+  e.craftCastRecipeId = '';
+  e.craftCastCommission = false;
+  e.craftCastBatchRemaining = 0;
+  e.craftCastBatchTotal = 0;
+  e.enchantCastItemId = '';
+  e.enchantCastBagSlot = 0;
+  e.enchantCastEnchantId = '';
+  e.enchantCastEquipSlot = '';
+  e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
+  e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
+  e.fishCastZoneId = '';
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;

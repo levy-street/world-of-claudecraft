@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   DESKTOP_VERSION,
@@ -16,6 +17,24 @@ const UA = {
   iphone:
     'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1',
 };
+
+describe('DESKTOP_VERSION', () => {
+  it('equals the package.json version, so a release bump can never leave it stale', () => {
+    // Read fresh from disk on purpose: comparing against __APP_VERSION__ (the
+    // define the module itself reads) or a literal would be a self-comparison.
+    const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+    expect(DESKTOP_VERSION).toBe(pkg.version);
+  });
+
+  it('is a real version, not the no-define fallback', () => {
+    // The equality pin above is the value anchor. This one exists to NAME the
+    // failure mode: '0.0.0' means the __APP_VERSION__ define never reached the
+    // module (the typeof guard fell back), and a non-X.Y.Z shape means the
+    // define itself is malformed.
+    expect(DESKTOP_VERSION).not.toBe('0.0.0');
+    expect(DESKTOP_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+});
 
 describe('detectDesktopPlatform', () => {
   it('detects macOS', () => {
@@ -56,9 +75,9 @@ describe('desktopDownloadUrl', () => {
     );
   });
 
-  it('builds the combined Windows NSIS installer URL', () => {
+  it('builds the x64 Windows NSIS installer URL (issue 2013: per-arch installers)', () => {
     expect(desktopDownloadUrl('win')).toBe(
-      `https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-${DESKTOP_VERSION}-win.exe`,
+      `https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-${DESKTOP_VERSION}-win-x64.exe`,
     );
   });
 

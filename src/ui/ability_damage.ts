@@ -54,7 +54,7 @@ export function abilityDamageBonus(
       // channel coefficient in combat, not the single-cast one.
       return def.channel
         ? channelTickBonus(power, def)
-        : directHitBonus(power, def, res.castTime, false);
+        : directHitBonus(power, def, res.castTime, false, 1, eff.spellPowerCoeff);
     case 'aoeDamage':
     case 'aoeRoot':
     case 'chainDamage':
@@ -69,8 +69,15 @@ export function abilityDamageBonus(
       // Each ground pulse is an AoE hit: effect_dispatch snapshots
       // directHitBonus(..., aoe) into the zone's spBonus at cast time.
       return directHitBonus(power, def, res.castTime, true);
+    case 'valkyrsCalling':
+      // The delayed landing owns its authored range in the movement system.
+      return 0;
     case 'aoeHeal':
       // AoE heals take the same per-target coefficient penalty as aoeDamage.
+      return directHealBonus(scaling.spellPower, res.castTime);
+    case 'chainHeal':
+      // Combat applies the full direct-heal coefficient to the first target,
+      // then applies the authored falloff to each jump.
       return directHealBonus(scaling.spellPower, res.castTime);
     case 'consumeAura':
       if (eff.deal) return directHitBonus(power, def, res.castTime, false);
@@ -107,6 +114,10 @@ export function abilityDamageBonus(
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
       return dotTickBonus(power, def, eff.duration, eff.interval) * ticks;
     }
+    case 'hunterBloodhook':
+      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff * (eff.damageMult ?? 1));
+    case 'hunterStampede':
+      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff);
     default:
       return 0;
   }
@@ -129,15 +140,20 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
       eff.type === 'aoeHeal' ||
+      eff.type === 'chainHeal' ||
       eff.type === 'aoeRoot' ||
+      eff.type === 'chainDamage' ||
       eff.type === 'groundAoE' ||
+      eff.type === 'valkyrsCalling' ||
       (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick' ||
       eff.type === 'sunder' ||
       eff.type === 'faerieFire' ||
-      eff.type === 'lifeTap',
+      eff.type === 'lifeTap' ||
+      eff.type === 'hunterBloodhook' ||
+      eff.type === 'hunterStampede',
   );
 }
 

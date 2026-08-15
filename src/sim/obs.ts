@@ -1,5 +1,21 @@
+import { AFFLICTION_DOOM_MAX, doomValue } from './combat/affliction';
+import { ruinAmount } from './combat/destruction';
+import { soulFragmentCount } from './combat/necromancy';
+import {
+  dominionCompositionMaskForOwner,
+  dominionSummonBlockFromMask,
+  dominionTemplateForAbility,
+} from './combat/necromancy_dominion';
+import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import {
+  ASCENSION_CHARGES,
+  ASCENSION_DURATION,
+  canActivateDivineAscension,
+  hasDevotion,
+  MAX_DEVOTION,
+} from './paladin_devotion';
 import type { Sim } from './sim';
 import {
   angleTo,
@@ -135,7 +151,7 @@ export function applyAction(sim: Sim, action: number): void {
 const NEARBY_MOBS = 5;
 
 export function obsSize(): number {
-  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2 + 3;
 }
 
 export function encodeObs(sim: Sim): number[] {
@@ -158,25 +174,76 @@ export function encodeObs(sim: Sim): number[] {
   obs.push(p.dead ? 1 : 0);
   obs.push(p.inCombat ? 1 : 0);
   obs.push(p.autoAttack ? 1 : 0);
-  obs.push(p.comboPoints / 5);
+  const destructionRuin = sim.talentSpec === 'destruction' ? ruinAmount(p) : 0;
+  const specializationResource =
+    sim.talentSpec === 'affliction'
+      ? doomValue(p) / AFFLICTION_DOOM_MAX
+      : sim.talentSpec === 'demonology'
+        ? soulFragmentCount(p) / 5
+        : sim.talentSpec === 'destruction'
+          ? destructionRuin / 5
+          : p.comboPoints / 5;
+  obs.push(specializationResource);
   obs.push(p.sitting || p.eating || p.drinking ? 1 : 0);
   obs.push(sim.time > p.overpowerUntil ? 0 : 1); // dodge proc available
 
   // --- abilities (10 x 2 = 20) ---
+  const selectedTarget = p.targetId !== null ? (sim.entities.get(p.targetId) ?? null) : null;
+  let dominionComposition: number | null = null;
   for (let i = 0; i < ABILITY_SLOTS; i++) {
     const known = sim.known[i];
     if (!known) {
       obs.push(0, 0);
       continue;
     }
-    const cd = p.cooldowns.get(known.def.id) ?? 0;
-    const ready = cd <= 0 && p.resource >= known.cost && (known.def.offGcd || p.gcdRemaining <= 0);
+    const cd = canUseForbiddenReflection(p, known.def.id)
+      ? 0
+      : (p.cooldowns.get(known.def.id) ?? 0);
+    const requiredAuraReady =
+      !known.def.requiresAuraKind ||
+      p.auras.some(
+        (aura) =>
+          aura.kind === known.def.requiresAuraKind &&
+          (aura.stacks ?? 1) >= (known.def.requiresAuraStacks ?? 1),
+      );
+    const requiresPrimaryEye =
+      known.def.id === 'sentence' ||
+      known.def.id === 'coven' ||
+      known.def.id === 'possess_evil_eye' ||
+      known.def.id === 'hour_of_judgment';
+    const afflictionEyeReady =
+      !requiresPrimaryEye ||
+      !!selectedTarget?.auras.some(
+        (aura) => aura.sourceId === p.id && aura.kind === 'affliction_eye',
+      );
+    const dominionTemplateId = dominionTemplateForAbility(known.def.id);
+    let dominionReady = true;
+    if (dominionTemplateId !== null) {
+      if (dominionComposition === null) {
+        dominionComposition = dominionCompositionMaskForOwner(sim.entities.values(), p.id);
+      }
+      dominionReady = dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
+    }
+    const devotionReady =
+      known.def.id === 'divine_ascension'
+        ? canActivateDivineAscension(p)
+        : !known.def.devotionCost || hasDevotion(p, known.def.devotionCost);
+    const ready =
+      cd <= 0 &&
+      devotionReady &&
+      p.resource >= known.cost &&
+      destructionRuin >= (known.def.ruinCost ?? 0) &&
+      soulFragmentCount(p) >= (known.def.soulFragmentCost ?? 0) &&
+      requiredAuraReady &&
+      afflictionEyeReady &&
+      dominionReady &&
+      (known.def.offGcd || p.gcdRemaining <= 0);
     obs.push(ready ? 1 : 0);
     obs.push(known.def.cooldown > 0 ? cd / known.def.cooldown : 0);
   }
 
   // --- target (9) ---
-  const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
+  const target = selectedTarget;
   if (target && (!target.dead || target.lootable)) {
     const d = dist2d(p.pos, target.pos);
     const rel = normAngle(angleTo(p.pos, target.pos) - p.facing);
@@ -282,6 +349,13 @@ export function encodeObs(sim: Sim): number[] {
       obs.push(state === 'done' ? 1 : 0);
     }
   }
+
+  // --- Paladin class resource (3), appended to preserve every existing index ---
+  // Non-Paladins emit zeros so the cross-class observation shape stays fixed.
+  const devotion = p.paladinDevotion;
+  obs.push(devotion ? devotion.value / MAX_DEVOTION : 0);
+  obs.push(devotion ? devotion.ascensionCharges / ASCENSION_CHARGES : 0);
+  obs.push(devotion ? devotion.ascensionRemaining / ASCENSION_DURATION : 0);
 
   return obs;
 }

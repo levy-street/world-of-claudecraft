@@ -55,9 +55,89 @@ export function scaledDefaultMobMeleeRange(scale: number): number {
 // reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
 const THUNZHARR_REACH_SCALE = 5;
 
+// Mob AI reads the profile several times per engaged mob per tick (the threat
+// scan in updateMobTarget, the lookup that opens updateMobCombatProfile, and
+// each melee-range probe in the pursuit/caster loops), and every non-hardcoded
+// branch below built a fresh object literal on every read. A profile is a pure
+// function of (templateId, scale), so cache it: bounded by the small number of
+// distinct template/scale pairs actually spawned. Safe because no caller
+// mutates the returned object, only reads its fields.
+//
+// scale is not always a small fixed set: rift.ts jitters it with
+// `rng.range(0.92, 1.12)` per spawn, so an unbounded map would grow by one
+// entry per rift mob for the life of the process. Cap the cache and evict the
+// oldest entry (Map iterates in insertion order) past the cap so a long
+// session of rift churn can't leak memory; a bounded miss just rebuilds the
+// same value, it never changes behavior.
+export const MAX_COMBAT_PROFILE_CACHE_ENTRIES = 2048;
+const combatProfileCache = new Map<string, MobCombatProfile>();
+
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
+  const key = `${templateId}:${scale}`;
+  const cached = combatProfileCache.get(key);
+  if (cached) return cached;
+  const profile = buildCombatProfileForMob(templateId, scale);
+  if (combatProfileCache.size >= MAX_COMBAT_PROFILE_CACHE_ENTRIES) {
+    const oldestKey = combatProfileCache.keys().next().value;
+    if (oldestKey !== undefined) combatProfileCache.delete(oldestKey);
+  }
+  combatProfileCache.set(key, profile);
+  return profile;
+}
+
+/** Test-only: the live entry count, so a bound regression fails a test instead of a live process. */
+export function combatProfileCacheSizeForTest(): number {
+  return combatProfileCache.size;
+}
+
+function buildCombatProfileForMob(templateId: string, scale: number): MobCombatProfile {
   if (templateId === 'nythraxis_scourge_of_thornpeak') return NYTHRAXIS_BOSS_COMBAT_PROFILE;
   if (templateId === 'nythraxis_skeleton_warrior') return NYTHRAXIS_ADD_COMBAT_PROFILE;
+  if (templateId === 'wildheart_ravager')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      // The scale-2 default settles at desiredRange 6.4 and swings out to 9,
+      // so real landed hits read as whiffs into the ether. Keep the scaled
+      // reach but close to visual contact before trading, the Nythraxis
+      // meleeRange 8 / desiredRange 5 pattern.
+      meleeRange: scaledDefaultMobMeleeRange(2),
+      desiredRange: 5,
+    };
+  // The grown dragonkin (the broodlords at scale 2.25, Cindraleth at 2.85):
+  // reach follows the body per the wildheart lesson (a big model on stock
+  // reach swings through thin air), while desiredRange stays close so the
+  // trade reads as contact, not ranged pawing.
+  if (templateId === 'drakemaw_broodlord')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2.25),
+      desiredRange: 5,
+    };
+  if (templateId === 'cindraleth_maw_matriarch')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2.85),
+      desiredRange: 5.5,
+    };
+  // Grubjaw the Glutton at scale 2.275: same treatment as the grown
+  // dragonkin, so the big body's swings land at visual contact instead of
+  // pawing from stock humanoid reach.
+  if (templateId === 'grubjaw')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(2.275),
+      desiredRange: 5,
+    };
+  if (templateId === 'wildheart_beastmaster')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      // Same whiff geometry as the ravager, one size up (scale 2.35 settles
+      // at 7.24): the pack-leader bruiser also closes to contact. Zulgar is
+      // deliberately left on the scale default, the boss fight is built on
+      // knockback/pulse spacing and his reach reads as boss presence.
+      meleeRange: scaledDefaultMobMeleeRange(2.35),
+      desiredRange: 5.5,
+    };
   if (templateId === 'thunzharr_waking_peak')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

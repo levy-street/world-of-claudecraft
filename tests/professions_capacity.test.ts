@@ -27,6 +27,7 @@ import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const FILLER = 'simple_fishing_pole'; // tool: one per slot, merges with nothing
 const SWORD = 'eastbrook_arming_sword'; // common mainhand weapon
@@ -109,7 +110,7 @@ const qaMwRecipe: ProfessionRecipeRecord = {
 } as ProfessionRecipeRecord;
 
 function makeSim(seed = 11) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
 }
 
 function metaOf(sim: Sim, pid: number) {

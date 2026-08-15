@@ -34,6 +34,47 @@ function ent(id: number, mainhandItemId: string | null, level = 20): any {
 const fire = (ctx: any, wielder: any, target: any, trigger: WeaponProcTrigger) =>
   runWeaponProcs(ctx, wielder, target, trigger);
 
+// Fire from a specific hand's weapon (the 5th arg). `null` = that hand empty.
+const fireHand = (
+  ctx: any,
+  wielder: any,
+  target: any,
+  trigger: WeaponProcTrigger,
+  weaponItemId: string | null,
+) => runWeaponProcs(ctx, wielder, target, trigger, weaponItemId);
+
+describe('runWeaponProcs: off-hand weapon (dual-wield) resolution', () => {
+  it('an off-hand proc weapon fires its OWN procs from an off-hand swing', () => {
+    // Mainhand is a plain dagger; the proc weapon is in the OFF hand. The
+    // off-hand swing passes the off-hand id and must roll the off-hand proc.
+    const { ctx, calls } = fakeCtx(true, [ent(2, null), ent(3, null), ent(4, null)]);
+    fireHand(ctx, ent(1, 'mistcallers_fang'), ent(2, null), 'weaponHit', 'kingsbane_last_oath');
+    expect(calls.some((c) => c.fn === 'dealDamage')).toBe(true);
+  });
+
+  it('an off-hand swing with an EMPTY off hand (null) draws no rng and does nothing', () => {
+    // The old bug: an off-hand auto read the MAINHAND id and rolled its proc.
+    // Passing null (no off-hand weapon) must short-circuit before any rng draw,
+    // even though the mainhand IS a proc weapon.
+    const { ctx, rolls, calls } = fakeCtx(true);
+    fireHand(ctx, ent(1, 'kingsbane_last_oath'), ent(2, null), 'weaponHit', null);
+    expect(rolls()).toBe(0);
+    expect(calls.length).toBe(0);
+  });
+
+  it('an off-hand swing with a NON-proc off-hand weapon draws no rng', () => {
+    const { ctx, rolls } = fakeCtx(true);
+    fireHand(ctx, ent(1, 'kingsbane_last_oath'), ent(2, null), 'weaponHit', 'mistcallers_fang');
+    expect(rolls()).toBe(0);
+  });
+
+  it('omitting the hand arg still resolves the mainhand (back-compat, unchanged draw order)', () => {
+    const { ctx, calls } = fakeCtx(true, [ent(2, null), ent(3, null)]);
+    fire(ctx, ent(1, 'kingsbane_last_oath'), ent(2, null), 'weaponHit');
+    expect(calls.some((c) => c.fn === 'dealDamage')).toBe(true);
+  });
+});
+
 describe('runWeaponProcs: determinism / parity safety', () => {
   it('draws NO rng for a wielder holding a weapon with no procs', () => {
     const { ctx, rolls } = fakeCtx(true);

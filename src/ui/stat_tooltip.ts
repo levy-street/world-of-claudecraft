@@ -12,6 +12,7 @@
 // recalcPlayerStats output so the numbers cannot silently drift.
 
 import { CLASSES } from '../sim/data';
+import { COMBAT_SPIRIT_REGEN_FRACTION, spiritRegenPer2s } from '../sim/mana_regen';
 import {
   type AuraKind,
   armorReduction,
@@ -67,6 +68,7 @@ export type StatEffectKind =
   | 'spellCritPct'
   | 'healthRegen'
   | 'manaRegen'
+  | 'manaRegenCombat'
   | 'damageReduction'
   | 'dpsFromAp';
 
@@ -225,13 +227,23 @@ export function restingHealthPer5s(sta: number): number {
   return Math.round(Math.round(Math.max(0, sta) * 0.3 + 2) * REGEN_TICKS_PER_5S);
 }
 
-/** Out-of-combat mana regen, per 5 sec (sim.ts updateRegen, five-second rule:
- *  mana gains round(spi / 3 + 4 + floor(level / 5)) every 2s). Per-tick rounded
- *  first to match the engine, then scaled by 2.5 ticks. */
+/** Out-of-combat mana regen, per 5 sec (sim mana_regen.ts, five-second rule
+ *  elapsed: mana gains round(spi / 3 + 4 + floor(level / 5)) every 2s). Per-tick
+ *  rounded first to match the engine, then scaled by 2.5 ticks. The Spirit
+ *  formula is imported from the sim leaf so the sheet cannot drift from the tick. */
 export function restingManaPer5s(spi: number, level: number): number {
-  return Math.round(
-    Math.round(Math.max(0, spi) / 3 + 4 + Math.floor(level / 5)) * REGEN_TICKS_PER_5S,
+  return Math.round(Math.round(spiritRegenPer2s(Math.max(0, spi), level, 0)) * REGEN_TICKS_PER_5S);
+}
+
+/** In-combat mana regen, per 5 sec: while the five-second rule is active the sim
+ *  restores COMBAT_SPIRIT_REGEN_FRACTION of the full Spirit amount each 2s tick
+ *  (round(full * fraction)), the classic "mp5" share. Rounded per-tick first, like
+ *  restingManaPer5s, so the two lines read consistently. */
+export function combatManaPer5s(spi: number, level: number): number {
+  const perTick = Math.round(
+    spiritRegenPer2s(Math.max(0, spi), level, 0) * COMBAT_SPIRIT_REGEN_FRACTION,
   );
+  return Math.round(perTick * REGEN_TICKS_PER_5S);
 }
 
 /** Build the structured breakdown for one stat cell. Pure: no DOM, no i18n.
@@ -294,6 +306,7 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = stats.spi;
       if (mana) {
         effects.push({ kind: 'manaRegen', value: restingManaPer5s(stats.spi, level) });
+        effects.push({ kind: 'manaRegenCombat', value: combatManaPer5s(stats.spi, level) });
       } else {
         minorForClass = true;
       }

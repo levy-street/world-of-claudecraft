@@ -84,7 +84,7 @@
     min-width: 220px;
     height: 100vh;
     overflow-y: auto;
-    background: #0b0b11;
+    background: var(--nav-bg);
     border-right: 1px solid var(--border-subtle);
   }
 
@@ -104,7 +104,7 @@
     font-size: 19px;
     font-weight: 600;
     white-space: nowrap;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: var(--title-shadow);
   }
 
   nav,
@@ -167,12 +167,12 @@
   .nav-page:hover,
   .nav-section-title:hover {
     color: var(--text-bright);
-    background: #1a160f;
+    background: var(--nav-hover-bg);
   }
 
   .nav-page.active {
     color: var(--gold);
-    background: #241a0e;
+    background: var(--surface-active);
     border-left-color: var(--gold);
   }
 

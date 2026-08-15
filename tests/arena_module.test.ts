@@ -110,6 +110,8 @@ describe('arena module: ranked match resolution', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     const b = sim.addPlayer('mage', 'Bet');
+    sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, a);
+    sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, b);
     teleport(sim, a, 0, -40);
     teleport(sim, b, 6, -40);
     arena.arenaQueueJoin(sim.ctx, a);

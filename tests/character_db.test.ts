@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // db.ts builds a pg Pool and requires DATABASE_URL at import time; stub both so
 // the module loads and every query goes through a spy we can assert against.
-const dbMock = vi.hoisted(() => ({ query: vi.fn(), connect: vi.fn() }));
+const dbMock = vi.hoisted(() => ({
+  query: vi.fn(),
+  connect: vi.fn(),
+  bustGuildList: vi.fn(),
+}));
 vi.hoisted(() => {
   process.env.DATABASE_URL = 'postgres://test/test';
 });
@@ -11,11 +15,15 @@ vi.mock('pg', () => ({
     return { query: dbMock.query, connect: dbMock.connect };
   },
 }));
+vi.mock('../server/admin_guilds_read', () => ({
+  bustAdminGuildListReads: dbMock.bustGuildList,
+}));
 
 import { configureCommunityTestAccounts } from '../server/community_test_accounts';
 import {
   backfillAccountEmailIfEmpty,
   bankBonusFactsForAccount,
+  consumeAppearanceReroll,
   createAccount,
   createCharacterCapped,
   deleteCharacter,
@@ -31,12 +39,17 @@ import {
   setAccountWeaponSkinLoadout,
   touchLogin,
 } from '../server/db';
+import { drainLinkChanges } from '../server/discord_link_changes';
 import { REALM } from '../server/realm';
 
 beforeEach(() => {
   configureCommunityTestAccounts(false);
   dbMock.query.mockReset();
   dbMock.connect.mockReset();
+  // The roster/create/delete sites write into the module-global linked-member
+  // change feed, so start every test with an empty queue.
+  drainLinkChanges();
+  dbMock.bustGuildList.mockReset();
 });
 
 describe('community test account transaction', () => {
@@ -143,16 +156,104 @@ describe('deleteCharacter', () => {
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toMatch(/realm/i);
     expect(params).toContain(REALM);
-    // id + account + realm — the same three predicates getCharacter/renameCharacter use
+    // id + account + realm: the same three predicates getCharacter/renameCharacter use
     expect(params).toEqual(expect.arrayContaining([42, 7, REALM]));
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
   });
 
   it('reports whether a row was actually deleted', async () => {
     dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
     expect(await deleteCharacter(7, 42)).toBe(false);
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
 
     dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
     expect(await deleteCharacter(7, 42)).toBe(true);
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+  });
+
+  it('does not invalidate the guild directory when the delete fails', async () => {
+    dbMock.query.mockRejectedValueOnce(new Error('delete failed'));
+
+    await expect(deleteCharacter(7, 42)).rejects.toThrow('delete failed');
+
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+  });
+});
+
+describe('consumeAppearanceReroll', () => {
+  // The WHERE arm of this one UPDATE is the eligibility AUTHORITY: the JS
+  // mirror the roster button reads (appearanceRerollAvailable) is pinned by
+  // tests/server/characters.test.ts, but if THIS statement drifts, the button
+  // renders for a character the UPDATE refuses or hides for one it would
+  // accept. So the statement itself is pinned here, the renameCharacter
+  // pattern: every eligibility predicate inside the SQL, asserted as SQL.
+  const LOOK = { gender: 'female' as const };
+  const CUTOFF = new Date('2026-08-17T00:00:00Z');
+
+  it('decides everything inside the one UPDATE: ownership, realm, window-or-never-designed, unspent token', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    await consumeAppearanceReroll(7, 42, LOOK, true, CUTOFF);
+
+    const [sql, params] = dbMock.query.mock.calls.at(-1)!;
+    expect(sql).toMatch(/UPDATE characters/i);
+    // the atomic one-shot: the token burns in the same statement as the look
+    expect(sql).toMatch(/appearance_reroll_used\s*=\s*TRUE/i);
+    expect(sql).toMatch(/appearance_reroll_used\s*=\s*FALSE/i);
+    // the free window OR the never-designed safety net, disjoined in SQL so
+    // two racing submits cannot both land whichever arm admits them
+    expect(sql).toMatch(/created_at\s*<\s*\$6\s+OR\s+appearance\s+IS\s+NULL/i);
+    // BOLA scoping, the getCharacter trio
+    expect(sql).toMatch(/account_id\s*=\s*\$2/);
+    expect(sql).toMatch(/realm\s*=\s*\$4/);
+    expect(params).toEqual([42, 7, JSON.stringify(LOOK), REALM, true, CUTOFF]);
+  });
+
+  it('edits the ONE helm key in the state blob, guarded on an actual change', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    await consumeAppearanceReroll(7, 42, LOOK, true, CUTOFF);
+    const [sql] = dbMock.query.mock.calls.at(-1)!;
+    // jsonb_set / minus-key, never a whole-blob rewrite from an HTTP route...
+    expect(sql).toMatch(/jsonb_set\(state,\s*'\{helmHidden\}'/);
+    expect(sql).toMatch(/state\s*-\s*'helmHidden'/);
+    // ...and each arm fires only when the value actually moves, because both
+    // operators mint a whole new datum: an unguarded write detoasts and
+    // re-TOASTs the entire blob even when nothing changed.
+    expect(sql).toMatch(/IS DISTINCT FROM 'true'::jsonb/);
+    expect(sql).toMatch(/state \? 'helmHidden'/);
+    // a NULL helm choice (client offered no toggle) leaves the blob alone
+    expect(sql).toMatch(/\$5::boolean IS NULL THEN state/);
+  });
+
+  it('maps rowCount to the applied/refused boolean the route answers with', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(true);
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
+    expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(false);
+  });
+});
+
+describe('createCharacterCapped appearance column', () => {
+  it('persists the authored look as the sixth INSERT column, null for a legacy client', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query.mockImplementation(async (sql: string) => {
+      if (/FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
+      if (/count\(\*\)/i.test(sql)) return { rows: [{ n: 0 }], rowCount: 1 };
+      if (/INSERT INTO characters/i.test(sql)) {
+        return { rows: [{ id: 100, account_id: 7 }], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+
+    await createCharacterCapped(7, 'Designed', 'mage', 10, null, { gender: 'female' });
+    let insert = client.query.mock.calls.find((c: any[]) => /INSERT INTO characters/i.test(c[0]))!;
+    expect(insert[0]).toMatch(/appearance\)/);
+    expect(insert[1][5]).toBe(JSON.stringify({ gender: 'female' }));
+
+    client.query.mockClear();
+    await createCharacterCapped(7, 'Legacy', 'mage', 10, null, null);
+    insert = client.query.mock.calls.find((c: any[]) => /INSERT INTO characters/i.test(c[0]))!;
+    expect(insert[1][5]).toBeNull();
   });
 });
 
@@ -191,9 +292,25 @@ describe('renameCharacter', () => {
       rowCount: 1,
     } as any);
     expect((await renameCharacter(7, 42, 'Newname'))?.name).toBe('Newname');
+    // A landed rename moves the bot-visible flex name (and the profileUrl derived
+    // from it), so it is a flex transition (Phase 5 QA feed sweep).
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
 
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
     expect(await renameCharacter(7, 42, 'Newname')).toBeNull();
+    // No sanctioned rename matched: no transition, no feed item.
+    expect(drainLinkChanges()).toEqual([]);
+    // The success arm above already busted once; the null arm adds nothing.
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+  });
+
+  it('does not invalidate the guild directory when the rename fails', async () => {
+    dbMock.query.mockRejectedValueOnce(new Error('rename failed'));
+
+    await expect(renameCharacter(7, 42, 'Newname')).rejects.toThrow('rename failed');
+
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
   });
 });
 
@@ -209,7 +326,15 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
       .mockResolvedValueOnce({
         rows: [
-          { id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: null },
+          {
+            id: 99,
+            name: 'SturdyStubs',
+            level: 4,
+            state: { skin: 2 },
+            account_id: 7,
+            deactivated_at: '2026-01-01T00:00:00Z',
+            banned_at: null,
+          },
         ],
         rowCount: 1,
       } as any) // holder lookup
@@ -217,20 +342,47 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 1 } as any) // UPDATE
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(true);
+    // The archived identity comes back so the caller can rekey the freed
+    // name's world state (market, mail, the orphan's own signed instances)
+    // exactly like a rename. freedName is the holder's STORED name (the
+    // lookup below is case-insensitive), and the blob rides along for the
+    // signer sweep.
+    await expect(reclaimDeactivatedName('sturdystubs')).resolves.toEqual({
+      id: 99,
+      archivedName: 'SturdyStubsa',
+      freedName: 'SturdyStubs',
+      level: 4,
+      state: { skin: 2 },
+    });
 
     const calls = client.query.mock.calls;
     expect(calls[0][0]).toBe('BEGIN');
     expect(calls[1][0]).toMatch(/deactivated_at/);
     expect(calls[1][0]).toMatch(/FOR UPDATE/);
-    expect(calls[1][1]).toEqual([REALM, 'SturdyStubs']);
+    expect(calls[1][0]).toMatch(/lower\(c\.name\)\s*=\s*lower\(\$2\)/);
+    expect(calls[1][1]).toEqual([REALM, 'sturdystubs']);
     const updateCall = calls.find((c) => /UPDATE characters/i.test(c[0]));
     expect(updateCall).toBeDefined();
     expect(updateCall![0]).toMatch(/force_rename\s*=\s*TRUE/i);
     expect(updateCall![1][0]).toBe(99); // scoped to the orphaned character id
     expect(updateCall![1][1]).toBe('SturdyStubsa'); // archival placeholder
-    expect(calls.map((c) => c[0])).toContain('COMMIT');
+    const commitIndex = calls.findIndex((c) => c[0] === 'COMMIT');
+    expect(commitIndex).toBeGreaterThanOrEqual(0);
+    expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+    expect(client.query.mock.invocationCallOrder[commitIndex]).toBeLessThan(
+      dbMock.bustGuildList.mock.invocationCallOrder[0],
+    );
     expect(client.release).toHaveBeenCalledTimes(1);
+    // The archived name is bot-visible via the flex payload and deactivation keeps
+    // the link row, so the release enqueues ONE flex item for the HOLDER's account
+    // (Phase 5 QA feed sweep). The holder SELECT must carry account_id for it.
+    expect(calls[1][0]).toMatch(/c\.account_id/);
+    // The rich return's level/state come from the MOCK ROW, so the toEqual above
+    // is blind to the column list; these pins hold the hand-unioned SELECT (the
+    // caller feeds reclaimed.level/state straight into a real save write).
+    expect(calls[1][0]).toMatch(/c\.level/);
+    expect(calls[1][0]).toMatch(/c\.state/);
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
   });
 
   it('does nothing and reports false when the name is held by a live account', async () => {
@@ -244,11 +396,14 @@ describe('reclaimDeactivatedName', () => {
       } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBeNull();
     const verbs = client.query.mock.calls.map((c) => c[0]);
     expect(verbs).not.toContain('COMMIT');
     expect(verbs).toContain('ROLLBACK');
     expect(verbs.some((s) => /UPDATE characters/i.test(s))).toBe(false);
+    // A refusal is not a transition: nothing may reach the change feed.
+    expect(drainLinkChanges()).toEqual([]);
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
   });
 
   it('does nothing when the name is not held at all', async () => {
@@ -259,8 +414,10 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // no holder
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('Nobody')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('Nobody')).resolves.toBeNull();
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
+    // A refusal is not a transition: nothing may reach the change feed.
+    expect(drainLinkChanges()).toEqual([]);
   });
 
   it("leaves a banned account's name reserved even when the account is deactivated", async () => {
@@ -281,10 +438,12 @@ describe('reclaimDeactivatedName', () => {
       } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBeNull();
     expect(client.query.mock.calls.map((c) => c[0]).some((s) => /UPDATE characters/i.test(s))).toBe(
       false,
     );
+    // The moderation-hold refusal must not reach the change feed either.
+    expect(drainLinkChanges()).toEqual([]);
   });
 });
 
@@ -717,5 +876,95 @@ describe('createCharacterCapped', () => {
     expect(client.query.mock.calls.map((c) => c[0])).toContain('ROLLBACK');
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+});
+
+// The characters-table writers on the linked-member change feed. A create can make the
+// account's top character (and fixes that character's class forever), a delete can
+// promote the next one, and the community-test roster defines a top character the
+// instant it commits. The enqueue lives inside these db functions rather than at the
+// routes so the RouteDef arm, its retained legacy twin in main.ts, and the PBE boost
+// roster are all covered by one site each.
+describe('character roster feed enqueues', () => {
+  it('enqueues one flex item for the account a successful create belongs to', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 2 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ id: 42, account_id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
+
+    await createCharacterCapped(7, 'Feedtest', 'mage', 10);
+
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
+  });
+
+  it('enqueues nothing when the create is refused at the realm cap', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 10 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
+
+    await expect(createCharacterCapped(7, 'Overflow', 'warrior', 10)).resolves.toBeNull();
+
+    expect(drainLinkChanges()).toEqual([]);
+  });
+
+  it('enqueues for a delete that matched a row, never for one that matched none', async () => {
+    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    expect(await deleteCharacter(7, 42)).toBe(false);
+    expect(drainLinkChanges()).toEqual([]);
+
+    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    expect(await deleteCharacter(7, 42)).toBe(true);
+    expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
+  });
+
+  it('enqueues the community-test roster only once the transaction commits', async () => {
+    configureCommunityTestAccounts(true);
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (/INSERT INTO accounts/i.test(sql)) {
+        return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
+      }
+      if (/INSERT INTO characters/i.test(sql)) {
+        return { rows: [{ id: 100, name: params?.[1] }], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+
+    await createAccount('tester', 'hash');
+
+    // Nine roster characters, one item: the feed's unit is the account, not the row.
+    expect(drainLinkChanges()).toEqual([{ accountId: 42, kinds: ['flex'] }]);
+  });
+
+  it('enqueues nothing when the roster transaction rolls back', async () => {
+    configureCommunityTestAccounts(true);
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    let characterInsert = 0;
+    client.query.mockImplementation(async (sql: string) => {
+      if (/INSERT INTO accounts/i.test(sql)) {
+        return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
+      }
+      if (/INSERT INTO characters/i.test(sql) && ++characterInsert === 4) {
+        throw new Error('character write failed');
+      }
+      return { rows: [{ id: 100 }], rowCount: 1 };
+    });
+
+    await expect(createAccount('tester', 'hash')).rejects.toThrow('character write failed');
+
+    // Three characters inserted before the failure, all of them rolled back: a feed
+    // item here would tell the bot to re-read a roster that does not exist.
+    expect(drainLinkChanges()).toEqual([]);
   });
 });

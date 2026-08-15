@@ -12,11 +12,11 @@
 // key (woc_editor_maps) migrates lazily on first access.
 
 import { sanitizeMapDoc, serializeMapDoc } from '../sim/map_doc';
-import type { CustomMap, CustomMapMeta } from './custom_map';
+import { type CustomMap, type CustomMapMeta, toMapDoc } from './custom_map';
 
 /** Pretty-printed serialization, for the human-readable file export ONLY. */
 export function serializeMap(map: CustomMap): string {
-  return serializeMapDoc(map as unknown as Parameters<typeof serializeMapDoc>[0]);
+  return serializeMapDoc(toMapDoc(map));
 }
 
 /**

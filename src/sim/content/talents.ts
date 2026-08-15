@@ -1,3 +1,4 @@
+import type { SavedGearSet } from '../loadout_gear';
 import type { AbilityEffect, AuraKind, ResourceType } from '../types';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../types';
 import { specBaselineFor } from './spec_baselines';
@@ -74,12 +75,17 @@ export interface AbilityModEffect {
   cooldownFlat?: number;
   castPct?: number;
   buffPct?: number;
+  durationFlat?: number;
   // Ability-scoped critical strike chance ADD (the classic Improved Backstab
   // shape). Reaches the weaponStrike hit table (meleeSwing critBonus) and the
   // directDamage crit roll in effect_dispatch.ts.
   critPct?: number;
   castWhileMoving?: boolean;
   damagePushbackImmune?: boolean;
+  // Cheap Trick (rogue row): the resolved ability no longer requires stealth.
+  // Baked onto KnownAbility beside castWhileMoving; consumed at the
+  // requiresStealth gate in casting_lifecycle.
+  ignoreStealthRequirement?: boolean;
   bonusCharges?: number;
   addEffects?: AbilityEffect[];
 }
@@ -144,6 +150,48 @@ export interface GlobalModEffect {
   // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
   // amount). Scales with level like every spec mastery.
   ignitionPct?: number;
+  // Paladin Divine Ascension (Amanecer) talents, applied at activation in
+  // effect_dispatch's divineAscension case:
+  // ascensionChargeBonus: extra empowered-ability charges (Extended Dawn).
+  // ascensionRush: 1 to cleanse roots/slows and grant a speed burst (Dawn's Path).
+  // ascensionWard: 1 to grant a brief damage-reduction ward (Aegis of Devotion).
+  ascensionChargeBonus?: number;
+  paladinRadiantStride?: number;
+  paladinDivineSteed?: number;
+  paladinDivineSteedBurstPct?: number;
+  paladinSteadyHandsHotPct?: number;
+  paladinRecurringGrace?: number;
+  paladinZeal?: number;
+  paladinSacredReserve?: number;
+  paladinDivinePurposeChance?: number;
+  paladinDawnEcho?: number;
+  paladinDawnEchoDevotion?: number;
+  paladinPerpetualSun?: number;
+  // Rogue v0.29 rows (docs/design/rogue-v029-class-design.md):
+  // Kill Chain: combo points granted on a killing blow (refreshes, never banks
+  // past the combo cap) and 1 to refresh Smokestep's cooldown on a kill.
+  onKillCombo?: number;
+  onKillVanishReset?: number;
+  // Second Shadow: fraction of a 5-combo Dirt Nap's resolved damage repeated
+  // as a shadow echo (combat/effect_dispatch.ts finisherDamage case).
+  secondShadowPct?: number;
+  // Dusk Economy: fraction cut from energy costs while a stealth aura or the
+  // 6 sec dusk_economy linger aura is worn (combat/rogue_talents.ts).
+  duskEconomyPct?: number;
+  // Foul Play: 1 when the caster's own dot ticks never break the caster's own
+  // incapacitates (combat/damage.ts CC break).
+  foulPlayGuard?: number;
+  // Warlock class-tree hooks. Numeric flags keep the accumulated modifier
+  // shape deterministic and let the combat modules no-op for every other
+  // class/build.
+  warlockBlacktideSpeedPct?: number;
+  warlockLeadenHex?: number;
+  warlockShadowCredit?: number;
+  warlockAshenFocus?: number;
+  warlockUnbrokenRitual?: number;
+  warlockForbiddenReflection?: number;
+  warlockSoulwellWardPct?: number;
+  warlockFiendhideMagicDrPct?: number;
 }
 
 export type ProcTrigger =
@@ -214,6 +262,11 @@ export interface ProcDef {
   school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   trigger: ProcTrigger;
   responses: ProcResponse[];
+  // Committed specs for which this proc is inert (it never fires and banks
+  // nothing). For a talent shared across a class's specs whose payoff is
+  // designed for one of them: e.g. Ceaseless Cuts is Combat's energy engine,
+  // so it stays dead for the dagger specs even if they pick the row.
+  excludeSpecs?: readonly string[];
 }
 
 export interface TalentEffect {
@@ -222,6 +275,50 @@ export interface TalentEffect {
   proc?: ProcDef;
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
+  // Numeric contract for bespoke runtime hooks that do not fit a generic
+  // modifier primitive. Tooltip audits read this metadata so authored copy and
+  // the implementation constants stay in lockstep.
+  runtime?: {
+    [key: string]: number | undefined;
+    movementSpeedPct?: number;
+    enduringMovementSpeedPct?: number;
+    focusGenerationPct?: number;
+    damageReductionPct?: number;
+    fallbackDamageReductionPct?: number;
+    petHealPct?: number;
+    cooldownRefundPct?: number;
+    petHealthFloorPct?: number;
+    healthThresholdPct?: number;
+    slowPct?: number;
+    costReductionPct?: number;
+    primaryDamagePct?: number;
+    cleavePct?: number;
+    echoPct?: number;
+    hastePct?: number;
+    focusSpendThreshold?: number;
+    focusBonus?: number;
+    focusGain?: number;
+    duration?: number;
+    rootDuration?: number;
+    slowDuration?: number;
+    markDuration?: number;
+    internalCooldown?: number;
+    perTargetCooldown?: number;
+    cooldownRefundCap?: number;
+    durationBuffer?: number;
+    charges?: number;
+    radius?: number;
+    targetCap?: number;
+    everyNth?: number;
+  };
+  // Class-owned mechanics that intentionally live behind a narrow combat hook
+  // rather than the generic modifier/proc engine. `values` keeps authored
+  // tooltip numbers mechanically auditable; the sim ignores this metadata.
+  intrinsic?: { mechanic: string; metrics: Record<string, number> };
+  // Authored values for bespoke module-backed mechanics. Runtime logic reads
+  // the named global hook; tooltip accuracy tests read these numbers so the
+  // hand-written description cannot drift from the implementation.
+  tuning?: Readonly<Record<string, number>>;
 }
 
 export interface SpecDef {
@@ -257,6 +354,14 @@ export interface SavedLoadout {
   name: string;
   alloc: TalentAllocation;
   bar: (string | null)[];
+  /** The worn set this loadout captured, if the player opted in at save time
+   *  (src/sim/loadout_gear.ts). OMITTED, never set to undefined, when gear was not
+   *  captured: it is additive persistence, so an old save loads unchanged and the
+   *  snapshot shape stays byte-identical for every loadout that carries no set.
+   *
+   *  Opt-in rather than automatic on purpose. Someone saving a talent build for a
+   *  dungeon should not have their gear swap as a side effect of applying it. */
+  gear?: SavedGearSet;
 }
 
 export const MAX_LOADOUTS = 10;
@@ -272,9 +377,11 @@ export interface ResolvedAbilityMod {
   cooldownFlat: number;
   castPct: number;
   buffPct: number;
+  durationFlat?: number;
   critPct: number;
   castWhileMoving: boolean;
   damagePushbackImmune: boolean;
+  ignoreStealthRequirement: boolean;
   bonusCharges: number;
   addEffects: AbilityEffect[];
 }
@@ -282,6 +389,9 @@ export interface ResolvedAbilityMod {
 export interface TalentModifiers {
   spec: string | null;
   role: Role | null;
+  /** Selected option ids baked alongside the numeric modifiers. Combat modules
+   *  query this flat map instead of walking the authoritative allocation. */
+  selected: Record<string, true>;
   stats: Required<StatModEffect>;
   abilities: Record<string, ResolvedAbilityMod>;
   global: Required<GlobalModEffect>;
@@ -535,6 +645,31 @@ function zeroGlobal(): Required<GlobalModEffect> {
     blinkCast: 0,
     convergence: 0,
     ignitionPct: 0,
+    ascensionChargeBonus: 0,
+    paladinRadiantStride: 0,
+    paladinDivineSteed: 0,
+    paladinDivineSteedBurstPct: 0,
+    paladinSteadyHandsHotPct: 0,
+    paladinRecurringGrace: 0,
+    paladinZeal: 0,
+    paladinSacredReserve: 0,
+    paladinDivinePurposeChance: 0,
+    paladinDawnEcho: 0,
+    paladinDawnEchoDevotion: 0,
+    paladinPerpetualSun: 0,
+    onKillCombo: 0,
+    onKillVanishReset: 0,
+    secondShadowPct: 0,
+    duskEconomyPct: 0,
+    foulPlayGuard: 0,
+    warlockBlacktideSpeedPct: 0,
+    warlockLeadenHex: 0,
+    warlockShadowCredit: 0,
+    warlockAshenFocus: 0,
+    warlockUnbrokenRitual: 0,
+    warlockForbiddenReflection: 0,
+    warlockSoulwellWardPct: 0,
+    warlockFiendhideMagicDrPct: 0,
   };
 }
 
@@ -548,9 +683,11 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     cooldownFlat: 0,
     castPct: 0,
     buffPct: 0,
+    durationFlat: 0,
     critPct: 0,
     castWhileMoving: false,
     damagePushbackImmune: false,
+    ignoreStealthRequirement: false,
     bonusCharges: 0,
     addEffects: [],
   };
@@ -560,6 +697,7 @@ export function emptyModifiers(): TalentModifiers {
   return {
     spec: null,
     role: null,
+    selected: {},
     stats: zeroStats(),
     abilities: {},
     global: zeroGlobal(),
@@ -637,6 +775,31 @@ export function accumulateTalentEffect(
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
+    target.ascensionChargeBonus += (source.ascensionChargeBonus ?? 0) * multiplier;
+    target.paladinRadiantStride += (source.paladinRadiantStride ?? 0) * multiplier;
+    target.paladinDivineSteed += (source.paladinDivineSteed ?? 0) * multiplier;
+    target.paladinDivineSteedBurstPct += (source.paladinDivineSteedBurstPct ?? 0) * multiplier;
+    target.paladinSteadyHandsHotPct += (source.paladinSteadyHandsHotPct ?? 0) * multiplier;
+    target.paladinRecurringGrace += (source.paladinRecurringGrace ?? 0) * multiplier;
+    target.paladinZeal += (source.paladinZeal ?? 0) * multiplier;
+    target.paladinSacredReserve += (source.paladinSacredReserve ?? 0) * multiplier;
+    target.paladinDivinePurposeChance += (source.paladinDivinePurposeChance ?? 0) * multiplier;
+    target.paladinDawnEcho += (source.paladinDawnEcho ?? 0) * multiplier;
+    target.paladinDawnEchoDevotion += (source.paladinDawnEchoDevotion ?? 0) * multiplier;
+    target.paladinPerpetualSun += (source.paladinPerpetualSun ?? 0) * multiplier;
+    target.onKillCombo += (source.onKillCombo ?? 0) * multiplier;
+    target.onKillVanishReset += (source.onKillVanishReset ?? 0) * multiplier;
+    target.secondShadowPct += (source.secondShadowPct ?? 0) * multiplier;
+    target.duskEconomyPct += (source.duskEconomyPct ?? 0) * multiplier;
+    target.foulPlayGuard += (source.foulPlayGuard ?? 0) * multiplier;
+    target.warlockBlacktideSpeedPct += (source.warlockBlacktideSpeedPct ?? 0) * multiplier;
+    target.warlockLeadenHex += (source.warlockLeadenHex ?? 0) * multiplier;
+    target.warlockShadowCredit += (source.warlockShadowCredit ?? 0) * multiplier;
+    target.warlockAshenFocus += (source.warlockAshenFocus ?? 0) * multiplier;
+    target.warlockUnbrokenRitual += (source.warlockUnbrokenRitual ?? 0) * multiplier;
+    target.warlockForbiddenReflection += (source.warlockForbiddenReflection ?? 0) * multiplier;
+    target.warlockSoulwellWardPct += (source.warlockSoulwellWardPct ?? 0) * multiplier;
+    target.warlockFiendhideMagicDrPct += (source.warlockFiendhideMagicDrPct ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();
@@ -652,10 +815,12 @@ export function accumulateTalentEffect(
     target.cooldownFlat += (ability.cooldownFlat ?? 0) * multiplier;
     target.castPct += (ability.castPct ?? 0) * multiplier;
     target.buffPct += (ability.buffPct ?? 0) * multiplier;
+    target.durationFlat = (target.durationFlat ?? 0) + (ability.durationFlat ?? 0) * multiplier;
     target.critPct += (ability.critPct ?? 0) * multiplier;
     target.bonusCharges += (ability.bonusCharges ?? 0) * multiplier;
     if (ability.castWhileMoving) target.castWhileMoving = true;
     if (ability.damagePushbackImmune) target.damagePushbackImmune = true;
+    if (ability.ignoreStealthRequirement) target.ignoreStealthRequirement = true;
     if (ability.addEffects) target.addEffects.push(...ability.addEffects);
   }
   if (effect.grant) {
@@ -707,7 +872,10 @@ export function computeTalentModifiers(
     const optionId = allocation.rows[row.level];
     if (!optionId) continue;
     const option = row.options.find((candidate) => candidate.id === optionId);
-    if (option) accumulateTalentEffect(modifiers, option.effect);
+    if (option) {
+      modifiers.selected[option.id] = true;
+      accumulateTalentEffect(modifiers, option.effect);
+    }
   }
   return modifiers;
 }

@@ -1,4 +1,3 @@
-import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { ArmoryInspect } from './armory_inspect';
@@ -133,6 +132,7 @@ export class DailyRewardsWindow {
   private storeItems: WocStoreItemInput[] = [];
   private armorySections: ArmorySection[] = [];
   private armoryInspect: ArmoryInspect | null = null;
+  private armoryGraphicsRestoreSkinId: string | null = null;
   private storeLoading = false;
   private storeReady = false;
   private storeError = false;
@@ -159,10 +159,20 @@ export class DailyRewardsWindow {
     void this.renderCurrent('open');
   }
 
-  /** Prebuild the store's persistent Armory context while loading hides it. */
-  async prewarmArmoryPreview(): Promise<void> {
-    if (!this.storeEnabled()) return;
-    await this.ensureArmoryInspect().prewarm(WEAPON_SKIN_LIST.map((skin) => skin.id));
+  /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */
+  resetArmoryPreviewForGraphicsRebuild(): void {
+    this.armoryGraphicsRestoreSkinId = this.armoryInspect?.openSkinId ?? null;
+    this.armoryInspect?.destroy();
+    this.armoryInspect = null;
+  }
+
+  /** Reopen an inspect overlay that was visible when its old profile context was reset. */
+  restoreArmoryPreviewAfterGraphicsRebuild(): void {
+    const skinId = this.armoryGraphicsRestoreSkinId;
+    this.armoryGraphicsRestoreSkinId = null;
+    if (!skinId || !this.isOpen) return;
+    const row = this.armoryRowById(skinId);
+    if (row) this.openArmoryInspect(row);
   }
 
   toggle(): void {
@@ -359,6 +369,7 @@ export class DailyRewardsWindow {
       cosmetics: world.accountCosmetics,
       cls: player.templateId,
       mainhandItemId: player.mainhandItemId,
+      skinCatalog: player.skinCatalog,
     });
   }
 

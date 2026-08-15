@@ -97,6 +97,7 @@ function harness() {
   let statuses: LootRollGroupStatus[] = [];
   const submitLootRoll = vi.fn();
   const assignMasterLoot = vi.fn();
+  const hideTooltip = vi.fn();
   const writerCounts = { writes: 0, skips: 0 };
   // Retained so a test can read back the elided style props the painter wrote
   // (the timer fraction is only ever a CSS custom property).
@@ -133,6 +134,7 @@ function harness() {
     itemIcon: () => '<img class="test-item-icon">',
     itemTooltip: () => 'tooltip',
     attachTooltip: () => {},
+    hideTooltip,
     writers,
   });
   return {
@@ -140,6 +142,7 @@ function harness() {
     root,
     submitLootRoll,
     assignMasterLoot,
+    hideTooltip,
     setOpen: (next: LootRollPrompt[]) => {
       open = next;
     },
@@ -531,5 +534,87 @@ describe('LootRollController', () => {
     test.advance(1_000);
     test.controller.update(test.now());
     expect(test.writerCounts).toEqual({ writes: 2, skips: 2 });
+  });
+
+  // #3027: if the looter is hovering an item when its roll entry disappears (the
+  // window closes, or the roll finishes), the shared tooltip must be dismissed
+  // at that moment instead of lingering until the next mousemove.
+  it('dismisses the shared tooltip whenever a repaint would remove the hovered row', () => {
+    const test = harness();
+    test.setOpen([prompt()]);
+    test.controller.update(test.now());
+    expect(test.hideTooltip).toHaveBeenCalled();
+    test.hideTooltip.mockClear();
+
+    test.setOpen([]);
+    test.controller.update(test.now());
+
+    expect(test.hideTooltip).toHaveBeenCalled();
+    expect(test.root.style.display).toBe('none');
+  });
+
+  it('a render throw is contained, never retried on identical data, and heals on the next change', () => {
+    // The catch/finally contract at the status fingerprint commit: one throw
+    // must not abort the update (the old shape ate every concurrent prompt),
+    // identical data must not re-render (no per-frame throw storm on a
+    // persistently-throwing host), and the NEXT data change must render
+    // because the committed fingerprint differs.
+    const test = harness();
+    const status = (choice: 'need' | null): LootRollGroupStatus => ({
+      rollId: 7,
+      itemId: 'greyjaw_hide_boots',
+      itemName: 'Greyjaw Hide Boots',
+      quality: 'uncommon',
+      expiresAt: 60_000,
+      entries: [{ pid: 2, name: 'Aki', choice }],
+    });
+    const target = test.controller as unknown as { render: () => void };
+    const real = target.render.bind(test.controller);
+    const render = vi
+      .spyOn(target, 'render')
+      .mockImplementationOnce(() => {
+        throw new Error('canvas exhausted');
+      })
+      .mockImplementation(real);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      test.setStatuses([status(null)]);
+      test.controller.update(test.now());
+      expect(render).toHaveBeenCalledTimes(1);
+      expect(errors).toHaveBeenCalled();
+      // Identical data: elided, not retried.
+      test.controller.update(test.now());
+      expect(render).toHaveBeenCalledTimes(1);
+      // A real change renders again: the throw did not freeze the panel.
+      test.setStatuses([status('need')]);
+      test.controller.update(test.now());
+      expect(render).toHaveBeenCalledTimes(2);
+    } finally {
+      errors.mockRestore();
+      render.mockRestore();
+    }
+  });
+});
+
+describe('stale-client fallback wiring (source pins)', () => {
+  // The suite's fixtures use real content ids, so the unknown-id fallback
+  // arms never execute behaviorally here; these pins keep all three call
+  // sites on the shared helper WITH the wire quality argument. Dropping the
+  // second argument type-checks (the parameter defaults to 'common') and
+  // would silently render an epic drop's fallback icon at common quality.
+  it('routes all three fallback icons through unknownItemIconHtml with the wire quality', async () => {
+    const { readFileSync } = await import('node:fs');
+    const source = readFileSync(
+      new URL('../src/ui/hud/loot/loot_roll_controller.ts', import.meta.url),
+      'utf8',
+    );
+    const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const eventArms = code.split('unknownItemIconHtml(event.itemId, quality)').length - 1;
+    const statusArms = code.split('unknownItemIconHtml(status.itemId, quality)').length - 1;
+    expect(eventArms).toBe(2);
+    expect(statusArms).toBe(1);
+    // Total-count pin: a FOURTH call site added without the quality argument
+    // would leave the two shape counts green; the total closes that door.
+    expect(code.split('unknownItemIconHtml(').length - 1).toBe(3);
   });
 });

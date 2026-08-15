@@ -66,6 +66,17 @@ export function stationTypeForCraft(craftId: string): StationType | undefined {
   return STATION_TYPE_BY_CRAFT[craftId];
 }
 
+/** Every craft served by a station of `type`, in STATION_TYPE_BY_CRAFT
+ *  declaration order: the reverse of stationTypeForCraft. One craft per type
+ *  today except the forge, which serves weaponcrafting AND armorcrafting.
+ *  (Declaration order is guaranteed because every craft id is a
+ *  non-integer-like key, so Object.keys is insertion order per spec.) */
+export function craftsForStationType(type: StationType): string[] {
+  return Object.keys(STATION_TYPE_BY_CRAFT).filter(
+    (craftId) => STATION_TYPE_BY_CRAFT[craftId] === type,
+  );
+}
+
 /**
  * The set of station types the crafting UI should treat as in range right
  * now: every type with a physical station within STATION_RADIUS of `pos`,

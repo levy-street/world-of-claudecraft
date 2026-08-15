@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { grantXp } from '../src/sim/combat/damage';
+import { ABILITIES, BUILTIN_WORLD } from '../src/sim/data';
+import { despawnPet, restorePet, serializePet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
-import { dist2d } from '../src/sim/types';
+import { dist2d, xpForLevel } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 // The imp's target is whatever wild mob is nearest (teleported next to the
@@ -49,6 +51,73 @@ function castAndFinish(sim: Sim, id: string) {
 }
 
 describe('warlock demon pets', () => {
+  it('grows Emberkin at each Summon Emberkin rank through level 20', () => {
+    expect(ABILITIES.summon_imp.ranks?.map(({ rank, level }) => ({ rank, level }))).toEqual([
+      { rank: 2, level: 8 },
+      { rank: 3, level: 14 },
+      { rank: 4, level: 20 },
+    ]);
+
+    for (const [level, scale] of [
+      [1, 0.55],
+      [7, 0.55],
+      [8, 0.65],
+      [13, 0.65],
+      [14, 0.75],
+      [19, 0.75],
+      [20, 0.85],
+    ] as const) {
+      const sim = makeSim(100 + level);
+      sim.setPlayerLevel(level);
+      if (level >= 5) expect(sim.setSpec('destruction')).toBe(true);
+      castAndFinish(sim, 'summon_imp');
+      expect(sim.petOf(sim.playerId)?.scale, `level ${level}`).toBe(scale);
+    }
+  });
+
+  it('resizes an existing Emberkin immediately when its owner reaches a new rank', () => {
+    const sim = makeSim(222);
+    castAndFinish(sim, 'summon_imp');
+    const emberkin = sim.petOf(sim.playerId);
+    expect(emberkin?.scale).toBe(0.55);
+
+    sim.setPlayerLevel(20);
+
+    expect(sim.petOf(sim.playerId)).toBe(emberkin);
+    expect(emberkin?.scale).toBe(0.85);
+  });
+
+  it('resizes Emberkin when its owner reaches a new rank through experience', () => {
+    const sim = makeSim(224);
+    sim.setPlayerLevel(7);
+    expect(sim.setSpec('destruction')).toBe(true);
+    castAndFinish(sim, 'summon_imp');
+    const emberkin = sim.petOf(sim.playerId);
+    const meta = sim.players.get(sim.playerId);
+    if (!emberkin || !meta) throw new Error('Expected a warlock and Emberkin.');
+    expect(emberkin.scale).toBe(0.55);
+
+    grantXp(sim.ctx, xpForLevel(7), meta);
+
+    expect(sim.player.level).toBe(8);
+    expect(sim.petOf(sim.playerId)).toBe(emberkin);
+    expect(emberkin.scale).toBe(0.65);
+  });
+
+  it('restores Emberkin at the scale for its owner current rank', () => {
+    const sim = makeSim(223);
+    castAndFinish(sim, 'summon_imp');
+    const emberkin = sim.petOf(sim.playerId);
+    const saved = serializePet(sim.ctx, sim.playerId);
+    if (!emberkin || !saved) throw new Error('Expected a summoned Emberkin.');
+    despawnPet(sim.ctx, emberkin);
+
+    sim.setPlayerLevel(20);
+    restorePet(sim.ctx, sim.player, saved);
+
+    expect(sim.petOf(sim.playerId)?.scale).toBe(0.85);
+  });
+
   it('summons an imp that is an owned, friendly demon', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);
@@ -100,6 +169,58 @@ describe('warlock demon pets', () => {
     expect(pet.templateId).toBe('gloomshade');
     // the imp is gone from the world entirely (summoned demons unravel)
     expect(sim.entities.has(imp.id)).toBe(false);
+  });
+
+  it('gloomshade, the tank demon, auto-taunts by default on summon', () => {
+    // Bug #1356: createDemonPet unconditionally set petAutoTaunt=false for every
+    // demon, so Gloomshade (a "sturdy melee tank that taunts to hold threat", per
+    // this file's header comment) never held aggro unless the owner manually
+    // toggled auto-taunt every session. A melee_tank demon should come up with
+    // auto-taunt already on.
+    const sim = makeSim();
+    sim.setPlayerLevel(12);
+    castAndFinish(sim, 'summon_voidwalker');
+    const pet = sim.petOf(sim.playerId);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('gloomshade');
+    expect(pet!.petAutoTaunt).toBe(true);
+  });
+
+  it('gloomshade does not auto-taunt by default for a grouped owner', () => {
+    // Auto-taunting off a 10s cycle with no target/tank check would rip every
+    // non-boss add off the real party/raid tank. Keep the free default scoped
+    // to solo play; a grouped warlock keeps the manual /pettaunt opt-in.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: WARLOCK_TEST_WORLD,
+    });
+    const lockPid = sim.addPlayer('warlock', 'Lock');
+    const otherPid = sim.addPlayer('warrior', 'Tank');
+    sim.partyInvite(otherPid, lockPid);
+    sim.partyAccept(otherPid);
+    const lock = sim.entities.get(lockPid)!;
+    sim.setPlayerLevel(12, lockPid);
+    lock.resource = lock.maxResource;
+    sim.castAbility('summon_voidwalker', lockPid);
+    for (let i = 0; i < 20 * 12 && sim.entities.get(lockPid)!.castingAbility; i++) sim.tick();
+    const pet = sim.petOf(lockPid);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('gloomshade');
+    expect(pet!.petAutoTaunt).toBe(false);
+  });
+
+  it('emberkin, the ranged damage demon, does not auto-taunt by default', () => {
+    // Non-tank demons keep the prior default: no free auto-taunt for a demon
+    // that was never described as a threat-holder.
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    castAndFinish(sim, 'summon_imp');
+    const pet = sim.petOf(sim.playerId);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('emberkin');
+    expect(pet!.petAutoTaunt).toBe(false);
   });
 
   it('a slain demon unravels instead of respawning into the wild', () => {

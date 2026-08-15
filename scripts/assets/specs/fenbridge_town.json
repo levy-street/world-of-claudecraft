@@ -1,0 +1,88 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/fenbridge_town/warden_gatehouse-final.glb",
+      "out": "models/props/fenbridge_warden_gatehouse.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/crooked_reed_inn-final.glb",
+      "out": "models/props/fenbridge_crooked_reed_inn.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/lantern_chapel-final.glb",
+      "out": "models/props/fenbridge_lantern_chapel.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/moonwort_apothecary-final.glb",
+      "out": "models/props/fenbridge_moonwort_apothecary.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/gilded_strongbox-final.glb",
+      "out": "models/props/fenbridge_gilded_strongbox.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/hesk_tannery-final.glb",
+      "out": "models/props/fenbridge_hesk_tannery.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/scout_lodge-final.glb",
+      "out": "models/props/fenbridge_scout_lodge.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/mirelight_cistern-final.glb",
+      "out": "models/props/fenbridge_mirelight_cistern.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/provision_stall-final.glb",
+      "out": "models/props/fenbridge_provision_stall.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/palisade_wing-final.glb",
+      "out": "models/props/fenbridge_palisade_wing.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/gate_arch-final.glb",
+      "out": "models/props/fenbridge_gate_arch.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/boardwalk-final.glb",
+      "out": "models/props/fenbridge_boardwalk.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/muster_board-final.glb",
+      "out": "models/props/fenbridge_muster_board.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/fenbridge_town/muster_order-final.glb",
+      "out": "models/quest/fenbridge_muster_order.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

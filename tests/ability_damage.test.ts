@@ -22,6 +22,7 @@ import {
   abilityDamageBonus,
   abilityTemporalHourglassValues,
 } from '../src/ui/ability_damage';
+import { abilityEffectText } from '../src/ui/hud';
 
 function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string, mods?: TalentModifiers) {
   const ability = abilitiesKnownAt(cls, MAX_LEVEL, mods).find((k) => k.def.id === id);
@@ -37,6 +38,18 @@ function required<T>(value: T | undefined): T {
 const SC: AbilityScaling = { spellPower: 80, rangedPower: 200, attackPower: 140 };
 const ARCANE_MODS = { ...emptyModifiers(), spec: 'arcane' as const };
 const FROST_MODS = { ...emptyModifiers(), spec: 'frost' as const };
+const SURVIVAL_MODS = computeTalentModifiers('hunter', {
+  ...emptyAllocation(),
+  spec: 'survival',
+} as never);
+const SPIRITMEND_MODS = computeTalentModifiers('shaman', {
+  ...emptyAllocation(),
+  spec: 'restoration',
+} as never);
+const DESTRUCTION_MODS = computeTalentModifiers('warlock', {
+  ...emptyAllocation(),
+  spec: 'destruction',
+} as never);
 const PROT_MODS = computeTalentModifiers('warrior', {
   ...emptyAllocation(),
   spec: 'prot',
@@ -103,6 +116,19 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     );
   });
 
+  it('Bloodhook uses the same Ranged Attack Power wound bonus that combat snapshots', () => {
+    const bloodhook = known('hunter', 'bloodhook', SURVIVAL_MODS);
+    const effect = required(
+      bloodhook.effects.find((candidate) => candidate.type === 'hunterBloodhook'),
+    );
+    expect(abilityDamageBonus(bloodhook, effect, { ...SC, rangedPower: 0 })).toBe(0);
+    // 2026-08-09 120s band round: the survival baseline meleeDmgPct stepped
+    // 0.06 to 0.3 (the rest of the raise rides the baseline agiPct), so the 34
+    // base and 200*0.26 rider re-derive at 1.3x.
+    expect(abilityDamageBonus(bloodhook, effect, SC)).toBe(68);
+    expect(abilityEffectText(bloodhook, SC)).toBe('44.2 (+68)');
+  });
+
   it('a channelled directDamage (Arcane Missiles) uses the per-tick CHANNEL coefficient', () => {
     const am = known('mage', 'arcane_missiles', ARCANE_MODS);
     const eff = required(am.effects.find((e) => e.type === 'directDamage'));
@@ -138,6 +164,17 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     expect(abilityDamageBonus(heal, eff, SC)).toBeGreaterThan(0);
   });
 
+  it('Cascading Mend shows the same Spell Power bonus as its first combat heal', () => {
+    const chain = known('shaman', 'chain_heal', SPIRITMEND_MODS);
+    const effect = required(chain.effects.find((candidate) => candidate.type === 'chainHeal'));
+    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 0 })).toBe(0);
+    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 100 })).toBe(
+      directHealBonus(100, chain.castTime),
+    );
+    expect(abilityEffectText(chain, { ...SC, spellPower: 0 })).toBe('120 to 145');
+    expect(abilityEffectText(chain, { ...SC, spellPower: 100 })).toMatch(/^120 to 145 \(\+\d+\)$/);
+  });
+
   it('a personal mage barrier shows the same Spell Power bonus combat applies', () => {
     const barrier = known('mage', 'ice_barrier', FROST_MODS);
     const eff = required(barrier.effects.find((e) => e.type === 'absorb'));
@@ -161,16 +198,23 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
   });
 
   it('a ground AoE pulse folds the AoE-penalised direct coefficient (combat spBonus)', () => {
-    const cons = known('paladin', 'consecration');
+    const protection = computeTalentModifiers(
+      'paladin',
+      { spec: 'protection', ranks: {}, choices: {} },
+      MAX_LEVEL,
+    );
+    const cons = known('paladin', 'consecration', protection);
     const eff = required(cons.effects.find((e) => e.type === 'groundAoE'));
     expect(abilityDamageBonus(cons, eff, SC)).toBe(
       directHitBonus(SC.spellPower, cons.def, cons.castTime, true),
     );
   });
 
-  it('a channelled AoE (Rain of Fire) uses the per-tick CHANNEL coefficient, not the cast one', () => {
-    const rof = known('warlock', 'rain_of_fire');
-    const eff = required(rof.effects.find((e) => e.type === 'aoeDamage'));
-    expect(abilityDamageBonus(rof, eff, SC)).toBe(channelTickBonus(SC.spellPower, rof.def));
+  it('the reworked Rain of Fire ground pulse uses the AoE-penalised direct coefficient', () => {
+    const rof = known('warlock', 'rain_of_fire', DESTRUCTION_MODS);
+    const eff = required(rof.effects.find((e) => e.type === 'groundAoE'));
+    expect(abilityDamageBonus(rof, eff, SC)).toBe(
+      directHitBonus(SC.spellPower, rof.def, rof.castTime, true),
+    );
   });
 });

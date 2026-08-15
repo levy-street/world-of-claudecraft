@@ -88,6 +88,17 @@ export function instanceBindingLines(
   return '';
 }
 
+/** The player item lock line (issue 3042, src/sim/item_lock.ts): unlike the
+ *  Maker's Bond lines above, not scoped to commission-eligible equipment
+ *  kinds, since a player can lock any bag copy. The toggle itself only ever
+ *  targets a bag slot (src/sim/item_lock.ts setItemLocked), so this renders
+ *  on bag/bank tooltips; a worn item's projection (wornTooltipInstance above)
+ *  never carries `locked`, so this is naturally a no-op on the paperdoll. */
+export function instanceLockLine(instance?: ItemInstancePayload): string {
+  if (!instance?.locked) return '';
+  return `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.bags.itemLockedLine'))}</div>`;
+}
+
 /** The masterwork seal (gold, the soulbound line's style). A legacy signed copy
  *  renders nothing here. There is deliberately NO standalone enchanted marker:
  *  a bare "Enchanted" badge told a player their copy was enchanted but not what
@@ -165,8 +176,8 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
  *  recipe output lands on the equip/consume kinds (weapon, armor, food,
  *  potion, elixir, tool, bag), so the signed universe partitions cleanly on
  *  the kind alone; the partition is pinned in tests/item_instance_tooltip.test.ts.
- *  Fish share kind 'food' with crafted meals but are never signed, so they
- *  never reach the provenance line at all. */
+ *  Raw fishing catches are also kind 'junk' (cooking reagents) but fishing never
+ *  signs a catch, so they never reach the provenance line either. */
 export function isGatheredProvenanceKind(kind: ItemDef['kind'] | undefined): boolean {
   return kind === 'junk';
 }

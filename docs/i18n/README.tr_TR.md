@@ -8,13 +8,13 @@
 
 [![CI](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Three.js](https://img.shields.io/badge/Three.js-r165-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-r185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Vitest](https://img.shields.io/badge/Vitest-4.1-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.31.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.38.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.tr_TR.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Karakterine isim ver, dokuz sınıftan herhangi birini seç ve merkezlerle çevrili bir pazar kasabası olan **Eastbrook Vale**'de (seviye 1-7) başla: kuzeyde kurt patikaları, doğuda yaban domuzu çayırları, batıda Sableweb ormanları, kuzeybatıda Mirror Lake, güneybatıda burrower'ların bastığı bir bakır kazısı ve kuzeydoğuda huzursuz ölülerin yıkık bir şapeli, güneydoğuda da Gorrak'ın haydut kampı. Kuzey yolu, bir dağ geçidinden **Mirefen Marsh**'a (6-13, merkez Fenbridge) ve oradan yukarıya **Thornpeak Heights**'a (13-20, merkez Highwatch) tırmanır. Dünya tohumu `src/main.ts` içinde sabittir, bu yüzden her ziyarette aynı yerdir.
+Karakterine isim ver, dokuz sınıftan herhangi birini seç ve merkezlerle çevrili bir pazar kasabası olan **Eastbrook Vale**'de (seviye 1-7) başla: kuzeyde kurt patikaları, doğuda yaban domuzu çayırları, batıda Sableweb ormanları, kuzeybatıda Mirror Lake, güneybatıda burrower'ların bastığı bir bakır kazısı ve kuzeydoğuda huzursuz ölülerin yıkık bir şapeli, güneydoğuda da Gorrak'ın haydut kampı. Kuzey yolu, bir dağ geçidinden **Mirefen Marsh**'a (6-13, merkez Fenbridge) ve oradan yukarıya **Thornpeak Heights**'a (13-20, merkez Highwatch) tırmanır. Dünya tohumu `src/sim/world_seed.ts` içinde sabittir, bu yüzden her ziyarette aynı yerdir.
 
 ### Windows, Linux ve macOS için masaüstü uygulamaları
 

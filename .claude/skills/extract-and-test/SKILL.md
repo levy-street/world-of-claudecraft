@@ -37,53 +37,52 @@ block of new logic to one, ask:
 If your edit to a monolith is more than a thin wiring of something defined elsewhere,
 you are probably appending behavior that wants its own module.
 
+## The enforcement backstop: the monolith line-count ratchet
+
+`tests/monolith_budget.test.ts` pins a per-file line ceiling for every named monolith:
+the four coordinators above plus the unsanctioned ones that grew alongside them (for
+example `server/game.ts`, `src/net/online.ts`, `src/game/music.ts`, `server/db.ts`; the
+test's `MONOLITHS` table is the authoritative list, one seam suggestion per row). It is
+a ratchet, not a budget to spend:
+
+- Growing a named file past its ceiling fails the suite, and the failure message points
+  back at this skill: the fix is extraction behind the row's seam, never raising the
+  ceiling (a raise is a maintainer decision, justified in the PR body).
+- After a real extraction shrinks a file, LOWER its ceiling to the new size plus a small
+  margin in the same change; a companion check fails any ceiling sitting far above the
+  real file size, so the ratchet keeps tension.
+- A tracked file that disappears (split or renamed, good) must have its row updated in
+  the same change.
+- Data-as-code stays exempt by design: content tables, i18n catalogs and matcher DICTs,
+  and generated artifacts are correctly large and are not in the table.
+
 ## Use the seams this repo already has
 
-Do not invent a new architecture. Pick the seam that matches the work:
+Do not invent a new architecture. **The seam catalog lives in the root `CLAUDE.md`
+Modularity section** (one bullet per seam: `IWorld` facets, `SimContext` sim systems,
+content records, render modules, HUD components, `RouteDef` endpoints, server hot paths,
+barrel subsystems); pick the row that matches the work and follow the local `CLAUDE.md`
+it points at. This skill adds only the detail that list omits:
 
-- **render or ui needs new data or an action:** extend `IWorld` first. `IWorld` is
-  split into domain facets under `src/world_api/`, re-aggregated by `src/world_api.ts`:
-  add the member to the matching facet file, implement it in BOTH the offline `Sim`
-  (`src/sim/sim.ts`) and the online `ClientWorld` (`src/net/online.ts`), and update the
-  member pins in `tests/world_api_parity.test.ts` in the same change. render and ui
-  never import a concrete world. This is the load-bearing parity rule; the
-  `cross-platform-sync` agent audits it.
-- **New sim SYSTEM behavior (a combat, mob, social, or economy mechanic, not just a
-  data record):** its own module behind the `SimContext` seam
-  (`src/sim/sim_context.ts`), with backing state kept on `Sim` as a live `ctx` view,
-  never a new method cluster on the `sim.ts` coordinator. See `src/sim/CLAUDE.md`.
-- **New game content (mob, quest, item, ability, zone, talent):** a declarative
-  record in `src/sim/content/`, merged into the flat tables by `src/sim/data.ts`.
-  Never inline a content table in `sim.ts`.
-- **New visual system:** a new `src/render/<thing>.ts` exporting a `build*()` that
-  returns a `*View` the renderer owns and calls. Not a new method bank on
-  `renderer.ts` (templates: `terrain.ts`, `props.ts`, `foliage.ts`).
-- **New HUD component (a self-contained window OR a per-frame frame/bar):** a
-  DOM-free pure view core (`src/ui/<name>_view.ts` or `_core.ts`, registered in the
-  `UI_PURE_CORES` allowlist that `tests/architecture.test.ts` sweeps) plus a thin
-  write-elided painter on the `PainterHost` seam (`src/ui/painter_host.ts`),
-  instance-parameterized (take a descriptor or id, no hardcoded element id). A
-  component that belongs to an extracted HUD domain lands in its
-  `src/ui/hud/<domain>/` directory and exports through that domain's `index.ts`
-  (domain modules never import the `Hud` class; they receive narrow dependency
-  bags; see `src/ui/hud/CLAUDE.md`); a standalone component stays a flat
-  `src/ui/` sibling. A `src/ui` module that can be NEITHER (it must touch the DOM,
-  and it is not a painter) is a painter-side helper and a LAST RESORT: register it
-  in `UI_PAINTER_HELPERS` for the hard contract, or in `UI_DOM_MODULES` if it owns
-  browser state, since the classification sweep in the same test file fails on an
-  unregistered module that reaches a host. Reuse a painter FAMILY before writing a bespoke one (a
-  unit-style frame is a `UnitFramePainter`; an extra action bar is a new
-  `ActionBarPainter(descriptor)`). Full recipe: `src/ui/CLAUDE.md` and
-  `src/ui/hud/CLAUDE.md`.
-- **New server REST endpoint:** a `RouteDef` module (`server/<domain>.ts` exporting
-  `routes`) registered in `server/http/registry.ts`, never an inline route in
-  `main.ts`. Scaffold with `npm run new:endpoint`; see `server/http/CLAUDE.md`.
+- **HUD escape hatch:** a `src/ui` module that can be neither a pure view core nor a
+  painter (it must touch the DOM and is not on the `PainterHost` seam) is a LAST RESORT:
+  register it in `UI_PAINTER_HELPERS` (hard contract) or `UI_DOM_MODULES` (owns browser
+  state) in `tests/architecture.test.ts`, whose classification sweep fails an
+  unregistered module that reaches a browser host. Reuse a painter FAMILY before writing
+  a bespoke one (a unit-style frame is a `UnitFramePainter`; an extra action bar is a new
+  `ActionBarPainter(descriptor)`).
 - **New server WS command:** validate every field in `dispatchMessage`
   (`server/game.ts`), then call the `sim.*` method that owns the rule. The outcome
   resolves in the `Sim`, never on the server outside it.
-- **A multi-file subsystem:** a directory with an `index.ts` barrel that exports only
-  its public surface, plus its own short `CLAUDE.md` (templates:
-  `src/render/characters/`, `src/ui/i18n.catalog/`).
+- **New game content carries same-change obligations**, not just the declarative record
+  in `src/sim/content/` (merged by `src/sim/data.ts`, never inlined in `sim.ts`):
+  conquerable content authors its Book of Deeds records (`docs/design/deeds.md`,
+  `tests/deeds_content.test.ts`) and, for conquerable unique loot, its Reliquary pages
+  (`docs/design/reliquary.md`, `tests/reliquary_content.test.ts`); player-facing content
+  regenerates the wiki (`npm run wiki:content`, freshness-gated by `tests/guide.test.ts`)
+  plus any new `guide.*` prose keys; every new item id ships committed WebP art
+  (`tests/item_icons.test.ts`), a wordy English name its M16 non-Latin fills,
+  and new named entities their `src/ui/world_entity_i18n.ts` entries.
 
 ## When to extract, and when not to
 
@@ -164,10 +163,11 @@ When you extract, the diff should read as move plus import, not rewrite. If you
 follow-up so the extraction stays reviewable. Delete the code you replaced; leave no
 dead duplicate, commented-out block, or unused import behind.
 
-Effort by model (the doctrine here is identical, only the effort scales): on Opus 4.8,
+The doctrine here is identical at every capability tier; only the effort scales (the
+root `CLAUDE.md` "Working style" block owns that mapping). On a frontier-tier model,
 after the extraction fan out a fresh subagent (or the `architecture-reviewer` for a
 `src/sim/` move) to review your move-diff for COVERAGE, every parity and correctness gap,
-before calling it done. On the Sonnet baseline, take small verifiable steps and lean on
+before calling it done. On the baseline tier, take small verifiable steps and lean on
 one investigator.
 
 ## Repo anti-patterns to avoid

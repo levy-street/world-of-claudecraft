@@ -36,11 +36,11 @@ import type * as http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
 import {
   hashPassword,
+  MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
   newToken,
   normalizeEmail,
   offensiveName,
-  validPassword,
   validUsernameShape,
   verifyPassword,
 } from './auth';
@@ -74,6 +74,7 @@ import {
   recordAuthFailure,
   requestIp,
 } from './ratelimit';
+import { captureSignupContext, parseSignupProfile } from './signup_attribution';
 import { isWebClientRequest, webLoginEnforced } from './web_login_guard';
 
 // ---------------------------------------------------------------------------
@@ -97,9 +98,11 @@ const TOO_MANY_FAILED_ATTEMPTS = 'too many failed attempts, wait a few minutes a
 const INVALID_CREDENTIALS = 'invalid username or password';
 const USERNAME_SHAPE = 'username must be 3-24 chars (letters, digits, _)';
 const USERNAME_NOT_ALLOWED = 'username is not allowed';
-// The literal derives its bound from MIN_PASSWORD_LENGTH so the message and the
-// validator can never disagree (byte-identical to the legacy "at least 6 chars").
+// The literals derive their bounds from MIN_PASSWORD_LENGTH / MAX_PASSWORD_LENGTH so
+// the message and the validator can never disagree (byte-identical to the legacy
+// "at least 6 chars" / "at most 128 chars").
 const PASSWORD_TOO_SHORT = `password must be at least ${MIN_PASSWORD_LENGTH} chars`;
+const PASSWORD_TOO_LONG = `password must be at most ${MAX_PASSWORD_LENGTH} chars`;
 const USERNAME_TAKEN = 'username already taken';
 const INVALID_TWO_FACTOR_CODE = 'invalid authentication code';
 // Mandatory signup-email reject (mirrors the legacy /api/register arm; the shape
@@ -170,6 +173,7 @@ const REAL_AUTH_DB = {
   createSuspiciousRegistrationReport,
   captureReferral,
   trackAccountCreated,
+  captureSignupContext,
 };
 let authDb = REAL_AUTH_DB;
 
@@ -247,8 +251,12 @@ async function registerHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 400, { error: USERNAME_NOT_ALLOWED, code: 'account.username_not_allowed' });
     return;
   }
-  if (!validPassword(body.password)) {
+  if (typeof body.password !== 'string' || body.password.length < MIN_PASSWORD_LENGTH) {
     json(ctx.res, 400, { error: PASSWORD_TOO_SHORT, code: 'account.password_too_short' });
+    return;
+  }
+  if (body.password.length > MAX_PASSWORD_LENGTH) {
+    json(ctx.res, 400, { error: PASSWORD_TOO_LONG, code: 'account.password_too_long' });
     return;
   }
   // Email is mandatory at signup: it is the recovery address that later proves
@@ -280,15 +288,21 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   const token = newToken();
   await authDb.saveToken(token, account.id);
   // Store the mandatory signup email and send the welcome mail. Validated above,
-  // so this always runs for a fresh registration.
+  // so this always runs for a fresh registration. The profile parse is
+  // synchronous so the welcome mail already carries the signup locale and
+  // opt-in state; the capture below persists them (plus attribution).
+  const profile = parseSignupProfile(ctx.req, body);
   await authDb.setAccountEmail(account.id, signupEmail);
   authDb.emailAccountCreated({
     id: account.id,
     username: account.username,
     email: signupEmail,
-    locale: null,
-    marketing_opt_in: false,
+    locale: profile.locale,
+    marketing_opt_in: profile.marketingOptIn,
   });
+  // First-touch attribution + locale/country/opt-in persistence
+  // (fire-and-forget; must never block or fail registration).
+  authDb.captureSignupContext(account.id, ctx.req, body, profile);
   // Server-side Meta CAPI conversion event (fire-and-forget; a no-op without
   // META_CAPI env config, and it must never block or fail registration).
   void authDb.trackAccountCreated(

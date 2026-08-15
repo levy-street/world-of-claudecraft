@@ -30,7 +30,9 @@ function q(over: Partial<MarketQuery> = {}): MarketQuery {
     armorClass: 'all',
     primaryStat: 'all',
     rarity: 'all',
+    sort: 'name',
     page: 0,
+    collapseLowest: false,
     ...over,
   };
 }
@@ -267,6 +269,17 @@ describe('World Market filters', () => {
     );
   });
 
+  // Mount reins are listable now that they are unbound, so their browse home is
+  // newly load-bearing: a listed reins must be findable under the Other chip,
+  // never stranded where only an exact-name search reaches it.
+  it("routes mount reins through the 'other' chip so a listed reins stays browsable", () => {
+    expect(filterIds(['reins_grag_bear'], { itemType: 'other' })).toEqual(['reins_grag_bear']);
+    // And no narrower chip claims it.
+    for (const t of ['weapon', 'armor', 'consumable', 'bag', 'material', 'cosmetic'] as const) {
+      expect(filterIds(['reins_grag_bear'], { itemType: t }), t).toEqual([]);
+    }
+  });
+
   // The exhaustiveness tail in itemMatchesType is a tsc guard, and tsc is erased in
   // the shipped bundle. This drives what SURVIVES that erasure: an item type with no
   // arm must browse as nothing, never as everything. Returning the asserted `never`
@@ -483,6 +496,18 @@ describe('World Market filters', () => {
     const invalid = sanitizeMarketQuery({ armorClass: 'plate', primaryStat: 'stamina' });
     expect(invalid.armorClass).toBe('all');
     expect(invalid.primaryStat).toBe('all');
+  });
+
+  // Issue #3102: the browse sort axis. Unlike the dropdown filters above it has no
+  // meaningful "all" fallback (there is always an active order), so an omitted or
+  // invalid wire value falls back to the classic name-then-price default rather
+  // than an 'all' sentinel.
+  it('sanitizes the sort axis, defaulting to the classic name order', () => {
+    expect(sanitizeMarketQuery({ sort: 'price' }).sort).toBe('price');
+    expect(sanitizeMarketQuery({ sort: 'name' }).sort).toBe('name');
+    expect(sanitizeMarketQuery({ sort: 'cheapest' }).sort).toBe('name');
+    expect(sanitizeMarketQuery({}).sort).toBe('name');
+    expect(sanitizeMarketQuery(undefined).sort).toBe('name');
   });
 
   it('narrows weapon filters by weapon family', () => {

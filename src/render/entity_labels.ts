@@ -5,7 +5,7 @@
 // a renderer <-> painter import cycle.
 
 import type { Entity } from '../sim/types';
-import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
+import { dungeonDisplayName, localizedRiftName, tEntity } from '../ui/entity_i18n';
 import { t } from '../ui/i18n';
 
 export function mobDisplayName(mobId: string): string {
@@ -22,6 +22,9 @@ export function objectDisplayName(entity: Entity): string {
   }
   if (entity.templateId === 'noticeboard_eastbrook') {
     return t('worldContent.noticeboardName');
+  }
+  if (entity.templateId === 'soulwell') {
+    return tEntity({ kind: 'ability', id: 'soulwell', field: 'name' });
   }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
@@ -76,6 +79,10 @@ export function objectDisplayName(entity: Entity): string {
       ? t('worldContent.dungeonExitName', { name: dungeonName })
       : dungeonName;
   }
+  if (entity.templateId === 'rift_portal') return localizedRiftName(entity.name);
+  if (entity.templateId === 'rift_tower_core') return t('worldContent.demonTowerCoreName');
+  if (entity.templateId === 'rift_descent' && entity.name === 'Tower Ascent')
+    return t('worldContent.demonTowerAscentName');
   // Collectible/quest ground objects carry the item id they grant; localize the
   // nameplate through the item dictionary instead of the raw English name.
   if (entity.objectItemId) return tEntity({ kind: 'item', id: entity.objectItemId, field: 'name' });

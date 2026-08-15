@@ -1,7 +1,15 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import { DUSK_ECONOMY_LINGER_SEC } from '../src/sim/combat/rogue_talents';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES } from '../src/sim/content/classes';
 import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
+import {
+  AEGIS_OF_DEVOTION_DR,
+  AEGIS_OF_DEVOTION_DURATION,
+  DAWNS_PATH_SPEED_DURATION,
+  DAWNS_PATH_SPEED_MULT,
+  MAX_DEVOTION,
+} from '../src/sim/paladin_devotion';
 import {
   STANCE_MASTERY_BATTLE_CRIT_DMG,
   STANCE_MASTERY_BERSERKER_HASTE,
@@ -119,17 +127,16 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       if (!entry) throw new Error(`no talent entry matched for ${cls}`);
       return entry.render();
     };
-    // Balance pass: Swift Verdicts is a cooldown cut now, not banked charges.
-    const swift = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
-    expect(swift).toContain('cooldown is reduced by 20%');
+    const fist = render('paladin', (e) => e.id === 'pal_r11_fist_of_justice');
+    expect(fist).toContain('cooldown is reduced by 25%');
 
-    // Balance pass: the option is now Steady Draw, a plain cast-speed talent.
-    const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
-    expect(sniper).toContain('cast time is reduced by 20%');
+    // Hunter Talents 2.0: Trapcraft exposes the real cooldown reduction.
+    const trapcraft = render('hunter', (e) => e.id === 'hun_r14_trapcraft');
+    expect(trapcraft).toContain('cooldown is reduced by 20%');
 
     const attunement = render('shaman', (e) => e.id === 'sha_r11_elemental_attunement');
-    expect(attunement).toContain('critical strikes');
-    expect(attunement).toContain('instant');
+    expect(attunement).toContain('roots the target');
+    expect(attunement).toContain('2 sec');
 
     const mastery = render('warrior', (e) => e.id === 'war_row_blood_offering');
     expect(mastery).toContain('ability criticals deal 15% more damage');
@@ -157,6 +164,39 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       setLanguage('en');
     }
   });
+
+  it('renders every shared Warlock row safely and completely outside English', async () => {
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    try {
+      const choices = CHOICE_ROWS.warlock.rows.flatMap((row) => [...row.options]);
+      const rendered = new Map(
+        choices.map((choice) => [
+          choice.id,
+          tTalent({ kind: 'talentChoice', choice, field: 'description' }),
+        ]),
+      );
+
+      expect(rendered.size).toBe(18);
+      expect(rendered.get('wlk_r5_bane')).toContain('15');
+      expect(rendered.get('wlk_r5_improved_corruption')).toContain('40');
+      expect(rendered.get('wlk_r11_fel_concentration')).toContain('30');
+      expect(rendered.get('wlk_r14_ruin')).toContain('50');
+      expect(rendered.get('wlk_r14_ruin')).toContain('Trato');
+      expect(rendered.get('wlk_r14_ruin')).toContain('Pacto');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('25');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Maleficio de violencia');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Mandato profano');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Marca ruinosa');
+      expect(rendered.get('wlk_r20_chaos_bolt')).toContain('habilidades de clase de brujo');
+      expect(rendered.get('wlk_r20_chaos_bolt')).toContain('talentos finales');
+      expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('esa misma habilidad');
+      expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('una vez cada 60 s');
+      expect(rendered.get('wlk_r20_curse_mastery')).toContain('90');
+    } finally {
+      setLanguage('en');
+    }
+  });
 });
 
 // Talent descriptions are generated from effect data outside English. English remains
@@ -164,6 +204,9 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
 // records that power specs, masteries, and the choice rows.
 
 const PCT_FIELDS = new Set([
+  // Class-owned intrinsic mechanic metadata uses `pct` for its player-facing
+  // fraction while runtime behavior stays in the class combat module.
+  'pct',
   'leechPct',
   'hpFrac',
   'belowFrac',
@@ -175,6 +218,13 @@ const PCT_FIELDS = new Set([
   'armorPct',
   'maxHpPct',
   'strPct',
+  'doctrineShieldPct',
+  'benisonAbsorbCapPct',
+  'doctrineConversionPct',
+  'shieldHealPct',
+  'splashHealPct',
+  'tithefiendDamagePct',
+  'tithefiendDurationPct',
   'agiPct',
   'intPct',
   'spiPct',
@@ -236,6 +286,41 @@ const PCT_FIELDS = new Set([
   // entity.ts / auras.ts, shown as "5%" and "20%" in the hand-written description.
   'manaPct',
   'manaRegenPct',
+  // Hunter Talents 2.0 stores bespoke runtime constants here so the authored
+  // tooltip remains mechanically auditable without fake ability modifiers.
+  'movementSpeedPct',
+  'enduringMovementSpeedPct',
+  'focusGenerationPct',
+  'damageReductionPct',
+  'fallbackDamageReductionPct',
+  'petHealPct',
+  'cooldownRefundPct',
+  'petHealthFloorPct',
+  'healthThresholdPct',
+  'slowPct',
+  'costReductionPct',
+  'primaryDamagePct',
+  'cleavePct',
+  'echoPct',
+  'hastePct',
+  'paladinRadiantStride',
+  'paladinDivineSteed',
+  'paladinDivineSteedBurstPct',
+  'paladinSteadyHandsHotPct',
+  'paladinRecurringGrace',
+  'paladinDivinePurposeChance',
+  'paladinDawnEcho',
+  // Rogue v0.29 rows: Dusk Economy's cost cut ("50%") and Second Shadow's
+  // finisher echo fraction ("40%").
+  'duskEconomyPct',
+  'secondShadowPct',
+  'warlockBlacktideSpeedPct',
+  'warlockLeadenHex',
+  'warlockShadowCredit',
+  'warlockAshenFocus',
+  'warlockSoulwellWardPct',
+  'warlockFiendhideMagicDrPct',
+  'upperThresholdPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -245,27 +330,73 @@ function expectedTokens(effect: unknown): string[] {
     // Aura proc responses with multiplier-shaped kinds (buff_speed 1.4 =
     // "+40% movement"): the delta is the stated number, not the raw 1.4.
     const shapedAura = obj as {
+      type?: string;
       kind?: string;
       auraKind?: string;
       value?: number;
       duration?: number;
     };
     if (
-      shapedAura.kind === 'aura' &&
-      (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')
+      (shapedAura.kind === 'aura' &&
+        (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')) ||
+      (shapedAura.type === 'selfBuff' &&
+        (shapedAura.kind === 'buff_speed' || shapedAura.kind === 'buff_haste'))
     ) {
       toks.push(`${+(((shapedAura.value ?? 1) - 1) * 100).toFixed(1)}%`);
       if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'buff_haste') {
+      toks.push(`${+(((shapedAura.value ?? 1) - 1) * 100).toFixed(1)}%`);
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (
+      shapedAura.type === 'selfBuff' &&
+      (shapedAura.kind === 'buff_crit' || shapedAura.kind === 'buff_spellhaste')
+    ) {
+      toks.push(`${+((shapedAura.value ?? 0) * 100).toFixed(1)}%`);
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'slow_immunity') {
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    // Fraction-valued rider effects (Ghostfoot Ward's shield_wall damage cut,
+    // Marked Prey's vulnerability, Deathmark's source brand): the stated number
+    // is the percentage. The rider's duration may simply ride its host buff, so
+    // it is legitimate in copy but not required (see legitNumbers).
+    const shapedRider = obj as { type?: string; kind?: string; value?: number };
+    if (
+      (shapedRider.type === 'selfBuff' || shapedRider.type === 'debuffTargetSource') &&
+      (shapedRider.kind === 'shield_wall' ||
+        shapedRider.kind === 'vulnerability' ||
+        shapedRider.kind === 'vuln_source') &&
+      typeof shapedRider.value === 'number'
+    ) {
+      toks.push(`${+(shapedRider.value * 100).toFixed(1)}%`);
       return;
     }
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (value === 0) continue;
         if (key === 'battleRhythm') continue;
-        // Blink While Casting / Elemental Convergence (mage choice rows) are
-        // picked/not-picked flags like battleRhythm; their timings are stated
-        // as durations, not this 1.
-        if (key === 'blinkCast' || key === 'convergence') continue;
+        // Temporal Rift / Blink While Casting / Elemental Convergence (mage
+        // choice rows) are picked/not-picked flags like battleRhythm; their
+        // timings are stated as durations, not this 1.
+        if (key === 'temporalRift' || key === 'blinkCast' || key === 'convergence') continue;
+        // Dawn's Path / Aegis of Devotion are picked/not-picked flags; their
+        // speed / duration / damage-reduction numbers live in effect_dispatch's
+        // divineAscension case (the exported paladin_devotion constants), so the
+        // stated numbers are intrinsic, not this 1.
+        if (key === 'ascensionRush' || key === 'ascensionWard') continue;
+        // Kill Chain's Smokestep refresh and Foul Play's CC guard are
+        // picked/not-picked flags too; their copy is behavioral, not numeric.
+        if (key === 'onKillVanishReset' || key === 'foulPlayGuard') continue;
+        // costPct -1 means the ability costs nothing; tooltips say "cost no
+        // energy" rather than "100% less".
+        if (key === 'costPct' && value === -1) continue;
         // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
         // hand-written descriptions phrase as "double" rather than "50%".
         if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {
@@ -312,17 +443,47 @@ function legitNumbers(effect: unknown): Set<number> {
     // Aura proc responses with multiplier-shaped kinds (buff_speed 1.4 =
     // "+40% movement"): the delta is the stated number, not the raw 1.4.
     const shapedAura = obj as {
+      type?: string;
       kind?: string;
       auraKind?: string;
       value?: number;
       duration?: number;
     };
     if (
-      shapedAura.kind === 'aura' &&
-      (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')
+      (shapedAura.kind === 'aura' &&
+        (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')) ||
+      (shapedAura.type === 'selfBuff' &&
+        (shapedAura.kind === 'buff_speed' || shapedAura.kind === 'buff_haste'))
     ) {
       add((shapedAura.value ?? 1) - 1, true);
       if (shapedAura.duration) add(shapedAura.duration, false);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'buff_haste') {
+      add((shapedAura.value ?? 1) - 1, true);
+      if (shapedAura.duration) add(shapedAura.duration, false);
+      return;
+    }
+    if (
+      shapedAura.type === 'selfBuff' &&
+      (shapedAura.kind === 'buff_crit' || shapedAura.kind === 'buff_spellhaste')
+    ) {
+      add(shapedAura.value ?? 0, true);
+      if (shapedAura.duration) add(shapedAura.duration, false);
+      return;
+    }
+    // Fraction-valued rider effects (see expectedTokens): percentage plus an
+    // optional stated duration are both legitimate.
+    const shapedRider = obj as { type?: string; kind?: string; value?: number; duration?: number };
+    if (
+      (shapedRider.type === 'selfBuff' || shapedRider.type === 'debuffTargetSource') &&
+      (shapedRider.kind === 'shield_wall' ||
+        shapedRider.kind === 'vulnerability' ||
+        shapedRider.kind === 'vuln_source') &&
+      typeof shapedRider.value === 'number'
+    ) {
+      add(shapedRider.value, true);
+      if (shapedRider.duration) add(shapedRider.duration, false);
       return;
     }
     for (const [key, value] of Object.entries(obj)) {
@@ -338,12 +499,32 @@ function legitNumbers(effect: unknown): Set<number> {
         // Cheat death leaves the player at 1 health: the floor is intrinsic to
         // the mechanic, so copy may state the 1.
         if (key === 'cheatDeathIcd') out.add(1);
+        // Dawn's Path / Aegis of Devotion riders are intrinsic to the sim
+        // (effect_dispatch's divineAscension case), so their copy legitimately
+        // states the exported speed / duration / damage-reduction numbers.
+        if (key === 'ascensionRush') {
+          out.add(Math.round((DAWNS_PATH_SPEED_MULT - 1) * 100));
+          out.add(DAWNS_PATH_SPEED_DURATION);
+        }
+        if (key === 'ascensionWard') {
+          out.add(Math.round(AEGIS_OF_DEVOTION_DR * 100));
+          out.add(AEGIS_OF_DEVOTION_DURATION);
+        }
+        if (key === 'paladinDivineSteed') {
+          out.add(Math.round((value / MAX_DEVOTION) * 100));
+          out.add(MAX_DEVOTION);
+        }
         if (key === 'bonusCharges') out.add(value + 1);
         // A slow mult also legitimizes the stated slow percentage (mult 0.5 = 50%).
         if (key === 'mult' && value > 0 && value < 1) out.add(Math.round((1 - value) * 100));
         // Second Wind regenerates only below the SECOND_WIND_THRESHOLD floor
         // (0.35 in combat/auras.ts): the 35% gate is intrinsic to the mechanic.
         if (key === 'secondWindPctPerSec') out.add(35);
+        // Second Shadow fires only from a full 5-combo finisher: the gate is
+        // intrinsic to the mechanic (effect_dispatch.ts), so copy may state 5.
+        if (key === 'secondShadowPct') out.add(5);
+        // Dusk Economy lingers DUSK_ECONOMY_LINGER_SEC after leaving stealth.
+        if (key === 'duskEconomyPct') out.add(DUSK_ECONOMY_LINGER_SEC);
         // Combat Mastery is a flag; the per-stance riders are the exported
         // STANCE_MASTERY_* constants the sim applies at runtime.
         if (key === 'stanceMastery') {
@@ -618,20 +799,20 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(survival).toContain('dodge chance by 4%');
   });
 
-  it('localized thorns procs identify the ward and reflected melee strike trigger', async () => {
+  it('Warded Elements identifies the ward retaliation and defensive value', async () => {
     await ensureLocaleLoaded('es');
     setLanguage('es');
     const entry = effects.find(
-      (candidate) =>
-        candidate.cls === 'shaman' && candidate.id.endsWith('sha_r5_improved_lightning_shield'),
+      (candidate) => candidate.cls === 'shaman' && candidate.id.endsWith('sha_r8_frost_bind'),
     );
     if (!entry) throw new Error('missing Improved Thunder Ward talent entry');
 
     const rendered = entry.render();
-    expect(rendered).toContain(tEntity({ kind: 'ability', id: 'lightning_shield', field: 'name' }));
-    expect(rendered).toContain(
-      'Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.',
-    );
+    // The v0.36 release fill authored a real Spanish description for this row,
+    // superseding the English fallback this test originally pinned: the
+    // Spanish must still name the ward retaliation and the defensive value.
+    expect(rendered).toContain('Égida de Truenos');
+    expect(rendered).toContain('10%');
     setLanguage('en');
   });
 });

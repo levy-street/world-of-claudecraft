@@ -15,7 +15,7 @@ import {
   type WeaponSkinDef,
   type WeaponSkinRarity,
 } from '../sim/content/weapon_skins';
-import type { PlayerClass, WeaponSkinType } from '../sim/types';
+import type { PlayerClass, SkinCatalog, WeaponSkinType } from '../sim/types';
 import type { AccountCosmetics } from '../world_api/cosmetics';
 
 export interface WocStoreItemInput {
@@ -57,10 +57,19 @@ export interface ArmoryContext {
   cosmetics: Pick<AccountCosmetics, 'weaponSkinIds' | 'weaponSkinLoadout'>;
   cls: string;
   mainhandItemId: string | null;
+  /** The body being worn: the Combat Mech shows the equipped mainhand, so it
+   *  decides which skin types a hunter can apply (weapon_skin_rules). */
+  skinCatalog: SkinCatalog;
 }
 
+/** The Armory thumbnail directory, exported so consumers reasoning about the
+ *  FAMILY (the reliquary's opaque-art carve-out) share this one path instead
+ *  of re-spelling it. These cards paint their own bright background with no
+ *  alpha matte, unlike the dark-card item icon style. */
+export const ARMORY_SKIN_ART_DIR = '/ui/store/armory';
+
 export function armorySkinArt(skinId: string): string {
-  return `/ui/store/armory/${skinId}.webp`;
+  return `${ARMORY_SKIN_ART_DIR}/${skinId}.webp`;
 }
 
 /** Season 1 Armory sections, highest rarity first (the hero collection leads).
@@ -75,7 +84,7 @@ export function buildArmorySections(
 ): ArmorySection[] {
   const serviceRows = new Map(items.filter((i) => i.kind === 'skin').map((i) => [i.itemId, i]));
   const applicableTypes = new Set<WeaponSkinType>(
-    skinnableWeaponTypesFor(ctx.cls, ctx.mainhandItemId),
+    skinnableWeaponTypesFor(ctx.cls, ctx.mainhandItemId, ctx.skinCatalog),
   );
   const sections = new Map<string, ArmorySection>();
   for (const skin of WEAPON_SKIN_LIST) {

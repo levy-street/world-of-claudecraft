@@ -5,6 +5,7 @@ import { isLitanyModuleId, litanyModuleGeometry } from '../src/sim/delve_litany_
 import {
   delveAreaLabel,
   delveCanvasScales,
+  delveCurrentModuleOrigin,
   delveLocalToCanvas,
   delveSchematicPlayer,
   delveSchematicStatic,
@@ -40,6 +41,57 @@ describe('playerDelveLocal', () => {
     const { localX, localZ } = playerDelveLocal(3600, -1250, origin);
     expect(localX).toBe(0);
     expect(localZ).toBe(0);
+  });
+});
+
+describe('delveCurrentModuleOrigin', () => {
+  it('adds the active module stack offset to the run origin', () => {
+    const run = {
+      origin: { x: 3600, z: -1250 },
+      modules: ['reliquary_sunken_ossuary', 'reliquary_bell_niche'],
+      moduleIndex: 1,
+    };
+    const origin = delveCurrentModuleOrigin(run);
+    expect(origin.x).toBe(3600);
+    expect(origin.z).toBeGreaterThan(-1250);
+    expect(origin).not.toEqual(run.origin);
+  });
+});
+
+describe('delve circular minimap fit', () => {
+  it('keeps every module corner and a full compact route marker inside the rim', () => {
+    const size = 162;
+    const clipRadius = size / 2 - 2;
+    const markerHalf = 12;
+    const pad = 2 + Math.ceil(markerHalf * Math.SQRT2);
+    let widestHalfWidth = 0;
+
+    for (const layout of Object.values(DELVE_MODULE_LAYOUTS)) {
+      const { halfWidth } = delveCanvasScales(layout, size, pad, 'circle');
+      widestHalfWidth = Math.max(widestHalfWidth, halfWidth);
+      for (const localX of [-halfWidth, halfWidth]) {
+        for (const localZ of [layout.zMin, layout.zMax]) {
+          const center = delveLocalToCanvas(localX, localZ, layout, size, pad, 'circle');
+          for (const dx of [-markerHalf, markerHalf]) {
+            for (const dy of [-markerHalf, markerHalf]) {
+              expect(
+                Math.hypot(center.cx + dx - size / 2, center.cy + dy - size / 2),
+              ).toBeLessThanOrEqual(clipRadius);
+            }
+          }
+        }
+      }
+    }
+
+    // Litany contains modules wider than the legacy 23-unit reliquary room;
+    // the all-module loop above therefore exercises its widest authored fit.
+    expect(widestHalfWidth).toBeGreaterThan(23);
+    const layout = DELVE_MODULE_LAYOUTS.litany_baptistry;
+    const { halfWidth } = delveCanvasScales(layout, size, pad);
+    expect(delveLocalToCanvas(halfWidth, layout.zMin, layout, size, pad)).toEqual({
+      cx: pad,
+      cy: pad,
+    });
   });
 });
 
@@ -92,7 +144,7 @@ describe('delveSchematicStatic', () => {
       }
     });
 
-    it(`${moduleId}: has at least a floor rect, dais, and exit marker`, () => {
+    it(`${moduleId}: has room geometry but no baked navigation marker`, () => {
       const layout = DELVE_MODULE_LAYOUTS[moduleId];
       const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
       const rects = prims.filter((p) => p.kind === 'rect');
@@ -101,8 +153,11 @@ describe('delveSchematicStatic', () => {
       const texts = prims.filter((p) => p.kind === 'text');
       if (isLitanyModuleId(moduleId)) expect(islandRects.length).toBeGreaterThanOrEqual(1);
       else expect(rects.length).toBeGreaterThanOrEqual(1); // floor
-      expect(circles.length).toBeGreaterThanOrEqual(2); // dais + exit
-      expect(texts.length).toBeGreaterThanOrEqual(1); // 'N' exit label
+      expect(circles.length).toBeGreaterThanOrEqual(1); // room geometry, e.g. dais/pillars/pools
+      // A static exit lied in finale modules and could not show sealed/open state.
+      // Navigation now comes only from the live delve_module_exit/surface entity.
+      expect(circles.filter((p) => p.fill === '#7a50c8')).toHaveLength(0);
+      expect(texts).toHaveLength(0);
     });
   }
 
@@ -232,10 +287,25 @@ describe('delveSchematicPlayer', () => {
     expect(arrow.cy).toBeLessThanOrEqual(162);
   });
 
-  it('passes facing as negated angle (matches hud.ts -p.facing convention)', () => {
+  it('rotates the arrow by facing + PI (this schematic maps localZ to canvas Y unflipped, unlike the overworld -facing convention)', () => {
     const layout = DELVE_MODULE_LAYOUTS.reliquary_sunken_ossuary;
     const facing = Math.PI / 4;
     const arrow = delveSchematicPlayer(0, 20, facing, layout, 162, 8);
-    expect(arrow.angle).toBeCloseTo(-facing, 5);
+    expect(arrow.angle).toBeCloseTo(facing + Math.PI, 5);
+  });
+
+  it('points north (canvas -Y, up) when facing 0 = world +Z, matching delveLocalToCanvas', () => {
+    // facing 0 means the player moves toward +Z (world north), and this
+    // schematic's Z maps DIRECTLY to canvas Y (localZ - zMin, unflipped), so
+    // +Z is canvas-DOWN. The arrow tip (drawn at local (0, -size) before
+    // rotation) must therefore point canvas-down at facing 0, the opposite of
+    // the overworld's -facing convention (which would point it canvas-up).
+    const layout = DELVE_MODULE_LAYOUTS.reliquary_sunken_ossuary;
+    const arrow = delveSchematicPlayer(0, 20, 0, layout, 162, 8);
+    // Tip after rotation: (size*sin(angle), -size*cos(angle)).
+    const tipX = Math.sin(arrow.angle);
+    const tipY = -Math.cos(arrow.angle);
+    expect(tipX).toBeCloseTo(0, 5);
+    expect(tipY).toBeCloseTo(1, 5); // +Y = canvas-down = world +Z here
   });
 });

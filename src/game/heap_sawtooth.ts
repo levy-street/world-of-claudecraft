@@ -17,10 +17,26 @@ export interface HeapSawtoothSummary {
   lastUsedMb: number;
 }
 
+/** Read-only GC-floor trend for the local `?perf` hitch referee. */
+export interface HeapFloorTrend {
+  startMb: number;
+  endMb: number;
+  growthMb: number;
+  floorSamples: number;
+}
+
+export interface HeapFloorValley {
+  readonly atMs: number;
+  readonly floorMb: number;
+}
+
 export interface HeapSawtoothOptions {
   // Bytes of used JS heap, or null where the source does not exist
   // (performance.memory is Chromium-only).
   readUsedHeapBytes: () => number | null;
+  // The full valley series is local dev evidence only. Fleet instances leave
+  // this off, avoiding retained samples outside the hitch referee.
+  recordFloorSeries?: () => boolean;
 }
 
 // Chrome quantizes performance.memory.usedJSHeapSize on non-isolated pages, so
@@ -34,6 +50,10 @@ export const GC_DROP_MIN_MB = 2;
 // ~6 minutes of 1 Hz samples bounds the amplitude window (and the module's
 // memory); the counters and rates are cumulative since start/reset.
 const WINDOW_CAPACITY = 360;
+// The referee resets before its ten-minute soak. At the 1 Hz sample cadence,
+// this retains every possible valley in that measurement with headroom while
+// still bounding a dev overlay left open after the run.
+const FLOOR_SERIES_CAPACITY = 720;
 
 const BYTES_PER_MB = 1024 * 1024;
 
@@ -43,7 +63,9 @@ function round(v: number): number {
 
 export class HeapSawtooth {
   private readonly readUsedHeapBytes: () => number | null;
+  private readonly recordFloorSeries: () => boolean;
   private window: number[] = [];
+  private floorValleys: HeapFloorValley[] = [];
   private samples = 0;
   private firstAtMs = 0;
   private lastAtMs = 0;
@@ -54,9 +76,21 @@ export class HeapSawtooth {
   private dropCount = 0;
   private dropTotalMb = 0;
   private riseTotalMb = 0;
+  private firstFloorMb = 0;
+  private lastFloorMb = 0;
+  private floorSamples = 0;
 
   constructor(options: HeapSawtoothOptions) {
     this.readUsedHeapBytes = options.readUsedHeapBytes;
+    this.recordFloorSeries = options.recordFloorSeries ?? (() => false);
+  }
+
+  private recordFloorValley(atMs: number, floorMb: number): void {
+    if (!this.recordFloorSeries()) return;
+    this.floorValleys.push({ atMs, floorMb });
+    if (this.floorValleys.length > FLOOR_SERIES_CAPACITY) {
+      this.floorValleys.splice(0, this.floorValleys.length - FLOOR_SERIES_CAPACITY);
+    }
   }
 
   sample(nowMs: number): void {
@@ -66,6 +100,10 @@ export class HeapSawtooth {
     if (this.samples === 0) {
       this.firstAtMs = nowMs;
       this.baselineMb = usedMb;
+      this.firstFloorMb = usedMb;
+      this.lastFloorMb = usedMb;
+      this.floorSamples = 1;
+      this.recordFloorValley(nowMs, usedMb);
     } else {
       const delta = usedMb - this.baselineMb;
       if (delta > 0) {
@@ -75,6 +113,9 @@ export class HeapSawtooth {
         this.dropCount++;
         this.dropTotalMb += -delta;
         this.baselineMb = usedMb;
+        this.lastFloorMb = usedMb;
+        this.floorSamples++;
+        this.recordFloorValley(nowMs, usedMb);
       }
     }
     this.samples++;
@@ -108,8 +149,28 @@ export class HeapSawtooth {
     };
   }
 
+  /**
+   * Return the first and latest GC valleys without changing the production
+   * summary shape. PerfMonitor exposes this only while its dev overlay is on.
+   */
+  floorTrend(): HeapFloorTrend | null {
+    if (this.samples < 2 || this.floorSamples === 0) return null;
+    return {
+      startMb: round(this.firstFloorMb),
+      endMb: round(this.lastFloorMb),
+      growthMb: round(this.lastFloorMb - this.firstFloorMb),
+      floorSamples: this.floorSamples,
+    };
+  }
+
+  /** Return a copy so referee code cannot mutate the live tracker. */
+  floorSeries(): readonly HeapFloorValley[] {
+    return this.floorValleys.map((valley) => ({ ...valley }));
+  }
+
   reset(): void {
     this.window = [];
+    this.floorValleys = [];
     this.samples = 0;
     this.firstAtMs = 0;
     this.lastAtMs = 0;
@@ -118,6 +179,9 @@ export class HeapSawtooth {
     this.dropCount = 0;
     this.dropTotalMb = 0;
     this.riseTotalMb = 0;
+    this.firstFloorMb = 0;
+    this.lastFloorMb = 0;
+    this.floorSamples = 0;
   }
 }
 

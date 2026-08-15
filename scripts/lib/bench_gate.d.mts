@@ -52,3 +52,42 @@ export declare function evaluateJitterRun(run: {
 }): JitterVerdict;
 export declare function pct(sorted: ReadonlyArray<number>, p: number): number;
 export declare function gapStats(snapTimes: ReadonlyArray<number>): GapStats;
+
+export interface SampleStats {
+  count: number;
+  mean: number;
+  p50: number;
+  p95: number;
+  p99: number;
+  max: number;
+}
+
+export interface ProfessionsObserverEvidence {
+  label: string;
+  role: 'gather' | 'fish';
+  gaps: number;
+  /** The observer's worst inter-snapshot gap in ms (gapStats(...).max). */
+  gapMaxMs: number;
+  sawStableTw: boolean;
+  /** Snapshots whose own node-cooldown map arrived NON-empty (gather evidence). */
+  ncdFrames: number;
+  fishingOutcomes: number;
+}
+
+export declare function sampleStats(values: ReadonlyArray<number>): SampleStats;
+export declare function profMinGapsFor(durationMs: number): number;
+export declare function profMinRoleEventsFor(durationMs: number): number;
+export declare const PROF_MAX_OBSERVER_GAP_MS: number;
+
+export interface ProfessionsVerdict extends JitterVerdict {
+  minRoleEvents: number;
+}
+export declare function evaluateProfessionsLoadRun(run: {
+  joined: number;
+  expected: number;
+  aliveAtEnd: number;
+  mode: 'gather' | 'fish' | 'mixed';
+  stable: boolean;
+  durationMs: number;
+  observers: ReadonlyArray<ProfessionsObserverEvidence> | null | undefined;
+}): ProfessionsVerdict;
