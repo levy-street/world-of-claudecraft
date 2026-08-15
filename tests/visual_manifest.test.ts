@@ -139,6 +139,39 @@ describe('character visual manifest', () => {
     }
   });
 
+  it('faces every Demon Tower rig into its movement and enlarges its combat silhouette', () => {
+    const expectedHeights: Record<string, number> = {
+      tower_imp: 1.68,
+      tower_hellhound: 1.56,
+      tower_pact_reaver: 2.35,
+      tower_brimstone_zealot: 2.24,
+      tower_soulbinder: 2.24,
+      tower_iron_defiler: 2.76,
+      tower_abyss_knight: 2.97,
+      tower_dread_harbinger: 3.07,
+      tower_gloom_bat: 1.44,
+      tower_cinder_crawler: 1.32,
+      tower_bone_acolyte: 2.13,
+      tower_shade_dancer: 2.24,
+      tower_flame_herald: 2.58,
+      tower_rot_hulk: 2.86,
+      tower_blood_matron: 2.65,
+      tower_void_sentinel: 3.18,
+      tower_boss_flesh_shaper: 3.18,
+      tower_boss_ash_tyrant: 3.82,
+      tower_boss_gatekeeper: 3.6,
+      tower_boss_demon_lord: 4.45,
+    };
+    expect(Object.keys(expectedHeights).sort()).toEqual(Object.keys(TOWER_MOBS).sort());
+    for (const [templateId, height] of Object.entries(expectedHeights)) {
+      const visual = VISUALS[`mob_${templateId}`];
+      expect(visual.yaw, `${templateId} must face +Z while moving and attacking`).toBe(
+        -Math.PI / 2,
+      );
+      expect(visual.height, `${templateId} presentation height`).toBeCloseTo(height, 5);
+    }
+  });
+
   it('keeps Bursar Fernando in his likeness atlas (the Eastbrook banker easter egg)', () => {
     // The maintainer-approved easter egg: black shoulder-length hair and light
     // brown skin ride a repainted rogue palette resolved at skin index 0 (NPCs

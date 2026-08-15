@@ -7,6 +7,8 @@ export interface DemonTowerScenePlan {
   profile: DemonTowerSceneProfile;
   floorColor: number;
   floorRoughness: number;
+  floorTextureScale: number;
+  floorAccentOpacity: number;
   accentColor: number;
   secondaryAccent: number;
   backdropColor: number;
@@ -19,10 +21,12 @@ export interface DemonTowerScenePlan {
 const PLANS: Readonly<Record<DemonTowerSceneProfile, DemonTowerScenePlan>> = {
   bloodforge: {
     profile: 'bloodforge',
-    floorColor: 0x211a18,
-    floorRoughness: 0.92,
-    accentColor: 0xff5a18,
-    secondaryAccent: 0xc88b38,
+    floorColor: 0x191715,
+    floorRoughness: 0.96,
+    floorTextureScale: 6.5,
+    floorAccentOpacity: 0.18,
+    accentColor: 0xa64724,
+    secondaryAccent: 0x80643e,
     backdropColor: 0x240805,
     backdropKind: 'forge_vault',
     ringRadii: [8.2, 17, 27.5],
@@ -37,6 +41,8 @@ const PLANS: Readonly<Record<DemonTowerSceneProfile, DemonTowerScenePlan>> = {
     profile: 'ossuary',
     floorColor: 0x24232c,
     floorRoughness: 0.88,
+    floorTextureScale: 5.5,
+    floorAccentOpacity: 0.2,
     accentColor: 0x9b63ff,
     secondaryAccent: 0x67dcff,
     backdropColor: 0x0c0b1d,
@@ -51,8 +57,10 @@ const PLANS: Readonly<Record<DemonTowerSceneProfile, DemonTowerScenePlan>> = {
   },
   void_crown: {
     profile: 'void_crown',
-    floorColor: 0x151625,
+    floorColor: 0x191a20,
     floorRoughness: 0.76,
+    floorTextureScale: 7,
+    floorAccentOpacity: 0.22,
     accentColor: 0xd94cff,
     secondaryAccent: 0x6f7dff,
     backdropColor: 0x09091f,

@@ -238,7 +238,10 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     category: 'travel',
     labelKey: 'devCommand.actions.raid.label',
     descriptionKey: 'devCommand.actions.raid.description',
-    command: (values) => `/dev raid ${values.raidDifficulty === 'normal' ? 'normal' : 'heroic'}`,
+    command: (values) =>
+      values.raidTarget === 'demon_tower'
+        ? '/dev raid tower'
+        : `/dev raid ${values.raidDifficulty === 'normal' ? 'normal' : 'heroic'}`,
   },
   {
     id: 'raidreset',

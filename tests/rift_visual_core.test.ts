@@ -2,16 +2,32 @@ import { describe, expect, it } from 'vitest';
 import {
   DEMON_TOWER_CORE_RENDER_HEIGHT,
   resolveRiftLightingGrade,
+  riftHazardPalette,
   riftHazardStyleForProfile,
   riftPuzzlePropRenderHeight,
 } from '../src/render/rift_visual_core';
 
 describe('rift visual core', () => {
   it('maps each Demon Tower profile to its authored hazard language', () => {
-    expect(riftHazardStyleForProfile('bloodforge')).toBe('lava');
+    expect(riftHazardStyleForProfile('bloodforge')).toBe('tower_lava');
     expect(riftHazardStyleForProfile('ossuary')).toBe('soul');
     expect(riftHazardStyleForProfile('void_crown')).toBe('void');
     expect(riftHazardStyleForProfile(undefined)).toBe('lava');
+  });
+
+  it('pins the restrained Bloodforge hazard palette without weakening the warning rim', () => {
+    expect(riftHazardPalette('tower_lava')).toEqual({
+      pool: 0x3b1710,
+      poolOpacity: 0.82,
+      rim: 0xe3a44a,
+      glow: 0xb74b22,
+    });
+    expect(riftHazardPalette('lava')).toEqual({
+      pool: 0xd83410,
+      poolOpacity: 0.9,
+      rim: 0xffca4a,
+      glow: 0xff5a1e,
+    });
   });
 
   it('uses a floor grade before the authored and procedural defaults', () => {

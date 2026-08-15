@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEMON_TOWER_SEED } from '../src/sim/content/rift/demon_tower';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -207,6 +208,16 @@ describe('/dev attune + /dev raid cheats', () => {
     expect(inst!.difficulty).toBe('heroic');
   });
 
+  it('/dev raid tower enters the reserved Demon Tower run at S rank', () => {
+    const { sim, pid } = godSim();
+    sim.chat('/dev raid tower', pid);
+    const inst = sim.riftInstances.find((candidate) => candidate.partyKey !== null);
+    expect(inst).toBeTruthy();
+    expect(inst?.seed).toBe(DEMON_TOWER_SEED);
+    expect(inst?.baseLevel).toBe(28);
+    expect(inst?.floorIndex).toBe(0);
+  });
+
   it('/dev raid reset clears raid lockouts', () => {
     const { sim, pid } = godSim();
     const meta = sim.players.get(pid)!;
@@ -218,9 +229,11 @@ describe('/dev attune + /dev raid cheats', () => {
   it('is gated: without dev commands, /dev raid does not zone in', () => {
     const { sim, pid } = godSim(false);
     sim.chat('/dev raid heroic', pid);
+    sim.chat('/dev raid tower', pid);
     const claimed = (
       sim as unknown as { instances: { dungeonId: string; partyKey: string | null }[] }
     ).instances.some((i) => i.dungeonId === 'nythraxis_boss_arena' && i.partyKey !== null);
     expect(claimed).toBe(false);
+    expect(sim.riftInstances.some((candidate) => candidate.partyKey !== null)).toBe(false);
   });
 });

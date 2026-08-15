@@ -9,6 +9,58 @@ import { demonTowerScenePlan } from './demon_tower_scene_core';
 type LightSink = (x: number, z: number, color: number, y?: number, scale?: number) => void;
 
 const ENVIRONMENT_TEMPLATES = new Map<string, THREE.Group>();
+const FLOOR_TEXTURES = new Map<DemonTowerSceneProfile, THREE.DataTexture>();
+
+function textureNoise(x: number, y: number, seed: number): number {
+  let value = Math.imul(x + seed * 17, 0x45d9f3b) ^ Math.imul(y + seed * 31, 0x119de1f3);
+  value ^= value >>> 16;
+  value = Math.imul(value, 0x45d9f3b);
+  value ^= value >>> 16;
+  return value >>> 0;
+}
+
+/** Deterministic stone relief shared by every clone of one floor profile. The
+ * grayscale map multiplies the restrained base color and doubles as a subtle
+ * bump map, so low tier keeps the same readable terrain grain without another
+ * texture allocation or a cosmetic-only geometry layer. */
+function floorTexture(profile: DemonTowerSceneProfile, repeat: number): THREE.DataTexture {
+  const cached = FLOOR_TEXTURES.get(profile);
+  if (cached) return cached;
+  const size = 128;
+  const data = new Uint8Array(size * size * 4);
+  const seed = profile === 'bloodforge' ? 11 : profile === 'ossuary' ? 29 : 47;
+  const tile = profile === 'void_crown' ? 19 : profile === 'ossuary' ? 22 : 16;
+  for (let y = 0; y < size; y++) {
+    const rowOffset = (Math.floor(y / tile) & 1) * Math.floor(tile / 2);
+    for (let x = 0; x < size; x++) {
+      const localX = (x + rowOffset) % tile;
+      const localY = y % tile;
+      const hash = textureNoise(x, y, seed);
+      const seam = localX <= 1 || localY <= 1;
+      const fissure =
+        ((x * 7 + y * 13 + seed * 5) % 113 === 0 && (hash & 3) !== 0) ||
+        ((x * 19 - y * 5 + seed) % 181 === 0 && (hash & 7) === 0);
+      const grain = ((hash >>> 8) & 31) - 15;
+      const chip = (hash & 127) === 0 ? -42 : 0;
+      const value = Math.max(38, Math.min(210, (seam ? 88 : fissure ? 58 : 166) + grain + chip));
+      const offset = (y * size + x) * 4;
+      data[offset] = value;
+      data[offset + 1] = value;
+      data[offset + 2] = value;
+      data[offset + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(repeat, repeat);
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = true;
+  texture.needsUpdate = true;
+  FLOOR_TEXTURES.set(profile, texture);
+  return texture;
+}
 
 function polygonGeometry(points: ReadonlyArray<{ x: number; z: number }>): THREE.ShapeGeometry {
   const shape = new THREE.Shape();
@@ -17,7 +69,24 @@ function polygonGeometry(points: ReadonlyArray<{ x: number; z: number }>): THREE
     else shape.lineTo(point.x, -point.z);
   });
   shape.closePath();
-  return new THREE.ShapeGeometry(shape).rotateX(-Math.PI / 2);
+  const geometry = new THREE.ShapeGeometry(shape).rotateX(-Math.PI / 2);
+  geometry.computeBoundingBox();
+  const bounds = geometry.boundingBox;
+  const positions = geometry.getAttribute('position');
+  const uvs = geometry.getAttribute('uv');
+  if (bounds && positions && uvs) {
+    const width = Math.max(1e-6, bounds.max.x - bounds.min.x);
+    const depth = Math.max(1e-6, bounds.max.z - bounds.min.z);
+    for (let i = 0; i < positions.count; i++) {
+      uvs.setXY(
+        i,
+        (positions.getX(i) - bounds.min.x) / width,
+        (positions.getZ(i) - bounds.min.z) / depth,
+      );
+    }
+    uvs.needsUpdate = true;
+  }
+  return geometry;
 }
 
 function addAccentRing(group: THREE.Group, radius: number, color: number, opacity: number): void {
@@ -28,13 +97,14 @@ function addAccentRing(group: THREE.Group, radius: number, color: number, opacit
       transparent: true,
       opacity,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       side: THREE.DoubleSide,
     }),
   );
   ring.position.y = 0.1;
   ring.renderOrder = 2;
   ring.userData.towerEssential = 'landmark';
+  ring.userData.towerFloorAccent = true;
   group.add(ring);
 }
 
@@ -44,14 +114,15 @@ function addRadialAccents(
   length: number,
   width: number,
   color: number,
+  opacity: number,
   phase = 0,
 ): void {
   const material = new THREE.MeshBasicMaterial({
     color,
     transparent: true,
-    opacity: 0.62,
+    opacity,
     depthWrite: false,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NormalBlending,
   });
   const geometry = new THREE.PlaneGeometry(width, length).rotateX(-Math.PI / 2);
   for (let i = 0; i < count; i++) {
@@ -60,6 +131,7 @@ function addRadialAccents(
     strip.position.set(Math.sin(angle) * (length / 2), 0.11, Math.cos(angle) * (length / 2));
     strip.rotation.y = angle;
     strip.renderOrder = 2;
+    strip.userData.towerFloorAccent = true;
     group.add(strip);
   }
 }
@@ -138,6 +210,9 @@ function buildDemonTowerGeometry(
     polygonGeometry(points),
     new THREE.MeshStandardMaterial({
       color: plan.floorColor,
+      map: floorTexture(profile, plan.floorTextureScale),
+      bumpMap: floorTexture(profile, plan.floorTextureScale),
+      bumpScale: profile === 'void_crown' ? 0.1 : 0.14,
       roughness: plan.floorRoughness,
       metalness: profile === 'bloodforge' ? 0.22 : 0.05,
     }),
@@ -148,11 +223,21 @@ function buildDemonTowerGeometry(
   floor.userData.towerEssential = 'floor';
   group.add(floor);
 
-  for (const radius of plan.ringRadii) addAccentRing(group, radius, plan.accentColor, 0.5);
+  for (const radius of plan.ringRadii)
+    addAccentRing(group, radius, plan.accentColor, plan.floorAccentOpacity);
   if (profile === 'bloodforge')
-    addRadialAccents(group, 8, 27, 0.22, plan.secondaryAccent, Math.PI / 8);
-  else if (profile === 'ossuary') addRadialAccents(group, 4, 25, 0.32, plan.secondaryAccent, 0);
-  else addRadialAccents(group, 5, 24, 0.26, plan.accentColor, Math.PI / 5);
+    addRadialAccents(
+      group,
+      8,
+      27,
+      0.22,
+      plan.secondaryAccent,
+      plan.floorAccentOpacity,
+      Math.PI / 8,
+    );
+  else if (profile === 'ossuary')
+    addRadialAccents(group, 4, 25, 0.32, plan.secondaryAccent, plan.floorAccentOpacity, 0);
+  else addRadialAccents(group, 5, 24, 0.26, plan.accentColor, plan.floorAccentOpacity, Math.PI / 5);
   addBackdrop(group, profile, plan.backdropColor, lowGfx);
 }
 

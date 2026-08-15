@@ -1,6 +1,7 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
+import { DEMON_TOWER_SEED } from './content/rift/demon_tower';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
@@ -496,6 +497,11 @@ export function handleDevChat(
     if (/\breset\b/.test(rest)) {
       if (meta) meta.raidLockouts.clear();
       emitDevLog(ctx, pid, '[dev] Raid lockouts cleared.');
+      return null;
+    }
+    if (/\b(?:demon[_ -]?tower|tower)\b/.test(rest)) {
+      ctx.enterRift(DEMON_TOWER_SEED, RIFT_RANK_BASE_LEVEL.S, pid);
+      emitDevLog(ctx, pid, '[dev] Entering the Demon Tower (S rank).');
       return null;
     }
     const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';

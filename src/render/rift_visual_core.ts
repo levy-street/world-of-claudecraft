@@ -11,7 +11,21 @@ export interface RiftLightingGrade {
   rim: number;
 }
 
-export type RiftHazardStyle = 'lava' | 'soul' | 'void';
+export type RiftHazardStyle = 'lava' | 'tower_lava' | 'soul' | 'void';
+
+export interface RiftHazardPalette {
+  pool: number;
+  poolOpacity: number;
+  rim: number;
+  glow: number;
+}
+
+const RIFT_HAZARD_PALETTES: Readonly<Record<RiftHazardStyle, RiftHazardPalette>> = {
+  lava: { pool: 0xd83410, poolOpacity: 0.9, rim: 0xffca4a, glow: 0xff5a1e },
+  tower_lava: { pool: 0x3b1710, poolOpacity: 0.82, rim: 0xe3a44a, glow: 0xb74b22 },
+  soul: { pool: 0x221247, poolOpacity: 0.9, rim: 0x73e7ff, glow: 0x9b63ff },
+  void: { pool: 0x160c32, poolOpacity: 0.92, rim: 0xf05cff, glow: 0x806dff },
+};
 
 export const DUNGEON_SUN_INTENSITY = 0.34;
 export const DUNGEON_HEMI_INTENSITY = 0.22;
@@ -44,9 +58,14 @@ export function resolveRiftLightingGrade(
 export function riftHazardStyleForProfile(
   profile: DemonTowerSceneProfile | undefined,
 ): RiftHazardStyle {
+  if (profile === 'bloodforge') return 'tower_lava';
   if (profile === 'ossuary') return 'soul';
   if (profile === 'void_crown') return 'void';
   return 'lava';
+}
+
+export function riftHazardPalette(style: RiftHazardStyle): RiftHazardPalette {
+  return RIFT_HAZARD_PALETTES[style];
 }
 
 export function riftPuzzlePropRenderHeight(templateId: string): number {

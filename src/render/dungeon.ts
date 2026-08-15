@@ -66,6 +66,7 @@ import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occl
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
+import { riftHazardPalette } from './rift_visual_core';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
@@ -745,7 +746,7 @@ export class DungeonInteriors {
       }>;
       // Rift hazards render as molten lava instead of the delve's blackwater; the
       // sim damage model is shared, only the palette differs.
-      hazardStyle?: 'blackwater' | 'lava' | 'soul' | 'void';
+      hazardStyle?: 'blackwater' | 'lava' | 'tower_lava' | 'soul' | 'void';
       // Rift ice-slide zone (frictionless slick you skate across to the goal
       // sigil): a pale frost sheet over this rect, purely cosmetic.
       iceZone?: { x: number; z: number; hw: number; hd: number } | null;
@@ -1055,7 +1056,7 @@ export class DungeonInteriors {
   private placeBlackwaterPools(
     group: THREE.Group,
     hazards: Array<{ x: number; z: number; r: number; rx?: number; rz?: number }>,
-    style: 'blackwater' | 'lava' | 'soul' | 'void' = 'blackwater',
+    style: 'blackwater' | 'lava' | 'tower_lava' | 'soul' | 'void' = 'blackwater',
     liftAt?: (x: number, z: number) => number,
   ): void {
     // Rift lava reuses the delve blackwater overlay with a molten palette: the
@@ -1063,13 +1064,9 @@ export class DungeonInteriors {
     // hazard reads identically, only the colour changes. Bands can be ellipses
     // (rx/rz), so the disc is a unit circle scaled to match the sim footprint.
     const pal =
-      style === 'lava'
-        ? { pool: 0xd83410, poolOpacity: 0.9, rim: 0xffca4a, glow: 0xff5a1e }
-        : style === 'soul'
-          ? { pool: 0x221247, poolOpacity: 0.9, rim: 0x73e7ff, glow: 0x9b63ff }
-          : style === 'void'
-            ? { pool: 0x160c32, poolOpacity: 0.92, rim: 0xf05cff, glow: 0x806dff }
-            : { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f };
+      style === 'blackwater'
+        ? { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f }
+        : riftHazardPalette(style);
     for (const h of hazards) {
       const rx = h.rx ?? h.r;
       const rz = h.rz ?? h.r;
@@ -1112,7 +1109,7 @@ export class DungeonInteriors {
         h.x,
         h.z,
         pal.glow,
-        (style === 'lava' ? 0.55 : 0.3) + y0,
+        (style === 'lava' || style === 'tower_lava' ? 0.55 : 0.3) + y0,
         Math.max(rx, rz) * 0.6,
       );
     }

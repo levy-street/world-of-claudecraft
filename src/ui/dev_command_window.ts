@@ -1,5 +1,6 @@
 import { DEV_KIT_ROLES } from '../sim/content/dev_kit_roles';
 import { GATHERING_PROFESSIONS } from '../sim/content/professions';
+import { DEMON_TOWER_THEME_NAME } from '../sim/content/rift/demon_tower';
 import { DUNGEONS, ITEMS, MOBS, QUESTS } from '../sim/data';
 import { ALL_CLASSES, MAX_LEVEL } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -17,7 +18,7 @@ import {
   resolveDevItem,
 } from './dev_item_picker_view';
 import { markDialogRoot } from './dialog_root';
-import { classDisplayName, tEntity } from './entity_i18n';
+import { classDisplayName, localizedRiftName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { getLanguage, type SupportedLanguage, type TranslationKey, t } from './i18n';
 import { svgIcon } from './ui_icons';
@@ -175,11 +176,15 @@ function actionFields(actionId: string): string {
         ),
       )}${selectField('devCommand.fields.difficulty', 'difficulty', `<option value="normal">${esc(t('devCommand.difficulty.normal'))}</option><option value="heroic">${esc(t('devCommand.difficulty.heroic'))}</option>`)}`;
     case 'raid':
-      return selectField(
+      return `${selectField(
+        'devCommand.actions.raid.label',
+        'raidTarget',
+        `<option value="nythraxis">${esc(tEntity({ kind: 'dungeon', id: 'nythraxis_boss_arena', field: 'name' }))}</option><option value="demon_tower">${esc(localizedRiftName(DEMON_TOWER_THEME_NAME))}</option>`,
+      )}${selectField(
         'devCommand.fields.difficulty',
         'raidDifficulty',
         `<option value="heroic">${esc(t('devCommand.difficulty.heroic'))}</option><option value="normal">${esc(t('devCommand.difficulty.normal'))}</option>`,
-      );
+      )}`;
     case 'bot':
       return textField('devCommand.fields.name', 'botName', 'TestBot');
     default:

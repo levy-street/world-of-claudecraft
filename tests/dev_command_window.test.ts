@@ -71,4 +71,21 @@ describe('developer command window', () => {
     expect(document.activeElement).toBe(fresh);
     expect(document.querySelector('[data-dev-action="spawn"]')).not.toBeNull();
   });
+
+  it('offers Demon Tower in Enter Raid and sends its direct-entry command', () => {
+    const { chat, window } = makeWindow();
+    window.toggle();
+    document.querySelector<HTMLButtonElement>('[data-dev-category="travel"]')?.click();
+
+    const target = document.querySelector<HTMLSelectElement>('[data-dev-field="raidTarget"]');
+    expect(target).not.toBeNull();
+    expect(Array.from(target?.options ?? []).map((option) => option.value)).toEqual([
+      'nythraxis',
+      'demon_tower',
+    ]);
+    if (!target) throw new Error('Expected the Enter Raid destination selector');
+    target.value = 'demon_tower';
+    document.querySelector<HTMLButtonElement>('[data-dev-run="raid"]')?.click();
+    expect(chat).toHaveBeenCalledWith('/dev raid tower');
+  });
 });

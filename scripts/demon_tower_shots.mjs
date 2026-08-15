@@ -73,71 +73,75 @@ async function gotoTowerDoor(page) {
 }
 
 /** Enter the tower and advance to `floorIndex`, leaving a live wave on screen. */
-async function enterTowerFloor(page, floorIndex) {
-  return page.evaluate((target) => {
-    const game = window.__game;
-    const sim = game.sim;
-    const p = sim.player;
-    p.devGod = true;
-    sim.enterRift(0x70b30000, 28, p.id);
-    const inst = sim.riftInstances.find((i) => i.partyKey !== null);
-    if (!inst) return { ok: false, why: 'no instance' };
-    // Climb by clearing floors outright; we only want the CAMERA on `target`.
-    let guard = 0;
-    while (inst.floorIndex < target && guard++ < 400) {
-      for (let i = 0; i < 22; i++) sim.tick();
-      for (const id of inst.towerWaveMobIds) {
-        const e = sim.entities.get(id);
-        if (e) {
-          e.hp = 0;
-          e.dead = true;
+async function enterTowerFloor(page, floorIndex, cameraDistance) {
+  return page.evaluate(
+    (target, distance) => {
+      const game = window.__game;
+      const sim = game.sim;
+      const p = sim.player;
+      p.devGod = true;
+      sim.enterRift(0x70b30000, 28, p.id);
+      const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+      if (!inst) return { ok: false, why: 'no instance' };
+      // Climb by clearing floors outright; we only want the CAMERA on `target`.
+      let guard = 0;
+      while (inst.floorIndex < target && guard++ < 400) {
+        for (let i = 0; i < 22; i++) sim.tick();
+        for (const id of inst.towerWaveMobIds) {
+          const e = sim.entities.get(id);
+          if (e) {
+            e.hp = 0;
+            e.dead = true;
+          }
+        }
+        if (inst.towerBossId !== null) {
+          const b = sim.entities.get(inst.towerBossId);
+          if (b) {
+            b.hp = 0;
+            b.dead = true;
+          }
+        }
+        if (inst.descentOpen && inst.descentId !== null) {
+          const d = sim.entities.get(inst.descentId);
+          if (d) {
+            p.pos = { ...d.pos };
+            p.prevPos = { ...p.pos };
+          }
         }
       }
-      if (inst.towerBossId !== null) {
-        const b = sim.entities.get(inst.towerBossId);
-        if (b) {
-          b.hp = 0;
-          b.dead = true;
-        }
+      // Let the floor send a live wave, then stand the player INSIDE the arena,
+      // south of the core and facing it, so the shot frames the centrepiece and
+      // the ring of demons rather than the outside of the wall.
+      for (let i = 0; i < 26; i++) sim.tick();
+      const core = inst.towerCoreId != null ? sim.entities.get(inst.towerCoreId) : null;
+      if (core) {
+        // Frame from a safe off-axis position: a straight south view put the
+        // generated Core between the chase camera and the whole arena. The
+        // diagonal keeps the centrepiece, hazards and two architectural wings in
+        // one shot without placing the camera behind a shell wall.
+        const yaw = Math.PI / 4;
+        p.pos = { x: core.pos.x - 6, y: core.pos.y, z: core.pos.z - 6 };
+        p.prevPos = { ...p.pos };
+        p.facing = yaw;
+        game.input.camYaw = yaw;
+        game.input.camPitch = 0.42;
+        game.input.camDist = distance;
+        game.renderer.camDist = distance;
       }
-      if (inst.descentOpen && inst.descentId !== null) {
-        const d = sim.entities.get(inst.descentId);
-        if (d) {
-          p.pos = { ...d.pos };
-          p.prevPos = { ...p.pos };
-        }
-      }
-    }
-    // Let the floor send a live wave, then stand the player INSIDE the arena,
-    // south of the core and facing it, so the shot frames the centrepiece and
-    // the ring of demons rather than the outside of the wall.
-    for (let i = 0; i < 26; i++) sim.tick();
-    const core = inst.towerCoreId != null ? sim.entities.get(inst.towerCoreId) : null;
-    if (core) {
-      // Frame from a safe off-axis position: a straight south view put the
-      // generated Core between the chase camera and the whole arena. The
-      // diagonal keeps the centrepiece, hazards and two architectural wings in
-      // one shot without placing the camera behind a shell wall.
-      const yaw = Math.PI / 4;
-      p.pos = { x: core.pos.x - 6, y: core.pos.y, z: core.pos.z - 6 };
-      p.prevPos = { ...p.pos };
-      p.facing = yaw;
-      game.input.camYaw = yaw;
-      game.input.camPitch = 0.42;
-      game.input.camDist = 7;
-      game.renderer.camDist = 7;
-    }
-    for (let i = 0; i < 8; i++) sim.tick();
-    return {
-      ok: true,
-      floor: inst.floorIndex + 1,
-      wave: inst.towerWave,
-      alive: inst.towerWaveMobIds.filter((id) => {
-        const e = sim.entities.get(id);
-        return e && !e.dead;
-      }).length,
-    };
-  }, floorIndex);
+      for (let i = 0; i < 8; i++) sim.tick();
+      return {
+        ok: true,
+        floor: inst.floorIndex + 1,
+        wave: inst.towerWave,
+        alive: inst.towerWaveMobIds.filter((id) => {
+          const e = sim.entities.get(id);
+          return e && !e.dead;
+        }).length,
+      };
+    },
+    floorIndex,
+    cameraDistance,
+  );
 }
 
 async function shoot(page, name) {
@@ -146,6 +150,7 @@ async function shoot(page, name) {
   // an artifact of the capture environment, not of this change, so it never
   // belongs in a committed shot.
   await page.evaluate(() => {
+    document.querySelector('.tut-skip')?.click();
     for (const b of document.querySelectorAll('button')) {
       const label = (b.textContent ?? '').trim().toLowerCase();
       // "dismiss" is the software-rendering notice; "confirm" is the camera
@@ -188,7 +193,7 @@ async function run(label, viewport, floors) {
     await enterOfflineGame(page, {});
     await waitForGame(page);
     await sleep(1500);
-    const info = await enterTowerFloor(page, floor - 1);
+    const info = await enterTowerFloor(page, floor - 1, viewport.isMobile ? 10 : 7);
     console.log(`${label} floor${floor}:`, JSON.stringify(info));
     if (!info.ok || info.floor !== floor || info.alive < 1) {
       throw new Error(`tower floor ${floor} setup failed: ${JSON.stringify(info)}`);

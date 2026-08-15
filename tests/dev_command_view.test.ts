@@ -9,6 +9,18 @@ import {
 } from '../src/ui/dev_command_view';
 
 describe('developer command view', () => {
+  it('builds the selected raid destination without applying Nythraxis difficulty to the Tower', () => {
+    expect(buildDevCommand('raid', { raidTarget: 'nythraxis', raidDifficulty: 'normal' })).toBe(
+      '/dev raid normal',
+    );
+    expect(buildDevCommand('raid', { raidTarget: 'nythraxis', raidDifficulty: 'heroic' })).toBe(
+      '/dev raid heroic',
+    );
+    expect(buildDevCommand('raid', { raidTarget: 'demon_tower', raidDifficulty: 'heroic' })).toBe(
+      '/dev raid tower',
+    );
+  });
+
   it('builds the BIS-20 kit command with the same optional-spec contract as the fresh kit', () => {
     expect(buildDevCommand('biskit', { bisSpec: '' })).toBe('/dev bis');
     expect(buildDevCommand('biskit', { bisSpec: 'protection' })).toBe('/dev bis protection');
