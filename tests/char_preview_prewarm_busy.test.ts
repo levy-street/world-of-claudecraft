@@ -26,27 +26,26 @@ describe('hud.ts: post-entry preview prewarm char-family busy predicate', () => 
     const scheduleEnd = hud.indexOf('return handle;', startAt);
     expect(scheduleEnd).toBeGreaterThan(startAt);
     const schedule = hud.slice(startAt, scheduleEnd);
-    expect(schedule).toContain(
-      "family === 'char' ? this.isCharPreviewSurfaceVisible() : this.dailyRewardsWindow.isOpen",
-    );
-    // The old, under-covering form: reverting the fix (routing 'char' straight
-    // back to charWindow.isOpen) must fail this pin.
-    expect(schedule).not.toContain("family === 'char' ? this.charWindow.isOpen");
+    // One family remains (the armory left with the catalog warming), so the
+    // predicate is no longer a ternary. What it must still route through is
+    // unchanged, and so is the regression it guards.
+    expect(schedule).toContain('isFamilyBusy: () => this.isCharPreviewSurfaceVisible()');
+    // The old, under-covering form: routing the char family straight back to
+    // charWindow.isOpen must fail this pin, in either shape.
+    expect(schedule).not.toContain('this.charWindow.isOpen');
   });
 
-  it('the armory family keeps reading dailyRewardsWindow.isOpen (no surface gap there)', () => {
-    // dailyRewardsWindow.close() cascades to armoryInspect?.close() (see
-    // daily_rewards_window.ts), and openArmoryInspect is only ever reachable
-    // while the daily rewards window is open, so dailyRewardsWindow.isOpen
-    // already covers every surface that shows the shared ArmoryPreview. This
-    // pin exists so a future edit cannot silently narrow the armory arm
-    // without a test noticing.
+  it('the schedule watches no armory surface, because it plans no armory unit', () => {
+    // This used to pin the armory arm of the predicate. That arm is gone with
+    // the catalog warming, so the pin is inverted rather than deleted: a
+    // returning schedule would need a busy key again, and it would land here.
     const startAt = hud.indexOf(
       'startPostEntryPreviewPrewarm(includeCharFamily: boolean = true): PreviewPrewarmHandle {',
     );
     const scheduleEnd = hud.indexOf('return handle;', startAt);
     const schedule = hud.slice(startAt, scheduleEnd);
-    expect(schedule).toContain(': this.dailyRewardsWindow.isOpen');
+    expect(schedule.toLowerCase()).not.toContain('armory');
+    expect(schedule).not.toContain('dailyRewardsWindow');
   });
 
   it('isCharPreviewSurfaceVisible() covers both surfaces that mount the shared CharacterPreview', () => {

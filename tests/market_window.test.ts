@@ -29,8 +29,20 @@ describe('market_window: no magic values', () => {
     );
   });
 
-  it('routes the unranked quality fallback through a CSS token, not a hex literal', () => {
-    expect(painter).toContain("const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)'");
+  it('routes the item-name quality color through the market_name_color resolver (CSS tokens), not a hex literal', () => {
+    // The name color (including the unranked fallback) lives in market_name_color.ts
+    // as CSS custom properties, so the painter holds no color literal. The resolver's
+    // own tests pin that every quality maps to a var(--mkt-name-*) token.
+    expect(painter).toContain("import { marketNameColor } from './market_name_color';");
+    expect(painter).toContain('const qColor = marketNameColor(item.quality);');
+    const core = readFileSync(new URL('../src/ui/market_name_color.ts', import.meta.url), 'utf8');
+    expect(core).toContain('var(--mkt-name-');
+    // The CODE must carry no color literal (tokens only); the header comment may
+    // cite the shipped hex values it lifts away from, so strip line comments first.
+    const coreCode = core.replace(/\/\/.*$/gm, '');
+    expect(coreCode, 'the resolver must not carry a raw hex in code').not.toMatch(
+      /#[0-9a-fA-F]{3,8}\b/,
+    );
   });
 
   it('names the coin-conversion constants instead of bare 10000 / 100', () => {
@@ -385,21 +397,28 @@ describe('market_window: behavior preserved through the core', () => {
 
 describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
   it('resolves the badge from the shared armor-type resolver, not a second classification', () => {
-    expect(painter).toContain("import { marketArmorBadge } from './market_armor_badge';");
+    expect(painter).toContain(
+      "import { marketArmorBadge, marketArmorPips, marketHeroicStar } from './market_armor_badge';",
+    );
     expect(painter).toContain('const armorBadge = marketArmorBadge(item);');
   });
 
   it('shows no mark on non-armor rows (weapons, bags, materials) instead of an empty badge', () => {
     const badgeAssign = painter.slice(
-      painter.indexOf('const armorBadge = marketArmorBadge(item);'),
+      painter.indexOf('const badge = armorBadge'),
       painter.indexOf('row.innerHTML ='),
     );
-    expect(badgeAssign).toContain('const badge = armorBadge');
-    expect(badgeAssign).toMatch(/:\s*'';\s*$/);
+    // The badge is the pips symbol when armor, and the empty string otherwise,
+    // so a weapon/bag/material row paints no armor mark at all.
+    expect(badgeAssign).toContain('marketArmorPips(armorBadge.armorType');
+    expect(badgeAssign).toMatch(/:\s*'';/);
   });
 
-  it('escapes the localized armor-type label before it reaches innerHTML', () => {
-    expect(painter).toContain('esc(t(armorBadge.labelKey))');
+  it('passes the escaped localized armor-type label into the pip symbol', () => {
+    // The word no longer renders as visible text (the visible cue is the pip
+    // symbol), but the escaped localized label is still handed to marketArmorPips
+    // as the chip's accessible name, so the vocabulary and the escaping are intact.
+    expect(painter).toContain('marketArmorPips(armorBadge.armorType, esc(t(armorBadge.labelKey)))');
   });
 
   it('reuses the tooltip slot-line vocabulary (hudChrome.itemArmorType), not the filter-menu one', () => {
@@ -411,12 +430,23 @@ describe('market_window: Browse row cloth/leather/mail cue (#3104)', () => {
     expect(core).toContain("from '../sim/equipment_rules'");
   });
 
-  it('is not color-only: the badge always carries real text, distinguished further by a border/background class per type', () => {
+  it('is not color-only: the cue is a countable pip symbol, distinguished by a per-type class, and still carries the word for assistive tech', () => {
+    // The distinction survives with color removed because the pip COUNT differs
+    // per armor type; color is only a bonus channel. The localized word rides the
+    // symbol's aria-label/title rather than rendering as visible text.
+    const core = readFileSync(new URL('../src/ui/market_armor_badge.ts', import.meta.url), 'utf8');
+    expect(core).toContain('role="img"');
+    expect(core).toContain('aria-label="${label}"');
+    expect(core).toContain('aria-hidden="true"'); // the pips themselves are decorative
+    // per-armor-type pip counts (the non-color carrier): cloth 1, leather 2, mail 3
+    expect(core).toMatch(/cloth:\s*1/);
+    expect(core).toMatch(/leather:\s*2/);
+    expect(core).toMatch(/mail:\s*3/);
     for (const cls of [
-      'mkt-armor-badge',
-      'mkt-armor-badge--cloth',
-      'mkt-armor-badge--leather',
-      'mkt-armor-badge--mail',
+      'mkt-armor-pips',
+      'mkt-armor-pips--cloth',
+      'mkt-armor-pips--leather',
+      'mkt-armor-pips--mail',
     ]) {
       expect(componentsCss, `components.css must define .${cls}`).toContain(`.${cls}`);
     }
@@ -515,21 +545,34 @@ describe('market_window: reconnect resync (#2416)', () => {
     expect(method).toContain('queryDiffersFromEcho(query, info)');
     expect(method).toContain('searchDiffersFromEcho(query, info)');
     expect(method).toContain('this.pushQuery();');
+    // Issue 3043: the Sell tab's price-check axis resets server-side on a fresh
+    // join too, independent of marketQuery, so the resync must re-arm it as
+    // well, not just the browse query.
+    expect(method).toContain('this.pushSellPriceCheck();');
   });
 
-  it('refreshIfChanged resolves the pending resync even on the Sell tab (before the sell-tab early return)', () => {
+  it('refreshIfChanged resolves the pending resync even on the Sell tab, then patches only the price ref (never the browse/collect signature work)', () => {
     const method = painter.slice(
       painter.indexOf('refreshIfChanged(): void {'),
       painter.indexOf('render(): void {'),
     );
     const resolveIdx = method.indexOf('this.resolvePendingReconnectResync(info);');
-    const sellReturnIdx = method.indexOf("if (this.tab === 'sell') return;");
+    const sellBranchIdx = method.indexOf("if (this.tab === 'sell')");
     expect(resolveIdx, 'must call resolvePendingReconnectResync').toBeGreaterThan(-1);
+    expect(sellBranchIdx, 'must still branch on the Sell tab').toBeGreaterThan(-1);
+    expect(resolveIdx, 'resync must resolve BEFORE the sell-tab branch').toBeLessThan(
+      sellBranchIdx,
+    );
+    // Patches the price ref (issue 3043) INSIDE the sell-tab branch, then still
+    // returns before it would fall through to the browse/collect signature work.
+    const refreshPriceRefIdx = method.indexOf('this.refreshSellPriceRef(info);', sellBranchIdx);
+    const sellReturnIdx = method.indexOf('return;', sellBranchIdx);
+    expect(refreshPriceRefIdx, 'must patch the price ref on the Sell tab').toBeGreaterThan(-1);
     expect(
       sellReturnIdx,
       'must still early-return before the browse/collect signature work',
     ).toBeGreaterThan(-1);
-    expect(resolveIdx).toBeLessThan(sellReturnIdx);
+    expect(refreshPriceRefIdx).toBeLessThan(sellReturnIdx);
   });
 
   it('imports queryDiffersFromEcho and searchDiffersFromEcho from the world_api seam (the pure drift checks, not re-derived comparisons)', () => {
@@ -560,6 +603,76 @@ describe('market_window: reconnect resync (#2416)', () => {
     expect(chain, 'main.ts must call the hud resync hook on reconnect').toContain(
       'hud.marketResyncAfterReconnect();',
     );
+  });
+});
+
+describe('market_window: the Sell tab price-check stays in sync with the staged item (issue 3043)', () => {
+  // The server-side echo (meta.sellPriceItemId) is a live, separate piece of
+  // session state this window drives entirely by side effect: every place the
+  // window's OWN sellItemId is cleared or set must re-arm the check, or the
+  // server keeps quoting a price for an item the player is no longer staging
+  // (a stale echo the client-side priceEcho.itemId === sellItemId guard cannot
+  // catch on its own, since it only compares against the CURRENT sellItemId).
+  it('every site that clears sellItemId also re-pushes the price check', () => {
+    const clearSites = [...painter.matchAll(/this\.sellItemId = null;/g)].map((m) => m.index);
+    // open(), close(), the cannot-market branch of renderSell, and the
+    // post-list branch of the List button handler.
+    expect(clearSites.length, 'expected exactly the known clear sites').toBe(4);
+    for (const idx of clearSites) {
+      const window = painter.slice(idx, idx + 200);
+      expect(
+        window,
+        `sellItemId clear at offset ${idx} must be followed by a pushSellPriceCheck() re-arm`,
+      ).toContain('this.pushSellPriceCheck();');
+    }
+  });
+
+  it('stageSell, the only site that stages a real item, pushes the price check', () => {
+    const method = painter.slice(
+      painter.indexOf('stageSell(itemId: string'),
+      painter.indexOf('/** The current browse query'),
+    );
+    expect(method).toContain('this.sellItemId = itemId;');
+    expect(method).toContain('this.pushSellPriceCheck();');
+  });
+
+  it('the price-ref line and its off-screen status echo carry the SAME markup (no drift between what is shown and what is announced)', () => {
+    const method = painter.slice(
+      painter.indexOf('private sellPriceRefHtml('),
+      painter.indexOf('private sellPriceRefHtml(') + 400,
+    );
+    expect(method, 'sellPriceRefHtml must exist').toContain('private sellPriceRefHtml(');
+    // Both renderSell's initial build and refreshSellPriceRef's later patch
+    // call this ONE method, so the two paint paths cannot say different things.
+    const renderSellCalls = (
+      painter
+        .slice(painter.indexOf('private renderSell('), painter.indexOf('private renderCollect('))
+        .match(/this\.sellPriceRefHtml\(/g) ?? []
+    ).length;
+    const refreshCalls = (
+      painter
+        .slice(
+          painter.indexOf('private refreshSellPriceRef('),
+          painter.indexOf('private sellPriceRefHtml('),
+        )
+        .match(/this\.sellPriceRefHtml\(/g) ?? []
+    ).length;
+    expect(renderSellCalls, 'renderSell must build the line via sellPriceRefHtml').toBe(1);
+    expect(refreshCalls, 'refreshSellPriceRef must patch the line via sellPriceRefHtml').toBe(1);
+  });
+
+  it('the price ref carries an off-screen live-region status, the .mkt-status precedent for async market content', () => {
+    const method = painter.slice(
+      painter.indexOf('private renderSell('),
+      painter.indexOf('private renderCollect('),
+    );
+    expect(method).toContain("priceRefStatus.className = 'mkt-sell-price-status visually-hidden'");
+    expect(method).toContain("priceRefStatus.setAttribute('role', 'status');");
+    expect(method).toContain("priceRefStatus.setAttribute('aria-live', 'polite');");
+  });
+
+  it('the new CSS class the price ref renders into is really defined in the extracted stylesheet', () => {
+    expect(componentsCss).toContain('.mkt-sell-price-ref {');
   });
 });
 

@@ -63,6 +63,7 @@ import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressi
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
@@ -672,7 +673,7 @@ export class DungeonInteriors {
     private scene: THREE.Scene,
     private lowGfx: boolean,
     private flames: THREE.Mesh[],
-    private fireLights: THREE.PointLight[],
+    private fireLights: FireLightSink,
     // The renderer's live compile gate. A live interior build (first dungeon
     // approach, delve module, rift floor) attaches through it hidden until its
     // programs are linked: the boot prewarm covers the base pack materials,

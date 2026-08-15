@@ -73,8 +73,8 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 965,
-      "state": "8f986167",
-      "events": "071cd128",
+      "state": "bdd28287",
+      "events": "882e2781",
       "rng": {
         "draws": 787,
         "digest": "22f85826"
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 965,
-      "state": "9066cdc2",
+      "state": "48657484",
       "events": "741638a5",
       "rng": {
         "draws": 982,
@@ -256,6 +256,14 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 8,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "lossesByOpponent": {
+              "1v1:[\"name:aleph\"]": 1
+            },
+            "winsByOpponent": {}
+          },
           "inventory": [
             {
               "count": 5,
@@ -266,6 +274,7 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeHonor": 8,
           "lifetimeXp": 78400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},

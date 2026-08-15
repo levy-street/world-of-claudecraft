@@ -33,10 +33,6 @@ for (const key of Object.keys(GATE_URLS) as GateKey[]) {
   );
 }
 
-export const hollowGatesPreloadInternalsForTest = {
-  propUrls: Object.values(GATE_URLS),
-};
-
 /** Gate height in world units (a walk-in cave mouth over the 2yd trigger). */
 const GATE_HEIGHT = 12;
 

@@ -1741,6 +1741,7 @@ export const cs_CZ: EnTranslations = {
       "notEnoughHonor": "Nemáš dost cti.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
+        "arenaComplete": "Odehrán souboj v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
         "fiestaComplete": "Dokončení Fiesty",
         "fiestaWin": "Vítězství ve Fiestě",
@@ -1847,6 +1848,7 @@ export const cs_CZ: EnTranslations = {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
     "itemHeroicTag": "[HRDINSKÉ]",
+    "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const cs_CZ: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "PRYČ"
+      "afkTag": "PRYČ",
+      "cheaterTag": "< Podvodník >"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -3936,6 +3939,12 @@ export const cs_CZ: EnTranslations = {
       "genesis_token_claimed": "Tento Seeker Genesis Token už byl uplatněn.",
       "entitlement_required": "Je vyžadováno ověřené oprávnění Seeker.",
       "current_ownership_required": "Je vyžadováno aktuální vlastnictví Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Účty operátorů nelze označit.",
+      "reason_required": "Je nutné uvést důvod.",
+      "invalid_duration": "Zadejte dobu označení alespoň jednu sekundu.",
+      "not_marked": "Tento účet není označen."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const cs_CZ: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Zadej platnou e-mailovou adresu.",
+    "marketingOptIn": "Chci dostávat novinky a aktualizace hry e-mailem (volitelné)",
     "showPassword": "Zobrazit heslo",
     "hidePassword": "Skrýt heslo",
     "logIn": "Přihlásit se",
@@ -6652,6 +6662,19 @@ export const cs_CZ: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetovat vzhled",
     "resetShort": "Resetovat",
+    "shareTab": "Sdílet",
+    "designCode": "Kód vzhledu",
+    "designCodeHint": "Zkopírujte tento kód, chcete-li vzhled uložit nebo sdílet. Vložte sem kód a importujte jej, abyste vzhled načetli.",
+    "copyCode": "Kopírovat kód",
+    "importCode": "Importovat",
+    "designCodeCopied": "Kód vzhledu byl zkopírován.",
+    "designCodeCopyManual": "Automatické kopírování je zde zablokováno. Kód je vybraný, zkopírujte jej pomocí klávesnice.",
+    "designCodeImported": "Vzhled byl importován.",
+    "designCodeImportedPartial": "Vzhled byl importován. Hodnoty, které tato verze nezná, byly přeskočeny.",
+    "designCodeErrEmpty": "Nejprve vložte kód vzhledu.",
+    "designCodeErrHeader": "Toto nevypadá jako kód vzhledu.",
+    "designCodeErrVersion": "Tento kód vzhledu pochází z novější verze hry.",
+    "designCodeErrMalformed": "Tento kód vzhledu je poškozený. Zkopírujte celý kód a zkuste to znovu.",
     "browFlat": "Rovné",
     "browArched": "Klenuté",
     "browThin": "Tenké",
@@ -8003,7 +8026,111 @@ export const cs_CZ: EnTranslations = {
       "zoomIn": "Přiblížit",
       "zoomOut": "Oddálit",
       "mapCanvasLabel": "Mapa",
-      "mapSummary": "Mapa oblasti {zone}."
+      "mapSummary": "Mapa oblasti {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Nejsou vidět žádné významné značky.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Další značky: {count}.",
+      "mapMarkerDirections": {
+        "center": "uprostřed",
+        "north": "severně",
+        "northeast": "severovýchodně",
+        "east": "východně",
+        "southeast": "jihovýchodně",
+        "south": "jižně",
+        "southwest": "jihozápadně",
+        "west": "západně",
+        "northwest": "severozápadně"
+      },
+      "mapMarkerDistances": {
+        "near": "blízko",
+        "medium": "ve střední vzdálenosti",
+        "far": "daleko"
+      },
+      "mapMarkerLabels": {
+        "you": "Ty",
+        "availableQuest": "Dostupný úkol",
+        "readyQuest": "Úkol připravený k odevzdání",
+        "repeatQuest": "Opakovatelný úkol",
+        "cooldownQuest": "Úkol čeká na obnovení",
+        "questObjective": "Oblast cíle úkolu",
+        "readyOre": "Dostupná rudná žíla",
+        "readyWood": "Dostupná skupina stromů",
+        "readyHerb": "Dostupný porost bylin",
+        "readyLockedOre": "Dostupná rudná žíla, potřebný nástroj je uzamčený",
+        "readyLockedWood": "Dostupná skupina stromů, potřebný nástroj je uzamčený",
+        "readyLockedHerb": "Dostupný porost bylin, potřebný nástroj je uzamčený",
+        "cooldownOre": "Vytěžená rudná žíla",
+        "cooldownWood": "Vykácená skupina stromů",
+        "cooldownHerb": "Sesbíraný porost bylin",
+        "cooldownLockedOre": "Vytěžená rudná žíla, potřebný nástroj je uzamčený",
+        "cooldownLockedWood": "Vykácená skupina stromů, potřebný nástroj je uzamčený",
+        "cooldownLockedHerb": "Sesbíraný porost bylin, potřebný nástroj je uzamčený",
+        "station": "Řemeslná stanice: {name}",
+        "service": "Služba: {name}",
+        "partyMember": "Člen skupiny: {name}",
+        "deadPartyMember": "Mrtvý člen skupiny: {name}",
+        "partyMemberGeneric": "Člen skupiny",
+        "deadPartyMemberGeneric": "Mrtvý člen skupiny",
+        "friend": "Přítel: {name}",
+        "guildMember": "Člen cechu: {name}",
+        "pointOfInterest": "Zajímavé místo: {name}",
+        "dungeonEntrance": "Vstup do dungeonu: {name}",
+        "dungeonExit": "Východ z dungeonu",
+        "delveEntrance": "Vstup do výpravy: {name}",
+        "worldPassage": "Průchod do oblasti: {zone}",
+        "riftEntrance": "Vstup do trhliny: {name}",
+        "hostileEnemy": "Nepřátelská jednotka",
+        "aggressiveEnemy": "Nepřítel, který na tebe útočí",
+        "lootableEnemy": "Nepřítel s dostupnou kořistí",
+        "corpse": "Tvoje mrtvé tělo",
+        "deathZone": "Nebezpečná zóna",
+        "teammate": "Spoluhráč",
+        "deadTeammate": "Mrtvý spoluhráč",
+        "flagCarrier": "Spoluhráč nesoucí vlajku",
+        "ownFlagStand": "Stojan na tvoji vlajku",
+        "enemyFlagStand": "Stojan na nepřátelskou vlajku",
+        "riftDescent": "Sestup trhlinou",
+        "riftReturnBeacon": "Návratový maják",
+        "riftReturnExit": "Východ zpět",
+        "ranked": "{marker}, stupeň {rank}",
+        "riftTreasureAvailable": "Dostupný poklad",
+        "riftTreasureLocked": "Uzamčený poklad",
+        "riftTreasureOpened": "Otevřený poklad",
+        "riftTreasureJammed": "Poklad se zaseknutým zámkem",
+        "riftCacheAvailable": "Dostupná skrýš trhliny",
+        "riftCacheLocked": "Uzamčená skrýš",
+        "riftCacheOpened": "Otevřená skrýš",
+        "riftCacheJammed": "Skrýš se zaseknutým zámkem",
+        "pylonUnlit": "Zhasnutý runový pilíř",
+        "pylonLit": "Rozsvícený runový pilíř",
+        "sequenceRuneUnlit": "Zhasnutá sekvenční runa",
+        "sequenceRuneLit": "Rozsvícená sekvenční runa",
+        "iceGoal": "Ledový cíl",
+        "boulderPad": "Cíl pro balvan",
+        "boulderMovable": "Balvan k přesunutí",
+        "boulderPlaced": "Umístěný balvan",
+        "gateSealed": "Zapečetěná brána",
+        "gateOpen": "Otevřená brána",
+        "switchReady": "Spínač připravený k aktivaci",
+        "switchOn": "Aktivovaný spínač",
+        "orbDormant": "Spící koule",
+        "orbActive": "Aktivní koule",
+        "rollerHazard": "Nebezpečný valící se balvan",
+        "delvePassageSealed": "Zapečetěný průchod",
+        "delvePassageOpen": "Otevřený průchod",
+        "delveSurfaceExit": "Východ na povrch",
+        "delveCacheLocked": "Uzamčená skrýš výpravy",
+        "delveCacheReady": "Připravená skrýš výpravy",
+        "delveCacheActive": "Aktivní skrýš výpravy",
+        "delveCacheOpened": "Otevřená skrýš výpravy",
+        "delveReliquaryLocked": "Uzamčený relikviář",
+        "delveReliquaryReady": "Připravený relikviář",
+        "delveReliquaryActive": "Probíhá obřad relikviáře",
+        "delveReliquaryOpened": "Otevřený relikviář",
+        "bountiful": "{marker} s bohatou kořistí"
+      }
     },
     "options": {
       "gameMenu": "Herní menu",
@@ -8922,6 +9049,7 @@ export const cs_CZ: EnTranslations = {
       "filterSort": "Řazení",
       "sortName": "Název (A-Z)",
       "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
+      "collapseLowest": "Pouze nejnižší cena",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",
@@ -8952,6 +9080,8 @@ export const cs_CZ: EnTranslations = {
       "quantity": "Množství",
       "quantityOf": "z {count}",
       "priceEach": "Cena za kus",
+      "lowestPriceLabel": "Současná nejnižší nabídková cena",
+      "lowestPriceNone": "Pro tento předmět zatím nejsou žádné aktivní nabídky.",
       "listButton": "Nabídnout na Světovém trhu",
       "minPriceError": "Zadej cenu alespoň 1 měď.",
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",
@@ -9379,6 +9509,7 @@ export const cs_CZ: EnTranslations = {
       "cheap_shot": {
         "name": "Rána do břicha",
         "description": "Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Musíš být v skrytí. Udělí 2 combo body.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí: takové použití nic nestojí, spotřebuje všechna 3 Šera a spustí Stínový závoj na 6 s."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const cs_CZ: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Hořící přísaha",
-        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 60 %. Pouze Strážce víry."
+        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 30 %. Pouze Strážce víry."
       },
       "retribution_aura": {
         "name": "Aura odplaty",
@@ -9707,7 +9838,7 @@ export const cs_CZ: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Zbraň spoutaná kamenem",
-        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 30 % zbroje, utrpí o 10 % nižší poškození a vytváří dvojnásobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
+        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 40 % zbroje a 20 % výdrže, utrpí o 15 % nižší poškození a je odolný vůči kritickým zásahům od nestvůr a vytváří 2,75násobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
       },
       "healing_wave": {
         "name": "Léčivé vody",
@@ -9886,7 +10017,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_form": {
         "name": "Medvědí podoba",
-        "description": "Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
+        "description": "Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
       },
       "maul": {
         "name": "Drcení kostí",
@@ -9896,6 +10027,10 @@ export const cs_CZ: EnTranslations = {
       "growl": {
         "name": "Hrozba",
         "description": "Zavrčí na cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit. Pouze v medvědí podobě."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Vlčí podoba",

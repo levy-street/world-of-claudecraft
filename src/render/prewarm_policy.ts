@@ -295,8 +295,8 @@ export function prewarmSubmitShouldStop(
  * left unpaid, make ordinary first draws stall in live frames (the login
  * storm's blocking reflection and texture-decode hitches). Their resume
  * units run at BOOT_DEBT priority so cosmetic background warming (the
- * char/armory preview lane at BACKGROUND) cannot starve them, which
- * production measured as minutes of unpaid debt after the reveal.
+ * char preview lane at BACKGROUND) cannot starve them, which production
+ * measured as minutes of unpaid debt after the reveal.
  *
  * Deliberately NOT in the set: the per-family VFX warmers
  * (props.ghost-fade-variants, vfx.weapon-skins, vfx.ability-primitives).

@@ -3140,6 +3140,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
   growl: r('earth', 'earthBrown', ['roar'], ['arcs']),
+  challenging_roar: r('fury', 'earthBrown', ['roar', { p: 'paw', ...BR }], ['arcs']),
   demoralizing_roar: r('shadow', 'earthBrown', ['roar'], ['arcs']),
   cat_form: r('nature', 'leafGreen', ['paw', { p: 'fang', ...BR }]),
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
@@ -3650,6 +3651,13 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // red_banner ability's staff-plus-sunburst language) on the objective gold, so
   // it reads as the flag itself and not as another rune.
   bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
+  // The operator-applied Cheater mark (src/sim/moderation/), keyed by AURA id like
+  // the rune buffs above. Without a row here the resolver fell through to the
+  // generic utility fallback, so a SANCTION wore a parchment/gold buff icon in the
+  // debuff bar and, being outside AURA_RECIPE_IDS, also missed the prewarm worker
+  // and composed synchronously on the frame path the first time anyone saw it.
+  // A blood brand-sigil watched by a bone eye: branded, and seen.
+  cheater_mark: r('shadow', 'blood', ['sigil_rune', { p: 'eye', ...BR, pal: 'bone' }], ['glow']),
   // Painted talent/modifier identities are not ABILITIES records, but their
   // runtime timers still need a meaningful synchronous layer while the WebP
   // decodes (and if it ever fails to load).
@@ -4652,6 +4660,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'overbloom',
   'feral_charge',
   'frenzied_regeneration',
+  'challenging_roar',
   'hurricane',
   'innervate',
   'moonkin_form',

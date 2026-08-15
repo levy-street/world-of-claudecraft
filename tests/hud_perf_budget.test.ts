@@ -662,6 +662,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/battleground/battleground_atlas_marks_painter.ts', allow: {}, reflowAllow: {} },
   // the M-map Thornhollow Fields plan: canvas-only, redrawn on the map cadence;
   // like minimap it caches its one --color-* group resolve for the session
@@ -885,6 +886,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       '.scrollLeft': 1,
       '.getBoundingClientRect': 1,
     },
+    driverAllow: {},
+  },
+  // One map-canvas projection read at the bounded map-paint boundary. Pointer hover and
+  // touch hit tests consume only the controller-owned cache, so no pointer event can force
+  // layout.
+  {
+    file: 'hud/map/map_marker_interaction_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
   { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
@@ -1314,6 +1323,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     const controllers = ON_DISK_PAINTERS.filter((f) => f.endsWith('_controller.ts'));
     expect(controllers.length, 'the HUD controllers vanished from the sweep').toBeGreaterThan(10);
     expect(controllers).toContain('hud/chat/chat_geometry_controller.ts');
+    expect(COLD_PAINTERS).toContain('hud/map/map_marker_interaction_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/fiesta/fiesta_controller.ts');
   });
 

@@ -9,3 +9,11 @@ export interface WorldAuthMessage {
 }
 
 export function worldAuthMessage(token: string, character: number): WorldAuthMessage;
+
+export interface ChatCommandMessage {
+  readonly t: 'cmd';
+  readonly cmd: 'chat';
+  readonly text: string;
+}
+
+export function chatCommandMessage(text: string): ChatCommandMessage;

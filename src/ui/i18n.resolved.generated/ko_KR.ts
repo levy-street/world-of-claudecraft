@@ -1741,6 +1741,7 @@ export const ko_KR: EnTranslations = {
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
+        "arenaComplete": "투기장 참전",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
@@ -1847,6 +1848,7 @@ export const ko_KR: EnTranslations = {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
     "itemHeroicTag": "[영웅]",
+    "itemHeroicLabel": "영웅",
     "itemSoulbound": "귀속",
     "itemUniqueEquipped": "착용 시 고유",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const ko_KR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "자리비움"
+      "afkTag": "자리비움",
+      "cheaterTag": "< 부정행위자 >"
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",
@@ -3936,6 +3939,12 @@ export const ko_KR: EnTranslations = {
       "genesis_token_claimed": "해당 Seeker Genesis Token은 이미 등록되었습니다.",
       "entitlement_required": "인증된 Seeker 자격이 필요합니다.",
       "current_ownership_required": "현재 Seeker Genesis Token을 보유해야 합니다."
+    },
+    "cheater_mark": {
+      "admin_target": "운영자 계정에는 표식을 부여할 수 없습니다.",
+      "reason_required": "사유를 입력해야 합니다.",
+      "invalid_duration": "표식 기간은 최소 1초 이상이어야 합니다.",
+      "not_marked": "해당 계정에는 표식이 없습니다."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const ko_KR: EnTranslations = {
     "email": "이메일",
     "emailPlaceholder": "you@example.com",
     "emailError": "유효한 이메일 주소를 입력하세요.",
+    "marketingOptIn": "게임 소식 및 업데이트 이메일 받기 (선택 사항)",
     "showPassword": "비밀번호 표시",
     "hidePassword": "비밀번호 숨기기",
     "logIn": "로그인",
@@ -6652,6 +6662,19 @@ export const ko_KR: EnTranslations = {
     "style": "스타일",
     "resetLook": "외형 초기화",
     "resetShort": "초기화",
+    "shareTab": "공유",
+    "designCode": "디자인 코드",
+    "designCodeHint": "이 코드를 복사하면 이 모습을 저장하거나 공유할 수 있습니다. 코드를 여기에 붙여넣고 가져오면 불러올 수 있습니다.",
+    "copyCode": "코드 복사",
+    "importCode": "가져오기",
+    "designCodeCopied": "디자인 코드가 복사되었습니다.",
+    "designCodeCopyManual": "여기서는 자동 복사가 차단되어 있습니다. 코드가 선택되어 있으니 키보드로 복사하세요.",
+    "designCodeImported": "디자인을 가져왔습니다.",
+    "designCodeImportedPartial": "디자인을 가져왔습니다. 이 버전에서 인식할 수 없는 값은 건너뛰었습니다.",
+    "designCodeErrEmpty": "먼저 디자인 코드를 붙여넣으세요.",
+    "designCodeErrHeader": "디자인 코드가 아닌 것 같습니다.",
+    "designCodeErrVersion": "이 디자인 코드는 더 새로운 게임 버전의 것입니다.",
+    "designCodeErrMalformed": "이 디자인 코드는 손상되었습니다. 코드 전체를 복사한 뒤 다시 시도하세요.",
     "browFlat": "일자",
     "browArched": "아치",
     "browThin": "얇게",
@@ -8003,7 +8026,111 @@ export const ko_KR: EnTranslations = {
       "zoomIn": "확대",
       "zoomOut": "축소",
       "mapCanvasLabel": "지도",
-      "mapSummary": "{zone}의 지도."
+      "mapSummary": "{zone}의 지도.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "표시된 중요 표식이 없습니다.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}개, {direction}, {distance}.",
+      "mapMarkerMore": "표식 {count}개 더 있음.",
+      "mapMarkerDirections": {
+        "center": "중앙",
+        "north": "북쪽",
+        "northeast": "북동쪽",
+        "east": "동쪽",
+        "southeast": "남동쪽",
+        "south": "남쪽",
+        "southwest": "남서쪽",
+        "west": "서쪽",
+        "northwest": "북서쪽"
+      },
+      "mapMarkerDistances": {
+        "near": "가까움",
+        "medium": "중간 거리",
+        "far": "멀리"
+      },
+      "mapMarkerLabels": {
+        "you": "자신",
+        "availableQuest": "수락 가능한 퀘스트",
+        "readyQuest": "완료 가능한 퀘스트",
+        "repeatQuest": "반복 퀘스트",
+        "cooldownQuest": "재사용 대기 중인 퀘스트",
+        "questObjective": "퀘스트 목표 지역",
+        "readyOre": "채광 가능한 광맥",
+        "readyWood": "채집 가능한 목재",
+        "readyHerb": "채집 가능한 약초",
+        "readyLockedOre": "채광 가능한 광맥, 도구 잠김",
+        "readyLockedWood": "채집 가능한 목재, 도구 잠김",
+        "readyLockedHerb": "채집 가능한 약초, 도구 잠김",
+        "cooldownOre": "고갈된 광맥",
+        "cooldownWood": "고갈된 목재",
+        "cooldownHerb": "고갈된 약초",
+        "cooldownLockedOre": "고갈된 광맥, 도구 잠김",
+        "cooldownLockedWood": "고갈된 목재, 도구 잠김",
+        "cooldownLockedHerb": "고갈된 약초, 도구 잠김",
+        "station": "제작 시설: {name}",
+        "service": "편의 시설: {name}",
+        "partyMember": "파티원: {name}",
+        "deadPartyMember": "사망한 파티원: {name}",
+        "partyMemberGeneric": "파티원",
+        "deadPartyMemberGeneric": "사망한 파티원",
+        "friend": "친구: {name}",
+        "guildMember": "길드원: {name}",
+        "pointOfInterest": "주요 지점: {name}",
+        "dungeonEntrance": "던전 입구: {name}",
+        "dungeonExit": "던전 출구",
+        "delveEntrance": "탐굴 입구: {name}",
+        "worldPassage": "{zone}(으)로 가는 통로",
+        "riftEntrance": "균열 입구: {name}",
+        "hostileEnemy": "적대 대상",
+        "aggressiveEnemy": "당신을 공격 중인 적",
+        "lootableEnemy": "전리품을 획득할 수 있는 적",
+        "corpse": "자신의 시체",
+        "deathZone": "위험 지역",
+        "teammate": "아군",
+        "deadTeammate": "사망한 아군",
+        "flagCarrier": "깃발을 운반 중인 아군",
+        "ownFlagStand": "아군 깃발 거치대",
+        "enemyFlagStand": "적군 깃발 거치대",
+        "riftDescent": "균열 하강로",
+        "riftReturnBeacon": "귀환 신호기",
+        "riftReturnExit": "귀환 출구",
+        "ranked": "{marker}, {rank} 등급",
+        "riftTreasureAvailable": "획득 가능한 보물",
+        "riftTreasureLocked": "잠긴 보물",
+        "riftTreasureOpened": "열린 보물",
+        "riftTreasureJammed": "고장 난 보물",
+        "riftCacheAvailable": "획득 가능한 균열 보관함",
+        "riftCacheLocked": "잠긴 보관함",
+        "riftCacheOpened": "열린 보관함",
+        "riftCacheJammed": "고장 난 보관함",
+        "pylonUnlit": "꺼진 기둥",
+        "pylonLit": "켜진 기둥",
+        "sequenceRuneUnlit": "꺼진 순서 룬",
+        "sequenceRuneLit": "켜진 순서 룬",
+        "iceGoal": "얼음 목표 지점",
+        "boulderPad": "바위 목표 지점",
+        "boulderMovable": "움직일 수 있는 바위",
+        "boulderPlaced": "배치된 바위",
+        "gateSealed": "봉인된 문",
+        "gateOpen": "열린 문",
+        "switchReady": "사용 가능한 스위치",
+        "switchOn": "작동 중인 스위치",
+        "orbDormant": "휴면 구슬",
+        "orbActive": "활성 구슬",
+        "rollerHazard": "굴림 장치 위험물",
+        "delvePassageSealed": "봉인된 통로",
+        "delvePassageOpen": "열린 통로",
+        "delveSurfaceExit": "지상 출구",
+        "delveCacheLocked": "잠긴 탐굴 보관함",
+        "delveCacheReady": "준비된 탐굴 보관함",
+        "delveCacheActive": "활성화된 탐굴 보관함",
+        "delveCacheOpened": "열린 탐굴 보관함",
+        "delveReliquaryLocked": "잠긴 성물함",
+        "delveReliquaryReady": "준비된 성물함",
+        "delveReliquaryActive": "의식 진행 중인 성물함",
+        "delveReliquaryOpened": "열린 성물함",
+        "bountiful": "풍요로운 {marker}"
+      }
     },
     "options": {
       "gameMenu": "게임 메뉴",
@@ -8922,6 +9049,7 @@ export const ko_KR: EnTranslations = {
       "filterSort": "정렬",
       "sortName": "이름 (A-Z)",
       "sortPriceAsc": "가격: 낮은순",
+      "collapseLowest": "최저가만 표시",
       "weaponSword": "검",
       "weaponDagger": "단검",
       "weaponStaff": "지팡이",
@@ -8952,6 +9080,8 @@ export const ko_KR: EnTranslations = {
       "quantity": "수량",
       "quantityOf": "/ {count}",
       "priceEach": "개당 가격",
+      "lowestPriceLabel": "현재 최저 등록 가격",
+      "lowestPriceNone": "이 아이템은 현재 등록된 판매가 없습니다.",
       "listButton": "세계 시장에 등록",
       "minPriceError": "가격은 최소 1동화여야 합니다.",
       "collectEmpty": "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.",
@@ -9379,6 +9509,7 @@ export const ko_KR: EnTranslations = {
       "cheap_shot": {
         "name": "명치 가격",
         "description": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.",
+        "descriptionNoStealth": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 연계 점수 2점을 얻습니다.",
         "specNote_subtlety": "황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const ko_KR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "불타는 맹세",
-        "description": "신성 피해가 만드는 위협 수준을 지속적으로 60% 높입니다. 신앙수호자 전용."
+        "description": "신성 피해가 만드는 위협 수준을 지속적으로 30% 높입니다. 신앙수호자 전용."
       },
       "retribution_aura": {
         "name": "응보의 오라",
@@ -9707,7 +9838,7 @@ export const ko_KR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
-        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 30% 얻고, 받는 피해가 10% 줄며, 위협 수준을 두 배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
+        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 40%, 체력을 20% 얻고, 받는 피해가 15% 줄며, 야수의 치명타에 면역이 되며, 위협 수준을 2.75배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
       },
       "healing_wave": {
         "name": "치유의 물결",
@@ -9886,7 +10017,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_form": {
         "name": "큰곰 변신",
-        "description": "곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "description": "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
         "name": "뼈 분쇄",
@@ -9896,6 +10027,10 @@ export const ko_KR: EnTranslations = {
       "growl": {
         "name": "위협",
         "description": "대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
+      },
+      "challenging_roar": {
+        "name": "위압의 포효",
+        "description": "위압적으로 포효합니다. 10미터 내의 모든 적이 도발되어 자신에 대한 위협 수준이 그 적이 가장 증오하는 대상과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
       },
       "cat_form": {
         "name": "늑대 변신",

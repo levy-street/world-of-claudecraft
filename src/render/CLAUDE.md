@@ -94,9 +94,6 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
-- `voxel_terrain.ts`: verification-only prototype (proposal #1611, driven by
-  `scripts/`, NOT the live path); live terrain is `terrain.ts` sampling sim heights.
-
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,
@@ -218,6 +215,25 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   `background_gpu_queue.ts` (the one priority arbiter for idle-time work that
   reaches WebGL), `idle_queue.ts` (idle-slot queue draining). Use these, never
   a bespoke idle loop.
+- **A program only ONE encounter can reach warms at that interior's attach,
+  never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
+  `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis
+  tenant is Soul Rend: its mark clones every marked body's materials
+  `transparent` with `depthWrite = false`, which three keys as a NEW program per
+  body AND per mesh SHAPE, so the first mark linked ~32 programs inside one
+  frame. Two halves, because neither covers the other: a CATALOG (class rigs,
+  VFX weapon skins) and the LIVE looks in the room, since real players carry dye
+  and jewel variants no default rig has. Three rules the measurements paid for:
+  the stand-in must be SKINNED (a `PlaneGeometry` proxy links a different
+  variant and changes nothing), the clone materials are kept alive and never
+  disposed (three releases the program with the last material), and BOTH the
+  build and the compile drain across idle slots, per body, chained, because a
+  raid arrives together and independent idle waits otherwise resolve in one idle
+  period and concatenate into a single long task.
+  Warm nothing whose cost you have not measured: Brother Aldric was in this
+  spec until an A/B from a start zone that had never compiled his model showed
+  his spawn linking ZERO programs (the player bodies on screen already carry
+  them).
 
 ## i18n: overhead labels are the only string surface here
 One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the

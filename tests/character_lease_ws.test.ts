@@ -95,7 +95,17 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     releaseCharacterLease: releaseSpy,
     bankBonusForAccount: bankBonusSpy,
   };
-  return { deps, game, joinSpy, hasSessionSpy, acquireSpy, releaseSpy, bankBonusSpy, session };
+  return {
+    deps,
+    game,
+    joinSpy,
+    hasSessionSpy,
+    acquireSpy,
+    releaseSpy,
+    bankBonusSpy,
+    session,
+    character,
+  };
 }
 
 beforeEach(() => {
@@ -167,6 +177,45 @@ describe('ws auth character load lease', () => {
     expect(sent).not.toContainEqual({ t: 'error', error: ALREADY_IN_WORLD });
     // A successful join owns the lease; leave() releases it, not the handshake.
     expect(releaseSpy).not.toHaveBeenCalled();
+  });
+
+  it('reloads after the lease and joins with the refreshed state', async () => {
+    const { deps, character, joinSpy, acquireSpy } = makeDeps();
+    const staleCharacter = { ...character, state: { marker: 'before-migration' } };
+    const refreshedCharacter = { ...character, state: { marker: 'after-migration' } };
+    const getCharacterSpy = vi
+      .fn()
+      .mockResolvedValueOnce(staleCharacter)
+      .mockResolvedValueOnce(refreshedCharacter);
+    deps.getCharacter = getCharacterSpy;
+    const { ws } = fakeWs();
+
+    await createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq());
+
+    expect(getCharacterSpy).toHaveBeenCalledTimes(2);
+    expect(acquireSpy.mock.invocationCallOrder[0]).toBeLessThan(
+      getCharacterSpy.mock.invocationCallOrder[1],
+    );
+    expect(joinSpy).toHaveBeenCalledTimes(1);
+    expect(joinSpy.mock.calls[0][5]).toEqual({ marker: 'after-migration' });
+  });
+
+  it('releases the acquired lease when the post-lease reload rejects', async () => {
+    const { deps, character, joinSpy, acquireSpy, releaseSpy } = makeDeps();
+    deps.getCharacter = vi
+      .fn()
+      .mockResolvedValueOnce(character)
+      .mockRejectedValueOnce(new Error('reload failed'));
+    const { ws } = fakeWs();
+
+    await expect(
+      createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq()),
+    ).rejects.toThrow('reload failed');
+
+    const nonce = acquireSpy.mock.calls[0][2];
+    expect(releaseSpy).toHaveBeenCalledTimes(1);
+    expect(releaseSpy).toHaveBeenCalledWith(character.id, nonce);
+    expect(joinSpy).not.toHaveBeenCalled();
   });
 
   it('awaits a nonce-fenced release when join refuses and no session owns it', async () => {

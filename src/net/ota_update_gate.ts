@@ -9,15 +9,16 @@
 //
 // This module turns those native events into a visible flow with two faces:
 // - Boot/pre-world: while a download runs before the player enters the world,
-//   an overlay shows live percent progress with a "continue without
-//   updating" escape hatch; when the download completes and the player has
-//   neither dismissed the overlay nor entered the world, the staged bundle is
-//   applied immediately via a WebView reload instead of waiting for a
-//   backgrounding.
+//   an overlay shows live percent progress with no dismiss action (a skipped
+//   update leaves the player on a stale bundle headed for the
+//   incompatible-version dead end, so the gate holds until the update lands);
+//   when the download completes and the player has not entered the world, the
+//   staged bundle is applied immediately via a WebView reload instead of
+//   waiting for a backgrounding.
 // - The incompatible-version rejection: when the server refuses the bundle's
 //   world-layout epoch and a download is in flight (or already staged), the
 //   dead-end fatal overlay is replaced by this gate in "fatal" mode: progress,
-//   then auto-apply, no dismiss (there is nothing playable behind it).
+//   then auto-apply (there is nothing playable behind it).
 //
 // In-world sessions are never interrupted: while body is game-active the
 // overlay stays hidden and a completed download falls back to the plugin's
@@ -39,12 +40,10 @@ export interface OtaGateState {
   phase: OtaGatePhase;
   /** Last reported download percent, 0..100. */
   percent: number;
-  /** Player chose "continue without updating"; stop surfacing the overlay. */
-  dismissed: boolean;
   /**
    * The session died on the incompatible-version rejection and this gate took
-   * over the recovery: the overlay switches to the "update required" copy,
-   * loses its dismiss action, and applies the bundle the moment it is ready.
+   * over the recovery: the overlay switches to the "update required" copy and
+   * applies the bundle the moment it is ready.
    */
   fatal: boolean;
 }
@@ -53,7 +52,6 @@ export type OtaGateEvent =
   | { type: 'progress'; percent: number }
   | { type: 'complete' }
   | { type: 'failed' }
-  | { type: 'dismiss' }
   | { type: 'incompatible' }
   | { type: 'applying' };
 
@@ -61,12 +59,11 @@ export type OtaGateEvent =
 export interface OtaOverlayModel {
   phase: 'downloading' | 'applying';
   percent: number;
-  showContinue: boolean;
   fatal: boolean;
 }
 
 export function initialOtaGateState(): OtaGateState {
-  return { phase: 'idle', percent: 0, dismissed: false, fatal: false };
+  return { phase: 'idle', percent: 0, fatal: false };
 }
 
 export function reduceOtaGateEvent(state: OtaGateState, event: OtaGateEvent): OtaGateState {
@@ -82,12 +79,8 @@ export function reduceOtaGateEvent(state: OtaGateState, event: OtaGateEvent): Ot
     case 'failed':
       if (state.phase === 'applying') return state;
       return { ...state, phase: 'failed' };
-    case 'dismiss':
-      return { ...state, dismissed: true };
     case 'incompatible':
-      // Fatal mode overrides an earlier dismissal: the session is dead, so
-      // "continue without updating" no longer means anything.
-      return { ...state, fatal: true, dismissed: false };
+      return { ...state, fatal: true };
     case 'applying':
       return { ...state, phase: 'applying', percent: 100 };
   }
@@ -95,26 +88,20 @@ export function reduceOtaGateEvent(state: OtaGateState, event: OtaGateEvent): Ot
 
 export function otaOverlayModel(state: OtaGateState, inWorld: boolean): OtaOverlayModel | null {
   if (state.phase === 'idle' || state.phase === 'failed') return null;
-  if (state.dismissed && !state.fatal) return null;
   // Never veil live play; the plugin's apply-on-background still covers it.
   if (inWorld && !state.fatal) return null;
   if (state.phase === 'downloading') {
-    return {
-      phase: 'downloading',
-      percent: state.percent,
-      showContinue: !state.fatal,
-      fatal: state.fatal,
-    };
+    return { phase: 'downloading', percent: state.percent, fatal: state.fatal };
   }
   // 'ready' renders as applying: the auto-apply decision below fires in the
   // same event turn, so the player never sees a stalled "ready" state.
-  return { phase: 'applying', percent: 100, showContinue: false, fatal: state.fatal };
+  return { phase: 'applying', percent: 100, fatal: state.fatal };
 }
 
 export function shouldAutoApplyOta(state: OtaGateState, inWorld: boolean): boolean {
   if (state.phase !== 'ready') return false;
   if (state.fatal) return true;
-  return !state.dismissed && !inWorld;
+  return !inWorld;
 }
 
 export interface OtaUpdateGateDeps {
@@ -144,15 +131,12 @@ export interface OtaUpdateGate {
    * is downloading or staged. On false the caller shows its usual overlay.
    */
   handleIncompatibleDisconnect(reason: string | undefined): boolean;
-  /** The overlay's "continue without updating" action. */
-  dismiss(): void;
   /** Snapshot for tests/diagnostics. */
   state(): Readonly<OtaGateState>;
 }
 
 const INERT_GATE: OtaUpdateGate = {
   handleIncompatibleDisconnect: () => false,
-  dismiss: () => {},
   state: () => initialOtaGateState(),
 };
 
@@ -187,9 +171,11 @@ export function installOtaUpdateGate(deps: OtaUpdateGateDeps): OtaUpdateGate {
       if (state.fatal) {
         // Nothing left to try in fatal mode: hand the screen back to the
         // caller's own dead-end overlay rather than showing "restarting"
-        // forever. The plugin still applies the staged bundle on the next
-        // launch or backgrounding.
-        paint();
+        // forever. Hiding is load-bearing, not cosmetic: the caller's
+        // recovery overlay stacks BELOW this scrim, so a repaint here would
+        // bury its only action. The plugin still applies the staged bundle
+        // on the next launch or backgrounding.
+        deps.overlay.hide();
         deps.onFatalRecoveryFailed?.();
       } else {
         // Pre-world boot flow: fall back silently to apply-on-background.
@@ -227,10 +213,6 @@ export function installOtaUpdateGate(deps: OtaUpdateGateDeps): OtaUpdateGate {
       state = reduceOtaGateEvent(state, { type: 'incompatible' });
       maybeApply();
       return true;
-    },
-    dismiss: () => {
-      state = reduceOtaGateEvent(state, { type: 'dismiss' });
-      paint();
     },
     state: () => state,
   };

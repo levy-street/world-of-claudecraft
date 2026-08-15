@@ -238,6 +238,10 @@ describe('buildGateProfileSteps', () => {
     expect(names).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
       'vitest (full suite)',
@@ -269,6 +273,10 @@ describe('buildGateProfileSteps', () => {
     expect(steps.map((s) => s.name)).toEqual([
       'i18n + wiki + sfx artifacts',
       'i18n freshness',
+      'sfx manifest regen',
+      'media manifest regen',
+      'manifest trackedness',
+      'manifest freshness',
       'malware scan',
       'biome (changed files)',
     ]);

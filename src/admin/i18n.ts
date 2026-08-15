@@ -274,6 +274,13 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   // reads the ternary fallback literal).
   'ai must be a boolean': 'error.aiFlagRequired',
   'streamer must be a boolean': 'error.streamerFlagRequired',
+  // The Cheater mark routes emit stable codes, never prose
+  // (server/cheater_mark_api.ts); reason_required reuses the shared
+  // moderation-reason key so the two alerts read identically.
+  'cheater_mark.reason_required': 'error.moderationReasonRequired',
+  'cheater_mark.invalid_duration': 'error.cheaterMarkDurationInvalid',
+  'cheater_mark.not_marked': 'error.cheaterMarkNotMarked',
+  'cheater_mark.admin_target': 'error.cheaterMarkAdminTarget',
   'a links object is required': 'error.streamerLinksRequired',
   'failed to update account flair': 'error.accountFlairFailed',
   'a valid daily rewards date is required': 'error.dailyRewardDayRequired',

@@ -1741,6 +1741,7 @@ export const da_DK: EnTranslations = {
       "notEnoughHonor": "Ikke nok Ære.",
       "reasons": {
         "arenaWin": "Arenasejr",
+        "arenaComplete": "Arenakamp udkæmpet",
         "fiestaKill": "Fiesta-nedlæggelse",
         "fiestaComplete": "Fiesta gennemført",
         "fiestaWin": "Fiesta-sejr",
@@ -1847,6 +1848,7 @@ export const da_DK: EnTranslations = {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
     "itemHeroicTag": "[HEROISK]",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Sjælebundet",
     "itemUniqueEquipped": "Unikt Udrustet",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const da_DK: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Snyder >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3936,6 +3939,12 @@ export const da_DK: EnTranslations = {
       "genesis_token_claimed": "Det Seeker Genesis Token er allerede indløst.",
       "entitlement_required": "Der kræves en verificeret Seeker-rettighed.",
       "current_ownership_required": "Der kræves aktuelt ejerskab af et Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatørkonti kan ikke markeres.",
+      "reason_required": "Der skal angives en grund.",
+      "invalid_duration": "Angiv en markeringsvarighed på mindst ét sekund.",
+      "not_marked": "Den konto er ikke markeret."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const da_DK: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "dig@eksempel.com",
     "emailError": "Indtast venligst en gyldig e-mailadresse.",
+    "marketingOptIn": "Send mig nyheder og opdateringer om spillet via e-mail (valgfrit)",
     "showPassword": "Vis adgangskode",
     "hidePassword": "Skjul adgangskode",
     "logIn": "Log ind",
@@ -6652,6 +6662,19 @@ export const da_DK: EnTranslations = {
     "style": "Stil",
     "resetLook": "Nulstil Udseende",
     "resetShort": "Nulstil",
+    "shareTab": "Del",
+    "designCode": "Udseendeskode",
+    "designCodeHint": "Kopiér denne kode for at gemme eller dele dette udseende. Indsæt en kode her, og importér den for at indlæse udseendet.",
+    "copyCode": "Kopiér kode",
+    "importCode": "Importér",
+    "designCodeCopied": "Udseendeskoden er kopieret.",
+    "designCodeCopyManual": "Automatisk kopiering er blokeret her. Koden er markeret; kopiér den med tastaturet.",
+    "designCodeImported": "Udseendet er importeret.",
+    "designCodeImportedPartial": "Udseendet er importeret. Værdier, som denne version ikke kender, blev sprunget over.",
+    "designCodeErrEmpty": "Indsæt først en udseendeskode.",
+    "designCodeErrHeader": "Det ligner ikke en udseendeskode.",
+    "designCodeErrVersion": "Den udseendeskode stammer fra en nyere spilversion.",
+    "designCodeErrMalformed": "Den udseendeskode er beskadiget. Kopiér hele koden, og prøv igen.",
     "browFlat": "Flad",
     "browArched": "Buet",
     "browThin": "Tynd",
@@ -8003,7 +8026,111 @@ export const da_DK: EnTranslations = {
       "zoomIn": "Zoom ind",
       "zoomOut": "Zoom ud",
       "mapCanvasLabel": "Kort",
-      "mapSummary": "Kort over {zone}."
+      "mapSummary": "Kort over {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Ingen relevante markører er synlige.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Yderligere markører: {count}.",
+      "mapMarkerDirections": {
+        "center": "i midten",
+        "north": "mod nord",
+        "northeast": "mod nordøst",
+        "east": "mod øst",
+        "southeast": "mod sydøst",
+        "south": "mod syd",
+        "southwest": "mod sydvest",
+        "west": "mod vest",
+        "northwest": "mod nordvest"
+      },
+      "mapMarkerDistances": {
+        "near": "i nærheden",
+        "medium": "på mellemlang afstand",
+        "far": "langt væk"
+      },
+      "mapMarkerLabels": {
+        "you": "Dig",
+        "availableQuest": "Tilgængelig quest",
+        "readyQuest": "Quest klar til aflevering",
+        "repeatQuest": "Gentagelig quest",
+        "cooldownQuest": "Quest på nedkøling",
+        "questObjective": "Område med questmål",
+        "readyOre": "Tilgængelig malmåre",
+        "readyWood": "Tilgængelig tømmerlund",
+        "readyHerb": "Tilgængelig urteplet",
+        "readyLockedOre": "Tilgængelig malmåre, værktøj låst",
+        "readyLockedWood": "Tilgængelig tømmerlund, værktøj låst",
+        "readyLockedHerb": "Tilgængelig urteplet, værktøj låst",
+        "cooldownOre": "Udtømt malmåre",
+        "cooldownWood": "Udtømt tømmerlund",
+        "cooldownHerb": "Udtømt urteplet",
+        "cooldownLockedOre": "Udtømt malmåre, værktøj låst",
+        "cooldownLockedWood": "Udtømt tømmerlund, værktøj låst",
+        "cooldownLockedHerb": "Udtømt urteplet, værktøj låst",
+        "station": "Håndværksstation: {name}",
+        "service": "Tjeneste: {name}",
+        "partyMember": "Gruppemedlem: {name}",
+        "deadPartyMember": "Dødt gruppemedlem: {name}",
+        "partyMemberGeneric": "Gruppemedlem",
+        "deadPartyMemberGeneric": "Dødt gruppemedlem",
+        "friend": "Ven: {name}",
+        "guildMember": "Laugsmedlem: {name}",
+        "pointOfInterest": "Interessepunkt: {name}",
+        "dungeonEntrance": "Fangehulsindgang: {name}",
+        "dungeonExit": "Fangehulsudgang",
+        "delveEntrance": "Delve-indgang: {name}",
+        "worldPassage": "Passage til {zone}",
+        "riftEntrance": "Rift-indgang: {name}",
+        "hostileEnemy": "Fjendtligt mål",
+        "aggressiveEnemy": "Fjende angriber dig",
+        "lootableEnemy": "Fjende med bytte",
+        "corpse": "Dit lig",
+        "deathZone": "Farezone",
+        "teammate": "Holdkammerat",
+        "deadTeammate": "Død holdkammerat",
+        "flagCarrier": "Holdkammerat med flaget",
+        "ownFlagStand": "Din flagstander",
+        "enemyFlagStand": "Fjendens flagstander",
+        "riftDescent": "Nedstigning i riften",
+        "riftReturnBeacon": "Retursignal",
+        "riftReturnExit": "Returudgang",
+        "ranked": "{marker}, rang {rank}",
+        "riftTreasureAvailable": "Tilgængelig skat",
+        "riftTreasureLocked": "Låst skat",
+        "riftTreasureOpened": "Åbnet skat",
+        "riftTreasureJammed": "Skat med fastklemt lås",
+        "riftCacheAvailable": "Tilgængelig riftkiste",
+        "riftCacheLocked": "Låst kiste",
+        "riftCacheOpened": "Åbnet kiste",
+        "riftCacheJammed": "Kiste med fastklemt lås",
+        "pylonUnlit": "Slukket runepylon",
+        "pylonLit": "Tændt runepylon",
+        "sequenceRuneUnlit": "Slukket sekvensrune",
+        "sequenceRuneLit": "Tændt sekvensrune",
+        "iceGoal": "Ismål",
+        "boulderPad": "Kampestensmål",
+        "boulderMovable": "Flytbar kampesten",
+        "boulderPlaced": "Placeret kampesten",
+        "gateSealed": "Forseglet port",
+        "gateOpen": "Åben port",
+        "switchReady": "Kontakt klar til brug",
+        "switchOn": "Aktiveret kontakt",
+        "orbDormant": "Hvilende kugle",
+        "orbActive": "Aktiv kugle",
+        "rollerHazard": "Farlig rullende kampesten",
+        "delvePassageSealed": "Forseglet passage",
+        "delvePassageOpen": "Åben passage",
+        "delveSurfaceExit": "Udgang til overfladen",
+        "delveCacheLocked": "Låst delve-kiste",
+        "delveCacheReady": "Delve-kiste klar",
+        "delveCacheActive": "Delve-kiste aktiv",
+        "delveCacheOpened": "Åbnet delve-kiste",
+        "delveReliquaryLocked": "Låst relikvarium",
+        "delveReliquaryReady": "Relikvarium klart",
+        "delveReliquaryActive": "Relikvarieritual aktivt",
+        "delveReliquaryOpened": "Åbnet relikvarium",
+        "bountiful": "{marker} med rigt bytte"
+      }
     },
     "options": {
       "gameMenu": "Spilmenu",
@@ -8922,6 +9049,7 @@ export const da_DK: EnTranslations = {
       "filterSort": "Sortering",
       "sortName": "Navn (A-Z)",
       "sortPriceAsc": "Pris: laveste til højeste",
+      "collapseLowest": "Kun laveste pris",
       "weaponSword": "Sværd",
       "weaponDagger": "Dolke",
       "weaponStaff": "Stave",
@@ -8952,6 +9080,8 @@ export const da_DK: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "af {count}",
       "priceEach": "Pris pr. styk",
+      "lowestPriceLabel": "Nuværende laveste udbudspris",
+      "lowestPriceNone": "Der er endnu ingen aktive opslag for denne genstand.",
       "listButton": "Sæt til salg på Verdensmarkedet",
       "minPriceError": "Angiv en pris på mindst 1 kobber.",
       "collectEmpty": "Intet venter. Salgsindtægter og udløbne varer hentes her.",
@@ -9379,6 +9509,7 @@ export const da_DK: EnTranslations = {
       "cheap_shot": {
         "name": "Maveslag",
         "description": "Slå målet for {damage} skade og bedøv det i 4 sek. Skal være i snigen. Giver 2 combopoint.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Brugt fra Skumringsslør tilføjer dette 1 Tusmørke (maks. 3). Ved 3 Tusmørke kan du bruge den UDEN snigen: den brug koster intet, forbruger alle 3 Tusmørke og starter det 6 sek. lange Skyggesløret."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const da_DK: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brændende Ed",
-        "description": "Øger passivt den trussel, jeres Hellige skade skaber, med 60%. Kun Trosvogter."
+        "description": "Øger passivt den trussel, jeres Hellige skade skaber, med 30%. Kun Trosvogter."
       },
       "retribution_aura": {
         "name": "Gengældelsens Aura",
@@ -9707,7 +9838,7 @@ export const da_DK: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet Våben",
-        "description": "Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 30% rustning, tager 10% mindre skade og skaber dobbelt så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek."
+        "description": "Gennemtrænger jeres våben i 30 min. Hvert hug volder {damage} ekstra skade. Forstærkning vinder desuden 40% rustning og 20% udholdenhed, tager 15% mindre skade og er immun over for kritiske træf fra væsner og skaber 2,75 gange så meget trussel. Jordstød tvinger sit mål til at angribe jer i 3 sek., og Tordenværn giver 10% skadereduktion i 3 sek."
       },
       "healing_wave": {
         "name": "Lægende Vande",
@@ -9886,7 +10017,7 @@ export const da_DK: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-form",
-        "description": "Forvandl dig til en bjørn: rustning +130%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
+        "description": "Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
       },
       "maul": {
         "name": "Knogleknus",
@@ -9896,6 +10027,10 @@ export const da_DK: EnTranslations = {
       "growl": {
         "name": "Trussel",
         "description": "Knurrer ad målet: din trussel stiger til at matche dets mest forhadte fjende, og det tvinges til at angribe dig i 3 sek. Kun i Bruin-form."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Ulveform",

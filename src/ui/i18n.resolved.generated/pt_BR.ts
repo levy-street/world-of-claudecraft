@@ -1741,6 +1741,7 @@ export const pt_BR: EnTranslations = {
       "notEnoughHonor": "Honra insuficiente.",
       "reasons": {
         "arenaWin": "Vitória na arena",
+        "arenaComplete": "combate na arena disputado",
         "fiestaKill": "Eliminação na Fiesta",
         "fiestaComplete": "Fiesta concluída",
         "fiestaWin": "Vitória na Fiesta",
@@ -1847,6 +1848,7 @@ export const pt_BR: EnTranslations = {
       "joinChannels": "Dica: digite /join world ou /join lfg para conversar com jogadores do mundo inteiro."
     },
     "itemHeroicTag": "[HEROICO]",
+    "itemHeroicLabel": "Heroico",
     "itemSoulbound": "Vinculado à alma",
     "itemUniqueEquipped": "Único-Equipado",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const pt_BR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Trapaceiro >"
     },
     "mobTooltip": {
       "levelFamily": "{family} de nível {level}",
@@ -3936,6 +3939,12 @@ export const pt_BR: EnTranslations = {
       "genesis_token_claimed": "Esse Seeker Genesis Token já foi resgatado.",
       "entitlement_required": "É necessário ter o benefício Seeker verificado.",
       "current_ownership_required": "É necessário possuir atualmente o Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Contas de operador não podem receber a marca.",
+      "reason_required": "É necessário informar um motivo.",
+      "invalid_duration": "Informe uma duração de pelo menos um segundo para a marca.",
+      "not_marked": "Essa conta não está marcada."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const pt_BR: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "voce@exemplo.com",
     "emailError": "Por favor, insira um endereço de e-mail válido.",
+    "marketingOptIn": "Quero receber notícias e atualizações do jogo por e-mail (opcional)",
     "showPassword": "Mostrar senha",
     "hidePassword": "Ocultar senha",
     "logIn": "Entrar",
@@ -6652,6 +6662,19 @@ export const pt_BR: EnTranslations = {
     "style": "Estilo",
     "resetLook": "Redefinir Aparência",
     "resetShort": "Redefinir",
+    "shareTab": "Compartilhar",
+    "designCode": "Código de aparência",
+    "designCodeHint": "Copie este código para salvar ou compartilhar esta aparência. Cole um código aqui e importe-o para carregá-la.",
+    "copyCode": "Copiar código",
+    "importCode": "Importar",
+    "designCodeCopied": "Código de aparência copiado.",
+    "designCodeCopyManual": "A cópia automática está bloqueada aqui. O código está selecionado; copie-o com o teclado.",
+    "designCodeImported": "Aparência importada.",
+    "designCodeImportedPartial": "Aparência importada. Os valores que esta versão não reconhece foram ignorados.",
+    "designCodeErrEmpty": "Cole primeiro um código de aparência.",
+    "designCodeErrHeader": "Isso não parece ser um código de aparência.",
+    "designCodeErrVersion": "Esse código de aparência veio de uma versão mais recente do jogo.",
+    "designCodeErrMalformed": "Esse código de aparência está corrompido. Copie o código inteiro e tente novamente.",
     "browFlat": "Reta",
     "browArched": "Arqueada",
     "browThin": "Fina",
@@ -8003,7 +8026,111 @@ export const pt_BR: EnTranslations = {
       "zoomIn": "Aproximar",
       "zoomOut": "Afastar",
       "mapCanvasLabel": "Mapa",
-      "mapSummary": "Mapa de {zone}."
+      "mapSummary": "Mapa de {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Não há nenhum marcador relevante visível.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Marcadores adicionais: {count}.",
+      "mapMarkerDirections": {
+        "center": "no centro",
+        "north": "ao norte",
+        "northeast": "a nordeste",
+        "east": "a leste",
+        "southeast": "a sudeste",
+        "south": "ao sul",
+        "southwest": "a sudoeste",
+        "west": "a oeste",
+        "northwest": "a noroeste"
+      },
+      "mapMarkerDistances": {
+        "near": "perto",
+        "medium": "a uma distância média",
+        "far": "longe"
+      },
+      "mapMarkerLabels": {
+        "you": "Você",
+        "availableQuest": "Missão disponível",
+        "readyQuest": "Missão pronta para entrega",
+        "repeatQuest": "Missão repetível",
+        "cooldownQuest": "Missão em recarga",
+        "questObjective": "Área do objetivo da missão",
+        "readyOre": "Veio de minério disponível",
+        "readyWood": "Arvoredo pronto para corte",
+        "readyHerb": "Canteiro de ervas disponível para coleta",
+        "readyLockedOre": "Veio de minério disponível, ferramenta indisponível",
+        "readyLockedWood": "Arvoredo pronto para corte, ferramenta indisponível",
+        "readyLockedHerb": "Canteiro de ervas disponível para coleta, ferramenta indisponível",
+        "cooldownOre": "Veio de minério esgotado",
+        "cooldownWood": "Arvoredo cortado",
+        "cooldownHerb": "Canteiro de ervas colhido",
+        "cooldownLockedOre": "Veio de minério esgotado, ferramenta indisponível",
+        "cooldownLockedWood": "Arvoredo cortado, ferramenta indisponível",
+        "cooldownLockedHerb": "Canteiro de ervas colhido, ferramenta indisponível",
+        "station": "Estação de criação: {name}",
+        "service": "Serviço: {name}",
+        "partyMember": "Membro do grupo: {name}",
+        "deadPartyMember": "Membro morto do grupo: {name}",
+        "partyMemberGeneric": "Membro do grupo",
+        "deadPartyMemberGeneric": "Membro morto do grupo",
+        "friend": "Amigo: {name}",
+        "guildMember": "Membro da guilda: {name}",
+        "pointOfInterest": "Ponto de interesse: {name}",
+        "dungeonEntrance": "Entrada da masmorra: {name}",
+        "dungeonExit": "Saída da masmorra",
+        "delveEntrance": "Entrada da incursão: {name}",
+        "worldPassage": "Passagem para {zone}",
+        "riftEntrance": "Entrada da fenda: {name}",
+        "hostileEnemy": "Inimigo hostil",
+        "aggressiveEnemy": "Inimigo atacando você",
+        "lootableEnemy": "Inimigo saqueável",
+        "corpse": "Seu cadáver",
+        "deathZone": "Zona de perigo",
+        "teammate": "Companheiro de equipe",
+        "deadTeammate": "Companheiro de equipe morto",
+        "flagCarrier": "Companheiro de equipe com a bandeira",
+        "ownFlagStand": "Suporte da sua bandeira",
+        "enemyFlagStand": "Suporte da bandeira inimiga",
+        "riftDescent": "Descida da fenda",
+        "riftReturnBeacon": "Sinalizador de retorno",
+        "riftReturnExit": "Saída de volta ao mundo",
+        "ranked": "{marker}, ranque {rank}",
+        "riftTreasureAvailable": "Tesouro disponível",
+        "riftTreasureLocked": "Tesouro trancado",
+        "riftTreasureOpened": "Tesouro aberto",
+        "riftTreasureJammed": "Tesouro com a fechadura emperrada",
+        "riftCacheAvailable": "Reserva da fenda disponível",
+        "riftCacheLocked": "Reserva trancada",
+        "riftCacheOpened": "Reserva aberta",
+        "riftCacheJammed": "Reserva com a fechadura emperrada",
+        "pylonUnlit": "Pilar rúnico apagado",
+        "pylonLit": "Pilar rúnico aceso",
+        "sequenceRuneUnlit": "Runa da sequência apagada",
+        "sequenceRuneLit": "Runa da sequência acesa",
+        "iceGoal": "Alvo de gelo",
+        "boulderPad": "Alvo da rocha",
+        "boulderMovable": "Rocha móvel",
+        "boulderPlaced": "Rocha posicionada",
+        "gateSealed": "Portão selado",
+        "gateOpen": "Portão aberto",
+        "switchReady": "Interruptor pronto",
+        "switchOn": "Interruptor ativado",
+        "orbDormant": "Orbe adormecido",
+        "orbActive": "Orbe ativo",
+        "rollerHazard": "Rocha rolante perigosa",
+        "delvePassageSealed": "Passagem selada",
+        "delvePassageOpen": "Passagem aberta",
+        "delveSurfaceExit": "Saída para a superfície",
+        "delveCacheLocked": "Reserva da incursão trancada",
+        "delveCacheReady": "Reserva da incursão pronta",
+        "delveCacheActive": "Reserva da incursão ativa",
+        "delveCacheOpened": "Reserva da incursão aberta",
+        "delveReliquaryLocked": "Relicário trancado",
+        "delveReliquaryReady": "Relicário pronto",
+        "delveReliquaryActive": "Rito do relicário ativo",
+        "delveReliquaryOpened": "Relicário aberto",
+        "bountiful": "Recompensa generosa: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu do jogo",
@@ -8922,6 +9049,7 @@ export const pt_BR: EnTranslations = {
       "filterSort": "Ordenar",
       "sortName": "Nome (A-Z)",
       "sortPriceAsc": "Preço: menor para maior",
+      "collapseLowest": "Apenas o menor preço",
       "weaponSword": "Espadas",
       "weaponDagger": "Adagas",
       "weaponStaff": "Cajados",
@@ -8952,6 +9080,8 @@ export const pt_BR: EnTranslations = {
       "quantity": "Quantidade",
       "quantityOf": "de {count}",
       "priceEach": "Preço unitário",
+      "lowestPriceLabel": "Menor preço anunciado no momento",
+      "lowestPriceNone": "Ainda não há anúncios ativos para este item.",
       "listButton": "Listar no Mercado Mundial",
       "minPriceError": "Informe um preço de pelo menos 1 cobre.",
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",
@@ -9379,6 +9509,7 @@ export const pt_BR: EnTranslations = {
       "cheap_shot": {
         "name": "Soco no Estômago",
         "description": "Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Deve estar furtivo. Concede 2 pontos de combo.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Usada a partir de Duskveil, adiciona 1 Gloam (máx. 3). Em 3 Gloam, você pode usá-la SEM furtividade: esse uso não custa nada, gasta todos os 3 Gloam e inicia o Shadow Veil de 6 s."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const pt_BR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Juramento Ardente",
-        "description": "Aumenta passivamente em 60% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé."
+        "description": "Aumenta passivamente em 30% a ameaça gerada por vosso dano Sagrado. Apenas Guardião da fé."
       },
       "retribution_aura": {
         "name": "Aura de Represália",
@@ -9707,7 +9838,7 @@ export const pt_BR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
-        "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 30% de armadura, sofre 10% menos dano e gera o dobro de ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."
+        "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 40% de armadura e 20% de Vigor, sofre 15% menos dano e é imune a acertos críticos de criaturas e gera 2,75 vezes mais ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."
       },
       "healing_wave": {
         "name": "Águas Restauradoras",
@@ -9886,7 +10017,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Assume a forma de urso: armadura +130%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
+        "description": "Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
       },
       "maul": {
         "name": "Esmaga-Ossos",
@@ -9896,6 +10027,10 @@ export const pt_BR: EnTranslations = {
       "growl": {
         "name": "Ameaçar",
         "description": "Rosna para o alvo: sua ameaça sobe para igualar a do inimigo mais odiado por ele, que é forçado a atacar você por 3 s. Apenas Forma de Bruin."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Forma de Lobo",

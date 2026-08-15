@@ -1741,6 +1741,7 @@ export const en_XA: EnTranslations = {
       "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
       "reasons": {
         "arenaWin": "[Áŕéñá ʋíçţóŕý]",
+        "arenaComplete": "[Áŕéñá ƀóúţ ƒóúĝĥţ]",
         "fiestaKill": "[Ƒíéšţá ţáķéðóŵñ]",
         "fiestaComplete": "[Ƒíéšţá çóɱþļéţéð]",
         "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]",
@@ -1847,6 +1848,7 @@ export const en_XA: EnTranslations = {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"
     },
     "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
+    "itemHeroicLabel": "[Ĥéŕóíç]",
     "itemSoulbound": "[Šóúļƀóúñð]",
     "itemUniqueEquipped": "[Úñíɋúé-Éɋúíþþéð]",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const en_XA: EnTranslations = {
     "nameplate": {
       "mobLevel": "[{level}]",
       "mobEliteLevel": "[{level}+]",
-      "afkTag": "[ÁƑĶ]"
+      "afkTag": "[ÁƑĶ]",
+      "cheaterTag": "[< Çĥéáţéŕ >]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
@@ -3936,6 +3939,12 @@ export const en_XA: EnTranslations = {
       "genesis_token_claimed": "[Ţĥáţ Šééķéŕ Ĝéñéšíš Ţóķéñ ĥáš áļŕéáðý ƀééñ çļáíɱéð.]",
       "entitlement_required": "[Ʋéŕíƒíéð Šééķéŕ éñţíţļéɱéñţ íš ŕéɋúíŕéð.]",
       "current_ownership_required": "[Çúŕŕéñţ Šééķéŕ Ĝéñéšíš Ţóķéñ óŵñéŕšĥíþ íš ŕéɋúíŕéð.]"
+    },
+    "cheater_mark": {
+      "admin_target": "[Óþéŕáţóŕ áççóúñţš çáññóţ ƀé ɱáŕķéð.]",
+      "reason_required": "[Á ŕéášóñ íš ŕéɋúíŕéð.]",
+      "invalid_duration": "[Éñţéŕ á ɱáŕķ ðúŕáţíóñ óƒ áţ ļéášţ óñé šéçóñð.]",
+      "not_marked": "[Ţĥáţ áççóúñţ íš ñóţ ɱáŕķéð.]"
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const en_XA: EnTranslations = {
     "email": "[Éɱáíļ]",
     "emailPlaceholder": "[ýóú@éẋáɱþļé.çóɱ]",
     "emailError": "[Þļéášé éñţéŕ á ʋáļíð éɱáíļ áððŕéšš.]",
+    "marketingOptIn": "[Éɱáíļ ɱé ĝáɱé ñéŵš áñð úþðáţéš (óþţíóñáļ)]",
     "showPassword": "[Šĥóŵ þáššŵóŕð]",
     "hidePassword": "[Ĥíðé þáššŵóŕð]",
     "logIn": "[Ļóĝ Íñ]",
@@ -6652,6 +6662,19 @@ export const en_XA: EnTranslations = {
     "style": "[Šţýļé]",
     "resetLook": "[Ŕéšéţ Ļóóķ]",
     "resetShort": "[Ŕéšéţ]",
+    "shareTab": "[Šĥáŕé]",
+    "designCode": "[Ðéšíĝñ çóðé]",
+    "designCodeHint": "[Çóþý ţĥíš çóðé ţó šáʋé óŕ šĥáŕé ţĥíš ļóóķ. Þášţé á çóðé ĥéŕé áñð íɱþóŕţ íţ ţó ļóáð óñé.]",
+    "copyCode": "[Çóþý çóðé]",
+    "importCode": "[Íɱþóŕţ]",
+    "designCodeCopied": "[Ðéšíĝñ çóðé çóþíéð.]",
+    "designCodeCopyManual": "[Áúţóɱáţíç çóþý íš ƀļóçķéð ĥéŕé. Ţĥé çóðé íš šéļéçţéð, çóþý íţ ŵíţĥ ýóúŕ ķéýƀóáŕð.]",
+    "designCodeImported": "[Ðéšíĝñ íɱþóŕţéð.]",
+    "designCodeImportedPartial": "[Ðéšíĝñ íɱþóŕţéð. Ʋáļúéš ţĥíš ʋéŕšíóñ ðóéš ñóţ ķñóŵ ŵéŕé šķíþþéð.]",
+    "designCodeErrEmpty": "[Þášţé á ðéšíĝñ çóðé ƒíŕšţ.]",
+    "designCodeErrHeader": "[Ţĥáţ ðóéš ñóţ ļóóķ ļíķé á ðéšíĝñ çóðé.]",
+    "designCodeErrVersion": "[Ţĥáţ ðéšíĝñ çóðé çóɱéš ƒŕóɱ á ñéŵéŕ ĝáɱé ʋéŕšíóñ.]",
+    "designCodeErrMalformed": "[Ţĥáţ ðéšíĝñ çóðé íš ðáɱáĝéð. Çóþý ţĥé ŵĥóļé çóðé áñð ţŕý áĝáíñ.]",
     "browFlat": "[Ƒļáţ]",
     "browArched": "[Áŕçĥéð]",
     "browThin": "[Ţĥíñ]",
@@ -8003,7 +8026,111 @@ export const en_XA: EnTranslations = {
       "zoomIn": "[Žóóɱ íñ]",
       "zoomOut": "[Žóóɱ óúţ]",
       "mapCanvasLabel": "[Ɱáþ]",
-      "mapSummary": "[Ɱáþ óƒ {zone}.]"
+      "mapSummary": "[Ɱáþ óƒ {zone}.]",
+      "mapMarkerDescription": "[{area}. {markers}]",
+      "mapMarkerEmpty": "[Ñó ɱéáñíñĝƒúļ ɱáŕķéŕš áŕé ʋíšíƀļé.]",
+      "mapMarkerLocated": "[{marker}: {direction}, {distance}.]",
+      "mapMarkerLocatedCount": "[{marker}: {count}; {direction}, {distance}.]",
+      "mapMarkerMore": "[Áððíţíóñáļ ɱáŕķéŕš: {count}.]",
+      "mapMarkerDirections": {
+        "center": "[çéñţéŕ]",
+        "north": "[ñóŕţĥ]",
+        "northeast": "[ñóŕţĥéášţ]",
+        "east": "[éášţ]",
+        "southeast": "[šóúţĥéášţ]",
+        "south": "[šóúţĥ]",
+        "southwest": "[šóúţĥŵéšţ]",
+        "west": "[ŵéšţ]",
+        "northwest": "[ñóŕţĥŵéšţ]"
+      },
+      "mapMarkerDistances": {
+        "near": "[ñéáŕ]",
+        "medium": "[ɱéðíúɱ ðíšţáñçé]",
+        "far": "[ƒáŕ]"
+      },
+      "mapMarkerLabels": {
+        "you": "[Ýóú]",
+        "availableQuest": "[Áʋáíļáƀļé ɋúéšţ]",
+        "readyQuest": "[Ɋúéšţ ŕéáðý ţó ţúŕñ íñ]",
+        "repeatQuest": "[Ŕéþéáţáƀļé ɋúéšţ]",
+        "cooldownQuest": "[Ɋúéšţ óñ çóóļðóŵñ]",
+        "questObjective": "[Ɋúéšţ óƀĵéçţíʋé áŕéá]",
+        "readyOre": "[Ŕéáðý óŕé ñóðé]",
+        "readyWood": "[Ŕéáðý ŵóóð ñóðé]",
+        "readyHerb": "[Ŕéáðý ĥéŕƀ ñóðé]",
+        "readyLockedOre": "[Ŕéáðý óŕé ñóðé, ţóóļ ļóçķéð]",
+        "readyLockedWood": "[Ŕéáðý ŵóóð ñóðé, ţóóļ ļóçķéð]",
+        "readyLockedHerb": "[Ŕéáðý ĥéŕƀ ñóðé, ţóóļ ļóçķéð]",
+        "cooldownOre": "[Ðéþļéţéð óŕé ñóðé]",
+        "cooldownWood": "[Ðéþļéţéð ŵóóð ñóðé]",
+        "cooldownHerb": "[Ðéþļéţéð ĥéŕƀ ñóðé]",
+        "cooldownLockedOre": "[Ðéþļéţéð óŕé ñóðé, ţóóļ ļóçķéð]",
+        "cooldownLockedWood": "[Ðéþļéţéð ŵóóð ñóðé, ţóóļ ļóçķéð]",
+        "cooldownLockedHerb": "[Ðéþļéţéð ĥéŕƀ ñóðé, ţóóļ ļóçķéð]",
+        "station": "[Çŕáƒţíñĝ šţáţíóñ: {name}]",
+        "service": "[Šéŕʋíçé: {name}]",
+        "partyMember": "[Þáŕţý ɱéɱƀéŕ: {name}]",
+        "deadPartyMember": "[Ðéáð þáŕţý ɱéɱƀéŕ: {name}]",
+        "partyMemberGeneric": "[Þáŕţý ɱéɱƀéŕ]",
+        "deadPartyMemberGeneric": "[Ðéáð þáŕţý ɱéɱƀéŕ]",
+        "friend": "[Ƒŕíéñð: {name}]",
+        "guildMember": "[Ĝúíļð ɱéɱƀéŕ: {name}]",
+        "pointOfInterest": "[Þóíñţ óƒ íñţéŕéšţ: {name}]",
+        "dungeonEntrance": "[Ðúñĝéóñ éñţŕáñçé: {name}]",
+        "dungeonExit": "[Ðúñĝéóñ éẋíţ]",
+        "delveEntrance": "[Ðéļʋé éñţŕáñçé: {name}]",
+        "worldPassage": "[Þáššáĝé ţó {zone}]",
+        "riftEntrance": "[Ŕíƒţ éñţŕáñçé: {name}]",
+        "hostileEnemy": "[Ĥóšţíļé éñéɱý]",
+        "aggressiveEnemy": "[Éñéɱý áţţáçķíñĝ ýóú]",
+        "lootableEnemy": "[Ļóóţáƀļé éñéɱý]",
+        "corpse": "[Ýóúŕ çóŕþšé]",
+        "deathZone": "[Ðáñĝéŕ žóñé]",
+        "teammate": "[Ţéáɱɱáţé]",
+        "deadTeammate": "[Ðéáð ţéáɱɱáţé]",
+        "flagCarrier": "[Ţéáɱɱáţé çáŕŕýíñĝ ţĥé ƒļáĝ]",
+        "ownFlagStand": "[Ýóúŕ ƒļáĝ šţáñð]",
+        "enemyFlagStand": "[Éñéɱý ƒļáĝ šţáñð]",
+        "riftDescent": "[Ŕíƒţ ðéšçéñţ]",
+        "riftReturnBeacon": "[Ŕéţúŕñ ƀéáçóñ]",
+        "riftReturnExit": "[Ŕéţúŕñ éẋíţ]",
+        "ranked": "[{marker}, ŕáñķ {rank}]",
+        "riftTreasureAvailable": "[Ţŕéášúŕé áʋáíļáƀļé]",
+        "riftTreasureLocked": "[Ţŕéášúŕé ļóçķéð]",
+        "riftTreasureOpened": "[Ţŕéášúŕé óþéñéð]",
+        "riftTreasureJammed": "[Ţŕéášúŕé ĵáɱɱéð]",
+        "riftCacheAvailable": "[Ŕíƒţ çáçĥé áʋáíļáƀļé]",
+        "riftCacheLocked": "[Ļóçķéð çáçĥé]",
+        "riftCacheOpened": "[Çáçĥé óþéñéð]",
+        "riftCacheJammed": "[Ĵáɱɱéð çáçĥé]",
+        "pylonUnlit": "[Úñļíţ þýļóñ]",
+        "pylonLit": "[Ļíţ þýļóñ]",
+        "sequenceRuneUnlit": "[Úñļíţ šéɋúéñçé ŕúñé]",
+        "sequenceRuneLit": "[Ļíţ šéɋúéñçé ŕúñé]",
+        "iceGoal": "[Íçé ţáŕĝéţ]",
+        "boulderPad": "[Ɓóúļðéŕ ţáŕĝéţ]",
+        "boulderMovable": "[Ɱóʋáƀļé ƀóúļðéŕ]",
+        "boulderPlaced": "[Þļáçéð ƀóúļðéŕ]",
+        "gateSealed": "[Šéáļéð ĝáţé]",
+        "gateOpen": "[Óþéñ ĝáţé]",
+        "switchReady": "[Ŕéáðý šŵíţçĥ]",
+        "switchOn": "[Áçţíʋáţéð šŵíţçĥ]",
+        "orbDormant": "[Ðóŕɱáñţ óŕƀ]",
+        "orbActive": "[Áçţíʋé óŕƀ]",
+        "rollerHazard": "[Ŕóļļéŕ ĥážáŕð]",
+        "delvePassageSealed": "[Šéáļéð þáššáĝé]",
+        "delvePassageOpen": "[Óþéñ þáššáĝé]",
+        "delveSurfaceExit": "[Šúŕƒáçé éẋíţ]",
+        "delveCacheLocked": "[Ļóçķéð ðéļʋé çáçĥé]",
+        "delveCacheReady": "[Ðéļʋé çáçĥé ŕéáðý]",
+        "delveCacheActive": "[Ðéļʋé çáçĥé áçţíʋé]",
+        "delveCacheOpened": "[Óþéñéð ðéļʋé çáçĥé]",
+        "delveReliquaryLocked": "[Ļóçķéð ŕéļíɋúáŕý]",
+        "delveReliquaryReady": "[Ŕéļíɋúáŕý ŕéáðý]",
+        "delveReliquaryActive": "[Ŕéļíɋúáŕý ŕíţé áçţíʋé]",
+        "delveReliquaryOpened": "[Ŕéļíɋúáŕý óþéñéð]",
+        "bountiful": "[Ɓóúñţíƒúļ {marker}]"
+      }
     },
     "options": {
       "gameMenu": "[Ĝáɱé Ɱéñú]",
@@ -8922,6 +9049,7 @@ export const en_XA: EnTranslations = {
       "filterSort": "[Šóŕţ]",
       "sortName": "[Ñáɱé (Á-Ž)]",
       "sortPriceAsc": "[Þŕíçé: Ļóŵ ţó Ĥíĝĥ]",
+      "collapseLowest": "[Ļóŵéšţ þŕíçé óñļý]",
       "weaponSword": "[Šŵóŕðš]",
       "weaponDagger": "[Ðáĝĝéŕš]",
       "weaponStaff": "[Šţáʋéš]",
@@ -8952,6 +9080,8 @@ export const en_XA: EnTranslations = {
       "quantity": "[Ɋúáñţíţý]",
       "quantityOf": "[óƒ {count}]",
       "priceEach": "[Þŕíçé éáçĥ]",
+      "lowestPriceLabel": "[Çúŕŕéñţ ļóŵéšţ ļíšţéð þŕíçé]",
+      "lowestPriceNone": "[Ñó áçţíʋé ļíšţíñĝš ƒóŕ ţĥíš íţéɱ ýéţ.]",
       "listButton": "[Ļíšţ óñ ţĥé Ŵóŕļð Ɱáŕķéţ]",
       "minPriceError": "[Ñáɱé á þŕíçé óƒ áţ ļéášţ 1 çóþþéŕ.]",
       "collectEmpty": "[Ñóţĥíñĝ ŵáíţíñĝ. Šáļé þŕóçééðš áñð éẋþíŕéð ļíšţíñĝš çóļļéçţ ĥéŕé.]",
@@ -9379,6 +9509,7 @@ export const en_XA: EnTranslations = {
       "cheap_shot": {
         "name": "[Ĝúţ Þúñçĥ]",
         "description": "[Šţŕíķé ţĥé ţáŕĝéţ ƒóŕ {damage} ðáɱáĝé, šţúññíñĝ íţ ƒóŕ 4 šéç. Ɱúšţ ƀé šţéáļţĥéð. Áŵáŕðš 2 çóɱƀó þóíñţš.]",
+        "descriptionNoStealth": "[Šţŕíķé ţĥé ţáŕĝéţ ƒóŕ {damage} ðáɱáĝé, šţúññíñĝ íţ ƒóŕ 4 šéç. Áŵáŕðš 2 çóɱƀó þóíñţš.]",
         "specNote_subtlety": "[Úšéð ƒŕóɱ Ðúšķʋéíļ ţĥíš áððš 1 Ĝļóáɱ (ɱáẋ 3). Áţ 3 Ĝļóáɱ ýóú çáñ úšé íţ ŴÍŢĤÓÚŢ šţéáļţĥ: ţĥáţ úšé çóšţš ñóţĥíñĝ, šþéñðš áļļ 3 Ĝļóáɱ, áñð šţáŕţš ţĥé 6 šéç Šĥáðóŵ Ʋéíļ.]"
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const en_XA: EnTranslations = {
       },
       "righteous_fury": {
         "name": "[Ɓúŕñíñĝ Óáţĥ]",
-        "description": "[Þáššíʋéļý íñçŕéášéš ţĥé ţĥŕéáţ ĝéñéŕáţéð ƀý ýóúŕ Ĥóļý ðáɱáĝé ƀý 60%. Ƒáíţĥŵáŕðéñ óñļý.]"
+        "description": "[Þáššíʋéļý íñçŕéášéš ţĥé ţĥŕéáţ ĝéñéŕáţéð ƀý ýóúŕ Ĥóļý ðáɱáĝé ƀý 30%. Ƒáíţĥŵáŕðéñ óñļý.]"
       },
       "retribution_aura": {
         "name": "[Ŕéɋúíţáļ Áúŕá]",
@@ -9707,7 +9838,7 @@ export const en_XA: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "[Šţóñéƀóúñð Ŵéáþóñ]",
-        "description": "[Íɱƀúé ýóúŕ ŵéáþóñ ƒóŕ 30 ɱíñ. Éáçĥ šŵíñĝ ðéáļš {damage} éẋţŕá ðáɱáĝé. Ŵáŕšþíŕíţ áļšó ĝáíñš 30% áŕɱóŕ, ţáķéš 10% ļéšš ðáɱáĝé, áñð ĝéñéŕáţéš ţŵíçé áš ɱúçĥ ţĥŕéáţ. Éáŕţĥéñ Ĵóļţ ƒóŕçéš íţš ţáŕĝéţ ţó áţţáçķ ýóú ƒóŕ 3 šéç, áñð Ţĥúñðéŕ Ŵáŕð ĝŕáñţš 10% ðáɱáĝé ŕéðúçţíóñ ƒóŕ 3 šéç.]"
+        "description": "[Íɱƀúé ýóúŕ ŵéáþóñ ƒóŕ 30 ɱíñ. Éáçĥ šŵíñĝ ðéáļš {damage} éẋţŕá ðáɱáĝé. Ŵáŕšþíŕíţ áļšó ĝáíñš 40% áŕɱóŕ áñð 20% Šţáɱíñá, ţáķéš 15% ļéšš ðáɱáĝé, íš íɱɱúñé ţó çŕíţíçáļ šţŕíķéš ƒŕóɱ çŕéáţúŕéš, áñð ĝéñéŕáţéš ţŵó áñð ţĥŕéé ɋúáŕţéŕ ţíɱéš áš ɱúçĥ ţĥŕéáţ. Éáŕţĥéñ Ĵóļţ ƒóŕçéš íţš ţáŕĝéţ ţó áţţáçķ ýóú ƒóŕ 3 šéç, áñð Ţĥúñðéŕ Ŵáŕð ĝŕáñţš 10% ðáɱáĝé ŕéðúçţíóñ ƒóŕ 3 šéç.]"
       },
       "healing_wave": {
         "name": "[Ɱéñðíñĝ Ŵáţéŕš]",
@@ -9886,7 +10017,7 @@ export const en_XA: EnTranslations = {
       },
       "bear_form": {
         "name": "[Ɓŕúíñ Ƒóŕɱ]",
-        "description": "[Šĥáþéšĥíƒţ íñţó á ƀéáŕ: áŕɱóŕ +130%, ĝŕéáţļý íñçŕéášéð áţţáçķ þóŵéŕ, ýóúŕ áţţáçķš ƀúíļð ŕáĝé áñð ĝéñéŕáţé 30% ɱóŕé ţĥŕéáţ. Çášţ áĝáíñ ţó ŕéţúŕñ ţó çášţéŕ ƒóŕɱ.]"
+        "description": "[Šĥáþéšĥíƒţ íñţó á ƀéáŕ: áŕɱóŕ +110%, ɱáẋíɱúɱ ĥéáļţĥ +30%, ĝŕéáţļý íñçŕéášéð áţţáçķ þóŵéŕ, ýóúŕ áţţáçķš ƀúíļð ŕáĝé áñð ĝéñéŕáţé 30% ɱóŕé ţĥŕéáţ. Çášţ áĝáíñ ţó ŕéţúŕñ ţó çášţéŕ ƒóŕɱ.]"
       },
       "maul": {
         "name": "[Ɓóñéçŕúšĥ]",
@@ -9896,6 +10027,10 @@ export const en_XA: EnTranslations = {
       "growl": {
         "name": "[Ɱéñáçé]",
         "description": "[Ɱéñáçéš ţĥé ţáŕĝéţ: ýóúŕ ţĥŕéáţ ŕíšéš ţó ɱáţçĥ íţš ɱóšţ ĥáţéð éñéɱý áñð íţ íš çóɱþéļļéð ţó áţţáçķ ýóú ƒóŕ 3 šéç. Ɓŕúíñ Ƒóŕɱ óñļý.]"
+      },
+      "challenging_roar": {
+        "name": "[Ɓáļéƒúļ Ŕóáŕ]",
+        "description": "[Á ƀáļéƒúļ ŕóáŕ: éʋéŕý éñéɱý ŵíţĥíñ 10 ýáŕðš íš ţáúñţéð, íţš ţĥŕéáţ ţóŵáŕð ýóú ŕíšíñĝ ţó ɱáţçĥ íţš ɱóšţ ĥáţéð éñéɱý, áñð íţ íš çóɱþéļļéð ţó áţţáçķ ýóú ƒóŕ 3 šéç. Ɓŕúíñ Ƒóŕɱ óñļý.]"
       },
       "cat_form": {
         "name": "[Ŵóļƒ Ƒóŕɱ]",
@@ -10441,7 +10576,7 @@ export const en_XA: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "[Šáʋáĝé Ɱéñðíñĝ]",
-        "description": "[Ŕéšţóŕéš 180 ĥéáļţĥ óʋéŕ 10 šéç. Ɓŕúíñ Ƒóŕɱ óñļý. (Ðŕúíð ţáļéñţ)]"
+        "description": "[Ŕéšţóŕéš 180 ĥéáļţĥ óʋéŕ 10 šéç. Ɓŕúíñ Ƒóŕɱ óñļý.]"
       },
       "frost_trap": {
         "name": "[Ŕíɱé Šñáŕé]",

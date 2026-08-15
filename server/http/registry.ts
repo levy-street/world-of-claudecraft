@@ -22,6 +22,7 @@
 // loader.
 
 import { routes as accountRoutes } from '../account';
+import { routes as adSpendRoutes } from '../ad_spend';
 import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
 import { routes as authRoutes } from '../auth_routes';
@@ -142,6 +143,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...epicRoutes,
   ...otaUpdatesRoutes,
   ...reliquaryRoutes,
+  ...adSpendRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];
 

@@ -155,7 +155,3 @@ export function talentIconDataUrl(ref: TalentIconRef): string {
   if (ref.kind === 'image') return ref.url;
   return iconDataUrl(ref.kind, ref.id);
 }
-
-export function talentRowOptionIconDataUrl(option: TalentRowOption): string {
-  return talentIconDataUrl(talentRowOptionIconRef(option));
-}

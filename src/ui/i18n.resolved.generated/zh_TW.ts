@@ -1741,6 +1741,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughHonor": "榮譽不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
+        "arenaComplete": "競技場參戰",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
         "fiestaWin": "嘉年華勝利",
@@ -1847,6 +1848,7 @@ export const zh_TW: EnTranslations = {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
     "itemHeroicTag": "[英雄]",
+    "itemHeroicLabel": "英雄",
     "itemSoulbound": "靈魂綁定",
     "itemUniqueEquipped": "裝備唯一",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const zh_TW: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "暫離"
+      "afkTag": "暫離",
+      "cheaterTag": "< 作弊者 >"
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",
@@ -3936,6 +3939,12 @@ export const zh_TW: EnTranslations = {
       "genesis_token_claimed": "該 Seeker Genesis Token 已被領取。",
       "entitlement_required": "需要已驗證的 Seeker 權益。",
       "current_ownership_required": "需要目前持有 Seeker Genesis Token。"
+    },
+    "cheater_mark": {
+      "admin_target": "管理員帳號無法被標記。",
+      "reason_required": "必須填寫原因。",
+      "invalid_duration": "標記時長至少須為 1 秒。",
+      "not_marked": "該帳號未被標記。"
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const zh_TW: EnTranslations = {
     "email": "電子郵件",
     "emailPlaceholder": "you@example.com",
     "emailError": "請輸入有效的電子郵件地址。",
+    "marketingOptIn": "向我發送遊戲新聞和更新郵件（可選）",
     "showPassword": "顯示密碼",
     "hidePassword": "隱藏密碼",
     "logIn": "登入",
@@ -6652,6 +6662,19 @@ export const zh_TW: EnTranslations = {
     "style": "風格",
     "resetLook": "重置外觀",
     "resetShort": "重置",
+    "shareTab": "分享",
+    "designCode": "外觀代碼",
+    "designCodeHint": "複製此代碼即可保存或分享這個造型。將代碼貼到此處並匯入即可載入造型。",
+    "copyCode": "複製代碼",
+    "importCode": "匯入",
+    "designCodeCopied": "外觀代碼已複製。",
+    "designCodeCopyManual": "此處無法自動複製。代碼已選取，請使用鍵盤複製。",
+    "designCodeImported": "造型已匯入。",
+    "designCodeImportedPartial": "造型已匯入。此版本無法識別的數值已被略過。",
+    "designCodeErrEmpty": "請先貼上外觀代碼。",
+    "designCodeErrHeader": "這看起來不像外觀代碼。",
+    "designCodeErrVersion": "該外觀代碼來自較新的遊戲版本。",
+    "designCodeErrMalformed": "該外觀代碼已損壞。請複製完整代碼後再試一次。",
     "browFlat": "平直",
     "browArched": "拱形",
     "browThin": "細眉",
@@ -8003,7 +8026,111 @@ export const zh_TW: EnTranslations = {
       "zoomIn": "放大",
       "zoomOut": "縮小",
       "mapCanvasLabel": "地圖",
-      "mapSummary": "{zone}的地圖。"
+      "mapSummary": "{zone}的地圖。",
+      "mapMarkerDescription": "{area}。{markers}",
+      "mapMarkerEmpty": "沒有可見的重要標記。",
+      "mapMarkerLocated": "{marker}：{direction}，{distance}。",
+      "mapMarkerLocatedCount": "{marker}：{count}個；{direction}，{distance}。",
+      "mapMarkerMore": "另有 {count} 個標記。",
+      "mapMarkerDirections": {
+        "center": "中央",
+        "north": "北方",
+        "northeast": "東北方",
+        "east": "東方",
+        "southeast": "東南方",
+        "south": "南方",
+        "southwest": "西南方",
+        "west": "西方",
+        "northwest": "西北方"
+      },
+      "mapMarkerDistances": {
+        "near": "附近",
+        "medium": "中等距離",
+        "far": "遠處"
+      },
+      "mapMarkerLabels": {
+        "you": "你",
+        "availableQuest": "可接任務",
+        "readyQuest": "可交任務",
+        "repeatQuest": "可重複任務",
+        "cooldownQuest": "冷卻中的任務",
+        "questObjective": "任務目標區域",
+        "readyOre": "可採集礦點",
+        "readyWood": "可採伐木材點",
+        "readyHerb": "可採集草藥點",
+        "readyLockedOre": "可採集礦點，工具未解鎖",
+        "readyLockedWood": "可採伐木材點，工具未解鎖",
+        "readyLockedHerb": "可採集草藥點，工具未解鎖",
+        "cooldownOre": "已枯竭的礦點",
+        "cooldownWood": "已枯竭的木材點",
+        "cooldownHerb": "已枯竭的草藥點",
+        "cooldownLockedOre": "已枯竭的礦點，工具未解鎖",
+        "cooldownLockedWood": "已枯竭的木材點，工具未解鎖",
+        "cooldownLockedHerb": "已枯竭的草藥點，工具未解鎖",
+        "station": "製作站：{name}",
+        "service": "服務：{name}",
+        "partyMember": "隊伍成員：{name}",
+        "deadPartyMember": "已死亡的隊伍成員：{name}",
+        "partyMemberGeneric": "隊伍成員",
+        "deadPartyMemberGeneric": "已死亡的隊伍成員",
+        "friend": "好友：{name}",
+        "guildMember": "公會成員：{name}",
+        "pointOfInterest": "地標：{name}",
+        "dungeonEntrance": "地城入口：{name}",
+        "dungeonExit": "地城出口",
+        "delveEntrance": "秘探入口：{name}",
+        "worldPassage": "通往{zone}的通道",
+        "riftEntrance": "裂隙入口：{name}",
+        "hostileEnemy": "敵對目標",
+        "aggressiveEnemy": "正在攻擊你的敵人",
+        "lootableEnemy": "可拾取戰利品的敵人",
+        "corpse": "你的屍體",
+        "deathZone": "危險區域",
+        "teammate": "隊友",
+        "deadTeammate": "已死亡的隊友",
+        "flagCarrier": "攜帶旗幟的隊友",
+        "ownFlagStand": "己方旗座",
+        "enemyFlagStand": "敵方旗座",
+        "riftDescent": "裂隙下行通道",
+        "riftReturnBeacon": "返回信標",
+        "riftReturnExit": "返回出口",
+        "ranked": "{marker}，階級 {rank}",
+        "riftTreasureAvailable": "可開啟的寶藏",
+        "riftTreasureLocked": "已上鎖的寶藏",
+        "riftTreasureOpened": "已開啟的寶藏",
+        "riftTreasureJammed": "已卡住的寶藏",
+        "riftCacheAvailable": "可開啟的裂隙寶箱",
+        "riftCacheLocked": "已上鎖的寶箱",
+        "riftCacheOpened": "已開啟的寶箱",
+        "riftCacheJammed": "已卡住的寶箱",
+        "pylonUnlit": "未點亮的塔柱",
+        "pylonLit": "已點亮的塔柱",
+        "sequenceRuneUnlit": "未點亮的序列符文",
+        "sequenceRuneLit": "已點亮的序列符文",
+        "iceGoal": "冰面目標",
+        "boulderPad": "巨石目標點",
+        "boulderMovable": "可移動的巨石",
+        "boulderPlaced": "已就位的巨石",
+        "gateSealed": "封閉的大門",
+        "gateOpen": "開啟的大門",
+        "switchReady": "可用的開關",
+        "switchOn": "已啟動的開關",
+        "orbDormant": "休眠的法球",
+        "orbActive": "已啟動的法球",
+        "rollerHazard": "滾輪陷阱",
+        "delvePassageSealed": "封閉的通道",
+        "delvePassageOpen": "開啟的通道",
+        "delveSurfaceExit": "地表出口",
+        "delveCacheLocked": "已上鎖的秘探寶箱",
+        "delveCacheReady": "秘探寶箱已就緒",
+        "delveCacheActive": "秘探寶箱已啟動",
+        "delveCacheOpened": "已開啟的秘探寶箱",
+        "delveReliquaryLocked": "已上鎖的聖物匣",
+        "delveReliquaryReady": "聖物匣已就緒",
+        "delveReliquaryActive": "聖物匣儀式進行中",
+        "delveReliquaryOpened": "已開啟的聖物匣",
+        "bountiful": "豐裕的{marker}"
+      }
     },
     "options": {
       "gameMenu": "遊戲選單",
@@ -8922,6 +9049,7 @@ export const zh_TW: EnTranslations = {
       "filterSort": "排序",
       "sortName": "名稱 (A-Z)",
       "sortPriceAsc": "價格：從低到高",
+      "collapseLowest": "僅顯示最低價",
       "weaponSword": "劍",
       "weaponDagger": "匕首",
       "weaponStaff": "法杖",
@@ -8952,6 +9080,8 @@ export const zh_TW: EnTranslations = {
       "quantity": "數量",
       "quantityOf": "共 {count}",
       "priceEach": "單價",
+      "lowestPriceLabel": "目前最低上架價格",
+      "lowestPriceNone": "此物品目前沒有在售的上架。",
       "listButton": "上架到世界市場",
       "minPriceError": "價格至少為 1 銅幣。",
       "collectEmpty": "沒有待領取內容。銷售收益和過期上架會在這裡領取。",
@@ -9379,6 +9509,7 @@ export const zh_TW: EnTranslations = {
       "cheap_shot": {
         "name": "掏腹重擊",
         "description": "攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。",
+        "descriptionNoStealth": "攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。獎勵 2 個連擊點。",
         "specNote_subtlety": "自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，並開啟 6 秒的暗影纏身。"
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const zh_TW: EnTranslations = {
       },
       "righteous_fury": {
         "name": "燃燒誓言",
-        "description": "被動地將你的神聖傷害所產生的威脅提高 60%。僅限信仰守衛。"
+        "description": "被動地將你的神聖傷害所產生的威脅提高 30%。僅限信仰守衛。"
       },
       "retribution_aura": {
         "name": "報償光環",
@@ -9707,7 +9838,7 @@ export const zh_TW: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "縛石武器",
-        "description": "為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 30% 護甲，受到的傷害降低 10%，並產生兩倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。"
+        "description": "為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 40% 護甲和 20% 耐力，受到的傷害降低 15%，免疫生物的致命一擊，並產生 2.75 倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。"
       },
       "healing_wave": {
         "name": "療癒之水",
@@ -9886,7 +10017,7 @@ export const zh_TW: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形態",
-        "description": "變形為熊：護甲 +130%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
+        "description": "變形為熊：護甲 +110%，最大生命值 +30%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
       },
       "maul": {
         "name": "碎骨擊",
@@ -9896,6 +10027,10 @@ export const zh_TW: EnTranslations = {
       "growl": {
         "name": "威嚇",
         "description": "對目標低吼：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。"
+      },
+      "challenging_roar": {
+        "name": "挑釁咆哮",
+        "description": "發出挑釁的咆哮：10 碼內的每個敵人都被嘲諷，其對你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。僅限巨熊形態。"
       },
       "cat_form": {
         "name": "狼形態",

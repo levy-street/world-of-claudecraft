@@ -1934,8 +1934,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Menace"
       },
       {
+        "id": "challenging_roar",
+        "name": "Baleful Roar"
+      },
+      {
         "id": "demoralizing_roar",
         "name": "Craven Roar"
+      },
+      {
+        "id": "frenzied_regeneration",
+        "name": "Savage Mending"
       },
       {
         "id": "cat_form",
@@ -12716,6 +12724,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/kobold.glb",
     "idle": "Idle",
     "height": 2.1,
+    "hover": -0.2,
     "tintStrength": 0.12
   },
   "mob_bandit": {

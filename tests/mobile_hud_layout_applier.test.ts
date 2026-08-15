@@ -63,6 +63,7 @@ describe('applyMobileHudLayout', () => {
     const body = new FakeBody();
     applyMobileHudLayout(fakeWin(1920, 1080, body));
     expect(body.classList.contains('hud-mobile-tablet')).toBe(true);
+    expect(body.classList.contains('hud-mobile-landscape')).toBe(true);
     expect(body.classList.contains('hud-mobile-compact')).toBe(false);
     expect(body.classList.contains('hud-mobile-standard')).toBe(false);
   });
@@ -76,6 +77,17 @@ describe('applyMobileHudLayout', () => {
     applyMobileHudLayout(fakeWin(844, 390, body));
     expect(body.classList.contains('hud-mobile-tablet')).toBe(false);
     expect(body.classList.contains('hud-mobile-compact')).toBe(true);
+    expect(body.classList.contains('hud-mobile-landscape')).toBe(true);
+  });
+
+  it('drops the managed landscape class after an orientation change', () => {
+    setInterfaceMode('touch');
+    const body = new FakeBody();
+    applyMobileHudLayout(fakeWin(844, 390, body));
+    expect(body.classList.contains('hud-mobile-landscape')).toBe(true);
+
+    applyMobileHudLayout(fakeWin(390, 844, body));
+    expect(body.classList.contains('hud-mobile-landscape')).toBe(false);
   });
 
   it('mirrors mobile-window-open / mobile-chat-open into hud-menu-open / hud-chat-open', () => {

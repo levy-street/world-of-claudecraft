@@ -1741,6 +1741,7 @@ export const fr_FR: EnTranslations = {
       "notEnoughHonor": "Vous n’avez pas assez d’honneur.",
       "reasons": {
         "arenaWin": "Victoire en arène",
+        "arenaComplete": "combat en arène mené",
         "fiestaKill": "Élimination en Fiesta",
         "fiestaComplete": "Fiesta terminée",
         "fiestaWin": "Victoire en Fiesta",
@@ -1847,6 +1848,7 @@ export const fr_FR: EnTranslations = {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
     },
     "itemHeroicTag": "[HÉROÏQUE]",
+    "itemHeroicLabel": "Héroïque",
     "itemSoulbound": "Lié à l’âme",
     "itemUniqueEquipped": "Unique-équipé",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const fr_FR: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Tricheur >"
     },
     "mobTooltip": {
       "levelFamily": "{family} niveau {level}",
@@ -3936,6 +3939,12 @@ export const fr_FR: EnTranslations = {
       "genesis_token_claimed": "Ce Seeker Genesis Token a déjà été réclamé.",
       "entitlement_required": "Des droits Seeker vérifiés sont requis.",
       "current_ownership_required": "La possession actuelle d'un Seeker Genesis Token est requise."
+    },
+    "cheater_mark": {
+      "admin_target": "Les comptes opérateur ne peuvent pas être marqués.",
+      "reason_required": "Un motif est requis.",
+      "invalid_duration": "Saisissez une durée de marquage d'au moins une seconde.",
+      "not_marked": "Ce compte n'est pas marqué."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const fr_FR: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "vous@exemple.com",
     "emailError": "Veuillez saisir une adresse e-mail valide.",
+    "marketingOptIn": "M'envoyer par e-mail les actualités et mises à jour du jeu (facultatif)",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "logIn": "Se connecter",
@@ -6652,6 +6662,19 @@ export const fr_FR: EnTranslations = {
     "style": "Style",
     "resetLook": "Réinitialiser l'apparence",
     "resetShort": "Réinitialiser",
+    "shareTab": "Partager",
+    "designCode": "Code d'apparence",
+    "designCodeHint": "Copiez ce code pour enregistrer ou partager cette apparence. Collez un code ici et importez-le pour la charger.",
+    "copyCode": "Copier le code",
+    "importCode": "Importer",
+    "designCodeCopied": "Code d'apparence copié.",
+    "designCodeCopyManual": "La copie automatique est bloquée ici. Le code est sélectionné, copiez-le avec votre clavier.",
+    "designCodeImported": "Apparence importée.",
+    "designCodeImportedPartial": "Apparence importée. Les valeurs inconnues de cette version ont été ignorées.",
+    "designCodeErrEmpty": "Collez d'abord un code d'apparence.",
+    "designCodeErrHeader": "Cela ne ressemble pas à un code d'apparence.",
+    "designCodeErrVersion": "Ce code d'apparence provient d'une version plus récente du jeu.",
+    "designCodeErrMalformed": "Ce code d'apparence est endommagé. Copiez le code en entier et réessayez.",
     "browFlat": "Plat",
     "browArched": "Arqué",
     "browThin": "Fin",
@@ -8003,7 +8026,111 @@ export const fr_FR: EnTranslations = {
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
       "mapCanvasLabel": "Carte",
-      "mapSummary": "Carte de {zone}."
+      "mapSummary": "Carte de {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Aucun marqueur pertinent n'est visible.",
+      "mapMarkerLocated": "{marker} : {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker} : {count} ; {direction}, {distance}.",
+      "mapMarkerMore": "Marqueurs supplémentaires : {count}.",
+      "mapMarkerDirections": {
+        "center": "au centre",
+        "north": "au nord",
+        "northeast": "au nord-est",
+        "east": "à l'est",
+        "southeast": "au sud-est",
+        "south": "au sud",
+        "southwest": "au sud-ouest",
+        "west": "à l'ouest",
+        "northwest": "au nord-ouest"
+      },
+      "mapMarkerDistances": {
+        "near": "à proximité",
+        "medium": "à moyenne distance",
+        "far": "à grande distance"
+      },
+      "mapMarkerLabels": {
+        "you": "Vous",
+        "availableQuest": "Quête disponible",
+        "readyQuest": "Quête à rendre",
+        "repeatQuest": "Quête répétable",
+        "cooldownQuest": "Quête en attente",
+        "questObjective": "Zone d'objectif de quête",
+        "readyOre": "Filon de minerai disponible",
+        "readyWood": "Bosquet de bois disponible",
+        "readyHerb": "Parcelle de plantes disponible",
+        "readyLockedOre": "Filon de minerai disponible, outil indisponible",
+        "readyLockedWood": "Bosquet de bois disponible, outil indisponible",
+        "readyLockedHerb": "Parcelle de plantes disponible, outil indisponible",
+        "cooldownOre": "Filon de minerai épuisé",
+        "cooldownWood": "Bosquet de bois épuisé",
+        "cooldownHerb": "Parcelle de plantes épuisée",
+        "cooldownLockedOre": "Filon de minerai épuisé, outil indisponible",
+        "cooldownLockedWood": "Bosquet de bois épuisé, outil indisponible",
+        "cooldownLockedHerb": "Parcelle de plantes épuisée, outil indisponible",
+        "station": "Poste d'artisanat : {name}",
+        "service": "Service : {name}",
+        "partyMember": "Membre du groupe : {name}",
+        "deadPartyMember": "Membre du groupe mort : {name}",
+        "partyMemberGeneric": "Membre du groupe",
+        "deadPartyMemberGeneric": "Membre du groupe mort",
+        "friend": "Ami : {name}",
+        "guildMember": "Membre de la guilde : {name}",
+        "pointOfInterest": "Point d'intérêt : {name}",
+        "dungeonEntrance": "Entrée du donjon : {name}",
+        "dungeonExit": "Sortie du donjon",
+        "delveEntrance": "Entrée de la plongée : {name}",
+        "worldPassage": "Passage vers {zone}",
+        "riftEntrance": "Entrée de la faille : {name}",
+        "hostileEnemy": "Ennemi hostile",
+        "aggressiveEnemy": "Ennemi qui vous attaque",
+        "lootableEnemy": "Ennemi avec du butin",
+        "corpse": "Votre cadavre",
+        "deathZone": "Zone dangereuse",
+        "teammate": "Coéquipier",
+        "deadTeammate": "Coéquipier mort",
+        "flagCarrier": "Coéquipier portant le drapeau",
+        "ownFlagStand": "Stand de votre drapeau",
+        "enemyFlagStand": "Stand du drapeau ennemi",
+        "riftDescent": "Descente de la faille",
+        "riftReturnBeacon": "Balise de retour",
+        "riftReturnExit": "Sortie de retour",
+        "ranked": "{marker}, rang {rank}",
+        "riftTreasureAvailable": "Trésor disponible",
+        "riftTreasureLocked": "Trésor verrouillé",
+        "riftTreasureOpened": "Trésor ouvert",
+        "riftTreasureJammed": "Trésor à la serrure coincée",
+        "riftCacheAvailable": "Cachette de faille disponible",
+        "riftCacheLocked": "Cachette verrouillée",
+        "riftCacheOpened": "Cachette ouverte",
+        "riftCacheJammed": "Cachette à la serrure coincée",
+        "pylonUnlit": "Pylône runique éteint",
+        "pylonLit": "Pylône runique allumé",
+        "sequenceRuneUnlit": "Rune de séquence éteinte",
+        "sequenceRuneLit": "Rune de séquence allumée",
+        "iceGoal": "Cible de glace",
+        "boulderPad": "Cible du rocher",
+        "boulderMovable": "Rocher déplaçable",
+        "boulderPlaced": "Rocher placé",
+        "gateSealed": "Porte scellée",
+        "gateOpen": "Porte ouverte",
+        "switchReady": "Interrupteur prêt",
+        "switchOn": "Interrupteur activé",
+        "orbDormant": "Orbe dormant",
+        "orbActive": "Orbe actif",
+        "rollerHazard": "Rouleau dangereux",
+        "delvePassageSealed": "Passage scellé",
+        "delvePassageOpen": "Passage ouvert",
+        "delveSurfaceExit": "Sortie vers la surface",
+        "delveCacheLocked": "Cachette de plongée verrouillée",
+        "delveCacheReady": "Cachette de plongée prête",
+        "delveCacheActive": "Cachette de plongée active",
+        "delveCacheOpened": "Cachette de plongée ouverte",
+        "delveReliquaryLocked": "Reliquaire verrouillé",
+        "delveReliquaryReady": "Reliquaire prêt",
+        "delveReliquaryActive": "Rite du reliquaire actif",
+        "delveReliquaryOpened": "Reliquaire ouvert",
+        "bountiful": "Récompense opulente : {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu du jeu",
@@ -8922,6 +9049,7 @@ export const fr_FR: EnTranslations = {
       "filterSort": "Trier",
       "sortName": "Nom (A-Z)",
       "sortPriceAsc": "Prix : du plus bas au plus élevé",
+      "collapseLowest": "Prix le plus bas uniquement",
       "weaponSword": "Épées",
       "weaponDagger": "Dagues",
       "weaponStaff": "Bâtons",
@@ -8952,6 +9080,8 @@ export const fr_FR: EnTranslations = {
       "quantity": "Quantité",
       "quantityOf": "sur {count}",
       "priceEach": "Prix unitaire",
+      "lowestPriceLabel": "Prix de vente le plus bas actuellement",
+      "lowestPriceNone": "Aucune annonce active pour cet objet pour le moment.",
       "listButton": "Publier au Marché mondial",
       "minPriceError": "Indiquez un prix d'au moins 1 cuivre.",
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",
@@ -9379,6 +9509,7 @@ export const fr_FR: EnTranslations = {
       "cheap_shot": {
         "name": "Coup au ventre",
         "description": "Frappe la cible pour {damage} points de dégâts, l'étourdissant pendant 4 s. Camouflage requis. Confère 2 points de combo.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage : cette utilisation ne coûte rien, dépense les 3 Pénombre, et déclenche le voile d'ombre de 6 s."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const fr_FR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Serment ardent",
-        "description": "Augmente passivement de 60% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
+        "description": "Augmente passivement de 30% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
       },
       "retribution_aura": {
         "name": "Aura de représailles",
@@ -9707,7 +9838,7 @@ export const fr_FR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arme Stonebound",
-        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 30% d'armure, subit 10% de dégâts en moins et génère deux fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
+        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 40% d'armure et 20% d'Endurance, subit 15% de dégâts en moins et est insensible aux coups critiques des créatures et génère 2,75 fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
       },
       "healing_wave": {
         "name": "Eaux guérisseuses",
@@ -9886,7 +10017,7 @@ export const fr_FR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forme de Bruin",
-        "description": "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
+        "description": "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
       },
       "maul": {
         "name": "Brise-os",
@@ -9896,6 +10027,10 @@ export const fr_FR: EnTranslations = {
       "growl": {
         "name": "Menacer",
         "description": "Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Forme de loup",

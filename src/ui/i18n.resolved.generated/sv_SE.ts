@@ -1741,6 +1741,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "reasons": {
         "arenaWin": "Arenaseger",
+        "arenaComplete": "arenamatch utkämpad",
         "fiestaKill": "Fiesta-nedtagning",
         "fiestaComplete": "Fiesta avklarad",
         "fiestaWin": "Fiesta-seger",
@@ -1847,6 +1848,7 @@ export const sv_SE: EnTranslations = {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
     "itemHeroicTag": "[HEROISK]",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",
     "itemUniqueEquipped": "Unikt utrustad",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const sv_SE: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "BV"
+      "afkTag": "BV",
+      "cheaterTag": "< Fuskare >"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -3936,6 +3939,12 @@ export const sv_SE: EnTranslations = {
       "genesis_token_claimed": "Denna Seeker Genesis Token har redan hämtats.",
       "entitlement_required": "Verifierad Seeker-behörighet krävs.",
       "current_ownership_required": "Du måste fortfarande äga din Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatörskonton kan inte märkas.",
+      "reason_required": "En anledning krävs.",
+      "invalid_duration": "Ange en märkningslängd på minst en sekund.",
+      "not_marked": "Det kontot är inte märkt."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const sv_SE: EnTranslations = {
     "email": "E-post",
     "emailPlaceholder": "du@exempel.se",
     "emailError": "Ange en giltig e-postadress.",
+    "marketingOptIn": "Skicka mig nyheter och uppdateringar om spelet via e-post (valfritt)",
     "showPassword": "Visa lösenord",
     "hidePassword": "Dölj lösenord",
     "logIn": "Logga in",
@@ -6652,6 +6662,19 @@ export const sv_SE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Återställ utseende",
     "resetShort": "Återställ",
+    "shareTab": "Dela",
+    "designCode": "Utseendekod",
+    "designCodeHint": "Kopiera den här koden för att spara eller dela utseendet. Klistra in en kod här och importera den för att läsa in utseendet.",
+    "copyCode": "Kopiera kod",
+    "importCode": "Importera",
+    "designCodeCopied": "Utseendekoden har kopierats.",
+    "designCodeCopyManual": "Automatisk kopiering är blockerad här. Koden är markerad; kopiera den med tangentbordet.",
+    "designCodeImported": "Utseendet har importerats.",
+    "designCodeImportedPartial": "Utseendet har importerats. Värden som den här versionen inte känner igen hoppades över.",
+    "designCodeErrEmpty": "Klistra in en utseendekod först.",
+    "designCodeErrHeader": "Det där ser inte ut som en utseendekod.",
+    "designCodeErrVersion": "Den utseendekoden kommer från en nyare spelversion.",
+    "designCodeErrMalformed": "Den utseendekoden är skadad. Kopiera hela koden och försök igen.",
     "browFlat": "Platt",
     "browArched": "Bågformad",
     "browThin": "Tunn",
@@ -8003,7 +8026,111 @@ export const sv_SE: EnTranslations = {
       "zoomIn": "Zooma in",
       "zoomOut": "Zooma ut",
       "mapCanvasLabel": "Karta",
-      "mapSummary": "Karta över {zone}."
+      "mapSummary": "Karta över {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Inga relevanta markörer är synliga.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Ytterligare markörer: {count}.",
+      "mapMarkerDirections": {
+        "center": "i mitten",
+        "north": "i norr",
+        "northeast": "i nordost",
+        "east": "i öster",
+        "southeast": "i sydost",
+        "south": "i söder",
+        "southwest": "i sydväst",
+        "west": "i väster",
+        "northwest": "i nordväst"
+      },
+      "mapMarkerDistances": {
+        "near": "i närheten",
+        "medium": "på medellångt avstånd",
+        "far": "långt bort"
+      },
+      "mapMarkerLabels": {
+        "you": "Du",
+        "availableQuest": "Tillgängligt uppdrag",
+        "readyQuest": "Uppdrag redo att lämnas in",
+        "repeatQuest": "Upprepbart uppdrag",
+        "cooldownQuest": "Uppdrag under nedkylning",
+        "questObjective": "Område med uppdragsmål",
+        "readyOre": "Tillgänglig malmåder",
+        "readyWood": "Tillgängligt timmerbestånd",
+        "readyHerb": "Tillgänglig örtfläck",
+        "readyLockedOre": "Tillgänglig malmåder, verktyg låst",
+        "readyLockedWood": "Tillgängligt timmerbestånd, verktyg låst",
+        "readyLockedHerb": "Tillgänglig örtfläck, verktyg låst",
+        "cooldownOre": "Uttömd malmåder",
+        "cooldownWood": "Uttömt timmerbestånd",
+        "cooldownHerb": "Uttömd örtfläck",
+        "cooldownLockedOre": "Uttömd malmåder, verktyg låst",
+        "cooldownLockedWood": "Uttömt timmerbestånd, verktyg låst",
+        "cooldownLockedHerb": "Uttömd örtfläck, verktyg låst",
+        "station": "Hantverksstation: {name}",
+        "service": "Tjänst: {name}",
+        "partyMember": "Gruppmedlem: {name}",
+        "deadPartyMember": "Död gruppmedlem: {name}",
+        "partyMemberGeneric": "Gruppmedlem",
+        "deadPartyMemberGeneric": "Död gruppmedlem",
+        "friend": "Vän: {name}",
+        "guildMember": "Gillesmedlem: {name}",
+        "pointOfInterest": "Intressepunkt: {name}",
+        "dungeonEntrance": "Fängelsehålsingång: {name}",
+        "dungeonExit": "Fängelsehålsutgång",
+        "delveEntrance": "Delve-ingång: {name}",
+        "worldPassage": "Passage till {zone}",
+        "riftEntrance": "Ingång till revan: {name}",
+        "hostileEnemy": "Fientligt mål",
+        "aggressiveEnemy": "Fiende angriper dig",
+        "lootableEnemy": "Plundringsbar fiende",
+        "corpse": "Din kropp",
+        "deathZone": "Farozon",
+        "teammate": "Lagkamrat",
+        "deadTeammate": "Död lagkamrat",
+        "flagCarrier": "Lagkamrat med flaggan",
+        "ownFlagStand": "Din flaggplats",
+        "enemyFlagStand": "Fiendens flaggplats",
+        "riftDescent": "Nedstigning i revan",
+        "riftReturnBeacon": "Återvändningsbåk",
+        "riftReturnExit": "Återvändningsutgång",
+        "ranked": "{marker}, grad {rank}",
+        "riftTreasureAvailable": "Tillgänglig skatt",
+        "riftTreasureLocked": "Låst skatt",
+        "riftTreasureOpened": "Öppnad skatt",
+        "riftTreasureJammed": "Skatt med fastkilat lås",
+        "riftCacheAvailable": "Tillgängligt förråd i revan",
+        "riftCacheLocked": "Låst förråd",
+        "riftCacheOpened": "Öppnat förråd",
+        "riftCacheJammed": "Förråd med fastkilat lås",
+        "pylonUnlit": "Släckt runpelare",
+        "pylonLit": "Tänd runpelare",
+        "sequenceRuneUnlit": "Släckt sekvensruna",
+        "sequenceRuneLit": "Tänd sekvensruna",
+        "iceGoal": "Ismål",
+        "boulderPad": "Stenblocksmål",
+        "boulderMovable": "Flyttbart stenblock",
+        "boulderPlaced": "Placerat stenblock",
+        "gateSealed": "Förseglad port",
+        "gateOpen": "Öppen port",
+        "switchReady": "Brytare redo att användas",
+        "switchOn": "Aktiverad brytare",
+        "orbDormant": "Slumrande orb",
+        "orbActive": "Aktiv orb",
+        "rollerHazard": "Farligt rullande stenblock",
+        "delvePassageSealed": "Förseglad passage",
+        "delvePassageOpen": "Öppen passage",
+        "delveSurfaceExit": "Utgång till ytan",
+        "delveCacheLocked": "Låst delve-kista",
+        "delveCacheReady": "Delve-kista redo",
+        "delveCacheActive": "Delve-kista aktiv",
+        "delveCacheOpened": "Öppnad delve-kista",
+        "delveReliquaryLocked": "Låst relikvarium",
+        "delveReliquaryReady": "Relikvarium redo",
+        "delveReliquaryActive": "Relikvarierit aktiv",
+        "delveReliquaryOpened": "Öppnat relikvarium",
+        "bountiful": "{marker} med rikligt byte"
+      }
     },
     "options": {
       "gameMenu": "Spelmeny",
@@ -8922,6 +9049,7 @@ export const sv_SE: EnTranslations = {
       "filterSort": "Sortera",
       "sortName": "Namn (A-Z)",
       "sortPriceAsc": "Pris: lågt till högt",
+      "collapseLowest": "Endast lägsta pris",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",
@@ -8952,6 +9080,8 @@ export const sv_SE: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "av {count}",
       "priceEach": "Pris per styck",
+      "lowestPriceLabel": "Nuvarande lägsta annonspris",
+      "lowestPriceNone": "Det finns inga aktiva annonser för det här föremålet ännu.",
       "listButton": "Lägg upp på Världsmarknaden",
       "minPriceError": "Ange ett pris på minst 1 koppar.",
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",
@@ -9379,6 +9509,7 @@ export const sv_SE: EnTranslations = {
       "cheap_shot": {
         "name": "Magslag",
         "description": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const sv_SE: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brinnande ed",
-        "description": "Ökar passivt hotet som er Heliga skada alstrar med 60%. Endast Trosväktare."
+        "description": "Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare."
       },
       "retribution_aura": {
         "name": "Vedergällningsaura",
@@ -9707,7 +9838,7 @@ export const sv_SE: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet vapen",
-        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 30% rustning, tar 10% mindre skada och alstrar dubbelt så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
+        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 40% rustning och 20% uthållighet, tar 15% mindre skada och är immun mot kritiska träffar från varelser och alstrar 2,75 gånger så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
       },
       "healing_wave": {
         "name": "Lagande vatten",
@@ -9886,7 +10017,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
@@ -9896,6 +10027,10 @@ export const sv_SE: EnTranslations = {
       "growl": {
         "name": "Hota",
         "description": "Morrar åt målet: ditt hot stiger till nivån hos dess mest hatade fiende och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Vargform",

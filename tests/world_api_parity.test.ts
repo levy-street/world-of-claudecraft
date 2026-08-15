@@ -142,6 +142,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
+  { name: 'civicServicePlacements', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
@@ -279,6 +280,7 @@ export const IWORLD_MEMBERS = [
   { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
+  { name: 'marketSellPriceCheck', kind: 'method' },
   { name: 'marketList', kind: 'method' },
   { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
@@ -591,7 +593,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (data) + setActiveBorder (method), leaving 319. This branch's backward
     // target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a method),
     // leaving 320. The player item lock (issue #3042) adds setItemLocked
-    // (IWorldInventory, a method), leaving 321.
+    // (IWorldInventory, a method), leaving 321. Civic service anchors add
+    // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
+    // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
+    // method), leaving 323.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -601,9 +606,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(321);
-    expect(DATA_MEMBERS.length).toBe(85);
-    expect(METHOD_MEMBERS.length).toBe(236);
+    expect(IWORLD_MEMBERS.length).toBe(323);
+    expect(DATA_MEMBERS.length).toBe(86);
+    expect(METHOD_MEMBERS.length).toBe(237);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -668,6 +673,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'changeWeaponSkin',
       'characterProfile',
       'chat',
+      'civicServicePlacements',
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
@@ -799,6 +805,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -957,6 +964,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgInfo',
       'cardMinigameInfo',
       'cfg',
+      'civicServicePlacements',
       'commissionOrders',
       'companionState',
       'companionUpgrades',
@@ -1161,6 +1169,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1372,6 +1381,7 @@ type _ExhaustTargeting = AssertNever<
 >;
 
 const FACET_INTERACTION = [
+  'civicServicePlacements',
   'interact',
   'lootCorpse',
   'harvestCorpse',
@@ -1603,6 +1613,7 @@ const FACET_MARKET = [
   'marketInfo',
   'marketCollectPending',
   'marketSearch',
+  'marketSellPriceCheck',
   'marketList',
   'marketListInstance',
   'marketBuy',
@@ -1874,8 +1885,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(321);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(321);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

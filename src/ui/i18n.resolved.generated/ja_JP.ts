@@ -1741,6 +1741,7 @@ export const ja_JP: EnTranslations = {
       "notEnoughHonor": "名誉が足りません。",
       "reasons": {
         "arenaWin": "アリーナ勝利",
+        "arenaComplete": "アリーナ参戦",
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
         "fiestaWin": "フィエスタ勝利",
@@ -1847,6 +1848,7 @@ export const ja_JP: EnTranslations = {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
     "itemHeroicTag": "[ヒロイック]",
+    "itemHeroicLabel": "ヒロイック",
     "itemSoulbound": "魂縛",
     "itemUniqueEquipped": "装備ユニーク",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const ja_JP: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "退席"
+      "afkTag": "退席",
+      "cheaterTag": "< チーター >"
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",
@@ -3936,6 +3939,12 @@ export const ja_JP: EnTranslations = {
       "genesis_token_claimed": "そのSeeker Genesis Tokenはすでに取得されています。",
       "entitlement_required": "検証済みのSeeker資格が必要です。",
       "current_ownership_required": "現在Seeker Genesis Tokenを所有している必要があります。"
+    },
+    "cheater_mark": {
+      "admin_target": "管理者アカウントにはマークを付けられません。",
+      "reason_required": "理由の入力が必要です。",
+      "invalid_duration": "マークの期間は1秒以上で入力してください。",
+      "not_marked": "そのアカウントはマークされていません。"
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const ja_JP: EnTranslations = {
     "email": "メールアドレス",
     "emailPlaceholder": "mail@example.com",
     "emailError": "有効なメールアドレスを入力してください。",
+    "marketingOptIn": "ゲームのニュースやアップデートをメールで受け取る（任意）",
     "showPassword": "パスワードを表示",
     "hidePassword": "パスワードを非表示",
     "logIn": "ログイン",
@@ -6652,6 +6662,19 @@ export const ja_JP: EnTranslations = {
     "style": "スタイル",
     "resetLook": "外見をリセット",
     "resetShort": "リセット",
+    "shareTab": "共有",
+    "designCode": "デザインコード",
+    "designCodeHint": "このコードをコピーすると、この見た目を保存したり共有したりできます。コードをここに貼り付けてインポートすると読み込めます。",
+    "copyCode": "コードをコピー",
+    "importCode": "インポート",
+    "designCodeCopied": "デザインコードをコピーしました。",
+    "designCodeCopyManual": "ここでは自動コピーができません。コードは選択済みです。キーボードでコピーしてください。",
+    "designCodeImported": "デザインをインポートしました。",
+    "designCodeImportedPartial": "デザインをインポートしました。このバージョンで認識できない値はスキップされました。",
+    "designCodeErrEmpty": "まずデザインコードを貼り付けてください。",
+    "designCodeErrHeader": "これはデザインコードではないようです。",
+    "designCodeErrVersion": "このデザインコードはより新しいゲームバージョンのものです。",
+    "designCodeErrMalformed": "このデザインコードは壊れています。コード全体をコピーしてやり直してください。",
     "browFlat": "平ら",
     "browArched": "アーチ",
     "browThin": "細め",
@@ -8003,7 +8026,111 @@ export const ja_JP: EnTranslations = {
       "zoomIn": "ズームイン",
       "zoomOut": "ズームアウト",
       "mapCanvasLabel": "マップ",
-      "mapSummary": "{zone}のマップ。"
+      "mapSummary": "{zone}のマップ。",
+      "mapMarkerDescription": "{area}。{markers}",
+      "mapMarkerEmpty": "重要なマーカーは表示されていません。",
+      "mapMarkerLocated": "{marker}：{direction}、{distance}。",
+      "mapMarkerLocatedCount": "{marker}：{count}件、{direction}、{distance}。",
+      "mapMarkerMore": "ほかに{count}件のマーカー。",
+      "mapMarkerDirections": {
+        "center": "中央",
+        "north": "北",
+        "northeast": "北東",
+        "east": "東",
+        "southeast": "南東",
+        "south": "南",
+        "southwest": "南西",
+        "west": "西",
+        "northwest": "北西"
+      },
+      "mapMarkerDistances": {
+        "near": "近く",
+        "medium": "中距離",
+        "far": "遠く"
+      },
+      "mapMarkerLabels": {
+        "you": "自分",
+        "availableQuest": "受注可能なクエスト",
+        "readyQuest": "報告可能なクエスト",
+        "repeatQuest": "繰り返し可能なクエスト",
+        "cooldownQuest": "再受注待ちのクエスト",
+        "questObjective": "クエスト目標エリア",
+        "readyOre": "採掘可能な鉱脈",
+        "readyWood": "採集可能な木材",
+        "readyHerb": "採集可能な薬草",
+        "readyLockedOre": "採掘可能な鉱脈、道具未解放",
+        "readyLockedWood": "採集可能な木材、道具未解放",
+        "readyLockedHerb": "採集可能な薬草、道具未解放",
+        "cooldownOre": "枯渇した鉱脈",
+        "cooldownWood": "枯渇した木材",
+        "cooldownHerb": "枯渇した薬草",
+        "cooldownLockedOre": "枯渇した鉱脈、道具未解放",
+        "cooldownLockedWood": "枯渇した木材、道具未解放",
+        "cooldownLockedHerb": "枯渇した薬草、道具未解放",
+        "station": "製作設備：{name}",
+        "service": "施設：{name}",
+        "partyMember": "パーティメンバー：{name}",
+        "deadPartyMember": "死亡したパーティメンバー：{name}",
+        "partyMemberGeneric": "パーティメンバー",
+        "deadPartyMemberGeneric": "死亡したパーティメンバー",
+        "friend": "フレンド：{name}",
+        "guildMember": "ギルドメンバー：{name}",
+        "pointOfInterest": "注目地点：{name}",
+        "dungeonEntrance": "ダンジョン入口：{name}",
+        "dungeonExit": "ダンジョン出口",
+        "delveEntrance": "デルヴ入口：{name}",
+        "worldPassage": "{zone}への通路",
+        "riftEntrance": "リフト入口：{name}",
+        "hostileEnemy": "敵対対象",
+        "aggressiveEnemy": "あなたを攻撃中の敵",
+        "lootableEnemy": "戦利品を回収できる敵",
+        "corpse": "自分の死体",
+        "deathZone": "危険地帯",
+        "teammate": "味方",
+        "deadTeammate": "死亡した味方",
+        "flagCarrier": "旗を運んでいる味方",
+        "ownFlagStand": "自軍の旗台",
+        "enemyFlagStand": "敵軍の旗台",
+        "riftDescent": "リフト下降口",
+        "riftReturnBeacon": "帰還ビーコン",
+        "riftReturnExit": "帰還出口",
+        "ranked": "{marker}、ランク{rank}",
+        "riftTreasureAvailable": "入手可能な宝",
+        "riftTreasureLocked": "施錠された宝",
+        "riftTreasureOpened": "開封済みの宝",
+        "riftTreasureJammed": "作動不良の宝",
+        "riftCacheAvailable": "入手可能なリフトの物資箱",
+        "riftCacheLocked": "施錠された物資箱",
+        "riftCacheOpened": "開封済みの物資箱",
+        "riftCacheJammed": "作動不良の物資箱",
+        "pylonUnlit": "消灯した塔",
+        "pylonLit": "点灯した塔",
+        "sequenceRuneUnlit": "消灯した順序のルーン",
+        "sequenceRuneLit": "点灯した順序のルーン",
+        "iceGoal": "氷の目標地点",
+        "boulderPad": "岩の目標地点",
+        "boulderMovable": "移動可能な岩",
+        "boulderPlaced": "配置済みの岩",
+        "gateSealed": "封印された門",
+        "gateOpen": "開いた門",
+        "switchReady": "使用可能なスイッチ",
+        "switchOn": "作動中のスイッチ",
+        "orbDormant": "休眠中のオーブ",
+        "orbActive": "作動中のオーブ",
+        "rollerHazard": "ローラーの危険物",
+        "delvePassageSealed": "封鎖された通路",
+        "delvePassageOpen": "開いた通路",
+        "delveSurfaceExit": "地上出口",
+        "delveCacheLocked": "施錠されたデルヴの物資箱",
+        "delveCacheReady": "準備完了のデルヴの物資箱",
+        "delveCacheActive": "作動中のデルヴの物資箱",
+        "delveCacheOpened": "開封済みのデルヴの物資箱",
+        "delveReliquaryLocked": "施錠された聖遺物匣",
+        "delveReliquaryReady": "準備完了の聖遺物匣",
+        "delveReliquaryActive": "儀式中の聖遺物匣",
+        "delveReliquaryOpened": "開封済みの聖遺物匣",
+        "bountiful": "豊穣な{marker}"
+      }
     },
     "options": {
       "gameMenu": "ゲームメニュー",
@@ -8922,6 +9049,7 @@ export const ja_JP: EnTranslations = {
       "filterSort": "並べ替え",
       "sortName": "名前 (A-Z)",
       "sortPriceAsc": "価格: 安い順",
+      "collapseLowest": "最安値のみ表示",
       "weaponSword": "剣",
       "weaponDagger": "短剣",
       "weaponStaff": "杖",
@@ -8952,6 +9080,8 @@ export const ja_JP: EnTranslations = {
       "quantity": "数量",
       "quantityOf": "/ {count}",
       "priceEach": "単価",
+      "lowestPriceLabel": "現在の最安出品価格",
+      "lowestPriceNone": "このアイテムには現在出品がありません。",
       "listButton": "ワールドマーケットに出品",
       "minPriceError": "価格は最低1銅貨にしてください。",
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",
@@ -9379,6 +9509,7 @@ export const ja_JP: EnTranslations = {
       "cheap_shot": {
         "name": "みぞおち強打",
         "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。",
+        "descriptionNoStealth": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。コンボポイントを2獲得します。",
         "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。"
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const ja_JP: EnTranslations = {
       },
       "righteous_fury": {
         "name": "バーニングオース",
-        "description": "神聖ダメージが生む脅威度を常時60%高めます。信仰の守護者専用。"
+        "description": "神聖ダメージが生む脅威度を常時30%高めます。信仰の守護者専用。"
       },
       "retribution_aura": {
         "name": "報復のオーラ",
@@ -9707,7 +9838,7 @@ export const ja_JP: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
-        "description": "武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を30%得て、受けるダメージが10%減り、脅威度を二倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。"
+        "description": "武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を40%、体力を20%得て、受けるダメージが15%減り、クリーチャーからのクリティカルヒットを無効化し、脅威度を2.75倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。"
       },
       "healing_wave": {
         "name": "癒しの水流",
@@ -9886,7 +10017,7 @@ export const ja_JP: EnTranslations = {
       },
       "bear_form": {
         "name": "ブルーインフォーム",
-        "description": "熊に変身します。アーマー +130%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
+        "description": "熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
       },
       "maul": {
         "name": "骨砕き",
@@ -9896,6 +10027,10 @@ export const ja_JP: EnTranslations = {
       "growl": {
         "name": "威嚇",
         "description": "対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。"
+      },
+      "challenging_roar": {
+        "name": "威圧の咆哮",
+        "description": "威圧的に咆哮します。10ヤード以内のすべての敵が挑発され、あなたへの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。"
       },
       "cat_form": {
         "name": "ウルフフォーム",

@@ -45,6 +45,7 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     primaryStat: 'all',
     rarity: 'all',
     sort: 'name',
+    collapseLowest: false,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
@@ -54,6 +55,8 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,
+    sellPriceItemId: null,
+    sellLowestPrice: null,
     ...over,
   };
 }
@@ -280,6 +283,59 @@ describe('market_view: sell states', () => {
       body.form.suggested.silver * COPPER_PER_SILVER +
       body.form.suggested.copper;
     expect(reconstructed).toBe(36000);
+  });
+});
+
+describe('market_view: sell-tab lowest listing price reference (issue #3043)', () => {
+  it('omits priceRef entirely when no echo is passed (existing 2/3-arg callers stay byte-identical)', () => {
+    const body = buildMarketSell('worn_sword', 3);
+    expect(body.state).toBe('form');
+    if (body.state !== 'form') return;
+    expect('priceRef' in body.form).toBe(false);
+  });
+
+  it('omits priceRef when the echo names a DIFFERENT item (stale across an item switch)', () => {
+    const body = buildMarketSell('worn_sword', 3, null, {
+      itemId: 'healing_potion',
+      lowestPrice: 100,
+    });
+    expect(body.state).toBe('form');
+    if (body.state !== 'form') return;
+    expect('priceRef' in body.form).toBe(false);
+  });
+
+  it('carries the price when the echo names THIS item', () => {
+    const body = buildMarketSell('worn_sword', 3, null, {
+      itemId: 'worn_sword',
+      lowestPrice: 42,
+    });
+    expect(body.state).toBe('form');
+    if (body.state !== 'form') return;
+    expect(body.form.priceRef).toBe(42);
+  });
+
+  it('carries null (not undefined) when the echo confirms no active listings for this item', () => {
+    const body = buildMarketSell('worn_sword', 3, null, {
+      itemId: 'worn_sword',
+      lowestPrice: null,
+    });
+    expect(body.state).toBe('form');
+    if (body.state !== 'form') return;
+    expect(body.form.priceRef).toBeNull();
+    expect('priceRef' in body.form).toBe(true);
+  });
+
+  it('buildMarketView wires the echo straight off MarketInfo.sellPriceItemId/sellLowestPrice', () => {
+    const view = buildMarketView({
+      info: info({ sellPriceItemId: 'worn_sword', sellLowestPrice: 77 }),
+      tab: 'sell',
+      filters: ALL,
+      sellItemId: 'worn_sword',
+      sellHave: 3,
+    });
+    expect(view.kind).toBe('sell');
+    if (view.kind !== 'sell' || view.body.state !== 'form') return;
+    expect(view.body.form.priceRef).toBe(77);
   });
 });
 

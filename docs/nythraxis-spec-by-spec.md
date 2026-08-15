@@ -77,7 +77,7 @@ and the ordering, not a live parse.
 
 **Spread: 2.37x at 60 s** (308 to 130, median 196). **5.10x at 300 s** (319 to
 63, median 175). The repo's own declared intent in
-`tests/owned_class_balance_harness.test.ts` is roughly plus or minus 15%.
+`tests/owned_class_balance_druid_bands.test.ts` is roughly plus or minus 15%.
 
 ---
 
@@ -870,6 +870,14 @@ duty, but the conversion is not enough. As a primary healer it does not function
 ---
 
 # Tanks
+
+> **v0.38 RETUNE (2026-08-15):** the threat and survivability numbers in this
+> section describe the pre-v0.38 tree and motivated the tank balance pass. The
+> 3.6x threat gap and the Stonebound heroic one-shot below are FIXED: heroic
+> threat now reads warrior 276 / paladin 296 / bear 316 / Stonebound 255, the
+> bear owns the largest raw pool (2746, the biggest of the four), and no tank
+> is one-shot by the biggest observed heroic hit. Current tables and the constant-by-constant record live
+> in `docs/nythraxis-class-balance-monte-carlo.md` (the v0.38 addendum).
 
 Unhealed, against boss melee only. No Gravebreaker, no adds. Health is re-pinned
 each tick so the window always completes; "survival" is the pool divided by

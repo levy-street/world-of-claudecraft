@@ -1741,6 +1741,7 @@ export const vi_VN: EnTranslations = {
       "notEnoughHonor": "Không đủ danh dự.",
       "reasons": {
         "arenaWin": "Chiến thắng đấu trường",
+        "arenaComplete": "Đã đấu trận đấu trường",
         "fiestaKill": "Hạ gục trong Fiesta",
         "fiestaComplete": "Fiesta đã hoàn thành",
         "fiestaWin": "Chiến thắng Fiesta",
@@ -1847,6 +1848,7 @@ export const vi_VN: EnTranslations = {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp thế giới."
     },
     "itemHeroicTag": "[ANH HÙNG]",
+    "itemHeroicLabel": "Anh Hùng",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
     "itemUniqueEquipped": "Độc Nhất Khi Trang Bị",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const vi_VN: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "VắngMặt"
+      "afkTag": "VắngMặt",
+      "cheaterTag": "< Kẻ Gian Lận >"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -3936,6 +3939,12 @@ export const vi_VN: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token đó đã được nhận rồi.",
       "entitlement_required": "Cần có quyền lợi Seeker đã được xác minh.",
       "current_ownership_required": "Bạn phải đang sở hữu Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Không thể đánh dấu tài khoản điều hành.",
+      "reason_required": "Bắt buộc phải nhập lý do.",
+      "invalid_duration": "Nhập thời hạn đánh dấu ít nhất một giây.",
+      "not_marked": "Tài khoản đó chưa bị đánh dấu."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const vi_VN: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "emailError": "Vui lòng nhập một địa chỉ email hợp lệ.",
+    "marketingOptIn": "Gửi cho tôi tin tức và cập nhật trò chơi qua email (tùy chọn)",
     "showPassword": "Hiện mật khẩu",
     "hidePassword": "Ẩn mật khẩu",
     "logIn": "Đăng Nhập",
@@ -6652,6 +6662,19 @@ export const vi_VN: EnTranslations = {
     "style": "Kiểu Dáng",
     "resetLook": "Đặt Lại Diện Mạo",
     "resetShort": "Đặt Lại",
+    "shareTab": "Chia sẻ",
+    "designCode": "Mã ngoại hình",
+    "designCodeHint": "Sao chép mã này để lưu hoặc chia sẻ ngoại hình. Dán mã vào đây rồi nhập để tải ngoại hình.",
+    "copyCode": "Sao chép mã",
+    "importCode": "Nhập",
+    "designCodeCopied": "Đã sao chép mã ngoại hình.",
+    "designCodeCopyManual": "Tính năng tự động sao chép bị chặn tại đây. Mã đã được chọn; hãy dùng bàn phím để sao chép.",
+    "designCodeImported": "Đã nhập ngoại hình.",
+    "designCodeImportedPartial": "Đã nhập ngoại hình. Những giá trị mà phiên bản này không nhận diện được đã bị bỏ qua.",
+    "designCodeErrEmpty": "Trước tiên, hãy dán mã ngoại hình.",
+    "designCodeErrHeader": "Nội dung đó không giống mã ngoại hình.",
+    "designCodeErrVersion": "Mã ngoại hình đó đến từ phiên bản trò chơi mới hơn.",
+    "designCodeErrMalformed": "Mã ngoại hình đó bị hỏng. Hãy sao chép toàn bộ mã rồi thử lại.",
     "browFlat": "Thẳng",
     "browArched": "Cong",
     "browThin": "Mảnh",
@@ -8003,7 +8026,111 @@ export const vi_VN: EnTranslations = {
       "zoomIn": "Phóng to",
       "zoomOut": "Thu nhỏ",
       "mapCanvasLabel": "Bản Đồ",
-      "mapSummary": "Bản đồ của {zone}."
+      "mapSummary": "Bản đồ của {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Không thấy dấu mốc quan trọng nào.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Thêm {count} dấu mốc.",
+      "mapMarkerDirections": {
+        "center": "chính giữa",
+        "north": "phía bắc",
+        "northeast": "đông bắc",
+        "east": "phía đông",
+        "southeast": "đông nam",
+        "south": "phía nam",
+        "southwest": "tây nam",
+        "west": "phía tây",
+        "northwest": "tây bắc"
+      },
+      "mapMarkerDistances": {
+        "near": "gần",
+        "medium": "cách một khoảng vừa phải",
+        "far": "xa"
+      },
+      "mapMarkerLabels": {
+        "you": "Bạn",
+        "availableQuest": "Nhiệm vụ khả dụng",
+        "readyQuest": "Nhiệm vụ sẵn sàng nộp",
+        "repeatQuest": "Nhiệm vụ lặp lại",
+        "cooldownQuest": "Nhiệm vụ đang trong thời gian hồi",
+        "questObjective": "Khu vực mục tiêu nhiệm vụ",
+        "readyOre": "Mạch quặng sẵn sàng",
+        "readyWood": "Cụm cây gỗ sẵn sàng",
+        "readyHerb": "Khóm thảo dược sẵn sàng",
+        "readyLockedOre": "Mạch quặng sẵn sàng, dụng cụ chưa mở khóa",
+        "readyLockedWood": "Cụm cây gỗ sẵn sàng, dụng cụ chưa mở khóa",
+        "readyLockedHerb": "Khóm thảo dược sẵn sàng, dụng cụ chưa mở khóa",
+        "cooldownOre": "Mạch quặng đã cạn",
+        "cooldownWood": "Cụm cây gỗ đã khai thác",
+        "cooldownHerb": "Khóm thảo dược đã hái",
+        "cooldownLockedOre": "Mạch quặng đã cạn, dụng cụ chưa mở khóa",
+        "cooldownLockedWood": "Cụm cây gỗ đã khai thác, dụng cụ chưa mở khóa",
+        "cooldownLockedHerb": "Khóm thảo dược đã hái, dụng cụ chưa mở khóa",
+        "station": "Trạm chế tác: {name}",
+        "service": "Dịch vụ: {name}",
+        "partyMember": "Thành viên tổ đội: {name}",
+        "deadPartyMember": "Thành viên tổ đội đã chết: {name}",
+        "partyMemberGeneric": "Thành viên tổ đội",
+        "deadPartyMemberGeneric": "Thành viên tổ đội đã chết",
+        "friend": "Bạn bè: {name}",
+        "guildMember": "Thành viên bang hội: {name}",
+        "pointOfInterest": "Điểm đáng chú ý: {name}",
+        "dungeonEntrance": "Lối vào hầm ngục: {name}",
+        "dungeonExit": "Lối ra hầm ngục",
+        "delveEntrance": "Lối vào hang sâu: {name}",
+        "worldPassage": "Lối sang {zone}",
+        "riftEntrance": "Lối vào Rạn Nứt: {name}",
+        "hostileEnemy": "Kẻ địch",
+        "aggressiveEnemy": "Kẻ địch đang tấn công bạn",
+        "lootableEnemy": "Kẻ địch có chiến lợi phẩm",
+        "corpse": "Thi thể của bạn",
+        "deathZone": "Vùng nguy hiểm",
+        "teammate": "Đồng đội",
+        "deadTeammate": "Đồng đội đã chết",
+        "flagCarrier": "Đồng đội đang cầm cờ",
+        "ownFlagStand": "Bệ cờ của bạn",
+        "enemyFlagStand": "Bệ cờ địch",
+        "riftDescent": "Lối xuống Rạn Nứt",
+        "riftReturnBeacon": "Đèn hiệu trở về",
+        "riftReturnExit": "Lối ra để trở về",
+        "ranked": "{marker}, hạng {rank}",
+        "riftTreasureAvailable": "Kho báu sẵn sàng",
+        "riftTreasureLocked": "Kho báu bị khóa",
+        "riftTreasureOpened": "Kho báu đã mở",
+        "riftTreasureJammed": "Khóa kho báu bị kẹt",
+        "riftCacheAvailable": "Rương Rạn Nứt sẵn sàng",
+        "riftCacheLocked": "Rương bị khóa",
+        "riftCacheOpened": "Rương đã mở",
+        "riftCacheJammed": "Khóa rương bị kẹt",
+        "pylonUnlit": "Trụ rune chưa sáng",
+        "pylonLit": "Trụ rune đã sáng",
+        "sequenceRuneUnlit": "Rune trình tự chưa sáng",
+        "sequenceRuneLit": "Rune trình tự đã sáng",
+        "iceGoal": "Mục tiêu băng",
+        "boulderPad": "Đích đến của tảng đá",
+        "boulderMovable": "Tảng đá có thể di chuyển",
+        "boulderPlaced": "Tảng đá đã vào vị trí",
+        "gateSealed": "Cổng bị niêm phong",
+        "gateOpen": "Cổng mở",
+        "switchReady": "Công tắc sẵn sàng",
+        "switchOn": "Công tắc đã kích hoạt",
+        "orbDormant": "Quả cầu ngủ yên",
+        "orbActive": "Quả cầu đang hoạt động",
+        "rollerHazard": "Tảng đá lăn nguy hiểm",
+        "delvePassageSealed": "Lối đi bị niêm phong",
+        "delvePassageOpen": "Lối đi mở",
+        "delveSurfaceExit": "Lối ra mặt đất",
+        "delveCacheLocked": "Rương hang sâu bị khóa",
+        "delveCacheReady": "Rương hang sâu sẵn sàng",
+        "delveCacheActive": "Rương hang sâu đang hoạt động",
+        "delveCacheOpened": "Rương hang sâu đã mở",
+        "delveReliquaryLocked": "Hộp thánh tích bị khóa",
+        "delveReliquaryReady": "Hộp thánh tích sẵn sàng",
+        "delveReliquaryActive": "Nghi lễ hộp thánh tích đang hoạt động",
+        "delveReliquaryOpened": "Hộp thánh tích đã mở",
+        "bountiful": "Phần thưởng dồi dào: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu Trò Chơi",
@@ -8922,6 +9049,7 @@ export const vi_VN: EnTranslations = {
       "filterSort": "Sắp xếp",
       "sortName": "Tên (A-Z)",
       "sortPriceAsc": "Giá: thấp đến cao",
+      "collapseLowest": "Chỉ giá thấp nhất",
       "weaponSword": "Kiếm",
       "weaponDagger": "Dao Găm",
       "weaponStaff": "Trượng",
@@ -8952,6 +9080,8 @@ export const vi_VN: EnTranslations = {
       "quantity": "Số lượng",
       "quantityOf": "trong {count}",
       "priceEach": "Giá mỗi món",
+      "lowestPriceLabel": "Giá đăng bán thấp nhất hiện tại",
+      "lowestPriceNone": "Hiện chưa có tin đăng bán nào cho vật phẩm này.",
       "listButton": "Rao bán trên Chợ Thế Giới",
       "minPriceError": "Hãy đặt giá ít nhất 1 đồng.",
       "collectEmpty": "Không có gì đang chờ. Tiền bán và mặt hàng hết hạn sẽ được thu về tại đây.",
@@ -9379,6 +9509,7 @@ export const vi_VN: EnTranslations = {
       "cheap_shot": {
         "name": "Thụi Bụng",
         "description": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Nhận 2 điểm liên hoàn.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân: lần dùng đó không tốn gì, tiêu hết 3 U Ám, và kích hoạt Màn Bóng Tối 6 giây."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const vi_VN: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Lời Thề Rực Cháy",
-        "description": "Bị động tăng 60% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin."
+        "description": "Bị động tăng 30% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin."
       },
       "retribution_aura": {
         "name": "Hào Quang Báo Đền",
@@ -9707,7 +9838,7 @@ export const vi_VN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Vũ Khí Khắc Đá",
-        "description": "Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 30% giáp, chịu ít hơn 10% sát thương và tạo ra gấp đôi mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây."
+        "description": "Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 40% giáp và 20% Thể Lực, chịu ít hơn 15% sát thương và miễn nhiễm với đòn chí mạng từ quái vật và tạo ra gấp 2,75 lần mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây."
       },
       "healing_wave": {
         "name": "Dòng Nước Hàn Gắn",
@@ -9886,7 +10017,7 @@ export const vi_VN: EnTranslations = {
       },
       "bear_form": {
         "name": "Hình Bruin",
-        "description": "Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
+        "description": "Biến hình thành gấu: giáp +110%, máu tối đa +30%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
       },
       "maul": {
         "name": "Nghiền Xương",
@@ -9896,6 +10027,10 @@ export const vi_VN: EnTranslations = {
       "growl": {
         "name": "Hăm Dọa",
         "description": "Gầm gừ với mục tiêu: mối đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Hình Sói",

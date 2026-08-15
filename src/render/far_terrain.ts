@@ -24,6 +24,7 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
+import { NIGHT_AMBIENT_FLOOR } from './day_night_core';
 import { stoneDetailNormal } from './detail_normals';
 import {
   advanceWithinBudget,
@@ -177,11 +178,21 @@ const farNightFloor = { value: new THREE.Color(0, 0, 0) };
  * night floor is applied after this and is albedo-shaped, so it scales with it
  * and keeps its relative say against the lit terms.
  *
+ * DERIVED from NIGHT_AMBIENT_FLOOR, not a free constant. The far faces are lit
+ * by that same ambient floor, so a dim tuned to one floor makes the vista glow
+ * the moment the floor is raised, which is exactly what the moon-lit night
+ * overhaul did (the deep-night ambient went 0.30 -> ~0.49). What must stay put
+ * is the far face's ABSOLUTE night brightness (floor times dim); pin that at the
+ * level the original 0.5-at-0.30 tuning gave (0.15) and solve for the dim, so
+ * the vista reads the same against the navy sky at any ambient floor.
+ * tests/far_terrain_night pins that PRODUCT, not the dim.
+ *
  * Cosmetic and gameplay-neutral by construction: this material only ever draws
  * past the detail envelope (see FAR_DISCARD_MARGIN), where no actionable
  * information lives; the near terrain a player reads is untouched.
  */
-const FAR_NIGHT_ALBEDO_DIM = 0.5;
+const FAR_NIGHT_TARGET_BRIGHTNESS = 0.5 * 0.3; // original dim * original floor
+const FAR_NIGHT_ALBEDO_DIM = FAR_NIGHT_TARGET_BRIGHTNESS / NIGHT_AMBIENT_FLOOR;
 const farNightDim = { value: 1 };
 
 /** Per-frame, from the renderer's day/night update: scales the moonlit ambient

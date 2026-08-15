@@ -1741,6 +1741,7 @@ export const pl_PL: EnTranslations = {
       "notEnoughHonor": "Za mało Honoru.",
       "reasons": {
         "arenaWin": "Zwycięstwo na arenie",
+        "arenaComplete": "Stoczono pojedynek na arenie",
         "fiestaKill": "Upadek Fiesty",
         "fiestaComplete": "Fiesta zakończona",
         "fiestaWin": "Zwycięstwo Fiesty",
@@ -1847,6 +1848,7 @@ export const pl_PL: EnTranslations = {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
     "itemHeroicTag": "[HEROICZNY]",
+    "itemHeroicLabel": "Heroiczny",
     "itemSoulbound": "Związany z duszą",
     "itemUniqueEquipped": "Unikatowo zakładany",
     "itemSet": {
@@ -2464,7 +2466,8 @@ export const pl_PL: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Oszust >"
     },
     "mobTooltip": {
       "levelFamily": "Poziom {level}: {family}",
@@ -3936,6 +3939,12 @@ export const pl_PL: EnTranslations = {
       "genesis_token_claimed": "Ten Seeker Genesis Token został już odebrany.",
       "entitlement_required": "Wymagane jest zweryfikowane uprawnienie Seeker.",
       "current_ownership_required": "Musisz obecnie posiadać Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Kont operatorów nie można oznaczać.",
+      "reason_required": "Wymagane jest podanie powodu.",
+      "invalid_duration": "Podaj czas trwania oznaczenia wynoszący co najmniej jedną sekundę.",
+      "not_marked": "To konto nie jest oznaczone."
     }
   },
   "guide": {
@@ -6552,6 +6561,7 @@ export const pl_PL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Wprowadź prawidłowy adres e-mail.",
+    "marketingOptIn": "Wysyłaj mi e-mailem nowości i aktualizacje gry (opcjonalnie)",
     "showPassword": "Pokaż hasło",
     "hidePassword": "Ukryj hasło",
     "logIn": "Zaloguj się",
@@ -6652,6 +6662,19 @@ export const pl_PL: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetuj wygląd",
     "resetShort": "Resetuj",
+    "shareTab": "Udostępnij",
+    "designCode": "Kod wyglądu",
+    "designCodeHint": "Skopiuj ten kod, aby zapisać lub udostępnić ten wygląd. Wklej tutaj kod i zaimportuj go, aby wczytać wygląd.",
+    "copyCode": "Kopiuj kod",
+    "importCode": "Importuj",
+    "designCodeCopied": "Kod wyglądu skopiowany.",
+    "designCodeCopyManual": "Automatyczne kopiowanie jest tutaj zablokowane. Kod jest zaznaczony; skopiuj go za pomocą klawiatury.",
+    "designCodeImported": "Wygląd zaimportowany.",
+    "designCodeImportedPartial": "Wygląd zaimportowany. Wartości nieznane tej wersji zostały pominięte.",
+    "designCodeErrEmpty": "Najpierw wklej kod wyglądu.",
+    "designCodeErrHeader": "To nie wygląda na kod wyglądu.",
+    "designCodeErrVersion": "Ten kod wyglądu pochodzi z nowszej wersji gry.",
+    "designCodeErrMalformed": "Ten kod wyglądu jest uszkodzony. Skopiuj cały kod i spróbuj ponownie.",
     "browFlat": "Płaskie",
     "browArched": "Łukowate",
     "browThin": "Cienkie",
@@ -8003,7 +8026,111 @@ export const pl_PL: EnTranslations = {
       "zoomIn": "Przybliż",
       "zoomOut": "Oddal",
       "mapCanvasLabel": "Mapa",
-      "mapSummary": "Mapa {zone}."
+      "mapSummary": "Mapa {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Nie widać żadnych istotnych znaczników.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Pozostałe znaczniki: {count}.",
+      "mapMarkerDirections": {
+        "center": "w centrum",
+        "north": "na północ",
+        "northeast": "na północny wschód",
+        "east": "na wschód",
+        "southeast": "na południowy wschód",
+        "south": "na południe",
+        "southwest": "na południowy zachód",
+        "west": "na zachód",
+        "northwest": "na północny zachód"
+      },
+      "mapMarkerDistances": {
+        "near": "blisko",
+        "medium": "w średniej odległości",
+        "far": "daleko"
+      },
+      "mapMarkerLabels": {
+        "you": "Ty",
+        "availableQuest": "Dostępne zadanie",
+        "readyQuest": "Zadanie gotowe do oddania",
+        "repeatQuest": "Zadanie powtarzalne",
+        "cooldownQuest": "Zadanie wkrótce ponownie dostępne",
+        "questObjective": "Obszar celu zadania",
+        "readyOre": "Żyła rudy gotowa do wydobycia",
+        "readyWood": "Drzewostan gotowy do wyrębu",
+        "readyHerb": "Łan ziół gotowy do zebrania",
+        "readyLockedOre": "Żyła rudy gotowa do wydobycia, narzędzie niedostępne",
+        "readyLockedWood": "Drzewostan gotowy do wyrębu, narzędzie niedostępne",
+        "readyLockedHerb": "Łan ziół gotowy do zebrania, narzędzie niedostępne",
+        "cooldownOre": "Wyczerpana żyła rudy",
+        "cooldownWood": "Wycięty drzewostan",
+        "cooldownHerb": "Zebrany łan ziół",
+        "cooldownLockedOre": "Wyczerpana żyła rudy, narzędzie niedostępne",
+        "cooldownLockedWood": "Wycięty drzewostan, narzędzie niedostępne",
+        "cooldownLockedHerb": "Zebrany łan ziół, narzędzie niedostępne",
+        "station": "Stacja rzemieślnicza: {name}",
+        "service": "Usługa: {name}",
+        "partyMember": "Członek drużyny: {name}",
+        "deadPartyMember": "Martwy członek drużyny: {name}",
+        "partyMemberGeneric": "Członek drużyny",
+        "deadPartyMemberGeneric": "Martwy członek drużyny",
+        "friend": "Znajomy: {name}",
+        "guildMember": "Członek gildii: {name}",
+        "pointOfInterest": "Punkt zainteresowania: {name}",
+        "dungeonEntrance": "Wejście do lochu: {name}",
+        "dungeonExit": "Wyjście z lochu",
+        "delveEntrance": "Wejście do wyprawy: {name}",
+        "worldPassage": "Przejście do {zone}",
+        "riftEntrance": "Wejście do Szczeliny: {name}",
+        "hostileEnemy": "Wrogi przeciwnik",
+        "aggressiveEnemy": "Atakujący cię wróg",
+        "lootableEnemy": "Wróg do ograbienia",
+        "corpse": "Twoje zwłoki",
+        "deathZone": "Strefa zagrożenia",
+        "teammate": "Członek zespołu",
+        "deadTeammate": "Martwy członek zespołu",
+        "flagCarrier": "Członek zespołu niosący flagę",
+        "ownFlagStand": "Twój stojak na flagę",
+        "enemyFlagStand": "Stojak na flagę wroga",
+        "riftDescent": "Zejście do Szczeliny",
+        "riftReturnBeacon": "Latarnia powrotu",
+        "riftReturnExit": "Wyjście prowadzące z powrotem",
+        "ranked": "{marker}, ranga {rank}",
+        "riftTreasureAvailable": "Dostępny skarb",
+        "riftTreasureLocked": "Zamknięty skarb",
+        "riftTreasureOpened": "Otwarty skarb",
+        "riftTreasureJammed": "Skarb z zaciętym zamkiem",
+        "riftCacheAvailable": "Dostępna skrytka Szczeliny",
+        "riftCacheLocked": "Zamknięta skrytka",
+        "riftCacheOpened": "Otwarta skrytka",
+        "riftCacheJammed": "Skrytka z zaciętym zamkiem",
+        "pylonUnlit": "Wygaszony pylon runiczny",
+        "pylonLit": "Zapalony pylon runiczny",
+        "sequenceRuneUnlit": "Wygaszona runa sekwencji",
+        "sequenceRuneLit": "Zapalona runa sekwencji",
+        "iceGoal": "Cel lodowy",
+        "boulderPad": "Cel dla głazu",
+        "boulderMovable": "Ruchomy głaz",
+        "boulderPlaced": "Ustawiony głaz",
+        "gateSealed": "Zapieczętowana brama",
+        "gateOpen": "Otwarta brama",
+        "switchReady": "Przełącznik gotowy do użycia",
+        "switchOn": "Aktywowany przełącznik",
+        "orbDormant": "Uśpiona kula",
+        "orbActive": "Aktywna kula",
+        "rollerHazard": "Niebezpieczny toczący się głaz",
+        "delvePassageSealed": "Zapieczętowane przejście",
+        "delvePassageOpen": "Otwarte przejście",
+        "delveSurfaceExit": "Wyjście na powierzchnię",
+        "delveCacheLocked": "Zamknięta skrytka wyprawy",
+        "delveCacheReady": "Skrytka wyprawy gotowa",
+        "delveCacheActive": "Aktywna skrytka wyprawy",
+        "delveCacheOpened": "Otwarta skrytka wyprawy",
+        "delveReliquaryLocked": "Zamknięty relikwiarz",
+        "delveReliquaryReady": "Relikwiarz gotowy",
+        "delveReliquaryActive": "Aktywny obrzęd relikwiarza",
+        "delveReliquaryOpened": "Otwarty relikwiarz",
+        "bountiful": "Obfita nagroda: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu gry",
@@ -8922,6 +9049,7 @@ export const pl_PL: EnTranslations = {
       "filterSort": "Sortuj",
       "sortName": "Nazwa (A-Z)",
       "sortPriceAsc": "Cena: od najniższej do najwyższej",
+      "collapseLowest": "Tylko najniższa cena",
       "weaponSword": "Miecze",
       "weaponDagger": "Sztylety",
       "weaponStaff": "Kostury",
@@ -8952,6 +9080,8 @@ export const pl_PL: EnTranslations = {
       "quantity": "Ilość",
       "quantityOf": "z {count}",
       "priceEach": "Cena za sztukę",
+      "lowestPriceLabel": "Obecnie najniższa cena wystawienia",
+      "lowestPriceNone": "Nie ma jeszcze aktywnych ofert tego przedmiotu.",
       "listButton": "Wystaw na Rynku Świata",
       "minPriceError": "Podaj cenę co najmniej 1 miedziaka.",
       "collectEmpty": "Nic nie czeka. Dochód ze sprzedaży i wygasłe oferty zbierają się tutaj.",
@@ -9379,6 +9509,7 @@ export const pl_PL: EnTranslations = {
       "cheap_shot": {
         "name": "Cios w brzuch",
         "description": "Uderz cel za {damage} obrażeń, ogłuszając go na 4 sekundy. Musisz być w ukryciu. Przyznaje 2 punkty combo.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia: takie użycie nic nie kosztuje, zużywa cały Mrok i rozpoczyna 6-sekundową Zasłonę Cieni."
       },
       "sap": {
@@ -9591,7 +9722,7 @@ export const pl_PL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Płonąca przysięga",
-        "description": "Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 60%. Tylko Strażnik wiary."
+        "description": "Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 30%. Tylko Strażnik wiary."
       },
       "retribution_aura": {
         "name": "Aura odpłaty",
@@ -9707,7 +9838,7 @@ export const pl_PL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Oręż kamiennych okowów",
-        "description": "Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 30% pancerza, otrzymuje o 10% mniej obrażeń i generuje dwukrotnie większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s."
+        "description": "Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń i jest odporny na trafienia krytyczne od stworzeń i generuje 2,75 razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s."
       },
       "healing_wave": {
         "name": "Kojące wody",
@@ -9886,7 +10017,7 @@ export const pl_PL: EnTranslations = {
       },
       "bear_form": {
         "name": "Postać Bruina",
-        "description": "Zmień postać w niedźwiedzia: pancerz +130%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
+        "description": "Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "maul": {
         "name": "Kruszenie kości",
@@ -9896,6 +10027,10 @@ export const pl_PL: EnTranslations = {
       "growl": {
         "name": "Groźba",
         "description": "Warczy na cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Postać wilka",

@@ -309,7 +309,7 @@ describe('modifier bake and known-ability resolution', () => {
 
     const prot = computeTalentModifiers('warrior', allocation('prot'));
     expect(prot.grants).toContainEqual({ ability: 'shield_slam', rank: 1 });
-    expect(prot.global.threatPct).toBeCloseTo(0.3);
+    expect(prot.global.threatPct).toBeCloseTo(0.8);
     expect(prot.stats).toMatchObject({ armorPct: 0.1, staPct: 0.4, armorFromStrPct: 0.7 });
   });
 

@@ -31,9 +31,10 @@ export interface MarketListingView {
 }
 
 export interface MarketInfo {
-  // The viewer's own listings (always wired, for reclaim) followed by ONE page of
-  // other sellers' listings matching the active query. The server filters + paginates
-  // authoritatively, so paging walks the whole market, not just a single wire window.
+  // The viewer's own visible listings followed by ONE page of other sellers' listings
+  // matching the active query. All matching own rows wire for reclaim normally; collapse
+  // mode first narrows the whole match set, including own rows. The server filters +
+  // paginates authoritatively, so paging walks the whole market.
   listings: MarketListingView[];
   totalCount: number; // all listings matching the active filter (mine + others)
   filter: string; // the active search string (echoed back from the server)
@@ -50,6 +51,9 @@ export interface MarketInfo {
   primaryStat: MarketPrimaryStatFilter;
   rarity: MarketRarityFilter;
   sort: MarketSort;
+  // Whether the server collapsed matching plain listings to the lowest price per item
+  // (issue #3103), echoed back for the same drift-detection reason as the axes above.
+  collapseLowest: boolean;
   page: number; // current browse page (of other sellers' listings), 0-based
   pageCount: number; // total browse pages of other sellers' listings (>= 1)
   collectionCopper: number; // proceeds waiting to be collected
@@ -64,6 +68,13 @@ export interface MarketInfo {
   cutPct: number; // the Merchant's cut on a sale, as a percentage
   maxListings: number; // per-seller active-listing cap
   myListingCount: number; // how many active listings the viewer already has
+  // The Sell tab's current-lowest-listing-price reference (issue #3043), echoed
+  // alongside the item id it was computed for so a stale snapshot across an item
+  // switch is detectable (compare against the currently staged item before
+  // trusting sellLowestPrice). Null itemId means nothing is staged; a null
+  // price with a non-null itemId means the item has no active listings.
+  sellPriceItemId: string | null;
+  sellLowestPrice: number | null; // per unit, matching the sell form's "price each" field
 }
 
 export interface IWorldMarket {
@@ -75,6 +86,10 @@ export interface IWorldMarket {
   // World Market. The browse query (search + type/subtype/rarity filters + page) is
   // sent to the server, which filters and paginates; marketInfo mirrors the result.
   marketSearch(query: MarketQuery): void;
+  /** Ask for a current-lowest-listing-price reference for the Sell tab's staged
+   *  item (issue #3043); null clears it. Purely a display/query narrowing (no
+   *  gameplay effect), the marketSearch precedent. */
+  marketSellPriceCheck(itemId: string | null): void;
   marketList(itemId: string, count: number, price: number): void;
   /** List ONE instanced copy (count 1), named by its payload: the sim escrows
    *  the actual held copy whose payload matches, refusing transfer-locked
@@ -91,9 +106,10 @@ export interface IWorldMarket {
 // against the live match count (a normal narrowing, not drift), and `filter` is
 // not sanitized the same way `search` is on the way in (length/trim), so comparing
 // it here would false-positive on a search box the player is mid-typing in. The
-// six compared axes (five filters plus sort, issue 3102) are exactly the ones
-// that silently reset to default on a fresh join (post-linkdead-grace reconnect)
-// while a window's own filter controls survive the socket drop untouched.
+// seven compared axes (five filters plus sort, issue 3102, plus collapseLowest,
+// issue 3103) are exactly the ones that silently reset to default on a fresh join
+// (post-linkdead-grace reconnect) while a window's own filter controls survive the
+// socket drop untouched.
 export function queryDiffersFromEcho(query: MarketQuery, info: MarketInfo): boolean {
   return (
     query.itemType !== info.itemType ||
@@ -101,7 +117,8 @@ export function queryDiffersFromEcho(query: MarketQuery, info: MarketInfo): bool
     query.armorClass !== info.armorClass ||
     query.primaryStat !== info.primaryStat ||
     query.rarity !== info.rarity ||
-    query.sort !== info.sort
+    query.sort !== info.sort ||
+    query.collapseLowest !== info.collapseLowest
   );
 }
 

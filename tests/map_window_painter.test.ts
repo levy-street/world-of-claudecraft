@@ -24,6 +24,13 @@ import {
 import { emptyZoneProps, isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import {
+  MAP_MARKER_SIZES,
+  type MapMarkerArt,
+  type MapMarkerArtId,
+  type MapMarkerSize,
+} from '../src/ui/map_marker_icon_art';
+import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
+import {
   MapWindowPainter,
   MAP_COLOR_TOKENS as PAINTER_TOKEN_TABLE,
 } from '../src/ui/map_window_painter';
@@ -38,6 +45,24 @@ const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'ut
 // Comments stripped for the same reason as `code` above: a wiring pin that a
 // commented-out call satisfies is not a pin (see the repo's raw-source rule).
 const hud = hudSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+const tooltipAdapter = readFileSync(
+  new URL('../src/ui/map_marker_tooltip_adapter.ts', import.meta.url),
+  'utf8',
+)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const markerInteraction = readFileSync(
+  new URL('../src/ui/hud/map/map_marker_interaction_controller.ts', import.meta.url),
+  'utf8',
+)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
+const markerTooltipContent = readFileSync(
+  new URL('../src/ui/hud/map/map_marker_tooltip_content.ts', import.meta.url),
+  'utf8',
+)
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
 // Comment-stripped like `code`: a commented-out token declaration must not
 // satisfy the design-token pins below.
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8')
@@ -92,9 +117,22 @@ const classColor = (cls: string): string => `color:${cls}`;
 interface LabelSprite {
   width: number;
   height: number;
+  fonts: string[];
+  lineWidths: number[];
   /** Each text pass baked into this sprite, in order. The x/y are the sprite's
    *  own origin, which is what the blit destination subtracts. */
   ink: Array<{ op: 'fill' | 'stroke'; color: string; text: string; x: number; y: number }>;
+}
+
+/** A successful stable-marker sprite returned by the injected art seam. */
+interface FakeMarkerSprite {
+  markerId: MapMarkerArtId;
+  sizeId: MapMarkerSize;
+}
+
+interface MarkerArtCall {
+  id: MapMarkerArtId;
+  size: MapMarkerSize;
 }
 
 /** Where a blit put the label's anchor back: destination plus the sprite origin. */
@@ -121,29 +159,68 @@ interface PaintTrace {
    *  matched to the fill of the SAME path rather than to any similar one
    *  elsewhere in the redraw. */
   seq: number;
-  fills: Array<{ style: string; commands: string[]; at: number }>;
+  fills: Array<{ style: string; commands: string[]; args: number[]; at: number }>;
+  /** Immediate rectangle fills, including the hue-independent rank pips used by
+   *  the generated-art fallback. The ocean flood remains distinguishable by
+   *  style and dimensions. */
+  fillRects: Array<{
+    style: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    at: number;
+  }>;
   styleReads: string[];
   /** Every canvas minted through document.createElement('canvas'). */
   sprites: LabelSprite[];
   /** Every 3-argument drawImage: the label blits (the terrain blit passes 9),
    *  with the context's globalAlpha AT BLIT TIME (the cooldown glyph dims at
    *  the blit, never in the sprite raster). */
-  blits: Array<{ sprite: LabelSprite; dx: number; dy: number; alpha: number }>;
+  blits: Array<{ sprite: LabelSprite; dx: number; dy: number; alpha: number; at: number }>;
+  /** Successful marker-art blits, kept separate from label-cache sprites. */
+  markerBlits: Array<{
+    sprite: FakeMarkerSprite;
+    dx: number;
+    dy: number;
+    alpha: number;
+    at: number;
+  }>;
   /** Every canvas text entry point used on the MAP context, which must stay empty. */
   textApi: string[];
   /** Every stroke() on the map context with the stroke state it used. The width
    *  matters as much as the color: the badge block leaves 1.5 behind. */
-  strokes: Array<{ style: string; lineWidth: number; commands: string[]; at: number }>;
+  strokes: Array<{
+    style: string;
+    lineWidth: number;
+    commands: string[];
+    args: number[];
+    at: number;
+  }>;
 }
 
 function makeLabelSprite(trace: PaintTrace): LabelSprite {
+  let font = '';
+  let lineWidth = 1;
   const ctx = {
-    font: '',
     fillStyle: '',
     strokeStyle: '',
-    lineWidth: 1,
     textAlign: 'start',
     textBaseline: 'alphabetic',
+    get font(): string {
+      return font;
+    },
+    set font(value: string) {
+      font = value;
+      sprite.fonts.push(value);
+    },
+    get lineWidth(): number {
+      return lineWidth;
+    },
+    set lineWidth(value: number) {
+      lineWidth = value;
+      sprite.lineWidths.push(value);
+    },
     measureText(text: string): { width: number } {
       return { width: text.length * 6 };
     },
@@ -157,6 +234,8 @@ function makeLabelSprite(trace: PaintTrace): LabelSprite {
   const sprite: LabelSprite = {
     width: 0,
     height: 0,
+    fonts: [],
+    lineWidths: [],
     ink: [] as LabelSprite['ink'],
     getContext: (kind: string): unknown => (kind === '2d' ? (ctx as unknown) : null),
   } as unknown as LabelSprite;
@@ -164,8 +243,41 @@ function makeLabelSprite(trace: PaintTrace): LabelSprite {
   return sprite;
 }
 
+function isMarkerSprite(image: unknown): image is FakeMarkerSprite {
+  return typeof image === 'object' && image !== null && 'markerId' in image;
+}
+
+/** Fake MapMarkerArt with an explicit success set. Requests that miss still
+ *  stay in `calls`, making fallback as observable as the successful blit. */
+function fakeMarkerArt(available: readonly MapMarkerArtId[]): {
+  art: MapMarkerArt;
+  calls: MarkerArtCall[];
+} {
+  const calls: MarkerArtCall[] = [];
+  const allowed = new Set(available);
+  const sprites = new Map<string, FakeMarkerSprite>();
+  return {
+    calls,
+    art: {
+      sprite(id, size): CanvasImageSource | null {
+        calls.push({ id, size });
+        if (!allowed.has(id)) return null;
+        const key = `${id}:${size}`;
+        let sprite = sprites.get(key);
+        if (!sprite) {
+          sprite = { markerId: id, sizeId: size };
+          sprites.set(key, sprite);
+        }
+        return sprite as unknown as CanvasImageSource;
+      },
+      preload(): void {},
+    },
+  };
+}
+
 function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
   let commands: string[] = [];
+  let pathArgs: number[] = [];
   let font = '';
   let alpha = 1;
   const ctx = {
@@ -188,37 +300,73 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
       trace.textApi.push(`font=${value}`);
     },
     drawImage(image: unknown, ...rest: number[]): void {
-      // The 3-argument form is a label sprite; the terrain sub-rect blit passes 9.
+      // The 3-argument form is a label or painted-marker sprite; the terrain
+      // sub-rect blit passes 9.
       if (rest.length === 2) {
-        trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1], alpha });
+        if (isMarkerSprite(image)) {
+          trace.markerBlits.push({
+            sprite: image,
+            dx: rest[0],
+            dy: rest[1],
+            alpha,
+            at: trace.seq++,
+          });
+        } else {
+          trace.blits.push({
+            sprite: image as LabelSprite,
+            dx: rest[0],
+            dy: rest[1],
+            alpha,
+            at: trace.seq++,
+          });
+        }
       }
     },
     // the painter floods the ocean before the zone bg blit; the fake context
     // must answer every call it makes, not only the path-building ones
-    fillRect(): void {},
+    fillRect(x: number, y: number, width: number, height: number): void {
+      trace.fillRects.push({
+        style: String(ctx.fillStyle),
+        x,
+        y,
+        width,
+        height,
+        at: trace.seq++,
+      });
+    },
     beginPath(): void {
       commands = [];
+      pathArgs = [];
     },
-    arc(): void {
+    arc(...args: number[]): void {
       commands.push('arc');
+      pathArgs.push(...args);
     },
-    moveTo(): void {
+    moveTo(...args: number[]): void {
       commands.push('moveTo');
+      pathArgs.push(...args);
     },
-    lineTo(): void {
+    lineTo(...args: number[]): void {
       commands.push('lineTo');
+      pathArgs.push(...args);
     },
     closePath(): void {
       commands.push('closePath');
     },
     fill(): void {
-      trace.fills.push({ style: String(ctx.fillStyle), commands: [...commands], at: trace.seq++ });
+      trace.fills.push({
+        style: String(ctx.fillStyle),
+        commands: [...commands],
+        args: [...pathArgs],
+        at: trace.seq++,
+      });
     },
     stroke(): void {
       trace.strokes.push({
         style: String(ctx.strokeStyle),
         lineWidth: ctx.lineWidth,
         commands: [...commands],
+        args: [...pathArgs],
         at: trace.seq++,
       });
     },
@@ -257,7 +405,17 @@ function installMapStyleGlobals(trace: PaintTrace): void {
 }
 
 function newTrace(): PaintTrace {
-  return { seq: 0, fills: [], styleReads: [], sprites: [], blits: [], textApi: [], strokes: [] };
+  return {
+    seq: 0,
+    fills: [],
+    fillRects: [],
+    styleReads: [],
+    sprites: [],
+    blits: [],
+    markerBlits: [],
+    textApi: [],
+    strokes: [],
+  };
 }
 
 function mapWorld(): IWorld {
@@ -276,6 +434,8 @@ function mapWorld(): IWorld {
     questLog: new Map(),
     inventory: [],
     gatheringProficiency: {},
+    stationPlacements: [],
+    civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
@@ -409,28 +569,87 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(hud).toContain('this.mapPainter.paintOverworld(ctx, this.sim, {');
   });
 
-  it('wires the gather markers: store, clears, memo resets, and tooltip priority', () => {
+  it('wires landmark and gather hit targets: stores, clears, memos, and tooltip priority', () => {
     // The overworld paint stores this paint's hit-test markers; the delve and
-    // continent branches clear them so no stale zone icon answers a tap.
-    expect(hud).toContain('this.mapGatherNodes = result.gatherNodes;');
-    expect(hud.match(/this\.mapGatherNodes = \[\];/g)).toHaveLength(2);
-    // The gather-tip resolve memo resets beside every marker rebuild (two
-    // clears plus the overworld store), bounding its staleness at the same
+    // non-zone branches clear them so no stale zone icon answers a tap.
+    expect(hud).toContain('this.mapMarkerInteraction.setOverworld(result);');
+    expect(markerInteraction).toContain('this.gatherNodes = EMPTY_MARKERS;');
+    expect(markerInteraction).toContain('this.stations = EMPTY_MARKERS;');
+    expect(markerInteraction).toContain('this.services = EMPTY_MARKERS;');
+    expect(markerInteraction).toContain('this.navigation = EMPTY_MARKERS;');
+    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(4);
+    // The gather-tip resolve memo resets inside the shared clear and beside the
+    // overworld store, bounding its staleness at the same
     // mediumHud repaint that refreshes the painted icon.
-    expect(hud.match(/this\.mapGatherTipMemo = null;/g)).toHaveLength(3);
-    // Hover/tap priority inside showMapTipAt: quest-giver glyph on top, then
-    // the gather node, then the quest-objective area.
-    const glyphAt = hud.indexOf('npcMarkerAt(this.mapNpcMarkers');
-    const gatherAt = hud.indexOf('gatherNodeMarkerAt(this.mapGatherNodes');
-    const areaAt = hud.indexOf('questAreaObjectivesAt(this.mapQuestAreas');
-    expect(glyphAt).toBeGreaterThan(-1);
-    expect(gatherAt).toBeGreaterThan(glyphAt);
+    expect(markerInteraction.match(/this\.clearMemo\(\);/g)).toHaveLength(2);
+    expect(hud.match(/this\.mapView = null;/g)).toHaveLength(1);
+    expect(hud).toContain('this.continentRegions.length = 0;');
+    // Point markers resolve globally by distance. Exact-distance ties follow
+    // visual top order in the pure resolver; quest areas remain the fallback.
+    const pointHitsAt = tooltipAdapter.indexOf('const pointHitCount = html');
+    const pointLoopAt = tooltipAdapter.indexOf(
+      'for (let i = 0; i < pointHitCount; i++)',
+      pointHitsAt,
+    );
+    const npcAt = tooltipAdapter.indexOf("if (hit.kind === 'npc')", pointHitsAt);
+    const navigationAt = tooltipAdapter.indexOf("else if (hit.kind === 'navigation')", pointHitsAt);
+    const stationAt = tooltipAdapter.indexOf("else if (hit.kind === 'station')", pointHitsAt);
+    const serviceAt = tooltipAdapter.indexOf("else if (hit.kind === 'service')", pointHitsAt);
+    const gatherAt = tooltipAdapter.indexOf('else html = resolvers.gather', pointHitsAt);
+    const areaAt = tooltipAdapter.indexOf('questAreaObjectivesAtInto(', pointHitsAt);
+    expect(pointHitsAt).toBeGreaterThan(-1);
+    expect(pointLoopAt).toBeGreaterThan(pointHitsAt);
+    expect(npcAt).toBeGreaterThan(pointLoopAt);
+    expect(navigationAt).toBeGreaterThan(npcAt);
+    expect(stationAt).toBeGreaterThan(navigationAt);
+    expect(serviceAt).toBeGreaterThan(stationAt);
+    expect(gatherAt).toBeGreaterThan(serviceAt);
     expect(areaAt).toBeGreaterThan(gatherAt);
+    expect(tooltipAdapter).toContain('pointHits,');
+    expect(tooltipAdapter).toContain('questObjectives);');
+    expect(tooltipAdapter).toContain('if (!html && questAreas.length > 0)');
+    expect(tooltipAdapter).toContain('resolvers.questArea(questObjectives, objectiveCount)');
+    // Touch passes through the same resolver with a finger-sized radius in CSS
+    // pixels converted to the map's backing coordinates.
+    expect(tooltipAdapter).toContain(
+      'MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX * geometry.backingPerCssPx',
+    );
+    expect(hud).toContain('showMapTipAt(clientX, clientY, true)');
+    expect(tooltipAdapter).toContain('resolvers.service(hit.marker)');
+    expect(markerTooltipContent).toContain("marker.kind === 'mailbox'");
+    expect(markerTooltipContent).toContain("'worldContent.mailboxName'");
+    expect(markerTooltipContent).toContain("'worldContent.noticeboardName'");
+    expect(markerTooltipContent).toContain('stationNameText(marker.type)');
+    expect(tooltipAdapter).toContain('resolvers.station(hit.marker)');
+    // Pointer motion must not mint resolver closures or input bags. Both are
+    // stable Hud-owned fields passed straight through the tiny hot-path method.
+    const method = markerInteraction.slice(
+      markerInteraction.indexOf('showAt('),
+      markerInteraction.indexOf('clear(): void', markerInteraction.indexOf('showAt(')),
+    );
+    expect(method).not.toContain('=>');
+    expect(method).not.toContain('new ');
+    expect(method).not.toContain(' = {');
+    expect(method).not.toContain(' = [');
+    expect(method).not.toContain('const state =');
+    expect(method).not.toContain('const resolvers =');
+    expect(method).toContain('this.pointHits');
+    expect(method).toContain('this.questObjectives');
+    expect(method).toContain('this.tooltipResolvers');
+    expect(method).not.toContain('getBoundingClientRect');
+    const pointerPath = tooltipAdapter.slice(tooltipAdapter.indexOf('showMapMarkerTooltipAt('));
+    expect(pointerPath).not.toContain('getBoundingClientRect');
+    expect(tooltipAdapter).not.toContain('getBoundingClientRect');
+    expect(markerInteraction.match(/\.getBoundingClientRect\(/g)).toHaveLength(1);
+    expect(hud).toContain('this.mapMarkerInteraction.refreshGeometry(canvas);');
+    expect(hud).toContain(
+      "if (el.id === 'map-window') this.mapMarkerInteraction.refreshCurrentGeometry();",
+    );
     // The gather arm resolves through the shared world-hover pair (behind the
     // tested memo seam), so the map tip and the 3D node tip cannot disagree.
-    expect(hud).toContain('resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId');
-    expect(hud).toContain('buildGatherNodeTooltip(this.sim, nodeId)');
-    expect(hud).toContain('gatherNodeTooltipHtml(model)');
+    expect(markerTooltipContent).toContain('resolveGatherTipMemo(this.gatherMemo, marker.nodeId');
+    expect(markerTooltipContent).toContain('buildGatherNodeTooltip(this.world, nodeId)');
+    expect(markerTooltipContent).toContain('gatherNodeTooltipHtml(model)');
   });
 
   it('accepts only the current Hud-owned zone background and never prewarms all zones', () => {
@@ -520,6 +739,8 @@ function labelWorld(): IWorld {
     craftingIdentity: { version: 1, synced: true, cadenceBlockedQuests: [] },
     inventory: [],
     gatheringProficiency: {},
+    stationPlacements: [],
+    civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
@@ -546,6 +767,29 @@ function readyGlyphWorld(): IWorld {
   npc.templateId = quest.giverNpcId as string;
   npc.questIds = [quest.id];
   world.questState = (q: string) => (q === quest.id ? 'ready' : 'unavailable');
+  return world as unknown as IWorld;
+}
+
+/** The label fixture's one NPC staged in each drawable map quest state. */
+function questVariantWorld(state: 'available' | 'ready' | 'repeat' | 'cooldown'): IWorld {
+  if (state === 'ready') return readyGlyphWorld();
+  if (state === 'available') return labelWorld();
+  const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+  if (!workOrder) throw new Error('expected a cadenced work order');
+  const world = labelWorld() as unknown as {
+    entities: Map<number, { templateId: string; questIds: string[] }>;
+    questState: (q: string) => string;
+    questsDone: Set<string>;
+    craftingIdentity: { cadenceBlockedQuests: string[] };
+  };
+  const npc = world.entities.get(2);
+  if (!npc) throw new Error('expected the fixture npc');
+  npc.templateId = workOrder.giverNpcId;
+  npc.questIds = [workOrder.id];
+  world.questsDone = new Set([workOrder.id]);
+  world.questState = (q) =>
+    state === 'repeat' && q === workOrder.id ? 'available' : 'unavailable';
+  world.craftingIdentity.cadenceBlockedQuests = state === 'cooldown' ? [workOrder.id] : [];
   return world as unknown as IWorld;
 }
 
@@ -632,7 +876,6 @@ function expectedLabels(): Set<string> {
     ...overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).map((portal) =>
       dungeonName(portal.id),
     ),
-    '!', // the quest-giver glyph for an available quest
     'FriendA',
     'GuildB',
     '1', // the single active quest's badge number
@@ -661,7 +904,862 @@ function labelPaintOptions(ping?: { x: number; z: number }) {
   };
 }
 
+function zonePaintOptions(zone: (typeof ZONES)[number]) {
+  return {
+    zone,
+    zoneBg: {
+      canvas: { width: 560, height: 560 } as HTMLCanvasElement,
+      region: {
+        minX: zone.xMin ?? STRIP_MIN_X,
+        maxX: zone.xMax ?? STRIP_MAX_X,
+        minZ: zone.zMin,
+        maxZ: zone.zMax,
+      },
+    },
+    canvasSize: 560,
+    zoom: 1,
+    center: null,
+    ping: null,
+  };
+}
+
+const TEST_STATION_TYPES = [
+  'forge',
+  'kitchens',
+  'apothecary',
+  'tannery',
+  'loom',
+  'toolworks',
+] as const;
+
+function stationTypesLabelWorld(types: readonly (typeof TEST_STATION_TYPES)[number][]): IWorld {
+  const world = labelWorld() as unknown as { stationPlacements: unknown[] };
+  const minX = LABEL_ZONE.xMin ?? STRIP_MIN_X;
+  const maxX = LABEL_ZONE.xMax ?? STRIP_MAX_X;
+  const step = (maxX - minX) / (types.length + 1);
+  world.stationPlacements = types.map((type, index) => ({
+    id: `station_test_${type}`,
+    type,
+    zoneId: LABEL_ZONE.id,
+    pos: { x: minX + step * (index + 1), z: LABEL_ZONE_CZ },
+    masterNpcId: `test_${type}_master`,
+  }));
+  return world as unknown as IWorld;
+}
+
+function stationLabelWorld(): IWorld {
+  return stationTypesLabelWorld(['forge']);
+}
+
+function serviceWorldContent() {
+  const noticeboard = BUILTIN_WORLD.services?.noticeboards?.[0];
+  if (!noticeboard) throw new Error('expected the built-in noticeboard fixture');
+  return {
+    ...BUILTIN_WORLD,
+    services: {
+      ...BUILTIN_WORLD.services,
+      stations: [],
+      mailboxes: [{ x: 24, z: LABEL_ZONE_CZ + 18 }],
+      noticeboards: [
+        {
+          ...noticeboard,
+          x: -26,
+          z: LABEL_ZONE_CZ - 20,
+          frontStandingPoint: { x: -26, z: LABEL_ZONE_CZ - 22 },
+        },
+      ],
+      musterBoards: BUILTIN_WORLD.services?.musterBoards ?? [],
+    },
+  };
+}
+
+function serviceLabelWorld(): IWorld {
+  const world = labelWorld() as unknown as {
+    civicServicePlacements: Array<{
+      kind: 'mailbox' | 'noticeboard';
+      x: number;
+      z: number;
+    }>;
+  };
+  const services = serviceWorldContent().services;
+  world.civicServicePlacements = [
+    ...(services.mailboxes ?? []).map(({ x, z }) => ({ kind: 'mailbox' as const, x, z })),
+    ...(services.noticeboards ?? []).map(({ x, z }) => ({
+      kind: 'noticeboard' as const,
+      x,
+      z,
+    })),
+  ];
+  return world as unknown as IWorld;
+}
+
+describe('map_window_painter: painted stable marker sprites', () => {
+  it('routes dungeon entrances through mapDungeon while preserving their labels', () => {
+    const markerArt = fakeMarkerArt(['dungeon-entrance']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = labelWorld();
+
+    new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      world,
+      labelPaintOptions(),
+    );
+    const model = buildOverworldMapModel({
+      world,
+      props: BUILTIN_WORLD.props,
+      zone: LABEL_ZONE,
+      zoom: 1,
+      center: null,
+      canvasSize: 560,
+      decorations: [],
+      ping: null,
+    });
+    const portals = overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax);
+    const calls = markerArt.calls.filter((call) => call.id === 'dungeon-entrance');
+    expect(calls).toEqual(portals.map(() => ({ id: 'dungeon-entrance', size: 'mapDungeon' })));
+    const blits = trace.markerBlits.filter((blit) => blit.sprite.markerId === 'dungeon-entrance');
+    expect(blits).toHaveLength(portals.length);
+    expect(blits.map(({ sprite, dx, dy }) => ({ sprite, dx, dy }))).toEqual(
+      model.portals.map((portal) => ({
+        sprite: { markerId: 'dungeon-entrance', sizeId: 'mapDungeon' },
+        dx: Math.round(portal.mx - MAP_MARKER_SIZES.mapDungeon / 2),
+        dy: Math.round(portal.my - MAP_MARKER_SIZES.mapDungeon / 2),
+      })),
+    );
+    for (const portal of portals) {
+      expect(trace.blits.some((blit) => spriteText(blit.sprite) === dungeonName(portal.id))).toBe(
+        true,
+      );
+    }
+  });
+
+  it.each([
+    { kind: 'delve-entrance', id: 'delve-entrance' },
+    { kind: 'world-passage', id: 'world-passage' },
+  ] as const)('routes static $kind sites through mapNavigation art', ({ kind, id }) => {
+    const site = STABLE_MAP_NAVIGATION_LANDMARKS.find((landmark) => landmark.kind === kind);
+    if (!site) throw new Error(`expected a shipped ${kind} site`);
+    const zone = ZONES.find((candidate) => candidate.id === site.zoneId);
+    if (!zone) throw new Error(`unknown zone ${site.zoneId}`);
+    const world = mapWorld();
+    const markerArt = fakeMarkerArt([id]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      world,
+      zonePaintOptions(zone),
+    );
+
+    const matching = result.navigation.filter((marker) => marker.kind === kind);
+    expect(matching).toHaveLength(1);
+    expect(markerArt.calls.filter((call) => call.id === id)).toEqual([
+      { id, size: 'mapNavigation' },
+    ]);
+    expect(trace.markerBlits.filter((blit) => blit.sprite.markerId === id)).toEqual([
+      expect.objectContaining({ sprite: { markerId: id, sizeId: 'mapNavigation' }, alpha: 1 }),
+    ]);
+  });
+
+  it.each([
+    {
+      kind: 'delve-entrance',
+      id: 'delve-entrance',
+      commands: 'arc,lineTo,lineTo,closePath',
+      args(marker: { mx: number; my: number }): number[] {
+        const radius = 22 * 0.33;
+        return [
+          marker.mx,
+          marker.my,
+          radius,
+          Math.PI,
+          Math.PI * 2,
+          marker.mx + radius,
+          marker.my + radius,
+          marker.mx - radius,
+          marker.my + radius,
+        ];
+      },
+    },
+    {
+      kind: 'world-passage',
+      id: 'world-passage',
+      commands: 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+      args(marker: { mx: number; my: number }): number[] {
+        const radius = 22 * 0.33;
+        return [
+          marker.mx - radius,
+          marker.my - radius,
+          marker.mx,
+          marker.my,
+          marker.mx - radius,
+          marker.my + radius,
+          marker.mx + radius,
+          marker.my - radius,
+          marker.mx,
+          marker.my,
+          marker.mx + radius,
+          marker.my + radius,
+        ];
+      },
+    },
+  ] as const)(
+    'keeps the full-map $kind silhouette visible while generated art is unavailable',
+    ({ kind, id, commands, args }) => {
+      const site = STABLE_MAP_NAVIGATION_LANDMARKS.find((landmark) => landmark.kind === kind);
+      if (!site) throw new Error(`expected a shipped ${kind} site`);
+      const zone = ZONES.find((candidate) => candidate.id === site.zoneId);
+      if (!zone) throw new Error(`unknown zone ${site.zoneId}`);
+      const markerArt = fakeMarkerArt([]);
+      const trace = newTrace();
+      installMapStyleGlobals(trace);
+      setActiveWorldContent(BUILTIN_WORLD);
+
+      const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+        fakeMapContext(trace),
+        mapWorld(),
+        zonePaintOptions(zone),
+      );
+
+      const marker = result.navigation.find((candidate) => candidate.kind === kind);
+      if (!marker) throw new Error(`expected painted ${kind} marker`);
+      expect(markerArt.calls.filter((call) => call.id === id)).toEqual([
+        { id, size: 'mapNavigation' },
+      ]);
+      expect(trace.markerBlits.filter((blit) => blit.sprite.markerId === id)).toEqual([]);
+      const fill = trace.fills.find(
+        (candidate) =>
+          candidate.style === 'paint:--color-map-portal-dot' &&
+          candidate.commands.join() === commands &&
+          candidate.args[0] === args(marker)[0],
+      );
+      expect(fill, `${kind} fallback fill`).toBeDefined();
+      expect(fill?.args).toEqual(args(marker));
+      const stroke = trace.strokes.find((candidate) => candidate.at > (fill?.at ?? -1));
+      expect(stroke).toMatchObject({
+        style: 'paint:--color-map-outline',
+        lineWidth: 1.5,
+        commands: commands.split(','),
+        args: args(marker),
+      });
+    },
+  );
+
+  it.each([
+    {
+      profile: 'standard',
+      rank: null,
+      size: 'mapNavigation',
+      sizePx: 22,
+      pips: 0,
+      outlineWidth: 1.5,
+    },
+    {
+      profile: 'standard',
+      rank: 'C',
+      size: 'mapNavigationRankC',
+      sizePx: 22,
+      pips: 1,
+      outlineWidth: 1.5,
+    },
+    {
+      profile: 'standard',
+      rank: 'B',
+      size: 'mapNavigationRankB',
+      sizePx: 22,
+      pips: 2,
+      outlineWidth: 1.5,
+    },
+    {
+      profile: 'standard',
+      rank: 'A',
+      size: 'mapNavigationRankA',
+      sizePx: 22,
+      pips: 3,
+      outlineWidth: 1.5,
+    },
+    {
+      profile: 'standard',
+      rank: 'S',
+      size: 'mapNavigationRankS',
+      sizePx: 22,
+      pips: 4,
+      outlineWidth: 1.5,
+    },
+    {
+      profile: 'compact',
+      rank: null,
+      size: 'mapNavigationCompact',
+      sizePx: 30,
+      pips: 0,
+      outlineWidth: 2,
+    },
+    {
+      profile: 'compact',
+      rank: 'C',
+      size: 'mapNavigationRankCCompact',
+      sizePx: 30,
+      pips: 1,
+      outlineWidth: 2,
+    },
+    {
+      profile: 'compact',
+      rank: 'B',
+      size: 'mapNavigationRankBCompact',
+      sizePx: 30,
+      pips: 2,
+      outlineWidth: 2,
+    },
+    {
+      profile: 'compact',
+      rank: 'A',
+      size: 'mapNavigationRankACompact',
+      sizePx: 30,
+      pips: 3,
+      outlineWidth: 2,
+    },
+    {
+      profile: 'compact',
+      rank: 'S',
+      size: 'mapNavigationRankSCompact',
+      sizePx: 30,
+      pips: 4,
+      outlineWidth: 2,
+    },
+  ] as const)(
+    'keeps the $profile full-map Rift rank $rank fallback visible with $pips literal pips',
+    ({ profile, rank, size, sizePx, pips, outlineWidth }) => {
+      const world = mapWorld() as unknown as {
+        player: { pos: { x: number; z: number } };
+        entities: Map<number, unknown>;
+      };
+      world.player.pos = { x: 0, z: LABEL_ZONE_CZ };
+      world.entities = new Map([
+        [
+          99,
+          {
+            id: 99,
+            kind: 'object',
+            templateId: 'rift_portal',
+            name: 'The Loading Rift',
+            ...(rank === null ? {} : { riftTier: rank }),
+            pos: { x: 20, z: LABEL_ZONE_CZ },
+          },
+        ],
+      ]);
+      const markerArt = fakeMarkerArt([]);
+      const trace = newTrace();
+      installMapStyleGlobals(trace);
+      setActiveWorldContent(BUILTIN_WORLD);
+      const resolveProfile = vi.fn(() => profile);
+
+      const result = new MapWindowPainter(classColor, markerArt.art, resolveProfile).paintOverworld(
+        fakeMapContext(trace),
+        world as unknown as IWorld,
+        labelPaintOptions(),
+      );
+
+      expect(resolveProfile).toHaveBeenCalledTimes(1);
+      const marker = result.navigation.find((candidate) => candidate.kind === 'rift-entrance');
+      if (!marker) throw new Error('expected live Rift navigation marker');
+      expect(marker.rank).toBe(rank);
+      expect(markerArt.calls.filter((call) => call.id === 'rift-entrance')).toEqual([
+        { id: 'rift-entrance', size },
+      ]);
+      expect(trace.markerBlits.filter((blit) => blit.sprite.markerId === 'rift-entrance')).toEqual(
+        [],
+      );
+
+      const radius = sizePx * 0.33;
+      const core = radius * 0.38;
+      expect(
+        trace.fills
+          .filter(
+            (fill) =>
+              fill.commands.join() === 'arc' &&
+              fill.args[0] === marker.mx &&
+              fill.args[1] === marker.my,
+          )
+          .map(({ style, commands, args }) => ({ style, commands, args })),
+      ).toEqual([
+        {
+          style: 'paint:--color-map-portal-dot',
+          commands: ['arc'],
+          args: [marker.mx, marker.my, radius, 0, Math.PI * 2],
+        },
+        {
+          style: 'paint:--color-map-outline',
+          commands: ['arc'],
+          args: [marker.mx, marker.my, core, 0, Math.PI * 2],
+        },
+      ]);
+      expect(
+        trace.strokes.find(
+          (stroke) =>
+            stroke.commands.join() === 'arc' &&
+            stroke.args[0] === marker.mx &&
+            stroke.args[1] === marker.my,
+        ),
+      ).toMatchObject({
+        style: 'paint:--color-map-outline',
+        lineWidth: outlineWidth,
+        args: [marker.mx, marker.my, radius, 0, Math.PI * 2],
+      });
+
+      const pip = Math.max(1, sizePx * 0.13);
+      const gap = sizePx * 0.08;
+      const pipWidth = pips * pip + Math.max(0, pips - 1) * gap;
+      const paintedPips = trace.fillRects.filter(
+        (rect) => rect.style === 'paint:--color-map-player',
+      );
+      expect(paintedPips).toHaveLength(pips);
+      paintedPips.forEach((rect, index) => {
+        // The painter advances a running x; compare geometry numerically so a
+        // harmless floating-association bit cannot masquerade as a missing pip.
+        expect(rect.x).toBeCloseTo(marker.mx - pipWidth / 2 + index * (pip + gap), 12);
+        expect(rect.y).toBeCloseTo(marker.my + radius * 0.58, 12);
+        expect(rect.width).toBe(pip);
+        expect(rect.height).toBe(pip);
+      });
+    },
+  );
+
+  it('routes a nearby live S-rank Rift through ranked zone-map art', () => {
+    const world = mapWorld() as unknown as {
+      player: { pos: { x: number; z: number } };
+      entities: Map<number, unknown>;
+    };
+    world.player.pos = { x: 0, z: LABEL_ZONE_CZ };
+    world.entities = new Map([
+      [
+        99,
+        {
+          id: 99,
+          kind: 'object',
+          templateId: 'rift_portal',
+          name: 'The Painted Rift',
+          riftTier: 'S',
+          pos: { x: 20, z: LABEL_ZONE_CZ },
+        },
+      ],
+    ]);
+    const markerArt = fakeMarkerArt(['rift-entrance']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      world as unknown as IWorld,
+      labelPaintOptions(),
+    );
+
+    expect(result.navigation).toContainEqual(
+      expect.objectContaining({ kind: 'rift-entrance', name: 'The Painted Rift', rank: 'S' }),
+    );
+    expect(markerArt.calls.filter((call) => call.id === 'rift-entrance')).toEqual([
+      { id: 'rift-entrance', size: 'mapNavigationRankS' },
+    ]);
+    expect(
+      trace.markerBlits.filter((blit) => blit.sprite.markerId === 'rift-entrance')[0]?.sprite,
+    ).toEqual({ markerId: 'rift-entrance', sizeId: 'mapNavigationRankS' });
+  });
+
+  it('centers station art at mapStation and draws the quest painting over it', () => {
+    const markerArt = fakeMarkerArt(['station-forge', 'quest-available']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      stationLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.stations).toHaveLength(1);
+    expect(markerArt.calls.filter((call) => call.id === 'station-forge')).toEqual([
+      { id: 'station-forge', size: 'mapStation' },
+    ]);
+    const stationBlit = trace.markerBlits.find((blit) => blit.sprite.markerId === 'station-forge');
+    expect(stationBlit).toMatchObject({
+      sprite: { markerId: 'station-forge', sizeId: 'mapStation' },
+      dx: Math.round(result.stations[0].mx - MAP_MARKER_SIZES.mapStation / 2),
+      dy: Math.round(result.stations[0].my - MAP_MARKER_SIZES.mapStation / 2),
+      alpha: 1,
+    });
+    const questBlit = trace.markerBlits.find((blit) => blit.sprite.markerId === 'quest-available');
+    expect(questBlit, 'fixture must carry actionable quest art').toBeDefined();
+    expect(stationBlit?.at).toBeLessThan(questBlit?.at ?? -1);
+  });
+
+  it('routes all six crafting-station identities through mapStation art', () => {
+    const stationIds = TEST_STATION_TYPES.map((type) => `station-${type}` as MapMarkerArtId);
+    const markerArt = fakeMarkerArt(stationIds);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      stationTypesLabelWorld(TEST_STATION_TYPES),
+      labelPaintOptions(),
+    );
+
+    expect(result.stations.map((station) => station.type)).toEqual(TEST_STATION_TYPES);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('station-'))).toEqual(
+      stationIds.map((id) => ({ id, size: 'mapStation' })),
+    );
+    const blits = trace.markerBlits.filter((blit) => blit.sprite.markerId.startsWith('station-'));
+    expect(blits.map((blit) => blit.sprite)).toEqual(
+      stationIds.map((markerId) => ({ markerId, sizeId: 'mapStation' })),
+    );
+    expect(blits.map(({ dx, dy }) => ({ dx, dy }))).toEqual(
+      result.stations.map((station) => ({
+        dx: Math.round(station.mx - MAP_MARKER_SIZES.mapStation / 2),
+        dy: Math.round(station.my - MAP_MARKER_SIZES.mapStation / 2),
+      })),
+    );
+  });
+
+  it('falls back to the station diamond when its sprite is unavailable', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      stationLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.stations).toHaveLength(1);
+    expect(markerArt.calls.filter((call) => call.id === 'station-forge')).toEqual([
+      { id: 'station-forge', size: 'mapStation' },
+    ]);
+    expect(trace.markerBlits.some((blit) => blit.sprite.markerId === 'station-forge')).toBe(false);
+    const diamond = trace.fills.find(
+      (fill) =>
+        fill.style === 'paint:--color-map-stall' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,lineTo,closePath',
+    );
+    expect(diamond, 'missing station art must retain the procedural diamond').toBeDefined();
+    const outline = trace.strokes.find((stroke) => stroke.at > (diamond?.at ?? Number.MAX_VALUE));
+    expect(outline).toMatchObject({
+      style: 'paint:--color-map-outline',
+      lineWidth: 1.5,
+      commands: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+    });
+  });
+
+  it('routes civic services through exact mapService art, result markers, and quest-underlay order', () => {
+    const markerArt = fakeMarkerArt(['service-mailbox', 'service-noticeboard', 'quest-available']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(serviceWorldContent());
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      serviceLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(MAP_MARKER_SIZES.mapService).toBe(20);
+    expect(result.services.map((service) => service.kind)).toEqual(['mailbox', 'noticeboard']);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('service-'))).toEqual([
+      { id: 'service-mailbox', size: 'mapService' },
+      { id: 'service-noticeboard', size: 'mapService' },
+    ]);
+    const serviceBlits = trace.markerBlits.filter((blit) =>
+      blit.sprite.markerId.startsWith('service-'),
+    );
+    expect(serviceBlits.map((blit) => blit.sprite)).toEqual([
+      { markerId: 'service-mailbox', sizeId: 'mapService' },
+      { markerId: 'service-noticeboard', sizeId: 'mapService' },
+    ]);
+    expect(serviceBlits.map(({ dx, dy }) => ({ dx, dy }))).toEqual(
+      result.services.map((service) => ({
+        dx: Math.round(service.mx - MAP_MARKER_SIZES.mapService / 2),
+        dy: Math.round(service.my - MAP_MARKER_SIZES.mapService / 2),
+      })),
+    );
+    const questBlit = trace.markerBlits.find((blit) => blit.sprite.markerId === 'quest-available');
+    expect(questBlit, 'fixture must carry actionable quest art').toBeDefined();
+    expect(Math.max(...serviceBlits.map((blit) => blit.at))).toBeLessThan(questBlit?.at ?? -1);
+  });
+
+  it('keeps distinct mailbox and noticeboard fallbacks at their returned hit coordinates', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(serviceWorldContent());
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      serviceLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.services.map((service) => service.kind)).toEqual(['mailbox', 'noticeboard']);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('service-'))).toEqual([
+      { id: 'service-mailbox', size: 'mapService' },
+      { id: 'service-noticeboard', size: 'mapService' },
+    ]);
+    expect(trace.markerBlits.some((blit) => blit.sprite.markerId.startsWith('service-'))).toBe(
+      false,
+    );
+    const [mailbox, noticeboard] = result.services;
+    const serviceFills = trace.fills.filter(
+      (fill) =>
+        fill.style === 'paint:--color-map-stall' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,lineTo,closePath',
+    );
+    const radius = MAP_MARKER_SIZES.mapService / 3;
+    const noticeHalfWidth = MAP_MARKER_SIZES.mapService * 0.375;
+    const noticeHalfHeight = MAP_MARKER_SIZES.mapService * 0.22;
+    expect(serviceFills.map((fill) => fill.args)).toEqual([
+      [
+        mailbox.mx,
+        mailbox.my - radius,
+        mailbox.mx + radius,
+        mailbox.my,
+        mailbox.mx,
+        mailbox.my + radius,
+        mailbox.mx - radius,
+        mailbox.my,
+      ],
+      [
+        noticeboard.mx - noticeHalfWidth,
+        noticeboard.my - noticeHalfHeight,
+        noticeboard.mx + noticeHalfWidth,
+        noticeboard.my - noticeHalfHeight,
+        noticeboard.mx + noticeHalfWidth,
+        noticeboard.my + noticeHalfHeight,
+        noticeboard.mx - noticeHalfWidth,
+        noticeboard.my + noticeHalfHeight,
+      ],
+    ]);
+    for (const fill of serviceFills) {
+      const outline = trace.strokes.find((stroke) => stroke.at > fill.at);
+      expect(outline).toMatchObject({
+        style: 'paint:--color-map-outline',
+        lineWidth: 1.5,
+        commands: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+      });
+    }
+    const questOutline = trace.strokes.find(
+      (stroke) => stroke.lineWidth === 4 && stroke.commands.join() === 'moveTo,lineTo',
+    );
+    expect(questOutline, 'fixture must carry the actionable quest fallback').toBeDefined();
+    expect(Math.max(...serviceFills.map((fill) => fill.at))).toBeLessThan(questOutline?.at ?? -1);
+  });
+
+  it('uses one compact profile for landmark art, placement, labels, and ping geometry', () => {
+    const markerArt = fakeMarkerArt([
+      'dungeon-entrance',
+      'station-forge',
+      'service-mailbox',
+      'service-noticeboard',
+    ]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const services = serviceLabelWorld() as unknown as {
+      civicServicePlacements: unknown[];
+    };
+    const world = stationLabelWorld() as unknown as {
+      civicServicePlacements: unknown[];
+    };
+    world.civicServicePlacements = services.civicServicePlacements;
+    const portal = overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax)[0];
+    if (!portal) throw new Error('expected a dungeon portal in the label zone');
+    const profile = vi.fn(() => 'compact' as const);
+
+    new MapWindowPainter(classColor, markerArt.art, profile).paintOverworld(
+      fakeMapContext(trace),
+      world as unknown as IWorld,
+      labelPaintOptions({ x: portal.x, z: portal.z }),
+    );
+
+    expect(profile).toHaveBeenCalledTimes(1);
+    expect(markerArt.calls.filter((call) => call.id === 'dungeon-entrance')).toEqual(
+      overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).map(() => ({
+        id: 'dungeon-entrance',
+        size: 'mapDungeonCompact',
+      })),
+    );
+    expect(markerArt.calls.filter((call) => call.id === 'station-forge')).toEqual([
+      { id: 'station-forge', size: 'mapStationCompact' },
+    ]);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('service-'))).toEqual([
+      { id: 'service-mailbox', size: 'mapServiceCompact' },
+      { id: 'service-noticeboard', size: 'mapServiceCompact' },
+    ]);
+    expect(
+      trace.markerBlits
+        .filter((blit) =>
+          ['dungeon-entrance', 'station-forge', 'service-mailbox', 'service-noticeboard'].includes(
+            blit.sprite.markerId,
+          ),
+        )
+        .map((blit) => blit.sprite.sizeId),
+    ).toEqual(
+      expect.arrayContaining([
+        'mapDungeonCompact',
+        'mapStationCompact',
+        'mapServiceCompact',
+        'mapServiceCompact',
+      ]),
+    );
+
+    const portalMarker = buildOverworldMapModel({
+      world: world as unknown as IWorld,
+      props: BUILTIN_WORLD.props,
+      zone: LABEL_ZONE,
+      zoom: 1,
+      center: null,
+      canvasSize: 560,
+      decorations: [],
+      ping: { x: portal.x, z: portal.z },
+      markerProfile: 'compact',
+    }).portals[0];
+    const portalName = trace.blits.find(
+      (blit) => spriteText(blit.sprite) === dungeonName(portal.id),
+    );
+    expect(portalName && blitAnchor(portalName)).toEqual({
+      x: Math.round(portalMarker.mx),
+      y: Math.round(portalMarker.my - 17),
+    });
+    expect(
+      trace.strokes
+        .filter((stroke) => stroke.style === 'paint:--color-map-ping')
+        .map((stroke) => ({ radius: stroke.args[2], lineWidth: stroke.lineWidth })),
+    ).toEqual([
+      { radius: 17, lineWidth: 4 },
+      { radius: 23, lineWidth: 4 },
+    ]);
+  });
+
+  it('uses that one compact profile for all live player, ally, and party geometry', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = partyWorld();
+    const profile = vi.fn(() => 'compact' as const);
+
+    new MapWindowPainter(classColor, undefined, profile).paintOverworld(
+      fakeMapContext(trace),
+      world,
+      labelPaintOptions(),
+    );
+
+    expect(profile).toHaveBeenCalledTimes(1);
+    const player = trace.fills.find(
+      (fill) =>
+        fill.style === 'paint:--color-map-player' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,closePath',
+    );
+    expect(player?.args).toEqual([0, -10.5, 7.5, 9, -7.5, 9]);
+    const liveDotStyles = new Set([
+      'paint:--color-map-ally-friend',
+      'paint:--color-map-ally-guild',
+      'color:mage',
+      'paint:--color-map-party-dead',
+    ]);
+    const liveDots = trace.fills.filter(
+      (fill) => liveDotStyles.has(fill.style) && fill.commands.join() === 'arc',
+    );
+    expect(liveDots).toHaveLength(4);
+    expect(liveDots.map((fill) => fill.args[2])).toEqual([6, 6, 6, 6]);
+    const liveOutlines = [player, ...liveDots].map((fill) => {
+      const stroke = trace.strokes.find((candidate) => candidate.at > (fill?.at ?? Infinity));
+      return { style: stroke?.style, lineWidth: stroke?.lineWidth };
+    });
+    expect(liveOutlines).toEqual(
+      Array.from({ length: 5 }, () => ({
+        style: 'paint:--color-map-outline',
+        lineWidth: 4,
+      })),
+    );
+
+    const model = buildOverworldMapModel({
+      world,
+      props: BUILTIN_WORLD.props,
+      zone: LABEL_ZONE,
+      zoom: 1,
+      center: null,
+      canvasSize: 560,
+      decorations: [],
+      ping: null,
+      markerProfile: 'compact',
+    });
+    const labelFont = (text: string): string | undefined =>
+      trace.sprites.find((sprite) => spriteText(sprite) === text)?.fonts.at(-1);
+    expect(labelFont(LABEL_ZONE.name)).toBe('bold 24px Georgia');
+    expect(labelFont(LABEL_ZONE.pois[0].label)).toBe('bold 20px Georgia');
+    expect(labelFont(portalLabelText())).toBe('bold 18px Georgia');
+    expect(labelFont('FriendA')).toBe('bold 16px Georgia');
+    expect(labelFont('Ally')).toBe('bold 16px Georgia');
+    expect(labelFont('1')).toBe('bold 18px Georgia');
+    const labelOutline = (text: string): number | undefined =>
+      trace.sprites.find((sprite) => spriteText(sprite) === text)?.lineWidths.at(-1);
+    expect(labelOutline(LABEL_ZONE.name)).toBe(4.5);
+    expect(labelOutline(LABEL_ZONE.pois[0].label)).toBe(4.5);
+    expect(labelOutline(portalLabelText())).toBe(4.5);
+    expect(labelOutline('FriendA')).toBe(4);
+    expect(labelOutline('Ally')).toBe(4);
+    const titleBlit = trace.blits.find((entry) => spriteText(entry.sprite) === LABEL_ZONE.name);
+    expect(titleBlit && blitAnchor(titleBlit)).toEqual({ x: 280, y: 30 });
+    const questNumber = trace.blits.find((entry) => spriteText(entry.sprite) === '1');
+    expect(questNumber && blitAnchor(questNumber)).toEqual({
+      x: Math.round(model.questAreas[0].mx),
+      y: Math.round(model.questAreas[0].my + 6),
+    });
+    for (const marker of [...model.allies, ...model.party]) {
+      const blit = trace.blits.find((entry) => spriteText(entry.sprite) === marker.name);
+      expect(blit && blitAnchor(blit)).toEqual({
+        x: Math.round(marker.mx),
+        y: Math.round(marker.my - 12),
+      });
+    }
+  });
+});
+
 describe('map_window_painter: labels blit from the sprite cache', () => {
+  it('returns direct references to every already-painted a11y marker family', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = partyWorld();
+
+    const result = new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      world,
+      labelPaintOptions(),
+    );
+    const model = buildOverworldMapModel({
+      world,
+      props: BUILTIN_WORLD.props,
+      zone: LABEL_ZONE,
+      zoom: 1,
+      center: null,
+      canvasSize: 560,
+      decorations: [],
+      ping: null,
+    });
+
+    expect(result.player).toEqual(model.player);
+    expect(result.allies).toEqual(model.allies);
+    expect(result.party).toEqual(model.party);
+    expect(result.portals).toEqual(model.portals);
+    expect(result.pois).toEqual(model.pois);
+  });
+
   it('draws every label layer without touching the map context text API', () => {
     const trace = newTrace();
     installMapStyleGlobals(trace);
@@ -717,11 +1815,8 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     expect(anchorOf(LABEL_ZONE.name)).toEqual(at(560 / 2, 20));
     // POI label: on the POI point itself.
     expect(anchorOf(LABEL_ZONE.pois[0].label)).toEqual(at(model.pois[0].mx, model.pois[0].my));
-    // Quest-giver glyph: on the marker, which is what the hover hit-test
-    // (npcMarkerAt, over the same mx/my) resolves against.
-    expect(anchorOf('!')).toEqual(at(model.npcs[0].mx, model.npcs[0].my));
-    // Dungeon name: 9px above its portal dot.
-    expect(anchorOf(portalLabelText())).toEqual(at(model.portals[0].mx, model.portals[0].my - 9));
+    // Dungeon name: 12px above its standard-profile portal badge.
+    expect(anchorOf(portalLabelText())).toEqual(at(model.portals[0].mx, model.portals[0].my - 12));
     // Ally names: 8px above their dots, one per ally.
     const friend = model.allies.find((a) => a.name === 'FriendA');
     const guild = model.allies.find((a) => a.name === 'GuildB');
@@ -832,7 +1927,6 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       1 + // the zone title
       LABEL_ZONE.pois.length +
       overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).length +
-      result.npcs.length +
       2 + // the two allies
       badges;
     expect(trace.blits).toHaveLength(expected);
@@ -861,130 +1955,125 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     ]);
   });
 
-  it("draws the '?' glyph for a turn-in that is ready, with the same styling", () => {
+  it.each([
+    { state: 'available', id: 'quest-available', size: 'mapQuest' },
+    { state: 'ready', id: 'quest-ready', size: 'mapQuest' },
+    { state: 'repeat', id: 'quest-repeat', size: 'mapQuest' },
+    { state: 'cooldown', id: 'quest-cooldown', size: 'mapQuestCooldown' },
+  ] as const)('routes $state through its exact standard quest raster', ({ state, id, size }) => {
+    const markerArt = fakeMarkerArt([id]);
     const trace = newTrace();
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
 
-    new MapWindowPainter(classColor).paintOverworld(
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
       fakeMapContext(trace),
-      readyGlyphWorld(),
+      questVariantWorld(state),
       labelPaintOptions(),
     );
 
-    const glyphs = trace.sprites.filter((sprite) => ['?', '!'].includes(spriteText(sprite)));
-    expect(glyphs.map(spriteText)).toEqual(['?']);
-    expect(glyphs[0].ink.map(inkStyle)).toEqual([
-      { op: 'stroke', color: 'paint:--color-map-outline', text: '?' },
-      { op: 'fill', color: 'paint:--color-map-npc-quest', text: '?' },
-    ]);
+    expect(result.npcs).toHaveLength(1);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('quest-'))).toEqual([{ id, size }]);
+    const blit = trace.markerBlits.find((candidate) => candidate.sprite.markerId === id);
+    expect(blit).toMatchObject({
+      sprite: { markerId: id, sizeId: size },
+      dx: Math.round(result.npcs[0].mx - MAP_MARKER_SIZES[size] / 2),
+      dy: Math.round(result.npcs[0].my - MAP_MARKER_SIZES[size] / 2),
+      alpha: 1,
+    });
+    expect(trace.textApi).toEqual([]);
+    expect(trace.sprites.some((sprite) => ['!', '?'].includes(spriteText(sprite)))).toBe(false);
   });
 
-  it('draws the repeat and cooldown variants in the repeat token, dimming only the cooldown blit', () => {
-    // The phase 23 blue "!" at the map surface, over the real cadenced work
-    // order. The repeat arm fills the repeat token at full alpha; the
-    // cooldown arm reuses the same style but blits at the dim, restoring the
-    // context's alpha so no later layer inherits it; and the plain available
-    // glyph (labelWorld above) stays on the gold token, pinned as the
-    // negative arm so acceptance (b) has a decisive assertion here.
-    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
-    if (!workOrder) throw new Error('expected a cadenced work order');
-    const variantWorld = (state: 'repeat' | 'cooldown'): IWorld => {
-      const world = labelWorld() as unknown as {
-        entities: Map<number, { templateId: string; questIds: string[] }>;
-        questState: (q: string) => string;
-        questsDone: Set<string>;
-        craftingIdentity: { cadenceBlockedQuests: string[] };
-      };
-      const npc = world.entities.get(2);
-      if (!npc) throw new Error('expected the fixture npc');
-      npc.templateId = workOrder.giverNpcId;
-      npc.questIds = [workOrder.id];
-      world.questsDone = new Set([workOrder.id]);
-      world.questState = (q) =>
-        state === 'repeat' && q === workOrder.id ? 'available' : 'unavailable';
-      world.craftingIdentity.cadenceBlockedQuests = state === 'cooldown' ? [workOrder.id] : [];
-      return world as unknown as IWorld;
-    };
-    // Is the work order's giver even inside this fixture zone? The glyphs
-    // resolve from static content, so require it up front rather than
-    // passing vacuously on an empty marker list.
-    for (const state of ['repeat', 'cooldown'] as const) {
-      const trace = newTrace();
-      installMapStyleGlobals(trace);
-      setActiveWorldContent(BUILTIN_WORLD);
-      const ctx = fakeMapContext(trace);
-      new MapWindowPainter(classColor).paintOverworld(
-        ctx,
-        variantWorld(state),
-        labelPaintOptions(),
-      );
-      const glyphBlits = trace.blits.filter((b) => spriteText(b.sprite) === '!');
-      // Exactly one: the fixture stages a single giver, and a second glyph
-      // drawn first would silently change which sprite is asserted below.
-      expect(glyphBlits, state).toHaveLength(1);
-      expect(glyphBlits[0].sprite.ink.map(inkStyle), state).toEqual([
-        { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
-        { op: 'fill', color: 'paint:--color-map-npc-quest-repeat', text: '!' },
-      ]);
-      expect(glyphBlits[0].alpha, state).toBe(state === 'cooldown' ? 0.55 : 1);
-      expect(ctx.globalAlpha, state).toBe(1);
-    }
-
-    // The negative arm: the ordinary available glyph keeps the gold token at
-    // full alpha, byte-identical styling to the pre-phase painter.
+  it.each([
+    { state: 'available', id: 'quest-available', size: 'mapQuestCompact' },
+    { state: 'ready', id: 'quest-ready', size: 'mapQuestCompact' },
+    { state: 'repeat', id: 'quest-repeat', size: 'mapQuestCompact' },
+    { state: 'cooldown', id: 'quest-cooldown', size: 'mapQuestCooldownCompact' },
+  ] as const)('selects compact $state art once per redraw', ({ state, id, size }) => {
+    const markerArt = fakeMarkerArt([id]);
     const trace = newTrace();
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
-    new MapWindowPainter(classColor).paintOverworld(
+    const profile = vi.fn(() => 'compact' as const);
+
+    const result = new MapWindowPainter(classColor, markerArt.art, profile).paintOverworld(
       fakeMapContext(trace),
-      labelWorld(),
+      questVariantWorld(state),
       labelPaintOptions(),
     );
-    const gold = trace.blits.filter((b) => spriteText(b.sprite) === '!');
-    // Exactly one, for the same reason as the variant arms above.
-    expect(gold).toHaveLength(1);
-    expect(gold[0].sprite.ink.map(inkStyle)).toEqual([
-      { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
-      { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
-    ]);
-    expect(gold[0].alpha).toBe(1);
+
+    expect(profile).toHaveBeenCalledTimes(1);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('quest-'))).toEqual([{ id, size }]);
+    expect(trace.markerBlits.find((candidate) => candidate.sprite.markerId === id)).toMatchObject({
+      sprite: { markerId: id, sizeId: size },
+      dx: Math.round(result.npcs[0].mx - MAP_MARKER_SIZES[size] / 2),
+      dy: Math.round(result.npcs[0].my - MAP_MARKER_SIZES[size] / 2),
+      alpha: 1,
+    });
   });
 
-  it('restores the CALLER alpha around the cooldown blit, not a literal 1', () => {
-    // The restore-prior contract is only observable under a non-1 caller
-    // alpha: a reverted literal-1 restore stays green on every 1-alpha
-    // fixture and reddens here. The world staging mirrors the variant arms
-    // above (a cadenced work order inside its window).
-    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
-    if (!workOrder) throw new Error('expected a cadenced work order');
+  it('keeps cooldown art at the caller alpha without a dimming write', () => {
+    const markerArt = fakeMarkerArt(['quest-cooldown']);
     const trace = newTrace();
     installMapStyleGlobals(trace);
     setActiveWorldContent(BUILTIN_WORLD);
-    const world = labelWorld() as unknown as {
-      entities: Map<number, { templateId: string; questIds: string[] }>;
-      questState: (q: string) => string;
-      questsDone: Set<string>;
-      craftingIdentity: { cadenceBlockedQuests: string[] };
-    };
-    const fixtureNpc = world.entities.get(2);
-    if (!fixtureNpc) throw new Error('expected the fixture npc');
-    fixtureNpc.templateId = workOrder.giverNpcId;
-    fixtureNpc.questIds = [workOrder.id];
-    world.questsDone = new Set([workOrder.id]);
-    world.questState = () => 'unavailable';
-    world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
     const ctx = fakeMapContext(trace);
     ctx.globalAlpha = 0.9;
-    new MapWindowPainter(classColor).paintOverworld(
+
+    new MapWindowPainter(classColor, markerArt.art).paintOverworld(
       ctx,
-      world as unknown as IWorld,
+      questVariantWorld('cooldown'),
       labelPaintOptions(),
     );
-    const glyphBlits = trace.blits.filter((b) => spriteText(b.sprite) === '!');
-    expect(glyphBlits).toHaveLength(1);
-    expect(glyphBlits[0].alpha).toBe(0.55);
+
+    const blit = trace.markerBlits.find(
+      (candidate) => candidate.sprite.markerId === 'quest-cooldown',
+    );
+    expect(blit?.alpha).toBe(0.9);
     expect(ctx.globalAlpha).toBe(0.9);
+  });
+
+  it.each([
+    { state: 'available', commands: 'moveTo,lineTo' },
+    { state: 'ready', commands: 'arc,lineTo' },
+    {
+      state: 'repeat',
+      commands: 'moveTo,lineTo,moveTo,lineTo,lineTo,moveTo,lineTo,moveTo,lineTo',
+    },
+    { state: 'cooldown', commands: 'moveTo,lineTo,lineTo,lineTo' },
+  ] as const)('draws a distinct no-text $state fallback while art loads', ({ state, commands }) => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      questVariantWorld(state),
+      labelPaintOptions(),
+    );
+
+    const expectedId = `quest-${state}` as MapMarkerArtId;
+    expect(markerArt.calls.filter((call) => call.id.startsWith('quest-'))).toEqual([
+      {
+        id: expectedId,
+        size: state === 'cooldown' ? 'mapQuestCooldown' : 'mapQuest',
+      },
+    ]);
+    expect(trace.markerBlits.some((blit) => blit.sprite.markerId === expectedId)).toBe(false);
+    expect(trace.strokes.some((stroke) => stroke.commands.join() === commands)).toBe(true);
+    expect(trace.textApi).toEqual([]);
+    expect(trace.sprites.some((sprite) => ['!', '?'].includes(spriteText(sprite)))).toBe(false);
+  });
+
+  it('keeps profile resolution and every canvas text entry point out of the quest loop', () => {
+    expect(code).not.toContain('NPC_GLYPH_FONT');
+    const questLoop = code.slice(code.indexOf('for (const npc of model.npcs)'));
+    expect(questLoop).not.toContain('markerProfile()');
+    expect(questLoop.slice(0, questLoop.indexOf('if (model.player)'))).not.toMatch(
+      /fillText|strokeText|measureText|\.font\s*=/,
+    );
   });
 
   it('opens each redraw on the cache, so the budget is enforced in the shipped path', () => {
@@ -1066,10 +2155,11 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       ['without quest areas', noQuestWorld()],
     ] as const) {
       const trace = newTrace();
+      const markerArt = fakeMarkerArt([]);
       installMapStyleGlobals(trace);
       setActiveWorldContent(BUILTIN_WORLD);
 
-      const result = new MapWindowPainter(classColor).paintOverworld(
+      const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
         fakeMapContext(trace),
         world,
         labelPaintOptions(),
@@ -1077,6 +2167,13 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
 
       const portals = overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax);
       expect(portals.length, arm).toBeGreaterThan(0);
+      expect(
+        markerArt.calls.filter((call) => call.id === 'dungeon-entrance'),
+        `${arm}: art miss still routes the stable portal identity and size`,
+      ).toEqual(portals.map(() => ({ id: 'dungeon-entrance', size: 'mapDungeon' })));
+      expect(trace.markerBlits.some((blit) => blit.sprite.markerId === 'dungeon-entrance')).toBe(
+        false,
+      );
       // Each portal dot fills then strokes the SAME path, so its own outline is
       // the first stroke after its fill. Matching by draw order rather than by
       // "some arc somewhere used these settings" is what makes this decisive:
@@ -1177,12 +2274,12 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       (s) => s.commands.join(',') === 'moveTo,lineTo,lineTo,closePath',
     );
     expect(arrow.map((s) => s.style)).toEqual(['paint:--color-map-outline']);
-    // Neither may the quest-giver glyph, which now names its outline explicitly.
-    const glyph = trace.sprites.find((s) => spriteText(s) === '!');
-    expect(glyph?.ink.map(inkStyle)).toEqual([
-      { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
-      { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
-    ]);
+    // Neither may the allocation-free quest fallback, which names both of its
+    // strokes explicitly while generated art is still loading.
+    const questOutline = trace.strokes.find(
+      (stroke) => stroke.lineWidth === 4 && stroke.commands.join() === 'moveTo,lineTo',
+    );
+    expect(questOutline?.style).toBe('paint:--color-map-outline');
   });
 });
 
@@ -1219,25 +2316,36 @@ const GATHER_SILHOUETTE: Record<string, string[]> = {
 };
 const GATHER_STRIKE_COMMANDS = ['moveTo', 'lineTo'];
 
-function paintGatherZone(world: IWorld) {
+function paintGatherZone(
+  world: IWorld,
+  markerArt?: MapMarkerArt,
+  initialAlpha = 1,
+  markerProfile: () => 'standard' | 'compact' = () => 'standard',
+) {
   const trace = newTrace();
   installMapStyleGlobals(trace);
   setActiveWorldContent(BUILTIN_WORLD);
-  const result = new MapWindowPainter(classColor).paintOverworld(fakeMapContext(trace), world, {
-    zone: ZONES[0],
-    zoneBg: {
-      canvas: { width: 560, height: 560 } as HTMLCanvasElement,
-      region: {
-        minX: ZONES[0].xMin ?? STRIP_MIN_X,
-        maxX: ZONES[0].xMax ?? STRIP_MAX_X,
-        minZ: ZONES[0].zMin,
-        maxZ: ZONES[0].zMax,
+  const ctx = fakeMapContext(trace);
+  ctx.globalAlpha = initialAlpha;
+  const result = new MapWindowPainter(classColor, markerArt, markerProfile).paintOverworld(
+    ctx,
+    world,
+    {
+      zone: ZONES[0],
+      zoneBg: {
+        canvas: { width: 560, height: 560 } as HTMLCanvasElement,
+        region: {
+          minX: ZONES[0].xMin ?? STRIP_MIN_X,
+          maxX: ZONES[0].xMax ?? STRIP_MAX_X,
+          minZ: ZONES[0].zMin,
+          maxZ: ZONES[0].zMax,
+        },
       },
+      canvasSize: 560,
+      zoom: 1,
+      center: null,
     },
-    canvasSize: 560,
-    zoom: 1,
-    center: null,
-  });
+  );
   const gatherFills = trace.fills
     .filter((fill) => fill.style.startsWith('paint:--color-map-gather-'))
     .map(({ style, commands }) => ({ style, commands }));
@@ -1250,7 +2358,7 @@ function paintGatherZone(world: IWorld) {
   const silhouetteStrokes = trace.strokes.filter((stroke) =>
     Object.values(GATHER_SILHOUETTE).some((sig) => stroke.commands.join(',') === sig.join(',')),
   );
-  return { trace, result, gatherFills, strikes, silhouetteStrokes };
+  return { trace, result, gatherFills, strikes, silhouetteStrokes, ctx };
 }
 
 function toolWorld(): IWorld {
@@ -1269,24 +2377,25 @@ function toolWorld(): IWorld {
 }
 
 describe('map_window_painter: zone-map gather nodes', () => {
-  it('locked viewer: locked fills + one strike per node, never a ready or glow token', () => {
-    // Empty inventory locks every node: fills use the locked token, never a
-    // ready profession color and never a glow halo.
-    const { result, gatherFills, strikes } = paintGatherZone(mapWorld());
+  it('locked viewer: ready identity plus a padlock, never a glow or strike', () => {
+    const markerArt = fakeMarkerArt([]);
+    const { result, trace, gatherFills, strikes } = paintGatherZone(mapWorld(), markerArt.art);
     expect(result.gatherNodes.length).toBeGreaterThan(0);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('gather-'))).toEqual(
+      result.gatherNodes.map((node) => ({
+        id: `gather-${node.type}`,
+        size: 'mapGatherReadyLocked',
+      })),
+    );
     // Fixture guard: every node is locked AND ready here, so the no-glow
     // assertion below genuinely exercises the `!node.locked` conjunct of the
     // glow gate (a not-ready fixture would defuse it silently).
     expect(result.gatherNodes.every((n) => n.locked && n.ready)).toBe(true);
-    const lockedFills = gatherFills.filter(
-      (fill) => fill.style === 'paint:--color-map-gather-locked',
+    const readyFills = result.gatherNodes.map((node) =>
+      gatherFills.find((fill) => fill.style === `paint:--color-map-gather-${node.type}-ready`),
     );
-    expect(lockedFills.length).toBe(result.gatherNodes.length);
-    expect(gatherFills.length).toBe(result.gatherNodes.length); // locked fills are the ONLY gather fills
+    expect(readyFills.every(Boolean)).toBe(true);
     for (const tok of [
-      '--color-map-gather-ore-ready',
-      '--color-map-gather-wood-ready',
-      '--color-map-gather-herb-ready',
       '--color-map-gather-ore-glow',
       '--color-map-gather-wood-glow',
       '--color-map-gather-herb-glow',
@@ -1296,9 +2405,15 @@ describe('map_window_painter: zone-map gather nodes', () => {
         `locked viewer must not fill ${tok}`,
       ).toBe(false);
     }
-    // The non-hue lock cue (DESIGN.md color independence): one diagonal
-    // outline strike through every locked icon.
-    expect(strikes.length).toBe(result.gatherNodes.length);
+    expect(strikes).toEqual([]);
+    expect(
+      trace.strokes.filter(
+        (stroke) =>
+          stroke.style === 'paint:--color-map-gather-locked' &&
+          stroke.lineWidth === 1.4 &&
+          stroke.commands.join(',') === 'arc',
+      ),
+    ).toHaveLength(result.gatherNodes.length);
   });
 
   it('ready viewer: glow-under-silhouette per node, tokens matched to the node type', () => {
@@ -1321,6 +2436,157 @@ describe('map_window_painter: zone-map gather nodes', () => {
     expect(strikes.length).toBe(0);
   });
 
+  it('routes painted gathering art through ready/cooldown sprites at caller alpha', () => {
+    const world = toolWorld() as unknown as { nodeHarvestableByMe: (id: string) => boolean };
+    world.nodeHarvestableByMe = (id) => !id.startsWith('ore_');
+    const markerArt = fakeMarkerArt(['gather-ore', 'gather-wood', 'gather-herb']);
+
+    const { result, trace, ctx } = paintGatherZone(world as unknown as IWorld, markerArt.art, 0.8);
+
+    expect(result.gatherNodes.some((node) => !node.ready)).toBe(true);
+    expect(result.gatherNodes.some((node) => node.ready)).toBe(true);
+    expect(new Set(result.gatherNodes.map((node) => node.type))).toEqual(
+      new Set(['ore', 'wood', 'herb']),
+    );
+    expect(markerArt.calls.filter((call) => call.id.startsWith('gather-'))).toEqual(
+      result.gatherNodes.map((node) => ({
+        id: `gather-${node.type}`,
+        size: node.ready ? 'mapGatherReady' : 'mapGatherCooldown',
+      })),
+    );
+    const blits = trace.markerBlits.filter((blit) => blit.sprite.markerId.startsWith('gather-'));
+    expect(blits).toHaveLength(result.gatherNodes.length);
+    expect(blits.map((blit) => blit.sprite)).toEqual(
+      result.gatherNodes.map((node) => ({
+        markerId: `gather-${node.type}`,
+        sizeId: node.ready ? 'mapGatherReady' : 'mapGatherCooldown',
+      })),
+    );
+    // The cooldown-size sprite is precomputed grayscale + outlined by the art
+    // loader, so the painter preserves the caller's alpha instead of dimming
+    // the finished marker a second time.
+    expect(blits.map((blit) => blit.alpha)).toEqual(result.gatherNodes.map(() => 0.8));
+    for (let i = 0; i < blits.length; i++) {
+      const node = result.gatherNodes[i];
+      const sizeId = node.ready ? 'mapGatherReady' : 'mapGatherCooldown';
+      expect(blits[i].dx).toBe(Math.round(node.mx - MAP_MARKER_SIZES[sizeId] / 2));
+      expect(blits[i].dy).toBe(Math.round(node.my - MAP_MARKER_SIZES[sizeId] / 2));
+    }
+    expect(ctx.globalAlpha).toBe(0.8);
+  });
+
+  it('draws every full-map gathering painting below the actionable quest-glyph layer', () => {
+    const markerArt = fakeMarkerArt([
+      'gather-ore',
+      'gather-wood',
+      'gather-herb',
+      'quest-available',
+    ]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
+
+    const gatherBlits = trace.markerBlits.filter((blit) =>
+      blit.sprite.markerId.startsWith('gather-'),
+    );
+    const questBlits = trace.markerBlits.filter((blit) =>
+      blit.sprite.markerId.startsWith('quest-'),
+    );
+    expect(result.gatherNodes.length).toBeGreaterThan(0);
+    expect(result.npcs.length).toBeGreaterThan(0);
+    expect(gatherBlits).toHaveLength(result.gatherNodes.length);
+    expect(questBlits).toHaveLength(result.npcs.length);
+    expect(Math.max(...gatherBlits.map((blit) => blit.at))).toBeLessThan(
+      Math.min(...questBlits.map((blit) => blit.at)),
+    );
+  });
+
+  it('uses a precomputed locked painted icon at caller alpha with no runtime overlay', () => {
+    const markerArt = fakeMarkerArt(['gather-ore', 'gather-wood', 'gather-herb']);
+    const { result, trace, strikes, ctx } = paintGatherZone(mapWorld(), markerArt.art, 0.8);
+
+    expect(result.gatherNodes.every((node) => node.ready && node.locked)).toBe(true);
+    const blits = trace.markerBlits.filter((blit) => blit.sprite.markerId.startsWith('gather-'));
+    expect(blits).toHaveLength(result.gatherNodes.length);
+    expect(blits.every((blit) => blit.sprite.sizeId === 'mapGatherReadyLocked')).toBe(true);
+    expect(blits.every((blit) => blit.alpha === 0.8)).toBe(true);
+    expect(strikes).toEqual([]);
+    expect(ctx.globalAlpha).toBe(0.8);
+  });
+
+  it('preserves both gray cooldown and lock states in one cached sprite', () => {
+    const world = mapWorld() as unknown as { nodeHarvestableByMe: () => boolean };
+    world.nodeHarvestableByMe = () => false;
+    const markerArt = fakeMarkerArt(['gather-ore', 'gather-wood', 'gather-herb']);
+
+    const { result, trace, gatherFills, strikes, ctx } = paintGatherZone(
+      world as unknown as IWorld,
+      markerArt.art,
+      0.8,
+    );
+
+    expect(result.gatherNodes.length).toBeGreaterThan(0);
+    expect(result.gatherNodes.every((node) => !node.ready && node.locked)).toBe(true);
+    expect(markerArt.calls.filter((call) => call.id.startsWith('gather-'))).toEqual(
+      result.gatherNodes.map((node) => ({
+        id: `gather-${node.type}`,
+        size: 'mapGatherCooldownLocked',
+      })),
+    );
+    const blits = trace.markerBlits.filter((blit) => blit.sprite.markerId.startsWith('gather-'));
+    expect(blits.map((blit) => blit.sprite)).toEqual(
+      result.gatherNodes.map((node) => ({
+        markerId: `gather-${node.type}`,
+        sizeId: 'mapGatherCooldownLocked',
+      })),
+    );
+    expect(blits.every((blit) => blit.alpha === 0.8)).toBe(true);
+    expect(gatherFills).toEqual([]);
+    expect(strikes).toHaveLength(0);
+    expect(ctx.globalAlpha).toBe(0.8);
+  });
+
+  it.each([
+    { ready: true, locked: false, size: 'mapGatherReadyCompact' },
+    { ready: false, locked: false, size: 'mapGatherCooldownCompact' },
+    { ready: true, locked: true, size: 'mapGatherReadyLockedCompact' },
+    { ready: false, locked: true, size: 'mapGatherCooldownLockedCompact' },
+  ] as const)('uses compact gathering raster $size', ({ ready, locked, size }) => {
+    const world = (locked ? mapWorld() : toolWorld()) as unknown as {
+      nodeHarvestableByMe: () => boolean;
+    };
+    world.nodeHarvestableByMe = () => ready;
+    const markerArt = fakeMarkerArt(['gather-ore', 'gather-wood', 'gather-herb']);
+    const profile = vi.fn(() => 'compact' as const);
+
+    const { result, trace, strikes } = paintGatherZone(
+      world as unknown as IWorld,
+      markerArt.art,
+      1,
+      profile,
+    );
+
+    expect(profile).toHaveBeenCalledTimes(1);
+    expect(result.gatherNodes.every((node) => node.ready === ready && node.locked === locked)).toBe(
+      true,
+    );
+    expect(markerArt.calls.filter((call) => call.id.startsWith('gather-'))).toEqual(
+      result.gatherNodes.map((node) => ({ id: `gather-${node.type}`, size })),
+    );
+    expect(
+      trace.markerBlits
+        .filter((blit) => blit.sprite.markerId.startsWith('gather-'))
+        .every((blit) => blit.sprite.sizeId === size),
+    ).toBe(true);
+    expect(strikes).toEqual([]);
+  });
+
   it('the locked token references the minimap rust token (both surfaces retune together)', () => {
     // The map side of the agreement is this var() reference; the minimap side
     // (the declaration of --color-minimap-node-locked itself) is pinned by
@@ -1328,7 +2594,14 @@ describe('map_window_painter: zone-map gather nodes', () => {
     expect(tokens).toContain('--color-map-gather-locked: var(--color-minimap-node-locked)');
   });
 
-  it('cooldown viewer: desaturated type token, no glow, no outline, no strike', () => {
+  it('pins one literal neutral cooldown gray across minimap and all full-map fallbacks', () => {
+    expect(tokens).toContain('--color-minimap-gather-cooldown: #90989a;');
+    expect(tokens).toContain('--color-map-gather-ore-cooldown: #90989a;');
+    expect(tokens).toContain('--color-map-gather-wood-cooldown: #90989a;');
+    expect(tokens).toContain('--color-map-gather-herb-cooldown: #90989a;');
+  });
+
+  it('cooldown viewer: neutral outlined silhouette, no glow or strike', () => {
     const world = toolWorld() as unknown as { nodeHarvestableByMe: (id: string) => boolean };
     // Tools for everything, but every ore vein is on this viewer's respawn
     // cooldown: the cooldown arm (smaller bare silhouette) paints for ore
@@ -1342,7 +2615,8 @@ describe('map_window_painter: zone-map gather nodes', () => {
       (fill) => fill.style === 'paint:--color-map-gather-ore-cooldown',
     );
     expect(oreCooldownFills.length).toBe(oreMarkers.length);
-    // Cooldown keeps the type silhouette (the hex), just desaturated.
+    // Cooldown keeps the type silhouette (the hex), but the shared cooldown
+    // tokens resolve to neutral gray rather than a dim profession hue.
     for (const fill of oreCooldownFills) {
       expect(fill.commands).toEqual(GATHER_SILHOUETTE.ore);
     }
@@ -1351,14 +2625,13 @@ describe('map_window_painter: zone-map gather nodes', () => {
     expect(gatherFills.some((f) => f.style === 'paint:--color-map-gather-ore-ready')).toBe(false);
     expect(gatherFills.some((f) => f.style === 'paint:--color-map-gather-wood-glow')).toBe(true);
     expect(gatherFills.some((f) => f.style === 'paint:--color-map-gather-herb-glow')).toBe(true);
-    // A cooldown silhouette takes no outline stroke (only ready ones do), and
-    // nothing here is locked, so no strikes either. The hex signature is
-    // unique to ore in this paint, so zero hex strokes pins the elided arm.
+    // Cooldown fallbacks retain an outline so they survive terrain while art
+    // is loading. Nothing here is locked, so no diagonal strikes appear.
     expect(strikes.length).toBe(0);
     const hexStrokes = trace.strokes.filter(
       (stroke) => stroke.commands.join(',') === GATHER_SILHOUETTE.ore.join(','),
     );
-    expect(hexStrokes.length).toBe(0);
+    expect(hexStrokes).toHaveLength(oreMarkers.length);
   });
 });
 

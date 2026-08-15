@@ -1079,4 +1079,33 @@ export const it_IT: Record<string, string> = {
     'Inserisci un numero intero compreso tra {min} e {max}.',
   'generalChatRateLimit.windowMinutesLabel': 'Durata della finestra (minuti)',
   'moderationHistory.actionGeneralChatRateLimit': 'Limite della chat Generale modificato',
+  'detail.cheaterMarkModeration': 'Marchio di baro',
+  'detail.cheaterMarkActions': 'Azioni di moderazione del marchio di baro',
+  'detail.cheaterMarkApply': 'Applica il marchio di baro',
+  'detail.cheaterMarkLift': 'Rimuovi il marchio di baro',
+  'detail.cheaterMarkReason': 'Motivo del marchio: {value}',
+  'detail.cheaterMarkRemaining': 'Tempo di gioco restante: {value}',
+  'detail.cheaterMarkSetAt': 'Applicato: {value}',
+  'detail.cheaterMarkRelength': 'Modifica la durata del marchio',
+  'detail.cheaterMarkDuration': 'Credito in ore di gioco',
+  'detail.cheaterMarkDurationPlaceholder': 'Ore',
+  'detail.cheaterMarkDurationHint':
+    'Ogni personaggio dell’account mostra l’etichetta pubblica finché non si esaurisce questo tempo di gioco.',
+  'detail.cheaterMarkRelengthHint':
+    'Sostituisce completamente il tempo restante, senza aggiungervisi. L’etichetta pubblica rimane visibile.',
+  'dialog.confirmCheaterMark': 'Conferma il marchio di baro',
+  'dialog.confirmCheaterMarkRelength': 'Conferma la nuova durata del marchio',
+  'dialog.confirmCheaterMarkLift': 'Conferma la rimozione del marchio',
+  'dialog.actionCheaterMark':
+    'Mostra l’etichetta pubblica Baro su ogni personaggio di questo account',
+  'dialog.actionCheaterMarkRelength': 'Sostituisci il tempo di gioco restante del marchio',
+  'dialog.actionCheaterMarkLift': 'Rimuovi in anticipo il marchio di baro',
+  'alert.cheaterMarkDurationInvalid': 'Inserisci un numero intero da 1 a {max} ore.',
+  'error.cheaterMarkDurationInvalid':
+    'Il credito di tempo di gioco deve essere compreso tra 1 e 100 ore.',
+  'error.cheaterMarkNotMarked': 'Questo account non porta il marchio di baro.',
+  'error.cheaterMarkAdminTarget':
+    'Gli account amministratore non possono ricevere il marchio di baro.',
+  'moderationHistory.actionCheaterMark': 'Marchio di baro applicato',
+  'moderationHistory.actionCheaterMarkLift': 'Marchio di baro rimosso',
 };

@@ -22,7 +22,6 @@
 //   gallery and the pit's forge wing each hold an off-path reward cache.
 
 import type { AuthoredDecor, AuthoredDoor, AuthoredRoom } from '../../dungeon_layout';
-import { layoutColliders } from '../../dungeon_layout';
 import type { StyleSource } from '../../rift/style';
 import { buildStyle, mixSeed } from '../../rift/style';
 import type { RiftFloorPlan, RiftObjectPlan, RiftSpawn } from '../../rift/types';
@@ -395,10 +394,4 @@ export function buildInfernalCitadelFloor(
       ? null
       : { x: 0, z: GATE_Z, hw: 18, hd: 1.6, switchX: 0, switchZ: 0, openOnOrb: true },
   };
-}
-
-/** Instance-local colliders for a citadel floor (walls minus doorways, plus the
- * decor footprints). Exposed for tests; the runtime goes through layoutColliders. */
-export function infernalCitadelColliders(floorIndex = 0): ReturnType<typeof layoutColliders> {
-  return layoutColliders(buildInfernalCitadelFloor(1, 20, 20, floorIndex).layout);
 }

@@ -10,9 +10,11 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
+import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
 import {
@@ -65,6 +67,7 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
+import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -414,6 +417,15 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
+-- ISO 3166-1 alpha-2 country at signup, resolved from a trusted edge geo
+-- header (GEOIP_COUNTRY_HEADER; see server/signup_attribution.ts). Analytics
+-- only, never authorization.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_country TEXT;
+-- Once-guard for the D7Retained ad conversion event: stamped by the atomic
+-- claim in server/ua_capi_db.ts the first time the account opens a session
+-- during day seven after signup, so the event can never double-fire across
+-- sessions, realms, or restarts.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS d7_capi_sent_at TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
 -- Paid weapon ownership and loadouts live outside accounts.cosmetics. Older game
 -- binaries replace that JSON document wholesale, so keeping paid state there would
@@ -769,6 +781,16 @@ CREATE INDEX IF NOT EXISTS bot_detector_config_changes_realm
 -- hard-word (slur) enforcement ladder. A mute blocks chat only, never login.
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_muted_until TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_strikes INT NOT NULL DEFAULT 0;
+-- The operator-applied Cheater mark (src/sim/moderation/): a public tag every
+-- character on the account wears until a budget of PLAYED seconds burns down.
+-- A REMAINING-SECONDS counter and not an expiry timestamp on purpose: a
+-- wall-clock sanction runs out while the account is logged out, which is exactly
+-- the window it would otherwise be waited out in. The sim owns the countdown
+-- while a character is in world and the session save writes the remainder back,
+-- so 0 (the default) means unmarked and is never written for an unmarked row.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_seconds INT NOT NULL DEFAULT 0;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_reason TEXT;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_set_at TIMESTAMPTZ;
 -- Admin-managed filter word lists. tier 'soft' = cosmetic (masked client-side
 -- when the player's filter is on); tier 'hard' = enforced (blocked + escalated).
 CREATE TABLE IF NOT EXISTS chat_filter_words (
@@ -1247,6 +1269,17 @@ export async function ensureSchema(): Promise<void> {
     // association arm, so it is created after the retention schema above; on a
     // fresh database SCHEMA alone could not create it.
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
+    // Progression analytics event logs (level_up_events, ftue_events).
+    // FK-references accounts(id) and characters(id), so they run after SCHEMA.
+    // Applied unconditionally (idempotent), like the other schema modules.
+    await client.query(PROGRESS_EVENTS_SCHEMA);
+    // First-touch signup attribution (one row per account, written at
+    // registration). FK-references accounts(id), so it runs after SCHEMA.
+    await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
+    // The hand-entered ad-spend ledger (admin API); no FK dependencies, kept
+    // beside the other analytics schemas. Bounded (one row per campaign-day),
+    // deliberately keep-forever (see ad_spend_db.ts).
+    await client.query(AD_SPEND_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -2421,6 +2454,23 @@ export async function exportAccountData(
       ORDER BY claimed_at`,
     [accountId],
   );
+  // Subject-access completeness for the UA instrumentation: the signup
+  // country, the first-touch attribution row, and the per-account analytics
+  // event rows are all account-linked personal data, so they ride the export.
+  const createdCountry = await pool.query('SELECT created_country FROM accounts WHERE id = $1', [
+    accountId,
+  ]);
+  const attribution = await accountAttributionForExport(pool, accountId);
+  const levelUpEvents = await pool.query(
+    `SELECT character_id, level, earned_at
+       FROM level_up_events WHERE account_id = $1 ORDER BY earned_at`,
+    [accountId],
+  );
+  const ftueEvents = await pool.query(
+    `SELECT character_id, kind, quest_id, level, zone, killer, occurred_at
+       FROM ftue_events WHERE account_id = $1 ORDER BY occurred_at`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2429,9 +2479,13 @@ export async function exportAccountData(
       email: acct.email,
       createdAt: acct.created_at,
       locale: acct.locale,
+      createdCountry: createdCountry.rows[0]?.created_country ?? null,
       marketingOptIn: acct.marketing_opt_in,
       twoFactorEnabled,
     },
+    signupAttribution: attribution,
+    levelUpEvents: levelUpEvents.rows,
+    ftueEvents: ftueEvents.rows,
     characters: characters.map((c) => ({
       id: c.id,
       name: c.name,

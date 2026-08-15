@@ -509,8 +509,23 @@ describe('entry wiring', () => {
     expect(code).toContain("from './lib/ci_leg_runner.mjs'");
     expect(code).toContain('runLegsWithFlakeRetry({ legs: plan.legs, cwd: repoRoot })');
     // The one retry policy lives in the runner; the entry must not grow its
-    // own spawn path around it.
-    expect(code).not.toContain('spawnSync');
+    // own TEST-spawning path around it. The single sanctioned spawnSync is
+    // the entry-level pretest step (the merged selective leg is a bare
+    // vitest-related invocation with no npm lifecycle, so artifact
+    // regeneration cannot ride a leg): pin it to exactly one occurrence,
+    // aimed at pretest.mjs, so a second raw spawn still fails here.
+    const spawnSyncSites = code.match(/spawnSync\(/g) ?? [];
+    expect(spawnSyncSites).toHaveLength(1);
+    const site = code.slice(code.indexOf('spawnSync('), code.indexOf('spawnSync(') + 200);
+    expect(site).toContain('pretest.mjs');
+    // Ordering: the pretest spawn must sit BEFORE the leg runner in the
+    // entry, so a refactor that moves regeneration after (or out of) the leg
+    // path fails here rather than shipping stale artifacts to the guards.
+    expect(code.indexOf('spawnSync(')).toBeLessThan(code.indexOf('runLegsWithFlakeRetry('));
+    // The skip handshake shares the ONE exported env constant with
+    // scripts/pretest.mjs's own reader, so the two spellings cannot drift.
+    expect(code).toContain("from './lib/gate_artifact_skip.mjs'");
+    expect(code).toContain('process.env[WOC_SKIP_PRETEST]');
     expect(code).not.toContain('spawn(');
     // The failure path must set exitCode and let the piped output drain; a
     // forced process.exit() discards queued stdout and truncates the

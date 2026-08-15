@@ -36,10 +36,37 @@ export const I18N_RELEASE_TIER_SUITES = Object.freeze([
  */
 export const PRE_VITEST_STEP_NAME = 'biome (changed files)';
 
+/**
+ * Name of the full-suite vitest step. gate.mjs locks around exactly this step (issue
+ * #2808), never the whole run, so both sides read the same constant rather than the
+ * lock matching a display string a rename would silently move.
+ */
+export const FULL_SUITE_STEP_NAME = 'vitest (full suite)';
+
 export const I18N_ARTIFACTS = Object.freeze([
   'src/ui/i18n.resolved.generated',
   'src/admin/i18n.resolved.generated',
   'src/ui/i18n.catalog/translation_keys.generated.ts',
+]);
+
+// The manifest freshness set: EVERY tracked file the three manifest
+// generators write, a strict SUPERSET of the classifier's carve-out family
+// (lib/gate_select_plan.mjs, GENERATED_MANIFEST_ARTIFACT_FILES: the three
+// .ts graph nodes). The SFX generator also writes the runtime pack and the
+// gain-ceiling cache; those are fs-read data, never graph nodes, so they
+// belong in the DIFF (a partial diff would let the local gate silently heal
+// them mid-run while CI reads the stale committed copies) but never in the
+// classifier. tests/ci_workflow.test.ts welds this list, both check jobs'
+// trackedness and diff argv, and the classifier containment to each other. The wiki content
+// regenerates in the artifacts turbo step (wiki:content); the SFX and media
+// manifests regenerate in their own steps directly (sub-second scripts, not
+// turbo tasks).
+export const MANIFEST_ARTIFACTS = Object.freeze([
+  'src/game/sfx_manifest.generated.ts',
+  'src/guide/content.generated.ts',
+  'src/render/assets/manifest.generated.ts',
+  'public/audio/sfx/runtime-pack.json',
+  'scripts/sfx/sfx_gain_ceiling.generated.json',
 ]);
 
 /**
@@ -86,6 +113,35 @@ export function buildFullGateSteps(workers, opts = {}) {
         'the regenerated i18n artifacts differ from the staged/committed copies: stage them ' +
         `(git add ${I18N_ARTIFACTS.join(' ')}) and re-run`,
     },
+    // The two manifest generators run directly (each is a deterministic
+    // sub-second script; the wiki content regenerated in the turbo step
+    // above), then trackedness plus one diff prove all committed outputs fresh.
+    {
+      name: 'sfx manifest regen',
+      cmd: 'node',
+      args: ['scripts/build_sfx_manifest.mjs'],
+    },
+    {
+      name: 'media manifest regen',
+      cmd: 'node',
+      args: ['scripts/build_media_manifest.mjs', 'generate'],
+    },
+    {
+      name: 'manifest trackedness',
+      cmd: 'git',
+      args: ['ls-files', '--error-unmatch', '--', ...MANIFEST_ARTIFACTS],
+      hint:
+        'every generated build-manifest output must remain tracked: restore the missing path ' +
+        'or update the manifest contract before re-running the gate',
+    },
+    {
+      name: 'manifest freshness',
+      cmd: 'git',
+      args: ['diff', '--exit-code', '--', ...MANIFEST_ARTIFACTS],
+      hint:
+        'the regenerated build manifests differ from the staged/committed copies: stage them ' +
+        `(git add ${MANIFEST_ARTIFACTS.join(' ')}) and re-run`,
+    },
     {
       name: 'malware scan',
       cmd: 'npm',
@@ -100,7 +156,7 @@ export function buildFullGateSteps(workers, opts = {}) {
 
   if (!opts.skipVitest) {
     steps.push({
-      name: 'vitest (full suite)',
+      name: FULL_SUITE_STEP_NAME,
       cmd: 'npm',
       args: ['test', '--', `--maxWorkers=${workers}`],
       env: gateVitestSkipPretestEnv(),

@@ -342,6 +342,21 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
+    // PROGRESS_EVENTS_SCHEMA (server/progress_events_db.ts),
+    // ACCOUNT_ATTRIBUTION_SCHEMA (server/attribution_db.ts), and
+    // AD_SPEND_SCHEMA (server/ad_spend_db.ts) back the UA instrumentation.
+    // Pin them by name so none can regress to defined-but-unwired (the
+    // DISCORD_SCHEMA lesson): deleting an ensureSchema line must fail here.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS level_up_events');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS ftue_events');
+    expect(applied).toContain('CREATE UNIQUE INDEX IF NOT EXISTS ftue_events_first_touch');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS account_attribution');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS ad_spend');
+  });
+
   it('applies the compact player-metrics schema without a boot backfill', async () => {
     // Both phases, in the order server/main.ts runs them: the schema
     // transaction, then the CONCURRENTLY builds, which are now a SEPARATE call

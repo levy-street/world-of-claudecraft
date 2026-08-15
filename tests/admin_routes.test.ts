@@ -90,6 +90,20 @@ describe('admin route permission map', () => {
     expect(
       permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/daily-rewards-ip-ban'),
     ).toBe('moderation.act');
+    // The Cheater mark pair is registry-only, so the source scan above never sees
+    // it: without these rows the central gate would fail closed with a 404 and the
+    // routes would be unreachable in production. Spot-checked here because that is
+    // the only place a missing row would show up before runtime.
+    expect(permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/cheater-mark')).toBe(
+      'moderation.act',
+    );
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/lift-cheater-mark'),
+    ).toBe('moderation.act');
+    // A read never reaches either arm (both are writes).
+    expect(
+      permissionForAdminRoute('GET', '/admin/api/moderation/accounts/42/cheater-mark'),
+    ).toBeNull();
     expect(permissionForAdminRoute('POST', '/admin/api/chat-filter/config')).toBe(
       'chatfilter.manage',
     );

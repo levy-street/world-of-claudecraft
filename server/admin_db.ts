@@ -1137,6 +1137,11 @@ export interface AccountDetail {
   streamerLinks: StreamerLinks;
   dailyRewardsBan?: { reason: string; createdAt: string; expiresAt: string | null } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
+  // The operator-applied Cheater mark (accounts.cheater_mark_*): the remaining
+  // played-second budget, the audited reason, and when it was applied. Null when
+  // the account is not marked, so the dashboard can branch apply-vs-lift the way
+  // it does for dailyRewardsBan.
+  cheaterMark: { secondsRemaining: number; reason: string; setAt: string | null } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -1449,6 +1454,9 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
                 active_daily_rewards_ban.daily_rewards_ban_reason,
                 active_daily_rewards_ban.daily_rewards_banned_at,
                 active_daily_rewards_ban.daily_rewards_ban_expires_at,
+                cheater_mark_seconds,
+                COALESCE(cheater_mark_reason, '') AS cheater_mark_reason,
+                cheater_mark_set_at,
                 last_login_ip,
                 (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                            FROM play_sessions s WHERE s.account_id = accounts.id), 0)
@@ -1562,6 +1570,14 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       reason: String(row.reason),
       createdAt: row.created_at,
     })),
+    cheaterMark:
+      Number(a.cheater_mark_seconds) > 0
+        ? {
+            secondsRemaining: Number(a.cheater_mark_seconds),
+            reason: String(a.cheater_mark_reason),
+            setAt: a.cheater_mark_set_at ?? null,
+          }
+        : null,
     lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({

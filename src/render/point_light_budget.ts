@@ -1,5 +1,19 @@
 import type * as THREE from 'three';
 
+/**
+ * The append-only face of the fire-light registry that a subsystem is handed.
+ *
+ * Deliberately shaped like `Array.prototype.push` so a plain array still
+ * satisfies it (tests and off-screen callers keep passing one), while the
+ * renderer can pass an adopter that hides the light and marks the budget rank
+ * dirty in the same step. A subsystem that appends a VISIBLE light the rank has
+ * never seen changes numPointLights for the frames before the next budget pass,
+ * and that relinks every material drawn in them.
+ */
+export interface FireLightSink {
+  push(...lights: THREE.PointLight[]): number;
+}
+
 export interface RankedPointLight {
   light: THREE.PointLight;
   d2: number;

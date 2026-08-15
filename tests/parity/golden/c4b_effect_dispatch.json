@@ -2200,7 +2200,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 972,
-      "state": "8137f7ea",
+      "state": "e9e4b7b7",
       "events": "0b7b6d20",
       "rng": {
         "draws": 853,
@@ -3208,7 +3208,7 @@
           "threat": [
             [
               963,
-              170
+              289
             ]
           ],
           "weapon": {
@@ -3223,8 +3223,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 974,
-      "state": "7b919096",
-      "events": "1b948be4",
+      "state": "888af9d7",
+      "events": "3f1a4ceb",
       "rng": {
         "draws": 855,
         "digest": "2a20cdbb"
@@ -4236,7 +4236,7 @@
           "threat": [
             [
               963,
-              170
+              289
             ]
           ],
           "weapon": {
@@ -4359,7 +4359,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 975,
-      "state": "ed8e0a5d",
+      "state": "0c8a320c",
       "events": "8ce4e092",
       "rng": {
         "draws": 860,
@@ -5384,7 +5384,7 @@
           "threat": [
             [
               963,
-              170
+              289
             ]
           ],
           "weapon": {
@@ -5572,7 +5572,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 976,
-      "state": "9667572f",
+      "state": "23d274ff",
       "events": "ab4ca58e",
       "rng": {
         "draws": 861,
@@ -6634,7 +6634,7 @@
           "threat": [
             [
               963,
-              170
+              289
             ]
           ],
           "weapon": {
@@ -6858,7 +6858,7 @@
           "threat": [
             [
               966,
-              188.2
+              83.81
             ]
           ],
           "weapon": {
@@ -6873,7 +6873,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 977,
-      "state": "24be9df0",
+      "state": "ac522808",
       "events": "da52a003",
       "rng": {
         "draws": 861,
@@ -7948,7 +7948,7 @@
           "threat": [
             [
               963,
-              170
+              289
             ]
           ],
           "weapon": {
@@ -8172,7 +8172,7 @@
           "threat": [
             [
               966,
-              188.2
+              83.81
             ]
           ],
           "weapon": {
@@ -8228,7 +8228,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 977,
-      "state": "24be9df0",
+      "state": "ac522808",
       "events": "741638a5",
       "rng": {
         "draws": 861,
@@ -9303,7 +9303,7 @@
           "threat": [
             [
               963,
-              170
+              289
             ]
           ],
           "weapon": {
@@ -9527,7 +9527,7 @@
           "threat": [
             [
               966,
-              188.2
+              83.81
             ]
           ],
           "weapon": {

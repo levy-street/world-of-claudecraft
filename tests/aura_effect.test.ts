@@ -375,7 +375,7 @@ describe('auraEffectDescriptor', () => {
       { kind: 'aoe_echo', value: 0, charges: 2 },
       { kind: 'sure_crit', value: 1, charges: 3 },
       { kind: 'internal_cd', value: 0 },
-      { kind: 'temporal_echo', value: 0.35 },
+      { kind: 'temporal_echo', value: 0.4 },
       { kind: 'arcane_charge', value: 4, stacks: 4 },
       { kind: 'buff_dr', value: 0.2 },
       { kind: 'buff_dr_phys', value: 0.5 },

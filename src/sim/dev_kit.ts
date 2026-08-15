@@ -118,12 +118,6 @@ function excludedLoot(): ReadonlySet<string> {
   return excludedDungeonLoot;
 }
 
-// Reset the memoized exclusion set. Tests that mutate the content tables call this;
-// production never needs it.
-export function resetDevKitCache(): void {
-  excludedDungeonLoot = null;
-}
-
 /**
  * Whether an item belongs in the fresh-20 pool for `cls`.
  *

@@ -48,19 +48,22 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   charge: [9, 1],
   bear_charge: [9, 1],
   // "30% more threat": the stance threat multiplier inside threatModifier.
-  // Bear form's "armor +130%" is the recalcPlayerStats multiplier (2.3, the
-  // 2026-07 tank-parity pass) in entity.ts, not the form effect's value.
+  // Bear form's "armor +110%" and "maximum health +30%" are the
+  // recalcPlayerStats multipliers (2.1 and 1.3, the v0.38 tank-parity pass)
+  // in entity.ts, not the form effect's value.
   defensive_stance: [30],
   // Battle Stance's rage multiplier is applied by resourceGainMultiplier.
   battle_stance: [10],
   // Valor Roar's Protection-only damage reduction is applied when the party
   // maximum-health aura is created, rather than stored on its shared effect.
   rallying_cry: [5],
-  bear_form: [30, 130],
+  bear_form: [30, 110],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
   holy_taunt: [3],
   growl: [3],
+  // Baleful Roar cites the same compel window plus its own aoeTaunt radius.
+  challenging_roar: [3, 10],
   // "attack power +8 plus 2 per level": the cat-form AP constants in
   // recalcPlayerStats (entity.ts), not effect fields.
   cat_form: [8, 2],
@@ -107,7 +110,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   mind_blast: [1, 3, 30],
   // Thundercall and Stonebound values live in their spec runtime modules.
   lightning_bolt: [1, 5],
-  rockbiter_weapon: [3, 10],
+  rockbiter_weapon: [3, 10, 15, 20, 40],
   earth_shock: [3, 5, 125],
   // Spiritmend deposits are calculated after the direct heal resolves.
   healing_wave: [12, 30, 50],

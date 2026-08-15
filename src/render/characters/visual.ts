@@ -78,6 +78,8 @@ import {
   weaponSkinOrientPin,
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
+import { applySoulRendOverlay } from './soul_rend_overlay';
+import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
@@ -263,8 +265,6 @@ const GHOST_OPACITY = 0.34;
 // Stealth (Duskveil/Smokestep) reads as a faded-but-solid silhouette, a touch
 // denser than the spirit run's 0.34 (owner: stealth was "too transparent").
 const STEALTH_OPACITY = 0.45;
-const SOUL_REND_OPACITY = 0.58;
-const SOUL_REND_TINT = new THREE.Color(0x4f0505);
 const SHADOWFORM_OPACITY = 0.9;
 const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
 // Moonkin Form: a brighter, more luminous violet than the ghost run (owner's brief: a
@@ -1658,6 +1658,28 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  /** The Soul Rend clones this body will need, built without flipping the mark
+   *  (no `soulRend` flag, no material application): the encounter prewarm only
+   *  wants the program linked. Selection lives in `soul_rend_prewarm_core`; the
+   *  disposed arm matters because the queue defers this past the frame that
+   *  built the view. */
+  prewarmSoulRendSlots(): Array<{
+    source: THREE.Mesh;
+    overlay: THREE.Material | THREE.Material[];
+  }> {
+    return soulRendPrewarmTargets<THREE.Mesh, THREE.Material>({
+      originalMaterials: this.originalMaterials,
+      farMesh: this.farMesh,
+      farMaterials: this.farMaterials,
+      disposed: this.disposed,
+    }).map(({ source, original }) => ({
+      source,
+      overlay: Array.isArray(original)
+        ? original.map((material) => this.soulRendMaterial(material))
+        : this.soulRendMaterial(original),
+    }));
+  }
+
   /** Scale only the drawn pose. The click proxy remains at its authoritative size. */
   setPresentationScale(scale: number): void {
     const next = Number.isFinite(scale) ? Math.min(1.2, Math.max(1, scale)) : 1;
@@ -2159,6 +2181,29 @@ export class CharacterVisual {
     return skin ? (WEAPON_VFX[skin.model] ?? null) : null;
   }
 
+  /**
+   * Whether a point-light budget owns this rig's weapon-skin light.
+   *
+   * TRUE only in the world, where the renderer reconciles the light into its
+   * fixed budget: born visible there, it would be counted for the frames before
+   * the first budget pass, and that changed numPointLights relinks every
+   * material drawn in them. `createCharacterVisual` sets it.
+   *
+   * FALSE for a rig built directly (the armoury preview, the character screen).
+   * Those own their renderer and scene and have NO budget, so nothing would ever
+   * turn the light back on: the skin's cast glow is the product on a cosmetics
+   * surface, and it must light immediately.
+   *
+   * A FIELD rather than a constructor argument, so it must be set before the
+   * rig attaches a weapon. That holds today because `buildWeaponVfx` is only
+   * reached from `finishWeaponAttach`, which runs from async model-load
+   * continuations and the runtime re-attach paths, never synchronously from the
+   * constructor. A future synchronous attach in the constructor would silently
+   * miss the flag; the ordering at the one world call site is pinned by
+   * tests/weapon_vfx_rig_build.test.ts.
+   */
+  budgetedWeaponLight = false;
+
   /** Attach the skin's rarity VFX rig to each held payload (in-hand mode: no
    *  backdrop dome, no ground pool; emissive + particles ride the weapon). */
   private buildWeaponVfx(payloads: THREE.Object3D[]): void {
@@ -2170,7 +2215,10 @@ export class CharacterVisual {
     this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
     this.weaponVfxShed = 1;
     for (const payload of payloads) {
-      const handle = createWeaponVfx(payload, spec, { grounded: false });
+      const handle = createWeaponVfx(payload, spec, {
+        grounded: false,
+        budgetedLight: this.budgetedWeaponLight,
+      });
       handle.setBackdropVisible(false);
       handle.setTuning(this.weaponVfxAuthored);
       handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
@@ -2625,20 +2673,7 @@ export class CharacterVisual {
   private soulRendMaterial(material: THREE.Material): THREE.Material {
     const cached = this.soulRendMaterials.get(material);
     if (cached) return cached;
-    const marked = cloneMaterialWithHooks(material);
-    marked.transparent = true;
-    marked.opacity = SOUL_REND_OPACITY;
-    marked.depthWrite = false;
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(SOUL_REND_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x2a0000);
-      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.35);
-    }
+    const marked = applySoulRendOverlay(material);
     this.soulRendMaterials.set(material, marked);
     return marked;
   }

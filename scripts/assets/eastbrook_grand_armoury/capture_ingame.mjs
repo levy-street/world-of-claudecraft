@@ -139,6 +139,9 @@ const polishProvenance =
           rendererIntegrationSha256: sha256RepoFile(
             EASTBROOK_POLISH_PROVENANCE_INPUTS.rendererIntegration,
           ),
+          entityViewPolicySha256: sha256RepoFile(
+            EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy,
+          ),
           viewPriorityPolicySha256: sha256RepoFile(
             EASTBROOK_POLISH_PROVENANCE_INPUTS.viewPriorityPolicy,
           ),

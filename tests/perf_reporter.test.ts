@@ -168,11 +168,31 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
     manifestCompleted: 12,
     manifestPartial: 1,
     manifestSkipped: 0,
-    manifestTimedOut: 0,
+    manifestTimedOut: 1,
     manifestFailed: 0,
     partialEntryIds: ['textures.scene'],
-    timedOutEntryIds: [],
+    timedOutEntryIds: ['vfx.weapon-skins'],
     failedEntryIds: [],
+    // The dropped entry's second half. Without this, a report showing
+    // vfx.weapon-skins as timed-out cannot say whether the world-side weapon
+    // protection exists a minute into play or not at all.
+    resume: {
+      status: 'done' as const,
+      plannedEntries: 1,
+      plannedUnits: 3,
+      startedUnits: 3,
+      failedUnits: 1,
+      failedUnitIds: ['vfx.weapon-skins:weapon-skins:compile'],
+      entries: [
+        {
+          id: 'vfx.weapon-skins',
+          lane: 'cosmetic' as const,
+          planned: 3,
+          started: 3,
+          failed: 1,
+        },
+      ],
+    },
     diagnosticsBaseline: null,
   };
 }
@@ -226,20 +246,106 @@ function snapshot(): PerfSnapshot {
     renderer: {
       graphicsConfigVersion: 16,
       tier: 'high',
+      currentZoneId: 'eastbrook_vale',
       qualityBuckets: qualityBuckets(),
       gpuQueue: {
         units: 2,
         totalSyncMs: 18.4,
         worstSyncMs: 12.1,
+        // The texture unit is the cheap-looking one that actually cost the
+        // frame: 6.3 ms of sync, 310 ms of lost frame. That inversion is why
+        // the beacon carries both rankings.
+        totalFrameGapMs: 329.2,
+        worstFrameGapMs: 310.5,
+        worstUnsharedFrameGapMs: 18.7,
         slowest: [
-          { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2, atMs: 5000 },
-          { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3, atMs: 5200 },
+          {
+            label: 'live-view-compile',
+            priority: 30,
+            syncMs: 12.1,
+            wallMs: 40.2,
+            atMs: 5000,
+            waitMs: 2.4,
+            frameGapMs: 18.7,
+            sharedFrameGap: 1,
+          },
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            syncMs: 6.3,
+            wallMs: 6.3,
+            atMs: 5200,
+            waitMs: 940.5,
+            frameGapMs: 310.5,
+            sharedFrameGap: 2,
+          },
+        ],
+        blockiest: [
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            syncMs: 6.3,
+            wallMs: 6.3,
+            atMs: 5200,
+            waitMs: 940.5,
+            frameGapMs: 310.5,
+            sharedFrameGap: 2,
+          },
+          {
+            label: 'live-view-compile',
+            priority: 30,
+            syncMs: 12.1,
+            wallMs: 40.2,
+            atMs: 5000,
+            waitMs: 2.4,
+            frameGapMs: 18.7,
+            sharedFrameGap: 1,
+          },
         ],
         pending: 0,
         active: null,
         waitingTails: [],
         stallCount: 0,
         stalls: [],
+        worstWaitMs: 940.5,
+        longestWaits: [
+          {
+            label: 'texture-chunk',
+            priority: 10,
+            waitMs: 940.5,
+            blockedBy: 'preview:armory:skin',
+            blockedByPriority: 10,
+            waitedOnTailCap: true,
+            tails: ['preview:armory:skin'],
+          },
+        ],
+        recent: {
+          windowMs: 30000,
+          units: 2,
+          totalSyncMs: 18.4,
+          totalFrameGapMs: 329.2,
+          worstSyncMs: 12.1,
+          worstFrameGapMs: 310.5,
+          worstWaitMs: 940.5,
+          lanes: [
+            {
+              priority: 30,
+              units: 1,
+              worstWaitMs: 2.4,
+              totalWaitMs: 2.4,
+              worstSyncMs: 12.1,
+              worstFrameGapMs: 18.7,
+            },
+            {
+              priority: 10,
+              units: 1,
+              worstWaitMs: 940.5,
+              totalWaitMs: 940.5,
+              worstSyncMs: 6.3,
+              worstFrameGapMs: 310.5,
+            },
+          ],
+        },
       },
       nightAmount: 0,
       autoGovernor: true,
@@ -438,10 +544,29 @@ describe('perf reporter payload', () => {
       workDone: 12,
       workPlanned: 20,
     });
-    expect(
-      (body.rawSummary as { rendererPrewarm?: { manifestEntries?: unknown[] } }).rendererPrewarm
-        ?.manifestEntries,
-    ).toHaveLength(2);
+    // The live stats object is NOT sent beside the summary. It was a second
+    // copy of the same block under the ingest's 16 KB cap, and once its resume
+    // getter started serializing, the copy the server rebuilds from a fixed key
+    // set was no longer the only one carrying resume. Nothing reads the twin
+    // back out of storage, so the summary is the whole payload: a new field
+    // belongs in `rendererPrewarmSummary`, never in a restored twin.
+    expect(body.rawSummary as Record<string, unknown>).not.toHaveProperty('rendererPrewarm');
+    // The resume lane's outcome, which is the other half of "did this entry
+    // run". `vfx.weapon-skins` reads timed-out above; only this block says its
+    // units were handed to the lane, and that one of them failed, so the
+    // world-side weapon protection is incomplete rather than merely late.
+    const prewarmSummary = (body.rawSummary as { rendererPrewarmSummary?: Record<string, unknown> })
+      .rendererPrewarmSummary;
+    expect(prewarmSummary?.manifestSkipped).toBe(0);
+    expect(prewarmSummary?.resume).toEqual({
+      status: 'done',
+      plannedEntries: 1,
+      plannedUnits: 3,
+      startedUnits: 3,
+      failedUnits: 1,
+      failedUnitIds: ['vfx.weapon-skins:weapon-skins:compile'],
+      entries: [{ id: 'vfx.weapon-skins', lane: 'cosmetic', planned: 3, started: 3, failed: 1 }],
+    });
     expect(
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,
@@ -484,14 +609,99 @@ describe('perf reporter payload', () => {
       units: 2,
       totalSyncMs: 18.4,
       worstSyncMs: 12.1,
+      totalFrameGapMs: 329.2,
+      worstFrameGapMs: 310.5,
+      worstUnsharedFrameGapMs: 18.7,
       pending: 0,
       stallCount: 0,
       active: null,
       stalls: [],
     });
     expect(settledQueue?.slowest).toEqual([
-      { label: 'live-view-compile', priority: 30, syncMs: 12.1, wallMs: 40.2 },
-      { label: 'texture-chunk', priority: 10, syncMs: 6.3, wallMs: 6.3 },
+      {
+        label: 'live-view-compile',
+        priority: 30,
+        syncMs: 12.1,
+        wallMs: 40.2,
+        waitMs: 2.4,
+        frameGapMs: 18.7,
+        sharedFrameGap: 1,
+      },
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        syncMs: 6.3,
+        wallMs: 6.3,
+        waitMs: 940.5,
+        frameGapMs: 310.5,
+        sharedFrameGap: 2,
+      },
+    ]);
+    // The interval arm, which is the only one two reports can be differenced
+    // on: everything above it is cumulative or a lifetime maximum. The lane
+    // rows are what say a cosmetic unit made a live-view one wait.
+    expect(settledQueue?.recent).toEqual({
+      windowMs: 30_000,
+      units: 2,
+      totalSyncMs: 18.4,
+      totalFrameGapMs: 329.2,
+      worstSyncMs: 12.1,
+      worstFrameGapMs: 310.5,
+      worstWaitMs: 940.5,
+      lanes: [
+        {
+          priority: 30,
+          units: 1,
+          worstWaitMs: 2.4,
+          totalWaitMs: 2.4,
+          worstSyncMs: 12.1,
+          worstFrameGapMs: 18.7,
+        },
+        {
+          priority: 10,
+          units: 1,
+          worstWaitMs: 940.5,
+          totalWaitMs: 940.5,
+          worstSyncMs: 6.3,
+          worstFrameGapMs: 310.5,
+        },
+      ],
+    });
+    expect(settledQueue?.worstWaitMs).toBe(940.5);
+    // Attribution rides with the wait: the cost lists cannot carry it, because a
+    // unit can wait a long time while costing nothing itself.
+    expect(settledQueue?.longestWaits).toEqual([
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        waitMs: 940.5,
+        blockedBy: 'preview:armory:skin',
+        blockedByPriority: 10,
+        waitedOnTailCap: true,
+        tails: ['preview:armory:skin'],
+      },
+    ]);
+    // The frame-cost ranking inverts the sync ranking, which is the whole point
+    // of shipping both: a sync-ordered beacon would bury the unit that hurt.
+    expect(settledQueue?.blockiest).toEqual([
+      {
+        label: 'texture-chunk',
+        priority: 10,
+        syncMs: 6.3,
+        wallMs: 6.3,
+        waitMs: 940.5,
+        frameGapMs: 310.5,
+        sharedFrameGap: 2,
+      },
+      {
+        label: 'live-view-compile',
+        priority: 30,
+        syncMs: 12.1,
+        wallMs: 40.2,
+        waitMs: 2.4,
+        frameGapMs: 18.7,
+        sharedFrameGap: 1,
+      },
     ]);
 
     const snap = snapshot();
@@ -499,7 +709,11 @@ describe('perf reporter payload', () => {
       units: 2,
       totalSyncMs: 18.4,
       worstSyncMs: 12.1,
+      totalFrameGapMs: 0,
+      worstFrameGapMs: 0,
+      worstUnsharedFrameGapMs: 0,
       slowest: [],
+      blockiest: [],
       pending: 7,
       active: { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000 },
       waitingTails: [{ label: 'released-gate', priority: 30, ageMs: 5000, atMs: 11_000 }],
@@ -507,6 +721,18 @@ describe('perf reporter payload', () => {
       stalls: [
         { label: 'wedged-compile', priority: 40, ageMs: 91_000, atMs: 12_000, settled: false },
       ],
+      worstWaitMs: 0,
+      longestWaits: [],
+      recent: {
+        windowMs: 30000,
+        units: 0,
+        totalSyncMs: 0,
+        totalFrameGapMs: 0,
+        worstSyncMs: 0,
+        worstFrameGapMs: 0,
+        worstWaitMs: 0,
+        lanes: [],
+      },
     };
     const wedged = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
     const wedgedQueue = (wedged.rawSummary as { rendererGpuQueue?: Record<string, unknown> })

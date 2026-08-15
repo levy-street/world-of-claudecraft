@@ -3,7 +3,8 @@ import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   assertPartitionCompleteness,
-  DURATION_WEIGHT_OVERLAY,
+  MEASURED_FALLBACK_MS,
+  MEASURED_WEIGHTS,
   partitionByLpt,
   partitionByStripe,
   partitionForCi,
@@ -111,19 +112,14 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     expect(assertPartitionCompleteness(items, a)).toEqual({ ok: true });
     // Contiguous equal slices of the same key order put sequential keys together;
     // stripe fans neighbors across packs.
-    const stripeNeighbors = a.some((pack) => {
-      const keys = pack.map((x) => x.key).sort();
-      // With 10 consecutive numeric keys, contiguous would keep many adjacent.
-      // Stripe of 80/8=10 should not keep f000..f009 all on one pack.
-      return false;
-    });
-    void stripeNeighbors;
     // f000 and f001 must not both land on the same pack when count divides span.
     // After sha1 sort they may not be neighbors; check counts instead.
     const counts = a.map((p) => p.length);
     expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
-    // CI active strategy is stripe (approach 2 after LPT miss).
-    expect(partitionForCi).toBe(partitionByStripe);
+    // CI active strategy is LPT over MEASURED weights (re-wired 2026-08-14
+    // after the harness splits; stripe re-measured WORSE than contiguous
+    // with real durations and stays rejected).
+    expect(partitionForCi).toBe(partitionByLpt);
   });
 
   it('rejects a non-positive shard count', () => {
@@ -174,27 +170,84 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     expect(assertPartitionCompleteness(items, packs)).toEqual({ ok: true });
   });
 
-  it('weights three/render/electron bodies above a plain small suite', () => {
-    const plain = weightForTestFile('tests/plain.test.ts', "import { it } from 'vitest';\n", 100);
-    const three = weightForTestFile(
-      'tests/render_heavy.test.ts',
-      "import * as THREE from 'three';\nimport { x } from '../src/render/foo.ts';\n",
-      100,
+  it('prefers a measured duration over every heuristic and falls back cleanly', () => {
+    // The whale must carry its real measured ms (not the static guess), and
+    // an unknown file must keep the heuristic path (never zero, never NaN).
+    const whale = MEASURED_WEIGHTS['tests/druid_balance_probe.test.ts'];
+    expect(whale).toBeGreaterThan(120_000);
+    expect(weightForTestFile('tests/druid_balance_probe.test.ts', '', 100)).toBe(whale);
+    const unknown = weightForTestFile(
+      'tests/not_yet_written.test.ts',
+      "import x from '../src/sim/sim';",
+      500,
     );
-    const electron = weightForTestFile(
-      'tests/electron_shell_guards.test.ts',
-      "import { app } from 'electron';\n",
-      100,
-    );
-    expect(three).toBeGreaterThan(plain);
-    expect(electron).toBeGreaterThan(plain);
+    expect(unknown).toBeGreaterThanOrEqual(1);
+    expect(Number.isFinite(unknown)).toBe(true);
   });
 
-  it('applies the duration overlay for known Phase 3 monsters', () => {
-    const base = weightForTestFile('tests/mail_expiry.test.ts', '', 1000);
-    // BASE 1000 + size 1000 + overlay 80_000
-    expect(DURATION_WEIGHT_OVERLAY['tests/mail_expiry.test.ts']).toBe(80_000);
-    expect(base).toBe(82_000);
+  it('carries a plausibly complete measured table with provenance', () => {
+    // Vacuity floor near the real harvest (2,709 files on 2026-08-14): a
+    // shrunken regeneration (e.g. harvested from a SELECTIVE run) must fail
+    // here, not silently unbalance the packs.
+    expect(Object.keys(MEASURED_WEIGHTS).length).toBeGreaterThanOrEqual(2_400);
+    // Realism: the table must carry real variance (a degenerate all-equal
+    // regeneration would balance trivially while measuring nothing).
+    const heavy = Object.values(MEASURED_WEIGHTS).filter((ms) => ms > 60_000).length;
+    expect(heavy).toBeGreaterThanOrEqual(5);
+    const raw = JSON.parse(
+      readFileSync(join(root, 'scripts/ci_shard_weights.generated.json'), 'utf8'),
+    ) as { __provenance?: { run?: string; files?: number } };
+    expect(raw.__provenance?.run).toMatch(/^\d+$/);
+    expect(raw.__provenance?.files).toBe(Object.keys(MEASURED_WEIGHTS).length);
+    for (const [file, ms] of Object.entries(MEASURED_WEIGHTS)) {
+      expect(file.startsWith('tests/'), file).toBe(true);
+      expect(ms).toBeGreaterThan(0);
+      expect(ms).toBeLessThan(20 * 60_000);
+    }
+  });
+
+  it('is wired as the live vitest sequencer', () => {
+    // Line-anchored on the RAW text (a block-comment strip would eat the
+    // config's own glob patterns): a `//`-commented wiring breaks the ^\s*
+    // anchor, so it cannot satisfy the pin.
+    const vite = readFileSync(join(root, 'vite.config.ts'), 'utf8');
+    expect(vite).toMatch(/^\s{4}sequence: \{ sequencer: BalancedSequencer \},$/m);
+    expect(vite).toMatch(
+      /^import \{ BalancedSequencer \} from '\.\/scripts\/ci_balanced_sequencer\.mjs';$/m,
+    );
+  });
+
+  it('gives every unknown file the measured-scale fallback (never the raw heuristic)', () => {
+    // The review round measured the import-cost heuristic on a different
+    // scale than real durations (unknowns claimed 18.7% of planned load and
+    // made the packing WORSE than contiguous), so with a non-empty table
+    // every unknown file gets exactly the measured median.
+    expect(MEASURED_FALLBACK_MS).toBeGreaterThan(0);
+    const values = Object.values(MEASURED_WEIGHTS).sort((a, b) => a - b);
+    expect(MEASURED_FALLBACK_MS).toBe(values[Math.floor(values.length / 2)]);
+    for (const [path, body] of [
+      ['tests/__synthetic_plain.test.ts', "import { it } from 'vitest';\n"],
+      ['tests/__synthetic_render_heavy.test.ts', "import * as THREE from 'three';\n"],
+      ['tests/__synthetic_electron.test.ts', "import { app } from 'electron';\n"],
+    ] as const) {
+      expect(weightForTestFile(path, body, 100)).toBe(MEASURED_FALLBACK_MS);
+    }
+  });
+
+  it('a table member returns exactly its measured ms, anchored independently', () => {
+    // The whale is DERIVED as the table argmax (rename-proof), with an
+    // absolute bound no heuristic or fallback can reach.
+    const [whaleFile, whaleMs] = Object.entries(MEASURED_WEIGHTS).sort((a, b) => b[1] - a[1])[0];
+    expect(whaleMs).toBeGreaterThan(120_000);
+    expect(weightForTestFile(whaleFile, '', 100)).toBe(whaleMs);
+    // A mid-table member with rich imports still returns its measured value,
+    // proving measured beats the heuristic path outright (the old additive
+    // overlay is deleted; mail_expiry's measured ms sits far below the 82k
+    // the overlay-era sum produced).
+    expect(MEASURED_WEIGHTS['tests/mail_expiry.test.ts']).toBeLessThan(80_000);
+    expect(weightForTestFile('tests/mail_expiry.test.ts', '', 1000)).toBe(
+      MEASURED_WEIGHTS['tests/mail_expiry.test.ts'],
+    );
   });
 
   it('partitions the real tests/ tree into N complete packs (suite completeness)', () => {
@@ -206,14 +259,26 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
       const size = statSync(abs).size;
       return { id: key, key, weight: weightForTestFile(key.slice(1), body, size) };
     });
-    // Active CI strategy (stripe).
+    // Active CI strategy (LPT over measured weights).
     const packs = partitionForCi(items, SHARD_N);
     expect(assertPartitionCompleteness(items, packs)).toEqual({ ok: true });
     const counts = packs.map((p) => p.length);
-    const sum = counts.reduce((a, b) => a + b, 0);
-    expect(sum).toBe(items.length);
-    // No empty pack when suite >> N; counts differ by at most 1.
+    expect(counts.reduce((a, b) => a + b, 0)).toBe(items.length);
     expect(counts.every((c) => c > 0)).toBe(true);
-    expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+    // LPT's contract is WEIGHTED balance, not count parity, and the bar is
+    // scored on MEASURED ms only (unknowns at the measured fallback), never
+    // on the planner's own weights: a self-referential bar passed cleanly
+    // while the real spread regressed (review round). 1.15 is the D11 bar.
+    const measuredLoad = (p: { key: string }[]) =>
+      p.reduce((s, x) => s + (MEASURED_WEIGHTS[x.key.slice(1)] ?? MEASURED_FALLBACK_MS), 0);
+    const loads = packs.map(measuredLoad);
+    const sorted = [...loads].sort((a, b) => a - b);
+    const mid = Math.floor(loads.length / 2);
+    const median = loads.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+    expect(Math.max(...loads) / median).toBeLessThanOrEqual(1.15);
+    // Table coverage over the real walked tree: staleness shows up as
+    // fallback churn, and below 95% the balance claim stops being measured.
+    const covered = items.filter((i) => MEASURED_WEIGHTS[i.key.slice(1)] !== undefined).length;
+    expect(covered / items.length).toBeGreaterThanOrEqual(0.95);
   });
 });

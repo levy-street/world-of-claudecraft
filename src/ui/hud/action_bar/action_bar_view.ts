@@ -25,6 +25,7 @@
 // Map, inventory is InvSlot[]); the core never reaches for a Sim-only field.
 
 import { afflictionPossessionEmpowers } from '../../../sim/combat/affliction';
+import { aetherDartsProcGlowActive } from '../../../sim/combat/chronomancy';
 import { destructionProcGlowActive, ruinAmountFromAuras } from '../../../sim/combat/destruction';
 import {
   freeCostAuraActive,
@@ -115,6 +116,11 @@ export interface ActionBarAbility {
    *  the sim gate checks, or a running shared clock is invisible while the
    *  button is transformed. */
   cooldownId?: string;
+  /** Talent-resolved drop of the def's stealth requirement (Cheap Trick on Gut
+   *  Punch). Baked by applyTalentMods, so BOTH worlds carry it on `known`, and
+   *  read by the sim's cast gate; the bar must read it too or the talent's one
+   *  button paints unusable while the cast it refuses to advertise succeeds. */
+  ignoreStealthRequirement?: boolean;
 }
 
 /** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
@@ -647,16 +653,18 @@ export function createActionBarView(
           primaryEyeReady &&
           dominionReady &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
-          (!def.requiresStealth || world.stealthed);
+          (!def.requiresStealth || world.stealthed || ability.ignoreStealthRequirement === true);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
-        // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
-        // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
-        // sim predicate idiom as freeCostAuraActive above).
+        // Spec resources/procs share pure sim predicates so the bar and combat
+        // agree: Frost lights Ice Lance on a banked Fingers of Frost and Flurry
+        // on an armed Brain Freeze (combat/frost_mage.ts), while a full
+        // Chronomancy charge bank lights Aether Darts as the actionable spender
+        // (combat/chronomancy.ts).
         const divineAscensionActive =
           (player.paladinDevotion?.ascensionCharges ?? 0) > 0 &&
           (player.paladinDevotion?.ascensionRemaining ?? 0) > 0;
@@ -673,6 +681,7 @@ export function createActionBarView(
           radiantResonanceActive ||
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
+          aetherDartsProcGlowActive(player.auras ?? [], def.id) ||
           destructionProcGlowActive(player.auras ?? [], def.id) ||
           packlordActionGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||

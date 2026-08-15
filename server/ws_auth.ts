@@ -362,6 +362,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
       pendingLeaseJoins.add(character.id);
       try {
+        let admittedCharacter = character;
         let leaseNonce: string | undefined;
         let result: ReturnType<GameServer['join']>;
         if (game.hasSessionForCharacter(character.id)) {
@@ -436,14 +437,48 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               rejectHandshake(ws, WS_AUTH_ERROR.alreadyInWorld);
               return;
             }
+
+            // The rollback migration fences new admissions by locking the lease
+            // table. A handshake can read the character before that lock, then wait
+            // here until the migration commits. Reload only AFTER the lease is ours
+            // so game.join never receives the stale pre-migration JSON. Conversely,
+            // when this lease lands first, the migration sees it and refuses apply.
+            // If the reload fails, release the lease before propagating/rejecting so
+            // an unavailable row cannot strand the character until lease expiry.
+            try {
+              const refreshedCharacter = await getCharacter(accountId, character.id);
+              if (!refreshedCharacter) {
+                await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+                  console.error('lease release failed:', err),
+                );
+                leaseNonce = undefined;
+                rejectHandshake(ws, WS_AUTH_ERROR.noSuchCharacter);
+                return;
+              }
+              if (refreshedCharacter.force_rename) {
+                await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+                  console.error('lease release failed:', err),
+                );
+                leaseNonce = undefined;
+                rejectHandshake(ws, WS_AUTH_ERROR.forceRename);
+                return;
+              }
+              admittedCharacter = refreshedCharacter;
+            } catch (err) {
+              await releaseCharacterLease(character.id, leaseNonce).catch((releaseErr) =>
+                console.error('lease release failed:', releaseErr),
+              );
+              leaseNonce = undefined;
+              throw err;
+            }
             result = game.join(
               ws,
               accountId,
-              character.id,
-              character.name,
-              character.class,
-              character.state,
-              character.is_gm,
+              admittedCharacter.id,
+              admittedCharacter.name,
+              admittedCharacter.class,
+              admittedCharacter.state,
+              admittedCharacter.is_gm,
               {
                 ...joinMeta,
                 leaseNonce,
@@ -476,7 +511,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           return;
         }
         const session = result;
-        console.log(`+ ${character.name} (${character.class}) joined, ${game.clients.size} online`);
+        console.log(
+          `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
+        );
         ws.on('message', (data) => {
           game.handleMessage(session, String(data));
         });
@@ -524,7 +561,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // saves. Every other socketClosed caller keeps the market halves.
         if (ws.readyState !== ws.OPEN && game.socketClosed(session, ws, { withMarket: false })) {
           console.log(
-            `~ ${character.name} socket died mid-handshake, entering linkdead, ${game.clients.size} online`,
+            `~ ${admittedCharacter.name} socket died mid-handshake, entering linkdead, ${game.clients.size} online`,
           );
         }
       } finally {

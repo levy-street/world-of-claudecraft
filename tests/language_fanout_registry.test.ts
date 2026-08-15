@@ -93,6 +93,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
+  'this.riftPainter.relocalize|',
   'this.targetFrameMover.relocalize|',
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
@@ -311,9 +312,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'market_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastSig', 'lastSellPriceRefSig'],
     answer: 'this.marketWindow.render',
-    why: 'the listing ids, prices and the active tab; render() carries no self-gate',
+    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig',
   },
   {
     file: 'professions_window.ts',
@@ -383,6 +384,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly memos: readonly string[] | 'coordinator';
   readonly reason: string;
 }> = [
+  {
+    file: 'map_semantic_accessibility_core.ts',
+    memos: ['lastHash', 'lastLanguage'],
+    reason:
+      'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
   {
     file: 'claudium_window.ts',
     memos: ['paintedWalletMarkup'],
@@ -683,7 +690,10 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // no text); fillGrid rebuilds every cell unconditionally and the
       // existing bags fan-out arm repaints the window wholesale on a locale
       // switch.
-    ).toBe(8);
+      // 9 as of map semantic accessibility: lastHash is paired with
+      // lastLanguage in the same guard, so getLanguage() changing explicitly
+      // invalidates the localized summary without a separate fan-out arm.
+    ).toBe(9);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

@@ -6,7 +6,6 @@ import { grantShadowCredit } from './warlock_talents';
 
 export const AFFLICTION_DOOM_MAX = 100;
 export const AFFLICTION_DOOM_DURATION = 20;
-export const AFFLICTION_DOOM_WARNING = 5;
 export const AFFLICTION_EYE_DEATH_GAIN = 10;
 export const FATE_THREAD_MAX = 3;
 export const FATE_THREAD_DURATION = 12;

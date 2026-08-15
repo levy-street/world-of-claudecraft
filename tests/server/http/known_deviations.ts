@@ -62,7 +62,6 @@ export const DEVIATION_ID = {
   mapsAssetsRateLimitedBodyToCode: 'maps-assets-rate-limited-body-to-code',
   mapsAssetsIdParamDecode: 'maps-assets-id-param-decode-422',
 } as const;
-export type DeviationId = (typeof DEVIATION_ID)[keyof typeof DEVIATION_ID];
 
 export interface KnownDeviation {
   // Kebab-style unique id (a value of DEVIATION_ID).

@@ -74,6 +74,8 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   // badge variant (the set_ai / note reasoning).
   restore_item: 'moderationHistory.actionRestoreItem',
   restore_slot: 'moderationHistory.actionRestoreSlot',
+  cheater_mark: 'moderationHistory.actionCheaterMark',
+  cheater_mark_lift: 'moderationHistory.actionCheaterMarkLift',
   // Realm-scoped rather than account-scoped: written by the guild backoffice into
   // guild_moderation_actions, surfaced only by the realm-wide page. The closed
   // set is server/admin_db.ts GUILD_MODERATION_ACTIONS, pinned in
@@ -83,7 +85,15 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
 };
 
 const BAD_ACTIONS = new Set(['ban', 'block', 'daily_rewards_ban', 'daily_rewards_ip_ban']);
-const WARN_ACTIONS = new Set(['suspend', 'chat_mute', 'reset_password', 'kick', 'kill', 'jail']);
+const WARN_ACTIONS = new Set([
+  'suspend',
+  'chat_mute',
+  'reset_password',
+  'kick',
+  'kill',
+  'jail',
+  'cheater_mark',
+]);
 const GOOD_ACTIONS = new Set([
   'unban',
   'unsuspend',
@@ -94,6 +104,7 @@ const GOOD_ACTIONS = new Set([
   'daily_rewards_ip_unban',
   'reactivate',
   'chat_strikes_reset',
+  'cheater_mark_lift',
 ]);
 
 export function moderationActionLabel(action: string): string {

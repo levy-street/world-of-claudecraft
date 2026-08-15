@@ -10,32 +10,50 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "es_ES": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "fr_FR": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "fr_CA": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "de_DE": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
@@ -45,47 +63,74 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "nl_NL": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "pl_PL": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "id_ID": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "tr_TR": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "sv_SE": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "vi_VN": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"
   ],
   "da_DK": [
+    "entities.abilities.challenging_roar.description",
+    "entities.abilities.challenging_roar.name",
+    "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
     "hudChrome.mounts.name_goblin_rocket_sled"

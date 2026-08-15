@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -13,11 +14,12 @@ import {
   resolveSelectBase,
 } from '../scripts/lib/gate_discovery.mjs';
 import {
-  buildAlwaysRunArgs,
   buildFullSuiteArgs,
-  buildRelatedArgs,
+  buildSelectiveLegArgs,
   buildSelectPlan,
   classifySelectPaths,
+  FLOOR_SANITY_MIN,
+  planSelectiveLegs,
 } from '../scripts/lib/gate_select_plan.mjs';
 import {
   buildAlwaysRunSet,
@@ -226,19 +228,21 @@ describe('selective gate planning', () => {
     },
   );
 
-  it('classifies paths into the five planner buckets', () => {
+  it('classifies paths into the six planner buckets', () => {
     const c = classifySelectPaths([
       'src/sim/sim.ts',
       'tests/threat.test.ts',
       'package.json',
       'docs/x.md',
       'src/ui/i18n.resolved.generated/en.ts',
+      'src/game/sfx_manifest.generated.ts',
     ]);
     expect(c.relatedSources).toEqual(['src/sim/sim.ts']);
     expect(c.testFiles).toEqual(['tests/threat.test.ts']);
     expect(c.broadConfigs).toEqual(['package.json']);
     expect(c.nonCode).toEqual(['docs/x.md']);
     expect(c.generatedI18n).toEqual(['src/ui/i18n.resolved.generated/en.ts']);
+    expect(c.generatedManifests).toEqual(['src/game/sfx_manifest.generated.ts']);
   });
 
   // Generated i18n artifacts: never widen while present (pr-checks and the
@@ -345,10 +349,13 @@ describe('selective gate planning', () => {
   });
 
   it('keeps every other generated tree a full-suite widen', () => {
+    // The SFX/guide/media manifests moved to the freshness-guarded family
+    // (GENERATED_MANIFEST_ARTIFACT_FILES; their arms are below), so the
+    // widen examples here are generated paths OUTSIDE both families.
     for (const p of [
-      'src/game/sfx_manifest.generated.ts',
-      'src/guide/content.generated.ts',
       'src/ui/map_bg_manifest.generated.ts',
+      'src/editor/asset_catalog.generated.ts',
+      'src/sim/thornhollow_field.generated.ts',
     ]) {
       const plan = buildSelectPlan({
         changedPaths: [p],
@@ -359,29 +366,176 @@ describe('selective gate planning', () => {
       expect(plan.reason).toContain('broad/unclassified change');
     }
   });
+
+  it('feeds a present manifest artifact to related without widening', () => {
+    const plan = buildSelectPlan({
+      changedPaths: [
+        'src/game/sfx_manifest.generated.ts',
+        'src/render/assets/manifest.generated.ts',
+      ],
+      alwaysRunFiles: ALWAYS,
+      exists: () => true,
+    });
+    expect(plan.mode).toBe('selective');
+    expect(plan.relatedSources).toEqual([
+      'src/game/sfx_manifest.generated.ts',
+      'src/render/assets/manifest.generated.ts',
+    ]);
+    expect(plan.reason).toContain(
+      '2 generated manifest artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('names both artifact families in one reason when a diff carries both', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/ui/i18n.resolved.generated/en.ts', 'src/game/sfx_manifest.generated.ts'],
+      alwaysRunFiles: ALWAYS,
+      exists: () => true,
+    });
+    expect(plan.mode).toBe('selective');
+    expect(plan.reason).toContain(
+      '1 generated i18n artifact(s) fed to related (freshness-guarded)',
+    );
+    expect(plan.reason).toContain(
+      '1 generated manifest artifact(s) fed to related (freshness-guarded)',
+    );
+  });
+
+  it('falls back to the FULL suite when a changed manifest is missing from the tree', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/guide/content.generated.ts'],
+      alwaysRunFiles: ALWAYS,
+      exists: (p) => p !== 'src/guide/content.generated.ts',
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('generated manifest artifact(s) removed');
+  });
+
+  it('falls back to the FULL suite when the caller cannot verify manifest existence', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/guide/content.generated.ts'],
+      alwaysRunFiles: ALWAYS,
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain(
+      'generated manifest artifact(s) changed but existence cannot be verified',
+    );
+  });
 });
 
 describe('selective gate argv', () => {
-  it('builds the always-run leg with an explicit file list', () => {
-    expect(buildAlwaysRunArgs({ files: ['tests/a.test.ts'], workers: 7 })).toEqual([
-      'run',
-      'tests/a.test.ts',
-      '--maxWorkers=7',
+  it('POSIX plans exactly ONE strict merged leg, sources before floor seeds', () => {
+    const legs = planSelectiveLegs({
+      relatedSources: ['src/x.ts'],
+      alwaysRunFiles: ['tests/a.test.ts', 'tests/b.test.ts'],
+      platform: 'darwin',
+    });
+    expect(legs).toEqual([
+      {
+        kind: 'merged-related',
+        files: ['src/x.ts', 'tests/a.test.ts', 'tests/b.test.ts'],
+        strict: true,
+      },
     ]);
-  });
-
-  it('builds the related leg as a subcommand, not a flag', () => {
-    expect(buildRelatedArgs({ sources: ['src/x.ts'], workers: 4 })).toEqual([
+    // The =false spelling is load-bearing: the related subcommand defaults
+    // the flag TRUE via ??=, so a bare flag would let an empty collection
+    // exit 0 on the merge bar.
+    expect(buildSelectiveLegArgs(legs[0], 4)).toEqual([
       'related',
       'src/x.ts',
+      'tests/a.test.ts',
+      'tests/b.test.ts',
       '--run',
-      '--passWithNoTests',
+      '--passWithNoTests=false',
       '--maxWorkers=4',
     ]);
   });
 
-  it('returns null for the related leg when nothing changed', () => {
-    expect(buildRelatedArgs({ sources: [], workers: 4 })).toBeNull();
+  it('win32 keeps the classic two-leg shape (related cannot match seeds there)', () => {
+    // vitest 4.1.10 resolves `related` seeds without slash-normalizing on
+    // win32 while moduleIds are slashed, so a merged leg matches NOTHING;
+    // the floor must stay on `vitest run` chunks with the tolerant related
+    // leg beside it.
+    const floor = Array.from({ length: 400 }, (_, i) => `tests/floor_${i}_long_name.test.ts`);
+    const legs = planSelectiveLegs({
+      relatedSources: ['src/x.ts'],
+      alwaysRunFiles: floor,
+      platform: 'win32',
+    });
+    const floorLegs = legs.filter((l) => l.kind === 'floor-run');
+    expect(floorLegs.length).toBeGreaterThan(1);
+    expect(floorLegs.flatMap((l) => l.files)).toEqual(floor);
+    for (const leg of floorLegs) expect(leg.files.length).toBeGreaterThan(0);
+    expect(buildSelectiveLegArgs(floorLegs[0], 2).slice(0, 1)).toEqual(['run']);
+    const related = legs[legs.length - 1];
+    expect(related.kind).toBe('tolerant-related');
+    expect(buildSelectiveLegArgs(related, 2)).toEqual([
+      'related',
+      'src/x.ts',
+      '--run',
+      '--passWithNoTests',
+      '--maxWorkers=2',
+    ]);
+    // No sources: no related leg at all (the retired null-return arm's heir).
+    const floorOnly = planSelectiveLegs({
+      relatedSources: [],
+      alwaysRunFiles: floor,
+      platform: 'win32',
+    });
+    expect(floorOnly.every((l) => l.kind === 'floor-run')).toBe(true);
+  });
+
+  it('plans the REAL floor as one strict POSIX leg (derived, not hand-picked)', () => {
+    const { alwaysRun } = collectSuiteVisibility({
+      root: REPO_ROOT,
+      readdirSync,
+      readFileSync,
+      join: path.join,
+      relative: path.relative,
+      sep: path.sep,
+    });
+    expect(alwaysRun.length).toBeGreaterThan(FLOOR_SANITY_MIN);
+    const legs = planSelectiveLegs({
+      relatedSources: ['src/sim/sim.ts'],
+      alwaysRunFiles: alwaysRun,
+      platform: 'linux',
+    });
+    expect(legs).toHaveLength(1);
+    expect(legs[0].kind).toBe('merged-related');
+    expect(buildSelectiveLegArgs(legs[0], 8)).toContain('--passWithNoTests=false');
+  });
+
+  it('falls back to the FULL suite when the floor is implausibly small (opt-in)', () => {
+    const plan = buildSelectPlan({
+      changedPaths: ['src/render/nameplates.ts'],
+      alwaysRunFiles: ['tests/a.test.ts'],
+      floorSanityMin: FLOOR_SANITY_MIN,
+    });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('implausibly small');
+  });
+
+  it('chunkFileArgs returns no chunks for an empty input (the caller must guard)', () => {
+    expect(chunkFileArgs({ files: [] })).toEqual([]);
+  });
+
+  it('wires the planner, the sanity floor, and the zero-leg guard at both entrypoints', () => {
+    // Comment-stripped source pins (a commented-out call must not satisfy
+    // them): both live callers build their legs from the shared planner,
+    // gate_select opts into the sanity floor and fails closed on zero legs.
+    for (const entry of ['scripts/gate_select.mjs', 'scripts/gate_shadow.mjs']) {
+      const text = readFileSync(path.join(REPO_ROOT, entry), 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[^:])\/\/.*$/gm, '$1');
+      expect(text, entry).toContain('planSelectiveLegs({');
+      expect(text, entry).toContain('buildSelectiveLegArgs(');
+    }
+    const gateText = readFileSync(path.join(REPO_ROOT, 'scripts/gate_select.mjs'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(gateText).toContain('floorSanityMin: FLOOR_SANITY_MIN');
+    expect(gateText).toContain('legs.length === 0 || liveFloor.length === 0');
+    expect(gateText).toContain('empty selective legs');
   });
 
   it('builds the full-suite fallback with no file filter', () => {
@@ -540,6 +694,63 @@ describe('branch diff resolution', () => {
     expect(r.base).toBeNull();
   });
 
+  it('reports a Git child-process launch error instead of replacing it with a base miss', () => {
+    const r = resolveSelectBase({
+      env: {},
+      run: () => ({
+        status: null,
+        stdout: '',
+        error: new Error('spawnSync git ENOENT'),
+      }),
+    });
+    expect(r).toEqual({ base: null, reason: 'git failed to launch: spawnSync git ENOENT' });
+  });
+
+  it('still falls back after an ordinary nonzero release-listing result', () => {
+    const r = resolveSelectBase({
+      env: {},
+      run: (_c, args) => {
+        if (args[0] === 'for-each-ref') return { status: 1, stdout: '' };
+        return args.includes('origin/main^{commit}')
+          ? { status: 0, stdout: '' }
+          : { status: 128, stdout: '' };
+      },
+    });
+    expect(r.base).toBe('origin/main');
+  });
+
+  // #3225: on win32, gate_select.mjs, gate_shadow.mjs, and ci_changed.mjs used
+  // to spawn git with shell:true. cmd.exe treats `^` as its own escape
+  // character, so the `<ref>^{commit}` peel this probe sends arrives at git
+  // as `<ref>{commit}`, which is not a resolvable revision: every candidate
+  // base fails, even one that would resolve fine unmangled. `caretAwareRun`
+  // answers the SAME rev-parse probe two ways off the SAME available ref, so
+  // only the mangling (not a missing ref) can flip the outcome: a run that
+  // sees the caret survive resolves fine, one that strips it exactly as
+  // cmd.exe does cannot. (A run that returned 128 unconditionally, regardless
+  // of mangling, would pass both tests below vacuously; this one cannot.)
+  const caretAwareRun =
+    (mangle: boolean) =>
+    (_c: string, args: string[]): { status: number | null; stdout: string } => {
+      if (args[0] === 'for-each-ref') return { status: 0, stdout: 'origin/release/v1\n' };
+      if (args[0] === 'rev-parse') {
+        const probe = mangle ? args[2]?.replace(/\^/g, '') : args[2];
+        return { status: probe === 'origin/release/v1^{commit}' ? 0 : 128, stdout: '' };
+      }
+      return { status: 0, stdout: '' };
+    };
+
+  it('resolves the base fine when the caret peel survives unmangled', () => {
+    const r = resolveSelectBase({ env: {}, run: caretAwareRun(false) });
+    expect(r.base).toBe('origin/release/v1');
+  });
+
+  it('never resolves a base if the caret peel arrives cmd.exe-mangled', () => {
+    const r = resolveSelectBase({ env: {}, run: caretAwareRun(true) });
+    expect(r.base).toBeNull();
+    expect(r.reason).toBe('no release branch or origin base could be resolved');
+  });
+
   // A swallowed git failure narrows the run silently, which is the one direction
   // this design must never fail in.
   it('throws rather than returning an empty changed set when git fails', () => {
@@ -549,6 +760,67 @@ describe('branch diff resolution', () => {
         run: () => ({ status: 128, stdout: '', stderr: 'bad revision' }),
       }),
     ).toThrow(/bad revision/);
+  });
+
+  // The actual fix for the mangling reproduced above: none of the three
+  // entry points that resolve a base through resolveSelectBase (gate_select,
+  // gate_shadow, and ci_changed, which gate_select's own step list runs via
+  // `npm run ci:changed`, #3225) may ever route their git spawn through a
+  // shell, on any platform, since git needs none (unlike vitest.cmd/npx,
+  // which is why `shell` legitimately survives elsewhere in all three files
+  // for THOSE spawns). Anchored on `encoding: 'utf8'`, the option unique to
+  // the git-spawning call in every file (the OTHER spawnSync calls each file
+  // makes carry `stdio: 'inherit'` instead), so this cannot accidentally
+  // match one of those and pass vacuously.
+  it('gate_select.mjs, gate_shadow.mjs, and ci_changed.mjs spawn git without a shell (#3225)', () => {
+    for (const file of [
+      'scripts/gate_select.mjs',
+      'scripts/gate_shadow.mjs',
+      'scripts/ci_changed.mjs',
+    ]) {
+      const src = readFileSync(path.join(REPO_ROOT, file), 'utf8');
+      const gitCall = src.match(/spawnSync\(cmd, args, \{ encoding: 'utf8', [^}]*\}\)/)?.[0];
+      expect(
+        gitCall,
+        `${file}: expected git-spawning spawnSync call not found in its known shape`,
+      ).toBeTruthy();
+      expect(
+        gitCall,
+        `${file}: git spawn must explicitly disable the shell (cmd.exe mangles the ^{commit} peel)`,
+      ).toMatch(/shell:\s*false/);
+      expect(gitCall).not.toMatch(/shell:\s*true|\bshell\s*[,}]/);
+    }
+  });
+
+  it.each([
+    [
+      'scripts/ci_changed.mjs',
+      '[ci:changed] ci:changed: could not resolve a --since base ref (git failed to launch: spawnSync git ENOENT)',
+    ],
+    [
+      'scripts/gate_shadow.mjs',
+      '[gate:shadow] cannot resolve a branch base: git failed to launch: spawnSync git ENOENT',
+    ],
+  ])('%s prints the Git launch error and exits 1', (script, diagnostic) => {
+    const emptyPath = mkdtempSync(path.join(tmpdir(), 'wocc-no-git-'));
+    try {
+      const env = Object.fromEntries(
+        Object.entries(process.env).filter(([key]) => key.toLowerCase() !== 'path'),
+      );
+      env.PATH = emptyPath;
+      delete env.GATE_SELECT_BASE;
+      const result = spawnSync(process.execPath, [path.join(REPO_ROOT, script)], {
+        cwd: REPO_ROOT,
+        encoding: 'utf8',
+        env,
+      });
+      expect(result.status).toBe(1);
+      expect(result.signal).toBeNull();
+      expect(result.stdout).toBe('');
+      expect(result.stderr.trim()).toBe(diagnostic);
+    } finally {
+      rmSync(emptyPath, { recursive: true, force: true });
+    }
   });
 
   it('unions branch, working-tree, and untracked changes', () => {
@@ -627,7 +899,7 @@ describe('deleted test files never reach the argv', () => {
   });
 });
 
-describe('argv chunking for the always-run leg', () => {
+describe('argv chunking for the win32 floor legs', () => {
   it('keeps every chunk under the limit and loses no file', () => {
     const files = Array.from({ length: 500 }, (_, i) => `tests/some_fairly_long_name_${i}.test.ts`);
     const chunks = chunkFileArgs({ files, limit: 6000 });

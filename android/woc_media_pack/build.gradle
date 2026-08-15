@@ -6,11 +6,11 @@
 // exactly how Capacitor serves the web tree (AndroidProtocolHandler ->
 // context.getAssets()), so the WebView sees one unchanged public/ tree.
 //
-// The assets under src/main/assets/ are NOT checked in: they are relocated
-// out of app/src/main/assets/public by scripts/native_assets_pack.mjs, which
-// npm run native:sync runs after every cap sync. The solanaStore flavor (a
-// plain APK, no Play delivery) merges this same directory back into its own
-// assets via a sourceSets entry in app/build.gradle.
+// The assets under src/main/assets/ are NOT checked in. The
+// relocateHeavyWebAssets Gradle task in app/build.gradle derives their location
+// for each build: bundle builds move public/media and public/audio from the app
+// base into this install-time pack, while APK builds ensure those directories
+// live in the app base, restoring them from the pack after a bundle build.
 apply plugin: 'com.android.asset-pack'
 
 assetPack {

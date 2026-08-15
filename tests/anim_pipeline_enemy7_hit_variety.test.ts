@@ -58,14 +58,6 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
     const consumers: [string, string, string][] = [
       ['mob_kobold', 'goblin_hit_variety_anims.glb', 'clips: KOBOLD_ENEMY7'],
       ['mob_ogre', 'giant_hit_variety_anims.glb', 'clips: ENEMY7'],
-      // The authored kobold body shares the goblin rig's donor: its own drop
-      // authors HitRecieve but not the heavy stagger. It carries plain ENEMY7
-      // (its drop authors Attack), so unlike mob_kobold it takes no override.
-      ['mob_kobold_digger', 'goblin_hit_variety_anims.glb', 'clips: ENEMY7'],
-      // Grix leans on the donor HARDER: his drop authors no hit reaction at all,
-      // so HitRecieve_Heavy out of this GLB is his only hit clip, and his GRIX
-      // ClipMap narrows ENEMY7's hit array to it alone.
-      ['mob_grix', 'goblin_hit_variety_anims.glb', 'clips: GRIX'],
     ];
     for (const [key, file, clipsLine] of consumers) {
       const idx = MANIFEST_SRC.indexOf(`  ${key}: {`);
@@ -74,6 +66,27 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
       const block = MANIFEST_SRC.slice(idx, end);
       expect(block, key).toContain(clipsLine);
       expect(block, `${key} animUrls`).toContain(file);
+    }
+    // The two authored mixamorig drops (kobold.glb, grix.glb) must NOT consume
+    // the goblin-rig donor: its tracks target Head/Arm.L/Arm.R/Body, none of
+    // which exist on a mixamorig skeleton, so on these bodies the clip
+    // resolved by name and bound nothing, freezing the rig mid-pose on every
+    // hit taken (the Grix the Tunnelking statue). The binding gate in
+    // tests/character_clipmaps.test.ts owns the general rule; these pins keep
+    // the two known-bad wirings from quietly returning.
+    const nonConsumers: [string, string][] = [
+      ['mob_kobold_digger', 'clips: KOBOLD_DIGGER'],
+      ['mob_grix', 'clips: GRIX'],
+    ];
+    for (const [key, clipsLine] of nonConsumers) {
+      const idx = MANIFEST_SRC.indexOf(`  ${key}: {`);
+      expect(idx, key).toBeGreaterThanOrEqual(0);
+      const end = MANIFEST_SRC.indexOf('\n  },', idx);
+      const block = MANIFEST_SRC.slice(idx, end);
+      expect(block, key).toContain(clipsLine);
+      expect(block, `${key} must not wire the goblin-rig donor`).not.toContain(
+        'goblin_hit_variety_anims.glb',
+      );
     }
     // Scoped to this family's own donor basenames: an unscoped
     // `_hit_variety_anims.glb` count also picks up unrelated families
