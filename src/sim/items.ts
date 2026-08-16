@@ -1002,7 +1002,17 @@ export function useItem(
       value: elx.value,
       sourceId: p.id,
       school: 'nature',
-      ...(isFlask ? { flask: true as const } : {}),
+      // A flask also stamps undispellable (phase 10 QA STK-2 ruling, taken
+      // 2026-08-16): classic consumable buffs carried no dispel type, so an
+      // offensive dispel skips a flask and Spellplunder cannot take one (the
+      // steal copies the WHOLE aura, flask marker included, so a stolen flask
+      // would ride the thief's own singleton/refusal/death rules). The flag's
+      // standing rule also makes the flask non-right-click-cancelable and it
+      // is accepted deliberately: the elixir/scroll sources of the same aura
+      // id stay dispellable and cancelable. The mob Spellgnaw devour affix
+      // reads neither flag and still eats a flask (recorded exception: the
+      // ruling covers player counters; see mob/mob_swing.ts isDevourableAura).
+      ...(isFlask ? { flask: true as const, undispellable: true as const } : {}),
     });
     if (def.kind === 'scroll') {
       ctx.emit({

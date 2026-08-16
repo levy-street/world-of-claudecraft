@@ -113,6 +113,54 @@ describe('Talents V2 dispel and steal primitives', () => {
     expect(stolen?.sourceId).toBe(sim.player.id);
   });
 
+  it('cannot take a flask: the undispellable stamp shields it and no marker reaches the thief', () => {
+    // The phase 10 QA STK-2 ruling (2026-08-16): the flask mint stamps
+    // `undispellable` beside the flask marker (src/sim/items.ts useItem), and
+    // the steal copies the WHOLE aura, marker included, so an unshielded
+    // stolen flask would ride the thief's own singleton, downward-refusal, and
+    // death-persistence rules. The worn shape here is the exact mint shape,
+    // and it is FIRST in the target's aura array so the skip is what decides:
+    // with the stamp reverted, the steal takes the flask instead of the
+    // blessing and every assertion below reds.
+    const sim = new Sim({
+      seed: 24,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const enemy = addHostile(sim);
+    enemy.auras.push({
+      ...aura(enemy, 'elixir_buff_sta', 'buff_sta', 15, 'nature'),
+      flask: true as const,
+      undispellable: true as const,
+    });
+    enemy.auras.push(aura(enemy, 'magic_blessing', 'buff_spellpower', 40, 'holy'));
+
+    runAbilityEffect(sim, enemy, 'spellsteal');
+
+    expect(enemy.auras.some((entry) => entry.id === 'elixir_buff_sta')).toBe(true);
+    expect(enemy.auras.some((entry) => entry.id === 'magic_blessing')).toBe(false);
+    expect(sim.player.auras.some((entry) => entry.id === 'elixir_buff_sta')).toBe(false);
+
+    // With ONLY the flask worn, the steal has nothing to take: no flask marker
+    // ever lands on the thief.
+    const sim2 = new Sim({
+      seed: 25,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const enemy2 = addHostile(sim2);
+    enemy2.auras.push({
+      ...aura(enemy2, 'elixir_buff_ap', 'buff_ap', 15, 'nature'),
+      flask: true as const,
+      undispellable: true as const,
+    });
+    runAbilityEffect(sim2, enemy2, 'spellsteal');
+    expect(enemy2.auras.some((entry) => entry.id === 'elixir_buff_ap')).toBe(true);
+    expect(sim2.player.auras.some((entry) => entry.flask === true)).toBe(false);
+  });
+
   it('does not steal permanent stance-style magic auras', () => {
     const sim = new Sim({ seed: 21, playerClass: 'mage', autoEquip: true });
     const enemy = addHostile(sim);

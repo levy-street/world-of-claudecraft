@@ -20,6 +20,8 @@
 // in tests/masterwrought_budget.test.ts; this file pins what the sim DOES with
 // them.
 import { describe, expect, it } from 'vitest';
+import { isDispellableAura } from '../src/sim/aura_classify';
+import { isCancelableAura } from '../src/sim/combat/aura_cancel';
 import { DELVES, isDelvePos } from '../src/sim/data';
 import { ejectToDelveDoor } from '../src/sim/delves/runs';
 import { Sim } from '../src/sim/sim';
@@ -604,5 +606,52 @@ describe('the phase 10 consumables reach a real player', () => {
     expect(withFlask, 'stamina from the flask reaches the pool').toBeGreaterThan(baseHp);
     use(sim, pid, WARBOAR);
     expect(p.maxHp, 'shedding it takes the pool back down').toBe(baseHp);
+  });
+});
+
+describe('flask auras are undispellable (the phase 10 QA STK-2 ruling, 2026-08-16)', () => {
+  // Classic consumable buffs carried no dispel type, so the mint stamps
+  // `undispellable` BESIDE the flask marker: offensive dispel and Spellplunder
+  // skip a flask (the steal-side behavior is pinned in
+  // tests/talent_effect_primitives_v026.test.ts on the real spellsteal path),
+  // and per the flag's standing rule a flask is also not right-click
+  // cancelable, accepted deliberately. The elixir and scroll sources of the
+  // SAME aura family stay plain, so they remain dispellable and cancelable:
+  // that is the negative control keeping the stamp from reading as a blanket
+  // family rule. The mob Spellgnaw devour affix reads neither flag and still
+  // eats a flask, the recorded exception (tests/mob_purge.test.ts).
+  it.each([
+    [IRONHUSK, STA_FAMILY],
+    [WARBOAR, AP_FAMILY],
+    [RUNEWATER, INT_FAMILY],
+  ] as const)('%s mints its aura with undispellable beside the marker', (itemId, familyId) => {
+    const { sim, pid, p } = world();
+    use(sim, pid, itemId);
+    const worn = aurasById(p, familyId);
+    expect(worn, 'the flask aura landed').toHaveLength(1);
+    expect(worn[0].flask).toBe(true);
+    expect(worn[0].undispellable).toBe(true);
+    // The classification the dispel executor and the cancel path both read.
+    expect(isDispellableAura(worn[0], true), 'offensive dispel skips it').toBe(false);
+    expect(isDispellableAura(worn[0], false), 'defensive dispel skips it').toBe(false);
+    expect(isCancelableAura(worn[0]), 'right-click cancel refuses it').toBe(false);
+  });
+
+  it('the elixir and scroll sources of the same family stay dispellable and cancelable', () => {
+    const { sim, pid, p } = world();
+    use(sim, pid, SERPENT);
+    const elixirAura = aurasById(p, STA_FAMILY);
+    expect(elixirAura).toHaveLength(1);
+    expect(elixirAura[0].flask).toBeUndefined();
+    expect(elixirAura[0].undispellable).toBeUndefined();
+    expect(isDispellableAura(elixirAura[0], true), 'an elixir is still stealable').toBe(true);
+    expect(isCancelableAura(elixirAura[0]), 'an elixir still cancels').toBe(true);
+
+    const second = world(43);
+    use(second.sim, second.pid, SUNPETAL_SCROLL);
+    const scrollAura = aurasById(second.p, STA_FAMILY);
+    expect(scrollAura).toHaveLength(1);
+    expect(scrollAura[0].flask).toBeUndefined();
+    expect(scrollAura[0].undispellable).toBeUndefined();
   });
 });

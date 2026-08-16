@@ -86,6 +86,38 @@ describe('mob purge affix (Spellgnaw)', () => {
     expect(player.auras.length).toBe(1); // exactly one eaten
   });
 
+  it('still devours a flask aura: the STK-2 ruling covers player counters only (recorded exception)', () => {
+    // The phase 10 QA STK-2 ruling (2026-08-16) stamps flask auras
+    // `undispellable`, which routes every PLAYER counter (dispel, purge,
+    // cleanse, Spellplunder, right-click cancel) through
+    // isPlayerRemovableAura's refusal. The mob Spellgnaw devour affix reads
+    // NEITHER flag: isDevourableAura is a bare beneficial-buff test, so a mob
+    // purge still eats a flask. Deliberate and recorded (the ruling's text
+    // names the player-driven counters; mob affix balance is untouched); if
+    // the maintainer ever widens the ruling to mobs, this pin is the one that
+    // flips.
+    const sim = makeSim();
+    const player = sim.player;
+    spawnGrubjaw(sim);
+    player.auras = [];
+    const flask: Aura = {
+      id: 'elixir_buff_sta',
+      name: 'Ironhusk Vigor',
+      kind: 'buff_sta',
+      remaining: 1200,
+      duration: 1200,
+      value: 15,
+      sourceId: player.id,
+      school: 'nature',
+      flask: true,
+      undispellable: true,
+    };
+    player.auras.push(flask);
+    const removed = devourBeneficialAura((sim as any).ctx, player, 'Spellgnaw');
+    expect(removed).toBe(true);
+    expect(player.auras.some((a) => a.id === 'elixir_buff_sta')).toBe(false);
+  });
+
   it('never strips a debuff or a negative buff_* drain', () => {
     const sim = makeSim();
     const player = sim.player;

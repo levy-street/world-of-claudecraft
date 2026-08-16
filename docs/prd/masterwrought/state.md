@@ -4497,6 +4497,33 @@ recorded, or refuted with the file open)
   gather_rare_events + architecture green, tsc clean, biome clean. With
   (a2) below, the standing reds are CLOSED: the full suite is expected fully
   green for the first time since the third phase 10 QA sync.
+- (c) Undispellable flask auras, OUTCOME 2026-08-16: the flask mint
+  (items.ts useItem) stamps undispellable BESIDE the flask marker per ruling
+  (6) (STK-2): classic consumable buffs carried no dispel type, so offensive
+  dispel skips a flask and Spellplunder cannot take one (the steal copies the
+  whole aura, marker included, so an unshielded stolen flask would have
+  ridden the thief's own singleton/refusal/death rules). Both types.ts doc
+  comments recut (undispellable now names its THREE stamp sites; the flask
+  marker doc says dispel protection rides the flag, never the marker, so the
+  marker's three-rule consumer list stays complete). TWO side effects decided
+  deliberately and recorded: (i) per the flag's standing rule a flask is no
+  longer right-click cancelable (sim + HUD consistently via the existing und
+  wire flag; a cancel carve-out would need the phase 14 flask-marker-on-the-
+  wire change, and classic did allow owner-cancel, so this is a small
+  recorded fidelity deviation, maintainer may revisit with phase 14); (ii)
+  the mob Spellgnaw devour affix reads neither flag and STILL eats a flask
+  (the ruling names player counters; affix balance untouched; pinned as the
+  recorded exception in tests/mob_purge.test.ts, the pin that flips if the
+  ruling is ever widened to mobs). Pins: flask_consumables gained the STK-2
+  describe (all three mints carry the flag; dispel/cancel classification
+  refuses; elixir AND scroll sources of the same family stay plain, the
+  negative control), talent_effect_primitives_v026 gained the real-spellsteal
+  arm (flask FIRST in the aura array so the skip decides; the blessing is
+  taken instead; a flask-only target yields the thief nothing), mob_purge
+  gained the exception pin. Suites: flask_consumables,
+  talent_effect_primitives_v026, mob_purge, sickness_undispellable,
+  aura_classify, resurrection, architecture all green (138/138); parity gate
+  green at the commit; tsc + biome clean.
 - (b) Lucent weapon int twin, OUTCOME 2026-08-16: enchant_weapon_lucent_
   spellpower shipped per ruling (5) (D10-D1): int 7, mainhand, skillReq 100,
   bill byte-identical to Lucent Might (lucent_reagent 1 + arcane_shard 1 +

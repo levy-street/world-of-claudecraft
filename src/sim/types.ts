@@ -646,12 +646,17 @@ export interface Aura {
   // Encounter-authored control that must land through immunity and cannot be
   // removed by player counters. Natural expiry and encounter cleanup still own it.
   unbreakableControl?: true;
-  // A penalty no player counter may shed: dispel, purge, and cleanse all skip it, and
-  // it is never right-click cancelable. Only its own timer takes it off. Set today at
-  // exactly one site, applySickness in ./spirit.ts, which serves both recovery
-  // sicknesses, matching the fact that they already survive death and relogging;
-  // without it a single dispel erased the entire Pale Keeper / unstuck penalty. The
-  // rule itself is isPlayerRemovableAura in ./aura_classify.ts.
+  // An aura no player counter may shed: dispel, purge, cleanse, and spellsteal
+  // all skip it, and it is never right-click cancelable. Only its own timer
+  // (or a rule that bypasses player counters entirely) takes it off. Set today
+  // at three sites: applySickness in ./spirit.ts (both recovery sicknesses,
+  // matching the fact that they already survive death and relogging; without
+  // it a single dispel erased the entire Pale Keeper / unstuck penalty), the
+  // cheater mark (./moderation/cheater_mark.ts), and the flask mint in
+  // ./items.ts useItem (the phase 10 QA STK-2 ruling: classic consumable
+  // buffs carried no dispel type, so a flask is neither offensively
+  // dispellable nor stealable). The rule itself is isPlayerRemovableAura in
+  // ./aura_classify.ts.
   undispellable?: true;
   // Marks a FLASK consumable aura (kind 'flask', src/sim/items.ts useItem).
   // Three rules key on it and nothing else does: the one-flask singleton strip
@@ -662,7 +667,10 @@ export interface Aura {
   // ./resurrection.ts keeps it). DEATH only: auras are session state and are
   // not persisted, so a flask does not survive a logout or a restart. The
   // elixir/scroll sources of the same aura id never set it, so a plain elixir
-  // stays mortal and stays outside the singleton.
+  // stays mortal and stays outside the singleton. The mint also stamps
+  // `undispellable` BESIDE this marker (the phase 10 QA STK-2 ruling; see
+  // that field above): dispel/steal protection rides that flag, never this
+  // marker, so the three rules here stay the marker's complete consumer list.
   flask?: true;
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
