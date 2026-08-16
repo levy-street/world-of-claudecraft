@@ -3287,8 +3287,8 @@ applied in the fix round or recorded below.
   arena seat, end, and send-home wipe (Yumi and Fiesta matches end through
   the same two arena.ts sites), the Yumi match SEAT wipes, and the Vale Cup
   wipes at its kit-swap seat (valeCupStandardize) and at the match
-  teardown. So the true
-  accounting is: overworld and PvE deaths keep a flask, a battleground or
+  teardown. So the true accounting is: overworld and PvE deaths keep a
+  flask, a battleground or
   arena DEATH keeps it on the corpse (quaffed inside a battleground match it
   rides through every death in it, the classic-era rule), and every
   instanced match (arena, Fiesta, Protect Yumi, Thornhollow Fields, Vale

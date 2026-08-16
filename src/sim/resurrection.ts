@@ -111,10 +111,10 @@ export function unstuckSicknessDuration(level: number): number {
 // one-line wrapper around (2), which social/arena.ts runs at its own seat
 // (startArenaMatch, every arena-family format), match end (endArenaMatch, the
 // undefeated), and send-home (returnFromArena, everyone the seat wrote a
-// return record for and who is still present), and
-// which the SimContext seam (ctx.resetForArena) hands to call sites that never
-// spell readyArenaFighter: the Protect Yumi match seat, and the Vale Cup
-// (social/vale_cup.ts) kit-swap seat (valeCupStandardize) and match teardown.
+// return record for and who is still present), and which the SimContext seam
+// (ctx.resetForArena) hands to call sites that never spell readyArenaFighter:
+// the Protect Yumi match seat, and the Vale Cup (social/vale_cup.ts) kit-swap
+// seat (valeCupStandardize) and match teardown.
 // So an instanced match is a parenthesis for a flask: nothing carried in rides
 // through the gates, and nothing quaffed inside comes back out. The one PvP
 // path that KEEPS a flask is a Thornhollow Fields DEATH: handleDeath runs this
@@ -141,11 +141,11 @@ export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
 // Auras that survive a CLEAN-SLATE wipe: only the Cheater mark. The clearPrep
 // arm of readyArenaFighter (the arm lives in social/arena.ts; it is reached
 // from every instanced match's seat and end, the Thornhollow Fields gates, and
-// every Fiesta and Yumi revive, the three routes above) and a Fiesta down
+// every Fiesta and Yumi revive; see the three routes above) and a Fiesta down
 // (social/fiesta.ts fiestaDownEntity) deliberately strip MORE than a death
-// does, The Keeper's Toll included, so a
-// normalized bout is decided by play and not by what each fighter walked in
-// carrying. A sanction is not something the fighter walked in carrying:
+// does, The Keeper's Toll included, so a normalized bout is decided by play
+// and not by what each fighter walked in carrying. A sanction is not something
+// the fighter walked in carrying:
 // it is account state an operator applied, so it survives here exactly as it
 // survives an ordinary death. Returns a NEW array, so the caller's assignment
 // stays a replacement and never mutates the array it read.
