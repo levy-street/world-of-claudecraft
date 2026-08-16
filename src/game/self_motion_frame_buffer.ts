@@ -8,6 +8,8 @@ export interface BufferedSelfMotionFrame {
   jitterMs: number;
   alpha: number;
   frameDt: number;
+  snapAgeMs: number;
+  snapIntervalMs: number;
 }
 
 export class SelfMotionFrameBuffer {
@@ -21,6 +23,8 @@ export class SelfMotionFrameBuffer {
     jitterMs: number,
     alpha: number,
     frameDt: number,
+    snapAgeMs: number,
+    snapIntervalMs: number,
   ): BufferedSelfMotionFrame {
     if (this.frame === null) {
       this.frame = {
@@ -31,6 +35,8 @@ export class SelfMotionFrameBuffer {
         jitterMs,
         alpha,
         frameDt,
+        snapAgeMs,
+        snapIntervalMs,
       };
     } else {
       this.frame.enabled = enabled;
@@ -40,6 +46,8 @@ export class SelfMotionFrameBuffer {
       this.frame.jitterMs = jitterMs;
       this.frame.alpha = alpha;
       this.frame.frameDt = frameDt;
+      this.frame.snapAgeMs = snapAgeMs;
+      this.frame.snapIntervalMs = snapIntervalMs;
     }
     return this.frame;
   }
