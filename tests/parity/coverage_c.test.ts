@@ -12,6 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../../src/sim/data';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
+import { RIFT_COIN_BONUS_A, RIFT_PATTERN_ITEM_IDS } from '../../src/sim/rift/progression';
 import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
@@ -673,5 +674,31 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(rec.notes.respawned).toBe(true);
     const deaths = (rec.allEvents as Ev[]).filter((e) => e.type === 'death');
     expect(deaths.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('rift_clear_rewards: the winning A clear really pays the corpse ladder, pattern draw included', () => {
+    const rec = run('rift_clear_rewards');
+    const inst = rec.sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst, 'the rift instance disappeared before the clear').toBeTruthy();
+    // completeRiftClear ran through the real sweep: won, rewarded, egress open.
+    expect(inst?.outcome).toBe('won');
+    expect(inst?.rewarded).toBe(true);
+    expect(inst?.exitId).not.toBeNull();
+    const boss = rec.sim.entities.get(rec.notes.bossId as number);
+    expect(boss, 'the tracked boss corpse disappeared before the payout').toBeTruthy();
+    const items = (boss?.loot?.items ?? []).map((entry) => entry.itemId);
+    // Draw 2 (the guaranteed heroic epic) plus draw 6 (the pattern) both landed:
+    // the seed is chosen so the 8% pattern roll SUCCEEDS in-window, so the golden
+    // pins the rng.int pick over the sorted RIFT_PATTERN_ITEM_IDS too, and this
+    // proves the recorded window really contains the whole payout, not a truncated
+    // run that never reached completeRiftClear.
+    const patterns = items.filter((id) =>
+      (RIFT_PATTERN_ITEM_IDS as readonly string[]).includes(id),
+    );
+    expect(patterns.length).toBe(1);
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    expect(boss?.lootable).toBe(true);
+    // The A-rank clear-time coin bonus landed on top of the static boss coin.
+    expect(boss?.loot?.copper ?? 0).toBeGreaterThanOrEqual(RIFT_COIN_BONUS_A);
   });
 });

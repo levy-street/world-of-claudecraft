@@ -4481,6 +4481,104 @@ recorded, or refuted with the file open)
   comma-joined mst as one craft id and omits the mobile-station row, server
   gating unaffected.
 
+## Phase 11 BUILT ledger (2026-08-16, pattern drops and vendors)
+- Commits: 72f4fa16b1 (patterns + append-only loot + art + i18n names),
+  4a87b16ff0 (quartermaster stock + the wiki vendor channel), 3181dbf7bd
+  (market pattern category), 835591eddc (the nythraxis parity golden
+  re-mint). Build was the phase file's three-agent fan-out plus the
+  coordinator's fan-in; the referential suite (Agent 4) follows.
+- RATES AND PRICES AS WIRED (the recorded initial numbers; phase 15
+  measures, never re-derives): RAID: rollGroup 'nythraxis_patterns'
+  appended at the tail of the nythraxis base table, ten APEX_GEAR patterns
+  at chance 0.04 each (one partitioned draw, at most one pattern per kill,
+  0.40 total). RIFT: draw 6 appended after the mount roll in
+  addRiftClearGearLoot, rng.chance(0.08) per winning B/A/S clear then one
+  rng.int uniform pick over the sorted ten-armor-pattern list
+  (RIFT_PATTERN_ITEM_IDS; C rifts exempt by the existing early return, by
+  design). QUARTERMASTER: the eight APEX_CONSUMABLE patterns, six
+  skill-100 at 12 marks (the ring point), two capstones at 16 (the neck
+  point); the valve note lives in heroic_vendor.ts (the marks vendor IS
+  the valve, live from day one; tradable duplicates purchasable BY DESIGN,
+  the vendor price acting as the market ceiling; quantity is the vendor's
+  hardcoded 1 per buy).
+- Pattern def facts: 28 ids pattern_<output id> in the new
+  content/apex_patterns.ts; kind 'recipe', epic, sellValue 100, tradable,
+  bind by consumption at learn; classic per-craft display prefixes (Plans:
+  armor/weaponcraft, Pattern: leather/tailoring, Design: jewelcrafting,
+  Schematic: engineering, Technique: inscription, Recipe: alchemy/cooking);
+  28 committed SVG-sourced opaque 128px WebPs with per-item
+  woc_original_svg provenance (docs/achievements/masterwrought-phase11-art,
+  batch-XOR-entries honored), audit admission advanced; 28 entity names
+  with five non-Latin fills each composing each locale's scheme words.
+- DECISIONS made at the build (each with its reviewer trail):
+  (1) Sundering gained the recipe-kind guard: the raid patterns are the
+  first epic AND raid-sourced non-gear ids, so without it a chase pattern
+  ground into one essence; classic disenchanting never took recipes; the
+  one-negative-per-clause pin rides the eligibility-boundary test with the
+  raid-sourced premise pinned. (2) NO Reliquary pages and NO deeds for
+  patterns: consumed-on-learn knowledge, not catalogued collectible gear
+  (the ruling-10 crafted-tools precedent); content-obligations-reviewer
+  audits the call at the review wave. (3) NO market corner mark: both
+  .mkt-ico corners are taken and a pattern mark is phase 14 restyle
+  territory; the category chip plus the parchment art carry findability.
+  (4) The guide masterwork prose apex clause is DEFERRED TO PHASE 12
+  (sanctioned by the phase 08 carry's "with phase 12"): the Perfecting
+  head start recuts that prose once, capturing the suppression exception
+  and the head start in one reword instead of staling the filled non-Latin
+  rows twice. (5) sourceVendor is a GENERATOR-level classification
+  (teaching pattern stocked = vendor row); sim acquisition stays ['drop']
+  for the learn flow. (6) vendorCountForced needs no pattern entry (it is
+  the copper-vendor force-1 rule; the marks vendor grants exactly one with
+  no quantity UI). (7) rods verified trainer-only (pinned upstream).
+  (8) tests/rift_rank_tuning.test.ts re-cut (bonus-draw filter widened to
+  the pattern list): the one out-of-assignment file Agent 1 touched,
+  flagged for the review wave.
+- Parity: exactly ONE golden moved (nythraxis_full_pull, the appended
+  draw), re-minted via UPDATE_PARITY on its shard alone; the other 211
+  stayed byte-identical across the full run, the append-only proof.
+  Portrait seal at the content tip: --check FRESH (bookkeeping-only
+  bundle drift, the v0.38 tolerance; no re-bless owed).
+- Release-fill obligations minted: the 28 pattern names x 15 Latin
+  locales, itemUi.market.filterTypePattern, guide.profPages.sourceVendor,
+  and itemUi.tooltip.flaskUnremovable Latin rows (all pending-tracked);
+  the 28 new item ids enter the shipped_item_ids golden at the release
+  re-mint (append-only; the suite demanded no re-mint now).
+- S2 closure: the commission-board pre-pattern window is CLOSED by this
+  phase (patterns are live acquisition; the board lists from the viewer's
+  own known recipes, so rows appear per player exactly at learn time).
+- BUILD REVIEW WAVE (2026-08-16; four charter reviewers as general-purpose
+  agents after the typed-agent empty-report failures, plus Agent 4's
+  referential suite ff2249b47a with its four decisive probes; the wave
+  survived a mid-flight session-limit outage, every agent resumed from its
+  transcript): ONE BLOCKING (content-obligations): the reliquary equality
+  pin went red because the ten epic raid patterns entered the derived
+  conquerors_nythraxis rare+ set (25 vs 15): the no-pages DECISION was
+  right under the reliquary doc's own curation latitude but UNEXECUTED at
+  the seam; fixed with the kind-keyed isReliquaryCarvedOut carve-out
+  written at the read plus an exactly-ten vacuity guard (over-carve and
+  dead-carve both impossible), suite 115/115. The phase 08 run-the-FULL-
+  suite lesson re-proven: hand-picked matrices missed a catalog-derived
+  pin again. ONE SHOULD-FIX (sim-seams): the rift pattern draw had no
+  parity-scenario coverage (an insertion above draw 6 would escape every
+  golden); closed with the NEW rift_clear_rewards scenario (seed 4332, a
+  real three-floor A-rank clear through the live descent flow reaching
+  completeRiftClear; the 8 percent draw SUCCEEDS in-window so the golden
+  pins the pick position; the winning-clear facts: dev-style entries win
+  with event null, candidates need partyKey + bossDiedAtTick + the boss
+  floor), insertion-above probe decisive, full parity 215 green, zero
+  existing goldens moved. NITS APPLIED: the live-catalog exclusivity pin
+  sorted per the sibling doctrine plus a search-by-name pin
+  (market_filters); a real-quaff wire arm pinning und=1 and NO flask field
+  on the wire (wire_aura, composing the two previously separate halves).
+  RECORDED, no change: sourceVendor generated rows land one commit before
+  their English source (bisectability nit); the deploy-skew pattern-chip
+  degradation is graceful by design; the stale-bundle market count note is
+  pre-existing; the eventual packet PR owes before/after screenshots for
+  the market chip (a visual change; phase 17 close). Cross-platform and
+  frontend reviews otherwise fully clean (parity pin 324 untouched, zero
+  wire changes, S3 green, ko Recipe-family split 제조법/요리법 verified
+  deliberate and correct).
+
 ## Phase 11 ruling executions (2026-08-16, the five items owed at the head)
 - (a1) Bag signer exemption, OUTCOME 2026-08-16: kind 'bag' is exempt from
   the #1149 crafting signer mint per ruling (1). The gate is the new exported

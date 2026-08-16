@@ -156,4 +156,21 @@ describe('wireEntity aura serialization', () => {
     const w = wireAuras(e)[0];
     expect(w.value).toBe(-0.004);
   });
+
+  it('a REAL quaffed flask serializes und=1 and no flask field (the STK-2 stamp end to end)', () => {
+    // Composes the two halves the phase 11 review found only pinned apart:
+    // the mint carries undispellable (tests/mob_purge.test.ts) and the flag
+    // serializes (the generic arm above). This drives the genuine mint
+    // through the real serializer: a stale client suppresses the cancel
+    // affordance off this und, and the flask MARKER stays off the wire by
+    // design (the phase 14 glyph note's premise).
+    const sim = new Sim({ seed: 1, playerClass: 'warrior' });
+    const pid = sim.playerId;
+    sim.addItem('ironhusk_flask', 1, pid);
+    sim.useItem('ironhusk_flask', pid);
+    const w = wireAuras(sim.player).find((a) => a.id === 'elixir_buff_sta');
+    expect(w, 'the quaffed flask aura rides the wire').toBeDefined();
+    expect(w?.und).toBe(1);
+    expect(w).not.toHaveProperty('flask');
+  });
 });

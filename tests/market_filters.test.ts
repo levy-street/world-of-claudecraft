@@ -302,12 +302,20 @@ describe('World Market filters', () => {
   it('browses patterns under their own chip, and exactly one browse category claims them', () => {
     // The bag-exclusivity model, applied to the pattern exemplar: an item
     // answers exactly one browse category, so the full chip answer is
-    // ['all', 'pattern'] and nothing else.
+    // ['all', 'pattern'] and nothing else. Both sides SORTED, matching the
+    // synthetic-def mirror's recorded doctrine: reordering the filter list
+    // is a presentation change and must not red this pin.
     expect(
       MARKET_ITEM_TYPE_FILTERS.filter((itemType) =>
         marketItemMatches('pattern_forgefold_legguards', q({ itemType })),
-      ),
-    ).toEqual(['all', 'pattern']);
+      ).sort(),
+    ).toEqual(['all', 'pattern'].sort());
+    // Search finds a pattern by its output name and by the kind word: the
+    // predicate is kind-agnostic (name/id substring), pinned here so the
+    // new kind's searchability is a tested fact, not an inference.
+    expect(filterIds(['pattern_forgefold_legguards'], { search: 'forgefold' })).toEqual([
+      'pattern_forgefold_legguards',
+    ]);
   });
 
   // The phase 11 findability claim, pinned in BOTH halves: the masterwrought

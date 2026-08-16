@@ -5849,6 +5849,88 @@ function catFormAutoSwing(): Scenario {
   };
 }
 
+// Rift winning-clear payout: a dev-style rift run at an A-rank baseLevel driven
+// through the REAL completion flow until the 1 Hz updateRiftInstances sweep
+// claims the clear and addRiftClearGearLoot rolls the whole corpse ladder.
+// rift_boss_floor cannot reach this: its hand-placed boss dies on floor 0, and
+// the completion sweep only claims an instance whose CURRENT generated floor
+// isBoss, so completeRiftClear (and every payout draw behind it) stayed outside
+// the gate until this scenario (the phase 11 pattern draw landed with no golden
+// moving, which is the blindness this closes). Each non-boss floor is cleared
+// the fixture way (hand-killed trash, hand-solved puzzle), then the descent is
+// walked through the real trigger; the boss floor kill lets the tick pre-pass
+// stamp the death and the sweep pay the clear. Dev entry (no portal) wins the
+// claim by design, so the payout runs without race scaffolding. Seed 4332 is
+// chosen so the 8% pattern roll (draw 6) SUCCEEDS in-window: the golden pins
+// not only every chance() position but the rng.int pick over the sorted
+// RIFT_PATTERN_ITEM_IDS (pattern_forgefold_legguards on this seed). The boss is
+// tracked, so the corpse loot (guaranteed heroic epic + the pattern + the
+// A-rank coin bonus) is in the state digest, not just the draw digest.
+function riftClearRewards(): Scenario {
+  return {
+    name: 'rift_clear_rewards',
+    coverage: [
+      'completeRiftClear winning payout reached through the real 1 Hz updateRiftInstances sweep',
+      'addRiftClearGearLoot draws 0..6 including the phase 11 pattern draw (draw 6 succeeds on this seed)',
+      'openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors',
+      'openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)',
+    ],
+    build: () => new Sim({ seed: 4332, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      sim.setPlayerLevel(20);
+      const p = sim.player as AnyEntity;
+      beef(p);
+      p.gm = true; // survive floor hazards while the run is walked, auras still apply
+      sim.enterRift(3, 25, sim.playerId); // dev entry; baseLevel 25 = A rank, 3 floors
+      const inst = requireValue(
+        sim.riftInstances.find((i) => i.partyKey !== null),
+        'rift_clear_rewards instance',
+      );
+      rec.snapshot('entered');
+      while (inst.floorIndex < inst.floorCount - 1) {
+        // Clear the floor the fixture way (the rift_boss_floor idiom): trash
+        // hand-killed, puzzle hand-solved, so the 1 Hz sweep opens the descent.
+        for (const id of inst.mobIds) {
+          if (id === inst.bossId) continue;
+          const e = sim.entities.get(id);
+          if (e) {
+            e.hp = 0;
+            e.dead = true;
+          }
+        }
+        inst.litPylons = new Set(inst.pylonIds);
+        inst.puzzleSolved = true;
+        rec.tick(20); // guarantees exactly one 1 Hz sweep: openDescent runs
+        const desc = requireEntity(
+          sim,
+          requireValue(inst.descentId, 'rift descent id'),
+          'rift descent object',
+        );
+        teleport(sim, p, desc.pos.x, desc.pos.z);
+        rec.tick(1); // updateRiftTriggers walks the descent: next floor spawns
+        rec.snapshot(`descended-to-${inst.floorIndex}`);
+      }
+      // Boss floor: track the boss so the payout lands in the state digest,
+      // then kill everything at once. The tick pre-pass stamps bossDiedAtTick,
+      // and the next 1 Hz sweep runs completeRiftClear -> addRiftClearGearLoot
+      // (the full draw ladder) -> openExit.
+      const boss = requireEntity(sim, requireValue(inst.bossId, 'rift boss id'), 'rift floor boss');
+      rec.track(boss.id);
+      rec.notes.bossId = boss.id;
+      for (const id of inst.mobIds) {
+        const e = sim.entities.get(id);
+        if (e) {
+          e.hp = 0;
+          e.dead = true;
+        }
+      }
+      rec.tick(25); // covers the stamp tick plus one full sweep window
+      rec.snapshot('clear-paid');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5917,4 +5999,5 @@ export const SCENARIOS: Scenario[] = [
   riftBossFloor(),
   grixRespawnWindow(),
   catFormAutoSwing(),
+  riftClearRewards(),
 ];

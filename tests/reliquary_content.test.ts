@@ -186,16 +186,38 @@ function dungeonObjectItemIds(dungeonId: string): string[] {
  * hangs off MobTemplate.loot (src/sim/types.ts), never the DungeonDef itself,
  * and ground objects contribute their interaction yield. Filler falls out by
  * live ITEMS quality, not hand-listing.
+ *
+ * DELIBERATE CARVE-OUT, written at the read per docs/design/reliquary.md's
+ * own curation latitude ("do not auto-include every loot table row without
+ * review"): kind 'recipe' pattern items are EXCLUDED from the derived set.
+ * The phase 11 apex patterns are epic drops on the Nythraxis table, but a
+ * pattern is repeatable (0.04 per kill), tradable, and consumed on learn:
+ * not conquerable unique loot, so no Reliquary page exists for one and the
+ * equality pin must not demand it (the build decision in the Phase 11 BUILT
+ * ledger; the ruling-10 tools precedent plus non-uniqueness carry the call).
+ * The carve-out is kind-keyed, never id-listed, so a future pattern joins it
+ * automatically; its vacuity guard below pins that it excludes EXACTLY the
+ * live raid patterns and nothing else, so it can never silently over-carve.
  */
+function isReliquaryCarvedOut(itemId: string): boolean {
+  return ITEMS[itemId]?.kind === 'recipe';
+}
+
 function dungeonRarePlusLootIds(dungeonId: string): string[] {
   const ids = new Set<string>();
   for (const mobId of dungeonMobIds(dungeonId)) {
     for (const entry of MOBS[mobId]?.loot ?? []) {
-      if (entry.itemId !== undefined && isRarePlus(entry.itemId)) ids.add(entry.itemId);
+      if (
+        entry.itemId !== undefined &&
+        isRarePlus(entry.itemId) &&
+        !isReliquaryCarvedOut(entry.itemId)
+      ) {
+        ids.add(entry.itemId);
+      }
     }
   }
   for (const itemId of dungeonObjectItemIds(dungeonId)) {
-    if (isRarePlus(itemId)) ids.add(itemId);
+    if (isRarePlus(itemId) && !isReliquaryCarvedOut(itemId)) ids.add(itemId);
   }
   return [...ids].sort();
 }
@@ -1502,6 +1524,47 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       expect(derived.length, `${dungeonId} vacuity floor`).toBeGreaterThanOrEqual(floor);
       expect(itemRelicIds(RELIQUARY_PAGES_BY_ID[pageId]).sort(), pageId).toEqual(derived);
     }
+  });
+
+  it('the recipe carve-out excludes EXACTLY the live raid patterns and nothing else', () => {
+    // The vacuity guard for isReliquaryCarvedOut: recompute every equality
+    // dungeon's rare+ set WITHOUT the carve-out and diff. The removed set
+    // must be exactly the ten phase 11 gear patterns on the Nythraxis table
+    // (kind 'recipe', epic, repeatable tradable consumed-on-learn drops:
+    // not conquerable unique loot per the ledger decision), so the
+    // carve-out can neither over-carve a real relic nor go silently dead.
+    const removed = new Set<string>();
+    for (const dungeonId of Object.keys(EQUALITY_PAGES)) {
+      for (const mobId of dungeonMobIds(dungeonId)) {
+        for (const entry of MOBS[mobId]?.loot ?? []) {
+          if (
+            entry.itemId !== undefined &&
+            isRarePlus(entry.itemId) &&
+            isReliquaryCarvedOut(entry.itemId)
+          ) {
+            removed.add(entry.itemId);
+          }
+        }
+      }
+      for (const itemId of dungeonObjectItemIds(dungeonId)) {
+        if (isRarePlus(itemId) && isReliquaryCarvedOut(itemId)) removed.add(itemId);
+      }
+    }
+    expect([...removed].sort()).toEqual([
+      'pattern_duskforged_bulwark',
+      'pattern_duskforged_warblade',
+      'pattern_gyrelens_array',
+      'pattern_makers_charm',
+      'pattern_masters_field_forge',
+      'pattern_prismglass_loop',
+      'pattern_ridgebreaker',
+      'pattern_voidbound_grimoire',
+      'pattern_warhewn_signet',
+      'pattern_wyrmfall_pendant',
+    ]);
+    // The predicate itself stays kind-keyed: a real relic never carves.
+    expect(isReliquaryCarvedOut('duskforged_warblade')).toBe(false);
+    expect(isReliquaryCarvedOut('pattern_duskforged_warblade')).toBe(true);
   });
 
   it('the mob walk really reaches boss-summoned adds', () => {
