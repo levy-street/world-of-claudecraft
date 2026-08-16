@@ -21,7 +21,7 @@
 | 09 | Apex weapons, jewelry, gadgets | complete | 2026-08-13 | 2026-08-13 |
 | 09 QA | verify | complete | 2026-08-13 | 2026-08-13 |
 | 10 | Apex consumables and enchants | complete | 2026-08-14 | 2026-08-14 |
-| 10 QA | verify | in progress | 2026-08-14 | |
+| 10 QA | verify | complete | 2026-08-14 | 2026-08-16 |
 | 11 | Pattern drops and vendors | pending | | |
 | 11 QA | verify | pending | | |
 | 12 | The Perfecting stage | pending | | |
@@ -441,3 +441,37 @@ never future-PR items, per the delivery contract in `state.md`).
   portrait trio fresh in the bookkeeping lane, naming guards green. Merge
   audit by hand over the 99-file delta: CLEAN, nothing owed beyond the
   re-mints. Full record: state.md "Phase 10 QA release sync, third pass".
+- Phase 10 QA (2026-08-16): verdict PASS-WITH-FOLLOWUPS. Eight-dimension
+  ultracode fan-out (correctness, exclusivity/stacking, guard, i18n/prose
+  truth, content obligations, cleanup, design ratification, decisiveness in
+  an isolated worktree: 44 mutations, 39 killed by a named test) with
+  two-lens adversarial verification (17 upheld, 1 refuted) plus the six
+  repo reviewers; no blocking correctness defect in the shipped mechanics.
+  Twelve fix rounds, each reviewed FRESH and (through round 6) probed in
+  the isolated worktree (round 1: 38 probes; 2: 19; 3: 15; 4: 12 plus the
+  author's 6; 5: 12 plus 6; 6: 4 plus replicas; 7 to 12 comment-truth
+  only): pin gaps closed (the apex tier arm, the tripwire's
+  computed-key shapes and its deliberate over-veto text, the picker's worn
+  Perfected copy through the menu's own viewer, the literal class-token
+  hooks, the two gate lines), the Wyrmfall letter registered through the
+  ONE shared authoredLettersById builder (both ui registries derive from
+  it), the flask PvP accounting corrected THREE times (the indirect
+  readyArenaFighter route, then its resetForArena wrapper through the
+  SimContext seam, then a call spelling the wrapper scan let through) and
+  now pinned per mode behaviorally (arena, Thornhollow Fields, Fiesta,
+  Protect Yumi, Vale Cup: seat and end, plus the downs and revives) and
+  structurally (three literal per-file caller tables over a balanced-paren
+  call walk with their own controls, after two regex cuts each let a
+  spelling through), the
+  tooltip's death clause widened to "instanced matches begin and end on a
+  clean slate" with five non-Latin rows refreshed, 85 non-Latin guide rows
+  refreshed and verified against the reworded English, seven committed
+  captures under docs/screenshots/masterwrought-phase10-qa/ (target table
+  entry, lowest preset, five sparse cones + the workflow pin), a stale
+  source-text pin on the mastery-reset letter converted to a runtime pin.
+  Full suite at the final tip: only the two standing ruling reds; gate PASS
+  apart from those two; portrait trio fresh under the bundle-only-drift
+  tolerance (no re-bless owed). Twelve rulings surfaced (the standing set
+  plus D10-B1, D10-D1, STK-2, Q2, FE6, I18N-06, and the new flask
+  parenthesis). Full ledger, review record, and validation record in
+  state.md "Phase 10 QA ledger".

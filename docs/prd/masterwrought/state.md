@@ -3834,8 +3834,8 @@ mechanics: the flask arm, the death predicates, the Well Fed grant, the
 capstones, the deny ladder, and every increment recomputed exactly as the
 ledger records them.
 
-### Findings, and what the fix round did with them (four commits
-f877abad7c, a6d2caf313, 94cb93f0fc, c948dccd83; every finding applied,
+### Findings, and what the fix rounds did with them (the round-by-round
+commit list is in the review record below; every finding applied,
 recorded, or refuted with the file open)
 - PIN GAPS (blocking, closed): the apex arm of enchantGainTier had no
   assertion anywhere (deleting it regraded the dust-only boots enchant to
@@ -3996,6 +3996,211 @@ recorded, or refuted with the file open)
   the content table (house style, like def.elixir; now stated in the
   Consuming comment).
 
+### The fix-round review record (every round reviewed fresh, then probed)
+- Round 1 (commits f877abad7c, a6d2caf313, 94cb93f0fc, c948dccd83, e50d88c13e)
+  was reviewed by a fresh adversarial reviewer (0 blocking, 6 should-fix, 6
+  nits, plus a delegated pin audit it spawned: 3 should-fix, 8 nits), a
+  gate-integrity reviewer over the cone edit (PASS, 1 warning, 2 info), and
+  a 38-probe mutation audit in the isolated worktree at e50d88c13e (every
+  guard it tried red except the menu's worn-set wiring, which SURVIVED,
+  and the letter guard, which was caught only as a module-load throw). The
+  first attempt at this round died on the harness usage limit mid-run
+  (three agents at once) and was relaunched fresh; nothing was inferred
+  from the dead runs.
+- Round 2 (commits 33657ca94d, 72660c4070) applied every round-1 finding:
+  the PvP accounting correction (the reviewer's S4 asked for a behavioral
+  battleground arm; writing it exposed the indirect readyArenaFighter route
+  every earlier auditor and the caller scan itself had missed),
+  perfectedCandidateExists asking the builders (S5), the computed-key
+  tripwire shapes and the honest header (S1), the literal class-token pins,
+  the worn-wiring paint case, the two-gate-lines case (S2/S3), the target's
+  `when` list widened to the painter but NOT to the mobile stylesheet (the
+  pr_shot_targets pin caught that a whole-sheet path in a specific target
+  narrows the generic mobile HUD frames), the lowest-preset seed on every
+  variant, the p13 drill guard (the gate reviewer's warning), and the nits
+  (test comment, scan title, tooltip clause widened to "instanced matches
+  begin and end on a clean slate" with its five non-Latin rows refreshed,
+  the ledger's refresh count, the lazy import in the letter guard so its own
+  pin prints first, the derived role-food kinds, the end-to-end set-up round
+  trip, the capstone length floor, the seam-naming sentinel). Recorded
+  rather than changed: ru keeps craft names in Latin throughout its guide
+  prose (so "Enchanting 100" in the enchant note matches its neighborhood; a
+  locale-wide register call for the release fill), and the ru "Perfected
+  only" badge is 35 characters (an eyeball at the wiki table's mobile width
+  for the release fill). Reviewed fresh plus a 19-probe mutation audit at
+  72660c4070 (16 caught, 3 survived, 1 false positive): ONE BLOCKING (a
+  THIRD clean-slate route, resetForArena, the wrapper the SimContext seam
+  hands to the Yumi match seat and the Vale Cup kit-swap seat and teardown;
+  the scan was blind to a planted ctx.resetForArena in an unrecorded
+  module), 3 should-fix (the battleground SEAT wipe unpinned behaviorally,
+  a seat-only softening survived; two CLAUDE.md records with the retired
+  framing; Yumi/Fiesta wipes source-text only), 4 nits (the tripwire's
+  over-veto of a legitimate `cache[perfectedMetKey]` unexplained; two
+  overclaiming titles; the catalog comment's missing third clause; per-arm
+  pins hidden inside the positive-controls loop). Also surfaced: running
+  tests/guide.test.ts regenerates src/guide/content.generated.ts in place
+  (a probe-session trap, recorded in memory).
+- Round 3 (commit 77e076b8fa) applied all of round 2: the wrapper route as
+  a third literal per-module table, per-mode behavioral arms (bg seat before
+  the pop; Yumi seat/down/revive; Fiesta seat/down; Vale Cup kit-swap
+  seat/teardown), the records and the catalog comment, the tripwire's
+  deliberate-veto text and its per-arm case, the titles. Reviewed fresh plus
+  a 15-probe audit at 77e076b8fa (13 caught, 2 survived, 0 false
+  positives): ONE BLOCKING (the wrapper pattern's bare-identifier argument
+  tail let `ctx.resetForArena(e as Entity)` through), 3 should-fix (a
+  Protect Yumi down attributed to the readyArenaFighter route when it is
+  the DIRECT call in fiesta.ts; the ledger's "revive pinned behaviorally"
+  overclaim, since the down had already wiped the flask; the wrapper
+  controls hidden behind the table assertion), 7 nits (Vale Cup halves in
+  one case; "arena entry" naming readyArenaFighter's own arm; a "carried
+  IN" title for a form-up quaff; Yumi/Fiesta seat arms observing after
+  kickoff; a 132-char CLAUDE.md line; the sim.ts gloss naming the bind line;
+  Yumi/Fiesta ENDS with no behavioral arm). Also fixed in this round, from
+  the full-suite run at 77e076b8fa (the third red beside the two ruling
+  reds): tests/professions_mastery_reset.test.ts pinned the letter's
+  entity_i18n registration by scanning for the hand-seeded LETTERS_BY_ID
+  literal this QA replaced with the shared builder; it now pins the runtime
+  registry (knownLetterId plus the shared map's row, with a negative
+  control), commit 9c97a0e934.
+- Round 4 (commit f460599731) applied all of round 3: the wrapper pattern
+  takes any argument spelling (members, indexes, casts, ternaries, one
+  nested call, wrapped calls) and rejects the declarations by their `: void`
+  return annotation, with fourteen call and five declaration controls in
+  their own case; the note, both CLAUDE.md records, and the ledger
+  paragraph attribute the Yumi down to fiesta.ts's direct call and name
+  readyArenaFighter's own arm as the direct site in arena.ts; the Yumi
+  revive arm re-plants the flask on the benched body so the revive's own
+  wipe is decisive; the Yumi and Fiesta seat arms observe at the countdown;
+  the bg seat arm pins the positive state and the form-up title is exact;
+  the Vale Cup halves are two cases; the arena family's own seat, end (the
+  winner), and send-home (the loser's corpse, which the death kept) are
+  pinned in tests/arena.test.ts, the path Yumi and Fiesta ends share.
+  Self-probed at f460599731 (six mutations, all caught: the `e as Entity`
+  plant, the revive flip, the three arena.ts sites, the Vale Cup teardown
+  alone), then reviewed fresh plus a 12-probe audit (8 caught, 1 survived
+  by design, 3 survived as defects): TWO BLOCKING (the widened wrapper regex
+  still let a depth-two nested argument and an optional call through; the
+  readyArenaFighter sibling could not cross a `)`, so a site written the way
+  arena.ts writes its neighbors, `ctx.entities.get(pid)!`, hid), 2
+  should-fix ("modules that never name readyArenaFighter" false for yumi.ts;
+  the Yumi/Fiesta match END branch of endArenaMatch, benched bodies never in
+  match.defeated, had no behavioral arm), 6 nits (`bgSeat` for placeInBg;
+  the sibling note's "arena entry"; "everyone" for returnFromArena; the
+  arena end arm packing two sites; the loser-skip claim carried by the dead
+  flag; the mastery-reset title).
+- Round 5 (commits 96b7f4d4c2, 9331084310) applied all of round 4: both
+  regexes replaced by ONE balanced-parenthesis call walk (whole identifier,
+  optional `?.`, string literals skipped, declarations rejected by their
+  `: void` return annotation), every readyArenaFighter site classified by
+  its own clearPrep literal with the keeps as their own pinned table and
+  any unclassifiable site reported (the sim.ts seam passthrough the one
+  pinned), a controls case of seventeen call spellings, six non-calls, and
+  the classification; the records reworded (call sites, everyone still
+  present, the sibling note); the arena end and send-home as two cases with
+  match.defeated asserted; the Yumi benched-at-the-whistle END arm; the
+  mastery-reset title. Self-probed at 96b7f4d4c2 (six mutations: five
+  caught, and the string-skip probe SURVIVED because the string control
+  carried balanced parens; fixed in 9331084310 with an unbalanced paren and
+  the argument text asserted whole, re-probed red), then reviewed fresh plus
+  a 12-probe audit (8 caught, 4 survived: two benign, two defects): NO
+  blocking, 3 should-fix (the walk's whole-identifier guard had no control;
+  `isDeclaration` swallowed a call in a ternary's true arm whose else is
+  `void 0`, a real fail-open spelling biome leaves alone; the DIRECT route
+  pinned as a file set while the record says "in exactly two places"), 8
+  nits (the string model's unmodeled regex literals and nested templates,
+  which fail loudly; whitespace or paren spellings before `(` that biome's
+  formatter rewrites; the classification reading the whole argument blob;
+  raw controls not run through the comment stripper; a 90-column ledger
+  line; the return-record condition on the send-home; the sibling note's
+  file-attribution parse; the per-file swap blind spot, closed elsewhere).
+- Round 6 (commit ee6433e506) applied all of round 5: `isDeclaration`
+  wants the `: void` to end a signature (`;` or `{`); the direct route is a
+  per-file count table through the same walk (with the predicate's own
+  module excluded, since its definition returns `Aura[]`); the controls
+  carry the identifier neighbors on both sides and the `void 0` ternary and
+  run through the same comment stripper as the tree; the walker comment
+  states its string model's edge and the format-gate-netted spellings; the
+  two wording nits and the rewrap. Self-probed at ee6433e506 (four
+  mutations, all caught: the guard deleted, the `void 0` plant, a second
+  direct call in fiesta.ts, `isDeclaration` reverted), then reviewed fresh:
+  NO blocking, 2 should-fix (the walker comment's "fails loudly, never
+  silently" was false in both halves: an unmatched `(` in a regex literal
+  inside a call's own arguments throws, an unmatched `)` truncates the
+  argument text quietly, and balanced backticks parse; the route-1 pin's
+  rationale named a rename, which already reds the table, when what the pin
+  adds is the predicate MOVING modules), 8 nits (comment-stripper on only
+  some controls; the identifier guard described as two-sided; "Neither"
+  closing a three-item list; a duplicated name literal; counted declaration
+  FORMS unnamed; a semicolon-to-comma ambiguity in the sibling note; the
+  module exclusion also hiding a direct call inside resurrection.ts itself;
+  ragged rewraps).
+- Round 7 (commit a799dcf6d6, comments and test controls only) applied all
+  of round 6: the walker comment states the regex-literal edge exactly and
+  names the classification tables as the net for its quiet half, with that
+  spelling pinned as a control (a truncated wipe REPORTED as a
+  passthrough); every control runs through the same comment stripper; one
+  name literal; the counted declaration forms named; the route-1 comments
+  say what the exclusion hides and what the pin adds; the sibling note's
+  semicolon; the reflows. Reviewed fresh: NO blocking, 3 should-fix (the
+  route-1 pin's "move" rationale, since a move under src/sim is COUNTED and
+  reds the table on its own, so the pin's unique net is the predicate
+  leaving the sim tree; arrow-property forms are not seen, not counted; the
+  regex-literal taxonomy stated as absolute where a nested template with an
+  unbalanced inner paren shares the edge and a later surplus paren can close
+  a runaway walk quietly), 6 nits (two orphan lines the reflow left; the
+  bracketed call is visible to a quoted-name scan; the pet_commands.ts
+  citation's path and role; the passthrough gloss; the suffix mechanism;
+  the quote arm of a regex literal). Judged in-session: the "unsafe
+  direction" of the quiet edge is not fail-open, since a planted site is a
+  new count and a rewritten site changes bucket, so a table reds either way;
+  the one blind combination (a swallowed span hiding a second call) is
+  stated in the comment rather than guarded by a heuristic cap.
+- Round 8 (commit 0498428e4f, comments and reflows only) applied all of
+  round 7. Reviewed fresh for FALSE claims only: one (a regex-literal
+  misread that leaves the clearPrep literal inside its span keeps the site
+  in its bucket, so "reds either way" was too strong), plus two reflow
+  orphans.
+- Round 9 (commit 296c6b4e32, comments, one control, reflows) applied all
+  of round 8: the misread clause states exactly which misreads change
+  bucket and which do not, names the per-mode behavioral arms as the net
+  for the residue, and pins that residue beside the reported case as a
+  documented blind spot; both reflows are whole-block rewraps. Reviewed
+  fresh for false claims: two, both introduced by that rewrite (a swallowed
+  later call DOES red the table for a rewritten site, since its count
+  vanishes, and is quiet only for a same-bucket planted site; a wipe taking
+  in a foreign `false` keeps its bucket because `true` is tested first),
+  plus the note that the new control pinned the consequence, not the
+  truncation.
+- Round 10 (commit bc0a2bfa4d, comments and one control) applied all of
+  round 9: the misreads that move a table and the two that stay quiet are
+  enumerated exactly, and the blind-spot control asserts the truncated
+  argument text beside the bucket. Reviewed fresh for false claims,
+  measured case by case (twelve fixtures): one (the quiet clause omitted
+  "and swallows no later call of the same name", a case the preceding
+  clause already stated correctly); the args pin byte-identical to the walk;
+  no orphan.
+- Round 11 (commit f88803bb64, one sentence): the quiet clause carries
+  its third conjunct and the planted-swallow exception says "as classified
+  after the swallow". Reviewed fresh for false claims over twenty-one
+  fixtures: two safe-direction overstatements of the exception (the
+  passthrough list is asserted by content, so a planted passthrough that
+  swallows one always reds; two hidden calls leave a -1), one ruling item
+  (a run-on that never closes throws, which the preceding sentence names
+  and the quiet clause, scoped to table outcomes, does not contradict:
+  no change).
+- Round 12 (commit 5f56ade89e, two sentences): the exception is bounded
+  to "the counted bucket of the one call it hides", with both boundaries
+  stated. Reviewed fresh for false claims over the previous rounds'
+  twenty-one fixtures plus eighteen new ones (every quiet and every red
+  case the wording names, measured before and after on the test's exact
+  table shapes): CLEAN, no false clause, no orphan. The chain closes here:
+  5f56ade89e is the code tip the closing validation below was run at.
+- The chain in one line: rounds 1 to 6 changed behavior or pins (each
+  found by the previous round's fresh review and probe), rounds 7 to 12
+  changed comment truth only, and the closing rule was "the first fresh
+  review that reports no false claim". Every commit carries a body; every
+  finding of every round was applied, none deferred.
+
 ### Rulings taken or wanted (see the report; standing ones re-stated)
 - WANTED (new this QA): D10-B1 the capstone dispenser/feast divergence:
   the shipped party field-crafting stations hand a non-crafting party
@@ -4022,7 +4227,15 @@ recorded, or refuted with the file open)
   Vigor, Warboar Might, Runewater Clarity, Well Fed) are not in the naming
   registry and "Well Fed" is WoW's verbatim same-role buff name: register
   as GENERIC-with-caveat (the shipped elixir aura names are unregistered
-  too) or rename.
+  too) or rename. FLASK-PARENTHESIS (new, from the fix-round review): a
+  20-minute flask does not survive an instanced match's seat or end (arena,
+  Fiesta, Protect Yumi, Thornhollow Fields, Vale Cup) nor a Yumi or Fiesta
+  down, only a Thornhollow Fields DEATH; ratify the arena-family clean-slate
+  doctrine as it stands (recommended: the classic-era rule kept flasks
+  through battleground deaths, never through a normalized bout's gates), or
+  add a flask carve-out to aurasSurvivingCleanSlate for the battleground
+  seat only (a one-line change plus the tooltip clause and its five
+  non-Latin rows).
 - STANDING (re-surfaced): the two ruling reds (bags sunspun_haversack, the
   rogue band assassination 170.383), reliquary curation for the four
   crafted epic tools, forge world-visibility, the flask logout-persistence
@@ -4063,4 +4276,44 @@ recorded, or refuted with the file open)
   flask 15 / well-fed 6 as the first tune-down knobs, never the formulas.
 
 ### Validation record
-(filled at close)
+- Named suites at every round (the touched files' suites: resurrection,
+  battleground, yumi_match, fiesta, vale_cup_match, arena,
+  lucent_infusion_guard, bag_item_action_menu_paint, enchant_apply_view,
+  entity_i18n_guards, aura_icons, mobile_station_party, masterwrought_budget,
+  professions_mastery_reset, and the rest of the phase's touched suites) all
+  green at each commit; `npx tsc --noEmit` clean and biome clean (warnings
+  only, the repo's accepted debt) on every changed file at every commit.
+- Full suite (`npx vitest run --maxWorkers=5`) on the committed tree at
+  77e076b8fa (three reds: the two ruling reds plus the mastery-reset
+  source-text pin this QA had staled, fixed in 9c97a0e934), then at
+  f460599731, 9331084310, and ee6433e506: 2825 files / 39609 tests green,
+  ONLY the two standing ruling reds (tests/bags.test.ts sunspun_haversack
+  signable rarity; tests/rogue_dps_balance.test.ts assassination 170.383
+  under the 180 floor), 12 files / 115 tests skipped, 2 expected fails.
+- `node scripts/gate_select.mjs` (GATE_MAX_WORKERS=5, committed tree, no
+  pipe) at ee6433e506, a799dcf6d6, 0498428e4f, 296c6b4e32, bc0a2bfa4d,
+  f88803bb64, and the closing code tip 5f56ade89e: PASS through
+  every step to the full vitest run (i18n:gen + wiki:content + sfx:check via
+  turbo, i18n freshness, sfx and media manifest regen + trackedness +
+  freshness, malware scan 6207 files 0 high after priors, biome on changed
+  files), where the planner fell back to the full suite (broad diff against
+  the integration base) and stopped on exactly the two ruling reds. The
+  steps behind that first-red stop, run by hand in the gate's own order at
+  every one of those tips from a799dcf6d6 on: browser regressions 19 files
+  / 129 tests green; typecheck + env/server/bot builds 5/5 successful;
+  client bundle built. Tree clean before and after every run. (The docs
+  close commit after 5f56ade89e touches docs/ only.)
+- Portrait seal: `build_mob_portrait_source_manifest.mjs --check` reports
+  fresh (bookkeeping-only renderer bundle drift, the tolerance
+  b8026c84ff/ddd449f506/406a6b01a4 shipped in v0.38), and both seal suites
+  (mob_portrait_source_manifest, placeholder_art_completion) green at the
+  tip; the receipt re-bless ritual is therefore not owed for a code-only tip
+  and was NOT run (recorded here as the deliberate deviation from the QA
+  prompt's STEP 0 wording; the ritual stays owed if --check ever reports
+  real drift).
+- Mutation probing across the rounds (all in the isolated worktree at the
+  exact tip under review, one mutation at a time, tree re-checked clean
+  after each): 44 (audit) + 38 + 19 + 15 + 6 + 12 + 6 + 12 + 4, then the
+  rounds 6 to 12 node-replica fixture sets (up to thirty-nine per round)
+  over the walker; every guard this QA added is decisive against a named
+  mutation, and every survivor found was fixed and re-probed red.
