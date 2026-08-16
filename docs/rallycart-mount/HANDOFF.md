@@ -89,6 +89,13 @@ brightness are all guesses that have not been through a full pass on screen.
   no tail light work. **This is the fallback if the lens is abandoned.**
 - `b0ed7164a6`: three audio fixes, all found by ear in game.
 
+**READ THE TAG CAREFULLY.** `rallycart-v1` points at `96ebbd2fea`, which is one
+commit BEFORE the audio fixes. "Go back to v1" therefore silently drops the
+engine-transition panner fix, the summon-to-idle crossfade, and the landing gain
+retune. For a new skin or any other fresh start, work from the BRANCH TIP, not
+from the tag. If the tag is meant to be the shipping reference rather than a
+model-only snapshot, move it forward to `b0ed7164a6` or later.
+
 ### Audio, all live
 
 1. **Engine transitions follow the car.** The windup and winddown are
@@ -106,7 +113,15 @@ brightness are all guesses that have not been through a full pass on screen.
 3. **`MOUNT_LAND_BOOST` 1.5 -> 1.125.** Mount landing only; jump and the
    rider's own landing untouched.
 
-### The tail light lens: NOT committed, and the state to resume from
+### The tail light lens: PARKED, not committed
+
+**Status as of session 4: Jamie has stopped pursuing this and is generating a
+new texture instead.** Many attempts, none of which landed on screen. Read the
+trap table below before reviving it, and read the paragraph after it before
+deciding to revive it at all.
+
+Everything here is preserved because the traps are general, not because the
+approach is recommended.
 
 Built in Blender, `E:\rallycart_work\scripts\19_taillight_lens.py`, output
 `E:\rallycart_work\rallycart-lens.glb`. The repo copy of the model is back to
@@ -145,6 +160,14 @@ sit-on-top vs clipping, `AXIS_INSET`, `EXTENT_PERCENTILE`.
 **Where it was left:** the rounded-rectangle fit had just gone in and Jamie had
 not yet seen it. Verify `raysMissed: 0` in the script's report; anything above
 zero means vertices fell back to the flat plane and will hang in space.
+
+**Before reviving it, read this.** The whole exercise exists because the tail
+lights are PAINT on a smooth panel with no moulded recess, so geometry had to be
+invented to catch light. A NEW TEXTURE changes that premise. If the new skin
+paints its lamps somewhere the geometry does not fight, or gives them a recess,
+most of this becomes unnecessary. The cheaper order is: generate the texture
+first, look at the rear end, and only then decide whether a lens is still
+needed. Do not start by porting the lens script to the new skin.
 
 **Not done:** the twin-lens divider (dropped while fixing the floating and never
 restored), reverse white lights (this lens is the natural place: it is a
@@ -633,7 +656,7 @@ than this one mount.
 
 ### Engine audio
 
-Full detail in `RALLYCART_HANDOFF.md`. Summary: idle loop runs from summon
+Full detail in `WIRING_AND_AUDIO.md`. Summary: idle loop runs from summon
 onward; reverse is that same idle loop **pitched up at runtime on the live
 voice**, so it never re-triggers and the seamless loop stays seamless; direction
 changes cut immediately in both directions sharing one voice with a 40 ms
@@ -643,6 +666,25 @@ crossfade. Pitch table in `mountEngineBendRate`
 keeps its original 1.08 airborne-only bend, so this cannot retune a shipped
 mount. Summon fires on the `mountKey` change edge minus dismounts, preloaded
 when the summon channel starts.
+
+**Two fixes found by ear after the v1 tag, both live** (commit `b0ed7164a6`,
+which sits AFTER the `rallycart-v1` tag, so anyone starting from the tag loses
+them):
+
+- **The windup and winddown now travel with the car.** They are one-shots, so
+  unlike the loops they were never repositioned once started, and stayed parked
+  in the world where the throttle was pressed while the car drove away from
+  them. The panner is now retained on the keyed voice and moved every frame,
+  and both transitions share that voice key, so one fix covers the pair. The
+  general lesson, worth carrying to any mount: a one-shot long enough to
+  outlive the moment that fired it needs its PANNER kept, not just its buffer.
+- **The summon no longer clicks into the idle.** The parked idle used to start
+  on the exact sample the summon take ended, and that take does not decay: its
+  last 120ms still peaks near -15 dBFS. Two discontinuities on one boundary,
+  which is the click. The summon now takes a release fade
+  (`SUMMON_RELEASE_SEC`, 0.2s) and the idle leads in under its tail
+  (`SUMMON_IDLE_LEAD_SEC`, 0.45s), so the loop is already up as the summon
+  fades out.
 
 ### Jump and landing audio
 
@@ -729,12 +771,26 @@ size, and the outboard one sits 18mm further back in z.
 The bowls are RECESSED 15 to 21mm behind their rims, so the depth reference is
 the dish surface, never the rim. `z` in the table is the dish.
 
-| lamp | model x, y, z (dish) | bowl radius | glow |
+| lamp | model x, y, z | bowl radius | glow |
 |---|---|---|---|
-| left inner | -0.153, 0.211, 0.451 | 0.025 | 0.020 |
-| left outer | -0.222, 0.215, 0.427 | 0.024 | 0.018 |
-| right inner | +0.154, 0.205, 0.452 | 0.025 | 0.020 |
-| right outer | +0.223, 0.210, 0.427 | 0.024 | 0.018 |
+| left inner | -0.157, 0.211, 0.448 | 0.025 | 0.020 |
+| left outer | -0.222, 0.215, 0.424 | 0.024 | 0.018 |
+| right inner | +0.154, 0.209, 0.449 | 0.025 | 0.020 |
+| right outer | +0.219, 0.213, 0.427 | 0.024 | 0.018 |
+
+**These are hand-tuned on screen and deliberately NOT symmetric.** The mesh came
+from an image through Tripo, so the two housings genuinely do not mirror each
+other, and a symmetric table lands at least one lamp off centre. The measured
+values are the starting point, not the answer. Two specifics worth keeping:
+
+- The two INNER lamps sit about 3mm BEHIND their measured dish surface. Pushing
+  them forward fills better face on and looks wrong from three quarters, where
+  the dome visibly emerges from the dish. Judge those two off the angle, never
+  off a front-on screenshot.
+- The far-right lamp was originally taken from the vertex CENTROID, which the
+  dense cluster on its inboard side dragged 4mm out and 3mm low. The table now
+  uses the bounding-box midpoint of the same dish, which is what actually
+  centres it. Centroid follows vertex density; midpoint follows the shape.
 
 **Two separate knobs, and they do different jobs.** `glow` is the sphere radius
 (size). `SINK` (0.35) is how far its CENTRE sits behind the dish, as a fraction
