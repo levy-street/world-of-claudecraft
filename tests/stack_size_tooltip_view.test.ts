@@ -73,6 +73,10 @@ describe('stackSizeTooltipLine', () => {
       ['valefire_lantern', 'held_offhand'],
       ['silkspun_satchel', 'bag'],
       ['riding_training', 'tool'],
+      // Masterwrought phase 11: a shipped pattern item. RecipeItemDef bars
+      // stackSize outright, so the kind can never opt back in the way
+      // heroic_mark's tool row does below.
+      ['pattern_ironhusk_flask', 'recipe'],
     ];
     for (const [id, kind] of probes) {
       const def = ITEMS[id];

@@ -7,6 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_ITEMS, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { APEX_CONSUMABLE_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
@@ -46,11 +47,16 @@ describe('heroic vendor stock: item-level and budget pins', () => {
   // Masterwrought phase 04 re-cut this pin deliberately: the stock gained the
   // wyrmfall_core material row (the ruling R8 catch-up valve), so the
   // gear-shape assertions now run over the stock MINUS that row, and the
-  // material row gets its own pins below. The exact-count floors keep both
-  // halves honest: a new gear row or a second material row moves a literal.
+  // material row gets its own pins below. Phase 11 re-cut it again: the eight
+  // APEX_CONSUMABLE pattern rows joined (kind 'recipe', excluded from the
+  // gear loop by KIND) and get their own describe below. The exact-count
+  // floors keep all three slices honest: a new gear, material, or pattern
+  // row moves a literal.
   it('every gear offer is a real epic level-20 jewelry item at item level 26', () => {
-    expect(HEROIC_VENDOR_STOCK.length).toBe(11);
-    const gearOffers = HEROIC_VENDOR_STOCK.filter((o) => o.itemId !== 'wyrmfall_core');
+    expect(HEROIC_VENDOR_STOCK.length).toBe(19);
+    const gearOffers = HEROIC_VENDOR_STOCK.filter(
+      (o) => o.itemId !== 'wyrmfall_core' && ITEMS[o.itemId]?.kind !== 'recipe',
+    );
     expect(gearOffers.length).toBe(10);
     for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
@@ -86,6 +92,66 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     sim.buyHeroicVendorItem('wyrmfall_core', pid);
     expect(sim.countItem('wyrmfall_core', pid)).toBe(1);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+  });
+
+  // Masterwrought phase 11 (ruling R8's deterministic pillar): the eight
+  // APEX_CONSUMABLE patterns are SOLD here for Heroic Marks, day one. The
+  // vendor is the valve: patterns are tradable, so duplicates are purchasable
+  // BY DESIGN and the vendor price is the market ceiling; the six skill-100
+  // patterns sit at the ring price point, the two capstones at the neck point.
+  describe('the phase 11 pattern rows (the R8 deterministic valve)', () => {
+    const PATTERN_PRICES: Record<string, number> = {
+      pattern_ironhusk_flask: 12,
+      pattern_warboar_flask: 12,
+      pattern_runewater_flask: 12,
+      pattern_stonepot_stew: 12,
+      pattern_warspice_skewers: 12,
+      pattern_sageleaf_chowder: 12,
+      pattern_grand_cauldron: 16,
+      pattern_laden_hearth: 16,
+    };
+
+    it('sells exactly the eight apex consumable patterns, six at 12 and two at 16', () => {
+      // The kind read, not an id prefix: a pattern row whose def vanished
+      // from ITEMS must fall out of this census and red the exact-set pin.
+      const patternOffers = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind === 'recipe');
+      expect(patternOffers.map((o) => o.itemId).sort()).toEqual(Object.keys(PATTERN_PRICES).sort());
+      for (const offer of patternOffers) {
+        expect(offer.marks, offer.itemId).toBe(PATTERN_PRICES[offer.itemId]);
+      }
+    });
+
+    it('every pattern row is an epic recipe def teaching an APEX_CONSUMABLE recipe', () => {
+      const apexRecipeIds = new Set(APEX_CONSUMABLE_RECIPES.map((r) => r.id));
+      for (const itemId of Object.keys(PATTERN_PRICES)) {
+        const def = ITEMS[itemId];
+        expect(def, itemId).toBeTruthy();
+        if (def?.kind !== 'recipe') throw new Error(`${itemId} must be a kind-'recipe' def`);
+        expect(def.quality, itemId).toBe('epic');
+        expect(apexRecipeIds.has(def.teachesRecipeId), `${itemId} -> ${def.teachesRecipeId}`).toBe(
+          true,
+        );
+        // A pattern is not item-level eligible (no slot): the stock
+        // source-level bump must stay a no-op for it, like wyrmfall_core.
+        expect(itemLevel(def), itemId).toBeUndefined();
+      }
+    });
+
+    it('a pattern row BUYS: 12 marks debit, one pattern lands (no kind gate on the buy path)', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'PatternBuyer');
+      atQuartermaster(sim, pid);
+      sim.addItem(HEROIC_MARK_ITEM_ID, 13, pid);
+      sim.buyHeroicVendorItem('pattern_ironhusk_flask', pid);
+      expect(sim.countItem('pattern_ironhusk_flask', pid)).toBe(1);
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+      // Short one mark: refused, nothing granted, nothing debited. The
+      // refusal is affordability only; owning a copy never blocks a second
+      // purchase (duplicates are purchasable BY DESIGN, see the stock note).
+      sim.buyHeroicVendorItem('pattern_ironhusk_flask', pid);
+      expect(sim.countItem('pattern_ironhusk_flask', pid)).toBe(1);
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid)).toBe(1);
+    });
   });
 
   it('pins the ring and neck stat budgets (11 and 12) and every stat sum matches', () => {
@@ -180,7 +246,7 @@ describe('heroic vendor shop view (pure)', () => {
     // The literal, not HEROIC_VENDOR_STOCK.length: both sides of that compare
     // move together, so a vanished row would pass it (the unknown-id drop is
     // what this fixture proves; the row census literal is pinned above).
-    expect(view.rows.length).toBe(11);
+    expect(view.rows.length).toBe(19);
     expect(view.balance).toBe(12);
     const ring = view.rows.find((r) => r.itemId === 'seal_of_the_nine_oaths');
     const neck = view.rows.find((r) => r.itemId === 'yumis_keepsake_locket');

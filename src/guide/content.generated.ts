@@ -138,7 +138,7 @@ export interface GuideProfRecipe {
   skillReq: number;
   tier: number;
   station: string | null;
-  acquisition: 'trainer' | 'drop' | 'known';
+  acquisition: 'trainer' | 'drop' | 'vendor' | 'known';
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
@@ -8415,7 +8415,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "apothecary",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {
@@ -8458,7 +8458,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "apothecary",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {
@@ -8501,7 +8501,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "apothecary",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {
@@ -8544,7 +8544,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 125,
         "tier": 5,
         "station": "apothecary",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {
@@ -8988,7 +8988,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "kitchens",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {
@@ -9031,7 +9031,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "kitchens",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {
@@ -9074,7 +9074,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 100,
         "tier": 4,
         "station": "kitchens",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {
@@ -9117,7 +9117,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "skillReq": 125,
         "tier": 5,
         "station": "kitchens",
-        "acquisition": "drop",
+        "acquisition": "vendor",
         "feeCopper": 0,
         "materials": [
           {

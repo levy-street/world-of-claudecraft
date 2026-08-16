@@ -212,6 +212,10 @@ describe('MATERIAL_ITEM_IDS: class exclusions, keyed on KIND against the live ca
       'elixir',
       'scroll',
       'flask',
+      // Masterwrought phase 11: the apex pattern items (kind 'recipe') are
+      // the first shipped rows of their kind, so the census claims them and
+      // the non-junk sweep proves no pattern ever classifies as a material.
+      'recipe',
     ] as const;
     for (const kind of censused) {
       expect(kinds.has(kind), `catalog carries no kind-${kind} item`).toBe(true);

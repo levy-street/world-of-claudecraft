@@ -163,4 +163,25 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   // content/items.ts with the other materials; the item_level stock bump
   // no-ops for it (junk is not item-level eligible).
   { itemId: 'wyrmfall_core', marks: 12 },
+  // Masterwrought phase 11: the eight APEX_CONSUMABLE patterns, ruling R8's
+  // deterministic pillar. This marks vendor IS the valve, live from day one:
+  // consumable crafters get deterministic access so the raid economy
+  // functions, while the gear patterns stay chase drops per R8's split.
+  // Prices sit in the shipped mark family: the six skill-100 patterns at the
+  // ring point (12), the two skill-125 capstones at the neck point (16).
+  // Patterns are tradable, so duplicates are purchasable BY DESIGN: surplus
+  // copies flow to the World Market and this vendor price acts as the market
+  // ceiling. Purchase quantity is the vendor's hardcoded 1 per buy
+  // (buyHeroicVendorItem debits one price and grants exactly one copy; this
+  // vendor has no count multiplier). The defs live in
+  // content/apex_patterns.ts; the item_level stock bump no-ops for them
+  // (kind 'recipe' carries no slot, so it is not item-level eligible).
+  { itemId: 'pattern_ironhusk_flask', marks: 12 },
+  { itemId: 'pattern_warboar_flask', marks: 12 },
+  { itemId: 'pattern_runewater_flask', marks: 12 },
+  { itemId: 'pattern_stonepot_stew', marks: 12 },
+  { itemId: 'pattern_warspice_skewers', marks: 12 },
+  { itemId: 'pattern_sageleaf_chowder', marks: 12 },
+  { itemId: 'pattern_grand_cauldron', marks: 16 },
+  { itemId: 'pattern_laden_hearth', marks: 16 },
 ];

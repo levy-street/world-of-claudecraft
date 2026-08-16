@@ -45,6 +45,7 @@ const entrySource = `
     CRAFT_BATCH_MAX, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
   } from './src/sim/content/professions.ts';
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
+  export { HEROIC_VENDOR_STOCK } from './src/sim/content/heroic_vendor.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
   export { GATHER_NODES } from './src/sim/content/gather_nodes.ts';
   export { FISHING_TABLES_BY_BAND, FISHING_RARE_ID } from './src/sim/content/items.ts';
@@ -143,6 +144,7 @@ const {
   GATHERING_PROFESSIONS,
   GATHERING_PROFESSION_IDS,
   ALL_RECIPES,
+  HEROIC_VENDOR_STOCK,
   ENCHANTS,
   GATHER_NODES,
   FISHING_TABLES_BY_BAND,
@@ -680,6 +682,16 @@ const gainBoundaries = (skillReq) => {
   };
 };
 
+// The Heroic Quartermaster's pattern rows (Masterwrought phase 11, R8's
+// deterministic pillar): a drop-acquisition recipe whose TEACHING PATTERN
+// item (pattern_<resultItemId>) sits in the quartermaster's marks stock is
+// deterministically purchasable, so the wiki says 'vendor', never 'drop'.
+// The sim-side acquisition stays ['drop'] on purpose (the learn flow and the
+// pattern sweeps key on it); this mapping is wiki display only.
+const vendorPatternItemIds = new Set(HEROIC_VENDOR_STOCK.map((o) => o.itemId));
+const vendorTaughtRecipe = (r) =>
+  Boolean(r.acquisition?.includes('drop')) && vendorPatternItemIds.has(`pattern_${r.resultItemId}`);
+
 const profRecipeRow = (r) => ({
   id: r.id,
   name: itemName(r.resultItemId),
@@ -687,13 +699,16 @@ const profRecipeRow = (r) => ({
   tier: tierForSkill(r.skillReq),
   station: r.stationType ?? null,
   // Drop-taught recipes (the Masterwrought apex rows, R8) say so rather than
-  // claiming "Known from the start": the pattern items land in phase 11, but
-  // the wiki row must never misstate the acquisition in the meantime.
+  // claiming "Known from the start", and the vendor-sold slice of them says
+  // 'vendor' (see vendorTaughtRecipe above): the wiki row must never
+  // misstate the acquisition.
   acquisition: r.acquisition?.includes('trainer')
     ? 'trainer'
-    : r.acquisition?.includes('drop')
-      ? 'drop'
-      : 'known',
+    : vendorTaughtRecipe(r)
+      ? 'vendor'
+      : r.acquisition?.includes('drop')
+        ? 'drop'
+        : 'known',
   feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
   materials: r.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
   output: {
@@ -1245,7 +1260,7 @@ export interface GuideProfRecipe {
   skillReq: number;
   tier: number;
   station: string | null;
-  acquisition: 'trainer' | 'drop' | 'known';
+  acquisition: 'trainer' | 'drop' | 'vendor' | 'known';
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };

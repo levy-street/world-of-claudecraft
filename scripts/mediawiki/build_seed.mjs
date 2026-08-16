@@ -59,6 +59,13 @@ function link(title, label = title) {
   return title === label ? '[[' + title + ']]' : '[[' + title + '|' + label + ']]';
 }
 
+function kindWording(kind) {
+  // kind 'recipe' is the physical PATTERN item (it teaches a recipe when
+  // used), so prose, facts, and categories say 'pattern': an item page must
+  // never read as the recipe it teaches. Every other kind is its own word.
+  return kind === 'recipe' ? 'pattern' : kind;
+}
+
 function section(title, body) {
   return '== ' + title + ' ==\\n' + body.trim() + '\\n\\n';
 }
@@ -264,9 +271,9 @@ for (const [id, mob] of Object.entries(MOBS)) {
 }
 
 for (const [id, item] of Object.entries(ITEMS)) {
-  add(titleBy.item.get(id), section('Overview', item.name + ' is a ' + (item.quality ?? 'common') + ' ' + item.kind + (item.slot ? ' for ' + item.slot : '') + '.') + section('Facts', table([
-    ['Kind', item.kind], ['Quality', item.quality ?? 'common'], ['Slot', item.slot ?? 'None'], ['Sell value', money(item.sellValue)], ['Buy value', money(item.buyValue)], ['Required class', item.requiredClass?.join(', ') ?? 'Any'],
-  ])) + (item.weapon ? section('Weapon', table([['Damage', item.weapon.min + '-' + item.weapon.max], ['Speed', String(item.weapon.speed)], ['Dagger', item.weapon.dagger ? 'Yes' : 'No']])) : '') + (item.stats ? section('Stats', table(Object.entries(item.stats).map(([k, v]) => [k.toUpperCase(), String(v)]))) : '') + (item.foodHp || item.drinkMana ? section('Consumable', table([['Health restored', String(item.foodHp ?? 0)], ['Mana restored', String(item.drinkMana ?? 0)]])) : ''), ['Items', item.kind, item.quality ?? 'common']);
+  add(titleBy.item.get(id), section('Overview', item.name + ' is a ' + (item.quality ?? 'common') + ' ' + kindWording(item.kind) + (item.slot ? ' for ' + item.slot : '') + '.') + section('Facts', table([
+    ['Kind', kindWording(item.kind)], ['Quality', item.quality ?? 'common'], ['Slot', item.slot ?? 'None'], ['Sell value', money(item.sellValue)], ['Buy value', money(item.buyValue)], ['Required class', item.requiredClass?.join(', ') ?? 'Any'],
+  ])) + (item.weapon ? section('Weapon', table([['Damage', item.weapon.min + '-' + item.weapon.max], ['Speed', String(item.weapon.speed)], ['Dagger', item.weapon.dagger ? 'Yes' : 'No']])) : '') + (item.stats ? section('Stats', table(Object.entries(item.stats).map(([k, v]) => [k.toUpperCase(), String(v)]))) : '') + (item.foodHp || item.drinkMana ? section('Consumable', table([['Health restored', String(item.foodHp ?? 0)], ['Mana restored', String(item.drinkMana ?? 0)]])) : ''), ['Items', kindWording(item.kind), item.quality ?? 'common']);
 }
 
 for (const [id, ability] of visibleAbilities) {

@@ -59,8 +59,13 @@ function sourceCell(r: GuideProfRecipe): string {
       ? esc(t('guide.profPages.sourceTrainerFee', { fee: formatMoney(r.feeCopper) }))
       : esc(t('guide.profPages.sourceTrainerFree'));
   }
-  // Drop-taught (the Masterwrought apex rows, R8): the pattern items land in
-  // phase 11, but the row must never claim the recipe is known from the start.
+  // Vendor-sold patterns (Masterwrought phase 11, R8's deterministic pillar):
+  // the generator emits 'vendor' for a drop-acquisition recipe whose teaching
+  // pattern the Heroic Quartermaster stocks, so this arm sits BEFORE the drop
+  // arm and the row states the deterministic source.
+  if (r.acquisition === 'vendor') return esc(t('guide.profPages.sourceVendor'));
+  // Drop-taught (the Masterwrought apex rows, R8): the row must never claim
+  // the recipe is known from the start.
   if (r.acquisition === 'drop') return esc(t('guide.profPages.sourceDrop'));
   return esc(t('guide.profPages.sourceKnown'));
 }

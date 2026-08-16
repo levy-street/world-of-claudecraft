@@ -52,6 +52,7 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import {
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
@@ -1723,11 +1724,20 @@ describe('Guide professions generated content accuracy', () => {
         expect(row.skillReq).toBe(def.skillReq);
         expect(row.tier).toBe(tierForSkill(def.skillReq));
         expect(row.station).toBe(def.stationType ?? null);
+        // The vendor arm mirrors the generator's channel split (phase 11,
+        // R8): a drop-acquisition recipe whose teaching pattern is stocked
+        // on the Heroic Quartermaster renders as the vendor channel; every
+        // other drop recipe stays the found-pattern channel.
+        const vendorTaught = HEROIC_VENDOR_STOCK.some(
+          (offer) => offer.itemId === `pattern_${def.resultItemId}`,
+        );
         expect(row.acquisition).toBe(
           def.acquisition?.includes('trainer')
             ? 'trainer'
             : def.acquisition?.includes('drop')
-              ? 'drop'
+              ? vendorTaught
+                ? 'vendor'
+                : 'drop'
               : 'known',
         );
         expect(row.feeCopper).toBe(def.acquisition?.includes('trainer') ? trainingFeeFor(def) : 0);
@@ -1783,6 +1793,13 @@ describe('Guide professions generated content accuracy', () => {
     expect(apexLegs?.acquisition).toBe('drop');
     expect(apexLegs?.feeCopper).toBe(0);
     expect(apexLegs?.skillReq).toBe(100);
+    // A vendor-channel apex row (phase 11, R8's deterministic pillar): the
+    // fourth acquisition arm, distinct from the found-pattern channel even
+    // though the sim-side acquisition stays ['drop'] for the learn flow.
+    const alc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'alchemy');
+    const apexFlask = alc?.recipes.find((r) => r.id === 'recipe_ironhusk_flask');
+    expect(apexFlask?.acquisition).toBe('vendor');
+    expect(apexFlask?.feeCopper).toBe(0);
     // Specialization: skill 75, 20 percent material discount, from content.
     for (const c of GUIDE_PROF_CRAFTS) {
       expect(c.specialization.at).toBe(PERK_THRESHOLDS[c.id].specializedSkillThreshold);
@@ -2505,6 +2522,24 @@ describe('Guide professions pages and routes', () => {
       t('guide.profPages.sourceDrop'),
     );
     expect(armorRowFor('Forgefold Legguards')).not.toContain(t('guide.profPages.sourceKnown'));
+    // The RENDERED source cell for the VENDOR channel (phase 11): the eight
+    // APEX_CONSUMABLE patterns are sold by the Heroic Quartermaster, so the
+    // generator maps their drop-acquisition rows to 'vendor' and sourceCell
+    // must route them to the vendor string, never the drop or known arms (a
+    // mapping that fell through to 'drop' would stay green under the
+    // data-level corpus pin alone). Same row-scoped idiom as the armor pin;
+    // the armor drop pin above stays as the drop channel's own contrast.
+    const alch = professionsPage.render(ctx(['alchemy']));
+    const alchRowFor = (name: string): string =>
+      alch.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? '';
+    expect(
+      alchRowFor('Ironhusk Flask'),
+      'vendor-sold pattern row renders the quartermaster source string',
+    ).toContain(t('guide.profPages.sourceVendor'));
+    expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceDrop'));
+    expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceKnown'));
     // The enchanting route rides the craft module with its own sections.
     const ench = professionsPage.render(ctx(['enchanting']));
     expect(ench).toContain('Enchant Weapon - Runed Edge');

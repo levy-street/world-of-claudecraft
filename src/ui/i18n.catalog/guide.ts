@@ -2649,6 +2649,9 @@ export const guideStrings = {
     sourceTrainerFree: 'Trainer, free',
     sourceKnown: 'Known from the start',
     sourceDrop: 'From a found pattern',
+    // Vendor-sold patterns (Masterwrought phase 11): the Heroic Quartermaster
+    // stocks the apex consumable patterns for Heroic Marks.
+    sourceVendor: 'Sold by the Heroic Quartermaster',
     gainFmt: '{reduced} / {minimal} / {zero}',
     colRecipe: 'Recipe',
     colSkill: 'Skill',
