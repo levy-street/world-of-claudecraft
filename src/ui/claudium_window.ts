@@ -256,6 +256,15 @@ export class ClaudiumWindow {
   private paint(view: ClaudiumView): void {
     const body = this.deps.root().querySelector<HTMLElement>('.cl-body');
     if (!body) return;
+    // The default tab is Stripe, but a deployment without Stripe (our test
+    // economy) must not strand the user on a fully-disabled tab: fall over to
+    // the first live rail so the packs are immediately buyable.
+    if (!view.rails[this.selectedRail]) {
+      const fallback = (['stripe', 'woc', 'usdc', 'sol'] as const).find(
+        (rail) => view.rails[rail],
+      );
+      if (fallback) this.selectedRail = fallback;
+    }
     const walletMarkup = this.walletConnectionHtml();
     body.innerHTML =
       this.balanceHtml(view) +

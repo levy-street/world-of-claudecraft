@@ -3280,6 +3280,13 @@ async function startGame(
           const refreshClaudiumLater = () => {
             void hud.refreshClaudium();
           };
+          // A native buy needs a CONNECTED wallet to sign with. The SDK would
+          // bury a missing wallet as a generic 'unavailable' refusal; checking
+          // here surfaces the actionable "connect a wallet first" error instead.
+          if (rail !== 'stripe' && !desktopWalletBrowserHandoffAvailable()) {
+            const wallet = await loadWallet();
+            if (!wallet.currentWallet()?.address) throw new Error('connect a wallet first');
+          }
           const result = await startClaudiumPurchase(economy, rail, sku, {
             nativePayer:
               desktopWalletBrowserHandoffAvailable() && linkedWalletPubkey
@@ -3319,7 +3326,20 @@ async function startGame(
                 return result.signature;
               }
               const wallet = await loadWallet();
-              return wallet.signAndSendTransactionBase64(transactionBase64);
+              try {
+                return await wallet.signAndSendTransactionBase64(transactionBase64);
+              } catch (sendErr) {
+                // The service-built transaction carries a TEST-CLUSTER blockhash;
+                // a wallet pointed at another cluster rejects it with a raw
+                // 'Blockhash not found'. Translate that into the actual fix.
+                const sendMessage = sendErr instanceof Error ? sendErr.message : String(sendErr);
+                if (/blockhash/i.test(sendMessage)) {
+                  throw new Error(
+                    'wallet cluster mismatch: switch your wallet to the devnet cluster (Phantom: Settings → Developer Settings → Testnet Mode) and try again',
+                  );
+                }
+                throw sendErr;
+              }
             },
           });
           if ('ok' in result && !result.ok) {

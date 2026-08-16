@@ -476,6 +476,9 @@ async function quoteNative(body: unknown): Promise<Record<string, unknown>> {
   const payer = typeof input.payer === 'string' ? input.payer : '';
   const accountId = Number(input.fulfillment?.accountId);
   if (!rail || !sku || !isSolanaAddress(payer) || !Number.isSafeInteger(accountId)) {
+    console.warn(
+      `[claudium-test] quote refused (invalid_request): rail=${String(input.rail)} sku=${String(input.sku)} payer=${payer.slice(0, 8)}… account=${accountId}`,
+    );
     return { reason: 'invalid_request' };
   }
   const lamports = usdToLamports(sku.usd);
@@ -483,7 +486,10 @@ async function quoteNative(body: unknown): Promise<Record<string, unknown>> {
   let blockhash = '';
   try {
     blockhash = await latestBlockhash();
-  } catch {
+  } catch (err) {
+    console.warn(
+      `[claudium-test] quote refused (rpc_unavailable): ${err instanceof Error ? err.message : String(err)}`,
+    );
     return { reason: 'rpc_unavailable' };
   }
   const transactionBase64 = buildLegacyTransferTxBase64({
