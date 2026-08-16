@@ -57,6 +57,57 @@ function rpcUrl(): string {
   return (process.env.SOLANA_RPC_URL ?? 'https://api.devnet.solana.com').trim();
 }
 
+// Public test-cluster RPCs rate-limit hard per IP (the packs modal polls balances
+// every ~15s per player), so every RPC read goes through a small cache and the
+// blockhash fetch retries before a quote is refused.
+const BLOCKHASH_CACHE_TTL_MS = 45_000; // blockhashes stay valid ~60-90s
+const SOL_BALANCE_CACHE_TTL_MS = 20_000;
+const BLOCKHASH_RETRIES = 3;
+
+let cachedBlockhash: { hash: string; at: number } | null = null;
+
+async function latestBlockhash(): Promise<string> {
+  if (cachedBlockhash && Date.now() - cachedBlockhash.at < BLOCKHASH_CACHE_TTL_MS) {
+    return cachedBlockhash.hash;
+  }
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= BLOCKHASH_RETRIES; attempt++) {
+    try {
+      const result = await rpc<{ value?: { blockhash?: string } }>('getLatestBlockhash', [
+        { commitment: 'finalized' },
+      ]);
+      const hash = result?.value?.blockhash ?? '';
+      if (hash !== '') {
+        cachedBlockhash = { hash, at: Date.now() };
+        return hash;
+      }
+      throw new Error('empty blockhash');
+    } catch (err) {
+      lastError = err;
+      await new Promise((resolve) => setTimeout(resolve, 400 * attempt));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('blockhash fetch failed');
+}
+
+const solBalanceCache = new Map<string, { lamports: string; at: number }>();
+
+async function cachedSolBalance(owner: string): Promise<string> {
+  const hit = solBalanceCache.get(owner);
+  if (hit && Date.now() - hit.at < SOL_BALANCE_CACHE_TTL_MS) return hit.lamports;
+  const result = await rpc<{ value?: number }>('getBalance', [
+    owner,
+    { commitment: 'confirmed' },
+  ]);
+  const lamports = String(result?.value ?? 0);
+  solBalanceCache.set(owner, { lamports, at: Date.now() });
+  if (solBalanceCache.size > 512) {
+    const oldest = solBalanceCache.keys().next().value;
+    if (oldest !== undefined) solBalanceCache.delete(oldest);
+  }
+  return lamports;
+}
+
 /** Test mode is on only when explicitly requested AND a treasury address exists. */
 export function testEconomyEnabled(): boolean {
   return (process.env.WOC_TEST_ECONOMY ?? '').trim() === '1' && treasuryAddress() !== '';
@@ -333,11 +384,11 @@ export async function callTestEconomy(req: TestRequest): Promise<unknown> {
   if (req.method === 'GET' && solBalanceMatch) {
     const owner = decodeURIComponent(solBalanceMatch[1]);
     if (!isSolanaAddress(owner)) return { owner, lamports: null };
-    const result = await rpc<{ value?: number }>('getBalance', [
-      owner,
-      { commitment: 'confirmed' },
-    ]);
-    return { owner, lamports: String(result?.value ?? 0) };
+    try {
+      return { owner, lamports: await cachedSolBalance(owner) };
+    } catch {
+      return { owner, lamports: null };
+    }
   }
 
   const usdcBalanceMatch = /^native\/balance\/usdc\/(\w+)$/.exec(path);
@@ -431,11 +482,7 @@ async function quoteNative(body: unknown): Promise<Record<string, unknown>> {
   const reference = `tst_${randomBytes(12).toString('hex')}`;
   let blockhash = '';
   try {
-    const result = await rpc<{ context?: { slot?: number }; value?: { blockhash?: string } }>(
-      'getLatestBlockhash',
-      [{ commitment: 'finalized' }],
-    );
-    blockhash = result?.value?.blockhash ?? '';
+    blockhash = await latestBlockhash();
   } catch {
     return { reason: 'rpc_unavailable' };
   }

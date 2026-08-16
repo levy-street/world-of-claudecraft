@@ -7768,6 +7768,16 @@ function wireContractAddressCopy(): void {
   const container = document.getElementById('token-ca');
   if (!btn || !container) return;
 
+  // The pill ships with a %VITE_DONATION_ADDRESS% placeholder that Vite replaces
+  // at build time. When the operator never set a donation wallet the raw
+  // placeholder (or empty string) survives; anything that is not a plausible
+  // Solana address hides the whole block instead of advertising a bogus address.
+  const rawCa = btn.getAttribute('data-ca') ?? '';
+  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(rawCa)) {
+    container.hidden = true;
+    return;
+  }
+
   const showCopied = () => {
     container.classList.add('is-copied');
     if (caCopyResetTimer !== null) window.clearTimeout(caCopyResetTimer);

@@ -802,15 +802,15 @@
           <button type="button" id="btn-offline" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
 
           <div id="token-ca">
-            <span class="token-ca-label" data-i18n="mode.caLabel">$WOC Contract Address</span>
-            <button type="button" id="btn-copy-ca" class="token-ca-pill" data-ca="3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth" data-i18n-aria="mode.caCopyAria" aria-label="Copy contract address">
-              <code class="token-ca-addr">3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth</code>
+            <span class="token-ca-label">Bağış Adresi (Solana) · Donation Address</span>
+            <button type="button" id="btn-copy-ca" class="token-ca-pill" data-ca="%VITE_DONATION_ADDRESS%" aria-label="Copy donation address">
+              <code class="token-ca-addr">%VITE_DONATION_ADDRESS%</code>
               <span class="token-ca-copy" aria-hidden="true">
                 <svg class="icon-clipboard" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 <svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </span>
             </button>
-            <p class="token-ca-note" data-i18n="mode.caNote">WOC is our community token. It is not needed to play. Join Discord to discuss the WOC utility and flywheel.</p>
+            <p class="token-ca-note">Bu sunucunun bağış cüzdanıdır; token sözleşmesi değildir ve bağış zorunlu değildir. This is the server's donation wallet, not a token contract; donating is optional.</p>
           </div>
 
           <!-- Tip — part of the same play container (divider above). -->
