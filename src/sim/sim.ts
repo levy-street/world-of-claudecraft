@@ -549,6 +549,7 @@ import {
   spawnOverworldSpiritHealers,
   UNSTUCK_SICKNESS_ID,
 } from './spirit';
+import { buyRedesignCredit as buyRedesignCreditImpl } from './stylist';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
@@ -1300,6 +1301,11 @@ export interface PlayerMeta {
   // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
   // that had mountTrainingFeePaid=true gets ridingTrained=true on load.
   ridingTrained?: boolean;
+  // Unspent character-redesign credits bought from the Stylist (src/sim/stylist.ts).
+  // An INTEGER, not a boolean: holding several at once is legal, so a player can
+  // buy ahead. Optional and absent while zero (the zero-default omission
+  // convention), so every pre-feature save loads as 0 with no migration.
+  redesignCredits?: number;
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
@@ -1819,6 +1825,10 @@ export interface CharacterState {
   mountTrainingFeePaid?: boolean;
   // Riding skill purchased from Marla (80g). Optional and absent until bought.
   ridingTrained?: boolean;
+  // Unspent Stylist redesign credits. Integer (several may be held); absent while
+  // zero, so an existing character with no key reads as 0 and needs no migration.
+  // The char-select roster and the redesign endpoint both read it from here.
+  redesignCredits?: number;
   // PBE boost kit version applied (server/pbe_boost.ts); absent outside PBE.
   pbeBoostKit?: number;
   delveMarks?: number;
@@ -3364,6 +3374,14 @@ export class Sim {
       if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
       // Grandfather: players who already paid the old 100g fee are riding-trained.
       if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
+      // Stylist redesign credits. Absent (a pre-feature save) stays absent, so
+      // the blob round-trips byte-equal; a stored value is floored and clamped
+      // at zero because this is untrusted persisted JSON and a negative or
+      // fractional count must never reach the credit compare.
+      if (typeof s.redesignCredits === 'number' && Number.isFinite(s.redesignCredits)) {
+        const credits = Math.max(0, Math.floor(s.redesignCredits));
+        if (credits > 0) meta.redesignCredits = credits;
+      }
       if (typeof s.pbeBoostKit === 'number') meta.pbeBoostKit = s.pbeBoostKit;
       // Grandfather: players who had q_riding_lessons active in a mid-quest save
       // (state='active' or 'ready') but never received ridingTrained=true are
@@ -4193,6 +4211,9 @@ export class Sim {
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       // Absent until riding skill is purchased (back-compat).
       ...(meta.ridingTrained ? { ridingTrained: true } : {}),
+      // Absent while zero (zero-default omission), so a character who has never
+      // bought a redesign saves byte-identically to a pre-feature blob.
+      ...(meta.redesignCredits ? { redesignCredits: meta.redesignCredits } : {}),
       // Absent outside the PBE (back-compat; server/pbe_boost.ts).
       ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
@@ -4334,6 +4355,17 @@ export class Sim {
   // --- IWorldMounts: learn riding ---
   learnRiding(npcId: number): void {
     this.learnRidingFor(npcId, this.primaryId);
+  }
+
+  /** Buy a redesign credit from the Stylist. Server path; the IWorld member
+   *  below rides primaryId. Rules live in src/sim/stylist.ts. */
+  buyRedesignCreditFor(npcId: number, pid: number): void {
+    buyRedesignCreditImpl(this.ctx, npcId, pid);
+  }
+
+  // --- IWorldCosmetics: buy a character-redesign credit ---
+  buyRedesignCredit(npcId: number): void {
+    this.buyRedesignCreditFor(npcId, this.primaryId);
   }
 
   /** Per-pid riding-lesson command surface (the server path); the IWorld member

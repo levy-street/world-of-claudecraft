@@ -36,6 +36,10 @@ import {
   resetCharactersRuntimeForTests,
   setCharactersDbForTests,
 } from '../../../server/characters';
+import {
+  resetCharacterRedesignDbForTests,
+  setCharacterRedesignDbForTests,
+} from '../../../server/character_redesign';
 import { compose } from '../../../server/http/compose';
 import { logger } from '../../../server/http/logger';
 import { ADMIN_AUTH_REQUIRED } from '../../../server/http/middleware/require_admin';
@@ -126,6 +130,14 @@ function installDenyingCharacterDb(): void {
     moderationStatusForAccount: async () => NOT_LOCKED,
     getCharacter: async () => null,
     lifetimeXpStanding: async () => null,
+  });
+  // The paid-redesign domain owns its OWN loader seam (server/character_redesign.ts),
+  // so it needs its own denying stub: it composes the character domain's auth
+  // guard but never its db bundle. consumeRedesignCredit refuses too, so a route
+  // that somehow skipped the loader still writes nothing.
+  setCharacterRedesignDbForTests({
+    getCharacter: async () => null,
+    consumeRedesignCredit: async () => false,
   });
 }
 
@@ -219,6 +231,7 @@ describe('ownership coverage: registry-wide deny-by-default sweep', () => {
 
   afterEach(() => {
     resetCharactersDbForTests();
+    resetCharacterRedesignDbForTests();
     resetCharactersRuntimeForTests();
     resetMapsGuardDbForTests();
     resetMapsServiceForTests();

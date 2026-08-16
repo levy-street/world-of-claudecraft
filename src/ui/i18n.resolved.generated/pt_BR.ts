@@ -3857,7 +3857,8 @@ export const pt_BR: EnTranslations = {
       "taken_over": "Seu personagem foi assumido por outra sessão.",
       "rename_required": "Este personagem precisa ser renomeado antes de entrar no mundo.",
       "invalid_appearance": "Não foi possível salvar essa aparência. Ajuste o visual e tente novamente.",
-      "reroll_unavailable": "Este personagem não tem um redesenho gratuito disponível."
+      "reroll_unavailable": "Este personagem não tem um redesenho gratuito disponível.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Esta conta está suspensa até {date}.",
@@ -7249,6 +7250,10 @@ export const pt_BR: EnTranslations = {
     "waitingOnOpponent": "Aguardando a carta do seu oponente...",
     "yourTurn": "Jogue uma carta"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Quadro de Incursões",
@@ -7831,7 +7836,11 @@ export const pt_BR: EnTranslations = {
     "redesignHint": "Este personagem é anterior ao novo criador de personagens. Você tem um redesenho gratuito; ele é usado ao salvar.",
     "redesignTitle": "Redesenhar {name}",
     "redesignSave": "Salvar novo visual",
-    "redesignCancel": "Manter visual atual"
+    "redesignCancel": "Manter visual atual",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Excluir personagem",
@@ -13813,6 +13822,11 @@ export const pt_BR: EnTranslations = {
         "name": "Mestre das Cartas",
         "title": "Distribuidor do Acaso",
         "greeting": "Que tal um Duelo de Cartas? Melhor de três, quem vence fica com os direitos de se gabar."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Tesoureira Petra Vell",

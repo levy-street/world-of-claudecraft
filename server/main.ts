@@ -91,6 +91,7 @@ import {
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { bustAllLifetimeXpRankCache } from './character_rank_cache';
+import { configureCharacterRedesignRuntime } from './character_redesign';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   buildCharacterList,
@@ -2769,6 +2770,20 @@ configureCharactersRuntime({
   purgeMailOwner: (characterId, name) => liveGame().purgeMailOwner(characterId, name),
   initialCharacterState,
   publicOrigin,
+});
+
+// The PAID redesign route's own runtime (server/character_redesign.ts). Three
+// live-session mirrors, all no-ops when the character is offline: the look, the
+// helm choice, and the CREDIT. The credit push is the load-bearing one: without
+// it an online character's 30 s autosave writes its stale in-memory count back
+// over the row and refunds the credit the player just spent.
+configureCharacterRedesignRuntime({
+  applyAppearanceForCharacter: (characterId, appearance) =>
+    liveGame().applyAppearanceForCharacter(characterId, appearance),
+  setHelmHiddenForCharacter: (characterId, hidden) =>
+    liveGame().setHelmHiddenForCharacter(characterId, hidden),
+  spendRedesignCreditForCharacter: (characterId) =>
+    liveGame().spendRedesignCreditForCharacter(characterId),
 });
 
 // Inject the main.ts game-session hooks the ported account handlers

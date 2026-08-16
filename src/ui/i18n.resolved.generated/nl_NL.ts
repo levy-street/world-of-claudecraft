@@ -3857,7 +3857,8 @@ export const nl_NL: EnTranslations = {
       "taken_over": "Je personage is overgenomen door een andere sessie.",
       "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
       "invalid_appearance": "Dat uiterlijk kon niet worden opgeslagen. Pas het ontwerp aan en probeer het opnieuw.",
-      "reroll_unavailable": "Dit personage heeft geen gratis herontwerp beschikbaar."
+      "reroll_unavailable": "Dit personage heeft geen gratis herontwerp beschikbaar.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Dit account is geschorst tot {date}.",
@@ -7249,6 +7250,10 @@ export const nl_NL: EnTranslations = {
     "waitingOnOpponent": "Wachten op de kaart van je tegenstander...",
     "yourTurn": "Speel een kaart"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Delvebord",
@@ -7831,7 +7836,11 @@ export const nl_NL: EnTranslations = {
     "redesignHint": "Dit personage stamt van vóór de nieuwe personagemaker. Je hebt één gratis herontwerp; het wordt gebruikt zodra je opslaat.",
     "redesignTitle": "{name} herontwerpen",
     "redesignSave": "Nieuw uiterlijk opslaan",
-    "redesignCancel": "Huidig uiterlijk behouden"
+    "redesignCancel": "Huidig uiterlijk behouden",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Personage verwijderen",
@@ -13813,6 +13822,11 @@ export const nl_NL: EnTranslations = {
         "name": "Kaartmeester",
         "title": "Verdeler van het Lot",
         "greeting": "Zin in een Kaartduel? Beste van drie, de winnaar pakt de praatrechten."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Thesaurier Petra Vell",

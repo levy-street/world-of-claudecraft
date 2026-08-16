@@ -3857,7 +3857,8 @@ export const ko_KR: EnTranslations = {
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
       "invalid_appearance": "해당 외형을 저장할 수 없습니다. 디자인을 조정한 뒤 다시 시도하세요.",
-      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다."
+      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "이 계정은 {date}까지 정지되었습니다.",
@@ -7249,6 +7250,10 @@ export const ko_KR: EnTranslations = {
     "waitingOnOpponent": "상대의 카드를 기다리는 중...",
     "yourTurn": "카드를 내세요"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "탐굴 게시판",
@@ -7831,7 +7836,11 @@ export const ko_KR: EnTranslations = {
     "redesignHint": "이 캐릭터는 새 캐릭터 편집기 이전에 생성되었습니다. 무료 재디자인 기회가 1회 있으며, 저장할 때 사용됩니다.",
     "redesignTitle": "{name} 재디자인",
     "redesignSave": "새 외형 저장",
-    "redesignCancel": "현재 외형 유지"
+    "redesignCancel": "현재 외형 유지",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "캐릭터 삭제",
@@ -13813,6 +13822,11 @@ export const ko_KR: EnTranslations = {
         "name": "카드 마스터",
         "title": "운명의 딜러",
         "greeting": "카드 대결 한 판 어떻소? 삼판양승, 승자에게는 자랑거리가 생기지."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "출납관 페트라 벨",

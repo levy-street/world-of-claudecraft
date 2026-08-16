@@ -3857,7 +3857,8 @@ export const zh_TW: EnTranslations = {
       "taken_over": "你的角色已被另一個工作階段接管。",
       "rename_required": "此角色必須先更名才能進入世界。",
       "invalid_appearance": "無法儲存該外觀。請調整設計後再試一次。",
-      "reroll_unavailable": "此角色沒有可用的免費重新設計。"
+      "reroll_unavailable": "此角色沒有可用的免費重新設計。",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "此帳號停權至 {date}。",
@@ -7249,6 +7250,10 @@ export const zh_TW: EnTranslations = {
     "waitingOnOpponent": "正在等待對手出牌……",
     "yourTurn": "出一張牌"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "秘探看板",
@@ -7831,7 +7836,11 @@ export const zh_TW: EnTranslations = {
     "redesignHint": "此角色建立於新角色編輯器之前。你有一次免費重新設計的機會，儲存時即會消耗。",
     "redesignTitle": "重新設計{name}",
     "redesignSave": "儲存新外觀",
-    "redesignCancel": "保留目前外觀"
+    "redesignCancel": "保留目前外觀",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "刪除角色",
@@ -13813,6 +13822,11 @@ export const zh_TW: EnTranslations = {
         "name": "牌局大師",
         "title": "運氣經銷人",
         "greeting": "來一局紙牌對決？三局兩勝，贏家贏得吹噓的資本。"
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "司庫佩特拉·維爾",

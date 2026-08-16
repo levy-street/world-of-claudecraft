@@ -30,4 +30,11 @@ export interface IWorldCosmetics {
   // and portraits present the chosen look, and persists per character through
   // the sim's own save. Explicit boolean, not a toggle, so it is idempotent.
   setHelmHidden(hidden: boolean): void;
+  // Buy one character-redesign credit from the Stylist for gold, priced by the
+  // buyer's level band (src/sim/content/redesign_pricing.ts). Server-
+  // authoritative: the Sim re-validates NPC identity, range, liveness, the credit
+  // cap, and funds, then charges and increments in one tick. The credit is spent
+  // later at character select, not here, so there is no success payload; failure
+  // arrives as the usual vendor error toast.
+  buyRedesignCredit(npcId: number): void;
 }

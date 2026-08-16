@@ -246,6 +246,12 @@ export interface CharacterSummary {
    *  redesign (created before the modular creator shipped, token unspent).
    *  Drives the roster's reroll button; flips false after a successful spend. */
   appearanceRerollAvailable?: boolean;
+  /** Server-decided: how many unspent Stylist redesign credits this character
+   *  holds (absent or 0 = none). Drives the roster's Edit Appearance button.
+   *  Unlike appearanceRerollAvailable above this is a COUNT, not a flag: a
+   *  player may buy several ahead, and the button stays for as long as any
+   *  remain. Decremented server-side by the redesign endpoint. */
+  redesignCredits?: number;
 }
 
 /** Bounded positive-integer wire read for cosmetic counts. NEVER trust the
@@ -830,6 +836,24 @@ export class Api {
     helmHidden: boolean,
   ): Promise<Record<string, unknown>> {
     const data = await this.post(`/api/characters/${characterId}/appearance-reroll`, {
+      appearance,
+      helmHidden,
+    });
+    return (data.appearance ?? appearance) as Record<string, unknown>;
+  }
+
+  // Spend ONE Stylist redesign credit on a new authored look. The paid sibling
+  // of rerollAppearance above: the server is the eligibility authority and
+  // decrements the credit atomically (a conditional update), so a double-submit
+  // yields one redesign and a clean error, never two. `helmHidden` is the
+  // editor's helmet toggle, the same standing wardrobe choice creation posts.
+  // Resolves with the normalized stored look.
+  async spendRedesignCredit(
+    characterId: number,
+    appearance: object,
+    helmHidden: boolean,
+  ): Promise<Record<string, unknown>> {
+    const data = await this.post(`/api/characters/${characterId}/redesign`, {
       appearance,
       helmHidden,
     });
@@ -4383,6 +4407,14 @@ export class ClientWorld implements IWorld {
   // delta (mntRtd=true) confirms the skill was granted. ---
   learnRiding(npcId: number): void {
     this.cmd({ cmd: 'learn_riding', npc: npcId });
+  }
+  // --- Stylist redesign credit: server-authoritative, no optimistic local
+  // nudge. Failure arrives as the usual vendor error toast; success as the
+  // purchase notice. The credit itself is never mirrored in world: it is read
+  // from the character roster at char-select, which is the only place it is
+  // spent. ---
+  buyRedesignCredit(npcId: number): void {
+    this.cmd({ cmd: 'buy_redesign_credit', npc: npcId });
   }
   // --- riding lesson: fully server-authoritative, no optimistic local nudge;
   // feedback rides the mountTrain* events straight to the HUD (drainEvents), no

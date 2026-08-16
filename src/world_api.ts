@@ -608,6 +608,11 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // Buy one character-redesign credit from the Stylist
+  // (IWorldCosmetics.buyRedesignCredit): carries the NPC entity id the client
+  // says it is talking to, which the Sim re-validates against the Stylist
+  // template. Appended because wire tokens are never reordered.
+  'buy_redesign_credit',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

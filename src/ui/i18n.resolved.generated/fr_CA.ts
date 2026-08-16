@@ -3857,7 +3857,8 @@ export const fr_CA: EnTranslations = {
       "taken_over": "Votre personnage a été pris en main par une autre session.",
       "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde.",
       "invalid_appearance": "Cette apparence n'a pas pu être enregistrée. Modifiez-la et réessayez.",
-      "reroll_unavailable": "Ce personnage ne dispose pas d'un remodelage gratuit."
+      "reroll_unavailable": "Ce personnage ne dispose pas d'un remodelage gratuit.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Ce compte est suspendu jusqu'au {date}.",
@@ -7249,6 +7250,10 @@ export const fr_CA: EnTranslations = {
     "waitingOnOpponent": "En attente de la carte de votre adversaire...",
     "yourTurn": "Jouez une carte"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Tableau des excavations",
@@ -7831,7 +7836,11 @@ export const fr_CA: EnTranslations = {
     "redesignHint": "Ce personnage est antérieur au nouveau créateur de personnage. Vous disposez d’un remodelage gratuit ; il est utilisé lors de la sauvegarde.",
     "redesignTitle": "Remodeler {name}",
     "redesignSave": "Enregistrer la nouvelle apparence",
-    "redesignCancel": "Conserver l’apparence actuelle"
+    "redesignCancel": "Conserver l’apparence actuelle",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Supprimer le personnage",
@@ -13813,6 +13822,11 @@ export const fr_CA: EnTranslations = {
         "name": "Maître des cartes",
         "title": "Marchand du hasard",
         "greeting": "Un Duel de cartes vous tente ? Deux manches gagnantes sur trois, et le vainqueur remporte la gloire."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Trésorière Petra Vell",

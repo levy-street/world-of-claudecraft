@@ -3857,7 +3857,8 @@ export const id_ID: EnTranslations = {
       "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
       "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
       "invalid_appearance": "Tampilan itu tidak dapat disimpan. Sesuaikan desainnya, lalu coba lagi.",
-      "reroll_unavailable": "Karakter ini tidak memiliki desain ulang gratis yang tersedia."
+      "reroll_unavailable": "Karakter ini tidak memiliki desain ulang gratis yang tersedia.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Akun ini ditangguhkan hingga {date}.",
@@ -7249,6 +7250,10 @@ export const id_ID: EnTranslations = {
     "waitingOnOpponent": "Menunggu kartu lawanmu...",
     "yourTurn": "Mainkan kartu"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Papan Delve",
@@ -7831,7 +7836,11 @@ export const id_ID: EnTranslations = {
     "redesignHint": "Karakter ini dibuat sebelum pembuat karakter baru. Anda punya satu desain ulang gratis; terpakai saat Anda menyimpan.",
     "redesignTitle": "Desain Ulang {name}",
     "redesignSave": "Simpan Tampilan Baru",
-    "redesignCancel": "Pertahankan Tampilan Saat Ini"
+    "redesignCancel": "Pertahankan Tampilan Saat Ini",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Hapus Karakter",
@@ -13813,6 +13822,11 @@ export const id_ID: EnTranslations = {
         "name": "Ahli Kartu",
         "title": "Penyebar Nasib",
         "greeting": "Mau Duel Kartu? Tiga babak terbaik, pemenang mendapat hak membual."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Bendahara Petra Vell",

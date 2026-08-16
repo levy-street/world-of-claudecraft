@@ -102,7 +102,16 @@ you cannot infer from the file alone.
   the `/dev kit` picker; a testing convenience, NOT a balance statement).
 - **Interactables:** `noticeboards.ts` (town noticeboards; the active
   WorldContent supplies the list so spawn, collision, and interaction share one
-  authority), `card_master.ts` (the Card Duel NPC gate constants).
+  authority), `card_master.ts` (the Card Duel NPC gate constants),
+  `stylist.ts` (the Stylist NPC id; she carries NO `vendorItems`, because what
+  she sells is a per-character entitlement rather than an item).
+- **`redesign_pricing.ts`, the Stylist's price ladder:** a contiguous,
+  exhaustive band table over levels 1 to `MAX_LEVEL` plus one total lookup
+  (`redesignPriceCopper`). Prices are authored in COPPER but every band must
+  land on a clean coin value, or it renders to players as "1g 99s 99c";
+  `tests/redesign_pricing.test.ts` pins contiguity, exhaustiveness, the
+  authored values, and that no input is ever free. Re-band here, never at the
+  purchase site.
 
 ## Classic-era fidelity (YOU MUST)
 Abilities gain ranks at **classic-era learn levels** with era-accurate values. The

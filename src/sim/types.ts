@@ -3303,6 +3303,12 @@ export interface NpcDef {
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
+  // The Stylist: talking to this NPC opens the redesign-credit service desk
+  // (src/sim/stylist.ts) instead of any vendor/bank flow. A FLAG rather than a
+  // hard-keyed NPC id, following warfareVendor's note above, so a second town's
+  // Stylist needs no constant widened. She carries no vendorItems on purpose:
+  // what she sells is a per-character entitlement, never an item.
+  stylist?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in

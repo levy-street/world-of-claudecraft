@@ -24,6 +24,10 @@ export interface GossipMenuContent {
   hasDelveBoard: boolean;
   hasVcup: boolean;
   hasCardMaster: boolean;
+  /** The Stylist's redesign-credit desk. Its own field for the same reason
+   *  hasWarfareVendor is: she carries no `vendorItems`, so without it a Stylist
+   *  with no quests reads as an empty menu and closes the moment it opens. */
+  hasStylist: boolean;
   hasTraining: boolean;
 }
 
@@ -38,6 +42,7 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasDelveBoard &&
     !content.hasVcup &&
     !content.hasCardMaster &&
+    !content.hasStylist &&
     !content.hasTraining
   );
 }

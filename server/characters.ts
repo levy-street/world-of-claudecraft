@@ -290,7 +290,7 @@ function normalizeDeleteConfirmation(name: unknown): string {
  *  400. What the values MEAN is the renderer's business: every consumer runs
  *  normalizeAppearance before composing, so a stored style id that no longer
  *  exists clamps to a valid body rather than breaking one. */
-function parseAppearanceBody(raw: unknown): Record<string, unknown> | null | 'invalid' {
+export function parseAppearanceBody(raw: unknown): Record<string, unknown> | null | 'invalid' {
   if (raw === undefined || raw === null) return null;
   return sanitizeAppearance(raw) ?? 'invalid';
 }
@@ -347,6 +347,18 @@ function appearanceRerollAvailable(c: CharacterRow): boolean {
   if (c.appearance === null || c.appearance === undefined) return true;
   const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
   return Number.isFinite(created) && created < APPEARANCE_REROLL_CUTOFF.getTime();
+}
+
+/** Unspent Stylist redesign credits held by a character, read from its sim-owned
+ *  state blob. Absent, negative, fractional, or non-finite all read as the
+ *  nearest safe integer at or above zero: this is persisted JSON, so it is
+ *  untrusted the same way a client body is, and the roster button must never
+ *  render off a value the redesign endpoint's SQL guard would then reject.
+ *  Exported for the redesign module and its tests. */
+export function redesignCreditsFromState(state: CharacterState | null | undefined): number {
+  const held = state?.redesignCredits;
+  if (typeof held !== 'number' || !Number.isFinite(held) || held <= 0) return 0;
+  return Math.floor(held);
 }
 
 /** Shape a realm rank lookup into the character-sheet's rank field (pure; mirrors main.ts). */
@@ -408,6 +420,13 @@ export function buildCharacterList(
       // Server-decided (cutoff + unspent token): the roster's one-shot
       // redesign button renders exactly when this is true.
       appearanceRerollAvailable: appearanceRerollAvailable(c),
+      // Unspent Stylist redesign credits. Read straight off the sim-owned state
+      // blob, where absent means zero (the sim omits the key while it is falsy),
+      // and clamped here because a stored blob is untrusted JSON. This is what
+      // the roster's Edit Appearance button gates on, so it is decided
+      // server-side exactly like appearanceRerollAvailable above rather than
+      // being inferred by the client.
+      redesignCredits: redesignCreditsFromState(c.state),
     })),
   };
 }
@@ -545,7 +564,10 @@ const readGuard: Middleware = async (ctx, next) => {
   await next();
 };
 
-const activeGuard: Middleware = async (ctx, next) => {
+/** Exported so the sibling character-redesign domain module composes the SAME
+ *  authenticated-and-not-locked gate rather than rebuilding an auth guard of its
+ *  own. Duplicating this is how the two arms drift on a moderation rule. */
+export const activeGuard: Middleware = async (ctx, next) => {
   const info = await resolveBearer(ctx.req);
   if (info === null) {
     json(ctx.res, 401, NOT_AUTHENTICATED);

@@ -3857,7 +3857,8 @@ export const en: EnTranslations = {
       "taken_over": "Your character was taken over by another session.",
       "rename_required": "This character must be renamed before entering the world.",
       "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
-      "reroll_unavailable": "This character does not have a free redesign available."
+      "reroll_unavailable": "This character does not have a free redesign available.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "This account is suspended until {date}.",
@@ -7249,6 +7250,10 @@ export const en: EnTranslations = {
     "waitingOnOpponent": "Waiting on your opponent's card...",
     "yourTurn": "Play a card"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Delve Board",
@@ -7831,7 +7836,11 @@ export const en: EnTranslations = {
     "redesignHint": "This character predates the new character creator. You get one free redesign; it is used when you save.",
     "redesignTitle": "Redesign {name}",
     "redesignSave": "Save New Look",
-    "redesignCancel": "Keep Current Look"
+    "redesignCancel": "Keep Current Look",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Delete Character",
@@ -13813,6 +13822,11 @@ export const en: EnTranslations = {
         "name": "Card Master",
         "title": "Dealer of Chance",
         "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Bursar Petra Vell",

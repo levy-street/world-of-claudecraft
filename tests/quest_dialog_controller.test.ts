@@ -100,6 +100,7 @@ function harness(
   const openDelveBoard = vi.fn();
   const openValeCup = vi.fn();
   const openCardDuel = vi.fn();
+  const buyRedesignCredit = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
   const openCrafting = vi.fn();
@@ -137,6 +138,7 @@ function harness(
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    buyRedesignCredit,
     openTrain,
     openUnbind,
     openCrafting,
@@ -169,6 +171,7 @@ function harness(
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    buyRedesignCredit,
     openTrain,
     openUnbind,
     openCrafting,
@@ -510,6 +513,13 @@ describe('QuestDialogController', () => {
     cardMaster.controller.open(45);
     cardMaster.element.querySelector<HTMLButtonElement>('[data-card-duel]')?.click();
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
+
+    // The Stylist's redesign row routes the NPC's own entity id through, so the
+    // Sim can re-validate which counter the player is standing at.
+    const stylist = harness(npc(46, 'stylist_verena'));
+    stylist.controller.open(46);
+    stylist.element.querySelector<HTMLButtonElement>('[data-stylist-buy]')?.click();
+    expect(stylist.buyRedesignCredit).toHaveBeenCalledWith(46);
   });
 
   it('REPLACES the generic goods row with the WARFARE shop row at a flagged NPC', () => {

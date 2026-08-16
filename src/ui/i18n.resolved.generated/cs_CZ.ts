@@ -3857,7 +3857,8 @@ export const cs_CZ: EnTranslations = {
       "taken_over": "Tvoje postava byla převzata jinou relací.",
       "rename_required": "Tato postava musí být před vstupem do světa přejmenována.",
       "invalid_appearance": "Tento vzhled se nepodařilo uložit. Uprav návrh a zkus to znovu.",
-      "reroll_unavailable": "Tato postava nemá k dispozici žádnou volnou změnu vzhledu."
+      "reroll_unavailable": "Tato postava nemá k dispozici žádnou volnou změnu vzhledu.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Tento účet je pozastavený do {date}.",
@@ -7249,6 +7250,10 @@ export const cs_CZ: EnTranslations = {
     "waitingOnOpponent": "Čekám na soupeřovu kartu...",
     "yourTurn": "Zahraj kartu"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Tabule výprav",
@@ -7831,7 +7836,11 @@ export const cs_CZ: EnTranslations = {
     "redesignHint": "Tato postava vznikla před novým editorem postav. Máte jedno bezplatné přetvoření; použije se při uložení.",
     "redesignTitle": "Přetvořit postavu {name}",
     "redesignSave": "Uložit nový vzhled",
-    "redesignCancel": "Ponechat současný vzhled"
+    "redesignCancel": "Ponechat současný vzhled",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Smazat postavu",
@@ -13813,6 +13822,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Karetní mistr",
         "title": "Rozdavač osudu",
         "greeting": "Jak by byl Karetní souboj? Na tři kola, vítěz získá právo chlubit se."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Pokladní Petra Vell",

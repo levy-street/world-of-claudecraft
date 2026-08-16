@@ -3857,7 +3857,8 @@ export const ru_RU: EnTranslations = {
       "taken_over": "Вашего персонажа перехватила другая сессия.",
       "rename_required": "Перед входом в мир этому персонажу нужно сменить имя.",
       "invalid_appearance": "Не удалось сохранить этот облик. Измените дизайн и попробуйте снова.",
-      "reroll_unavailable": "У этого персонажа нет доступного бесплатного редизайна."
+      "reroll_unavailable": "У этого персонажа нет доступного бесплатного редизайна.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Эта учетная запись заблокирована до {date}.",
@@ -7249,6 +7250,10 @@ export const ru_RU: EnTranslations = {
     "waitingOnOpponent": "Ожидание карты соперника...",
     "yourTurn": "Разыграйте карту"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Доска Вылазок",
@@ -7831,7 +7836,11 @@ export const ru_RU: EnTranslations = {
     "redesignHint": "Этот персонаж создан до появления нового редактора внешности. У вас есть одна бесплатная переделка; она расходуется при сохранении.",
     "redesignTitle": "Переделать: {name}",
     "redesignSave": "Сохранить новый облик",
-    "redesignCancel": "Оставить текущий облик"
+    "redesignCancel": "Оставить текущий облик",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Удалить персонажа",
@@ -13813,6 +13822,11 @@ export const ru_RU: EnTranslations = {
         "name": "Карточный мастер",
         "title": "Дилер удачи",
         "greeting": "Не сыграть ли партию в карточную дуэль? До двух побед, победителю достанется слава."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Казначей Петра Велль",

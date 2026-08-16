@@ -3061,6 +3061,80 @@ export async function consumeAppearanceReroll(
   return (res.rowCount ?? 0) > 0;
 }
 
+/** The stored redesign-credit count as SQL, shared by the guard and the
+ *  decrement so the two can never read the field differently. Written ONCE here
+ *  (the LIFETIME_XP_EXPR convention) because it appears three times in the
+ *  statement below. COALESCE to 0 is what makes "absent means zero" true in SQL
+ *  as well as in the sim: a pre-feature blob has no key. */
+const REDESIGN_CREDITS_EXPR = "COALESCE((state->>'redesignCredits')::int, 0)";
+
+/** The state blob with one credit spent. At the last credit the KEY IS REMOVED
+ *  rather than written as 0, matching the sim's zero-default omission convention
+ *  (serializeCharacter omits it while falsy), so a blob this route wrote and a
+ *  blob the sim wrote for the same character are byte-identical. */
+const STATE_AFTER_SPEND = `CASE
+       WHEN ${REDESIGN_CREDITS_EXPR} <= 1 THEN state - 'redesignCredits'
+       ELSE jsonb_set(state, '{redesignCredits}', to_jsonb(${REDESIGN_CREDITS_EXPR} - 1))
+     END`;
+
+/**
+ * Spend ONE redesign credit: write the new authored look and decrement the
+ * credit in a SINGLE statement, so two concurrent submits can never both land on
+ * one credit. A single UPDATE is atomic in Postgres and re-evaluates its WHERE
+ * arm after taking the row lock, which is exactly the property this needs and
+ * exactly how the sibling consumeAppearanceReroll above stays one-shot.
+ *
+ * ALL eligibility lives in the WHERE arm: ownership + realm (BOLA, matching
+ * getCharacter's scoping) and `credits >= 1`. The row is only touched when both
+ * pass, so a caller that loses the race changes nothing and gets `false`, which
+ * the route maps to a clean "no credit" error rather than a second free
+ * redesign. Returns whether the redesign was applied.
+ *
+ * The appearance is already normalized by the caller (untrusted client input,
+ * validated through the SAME sanitizeAppearance the creation path uses).
+ *
+ * The helm preference rides the same statement for the reasons the reroll's
+ * header gives at length: it is sim state, so it patches the one key inside the
+ * blob rather than rewriting it (a whole-blob write from an HTTP route would
+ * clobber a live session's progress), a NULL means the client did not offer the
+ * toggle and the blob's helm key is left exactly as it was, and both arms are
+ * guarded on an actual change so an identical value does not re-TOAST the blob.
+ * It is applied to the ALREADY-DECREMENTED state, so the two patches compose
+ * instead of one overwriting the other.
+ *
+ * A live session still holds the old credit count and the old look in memory and
+ * its 30 s autosave would write BOTH straight back over this. That is what the
+ * route's spendRedesignCreditForCharacter / applyAppearanceForCharacter /
+ * setHelmHiddenForCharacter pushes exist to prevent; without the credit half in
+ * particular, an online player would get their spent credit refunded by their
+ * own autosave.
+ */
+export async function consumeRedesignCredit(
+  accountId: number,
+  characterId: number,
+  appearance: Record<string, unknown>,
+  helmHidden: boolean | null,
+): Promise<boolean> {
+  const res = await pool.query(
+    `UPDATE characters
+        SET appearance = $3::jsonb,
+            state = CASE
+                      WHEN state IS NULL THEN state
+                      WHEN $5::boolean IS NULL THEN (${STATE_AFTER_SPEND})
+                      WHEN $5::boolean AND (${STATE_AFTER_SPEND})->'helmHidden' IS DISTINCT FROM 'true'::jsonb
+                        THEN jsonb_set((${STATE_AFTER_SPEND}), '{helmHidden}', 'true'::jsonb, true)
+                      WHEN NOT $5::boolean AND (${STATE_AFTER_SPEND}) ? 'helmHidden'
+                        THEN (${STATE_AFTER_SPEND}) - 'helmHidden'
+                      ELSE (${STATE_AFTER_SPEND})
+                    END,
+            updated_at = now()
+      WHERE id = $1 AND account_id = $2 AND realm = $4
+        AND ${REDESIGN_CREDITS_EXPR} >= 1`,
+    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden],
+  );
+  return (res.rowCount ?? 0) > 0;
+}
+
 // Active character names on this realm for the public character sitemap, ranked
 // by lifetime XP so the most significant players lead the file. Capped by the
 // caller (sitemap protocol allows 50k URLs/file).

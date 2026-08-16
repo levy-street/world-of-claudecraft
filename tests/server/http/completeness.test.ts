@@ -113,6 +113,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/broadcasts',
   '/api/characters/:id/deeds-recent',
   '/api/characters/:id/appearance-reroll',
+  '/api/characters/:id/redesign',
   '/api/steam/link',
   '/api/steam/status',
   '/api/battleground/leaderboard',
@@ -239,6 +240,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // owner's newest-first deed unlock ids for the Book's recent strip.
     { method: 'GET', path: '/api/characters/:id/deeds-recent' },
     { method: 'POST', path: '/api/characters/:id/appearance-reroll' },
+    // Registry-only (the new-route rule): the PAID Stylist redesign, which
+    // spends a bought credit rather than the free one-shot token above.
+    { method: 'POST', path: '/api/characters/:id/redesign' },
     { method: 'POST', path: '/api/characters/:id/rename' },
     { method: 'POST', path: '/api/characters/:id/takeover' },
     { method: 'DELETE', path: '/api/characters/:id' },

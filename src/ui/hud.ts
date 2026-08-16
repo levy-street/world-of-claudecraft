@@ -2230,6 +2230,7 @@ export class Hud {
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openValeCup: () => this.toggleValeCup(),
       openCardDuel: () => this.toggleCardDuel(),
+      buyRedesignCredit: (npcId) => this.sim.buyRedesignCredit(npcId),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
       voice: {
         play: (key) => voice.play(key),

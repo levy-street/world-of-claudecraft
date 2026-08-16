@@ -18,6 +18,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(true);
@@ -39,6 +40,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(true);
@@ -56,6 +58,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -73,6 +76,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -90,6 +94,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -104,6 +109,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -118,6 +124,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -135,6 +142,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -149,6 +157,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: true,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -163,6 +172,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: true,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -177,6 +187,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: true,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -192,6 +203,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: true,
       }),
     ).toBe(false);
@@ -214,6 +226,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
         hasTraining: false,
       }),
     ).toBe(false);
@@ -229,6 +242,29 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasStylist: false,
+        hasTraining: false,
+      }),
+    ).toBe(false);
+  });
+
+  it('the Stylist alone keeps the menu open', () => {
+    // Verena carries no quests and no vendorItems: the redesign-credit row is
+    // the only thing in her menu. Without hasStylist in the emptiness decision
+    // her dialog would close the instant it opened, which is exactly the bug
+    // hasWarfareVendor was added to prevent for the flagged honor quartermaster.
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: false,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasWarfareVendor: false,
+        hasDelveBoard: false,
+        hasVcup: false,
+        hasCardMaster: false,
+        hasStylist: true,
         hasTraining: false,
       }),
     ).toBe(false);

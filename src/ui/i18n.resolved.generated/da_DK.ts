@@ -3857,7 +3857,8 @@ export const da_DK: EnTranslations = {
       "taken_over": "Din karakter blev overtaget af en anden session.",
       "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",
       "invalid_appearance": "Det udseende kunne ikke gemmes. Juster designet, og prøv igen.",
-      "reroll_unavailable": "Denne karakter har ikke et gratis omdesign til rådighed."
+      "reroll_unavailable": "Denne karakter har ikke et gratis omdesign til rådighed.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Denne konto er suspenderet indtil {date}.",
@@ -7249,6 +7250,10 @@ export const da_DK: EnTranslations = {
     "waitingOnOpponent": "Venter på modstanderens kort...",
     "yourTurn": "Spil et kort"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Delve-Tavle",
@@ -7831,7 +7836,11 @@ export const da_DK: EnTranslations = {
     "redesignHint": "Denne figur blev skabt før den nye figureditor. Du har ét gratis omdesign; det bruges, når du gemmer.",
     "redesignTitle": "Omdesign {name}",
     "redesignSave": "Gem nyt udseende",
-    "redesignCancel": "Behold nuværende udseende"
+    "redesignCancel": "Behold nuværende udseende",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Slet Karakter",
@@ -13813,6 +13822,11 @@ export const da_DK: EnTranslations = {
         "name": "Kortmester",
         "title": "Tilfældets Udeler",
         "greeting": "Har du lyst til en Kortduel? Bedst af tre, vinderen får pralerrettighederne."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Skatmester Petra Vell",

@@ -3857,7 +3857,8 @@ export const ja_JP: EnTranslations = {
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
       "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
       "invalid_appearance": "この外見は保存できませんでした。デザインを調整してもう一度お試しください。",
-      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。"
+      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "このアカウントは {date} まで停止されています。",
@@ -7249,6 +7250,10 @@ export const ja_JP: EnTranslations = {
     "waitingOnOpponent": "相手のカードを待っています……",
     "yourTurn": "カードを出してください"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "デルヴボード",
@@ -7831,7 +7836,11 @@ export const ja_JP: EnTranslations = {
     "redesignHint": "このキャラクターは新しいキャラクターエディター以前に作成されました。無料の再デザインが1回できます。保存すると消費されます。",
     "redesignTitle": "{name}を再デザイン",
     "redesignSave": "新しい外見を保存",
-    "redesignCancel": "現在の外見を保持"
+    "redesignCancel": "現在の外見を保持",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "キャラクターを削除",
@@ -13813,6 +13822,11 @@ export const ja_JP: EnTranslations = {
         "name": "カードマスター",
         "title": "運命の胴元",
         "greeting": "カードデュエルはいかが？三本勝負、勝者には自慢の種が手に入る。"
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "出納官ペトラ・ヴェル",
