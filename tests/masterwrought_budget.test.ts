@@ -1308,6 +1308,10 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     for (const id of CAPSTONE_IDS) expect(rungOf(id), `${id} capstone rung`).toBe(125);
     const consumableIds = Object.keys(APEX_CONSUMABLES);
     expect(consumableIds.length, 'the six phase 10 consumables').toBe(6);
+    // The array is exactly these eight rows today, so a third capstone (or a
+    // ninth row of any kind) forces a visit here instead of landing unchecked
+    // beside a hand-picked capstone list.
+    expect(APEX_CONSUMABLE_RECIPES, 'six apex rungs plus two capstones').toHaveLength(8);
     for (const id of consumableIds) expect(rungOf(id), `${id} apex rung`).toBe(100);
     // The relation itself, so the two numbers can never be levelled without
     // this line failing even if both moved together.

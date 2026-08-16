@@ -156,7 +156,9 @@ describe('consumableBarItems', () => {
     // themselves, so a player carrying that plus a flask gets no flask button
     // and has to reach into the bags for it. Recorded rather than fixed (the
     // phase 14 residual): the head of the ladder is what a player needs mid
-    // fight, and a flask is re-applied after a wipe, not during one.
+    // fight, and a flask, which rides through death by design, is the buff a
+    // player sets up between pulls rather than the one they reach for during
+    // one; the bags stay reachable out of combat.
     expect(CONSUMABLE_BAR_SLOTS, 'the tray is six buttons wide').toBe(6);
     const got = consumableBarItems(
       inv(

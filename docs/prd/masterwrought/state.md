@@ -3267,6 +3267,29 @@ applied in the fix round or recorded below.
   and battleground deaths (classic-era fidelity: flasks persisted through
   battleground deaths; Protect Yumi likewise does not wipe); the arena and
   fiesta wipes clear flasks deliberately, as instanced minigame resets.
+  AMENDED at the phase 10 QA (2026-08-16), a correction the whole fan-out
+  missed and the fix-round review surfaced: "Protect Yumi likewise does not
+  wipe" is FALSE, and Thornhollow Fields wipes more than the sentence says.
+  The clean slate is reached by TWO routes: the direct aurasSurvivingCleanSlate
+  call (arena entry, a Fiesta down) and readyArenaFighter with clearPrep:
+  true (its clearPrep arm IS the clean slate). Through the second route a
+  Protect Yumi down (fiestaDownEntity) and every Yumi revive wipe, and
+  Thornhollow Fields wipes at the seat, at the countdown end, on a leaver,
+  and at the match end; ONLY its wave respawn (clearPrep: false) keeps a
+  flask. So the true accounting is: overworld and PvE deaths keep a flask, a
+  battleground DEATH keeps it (quaffed inside a match it rides through
+  every death in it, the classic-era rule), and every instanced match is a
+  parenthesis (nothing carried in rides through the gates, nothing quaffed
+  inside comes back out; Yumi and Fiesta downs clear it too). Corrected in
+  the resurrection.ts note, pinned behaviorally (tests/battleground.test.ts:
+  a flask quaffed inside rides through death + wave respawn; a flask carried
+  in is cleared at the countdown end) and structurally
+  (tests/resurrection.test.ts pins the direct caller set AND the literal
+  table of readyArenaFighter clearPrep: true call sites per module), and the
+  tooltip clause reads "instanced matches begin and end on a clean slate".
+  Whether a 20-minute flask should survive the Yumi/Fiesta downs or the
+  battleground parenthesis is a maintainer call (RULING below, recommend
+  keep: the arena-family clean-slate doctrine).
   AMENDED at the 2026-08-14 v0.38.0 sync (merge 33d641773f): the release
   replaced the bare full wipes (e.auras = []) with a second predicate,
   resurrection.ts aurasSurvivingCleanSlate, which keeps ONLY the release's
@@ -3817,8 +3840,14 @@ recorded, or refuted with the file open)
   channel" note was factually wrong; both projections are now pinned. (2)
   "Five non-Latin refreshes shipped in-change" overstated: of the 19 guide
   keys the phase reworded, 9 were refreshed in the five non-Latin overlays,
-  10 were byte-unchanged (three still carrying the retired claims); this
-  QA refreshed all of them (below). (3) A flask does survive an ordinary
+  10 were byte-unchanged (three still carrying the retired claims). Measured
+  against THIS QA's range: of the 17 keys refreshed here, 13 were reworded
+  in English by the QA and 3 were phase-reworded keys whose non-Latin rows
+  had never been refreshed (weaponcrafting.routeBody, cooking.routeBody,
+  enchanting.identityBody), plus the new perfectedOnly key; the other seven
+  phase-reworded keys the QA did not reword were pre-existing abridgements
+  that never carried the changed clause (recorded for the release fill).
+  (3) A flask does survive an ordinary
   reconnect: the server holds a dropped session in-world for the linkdead
   grace (server/linkdead.ts, five minutes), so the loss surface is a
   deliberate logout, an expired grace, or a realm restart; and the timer

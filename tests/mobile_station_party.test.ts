@@ -641,26 +641,39 @@ describe('the set-up line round trips through a real locale', () => {
     setLanguage('en');
   });
 
-  it('localizes the item name inside the sentence, leaving no English behind', async () => {
+  it('localizes the item name inside the REAL emit, end to end, leaving no English behind', async () => {
     await ensureLocaleLoaded(LOCALE);
     setLanguage(LOCALE);
     const english = ITEMS.laden_hearth.name;
     const localized = tEntity({ kind: 'item', id: 'laden_hearth', field: 'name' });
     expect(localized, 'the fixture locale really translates this item').not.toBe(english);
 
-    const out = localizeSimText(`You set up ${english}.`);
+    // The sentence comes off the sim's own log event for a real placement, not
+    // a test-composed string, so this pins the emit-to-matcher chain and not
+    // the matcher alone.
+    const sim = makeWorld();
+    const b = sim.addPlayer('priest', 'Bet');
+    teleport(sim, b, FIELD.x, FIELD.z);
+    grantItem(sim, 'laden_hearth', 1, b);
+    drainEvents(sim);
+    sim.useItem('laden_hearth', b);
+    const [line] = setUpLines(sim);
+    expect(line, 'the placement logged its set-up line').toBe(`You set up ${english}.`);
+
+    const out = localizeSimText(line);
     expect(out, 'the matcher recognized the line').not.toBeNull();
     expect(out, 'the localized name reached the sentence').toContain(localized);
     expect(out, 'no English name left in the localized line').not.toContain(english);
   });
 
-  it('cannot recover a doubled article, which is why the emit carries none', async () => {
-    // The negative half, and the reason the English arm above is not enough on
-    // its own: hand the matcher the sentence the old glued-article emit
-    // produced and the capture is "the The Laden Hearth", which resolves to no
-    // item at all, so the English name rides straight through into a Japanese
-    // sentence. The regex cannot fix that; only the emit not gluing an article
-    // can, so this arm records what a regression there would look like.
+  it('CHARACTERIZATION: the matcher cannot recover a doubled article, which is why the emit carries none', async () => {
+    // Not a requirement, a record of the matcher's limit and the reason the
+    // English arm above is not enough on its own: hand the matcher the sentence
+    // the old glued-article emit produced and the capture is "the The Laden
+    // Hearth", which resolves to no item at all, so the English name rides
+    // straight through into a Japanese sentence. A future matcher that strips
+    // a leading article would be free to retire this arm; the requirement it
+    // guards is the article-free emit, pinned by name earlier in this file.
     await ensureLocaleLoaded(LOCALE);
     setLanguage(LOCALE);
     const english = ITEMS.laden_hearth.name;

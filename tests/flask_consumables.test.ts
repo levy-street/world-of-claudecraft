@@ -521,7 +521,8 @@ describe('role foods: Well Fed lands only on a finished meal, and is mortal', ()
     const { sim, pid, p } = world();
     const ctx = sim.ctx as unknown as { applyAura: (target: Entity, aura: Aura) => void };
     const realApplyAura = ctx.applyAura;
-    let eatingAtApply: unknown = 'applyAura never ran for well_fed';
+    let eatingAtApply: unknown =
+      'ctx.applyAura never ran for well_fed (the grant rides the ctx seam; if the call moved to a direct import, re-point this patch, the order claim is unchanged)';
     ctx.applyAura = (target: Entity, aura: Aura): void => {
       if (aura.id === WELL_FED) eatingAtApply = target.eating;
       realApplyAura(target, aura);

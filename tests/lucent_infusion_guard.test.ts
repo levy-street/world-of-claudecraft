@@ -337,8 +337,11 @@ describe('the Lucent skill gates bind at their exact rungs', () => {
 // comment-prefixed line, a colon that wrapped onto the next line, and so on).
 // So the direction is inverted: collect EVERY occurrence of the identifier in
 // the corpus and require each one to match a known-legal class. A mint written
-// in any spelling, including one nobody has thought of, matches no class and
-// fails with its line printed.
+// in any spelling THAT NAMES THE FIELD (or brackets a key spelled from an
+// identifier that starts with it) matches no class and fails with its line
+// printed. What it cannot see, and says so: a key assembled at runtime from
+// string parts, or a key literal that lives outside the scanned trees (a JSON
+// asset, a tests/ fixture); those are the boundary of any source-text guard.
 //
 // PHASE 12 REMOVES THIS TEST, in the same change that mints the marker, and that
 // change must also take the eqi wire-visibility decision: the public equipped
@@ -547,6 +550,14 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
     // Shorthand property: `{ perfected }`, `{ perfected,`, `, perfected }`,
     // `, perfected,`, and the same token alone on its own wrapped line.
     /(?:^|[{,])\s*perfected\s*(?:[,}]|$)/,
+    // A COMPUTED key spelled from an identifier that starts with the field
+    // (`inst[perfectedKey] = true`, `{ [perfectedKey]: true }`): the prefixed-
+    // identifier legal class exists for the picker's `perfectedMet` family, and
+    // a bracketed one is how that class would otherwise become a hiding place.
+    // The key's own definition line (`const perfectedKey = 'perfected'`) is a
+    // residue hit as well, while it lives in a scanned tree.
+    /\[\s*perfected[\w$]*\s*\]\s*(?:\|\||&&|\?\?)?=(?!=)/,
+    /\[\s*perfected[\w$]*\s*\]\s*:/,
     // The one write that names the field only as an argument.
     /defineProperty\([^)]*["'`]perfected["'`]/,
   ];
@@ -640,7 +651,7 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
     }
   });
 
-  it('an unclassified mint fails in every spelling (positive controls)', () => {
+  it('an unclassified mint fails in every spelling that names the field (positive controls)', () => {
     // Each of these is a real way to stamp the field. None matches a legal
     // class, so each must come back unclassified. The bracket string, the
     // computed key and defineProperty are the three the previous mint-shape
@@ -681,6 +692,12 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
       // match a legal class, but it carries a SECOND marker token nothing legal
       // explains. The named shapes above are only instances of that.
       'if (enchant.requiresPerfected) stamp(inst, perfected);',
+      // A key spelled from a `perfected`-prefixed identifier and bracketed in:
+      // the newest legal class must not license the write it names.
+      'inst[perfectedKey] = true;',
+      'inst[perfectedField] ??= true;',
+      'Object.assign(inst, { [perfectedKey]: true });',
+      "const perfectedKey = 'perfected';",
     ];
     for (const mint of MINTS) {
       expect(classify(mint, 'sim/professions/perfecting.ts'), mint).toBeUndefined();
@@ -704,6 +721,9 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
       'const out = { ...inst, perfected, enchant };',
       'perfected,',
       "Object.defineProperty(inst, 'perfected', { value: true });",
+      'inst[perfectedKey] = true;',
+      'inst[perfectedField] ??= true;',
+      'const out = { [perfectedKey]: true };',
     ]) {
       expect(writesTheMarker(write), `${write} is a write of the marker`).toBe(true);
     }

@@ -8509,14 +8509,20 @@ export const TARGETS = [
         // Click the Apply Enchant row by its act token: the reagent's menu is no
         // longer a single-action list (the per-copy Lock Item row sits LAST since
         // #3042), so the old last-row click shot the lock instead of the picker.
-        await page.evaluate(() => {
+        const drilled = await page.evaluate(() => {
           const row =
             document.querySelector('#ctx-menu .ctx-item[data-act="applyEnchant"]') ??
             [...document.querySelectorAll('#ctx-menu .ctx-item')].find((r) =>
               (r.textContent ?? '').includes('Apply Enchant'),
             );
-          row?.click();
+          if (!row) return false;
+          row.click();
+          return true;
         });
+        // A missed drill must FAIL, not shoot the still-open action menu
+        // labelled as the picker (both share #ctx-menu, so pollForSize alone
+        // cannot tell them apart).
+        if (!drilled) throw new Error('no Apply Enchant row on the reagent menu');
         await wait(500);
         if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
         if (variant?.targets) {
@@ -9428,6 +9434,12 @@ export const TARGETS = [
       'hud/action_bar/consumable_bar_view',
       'ui/elixir_tooltip_view',
       'ui/enchant_apply_view',
+      // The painter that mints the gate sub-lines and the row routing. NOT the
+      // mobile stylesheet: a whole-sheet path in a specific target would turn a
+      // hud.mobile.css-only diff from the generic desktop+mobile HUD frames into
+      // these few states (tests/pr_shot_targets.test.ts pins that a mobile CSS
+      // change shoots the generic mobile HUD), which is a narrowing.
+      'ui/bag_item_action_menu',
     ],
     // Five states of the phase 10 consumables and enchant surface, each brought
     // up through the REAL bound events (pointer hover on a bag row, contextmenu
@@ -9444,14 +9456,40 @@ export const TARGETS = [
     // elixir-use-tooltip rationale (the synthetic hover does not raise #tooltip
     // on the touch layout); the picker states shoot both layouts because the
     // gate lines are the only explanation of an untappable row on touch.
+    // Every variant seeds the LOWEST graphics preset before the document loads
+    // (the standing capture rule): under SwiftShader an unseeded boot resolves
+    // to the low tier in effect, but the seed makes the rule explicit rather
+    // than incidental.
     variants: [
-      { key: 'flask-tooltip', tooltip: 'ironhusk_flask', itemName: 'Ironhusk Flask' },
-      { key: 'food-tooltip', tooltip: 'stonepot_stew', itemName: 'Stonepot Stew' },
-      { key: 'picker-skill-gated', picker: true, skill: 99 },
-      { key: 'picker-skill-gated-mobile', picker: true, skill: 99, mobile: true },
-      { key: 'picker-perfected', picker: true, skill: 125 },
-      { key: 'picker-perfected-mobile', picker: true, skill: 125, mobile: true },
-      { key: 'tray-mobile', tray: true, mobile: true },
+      {
+        key: 'flask-tooltip',
+        tooltip: 'ironhusk_flask',
+        itemName: 'Ironhusk Flask',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'food-tooltip',
+        tooltip: 'stonepot_stew',
+        itemName: 'Stonepot Stew',
+        beforeLoad: lowGraphicsSeed,
+      },
+      { key: 'picker-skill-gated', picker: true, skill: 99, beforeLoad: lowGraphicsSeed },
+      {
+        key: 'picker-skill-gated-mobile',
+        picker: true,
+        skill: 99,
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+      { key: 'picker-perfected', picker: true, skill: 125, beforeLoad: lowGraphicsSeed },
+      {
+        key: 'picker-perfected-mobile',
+        picker: true,
+        skill: 125,
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+      { key: 'tray-mobile', tray: true, mobile: true, beforeLoad: lowGraphicsSeed },
     ],
     async capture(page, variant) {
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
