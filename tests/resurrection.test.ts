@@ -255,26 +255,31 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
   // quote arm instead), or a nested template whose inner literal is
   // paren-unbalanced. There an unmatched `(` runs the walk on until some later
   // surplus `)` closes it, or off the end (a THROW), and an unmatched `)` ends
-  // the walk early; both misread the argument text, and the net is the tables,
-  // not the throw, as far as it goes: a planted site is a new count in some
-  // bucket, and an existing site whose misread boundary cuts its `clearPrep:`
-  // literal out (or lets a foreign one in) changes bucket (a truncated wipe
-  // reads as a passthrough and is REPORTED), so a table reds. When the literal
-  // survives the misread (the edge sits in a LATER option than clearPrep, or a
-  // swallowed span hides a second call of the same name) the site keeps its
-  // bucket and nothing here reds; the net there is the per-mode behavioral
-  // arms, and that residue is pinned below as a documented blind spot. No such
-  // spelling exists in the sim tree. Quote state is reset at each call's `(`,
-  // so a lone quote elsewhere in a file cannot poison a later call (the
-  // top-level character class `/^[A-Za-z][A-Za-z '-]{1,15}$/` in
-  // pet/pet_commands.ts is the per-file hazard that reset exists for). Any
-  // argument spelling is seen the same way: a bare identifier, a member, an
-  // index, a cast, a ternary, calls nested to any depth, a call wrapped over
-  // lines. What is NOT a call: a bind (`x.resetForArena.bind`), a property or
-  // type slot (`resetForArena: ...`, `resetForArena;`), an alias (`const f =
-  // ctx.resetForArena`); none opens a paren on the name. The DECLARATIONS do
-  // open one, so `isDeclaration` reads what follows the close: a `: void`
-  // return annotation ending the signature (`export function
+  // the walk early; both misread the argument text, and the tables are the net
+  // exactly this far: a planted site is a new count in some bucket; an existing
+  // site whose misread cuts its own `clearPrep:` literal out reads as a
+  // passthrough and is REPORTED; a keep or a passthrough whose run-on takes in
+  // a foreign literal it did not have (`true` for either, `false` for a
+  // passthrough) changes bucket, while a wipe taking in a foreign `false` does
+  // not, since `true` is tested first; and a run-on that swallows a later call
+  // of the same name drops that call's count, unless the swallowing site is
+  // itself newly planted into the same bucket (its +1 cancels the hidden -1).
+  // What stays quiet: a misread whose edge sits in a LATER option than
+  // clearPrep and takes in no literal that re-classifies the site (its own
+  // literal survives inside the span and its bucket holds), and the same-bucket
+  // planted swallow above. The net for those is the per-mode behavioral arms;
+  // the later-option case is pinned below as a documented blind spot, truncated
+  // argument text and all. No such spelling exists in the sim tree. Quote state
+  // is reset at each call's `(`, so a lone quote elsewhere in a file cannot
+  // poison a later call (the top-level character class `/^[A-Za-z][A-Za-z
+  // '-]{1,15}$/` in pet/pet_commands.ts is the per-file hazard that reset
+  // exists for). Any argument spelling is seen the same way: a bare identifier,
+  // a member, an index, a cast, a ternary, calls nested to any depth, a call
+  // wrapped over lines. What is NOT a call: a bind (`x.resetForArena.bind`), a
+  // property or type slot (`resetForArena: ...`, `resetForArena;`), an alias
+  // (`const f = ctx.resetForArena`); none opens a paren on the name. The
+  // DECLARATIONS do open one, so `isDeclaration` reads what follows the close:
+  // a `: void` return annotation ending the signature (`export function
   // resetForArena(...): void {`, the Sim delegate `private resetForArena(...):
   // void {`, the seam's `resetForArena(...): void;`); the `[;{]` tail keeps a
   // CALL in a ternary's true arm (`cond ? ctx.resetForArena(e) : void 0`) a
@@ -576,14 +581,20 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // stays testable: the same edge AFTER the literal (in a later option)
     // leaves the literal inside the misread span, the site keeps its bucket,
     // and nothing here reds; the per-mode behavioral arms are the net there.
-    expect(
-      callsOf(
-        stripComments(
-          'readyArenaFighter(ctx, e, { clearPrep: true, keepValidTargetPids: ids.filter((p) => /[)]/.test(String(p))) });',
-        ),
-        'readyArenaFighter',
-      ).map(clearPrepOf),
-    ).toEqual(['true']);
+    // The truncated argument text is asserted too (the walk closes at the
+    // paren inside the regex, one short of the real close), so this control
+    // pins the misread itself and not only its harmless consequence: a walk
+    // that learned regex literals would change this text and the pin.
+    const laterOption = callsOf(
+      stripComments(
+        'readyArenaFighter(ctx, e, { clearPrep: true, keepValidTargetPids: ids.filter((p) => /[)]/.test(String(p))) });',
+      ),
+      'readyArenaFighter',
+    );
+    expect(laterOption.map(clearPrepOf)).toEqual(['true']);
+    expect(laterOption[0].args).toBe(
+      'ctx, e, { clearPrep: true, keepValidTargetPids: ids.filter((p) => /[)]/.test(String(p))',
+    );
     for (const decl of [
       'export function readyArenaFighter(\n  ctx: SimContext,\n  e: Entity,\n  opts: { clearPrep: boolean; keepValidTargetPids?: readonly number[] },\n): void {',
       'readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void;',
