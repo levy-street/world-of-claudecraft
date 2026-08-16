@@ -60,15 +60,25 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     expect(repeat).toEqual(first);
 
     // Accepted three-seed measurements on this fixture are approximately
-    // 203 Combat, 186 Assassination, and 179 Subtlety. The bounds protect the
-    // player outcome while leaving a small deterministic tuning margin.
+    // 199.4 Combat, 170.4 Assassination, and 171.0 Subtlety. OUTCOME
+    // (2026-08-16, Masterwrought phase 10 QA ruling 1, "accept the phase
+    // design and re-pin"): the apex crafted jewelry (wyrmfall_pendant,
+    // prismglass_loop) enters all three specs' derived BiS loadout on the
+    // merged tree; its rating-heavy stat shape out-scores the raid pieces
+    // in bestEpicGearFor's stats-sum picker while measuring lower in the
+    // fight, so Assassination re-bands from the release's 180..195 to
+    // 165..180 and the sibling ordering is restated to what the apex
+    // jewelry yields: Combat strictly first, Subtlety marginally over
+    // Assassination (171.02 vs 170.38). The bounds still protect the
+    // player outcome while leaving a small deterministic tuning margin;
+    // phase 15 measures fights, never scores.
     expect(first.combat).toBeGreaterThanOrEqual(195);
     expect(first.combat).toBeLessThanOrEqual(205);
-    expect(first.assassination).toBeGreaterThanOrEqual(180);
-    expect(first.assassination).toBeLessThanOrEqual(195);
+    expect(first.assassination).toBeGreaterThanOrEqual(165);
+    expect(first.assassination).toBeLessThanOrEqual(180);
     expect(first.subtlety).toBeGreaterThanOrEqual(170);
     expect(first.subtlety).toBeLessThanOrEqual(185);
-    expect(first.combat).toBeGreaterThan(first.assassination);
-    expect(first.assassination).toBeGreaterThan(first.subtlety);
+    expect(first.combat).toBeGreaterThan(first.subtlety);
+    expect(first.subtlety).toBeGreaterThan(first.assassination);
   }, 30_000);
 });

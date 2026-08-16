@@ -4383,7 +4383,108 @@ recorded, or refuted with the file open)
   undispellable flask auras + Spellplunder pin, (d) the four aura names into
   the naming registry, (e) the phase-15 feast premise correction.
 
+## Phase 11 pre-fan-out ledger (2026-08-16, Step 1 seam record + the channel decision, recorded BEFORE any pattern row lands)
+- Seam verification (four Explore agents over the live tree, all anchors
+  re-verified at HEAD): the append contract in src/sim/loot/loot_roll.ts is
+  draw-position arithmetic: draws are consumed in array order, a rollGroup
+  spends exactly ONE rng.next() at its FIRST member's index, an ungrouped
+  entry spends one rng.chance (plus rng.int only if it carries copper), so
+  appending at the tail leaves every existing draw's stream position
+  byte-identical and inserting or reordering forks the parity digest. The
+  heroic-only block and awardWyrmfallCores draw AFTER the base loop, so a
+  base-table append still shifts those later draws forward: the parity
+  goldens that reach a final-boss kill (nythraxis_full_pull) move BY DESIGN
+  and are re-minted via UPDATE_PARITY in their own reviewed commit; every
+  other golden staying byte-identical is the real append-only proof.
+- The pattern universe is EXACTLY the 28 acquisition:['drop'] apex recipes
+  (10 APEX_ARMOR + 10 APEX_GEAR + 8 APEX_CONSUMABLE); enchants are EnchantDef
+  rows, not recipes, and take no pattern. There is exactly ONE raid
+  (nythraxis_boss_arena) and five heroic five-mans; rifts are the third
+  pillar. makeHeroicVariant spreads ...base BUT its generator filter
+  (quality + slot + kind armor/weapon/held_offhand) means a kind:'recipe'
+  def in a heroic-eligible table mints NO variant and heroicItem() no-ops
+  for it; the invariant (never a flagged DEF in a heroic-eligible table)
+  is honored by dropping only patterns.
+- CHANNEL ASSIGNMENT (the phase decision; R8 bounds it to the three pillars
+  and no document assigns recipes, so it is recorded here before authoring):
+  RAID (nythraxis, tradable drops) takes the ten APEX_GEAR patterns
+  (weapons, shield, jewelry, gadgets, grimoire: the chase prestige set);
+  RIFT (B/A/S winning clears, tradable drops riding addRiftClearGearLoot as
+  the appended draw after the mount roll) takes the ten APEX_ARMOR patterns
+  (the bulk armor demand on the repeatable pillar; the C arm's early return
+  means C rifts never reach the pattern draw, recorded as designed);
+  HEROIC QUARTERMASTER (deterministic, day-one) sells the eight
+  APEX_CONSUMABLE patterns for Heroic Marks (consumable crafters get
+  deterministic day-one access so the raid economy functions; gear patterns
+  stay chase items per R8's split). Planned initial rates and prices (the
+  build records finals): raid = ONE new rollGroup appended at the table
+  tail (one new draw total, at most one pattern per kill), total 0.40
+  partitioned 0.04 per pattern; rift = one appended rng.chance(0.08) per
+  winning B/A/S clear then one rng.int pick over the sorted rift pattern
+  list; quartermaster = skill-100 patterns at 12 marks (the ring point),
+  the two capstone patterns at 16 (the neck point), in the shipped mark
+  family. Phase 15 measures and tunes; rates recorded, never re-derived.
+- acquisition STAYS ['drop'] on all 28 (the learn flow's acquireRecipe
+  source is 'drop', the tooltip gate and the phase 02 sweep key on it, and
+  the union has no 'vendor' token); the wiki mislabel is fixed at the
+  GENERATOR level: build_content.mjs emits a vendor-channel acquisition for
+  recipes whose teaching pattern id is in HEROIC_VENDOR_STOCK, and
+  professions_craft.ts renders a new guide.profPages.sourceVendor row for
+  it, keeping guide.test.ts honest for both channels with sourceDrop
+  untouched for the drop channels.
+- Known pin movements (from the seam reports, so the build does not
+  rediscover them): tests/nythraxis_raid_unit.test.ts requires every
+  non-mount raid entry to carry rollGroup nythraxis_drop_[1-5] and pins
+  groups.size 5 (the pattern group re-cuts it); tests/dungeons.test.ts pins
+  the heroic-raid ungrouped set as the four reins (untouched: no pattern
+  rides HEROIC_BOSS_LOOT); tests/heroic_vendor.test.ts pins stock 11 /
+  gear 10 and its gear-shape loop must exclude pattern rows like
+  wyrmfall_core; the market category work moves tests/market_filters.test.ts
+  (list pin + All-only sweep non-vacuity) and re-cuts the phase 02
+  ['all','other'] pin in tests/recipe_pattern_items.test.ts to
+  ['all','pattern']; a pattern browse category is a VALUE on the existing
+  itemType axis, so NO IWorld member changes and the parity member pin
+  (324 = 86/238) does not move.
+- Commission board re-check CLOSED by inspection: the board lists from the
+  VIEWER'S known recipes (commission_order_view filters knownRecipes) and
+  the sim gate keys on the OUTPUT def's kind, so pre-pattern apex listings
+  were per-player impossible all along outside the picker's own known set;
+  patterns make rows appear per player exactly at learn time; no board
+  change owed. vendorCountForced decision (phase 02 QA carry): quartermaster
+  patterns sell singly (quantity hardcoded 1 per purchase), duplicates
+  purchasable BY DESIGN (tradable surplus makes the vendor price the market
+  ceiling, the valve working as intended).
+- Pattern def shape decisions: ids pattern_<output id>; kind 'recipe' defs
+  in a new src/sim/content/apex_patterns.ts merged by data.ts; quality
+  'epic' for all 28 (they teach the epic tier; recipe rarity stays monotone
+  to power); classic per-craft display prefixes (Plans: armor/weaponcraft,
+  Pattern: leather/tailoring, Design: jewelcrafting, Schematic: engineering,
+  Technique: inscription, Recipe: alchemy/cooking); modest uniform
+  sellValue; every id owes committed opaque 128px WebP art + audit
+  admission + M16 non-Latin name fills + wiki regen (the phase 02 QA art
+  blocker: ITEM_ART_PENDING is deliberately empty and an artless pattern
+  404s and reds item_icons).
+- makers_charm rollback line lands in THIS ledger (the packet keeps
+  deploy/rollback notes as state.md prose, the phase 04 precedent): the
+  makers_charm ToolEffectId widens a PERSISTED enum; a rollback to a
+  pre-phase-09 binary silently deletes a slotted charm at load (not a loud
+  failure), and that hazard becomes player-reachable the moment
+  pattern_makers_charm lands in the raid channel this phase; the paired
+  cosmetic note: a stale bundled desktop or native client reads the
+  comma-joined mst as one craft id and omits the mobile-station row, server
+  gating unaffected.
+
 ## Phase 11 ruling executions (2026-08-16, the five items owed at the head)
+- (a2) Rogue band re-pin, OUTCOME 2026-08-16: tests/rogue_dps_balance.test.ts
+  re-pinned to the merged-tree loadout per ruling (1). Assassination re-bands
+  180..195 to 165..180 around the measured 170.383; the sibling-ordering
+  claim restates to Combat strictly first with Subtlety marginally over
+  Assassination (171.022 vs 170.383, the apex jewelry stat shape: the
+  rating-heavy wyrmfall_pendant + prismglass_loop out-score the raid pieces
+  in the stats-sum picker while measuring lower in the fight, the
+  Lionheart/Lariat class first measured at the phase 10 QA sync). Combat and
+  Subtlety bands unchanged (199.367 and 171.022 sit inside them). Suite
+  green 2/2 at the re-pin; the dated OUTCOME note lives in the test comment.
 - (e) Phase-15 kit premise, OUTCOME 2026-08-16: the feast is dropped from the
   R5 full-kit premise per ruling (4) of the phase 10 QA (the party
   field-crafting stations are ratified as crafting stations; there is no feast
