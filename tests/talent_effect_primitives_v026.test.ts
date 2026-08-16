@@ -120,10 +120,12 @@ describe('Talents V2 dispel and steal primitives', () => {
     // stolen flask would ride the thief's own singleton, downward-refusal, and
     // death-persistence rules. The worn fixture is re-sourced from a GENUINE
     // mint (the mage quaffs the real flask and the captured aura seeds the
-    // enemy), so a mint that loses the stamp reaches this arm: the fixture
-    // becomes stealable, the steal takes it instead of the blessing, and the
-    // assertions red. It sits FIRST in the enemy's aura array so the skip is
-    // what decides, never the walk order.
+    // enemy), so a mint that loses the stamp reaches BOTH arms. The dispel
+    // executor walks the aura array from the END (effect_dispatch.ts), so
+    // the flask is seated LAST: the walk examines it FIRST, and only the
+    // stamp's skip moves the steal on to the blessing. With the stamp
+    // reverted the steal takes the flask here, and arm 2 below (a
+    // flask-only target) reds independently.
     const mintFlaskAura = (sim: Sim, itemId: string, familyId: string): Aura => {
       sim.addItem(itemId, 1, sim.playerId);
       sim.useItem(itemId, sim.playerId);
@@ -141,8 +143,8 @@ describe('Talents V2 dispel and steal primitives', () => {
     const enemy = addHostile(sim);
     const minted = mintFlaskAura(sim, 'ironhusk_flask', 'elixir_buff_sta');
     expect(minted.flask, 'sanity: the mint carries the marker').toBe(true);
-    enemy.auras.unshift({ ...minted, sourceId: enemy.id });
     enemy.auras.push(aura(enemy, 'magic_blessing', 'buff_spellpower', 40, 'holy'));
+    enemy.auras.push({ ...minted, sourceId: enemy.id });
 
     runAbilityEffect(sim, enemy, 'spellsteal');
 

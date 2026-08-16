@@ -346,7 +346,7 @@ Vellum.
     so this does not block, recorded for the maintainer. A FOURTH composed
     name joined at the head of phase 11 per the phase 10 QA D10-D1 ruling:
     'Enchant Weapon - Lucent Spellpower', the same registered scheme words
-    (Lucent plus the Spellpower axis word two shipped names already carry);
+    (Lucent plus the Spellpower axis word three shipped names already carry);
     it mints no new noun and rides this same scheme-wide record.
   - The four aura DISPLAY names (registered 2026-08-16 per ruling (9) of the
     phase 10 QA; these are the buff-bar strings the flask and role-food items

@@ -84,9 +84,10 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     // phase 10 QA sync record flagged through the research memo's
     // Lionheart/Lariat precedent, first measured there). With the
     // masterwrought defs removed the picker restores the release loadout
-    // and measures about 186.3 / 202.8 / 179.2, matching the release
-    // bands: that pre-apex baseline is recorded here and in state.md for
-    // phase 15, which measures fights, never scores. These bounds protect
+    // and measures about 186.3 / 202.8 / 179.2 (assassination, combat,
+    // subtlety), matching the release bands: that pre-apex baseline is
+    // recorded here and in state.md for phase 15, which measures fights,
+    // never scores. These bounds protect
     // the DEV-BIS FIXTURE's throughput (the suite's actual subject), not a
     // played rogue's. Assassination re-bands from the release's 180..195
     // to 165..180 around the measured 170.383. Subtlety's band is

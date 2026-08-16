@@ -4583,7 +4583,9 @@ recorded, or refuted with the file open)
   AT PHASE 10 block as a display-name group; Well Fed's caveat records that
   it is WoW's verbatim same-role food-buff name, kept deliberately as a
   plain-English state description; the other three compound packet-registered
-  coins with generic stat words the appendix already carries as GENERIC.
+  coins with generic stat words (Might carried by three appendix GENERIC
+  rows; Vigor and Clarity generic stat vocabulary with no appendix row, as
+  the registry rows themselves say).
   The live Naming registry block above gained the mirror line, and the
   shipped elixir aura names remain unregistered (the recorded pre-existing
   half of the gap, closed only for the packet's own rows).
@@ -4626,4 +4628,16 @@ recorded, or refuted with the file open)
   the bag+legendary gate arm pinned. FULL SUITE at the pre-fix-round tip
   36e539ebb7: 2827 files / 39619 passed, ZERO failures (2 expected fails,
   115 skips): the first fully green full run since the third phase 10 QA
-  sync, closing the two-reds acceptance item.
+  sync, closing the two-reds acceptance item. The fix round was itself
+  reviewed FRESH and probed (4/4 mutations caught, the carve-out-lane probe
+  proving the new command-path cancel arm covers exactly the classifier
+  pin's blind spot): zero blocking; three comment-truth residuals applied
+  in the follow-up commit: the spellsteal arm-1 comment had repeated a
+  pre-existing FALSE walk-order clause (the dispel executor walks the aura
+  array from the END, so the unshifted flask was examined last and arm 1
+  never consulted the stamp; the flask is now seated LAST so the end-first
+  walk examines it first and the skip genuinely decides, making BOTH arms
+  stamp-guarding), the Spellpower shipped-name count corrected to three,
+  and the (d) entry's appendix-GENERIC claim narrowed to Might (Vigor and
+  Clarity are generic vocabulary without appendix rows); the pre-apex
+  baseline triple gained its explicit spec order.
