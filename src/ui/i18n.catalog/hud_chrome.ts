@@ -3876,10 +3876,12 @@ export const hudChromeStrings = {
     enchant_chest_runeweave: 'Enchant Chest - Runed Weave',
     enchant_legs_runed_hide: 'Enchant Legs - Runed Hide',
     enchant_helmet_runed_links: 'Enchant Helmet - Runed Links',
-    // The Lucent (apex) tier. The first three follow the slot-and-effect
-    // formula every row above uses; Lucent Infusion is a registered standalone
+    // The Lucent (apex) tier. The first four follow the slot-and-effect
+    // formula every row above uses (the weapon int twin landed with the
+    // phase 10 QA D10-D1 ruling); Lucent Infusion is a registered standalone
     // name, so it takes no slot prefix even though it targets a slot.
     enchant_weapon_lucent_might: 'Enchant Weapon - Lucent Might',
+    enchant_weapon_lucent_spellpower: 'Enchant Weapon - Lucent Spellpower',
     enchant_chest_lucent_stamina: 'Enchant Chest - Lucent Stamina',
     enchant_feet_lucent_agility: 'Enchant Boots - Lucent Agility',
     enchant_lucent_infusion: 'Lucent Infusion',

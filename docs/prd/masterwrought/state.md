@@ -4497,6 +4497,26 @@ recorded, or refuted with the file open)
   gather_rare_events + architecture green, tsc clean, biome clean. With
   (a2) below, the standing reds are CLOSED: the full suite is expected fully
   green for the first time since the third phase 10 QA sync.
+- (b) Lucent weapon int twin, OUTCOME 2026-08-16: enchant_weapon_lucent_
+  spellpower shipped per ruling (5) (D10-D1): int 7, mainhand, skillReq 100,
+  bill byte-identical to Lucent Might (lucent_reagent 1 + arcane_shard 1 +
+  arcane_essence 2), name 'Enchant Weapon - Lucent Spellpower' continuing the
+  Greater Spellpower naming line. i18n: hudChrome.enchantName row + five
+  non-Latin fills composed from each locale's established Lucent + Spellpower
+  vocabulary; guide enchantsNoteOffhand recut 'the three' to 'the four' with
+  the weapon slot naming both options, and the five FILLED non-Latin overlay
+  rows hand-refreshed in the same change (the reword-staleness rule).
+  i18n:gen + wiki:content regenerated. Pins moved: enchants_magnitude_
+  invariants int 24 -> 26 with the axis comment recut (spi and armor are now
+  the untouched pair), apex list + skillReq literals + frozen-magnitudes
+  table gained the id; guide.test.ts Lucent list 4 -> 5 ids;
+  masterwrought_budget gained the mirrored int-ladder arm (2/3/5 -> 7 on the
+  same +2 step, bill equality pinned). No aura/marker/naming-registry
+  obligations: the composed name mints no new proper noun (the phase 10
+  scheme-wide record covers it; GW2 Lucent evidence already recorded).
+  Suites: enchants_magnitude_invariants, enchant_apply_view,
+  masterwrought_budget, professions_enchanting, guide, i18n_completeness,
+  localization_fixes all green; tsc + biome clean.
 - (a2) Rogue band re-pin, OUTCOME 2026-08-16: tests/rogue_dps_balance.test.ts
   re-pinned to the merged-tree loadout per ruling (1). Assassination re-bands
   180..195 to 165..180 around the measured 170.383; the sibling-ordering

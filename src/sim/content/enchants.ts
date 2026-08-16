@@ -499,7 +499,11 @@ export const ENCHANTS: Record<string, EnchantDef> = {
   // skill (skillReq, the first non-free-floor enchants; see the tier note in
   // the header). Each apex value continues its OWN slot ladder's step rather
   // than inventing a magnitude: weapon str runs 2 (base), 3 (runed), 5
-  // (Greater) and steps to 7; chest sta runs 4 (base), 7 (Greater) and steps
+  // (Greater) and steps to 7, and the weapon INT twin runs the identical
+  // ladder (Spellpower 2, Runed Sigil 3, Greater Spellpower 5) and steps to
+  // the same 7 with the byte-identical bill (the phase 10 QA D10-D1 ruling,
+  // taken 2026-08-16: every lower weapon rung pairs str with int, so the
+  // apex rung does too); chest sta runs 4 (base), 7 (Greater) and steps
   // to 10; boots, which have no Greater rung by design, take the base-to-runed
   // sized step 2 -> 3, kept deliberately small because R7 rules the boots
   // enchant stats only (movement speed is not even expressible in statBonus,
@@ -514,6 +518,18 @@ export const ENCHANTS: Record<string, EnchantDef> = {
       { itemId: 'arcane_essence', count: 2 },
     ],
     statBonus: { str: 7 },
+    skillReq: 100,
+  },
+  enchant_weapon_lucent_spellpower: {
+    id: 'enchant_weapon_lucent_spellpower',
+    name: 'Enchant Weapon - Lucent Spellpower',
+    itemSlot: 'mainhand',
+    reagents: [
+      { itemId: 'lucent_reagent', count: 1 },
+      { itemId: 'arcane_shard', count: 1 },
+      { itemId: 'arcane_essence', count: 2 },
+    ],
+    statBonus: { int: 7 },
     skillReq: 100,
   },
   enchant_chest_lucent_stamina: {

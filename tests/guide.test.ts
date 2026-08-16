@@ -2273,7 +2273,8 @@ describe('Guide professions enchanting and economy accuracy', () => {
       'enchant_weapon_runed_focus',
     ]);
     expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(6);
-    // The four Lucent (apex) enchants, Masterwrought phase 10.
+    // The five Lucent (apex) enchants: the phase 10 quartet plus the weapon
+    // int twin the phase 10 QA D10-D1 ruling added at the head of phase 11.
     expect(
       e.enchants
         .filter((row) => row.tier === 'lucent')
@@ -2284,6 +2285,7 @@ describe('Guide professions enchanting and economy accuracy', () => {
       'enchant_feet_lucent_agility',
       'enchant_lucent_infusion',
       'enchant_weapon_lucent_might',
+      'enchant_weapon_lucent_spellpower',
     ]);
   });
 

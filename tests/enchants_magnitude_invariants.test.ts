@@ -80,16 +80,18 @@ describe('enchant table magnitude invariants', () => {
     // layer lands at roughly 15 to 25 percent of that budget per axis, the
     // "finishing bonus" target, instead of the pre-trim 30 to 43 percent.
     // These are BEST-per-slot totals over the whole table, so since the
-    // Masterwrought Lucent tier landed (phase 10) three of them describe an
-    // apex enchanter at skill 100 or above, not the ordinary stack: the three
+    // Masterwrought Lucent tier landed (phase 10) four of them describe an
+    // apex enchanter at skill 100 or above, not the ordinary stack: the four
     // axes the Lucent tier touches each moved by exactly its own slot's step
-    // (str +2 on the weapon, agi +1 on the boots, sta +6 on the chest, which
-    // is the Perfected-only Lucent Infusion at 13 over the Greater 7, a rung
-    // NO live item can take until phase 12 mints a Perfected copy). int, spi,
-    // and armor are untouched by the tier and keep their pre-phase values.
+    // (str +2 on the weapon, int +2 on the weapon via the Spellpower twin the
+    // phase 10 QA D10-D1 ruling added, agi +1 on the boots, sta +6 on the
+    // chest, which is the Perfected-only Lucent Infusion at 13 over the
+    // Greater 7, a rung NO live item can take until phase 12 mints a
+    // Perfected copy). spi and armor are untouched by the tier and keep
+    // their pre-phase values.
     // The percentages below still name the level-20 BiS budgets, so the sta
     // line reads high by design; phase 15 owns the envelope verification.
-    expect(bestPerSlotTotal('int')).toBe(24); // 20 percent of the 120 int budget
+    expect(bestPerSlotTotal('int')).toBe(26); // 24 before the Lucent weapon int twin
     // 27 before the Lucent tier (24 plus offhand's enchant_offhand_stamina,
     // #2825: the offhand slot had no base enchant at all before that fix).
     // The HP pin below covers the x10 conversion, over its own fixed 5-slot
@@ -157,6 +159,7 @@ describe('enchant table magnitude invariants', () => {
       'enchant_feet_lucent_agility',
       'enchant_lucent_infusion',
       'enchant_weapon_lucent_might',
+      'enchant_weapon_lucent_spellpower',
     ]);
     for (const a of apex) {
       const axis = axisOf(a);
@@ -191,9 +194,10 @@ describe('enchant table magnitude invariants', () => {
       expect(e.skillReq, `${e.id}: free floor`).toBeUndefined();
       expect(e.requiresPerfected, `${e.id}: any-copy`).toBeUndefined();
     }
-    // The two rungs the design settled on: the apex trio at the skill-100
+    // The two rungs the design settled on: the apex quartet at the skill-100
     // product rung, the capstone Infusion at the 125 cap.
     expect(ENCHANTS.enchant_weapon_lucent_might.skillReq).toBe(100);
+    expect(ENCHANTS.enchant_weapon_lucent_spellpower.skillReq).toBe(100);
     expect(ENCHANTS.enchant_chest_lucent_stamina.skillReq).toBe(100);
     expect(ENCHANTS.enchant_feet_lucent_agility.skillReq).toBe(100);
     expect(ENCHANTS.enchant_lucent_infusion.skillReq).toBe(125);
@@ -310,6 +314,7 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
       enchant_legs_runed_hide: { agi: 4 },
       enchant_helmet_runed_links: { sta: 5 },
       enchant_weapon_lucent_might: { str: 7 },
+      enchant_weapon_lucent_spellpower: { int: 7 },
       enchant_chest_lucent_stamina: { sta: 10 },
       enchant_feet_lucent_agility: { agi: 3 },
       enchant_lucent_infusion: { sta: 13 },

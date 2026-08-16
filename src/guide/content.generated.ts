@@ -14656,6 +14656,34 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       ]
     },
     {
+      "id": "enchant_weapon_lucent_spellpower",
+      "name": "Enchant Weapon - Lucent Spellpower",
+      "slot": "mainhand",
+      "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "reagents": [
+        {
+          "name": "Lucent Reagent",
+          "count": 1
+        },
+        {
+          "name": "Chime Shard",
+          "count": 1
+        },
+        {
+          "name": "Chime Essence",
+          "count": 2
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "int",
+          "value": 7
+        }
+      ]
+    },
+    {
       "id": "enchant_chest_lucent_stamina",
       "name": "Enchant Chest - Lucent Stamina",
       "slot": "chest",

@@ -1282,7 +1282,7 @@ function foodDef(id: string): { foodHp?: number; wellFed?: { value: number; dura
   return def;
 }
 
-const statBonus = (enchantId: string, axis: 'str' | 'agi' | 'sta'): number => {
+const statBonus = (enchantId: string, axis: 'str' | 'agi' | 'sta' | 'int'): number => {
   const def = ENCHANTS[enchantId];
   if (!def) throw new Error(`${enchantId} is not in the enchant table`);
   return def.statBonus[axis] ?? 0;
@@ -1389,6 +1389,22 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
       statBonus('enchant_weapon_greater_might', 'str') + weaponStep,
     );
     expect(statBonus('enchant_weapon_lucent_might', 'str')).toBe(7);
+
+    // The weapon INT twin (phase 10 QA D10-D1 ruling) mirrors the str ladder
+    // exactly: Spellpower 2, Runed Sigil 3, Greater Spellpower 5, apex 7 on
+    // the same +2 step, with the bill byte-identical to Lucent Might.
+    expect([
+      statBonus('enchant_weapon_intellect', 'int'),
+      statBonus('enchant_weapon_runed_focus', 'int'),
+      statBonus('enchant_weapon_greater_spellpower', 'int'),
+    ]).toEqual([2, 3, 5]);
+    expect(statBonus('enchant_weapon_lucent_spellpower', 'int')).toBe(
+      statBonus('enchant_weapon_greater_spellpower', 'int') + weaponStep,
+    );
+    expect(statBonus('enchant_weapon_lucent_spellpower', 'int')).toBe(7);
+    expect(ENCHANTS.enchant_weapon_lucent_spellpower.reagents).toEqual(
+      ENCHANTS.enchant_weapon_lucent_might.reagents,
+    );
 
     // Chest stamina: 4 base, 7 Greater, so its own step is +3 and the apex
     // takes it again.

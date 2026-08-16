@@ -8606,6 +8606,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.enchantName.enchant_weapon_greater_spellpower'
   | 'hudChrome.enchantName.enchant_weapon_intellect'
   | 'hudChrome.enchantName.enchant_weapon_lucent_might'
+  | 'hudChrome.enchantName.enchant_weapon_lucent_spellpower'
   | 'hudChrome.enchantName.enchant_weapon_might'
   | 'hudChrome.enchantName.enchant_weapon_runed_edge'
   | 'hudChrome.enchantName.enchant_weapon_runed_focus'
