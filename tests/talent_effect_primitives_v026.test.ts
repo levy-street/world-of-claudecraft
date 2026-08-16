@@ -118,10 +118,20 @@ describe('Talents V2 dispel and steal primitives', () => {
     // `undispellable` beside the flask marker (src/sim/items.ts useItem), and
     // the steal copies the WHOLE aura, marker included, so an unshielded
     // stolen flask would ride the thief's own singleton, downward-refusal, and
-    // death-persistence rules. The worn shape here is the exact mint shape,
-    // and it is FIRST in the target's aura array so the skip is what decides:
-    // with the stamp reverted, the steal takes the flask instead of the
-    // blessing and every assertion below reds.
+    // death-persistence rules. The worn fixture is re-sourced from a GENUINE
+    // mint (the mage quaffs the real flask and the captured aura seeds the
+    // enemy), so a mint that loses the stamp reaches this arm: the fixture
+    // becomes stealable, the steal takes it instead of the blessing, and the
+    // assertions red. It sits FIRST in the enemy's aura array so the skip is
+    // what decides, never the walk order.
+    const mintFlaskAura = (sim: Sim, itemId: string, familyId: string): Aura => {
+      sim.addItem(itemId, 1, sim.playerId);
+      sim.useItem(itemId, sim.playerId);
+      const idx = sim.player.auras.findIndex((entry) => entry.id === familyId);
+      if (idx < 0) throw new Error(`${itemId} did not mint ${familyId}`);
+      const [minted] = sim.player.auras.splice(idx, 1);
+      return minted;
+    };
     const sim = new Sim({
       seed: 24,
       playerClass: 'mage',
@@ -129,11 +139,9 @@ describe('Talents V2 dispel and steal primitives', () => {
       world: EMPTY_TEST_WORLD,
     });
     const enemy = addHostile(sim);
-    enemy.auras.push({
-      ...aura(enemy, 'elixir_buff_sta', 'buff_sta', 15, 'nature'),
-      flask: true as const,
-      undispellable: true as const,
-    });
+    const minted = mintFlaskAura(sim, 'ironhusk_flask', 'elixir_buff_sta');
+    expect(minted.flask, 'sanity: the mint carries the marker').toBe(true);
+    enemy.auras.unshift({ ...minted, sourceId: enemy.id });
     enemy.auras.push(aura(enemy, 'magic_blessing', 'buff_spellpower', 40, 'holy'));
 
     runAbilityEffect(sim, enemy, 'spellsteal');
@@ -151,11 +159,8 @@ describe('Talents V2 dispel and steal primitives', () => {
       world: EMPTY_TEST_WORLD,
     });
     const enemy2 = addHostile(sim2);
-    enemy2.auras.push({
-      ...aura(enemy2, 'elixir_buff_ap', 'buff_ap', 15, 'nature'),
-      flask: true as const,
-      undispellable: true as const,
-    });
+    const minted2 = mintFlaskAura(sim2, 'warboar_flask', 'elixir_buff_ap');
+    enemy2.auras.unshift({ ...minted2, sourceId: enemy2.id });
     runAbilityEffect(sim2, enemy2, 'spellsteal');
     expect(enemy2.auras.some((entry) => entry.id === 'elixir_buff_ap')).toBe(true);
     expect(sim2.player.auras.some((entry) => entry.flask === true)).toBe(false);

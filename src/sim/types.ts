@@ -646,9 +646,13 @@ export interface Aura {
   // Encounter-authored control that must land through immunity and cannot be
   // removed by player counters. Natural expiry and encounter cleanup still own it.
   unbreakableControl?: true;
-  // An aura no player counter may shed: dispel, purge, cleanse, and spellsteal
-  // all skip it, and it is never right-click cancelable. Only its own timer
-  // (or a rule that bypasses player counters entirely) takes it off. Set today
+  // An aura no PLAYER counter may shed: dispel, cleanse, spellsteal, and any
+  // player purge that ever ships all skip it, and it is never right-click
+  // cancelable. The mob Spellgnaw devour affix deliberately reads neither
+  // this flag nor the flask marker (mob/mob_swing.ts isDevourableAura), so a
+  // mob purge still takes a flagged buff: the rule scopes to player-driven
+  // counters. Only its own timer (or a rule that bypasses player counters
+  // entirely) takes it off. Set today
   // at three sites: applySickness in ./spirit.ts (both recovery sicknesses,
   // matching the fact that they already survive death and relogging; without
   // it a single dispel erased the entire Pale Keeper / unstuck penalty), the

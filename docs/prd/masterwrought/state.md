@@ -96,15 +96,22 @@ down any raid epic of the tier), Maker's Ember (keystone), Apex Patterns (recipe
 Per profession: Duskforged Billet / Forgefold Plating / Wyrmhide Cording / Sunspun Bolt /
 Prismglass Setting / Precision Chassis / Quickening Catalyst / Seasoned Stock / Lucent
 Reagent (intermediates); Ridgebreaker (2H), Gyrelens Array (gadget), Master's Field Forge,
-Voidbound Grimoire, Grand Cauldron, The Laden Hearth (feast), Deed of Making (codex),
+Voidbound Grimoire, Grand Cauldron, The Laden Hearth (party field-crafting station,
+ratified by phase 10 QA ruling 4; minted under the spec's feast flavor), Deed of Making
+(codex),
 Lucent Infusion (Perfected-only enchant). Rejected for collisions: Vanquisher, Radiant,
 Arcanite (new uses), Quintessent, Grand Banquet, Colossus Splitter, Aetherlens, Apex (tag).
 Phase 10 additions (web-verified 2026-08-14, evidence in naming-audit.md): Ironhusk Flask /
 Warboar Flask / Runewater Flask (apex flasks, the shipped '<Word> Flask' form over WoW's
 'Flask of the <noun>' trade dress), Stonepot Stew / Warspice Skewers / Sageleaf Chowder
-(role foods); the three apex enchant names ride the recorded 'Enchant <Slot> - <Stat>'
+(role foods); the apex enchant names (four at phase 10, the D10-D1 weapon int twin at the
+head of phase 11) ride the recorded 'Enchant <Slot> - <Stat>'
 scheme with the registered Lucent tier word (no new coin). GW2's Lucent Mote / Pile of
 Lucent Crystal (same enchanting-material role class) recorded against the Lucent row.
+Phase 11 head, per ruling (9): the four aura DISPLAY names (Ironhusk Vigor, Warboar
+Might, Runewater Clarity, Well Fed) registered GENERIC-with-caveat in naming-audit.md
+(Well Fed's caveat: WoW's verbatim same-role food-buff name, kept as a plain-English
+state description).
 Phase 03 amendments: Prismstone Setting RENAMED to Prismglass Setting (FFXIV ships a real
 'Prismstone' crafting material in the same component role, plus WoW's Prismstone Ring;
 Prismglass verified zero-hit). Phase 03 QA amendment (v0.36.0 merge supersession): the
@@ -4548,12 +4555,38 @@ recorded, or refuted with the file open)
   re-pinned to the merged-tree loadout per ruling (1). Assassination re-bands
   180..195 to 165..180 around the measured 170.383; the sibling-ordering
   claim restates to Combat strictly first with Subtlety marginally over
-  Assassination (171.022 vs 170.383, the apex jewelry stat shape: the
-  rating-heavy wyrmfall_pendant + prismglass_loop out-score the raid pieces
-  in the stats-sum picker while measuring lower in the fight, the
-  Lionheart/Lariat class first measured at the phase 10 QA sync). Combat and
-  Subtlety bands unchanged (199.367 and 171.022 sit inside them). Suite
-  green 2/2 at the re-pin; the dated OUTCOME note lives in the test comment.
+  Assassination (171.022 vs 170.383). MECHANISM AMENDMENT (2026-08-16, from
+  the fresh review's measured A/B, superseding the sync record's
+  "rating-heavy shape out-scores" phrasing ON MECHANISM only): the picker's
+  score() sums only item.stats and cannot see hit/crit/haste ratings at all;
+  the apex jewelry wins on an int-led raw stat bag (neck int 8 + sta 6 = 14
+  over the displaced medallion's 12) that a class-blind sum credits while
+  int buys a rogue no throughput (rogue AP is str + agi), which is also why
+  the fight measures lower: the fixture wears two pieces no played rogue
+  would equip (still the score-vs-fight Lionheart/Lariat class the sync
+  record flagged; the outcome stands, the mechanism is corrected). The
+  pre-apex baseline for phase 15: with the masterwrought defs removed the
+  picker restores the release loadout and measures about 186.3 / 202.8 /
+  179.2, matching the release bands, so the suite's bounds protect the
+  DEV-BIS FIXTURE's throughput, not a played rogue's. Combat and Subtlety
+  bands unchanged (199.367 and 171.022 sit inside them; Subtlety's floor
+  now sits a deliberate, disclosed 1.0 under the measurement, the tightest
+  tripwire in the suite). The fix round added identity pins (neck =
+  wyrmfall_pendant, ring2 = prismglass_loop, 12 filled slots per spec: the
+  bands are conditioned on that loadout, and ring2 is a three-way score-13
+  tie broken by the picker's id sort, now a tested fact) and a near-tie
+  band (|subtlety - assassination| <= 5) beside the strict tie-sentinel
+  pair. Suite green 2/2; the dated OUTCOME note lives in the test comment.
+- (d) Naming registry rows, OUTCOME 2026-08-16: the four aura display names
+  (Ironhusk Vigor, Warboar Might, Runewater Clarity, Well Fed) registered
+  GENERIC-with-caveat per ruling (9), appended to naming-audit.md's MINTED
+  AT PHASE 10 block as a display-name group; Well Fed's caveat records that
+  it is WoW's verbatim same-role food-buff name, kept deliberately as a
+  plain-English state description; the other three compound packet-registered
+  coins with generic stat words the appendix already carries as GENERIC.
+  The live Naming registry block above gained the mirror line, and the
+  shipped elixir aura names remain unregistered (the recorded pre-existing
+  half of the gap, closed only for the packet's own rows).
 - (e) Phase-15 kit premise, OUTCOME 2026-08-16: the feast is dropped from the
   R5 full-kit premise per ruling (4) of the phase 10 QA (the party
   field-crafting stations are ratified as crafting stations; there is no feast
@@ -4564,3 +4597,33 @@ recorded, or refuted with the file open)
   phase 10 section) are historical records of the spec's original flavor,
   whose resolution into stations is already recorded in the Phase 10 ledger,
   and deliberately stand. R5's own wording in this file never listed a feast.
+- RULING REVIEW RECORD (2026-08-16): each of the six ruling commits got its
+  own FRESH review (five reviewers: sim-seams over a1 and c, pin-quality
+  over a2, content-obligations over b, a docs reviewer over d+e; the three
+  typed reviewer agents returned empty reports twice, a known harness
+  failure class, and were re-run as general-purpose agents with the charter
+  inlined), plus a six-probe mutation pass in the isolated worktree
+  wocc-mw11-probe at the exact tip 36e539ebb7: 6/6 mutations caught, every
+  new pin decisive (the resolve-arm bypass probe proved the bags behavioral
+  sweep covers the grant arm independently of the unit pin). ZERO blocking
+  findings anywhere. All findings applied in one reviewed fix round:
+  the rogue mechanism amendment + identity pins + tie band + disclosures
+  (above); the two fixture-self-supply pins re-sourced from GENUINE mints
+  (the spellsteal arm quaffs the real flask and seeds the enemy with the
+  captured aura; the mob-purge exception pin quaffs instead of hand-building
+  the literal); the flask tooltip gained its counter-immunity line
+  (itemUi.tooltip.flaskUnremovable, five non-Latin fills, the four-rule
+  tooltip pins re-cut) and the alchemy guide prose its matching clause with
+  its five non-Latin rows refreshed in-change; the types.ts undispellable
+  doc scopes "purge" to player-driven counters and names the Spellgnaw
+  exception; a real-command-path cancel arm (Sim.cancelAura no-ops on a
+  flask, removes the elixir control); the (d) OUTCOME above and the registry
+  mirror line; the Laden Hearth registry annotation re-cut to the ratified
+  station role; the naming-audit apex-enchant record extended to the fourth
+  composed name and the Well Fed caveat's unanchored class citation
+  reworded; stale four-Lucent count comments re-cut and the twin's
+  gain-tier literal added; the bags copper-grant comment made honest and
+  the bag+legendary gate arm pinned. FULL SUITE at the pre-fix-round tip
+  36e539ebb7: 2827 files / 39619 passed, ZERO failures (2 expected fails,
+  115 skips): the first fully green full run since the third phase 10 QA
+  sync, closing the two-reds acceptance item.

@@ -189,13 +189,18 @@ describe('elixirTooltipLines', () => {
   });
 
   describe('flask rules', () => {
-    // A flask renders the shared Use line PLUS three rules; an elixir or scroll
+    // A flask renders the shared Use line PLUS four rules; an elixir or scroll
     // of the same family renders the Use line alone. Both directions are
     // pinned, because the gate is the item KIND and an inverted gate would put
     // the flask rules on every elixir in the game.
     const FLASK_RULES = [
       '<div class="tt-desc">Only one flask effect at a time. Drinking another flask replaces this one.</div>',
       '<div class="tt-desc">A weaker elixir or scroll of the same stat cannot replace it.</div>',
+      // The counter-immunity clause (phase 10 QA STK-2 ruling): the mint
+      // stamps undispellable, so dispel, Spellplunder, and the owner's own
+      // right-click all refuse, and the tooltip states the limits per the
+      // live mechanic (docs/design/tooltip-writing.md).
+      '<div class="tt-desc">It cannot be dispelled, stolen, or canceled by hand.</div>',
       // The clean-slate clause is the instanced-match limit (aurasSurvivingCleanSlate,
       // reached directly at arena entry and Fiesta downs and indirectly through
       // readyArenaFighter clearPrep: true at every seat, start, end, and Yumi
@@ -203,7 +208,7 @@ describe('elixirTooltipLines', () => {
       '<div class="tt-desc">The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.</div>',
     ];
 
-    it('a flask adds its three rules under the shared Use line', () => {
+    it('a flask adds its four rules under the shared Use line', () => {
       expect(ITEMS.ironhusk_flask.kind).toBe('flask');
       const html = elixirTooltipLines(ITEMS.ironhusk_flask);
       // The Use line is the SAME sentence the elixirs get, word for word: a
@@ -213,11 +218,11 @@ describe('elixirTooltipLines', () => {
         '<div class="tt-desc">Use: Increases your Stamina by 15 for 20 min. Replaces any other elixir or scroll of the same stat. Usable in combat.</div>',
       );
       for (const rule of FLASK_RULES) expect(html, `flask must state: ${rule}`).toContain(rule);
-      // Exactly four blocks, so a rule cannot be dropped or doubled unnoticed.
-      expect(html.split('<div class="tt-desc">')).toHaveLength(5);
+      // Exactly five blocks, so a rule cannot be dropped or doubled unnoticed.
+      expect(html.split('<div class="tt-desc">')).toHaveLength(6);
     });
 
-    it('every shipped flask states all three, on its own stat axis', () => {
+    it('every shipped flask states all four, on its own stat axis', () => {
       const flasks = Object.values(ITEMS).filter((def) => def.kind === 'flask');
       // The three role flasks: stamina, attack power, intellect.
       expect(flasks.length).toBeGreaterThanOrEqual(3);

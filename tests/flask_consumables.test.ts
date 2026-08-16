@@ -632,9 +632,36 @@ describe('flask auras are undispellable (the phase 10 QA STK-2 ruling, 2026-08-1
     expect(worn[0].flask).toBe(true);
     expect(worn[0].undispellable).toBe(true);
     // The classification the dispel executor and the cancel path both read.
+    // Only the OFFENSIVE arm pins the stamp: the defensive arm was false
+    // before it too (a helpful buff already fails the friendly-dispel
+    // polarity check), so it documents polarity, not the flag.
     expect(isDispellableAura(worn[0], true), 'offensive dispel skips it').toBe(false);
     expect(isDispellableAura(worn[0], false), 'defensive dispel skips it').toBe(false);
     expect(isCancelableAura(worn[0]), 'right-click cancel refuses it').toBe(false);
+  });
+
+  it('the real cancel command is a silent no-op on a flask, and still removes an elixir', () => {
+    // The classifier pin above cannot see a pre-classifier carve-out lane in
+    // Sim.cancelAura (the battleground flag-drop arm is one), so this drives
+    // the command path the HUD actually sends: the flask survives its own
+    // cancel; the plain elixir control still cancels, so the arm is live.
+    const { sim, pid, p } = world();
+    use(sim, pid, IRONHUSK);
+    sim.drainEvents();
+    sim.cancelAura(STA_FAMILY, pid);
+    expect(aurasById(p, STA_FAMILY), 'the flask survives its own cancel').toHaveLength(1);
+    expect(
+      (sim.drainEvents() as SimEvent[]).some((e) => e.type === 'aura' && e.gained === false),
+      'no fade event fires for the refused cancel',
+    ).toBe(false);
+
+    const control = world(43);
+    use(control.sim, control.pid, SERPENT);
+    control.sim.cancelAura(STA_FAMILY, control.pid);
+    expect(
+      aurasById(control.p, STA_FAMILY),
+      'the elixir control cancels through the same command',
+    ).toHaveLength(0);
   });
 
   it('the elixir and scroll sources of the same family stay dispellable and cancelable', () => {

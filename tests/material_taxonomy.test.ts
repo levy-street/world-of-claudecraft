@@ -73,9 +73,10 @@ const HONEST_MATERIALS = [
   'iron_ore',
   'ironbark_log',
   'linen_scrap',
-  // Masterwrought phase 10: derives IN as the reagent all four Lucent
-  // (apex) ENCHANTS consume, through the enchant half of the reagent union
-  // rather than the recipe half, per the phase 07 allowlist obligation.
+  // Masterwrought phase 10: derives IN as the reagent all five Lucent
+  // (apex) ENCHANTS consume (the weapon int twin joined at the head of
+  // phase 11), through the enchant half of the reagent union rather than
+  // the recipe half, per the phase 07 allowlist obligation.
   'lucent_reagent',
   // Masterwrought phase 09: derives IN as the reagent the apex engineering
   // rows consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
@@ -151,8 +152,9 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   // Phase 09 removed duskforged_billet, precision_chassis,
   // prismglass_setting, and sablewax_vellum the same way: the apex gear rows
   // (APEX_GEAR_RECIPES) are their consumers.
-  // Phase 10 removed lucent_reagent: the four Lucent enchants are its
-  // consumers, and enchant reagents feed the same union recipe reagents do.
+  // Phase 10 removed lucent_reagent: the five Lucent enchants are its
+  // consumers (four at phase 10, the weapon int twin at the head of phase
+  // 11), and enchant reagents feed the same union recipe reagents do.
   // Phase 10 also removed seasoned_stock: the three role foods and The Laden
   // Hearth (APEX_CONSUMABLE_RECIPES) are its consumers, the same derivation
   // the phase 08/09 intermediates took.

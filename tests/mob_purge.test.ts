@@ -99,20 +99,15 @@ describe('mob purge affix (Spellgnaw)', () => {
     const sim = makeSim();
     const player = sim.player;
     spawnGrubjaw(sim);
+    // The fixture is a GENUINE mint, never a hand-built literal: the player
+    // quaffs the real flask, so a mint-shape change (marker or flag rename)
+    // reaches this pin instead of leaving it green over a drifted shape.
     player.auras = [];
-    const flask: Aura = {
-      id: 'elixir_buff_sta',
-      name: 'Ironhusk Vigor',
-      kind: 'buff_sta',
-      remaining: 1200,
-      duration: 1200,
-      value: 15,
-      sourceId: player.id,
-      school: 'nature',
-      flask: true,
-      undispellable: true,
-    };
-    player.auras.push(flask);
+    sim.addItem('ironhusk_flask', 1, player.id);
+    sim.useItem('ironhusk_flask', player.id);
+    const flask = player.auras.find((a) => a.id === 'elixir_buff_sta');
+    expect(flask?.flask, 'sanity: the mint carries the marker').toBe(true);
+    expect(flask?.undispellable, 'sanity: the mint carries the flag').toBe(true);
     const removed = devourBeneficialAura((sim as any).ctx, player, 'Spellgnaw');
     expect(removed).toBe(true);
     expect(player.auras.some((a) => a.id === 'elixir_buff_sta')).toBe(false);

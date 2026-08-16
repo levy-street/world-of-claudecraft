@@ -10539,6 +10539,7 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.flaskOnlyOne'
   | 'itemUi.tooltip.flaskOutranks'
   | 'itemUi.tooltip.flaskThroughDeath'
+  | 'itemUi.tooltip.flaskUnremovable'
   | 'itemUi.tooltip.ifYouEquip'
   | 'itemUi.tooltip.maxStack'
   | 'itemUi.tooltip.qualityKind'

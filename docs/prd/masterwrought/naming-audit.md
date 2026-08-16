@@ -343,7 +343,11 @@ Vellum.
     registry row: GW2 ships Lucent Mote and Pile of Lucent Crystal, crafting
     materials refined into rune and sigil inputs, the same role class as
     Lucent Reagent and Lucent Infusion; the composed names remain zero-hit,
-    so this does not block, recorded for the maintainer.
+    so this does not block, recorded for the maintainer. A FOURTH composed
+    name joined at the head of phase 11 per the phase 10 QA D10-D1 ruling:
+    'Enchant Weapon - Lucent Spellpower', the same registered scheme words
+    (Lucent plus the Spellpower axis word two shipped names already carry);
+    it mints no new noun and rides this same scheme-wide record.
   - The four aura DISPLAY names (registered 2026-08-16 per ruling (9) of the
     phase 10 QA; these are the buff-bar strings the flask and role-food items
     grant, separate strings from the registered item names above; the shipped
@@ -363,9 +367,9 @@ Vellum.
     - **Well Fed** (role-food completion buff) GENERIC with recorded caveat,
       the caveat being the point of the row: this is WoW's VERBATIM same-role
       food-buff name. Kept deliberately as a plain-English state description
-      in the Stunned/Exhausted class (genre-standard vocabulary describing the
-      character's condition rather than a coined mark), per the ruling; any
-      future trade-dress tightening starts here.
+      (genre-standard condition vocabulary describing the character's state
+      rather than a coined mark), per the ruling; any future trade-dress
+      tightening starts here.
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

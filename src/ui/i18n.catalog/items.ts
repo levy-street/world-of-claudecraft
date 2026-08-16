@@ -111,6 +111,11 @@ const itemStringsEn = {
       // read as promising all three.
       flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
       flaskOutranks: 'A weaker elixir or scroll of the same stat cannot replace it.',
+      // The counter-immunity line (phase 10 QA STK-2 ruling): the mint stamps
+      // undispellable, so no dispel or steal takes a flask and the flag's
+      // standing rule also removes the owner's right-click cancel; the
+      // tooltip states all three because the live mechanic refuses all three.
+      flaskUnremovable: 'It cannot be dispelled, stolen, or canceled by hand.',
       flaskThroughDeath:
         'The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.',
       // Well Fed (elixir_tooltip_view.ts): the buff a finished meal leaves.

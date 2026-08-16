@@ -870,6 +870,9 @@ describe('quality-tiered enchanting gains', () => {
     // ...and the same deletion drops the shard-carrying apex weapon enchant to
     // its shard rung, 2, so the apex tier saturates into Greater unnoticed.
     expect(enchantGainTier(ENCHANTS.enchant_weapon_lucent_might)).toBe(3);
+    // The int twin (phase 10 QA D10-D1, landed at the head of phase 11)
+    // carries the byte-identical bill, so it scores the same apex rung.
+    expect(enchantGainTier(ENCHANTS.enchant_weapon_lucent_spellpower)).toBe(3);
   });
 
   it('a fresh disenchanter still gains the full point from a common piece (orange at capability 0)', () => {

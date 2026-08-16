@@ -57,7 +57,7 @@ export function elixirTooltipLines(item: ItemDef): string {
   // rather than restating the shared one. Gated on the KIND, not the payload,
   // because every one of them keys on the flask marker the use path stamps and
   // nothing about the payload distinguishes a flask from the elixir it beats.
-  // The middle line is the DOWNWARD refusal (src/sim/items.ts useItem): the
+  // The Outranks line is the DOWNWARD refusal (src/sim/items.ts useItem): the
   // shared Use line says a flask replaces a weaker source, and without this the
   // reader would reasonably infer the reverse also works and lose a flask to a
   // careless elixir click. It does not: the quaff is refused outright.
@@ -66,6 +66,11 @@ export function elixirTooltipLines(item: ItemDef): string {
     desc(text) +
     desc(t('itemUi.tooltip.flaskOnlyOne')) +
     desc(t('itemUi.tooltip.flaskOutranks')) +
+    // The counter-immunity rule (STK-2): the mint stamps undispellable, so
+    // dispel, Spellplunder, and the owner's own right-click all refuse; a
+    // tooltip listing the other rules but not this one would leave the
+    // surprising limit (your own cancel) undocumented.
+    desc(t('itemUi.tooltip.flaskUnremovable')) +
     desc(t('itemUi.tooltip.flaskThroughDeath'))
   );
 }

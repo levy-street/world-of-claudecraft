@@ -364,6 +364,7 @@ describe('bags are declared payload-free (#2837)', () => {
     expect(armor?.kind).toBe('armor');
     expect(mintsSignerPayload(bag, 'epic')).toBe(false);
     expect(mintsSignerPayload(bag, 'rare')).toBe(false);
+    expect(mintsSignerPayload(bag, 'legendary')).toBe(false);
     expect(mintsSignerPayload(bag, 'common')).toBe(false);
     expect(mintsSignerPayload(armor, 'epic')).toBe(true);
     expect(mintsSignerPayload(armor, 'rare')).toBe(true);
@@ -377,6 +378,9 @@ describe('bags are declared payload-free (#2837)', () => {
       const sim = makeSim();
       const pid = sim.playerId;
       const m = meta(sim);
+      // Headroom only: nothing on this path charges today (acquireRecipe is
+      // free, the #1301 craft gold sink floors at 0 rather than denying), so
+      // this is insurance against a future priced arm, not an exercised fee.
       m.copper += 1_000_000;
       // Learn through the recipe's OWN acquisition channel (the trainer-taught
       // silkspun_satchel and the drop-taught sunspun_haversack both walk this
