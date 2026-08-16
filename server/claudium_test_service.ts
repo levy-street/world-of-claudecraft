@@ -45,6 +45,14 @@ function solUsdRate(): number {
   return Number.isFinite(raw) && raw > 0 ? raw : 150;
 }
 
+/** The SOL/USD rate the test economy quotes packs at (shared by daily rewards). */
+export function testSolUsdRate(): number {
+  return solUsdRate();
+}
+
+/** Fixed test-only $WOC price so daily-rewards eligibility can compute usdValue. */
+export const TEST_WOC_USD_PRICE = 0.01;
+
 function rpcUrl(): string {
   return (process.env.SOLANA_RPC_URL ?? 'https://api.devnet.solana.com').trim();
 }
