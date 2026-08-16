@@ -190,8 +190,11 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of release/v0.39.0 into feature/masterwrought:
 // both sides re-minted since the common base, so the merged tree mints
 // values matching neither parent. No capture was retaken.
+// Re-minted again for the merge of release/v0.38.2 (the composer NaN
+// hotfix's lockfile bump re-stamped every fingerprinted GLB upstream); the
+// merged tree mints values matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c5eb98d84998d930902cbae894ec1367b7ee8b54d912fa183c15a2efb5e34d0a';
+  '8ef6988b58ffc15aa623e12d1250a7632ea07d9fe54fa797ae7e170198fe4b9c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
