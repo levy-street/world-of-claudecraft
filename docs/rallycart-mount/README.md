@@ -18,9 +18,9 @@ Everything needed to pick up the Rallycart RXT mount cold. Written 2026-08-16.
 
 ## Two things to know before you touch anything
 
-- **Nothing is committed.** `feature/rallycart-mount` points at the same commit
-  as `feature/goblin-rocket-sled`. Every line of this work is an uncommitted
-  change in the worktree.
+- **The work is committed** as `2c0f0e1cb5` on `feature/rallycart-mount`, one commit
+  on top of `feature/goblin-rocket-sled`. It has NOT been pushed, so it still
+  lives only in this worktree's `.git`. Push it before trusting it.
 - **The gate has never run on this branch.** `node scripts/gate_select.mjs` has
   not been executed here. Do not describe the change as gated.
 

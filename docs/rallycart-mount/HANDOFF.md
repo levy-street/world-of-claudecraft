@@ -27,9 +27,9 @@ repo, so they would not survive a clone.
 The mount is modelled, rigged, animated, exported, wired, audible,
 terrain-reactive, steers, squats on landing, spins its wheels off the ground,
 pivots on the spot, smokes from four pipes and has lit headlights. It plays.
-**Nothing is committed, and the gate has never run.** Jamie is considering
-re-ripping the model from Tripo because parts of the mesh are sloppy; section 9
-covers exactly what that costs.
+**The gate has never run.** The work is committed (`2c0f0e1cb5`) but not pushed.
+Jamie is considering re-ripping the model from Tripo because parts of the mesh
+are sloppy; section 9 covers exactly what that costs.
 
 ---
 
@@ -63,6 +63,11 @@ several items changed how earlier sections read.
 the borrowed code from the five unmerged mount branches so a reader can follow
 a reference without checking out four more branches. `refresh_reference.sh`
 rebuilds it.
+
+**Committed 2026-08-16** as `2c0f0e1cb5`, the branch's first commit: 91 files, the
+whole feature as one unit, since splitting it would have produced intermediate
+commits that do not typecheck. Verified immediately before committing: tsc
+clean, 229 tests green. Not pushed.
 
 **In flight when the session ended:** nothing half-built. The last thing
 discussed and NOT done was giving the headlights real illumination via two
@@ -780,11 +785,11 @@ the mesh in and re-run the seat solve ONCE, rather than tuning twice.
 
 ## 11. What is NOT done
 
-- **Not committed, not gated.** `node scripts/gate_select.mjs` has never run,
-  and the branch still has ZERO commits: `feature/rallycart-mount` points at the
-  same sha as `feature/goblin-rocket-sled`. Every line of this work is an
-  uncommitted change in one worktree. This is the single largest risk on the
-  project and it grows every session.
+- **Not gated, and not pushed.** `node scripts/gate_select.mjs` has never run
+  on this branch. The work IS now committed as `2c0f0e1cb5`, a single commit on top
+  of `feature/goblin-rocket-sled`, so it no longer lives only in a dirty working
+  tree. It has not been pushed to any remote, so the one copy is still this
+  machine. Pushing it is the cheapest remaining risk reduction.
 - **No UI-hide toggle exists**, which Jamie wants for recording footage. There
   is no command, keybind, URL param or setting; the only UI-hiding code is
   `setIntroUiHidden`, a local closure the spawn cinematic uses. The workaround
