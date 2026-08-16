@@ -7775,7 +7775,35 @@ async function loadHighscores(): Promise<void> {
 // The sanitizing renderer + fetch/paint loop live in ./ui/news_feed (extracted
 // out of this firewall file); this call site just supplies the host + fetcher.
 async function loadNews(): Promise<void> {
-  await loadNewsInto($('#news-feed'), () => api.releases(20));
+  await loadNewsInto($('#news-feed'), async () => {
+    const proxied = await api.releases(20);
+    if (proxied.length > 0) return proxied;
+    // The server proxy reads GitHub unauthenticated from its egress IP; on a
+    // shared host that 60/hr budget is long gone and the proxy serves an empty
+    // feed. Fall back to the public releases API from the player's own IP,
+    // mapping into the same sanitized entry shape.
+    try {
+      const res = await fetch(
+        'https://api.github.com/repos/levy-street/world-of-claudecraft/releases?per_page=20',
+        { headers: { Accept: 'application/vnd.github+json' } },
+      );
+      if (!res.ok) return [];
+      const raw = (await res.json()) as Array<Record<string, unknown>>;
+      return raw
+        .filter((r) => r && !r.draft)
+        .map((r) => ({
+          id: Number(r.id),
+          tag: String(r.tag_name ?? ''),
+          name: String(r.name || r.tag_name || ''),
+          body: String(r.body ?? '').slice(0, 8000),
+          url: String(r.html_url ?? ''),
+          prerelease: Boolean(r.prerelease),
+          publishedAt: String(r.published_at ?? r.created_at ?? ''),
+        }));
+    } catch {
+      return [];
+    }
+  });
 }
 
 let caCopyResetTimer: number | null = null;
