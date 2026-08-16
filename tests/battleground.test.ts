@@ -116,7 +116,12 @@ function acceptAllBgOffers(sim: Sim): void {
 }
 
 // Ten solo players, queued, offered, and accepted, so a 5v5 is live.
-function tenInQueue(): { sim: Sim; pids: number[] } {
+// `beforeQueue` runs once the ten stand in the overworld and BEFORE anyone
+// queues, for arms about what a fighter carries INTO the match.
+function tenInQueue(beforeQueue?: (sim: Sim, pids: number[]) => void): {
+  sim: Sim;
+  pids: number[];
+} {
   const sim = makeWorld();
   const pids: number[] = [];
   const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
@@ -126,6 +131,7 @@ function tenInQueue(): { sim: Sim; pids: number[] } {
     must(sim.entities.get(pid), 'entity').level = 20; // the queue floor (BG_MIN_LEVEL)
     pids.push(pid);
   }
+  beforeQueue?.(sim, pids);
   for (const pid of pids) sim.bgQueueJoin(pid);
   // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
   // what seats the match, so every helper that wants a live 5v5 answers first.
@@ -4487,11 +4493,28 @@ describe('Thornhollow Fields: /bg reaches the whole match, both teams', () => {
 // match's own parenthesis: seating and the countdown end run readyArenaFighter
 // with clearPrep: true (the clean slate), so a flask carried IN is gone at the
 // gates and one quaffed inside is gone at the end. Both halves are pinned so
-// the accounting cannot silently drift in either direction again.
+// the accounting cannot silently drift in either direction again, and the seat
+// is pinned on its own (a flask quaffed BEFORE the pop, not during the form-up),
+// because a probe that softened the seat alone stayed green under the
+// countdown-end arm.
 describe('flask auras across a Thornhollow Fields match (the phase 10 accounting)', () => {
   const FLASK = 'ironhusk_flask';
   const flaskAuras = (sim: Sim, pid: number) =>
     must(sim.entities.get(pid), 'entity').auras.filter((a) => a.flask === true);
+
+  it('a flask carried in from the overworld is wiped at the SEAT (placeInBg), before the countdown', () => {
+    let carrier = -1;
+    const { sim, pids } = tenInQueue((s, ps) => {
+      carrier = ps[0];
+      s.addItem(FLASK, 1, carrier);
+      s.useItem(FLASK, carrier);
+      expect(flaskAuras(s, carrier), 'worn in the overworld, before the queue').toHaveLength(1);
+    });
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    expect(match.state, 'seated, the countdown has not ended').not.toBe('active');
+    expect([...match.teams[0], ...match.teams[1]]).toContain(carrier);
+    expect(flaskAuras(sim, carrier), 'the seat ran the clean slate').toHaveLength(0);
+  });
 
   it('a flask quaffed inside the match rides through a death and the wave respawn', () => {
     const { sim, pids } = tenInQueue();

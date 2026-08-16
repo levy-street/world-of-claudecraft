@@ -202,22 +202,35 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 
 // The PvP half of the flask decision, which until now lived only in the
 // resurrection.ts header comment, pinned as WHICH modules reach the clean slate,
-// by BOTH routes: the direct call (arena entry, a Fiesta down) and the indirect
-// one, readyArenaFighter(e, { clearPrep: true }), whose clearPrep arm IS the
-// clean slate (src/sim/social/arena.ts). The phase 10 QA found the record wrong
-// on the indirect route: a Protect Yumi down runs fiestaDownEntity and every
-// Yumi revive re-seats with clearPrep: true, and Thornhollow Fields seats,
-// starts, ends, and drops a leaver with clearPrep: true; ONLY its wave respawn
-// (clearPrep: false) keeps a flask, which is the classic-era battleground-death
-// rule the ledger records, pinned behaviorally in tests/battleground.test.ts.
-// The accounting a flask lives under is therefore: overworld and PvE deaths
-// keep it, a battleground death keeps it, every instanced match's seat, start,
-// end (and each Fiesta or Yumi down and revive) clears it. Absences cannot be
-// asserted by driving the predicates, so the caller sets are pinned literally.
+// by all THREE routes: the direct call (arena entry, a Fiesta down); the
+// indirect one, readyArenaFighter(e, { clearPrep: true }), whose clearPrep arm
+// IS the clean slate (src/sim/social/arena.ts); and resetForArena, the one-line
+// wrapper around that call, which arena.ts runs itself and hands out through
+// the SimContext seam (ctx.resetForArena) to modules that never name
+// readyArenaFighter at all. The phase 10 QA found the record wrong twice: first
+// on the readyArenaFighter route (a Protect Yumi down runs fiestaDownEntity and
+// every Yumi revive re-seats with clearPrep: true; Thornhollow Fields seats,
+// starts, ends, and drops a leaver with clearPrep: true; ONLY its wave respawn,
+// clearPrep: false, keeps a flask, the classic-era battleground-death rule the
+// ledger records), then on the resetForArena route (the Yumi match seat and the
+// Vale Cup's kit-swap seat and teardown wipe through it, and the first cut of
+// THIS scan was blind to a new ctx.resetForArena site anywhere). The accounting
+// a flask lives under is therefore: overworld and PvE deaths keep it, a
+// battleground death keeps it, every instanced match's seat and end (and each
+// Fiesta or Yumi down and revive) clears it; each mode's behavior is pinned in
+// its own suite (battleground, yumi_match, fiesta, vale_cup_match). Absences
+// cannot be asserted by driving the predicates, so the three caller sets are
+// pinned literally here.
 describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate', () => {
   const SIM_ROOT = fileURLToPath(new URL('../src/sim', import.meta.url));
   const CLEAN_SLATE_CALL = 'aurasSurvivingCleanSlate(';
   const INDIRECT_CALL = /readyArenaFighter\((?:ctx, )?[^)]*clearPrep: true/g;
+  // A CALL of the wrapper: `ctx.resetForArena(e)`, `resetForArena(ctx, e!)`,
+  // `arenaMod.resetForArena(this.ctx, e)`. The `[\w$]+!?\)` tail is what keeps
+  // the three DECLARATIONS out (`resetForArena(ctx: SimContext, e: Entity)`,
+  // the Sim delegate `resetForArena(e: Entity): void`, the seam's
+  // `resetForArena(e: Entity): void;`): each has a `:` where a call has `)`.
+  const WRAPPER_CALL = /resetForArena\((?:this\.)?(?:ctx, )?[\w$]+!?\)/g;
   // Comments stripped first, so prose naming the helper (resurrection.ts and the
   // sim/moderation notes both do) cannot mint a call site that does not exist.
   // The line-comment arm keeps a `://` in a URL from eating the rest of its
@@ -227,7 +240,7 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-  it('is called from arena.ts and fiesta.ts, and from nowhere else in src/sim outside its own definition', () => {
+  it('is called from arena.ts and fiesta.ts, and from nowhere else in src/sim outside its own module', () => {
     const files = tsFilesUnder(SIM_ROOT);
     // Vacuity floor near the real count: a walk that collapsed to the top level
     // (or to nothing) would find no caller at all and pass the set assertion
@@ -254,8 +267,9 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // purpose. battleground.ts: seat (bgSeat), the countdown end, the leaver
     // reset, and the match end; its WAVE respawn passes clearPrep: false and is
     // deliberately absent here. yumi.ts: the revive. fiesta.ts: the revive.
-    // arena.ts: resetForArena (the seat) and, with clearPrep: false, the
-    // countdown-end top-off that keeps a fighter's targets, absent here too.
+    // arena.ts: the body of resetForArena (the wrapper the next case counts
+    // the callers of) and, with clearPrep: false, the countdown-end top-off
+    // that keeps a fighter's targets, absent here too.
     const files = tsFilesUnder(SIM_ROOT);
     const indirect = new Map<string, number>();
     for (const f of files) {
@@ -273,6 +287,54 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // classic-era rule the whole accounting is built around.
     const bg = codeOf(fileURLToPath(new URL('../src/sim/social/battleground.ts', import.meta.url)));
     expect(bg.match(/readyArenaFighter\(e, \{ clearPrep: false \}\)/g)?.length).toBe(1);
+  });
+
+  it('reaches the clean slate through the resetForArena WRAPPER from exactly the recorded sites', () => {
+    // The third route, and the one the previous cut of this scan was blind to
+    // (a planted ctx.resetForArena in an unrelated module stayed green): the
+    // wrapper's callers never spell readyArenaFighter or clearPrep, so neither
+    // pattern above sees them. Counted per file. arena.ts: its own seat
+    // (startArenaMatch, every arena-family format including Fiesta), the match
+    // end (endArenaMatch), and the send-home (returnFromArena). yumi.ts: the
+    // match seat. vale_cup.ts: the kit-swap seat (valeCupStandardize) and the
+    // teardown. sim.ts: the one delegate that binds the seam callback, so a
+    // module reaching it as ctx.resetForArena is counted at its own site
+    // above, and the seam's plumbing is counted once here.
+    const files = tsFilesUnder(SIM_ROOT);
+    const wrapper = new Map<string, number>();
+    for (const f of files) {
+      const hits = codeOf(f.full).match(WRAPPER_CALL);
+      if (hits && hits.length > 0) wrapper.set(f.file, hits.length);
+    }
+    expect([...wrapper.entries()].sort()).toEqual([
+      ['sim.ts', 1],
+      ['social/arena.ts', 3],
+      ['social/vale_cup.ts', 2],
+      ['social/yumi.ts', 1],
+    ]);
+    // The wrapper really is the clean slate and nothing softer: its body is the
+    // one clearPrep: true call the indirect table counts for arena.ts.
+    const arena = codeOf(fileURLToPath(new URL('../src/sim/social/arena.ts', import.meta.url)));
+    expect(arena).toMatch(
+      /export function resetForArena\(ctx: SimContext, e: Entity\): void \{\s*readyArenaFighter\(ctx, e, \{ clearPrep: true \}\);\s*\}/,
+    );
+    // Positive control for the pattern itself: the three call spellings match,
+    // the three declaration spellings do not.
+    for (const call of [
+      'ctx.resetForArena(e);',
+      'for (const e of entities) resetForArena(ctx, e!);',
+      'arenaMod.resetForArena(this.ctx, e);',
+    ]) {
+      expect(call.match(WRAPPER_CALL)?.length, call).toBe(1);
+    }
+    for (const decl of [
+      'export function resetForArena(ctx: SimContext, e: Entity): void {',
+      'private resetForArena(e: Entity): void {',
+      'resetForArena(e: Entity): void;',
+      'resetForArena: sim.resetForArena.bind(sim),',
+    ]) {
+      expect(decl.match(WRAPPER_CALL), decl).toBeNull();
+    }
   });
 
   it('reads the sim tree only through the shared walker', () => {

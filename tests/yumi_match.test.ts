@@ -44,13 +44,16 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 }
 
 // Queue six solos for yumi3 and run the countdown out so the bout is live.
-function startYumi3(seed = 42) {
+// `beforeQueue` runs with the six standing in the overworld, BEFORE anyone
+// queues, for arms about what a fighter carries INTO the match.
+function startYumi3(seed = 42, beforeQueue?: (sim: Sim, pids: number[]) => void) {
   const sim = makeWorld(seed);
   const classes = ['warrior', 'mage', 'rogue', 'priest', 'hunter', 'druid'] as const;
   const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
   pids.forEach((p, i) => {
     teleport(sim, p, i * 4, -40);
   });
+  beforeQueue?.(sim, pids);
   pids.forEach((p) => {
     sim.arenaQueueJoin(p, 'yumi3');
   });
@@ -392,6 +395,48 @@ describe('yumi: respawn', () => {
     const { catB } = cats(sim, match);
     const d = Math.hypot(b0.pos.x - catB.pos.x, b0.pos.z - catB.pos.z);
     expect(d).toBeLessThan(10);
+  });
+});
+
+// Masterwrought phase 10 QA: the flask accounting for Protect Yumi, pinned
+// BEHAVIORALLY (the caller scan in tests/resurrection.test.ts is the proxy). The
+// match seat runs ctx.resetForArena (the clean slate through its wrapper), so a
+// flask carried IN is gone before the whistle; a down runs fiestaDownEntity
+// (the direct clean slate) and the revive re-seats with clearPrep: true, so a
+// flask quaffed inside is gone at the first down and does not come back with
+// the fighter. Both are the arena-family parenthesis, not the battleground
+// death rule (which is Thornhollow Fields only).
+describe('yumi: flask auras (the phase 10 accounting)', () => {
+  const FLASK = 'ironhusk_flask';
+  const flaskAuras = (sim: Sim, pid: number) =>
+    sim.entities.get(pid)!.auras.filter((a) => a.flask === true);
+
+  it('a flask carried in from the overworld is wiped at the match seat (ctx.resetForArena)', () => {
+    let carrier = -1;
+    const { sim, match } = startYumi3(42, (s, ps) => {
+      carrier = ps[0];
+      s.addItem(FLASK, 1, carrier);
+      s.useItem(FLASK, carrier);
+      expect(flaskAuras(s, carrier), 'worn in the overworld, before the queue').toHaveLength(1);
+    });
+    expect(match.state).toBe('active');
+    expect([...match.teamA, ...match.teamB]).toContain(carrier);
+    expect(flaskAuras(sim, carrier), 'the seat ran the clean slate').toHaveLength(0);
+  });
+
+  it('a flask quaffed inside is wiped by a down and stays gone through the revive', () => {
+    const { sim, match } = startYumi3();
+    const a0 = sim.entities.get(match.teamA[0])!;
+    const b0 = sim.entities.get(match.teamB[0])!;
+    sim.addItem(FLASK, 1, b0.id);
+    sim.useItem(FLASK, b0.id);
+    expect(flaskAuras(sim, b0.id), 'worn inside the live match').toHaveLength(1);
+    (sim as any).dealDamage(a0, b0, 999999, false, 'physical', null, 'hit');
+    expect(b0.dead).toBe(true);
+    expect(flaskAuras(sim, b0.id), 'the down ran the clean slate').toHaveLength(0);
+    for (let i = 0; i < 20 * (YUMI_RESPAWN_SECONDS + 1); i++) sim.tick();
+    expect(b0.dead, 'the bench revived the fighter').toBe(false);
+    expect(flaskAuras(sim, b0.id), 'the revive re-seats on a clean slate too').toHaveLength(0);
   });
 });
 

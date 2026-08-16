@@ -555,7 +555,11 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
     // identifier legal class exists for the picker's `perfectedMet` family, and
     // a bracketed one is how that class would otherwise become a hiding place.
     // The key's own definition line (`const perfectedKey = 'perfected'`) is a
-    // residue hit as well, while it lives in a scanned tree.
+    // residue hit as well, while it lives in a scanned tree. This arm vetoes
+    // ON PURPOSE a legitimate bracketed key spelled from any perfected-prefixed
+    // identifier, UI code included (`cache[perfectedMetKey] = row.perfectedMet`
+    // reads as a mint here): the remedy is to name such a key from a different
+    // stem, never to teach this guard a new legal class.
     /\[\s*perfected[\w$]*\s*\]\s*(?:\|\||&&|\?\?)?=(?!=)/,
     /\[\s*perfected[\w$]*\s*\]\s*:/,
     // The one write that names the field only as an argument.
@@ -636,7 +640,10 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
       unclassified,
       'an occurrence of `perfected` matches no legal READ class, which is what a MINT looks ' +
         'like. If this is phase 12, delete this whole describe and take the eqi ' +
-        'wire-visibility decision with it (tests/snapshots.test.ts pins the exclusion).',
+        'wire-visibility decision with it (tests/snapshots.test.ts pins the exclusion). ' +
+        'If it is a bracketed key spelled from a perfected-prefixed identifier ' +
+        '(`cache[perfectedMetKey] = ...`), the veto is deliberate: rename the key from ' +
+        'a different stem rather than widening a legal class.',
     ).toEqual([]);
 
     // Per-class floors: the classification above is only meaningful if the scan
@@ -703,11 +710,14 @@ describe('every `perfected` occurrence in the shipped trees is a READ, never a m
       expect(classify(mint, 'sim/professions/perfecting.ts'), mint).toBeUndefined();
       expect(occurrences(mint), mint).toEqual([mint]);
     }
+  });
 
-    // Each veto ARM is pinned directly too, not only through classify. The
+  it('each veto ARM is pinned on its own, apart from the residue rule', () => {
+    // Pinned directly, not only through classify, and in its OWN case: the
     // residue rule catches every line below on its own, so without this block
     // an arm could be deleted with the whole file still green, and the guard
-    // would be one general net where it reads as two layers.
+    // would be one general net where it reads as two layers. Its own it() so a
+    // red here is never hidden behind the positive-controls loop above.
     for (const write of [
       'inst.perfected = true;',
       'inst.perfected ||= true;',

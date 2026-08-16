@@ -32,12 +32,18 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 
 // Seat a 2v2 Fiesta with four solo-queued players and run the countdown out so
 // the bout is live. Returns the match plus the four pids.
-function startFiesta(classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest']) {
+// `beforeQueue` runs with the four standing in the overworld, BEFORE anyone
+// queues, for arms about what a fighter carries INTO the match.
+function startFiesta(
+  classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'],
+  beforeQueue?: (sim: Sim, pids: number[]) => void,
+) {
   const sim = makeWorld();
   const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
   pids.forEach((p, i) => {
     teleport(sim, p, i * 4, -40);
   });
+  beforeQueue?.(sim, pids);
   pids.forEach((p) => {
     sim.arenaQueueJoin(p, 'fiesta');
   });
@@ -154,6 +160,41 @@ function downViaEnemy(sim: Sim, match: any, victimPid: number) {
   const victim = sim.entities.get(victimPid)!;
   (sim as any).dealDamage(killer, victim, victim.maxHp + 50, false, 'physical', null);
 }
+
+// Masterwrought phase 10 QA: the flask accounting for a Fiesta match, pinned
+// BEHAVIORALLY (the caller scan in tests/resurrection.test.ts is the proxy). The
+// arena-family seat (startArenaMatch -> resetForArena) is the clean slate, so a
+// flask carried IN is gone before the whistle; a Fiesta down is the DIRECT
+// aurasSurvivingCleanSlate call (fiestaDownEntity), so a flask quaffed inside is
+// gone at the first down.
+describe('fiesta: flask auras (the phase 10 accounting)', () => {
+  const FLASK = 'ironhusk_flask';
+  const flaskAuras = (sim: Sim, pid: number) =>
+    sim.entities.get(pid)!.auras.filter((a) => a.flask === true);
+
+  it('a flask carried in from the overworld is wiped at the arena-family seat', () => {
+    let carrier = -1;
+    const { sim, match } = startFiesta(undefined, (s, ps) => {
+      carrier = ps[0];
+      s.addItem(FLASK, 1, carrier);
+      s.useItem(FLASK, carrier);
+      expect(flaskAuras(s, carrier), 'worn in the overworld, before the queue').toHaveLength(1);
+    });
+    expect(match.state).toBe('active');
+    expect([...match.teamA, ...match.teamB]).toContain(carrier);
+    expect(flaskAuras(sim, carrier), 'the seat ran the clean slate').toHaveLength(0);
+  });
+
+  it('a flask quaffed inside is wiped by a Fiesta down (the direct clean-slate call)', () => {
+    const { sim, match, pids } = startFiesta();
+    sim.addItem(FLASK, 1, pids[0]);
+    sim.useItem(FLASK, pids[0]);
+    expect(flaskAuras(sim, pids[0]), 'worn inside the live match').toHaveLength(1);
+    downViaEnemy(sim, match, pids[0]);
+    expect(sim.entities.get(pids[0])!.dead).toBe(true);
+    expect(flaskAuras(sim, pids[0]), 'the down ran the clean slate').toHaveLength(0);
+  });
+});
 
 describe('fiesta: augments', () => {
   it('queues an augment wave as pending, then offers it on the next death', () => {

@@ -42,7 +42,7 @@ const CTX_ITEM_META_CLASS = 'ctx-item-meta';
 // with every suite green. Pin the literals here, the way CTX_ITEM_META_CLASS is
 // a literal above.
 describe('the picker modifier classes are the literal CSS hooks', () => {
-  it('gate and danger class tokens match the stylesheet selectors byte for byte', () => {
+  it('gate and danger class tokens are the literal stylesheet hooks', () => {
     expect(CTX_ITEM_GATE_CLASS).toBe('ctx-item-gate');
     expect(CTX_ITEM_DANGER_CLASS).toBe('ctx-item-danger');
   });

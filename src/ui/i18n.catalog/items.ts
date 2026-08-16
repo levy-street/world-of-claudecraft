@@ -102,9 +102,13 @@ const itemStringsEn = {
       // overwrite it (the refusal is keyed on the aura family, so a worn flask
       // never blocks an elixir of a DIFFERENT stat, which is why the line says
       // so), and aurasSurvivingDeath keeps a flask aura through a death that
-      // clears everything else. The death line names its limit too: auras are
-      // session state, so the buff really does end at logout, and a tooltip
-      // that promised only the death half would be read as promising both.
+      // clears everything else. The death line names its limits too: auras are
+      // session state, so the buff really does end at logout, and every
+      // instanced match (arena, Thornhollow Fields, Fiesta, Protect Yumi, Vale
+      // Cup) runs the harsher clean slate at its seat and its end
+      // (aurasSurvivingCleanSlate), so a flask neither enters nor leaves one
+      // with the player; a tooltip that promised only the death half would be
+      // read as promising all three.
       flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
       flaskOutranks: 'A weaker elixir or scroll of the same stat cannot replace it.',
       flaskThroughDeath:

@@ -77,8 +77,9 @@ PLAYED seconds is burned down.
   (`Sim.setCheaterMark(0)`, which emits the ordinary aura fade), and the budget
   being written back at logout for the next session to resume. Every wipe a
   player can trigger preserves it: death and every respawn/resurrect path
-  (`aurasSurvivingDeath`), arena entry and Fiesta down (`aurasSurvivingCleanSlate`),
-  both in `../resurrection.ts`. `tests/cheater_mark_lifecycle.test.ts` pins all of
+  (`aurasSurvivingDeath`), and every clean-slate wipe (`aurasSurvivingCleanSlate`: arena
+  entry and a Fiesta down directly, plus every instanced match's seat and end through
+  `readyArenaFighter` clearPrep / `resetForArena`), both in `../resurrection.ts`. `tests/cheater_mark_lifecycle.test.ts` pins all of
   them, because a sanction with an escape hatch is not a sanction.
 - **Not on a party or raid frame.** Those frames cap how many auras they draw and
   sort harmful ones first, so a marked raider's tag would push a real dispellable

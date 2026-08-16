@@ -520,6 +520,46 @@ describe('Vale Cup: match lifecycle', () => {
     expect(goal.scorerName).toBe(''); // no confident scorer: nameless banner
   });
 
+  // Masterwrought phase 10 QA: the flask accounting for the Vale Cup, pinned
+  // BEHAVIORALLY (the caller scan in tests/resurrection.test.ts is the proxy).
+  // The kit-swap seat (valeCupStandardize) and the teardown both run
+  // ctx.resetForArena, the clean slate through its wrapper, so a flask carried
+  // IN is gone at the seat and one quaffed inside is gone when the match tears
+  // down: the sport match is a parenthesis, the same as every arena-family mode.
+  it('a flask carried in is wiped at the kit-swap seat, one quaffed inside is wiped at the teardown', () => {
+    const FLASK = 'ironhusk_flask';
+    const sim = makeWorld();
+    const flaskAuras = (pid: number) => entity(sim, pid).auras.filter((x) => x.flask === true);
+    const a = addAt(sim, 'warrior', 'Aleph');
+    const b = addAt(sim, 'mage', 'Bet', 4, -40);
+    sim.addItem(FLASK, 1, a);
+    sim.useItem(FLASK, a);
+    expect(flaskAuras(a), 'worn in the overworld, before the queue').toHaveLength(1);
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
+    sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, b);
+    sim.tick();
+    const match = currentMatch(sim);
+    expect(match.phase).toBe('briefing');
+    expect(flaskAuras(a), 'the kit-swap seat ran the clean slate').toHaveLength(0);
+    // Quaffed INSIDE the match (the sport kit swaps abilities, not bags).
+    readyAll(sim);
+    tickUntil(sim, () => match.phase === 'active', 20 * 5);
+    expect(match.phase).toBe('active');
+    sim.addItem(FLASK, 1, b);
+    sim.useItem(FLASK, b);
+    expect(flaskAuras(b), 'worn inside the live match').toHaveLength(1);
+    // Full time, then the golden cap: a draw, then the aftermath tears down.
+    match.clock = VC_MATCH_DURATION - 0.05;
+    tickUntil(sim, () => match.phase === 'golden', 20 * 2);
+    match.goldenClock = VC_GOLDEN_CAP - 0.05;
+    tickUntil(sim, () => match.phase === 'over', 20 * 2);
+    expect(match.phase).toBe('over');
+    expect(flaskAuras(b), 'still worn through the whistle and the result').toHaveLength(1);
+    tickUntil(sim, () => sim.vcup.match === null, 20 * 10);
+    expect(sim.vcup.match).toBe(null);
+    expect(flaskAuras(b), 'the teardown ran the clean slate').toHaveLength(0);
+  });
+
   it('full-time draw goes to golden goal; the golden cap ends in a draw', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Aleph');
