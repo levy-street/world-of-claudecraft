@@ -3704,3 +3704,59 @@ find the branch current.
   tasks green, client bundle build green; the tree stayed clean after
   every step. Verdict: PASS apart from the two RULING-WANTED reds, the
   same shape as the first sync.
+
+## Phase 10 QA release sync, third pass (2026-08-15, merge be0da18c94; the QA fan-out follows in THIS session)
+
+The phase-10-qa prompt was re-run in a fresh session; the release had moved
+a third time. The newest origin/release/** line CONTAINING v0.38.0 is now
+release/v0.38.2, whose tip 1fd1f2e247 is a SUPERSET of the v0.39.0 tip
+d2d1a8ad5c merged at the second pass (both v0.38.0 and v0.39.0 tips are its
+ancestors; the odd numbering is a hotfix line minted on top of v0.39.0, not
+a fork beside it). Nine commits: the composer NaN-sanitize hotfix (PR 3426:
+sanitizeFinite in post_output_grade.ts on the beauty AND the bloom read, a
+degenerate-normal guard in patches/three@0.185.1.patch, so pnpm-lock.yaml
+moved), the Nythraxis arena wardstone quest-gate fix (PR 3433:
+DungeonObjectSpawn.interactOnly + quest_gated_entity.ts reads it off the
+instance), and the 0.38.2 version surfaces. Merged as be0da18c94.
+
+- CONFLICTS (6), all provenance-shaped: the four Eastbrook polish evidence
+  JSONs (both sides re-minted since the common base again) took the release
+  sweep, were proven identical outside their sha fields, then re-swept by
+  remint_polish_provenance.mjs on the merged tree (values match neither
+  parent, no capture retaken; the mint printed identical values on two
+  consecutive runs); the two pin tests keep the branch's provenance
+  comment plus a new one and carry the tool's three literals. The
+  lockfile bump re-stamped every fingerprinted GLB upstream (27 GLBs,
+  byte-stable) but the branch-only inscription-tome family is unknown to
+  the release, so remint_lockfile_fingerprints.mjs ran on the merged tree:
+  release families hits=0 (already stamped), the three tomes hits=2 each
+  (FOURTH tome re-mint of the packet), the four suite hashes re-pinned, the
+  media manifest regenerated (exactly the three tome rows moved). pnpm
+  install --frozen-lockfile FIRST (the stale-node_modules trap):
+  three_compile_async_patch green.
+- COUNT PINS: IWorld 324 and commands 200/213 unchanged (world_api_parity,
+  command_schema green; the delta touches no IWorld/command surface). i18n
+  gen and wiki:content ZERO drift vs the auto-merge; naming guards
+  (ip_scrub, originality_renames, overlay_ip_scrub) green (the delta moved
+  no overlay row); S3 guard green; parity 212 green WITHOUT a re-mint (the
+  wardstone interactOnly flag is a render-side display gate; no sim draw
+  moved); portrait trio fresh in the bookkeeping-only lane again (the
+  three patch moved the bundle digest, no def/still input); tsc green.
+- MERGE AUDIT (release-merge-audit steps 1-7, run by hand: the delta is
+  99 files of which 68 are provenance/GLB/README badges): overlaps read =
+  README.md + the twenty docs/i18n README badges (0.38.1 to 0.38.2, no
+  branch text touched), src/sim/types.ts (additive interactOnly field
+  beside the branch's own additions, auto-merged), the six conflicts
+  above; NO legacy-arm divergence (no route or handler in the delta), NO
+  new endpoint or WS command, NO injected-helper signature change
+  (isQuestGatedGroundObjectHidden keeps its shape; the branch has no
+  quest-gate caller), NO new db mocks; the two release tests that read
+  disk (three_compile_async_patch reads node_modules/three,
+  nythraxis_wardstone_quest_gate imports the sim) pin nothing the branch
+  extracted from; planning-doc premises intact (no packet doc mentions
+  wardstones, the output grade, or the version surfaces). Verdict CLEAN,
+  zero fixes owed beyond the re-mints inside the merge commit.
+- The receipt-backed portrait re-bless is OWED at the genuinely final code
+  tip of this QA session (the maintainer directive for a sync touching
+  src/sim/content + src/render bytes), together with the accepted-art
+  second seal layer, after every fix round has landed.

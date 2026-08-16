@@ -21,7 +21,7 @@
 | 09 | Apex weapons, jewelry, gadgets | complete | 2026-08-13 | 2026-08-13 |
 | 09 QA | verify | complete | 2026-08-13 | 2026-08-13 |
 | 10 | Apex consumables and enchants | complete | 2026-08-14 | 2026-08-14 |
-| 10 QA | verify | pending | | |
+| 10 QA | verify | in progress | 2026-08-14 | |
 | 11 | Pattern drops and vendors | pending | | |
 | 11 QA | verify | pending | | |
 | 12 | The Perfecting stage | pending | | |
@@ -429,3 +429,15 @@ never future-PR items, per the delivery contract in `state.md`).
   2838 files / 39546 passed with ONLY the two ruling reds failing, browser
   129 passed, typecheck and every build green, tree clean. Full record:
   state.md "Phase 10 QA release sync, second pass".
+- Phase 10 QA release sync, third pass (2026-08-15): the release moved a third
+  time; the newest line containing v0.38.0 is now release/v0.38.2 (tip
+  1fd1f2e247, a superset of the v0.39.0 tip: nine commits, the composer
+  NaN-sanitize hotfix with its three patch + lockfile bump, the Nythraxis
+  wardstone quest-gate fix, the 0.38.2 version surfaces), merged as
+  be0da18c94 in the QA session itself. Six provenance-shaped conflicts
+  (eastbrook seals swept on the merged tree, tome fingerprints re-minted a
+  FOURTH time for the lockfile bump, media manifest regenerated). Count pins
+  unchanged, generated artifacts zero drift, parity 212 without a re-mint,
+  portrait trio fresh in the bookkeeping lane, naming guards green. Merge
+  audit by hand over the 99-file delta: CLEAN, nothing owed beyond the
+  re-mints. Full record: state.md "Phase 10 QA release sync, third pass".
