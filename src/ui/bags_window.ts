@@ -82,6 +82,7 @@ import {
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
+import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
@@ -112,6 +113,25 @@ const BAG_PROMPT_SELECTOR = '.discard-item-prompt, .sell-quantity-prompt, .bank-
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
 export function dismissBagPrompts(): void {
   for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
+}
+
+// An item row runs a GAME action (use / summon / equip / sell / deposit), so it
+// must never be the thing Space activates: Space is Jump. The row rebuild
+// re-seats focus by data-focus-key, so summoning a mount from bags leaves the
+// reins row focused, and the browser's native Space activation then re-used the
+// reins, which, on the mount you are already riding, dismounts you (see
+// src/sim/mounts.ts). Every hop threw the rider.
+//
+// Cancelling the default kills that synthesised click, and NOT stopping
+// propagation is the other half: the press still reaches Input's window keydown,
+// so the mount jumps. Enter is untouched, so keyboard players keep the row's
+// native activation: the same split the action bar draws (hud.ts), which
+// swallows Space on a slot for exactly this reason.
+function guardItemRowSpace(row: HTMLElement): void {
+  row.setAttribute(BAG_ITEM_ROW_ATTR, '');
+  row.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') e.preventDefault();
+  });
 }
 
 // The unranked quality fallback as a CSS custom property. The shared
@@ -864,6 +884,7 @@ export class BagsWindow {
       // unknown-cell builder keeps the two families from colliding on a
       // shared miss value.
       row.dataset.focusKey = `bag:${s.itemId}:${this.stackOrdinal(world.inventory, s)}`;
+      guardItemRowSpace(row);
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
@@ -1155,6 +1176,7 @@ export class BagsWindow {
     row.dataset.focusKey = `bagu:${s.itemId}:${
       cell ?? this.stackOrdinal(this.deps.world().inventory, s)
     }`;
+    guardItemRowSpace(row);
     row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
     // The known cell's ladder gives trade, mail-attach, market-sell, and
     // vendor precedence over the deposit; those four all need a def, so on

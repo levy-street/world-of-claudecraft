@@ -587,6 +587,7 @@ import {
 } from './painter_host';
 import { PaladinDevotionPainter } from './paladin_devotion_painter';
 import { createPaladinDevotionView } from './paladin_devotion_view';
+import { panelKeyGuardStops } from './panel_key_guard';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
@@ -2764,13 +2765,10 @@ export class Hud {
       }
       this.toggleReliquaryTrackerCollapsed();
     });
-    // The delve board, lockpick panel, map window, and the bank + bags cluster are
-    // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
-    // / chat (Enter) binds would otherwise hijack those keys on a focused panel
-    // button (the map's Quests toggle, a bank grid cell, and each close button
-    // included). Stop propagation (but NOT the default, so the button's native
-    // activation still fires) when a panel button has focus, mirroring the
-    // quest-tracker guard above.
+    // Non-modal overlays: keep the global jump (Space) / chat (Enter) binds off
+    // a focused panel button, mirroring the quest-tracker guard above. The rule
+    // itself (including the bag item row that Space must still pass through to
+    // reach the jump) lives in panel_key_guard.ts.
     for (const panelId of [
       '#delve-board',
       '#lockpick-panel',
@@ -2783,8 +2781,7 @@ export class Hud {
       '#professions-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
-        if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
-        if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
+        if (panelKeyGuardStops(e.target as HTMLElement, e.key, e.code)) e.stopPropagation();
       });
     }
     $('#mm-map').addEventListener('click', () => this.toggleMap());
