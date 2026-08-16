@@ -264,45 +264,47 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
   // not, since `true` is tested first; and a run-on that swallows a later call
   // of the same name drops that call's count, unless the swallowing site is
   // itself newly planted and, as classified after the swallow, lands in the
-  // hidden call's bucket (its +1 cancels the hidden -1). What stays quiet: a
-  // misread whose edge sits in a LATER option than clearPrep, takes in no
-  // literal that re-classifies the site, and swallows no later call of the same
-  // name (its own literal survives inside the span and its bucket holds), and
-  // the same-bucket planted swallow above. The net for those is the per-mode
-  // behavioral arms; the later-option case is pinned below as a documented
-  // blind spot, truncated argument text and all. No such spelling exists in the
-  // sim tree. Quote state is reset at each call's `(`, so a lone quote
-  // elsewhere in a file cannot poison a later call (the top-level character
-  // class `/^[A-Za-z][A-Za-z '-]{1,15}$/` in pet/pet_commands.ts is the
-  // per-file hazard that reset exists for). Any argument spelling is seen the
-  // same way: a bare identifier, a member, an index, a cast, a ternary, calls
-  // nested to any depth, a call wrapped over lines. What is NOT a call: a bind
-  // (`x.resetForArena.bind`), a property or type slot (`resetForArena: ...`,
-  // `resetForArena;`), an alias (`const f = ctx.resetForArena`); none opens a
-  // paren on the name. The DECLARATIONS do open one, so `isDeclaration` reads
-  // what follows the close: a `: void` return annotation ending the signature
-  // (`export function resetForArena(...): void {`, the Sim delegate `private
-  // resetForArena(...): void {`, the seam's `resetForArena(...): void;`); the
-  // `[;{]` tail keeps a CALL in a ternary's true arm (`cond ?
-  // ctx.resetForArena(e) : void 0`) a call. A declaration in any other FORM
-  // that still opens a paren on the name is COUNTED (the table reds and a
-  // person looks: the safe direction): a changed return type (`: boolean`, `:
-  // Promise<void>`, `: void | undefined`), a type-literal member ending in a
-  // comma or a brace (`): void,`, which biome rewrites to `;` anyway, `): void
-  // }`). An arrow-property form (`resetForArena = (e) => {`, `resetForArena:
-  // (e) => void`) never opens a paren on the name and is simply not seen; none
-  // exists for these three functions, and the seam's bind line is pinned as a
-  // non-call below. Residues, all recorded: the aliased call (`const f =
-  // ctx.resetForArena; f(e)`) is invisible to any source scan and the bracketed
-  // one (`ctx['resetForArena'](e)`) to this one, the same class of blind spot
-  // the Lucent tripwire documents; a space or a wrapping paren between the name
-  // and `(` (`ctx.resetForArena (e)`, `(ctx.resetForArena)(e)`) is invisible
-  // here but biome's formatter rewrites both and the format gate fails a
-  // changed file that keeps them; and the classification below reads the whole
-  // balanced argument text, so a nested call carrying its own `clearPrep:`
-  // literal would win (the tables would still count the site). None of these
-  // spellings exists in the sim tree, and the per-mode behavioral arms are the
-  // net under this scan for any site that matters.
+  // COUNTED bucket of the ONE call it hides (its +1 cancels that -1; two hidden
+  // calls leave a -1, and the passthrough list is asserted by content, so a
+  // swallow there always reds). What stays quiet: a misread whose edge sits in
+  // a LATER option than clearPrep, takes in no literal that re-classifies the
+  // site, and swallows no later call of the same name (its own literal survives
+  // inside the span and its bucket holds), and the one-call same-bucket planted
+  // swallow above. The net for those is the per-mode behavioral arms; the
+  // later-option case is pinned below as a documented blind spot, truncated
+  // argument text and all. No such spelling exists in the sim tree. Quote state
+  // is reset at each call's `(`, so a lone quote elsewhere in a file cannot
+  // poison a later call (the top-level character class `/^[A-Za-z][A-Za-z
+  // '-]{1,15}$/` in pet/pet_commands.ts is the per-file hazard that reset
+  // exists for). Any argument spelling is seen the same way: a bare identifier,
+  // a member, an index, a cast, a ternary, calls nested to any depth, a call
+  // wrapped over lines. What is NOT a call: a bind (`x.resetForArena.bind`), a
+  // property or type slot (`resetForArena: ...`, `resetForArena;`), an alias
+  // (`const f = ctx.resetForArena`); none opens a paren on the name. The
+  // DECLARATIONS do open one, so `isDeclaration` reads what follows the close:
+  // a `: void` return annotation ending the signature (`export function
+  // resetForArena(...): void {`, the Sim delegate `private resetForArena(...):
+  // void {`, the seam's `resetForArena(...): void;`); the `[;{]` tail keeps a
+  // CALL in a ternary's true arm (`cond ? ctx.resetForArena(e) : void 0`) a
+  // call. A declaration in any other FORM that still opens a paren on the name
+  // is COUNTED (the table reds and a person looks: the safe direction): a
+  // changed return type (`: boolean`, `: Promise<void>`, `: void | undefined`),
+  // a type-literal member ending in a comma or a brace (`): void,`, which biome
+  // rewrites to `;` anyway, `): void }`). An arrow-property form
+  // (`resetForArena = (e) => {`, `resetForArena: (e) => void`) never opens a
+  // paren on the name and is simply not seen; none exists for these three
+  // functions, and the seam's bind line is pinned as a non-call below.
+  // Residues, all recorded: the aliased call (`const f = ctx.resetForArena;
+  // f(e)`) is invisible to any source scan and the bracketed one
+  // (`ctx['resetForArena'](e)`) to this one, the same class of blind spot the
+  // Lucent tripwire documents; a space or a wrapping paren between the name and
+  // `(` (`ctx.resetForArena (e)`, `(ctx.resetForArena)(e)`) is invisible here
+  // but biome's formatter rewrites both and the format gate fails a changed
+  // file that keeps them; and the classification below reads the whole balanced
+  // argument text, so a nested call carrying its own `clearPrep:` literal would
+  // win (the tables would still count the site). None of these spellings exists
+  // in the sim tree, and the per-mode behavioral arms are the net under this
+  // scan for any site that matters.
   interface CallSite {
     args: string;
     after: string;
