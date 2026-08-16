@@ -2572,6 +2572,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.elixir': '藥劑',
   'itemUi.kind.mount': '坐騎',
   'itemUi.stats.armor': '護甲',
+  'itemUi.stats.short.armor': '護甲',
   'itemUi.stats.str': '力量',
   'itemUi.stats.agi': '敏捷',
   'itemUi.stats.sta': '耐力',

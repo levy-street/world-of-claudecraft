@@ -8926,7 +8926,7 @@ export const ru_RU: EnTranslations = {
       "dodge": "Уклонение",
       "parry": "Парирование",
       "short": {
-        "armor": "Armor",
+        "armor": "Броня",
         "str": "Str",
         "agi": "Agi",
         "sta": "Sta",

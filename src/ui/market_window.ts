@@ -71,6 +71,7 @@ import {
   marketFilterMenus,
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
+import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { svgIcon } from './ui_icons';
 
 // The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
@@ -765,6 +766,17 @@ export class MarketWindow {
       // the bracketed [HEROIC] tooltip tag, so a screen reader reads "Heroic", not
       // "left-bracket HEROIC right-bracket".
       const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicLabel')));
+      // Masterwork seal: the same authored seal the bag grid paints, on the icon's
+      // BOTTOM-LEFT corner (its own slot: the heroic star owns top-left, the armor pips
+      // bottom-right). A masterwork copy correctly stays its OWN row under Lowest-price
+      // collapse (its baked tier-delta stats are different goods), so without a marker two
+      // same-named rows would look identical; this makes the masterwork one legible at a
+      // glance. It reuses MASTERWORK_SEAL_IMAGE_URL so the market can never drift from the
+      // bag seal. aria-hidden; the accessible fact rides the buy-button aria-label below.
+      const isMasterwork = l.instance?.rolled?.masterwork === true;
+      const masterworkSeal = isMasterwork
+        ? `<img class="mkt-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
+        : '';
       // Enchant tag: a compact "+N Stat" chip after the item name (e.g. "+2 Int"), so
       // copies that differ only by enchant TYPE, which correctly stay as separate rows
       // under Lowest-price collapse, are told apart at a glance without hovering. Empty
@@ -785,17 +797,25 @@ export class MarketWindow {
         esc(formatLocalizedMoney(l.price, 'long')),
       );
       row.innerHTML =
-        `<span class="mkt-ico">${this.deps.itemIcon(item)}${badge}${heroicStar}</span>` +
+        `<span class="mkt-ico">${this.deps.itemIcon(item)}${badge}${heroicStar}${masterworkSeal}</span>` +
         `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>${enchantTag}` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price">${priceHtml}${each}</span>`;
       const btn = document.createElement('button');
       btn.className = `mkt-btn${l.mine ? ' cancel' : ''}`;
       btn.textContent = l.mine ? t('itemUi.market.reclaim') : t('itemUi.market.buy');
-      // The enchant tag is aria-hidden in the row (it is a terse visual chip), so fold
-      // it into the button's accessible item name here: two rows that differ only by
-      // enchant must sound different to a screen reader, not just look different.
-      const ariaItemName = enchantTagText ? `${itemName} ${enchantTagText}` : itemName;
+      // The enchant tag and masterwork seal are aria-hidden in the row (terse visual
+      // chips), so fold their facts into the button's accessible item name here: two rows
+      // that differ only by enchant or by masterwork must sound different to a screen
+      // reader, not just look different. Reuses the existing localized "Masterwork" word
+      // (hudChrome.crafting.masterworkSeal), so no new i18n key is added.
+      const ariaSuffix = [
+        enchantTagText,
+        isMasterwork ? t('hudChrome.crafting.masterworkSeal') : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+      const ariaItemName = ariaSuffix ? `${itemName} ${ariaSuffix}` : itemName;
       btn.setAttribute(
         'aria-label',
         t(l.mine ? 'itemUi.market.reclaimAria' : 'itemUi.market.buyAria', {

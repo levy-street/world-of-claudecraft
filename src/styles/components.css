@@ -12891,6 +12891,22 @@
       0 0 3px #000;
     pointer-events: none;
   }
+  /* Masterwork seal: the same authored seal the bag grid paints, on the icon's
+     BOTTOM-LEFT corner, its own slot so it never collides with the heroic star
+     (top-left) or the armor pips (bottom-right). A masterwork copy stays its own
+     row under Lowest-price collapse, so this is what tells it apart from a plain
+     copy of the same item. The localized "Masterwork" word rides the buy-button
+     aria-label; the seal itself is aria-hidden. */
+  .mkt-masterwork-seal {
+    position: absolute;
+    left: -3px;
+    bottom: -3px;
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 2px #000);
+  }
   /* Price is the number a shopper is actually comparing, so give it real weight.
      The market paints a gold-dominant, coinless, copper-trimmed block
      (market_price_view.ts): the largest denomination is the big headline, the

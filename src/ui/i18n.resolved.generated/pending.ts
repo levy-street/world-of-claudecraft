@@ -60,7 +60,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_CN": [
     "itemUi.stats.short.agi",
-    "itemUi.stats.short.armor",
     "itemUi.stats.short.int",
     "itemUi.stats.short.spi",
     "itemUi.stats.short.sta",
@@ -68,7 +67,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_TW": [
     "itemUi.stats.short.agi",
-    "itemUi.stats.short.armor",
     "itemUi.stats.short.int",
     "itemUi.stats.short.spi",
     "itemUi.stats.short.sta",
@@ -76,7 +74,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ko_KR": [
     "itemUi.stats.short.agi",
-    "itemUi.stats.short.armor",
     "itemUi.stats.short.int",
     "itemUi.stats.short.spi",
     "itemUi.stats.short.sta",
@@ -84,7 +81,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ja_JP": [
     "itemUi.stats.short.agi",
-    "itemUi.stats.short.armor",
     "itemUi.stats.short.int",
     "itemUi.stats.short.spi",
     "itemUi.stats.short.sta",
@@ -100,7 +96,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "itemUi.stats.short.agi",
-    "itemUi.stats.short.armor",
     "itemUi.stats.short.int",
     "itemUi.stats.short.spi",
     "itemUi.stats.short.sta",

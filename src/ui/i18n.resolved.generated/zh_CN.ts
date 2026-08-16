@@ -8926,7 +8926,7 @@ export const zh_CN: EnTranslations = {
       "dodge": "躲闪",
       "parry": "招架",
       "short": {
-        "armor": "Armor",
+        "armor": "护甲",
         "str": "Str",
         "agi": "Agi",
         "sta": "Sta",

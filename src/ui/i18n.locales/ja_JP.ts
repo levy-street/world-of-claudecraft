@@ -2679,6 +2679,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.elixir': 'エリクサー',
   'itemUi.kind.mount': 'マウント',
   'itemUi.stats.armor': '防御力',
+  'itemUi.stats.short.armor': '防御力',
   'itemUi.stats.str': '筋力',
   'itemUi.stats.agi': '敏捷性',
   'itemUi.stats.sta': 'スタミナ',

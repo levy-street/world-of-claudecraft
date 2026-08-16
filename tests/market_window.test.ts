@@ -770,3 +770,41 @@ describe('ClientWorld: reconnect re-push of session preferences (#2723 review)',
     }
   });
 });
+
+describe('market_window: enchant tag + masterwork seal wiring', () => {
+  it('renders the enchant tag chip from the pure core into the row name', () => {
+    // The "+N Stat" chip is built by market_enchant_tag_view and painted after the item
+    // name, aria-hidden. A revert of either half must fail here (the browser suite covers
+    // the live DOM; this pins the source wiring so it cannot silently disappear).
+    expect(painter).toContain("import { marketEnchantTagText } from './market_enchant_tag_view';");
+    expect(painter).toContain('const enchantTagText = marketEnchantTagText(l.instance);');
+    expect(painter).toContain('class="mkt-ench" aria-hidden="true"');
+  });
+
+  it('renders the masterwork seal on the icon corner from the shared seal image', () => {
+    // Reuses MASTERWORK_SEAL_IMAGE_URL so the market seal can never drift from the bag
+    // seal, on its own bottom-left corner class, aria-hidden.
+    expect(painter).toContain("import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';");
+    expect(painter).toContain('const isMasterwork = l.instance?.rolled?.masterwork === true;');
+    expect(painter).toContain('class="mkt-masterwork-seal"');
+    // The seal is placed in the icon cell alongside the heroic star and armor pips.
+    expect(painter).toMatch(/mkt-ico[^`]*\$\{masterworkSeal\}/);
+  });
+
+  it('folds the enchant + masterwork facts into the buy-button accessible name', () => {
+    // The visual chips are aria-hidden, so two rows differing only by enchant OR by
+    // masterwork must sound different via the button aria-label (ariaItemName).
+    expect(painter).toContain("t('hudChrome.crafting.masterworkSeal')");
+    expect(painter).toContain('const ariaItemName = ariaSuffix ?');
+    expect(painter).toContain('item: ariaItemName,');
+  });
+
+  it('positions the three icon corner marks so none collide (star TL, pips BR, seal BL)', () => {
+    // Corner ownership: heroic star top-left, armor pips bottom-right, masterwork seal
+    // bottom-left. The seal must not reuse the star's top-left or the pips' bottom-right.
+    const sealRule = componentsCss.slice(componentsCss.indexOf('.mkt-masterwork-seal'));
+    const sealBlock = sealRule.slice(0, sealRule.indexOf('}'));
+    expect(sealBlock).toMatch(/left:\s*-?\d/);
+    expect(sealBlock).toMatch(/bottom:\s*-?\d/);
+  });
+});

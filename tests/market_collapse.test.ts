@@ -166,4 +166,59 @@ describe('collapseIdentity', () => {
     expect(might).toBe(mightOther);
     expect(might).not.toBe(agility);
   });
+
+  it('cannot collide two materially different goods onto one key (separator safety)', () => {
+    // The key is `i:${itemId}|e:${enchant}|r:${rolled}`. Even for adversarial ids that
+    // contain the delimiter characters, a plain item id can never equal an instanced key
+    // (an instanced key always contains '|'), and two different (item, enchant) pairs
+    // never map to the same string.
+    const plain = collapseIdentity({ id: 1, itemId: 'i:sword|e:x|r:', price: 1 });
+    const instanced = collapseIdentity({
+      id: 2,
+      itemId: 'sword',
+      price: 1,
+      instance: { enchant: 'x' },
+    });
+    expect(plain).not.toBe(instanced);
+    // Splitting the item/enchant boundary differently must not collide either.
+    const a = collapseIdentity({ id: 3, itemId: 'a', price: 1, instance: { enchant: 'b_c' } });
+    const b = collapseIdentity({ id: 4, itemId: 'a_b', price: 1, instance: { enchant: 'c' } });
+    expect(a).not.toBe(b);
+  });
+
+  it('keeps a masterwork copy distinct from a plain copy, and folds two identical masterworks', () => {
+    // rolled present with masterwork but no explicit stats still yields a NON-empty rolled
+    // fragment ('m:'), so it stays its own row (different goods), and two such copies fold.
+    const mwA = collapseIdentity({
+      id: 1,
+      itemId: 'ring',
+      price: 1,
+      instance: { rolled: { masterwork: true } },
+    });
+    const mwB = collapseIdentity({
+      id: 2,
+      itemId: 'ring',
+      price: 1,
+      instance: { rolled: { masterwork: true }, signer: 'Ada' },
+    });
+    const plain = collapseIdentity({ id: 3, itemId: 'ring', price: 1 });
+    expect(mwA).toBe(mwB); // signer ignored, same masterwork goods fold
+    expect(mwA).not.toBe(plain); // masterwork is not the plain item
+  });
+
+  it('excludes legacy rolled.quality from the fold key (same-stats copies fold regardless)', () => {
+    const q1 = collapseIdentity({
+      id: 1,
+      itemId: 'ring',
+      price: 1,
+      instance: { rolled: { masterwork: true, stats: { str: 2 }, quality: 'fine' } },
+    });
+    const q2 = collapseIdentity({
+      id: 2,
+      itemId: 'ring',
+      price: 1,
+      instance: { rolled: { masterwork: true, stats: { str: 2 }, quality: 'superior' } },
+    });
+    expect(q1).toBe(q2);
+  });
 });

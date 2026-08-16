@@ -8926,7 +8926,7 @@ export const ko_KR: EnTranslations = {
       "dodge": "회피",
       "parry": "무기 막기",
       "short": {
-        "armor": "Armor",
+        "armor": "방어도",
         "str": "Str",
         "agi": "Agi",
         "sta": "Sta",

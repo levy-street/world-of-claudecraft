@@ -8926,7 +8926,7 @@ export const ja_JP: EnTranslations = {
       "dodge": "回避",
       "parry": "受け流し",
       "short": {
-        "armor": "Armor",
+        "armor": "防御力",
         "str": "Str",
         "agi": "Agi",
         "sta": "Sta",

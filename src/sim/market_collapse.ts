@@ -35,15 +35,20 @@ export interface CollapsibleListing {
 }
 
 /** The fold key for one listing: same string means "same goods, collapse together".
- *  A plain stack is just its item id. An instanced copy appends the buyer-relevant
- *  facts (enchant + rolled/masterwork stats), but never the signer, so identical
- *  gear from different crafters folds into one lowest-price row. The `i:` and field
- *  prefixes keep an instanced key from ever colliding with a plain item id that
- *  happens to match a serialized fragment. */
+ *  A plain stack is just its item id. An instanced copy keys on the buyer-relevant facts
+ *  (item id + enchant + rolled/masterwork stats), but never the signer, so identical gear
+ *  from different crafters folds into one lowest-price row. The instanced key is a
+ *  JSON-encoded array with a leading 'i' tag, so no field value (even one containing the
+ *  delimiter characters) can be split or made to collide with another key, and a plain
+ *  string item id can never equal the JSON-array form. */
 export function collapseIdentity(listing: CollapsibleListing): string {
   const inst = listing.instance;
   if (!inst) return listing.itemId;
   const enchant = inst.enchant ?? '';
+  // Only masterwork + rolled.stats go in the key. rolled.quality is deliberately
+  // excluded: it is legacy-only (new crafts never write it), it does not affect stats,
+  // and it is never rendered to a buyer in the market row or tooltip, so two copies
+  // differing only in legacy quality are the same goods to a shopper.
   const rolled = inst.rolled
     ? `${inst.rolled.masterwork ? 'm' : ''}:${serializeStats(inst.rolled.stats)}`
     : '';
@@ -51,7 +56,7 @@ export function collapseIdentity(listing: CollapsibleListing): string {
   // (only a signer, a bind flag, etc.) folds with the plain fungible stack for the
   // same item: from the buyer's side it is the same goods.
   if (enchant === '' && rolled === '') return listing.itemId;
-  return `i:${listing.itemId}|e:${enchant}|r:${rolled}`;
+  return JSON.stringify(['i', listing.itemId, enchant, rolled]);
 }
 
 /** Stable, order-independent serialization of a rolled-stats bag so two copies with the
