@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 6087,
-  "drawDigest": "1fae9376",
+  "draws": 6078,
+  "drawDigest": "1cc45c14",
   "frames": [
     {
       "tick": 0,
@@ -9549,11 +9549,11 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 976,
-      "state": "dd54aa16",
-      "events": "0f16414b",
+      "state": "d3f2ef85",
+      "events": "31ddc33c",
       "rng": {
-        "draws": 5553,
-        "digest": "75fd62ad"
+        "draws": 5554,
+        "digest": "9fb077ca"
       },
       "label": "death",
       "players": [
@@ -9679,7 +9679,7 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -9835,7 +9835,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -9987,7 +9987,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -10139,7 +10139,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -10290,7 +10290,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -10622,6 +10622,10 @@
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "pattern_makers_charm"
               }
             ]
           },
@@ -11003,77 +11007,77 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 976,
-      "state": "af59e148",
+      "state": "33b9f4c3",
       "events": "741638a5",
       "rng": {
-        "draws": 5574,
-        "digest": "739d878f"
+        "draws": 5575,
+        "digest": "5240a9f9"
       }
     },
     {
       "tick": 640,
       "time": 32,
       "nextId": 976,
-      "state": "d09ea112",
+      "state": "777927b1",
       "events": "741638a5",
       "rng": {
-        "draws": 5672,
-        "digest": "aa907469"
+        "draws": 5670,
+        "digest": "762a51fa"
       }
     },
     {
       "tick": 650,
       "time": 32.5,
       "nextId": 976,
-      "state": "2b283ff8",
+      "state": "2f60f30f",
       "events": "741638a5",
       "rng": {
-        "draws": 5744,
-        "digest": "b72521f6"
+        "draws": 5743,
+        "digest": "e8ef5387"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 976,
-      "state": "89a3faba",
+      "state": "47c47d75",
       "events": "741638a5",
       "rng": {
-        "draws": 5831,
-        "digest": "6a99fb2a"
+        "draws": 5828,
+        "digest": "2dc7fc4c"
       }
     },
     {
       "tick": 670,
       "time": 33.5,
       "nextId": 976,
-      "state": "fed94e74",
+      "state": "660cbd4f",
       "events": "741638a5",
       "rng": {
-        "draws": 5914,
-        "digest": "81d0cac2"
+        "draws": 5912,
+        "digest": "a956fd33"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 976,
-      "state": "8197431a",
+      "state": "400ceca9",
       "events": "741638a5",
       "rng": {
-        "draws": 6009,
-        "digest": "c8877e20"
+        "draws": 6006,
+        "digest": "8449bd7a"
       }
     },
     {
       "tick": 688,
       "time": 34.4,
       "nextId": 976,
-      "state": "47828688",
+      "state": "d18fd143",
       "events": "bf637b24",
       "rng": {
-        "draws": 6087,
-        "digest": "1fae9376"
+        "draws": 6078,
+        "digest": "1cc45c14"
       },
       "label": "final",
       "players": [
@@ -11199,7 +11203,7 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11355,7 +11359,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11507,7 +11511,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11659,7 +11663,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -11810,7 +11814,7 @@
               "itemId": "spring_water"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "wyrmfall_core"
             },
             {
@@ -12142,6 +12146,10 @@
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "itemId": "pattern_makers_charm"
               }
             ]
           },
