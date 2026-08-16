@@ -620,8 +620,8 @@ and any mount without landing takes all keep 0.7.
 
 ### Headlights
 
-Four glowing spheres, one in each lamp circle on the nose, in
-`vehicle_headlights.ts`.
+Four glowing spheres, one in each lamp bowl on the nose, in
+`vehicle_headlights.ts`. Tuned on screen with Jamie over several rounds.
 
 **Mount-owned geometry, not particles.** A headlight is always there and never
 moves relative to the car, so the spheres are parented into the CHASSIS and
@@ -629,19 +629,43 @@ inherit yaw, pitch, roll and the landing squat for free. There is no update
 function in that file at all, and no per-frame cost. Same call the sled's
 continuous flame makes.
 
-**The four circles are two concentric pairs, not four lamps side by side.** Per
-side there is a filled disc with a smaller ring sitting a little above its
-centre; the radial vertex histograms are what settle it (the housing fills in
-from the middle, the small one is empty in the middle and dense at the rim). So
-four spheres read as two lamps each with a hot inner core, which is what a lit
-headlight looks like anyway.
+**The four bowls are two per side, SIDE BY SIDE.** An earlier pass called them
+concentric pairs (a filled disc with a smaller ring inside it) and that was
+wrong twice over, both times by measuring the wrong thing:
 
-| lamp | model x, y, z | radius |
-|---|---|---|
-| left disc | -0.152, 0.208, 0.456 | 0.045 |
-| left ring | -0.164, 0.210, 0.455 | 0.019 |
-| right disc | +0.155, 0.201, 0.457 | 0.043 |
-| right ring | +0.159, 0.212, 0.455 | 0.019 |
+- The "disc" at radius 0.045 was not a lamp at all. It was the whole angular
+  HOUSING primitive (prim 37/36, 0.112 wide). A sphere sized to it filled each
+  housing edge to edge and bloomed past it: two white canteloupes.
+- A second pass histogrammed only the frontmost 15mm of the housing. But the
+  housing SWEEPS BACK toward its outer edge, so that slice discarded the
+  outboard bowl entirely and locked onto the housing's inner edge instead. Both
+  lamps ended up crowded inboard and far too small.
+
+Split the housing at its own midpoint and take the front surface of each half:
+that survives the sweep and finds both bowls. They are near enough the same
+size, and the outboard one sits 18mm further back in z.
+
+The bowls are RECESSED 15 to 21mm behind their rims, so the depth reference is
+the dish surface, never the rim. `z` in the table is the dish.
+
+| lamp | model x, y, z (dish) | bowl radius | glow |
+|---|---|---|---|
+| left inner | -0.153, 0.211, 0.451 | 0.025 | 0.020 |
+| left outer | -0.222, 0.215, 0.427 | 0.024 | 0.018 |
+| right inner | +0.154, 0.205, 0.452 | 0.025 | 0.020 |
+| right outer | +0.223, 0.210, 0.427 | 0.024 | 0.018 |
+
+**Two separate knobs, and they do different jobs.** `glow` is the sphere radius
+(size). `SINK` (0.35) is how far its CENTRE sits behind the dish, as a fraction
+of that radius, and it controls SHAPE: what the eye gets is the spherical cap in
+front of the dish, whose silhouette is `sqrt(1 - SINK^2)`, about 0.94 here, so
+the cap is nearly a full hemisphere and reads as the whole bowl lighting up.
+
+The trap that cost a round trip: a fixed small offset in model units instead of
+a fraction of the radius. A shallow cap's silhouette is `sqrt(2*r*h - h^2)`,
+which at 2mm proud of a 17mm sphere is an 8mm disc inside a 25mm bowl, and the
+dish is faceted, so what actually rendered was a ragged crescent rather than a
+circle. Raggedness is a SINK problem; size is a `glow` problem.
 
 Brightness is the composer's job, not view-angle maths: additive with an HDR
 colour where `GFX.composer` exists, so a lamp blows out as it fills the screen
@@ -658,8 +682,10 @@ the chassis, so there is no teardown to plumb through the visual lifecycle.
 Like the exhaust ports, these offsets are measured off bare primitives with no
 empties to name, so a re-rip invalidates them and
 `tests/rallycart_headlights.test.ts` re-finds the circles and fails if they
-move. Note that test has to match on centre AND radius: the concentric pairs
-make a positional match hand the big lamp its own inner ring.
+move. That test describes each nose primitive whole AND split at its own midpoint. It
+used to emit one circle per primitive, which meant it structurally could not see
+the outboard bowl and rejected a correct position: as written it was silently
+guarding only half the lamps, which is the exact re-rip case it exists to catch.
 
 Not done: nothing is lit by them. `NightLightSite` entries would put real light
 on the ground after dark, and two sites (one per lamp, not per circle) would be

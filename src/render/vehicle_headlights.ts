@@ -31,27 +31,64 @@ export interface HeadlightSite {
   x: number;
   y: number;
   z: number;
+  /** Radius of the bowl in the mesh. Used to VERIFY the site still lands on a
+   *  lamp, and to size the glow against, never as the glow itself. */
   radius: number;
+  /** Radius of the glowing sphere, sized to the BOWL: what shows is the cap
+   *  standing proud of the dish, so this is the radius of the dome that fills
+   *  the recess, not a bead sitting in it. */
+  glow: number;
 }
 
 /**
- * The Rallycart's four lamp circles.
+ * The Rallycart's four lamps: two round bowls per side, side by side.
  *
- * Two per side, and CONCENTRIC rather than side by side: a filled disc with a
- * smaller ring sitting a little above its centre. So four spheres read as two
- * lamps each with a hot inner core, which is what a lit headlight looks like
- * anyway.
+ * Two earlier passes got this wrong in opposite directions, both by measuring
+ * the wrong thing:
+ *
+ *  - The first sized a sphere to the whole angular HOUSING primitive (prim
+ *    37/36, 0.112 wide), which filled each housing edge to edge and bloomed
+ *    past it. Two white canteloupes.
+ *  - The second histogrammed only the frontmost 15mm of the housing. But the
+ *    housing SWEEPS BACK toward the outer edge, so that slice discarded the
+ *    outboard bowl entirely and found the housing's inner edge instead. Both
+ *    lamps ended up crowded inboard and far too small.
+ *
+ * The bowls are found by splitting the housing at its own midpoint and taking
+ * the front surface of each half, which survives the sweep. They come out
+ * near enough the same size, and the outboard one sits 18mm further back in z.
+ *
+ * `z` is the DISH SURFACE, the curved lens face itself, not the rim in front of
+ * it and not the sphere's centre. The bowls are recessed 15 to 21mm behind
+ * their rims, so anchoring to the rim leaves the glow standing proud of the
+ * lens; see PIERCE.
+ *
+ * `radius` is kept at the conservative value the TEST's own circle-finder
+ * reports (it takes one circle per primitive off its front face, which reads
+ * a little smaller than the split-half measurement above). The glow is sized
+ * against the real bowl, so it fills it; the radius column exists to catch a
+ * re-rip moving the nose, and a conservative number there is the safe one.
  */
 export const RALLYCART_HEADLIGHTS: readonly HeadlightSite[] = [
-  { x: -0.152, y: 0.208, z: 0.456, radius: 0.045 },
-  { x: -0.164, y: 0.21, z: 0.455, radius: 0.019 },
-  { x: 0.155, y: 0.201, z: 0.457, radius: 0.043 },
-  { x: 0.159, y: 0.212, z: 0.455, radius: 0.019 },
+  { x: -0.153, y: 0.211, z: 0.451, radius: 0.025, glow: 0.02 },
+  { x: -0.222, y: 0.215, z: 0.427, radius: 0.024, glow: 0.018 },
+  { x: 0.154, y: 0.205, z: 0.452, radius: 0.025, glow: 0.02 },
+  { x: 0.223, y: 0.21, z: 0.427, radius: 0.024, glow: 0.018 },
 ];
 
-/** Sit the sphere slightly proud of its lens, as a fraction of its own radius,
- *  so it is not half buried in the housing around it. */
-const PROUD = 0.35;
+/** How far the sphere's CENTRE sits behind the dish surface, as a fraction of
+ *  its own radius. What the eye gets is the spherical cap in front of the dish.
+ *
+ *  Under 0.5 on purpose, so the cap is close to a full hemisphere and its
+ *  silhouette is close to the sphere's full radius: `sqrt(1 - SINK^2)`, about
+ *  0.94 here. That is what makes the lamp read as the whole bowl lighting up.
+ *
+ *  A fixed SMALL offset in model units (this file's previous rule, 2mm proud of
+ *  the dish) is the trap: a shallow cap's silhouette is only
+ *  `sqrt(2*r*h - h^2)`, which at 2mm on a 17mm sphere is an 8mm disc inside a
+ *  25mm bowl, and the dish is faceted, so what actually showed was a ragged
+ *  crescent rather than a circle. */
+const SINK = 0.35;
 
 /** Warm white. Rally lamps are not daylight balanced, and a pure white sphere
  *  reads as a UI element rather than a bulb. */
@@ -60,10 +97,12 @@ const LAMP_COLOR = 0xfff2cf;
 /** HDR multiplier where a composer exists, to put the lamps over the bloom
  *  threshold. Without one there is nothing to bloom into and anything above 1
  *  would only clip to white. */
-const LAMP_HDR = 2.3;
+const LAMP_HDR = 1.5;
 
-/** Small on screen, and there are four. */
-const SEGMENTS = 10;
+/** Four spheres, two geometries shared across every cart in the world, so this
+ *  is cheap. It was 10 while the visible cap was a sliver; at close range a
+ *  near-hemisphere that size shows its facets on the silhouette. */
+const SEGMENTS = 20;
 
 /** Shared across every cart in the world, and never disposed: one material and
  *  one geometry per distinct radius. The MESHES are per mount and go away with
@@ -109,8 +148,8 @@ export function attachVehicleHeadlights(
   if (chassis.userData[ATTACHED]) return;
   chassis.userData[ATTACHED] = true;
   for (const site of sites) {
-    const mesh = new THREE.Mesh(lampGeometry(site.radius), lampMaterial());
-    mesh.position.set(site.x, site.y, site.z + site.radius * PROUD);
+    const mesh = new THREE.Mesh(lampGeometry(site.glow), lampMaterial());
+    mesh.position.set(site.x, site.y, site.z - site.glow * SINK);
     mesh.frustumCulled = false;
     chassis.add(mesh);
   }

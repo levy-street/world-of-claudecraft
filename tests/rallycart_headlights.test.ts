@@ -58,26 +58,42 @@ describe('rallycart headlights', () => {
     expect(chassis?.mesh, 'Chassis mesh missing: the rig contract changed').toBeDefined();
     const prims = json.meshes[chassis?.mesh as number].primitives;
 
-    // Every primitive at the front of the car, described by its own front face.
+    // Every primitive at the front of the car, described by its front face.
+    //
+    // A primitive is described THREE times: whole, and each half either side of
+    // its own midpoint. The housing carries both bowls on one primitive AND
+    // sweeps back toward the outer edge, so a single front-face pass over the
+    // whole thing is dominated by the inboard bowl and the outboard one is
+    // invisible to it. Splitting is what lets this see all four lamps; without
+    // it the guard silently covers half of them.
+    const faceCircle = (verts: number[][]) => {
+      if (verts.length < 20) return null;
+      const maxZ = Math.max(...verts.map((v) => v[2]));
+      const face = verts.filter((v) => v[2] > maxZ - 0.02);
+      if (face.length < 20) return null;
+      const cx = face.reduce((s, v) => s + v[0], 0) / face.length;
+      const cy = face.reduce((s, v) => s + v[1], 0) / face.length;
+      const radius = Math.max(...face.map((v) => Math.hypot(v[0] - cx, v[1] - cy)));
+      return { cx, cy, cz: maxZ, radius };
+    };
     const circles = prims
-      .map((p) => {
+      .flatMap((p) => {
         const acc = json.accessors[p.attributes.POSITION];
-        if (acc.max[2] < 0.35) return null;
+        if (acc.max[2] < 0.35) return [];
         const verts = positions(json, bin, p.attributes.POSITION);
-        const maxZ = Math.max(...verts.map((v) => v[2]));
-        const face = verts.filter((v) => v[2] > maxZ - 0.02);
-        if (face.length < 20) return null;
-        const cx = face.reduce((s, v) => s + v[0], 0) / face.length;
-        const cy = face.reduce((s, v) => s + v[1], 0) / face.length;
-        const radius = Math.max(...face.map((v) => Math.hypot(v[0] - cx, v[1] - cy)));
-        return { cx, cy, cz: maxZ, radius };
+        const mid = (acc.min[0] + acc.max[0]) / 2;
+        return [
+          faceCircle(verts),
+          faceCircle(verts.filter((v) => v[0] < mid)),
+          faceCircle(verts.filter((v) => v[0] >= mid)),
+        ];
       })
       .filter((c): c is NonNullable<typeof c> => c !== null);
 
     for (const lamp of RALLYCART_HEADLIGHTS) {
       // Nearest by centre AND radius. Centre alone is ambiguous here, because
-      // the two circles on a side are concentric: a plain positional match
-      // hands the big lamp its own inner ring.
+      // the half-splits overlap the whole-primitive circle, so several
+      // candidates sit near any one lamp.
       const near = circles.filter(
         (c) => Math.abs(c.cx - lamp.x) < 0.02 && Math.abs(c.cy - lamp.y) < 0.03,
       );
