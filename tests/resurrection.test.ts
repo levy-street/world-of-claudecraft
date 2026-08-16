@@ -3,6 +3,8 @@
 // Unstuck Sickness) and the "which auras survive death" predicate, shared by every player
 // death/respawn site so the rule cannot drift.
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CHEATER_MARK_AURA_ID } from '../src/sim/moderation';
 import {
@@ -22,6 +24,8 @@ import {
   unstuckSicknessDuration,
 } from '../src/sim/resurrection';
 import { type Aura, MAX_LEVEL } from '../src/sim/types';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // A minimal valid Aura carrying an id; the predicate reads only `id`, the rest satisfies
 // the type.
@@ -193,5 +197,60 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
     const auras = [aura(CHEATER_MARK_AURA_ID), aura('rejuvenation')];
     aurasSurvivingCleanSlate(auras);
     expect(auras).toHaveLength(2);
+  });
+});
+
+// The PvP half of the flask decision, which until now lived only in the
+// resurrection.ts header comment: arena entry and a Fiesta down wipe through
+// aurasSurvivingCleanSlate (so a flask never rides into a ranked bout), while
+// Thornhollow Fields and Protect Yumi deliberately do NOT wipe, so a death in
+// either mode runs the ordinary death filter and the flask survives it. The
+// second half is an ABSENCE, and no predicate arm above can assert one: every
+// test in this file drives the two functions directly, so re-pointing
+// battleground.ts at the harsher one would leave all of them green. What the
+// decision actually is, is WHICH modules call it, so that is what is pinned.
+describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate', () => {
+  const SIM_ROOT = fileURLToPath(new URL('../src/sim', import.meta.url));
+  const CLEAN_SLATE_CALL = 'aurasSurvivingCleanSlate(';
+  // Comments stripped first, so prose naming the helper (resurrection.ts and the
+  // sim/moderation notes both do) cannot mint a call site that does not exist.
+  // The line-comment arm keeps a `://` in a URL from eating the rest of its
+  // line, the stripper bug this repo has already shipped once (#2499).
+  const codeOf = (full: string): string =>
+    readFileSync(full, 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+  it('is called from arena.ts and fiesta.ts, and from nowhere else in src/sim', () => {
+    const files = tsFilesUnder(SIM_ROOT);
+    // Vacuity floor near the real count: a walk that collapsed to the top level
+    // (or to nothing) would find no caller at all and pass the set assertion
+    // below by accident, since both real callers live one directory down.
+    expect(files.length, 'the src/sim walk found the real tree').toBeGreaterThan(400);
+    expect(
+      files.some((f) => f.file === 'social/arena.ts'),
+      'the walk reaches subdirectories',
+    ).toBe(true);
+
+    const callers = files
+      .filter((f) => f.file !== 'resurrection.ts' && codeOf(f.full).includes(CLEAN_SLATE_CALL))
+      .map((f) => f.file)
+      .sort();
+    expect(callers).toEqual(['social/arena.ts', 'social/fiesta.ts']);
+  });
+
+  it('is NOT called from battleground.ts or yumi.ts: those modes keep their flasks', () => {
+    // Named directly rather than left to the set above, because THIS is the
+    // recorded decision: classic-era flasks persisted through battleground
+    // deaths, so Thornhollow Fields and Protect Yumi run the ordinary death
+    // filter and a flask rides through a death inside either mode.
+    for (const file of ['social/battleground.ts', 'social/yumi.ts']) {
+      const full = fileURLToPath(new URL(`../src/sim/${file}`, import.meta.url));
+      expect(codeOf(full).includes(CLEAN_SLATE_CALL), `${file} must not clean-slate`).toBe(false);
+    }
+  });
+
+  it('reads the sim tree only through the shared walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 });

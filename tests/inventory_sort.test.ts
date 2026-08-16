@@ -43,6 +43,13 @@ const ITEMS: Record<string, ItemDef> = {
   pouch: { id: 'pouch', name: 'Linen Pouch', kind: 'bag', bagSlots: 6, quality: 'common' },
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   elixir: { id: 'elixir', name: 'Elixir of Vigor', kind: 'elixir', quality: 'common' },
+  flask: {
+    id: 'flask',
+    name: 'Flask of Vigor',
+    kind: 'flask',
+    quality: 'common',
+    elixir: { aura: 'Vigor', kind: 'buff_sta', value: 1, duration: 60 },
+  },
   scroll: {
     id: 'scroll',
     name: 'Scroll of Vigor',
@@ -141,6 +148,7 @@ describe('compareBagStacks: the clean-up ladder', () => {
       slot('water', 2),
       slot('bread', 2),
       slot('scroll', 2),
+      slot('flask', 2),
       slot('elixir', 2),
       slot('potion', 3),
       slot('pouch'),
@@ -155,8 +163,11 @@ describe('compareBagStacks: the clean-up ladder', () => {
       'pouch',
       'potion',
       'elixir',
-      // The phase 06 kind slots between the elixirs it alternates with and
-      // the picnic food (KIND_RANK's consumable run).
+      // The two later kinds slot inside KIND_RANK's consumable run rather than
+      // after it: the phase 10 flask sits with the elixir it replaces, and the
+      // phase 06 scroll with the elixir it alternates with, both ahead of the
+      // picnic food.
+      'flask',
       'scroll',
       'bread',
       'water',

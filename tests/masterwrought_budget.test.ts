@@ -1291,7 +1291,34 @@ const statBonus = (enchantId: string, axis: 'str' | 'agi' | 'sta'): number => {
 const APEX_FOOD_IDS = ['stonepot_stew', 'warspice_skewers', 'sageleaf_chowder'] as const;
 
 describe('the phase 10 apex rungs step exactly one rung off the shipped ladders', () => {
-  it('the flask band is the top elixir rung plus the elixir ladder own step', () => {
+  it('the skill-125 capstones sit above the skill-100 apex rungs', () => {
+    // The SKILL dimension of "one rung above", which nothing said out loud: the
+    // two placement capstones are the only apex rows past the 100 wall every
+    // other apex recipe in the game sits on, and the two tool rows that carry
+    // the number today are named for their flag and tradability, so a 125 to 100
+    // slip reads as an unrelated row passing. Both sides literal, and the six
+    // consumable ids come off the local table so a phase-appended row is
+    // checked here the day it is added.
+    const rungOf = (resultItemId: string): number => {
+      const recipe = APEX_CONSUMABLE_RECIPES.find((r) => r.resultItemId === resultItemId);
+      if (!recipe) throw new Error(`${resultItemId} has no APEX_CONSUMABLE_RECIPES row`);
+      return recipe.skillReq;
+    };
+    const CAPSTONE_IDS = ['grand_cauldron', 'laden_hearth'] as const;
+    for (const id of CAPSTONE_IDS) expect(rungOf(id), `${id} capstone rung`).toBe(125);
+    const consumableIds = Object.keys(APEX_CONSUMABLES);
+    expect(consumableIds.length, 'the six phase 10 consumables').toBe(6);
+    for (const id of consumableIds) expect(rungOf(id), `${id} apex rung`).toBe(100);
+    // The relation itself, so the two numbers can never be levelled without
+    // this line failing even if both moved together.
+    for (const capstone of CAPSTONE_IDS) {
+      for (const id of consumableIds) {
+        expect(rungOf(capstone), `${capstone} vs ${id}`).toBeGreaterThan(rungOf(id));
+      }
+    }
+  });
+
+  it("the flask band is the top elixir rung plus the elixir ladder's own step", () => {
     const boar = elixirPayload('elixir_of_the_boar');
     const vipersear = elixirPayload('venomfire_elixir');
     const serpent = elixirPayload('elixir_of_the_serpent');

@@ -237,7 +237,7 @@ export function maxDisenchantYield(def: ItemDef): number {
  *  profession_items.ts, so the junk sweep never vendors a reagent), which
  *  would score the whole apex tier at or below its own Greater rung, and the
  *  dust-plus-lucent boots enchant at tier 0. */
-const APEX_TIER_REAGENT = 'lucent_reagent';
+export const APEX_TIER_REAGENT = 'lucent_reagent';
 
 /** The gain tier a Lucent enchant scores: the epic rung of
  *  ENCHANTING_GAIN_TIER_BY_QUALITY, one step above the shard-consuming

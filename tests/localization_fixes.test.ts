@@ -1636,10 +1636,19 @@ describe('S3 meta-guard: quest_commands.ts stays on the simSrc scan list', () =>
 describe('elixir aura names stay wired to the sim aura matcher', () => {
   it('every authored elixir aura resolves through localizeSimAuraName', async () => {
     const { ITEMS } = await import('../src/sim/data');
+    // BOTH authored aura-name fields, not just the elixir one: a role food's
+    // wellFed.aura ('Well Fed') is the same kind of twice-authored string (the
+    // def here, the AURA_NAME_KEY row there) reaching the same buff bar, and it
+    // was outside this walk, so a rename on one side alone would have gone
+    // un-localized for every non-English player with nothing red.
     const auras = Object.values(ITEMS)
-      .map((item) => (item as { elixir?: { aura?: string } }).elixir?.aura)
+      .flatMap((item) => [
+        (item as { elixir?: { aura?: string } }).elixir?.aura,
+        (item as { wellFed?: { aura?: string } }).wellFed?.aura,
+      ])
       .filter((aura): aura is string => typeof aura === 'string');
     expect(auras.length).toBeGreaterThanOrEqual(4);
+    expect(auras, 'the role foods are inside the walk').toContain('Well Fed');
     setLanguage('en');
     for (const aura of auras) {
       // Identity round-trip, not just non-null: the EN DICT value must equal

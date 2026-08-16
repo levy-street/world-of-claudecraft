@@ -75,6 +75,25 @@ describe('aura icons reuse image-based ability art', () => {
     );
   });
 
+  it('Well Fed carries its own plate recipe, distinct from every stat generic', () => {
+    // Masterwrought phase 10. Well Fed is keyed by AURA id like the rune buffs
+    // above, and it has to be: the three role foods share the id but carry an
+    // ordinary stat kind each (buff_sta / buff_ap / buff_int), so without a row
+    // of its own the resolver falls through to aura_buff_<kind> and Well Fed
+    // wears the elixir-or-flask glyph of whichever stat it happens to grant.
+    // Three buffs, one picture, on the bar where the player picks between them.
+    expect(hasAuraRecipe('well_fed'), 'Well Fed needs its identity recipe').toBe(true);
+    expect(isUnknownIconRecipe(auraIconRecipe('well_fed'))).toBe(false);
+    // The distinctness half, which the presence check alone cannot say: the
+    // recipe is not the one any of the three stat generics resolves to, so the
+    // buff really is separable at a glance from the elixir of the same stat.
+    for (const kind of ['buff_sta', 'buff_ap', 'buff_int']) {
+      expect(auraIconRecipe('well_fed'), `well_fed vs aura_${kind}`).not.toEqual(
+        auraIconRecipe(`aura_${kind}`),
+      );
+    }
+  });
+
   it('keeps a readable attack-power-percent safety fallback', () => {
     expect(hasAuraRecipe('aura_buff_ap_pct')).toBe(true);
   });

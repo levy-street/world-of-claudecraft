@@ -20,11 +20,12 @@
 // in tests/masterwrought_budget.test.ts; this file pins what the sim DOES with
 // them.
 import { describe, expect, it } from 'vitest';
-import { DELVES } from '../src/sim/data';
+import { DELVES, isDelvePos } from '../src/sim/data';
 import { ejectToDelveDoor } from '../src/sim/delves/runs';
 import { Sim } from '../src/sim/sim';
 import { revivePlayerAt } from '../src/sim/spirit';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const IRONHUSK = 'ironhusk_flask'; // buff_sta 15 / 1200
@@ -108,7 +109,31 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     const totalWithOne = p.auras.length;
     expect(totalWithOne, 'the fixture carries a non-flask aura too').toBeGreaterThanOrEqual(2);
 
-    use(sim, pid, RUNEWATER);
+    // The second quaff is driven in two steps so the event stream can be read
+    // across it alone (the tests/elixir.test.ts displacement idiom).
+    sim.addItem(RUNEWATER, 1, pid);
+    sim.drainEvents();
+    sim.useItem(RUNEWATER, pid);
+    const events = sim.drainEvents() as SimEvent[];
+
+    // The strip's own FADE event, which is the only way an online client can
+    // learn the shed happened: the mirror never sees the sim's aura list, so
+    // without this emit the stripped buff stays painted on the buff bar until
+    // something else refreshes the entity. Exactly one fade, naming the shed
+    // family and the player it left.
+    const fades = events.filter((e) => e.type === 'aura' && e.gained === false);
+    expect(fades, 'the shed flask faded exactly once').toHaveLength(1);
+    expect(fades[0]).toMatchObject({
+      type: 'aura',
+      gained: false,
+      abilityId: STA_FAMILY,
+      targetId: pid,
+    });
+    // ...and it rides BESIDE the new flask's gain, not instead of it.
+    expect(
+      events.some((e) => e.type === 'aura' && e.gained === true && e.abilityId === INT_FAMILY),
+      'the new flask still announces itself',
+    ).toBe(true);
 
     // THE INVARIANT, not just "the new one is there": at most one flask-marked
     // aura exists at all, and it is the newer one.
@@ -289,10 +314,15 @@ describe('flasks: one at a time, refuse downward, survive death', () => {
     // Pushed straight onto the list so applyAura's same-id rule cannot swallow
     // it, the death test's decoy idiom.
     const { sim, pid, p } = world();
+    // The decoy carries the INCOMING flask's own kind (buff_sta, the Ironhusk
+    // family) while keeping an id from nowhere near the elixir family. That
+    // pairing is what makes this arm decisive: the skip clause the strip loop
+    // spells is a same-ID one, and a decoy of some unrelated kind would be shed
+    // by a same-KIND clause too, so the mutation would pass unnoticed.
     p.auras.push({
       id: 'probe_unrelated_ward',
       name: 'Decoy Flask Ward',
-      kind: 'buff_armor',
+      kind: 'buff_sta',
       remaining: 1200,
       duration: 1200,
       value: 4,
@@ -408,10 +438,59 @@ describe('the flask marker at the OTHER site that reuses the death filter', () =
       'and the filter really ran: the marker-less aura is gone',
     ).toBe(false);
   });
+
+  it('a flask rides through a DELVE death respawn, the other site that filters auras', () => {
+    // entity_roster.ts releaseSpiritInDelve is the second caller of
+    // aurasSurvivingDeath: a delve death does not send the player to a
+    // graveyard, it respawns them at the module entry, and it runs its own
+    // filter call to do it. The source says the flask survives there; nothing
+    // drove it with a flask, so a sickness-only filter at that one site would
+    // have left every suite green.
+    const { sim, pid, p } = world();
+    const def = DELVES.collapsed_reliquary;
+    sim.setPlayerLevel(def.minLevel);
+    p.pos.x = def.doorPos.x;
+    p.pos.z = def.doorPos.z;
+    p.pos.y = terrainHeight(def.doorPos.x, def.doorPos.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    expect(isDelvePos(p.pos.x), 'the player really is inside the delve band').toBe(true);
+    use(sim, pid, IRONHUSK);
+    expect(flaskAuras(p), 'the flask is worn going into the death').toHaveLength(1);
+
+    kill(sim, p);
+    expect(p.dead).toBe(true);
+    // Pushed AFTER the death so only the RELEASE site can shed it: the death
+    // handler ran its own filter already, and an assertion over an aura that
+    // died back there would say nothing about this site at all.
+    p.auras.push({
+      id: 'probe_delve_ward',
+      name: 'Decoy Delve Ward',
+      kind: 'buff_armor',
+      remaining: 600,
+      duration: 600,
+      value: 4,
+      sourceId: p.id,
+      school: 'nature',
+    });
+
+    sim.releaseSpirit();
+
+    expect(p.dead, 'the delve release respawns rather than raising a ghost').toBe(false);
+    expect(isDelvePos(p.pos.x), 'respawned inside the delve, not at a graveyard').toBe(true);
+    const flasks = flaskAuras(p);
+    expect(flasks, 'the flask rode through the delve respawn').toHaveLength(1);
+    expect(flasks[0].id).toBe(STA_FAMILY);
+    expect(flasks[0].value).toBe(15);
+    expect(
+      p.auras.some((a) => a.id === 'probe_delve_ward'),
+      'and the filter really ran here: the marker-less aura is gone',
+    ).toBe(false);
+  });
 });
 
 describe('role foods: Well Fed lands only on a finished meal, and is mortal', () => {
-  it('a finished meal grants Well Fed with the plate own payload', () => {
+  it("a finished meal grants Well Fed with the plate's own payload", () => {
     const { sim, pid, p } = world();
     use(sim, pid, STEW);
     expect(p.eating, 'the meal started').not.toBeNull();
@@ -427,6 +506,36 @@ describe('role foods: Well Fed lands only on a finished meal, and is mortal', ()
     expect(fed[0].duration).toBe(600);
     expect(fed[0].remaining).toBeGreaterThan(590);
     expect(fed[0].flask, 'Well Fed carries no flask marker').toBeUndefined();
+  });
+
+  it('the eating slot is already cleared at the moment Well Fed is applied', () => {
+    // src/sim/combat/auras.ts spells the finish as clear THEN grant: the
+    // payload is read into a local, p.eating is nulled, and only then does
+    // applyAura run, so the meal is over from every reader's point of view
+    // when the buff lands. Nothing on the apply path consults isConsuming
+    // today, which is exactly why the order needs an assertion rather than a
+    // comment: swapping the two lines is invisible to every other case here.
+    // ctx is a plain record of bound functions built once at construction, so
+    // the seam is patched on the ctx object (a Sim.prototype spy cannot
+    // intercept a reference bound before it).
+    const { sim, pid, p } = world();
+    const ctx = sim.ctx as unknown as { applyAura: (target: Entity, aura: Aura) => void };
+    const realApplyAura = ctx.applyAura;
+    let eatingAtApply: unknown = 'applyAura never ran for well_fed';
+    ctx.applyAura = (target: Entity, aura: Aura): void => {
+      if (aura.id === WELL_FED) eatingAtApply = target.eating;
+      realApplyAura(target, aura);
+    };
+    try {
+      use(sim, pid, STEW);
+      expect(p.eating, 'the meal is running before the finishing tick').not.toBeNull();
+      for (let i = 0; i < MEAL_TICKS; i++) sim.tick();
+    } finally {
+      ctx.applyAura = realApplyAura;
+    }
+
+    expect(aurasById(p, WELL_FED), 'the meal really finished and paid out').toHaveLength(1);
+    expect(eatingAtApply, 'the slot was nulled BEFORE the buff was applied').toBeNull();
   });
 
   it('an INTERRUPTED meal grants nothing, and the plate is still spent', () => {

@@ -5634,6 +5634,35 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(isAuraDebuff(mirror)).toBe(false);
   });
 
+  it('never wires the Aura.flask marker: it stays server-and-offline state', () => {
+    // Masterwrought phase 10 stamps Aura.flask on the worn flask buff, and it
+    // crosses NO wire: wireAura has no flask arm, so an online client cannot
+    // tell a flask buff from the same-family elixir buff and paints no flask
+    // glyph. That is the recorded phase 14 answer, not an oversight, so it gets
+    // a pin: widening the aura wire to carry it becomes a deliberate edit here
+    // rather than a field that quietly appears in every snapshot.
+    const flaskBuff: Aura = {
+      id: 'elixir_buff_sta',
+      name: 'Ironhusk Fortitude',
+      kind: 'buff_sta',
+      remaining: 1200,
+      duration: 1200,
+      value: 15,
+      sourceId: 0,
+      school: 'nature',
+      flask: true,
+    };
+    const { wire, mirror } = roundTrip(flaskBuff);
+    const wired = wireAura(wire, 'elixir_buff_sta');
+    expect('flask' in wired, 'the marker stays off the wire').toBe(false);
+    // The rest of the aura still rides, so the absence above is a trimmed field
+    // and not an aura that failed to serialize at all.
+    expect(wired.value).toBe(15);
+    expect(wired.school).toBe('nature');
+    expect(mirror.value).toBe(15);
+    expect((mirror as { flask?: boolean }).flask, 'and never reaches the mirror').toBeUndefined();
+  });
+
   it('sends a POSITIVE absorb value so the shield overlay and tooltip work online too', () => {
     const shield: Aura = {
       id: 'power_word_shield',

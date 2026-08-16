@@ -10,6 +10,7 @@ import { characterDerivedStats } from '../src/sim/entity';
 import { canStackInstancePayloads } from '../src/sim/item_instance_merge';
 import { removePreferFungible } from '../src/sim/items';
 import {
+  APEX_TIER_REAGENT,
   consumeEnchantedVictim,
   disenchantItem,
   disenchantYield,
@@ -840,10 +841,10 @@ describe('quality-tiered enchanting gains', () => {
     });
   });
 
-  it('derives an enchant gain tier from its reagent defs (dust 0, essence 1, shard 2)', () => {
+  it('derives an enchant gain tier from its reagent defs (dust 0, essence 1, shard 2, lucent 3)', () => {
     // EnchantDef carries no tier field: the existing tier notion is the
     // arcane reagent ladder, read off the reagent ITEM DEFS' quality (max
-    // over the list). Pin the three material qualities so a def re-tune
+    // over the list). Pin the four material qualities so a def re-tune
     // cannot silently reshuffle every enchant's gain tier.
     expect(ITEMS.arcane_dust.quality).toBe('common');
     expect(ITEMS.arcane_essence.quality).toBe('uncommon');
@@ -851,6 +852,24 @@ describe('quality-tiered enchanting gains', () => {
     expect(enchantGainTier(ENCHANTS.enchant_weapon_might)).toBe(0);
     expect(enchantGainTier(ENCHANTS.enchant_chest_stamina)).toBe(1);
     expect(enchantGainTier(ENCHANTS.enchant_weapon_greater_might)).toBe(2);
+
+    // The apex rung is the one that CANNOT be read off item quality: the
+    // reagent is authored common/white so the junk sweep never vendors it,
+    // which is why enchantGainTier names it explicitly. Pin that premise
+    // (the reagent id as a literal, and the quality that would mis-score it)
+    // before the two arms that only pass while the named arm exists.
+    expect(APEX_TIER_REAGENT).toBe('lucent_reagent');
+    expect(ITEMS.lucent_reagent.quality).toBe('common');
+    // Decisive: delete the named apex arm and this boots enchant, whose whole
+    // bill is lucent plus dust, falls all the way to 0.
+    expect(ENCHANTS.enchant_feet_lucent_agility.reagents.map((r) => r.itemId)).toEqual([
+      'lucent_reagent',
+      'arcane_dust',
+    ]);
+    expect(enchantGainTier(ENCHANTS.enchant_feet_lucent_agility)).toBe(3);
+    // ...and the same deletion drops the shard-carrying apex weapon enchant to
+    // its shard rung, 2, so the apex tier saturates into Greater unnoticed.
+    expect(enchantGainTier(ENCHANTS.enchant_weapon_lucent_might)).toBe(3);
   });
 
   it('a fresh disenchanter still gains the full point from a common piece (orange at capability 0)', () => {

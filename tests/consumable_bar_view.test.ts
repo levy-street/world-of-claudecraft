@@ -13,7 +13,10 @@ const DEFS: Record<string, ItemDef> = Object.fromEntries(
     [
       ['healing_potion', 'potion'],
       ['mana_potion', 'potion'],
+      ['arcane_potion', 'potion'],
+      ['swiftness_potion', 'potion'],
       ['bear_elixir', 'elixir'],
+      ['serpent_elixir', 'elixir'],
       ['husk_flask', 'flask'],
       ['boar_scroll', 'scroll'],
       ['serpent_scroll', 'scroll'],
@@ -114,18 +117,21 @@ describe('consumableBarItems', () => {
   });
 
   it('a combat-buff-heavy bag evicts food and drink at the cap (the recorded trade)', () => {
-    // Two potions + one elixir + two scrolls + two foods + a drink is eight
-    // distinct consumables for six slots: the tail sheds first (the drink,
-    // then the id-later food), never the combat items at the head. This
-    // is the deliberate consequence of the combat-priority order, recorded in
-    // the Phase 06 QA ledger: mid-fight consumables outrank regen at the cap,
-    // and food/drink stay reachable from the bags.
+    // Two potions + one elixir + one flask + two scrolls + two foods + a drink
+    // is nine distinct consumables for six slots: the tail sheds first (the
+    // drink, then both foods), never the combat items at the head. This is the
+    // deliberate consequence of the combat-priority order, recorded in the
+    // Phase 06 QA ledger and widened by the phase 10 flask rank: mid-fight
+    // consumables outrank regen at the cap, and food/drink stay reachable from
+    // the bags. The flask entering at rank 3 is what pushed the last surviving
+    // food off this row, so the fixture carries one.
     const got = consumableBarItems(
       inv(
         'water',
         'bread',
         'boar_meat',
         'bear_elixir',
+        'husk_flask',
         'boar_scroll',
         'serpent_scroll',
         'healing_potion',
@@ -138,10 +144,42 @@ describe('consumableBarItems', () => {
       'healing_potion',
       'mana_potion',
       'bear_elixir',
+      'husk_flask',
       'boar_scroll',
       'serpent_scroll',
-      'boar_meat',
     ]);
+  });
+
+  it('a potion-and-elixir-heavy bag starves the flask out (the recorded phase 14 residual)', () => {
+    // The accepted cost of putting flasks on this bar at rank 3 rather than
+    // rank 1: four potion ids and two elixir ids fill all six slots by
+    // themselves, so a player carrying that plus a flask gets no flask button
+    // and has to reach into the bags for it. Recorded rather than fixed (the
+    // phase 14 residual): the head of the ladder is what a player needs mid
+    // fight, and a flask is re-applied after a wipe, not during one.
+    expect(CONSUMABLE_BAR_SLOTS, 'the tray is six buttons wide').toBe(6);
+    const got = consumableBarItems(
+      inv(
+        'husk_flask',
+        'healing_potion',
+        'mana_potion',
+        'arcane_potion',
+        'swiftness_potion',
+        'bear_elixir',
+        'serpent_elixir',
+      ),
+      lookup,
+      [],
+    );
+    expect(got).toEqual([
+      'arcane_potion',
+      'healing_potion',
+      'mana_potion',
+      'swiftness_potion',
+      'bear_elixir',
+      'serpent_elixir',
+    ]);
+    expect(got, 'the flask is starved off the tray').not.toContain('husk_flask');
   });
 
   it('reuses the caller array across calls (allocation-light per-frame contract)', () => {

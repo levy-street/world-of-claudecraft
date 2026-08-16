@@ -11,7 +11,7 @@
 // mirrors the craft gate exactly instead of shadowing one craft behind
 // another. The owner-only arms themselves stay pinned by
 // tests/professions_crafting_hub.test.ts; this file owns only the party half.
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { STATION_RADIUS, STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
@@ -29,6 +29,9 @@ import { isSpecialized } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
 import type { ItemDef, SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { tEntity } from '../src/ui/entity_i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { localizeSimText } from '../src/ui/sim_i18n';
 
 // Entity-stripped world (the tests/social_shared.ts SOCIAL_TEST_WORLD shape,
 // redefined locally per the tests/CLAUDE.md sim-test convention): every case
@@ -117,6 +120,27 @@ function mustApothecaryRecipe() {
 /** Teach the alchemy recipe and grant exactly its own reagent list. */
 function readyApothecaryCrafter(sim: Sim, pid: number) {
   const recipe = mustApothecaryRecipe();
+  metaOf(sim, pid).knownRecipes.add(recipe.id);
+  for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
+  return recipe;
+}
+
+// The cooking twin, for the OTHER shipped capstone. Derived from the live table
+// the same way, so a content change that unbinds it from the kitchens fails
+// HERE rather than as a silent green.
+const KITCHENS_RECIPE_ID = 'recipe_hunters_game_skewer';
+function mustKitchensRecipe() {
+  const recipe = ALL_RECIPES.find((r) => r.id === KITCHENS_RECIPE_ID);
+  if (!recipe) throw new Error(`${KITCHENS_RECIPE_ID} missing from ALL_RECIPES`);
+  if (recipe.stationType !== 'kitchens') {
+    throw new Error(`${KITCHENS_RECIPE_ID} is no longer kitchens-bound`);
+  }
+  return recipe;
+}
+
+/** Teach the cooking recipe and grant exactly its own reagent list. */
+function readyKitchensCrafter(sim: Sim, pid: number) {
+  const recipe = mustKitchensRecipe();
   metaOf(sim, pid).knownRecipes.add(recipe.id);
   for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, pid);
   return recipe;
@@ -421,6 +445,44 @@ describe('crafting station gate: the partyShared arm', () => {
     expect(sim.countItem('grand_cauldron', b), 'the cauldron survives its own use').toBe(1);
   });
 
+  it('the SHIPPED Laden Hearth, used from the bags, opens cooking for a party member', () => {
+    // The cauldron arm's twin, and not redundant with it: the two capstones are
+    // the same placement code pointed at DIFFERENT crafts, and only the cauldron
+    // was ever driven end to end. A def whose stationCraftId slipped (or a
+    // kitchens mapping that moved) would open the wrong station for the whole
+    // cooking half with every other arm here still green.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('priest', 'Bet');
+    makeParty(sim, a, b);
+
+    // The premise, read off the live def: a placement tool pointed at cooking.
+    expect(ITEMS.laden_hearth.use).toEqual({
+      type: 'placeMobileStation',
+      stationCraftId: 'cooking',
+    });
+
+    teleport(sim, b, FIELD.x, FIELD.z);
+    grantItem(sim, 'laden_hearth', 1, b);
+    sim.useItem('laden_hearth', b);
+    expect(metaOf(sim, b).mobileStation?.craftId, 'the placement landed').toBe('cooking');
+    expect(metaOf(sim, b).mobileStation?.partyShared).toBe(true);
+
+    // The MEMBER, in range but not the owner, gets the kitchens craft gate and
+    // the readout the crafting window paints its row set from.
+    teleport(sim, a, FIELD.x + 1, FIELD.z);
+    const recipe = readyKitchensCrafter(sim, a);
+    const crafterPos = (sim as any).entities.get(a).pos;
+    expect(isAtStation(STATIONS, crafterPos, 'kitchens'), 'no static kitchen in reach').toBe(false);
+    expect(sim.activeMobileStationCraftsFor(a)).toEqual(['cooking']);
+    const result = resolveCraft(simCtx(sim), a, KITCHENS_RECIPE_ID);
+    expect(result.ok, 'the party member cooks off the shared hearth').toBe(true);
+    expect(sim.countItem(recipe.resultItemId, a)).toBe(recipe.resultCount);
+
+    // A permanent tool: the capstone is never consumed by placing it.
+    expect(sim.countItem('laden_hearth', b), 'the hearth survives its own use').toBe(1);
+  });
+
   it('regression: a legacy specialization placement stays owner-only for party members', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
@@ -558,5 +620,52 @@ describe('activeMobileStationCraftsFor set arms', () => {
     expect(placeMobileStationForPlayer(simCtx(sim), 'weaponcrafting', b)).toBeDefined();
     teleport(sim, a, FIELD.x + 1, FIELD.z);
     expect(sim.activeMobileStationCraftsFor(a)).toEqual([]);
+  });
+});
+
+// The article omission above is pinned in English only, and English is the one
+// locale where the matcher's own regex cannot be caught out: /^You set up (.+)\.$/
+// matched the OLD "You set up the The Laden Hearth." sentence just as happily,
+// capturing "the The Laden Hearth", which no item name resolves. So the emit
+// shape is what carries the localization, not the regex, and that only shows up
+// once the line is actually run through a non-English locale.
+describe('the set-up line round trips through a real locale', () => {
+  // ja_JP is picked because the shipped overlay already carries an
+  // entities.items.laden_hearth.name fill; en_XA is URL-param-only and not
+  // selectable here. The fixture premise (a name that really differs from the
+  // English one) is asserted rather than assumed, so a locale that lost the fill
+  // fails loudly instead of passing on an English-equals-English comparison.
+  const LOCALE = 'ja_JP' as const;
+
+  afterEach(() => {
+    setLanguage('en');
+  });
+
+  it('localizes the item name inside the sentence, leaving no English behind', async () => {
+    await ensureLocaleLoaded(LOCALE);
+    setLanguage(LOCALE);
+    const english = ITEMS.laden_hearth.name;
+    const localized = tEntity({ kind: 'item', id: 'laden_hearth', field: 'name' });
+    expect(localized, 'the fixture locale really translates this item').not.toBe(english);
+
+    const out = localizeSimText(`You set up ${english}.`);
+    expect(out, 'the matcher recognized the line').not.toBeNull();
+    expect(out, 'the localized name reached the sentence').toContain(localized);
+    expect(out, 'no English name left in the localized line').not.toContain(english);
+  });
+
+  it('cannot recover a doubled article, which is why the emit carries none', async () => {
+    // The negative half, and the reason the English arm above is not enough on
+    // its own: hand the matcher the sentence the old glued-article emit
+    // produced and the capture is "the The Laden Hearth", which resolves to no
+    // item at all, so the English name rides straight through into a Japanese
+    // sentence. The regex cannot fix that; only the emit not gluing an article
+    // can, so this arm records what a regression there would look like.
+    await ensureLocaleLoaded(LOCALE);
+    setLanguage(LOCALE);
+    const english = ITEMS.laden_hearth.name;
+    const doubled = localizeSimText(`You set up the ${english}.`);
+    expect(doubled, 'the over-broad regex still matches it').not.toBeNull();
+    expect(doubled, 'and leaks the English name into the localized line').toContain(english);
   });
 });

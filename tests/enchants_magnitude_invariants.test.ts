@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS, type EnchantDef } from '../src/sim/content/enchants';
-import { resolveApplyEnchant } from '../src/sim/professions/enchanting';
+import { APEX_TIER_REAGENT, resolveApplyEnchant } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
 import { xpForLevel } from '../src/sim/types';
 
@@ -24,7 +24,11 @@ const AXES: readonly Axis[] = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
 // enchantGainTier use: every Lucent enchant also draws on the tier below it
 // (shard or dust), so an apex-blind predicate would read three of the four as
 // Greater and quietly widen that tier's pinned id list.
-const isApex = (e: EnchantDef) => e.reagents.some((r) => r.itemId === 'lucent_reagent');
+// Read from the sim's own APEX_TIER_REAGENT rather than re-spelling the id:
+// the tier identity here and the gain tier enchantGainTier scores are the
+// same claim about the same reagent, and a rename that reached only one of
+// them would leave this predicate silently matching nothing.
+const isApex = (e: EnchantDef) => e.reagents.some((r) => r.itemId === APEX_TIER_REAGENT);
 const isGreater = (e: EnchantDef) =>
   !isApex(e) && e.reagents.some((r) => r.itemId === 'arcane_shard');
 const isRuned = (e: EnchantDef) =>
