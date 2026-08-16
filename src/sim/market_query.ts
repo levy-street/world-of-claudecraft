@@ -17,6 +17,7 @@ export const MARKET_ITEM_TYPE_FILTERS = [
   'consumable',
   'material',
   'cosmetic',
+  'pattern',
   'other',
 ] as const;
 export const MARKET_ARMOR_TYPE_FILTERS = [
@@ -206,19 +207,16 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   if (filter === 'material')
     return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
   if (filter === 'cosmetic') return isCosmeticItem(item);
+  if (filter === 'pattern') return item.kind === 'recipe';
   // The catch-all for catalog kinds with no browse category of their own. Mount
   // reins join quest items here: quest items are never listable, and reins
   // (listable now that they are unbound) are too few to earn a filter chip.
-  // Recipe patterns join them for the same reason: they are deliberately
-  // listable (a tradable drop that binds by being consumed, not on pickup) but
-  // too few today to earn a chip of their own, so browsing them stays this
-  // arm's job until content makes a dedicated category worth it. None of the
-  // three may be left reachable through 'All' alone (quest and mount in
-  // tests/market_filters.test.ts, whose sweep sees only the live catalog;
-  // recipe in tests/recipe_pattern_items.test.ts on a synthetic def until
-  // shipped pattern content exists for that sweep to pick up).
-  if (filter === 'other')
-    return item.kind === 'quest' || item.kind === 'mount' || item.kind === 'recipe';
+  // Recipe patterns parked here through phase 02 for the same fewness reason;
+  // phase 11 shipped the apex pattern content and gave the kind its own chip
+  // (the 'pattern' arm above), so quest and mount are the whole bucket again.
+  // Neither may be left reachable through 'All' alone (pinned by the sweep in
+  // tests/market_filters.test.ts, which sees only the live catalog).
+  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.

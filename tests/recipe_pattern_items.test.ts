@@ -571,18 +571,20 @@ describe('patterns never stack (one per bag slot, classic style)', () => {
 });
 
 describe('patterns on the World Market', () => {
-  it('browses under the other type filter, and no other bucket claims it', () => {
-    // A pattern is not a weapon, armor, bag, consumable, material or cosmetic,
-    // so the catch-all bucket is the honest home for it. Driving the whole
-    // exported filter list means a future chip that started claiming patterns
-    // fails here instead of quietly splitting them across two tabs.
+  it('browses under the pattern type filter, and no other bucket claims it', () => {
+    // Phase 02 parked patterns in the 'other' catch-all until shipped content
+    // existed; phase 11 shipped the apex patterns and gave the kind its own
+    // chip, so a pattern now answers 'pattern' and nothing narrower or wider
+    // ('other' included: an item answers exactly one browse category). Driving
+    // the whole exported filter list means a second chip that started claiming
+    // patterns fails here instead of quietly splitting them across two tabs.
     const matched = MARKET_ITEM_TYPE_FILTERS.filter((itemType) =>
       marketItemMatches(PATTERN_ID, { ...defaultMarketQuery(), itemType }),
     );
     // Sorted on BOTH sides: the claim is which chips match, not the order the
     // chip list happens to declare them in, and reordering MARKET_ITEM_TYPE_FILTERS
     // is a presentation change that must not red this pin.
-    expect([...matched].sort()).toEqual(['all', 'other'].sort());
+    expect([...matched].sort()).toEqual(['all', 'pattern'].sort());
   });
 
   it('lists a pattern for sale: tradable drops, bound only by being consumed', () => {

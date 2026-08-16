@@ -68,6 +68,7 @@ describe('World Market filters', () => {
       'consumable',
       'material',
       'cosmetic',
+      'pattern',
       'other',
     ]);
     expect(MARKET_ARMOR_TYPE_FILTERS).toEqual([
@@ -280,9 +281,48 @@ describe('World Market filters', () => {
   it("routes mount reins through the 'other' chip so a listed reins stays browsable", () => {
     expect(filterIds(['reins_grag_bear'], { itemType: 'other' })).toEqual(['reins_grag_bear']);
     // And no narrower chip claims it.
-    for (const t of ['weapon', 'armor', 'consumable', 'bag', 'material', 'cosmetic'] as const) {
+    for (const t of [
+      'weapon',
+      'armor',
+      'consumable',
+      'bag',
+      'material',
+      'cosmetic',
+      'pattern',
+    ] as const) {
       expect(filterIds(['reins_grag_bear'], { itemType: t }), t).toEqual([]);
     }
+  });
+
+  // Phase 11: patterns (kind 'recipe') left the 'other' catch-all and earned
+  // their own chip once the apex pattern content shipped. The exemplar is a
+  // SHIPPED pattern id (the id contract: pattern_<output id>), so this is the
+  // live-catalog mirror of the synthetic-def pin in
+  // tests/recipe_pattern_items.test.ts.
+  it('browses patterns under their own chip, and exactly one browse category claims them', () => {
+    // The bag-exclusivity model, applied to the pattern exemplar: an item
+    // answers exactly one browse category, so the full chip answer is
+    // ['all', 'pattern'] and nothing else.
+    expect(
+      MARKET_ITEM_TYPE_FILTERS.filter((itemType) =>
+        marketItemMatches('pattern_forgefold_legguards', q({ itemType })),
+      ),
+    ).toEqual(['all', 'pattern']);
+  });
+
+  // The phase 11 findability claim, pinned in BOTH halves: the masterwrought
+  // intermediates and wyrmfall_core browse under Materials (kind 'junk',
+  // unchanged by the pattern chip), and a shipped pattern browses under the
+  // new Patterns chip.
+  it('finds the masterwrought intermediates under Materials and patterns under Patterns', () => {
+    expect(
+      filterIds(['wyrmfall_core', 'duskforged_billet', 'sablewax_vellum'], {
+        itemType: 'material',
+      }),
+    ).toEqual(['wyrmfall_core', 'duskforged_billet', 'sablewax_vellum']);
+    expect(filterIds(['pattern_forgefold_legguards'], { itemType: 'pattern' })).toEqual([
+      'pattern_forgefold_legguards',
+    ]);
   });
 
   // The exhaustiveness tail in itemMatchesType is a tsc guard, and tsc is erased in
