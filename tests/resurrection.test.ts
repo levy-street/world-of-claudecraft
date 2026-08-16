@@ -428,7 +428,7 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       'ctx.resetForArena(pickOne(lookUp(pid)));',
       'ctx.resetForArena(f(g(h(x))));',
       'ctx.resetForArena?.(e);',
-      "ctx.resetForArena(must(e, 'no (fighter) here'));",
+      "ctx.resetForArena(must(e, 'no fighter :)'));",
       'ctx.resetForArena(\n  e,\n);',
       'ctx.resetForArena( e )',
     ]) {
@@ -437,6 +437,19 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     expect(
       callsOf('cond ? ctx.resetForArena(a) : ctx.resetForArena(b);', 'resetForArena').length,
     ).toBe(2);
+    // The string skip is load-bearing, not decoration: an UNBALANCED paren
+    // inside a string argument must not end the walk early (the argument text
+    // comes back whole), or a wipe whose options object follows such a string
+    // would read as a passthrough.
+    expect(callsOf("ctx.resetForArena(must(e, 'no fighter :)'));", 'resetForArena')[0].args).toBe(
+      "must(e, 'no fighter :)')",
+    );
+    expect(
+      callsOf(
+        "ctx.readyArenaFighter(must(e, ':)'), { clearPrep: true });",
+        'readyArenaFighter',
+      ).map(clearPrepOf),
+    ).toEqual(['true']);
     // The declaration spellings, single-line and wrapped, the seam's bind
     // line, and an alias: none is a call.
     for (const decl of [
