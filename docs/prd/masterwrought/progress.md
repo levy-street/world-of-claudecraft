@@ -22,7 +22,7 @@
 | 09 QA | verify | complete | 2026-08-13 | 2026-08-13 |
 | 10 | Apex consumables and enchants | complete | 2026-08-14 | 2026-08-14 |
 | 10 QA | verify | complete | 2026-08-14 | 2026-08-16 |
-| 11 | Pattern drops and vendors | in progress | 2026-08-16 | |
+| 11 | Pattern drops and vendors | complete | 2026-08-16 | 2026-08-16 |
 | 11 QA | verify | pending | | |
 | 12 | The Perfecting stage | pending | | |
 | 12 QA | verify | pending | | |
@@ -475,3 +475,34 @@ never future-PR items, per the delivery contract in `state.md`).
   plus D10-B1, D10-D1, STK-2, Q2, FE6, I18N-06, and the new flask
   parenthesis). Full ledger, review record, and validation record in
   state.md "Phase 10 QA ledger".
+- Phase 11 (2026-08-16): every apex recipe reaches players through the three
+  R8 pillars. The five head-of-phase ruling items landed FIRST, each its own
+  commit with its own fresh review and probe cycle (bag signer exemption with
+  the re-scoped behavioral pin; rogue band re-pin with identity pins and the
+  corrected int-stat-bag mechanism note; the Lucent weapon int twin with its
+  fills, wiki regen, and the 24-to-26 pin; undispellable flask auras with the
+  Spellplunder, cancel-path, wire, and mob-purge-exception pins plus the
+  tooltip's new counter-immunity line; the four aura names registered; the
+  phase-15 feast premise corrected), closing both standing ruling reds: the
+  first fully green full suite since the third phase 10 QA sync. The build:
+  28 pattern items (pattern_<output>, epic, tradable, bind on learn, classic
+  per-craft prefixes, committed SVG-sourced art, 28 entity names with five
+  non-Latin fills each); the ten gear patterns as one appended tail rollGroup
+  on the Nythraxis table (0.04 each, one partitioned draw); the ten armor
+  patterns as rift draw 6 (0.08 per winning B/A/S clear, uniform pick, C
+  exempt); the eight consumable patterns on the Heroic Quartermaster (six at
+  12 marks, capstones at 16, the day-one valve); the market Patterns chip on
+  the existing itemType axis (parity pin untouched); the wiki vendor channel
+  at the generator level with sourceVendor; sundering excludes recipes; the
+  reliquary derivation carries the deliberate kind-keyed carve-out with an
+  exactly-ten self-diff vacuity guard. New suites: apex_pattern_items,
+  apex_pattern_channels (the R8 referential contract both directions plus a
+  nine-surface no-fourth-channel sweep), and the rift_clear_rewards parity
+  scenario (a real A-rank clear whose golden pins the pattern draw's stream
+  position). Exactly one pre-existing golden moved (nythraxis_full_pull, the
+  appended draw, re-minted in its own commit); parity 215 green. Three
+  reviewed findings rounds plus a round-3 verifier closed the chain;
+  qa-checklist READY; full suite 39653 green at the findings tip with the
+  one census red admitted with rationale; gate_select PASS all 12 steps at
+  b0d77be779. Rates, prices, decisions, review record, and the residuals in
+  state.md "Phase 11 BUILT ledger" and "Phase 11 ruling executions".

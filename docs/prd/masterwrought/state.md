@@ -4580,6 +4580,24 @@ recorded, or refuted with the file open)
   frontend reviews otherwise fully clean (parity pin 324 untouched, zero
   wire changes, S3 green, ko Recipe-family split 제조법/요리법 verified
   deliberate and correct).
+- PHASE 11 VALIDATION RECORD (close): code tip b0d77be779 (the docs close
+  commit after it touches docs only). gate_select PASS all 12 steps at the
+  tip (GATE_MAX_WORKERS=5, committed tree, no pipe, exit 0). Full suite at
+  1da7a4b775: 2828 files pass / 39653 tests green with the ONE bag census
+  red admitted in b3c8e64d56; full suite at the pre-fix-round ruling tip
+  36e539ebb7: 2827 files / 39619 green, ZERO failures (the two-reds
+  closure proof). Parity 215 green at the tip; exactly one pre-existing
+  golden moved all phase (nythraxis_full_pull) plus the new
+  rift_clear_rewards golden. Portrait seal --check FRESH at pre-flight,
+  after the content commits, and at the close (bookkeeping-only drift
+  every time; no re-bless owed). tsc clean and biome clean on changed
+  files at every commit; asset:budget run once (the failures are the
+  long-standing repo-wide overages, recorded above). Commit chain:
+  e2e6c5fdd8, 46da023d4d, 5276a985e2, f67ed4a5e4, 6998a77c30, 36e539ebb7
+  (the five ruling items), 91870a67ac + ad4f0f1bfb (their reviewed fix
+  rounds), 72f4fa16b1, 4a87b16ff0, 3181dbf7bd, 835591eddc (the build
+  cadence), ff2249b47a (the referential suite), 1da7a4b775 + b3c8e64d56 +
+  cb0132d732 + b0d77be779 (the findings rounds and chain close).
 - ROUND-3 VERIFICATION (fresh verifier at cb0132d732): both prescribed
   probes red exactly as specified (the quest-widening mutation that
   survived round 1 now reds the at-most-one sweep naming the double-chip
