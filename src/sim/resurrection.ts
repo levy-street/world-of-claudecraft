@@ -145,10 +145,10 @@ export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
 // (social/fiesta.ts fiestaDownEntity) deliberately strip MORE than a death
 // does, The Keeper's Toll included, so a normalized bout is decided by play
 // and not by what each fighter walked in carrying. A sanction is not something
-// the fighter walked in carrying:
-// it is account state an operator applied, so it survives here exactly as it
-// survives an ordinary death. Returns a NEW array, so the caller's assignment
-// stays a replacement and never mutates the array it read.
+// the fighter walked in carrying: it is account state an operator applied, so
+// it survives here exactly as it survives an ordinary death. Returns a NEW
+// array, so the caller's assignment stays a replacement and never mutates the
+// array it read.
 export function aurasSurvivingCleanSlate(auras: readonly Aura[]): Aura[] {
   return auras.filter((a) => a.id === CHEATER_MARK_AURA_ID);
 }

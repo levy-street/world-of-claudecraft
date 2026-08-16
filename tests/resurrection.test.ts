@@ -244,20 +244,27 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
 
   // Every CALL of `name` in a stripped source: the name as a whole identifier
   // (a `[\w$]` just before it is a longer identifier, `_resetForArena(`; a
-  // suffix, `readyArenaFighterAll(`, is rejected by the `(` requirement, since
-  // the next char after the name is then a letter), an optional `?.`, then `(`
-  // and a walk to its balanced `)`. Plain, double, and template string
+  // suffix, `readyArenaFighterAll(` or `readyArenaFighter$(`, is rejected by
+  // the requirement that the name be followed by `(` or `?.(` and nothing
+  // else), then a walk to its balanced `)`. Plain, double, and template string
   // literals are skipped (with backslash escapes), so a paren inside a message
   // cannot end the walk early; balanced backticks toggle correctly, so an
-  // ordinary nested template parses too. The model stops at regex literals (a
-  // `/[)]/` inside a call's OWN argument list): an unmatched `(` in one runs
-  // the walk off the end and THROWS (loud); an unmatched `)` in one ends the
-  // walk early and truncates the argument text (quiet), and the net there is
-  // not the throw but the tables: the site is still counted, and a truncated
-  // wipe reads as a passthrough and is REPORTED, so the classification case
-  // reds. Quote state is reset at each call's `(`, so a lone quote elsewhere
-  // in a file (a character class like `/[A-Za-z '-]/` exists in
-  // pet_commands.ts) cannot poison a later call. Any argument spelling is seen
+  // ordinary nested template parses too. The model stops at anything a real
+  // lexer would treat differently INSIDE a call's own argument list: a regex
+  // literal (`/[)]/`, or one holding a lone quote, `/['"]/`, which poisons the
+  // quote arm instead), or a nested template whose inner literal is
+  // paren-unbalanced. There an unmatched `(` runs the walk on until some later
+  // surplus `)` closes it, or off the end (a THROW), and an unmatched `)` ends
+  // the walk early; both misread the argument text, and the net is the tables,
+  // not the throw: a planted site is a new count in some bucket, and an
+  // existing site rewritten that way changes bucket (a truncated wipe reads as
+  // a passthrough and is REPORTED; a swallowed span reads as whatever literal
+  // it holds), so a table reds either way. The one blind combination is a
+  // swallowed span that hides a SECOND call of the same name; no such spelling
+  // exists in the sim tree. Quote state is reset at each call's `(`, so a lone
+  // quote elsewhere in a file cannot poison a later call (the top-level
+  // character class `/^[A-Za-z][A-Za-z '-]{1,15}$/` in pet/pet_commands.ts is
+  // the per-file hazard that reset exists for). Any argument spelling is seen
   // the same way: a bare identifier, a member, an index, a cast, a ternary,
   // calls nested to any depth, a call wrapped over lines. What is NOT a call:
   // a bind (`x.resetForArena.bind`), a property or type slot (`resetForArena:
@@ -268,13 +275,17 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
   // {`, the Sim delegate `private resetForArena(...): void {`, the seam's
   // `resetForArena(...): void;`); the `[;{]` tail keeps a CALL in a ternary's
   // true arm (`cond ? ctx.resetForArena(e) : void 0`) a call. A declaration in
-  // any other FORM is COUNTED (the table reds and a person looks: the safe
-  // direction): a changed return type (`: boolean`, `: Promise<void>`, `: void
-  // | undefined`), an arrow property (`): void => {`), a type-literal member
-  // ending in a comma (`): void,`, which biome rewrites to `;` anyway).
-  // Residues, all recorded: the aliased or bracketed call (`const f =
-  // ctx.resetForArena; f(e)`, `ctx['resetForArena'](e)`) is invisible to any
-  // source scan, the same class of blind spot the Lucent tripwire documents; a
+  // any other FORM that still opens a paren on the name is COUNTED (the table
+  // reds and a person looks: the safe direction): a changed return type (`:
+  // boolean`, `: Promise<void>`, `: void | undefined`), a type-literal member
+  // ending in a comma or a brace (`): void,`, which biome rewrites to `;`
+  // anyway, `): void }`). An arrow-property form (`resetForArena = (e) => {`,
+  // `resetForArena: (e) => void`) never opens a paren on the name and is
+  // simply not seen; none exists for these three functions, and the seam's
+  // bind line is pinned as a non-call below. Residues, all recorded: the
+  // aliased call (`const f = ctx.resetForArena; f(e)`) is invisible to any
+  // source scan and the bracketed one (`ctx['resetForArena'](e)`) to this one,
+  // the same class of blind spot the Lucent tripwire documents; a
   // space or a wrapping paren between the name and `(` (`ctx.resetForArena
   // (e)`, `(ctx.resetForArena)(e)`) is invisible here but biome's formatter
   // rewrites both and the format gate fails a changed file that keeps them;
@@ -363,10 +374,12 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       ['social/arena.ts', 1],
       ['social/fiesta.ts', 1],
     ]);
-    // And the predicate is defined in THIS module: a rename already reds the
-    // table above on its own (the walk finds nothing), so what this pin adds
-    // is the MOVE, the predicate leaving resurrection.ts for another file with
-    // its callers still resolving and the table still green.
+    // And the predicate is defined in THIS module. A rename already reds the
+    // table above (the walk finds nothing), and a move to another file UNDER
+    // src/sim reds it too (the moved definition returns `Aura[]`, so it is
+    // counted as a third row); what this pin adds is the predicate leaving the
+    // sim tree entirely, its callers importing it from outside src/sim with
+    // the table still [arena 1, fiesta 1].
     expect(codeOf(fileURLToPath(new URL('../src/sim/resurrection.ts', import.meta.url)))).toContain(
       `export function ${CLEAN_SLATE_CALL}`,
     );
@@ -385,8 +398,8 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // resetForArena (the wrapper the next case counts the callers of) and,
     // with clearPrep: false, the countdown-end top-off that keeps a fighter's
     // targets. sim.ts: the seam delegate passes its opts through, the one
-    // legal passthrough; any other site that spells neither literal is a
-    // hoisted options object this scan cannot classify and is reported here.
+    // legal passthrough; any other site that spells neither literal (a hoisted
+    // options object, a truncated argument text) is reported here.
     // Per-file counts cannot see two sites in ONE file swapping their
     // literals; that is closed elsewhere: battleground.ts has one keep (the
     // wave) and tests/battleground.test.ts pins it behaviorally, and arena.ts's
