@@ -70,10 +70,22 @@ export interface HeadlightSite {
  * re-rip moving the nose, and a conservative number there is the safe one.
  */
 export const RALLYCART_HEADLIGHTS: readonly HeadlightSite[] = [
-  { x: -0.153, y: 0.211, z: 0.451, radius: 0.025, glow: 0.02 },
-  { x: -0.222, y: 0.215, z: 0.427, radius: 0.024, glow: 0.018 },
-  { x: 0.154, y: 0.205, z: 0.452, radius: 0.025, glow: 0.02 },
-  { x: 0.223, y: 0.21, z: 0.427, radius: 0.024, glow: 0.018 },
+  // Hand tuned on screen, per lamp, and deliberately NOT symmetric. The mesh
+  // came from an image through Tripo, so the two housings genuinely do not
+  // mirror each other and a symmetric table lands at least one lamp off centre.
+  // The measured values are the starting point, not the answer.
+  //
+  // The two INNER lamps sit 3mm BEHIND their measured dish surface. Pushing
+  // them forward reads as better fill face on and wrong from three quarters,
+  // where the dome comes out of the dish. Judge those two off the angle, never
+  // off a front-on screenshot.
+  { x: -0.157, y: 0.211, z: 0.448, radius: 0.025, glow: 0.02 },
+  { x: -0.222, y: 0.215, z: 0.424, radius: 0.024, glow: 0.018 },
+  { x: 0.154, y: 0.209, z: 0.449, radius: 0.025, glow: 0.02 },
+  // Far right: was taken from the vertex CENTROID, which the dense cluster on
+  // its inboard side pulled 4mm out and 3mm low. This is the bounding-box
+  // midpoint of the same dish, which is what actually centres it.
+  { x: 0.219, y: 0.213, z: 0.427, radius: 0.024, glow: 0.018 },
 ];
 
 /** How far the sphere's CENTRE sits behind the dish surface, as a fraction of
