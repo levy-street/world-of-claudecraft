@@ -202,35 +202,48 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 
 // The PvP half of the flask decision, which until now lived only in the
 // resurrection.ts header comment, pinned as WHICH modules reach the clean slate,
-// by all THREE routes: the direct call (arena entry, a Fiesta down); the
-// indirect one, readyArenaFighter(e, { clearPrep: true }), whose clearPrep arm
-// IS the clean slate (src/sim/social/arena.ts); and resetForArena, the one-line
-// wrapper around that call, which arena.ts runs itself and hands out through
-// the SimContext seam (ctx.resetForArena) to modules that never name
-// readyArenaFighter at all. The phase 10 QA found the record wrong twice: first
-// on the readyArenaFighter route (a Protect Yumi down runs fiestaDownEntity and
-// every Yumi revive re-seats with clearPrep: true; Thornhollow Fields seats,
+// by all THREE routes: the direct call (exactly two: the clearPrep arm of
+// readyArenaFighter in src/sim/social/arena.ts, which IS the clean slate, and
+// a Fiesta down, fiestaDownEntity in social/fiesta.ts, which a Protect Yumi
+// down runs too); readyArenaFighter called with clearPrep: true; and
+// resetForArena, the one-line wrapper around that call, which arena.ts runs
+// itself and hands out through the SimContext seam (ctx.resetForArena) to
+// modules that never name readyArenaFighter at all. The phase 10 QA found the
+// record wrong three times: on the readyArenaFighter route (every Yumi and
+// Fiesta revive re-seats with clearPrep: true; Thornhollow Fields seats,
 // starts, ends, and drops a leaver with clearPrep: true; ONLY its wave respawn,
 // clearPrep: false, keeps a flask, the classic-era battleground-death rule the
-// ledger records), then on the resetForArena route (the Yumi match seat and the
+// ledger records), on the resetForArena route (the Yumi match seat and the
 // Vale Cup's kit-swap seat and teardown wipe through it, and the first cut of
-// THIS scan was blind to a new ctx.resetForArena site anywhere). The accounting
-// a flask lives under is therefore: overworld and PvE deaths keep it, a
-// battleground death keeps it, every instanced match's seat and end (and each
+// THIS scan was blind to a new ctx.resetForArena site anywhere), and on the
+// wrapper pattern itself (a call spelled `ctx.resetForArena(e as Entity)` slid
+// past the first bare-identifier regex). The accounting a flask lives under is
+// therefore: overworld and PvE deaths keep it, a battleground or arena death
+// keeps it on the corpse, every instanced match's seat and end (and each
 // Fiesta or Yumi down and revive) clears it; each mode's behavior is pinned in
-// its own suite (battleground, yumi_match, fiesta, vale_cup_match). Absences
-// cannot be asserted by driving the predicates, so the three caller sets are
-// pinned literally here.
+// its own suite (arena, battleground, yumi_match, fiesta, vale_cup_match).
+// Absences cannot be asserted by driving the predicates, so the three caller
+// sets are pinned literally here.
 describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate', () => {
   const SIM_ROOT = fileURLToPath(new URL('../src/sim', import.meta.url));
   const CLEAN_SLATE_CALL = 'aurasSurvivingCleanSlate(';
   const INDIRECT_CALL = /readyArenaFighter\((?:ctx, )?[^)]*clearPrep: true/g;
-  // A CALL of the wrapper: `ctx.resetForArena(e)`, `resetForArena(ctx, e!)`,
-  // `arenaMod.resetForArena(this.ctx, e)`. The `[\w$]+!?\)` tail is what keeps
-  // the three DECLARATIONS out (`resetForArena(ctx: SimContext, e: Entity)`,
-  // the Sim delegate `resetForArena(e: Entity): void`, the seam's
-  // `resetForArena(e: Entity): void;`): each has a `:` where a call has `)`.
-  const WRAPPER_CALL = /resetForArena\((?:this\.)?(?:ctx, )?[\w$]+!?\)/g;
+  // A CALL of the wrapper, in any argument spelling: a bare `e`, a member
+  // (`match.e`, `this.e`), an index, a cast, a ternary, one nested call
+  // (`ctx.entities.get(pid)!`), or a call wrapped over lines. What keeps the
+  // three DECLARATIONS out (`export function resetForArena(ctx: SimContext, e:
+  // Entity): void {`, the Sim delegate `private resetForArena(e: Entity): void
+  // {`, the seam's `resetForArena(e: Entity): void;`) is the RETURN annotation
+  // after the closing paren: `(?!\s*:\s*void\b)`. The seam's bind line
+  // (`resetForArena: sim.resetForArena.bind(sim)`) never opens a paren on the
+  // name. Two residues, both fail-safe or documented: a declaration that
+  // dropped its `: void` would be COUNTED (the table goes red and a person
+  // looks, the safe direction), and a bracketed or aliased call
+  // (`ctx['resetForArena'](e)`, `const f = ctx.resetForArena`) is invisible
+  // here, the same class of blind spot the Lucent tripwire documents; neither
+  // spelling exists in the sim tree, and the per-mode behavioral arms are the
+  // net under this scan for any site that matters.
+  const WRAPPER_CALL = /resetForArena\((?:[^()]|\([^()]*\))*\)(?!\s*:\s*void\b)/g;
   // Comments stripped first, so prose naming the helper (resurrection.ts and the
   // sim/moderation notes both do) cannot mint a call site that does not exist.
   // The line-comment arm keeps a `://` in a URL from eating the rest of its
@@ -297,9 +310,11 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // (startArenaMatch, every arena-family format including Fiesta), the match
     // end (endArenaMatch), and the send-home (returnFromArena). yumi.ts: the
     // match seat. vale_cup.ts: the kit-swap seat (valeCupStandardize) and the
-    // teardown. sim.ts: the one delegate that binds the seam callback, so a
-    // module reaching it as ctx.resetForArena is counted at its own site
-    // above, and the seam's plumbing is counted once here.
+    // teardown. sim.ts: the BODY of the Sim delegate (`private resetForArena`
+    // forwarding to arenaMod.resetForArena), so a module reaching it as
+    // ctx.resetForArena is counted at its own site above and the seam's
+    // plumbing once here; the delegate's declaration line and its bind line
+    // in buildSimContext are not calls and are not counted.
     const files = tsFilesUnder(SIM_ROOT);
     const wrapper = new Map<string, number>();
     for (const f of files) {
@@ -318,17 +333,39 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     expect(arena).toMatch(
       /export function resetForArena\(ctx: SimContext, e: Entity\): void \{\s*readyArenaFighter\(ctx, e, \{ clearPrep: true \}\);\s*\}/,
     );
-    // Positive control for the pattern itself: the three call spellings match,
-    // the three declaration spellings do not.
+  });
+
+  it('the wrapper pattern matches every call spelling and no declaration (its own case, so a table red cannot hide it)', () => {
+    // The three spellings the tree uses today, then the ones a new site could
+    // plausibly be written in (the round-3 probe planted `e as Entity` and the
+    // first regex, a bare-identifier tail, let it through): a member, an
+    // index, a cast, a ternary argument, a call inside a ternary, one nested
+    // call, a differently named context, and a call wrapped over lines.
     for (const call of [
       'ctx.resetForArena(e);',
       'for (const e of entities) resetForArena(ctx, e!);',
       'arenaMod.resetForArena(this.ctx, e);',
+      'ctx.resetForArena(match.e);',
+      'ctx.resetForArena(entities[i]);',
+      'ctx.resetForArena(e as Entity);',
+      'resetForArena(ctx, this.e);',
+      'resetForArena(simCtx, e);',
+      'ctx.resetForArena(cond ? a : b);',
+      'ctx.resetForArena(ctx.entities.get(pid)!);',
+      'resetForArena(ctx, must(e));',
+      'ctx.resetForArena(\n  e,\n);',
+      'ctx.resetForArena( e )',
     ]) {
       expect(call.match(WRAPPER_CALL)?.length, call).toBe(1);
     }
+    expect('cond ? ctx.resetForArena(a) : ctx.resetForArena(b);'.match(WRAPPER_CALL)?.length).toBe(
+      2,
+    );
+    // The declaration spellings, single-line and wrapped, and the seam's bind
+    // line: none is a call.
     for (const decl of [
       'export function resetForArena(ctx: SimContext, e: Entity): void {',
+      'export function resetForArena(\n  ctx: SimContext,\n  e: Entity,\n): void {',
       'private resetForArena(e: Entity): void {',
       'resetForArena(e: Entity): void;',
       'resetForArena: sim.resetForArena.bind(sim),',

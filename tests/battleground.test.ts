@@ -4511,7 +4511,7 @@ describe('flask auras across a Thornhollow Fields match (the phase 10 accounting
       expect(flaskAuras(s, carrier), 'worn in the overworld, before the queue').toHaveLength(1);
     });
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
-    expect(match.state, 'seated, the countdown has not ended').not.toBe('active');
+    expect(match.state, 'seated, the countdown has not ended').toBe('countdown');
     expect([...match.teams[0], ...match.teams[1]]).toContain(carrier);
     expect(flaskAuras(sim, carrier), 'the seat ran the clean slate').toHaveLength(0);
   });
@@ -4539,7 +4539,7 @@ describe('flask auras across a Thornhollow Fields match (the phase 10 accounting
     expect(flaskAuras(sim, pid), 'the wave respawn keeps the flask').toHaveLength(1);
   });
 
-  it('a flask carried IN is cleared at the countdown end (the clean slate the match starts on)', () => {
+  it('a flask quaffed during the form-up is cleared at the countdown end (the clean slate the match starts on)', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     const pid = match.teams[0][0];

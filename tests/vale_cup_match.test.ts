@@ -526,7 +526,7 @@ describe('Vale Cup: match lifecycle', () => {
   // ctx.resetForArena, the clean slate through its wrapper, so a flask carried
   // IN is gone at the seat and one quaffed inside is gone when the match tears
   // down: the sport match is a parenthesis, the same as every arena-family mode.
-  it('a flask carried in is wiped at the kit-swap seat, one quaffed inside is wiped at the teardown', () => {
+  it('a flask carried in is wiped at the kit-swap seat (valeCupStandardize -> ctx.resetForArena)', () => {
     const FLASK = 'ironhusk_flask';
     const sim = makeWorld();
     const flaskAuras = (pid: number) => entity(sim, pid).auras.filter((x) => x.flask === true);
@@ -541,10 +541,16 @@ describe('Vale Cup: match lifecycle', () => {
     const match = currentMatch(sim);
     expect(match.phase).toBe('briefing');
     expect(flaskAuras(a), 'the kit-swap seat ran the clean slate').toHaveLength(0);
+  });
+
+  it('a flask quaffed inside is wiped at the teardown (teardownCupMatch -> ctx.resetForArena)', () => {
+    const FLASK = 'ironhusk_flask';
+    const sim = makeWorld();
+    const flaskAuras = (pid: number) => entity(sim, pid).auras.filter((x) => x.flask === true);
+    const a = addAt(sim, 'warrior', 'Aleph');
+    const b = addAt(sim, 'mage', 'Bet', 4, -40);
+    const match = startBout(sim, a, b);
     // Quaffed INSIDE the match (the sport kit swaps abilities, not bags).
-    readyAll(sim);
-    tickUntil(sim, () => match.phase === 'active', 20 * 5);
-    expect(match.phase).toBe('active');
     sim.addItem(FLASK, 1, b);
     sim.useItem(FLASK, b);
     expect(flaskAuras(b), 'worn inside the live match').toHaveLength(1);

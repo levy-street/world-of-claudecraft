@@ -3270,34 +3270,43 @@ applied in the fix round or recorded below.
   AMENDED at the phase 10 QA (2026-08-16), a correction the whole fan-out
   missed and the fix-round review surfaced: "Protect Yumi likewise does not
   wipe" is FALSE, and Thornhollow Fields wipes more than the sentence says.
-  The clean slate is reached by THREE routes (the fix-round review of the
-  first correction found the third): the direct aurasSurvivingCleanSlate
-  call (arena entry, a Fiesta down); readyArenaFighter with clearPrep: true
-  (its clearPrep arm IS the clean slate); and resetForArena, the one-line
-  wrapper around that call, run by arena.ts at its own seat, end, and
-  send-home and handed out through the SimContext seam (ctx.resetForArena)
-  to modules that never name readyArenaFighter. Through the second route a
-  Protect Yumi down (fiestaDownEntity) and every Yumi revive wipe, and
-  Thornhollow Fields wipes at the seat, at the countdown end, on a leaver,
-  and at the match end; ONLY its wave respawn (clearPrep: false) keeps a
-  flask. Through the third route the Yumi match SEAT wipes, and the Vale Cup
-  wipes at its kit-swap seat (valeCupStandardize) and at the match teardown.
-  So the true accounting is: overworld and PvE deaths keep a flask, a
-  battleground DEATH keeps it (quaffed inside a match it rides through
-  every death in it, the classic-era rule), and every instanced match
-  (arena, Fiesta, Protect Yumi, Thornhollow Fields, Vale Cup) is a
-  parenthesis (nothing carried in rides through the gates, nothing quaffed
-  inside comes back out; Yumi and Fiesta downs clear it too). Corrected in
-  the resurrection.ts note, pinned behaviorally per mode
-  (tests/battleground.test.ts: a flask quaffed inside rides through death +
-  wave respawn, one carried in is wiped at the seat and one quaffed in the
-  form-up at the countdown end; tests/yumi_match.test.ts: seat, down, revive;
-  tests/fiesta.test.ts: seat, down; tests/vale_cup_match.test.ts: kit-swap
-  seat, teardown) and structurally (tests/resurrection.test.ts pins the
-  direct caller set AND the literal per-module tables of both indirect
-  routes, readyArenaFighter clearPrep: true and resetForArena call sites),
-  and the tooltip clause reads "instanced matches begin and end on a clean
-  slate".
+  The clean slate is reached by THREE routes (the fix-round reviews found
+  the third route, then a misattributed down, then a call spelling the
+  wrapper scan let through): the DIRECT aurasSurvivingCleanSlate call, in
+  exactly two places (the clearPrep arm of readyArenaFighter in arena.ts,
+  which IS the clean slate, and a Fiesta down, fiestaDownEntity in
+  fiesta.ts, which a Protect Yumi down runs too); readyArenaFighter called
+  with clearPrep: true; and resetForArena, the one-line wrapper around that
+  call, run by arena.ts at its own seat, end, and send-home and handed out
+  through the SimContext seam (ctx.resetForArena) to modules that never
+  name readyArenaFighter. Through the second route every Yumi and Fiesta
+  revive wipes, and Thornhollow Fields wipes at the seat, at the countdown
+  end, on a leaver, and at the match end; ONLY its wave respawn (clearPrep:
+  false) keeps a flask. Through the third route the arena seat, end, and
+  send-home wipe (Yumi and Fiesta matches end through the same two arena.ts
+  sites), the Yumi match SEAT wipes, and the Vale Cup wipes at its kit-swap
+  seat (valeCupStandardize) and at the match teardown. So the true
+  accounting is: overworld and PvE deaths keep a flask, a battleground or
+  arena DEATH keeps it on the corpse (quaffed inside a battleground match it
+  rides through every death in it, the classic-era rule), and every
+  instanced match (arena, Fiesta, Protect Yumi, Thornhollow Fields, Vale
+  Cup) is a parenthesis (nothing carried in rides through the gates,
+  nothing quaffed inside comes back out; Yumi and Fiesta downs clear it
+  too). Corrected in the resurrection.ts note, pinned behaviorally per mode
+  (tests/arena.test.ts: seat, match end for the winner, send-home for the
+  loser's corpse; tests/battleground.test.ts: a flask quaffed inside rides
+  through death + wave respawn, one carried in is wiped at the seat, one
+  quaffed in the form-up at the countdown end; tests/yumi_match.test.ts:
+  seat, down, and the revive on its own (a flask re-planted on the benched
+  body is gone at the revive); tests/fiesta.test.ts: seat, down;
+  tests/vale_cup_match.test.ts: kit-swap seat, teardown, each its own case)
+  and structurally (tests/resurrection.test.ts pins the direct caller set
+  AND the literal per-module tables of both indirect routes, readyArenaFighter
+  clearPrep: true and resetForArena call sites, the wrapper pattern taking
+  any argument spelling and rejecting the declarations by their return
+  annotation, with its own positive and negative controls in their own
+  case), and the tooltip clause reads "instanced matches begin and end on a
+  clean slate".
   Whether a 20-minute flask should survive the Yumi/Fiesta downs or the
   battleground parenthesis is a maintainer call (RULING below, recommend
   keep: the arena-family clean-slate doctrine).

@@ -33,8 +33,10 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 // Seat a 2v2 Fiesta with four solo-queued players and run the countdown out so
 // the bout is live. Returns the match plus the four pids.
 // `beforeQueue` runs with the four standing in the overworld, BEFORE anyone
-// queues, for arms about what a fighter carries INTO the match.
-function startFiesta(
+// queues, for arms about what a fighter carries INTO the match. queueFiesta
+// stops right after the matchmake tick (the match SEATED, in its countdown);
+// startFiesta runs it on to active.
+function queueFiesta(
   classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'],
   beforeQueue?: (sim: Sim, pids: number[]) => void,
 ) {
@@ -48,6 +50,14 @@ function startFiesta(
     sim.arenaQueueJoin(p, 'fiesta');
   });
   sim.tick(); // matchmake
+  return { sim, pids };
+}
+
+function startFiesta(
+  classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'],
+  beforeQueue?: (sim: Sim, pids: number[]) => void,
+) {
+  const { sim, pids } = queueFiesta(classes, beforeQueue);
   for (let i = 0; i < 20 * 8; i++) {
     sim.tick();
     const m = sim.arenaMatchFor(pids[0]);
@@ -174,13 +184,16 @@ describe('fiesta: flask auras (the phase 10 accounting)', () => {
 
   it('a flask carried in from the overworld is wiped at the arena-family seat', () => {
     let carrier = -1;
-    const { sim, match } = startFiesta(undefined, (s, ps) => {
+    const { sim } = queueFiesta(undefined, (s, ps) => {
       carrier = ps[0];
       s.addItem(FLASK, 1, carrier);
       s.useItem(FLASK, carrier);
       expect(flaskAuras(s, carrier), 'worn in the overworld, before the queue').toHaveLength(1);
     });
-    expect(match.state).toBe('active');
+    // Observed at the SEAT (the countdown has not run out), so the only wipe
+    // between the overworld and here is the match seat itself.
+    const match = sim.arenaMatchFor(carrier)!;
+    expect(match.state).toBe('countdown');
     expect([...match.teamA, ...match.teamB]).toContain(carrier);
     expect(flaskAuras(sim, carrier), 'the seat ran the clean slate').toHaveLength(0);
   });

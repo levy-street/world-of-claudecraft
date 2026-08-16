@@ -167,11 +167,12 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   shared by every death site, PLUS the two "which auras survive this wipe" predicates
   every wipe site routes through so the rule cannot drift: `aurasSurvivingDeath` (death
   and every respawn/resurrect path) and `aurasSurvivingCleanSlate` (the harsher
-  clean-slate wipe, which sheds even the sicknesses: reached directly by arena entry and
-  a Fiesta down, and indirectly by `readyArenaFighter` with `clearPrep: true` and its
-  `resetForArena` wrapper, so every instanced match's seat and end wipes: Thornhollow
-  Fields, Protect Yumi, Vale Cup included; the caller sets are pinned in
-  `tests/resurrection.test.ts`).
+  clean-slate wipe, which sheds even the sicknesses: called directly only inside
+  `readyArenaFighter`'s `clearPrep` arm and by a Fiesta down, and reached from every
+  `readyArenaFighter(..., { clearPrep: true })` site and every call of its
+  `resetForArena` wrapper, so every instanced match's seat and end wipes: arena,
+  Fiesta, Protect Yumi, Thornhollow Fields, Vale Cup; the three caller sets are pinned
+  in `tests/resurrection.test.ts`).
 - `ride_height.ts`: the waterline ride height slope gating reads for wading and
   swimming bodies (gating on the RAW lakebed height reads an uneven bed as a wall of
   cliffs and sticks waders in shore pockets).
