@@ -306,6 +306,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/masterwrought-phase06-tomes/',
       '            /docs/screenshots/masterwrought-phase07/',
       '            /docs/screenshots/masterwrought-phase08-qa/',
+      '            /docs/screenshots/masterwrought-phase10-qa/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',

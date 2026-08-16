@@ -8506,10 +8506,16 @@ export const TARGETS = [
         return { clip: '#ui' };
       }
       if (variant?.picker || variant?.targets) {
-        // Click the Apply Enchant row (the staged reagent's only action).
+        // Click the Apply Enchant row by its act token: the reagent's menu is no
+        // longer a single-action list (the per-copy Lock Item row sits LAST since
+        // #3042), so the old last-row click shot the lock instead of the picker.
         await page.evaluate(() => {
-          const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
-          rows[rows.length - 1]?.click();
+          const row =
+            document.querySelector('#ctx-menu .ctx-item[data-act="applyEnchant"]') ??
+            [...document.querySelectorAll('#ctx-menu .ctx-item')].find((r) =>
+              (r.textContent ?? '').includes('Apply Enchant'),
+            );
+          row?.click();
         });
         await wait(500);
         if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
@@ -9411,6 +9417,203 @@ export const TARGETS = [
         });
       }
       return {};
+    },
+  },
+  {
+    key: 'masterwrought-phase10-consumables',
+    label:
+      'Masterwrought phase 10: flask and role-food tooltips, the Lucent picker gates, the six-kind tray',
+    when: [
+      'content/profession_items',
+      'hud/action_bar/consumable_bar_view',
+      'ui/elixir_tooltip_view',
+      'ui/enchant_apply_view',
+    ],
+    // Five states of the phase 10 consumables and enchant surface, each brought
+    // up through the REAL bound events (pointer hover on a bag row, contextmenu
+    // or tap on the reagent's row, a tap on the tray toggle), never a hand-built
+    // string: the flask tooltip (the shared Use line plus its three rules, the
+    // ranked clean-slate clause included), the role-food tooltip (the Well Fed
+    // line with its one-effect rule), the enchant picker at Enchanting 99 (every
+    // Lucent row inert with its floor line, "Requires Enchanting 100" and 125),
+    // the same picker at 125 (the three apex rows actionable, the Infusion inert
+    // behind its "Only a Perfected item" line, the honest replacement of the
+    // "No eligible item" answer), and the mobile consumable tray with all six
+    // kinds competing for its six slots (potion, elixir, flask, scroll, food,
+    // drink, the flask sitting third). Tooltips are desktop only, the
+    // elixir-use-tooltip rationale (the synthetic hover does not raise #tooltip
+    // on the touch layout); the picker states shoot both layouts because the
+    // gate lines are the only explanation of an untappable row on touch.
+    variants: [
+      { key: 'flask-tooltip', tooltip: 'ironhusk_flask', itemName: 'Ironhusk Flask' },
+      { key: 'food-tooltip', tooltip: 'stonepot_stew', itemName: 'Stonepot Stew' },
+      { key: 'picker-skill-gated', picker: true, skill: 99 },
+      { key: 'picker-skill-gated-mobile', picker: true, skill: 99, mobile: true },
+      { key: 'picker-perfected', picker: true, skill: 125 },
+      { key: 'picker-perfected-mobile', picker: true, skill: 125, mobile: true },
+      { key: 'tray-mobile', tray: true, mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      const staged = await page.evaluate(
+        (tooltipId, wantsPicker, skill, wantsTray) => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          if (tooltipId) {
+            // ONE copy of the reported item, so the bag-cell lookup by display
+            // name below is unambiguous.
+            sim.addItem(tooltipId, 1);
+            return { ok: true };
+          }
+          if (wantsPicker) {
+            // The whole Lucent bill at once so affordability never masks the
+            // gate under test: weapon and chest take lucent 1 + shard 1 +
+            // essence 2/3, boots lucent 1 + dust 4, the Infusion lucent 3 +
+            // shard 2. The applier's flat Enchanting skill is written on the
+            // primary meta, the same map craftingIdentity derives from live.
+            sim.addItem('lucent_reagent', 6);
+            sim.addItem('arcane_shard', 4);
+            sim.addItem('arcane_essence', 6);
+            sim.addItem('arcane_dust', 8);
+            const meta = sim.players.get(sim.playerId);
+            if (!meta?.craftSkills) return { ok: false, reason: 'no primary meta craftSkills' };
+            meta.craftSkills.enchanting = skill;
+            return { ok: true };
+          }
+          if (wantsTray) {
+            // Six kinds, one of each; with the starter jerky already holding
+            // a food slot that is seven consumables for six slots, so the shot
+            // shows the tray's priority fill live: potion, elixir, flask (third,
+            // its phase 10 rank), scroll, both foods, and the drink shed off the
+            // end, exactly the recorded trade the phase 14 residual describes.
+            for (const id of [
+              'minor_healing_potion',
+              'elixir_of_the_boar',
+              'ironhusk_flask',
+              'sunpetal_scroll',
+              'stonepot_stew',
+              'spring_water',
+            ]) {
+              try {
+                sim.addItem(id, 1);
+              } catch {}
+            }
+            return { ok: true };
+          }
+          return { ok: false, reason: 'unknown variant' };
+        },
+        variant?.tooltip ?? null,
+        Boolean(variant?.picker),
+        variant?.skill ?? 0,
+        Boolean(variant?.tray),
+      );
+      if (!staged.ok) throw new Error(staged.reason);
+      // Writing the skill trips the once-ever first-tier tutorial modal
+      // (profTierTutorial) a tick or two later; wait for it and dismiss it
+      // through its own OK button so the picker is not shot behind a modal.
+      // Polled rather than a fixed wait: the tick that raises it lands at a
+      // different delay per boot, and a too-early click misses it.
+      const dismissTierTutorial = async () => {
+        if (await pollForSize(page, '#profession-tutorial', 8, 250)) {
+          await page.evaluate(() => {
+            document.querySelector('#profession-tutorial .cd-ok')?.click();
+          });
+          await wait(300);
+        }
+      };
+      if (variant?.picker) await dismissTierTutorial();
+      if (variant?.tray) {
+        // The tray toggle is a bindTouchTap target; a plain click reaches its
+        // onTap through the click arm, the same path a synthesized tap takes.
+        const opened = await page.evaluate(() => {
+          const toggle = document.getElementById('mobile-consumables-toggle');
+          if (!toggle) return false;
+          toggle.click();
+          return document.body.classList.contains('mobile-consumables-open');
+        });
+        if (!opened) throw new Error('mobile consumable tray did not open');
+        await wait(600);
+        return { clip: '#ui' };
+      }
+      // Bags for the tooltip hover and the reagent's action menu.
+      await page.evaluate(() => {
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      if (variant?.tooltip) {
+        const hovered = await page.evaluate((itemName) => {
+          const rows = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+          const el = rows.find((r) => (r.getAttribute('aria-label') ?? '').includes(itemName));
+          if (!el) return false;
+          const r = el.getBoundingClientRect();
+          for (const type of [
+            'pointerenter',
+            'pointerover',
+            'mouseenter',
+            'mouseover',
+            'pointermove',
+            'mousemove',
+          ]) {
+            el.dispatchEvent(
+              new MouseEvent(type, {
+                bubbles: true,
+                clientX: r.left + r.width / 2,
+                clientY: r.top + r.height / 2,
+              }),
+            );
+          }
+          return true;
+        }, variant.itemName);
+        if (!hovered) throw new Error(`no bag row for ${variant.itemName}`);
+        await wait(600);
+        return { clip: '#ui' };
+      }
+      // Open the reagent's action menu through the real handler (contextmenu on
+      // desktop, a tap on the mobile-touch layout), then its Apply Enchant row.
+      const opened = await page.evaluate(() => {
+        const rows = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+        const el = rows.find((r) =>
+          (r.getAttribute('aria-label') ?? '').includes('Lucent Reagent'),
+        );
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        el.dispatchEvent(
+          new MouseEvent(
+            document.body.classList.contains('mobile-touch') ? 'click' : 'contextmenu',
+            {
+              bubbles: true,
+              cancelable: true,
+              clientX: r.x + r.width / 2,
+              clientY: r.y + r.height / 2,
+            },
+          ),
+        );
+        return true;
+      });
+      if (!opened) throw new Error('no Lucent Reagent bag row to open the action menu on');
+      if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('action menu did not open');
+      // By act token, never by position: the reagent's menu is Use / Apply
+      // Enchant / Lock Item, and the lock row is last (#3042).
+      const drilled = await page.evaluate(() => {
+        const row = document.querySelector('#ctx-menu .ctx-item[data-act="applyEnchant"]');
+        if (!row) return false;
+        row.click();
+        return true;
+      });
+      if (!drilled) throw new Error('no Apply Enchant row on the Lucent Reagent menu');
+      await wait(500);
+      if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
+      // A late modal must not sit over the picker; the picker itself stays
+      // open (the modal is not a click on the menu's outside).
+      await page.evaluate(() => {
+        document.querySelector('#profession-tutorial .cd-ok')?.click();
+      });
+      await wait(300);
+      return { clip: '#ui' };
     },
   },
 ];

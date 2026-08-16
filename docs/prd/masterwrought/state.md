@@ -3760,3 +3760,250 @@ instance), and the 0.38.2 version surfaces. Merged as be0da18c94.
   tip of this QA session (the maintainer directive for a sync touching
   src/sim/content + src/render bytes), together with the accepted-art
   second seal layer, after every fix round has landed.
+
+## Phase 10 QA ledger (2026-08-16, verdict PASS-WITH-FOLLOWUPS)
+
+Fresh session on top of the third sync (be0da18c94, above). The audit ran as
+an eight-dimension ultracode workflow (correctness, exclusivity/stacking,
+guard, i18n/prose truth, content obligations, cleanup, design ratification,
+and a decisiveness/mutation audit in an ISOLATED worktree provisioned at the
+exact tip with the phase-close sha checked as an ancestor before probing:
+44 mutations tried, 39 killed by a named test, 5 survived) with two-lens
+adversarial verification of every non-nit finding (18 verified, 17 upheld,
+1 refuted: the S3-corpus claim about mobile_station.ts, refuted correctly by
+the professions directory glob, the third time this class has come up), plus
+the six repo reviewers dispatched through the Agent tool (architecture 0
+blocking / 3 should-fix / 7 notes; cross-platform no drift, 3 info;
+test-coverage 2 blocking pin gaps + 3 should-fix + 6 nits; content
+obligations PASS + 1 warning + 3 info; frontend seam 0 blocking / 6
+should-fix / 5 notes; qa-checklist NOT READY at the tree level solely for
+the two standing ruling reds, the phase 10 diff itself with no blocking
+defect). No auditor found a blocking correctness defect in the shipped
+mechanics: the flask arm, the death predicates, the Well Fed grant, the
+capstones, the deny ladder, and every increment recomputed exactly as the
+ledger records them.
+
+### Findings, and what the fix round did with them (four commits
+f877abad7c, a6d2caf313, 94cb93f0fc, c948dccd83; every finding applied,
+recorded, or refuted with the file open)
+- PIN GAPS (blocking, closed): the apex arm of enchantGainTier had no
+  assertion anywhere (deleting it regraded the dust-only boots enchant to
+  tier 0 in silence; APEX_TIER_REAGENT exported, the tier pinned with its
+  quality premise, isApex reads the export); the minting tripwire's shape
+  veto missed every shared-line mint whose value was not the literal true
+  (||=, &&=, a non-literal colon value, the shorthand property, a trailing
+  comment carrying a legal token): rebuilt STRUCTURALLY (comment-stripped
+  classification, any colon value except the ?: declaration, every
+  compound assignment, the shorthand forms, a residue rule that fails any
+  line where an exact perfected token survives after removing the legal
+  reads, per-arm write pins, the escaping spellings as positive controls,
+  and a legal class for perfected-PREFIXED identifiers the picker now
+  mints, perfectedMet and friends). Also closed: the deny ladder's other
+  two pairwise orderings at both twins, the flask strip's fade event, the
+  delve-DEATH respawn site (releaseSpiritInDelve; the eject was pinned, the
+  death was not), the clear-then-grant order (patching sim.ctx.applyAura,
+  restored in a finally), the flask sort rung, the same-KIND decoy for the
+  strip keying, the localized "You set up X." round trip through ja_JP,
+  the clean-slate caller scan (arena + fiesta only, shared walker), the
+  Laden Hearth driven end to end through useItem, the well_fed icon recipe,
+  the tray shed order plus the ACCEPTED flask starvation (four potions +
+  two elixirs + a flask shows no flask, the phase 14 residual now pinned
+  as such), the capstone rungs, the Well Fed aura name in the matcher walk,
+  and the flask marker pinned OFF both aura wires.
+- LEDGER CORRECTIONS the auditors forced: (1) Aura.flask crosses NO wire at
+  all: the party-frame payload projects each aura through
+  preparePartyFrameAuras into PartyFrameAuraSummary (id/kind/neg/remaining/
+  poolPct), so the phase's "crosses on the party frames but not the entity
+  channel" note was factually wrong; both projections are now pinned. (2)
+  "Five non-Latin refreshes shipped in-change" overstated: of the 19 guide
+  keys the phase reworded, 9 were refreshed in the five non-Latin overlays,
+  10 were byte-unchanged (three still carrying the retired claims); this
+  QA refreshed all of them (below). (3) A flask does survive an ordinary
+  reconnect: the server holds a dropped session in-world for the linkdead
+  grace (server/linkdead.ts, five minutes), so the loss surface is a
+  deliberate logout, an expired grace, or a realm restart; and the timer
+  PAUSES while dead (updateAuras early-returns for a dead entity), so a
+  death extends a flask by the time spent dead (classic flasks kept
+  ticking; a fidelity nuance recorded, not changed: the shared dead guard
+  is what the sicknesses rely on). Both now in the resurrection.ts comment.
+  (4) The enchant bills: weapon and chest apex = the slot's Greater bill
+  plus lucent_reagent 1 (only boots step their dust 3 -> 4); the hearth
+  bill carries sunpetal_herb 2 beside its meats. (5) The phase 07 demand
+  math ("3 of the intermediate per apex recipe") does not hold for the
+  consumable arms, which take ONE per batch (2 flasks / 4 plates), so a
+  flask costs one catalyst-day per two flasks. (6) The flask duration
+  1200 rests on the ladder's ONE non-zero duration step (600/900/900), not
+  a uniform ladder; the classic 2x-elixir reading would give 1800, the flat
+  reading 900; 1200 is the conservative rung (comment corrected). (7) foodHp
+  1392 follows the classic band ladder (61/243/552/874/1392/2148); the
+  shipped 980 is an off-band value, not a band (comment corrected). (8) The
+  role-food sellValue 90 is set by the BATCH (4 x 90 = 360 under the ~422
+  bill; Marlow's per-plate 150 would make a 600 faucet), and the "multi-
+  output curve" anchor the comment cited did not exist (both anchors are
+  single-output): comment rewritten to the real constraint; the visible
+  epic-under-rare vendor price is a RULING below. (9) The enchants.ts header
+  said "sta +6 on the chest" where the apex chest step is +3 (+3 again to
+  the Infusion). (10) The tray-order comment justified the flask's rank
+  with a wipe re-apply that the flask's own death persistence contradicts.
+- PROSE TRUTH (the reword-staleness class, twice over): three false claims
+  the phase minted or missed, all verified against archetype.ts gain math
+  and the live recipe rows before rewording: the enchanting levelingBody
+  said crafting the Lucent Reagent moves Enchanting skill (it teaches zero
+  to everyone: skillReq 75 = tier 3, above the rare ceiling every
+  enchanter works under since Enchanting has no oath pair and is never a
+  major); the alchemy/jewelcrafting/inscription identityBody rows said
+  every rung the trainer teaches sits inside the rare tier and the found-
+  pattern rung is the only exception (each trainer also teaches a 75-rung
+  intermediate, Quickening Catalyst / Prismglass Setting / Sablewax Vellum,
+  above that ceiling); the jewelcrafting/inscription ladderBody rows said
+  every rung is trainer work (the phase 09 found-pattern rung is not).
+  Also: the alchemy routeBody never named the Grand Cauldron while the
+  cooking twin names the Hearth; trainingBody and the professions FAQ read
+  as if only Enchanting had a 75 rung (every craft adds one); the enchant
+  note counted two shard sinks (the Lucent tier is a third) and named no
+  skill floors; the wiki enchant table could not show the 100/125 floors or
+  the Perfected gate (build_content now emits skillReq + perfectedOnly, the
+  page renders a Skill column and a "Perfected only" badge, new key
+  guide.profPages.ench.perfectedOnly with its five non-Latin fills). Every
+  reworded key stripped its remaining stale Latin rows (13 rows of
+  alchemy.routeBody; every other reworded key was already Latin-pending)
+  and refreshed all five non-Latin rows: 17 keys x 5 locales = 85 rows,
+  translated by one agent per locale and then verified by a fresh reviewer
+  per locale (ja 17/0, zh_CN 17/0, ko 14/3, ru 9/8, zh_TW 12/5; every FIX
+  applied verbatim, then a mechanical sweep: placeholder sets, paragraph
+  counts, dashes, script family, all 85 clean). On the way the translators
+  repaired pre-existing non-Latin defects the English never carried (the
+  double-batch Serpent "stays unsigned" inversion in ja/ko/zh_CN/zh_TW/ru,
+  an invented "ten crafts per minute" throttle and "+1%/+2%" figures in the
+  weaponcrafting route). Register splits the verifiers flagged for the
+  release fill are listed under release-fill obligations.
+- TOOLTIPS: Well Fed now states its one-shared-effect rule (a newer meal
+  replaces it); the flask line states the ranked clean slate.
+- THE ENCHANT PICKER (three false statements found by the frontend seam
+  review, fixed): during the online unsynced window the picker read
+  craftSkills with no synced gate and painted "skill too low" on a master
+  enchanter (and the online.ts comment claimed the opposite); the Lucent
+  Infusion was selectable at 125 and answered "No eligible item to enchant."
+  although nothing can be Perfected yet; the skill line named no floor. The
+  pure core takes one EnchantViewerInput (synced, enchantingSkill, the worn
+  set): unsynced skips the skill dimension entirely (the
+  recipe_pattern_tooltip_view contract, the sim stays the authority), a
+  requiresPerfected row carries perfectedMet and paints inert with the
+  notPerfected line until a candidate copy carries the marker (hover and
+  click agree; step two's noTargets is unreachable for the Infusion), and
+  the skill line states the floor through the crafting-window family key
+  ("Requires Enchanting 100"), which gives EnchantPickRow.skillReq its
+  consumer. The gate lines join the 13px touch bump beside the danger meta
+  (the danger selector stays LAST: the sizing pin's block regex depends on
+  it). The picker's worn-arm READ was deliberately not switched: the LIG-2
+  finding is right that a THIRD option exists (IWorld.equipmentInstances,
+  the self mirror, ships meta.equipmentInstance whole in both hosts, so the
+  eqi decision only concerns inspecting viewers), but the peer read feeds
+  wornEnchantTargets' wireTrimmed pin cluster; recorded in
+  copyMeetsPerfectedGate, openTargetPicker, the tripwire header, and the
+  phase-12 carry as the recommended phase 12 path.
+- THE WYRMFALL LETTER (the branch-owned phase 04 defect the sync audit
+  left for this fan-out; confirmed the ONLY letter gap): both client letter
+  registries now derive from ONE authoredLettersById builder in
+  content/letters.ts; entity_i18n_guards pins the two key sets equal in
+  both directions plus the Wyrmfall row by name; the localization_coverage
+  hand count grew 3 -> 4 singleton letters with the reason recorded.
+- TYPES: one named TimedStatBuffPayload for the three copies of the aura
+  payload shape (rule of three); FoodItemDef bars elixir, ScrollItemDef and
+  FlaskItemDef bar foodHp/drinkMana (symmetric never-fields).
+- SCREENSHOTS (the phase shipped none, a repo requirement): a
+  masterwrought-phase10-consumables target in scripts/pr_shot_targets.mjs
+  (seven states through the real bound events, lowest preset), captures
+  committed under docs/screenshots/masterwrought-phase10-qa/ (flask and
+  role-food tooltips, the picker at 99 and at 125 on desktop and mobile,
+  the six-kind mobile tray showing the recorded trade live), the five
+  ci.yml sparse cones and the test literal extended (the standing
+  sparse-cone obligation). Rig rot fixed on the way: the reagent's action
+  menu now ends with the #3042 Lock Item row, so the p13-bag-actions
+  target's last-row click shot the lock instead of the picker; both sites
+  now select the Apply Enchant row by its act token.
+- RATIFIED with fresh eyes (design_ratify dimension): (a) refuse-downward /
+  replace-upward is the right reading of the pairing wording (the later-
+  classic retail flask rule; refuses before consuming; the band pin makes
+  "weaker" true); (c) session-bound flasks: keep, with the linkdead
+  correction above; (d) every increment recomputes as exactly one rung.
+- REFUTED / no-change (do not re-raise): the S3 corpus claim (professions
+  directory glob); the retired guide.profPages.ench.enchantsNote key
+  ("three tiers", unrendered) is a deliberately RETIRED key under the
+  guide_key_coverage doctrine that keeps retired keys for their 21 locale
+  rows, not an orphan to delete; the flask-vs-different-stat-elixir stack
+  (family-keyed, deliberate); the belt-and-braces recalc after the strip
+  (unobservable, documented redundancy); Well Fed born one tick short
+  (599.95, the shared per-tick order); not_perfected swallowing not_held
+  for a mismatched slot (the documented ladder); the wellFed reference into
+  the content table (house style, like def.elixir; now stated in the
+  Consuming comment).
+
+### Rulings taken or wanted (see the report; standing ones re-stated)
+- WANTED (new this QA): D10-B1 the capstone dispenser/feast divergence:
+  the shipped party field-crafting stations hand a non-crafting party
+  member nothing, and the phase-15 kit premise still lists "feast" as a
+  buff source; option A is a bounded serve-at-station amplifier on the
+  family's eachPartyStationInRange walker (a flask quaffed or a role food
+  finished within STATION_RADIUS of an active capstone also lands on the
+  party in range), option B is to ratify the stations and correct the
+  phase-15 premise. D10-D1 the Lucent weapon tier has no int twin although
+  every lower weapon rung pairs str with int (the #1712 review): add
+  enchant_weapon_lucent_spellpower (int 7, same bill, skillReq 100, name +
+  fills + wiki + the int magnitude pin 24 -> 26) or record the omission.
+  STK-2 flask auras are offensively dispellable (school nature, no
+  undispellable flag) and Spellplunder copies the FLASK MARKER onto the
+  thief: stamp undispellable on flask auras (classic consumable buffs
+  carried no dispel type) or keep purgeable and strip the marker in the
+  steal copy; either way a pin. Q2 the role-food sellValue inversion (epic
+  90 under Marlow's rare 150) stands on the batch math: accept, or treat
+  Marlow's 150 as the outlier. FE6 the low-tier aura cap (8 visible) can
+  shed a flask or Well Fed icon while a re-quaff spends a unit
+  unconditionally: record flask timers as cosmetic (the settled buffs
+  doctrine) or add the elixir family ids to NEVER_SHED_IDS (the marker is
+  not client-side). I18N-06/CO-7 the four aura display names (Ironhusk
+  Vigor, Warboar Might, Runewater Clarity, Well Fed) are not in the naming
+  registry and "Well Fed" is WoW's verbatim same-role buff name: register
+  as GENERIC-with-caveat (the shipped elixir aura names are unregistered
+  too) or rename.
+- STANDING (re-surfaced): the two ruling reds (bags sunspun_haversack, the
+  rogue band assassination 170.383), reliquary curation for the four
+  crafted epic tools, forge world-visibility, the flask logout-persistence
+  schema call (recommendation: keep session-bound at 1200s; the sickness
+  fields are the cheap persistence shape if taken), the provisional
+  Infusion slot/stat (defer to 12 is fine).
+
+### Release-fill obligations minted or widened at this QA
+- 13 more Latin rows pending (alchemy.routeBody), plus the new
+  guide.profPages.ench.perfectedOnly key in 15 Latin locales.
+- Register splits the verifiers flagged, all pre-existing and outside the
+  17 refreshed keys: ja alchemy.ladderBody still writes Elixir of the Bear /
+  Serpent in Latin beside the now-localized route row; ja "ルーンの革"
+  (prose) vs "ルーンの獣皮" (enchant name key); ko cooking.materialsBody
+  "사냥 고기" vs the item's "야생 고기"; ko faq.a6's own register
+  (제작법/스승/작업장) vs the craftProse rows; ru enchantsNoteOffhand
+  paragraph 2 keeps the Runed/Resonant names in Latin while the table
+  renders the Cyrillic enchant names, and "Стойкость" for Stamina in the
+  guide prose vs "Выносливость" in itemUi.stats; zh_CN faq.a10 and
+  professions.toolEffectsBody store a literal backslash-n; the retired
+  enchantsNote row (all locales) still says three tiers and carries the
+  older Runed/Resonant coins (unrendered, cleanup only). The Latin
+  craftProse rows generally keep NPC/place/deed names in Latin where the
+  entity rows localize them (the untouched neighborhood, one future sweep).
+
+### Phase 11 / 12 / 14 carries added
+- Phase 12: the third worn-arm option (above) is written into the
+  phase-12 carry; the picker's perfectedMet row means minting simply makes
+  the Infusion row actionable, no picker copy change owed; the tripwire's
+  perfected-prefixed identifier class must not be widened to the bare field.
+- Phase 14: the tray flask starvation is now pinned as accepted; the
+  flask/elixir shared glyph note stands (a flask_<kind> icon needs the
+  marker on the wire, a cross-platform change).
+- Phase 15 (R5): the design_ratify rough math puts the consumables alone at
+  about 3 percent of physical white DPS and the full physical kit at 4.2 to
+  4.7 percent (tank EHP about 5 percent before Perfected pieces); measure
+  the DPS kits with the serpent elixir already in the baseline, and treat
+  flask 15 / well-fed 6 as the first tune-down knobs, never the formulas.
+
+### Validation record
+(filled at close)
