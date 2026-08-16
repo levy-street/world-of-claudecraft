@@ -408,15 +408,17 @@ export function equipBag(
   // park an instance payload or a craftedRecipeId while a bag is worn, so
   // equipping a payload-bearing copy would silently destroy it on the next
   // unequip's plain addStacked grant. Not reachable through shipped content
-  // today: no bag recipe or grant currently carries one (tests/bags.test.ts
-  // pins that no CRAFTABLE bag-kind item def is authored at a signable
-  // material rarity, the one live-content vector craftedRecipeId's own kind
-  // check does not close; two shipped bags already sit at rare/epic quality,
-  // but both are recipe-free loot drops granted plain). Bags are DECLARED
-  // payload-free here rather than merely assumed: peek the copy that would
-  // be consumed BEFORE consuming it (refusing late would have already
-  // removed it) and refuse the equip outright the moment one ever does carry
-  // a payload, whatever the source, rather than dropping it.
+  // today: no bag grant carries one, BY CONSTRUCTION since the phase 10 QA
+  // ruling (2026-08-16) exempted kind 'bag' from the crafting signer mint
+  // (crafting.ts mintsSignerPayload), so even the epic craftable
+  // sunspun_haversack lands plain (tests/bags.test.ts pins that no crafted
+  // bag copy carries a payload; craftedRecipeId's own kind check closes the
+  // other vector, and the two rare/epic loot bags are recipe-free drops
+  // granted plain). Bags are DECLARED payload-free here rather than merely
+  // assumed: peek the copy that would be consumed BEFORE consuming it
+  // (refusing late would have already removed it) and refuse the equip
+  // outright the moment one ever does carry a payload, whatever the source,
+  // rather than dropping it.
   const peeked =
     slotIndex !== undefined
       ? selectedInventorySlot(meta.inventory, itemId, slotIndex)

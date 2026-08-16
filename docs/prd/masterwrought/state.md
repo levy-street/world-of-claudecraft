@@ -4475,6 +4475,28 @@ recorded, or refuted with the file open)
   gating unaffected.
 
 ## Phase 11 ruling executions (2026-08-16, the five items owed at the head)
+- (a1) Bag signer exemption, OUTCOME 2026-08-16: kind 'bag' is exempt from
+  the #1149 crafting signer mint per ruling (1). The gate is the new exported
+  mintsSignerPayload in crafting.ts (isSignableMaterialRarity AND kind not
+  'bag'), feeding BOTH the #2350 admission capacity model and the resolve
+  grant arm (the craftBonusStatsFor one-exported-gate precedent, so the twins
+  cannot drift); the craft_rare deed mark deliberately keeps reading
+  isSignableMaterialRarity (the exemption is the MINT, not the rarity
+  milestone). The bag's other payload arms were verified structurally closed
+  (no stats so craftBonusStatsFor is null; bags are not commission
+  eligible). tests/bags.test.ts re-scoped per the ruling with the dated
+  OUTCOME note: a unit pin on the gate both ways, a behavioral sweep
+  crafting EVERY bag recipe end to end through resolveCraftForRecipe (the
+  real records: trainer-taught silkspun_satchel and drop-taught
+  sunspun_haversack, learned through their own channels, at their real loom)
+  asserting the granted copy carries no instance and no craftedRecipeId AND
+  equips, plus a positive control (an epic non-bag output through the same
+  resolver still signs, so the plain bag is the exemption firing, not a dead
+  signer arm). equipBag's comment premise re-cut to by-construction. Suites:
+  bags 48/48, professions_crafting + professions_masterwork +
+  gather_rare_events + architecture green, tsc clean, biome clean. With
+  (a2) below, the standing reds are CLOSED: the full suite is expected fully
+  green for the first time since the third phase 10 QA sync.
 - (a2) Rogue band re-pin, OUTCOME 2026-08-16: tests/rogue_dps_balance.test.ts
   re-pinned to the merged-tree loadout per ruling (1). Assassination re-bands
   180..195 to 165..180 around the measured 170.383; the sibling-ordering

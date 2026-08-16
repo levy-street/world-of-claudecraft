@@ -149,6 +149,27 @@ export function craftBonusStatsFor(
   });
 }
 
+// The #1149 signer-mint gate, with the #2837 bag exemption (Masterwrought
+// phase 10 QA ruling 1, taken 2026-08-16). Bags are declared payload-free:
+// equipBag refuses any payload-carrying copy (bags.ts) because meta.bags can
+// only hold a bare item id, so a signer payload on a crafted bag would make
+// the freshly crafted copy unequippable, exactly what the first epic
+// craftable bag (sunspun_haversack) would have hit. Kind 'bag' is therefore
+// exempt from the signer mint and a crafted bag always lands as a plain
+// fungible grant (its other payload arms are structurally closed: a bag has
+// no stats so craftBonusStatsFor is null, and bags are not commission
+// eligible). Like craftBonusStatsFor above, this is the ONE exported gate
+// feeding BOTH the #2350 admission capacity model and the resolve grant arm,
+// so the two cannot drift. The craft_rare deed mark deliberately keeps
+// reading isSignableMaterialRarity directly: the exemption is the signer
+// MINT, never the rarity milestone itself.
+export function mintsSignerPayload(
+  def: ItemDef | undefined,
+  outputQuality: MaterialRarity,
+): boolean {
+  return isSignableMaterialRarity(outputQuality) && def?.kind !== 'bag';
+}
+
 // Re-export for callers that already import from crafting.ts.
 export { CRAFT_BATCH_MAX } from '../content/professions';
 
@@ -632,7 +653,7 @@ export function evaluateCraftAdmission(
       }
     }
     const shapes: InvSlot[][] = [];
-    if (isSignableMaterialRarity(outputQuality)) {
+    if (mintsSignerPayload(def, outputQuality)) {
       const payload: ItemInstancePayload = { signer: meta.name };
       if (commissioned) payload.bindOnTrade = true;
       shapes.push([{ itemId: recipe.resultItemId, count: recipe.resultCount, instance: payload }]);
@@ -892,7 +913,7 @@ export function resolveCraftForRecipe(
         });
       }
     }
-  } else if (meta && isSignableMaterialRarity(outputQuality)) {
+  } else if (meta && mintsSignerPayload(def, outputQuality)) {
     const payload: ItemInstancePayload = { signer: meta.name };
     if (commissioned) payload.bindOnTrade = true;
     ctx.addItemInstance(recipe.resultItemId, payload, pid, recipe.resultCount, {
