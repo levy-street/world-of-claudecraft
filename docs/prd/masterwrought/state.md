@@ -4242,6 +4242,43 @@ recorded, or refuted with the file open)
   schema call (recommendation: keep session-bound at 1200s; the sickness
   fields are the cheap persistence shape if taken), the provisional
   Infusion slot/stat (defer to 12 is fine).
+- RULINGS TAKEN by Fernando in-session (2026-08-16), all twelve, each the
+  recommended option:
+  (1) The two standing reds: ACCEPT the phase design and re-pin. For the
+      bags red this is option (a) of the sync record above: exempt kind
+      'bag' from the crafting signer mint (resolveCraftForRecipe's
+      isSignableMaterialRarity arm) so a crafted sunspun_haversack carries
+      no payload and equipBag admits it, and re-scope the pin to "no
+      crafted bag copy carries a payload" with a dated OUTCOME note; for
+      the rogue band it is a re-pin of tests/rogue_dps_balance.test.ts to
+      the merged-tree loadout (assassination 170.38 with the wyrmfall
+      pendant and prismglass loop, its band and the sibling-ordering claim
+      restated to what the apex jewelry stat shape yields), again with a
+      dated OUTCOME note. Both are sim-or-balance work with their own
+      review and gate cycle: OWED at the head of phase 11 (below), not
+      slipped into this QA's close.
+  (2) FLASK-PARENTHESIS: keep the arena-family clean-slate doctrine as
+      shipped and pinned (no carve-out).
+  (3) Flask logout persistence: keep session-bound at 1200s (no schema).
+  (4) D10-B1: ratify the party field-crafting stations; correct the
+      phase-15 kit premise to drop the feast (docs, phase 15's file).
+  (5) D10-D1: ADD the Lucent weapon int twin (enchant_weapon_lucent_
+      spellpower, int 7, same bill, skillReq 100, name + M16 fills + wiki
+      regen + the int magnitude pin 24 -> 26): OWED, phase 11.
+  (6) STK-2: stamp flask auras undispellable (classic consumable buffs
+      carried no dispel type); Spellplunder cannot take them; pin both:
+      OWED, phase 11 (sim change, its own review).
+  (7) Q2: accept the role-food sellValue batch math (epic 90 under
+      Marlow's rare 150); recorded as deliberate.
+  (8) FE6: flask timers are cosmetic under the settled buffs doctrine;
+      the low-tier aura cap may shed the icon; recorded.
+  (9) I18N-06 / CO-7: register the four aura display names (Ironhusk
+      Vigor, Warboar Might, Runewater Clarity, Well Fed) as
+      GENERIC-with-caveat in the naming registry: OWED, phase 11 (docs).
+  (10) Reliquary: the four crafted epic tools stay OUT of the Reliquary
+       (crafted tools are not conquerable unique loot).
+  (11) Forge world-visibility: party-visible, as shipped.
+  (12) Infusion slot/stat: DEFERRED to phase 12, which mints the marker.
 
 ### Release-fill obligations minted or widened at this QA
 - 13 more Latin rows pending (alchemy.routeBody), plus the new
@@ -4262,6 +4299,11 @@ recorded, or refuted with the file open)
   entity rows localize them (the untouched neighborhood, one future sweep).
 
 ### Phase 11 / 12 / 14 carries added
+- Phase 11, at its HEAD (from the rulings taken above): the two-reds
+  execution (bag signer exemption + re-scoped pin; rogue band re-pin), the
+  Lucent weapon int twin, undispellable flask auras with the Spellplunder
+  pin, the four aura names in the naming registry, and the phase-15 kit
+  premise correction. Each with its own review and gate cycle.
 - Phase 12: the third worn-arm option (above) is written into the
   phase-12 carry; the picker's perfectedMet row means minting simply makes
   the Infusion row actionable, no picker copy change owed; the tripwire's
