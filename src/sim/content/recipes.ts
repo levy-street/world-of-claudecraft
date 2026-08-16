@@ -2498,7 +2498,9 @@ export const APEX_GEAR_RECIPES: ProfessionRecipeRecord[] = [
 // anyway; skillReq shapes teachability, the gold fee, the masterwork proc, and
 // skill gain, so the rung reads as the prestige marker it is. Their bills
 // mirror recipe_masters_field_forge: 3 of the craft's intermediate, 2 Wyrmfall
-// Cores, then the craft's gathered family.
+// Cores, then the craft's gathered family (the hearth's meats plus the shared
+// sunpetal herb that Marlow's roast and the three role dishes already carry,
+// so the mirror is by shape, not by literal item list).
 //
 // acquisition ['drop'] on every row per R8, same as the other two apex arrays:
 // the patterns land as drops and heroic-marks vendor rows in phase 11, so

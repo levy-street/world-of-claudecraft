@@ -107,15 +107,17 @@ const itemStringsEn = {
       // that promised only the death half would be read as promising both.
       flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
       flaskOutranks: 'A weaker elixir or scroll of the same stat cannot replace it.',
-      flaskThroughDeath: 'The effect remains through death, but ends when you log out.',
+      flaskThroughDeath:
+        'The effect remains through death, but ends when you log out; a ranked match starts with a clean slate.',
       // Well Fed (elixir_tooltip_view.ts): the buff a finished meal leaves.
       // The "after you finish eating" clause is load-bearing, not padding:
       // standing up early grants nothing at all, so the tooltip has to say
       // where the buff comes from. Second key is the unmapped-kind fallback,
       // the useElixirAura pattern.
       wellFed:
-        'Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating.',
-      wellFedAura: 'Well Fed: Grants {aura} for {minutes} min once you finish eating.',
+        'Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
+      wellFedAura:
+        'Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed

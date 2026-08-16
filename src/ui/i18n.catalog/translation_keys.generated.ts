@@ -6011,6 +6011,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.ench.enchantsNote'
   | 'guide.profPages.ench.enchantsNoteOffhand'
   | 'guide.profPages.ench.meleeWeapons'
+  | 'guide.profPages.ench.perfectedOnly'
   | 'guide.profPages.ench.salvageHeading'
   | 'guide.profPages.ench.salvageNote'
   | 'guide.profPages.ench.tier.base'

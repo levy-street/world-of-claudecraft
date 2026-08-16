@@ -637,15 +637,23 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // across all three, so the newest plate replaces the last and no one eats
   // three roles at once, and no flask marker: Well Fed dies with you.
   //
-  // foodHp 1392 is the next classic-era food band above the shipped 980
-  // ceiling (conjured_bread4 / marlows_grand_roast), which is where the
-  // repo's classic-formula doctrine puts the rung after it. The well-fed stat
+  // foodHp 1392 is the next classic-era food band above everything shipped:
+  // the classic ladder runs 61 / 243 / 552 / 874 / 1392 / 2148, and the
+  // shipped top of 980 (conjured_bread4 / marlows_grand_roast) is an off-band
+  // value that already sits past the 874 band, so the apex rung continues the
+  // classic ladder rather than stepping from that value. The well-fed stat
   // enters at the consumable family's own entry rung, value 6 (the common
-  // elixir rung), for the classic 10-minute duration. sellValue 90 continues
-  // the dish curve's per-unit multi-output pricing one step past the 75 of
-  // silvered_carp_supper, and 4 x 90 stays strictly below the summed reagent
-  // value. Never vendor-stocked (no buyValue). 'Well Fed' is localized
-  // client-side through the sim_i18n aura matcher, like the elixir auras.
+  // elixir rung), for the classic 10-minute duration. sellValue 90 is set by
+  // the BATCH, not the quality band: the recipe yields four plates and
+  // 4 x 90 = 360 stays strictly below the summed reagent value (about 422),
+  // where Marlow's per-plate 150 on a four-plate batch (600) would turn the
+  // recipe into a gold faucet. So an epic plate vendors for less than the
+  // rare Marlow's Grand Roast on purpose (a player-visible inversion, recorded
+  // as a maintainer call in the packet ledger; the earlier framing of a
+  // 'multi-output curve' past silvered_carp_supper was wrong: both anchors
+  // are single-output recipes). Never vendor-stocked (no buyValue). 'Well
+  // Fed' is localized client-side through the sim_i18n aura matcher, like
+  // the elixir auras.
   stonepot_stew: {
     id: 'stonepot_stew',
     name: 'Stonepot Stew',
@@ -772,11 +780,14 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   //
   // The band deliberately BREAKS the elixir ceiling documented above (buff_sta
   // <= 12 for <= 900s), which is the point of an apex rung: value 15 is the
-  // rare elixir's 12 plus the ladder's own +3 step, and duration 1200 is its
-  // 900 plus the ladder's +300 step. sellValue 25 continues the elixir curve
-  // (10/15/20) by its +5 step. Never vendor-stocked (no buyValue). The three
-  // aura display names are localized client-side through the sim_i18n aura
-  // matcher (AURA_NAME_KEY), the same path as 'Might of the Serpent'.
+  // rare elixir's 12 plus the ladder's own +3 step (6 / 9 / 12), and duration
+  // 1200 is the serpent's 900 plus the ladder's ONE non-zero duration step
+  // (600 / 900 / 900: +300, then flat; a strictly-flat reading would give 900,
+  // rejected in the phase 10 ledger, and the classic 2x-elixir ratio would give
+  // 1800, so 1200 is the conservative rung). sellValue 25 continues the elixir
+  // curve (10/15/20) by its +5 step. Never vendor-stocked (no buyValue). The
+  // three aura display names are localized client-side through the sim_i18n
+  // aura matcher (AURA_NAME_KEY), the same path as 'Might of the Serpent'.
   ironhusk_flask: {
     id: 'ironhusk_flask',
     name: 'Ironhusk Flask',

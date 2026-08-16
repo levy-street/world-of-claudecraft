@@ -176,12 +176,21 @@ function enchantingSections(): string {
   ].join('');
   const tierLabel = (tier: string): string =>
     t(`guide.profPages.ench.tier.${tier}` as TranslationKey);
+  // The Perfected gate is the defining fact of the one enchant that carries it,
+  // so it rides the same badge slot the recipe table gives the combo and daily
+  // gates; the Skill column mirrors the recipe table's, since the Lucent tier
+  // is the first enchant work with a floor at all (0 for the historical defs).
   const enchantRows = e.enchants
     .map(
       (row) => `<tr>
-        <td>${esc(row.name)}</td>
+        <td>${esc(row.name)}${
+          row.perfectedOnly
+            ? `<span class="guide-prof-combo">${esc(t('guide.profPages.ench.perfectedOnly'))}</span>`
+            : ''
+        }</td>
         <td>${esc(slotLabel(row.slot))}</td>
         <td>${esc(tierLabel(row.tier))}</td>
+        <td>${esc(formatNumber(row.skillReq))}</td>
         <td>${materialsCell(row.reagents)}</td>
         <td>${row.bonus
           .map(
@@ -230,6 +239,7 @@ function enchantingSections(): string {
           <th scope="col">${esc(t('guide.profPages.ench.colEnchant'))}</th>
           <th scope="col">${esc(t('guide.profPages.ench.colSlot'))}</th>
           <th scope="col">${esc(t('guide.profPages.ench.colTier'))}</th>
+          <th scope="col">${esc(t('guide.profPages.colSkill'))}</th>
           <th scope="col">${esc(t('guide.profPages.colMaterials'))}</th>
           <th scope="col">${esc(t('guide.profPages.ench.colBonus'))}</th>
         </tr></thead>

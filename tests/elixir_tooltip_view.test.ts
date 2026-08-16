@@ -196,7 +196,9 @@ describe('elixirTooltipLines', () => {
     const FLASK_RULES = [
       '<div class="tt-desc">Only one flask effect at a time. Drinking another flask replaces this one.</div>',
       '<div class="tt-desc">A weaker elixir or scroll of the same stat cannot replace it.</div>',
-      '<div class="tt-desc">The effect remains through death, but ends when you log out.</div>',
+      // The clean-slate clause is the arena/fiesta limit (aurasSurvivingCleanSlate)
+      // the QA audit found the line silent about; the death survival is unchanged.
+      '<div class="tt-desc">The effect remains through death, but ends when you log out; a ranked match starts with a clean slate.</div>',
     ];
 
     it('a flask adds its three rules under the shared Use line', () => {
@@ -255,7 +257,7 @@ describe('wellFedTooltipLines', () => {
     // The "once you finish eating" clause is the mechanic: the buff lands only
     // when the 18-second drain completes, so standing up early grants nothing.
     expect(wellFedTooltipLines(ITEMS.stonepot_stew)).toBe(
-      '<div class="tt-desc">Well Fed: Increases your Stamina by 6 for 10 min once you finish eating.</div>',
+      '<div class="tt-desc">Well Fed: Increases your Stamina by 6 for 10 min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
 
@@ -282,7 +284,7 @@ describe('wellFedTooltipLines', () => {
       wellFedDef({ aura: 'Probe', kind: 'buff_sta', value: 1234, duration: 450 }),
     );
     expect(html).toBe(
-      '<div class="tt-desc">Well Fed: Increases your Stamina by 1,234 for 7.5 min once you finish eating.</div>',
+      '<div class="tt-desc">Well Fed: Increases your Stamina by 1,234 for 7.5 min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
 
@@ -329,7 +331,7 @@ describe('wellFedTooltipLines', () => {
       duration: 300,
     });
     expect(wellFedTooltipLines(def)).toBe(
-      '<div class="tt-desc">Well Fed: Grants Might of the Boar for 5 min once you finish eating.</div>',
+      '<div class="tt-desc">Well Fed: Grants Might of the Boar for 5 min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
 

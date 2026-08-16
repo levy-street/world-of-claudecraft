@@ -920,6 +920,17 @@ export type ItemKind =
   | 'bag'
   | 'mount'
   | 'recipe';
+// One timed flat stat buff, the payload shape shared by the elixir/scroll/flask
+// `elixir` record, the role foods' `wellFed` record, and the meal in flight
+// (Consuming.wellFed). Named once because three copies had grown (the repo's
+// rule-of-three threshold); the grant POINT (use vs meal completion) is what
+// makes them different mechanics, never the payload.
+export interface TimedStatBuffPayload {
+  aura: string;
+  kind: AuraKind;
+  value: number;
+  duration: number;
+}
 
 interface BaseItemDef {
   id: string;
@@ -979,7 +990,7 @@ interface BaseItemDef {
   // elixirs: a temporary stat-buff aura granted on use (classic battle elixirs).
   // `aura` is a flavor name shown in the buff frame; `value` is the stat amount,
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
-  elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
+  elixir?: TimedStatBuffPayload;
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
@@ -1206,7 +1217,8 @@ export interface OtherItemDef extends BaseItemDef {
 // FOOD. Its own kind-scoped def for exactly one reason: `wellFed` lives HERE
 // rather than on BaseItemDef, so a drink (or a potion, or a sword) cannot
 // silently carry a Well Fed payload that nothing would ever grant. Only the
-// eating path reads it, and only a food def can spell it.
+// eating path GRANTS it (the item tooltip merely describes it), and only a
+// food def can spell it.
 //
 // The buff is the classic Well Fed: same payload shape as `elixir`, but the
 // grant POINT is what makes it a different mechanic. It lands only when the
@@ -1217,7 +1229,11 @@ export interface OtherItemDef extends BaseItemDef {
 // Optional, because most food is a plain sit-down heal with no buff at all.
 export interface FoodItemDef extends BaseItemDef {
   kind: 'food';
-  wellFed?: { aura: string; kind: AuraKind; value: number; duration: number };
+  wellFed?: TimedStatBuffPayload;
+  // A food is a sit-down heal that may leave Well Fed; it is never also an
+  // elixir source (the use path's elixir arm would never see a food anyway,
+  // so an `elixir` record here would be dead data, the same class as `use`).
+  elixir?: never;
   armorType?: never;
   weapon?: never;
   // Barred for the same reason ScrollItemDef and FlaskItemDef bar it: a `use`
@@ -1239,6 +1255,10 @@ export interface FoodItemDef extends BaseItemDef {
 export interface ScrollItemDef extends BaseItemDef {
   kind: 'scroll';
   elixir: NonNullable<BaseItemDef['elixir']>;
+  // A scroll is read, never eaten or drunk: the sit-down payloads are dead
+  // data on this kind (the eating arm never sees a scroll), barred like `use`.
+  foodHp?: never;
+  drinkMana?: never;
   armorType?: never;
   weapon?: never;
   use?: never;
@@ -1271,6 +1291,11 @@ export type FlaskAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | 'buff_int
 export interface FlaskItemDef extends BaseItemDef {
   kind: 'flask';
   elixir: NonNullable<BaseItemDef['elixir']> & { kind: FlaskAuraKind };
+  // Quaffed, never eaten or drunk over 18 seconds: the sit-down payloads are
+  // dead data on this kind, barred like `use` (symmetric with FoodItemDef
+  // barring `elixir`).
+  foodHp?: never;
+  drinkMana?: never;
   armorType?: never;
   weapon?: never;
   use?: never;
@@ -4076,11 +4101,13 @@ export interface Consuming {
   // read for anything else.
   ticksElapsed: number;
   // The Well Fed buff this meal owes on COMPLETION, copied off the food def at
-  // sit-down (ItemDef.wellFed). Carried here rather than re-read from the def
-  // at the end so the grant is decided by what was eaten, not by what the
-  // catalog says now, and so the drain in combat/auras.ts needs no item lookup.
-  // Absent for every drink and for food that grants no buff.
-  wellFed?: { aura: string; kind: AuraKind; value: number; duration: number };
+  // sit-down (FoodItemDef.wellFed, the only ItemDef member that can spell it).
+  // Carried here rather than re-read from the def at the end so the grant is
+  // decided by what was eaten, not by what the catalog says now, and so the
+  // drain in combat/auras.ts needs no item lookup. Absent for every drink and
+  // for food that grants no buff. A REFERENCE to the def's record, not a copy
+  // (house style, the same as `def.elixir`): read-only by every consumer.
+  wellFed?: TimedStatBuffPayload;
 }
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {

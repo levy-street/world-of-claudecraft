@@ -258,6 +258,8 @@ export interface GuideProfEnchanting {
     name: string;
     slot: string;
     tier: 'base' | 'runed' | 'greater' | 'lucent';
+    skillReq: number;
+    perfectedOnly: boolean;
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
   }[];
@@ -13718,6 +13720,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Might",
       "slot": "mainhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13736,6 +13740,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Spellpower",
       "slot": "mainhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13754,6 +13760,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Offhand - Stamina",
       "slot": "offhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13772,6 +13780,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Helmet - Fortitude",
       "slot": "helmet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13790,6 +13800,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Necklace - Spirit",
       "slot": "neck",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13808,6 +13820,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Shoulders - Agility",
       "slot": "shoulder",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13826,6 +13840,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Chest - Stamina",
       "slot": "chest",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13848,6 +13864,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Belt - Stamina",
       "slot": "waist",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13866,6 +13884,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Legs - Stamina",
       "slot": "legs",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13888,6 +13908,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Gloves - Agility",
       "slot": "gloves",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13906,6 +13928,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Gloves - Spellpower",
       "slot": "gloves",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13924,6 +13948,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Boots - Agility",
       "slot": "feet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13942,6 +13968,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Ring - Spirit",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13960,6 +13988,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Agility",
       "slot": "mainhand",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -13978,6 +14008,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Helmet - Intellect",
       "slot": "helmet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14000,6 +14032,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Helmet - Reinforcement",
       "slot": "helmet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14022,6 +14056,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Necklace - Intellect",
       "slot": "neck",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14040,6 +14076,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Necklace - Agility",
       "slot": "neck",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14058,6 +14096,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Shoulders - Strength",
       "slot": "shoulder",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14076,6 +14116,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Shoulders - Intellect",
       "slot": "shoulder",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14094,6 +14136,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Chest - Spirit",
       "slot": "chest",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14116,6 +14160,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Chest - Reinforcement",
       "slot": "chest",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14138,6 +14184,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Belt - Strength",
       "slot": "waist",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14156,6 +14204,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Belt - Agility",
       "slot": "waist",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14174,6 +14224,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Legs - Intellect",
       "slot": "legs",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14196,6 +14248,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Gloves - Strength",
       "slot": "gloves",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14214,6 +14268,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Boots - Strength",
       "slot": "feet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14232,6 +14288,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Boots - Stamina",
       "slot": "feet",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14250,6 +14308,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Ring - Strength",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14268,6 +14328,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Ring - Agility",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14286,6 +14348,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Ring - Intellect",
       "slot": "ring",
       "tier": "base",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Dust",
@@ -14304,6 +14368,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Greater Might",
       "slot": "mainhand",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Shard",
@@ -14326,6 +14392,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Greater Spellpower",
       "slot": "mainhand",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Shard",
@@ -14348,6 +14416,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Helmet - Greater Fortitude",
       "slot": "helmet",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Shard",
@@ -14370,6 +14440,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Chest - Greater Stamina",
       "slot": "chest",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Shard",
@@ -14392,6 +14464,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Legs - Greater Stamina",
       "slot": "legs",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Shard",
@@ -14414,6 +14488,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Gloves - Greater Agility",
       "slot": "gloves",
       "tier": "greater",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Shard",
@@ -14436,6 +14512,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Runed Edge",
       "slot": "mainhand",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Essence",
@@ -14458,6 +14536,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Runed Sigil",
       "slot": "mainhand",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Essence",
@@ -14480,6 +14560,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Chest - Runed Weave",
       "slot": "chest",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Essence",
@@ -14502,6 +14584,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Legs - Runed Hide",
       "slot": "legs",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Essence",
@@ -14524,6 +14608,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Helmet - Runed Links",
       "slot": "helmet",
       "tier": "runed",
+      "skillReq": 0,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Chime Essence",
@@ -14546,6 +14632,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Weapon - Lucent Might",
       "slot": "mainhand",
       "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Lucent Reagent",
@@ -14572,6 +14660,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Chest - Lucent Stamina",
       "slot": "chest",
       "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Lucent Reagent",
@@ -14598,6 +14688,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Enchant Boots - Lucent Agility",
       "slot": "feet",
       "tier": "lucent",
+      "skillReq": 100,
+      "perfectedOnly": false,
       "reagents": [
         {
           "name": "Lucent Reagent",
@@ -14620,6 +14712,8 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "name": "Lucent Infusion",
       "slot": "chest",
       "tier": "lucent",
+      "skillReq": 125,
+      "perfectedOnly": true,
       "reagents": [
         {
           "name": "Lucent Reagent",

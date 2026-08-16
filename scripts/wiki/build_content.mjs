@@ -1012,11 +1012,18 @@ const profEnchanting = {
     },
     counts: { rare: 1, epicMin: 1, epicMax: 2 },
   },
+  // skillReq is the applier's Enchanting floor (EnchantDef.skillReq; the
+  // historical defs carry none, which the sim reads as 0, so the row says 0
+  // and the page can print a real Skill column beside the recipe table's).
+  // perfectedOnly mirrors EnchantDef.requiresPerfected: the Lucent Infusion
+  // takes hold only on a Perfected copy, a fact the prose alone used to carry.
   enchants: Object.values(ENCHANTS).map((e) => ({
     id: e.id,
     name: e.name,
     slot: e.itemSlot,
     tier: enchantTier(e),
+    skillReq: e.skillReq ?? 0,
+    perfectedOnly: e.requiresPerfected === true,
     reagents: e.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
     bonus: Object.entries(e.statBonus).map(([stat, value]) => ({ stat, value })),
   })),
@@ -1358,6 +1365,8 @@ export interface GuideProfEnchanting {
     name: string;
     slot: string;
     tier: 'base' | 'runed' | 'greater' | 'lucent';
+    skillReq: number;
+    perfectedOnly: boolean;
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
   }[];

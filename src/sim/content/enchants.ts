@@ -46,8 +46,9 @@
 // Greater tier. LUCENT (Masterwrought phase 10) has no percentage rule of its
 // own: each apex value continues ITS OWN SLOT LADDER's step, one more rung
 // above that slot's Greater, which is why the tier moves three axes by three
-// different amounts (str +2 on the weapon, agi +1 on the boots, sta +6 on the
-// chest) instead of by one shared figure.
+// different amounts (str +2 on the weapon, agi +1 on the boots, sta +3 on the
+// chest, and +3 again to the Perfected-only Infusion on the same chest slot)
+// instead of by one shared figure.
 //
 // ONE axis now sits OUTSIDE the 15-to-25 band above, deliberately and on the
 // record: best-per-slot stamina reaches 33 against the documented 113 sta

@@ -17,7 +17,10 @@ export const CONSUMABLE_BAR_SLOTS = 6;
 // sit with the elixirs they alternate with (phase 06), and flasks with both
 // (phase 10): all three are combat-usable buffs, and touch has no
 // drag-to-hotbar, so this bar is their only mid-fight surface. The flask sits
-// ahead of the scroll because it is the buff a player re-applies after a wipe.
+// ahead of the scroll because it is the higher-value buff of the pair (an apex
+// consumable that outranks the elixir and scroll of its stat), not because it
+// is re-applied after a wipe: a flask rides through death by design, so the
+// only wipes that clear it are the arena and Fiesta clean slates.
 export const CONSUMABLE_KIND_ORDER = [
   'potion',
   'elixir',

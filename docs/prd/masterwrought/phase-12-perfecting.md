@@ -73,7 +73,21 @@ Agent 1 (sim module + tests):
     wire-visibility decision (perfected is pinned OFF the eqi allowlist in
     tests/snapshots.test.ts; until it rides, an online player's WORN Perfected copy is
     invisible to the picker while the sim accepts it; the bagged arm rides the
-    wholesale inv mirror and needs nothing).
+    wholesale inv mirror and needs nothing). AMENDED at the phase 10 QA (2026-08-16):
+    the choice is NOT the two-way "widen eqi or accept bags-only" the phase recorded.
+    A third option exists and is the recommended path: the owner's picker worn arm can
+    read IWorld.equipmentInstances, the SELF mirror (server/game.ts ships
+    meta.equipmentInstance WHOLE under `einst`; ClientWorld mirrors it as
+    equipmentInstances; the offline Sim getter returns the same map; char_window.ts
+    already reads it), instead of the trimmed PEER mirror
+    (world.entities.get(world.playerId)?.equippedInstances, fed by the eqi allowlist)
+    it reads today. That switch was NOT made at the QA because the peer read feeds
+    wornEnchantTargets' wireTrimmed pin cluster; making it here moves that cluster
+    deliberately, and it leaves the eqi decision about INSPECTING viewers only.
+    The picker already paints a requiresPerfected row inert with the notPerfected
+    line until a candidate copy carries the marker (EnchantPickRow.perfectedMet, the
+    phase 10 QA), so the noTargets copy is unreachable for the Infusion; when minting
+    lands, the row simply becomes actionable.
   - Narrow the guard's bagged arm from the HOLDING (any copy of the id) to the exact
     copy the apply consumes (the item_copy_ref discipline the disenchant and replace
     paths follow), or one Perfected copy licenses spending an ordinary one. The
