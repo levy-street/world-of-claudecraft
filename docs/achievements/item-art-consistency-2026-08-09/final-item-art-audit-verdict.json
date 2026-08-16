@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 878,
-    "liveItemDefinitions": 893,
+    "itemArtFilesReviewed": 906,
+    "liveItemDefinitions": 921,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -308,6 +308,7 @@
       "mount": 9,
       "potion": 13,
       "quest": 97,
+      "recipe": 28,
       "scroll": 3,
       "tool": 51,
       "ui-backpack": 1,
@@ -392,7 +393,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 878,
+    "passCount": 906,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -940,6 +941,34 @@
       "palecoil_heartscale",
       "palecoil_rod",
       "pan_seared_perch",
+      "pattern_barksong_handguards",
+      "pattern_briarstep_jerkin",
+      "pattern_duskforged_bulwark",
+      "pattern_duskforged_warblade",
+      "pattern_fenbloom_breeches",
+      "pattern_forgefold_legguards",
+      "pattern_grand_cauldron",
+      "pattern_gyrelens_array",
+      "pattern_ironhusk_flask",
+      "pattern_laden_hearth",
+      "pattern_makers_charm",
+      "pattern_masters_field_forge",
+      "pattern_prismglass_loop",
+      "pattern_ridgebreaker",
+      "pattern_runewater_flask",
+      "pattern_sageleaf_chowder",
+      "pattern_spiritweld_girdle",
+      "pattern_stonepot_stew",
+      "pattern_sunspun_handwraps",
+      "pattern_sunspun_haversack",
+      "pattern_sunspun_leggings",
+      "pattern_sunspun_vestments",
+      "pattern_voidbound_grimoire",
+      "pattern_warboar_flask",
+      "pattern_wardspeaker_sabatons",
+      "pattern_warhewn_signet",
+      "pattern_warspice_skewers",
+      "pattern_wyrmfall_pendant",
       "peaksong_helm",
       "peakwool_robe",
       "pearlwake_cargo_crate",
@@ -1277,7 +1306,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 878 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14."
+    "summary": "All 906 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16."
   },
   "nonVisualContentWatch": [
     {
@@ -1434,22 +1463,22 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "6c3f7975c5425e7f8a69e43c70621a8c6c2a2f4789d76ec46862e76e467ec0f3",
-      "bytes": 481727
+      "sha256": "82667558927c9485704392f2f336678f4fdb3b8a78c5de1a08d9805971ba1d36",
+      "bytes": 497520
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
-    "sheetCount": 224,
+    "sheetCount": 232,
     "sheetModeCounts": {
-      "128-color": 28,
-      "40-color": 28,
-      "28-color": 28,
-      "22-color": 28,
-      "28-grayscale": 28,
-      "64-circle": 28,
-      "small-multiview": 28,
-      "identity": 28
+      "128-color": 29,
+      "40-color": 29,
+      "28-color": 29,
+      "22-color": 29,
+      "28-grayscale": 29,
+      "64-circle": 29,
+      "small-multiview": 29,
+      "identity": 29
     },
-    "sheetSetSha256": "fe6e52b1a59ec44052750e4084900755bca85c9de3da16fb81e32672e1c719ad",
+    "sheetSetSha256": "42c30b18a770f46a05d2cfa17bc552fc81654ea446840a79d9af03b1dcf874ed",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2924,6 +2953,70 @@
         "format": "png"
       },
       {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--128-color.png",
+        "sha256": "be419bee9fc74f922fd5e6a342015d649520054b78dd0713065d649d8e5b6560",
+        "bytes": 365346,
+        "width": 1600,
+        "height": 542,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--40-color.png",
+        "sha256": "49c49550ad3bba981bbe1ac2652ec934929875194c441222af0a5ddc6b6a6e0c",
+        "bytes": 103698,
+        "width": 1600,
+        "height": 410,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--28-color.png",
+        "sha256": "79949426cb7a4056206e6a848ed4ecd5804a6fc491cf18458d91a0ce665a27a5",
+        "bytes": 85067,
+        "width": 1600,
+        "height": 542,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--22-color.png",
+        "sha256": "ccef9491d7b6075747bbf81b5ecc167b3e5d070a0cda1ec6360983837ea1b874",
+        "bytes": 72254,
+        "width": 1600,
+        "height": 542,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--28-grayscale.png",
+        "sha256": "59b4b4269a6b1b47db49791d0d30f31713338448e95f89d01a23f92a65071c46",
+        "bytes": 67731,
+        "width": 1600,
+        "height": 542,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--64-circle.png",
+        "sha256": "e345dd5b0680c1ef36d6ff5d2ec49697e186c0137ca26992e9aea11c59265f69",
+        "bytes": 146346,
+        "width": 1600,
+        "height": 542,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--small-multiview.png",
+        "sha256": "ace67db8a02c22e31ff273d543b12137329deedc2809332035e58fd6207339bf",
+        "bytes": 274105,
+        "width": 1800,
+        "height": 698,
+        "format": "png"
+      },
+      {
+        "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/recipe--p01--identity.png",
+        "sha256": "3cccd1a20e5c818640850f6c0bf63c1c3b5d9e47499873a0c2bb5262847d9aa7",
+        "bytes": 400144,
+        "width": 1800,
+        "height": 656,
+        "format": "png"
+      },
+      {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/scroll--p01--128-color.png",
         "sha256": "f29a2ed34363eed4096c777bc036518800cfce76f300c37e1235cb0f94cf45f9",
         "bytes": 54320,
@@ -3244,6 +3337,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "83fff3d8685ea8ac1ea6d470773cf16f03c1e8ce44d9903391ba93bcc3e2b227"
+    "shippingCatalogSha256": "1039f0a12f6ee207a0469ee276808748cd2054254afd3be02351bbf494908fab"
   }
 }

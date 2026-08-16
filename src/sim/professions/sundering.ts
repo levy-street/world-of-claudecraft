@@ -42,9 +42,13 @@ export const SUNDERED_ESSENCE_YIELD = 1;
 
 /** The one eligibility rule: an epic whose source index says a raid encounter
  *  drops it. Rift legendaries and heroic five-man epics are excluded by the
- *  index itself (itemFromRaid), vendor and crafted epics never enter it. */
+ *  index itself (itemFromRaid), vendor and crafted epics never enter it.
+ *  Pattern items are excluded by KIND (phase 11): the raid pattern drops are
+ *  epic and raid-sourced, so without this guard a player could grind a
+ *  chase pattern into one essence, a pure foot-gun; classic-era disenchanting
+ *  never took recipes, only gear, and sundering follows that line. */
 export function isSunderable(def: ItemDef | undefined): boolean {
-  return !!def && def.quality === 'epic' && itemFromRaid(def.id);
+  return !!def && def.quality === 'epic' && def.kind !== 'recipe' && itemFromRaid(def.id);
 }
 
 /** Shared admission for the start AND the completion re-validation: emits the

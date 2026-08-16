@@ -316,9 +316,15 @@ describe('Nythraxis raid encounter', () => {
 
   it('defines four Nythraxis equipment drops with 3 percent legendary rolls', () => {
     // Equipment drops only: the collectible mount reins (kind 'mount') is its
-    // own independent draw outside the four roll groups, pinned by tests/mounts.test.ts.
+    // own independent draw outside the four roll groups, pinned by tests/mounts.test.ts,
+    // and the apex recipe patterns (kind 'recipe', Masterwrought phase 11) ride
+    // their own appended 'nythraxis_patterns' group, pinned by the dedicated
+    // block below and by tests/apex_pattern_items.test.ts.
     const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
-      (entry) => entry.itemId && ITEMS[entry.itemId]?.kind !== 'mount',
+      (entry) =>
+        entry.itemId &&
+        ITEMS[entry.itemId]?.kind !== 'mount' &&
+        ITEMS[entry.itemId]?.kind !== 'recipe',
     );
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
@@ -371,6 +377,54 @@ describe('Nythraxis raid encounter', () => {
     expect(ITEMS.soulflame_mantle.requiredClass).toEqual(['mage', 'priest', 'warlock', 'druid']);
     expect(ITEMS.stormcallers_crown.requiredClass).toEqual(['shaman']);
     expect(ITEMS.stormcallers_spaulders.requiredClass).toEqual(['shaman']);
+  });
+
+  it('appends the ten apex gear patterns as one tail rollGroup at 0.04 each (phase 11)', () => {
+    // The R8 raid channel: the ten APEX_GEAR patterns ride ONE new partitioned
+    // draw (0.40 total, at most one pattern per kill). The append position is a
+    // CONTRACT, not a style choice: loot_roll.ts consumes rng draws in array
+    // order, so the pattern group must sit at the TAIL where its one new draw
+    // lands after every pre-existing draw.
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot;
+    const patterns = loot
+      .map((entry, index) => ({ entry, index }))
+      .filter(({ entry }) => entry.rollGroup === 'nythraxis_patterns');
+    expect(patterns).toHaveLength(10);
+    for (const { entry } of patterns) {
+      expect(entry.chance, entry.itemId).toBe(0.04);
+      expect(ITEMS[entry.itemId!]?.kind, entry.itemId).toBe('recipe');
+    }
+    expect(patterns.reduce((sum, { entry }) => sum + entry.chance, 0)).toBeCloseTo(0.4, 10);
+    // Every pattern member is a kind 'recipe' entry, and every kind 'recipe'
+    // entry on the table is a pattern member: the group cannot leak.
+    const recipeEntries = loot.filter(
+      (entry) => entry.itemId && ITEMS[entry.itemId]?.kind === 'recipe',
+    );
+    expect(recipeEntries).toHaveLength(10);
+    expect([...new Set(patterns.map(({ entry }) => entry.itemId))].sort()).toEqual(
+      [
+        'pattern_duskforged_bulwark',
+        'pattern_duskforged_warblade',
+        'pattern_gyrelens_array',
+        'pattern_makers_charm',
+        'pattern_masters_field_forge',
+        'pattern_prismglass_loop',
+        'pattern_ridgebreaker',
+        'pattern_voidbound_grimoire',
+        'pattern_warhewn_signet',
+        'pattern_wyrmfall_pendant',
+      ].sort(),
+    );
+    // TAIL pin: every pattern entry's array index sits above every non-pattern
+    // entry's index, so the group's single draw was appended, never inserted.
+    const lowestPatternIndex = Math.min(...patterns.map(({ index }) => index));
+    const highestNonPatternIndex = Math.max(
+      ...loot
+        .map((entry, index) => ({ entry, index }))
+        .filter(({ entry }) => entry.rollGroup !== 'nythraxis_patterns')
+        .map(({ index }) => index),
+    );
+    expect(lowestPatternIndex).toBeGreaterThan(highestNonPatternIndex);
   });
 
   it('drops the offhand-slot and two-hander epics at item level 29 (raid source)', () => {

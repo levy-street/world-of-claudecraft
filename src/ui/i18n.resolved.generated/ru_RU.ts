@@ -5592,6 +5592,7 @@ export const ru_RU: EnTranslations = {
       "sourceTrainerFree": "Учитель, бесплатно",
       "sourceKnown": "Известен с самого начала",
       "sourceDrop": "Из найденной схемы",
+      "sourceVendor": "Продаётся у героического интенданта",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "Рецепт",
       "colSkill": "Навык",
@@ -9113,6 +9114,7 @@ export const ru_RU: EnTranslations = {
       "filterTypeConsumable": "Расходники",
       "filterTypeMaterial": "Материалы",
       "filterTypeCosmetic": "Косметика",
+      "filterTypePattern": "Схемы",
       "filterTypeOther": "Другое",
       "filterArmorType": "Тип брони",
       "filterArmorAll": "Вся броня",
@@ -12605,6 +12607,90 @@ export const ru_RU: EnTranslations = {
       },
       "laden_hearth": {
         "name": "Обильный очаг"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "Чертеж: Пояс духовной спайки"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "Чертеж: Набедренники складчатой ковки"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "Чертеж: Сабатоны заклинателя оберегов"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "Выкройка: Куртка терновой поступи"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "Выкройка: Бриджи болотного цветения"
+      },
+      "pattern_barksong_handguards": {
+        "name": "Выкройка: Рукавицы поющей коры"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "Выкройка: Солнцепрядное облачение"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "Выкройка: Солнцепрядные поножи"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "Выкройка: Солнцепрядные обмотки"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "Выкройка: Солнцепрядная котомка"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "Чертеж: Боевой клинок сумеречной ковки"
+      },
+      "pattern_ridgebreaker": {
+        "name": "Чертеж: Хребтолом"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "Чертеж: Бастион сумеречной ковки"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "Эскиз: Кулон драконопада"
+      },
+      "pattern_warhewn_signet": {
+        "name": "Эскиз: Вытесанная войной печатка"
+      },
+      "pattern_prismglass_loop": {
+        "name": "Эскиз: Перстень из призменного стекла"
+      },
+      "pattern_gyrelens_array": {
+        "name": "Схема: Массив вихрелинз"
+      },
+      "pattern_masters_field_forge": {
+        "name": "Схема: Походная кузня мастера"
+      },
+      "pattern_makers_charm": {
+        "name": "Схема: Оберег мастера"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "Техника: Скованный Пустотой гримуар"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "Рецепт: Железноскорлупная фляга"
+      },
+      "pattern_warboar_flask": {
+        "name": "Рецепт: Фляга боевого вепря"
+      },
+      "pattern_runewater_flask": {
+        "name": "Рецепт: Фляга рунной воды"
+      },
+      "pattern_stonepot_stew": {
+        "name": "Рецепт: Похлебка из каменного котла"
+      },
+      "pattern_warspice_skewers": {
+        "name": "Рецепт: Боевые пряные шашлычки"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "Рецепт: Похлебка из мудролиста"
+      },
+      "pattern_grand_cauldron": {
+        "name": "Рецепт: Великий котел"
+      },
+      "pattern_laden_hearth": {
+        "name": "Рецепт: Обильный очаг"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

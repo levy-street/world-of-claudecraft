@@ -238,6 +238,25 @@ export const RIFT_EPIC_MOUNT_REINS = [
 ] as const;
 export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
 
+/** Masterwrought apex ARMOR patterns (Phase 11, R8 channel doctrine): the rift
+ *  pillar carries the ten armorcrafting/leatherworking/tailoring patterns
+ *  (content/apex_patterns.ts) as the final appended draw on every winning
+ *  B/A/S clear. SORTED, and exported for tests: the rng.int pick below indexes
+ *  it, so the order is part of the draw contract. */
+export const RIFT_PATTERN_ITEM_IDS = [
+  'pattern_barksong_handguards',
+  'pattern_briarstep_jerkin',
+  'pattern_fenbloom_breeches',
+  'pattern_forgefold_legguards',
+  'pattern_spiritweld_girdle',
+  'pattern_sunspun_handwraps',
+  'pattern_sunspun_haversack',
+  'pattern_sunspun_leggings',
+  'pattern_sunspun_vestments',
+  'pattern_wardspeaker_sabatons',
+] as const;
+export const RIFT_PATTERN_CHANCE = 0.08; // one draw per winning B/A/S clear
+
 /** Rank-gated gear payout on the winning clear: pushed onto the final boss's
  * corpse as PLAIN drops, so the normal party loot rules (rolls) decide who
  * takes them. Runs for every winning clear, ranked race or dev portal, with
@@ -253,6 +272,10 @@ export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
  *         in array order (RIFT_LEGENDARY_CHANCE_S each)
  *   5. B/A/S: exactly one mount roll, for the rank's own tier only
  *         (green/blue/epic chance + rng.int pick)
+ *   6. B/A/S: one apex-pattern roll (RIFT_PATTERN_CHANCE, then an rng.int
+ *         pick over the sorted RIFT_PATTERN_ITEM_IDS). C never reaches this
+ *         draw BY DESIGN: the C arm returns after draw 0, so the pattern
+ *         channel stays a winning ranked-clear reward (the R8 channel split).
  *
  * B/A/S draws are unaffected by the new C draw (C returns after draw 0).
  */
@@ -304,6 +327,17 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   if (ctx.rng.chance(mount.chance)) {
     loot.items.push({
       itemId: mount.reins[ctx.rng.int(0, mount.reins.length - 1)],
+      count: 1,
+    });
+  }
+
+  // --- Draw 6: the apex armor pattern roll (see RIFT_PATTERN_ITEM_IDS) ---
+  // Appended AFTER the mount roll so every existing draw keeps its stream
+  // position; a plain tradable drop like the draws above, so party loot rules
+  // decide who takes it.
+  if (ctx.rng.chance(RIFT_PATTERN_CHANCE)) {
+    loot.items.push({
+      itemId: RIFT_PATTERN_ITEM_IDS[ctx.rng.int(0, RIFT_PATTERN_ITEM_IDS.length - 1)],
       count: 1,
     });
   }

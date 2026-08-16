@@ -5592,6 +5592,7 @@ export const ko_KR: EnTranslations = {
       "sourceTrainerFree": "훈련사, 무료",
       "sourceKnown": "처음부터 습득",
       "sourceDrop": "발견한 도안으로 습득",
+      "sourceVendor": "영웅 병참장교가 판매",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "제조법",
       "colSkill": "기술",
@@ -9113,6 +9114,7 @@ export const ko_KR: EnTranslations = {
       "filterTypeConsumable": "소모품",
       "filterTypeMaterial": "재료",
       "filterTypeCosmetic": "외형",
+      "filterTypePattern": "도안",
       "filterTypeOther": "기타",
       "filterArmorType": "방어구 유형",
       "filterArmorAll": "모든 방어구",
@@ -12605,6 +12607,90 @@ export const ko_KR: EnTranslations = {
       },
       "laden_hearth": {
         "name": "풍성한 화덕"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "도면: 정령벼림 허리띠"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "도면: 접쇠 다리갑옷"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "도면: 결계술사 쇠장화"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "도안: 가시걸음 웃옷"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "도안: 늪꽃 바지"
+      },
+      "pattern_barksong_handguards": {
+        "name": "도안: 나무노래 손보호구"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "도안: 태양실 예복"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "도안: 태양실 각반"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "도안: 태양실 손싸개"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "도안: 태양실 배낭"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "도면: 황혼에 벼린 전쟁검"
+      },
+      "pattern_ridgebreaker": {
+        "name": "도면: 능선파괴자"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "도면: 황혼에 벼린 방벽"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "도안: 낙룡의 펜던트"
+      },
+      "pattern_warhewn_signet": {
+        "name": "도안: 전쟁에 깎인 인장"
+      },
+      "pattern_prismglass_loop": {
+        "name": "도안: 프리즘 유리 고리"
+      },
+      "pattern_gyrelens_array": {
+        "name": "설계도: 소용돌이 렌즈 배열"
+      },
+      "pattern_masters_field_forge": {
+        "name": "설계도: 장인의 야전 화로"
+      },
+      "pattern_makers_charm": {
+        "name": "설계도: 장인의 부적"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "기법: 공허에 묶인 마법서"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "제조법: 무쇠껍질 플라스크"
+      },
+      "pattern_warboar_flask": {
+        "name": "제조법: 전투 멧돼지 플라스크"
+      },
+      "pattern_runewater_flask": {
+        "name": "제조법: 룬물 플라스크"
+      },
+      "pattern_stonepot_stew": {
+        "name": "요리법: 돌솥 스튜"
+      },
+      "pattern_warspice_skewers": {
+        "name": "요리법: 전투향 꼬치"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "요리법: 현엽 차우더"
+      },
+      "pattern_grand_cauldron": {
+        "name": "제조법: 거대한 가마솥"
+      },
+      "pattern_laden_hearth": {
+        "name": "요리법: 풍성한 화덕"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

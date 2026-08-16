@@ -5592,6 +5592,7 @@ export const ja_JP: EnTranslations = {
       "sourceTrainerFree": "訓練師、無料",
       "sourceKnown": "最初から習得済み",
       "sourceDrop": "見つけた図案から習得",
+      "sourceVendor": "英雄補給係が販売",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "レシピ",
       "colSkill": "スキル",
@@ -9113,6 +9114,7 @@ export const ja_JP: EnTranslations = {
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "素材",
       "filterTypeCosmetic": "外見",
+      "filterTypePattern": "図案",
       "filterTypeOther": "その他",
       "filterArmorType": "防具の種類",
       "filterArmorAll": "すべての防具",
@@ -12605,6 +12607,90 @@ export const ja_JP: EnTranslations = {
       },
       "laden_hearth": {
         "name": "豊穣の炉"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "設計図：スピリットウェルドの帯"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "設計図：折り鍛えのレッグガード"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "設計図：ワードスピーカーのサバトン"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "型紙：ブライアステップのジャーキン"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "型紙：フェンブルームのズボン"
+      },
+      "pattern_barksong_handguards": {
+        "name": "型紙：バークソングのハンドガード"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "型紙：陽紡ぎの祭服"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "型紙：陽紡ぎのレギンス"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "型紙：陽紡ぎの手巻き"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "型紙：陽紡ぎの背負い袋"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "設計図：黄昏鍛えの戦刃"
+      },
+      "pattern_ridgebreaker": {
+        "name": "設計図：尾根砕き"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "設計図：黄昏鍛えの大盾"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "意匠図：竜墜のペンダント"
+      },
+      "pattern_warhewn_signet": {
+        "name": "意匠図：戦削りの印章"
+      },
+      "pattern_prismglass_loop": {
+        "name": "意匠図：プリズムガラスの輪"
+      },
+      "pattern_gyrelens_array": {
+        "name": "図面：渦鏡アレイ"
+      },
+      "pattern_masters_field_forge": {
+        "name": "図面：匠の野営炉"
+      },
+      "pattern_makers_charm": {
+        "name": "図面：匠のお守り"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "技法：虚無縛りの魔導書"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "レシピ：鉄殻のフラスコ"
+      },
+      "pattern_warboar_flask": {
+        "name": "レシピ：戦猪のフラスコ"
+      },
+      "pattern_runewater_flask": {
+        "name": "レシピ：呪水のフラスコ"
+      },
+      "pattern_stonepot_stew": {
+        "name": "レシピ：石鍋のシチュー"
+      },
+      "pattern_warspice_skewers": {
+        "name": "レシピ：戦香の串焼き"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "レシピ：賢葉のチャウダー"
+      },
+      "pattern_grand_cauldron": {
+        "name": "レシピ：大釜"
+      },
+      "pattern_laden_hearth": {
+        "name": "レシピ：豊穣の炉"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

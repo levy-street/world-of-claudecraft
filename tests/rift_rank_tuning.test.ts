@@ -23,6 +23,7 @@ import {
   RIFT_GREEN_MOUNT_CHANCE,
   RIFT_GREEN_MOUNT_REINS,
   RIFT_LEGENDARY_CHANCE_S,
+  RIFT_PATTERN_ITEM_IDS,
 } from '../src/sim/rift/progression';
 import {
   capRiftNonLethalMechanicDamage,
@@ -955,17 +956,22 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     const epicIds = new Set<string>(riftHeroicClearPool());
     const normalIds = new Set<string>(riftNormalClearPool());
     const legendaryIds = new Set<string>(RIFT_LEGENDARY_ITEM_IDS);
-    const mountIds = new Set<string>([
+    // The mount ladder (draw 5) and the apex-pattern roll (draw 6, phase 11)
+    // are independent bonus draws layered over the gear payout this block
+    // pins, so both are filtered out of the gear view; the pattern draw has
+    // its own pins in tests/apex_pattern_items.test.ts.
+    const bonusDrawIds = new Set<string>([
       ...RIFT_GREEN_MOUNT_REINS,
       ...RIFT_BLUE_MOUNT_REINS,
       ...RIFT_EPIC_MOUNT_REINS,
+      ...RIFT_PATTERN_ITEM_IDS,
     ]);
-    // Returns only the gear (non-mount) items from a clear.
+    // Returns only the gear (non-mount, non-pattern) items from a clear.
     const run = (baseLevel: number, rngSeed: number) => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
       const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
       addRiftClearGearLoot(ctx, boss, baseLevel);
-      return boss.loot!.items.map((i) => i.itemId).filter((id) => !mountIds.has(id!));
+      return boss.loot!.items.map((i) => i.itemId).filter((id) => !bonusDrawIds.has(id!));
     };
     const runCopper = (baseLevel: number, rngSeed: number): number => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
@@ -1045,16 +1051,19 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
   });
 
   it('each rift legendary drops at its own declared 0.3% rate on S, and never below S', () => {
-    const mountIds = new Set<string>([
+    // Same bonus-draw filter as the gear block above: mounts (draw 5) and apex
+    // patterns (draw 6, phase 11) are independent rolls outside this claim.
+    const bonusDrawIds = new Set<string>([
       ...RIFT_GREEN_MOUNT_REINS,
       ...RIFT_BLUE_MOUNT_REINS,
       ...RIFT_EPIC_MOUNT_REINS,
+      ...RIFT_PATTERN_ITEM_IDS,
     ]);
     const run = (baseLevel: number, rngSeed: number) => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
       const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
       addRiftClearGearLoot(ctx, boss, baseLevel);
-      return boss.loot!.items.map((i) => i.itemId).filter((id) => !mountIds.has(id!));
+      return boss.loot!.items.map((i) => i.itemId).filter((id) => !bonusDrawIds.has(id!));
     };
     // A 0.3% rate needs a big sample to be measurable at all; 20 000 clears puts
     // the expectation at 60 per legendary, tight enough to catch a 2x mistuning.

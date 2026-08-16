@@ -284,6 +284,7 @@ export {
   resolveDelveShopOffers,
 } from './content/delves';
 
+import { APEX_PATTERN_ITEMS } from './content/apex_patterns';
 import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
@@ -328,6 +329,7 @@ export { STATIONS };
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
   PROFESSION_ITEMS,
+  APEX_PATTERN_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,
   TEMPLE_ITEMS,

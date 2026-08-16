@@ -5592,6 +5592,7 @@ export const zh_CN: EnTranslations = {
       "sourceTrainerFree": "训练师，免费",
       "sourceKnown": "初始即会",
       "sourceDrop": "习自寻获的图样",
+      "sourceVendor": "由英雄军需官出售",
       "gainFmt": "{reduced} / {minimal} / {zero}",
       "colRecipe": "配方",
       "colSkill": "技能",
@@ -9113,6 +9114,7 @@ export const zh_CN: EnTranslations = {
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "材料",
       "filterTypeCosmetic": "外观",
+      "filterTypePattern": "图样",
       "filterTypeOther": "其他",
       "filterArmorType": "护甲类型",
       "filterArmorAll": "全部护甲",
@@ -12605,6 +12607,90 @@ export const zh_CN: EnTranslations = {
       },
       "laden_hearth": {
         "name": "丰盛炉灶"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "设计图：灵魂熔接腰带"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "设计图：叠锻腿甲"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "设计图：唤守者护胫"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "图样：棘行皮甲"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "图样：沼花马裤"
+      },
+      "pattern_barksong_handguards": {
+        "name": "图样：树歌护手"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "图样：阳纺法衣"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "图样：阳纺护腿"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "图样：阳纺裹手"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "图样：阳纺行囊"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "设计图：暮锻战刃"
+      },
+      "pattern_ridgebreaker": {
+        "name": "设计图：碎脊锤"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "设计图：暮锻壁垒"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "设计：坠龙坠饰"
+      },
+      "pattern_warhewn_signet": {
+        "name": "设计：战凿徽戒"
+      },
+      "pattern_prismglass_loop": {
+        "name": "设计：棱晶琉璃环"
+      },
+      "pattern_gyrelens_array": {
+        "name": "结构图：涡旋透镜阵列"
+      },
+      "pattern_masters_field_forge": {
+        "name": "结构图：匠人野战锻炉"
+      },
+      "pattern_makers_charm": {
+        "name": "结构图：匠人护符"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "技法：缚虚魔典"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "配方：铁壳药壶"
+      },
+      "pattern_warboar_flask": {
+        "name": "配方：战猪药壶"
+      },
+      "pattern_runewater_flask": {
+        "name": "配方：符水药壶"
+      },
+      "pattern_stonepot_stew": {
+        "name": "配方：石锅炖菜"
+      },
+      "pattern_warspice_skewers": {
+        "name": "配方：战香烤串"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "配方：贤叶浓汤"
+      },
+      "pattern_grand_cauldron": {
+        "name": "配方：宏伟坩埚"
+      },
+      "pattern_laden_hearth": {
+        "name": "配方：丰盛炉灶"
       },
       "conjured_water4": {
         "name": "魔法泉水"

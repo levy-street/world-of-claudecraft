@@ -722,6 +722,27 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // independent draw so the four guaranteed groups above keep their exact
       // 1.00 partitions (a 25% bonus shot, never displacing a set piece).
       { itemId: 'maul_of_the_scourged_wilds', chance: 0.25, rollGroup: 'nythraxis_drop_5' },
+      // Masterwrought apex GEAR patterns (Phase 11, R8 channel doctrine): the
+      // raid pillar carries the ten weaponcrafting/jewelcrafting/engineering/
+      // inscription patterns (content/apex_patterns.ts) as ONE new partitioned
+      // rollGroup, 0.04 each (0.40 total: at most one pattern per kill, 60% of
+      // kills shed none). APPENDED AT THE TAIL by contract: loot_roll.ts
+      // consumes rng draws in array order (one draw per rollGroup at its first
+      // member's index), so a tail append leaves every existing draw's stream
+      // position byte-identical while an insert or reorder forks the parity
+      // digest. Never insert or reorder any entry above this group. kind
+      // 'recipe' defs mint no heroic variants (heroic_variants.ts generator
+      // filter), so the heroic auto-upgrade path ignores them.
+      { itemId: 'pattern_duskforged_warblade', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_ridgebreaker', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_duskforged_bulwark', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_wyrmfall_pendant', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_warhewn_signet', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_prismglass_loop', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_gyrelens_array', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_masters_field_forge', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_makers_charm', chance: 0.04, rollGroup: 'nythraxis_patterns' },
+      { itemId: 'pattern_voidbound_grimoire', chance: 0.04, rollGroup: 'nythraxis_patterns' },
     ],
     scale: 3.1,
     color: 0x221b2d,

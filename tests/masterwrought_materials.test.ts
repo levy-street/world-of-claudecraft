@@ -9,6 +9,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, ITEMS, MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
+import { itemFromRaid } from '../src/sim/item_level';
 import { isItemLocked } from '../src/sim/item_lock';
 import {
   awardRiftFirstClearMaterials,
@@ -813,6 +814,18 @@ describe('sundered essence: the extraction', () => {
     expect(isSunderable(ITEMS.deathless_greatblade)).toBe(false);
     expect(isSunderable(ITEMS.heart_of_the_rift)).toBe(false);
     expect(isSunderable(ITEMS.deathless_heartwood)).toBe(false);
+    // Phase 11: the raid pattern drops are epic AND raid-sourced, the first
+    // ids to need the kind clause. Deleting `def.kind !== 'recipe'` admits
+    // them (a chase pattern ground into one essence, a pure foot-gun;
+    // classic disenchanting never took recipes). One negative for the new
+    // clause, with the premise pinned so this arm cannot go vacuous.
+    expect(ITEMS.pattern_duskforged_warblade.quality).toBe('epic');
+    expect(ITEMS.pattern_duskforged_warblade.kind).toBe('recipe');
+    expect(
+      itemFromRaid('pattern_duskforged_warblade'),
+      'premise: the raid pattern IS raid-sourced, so only the kind clause refuses it',
+    ).toBe(true);
+    expect(isSunderable(ITEMS.pattern_duskforged_warblade)).toBe(false);
   });
 
   it('refuses while busy and while dead', () => {

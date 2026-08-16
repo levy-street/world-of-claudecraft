@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<title>Pattern: Briarstep Jerkin</title>
+<defs>
+<radialGradient id="bg" cx="0.36" cy="0.3" r="1.05">
+<stop offset="0" stop-color="#33291f"/>
+<stop offset="0.55" stop-color="#1a1512"/>
+<stop offset="1" stop-color="#101014"/>
+</radialGradient>
+<radialGradient id="vig" cx="0.5" cy="0.5" r="0.72">
+<stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+<stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+</radialGradient>
+<filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="10"/>
+</filter>
+<filter id="soft4" x="-40%" y="-40%" width="180%" height="180%">
+<feGaussianBlur stdDeviation="4"/>
+</filter>
+<linearGradient id="sheet" x1="0" y1="0" x2="0.7" y2="1">
+<stop offset="0" stop-color="#d8bd8d"/>
+<stop offset="1" stop-color="#ab8a58"/>
+</linearGradient>
+<linearGradient id="roll" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#d8bd8d"/>
+<stop offset="0.55" stop-color="#ab8a58"/>
+<stop offset="1" stop-color="#5f4c2e"/>
+</linearGradient>
+<radialGradient id="wax" cx="0.35" cy="0.32" r="1">
+<stop offset="0" stop-color="#8a5a2e"/>
+<stop offset="1" stop-color="#4a2c12"/>
+</radialGradient>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<ellipse cx="184" cy="172" rx="172" ry="142" fill="#6b4a2c" opacity="0.14" filter="url(#soft)"/>
+<ellipse cx="256" cy="432" rx="156" ry="27" fill="#000000" opacity="0.55" filter="url(#soft)"/>
+<ellipse cx="256" cy="428" rx="100" ry="14" fill="#000000" opacity="0.4" filter="url(#soft4)"/>
+<!-- unrolled sheet -->
+<path d="M158 150 q98 10 196 0 l6 236 q-104 12 -208 0 z" fill="url(#sheet)" stroke="#241a0e" stroke-width="6"/>
+<path d="M164 260 l-14 8 l14 8 z" fill="#141014" opacity="0.55"/>
+<!-- rolled ends -->
+<rect x="138" y="118" width="236" height="42" rx="21" fill="url(#roll)" stroke="#241a0e" stroke-width="6"/>
+<circle cx="142" cy="139" r="14" fill="#6b563a" stroke="#241a0e" stroke-width="5"/>
+<circle cx="370" cy="139" r="14" fill="#7d6743" stroke="#241a0e" stroke-width="5"/>
+<rect x="150" y="384" width="212" height="36" rx="18" fill="url(#roll)" stroke="#241a0e" stroke-width="6"/>
+<circle cx="154" cy="402" r="12" fill="#6b563a" stroke="#241a0e" stroke-width="5"/>
+<circle cx="358" cy="402" r="12" fill="#7d6743" stroke="#241a0e" stroke-width="5"/>
+<!-- ribbon tie on the top roll -->
+<rect x="198" y="112" width="26" height="52" rx="6" fill="#7a5228" stroke="#1c1208" stroke-width="4"/>
+<path d="M211 164 l-10 26 l10 -7 l10 7 z" fill="#7a5228" stroke="#1c1208" stroke-width="4" stroke-linejoin="round"/>
+<!-- ruled ink header and footer lines -->
+<g stroke="#4c3a20" stroke-width="4" opacity="0.6" stroke-linecap="round">
+<path d="M186 190 l140 0"/>
+<path d="M196 208 l120 0"/>
+<path d="M202 348 l108 0"/>
+</g>
+<!-- the craft-family emblem, inked on the sheet -->
+<g transform="translate(256 276)">
+
+    <path d="M-40 -26 q10 -18 26 -12 q14 -14 28 -2 q20 -2 22 16 q12 14 -2 28 q0 18 -18 20 q-12 14 -28 6 q-18 8 -26 -8 q-16 -6 -10 -24 q-10 -14 8 -24 z" fill="none" stroke="#3a2a16" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M-22 -8 q22 -12 44 4" fill="none" stroke="#4c3a20" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 9"/>
+    <path d="M-24 12 q24 -10 46 4" fill="none" stroke="#4c3a20" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 9"/>
+</g>
+<!-- wax seal, per-item tilt -->
+<g transform="rotate(-22 322 366)">
+<circle cx="322" cy="366" r="30" fill="url(#wax)" stroke="#170d08" stroke-width="4"/>
+<circle cx="322" cy="366" r="19" fill="none" stroke="#170d08" stroke-width="3" opacity="0.6"/>
+<path d="M322 352 l4 10 l11 0 l-9 7 l4 11 l-10 -7 l-10 7 l4 -11 l-9 -7 l11 0 z" fill="#170d08" opacity="0.55"/>
+</g>
+<ellipse cx="314" cy="382" rx="26" ry="10" fill="#000000" opacity="0.25" filter="url(#soft4)"/>
+<!-- key-light sheen down the left edge -->
+<path d="M172 168 q-4 96 4 208" fill="none" stroke="#f0e4c8" stroke-width="7" opacity="0.3" stroke-linecap="round"/>
+<path d="M160 132 q30 -8 60 -4" fill="none" stroke="#f0e4c8" stroke-width="5" opacity="0.35" stroke-linecap="round"/>
+<rect width="512" height="512" fill="url(#vig)"/>
+</svg>

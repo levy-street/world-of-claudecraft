@@ -5592,6 +5592,7 @@ export const en_XA: EnTranslations = {
       "sourceTrainerFree": "[Ţŕáíñéŕ, ƒŕéé]",
       "sourceKnown": "[Ķñóŵñ ƒŕóɱ ţĥé šţáŕţ]",
       "sourceDrop": "[Ƒŕóɱ á ƒóúñð þáţţéŕñ]",
+      "sourceVendor": "[Šóļð ƀý ţĥé Ĥéŕóíç Ɋúáŕţéŕɱášţéŕ]",
       "gainFmt": "[{reduced} / {minimal} / {zero}]",
       "colRecipe": "[Ŕéçíþé]",
       "colSkill": "[Šķíļļ]",
@@ -9113,6 +9114,7 @@ export const en_XA: EnTranslations = {
       "filterTypeConsumable": "[Çóñšúɱáƀļéš]",
       "filterTypeMaterial": "[Ɱáţéŕíáļš]",
       "filterTypeCosmetic": "[Çóšɱéţíçš]",
+      "filterTypePattern": "[Þáţţéŕñš]",
       "filterTypeOther": "[Óţĥéŕ]",
       "filterArmorType": "[Áŕɱóŕ ţýþé]",
       "filterArmorAll": "[Áļļ áŕɱóŕ]",
@@ -12605,6 +12607,90 @@ export const en_XA: EnTranslations = {
       },
       "laden_hearth": {
         "name": "[Ţĥé Ļáðéñ Ĥéáŕţĥ]"
+      },
+      "pattern_spiritweld_girdle": {
+        "name": "[Þļáñš: Šþíŕíţŵéļð Ĝíŕðļé]"
+      },
+      "pattern_forgefold_legguards": {
+        "name": "[Þļáñš: Ƒóŕĝéƒóļð Ļéĝĝúáŕðš]"
+      },
+      "pattern_wardspeaker_sabatons": {
+        "name": "[Þļáñš: Ŵáŕðšþéáķéŕ Šáƀáţóñš]"
+      },
+      "pattern_briarstep_jerkin": {
+        "name": "[Þáţţéŕñ: Ɓŕíáŕšţéþ Ĵéŕķíñ]"
+      },
+      "pattern_fenbloom_breeches": {
+        "name": "[Þáţţéŕñ: Ƒéñƀļóóɱ Ɓŕééçĥéš]"
+      },
+      "pattern_barksong_handguards": {
+        "name": "[Þáţţéŕñ: Ɓáŕķšóñĝ Ĥáñðĝúáŕðš]"
+      },
+      "pattern_sunspun_vestments": {
+        "name": "[Þáţţéŕñ: Šúñšþúñ Ʋéšţɱéñţš]"
+      },
+      "pattern_sunspun_leggings": {
+        "name": "[Þáţţéŕñ: Šúñšþúñ Ļéĝĝíñĝš]"
+      },
+      "pattern_sunspun_handwraps": {
+        "name": "[Þáţţéŕñ: Šúñšþúñ Ĥáñðŵŕáþš]"
+      },
+      "pattern_sunspun_haversack": {
+        "name": "[Þáţţéŕñ: Šúñšþúñ Ĥáʋéŕšáçķ]"
+      },
+      "pattern_duskforged_warblade": {
+        "name": "[Þļáñš: Ðúšķƒóŕĝéð Ŵáŕƀļáðé]"
+      },
+      "pattern_ridgebreaker": {
+        "name": "[Þļáñš: Ŕíðĝéƀŕéáķéŕ]"
+      },
+      "pattern_duskforged_bulwark": {
+        "name": "[Þļáñš: Ðúšķƒóŕĝéð Ɓúļŵáŕķ]"
+      },
+      "pattern_wyrmfall_pendant": {
+        "name": "[Ðéšíĝñ: Ŵýŕɱƒáļļ Þéñðáñţ]"
+      },
+      "pattern_warhewn_signet": {
+        "name": "[Ðéšíĝñ: Ŵáŕĥéŵñ Šíĝñéţ]"
+      },
+      "pattern_prismglass_loop": {
+        "name": "[Ðéšíĝñ: Þŕíšɱĝļášš Ļóóþ]"
+      },
+      "pattern_gyrelens_array": {
+        "name": "[Šçĥéɱáţíç: Ĝýŕéļéñš Áŕŕáý]"
+      },
+      "pattern_masters_field_forge": {
+        "name": "[Šçĥéɱáţíç: Ɱášţéŕ'š Ƒíéļð Ƒóŕĝé]"
+      },
+      "pattern_makers_charm": {
+        "name": "[Šçĥéɱáţíç: Ɱáķéŕ'š Çĥáŕɱ]"
+      },
+      "pattern_voidbound_grimoire": {
+        "name": "[Ţéçĥñíɋúé: Ʋóíðƀóúñð Ĝŕíɱóíŕé]"
+      },
+      "pattern_ironhusk_flask": {
+        "name": "[Ŕéçíþé: Íŕóñĥúšķ Ƒļášķ]"
+      },
+      "pattern_warboar_flask": {
+        "name": "[Ŕéçíþé: Ŵáŕƀóáŕ Ƒļášķ]"
+      },
+      "pattern_runewater_flask": {
+        "name": "[Ŕéçíþé: Ŕúñéŵáţéŕ Ƒļášķ]"
+      },
+      "pattern_stonepot_stew": {
+        "name": "[Ŕéçíþé: Šţóñéþóţ Šţéŵ]"
+      },
+      "pattern_warspice_skewers": {
+        "name": "[Ŕéçíþé: Ŵáŕšþíçé Šķéŵéŕš]"
+      },
+      "pattern_sageleaf_chowder": {
+        "name": "[Ŕéçíþé: Šáĝéļéáƒ Çĥóŵðéŕ]"
+      },
+      "pattern_grand_cauldron": {
+        "name": "[Ŕéçíþé: Ĝŕáñð Çáúļðŕóñ]"
+      },
+      "pattern_laden_hearth": {
+        "name": "[Ŕéçíþé: Ţĥé Ļáðéñ Ĥéáŕţĥ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
