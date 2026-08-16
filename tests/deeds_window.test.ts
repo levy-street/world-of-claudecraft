@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { audio } from '../src/game/audio';
 import { deedName } from '../src/ui/deed_i18n';
 import { Hud } from '../src/ui/hud';
+import { panelKeyGuardStops } from '../src/ui/panel_key_guard';
 
 // This file runs under jsdom (for the keyboard-guard behavioral test below),
 // where import.meta.url is an http URL that readFileSync rejects; resolve the
@@ -875,6 +876,8 @@ describe('chrome keys and CSS floors', () => {
 });
 
 describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
+  const buttonEl = (): HTMLElement => document.createElement('button');
+
   it('adds the Book of Deeds window to the guard array, keeping the shared guard body', () => {
     // The Book is a non-modal overlay, so canUseGameKeys() stays true while a
     // Book button has focus: without the guard, Space jumps the character and
@@ -884,14 +887,21 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     expect(start).toBeGreaterThan(0);
     const guardArray = hud.slice(start, hud.indexOf(']', start));
     expect(guardArray).toContain("'#deeds-window'");
-    // The shared guard body the behavioral test below faithfully copies: it
-    // stopPropagation's Enter/Space only when a BUTTON has focus and NEVER
+    // The guard body: it stopPropagation's on the shared decision and NEVER
     // preventDefault's (native activation survives). Scope the preventDefault
     // absence to the guard region so an unrelated hud handler cannot mask a drift.
     const guardRegion = hud.slice(start, hud.indexOf("$('#mm-map')", start));
-    expect(guardRegion).toContain("(e.target as HTMLElement).tagName !== 'BUTTON'");
+    expect(guardRegion).toContain('panelKeyGuardStops(');
     expect(guardRegion).toContain('e.stopPropagation()');
     expect(guardRegion).not.toContain('preventDefault');
+    // The decision itself moved to the pure src/ui/panel_key_guard.ts, so the
+    // "only a focused BUTTON, only Enter/Space" rule is pinned there instead of
+    // in the hud string. The behavioral test below calls the real function, so
+    // it cannot drift from hud.ts the way a hand-copied body could.
+    expect(panelKeyGuardStops(buttonEl(), 'Enter', 'Enter')).toBe(true);
+    expect(panelKeyGuardStops(buttonEl(), ' ', 'Space')).toBe(true);
+    expect(panelKeyGuardStops(document.createElement('div'), ' ', 'Space')).toBe(false);
+    expect(panelKeyGuardStops(buttonEl(), 'w', 'KeyW')).toBe(false);
   });
 
   it('stops Enter/Space from the game binds on a focused Book button, preserving native activation', () => {
@@ -901,11 +911,11 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     document.body.innerHTML = '<div id="deeds-window"><button data-close></button></div>';
     const root = document.getElementById('deeds-window') as HTMLElement;
     const btn = root.querySelector('button') as HTMLButtonElement;
-    // The listener hud.ts installs on each guarded panel root (survives the
-    // painter's innerHTML rebuilds because it lives on the root).
+    // The listener hud.ts installs on each guarded panel root, byte for byte
+    // (survives the painter's innerHTML rebuilds because it lives on the root).
+    // It calls the real shared decision, so this copy cannot drift from hud.ts.
     root.addEventListener('keydown', (e) => {
-      if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
-      if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
+      if (panelKeyGuardStops(e.target as HTMLElement, e.key, e.code)) e.stopPropagation();
     });
     const windowSpy = vi.fn();
     window.addEventListener('keydown', windowSpy);
