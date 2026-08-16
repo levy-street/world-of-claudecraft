@@ -119,7 +119,7 @@ describe('applyMasteryReset (pure, in place)', () => {
     expect(src.slice(start, end)).toContain(`'${MASTERY_RESET_LETTER_ID}'`);
   });
 
-  it('the letter is registered in the entity_i18n LETTERS_BY_ID runtime registry', () => {
+  it('the letter is known to the entity_i18n runtime registry, through the shared authored map', () => {
     // The SECOND ui letter registry (the tEntity runtime source) is no longer a
     // hand-seeded literal: entity_i18n.ts builds it from the ONE shared
     // authoredLettersById() map (the Masterwrought phase 10 QA closed the

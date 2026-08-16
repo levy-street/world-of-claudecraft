@@ -454,6 +454,32 @@ describe('yumi: flask auras (the phase 10 accounting)', () => {
     expect(b0.dead, 'the bench revived the fighter').toBe(false);
     expect(flaskAuras(sim, b0.id), 'the revive re-seats on a clean slate too').toHaveLength(0);
   });
+
+  it('a fighter benched at the whistle is wiped by the match END (the endArenaMatch branch Yumi takes)', () => {
+    // A ranked loser sits in match.defeated and endArenaMatch skips it (the
+    // send-home wipes it later); a Yumi down never enters match.defeated, so a
+    // benched body takes the OTHER branch and is reset AT the end. Pinned
+    // here because tests/arena.test.ts can only reach the defeated branch.
+    const { sim, match } = startYumi3();
+    const a0 = sim.entities.get(match.teamA[0])!;
+    const b0 = sim.entities.get(match.teamB[0])!;
+    sim.addItem(FLASK, 1, b0.id);
+    sim.useItem(FLASK, b0.id);
+    const worn = { ...flaskAuras(sim, b0.id)[0] };
+    (sim as any).dealDamage(a0, b0, 999999, false, 'physical', null, 'hit');
+    expect(b0.dead).toBe(true);
+    expect(match.defeated.has(b0.id), 'a Yumi down is a bench, never a defeat').toBe(false);
+    b0.auras.push(worn);
+    expect(flaskAuras(sim, b0.id), 'planted on the bench').toHaveLength(1);
+    // Aleph's side kills the other cat: the match ends while b0 is still benched.
+    const { catB } = cats(sim, match);
+    (sim as any).dealDamage(a0, catB, 999999, false, 'physical', null, 'hit');
+    expect(match.state).toBe('over');
+    expect(b0.dead, 'the end reset raised the benched body').toBe(false);
+    expect(flaskAuras(sim, b0.id), 'the match end ran the clean slate on the bench').toHaveLength(
+      0,
+    );
+  });
 });
 
 describe('yumi: respawn safety', () => {

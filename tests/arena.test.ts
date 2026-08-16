@@ -95,17 +95,44 @@ function startBout(sim: Sim) {
 // Masterwrought phase 10 QA: the flask accounting for the arena family ITSELF,
 // pinned BEHAVIORALLY (the caller scan in tests/resurrection.test.ts is the
 // proxy). arena.ts reaches the clean slate through its own resetForArena
-// wrapper at three sites: the seat (startArenaMatch, every arena-family format,
-// which is also how a Fiesta or Protect Yumi match ends: both end through
-// ctx.endArenaMatch into these same end and send-home sites), the match end
-// (endArenaMatch, the undefeated only), and the send-home (returnFromArena,
-// everyone). A flask carried in is gone at the seat; one quaffed inside is gone
-// from the winner at the end and from the loser's corpse at the send-home (the
-// death itself KEEPS it, the ordinary death filter, until that wipe).
+// wrapper at three sites: the seat (startArenaMatch, every arena-family
+// format), the match end (endArenaMatch, the undefeated only: a ranked loser
+// sits in match.defeated and is skipped there), and the send-home
+// (returnFromArena, everyone still present). Fiesta and Protect Yumi matches
+// end through ctx.endArenaMatch into these same two sites, but never populate
+// match.defeated (their downs live in their own respawn maps), so their benched
+// bodies take the OTHER branch of the end wipe; that branch is pinned in
+// tests/yumi_match.test.ts, not here. A flask carried in is gone at the seat;
+// one quaffed inside is gone from the winner at the end and from the loser's
+// corpse at the send-home (the death itself KEEPS it, the ordinary death
+// filter, until that wipe).
 describe('arena: flask auras (the phase 10 accounting)', () => {
   const FLASK = 'ironhusk_flask';
   const flaskAuras = (sim: Sim, pid: number) =>
     sim.entities.get(pid)!.auras.filter((x) => x.flask === true);
+  // Both fighters quaff inside the live bout, then Aleph lands the decisive
+  // blow; returns right after the end tick (state 'over').
+  function boutEndedWithFlasks(): { sim: Sim; a: number; b: number } {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    for (const pid of [a, b]) {
+      sim.addItem(FLASK, 1, pid);
+      sim.useItem(FLASK, pid);
+      expect(flaskAuras(sim, pid), 'worn inside the live bout').toHaveLength(1);
+    }
+    (sim as any).dealDamage(
+      sim.entities.get(a)!,
+      sim.entities.get(b)!,
+      99999,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    sim.tick();
+    expect(sim.arenaMatchFor(a)!.state).toBe('over');
+    return { sim, a, b };
+  }
 
   it('a flask carried in from the overworld is wiped at the seat (startArenaMatch -> resetForArena)', () => {
     const { sim, a } = queueDuo('warrior', 'mage', (s, pa) => {
@@ -118,25 +145,22 @@ describe('arena: flask auras (the phase 10 accounting)', () => {
     expect(flaskAuras(sim, a), 'the seat ran the clean slate').toHaveLength(0);
   });
 
-  it('quaffed inside: the winner loses it at the match end, the loser keeps it dead until the send-home', () => {
-    const { sim, a, b } = queueDuo();
-    startBout(sim);
-    for (const pid of [a, b]) {
-      sim.addItem(FLASK, 1, pid);
-      sim.useItem(FLASK, pid);
-      expect(flaskAuras(sim, pid), 'worn inside the live bout').toHaveLength(1);
-    }
-    const ea = sim.entities.get(a)!;
+  it('quaffed inside: the match end wipes the winner (endArenaMatch), the defeated loser keeps it on the corpse', () => {
+    const { sim, a, b } = boutEndedWithFlasks();
     const eb = sim.entities.get(b)!;
-    (sim as any).dealDamage(ea, eb, 99999, false, 'physical', null, 'hit');
-    sim.tick();
-    expect(sim.arenaMatchFor(a)!.state).toBe('over');
+    // endArenaMatch: the undefeated fighter is reset (the end wipe); the loser
+    // is in match.defeated and skipped there, and the death filter kept the
+    // flask on the corpse (aurasSurvivingDeath, the flask clause).
+    expect(sim.arenaMatchFor(a)!.defeated.has(b), 'the loser is the defeated one').toBe(true);
     expect(eb.dead).toBe(true);
-    // endArenaMatch: the undefeated fighter is reset (the end wipe); the dead
-    // loser is skipped there, and the death filter kept the flask on the corpse.
     expect(flaskAuras(sim, a), 'the winner: the match end ran the clean slate').toHaveLength(0);
     expect(flaskAuras(sim, b), 'the loser: the death kept it on the corpse').toHaveLength(1);
-    // returnFromArena after the aftermath: everyone, the corpse included.
+  });
+
+  it('quaffed inside: the send-home wipes the corpse too (returnFromArena, after the aftermath)', () => {
+    const { sim, a, b } = boutEndedWithFlasks();
+    const eb = sim.entities.get(b)!;
+    expect(flaskAuras(sim, b), 'the corpse still wears it through the aftermath').toHaveLength(1);
     for (let i = 0; i < 20 * 6 && sim.arenaMatchFor(a); i++) sim.tick();
     expect(sim.arenaMatchFor(a)).toBe(null);
     expect(eb.dead).toBe(false);

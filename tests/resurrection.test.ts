@@ -208,42 +208,31 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 // down runs too); readyArenaFighter called with clearPrep: true; and
 // resetForArena, the one-line wrapper around that call, which arena.ts runs
 // itself and hands out through the SimContext seam (ctx.resetForArena) to
-// modules that never name readyArenaFighter at all. The phase 10 QA found the
-// record wrong three times: on the readyArenaFighter route (every Yumi and
-// Fiesta revive re-seats with clearPrep: true; Thornhollow Fields seats,
-// starts, ends, and drops a leaver with clearPrep: true; ONLY its wave respawn,
-// clearPrep: false, keeps a flask, the classic-era battleground-death rule the
-// ledger records), on the resetForArena route (the Yumi match seat and the
-// Vale Cup's kit-swap seat and teardown wipe through it, and the first cut of
-// THIS scan was blind to a new ctx.resetForArena site anywhere), and on the
-// wrapper pattern itself (a call spelled `ctx.resetForArena(e as Entity)` slid
-// past the first bare-identifier regex). The accounting a flask lives under is
-// therefore: overworld and PvE deaths keep it, a battleground or arena death
-// keeps it on the corpse, every instanced match's seat and end (and each
-// Fiesta or Yumi down and revive) clears it; each mode's behavior is pinned in
-// its own suite (arena, battleground, yumi_match, fiesta, vale_cup_match).
-// Absences cannot be asserted by driving the predicates, so the three caller
-// sets are pinned literally here.
+// call sites that never spell readyArenaFighter (the Vale Cup's two, the Yumi
+// match seat). The phase 10 QA found this record wrong four times: on the
+// readyArenaFighter route (every Yumi and Fiesta revive re-seats with
+// clearPrep: true; Thornhollow Fields seats, starts, ends, and drops a leaver
+// with clearPrep: true; ONLY its wave respawn, clearPrep: false, keeps a
+// flask, the classic-era battleground-death rule the ledger records), on the
+// resetForArena route (the Yumi match seat and the Vale Cup's kit-swap seat
+// and teardown wipe through it, and the first cut of THIS scan was blind to a
+// new ctx.resetForArena site anywhere), and twice on the SPELLING the scan
+// could see (a bare-identifier regex let `ctx.resetForArena(e as Entity)`
+// through; its widened successor still let a depth-two nested argument and an
+// optional call through, and its readyArenaFighter sibling could not cross a
+// `)` at all). So the scan no longer pattern-matches arguments: it walks each
+// call's balanced parentheses (strings skipped) and reads the argument text,
+// and every readyArenaFighter site must spell its clearPrep literal or be the
+// one pinned seam passthrough, or the case reds. The accounting a flask lives
+// under is therefore: overworld and PvE deaths keep it, a battleground or
+// arena death keeps it on the corpse, every instanced match's seat and end
+// (and each Fiesta or Yumi down and revive) clears it; each mode's behavior is
+// pinned in its own suite (arena, battleground, yumi_match, fiesta,
+// vale_cup_match). Absences cannot be asserted by driving the predicates, so
+// the three caller sets are pinned literally here.
 describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate', () => {
   const SIM_ROOT = fileURLToPath(new URL('../src/sim', import.meta.url));
   const CLEAN_SLATE_CALL = 'aurasSurvivingCleanSlate(';
-  const INDIRECT_CALL = /readyArenaFighter\((?:ctx, )?[^)]*clearPrep: true/g;
-  // A CALL of the wrapper, in any argument spelling: a bare `e`, a member
-  // (`match.e`, `this.e`), an index, a cast, a ternary, one nested call
-  // (`ctx.entities.get(pid)!`), or a call wrapped over lines. What keeps the
-  // three DECLARATIONS out (`export function resetForArena(ctx: SimContext, e:
-  // Entity): void {`, the Sim delegate `private resetForArena(e: Entity): void
-  // {`, the seam's `resetForArena(e: Entity): void;`) is the RETURN annotation
-  // after the closing paren: `(?!\s*:\s*void\b)`. The seam's bind line
-  // (`resetForArena: sim.resetForArena.bind(sim)`) never opens a paren on the
-  // name. Two residues, both fail-safe or documented: a declaration that
-  // dropped its `: void` would be COUNTED (the table goes red and a person
-  // looks, the safe direction), and a bracketed or aliased call
-  // (`ctx['resetForArena'](e)`, `const f = ctx.resetForArena`) is invisible
-  // here, the same class of blind spot the Lucent tripwire documents; neither
-  // spelling exists in the sim tree, and the per-mode behavioral arms are the
-  // net under this scan for any site that matters.
-  const WRAPPER_CALL = /resetForArena\((?:[^()]|\([^()]*\))*\)(?!\s*:\s*void\b)/g;
   // Comments stripped first, so prose naming the helper (resurrection.ts and the
   // sim/moderation notes both do) cannot mint a call site that does not exist.
   // The line-comment arm keeps a `://` in a URL from eating the rest of its
@@ -252,6 +241,75 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     readFileSync(full, 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+  // Every CALL of `name` in a stripped source: the name as a whole identifier,
+  // an optional `?.`, then `(` and a walk to its balanced `)` (string literals
+  // skipped, so a paren inside a message cannot end the walk early). Any
+  // argument spelling is seen the same way: a bare identifier, a member, an
+  // index, a cast, a ternary, calls nested to any depth, a call wrapped over
+  // lines. What is NOT a call: a bind (`x.resetForArena.bind`), a property or
+  // type slot (`resetForArena: ...`, `resetForArena;`), an alias
+  // (`const f = ctx.resetForArena`); none opens a paren on the name. The
+  // DECLARATIONS do open one, so `isDeclaration` reads what follows the close:
+  // a `: void` return annotation (`export function resetForArena(...): void {`,
+  // the Sim delegate `private resetForArena(...): void {`, the seam's
+  // `resetForArena(...): void;`). A declaration that changed its return type
+  // would be COUNTED (the table reds and a person looks: the safe direction).
+  // The one residue is the aliased or bracketed call (`const f =
+  // ctx.resetForArena; f(e)`, `ctx['resetForArena'](e)`), invisible to any
+  // source scan and the same class of blind spot the Lucent tripwire
+  // documents; neither spelling exists in the sim tree, and the per-mode
+  // behavioral arms are the net under this scan for any site that matters.
+  interface CallSite {
+    args: string;
+    after: string;
+  }
+  function callSites(code: string, name: string): CallSite[] {
+    const out: CallSite[] = [];
+    let from = 0;
+    for (;;) {
+      const at = code.indexOf(name, from);
+      if (at < 0) break;
+      from = at + name.length;
+      if (at > 0 && /[\w$]/.test(code[at - 1])) continue;
+      let open = from;
+      if (code.startsWith('?.', open)) open += 2;
+      if (code[open] !== '(') continue;
+      let depth = 0;
+      let quote: string | null = null;
+      let j = open;
+      for (; j < code.length; j++) {
+        const c = code[j];
+        if (quote) {
+          if (c === '\\') j++;
+          else if (c === quote) quote = null;
+          continue;
+        }
+        if (c === "'" || c === '"' || c === '`') quote = c;
+        else if (c === '(') depth++;
+        else if (c === ')') {
+          depth--;
+          if (depth === 0) break;
+        }
+      }
+      if (depth !== 0) throw new Error(`unbalanced parentheses after ${name} at ${at}`);
+      out.push({ args: code.slice(open + 1, j), after: code.slice(j + 1, j + 24) });
+      from = j + 1;
+    }
+    return out;
+  }
+  const isDeclaration = (site: CallSite): boolean => /^\s*:\s*void\b/.test(site.after);
+  const callsOf = (code: string, name: string): CallSite[] =>
+    callSites(code, name).filter((s) => !isDeclaration(s));
+  // A readyArenaFighter site is classified by the clearPrep literal in its own
+  // argument text; a site that spells neither (a hoisted options object, a
+  // passthrough) is reported, so the only legal passthrough is pinned below.
+  const clearPrepOf = (site: CallSite): 'true' | 'false' | 'passthrough' =>
+    /\bclearPrep:\s*true\b/.test(site.args)
+      ? 'true'
+      : /\bclearPrep:\s*false\b/.test(site.args)
+        ? 'false'
+        : 'passthrough';
 
   it('is called from arena.ts and fiesta.ts, and from nowhere else in src/sim outside its own module', () => {
     const files = tsFilesUnder(SIM_ROOT);
@@ -277,49 +335,62 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // names the predicate still wipes. Counted per file (call sites, not
     // lines that mention it), and pinned as the literal table so a new seat or
     // revive that wipes, or one that stops wiping, changes this record on
-    // purpose. battleground.ts: seat (bgSeat), the countdown end, the leaver
-    // reset, and the match end; its WAVE respawn passes clearPrep: false and is
-    // deliberately absent here. yumi.ts: the revive. fiesta.ts: the revive.
-    // arena.ts: the body of resetForArena (the wrapper the next case counts
-    // the callers of) and, with clearPrep: false, the countdown-end top-off
-    // that keeps a fighter's targets, absent here too.
+    // purpose. battleground.ts: the seat (placeInBg, which is also the form-up
+    // set-back), the countdown end, the leaver reset, and the match end; its
+    // WAVE respawn passes clearPrep: false and is in the second table instead.
+    // yumi.ts: the revive. fiesta.ts: the revive. arena.ts: the body of
+    // resetForArena (the wrapper the next case counts the callers of) and,
+    // with clearPrep: false, the countdown-end top-off that keeps a fighter's
+    // targets. sim.ts: the seam delegate passes its opts through, the one
+    // legal passthrough; any other site that spells neither literal is a
+    // hoisted options object this scan cannot classify and is reported here.
     const files = tsFilesUnder(SIM_ROOT);
-    const indirect = new Map<string, number>();
+    const wipes = new Map<string, number>();
+    const keeps = new Map<string, number>();
+    const passthroughs: string[] = [];
     for (const f of files) {
-      const hits = codeOf(f.full).match(INDIRECT_CALL);
-      if (hits && hits.length > 0) indirect.set(f.file, hits.length);
+      for (const site of callsOf(codeOf(f.full), 'readyArenaFighter')) {
+        const kind = clearPrepOf(site);
+        if (kind === 'true') wipes.set(f.file, (wipes.get(f.file) ?? 0) + 1);
+        else if (kind === 'false') keeps.set(f.file, (keeps.get(f.file) ?? 0) + 1);
+        else passthroughs.push(`${f.file}: readyArenaFighter(${site.args.trim()})`);
+      }
     }
-    expect([...indirect.entries()].sort()).toEqual([
+    expect([...wipes.entries()].sort()).toEqual([
       ['social/arena.ts', 1],
       ['social/battleground.ts', 4],
       ['social/fiesta.ts', 1],
       ['social/yumi.ts', 1],
     ]);
-    // And the one battleground respawn that KEEPS a flask is the wave, which
-    // passes clearPrep: false: pinned as the negative literal, since it is the
-    // classic-era rule the whole accounting is built around.
-    const bg = codeOf(fileURLToPath(new URL('../src/sim/social/battleground.ts', import.meta.url)));
-    expect(bg.match(/readyArenaFighter\(e, \{ clearPrep: false \}\)/g)?.length).toBe(1);
+    // The respawns that KEEP a flask: the battleground wave (the classic-era
+    // rule the whole accounting is built around) and the arena countdown-end
+    // top-off. Pinned as the literal table too, so a keep that starts wiping,
+    // or a new keep, changes this record on purpose.
+    expect([...keeps.entries()].sort()).toEqual([
+      ['social/arena.ts', 1],
+      ['social/battleground.ts', 1],
+    ]);
+    expect(passthroughs).toEqual(['sim.ts: readyArenaFighter(this.ctx, e, opts)']);
   });
 
   it('reaches the clean slate through the resetForArena WRAPPER from exactly the recorded sites', () => {
-    // The third route, and the one the previous cut of this scan was blind to
+    // The third route, and the one an earlier cut of this scan was blind to
     // (a planted ctx.resetForArena in an unrelated module stayed green): the
-    // wrapper's callers never spell readyArenaFighter or clearPrep, so neither
-    // pattern above sees them. Counted per file. arena.ts: its own seat
-    // (startArenaMatch, every arena-family format including Fiesta), the match
-    // end (endArenaMatch), and the send-home (returnFromArena). yumi.ts: the
-    // match seat. vale_cup.ts: the kit-swap seat (valeCupStandardize) and the
-    // teardown. sim.ts: the BODY of the Sim delegate (`private resetForArena`
-    // forwarding to arenaMod.resetForArena), so a module reaching it as
-    // ctx.resetForArena is counted at its own site above and the seam's
-    // plumbing once here; the delegate's declaration line and its bind line
-    // in buildSimContext are not calls and are not counted.
+    // wrapper's callers need not spell readyArenaFighter or clearPrep. Counted
+    // per file. arena.ts: its own seat (startArenaMatch, every arena-family
+    // format including Fiesta and Protect Yumi), the match end (endArenaMatch,
+    // the undefeated), and the send-home (returnFromArena, everyone still
+    // present). yumi.ts: the match seat. vale_cup.ts: the kit-swap seat
+    // (valeCupStandardize) and the teardown. sim.ts: the BODY of the Sim
+    // delegate (`private resetForArena` forwarding to arenaMod.resetForArena),
+    // so a module reaching it as ctx.resetForArena is counted at its own site
+    // above and the seam's plumbing once here; the delegate's declaration line
+    // and its bind line in buildSimContext are not calls and are not counted.
     const files = tsFilesUnder(SIM_ROOT);
     const wrapper = new Map<string, number>();
     for (const f of files) {
-      const hits = codeOf(f.full).match(WRAPPER_CALL);
-      if (hits && hits.length > 0) wrapper.set(f.file, hits.length);
+      const n = callsOf(codeOf(f.full), 'resetForArena').length;
+      if (n > 0) wrapper.set(f.file, n);
     }
     expect([...wrapper.entries()].sort()).toEqual([
       ['sim.ts', 1],
@@ -335,12 +406,13 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     );
   });
 
-  it('the wrapper pattern matches every call spelling and no declaration (its own case, so a table red cannot hide it)', () => {
-    // The three spellings the tree uses today, then the ones a new site could
-    // plausibly be written in (the round-3 probe planted `e as Entity` and the
-    // first regex, a bare-identifier tail, let it through): a member, an
-    // index, a cast, a ternary argument, a call inside a ternary, one nested
-    // call, a differently named context, and a call wrapped over lines.
+  it('the call walk sees every call spelling and no declaration (its own case, so a table red cannot hide it)', () => {
+    // The spellings the tree uses today, then the ones a new site could
+    // plausibly be written in, including each one an earlier regex let
+    // through: `e as Entity` (round 3), a depth-two nested argument and an
+    // optional call (round 4), plus a member, an index, a ternary argument, a
+    // call inside a ternary, deeper nesting, a differently named context, a
+    // call wrapped over lines, and a string argument holding a paren.
     for (const call of [
       'ctx.resetForArena(e);',
       'for (const e of entities) resetForArena(ctx, e!);',
@@ -353,24 +425,59 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       'ctx.resetForArena(cond ? a : b);',
       'ctx.resetForArena(ctx.entities.get(pid)!);',
       'resetForArena(ctx, must(e));',
+      'ctx.resetForArena(pickOne(lookUp(pid)));',
+      'ctx.resetForArena(f(g(h(x))));',
+      'ctx.resetForArena?.(e);',
+      "ctx.resetForArena(must(e, 'no (fighter) here'));",
       'ctx.resetForArena(\n  e,\n);',
       'ctx.resetForArena( e )',
     ]) {
-      expect(call.match(WRAPPER_CALL)?.length, call).toBe(1);
+      expect(callsOf(call, 'resetForArena').length, call).toBe(1);
     }
-    expect('cond ? ctx.resetForArena(a) : ctx.resetForArena(b);'.match(WRAPPER_CALL)?.length).toBe(
-      2,
-    );
-    // The declaration spellings, single-line and wrapped, and the seam's bind
-    // line: none is a call.
+    expect(
+      callsOf('cond ? ctx.resetForArena(a) : ctx.resetForArena(b);', 'resetForArena').length,
+    ).toBe(2);
+    // The declaration spellings, single-line and wrapped, the seam's bind
+    // line, and an alias: none is a call.
     for (const decl of [
       'export function resetForArena(ctx: SimContext, e: Entity): void {',
       'export function resetForArena(\n  ctx: SimContext,\n  e: Entity,\n): void {',
       'private resetForArena(e: Entity): void {',
       'resetForArena(e: Entity): void;',
       'resetForArena: sim.resetForArena.bind(sim),',
+      'const f = ctx.resetForArena;',
     ]) {
-      expect(decl.match(WRAPPER_CALL), decl).toBeNull();
+      expect(callsOf(decl, 'resetForArena'), decl).toEqual([]);
+    }
+    // The readyArenaFighter side, with the classification: the nested-argument
+    // spelling the tree already uses two lines above its real call sites
+    // (`ctx.entities.get(pid)!`) is a wipe, the wave's literal is a keep, a
+    // hoisted options object is a passthrough (reported, never silently
+    // counted either way), and the wrapped declaration is not a call.
+    const wipe = callsOf(
+      'ctx.readyArenaFighter(ctx.entities.get(pid)!, { clearPrep: true });',
+      'readyArenaFighter',
+    );
+    expect(wipe.map(clearPrepOf)).toEqual(['true']);
+    expect(
+      callsOf(
+        'readyArenaFighter(ctx, e, {\n  clearPrep: false,\n  keepValidTargetPids: ids,\n});',
+        'readyArenaFighter',
+      ).map(clearPrepOf),
+    ).toEqual(['false']);
+    expect(
+      callsOf(
+        'const opts = { clearPrep: true };\nctx.readyArenaFighter(e, opts);',
+        'readyArenaFighter',
+      ).map(clearPrepOf),
+    ).toEqual(['passthrough']);
+    for (const decl of [
+      'export function readyArenaFighter(\n  ctx: SimContext,\n  e: Entity,\n  opts: { clearPrep: boolean; keepValidTargetPids?: readonly number[] },\n): void {',
+      'readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void;',
+      'private readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void {',
+      'readyArenaFighter: sim.readyArenaFighter.bind(sim),',
+    ]) {
+      expect(callsOf(decl, 'readyArenaFighter'), decl).toEqual([]);
     }
   });
 

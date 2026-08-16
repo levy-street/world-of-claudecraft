@@ -3271,15 +3271,16 @@ applied in the fix round or recorded below.
   missed and the fix-round review surfaced: "Protect Yumi likewise does not
   wipe" is FALSE, and Thornhollow Fields wipes more than the sentence says.
   The clean slate is reached by THREE routes (the fix-round reviews found
-  the third route, then a misattributed down, then a call spelling the
-  wrapper scan let through): the DIRECT aurasSurvivingCleanSlate call, in
+  the third route, then a misattributed down, then, twice, call spellings
+  the scans let through): the DIRECT aurasSurvivingCleanSlate call, in
   exactly two places (the clearPrep arm of readyArenaFighter in arena.ts,
   which IS the clean slate, and a Fiesta down, fiestaDownEntity in
   fiesta.ts, which a Protect Yumi down runs too); readyArenaFighter called
   with clearPrep: true; and resetForArena, the one-line wrapper around that
   call, run by arena.ts at its own seat, end, and send-home and handed out
-  through the SimContext seam (ctx.resetForArena) to modules that never
-  name readyArenaFighter. Through the second route every Yumi and Fiesta
+  through the SimContext seam (ctx.resetForArena) to call sites that never
+  spell readyArenaFighter (the Vale Cup's two, the Yumi match seat; the
+  seam delegate in sim.ts is the plumbing). Through the second route every Yumi and Fiesta
   revive wipes, and Thornhollow Fields wipes at the seat, at the countdown
   end, on a leaver, and at the match end; ONLY its wave respawn (clearPrep:
   false) keeps a flask. Through the third route the arena seat, end, and
@@ -3293,20 +3294,27 @@ applied in the fix round or recorded below.
   Cup) is a parenthesis (nothing carried in rides through the gates,
   nothing quaffed inside comes back out; Yumi and Fiesta downs clear it
   too). Corrected in the resurrection.ts note, pinned behaviorally per mode
-  (tests/arena.test.ts: seat, match end for the winner, send-home for the
-  loser's corpse; tests/battleground.test.ts: a flask quaffed inside rides
-  through death + wave respawn, one carried in is wiped at the seat, one
-  quaffed in the form-up at the countdown end; tests/yumi_match.test.ts:
-  seat, down, and the revive on its own (a flask re-planted on the benched
-  body is gone at the revive); tests/fiesta.test.ts: seat, down;
-  tests/vale_cup_match.test.ts: kit-swap seat, teardown, each its own case)
-  and structurally (tests/resurrection.test.ts pins the direct caller set
-  AND the literal per-module tables of both indirect routes, readyArenaFighter
-  clearPrep: true and resetForArena call sites, the wrapper pattern taking
-  any argument spelling and rejecting the declarations by their return
-  annotation, with its own positive and negative controls in their own
-  case), and the tooltip clause reads "instanced matches begin and end on a
-  clean slate".
+  (tests/arena.test.ts: seat, match end for the winner with the defeated
+  loser skipped, send-home for the loser's corpse, each its own case;
+  tests/battleground.test.ts: a flask quaffed inside rides through death +
+  wave respawn, one carried in is wiped at the seat, one quaffed in the
+  form-up at the countdown end; tests/yumi_match.test.ts: seat, down, the
+  revive on its own (a flask re-planted on the benched body is gone at the
+  revive), and the match END on a benched body (the endArenaMatch branch
+  Yumi and Fiesta take, since their downs never enter match.defeated);
+  tests/fiesta.test.ts: seat, down; tests/vale_cup_match.test.ts: kit-swap
+  seat, teardown, each its own case) and structurally
+  (tests/resurrection.test.ts pins the direct caller set AND the literal
+  per-module tables of both indirect routes, readyArenaFighter clearPrep:
+  true and resetForArena call sites, through a balanced-parenthesis call
+  walk rather than a regex over arguments (two regex cuts each let a
+  spelling through: `e as Entity`, then a depth-two nested argument and an
+  optional call, and the readyArenaFighter sibling could not cross a `)`),
+  with every readyArenaFighter site classified by its own clearPrep literal
+  or reported as a passthrough (the sim.ts seam delegate is the one pinned),
+  the keeps pinned as their own table, and the call, declaration, and
+  classification controls in their own case), and the tooltip clause reads
+  "instanced matches begin and end on a clean slate".
   Whether a 20-minute flask should survive the Yumi/Fiesta downs or the
   battleground parenthesis is a maintainer call (RULING below, recommend
   keep: the arena-family clean-slate doctrine).
