@@ -40,7 +40,7 @@ describe('mount landing gain', () => {
     const mounted = capture('land', 'rallycart_rxt');
     expect(onFoot.key).toBe('move_land');
     expect(mounted.key).toBe('mount_land_rallycart_rxt');
-    expect(mounted.gain).toBeCloseTo(onFoot.gain * 1.5, 9);
+    expect(mounted.gain).toBeCloseTo(onFoot.gain * 1.125, 9);
   });
 
   it('leaves the rider on foot exactly where it was', () => {

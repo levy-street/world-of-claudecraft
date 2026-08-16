@@ -36,8 +36,12 @@ const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies 
 /** Per-call level for the movement one-shots (jump / land / splash / swim). */
 const MOVE_GAIN = 0.7;
 const SWIM_GAIN = 0.5;
-/** A mount's own landing over the rider's. See `movement`. */
-const MOUNT_LAND_BOOST = 1.5;
+/** A mount's own landing over the rider's. See `movement`.
+ *
+ *  Was 1.5, taken down 25% on a listening pass: the takeoff sat right but the
+ *  landing still read hot. Only the mount's LANDING is scaled, so the jump and
+ *  the rider's own landing are untouched. */
+const MOUNT_LAND_BOOST = 1.125;
 const MAX_VOICES = 24; // concurrent one-shot sources (frame-budget guard)
 // Per-ability synth layer (abilityAudio): its own small voice pool, separate
 // from MAX_VOICES so ability spam can never starve footsteps/UI one-shots,
@@ -92,6 +96,12 @@ const MOUNT_ENGINE_START_FALLBACK_SEC = 0.9;
 // long costs a beat of silence before the engine settles, too short lets the
 // idle cut into the summon, which is the artefact this gate exists to stop.
 const MOUNT_SUMMON_FALLBACK_SEC = 2.5;
+/** Fade applied to the summon take's tail so ending the buffer is not a step. */
+const SUMMON_RELEASE_SEC = 0.2;
+/** How far before the summon take ends the parked idle starts rising, so the
+ *  two overlap instead of butting against each other. Comfortably longer than
+ *  the release above, so the idle is already up as the summon fades. */
+const SUMMON_IDLE_LEAD_SEC = 0.45;
 
 // Rift roller/portal loops (src/render/rift_ambience.ts): a moving hazard or
 // an open portal should read as a clear nearby presence, not a wallpaper bed
@@ -204,7 +214,14 @@ class Sfx {
   private lastPlay = new Map<string, number>();
   private lastPlayPruneAt = 0;
   private loops = new Map<string, LoopSlot>();
-  private keyedOneShots = new Map<string, { src: AudioBufferSourceNode; gain: GainNode }>();
+  // The panner is retained alongside the voice so a MOVING emitter can carry
+  // its one-shots with it (see moveKeyedVoice). Without it a windup fires at
+  // the position the throttle was pressed and stays there while the vehicle
+  // drives away from its own engine note.
+  private keyedOneShots = new Map<
+    string,
+    { src: AudioBufferSourceNode; gain: GainNode; panner: PannerNode | null }
+  >();
   // Pending auto-stop timers for timedGroundLoop, keyed the same as `loops`.
   private groundLoopTimers = new Map<string, ReturnType<typeof setTimeout>>();
   // Per-entity windup/loop/winddown state for an engine mount (see mountEngine).
@@ -474,6 +491,22 @@ class Sfx {
     }
   }
 
+  /**
+   * Move an in-flight keyed one-shot to a new world position.
+   *
+   * Loops already track their emitter because `loop()` is re-called every frame
+   * with fresh coordinates. One-shots are fired once, so a transition take on a
+   * MOVING source (a vehicle's engine windup and winddown) stays pinned where
+   * it started and audibly falls behind the vehicle. Call this every frame for
+   * the voice key those one-shots share.
+   *
+   * A no-op when the voice has already ended or was never positional.
+   */
+  moveKeyedVoice(voiceKey: string, x: number, y: number, z: number): void {
+    const voice = this.keyedOneShots.get(voiceKey);
+    if (voice?.panner) this.setPannerPos(voice.panner, x, y, z);
+  }
+
   private setPannerPos(p: PannerNode, x: number, y: number, z: number): void {
     if (p.positionX) {
       p.positionX.value = x;
@@ -625,7 +658,7 @@ class Sfx {
       }
     }
     if (opts?.voiceKey) {
-      this.keyedOneShots.set(opts.voiceKey, { src, gain: g });
+      this.keyedOneShots.set(opts.voiceKey, { src, gain: g, panner });
     }
     src.connect(g).connect(panner).connect(master);
     this.active++;
@@ -1000,8 +1033,11 @@ class Sfx {
   ): void {
     const key = `mount_summon_${mountKey}`;
     if (!(key in SFX_CLIPS)) return;
-    if (self) this.playUi(key, { gain: 0.9, cooldown: 0.1 });
-    else this.playAt(key, x, y, z, { gain: 0.85, cooldown: 0.1 });
+    // A release fade, because the take does NOT decay to silence: its last
+    // 120ms still peaks at about -15 dBFS, so simply reaching the end of the
+    // buffer is a discontinuity, and that is an audible click.
+    if (self) this.playUi(key, { gain: 0.9, cooldown: 0.1, release: SUMMON_RELEASE_SEC });
+    else this.playAt(key, x, y, z, { gain: 0.85, cooldown: 0.1, release: SUMMON_RELEASE_SEC });
     // Hold the parked idle until the summon take has finished: the engine
     // catching and settling IS the summon sound, so an idle loop underneath it
     // reads as two engines. Preloaded on the channel's start edge, so the
@@ -1011,7 +1047,14 @@ class Sfx {
     const buf = this.buffers.get(assetCacheKey(key, 0));
     this.mountEngineIdleGate.set(
       entityId,
-      ctx.currentTime + (buf?.duration ?? MOUNT_SUMMON_FALLBACK_SEC),
+      // Lead the idle in UNDER the summon's tail rather than starting it at the
+      // seam. The gate used to expire exactly when the buffer ended, so the
+      // idle began from silence at the same instant the summon stopped: two
+      // discontinuities stacked on one sample boundary. Overlapping them makes
+      // it a crossfade, which is what the handoff always sounded like it should
+      // be. Floored at zero so a very short take cannot gate into the past.
+      ctx.currentTime +
+        Math.max(0, (buf?.duration ?? MOUNT_SUMMON_FALLBACK_SEC) - SUMMON_IDLE_LEAD_SEC),
     );
   }
 
@@ -1176,6 +1219,10 @@ class Sfx {
         voiceCrossfade: interruptible ? 0.04 : undefined,
       });
     }
+    // Carry any in-flight windup/winddown with the vehicle. These are one-shots,
+    // so unlike the loops below they are not re-positioned by being called
+    // again each frame, and a vehicle drives away from its own transition take.
+    if (transitionVoice) this.moveKeyedVoice(transitionVoice, x, y, z);
     const loopActive = mountEngineLoopActive(next.state);
     const loopId = `mountEngine:${entityId}`;
     // immediate: true, the windup take is authored to already end at the
