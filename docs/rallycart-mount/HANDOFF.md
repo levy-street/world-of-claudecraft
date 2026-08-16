@@ -81,6 +81,87 @@ brightness are all guesses that have not been through a full pass on screen.
 
 ---
 
+## 1c. Session 3: tail light lens and engine audio fixes
+
+### Committed and pushed
+
+- `96ebbd2fea`, tagged **`rallycart-v1`**: the mount through the headlights,
+  no tail light work. **This is the fallback if the lens is abandoned.**
+- `b0ed7164a6`: three audio fixes, all found by ear in game.
+
+### Audio, all live
+
+1. **Engine transitions follow the car.** The windup and winddown are
+   one-shots, so unlike the loops they were never repositioned and stayed where
+   the throttle was pressed. `Sfx.moveKeyedVoice` now moves the keyed voice's
+   panner every frame; both transitions share one voice key, so one call covers
+   them. **No test yet, and this bug class will recur on the next moving
+   one-shot: worth pinning.**
+2. **The summon click.** The idle used to start on the exact sample the summon
+   take ended, and that take does not decay (its last 120ms peaks near
+   -15 dBFS). Two discontinuities on one boundary. Now the summon gets a 0.2s
+   release and the idle leads in 0.45s under its tail. The underlying asset
+   still ends hot; the release is a runtime patch over that, and re-exporting
+   the take with a real tail would make it redundant.
+3. **`MOUNT_LAND_BOOST` 1.5 -> 1.125.** Mount landing only; jump and the
+   rider's own landing untouched.
+
+### The tail light lens: NOT committed, and the state to resume from
+
+Built in Blender, `E:\rallycart_work\scripts\19_taillight_lens.py`, output
+`E:\rallycart_work\rallycart-lens.glb`. The repo copy of the model is back to
+v1; drop that GLB over `public/models/mounts/rallycart_rxt.glb` to see it. It is
+**uncompressed and must not be committed** until it goes through the KTX2 pass.
+
+**Why geometry at all.** The tail lights are PAINT, not geometry. The rear panel
+is a continuous smooth curve with no moulded recess (proved by a scanline: z
+falls monotonically, no step in and back out), and Tripo shattered the lamp's
+UVs into dozens of tiny islands, so the painted boundary is a run of island
+seams. Four runtime overlay attempts all failed on that. Real geometry in front,
+opaque and emissive, covers it instead of blending with it.
+
+**What the script does, in order.** A companion Node script rasterizes the rear
+of the car from the mesh and its texture, classifies the housing, and writes
+`reports/taillight_outline.json`. Blender then fits the lens and exports.
+
+**Five things that were each wrong once, and are the traps:**
+
+| trap | symptom | fix |
+|---|---|---|
+| `matrix_parent_inverse` | lenses floating in space | glTF has no parent-inverse; author in CHASSIS LOCAL space with an identity inverse |
+| height field over (x,y) | a piece hanging off the side | the lamp wraps **81 degrees** around the corner; parameterize AROUND it, as angle about a vertical axis inset 85mm, plus height |
+| offset along +Y | paint z-fighting through the lens | offset along the SURFACE NORMAL, or the wrap never clears |
+| sparse sampling | jagged spiky blob | the outline needs the same density the flat mask had: sample triangle interiors on a barycentric grid (~18k samples), not the ~700 vertices |
+| fitting the red PAINT | lens too small, wrong shape | fit the HOUSING (paint plus the dark surround that hugs it, bounded by proximity), and fit a **rounded rectangle**, which is what the part actually is |
+
+That last row is the important one. Fitting a free-form outline to ragged
+artwork forced a choice between jagged and blobby; fitting the FORM and taking
+only its extents from the data removes the tradeoff entirely.
+
+**Knobs**, all at the top of the script and now independent:
+`CORNER_FRAC` roundness, `GROW` overhang into the housing border, `PROUD`
+sit-on-top vs clipping, `AXIS_INSET`, `EXTENT_PERCENTILE`.
+
+**Where it was left:** the rounded-rectangle fit had just gone in and Jamie had
+not yet seen it. Verify `raysMissed: 0` in the script's report; anything above
+zero means vertices fell back to the flat plane and will hang in space.
+
+**Not done:** the twin-lens divider (dropped while fixing the floating and never
+restored), reverse white lights (this lens is the natural place: it is a
+material we own), and headlights could use the same treatment to retire the four
+hand-tuned bowl positions.
+
+### The WRX-2 retexture, parked
+
+`E:\WRX-2-keeper.glb` is the same model retextured with Pack UV on: 42 parts
+still separate, 42 materials collapsed to 1, and **geometrically identical to v1
+(all 42 parts match within 0.0001)**. So the rig transfers and every measured
+constant stays valid. Its texture is 8192x8192 and must come down to 2k;
+`E:\rallycart_work\WRX-2-keeper-2k.glb` is a repacked 2k preview. Pack UV
+unified the file but NOT the unwrap, so the lamp is still many small islands.
+
+---
+
 ## 2. Repository workflow, treat as law
 
 - Read the root `CLAUDE.md` and every `CLAUDE.md` on the path to any directory
