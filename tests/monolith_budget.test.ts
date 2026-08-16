@@ -72,7 +72,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/mount_visual_lifecycle.ts. The merged file landed 3 lines over
     // the inherited ceiling and bought the room back by extraction, per the
     // ratchet's rule, rather than raising the number.
-    ceiling: 13652,
+    // Lowered again after extracting the mount's whole per-frame presentation
+    // pass (gait update, body attitude, rider carry, ambient trail) into
+    // src/render/mount_presentation.ts, which paid for the terrain-reactive
+    // vehicle suspension's call site and the mount-summon audio edge.
+    ceiling: 13651,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -32,7 +32,7 @@ export interface MountVisualSpec {
   bobShape: 'hover' | 'hop';
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
-  fx: 'slime' | 'exhaust' | null;
+  fx: 'slime' | 'exhaust' | 'pipes' | null;
 }
 
 const spec = (
@@ -41,7 +41,7 @@ const spec = (
   rigged: boolean,
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
-  fx: 'slime' | 'exhaust' | null = null,
+  fx: 'slime' | 'exhaust' | 'pipes' | null = null,
   groundLift = 0,
 ): MountVisualSpec => ({
   visualKey,
@@ -93,6 +93,12 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // Compact tracked vehicle with an authored rider socket behind the turret.
   // Its rigid-body clips animate the suspension and track wheels without a
   // procedural bob, keeping the pilot locked to the saddle.
+  // Seat solved in Blender against the car's real features rather than by eye:
+  // the rider's back lands on the backrest cushion face and the underside of
+  // his hips on the real sitting surface, which is the top of the cockpit's
+  // UPWARD-FACING geometry (model z 0.20). Measuring the max z of a probe box
+  // instead caught the base of the backrest and sat him a foot in the air.
+  rallycart_rxt: spec('mount_rallycart_rxt', 1.06, true, undefined, -0.86, 'pipes'),
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.

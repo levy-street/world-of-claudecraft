@@ -103,3 +103,57 @@ export function advanceInterruptibleMountEngine(
 export function mountEngineLoopActive(state: MountEngineState): boolean {
   return state === 'moving';
 }
+
+/** Whether the PARKED IDLE loop should be audible for this state, on a mount
+ *  authored with one.
+ *
+ *  It holds through `stopping` on purpose: the winddown is authored to land at
+ *  the idle's own level, so the idle sitting underneath is what makes that a
+ *  handoff rather than a cut to silence. It drops during `starting` for the
+ *  same reason in reverse: the windup climbs away from idle, and leaving the
+ *  idle underneath at full level muddies the climb and then snaps off when the
+ *  drive loop takes over. */
+export function mountEngineIdleAudible(state: MountEngineState): boolean {
+  return state === 'idle' || state === 'stopping';
+}
+
+/** Semitones of pitch bend over a mount's authored rate, by state.
+
+    reverse           +2
+    airborne          +3
+    reverse+airborne  +4
+
+Deliberately SUB-additive: pitch is logarithmic, so stacking +2 and +3 into +5
+turns a toy engine into a dentist drill. The combination is a chosen value, not
+arithmetic. */
+const BEND_SEMITONES = { reverse: 2, airborne: 3, both: 4 } as const;
+
+/** The single pitch multiplier for whichever engine loop is currently audible.
+
+`hasIdleTake` selects the behaviour, because only a mount with a parked-idle
+loop expresses reverse as a pitch bend at all. Mounts without one (the rocket
+sled) keep their original airborne-only bend untouched, so adding this table
+cannot retune a shipped mount. */
+export function mountEngineBendRate(
+  reversing: boolean,
+  airborne: boolean,
+  hasIdleTake: boolean,
+  pivoting = false,
+): number {
+  if (!hasIdleTake) return airborne ? SLED_AIRBORNE_RATE : 1;
+  // A car turning on the spot is working its engine the same way reverse does:
+  // load with no road speed. It gets the reverse bend rather than a third
+  // value, which is both what it sounds like and what was asked for.
+  const loaded = reversing || pivoting;
+  const semitones = loaded
+    ? airborne
+      ? BEND_SEMITONES.both
+      : BEND_SEMITONES.reverse
+    : airborne
+      ? BEND_SEMITONES.airborne
+      : 0;
+  return semitones === 0 ? 1 : 2 ** (semitones / 12);
+}
+
+/** The pre-table airborne bend, preserved exactly for mounts with no idle take. */
+const SLED_AIRBORNE_RATE = 1.08;

@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "ce3a5ff826f74efacb69667b1362d8c8dd270c04e30532c35ad809856a534fde",
-  "catalogHash": "b3b4fe8b4f301a88da047e2ebec6f594fe24742aa7353b65770d5b19b09c9d23",
+  "bundleId": "d7d69bb6989a59c6ae1ed8735c0780cf3eb4feff0ad243ab05ceed29c6dba1ab",
+  "catalogHash": "32eb3c1a1ff9caa9388e8a97b6f4167145f37d7e7d6e215daac768d40d48f523",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2854,6 +2854,72 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mount_jump_rallycart_rxt": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mount_jump_rallycart_rxt_1.mp3?v=996c1b5ad648",
+          "bytes": 35525,
+          "sha256": "996c1b5ad6483ce7d14ac2ca5ec012bbc68f49075f96364add48fb7079b35f9e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mount_jump_rallycart_rxt_2.mp3?v=40079c771f04",
+          "bytes": 29256,
+          "sha256": "40079c771f04f7a39574d522cdedc0434cc65301ea11b00a334ffb1ce6e688d1"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/mount_jump_rallycart_rxt_3.mp3?v=7c75554d7df0",
+          "bytes": 22986,
+          "sha256": "7c75554d7df02e113accc42e0d0b76390d16c91cf0568b0ef15e15bff4dae7da"
+        },
+        {
+          "id": "4",
+          "url": "/audio/sfx/mount_jump_rallycart_rxt_4.mp3?v=8d7945bf91c8",
+          "bytes": 32391,
+          "sha256": "8d7945bf91c82ba01560de32df3b8315ec8c4e5ad30885edcf005de424476f1c"
+        },
+        {
+          "id": "5",
+          "url": "/audio/sfx/mount_jump_rallycart_rxt_5.mp3?v=0407d178320a",
+          "bytes": 24031,
+          "sha256": "0407d178320a33d637b7346f7e3784c14dcc0403467864b7ec77c5a6a40a257f"
+        }
+      ],
+      "gain": 1.318257,
+      "playbackRate": 1
+    },
+    "mount_land_rallycart_rxt": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mount_land_rallycart_rxt_1.mp3?v=d4fa82e7b54e",
+          "bytes": 26166,
+          "sha256": "d4fa82e7b54ed5448dc539e9ff59db02515d8e5dbdf9397c1c468a914c950c00"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mount_land_rallycart_rxt_2.mp3?v=f5163d8f86ab",
+          "bytes": 38660,
+          "sha256": "f5163d8f86abf9e3434c6eb2f20ff42fb7f66c678e93499f00ef3d23baa0b002"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/mount_land_rallycart_rxt_3.mp3?v=dcde73fc8890",
+          "bytes": 41795,
+          "sha256": "dcde73fc8890a463f7374b8ff428fe68a7ba8f21a5266d501f45e0cd81aaaf45"
+        },
+        {
+          "id": "4",
+          "url": "/audio/sfx/mount_land_rallycart_rxt_4.mp3?v=7c4b38b4b91c",
+          "bytes": 36570,
+          "sha256": "7c4b38b4b91c3257d10ea104aad8bca813d54620bb32a115e0ec1892fded815a"
+        }
+      ],
+      "gain": 1.174898,
+      "playbackRate": 1
+    },
     "mount_run_aether_hover_cycle": {
       "variants": [
         {
@@ -2962,6 +3028,54 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mount_run_rallycart_rxt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_rallycart_rxt.mp3?v=f37faf2255d0",
+          "bytes": 399150,
+          "sha256": "f37faf2255d010c8891a71493b9481471bae9a4460faf4371d886c3845bd7056"
+        }
+      ],
+      "gain": 1.333521,
+      "playbackRate": 1
+    },
+    "mount_run_rallycart_rxt_idle": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_rallycart_rxt_idle.mp3?v=ce4b77fe55d7",
+          "bytes": 527672,
+          "sha256": "ce4b77fe55d75ddfc50910cf3d96d19065960ebad9b5c28ce499df03f9d8c588"
+        }
+      ],
+      "gain": 2.238721,
+      "playbackRate": 1
+    },
+    "mount_run_rallycart_rxt_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_rallycart_rxt_start.mp3?v=59d6e0def0a5",
+          "bytes": 146284,
+          "sha256": "59d6e0def0a5734cbce9d3ceb0b6b5cbdf7db7482b71622710603fa5aaa3a17e"
+        }
+      ],
+      "gain": 1.333521,
+      "playbackRate": 1
+    },
+    "mount_run_rallycart_rxt_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_rallycart_rxt_stop.mp3?v=babdb4c2fae8",
+          "bytes": 102399,
+          "sha256": "babdb4c2fae8cf5d7a6b141d642907d07e70232a317b0ec38786046debfd67fd"
+        }
+      ],
+      "gain": 1.496236,
+      "playbackRate": 1
+    },
     "mount_run_shadowjump_toad": {
       "variants": [
         {
@@ -3056,6 +3170,18 @@
         }
       ],
       "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_summon_rallycart_rxt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_summon_rallycart_rxt.mp3?v=62ee26fe7f44",
+          "bytes": 92995,
+          "sha256": "62ee26fe7f44027b3c547425d18e80062d6b965810622c52e3b97ab3a798397b"
+        }
+      ],
+      "gain": 2.371374,
       "playbackRate": 1
     },
     "move_jump": {

@@ -1927,6 +1927,135 @@ export class Vfx {
     );
   }
 
+  /**
+   * Smoke out of one tailpipe, at a world position, with the pipe's own exit
+   * direction.
+   *
+   * Separate from `mountExhaust` rather than an edit to it: that method is the
+   * Aether Hover Cycle's sparkle trail, and giving a new mount a different look
+   * must not retune a shipped one.
+   *
+   * `back` is the unit vector out of the pipe, already carrying the body's yaw
+   * AND its pitch and roll, so the plume stays welded to the car through a
+   * landing rather than detaching at the moment someone is most likely to be
+   * looking at the back of it.
+   */
+  mountPipeExhaust(
+    ports: readonly THREE.Vector3[],
+    weights: readonly number[],
+    back: THREE.Vector3,
+    rate: number,
+    dt: number,
+  ): void {
+    if (ports.length === 0 || !this.emitChance(rate, dt)) return;
+    // One pipe per spawn, chosen by weight, rather than every pipe every time.
+    // Four ports cost nothing over one in this pool (spawn is a write into a
+    // shared ring buffer, there are no emitter objects), so the only thing that
+    // costs is the particle COUNT, and this keeps that count the tuned rate
+    // instead of silently quadrupling it.
+    let total = 0;
+    for (const w of weights) total += w;
+    let pick = Math.random() * (total || 1);
+    let index = ports.length - 1;
+    for (let i = 0; i < ports.length; i++) {
+      pick -= weights[i] ?? 1;
+      if (pick <= 0) {
+        index = i;
+        break;
+      }
+    }
+    this.pipeSmoke(ports[index], back);
+  }
+
+  /**
+   * One soot puff, sized and coloured for the pool it lives in.
+   *
+   * THIS POOL IS ADDITIVE. That is the constraint everything here answers to,
+   * and getting it wrong is what made the first version read as white blobs.
+   * Additive can only ADD light, never occlude, so overlapping puffs SUM: three
+   * mid-greys at 0.5 clip straight to white. The brighter and the denser the
+   * smoke, the whiter it gets, which is the opposite of how smoke works.
+   *
+   * So it is dark and warm, in the same range the rocket sled's sputter smoke
+   * already uses (0x593126), and it is deliberately sparse. What this can
+   * honestly produce is a faint sooty haze that lifts off the pipes, not smoke
+   * that blocks anything. Real smoke needs to darken, and darkening needs a
+   * non-additive pass.
+   *
+   * The alpha envelope is the other half of it: alpha holds at 1 for the first
+   * 75% of a particle's life and only then ramps down, so a long-lived puff
+   * spends most of its time at full strength. Keeping lives short is what stops
+   * them piling up.
+   */
+  private pipeSmoke(at: THREE.Vector3, back: THREE.Vector3): void {
+    // Spawned off the mouth rather than in it: a smoke sprite is still wider
+    // than these pipes, so one centred on the opening would half intersect the
+    // tube it is meant to be leaving.
+    const out = 0.12 + Math.random() * 0.14;
+    const drift = 0.9 + Math.random() * 0.9;
+    // Larger further back, which is how a fixed-size sprite fakes expansion:
+    // spawn() takes no growth parameter, so a plume widens by later particles
+    // being bigger, not by any one of them changing.
+    const size = 0.22 + out * 0.5 + Math.random() * 0.1;
+    const soot = 0.11 + Math.random() * 0.09;
+    this.spawn(
+      at.x + back.x * out + (Math.random() - 0.5) * 0.12,
+      at.y + back.y * out + (Math.random() - 0.5) * 0.08,
+      at.z + back.z * out + (Math.random() - 0.5) * 0.12,
+      back.x * drift + (Math.random() - 0.5) * 0.35,
+      back.y * drift + 0.62 + Math.random() * 0.4,
+      back.z * drift + (Math.random() - 0.5) * 0.35,
+      new THREE.Color(soot, soot * 0.88, soot * 0.82),
+      size,
+      0.55 + Math.random() * 0.4,
+      -0.12,
+      SPR.smoke,
+    );
+  }
+
+  /**
+   * The launch flame: a short burst out of every pipe at once.
+   *
+   * Fired on the acceleration transient INSIDE the windup take, so it reads as
+   * the engine catching rather than as a generic effect bolted to a state
+   * change. One event per launch.
+   */
+  mountPipeFlame(ports: readonly THREE.Vector3[], back: THREE.Vector3): void {
+    for (const at of ports) {
+      for (let i = 0; i < 3; i++) {
+        const out = 0.08 + i * 0.13;
+        const speed = 3.4 - i * 0.7;
+        this.spawn(
+          at.x + back.x * out,
+          at.y + back.y * out,
+          at.z + back.z * out,
+          back.x * speed + (Math.random() - 0.5) * 0.5,
+          back.y * speed + 0.25,
+          back.z * speed + (Math.random() - 0.5) * 0.5,
+          i === 0 ? 0xfff0c0 : i === 1 ? 0xffb13b : 0xff6a1f,
+          0.3 - i * 0.05,
+          0.16 + i * 0.05,
+          0,
+          SPR.flame,
+        );
+      }
+      // A sooty kick behind the fire, so the burst leaves something behind it.
+      this.spawn(
+        at.x + back.x * 0.3,
+        at.y + back.y * 0.3,
+        at.z + back.z * 0.3,
+        back.x * 1.6,
+        back.y * 1.6 + 0.5,
+        back.z * 1.6,
+        new THREE.Color(0.17, 0.15, 0.13),
+        0.36,
+        0.5,
+        -0.1,
+        SPR.smoke,
+      );
+    }
+  }
+
   /** Twin-nozzle combustion trail for the Goblin Rocket Sled. The continuous
    *  flame is mount-owned geometry; this method contributes only short-lived
    *  detached tongues, sparks, and restrained sputter smoke to the shared

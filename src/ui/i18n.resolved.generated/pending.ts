@@ -14,32 +14,44 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "es_ES": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "fr_FR": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "fr_CA": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "en_CA": [],
   "it_IT": [
@@ -47,92 +59,145 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "de_DE": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "entities.items.reins_rallycart_rxt.name",
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_rallycart_rxt"
+  ],
+  "zh_TW": [
+    "entities.items.reins_rallycart_rxt.name",
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_rallycart_rxt"
+  ],
+  "ko_KR": [
+    "entities.items.reins_rallycart_rxt.name",
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_rallycart_rxt"
+  ],
+  "ja_JP": [
+    "entities.items.reins_rallycart_rxt.name",
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_rallycart_rxt"
+  ],
   "pt_BR": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "entities.items.reins_rallycart_rxt.name",
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_rallycart_rxt"
+  ],
   "cs_CZ": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "nl_NL": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "pl_PL": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "id_ID": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "tr_TR": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "sv_SE": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "vi_VN": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ],
   "da_DK": [
     "entities.abilities.challenging_roar.description",
     "entities.abilities.challenging_roar.name",
     "entities.abilities.cheap_shot.descriptionNoStealth",
     "entities.items.reins_goblin_rocket_sled.name",
+    "entities.items.reins_rallycart_rxt.name",
     "hudChrome.mounts.desc_goblin_rocket_sled",
-    "hudChrome.mounts.name_goblin_rocket_sled"
+    "hudChrome.mounts.desc_rallycart_rxt",
+    "hudChrome.mounts.name_goblin_rocket_sled",
+    "hudChrome.mounts.name_rallycart_rxt"
   ]
 };

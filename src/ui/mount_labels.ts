@@ -19,6 +19,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   stormfeather_griffin: 'hudChrome.mounts.name_stormfeather_griffin',
   thunderstrut_gobbler: 'hudChrome.mounts.name_thunderstrut_gobbler',
   goblin_rocket_sled: 'hudChrome.mounts.name_goblin_rocket_sled',
+  rallycart_rxt: 'hudChrome.mounts.name_rallycart_rxt',
   drakemaw_raptor: 'hudChrome.mounts.name_drakemaw_raptor',
   terrorspark_groundshaker: 'hudChrome.mounts.name_terrorspark_groundshaker',
 };
@@ -32,6 +33,7 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   stormfeather_griffin: 'hudChrome.mounts.desc_stormfeather_griffin',
   thunderstrut_gobbler: 'hudChrome.mounts.desc_thunderstrut_gobbler',
   goblin_rocket_sled: 'hudChrome.mounts.desc_goblin_rocket_sled',
+  rallycart_rxt: 'hudChrome.mounts.desc_rallycart_rxt',
   drakemaw_raptor: 'hudChrome.mounts.desc_drakemaw_raptor',
   terrorspark_groundshaker: 'hudChrome.mounts.desc_terrorspark_groundshaker',
 };

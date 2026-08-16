@@ -340,6 +340,16 @@ describe('character ClipMaps match the shipped GLBs', () => {
     });
   }
 
+  it('cuts wheeled vehicles straight to idle instead of crossfading', () => {
+    // A crossfade keeps the outgoing clip PLAYING while it fades, so a vehicle
+    // whose locomotion clip drives its wheels keeps turning them for the length
+    // of the fade after the throttle is released. Any mount rig that animates
+    // per-wheel nodes wants the cut.
+    expect(VISUALS.mount_rallycart_rxt.cutToIdle).toBe(true);
+    // Opt-in only: a creature's legs blending down to a stand needs the fade.
+    expect(VISUALS.mount_valorsteed.cutToIdle).toBeUndefined();
+  });
+
   it('bakes the far-LOD proxy from a real idle pose, never bind pose', () => {
     // prepareVisual poses a throwaway clone on clips.idle before baking the
     // static far mesh; with no idle clip resolved it bakes the BIND pose, and

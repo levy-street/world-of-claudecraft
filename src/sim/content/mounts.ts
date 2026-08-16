@@ -21,6 +21,7 @@ export type MountKey =
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
   | 'goblin_rocket_sled'
+  | 'rallycart_rxt'
   | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
@@ -109,6 +110,12 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   goblin_rocket_sled: {
     key: 'goblin_rocket_sled',
     name: 'Goblin Rocket Sled',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  rallycart_rxt: {
+    key: 'rallycart_rxt',
+    name: 'Rallycart RXT',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

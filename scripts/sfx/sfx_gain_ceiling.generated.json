@@ -2348,6 +2348,70 @@
       }
     ]
   },
+  "mount_jump_rallycart_rxt": {
+    "ceilingDb": 2.4,
+    "tracks": [
+      {
+        "filename": "mount_jump_rallycart_rxt_1.mp3",
+        "sha256": "996c1b5ad6483ce7d14ac2ca5ec012bbc68f49075f96364add48fb7079b35f9e",
+        "size": 35525,
+        "peakDb": -3.4
+      },
+      {
+        "filename": "mount_jump_rallycart_rxt_2.mp3",
+        "sha256": "40079c771f04f7a39574d522cdedc0434cc65301ea11b00a334ffb1ce6e688d1",
+        "size": 29256,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "mount_jump_rallycart_rxt_3.mp3",
+        "sha256": "7c75554d7df02e113accc42e0d0b76390d16c91cf0568b0ef15e15bff4dae7da",
+        "size": 22986,
+        "peakDb": -6
+      },
+      {
+        "filename": "mount_jump_rallycart_rxt_4.mp3",
+        "sha256": "8d7945bf91c82ba01560de32df3b8315ec8c4e5ad30885edcf005de424476f1c",
+        "size": 32391,
+        "peakDb": -6
+      },
+      {
+        "filename": "mount_jump_rallycart_rxt_5.mp3",
+        "sha256": "0407d178320a33d637b7346f7e3784c14dcc0403467864b7ec77c5a6a40a257f",
+        "size": 24031,
+        "peakDb": -6
+      }
+    ]
+  },
+  "mount_land_rallycart_rxt": {
+    "ceilingDb": 1.4,
+    "tracks": [
+      {
+        "filename": "mount_land_rallycart_rxt_1.mp3",
+        "sha256": "d4fa82e7b54ed5448dc539e9ff59db02515d8e5dbdf9397c1c468a914c950c00",
+        "size": 26166,
+        "peakDb": -10.9
+      },
+      {
+        "filename": "mount_land_rallycart_rxt_2.mp3",
+        "sha256": "f5163d8f86abf9e3434c6eb2f20ff42fb7f66c678e93499f00ef3d23baa0b002",
+        "size": 38660,
+        "peakDb": -4
+      },
+      {
+        "filename": "mount_land_rallycart_rxt_3.mp3",
+        "sha256": "dcde73fc8890a463f7374b8ff428fe68a7ba8f21a5266d501f45e0cd81aaaf45",
+        "size": 41795,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "mount_land_rallycart_rxt_4.mp3",
+        "sha256": "7c4b38b4b91c3257d10ea104aad8bca813d54620bb32a115e0ec1892fded815a",
+        "size": 36570,
+        "peakDb": -2.4
+      }
+    ]
+  },
   "mount_run_aether_hover_cycle": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -2447,6 +2511,50 @@
       }
     ]
   },
+  "mount_run_rallycart_rxt": {
+    "ceilingDb": 2.6,
+    "tracks": [
+      {
+        "filename": "mount_run_rallycart_rxt.mp3",
+        "sha256": "f37faf2255d010c8891a71493b9481471bae9a4460faf4371d886c3845bd7056",
+        "size": 399150,
+        "peakDb": -3.6
+      }
+    ]
+  },
+  "mount_run_rallycart_rxt_idle": {
+    "ceilingDb": 13.9,
+    "tracks": [
+      {
+        "filename": "mount_run_rallycart_rxt_idle.mp3",
+        "sha256": "ce4b77fe55d75ddfc50910cf3d96d19065960ebad9b5c28ce499df03f9d8c588",
+        "size": 527672,
+        "peakDb": -14.9
+      }
+    ]
+  },
+  "mount_run_rallycart_rxt_start": {
+    "ceilingDb": 7,
+    "tracks": [
+      {
+        "filename": "mount_run_rallycart_rxt_start.mp3",
+        "sha256": "59d6e0def0a5734cbce9d3ceb0b6b5cbdf7db7482b71622710603fa5aaa3a17e",
+        "size": 146284,
+        "peakDb": -8
+      }
+    ]
+  },
+  "mount_run_rallycart_rxt_stop": {
+    "ceilingDb": 6.7,
+    "tracks": [
+      {
+        "filename": "mount_run_rallycart_rxt_stop.mp3",
+        "sha256": "babdb4c2fae8cf5d7a6b141d642907d07e70232a317b0ec38786046debfd67fd",
+        "size": 102399,
+        "peakDb": -7.7
+      }
+    ]
+  },
   "mount_run_shadowjump_toad": {
     "ceilingDb": 5.3,
     "tracks": [
@@ -2532,6 +2640,17 @@
         "sha256": "d4e79277b2cb1da5d5941c6116136f2ca7104376e12d455c6306919a3e862002",
         "size": 10701,
         "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_summon_rallycart_rxt": {
+    "ceilingDb": 8.3,
+    "tracks": [
+      {
+        "filename": "mount_summon_rallycart_rxt.mp3",
+        "sha256": "62ee26fe7f44027b3c547425d18e80062d6b965810622c52e3b97ab3a798397b",
+        "size": 92995,
+        "peakDb": -9.3
       }
     ]
   },

@@ -146,6 +146,40 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'mount_summon_rallycart_rxt',
+    custom: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_idle',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_stop',
+    custom: true,
+  },
+  {
+    // Takeoff and touchdown for the cart, five and four takes respectively.
+    // A mount that carries no jump/land set falls back to the rider's own
+    // move_jump/move_land, so these two keys are the whole opt-in: no shipped
+    // mount changes behavior by their existing.
+    key: 'mount_jump_rallycart_rxt',
+    custom: true,
+  },
+  {
+    key: 'mount_land_rallycart_rxt',
+    custom: true,
+  },
+  {
     key: 'mount_run_terrorspark_groundshaker_start',
     custom: true,
   },
