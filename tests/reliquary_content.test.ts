@@ -203,21 +203,25 @@ function isReliquaryCarvedOut(itemId: string): boolean {
   return ITEMS[itemId]?.kind === 'recipe';
 }
 
-function dungeonRarePlusLootIds(dungeonId: string): string[] {
+function dungeonRarePlusLootIds(
+  dungeonId: string,
+  opts?: { includeCarvedOut?: boolean },
+): string[] {
+  // The includeCarvedOut arm exists ONLY for the vacuity guard below, which
+  // diffs this ONE walk against itself instead of second-modeling it (the
+  // recorded second-model-of-a-walk trap): a future third loot source added
+  // here is automatically covered by the guard with no twin to update.
+  const include = opts?.includeCarvedOut === true;
+  const admits = (itemId: string): boolean =>
+    isRarePlus(itemId) && (include || !isReliquaryCarvedOut(itemId));
   const ids = new Set<string>();
   for (const mobId of dungeonMobIds(dungeonId)) {
     for (const entry of MOBS[mobId]?.loot ?? []) {
-      if (
-        entry.itemId !== undefined &&
-        isRarePlus(entry.itemId) &&
-        !isReliquaryCarvedOut(entry.itemId)
-      ) {
-        ids.add(entry.itemId);
-      }
+      if (entry.itemId !== undefined && admits(entry.itemId)) ids.add(entry.itemId);
     }
   }
   for (const itemId of dungeonObjectItemIds(dungeonId)) {
-    if (isRarePlus(itemId) && !isReliquaryCarvedOut(itemId)) ids.add(itemId);
+    if (admits(itemId)) ids.add(itemId);
   }
   return [...ids].sort();
 }
@@ -1527,27 +1531,20 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
   });
 
   it('the recipe carve-out excludes EXACTLY the live raid patterns and nothing else', () => {
-    // The vacuity guard for isReliquaryCarvedOut: recompute every equality
-    // dungeon's rare+ set WITHOUT the carve-out and diff. The removed set
-    // must be exactly the ten phase 11 gear patterns on the Nythraxis table
-    // (kind 'recipe', epic, repeatable tradable consumed-on-learn drops:
-    // not conquerable unique loot per the ledger decision), so the
-    // carve-out can neither over-carve a real relic nor go silently dead.
+    // The vacuity guard for isReliquaryCarvedOut: run THE SAME derivation
+    // walk with the carve-out disabled and diff it against the protected
+    // form (never a re-implemented twin: the second-model trap). The
+    // removed set must be exactly the ten phase 11 gear patterns on the
+    // Nythraxis table (kind 'recipe', epic, repeatable tradable
+    // consumed-on-learn drops: not conquerable unique loot per the ledger
+    // decision), so the carve-out can neither over-carve a real relic nor
+    // go silently dead, and a future third loot source in the walk is
+    // covered automatically.
     const removed = new Set<string>();
     for (const dungeonId of Object.keys(EQUALITY_PAGES)) {
-      for (const mobId of dungeonMobIds(dungeonId)) {
-        for (const entry of MOBS[mobId]?.loot ?? []) {
-          if (
-            entry.itemId !== undefined &&
-            isRarePlus(entry.itemId) &&
-            isReliquaryCarvedOut(entry.itemId)
-          ) {
-            removed.add(entry.itemId);
-          }
-        }
-      }
-      for (const itemId of dungeonObjectItemIds(dungeonId)) {
-        if (isRarePlus(itemId) && isReliquaryCarvedOut(itemId)) removed.add(itemId);
+      const protectedSet = new Set(dungeonRarePlusLootIds(dungeonId));
+      for (const id of dungeonRarePlusLootIds(dungeonId, { includeCarvedOut: true })) {
+        if (!protectedSet.has(id)) removed.add(id);
       }
     }
     expect([...removed].sort()).toEqual([

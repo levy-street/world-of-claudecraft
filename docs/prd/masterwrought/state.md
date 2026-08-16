@@ -4534,8 +4534,10 @@ recorded, or refuted with the file open)
   the pattern list): the one out-of-assignment file Agent 1 touched,
   flagged for the review wave.
 - Parity: exactly ONE golden moved (nythraxis_full_pull, the appended
-  draw), re-minted via UPDATE_PARITY on its shard alone; the other 211
-  stayed byte-identical across the full run, the append-only proof.
+  draw), re-minted via UPDATE_PARITY on its shard alone; the other 66
+  golden FILES stayed byte-identical across the full run (211 was the
+  green-TEST count, mislabeled "goldens" here and in 835591eddc's commit
+  body, corrected at the round-2 review), the append-only proof.
   Portrait seal at the content tip: --check FRESH (bookkeeping-only
   bundle drift, the v0.38 tolerance; no re-bless owed).
 - Release-fill obligations minted: the 28 pattern names x 15 Latin
@@ -4552,7 +4554,7 @@ recorded, or refuted with the file open)
   survived a mid-flight session-limit outage, every agent resumed from its
   transcript): ONE BLOCKING (content-obligations): the reliquary equality
   pin went red because the ten epic raid patterns entered the derived
-  conquerors_nythraxis rare+ set (25 vs 15): the no-pages DECISION was
+  conquerors_nythraxis rare+ set (26 vs 16): the no-pages DECISION was
   right under the reliquary doc's own curation latitude but UNEXECUTED at
   the seam; fixed with the kind-keyed isReliquaryCarvedOut carve-out
   written at the read plus an exactly-ten vacuity guard (over-carve and
@@ -4578,6 +4580,25 @@ recorded, or refuted with the file open)
   frontend reviews otherwise fully clean (parity pin 324 untouched, zero
   wire changes, S3 green, ko Recipe-family split 제조법/요리법 verified
   deliberate and correct).
+- FINDINGS-ROUND REVIEW (round 2, fresh review + three source probes at
+  1da7a4b775; the full suite at that tip: 39653 green with ONE red, the
+  bag All-only census, admitted with rationale in b3c8e64d56, the
+  run-the-full-suite lesson's third strike this packet): V1 proved the
+  reliquary vacuity guard tracks the LIVE table; V2 proved the wire arm
+  decisive; V3 SURVIVED: a recipe-or-quest widening of the pattern arm
+  passed every market suite (the exactly-one doctrine was pinned
+  per-exemplar only), fixed by hardening the live-catalog sweep to
+  at-most-one chip per item (the sweep that reds under V3). Also applied:
+  the vacuity guard re-cut to diff the ONE derivation walk against itself
+  via an includeCarvedOut arm (the second-model-of-a-walk trap); the
+  scenario coverage line re-scoped honestly to the A-rank path (draws 2,
+  5, 6; the C/B/S-only arms stay outside every golden, a RECORDED
+  RESIDUAL for the phase 11 QA to weigh); the channels suite's false
+  behavioral-half pointer re-cut to name the parity golden; the search
+  pin gained its prefix-word half so its comment is true; the enterRift
+  seed-arg comment; the two numeric corrections above (26 vs 16; 66
+  golden files). The coverage-text edit re-mints the rift_clear_rewards
+  golden text-only (draw stream unchanged, verified by diff).
 
 ## Phase 11 ruling executions (2026-08-16, the five items owed at the head)
 - (a1) Bag signer exemption, OUTCOME 2026-08-16: kind 'bag' is exempt from

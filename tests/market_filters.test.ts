@@ -194,6 +194,22 @@ describe('World Market filters', () => {
       (id) => !buckets.some((itemType) => marketItemMatches(id, q({ itemType }))),
     );
     expect(orphans, `items no browse category can reach: ${orphans.join(', ')}`).toEqual([]);
+    // The other half of the exactly-one doctrine, over the WHOLE live
+    // catalog: no item answers two chips. The per-exemplar pins (bags, the
+    // mount, the pattern) each cover one id; this sweep is what reds when a
+    // predicate arm is widened onto a kind another arm already claims (the
+    // phase 11 review probe proved a recipe-or-quest widening survived every
+    // per-exemplar pin while this sweep catches it).
+    const multi = Object.keys(ITEMS)
+      .map((id) => ({
+        id,
+        chips: buckets.filter((itemType) => marketItemMatches(id, q({ itemType }))),
+      }))
+      .filter((entry) => entry.chips.length > 1);
+    expect(
+      multi.map((entry) => `${entry.id}: ${entry.chips.join('+')}`),
+      'every catalog item answers at most one browse category',
+    ).toEqual([]);
     // Non-vacuity: the sweep is worthless if the catalog is empty, and `.some()` short
     // circuits, so prove every bucket was actually exercised and is LIVE. A category
     // whose predicate matches nothing passes the orphan check while browsing as a dead
@@ -310,10 +326,14 @@ describe('World Market filters', () => {
         marketItemMatches('pattern_forgefold_legguards', q({ itemType })),
       ).sort(),
     ).toEqual(['all', 'pattern'].sort());
-    // Search finds a pattern by its output name and by the kind word: the
-    // predicate is kind-agnostic (name/id substring), pinned here so the
-    // new kind's searchability is a tested fact, not an inference.
+    // Search finds a pattern by its output name and by the prefix word: the
+    // predicate is kind-agnostic (name/id substring), pinned here in BOTH
+    // halves so the new kind's searchability is a tested fact, not an
+    // inference.
     expect(filterIds(['pattern_forgefold_legguards'], { search: 'forgefold' })).toEqual([
+      'pattern_forgefold_legguards',
+    ]);
+    expect(filterIds(['pattern_forgefold_legguards'], { search: 'plans' })).toEqual([
       'pattern_forgefold_legguards',
     ]);
   });

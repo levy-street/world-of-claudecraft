@@ -5,7 +5,7 @@
   "ticks": 67,
   "coverage": [
     "completeRiftClear winning payout reached through the real 1 Hz updateRiftInstances sweep",
-    "addRiftClearGearLoot draws 0..6 including the phase 11 pattern draw (draw 6 succeeds on this seed)",
+    "addRiftClearGearLoot on the A-RANK path: draws 2, 5, and 6 in order (the phase 11 pattern draw succeeds on this seed, pinning the pick position); the C/B/S-only arms (draws 0, 1, 3, 4) do not run at A and stay outside every golden, a recorded residual",
     "openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors",
     "openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)"
   ],

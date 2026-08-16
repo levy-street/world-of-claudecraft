@@ -323,8 +323,11 @@ describe('draw-order documentation', () => {
     // Source-text pin, acceptable ONLY for the comment's existence: the ledger
     // is the documented append contract, and a rewrite that dropped or
     // renumbered the pattern line would strand the recorded decision. The
-    // behavioral half (the draw actually running last, after the mount roll)
-    // lives in tests/apex_pattern_items.test.ts.
+    // behavioral half (the draw's STREAM POSITION after the mount roll) is
+    // pinned by the rift_clear_rewards parity golden (tests/parity), which
+    // reds on an insertion above draw 6 on the A-rank path; the statistical
+    // arms in tests/apex_pattern_items.test.ts are draw-order-insensitive
+    // by construction and pin rates, never position.
     const source = readFileSync(new URL('../src/sim/rift/progression.ts', import.meta.url), 'utf8');
     expect(source).toMatch(/Draw order \(APPEND-ONLY/);
     expect(source).toMatch(/6\. B\/A\/S: one apex-pattern roll \(RIFT_PATTERN_CHANCE/);

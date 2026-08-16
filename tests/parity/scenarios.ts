@@ -5871,7 +5871,7 @@ function riftClearRewards(): Scenario {
     name: 'rift_clear_rewards',
     coverage: [
       'completeRiftClear winning payout reached through the real 1 Hz updateRiftInstances sweep',
-      'addRiftClearGearLoot draws 0..6 including the phase 11 pattern draw (draw 6 succeeds on this seed)',
+      'addRiftClearGearLoot on the A-RANK path: draws 2, 5, and 6 in order (the phase 11 pattern draw succeeds on this seed, pinning the pick position); the C/B/S-only arms (draws 0, 1, 3, 4) do not run at A and stay outside every golden, a recorded residual',
       'openDescent + the walk-in descent trigger + spawnRiftFloor across all three floors',
       'openExit + rank coin bonus on the winning corpse (dev-entry claim, no race)',
     ],
@@ -5882,7 +5882,11 @@ function riftClearRewards(): Scenario {
       const p = sim.player as AnyEntity;
       beef(p);
       p.gm = true; // survive floor hazards while the run is walked, auras still apply
-      sim.enterRift(3, 25, sim.playerId); // dev entry; baseLevel 25 = A rank, 3 floors
+      // Dev entry. First arg is the RIFT SEED (floor count derives 3..6 from
+      // it via riftFloorCount; seed 3 yields 3 floors), second the baseLevel
+      // (25 = A rank): changing the 3 changes the generated rift, not a
+      // floor-count knob.
+      sim.enterRift(3, 25, sim.playerId);
       const inst = requireValue(
         sim.riftInstances.find((i) => i.partyKey !== null),
         'rift_clear_rewards instance',
