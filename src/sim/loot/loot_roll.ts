@@ -32,6 +32,7 @@
 import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
+import { applyMoneyDelta } from '../economy_events';
 import { formatMoney } from '../format_money';
 import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
@@ -328,7 +329,7 @@ export function rollLoot(
 }
 
 function grantLootCopper(ctx: SimContext, meta: PlayerMeta, amount: number): void {
-  meta.copper += amount;
+  applyMoneyDelta(ctx, meta, 'mob_loot', amount);
   meta.counters.lootCopper += amount;
   // The persisted lifetime twin of the session counter above.
   ctx.bumpDeedStat(meta, 'lootCopper', amount);

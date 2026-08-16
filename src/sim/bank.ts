@@ -19,6 +19,7 @@ import type { BankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
+import { applyMoneyDelta } from './economy_events';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -283,7 +284,7 @@ export function bankBuySlots(ctx: SimContext, pid?: number): void {
     ctx.error(meta.entityId, 'You cannot afford that bank expansion.');
     return;
   }
-  meta.copper -= price;
+  applyMoneyDelta(ctx, meta, 'bank_expansion', -price);
   meta.bank.purchasedSlots += BANK_EXPANSION_SLOTS;
   ctx.notice(meta.entityId, 'You purchase additional bank slots.');
   // A completed expansion is banker business; the gate above guarantees a banker.

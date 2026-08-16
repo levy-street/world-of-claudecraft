@@ -232,6 +232,7 @@ import { CASCADE_SCENARIO } from './dev/cascade_playtest';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import { arenaMapForSlot } from './dungeon_layout';
+import { applyMoneyDelta } from './economy_events';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -9348,7 +9349,7 @@ export class Sim {
     if (!r) return;
     const result = resolveTrain(this.stationPlacements, r.meta, r.e.pos, recipeId);
     if (result.ok) {
-      r.meta.copper -= result.fee;
+      applyMoneyDelta(this.ctx, r.meta, 'train_fee', -result.fee);
       acquireRecipeImpl(this.ctx, r.meta.entityId, recipeId, 'trainer');
     }
     r.meta.lastTrainResult = result;
@@ -9829,7 +9830,7 @@ export class Sim {
   }
 
   private chargeTownFocusRespec(meta: PlayerMeta, cost: professionsFocus.RespecCost): void {
-    if (cost.coin > 0) meta.copper -= cost.coin;
+    if (cost.coin > 0) applyMoneyDelta(this.ctx, meta, 'respec', -cost.coin);
     if (cost.materials > 0) {
       this.removeItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, cost.materials, meta.entityId);
     }

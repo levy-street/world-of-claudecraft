@@ -4,6 +4,7 @@ import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
+import { applyMoneyDelta } from './economy_events';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
 import { mountItemId, mountOwned } from './mounts';
@@ -239,7 +240,7 @@ export function handleDevChat(
       const gate = MOUNT_TRAIN_MIN_LEVEL;
       const leveled = entity.level < gate;
       if (leveled) ctx.setPlayerLevel(gate, pid);
-      meta.copper += 100 * 10000;
+      applyMoneyDelta(ctx, meta, 'dev_command', 100 * 10000);
       // Every teleport, the dev ones included, runs the one session teardown
       // (the same call /dev tp makes above).
       cancelProfessionSessionOnDisplacement(ctx, entity);
@@ -293,7 +294,7 @@ export function handleDevChat(
     const gold = clampInteger(Number(goldMatch[1]), 1, 100000);
     const meta = ctx.players.get(pid);
     if (meta) {
-      meta.copper += gold * 10000;
+      applyMoneyDelta(ctx, meta, 'dev_command', gold * 10000);
       emitDevLog(ctx, pid, `[dev] Added ${gold}g to your purse.`);
     }
     return null;

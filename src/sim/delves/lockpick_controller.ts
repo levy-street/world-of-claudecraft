@@ -38,6 +38,7 @@ import {
 } from '../content/delves/lockpick_tiers';
 import { DELVES } from '../data';
 import * as deedsMod from '../deeds';
+import { applyMoneyDelta } from '../economy_events';
 import {
   ANTE_TO_PAGES,
   ANTE_TO_STEP_TIMEOUT_MS,
@@ -444,7 +445,7 @@ function grantLockpickBonus(
     // copper bonus and the loot tier are unaffected. See delveBonusMarksFor.
     const bonusMarks = delveBonusMarksFor(meta, reward.bonusMarks);
     meta.delveMarks += bonusMarks;
-    meta.copper += bonusCopper;
+    applyMoneyDelta(ctx, meta, 'delve_lockpick_bonus', bonusCopper);
     // Structured (no prose crosses the sim boundary): the client renders a
     // tier-token "spoils" line from this event; the marks/copper fields carry
     // the actually granted amounts for any consumer that does read them.

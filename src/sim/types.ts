@@ -3,6 +3,11 @@
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
+// Type-only, and from a leaf with ZERO imports on purpose: the economy event
+// vocabulary has to be reachable from both this file (for the SimEvent variant)
+// and from economy_events.ts (which reaches data.ts for the zone lookup), so it
+// lives in neither. See src/sim/economy_event_kinds.ts.
+import type { EconomyCounterparty, EconomyEventKind } from './economy_event_kinds';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
@@ -6512,6 +6517,35 @@ export type SimEvent = { pid?: number } & (
       celebrantName: string;
       pairId: string;
       zoneId: string;
+    }
+  // Economy Watch (src/sim/economy_events.ts): the audit row explaining one
+  // movement of coin. SERVER-ONLY, the one variant of this union that never
+  // reaches a client socket: `SERVER_ONLY_SIM_EVENT_TYPES` names it, the
+  // authoritative host consumes it off the drained batch before routeEvents,
+  // and no client decodes it. It rides the personal event path anyway (pid is
+  // always set) because attribution is the whole point of the row, and because
+  // an out-only SimEvent is the sim's existing way to tell the host something
+  // without the host being able to reach back in.
+  //
+  // `amount` is SIGNED copper from the holder's point of view; `balanceAfter`
+  // is that holder's balance immediately after this event applied. The pair is
+  // what makes a bypassed mutation detectable: a character's rows chain, so a
+  // write that skipped the ledger breaks the chain at exactly the row after it.
+  // `x`/`z` are COARSE (whole world units), never the exact float: a
+  // keep-forever audit table must not become a movement recording.
+  | {
+      type: 'economy';
+      pid: number;
+      kind: EconomyEventKind;
+      amount: number;
+      balanceAfter: number;
+      counterparty: EconomyCounterparty;
+      // The sim clock, never a wall clock. Two events from one tick share it,
+      // which is what lets the reconciliation job reason about same-tick races.
+      tick: number;
+      zone: string;
+      x: number;
+      z: number;
     }
 );
 

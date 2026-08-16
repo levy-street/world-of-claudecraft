@@ -33,6 +33,7 @@
 
 import { bagCapacity, countFit } from '../bags';
 import { ITEMS } from '../data';
+import { applyMoneyDelta } from '../economy_events';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, type ItemDef, type StationDef } from '../types';
@@ -187,7 +188,7 @@ export function unbindItem(ctx: SimContext, itemId: string, pid?: number): Unbin
   // future refactor ever to let the resolver and the mutation diverge, the
   // failure mode is a no-op, never a fee charged with nothing cleared.
   if (instance === undefined) return result;
-  meta.copper -= result.fee;
+  applyMoneyDelta(ctx, meta, 'unbind_fee', -result.fee);
   if (slot.count === 1) {
     delete instance.boundTo;
   } else {

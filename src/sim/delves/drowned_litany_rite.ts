@@ -6,6 +6,7 @@ import { LOCKPICK_TIER_REWARD } from '../content/delves/lockpick_tiers';
 import { DELVES } from '../data';
 import * as deedsMod from '../deeds';
 import { DELVE_MODULE_LAYOUTS } from '../delve_layout';
+import { applyMoneyDelta } from '../economy_events';
 import type { LootTier } from '../lockpick';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
@@ -100,7 +101,7 @@ function grantRiteBonus(
     // copper bonus and the loot tier are unaffected. See delveBonusMarksFor.
     const bonusMarks = delveBonusMarksFor(meta, fullBonusMarks);
     meta.delveMarks += bonusMarks;
-    meta.copper += bonusCopper;
+    applyMoneyDelta(ctx, meta, 'delve_lockpick_bonus', bonusCopper);
     ctx.emit({ type: 'lockpickBonus', tier, marks: bonusMarks, copper: bonusCopper, pid });
   }
 }
