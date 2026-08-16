@@ -43,6 +43,7 @@ import {
 import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
 import { GITHUB_SCHEMA } from './github_db';
+import { GOLD_LEDGER_SCHEMA } from './gold_ledger_db';
 import {
   GuildBankEscrowRefused,
   type GuildBankSave,
@@ -1319,6 +1320,11 @@ export async function ensureSchema(): Promise<void> {
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.
+    // Economy Watch: the append-only gold ledger. FK-references characters(id)
+    // and accounts(id), so it runs after SCHEMA like the other domain modules.
+    // Deliberately keep-forever and NOT registered with retention_sweep.ts; the
+    // reasoning is at the DDL in gold_ledger_db.ts.
+    await client.query(GOLD_LEDGER_SCHEMA);
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
     // Audit trail for the map/asset moderation actions above (unpublish,

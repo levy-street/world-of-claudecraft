@@ -222,6 +222,7 @@ import {
 } from './github';
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { drainGoldLedger } from './gold_ledger_host';
 import { guildBankLogCacheStats } from './guild_bank_log';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
@@ -3563,6 +3564,11 @@ export async function startServer(): Promise<http.Server> {
     await releaseAllCharacterLeases().catch((err) =>
       console.error('lease release-all failed:', err),
     );
+    // Land the tail of the gold ledger BEFORE the pool closes: a deploy must
+    // not discard the audit rows for the last few seconds of play, and those
+    // are exactly the seconds an incident investigation reaches for. Guarded
+    // so a failed drain still lets the shutdown finish and close the pool.
+    await drainGoldLedger().catch((err) => console.error('gold ledger drain failed:', err));
     await game.parseCapture.stop();
     await game.chatLog.stop();
     await closeGeneralChatQuotaPool();

@@ -241,6 +241,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import { recordEconomyEvents } from './gold_ledger_host';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import {
   type CounterpartyActor,
@@ -2901,6 +2902,7 @@ export class GameServer {
             // routeEvents early-outs when no clients are connected, and the
             // recorder must see every tick. Read-only; never mutates events.
             this.parseCapture.observe(events);
+            recordEconomyEvents(events, this.sim.tickCount, this.clients);
             this.routeEvents(events);
             this.detectActivity(events);
             lap('events');

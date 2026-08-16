@@ -1,3 +1,4 @@
+import { SERVER_ONLY_SIM_EVENT_TYPES } from '../src/sim/economy_events';
 import type { SimEvent } from '../src/sim/types';
 
 type CombatEventParty = {
@@ -36,6 +37,13 @@ export function shouldDeliverCombatEventToViewer(
   viewerParty: CombatEventParty | null,
   ownerOf: CombatEventOwnerLookup,
 ): boolean {
+  // Server-only output never reaches a client socket. The economy audit row
+  // rides the personal event path so it carries attribution, but no client
+  // decodes it and shipping it would spend player bandwidth on operator data.
+  // The check belongs HERE rather than at the routeEvents call site: this is
+  // the module that owns 'may this viewer see this event', and putting it in
+  // the loop would grow server/game.ts, which the monolith ratchet forbids.
+  if (SERVER_ONLY_SIM_EVENT_TYPES.has(ev.type)) return false;
   if (ev.type === 'damage')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
   if (ev.type === 'heal2')
