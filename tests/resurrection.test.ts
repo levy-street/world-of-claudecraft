@@ -237,28 +237,42 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
   // sim/moderation notes both do) cannot mint a call site that does not exist.
   // The line-comment arm keeps a `://` in a URL from eating the rest of its
   // line, the stripper bug this repo has already shipped once (#2499).
-  const codeOf = (full: string): string =>
-    readFileSync(full, 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const stripComments = (source: string): string =>
+    source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  const codeOf = (full: string): string => stripComments(readFileSync(full, 'utf8'));
 
-  // Every CALL of `name` in a stripped source: the name as a whole identifier,
-  // an optional `?.`, then `(` and a walk to its balanced `)` (string literals
-  // skipped, so a paren inside a message cannot end the walk early). Any
-  // argument spelling is seen the same way: a bare identifier, a member, an
-  // index, a cast, a ternary, calls nested to any depth, a call wrapped over
-  // lines. What is NOT a call: a bind (`x.resetForArena.bind`), a property or
-  // type slot (`resetForArena: ...`, `resetForArena;`), an alias
+  // Every CALL of `name` in a stripped source: the name as a whole identifier
+  // (a `[\w$]` on either side is another identifier: `_resetForArena(`,
+  // `readyArenaFighterAll(`), an optional `?.`, then `(` and a walk to its
+  // balanced `)`. Plain, double, and template string literals are skipped
+  // (with backslash escapes), so a paren inside a message cannot end the walk
+  // early; the string model stops there: a regex literal or a nested template
+  // inside a call's OWN argument list is not modeled and fails LOUDLY (the walk
+  // runs off the end and throws unbalanced), never silently. Quote state is
+  // reset at each call's `(`, so a lone quote elsewhere in a file (a character
+  // class like `/[A-Za-z '-]/` exists in pet_commands.ts) cannot poison a
+  // later call. Any argument spelling is seen the same way: a bare identifier,
+  // a member, an index, a cast, a ternary, calls nested to any depth, a call
+  // wrapped over lines. What is NOT a call: a bind (`x.resetForArena.bind`), a
+  // property or type slot (`resetForArena: ...`, `resetForArena;`), an alias
   // (`const f = ctx.resetForArena`); none opens a paren on the name. The
   // DECLARATIONS do open one, so `isDeclaration` reads what follows the close:
-  // a `: void` return annotation (`export function resetForArena(...): void {`,
-  // the Sim delegate `private resetForArena(...): void {`, the seam's
-  // `resetForArena(...): void;`). A declaration that changed its return type
-  // would be COUNTED (the table reds and a person looks: the safe direction).
-  // The one residue is the aliased or bracketed call (`const f =
-  // ctx.resetForArena; f(e)`, `ctx['resetForArena'](e)`), invisible to any
-  // source scan and the same class of blind spot the Lucent tripwire
-  // documents; neither spelling exists in the sim tree, and the per-mode
+  // a `: void` return annotation ending the signature (`export function
+  // resetForArena(...): void {`, the Sim delegate `private
+  // resetForArena(...): void {`, the seam's `resetForArena(...): void;`); the
+  // `[;{]` tail keeps a CALL in a ternary's true arm (`cond ?
+  // ctx.resetForArena(e) : void 0`) a call. A declaration that changed its
+  // return type would be COUNTED (the table reds and a person looks: the safe
+  // direction). Residues, all recorded: the aliased or bracketed call
+  // (`const f = ctx.resetForArena; f(e)`, `ctx['resetForArena'](e)`) is
+  // invisible to any source scan, the same class of blind spot the Lucent
+  // tripwire documents; a space or a wrapping paren between the name and `(`
+  // (`ctx.resetForArena (e)`, `(ctx.resetForArena)(e)`) is invisible here but
+  // biome's formatter rewrites both and the format gate fails a changed file
+  // that keeps them; and the classification below reads the whole balanced
+  // argument text, so a nested call carrying its own `clearPrep:` literal
+  // would win (no such spelling exists, and the tables would still count the
+  // site). Neither residue spelling exists in the sim tree, and the per-mode
   // behavioral arms are the net under this scan for any site that matters.
   interface CallSite {
     args: string;
@@ -298,7 +312,7 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     }
     return out;
   }
-  const isDeclaration = (site: CallSite): boolean => /^\s*:\s*void\b/.test(site.after);
+  const isDeclaration = (site: CallSite): boolean => /^\s*:\s*void\s*[;{]/.test(site.after);
   const callsOf = (code: string, name: string): CallSite[] =>
     callSites(code, name).filter((s) => !isDeclaration(s));
   // A readyArenaFighter site is classified by the clearPrep literal in its own
@@ -311,10 +325,10 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
         ? 'false'
         : 'passthrough';
 
-  it('is called from arena.ts and fiesta.ts, and from nowhere else in src/sim outside its own module', () => {
+  it('is called ONCE from arena.ts and ONCE from fiesta.ts, and from nowhere else in src/sim outside its own module', () => {
     const files = tsFilesUnder(SIM_ROOT);
     // Vacuity floor near the real count: a walk that collapsed to the top level
-    // (or to nothing) would find no caller at all and pass the set assertion
+    // (or to nothing) would find no caller at all and pass the table assertion
     // below by accident, since both real callers live one directory down.
     expect(files.length, 'the src/sim walk found the real tree').toBeGreaterThan(400);
     expect(
@@ -322,11 +336,26 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       'the walk reaches subdirectories',
     ).toBe(true);
 
-    const callers = files
-      .filter((f) => f.file !== 'resurrection.ts' && codeOf(f.full).includes(CLEAN_SLATE_CALL))
-      .map((f) => f.file)
-      .sort();
-    expect(callers).toEqual(['social/arena.ts', 'social/fiesta.ts']);
+    // Counted per file through the same call walk as the two indirect routes
+    // (the record says "in exactly two places", so the COUNT is the claim: a
+    // second direct wipe added inside arena.ts or fiesta.ts changes this table
+    // on purpose). The predicate's own module is excluded, since its
+    // definition returns `Aura[]`, not `void`, and would read as a call.
+    const direct = new Map<string, number>();
+    for (const f of files) {
+      if (f.file === 'resurrection.ts') continue;
+      const n = callsOf(codeOf(f.full), 'aurasSurvivingCleanSlate').length;
+      if (n > 0) direct.set(f.file, n);
+    }
+    expect([...direct.entries()].sort()).toEqual([
+      ['social/arena.ts', 1],
+      ['social/fiesta.ts', 1],
+    ]);
+    // And the predicate is spelled in this module (the walk above would find
+    // nothing if the name were ever renamed without this pin moving).
+    expect(codeOf(fileURLToPath(new URL('../src/sim/resurrection.ts', import.meta.url)))).toContain(
+      `export function ${CLEAN_SLATE_CALL}`,
+    );
   });
 
   it('reaches the clean slate INDIRECTLY (readyArenaFighter clearPrep: true) from exactly the recorded sites', () => {
@@ -344,6 +373,10 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // targets. sim.ts: the seam delegate passes its opts through, the one
     // legal passthrough; any other site that spells neither literal is a
     // hoisted options object this scan cannot classify and is reported here.
+    // Per-file counts cannot see two sites in ONE file swapping their
+    // literals; that is closed elsewhere: battleground.ts has one keep (the
+    // wave) and tests/battleground.test.ts pins it behaviorally, and arena.ts's
+    // one wipe is resetForArena's body, pinned literally by the wrapper case.
     const files = tsFilesUnder(SIM_ROOT);
     const wipes = new Map<string, number>();
     const keeps = new Map<string, number>();
@@ -432,11 +465,16 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       'ctx.resetForArena(\n  e,\n);',
       'ctx.resetForArena( e )',
     ]) {
-      expect(callsOf(call, 'resetForArena').length, call).toBe(1);
+      expect(callsOf(stripComments(call), 'resetForArena').length, call).toBe(1);
     }
     expect(
       callsOf('cond ? ctx.resetForArena(a) : ctx.resetForArena(b);', 'resetForArena').length,
     ).toBe(2);
+    // A call in a ternary's true arm whose else is `void 0` is a CALL: the
+    // declaration test wants the `: void` to END a signature (`;` or `{`),
+    // which is what keeps this spelling counted (a round-5 probe planted it
+    // and the earlier `\bvoid\b` test swallowed it).
+    expect(callsOf('cond ? ctx.resetForArena(e) : void 0;', 'resetForArena').length).toBe(1);
     // The string skip is load-bearing, not decoration: an UNBALANCED paren
     // inside a string argument must not end the walk early (the argument text
     // comes back whole), or a wipe whose options object follows such a string
@@ -451,7 +489,8 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       ).map(clearPrepOf),
     ).toEqual(['true']);
     // The declaration spellings, single-line and wrapped, the seam's bind
-    // line, and an alias: none is a call.
+    // line, an alias, and the whole-identifier neighbors on either side: none
+    // is a call of THIS name.
     for (const decl of [
       'export function resetForArena(ctx: SimContext, e: Entity): void {',
       'export function resetForArena(\n  ctx: SimContext,\n  e: Entity,\n): void {',
@@ -459,8 +498,10 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       'resetForArena(e: Entity): void;',
       'resetForArena: sim.resetForArena.bind(sim),',
       'const f = ctx.resetForArena;',
+      '_resetForArena(ctx, e);',
+      'ctx.resetForArenaAll(e);',
     ]) {
-      expect(callsOf(decl, 'resetForArena'), decl).toEqual([]);
+      expect(callsOf(stripComments(decl), 'resetForArena'), decl).toEqual([]);
     }
     // The readyArenaFighter side, with the classification: the nested-argument
     // spelling the tree already uses two lines above its real call sites
@@ -489,6 +530,7 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       'readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void;',
       'private readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void {',
       'readyArenaFighter: sim.readyArenaFighter.bind(sim),',
+      'ctx.readyArenaFighterAll(e, { clearPrep: true });',
     ]) {
       expect(callsOf(decl, 'readyArenaFighter'), decl).toEqual([]);
     }

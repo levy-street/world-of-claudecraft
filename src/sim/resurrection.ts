@@ -110,7 +110,8 @@ export function unstuckSicknessDuration(level: number): number {
 // and the Fiesta revive; and the body of resetForArena. (3) resetForArena, the
 // one-line wrapper around (2), which social/arena.ts runs at its own seat
 // (startArenaMatch, every arena-family format), match end (endArenaMatch, the
-// undefeated), and send-home (returnFromArena, everyone still present), and
+// undefeated), and send-home (returnFromArena, everyone the seat wrote a
+// return record for and who is still present), and
 // which the SimContext seam (ctx.resetForArena) hands to call sites that never
 // spell readyArenaFighter: the Protect Yumi match seat, and the Vale Cup
 // (social/vale_cup.ts) kit-swap seat (valeCupStandardize) and match teardown.
@@ -138,10 +139,11 @@ export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
 }
 
 // Auras that survive a CLEAN-SLATE wipe: only the Cheater mark. The clearPrep
-// arm of readyArenaFighter (social/arena.ts: every instanced match's seat and
-// end, the Thornhollow Fields gates, every Fiesta and Yumi revive; the three
-// routes above) and a Fiesta down (social/fiesta.ts fiestaDownEntity)
-// deliberately strip MORE than a death does, The Keeper's Toll included, so a
+// arm of readyArenaFighter (the arm lives in social/arena.ts; it is reached
+// from every instanced match's seat and end, the Thornhollow Fields gates, and
+// every Fiesta and Yumi revive, the three routes above) and a Fiesta down
+// (social/fiesta.ts fiestaDownEntity) deliberately strip MORE than a death
+// does, The Keeper's Toll included, so a
 // normalized bout is decided by play and not by what each fighter walked in
 // carrying. A sanction is not something the fighter walked in carrying:
 // it is account state an operator applied, so it survives here exactly as it

@@ -3280,13 +3280,14 @@ applied in the fix round or recorded below.
   call, run by arena.ts at its own seat, end, and send-home and handed out
   through the SimContext seam (ctx.resetForArena) to call sites that never
   spell readyArenaFighter (the Vale Cup's two, the Yumi match seat; the
-  seam delegate in sim.ts is the plumbing). Through the second route every Yumi and Fiesta
-  revive wipes, and Thornhollow Fields wipes at the seat, at the countdown
-  end, on a leaver, and at the match end; ONLY its wave respawn (clearPrep:
-  false) keeps a flask. Through the third route the arena seat, end, and
-  send-home wipe (Yumi and Fiesta matches end through the same two arena.ts
-  sites), the Yumi match SEAT wipes, and the Vale Cup wipes at its kit-swap
-  seat (valeCupStandardize) and at the match teardown. So the true
+  seam delegate in sim.ts is the plumbing). Through the second route every
+  Yumi and Fiesta revive wipes, and Thornhollow Fields wipes at the seat, at
+  the countdown end, on a leaver, and at the match end; ONLY its wave
+  respawn (clearPrep: false) keeps a flask. Through the third route the
+  arena seat, end, and send-home wipe (Yumi and Fiesta matches end through
+  the same two arena.ts sites), the Yumi match SEAT wipes, and the Vale Cup
+  wipes at its kit-swap seat (valeCupStandardize) and at the match
+  teardown. So the true
   accounting is: overworld and PvE deaths keep a flask, a battleground or
   arena DEATH keeps it on the corpse (quaffed inside a battleground match it
   rides through every death in it, the classic-era rule), and every
