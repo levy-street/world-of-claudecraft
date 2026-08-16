@@ -36,6 +36,7 @@ import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
+import { ECONOMY_ALERTS_SCHEMA } from './economy_alerts_db';
 import {
   GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
   GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS,
@@ -1325,6 +1326,9 @@ export async function ensureSchema(): Promise<void> {
     // Deliberately keep-forever and NOT registered with retention_sweep.ts; the
     // reasoning is at the DDL in gold_ledger_db.ts.
     await client.query(GOLD_LEDGER_SCHEMA);
+    // The conservation-finding queue. Unlike the ledger this one grows per
+    // event and IS pruned (pruneEconomyAlerts), but only once acknowledged.
+    await client.query(ECONOMY_ALERTS_SCHEMA);
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
     // Audit trail for the map/asset moderation actions above (unpublish,
