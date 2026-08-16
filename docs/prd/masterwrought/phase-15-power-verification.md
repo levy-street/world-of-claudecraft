@@ -9,7 +9,7 @@ Model: xhigh effort. Harness: Claude Code. Worktree: ~/Documents/wocc-masterwrou
 (branch feature/masterwrought). ULTRACODE: yes (audit): drive the measured pass and the
 adversarial audits as a Workflow.
 
-Goal: prove the full kit (2 Perfected pieces + apex enchants + flask + food + feast)
+Goal: prove the full kit (2 Perfected pieces + apex enchants + flask + food)
 lands at most 5 percent total throughput over pre-packet raid BiS (R5), record the
 measurement so it is reproducible from the doc alone, and close every pin gap the
 adversarial audit finds. Any breach is fixed by tuning numbers DOWN in this phase,
@@ -41,7 +41,7 @@ pins exist today and which items each covers.
 
 STEP 2 - EXECUTE (ultracode Workflow; request the fan-out explicitly):
 Arm 1 (measured pass): build the full-kit character per R5 (2 Perfected pieces, apex
-enchants, flask, food, feast) and the pre-packet raid BiS baseline; measure both against
+enchants, flask, food) and the pre-packet raid BiS baseline; measure both against
 heroic raid and S-rift tuning targets per the framework; write every input, formula, and
 result to docs/prd/masterwrought/power-verification.md with the explicit 5 percent
 envelope verdict per measured kit. Heroic raid and S-rift clear difficulty is the

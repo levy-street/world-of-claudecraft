@@ -22,7 +22,7 @@
 | 09 QA | verify | complete | 2026-08-13 | 2026-08-13 |
 | 10 | Apex consumables and enchants | complete | 2026-08-14 | 2026-08-14 |
 | 10 QA | verify | complete | 2026-08-14 | 2026-08-16 |
-| 11 | Pattern drops and vendors | pending | | |
+| 11 | Pattern drops and vendors | in progress | 2026-08-16 | |
 | 11 QA | verify | pending | | |
 | 12 | The Perfecting stage | pending | | |
 | 12 QA | verify | pending | | |

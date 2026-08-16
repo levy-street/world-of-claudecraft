@@ -4359,3 +4359,38 @@ recorded, or refuted with the file open)
   rounds 6 to 12 node-replica fixture sets (up to thirty-nine per round)
   over the walker; every guard this QA added is decisive against a named
   mutation, and every survivor found was fixed and re-probed red.
+
+## Phase 11 pre-flight (2026-08-16, Step 0 record)
+- Worktree guard passed (session switched into ~/Documents/wocc-masterwrought);
+  tree clean at the phase 10 QA tips (code 5f56ade89e, docs d149382bc4, HEAD =
+  the docs tip).
+- Release sync: VERIFIED ALREADY COMPLETE, no new merge this session. After
+  `git fetch origin --prune`, the newest release branch is origin/release/v0.39.0
+  (tip d2d1a8ad5c) and `git rev-list --count HEAD..origin/release/v0.39.0` is 0;
+  origin/release/v0.38.2 (tip 1fd1f2e247) likewise 0 incoming. Both were merged
+  during the phase 10 QA (merges 9de151aacb and be0da18c94, both below the QA
+  tips), so no release-merge-audit is owed this session; the third-pass sync
+  record above stands as the audit of record.
+- Portrait seal: `build_mob_portrait_source_manifest.mjs --check` run FIRST at
+  the pre-flight tip: FRESH (bookkeeping-only renderer bundle drift, the v0.38
+  tolerance); no re-bless owed.
+- Memory scan done (test-pin trap index + caller-set/wrapper trap,
+  guide.test.ts regen-in-place, shot-target `when` rule, gotcha catalog's
+  local-tooling and PR/CI clusters).
+- Order of work this phase: the five ruling items owed at the head (each its
+  own commit + fresh review) land BEFORE the pattern/vendor/market work: (a)
+  the two standing reds per ruling 1, (b) the Lucent weapon int twin, (c)
+  undispellable flask auras + Spellplunder pin, (d) the four aura names into
+  the naming registry, (e) the phase-15 feast premise correction.
+
+## Phase 11 ruling executions (2026-08-16, the five items owed at the head)
+- (e) Phase-15 kit premise, OUTCOME 2026-08-16: the feast is dropped from the
+  R5 full-kit premise per ruling (4) of the phase 10 QA (the party
+  field-crafting stations are ratified as crafting stations; there is no feast
+  buff source to measure). Corrected in BOTH live copies:
+  phase-15-power-verification.md (the Goal line and Arm 1) and
+  implementation-plan.md's Phase 15 deliverable. The phase-10-era mentions
+  (phase-10-apex-consumables.md, phase-10-qa.md, implementation-plan.md's
+  phase 10 section) are historical records of the spec's original flavor,
+  whose resolution into stations is already recorded in the Phase 10 ledger,
+  and deliberately stand. R5's own wording in this file never listed a feast.
