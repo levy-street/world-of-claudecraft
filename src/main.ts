@@ -7780,6 +7780,22 @@ async function loadNews(): Promise<void> {
 
 let caCopyResetTimer: number | null = null;
 
+// Donate buttons ([data-donate-sol]) ship with a %VITE_DONATION_ADDRESS%
+// placeholder in their solscan URL. With a valid operator wallet baked in at
+// build time the link opens that address on-chain; with an unset/invalid
+// placeholder the button hides instead of pointing at upstream's fundraiser.
+function wireDonateLinks(): void {
+  const address = String(import.meta.env.VITE_DONATION_ADDRESS ?? '').trim();
+  const valid = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+  for (const anchor of document.querySelectorAll<HTMLAnchorElement>('[data-donate-sol]')) {
+    if (!valid) {
+      anchor.hidden = true;
+      continue;
+    }
+    anchor.href = `https://solscan.io/account/${address}`;
+  }
+}
+
 // Click-to-copy for the $WOC contract address on the landing page. Falls back to
 // a hidden-textarea copy when the async Clipboard API is unavailable (insecure
 // context / older browsers); the copied state is only shown on a real success.
@@ -8537,7 +8553,13 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
 // server-fed value is not known yet (logged out, offline), so every caller
 // gets the fail-open behavior for free.
-const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
+// Operator fork: in-game donations go to the operator's Solana wallet (build-time
+// VITE_DONATION_ADDRESS), mirroring the header Donate button. Without a valid
+// address baked in, the button still opens solscan rather than upstream's page.
+const DONATE_ADDRESS = String(import.meta.env.VITE_DONATION_ADDRESS ?? '').trim();
+const DONATE_URL = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(DONATE_ADDRESS)
+  ? `https://solscan.io/account/${DONATE_ADDRESS}`
+  : 'https://solscan.io';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 
@@ -9663,6 +9685,7 @@ function wireStartScreens(): void {
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();
+  wireDonateLinks();
   wireHomepageMusicToggle();
   void wireWallet();
   wireGithubLink();

@@ -1070,9 +1070,11 @@ describe('client HTML shell', () => {
     expect(hudCss).toContain('body.native-app #mobile-donate,');
     // The tap targets: the account panel with the invite as the logged-out /
     // offline fallback (discordInviteUrl() itself falls back to
-    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts), and the Ko-fi page,
-    // pinned to the shells' URLs.
-    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
+    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts).
+    // Operator fork: the ko-fi fundraiser is gone; every donate surface points
+    // at the operator's Solana wallet via build-time VITE_DONATION_ADDRESS.
+    expect(mainTs).toContain('const DONATE_URL =');
+    expect(mainTs).not.toContain('ko-fi.com');
     expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
@@ -1081,7 +1083,8 @@ describe('client HTML shell', () => {
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(entry, name).not.toContain('ko-fi.com/worldofclaudecraft');
+      expect(entry.match(/data-donate-sol/g), name).toHaveLength(2);
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
   });
