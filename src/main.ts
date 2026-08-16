@@ -447,7 +447,7 @@ import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
-import { loadNewsInto } from './ui/news_feed';
+import { fetchReleasesWithFallback, loadNewsInto } from './ui/news_feed';
 import { hideOtaUpdateOverlay, renderOtaUpdateOverlay } from './ui/ota_update_overlay';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
@@ -5845,7 +5845,10 @@ function show(el: string): void {
   // moment the player can actually read it, and the NEW-badge marker should
   // advance only then.
   if (el === '#charselect-panel') {
-    void loadCharselectNews($('#charselect-news-feed'), () => api.releases(20));
+    void loadCharselectNews(
+      $('#charselect-news-feed'),
+      () => fetchReleasesWithFallback(() => api.releases(20)),
+    );
   }
 
   // Reset currently rendered classes to force re-render/animation when opening a panel
@@ -7770,40 +7773,13 @@ async function loadHighscores(): Promise<void> {
   await loadHighscoresInto($('#hs-leaderboard'), () => api.leaderboard('global', 100));
 }
 
-// News & Updates: published GitHub releases, proxied + cached by the server.
-// Re-fetched each time the view is opened (the server caches, so it is cheap).
-// The sanitizing renderer + fetch/paint loop live in ./ui/news_feed (extracted
-// out of this firewall file); this call site just supplies the host + fetcher.
+// News & Updates: published GitHub releases, proxied + cached by the server,
+// with a direct-from-GitHub fallback when the proxy's shared-IP budget is dry
+// (see fetchReleasesWithFallback in ./ui/news_feed). The sanitizing renderer
+// + fetch/paint loop live in ./ui/news_feed; this call site just supplies the
+// host + fetcher.
 async function loadNews(): Promise<void> {
-  await loadNewsInto($('#news-feed'), async () => {
-    const proxied = await api.releases(20);
-    if (proxied.length > 0) return proxied;
-    // The server proxy reads GitHub unauthenticated from its egress IP; on a
-    // shared host that 60/hr budget is long gone and the proxy serves an empty
-    // feed. Fall back to the public releases API from the player's own IP,
-    // mapping into the same sanitized entry shape.
-    try {
-      const res = await fetch(
-        'https://api.github.com/repos/levy-street/world-of-claudecraft/releases?per_page=20',
-        { headers: { Accept: 'application/vnd.github+json' } },
-      );
-      if (!res.ok) return [];
-      const raw = (await res.json()) as Array<Record<string, unknown>>;
-      return raw
-        .filter((r) => r && !r.draft)
-        .map((r) => ({
-          id: Number(r.id),
-          tag: String(r.tag_name ?? ''),
-          name: String(r.name || r.tag_name || ''),
-          body: String(r.body ?? '').slice(0, 8000),
-          url: String(r.html_url ?? ''),
-          prerelease: Boolean(r.prerelease),
-          publishedAt: String(r.published_at ?? r.created_at ?? ''),
-        }));
-    } catch {
-      return [];
-    }
-  });
+  await loadNewsInto($('#news-feed'), () => fetchReleasesWithFallback(() => api.releases(20)));
 }
 
 let caCopyResetTimer: number | null = null;
@@ -7821,6 +7797,15 @@ function wireDonateLinks(): void {
       continue;
     }
     anchor.href = `https://solscan.io/account/${address}`;
+  }
+  // The icon-rail #mm-donate micro-button (which replaced #mm-discord on this
+  // fork) rides the same address: shown + wired when valid, hidden when not.
+  const railBtn = document.getElementById('mm-donate');
+  if (railBtn) {
+    railBtn.hidden = !valid;
+    railBtn.addEventListener('click', () => {
+      window.open(DONATE_URL, '_blank', 'noopener,noreferrer');
+    });
   }
 }
 

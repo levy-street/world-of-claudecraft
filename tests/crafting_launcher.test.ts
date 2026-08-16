@@ -167,13 +167,13 @@ describe('side rail height budget', () => {
     return '';
   }
 
-  // #mm-discord ships `hidden` in markup but client_shell.test.ts pins it
-  // un-hidden at boot on any Discord-enabled build, so it counts as visible
+  // #mm-donate ships `hidden` in markup but wireDonateLinks un-hides it at
+  // boot whenever the operator wallet is baked in, so it counts as visible
   // for the real-world budget even though the static markup hides it.
   function countVisibleMicroBtns(markup: string): number {
     const buttons = markup.match(/<button[^>]*class="micro-btn"[^>]*>/g) ?? [];
     return buttons.filter((b) => {
-      if (/id="mm-discord"/.test(b)) return true;
+      if (/id="mm-donate"/.test(b)) return true;
       return !/display:\s*none/.test(b) && !/\shidden(?=[\s>=])/.test(b);
     }).length;
   }
