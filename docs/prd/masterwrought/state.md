@@ -3290,35 +3290,34 @@ applied in the fix round or recorded below.
   teardown. So the true accounting is: overworld and PvE deaths keep a
   flask, a battleground or arena DEATH keeps it on the corpse (quaffed
   inside a battleground match it rides through every death in it, the
-  classic-era rule), and every
-  instanced match (arena, Fiesta, Protect Yumi, Thornhollow Fields, Vale
-  Cup) is a parenthesis (nothing carried in rides through the gates,
-  nothing quaffed inside comes back out; Yumi and Fiesta downs clear it
-  too). Corrected in the resurrection.ts note, pinned behaviorally per mode
-  (tests/arena.test.ts: seat, match end for the winner with the defeated
-  loser skipped, send-home for the loser's corpse, each its own case;
-  tests/battleground.test.ts: a flask quaffed inside rides through death +
-  wave respawn, one carried in is wiped at the seat, one quaffed in the
-  form-up at the countdown end; tests/yumi_match.test.ts: seat, down, the
-  revive on its own (a flask re-planted on the benched body is gone at the
-  revive), and the match END on a benched body (the endArenaMatch branch
-  Yumi and Fiesta take, since their downs never enter match.defeated);
-  tests/fiesta.test.ts: seat, down; tests/vale_cup_match.test.ts: kit-swap
-  seat, teardown, each its own case) and structurally
-  (tests/resurrection.test.ts pins the direct caller set AND the literal
-  per-module tables of both indirect routes, readyArenaFighter clearPrep:
-  true and resetForArena call sites, through a balanced-parenthesis call
-  walk rather than a regex over arguments (two regex cuts each let a
-  spelling through: `e as Entity`, then a depth-two nested argument and an
-  optional call, and the readyArenaFighter sibling could not cross a `)`),
-  with every readyArenaFighter site classified by its own clearPrep literal
-  or reported as a passthrough (the sim.ts seam delegate is the one pinned),
-  the keeps pinned as their own table, and the call, declaration, and
-  classification controls in their own case), and the tooltip clause reads
-  "instanced matches begin and end on a clean slate".
-  Whether a 20-minute flask should survive the Yumi/Fiesta downs or the
-  battleground parenthesis is a maintainer call (RULING below, recommend
-  keep: the arena-family clean-slate doctrine).
+  classic-era rule), and every instanced match (arena, Fiesta, Protect
+  Yumi, Thornhollow Fields, Vale Cup) is a parenthesis (nothing carried in
+  rides through the gates, nothing quaffed inside comes back out; Yumi and
+  Fiesta downs clear it too). Corrected in the resurrection.ts note,
+  pinned behaviorally per mode (tests/arena.test.ts: seat, match end for
+  the winner with the defeated loser skipped, send-home for the loser's
+  corpse, each its own case; tests/battleground.test.ts: a flask quaffed
+  inside rides through death + wave respawn, one carried in is wiped at
+  the seat, one quaffed in the form-up at the countdown end;
+  tests/yumi_match.test.ts: seat, down, the revive on its own (a flask
+  re-planted on the benched body is gone at the revive), and the match END
+  on a benched body (the endArenaMatch branch Yumi and Fiesta take, since
+  their downs never enter match.defeated); tests/fiesta.test.ts: seat,
+  down; tests/vale_cup_match.test.ts: kit-swap seat, teardown, each its
+  own case) and structurally (tests/resurrection.test.ts pins the direct
+  caller set AND the literal per-module tables of both indirect routes,
+  readyArenaFighter clearPrep: true and resetForArena call sites, through
+  a balanced-parenthesis call walk rather than a regex over arguments (two
+  regex cuts each let a spelling through: `e as Entity`, then a depth-two
+  nested argument and an optional call, and the readyArenaFighter sibling
+  could not cross a `)`), with every readyArenaFighter site classified by
+  its own clearPrep literal or reported as a passthrough (the sim.ts seam
+  delegate is the one pinned), the keeps pinned as their own table, and
+  the call, declaration, and classification controls in their own case),
+  and the tooltip clause reads "instanced matches begin and end on a clean
+  slate". Whether a 20-minute flask should survive the Yumi/Fiesta downs
+  or the battleground parenthesis is a maintainer call (RULING below,
+  recommend keep: the arena-family clean-slate doctrine).
   AMENDED at the 2026-08-14 v0.38.0 sync (merge 33d641773f): the release
   replaced the bare full wipes (e.auras = []) with a second predicate,
   resurrection.ts aurasSurvivingCleanSlate, which keeps ONLY the release's

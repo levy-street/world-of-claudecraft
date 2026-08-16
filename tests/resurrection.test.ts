@@ -256,44 +256,47 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
   // paren-unbalanced. There an unmatched `(` runs the walk on until some later
   // surplus `)` closes it, or off the end (a THROW), and an unmatched `)` ends
   // the walk early; both misread the argument text, and the net is the tables,
-  // not the throw: a planted site is a new count in some bucket, and an
-  // existing site rewritten that way changes bucket (a truncated wipe reads as
-  // a passthrough and is REPORTED; a swallowed span reads as whatever literal
-  // it holds), so a table reds either way. The one blind combination is a
-  // swallowed span that hides a SECOND call of the same name; no such spelling
-  // exists in the sim tree. Quote state is reset at each call's `(`, so a lone
-  // quote elsewhere in a file cannot poison a later call (the top-level
-  // character class `/^[A-Za-z][A-Za-z '-]{1,15}$/` in pet/pet_commands.ts is
-  // the per-file hazard that reset exists for). Any argument spelling is seen
-  // the same way: a bare identifier, a member, an index, a cast, a ternary,
-  // calls nested to any depth, a call wrapped over lines. What is NOT a call:
-  // a bind (`x.resetForArena.bind`), a property or type slot (`resetForArena:
-  // ...`, `resetForArena;`), an alias (`const f = ctx.resetForArena`); none
-  // opens a paren on the name. The DECLARATIONS do open one, so
-  // `isDeclaration` reads what follows the close: a `: void` return
-  // annotation ending the signature (`export function resetForArena(...): void
-  // {`, the Sim delegate `private resetForArena(...): void {`, the seam's
-  // `resetForArena(...): void;`); the `[;{]` tail keeps a CALL in a ternary's
-  // true arm (`cond ? ctx.resetForArena(e) : void 0`) a call. A declaration in
-  // any other FORM that still opens a paren on the name is COUNTED (the table
-  // reds and a person looks: the safe direction): a changed return type (`:
-  // boolean`, `: Promise<void>`, `: void | undefined`), a type-literal member
-  // ending in a comma or a brace (`): void,`, which biome rewrites to `;`
-  // anyway, `): void }`). An arrow-property form (`resetForArena = (e) => {`,
-  // `resetForArena: (e) => void`) never opens a paren on the name and is
-  // simply not seen; none exists for these three functions, and the seam's
-  // bind line is pinned as a non-call below. Residues, all recorded: the
-  // aliased call (`const f = ctx.resetForArena; f(e)`) is invisible to any
-  // source scan and the bracketed one (`ctx['resetForArena'](e)`) to this one,
-  // the same class of blind spot the Lucent tripwire documents; a
-  // space or a wrapping paren between the name and `(` (`ctx.resetForArena
-  // (e)`, `(ctx.resetForArena)(e)`) is invisible here but biome's formatter
-  // rewrites both and the format gate fails a changed file that keeps them;
-  // and the classification below reads the whole balanced argument text, so a
-  // nested call carrying its own `clearPrep:` literal would win (the tables
-  // would still count the site). None of these spellings exists in the sim
-  // tree, and the per-mode behavioral arms are the net under this scan for any
-  // site that matters.
+  // not the throw, as far as it goes: a planted site is a new count in some
+  // bucket, and an existing site whose misread boundary cuts its `clearPrep:`
+  // literal out (or lets a foreign one in) changes bucket (a truncated wipe
+  // reads as a passthrough and is REPORTED), so a table reds. When the literal
+  // survives the misread (the edge sits in a LATER option than clearPrep, or a
+  // swallowed span hides a second call of the same name) the site keeps its
+  // bucket and nothing here reds; the net there is the per-mode behavioral
+  // arms, and that residue is pinned below as a documented blind spot. No such
+  // spelling exists in the sim tree. Quote state is reset at each call's `(`,
+  // so a lone quote elsewhere in a file cannot poison a later call (the
+  // top-level character class `/^[A-Za-z][A-Za-z '-]{1,15}$/` in
+  // pet/pet_commands.ts is the per-file hazard that reset exists for). Any
+  // argument spelling is seen the same way: a bare identifier, a member, an
+  // index, a cast, a ternary, calls nested to any depth, a call wrapped over
+  // lines. What is NOT a call: a bind (`x.resetForArena.bind`), a property or
+  // type slot (`resetForArena: ...`, `resetForArena;`), an alias (`const f =
+  // ctx.resetForArena`); none opens a paren on the name. The DECLARATIONS do
+  // open one, so `isDeclaration` reads what follows the close: a `: void`
+  // return annotation ending the signature (`export function
+  // resetForArena(...): void {`, the Sim delegate `private resetForArena(...):
+  // void {`, the seam's `resetForArena(...): void;`); the `[;{]` tail keeps a
+  // CALL in a ternary's true arm (`cond ? ctx.resetForArena(e) : void 0`) a
+  // call. A declaration in any other FORM that still opens a paren on the name
+  // is COUNTED (the table reds and a person looks: the safe direction): a
+  // changed return type (`: boolean`, `: Promise<void>`, `: void | undefined`),
+  // a type-literal member ending in a comma or a brace (`): void,`, which biome
+  // rewrites to `;` anyway, `): void }`). An arrow-property form
+  // (`resetForArena = (e) => {`, `resetForArena: (e) => void`) never opens a
+  // paren on the name and is simply not seen; none exists for these three
+  // functions, and the seam's bind line is pinned as a non-call below.
+  // Residues, all recorded: the aliased call (`const f = ctx.resetForArena;
+  // f(e)`) is invisible to any source scan and the bracketed one
+  // (`ctx['resetForArena'](e)`) to this one, the same class of blind spot the
+  // Lucent tripwire documents; a space or a wrapping paren between the name and
+  // `(` (`ctx.resetForArena (e)`, `(ctx.resetForArena)(e)`) is invisible here
+  // but biome's formatter rewrites both and the format gate fails a changed
+  // file that keeps them; and the classification below reads the whole balanced
+  // argument text, so a nested call carrying its own `clearPrep:` literal would
+  // win (the tables would still count the site). None of these spellings exists
+  // in the sim tree, and the per-mode behavioral arms are the net under this
+  // scan for any site that matters.
   interface CallSite {
     args: string;
     after: string;
@@ -560,14 +563,27 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       ).map(clearPrepOf),
     ).toEqual(['passthrough']);
     // The quiet half of the regex-literal edge, pinned as REPORTED rather than
-    // passed: an unmatched `)` inside a regex argument truncates the argument
-    // text, and the truncated wipe classifies as a passthrough.
+    // passed: an unmatched `)` inside a regex argument BEFORE the literal
+    // truncates the argument text, and the truncated wipe classifies as a
+    // passthrough.
     expect(
       callsOf(
         stripComments('ctx.readyArenaFighter(/[)]/.test(x) ? e : f, { clearPrep: true });'),
         'readyArenaFighter',
       ).map(clearPrepOf),
     ).toEqual(['passthrough']);
+    // And the documented blind spot, pinned as such so the header's claim
+    // stays testable: the same edge AFTER the literal (in a later option)
+    // leaves the literal inside the misread span, the site keeps its bucket,
+    // and nothing here reds; the per-mode behavioral arms are the net there.
+    expect(
+      callsOf(
+        stripComments(
+          'readyArenaFighter(ctx, e, { clearPrep: true, keepValidTargetPids: ids.filter((p) => /[)]/.test(String(p))) });',
+        ),
+        'readyArenaFighter',
+      ).map(clearPrepOf),
+    ).toEqual(['true']);
     for (const decl of [
       'export function readyArenaFighter(\n  ctx: SimContext,\n  e: Entity,\n  opts: { clearPrep: boolean; keepValidTargetPids?: readonly number[] },\n): void {',
       'readyArenaFighter(e: Entity, opts: { clearPrep: boolean }): void;',
