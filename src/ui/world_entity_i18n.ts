@@ -1,13 +1,4 @@
-import {
-  GUILD_TREND_LETTERS,
-  HEROIC_MARK_LETTER,
-  type LetterDef,
-  MASTER_TIER_LETTERS,
-  MASTERY_RESET_LETTER,
-  QUEST_LETTERS,
-  WELCOME_LETTER,
-  WYRMFALL_CORE_LETTER,
-} from '../sim/content/letters';
+import { authoredLettersById } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
@@ -755,17 +746,10 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     };
   });
 
-  const lettersById: Record<string, LetterDef> = {
-    [WELCOME_LETTER.letterId]: WELCOME_LETTER,
-    [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
-    [WYRMFALL_CORE_LETTER.letterId]: WYRMFALL_CORE_LETTER,
-    [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
-  };
-  for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
-  for (const letter of Object.values(GUILD_TREND_LETTERS)) lettersById[letter.letterId] = letter;
-  for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
-    for (const letter of Object.values(byTier)) lettersById[letter.letterId] = letter;
-  }
+  // The one shared letter map (src/sim/content/letters.ts authoredLettersById),
+  // the same source entity_i18n.ts answers knownLetterId from; LETTER_IDS above
+  // fixes the ORDER and orderedValues throws for an id it lacks.
+  const lettersById = authoredLettersById();
   const letters = {} as LetterTranslations;
   orderedValues(LETTER_IDS, lettersById).forEach((letter) => {
     letters[letter.letterId as LetterId] = {

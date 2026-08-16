@@ -494,3 +494,29 @@ for (const pairId of Object.keys(MASTER_TIER_LETTERS)) {
     throw new Error(`MASTER_TIER_LETTERS has unexpected pair ${pairId}`);
   }
 }
+
+// Every authored letter keyed by letterId, ONE builder for both client
+// registries (src/ui/entity_i18n.ts LETTERS_BY_ID, the localization source
+// knownLetterId answers from, and src/ui/world_entity_i18n.ts, the English
+// key-set source the catalog reads). The two used to hand-seed their own
+// copies of this map, and the Wyrmfall Core letter reached one but not the
+// other, so knownLetterId('wyrmfall_core_reward') read false and the mailbox
+// fell back to the wire-shipped English in every locale while the overlays
+// carried live fills nobody could reach. Building both from here removes the
+// second registry; tests/entity_i18n_guards.test.ts pins the two key sets
+// equal in both directions. A NEW letter still owes its LETTER_IDS ordering
+// row in world_entity_i18n.ts (that guard reds until it lands).
+export function authoredLettersById(): Record<string, LetterDef> {
+  const byId: Record<string, LetterDef> = {
+    [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+    [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+    [WYRMFALL_CORE_LETTER.letterId]: WYRMFALL_CORE_LETTER,
+    [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
+  };
+  for (const letter of Object.values(QUEST_LETTERS)) byId[letter.letterId] = letter;
+  for (const letter of Object.values(GUILD_TREND_LETTERS)) byId[letter.letterId] = letter;
+  for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
+    for (const letter of Object.values(byTier)) byId[letter.letterId] = letter;
+  }
+  return byId;
+}
