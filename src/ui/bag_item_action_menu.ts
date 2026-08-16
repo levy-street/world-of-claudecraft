@@ -11,9 +11,10 @@
 //     that would actually be consumed is special (signed / masterwork /
 //     enchanted): bag_item_context_menu.ts decides that predicate.
 //   - Apply Enchant opens a two-step picker (also on #ctx-menu): the enchants
-//     that consume the reagent, each with affordability + target slot, then the
-//     eligible targets (the held copies AND the WORN ones, which enchant in
-//     place), then world.applyEnchant. enchant_apply_view.ts models both steps.
+//     that consume the reagent, each with affordability, target slot and the
+//     per-viewer gates it does not clear, then the eligible targets (the held
+//     copies AND the WORN ones, which enchant in place), then
+//     world.applyEnchant. enchant_apply_view.ts models both steps.
 //     An already-enchanted target is a flagged REPLACE row (#2415): it routes
 //     through the same destroy-confirm family before sending, and only that
 //     dialog's OK sends the apply with the explicit confirm flag. That row
@@ -39,9 +40,11 @@ import {
   bagItemContextActions,
   destroyConsumesSpecialCopy,
 } from './bag_item_context_menu';
+import { craftNameKey } from './craft_name_view';
 import { disenchantYieldLines } from './disenchant_yield_view';
 import {
   type EnchantReplaceTargetInfo,
+  type EnchantViewerInput,
   enchantNameKey,
   enchantSectionsForReagent,
   enchantTargets,
@@ -52,7 +55,7 @@ import {
 } from './enchant_apply_view';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 import { itemNumber, itemStatName } from './item_instance_tooltip';
 
 /** Modifier class the picker states set on the shared #ctx-menu element: the
@@ -68,6 +71,19 @@ export const CTX_MENU_PICKER_CLASS = 'ctx-menu-picker';
  *  Styled in hud.css from the picker's existing warning token, with a
  *  forced-colors arm that swaps the tint for a non-color cue. */
 export const CTX_ITEM_DANGER_CLASS = 'ctx-item-danger';
+
+/** Modifier class on a picker meta sub-line that explains why a LISTED row is
+ *  inert (the Enchanting floor, the Perfected requirement). Neither is
+ *  destructive, so neither takes the danger treatment; what they share, and what
+ *  the reference tags beside them (Worn, heroic, reagent counts) do not, is that
+ *  this line is the only answer a player gets to "why can I not tap this?". The
+ *  touch stylesheet sizes it with the danger line for exactly that reason. */
+export const CTX_ITEM_GATE_CLASS = 'ctx-item-gate';
+
+/** The craft id this picker gates on: the same one the sim's insufficient_skill
+ *  arm reads (professions/enchanting.ts, skillInCraft(..., 'enchanting')) and a
+ *  live CRAFT_RING id, so craftNameKey resolves a printable name for it. */
+const ENCHANTING_CRAFT_ID = 'enchanting';
 
 /** The desktop CSS cap for a picker menu (hud.css #ctx-menu.ctx-menu-picker
  *  max-height: min(60vh, 560px)), mirrored so placement can reserve the real
@@ -217,23 +233,82 @@ export class BagItemActionMenu {
     );
   }
 
+  /** The viewer projection both picker steps gate on, built once per open from
+   *  IWorld: the atomic crafting mirror plus the worn set the Perfected
+   *  candidate scan reads. `synced` rides along because it is the ONLY thing
+   *  that tells an online client's all-zero STARTUP mirror apart from a real
+   *  skill of 0, and both worlds implement it (Sim always true, ClientWorld
+   *  false until its first cprof delta). Gating on the unsynced mirror painted
+   *  "Requires Enchanting 100" at a master enchanter and emptied both target
+   *  lists; the pure core skips the whole skill dimension for that window
+   *  instead, and the sim still refuses honestly if the shortfall is real. */
+  private enchantViewer(): EnchantViewerInput {
+    const world = this.deps.world();
+    return {
+      synced: world.craftingIdentity.synced,
+      enchantingSkill: world.craftingIdentity.craftSkills.enchanting ?? 0,
+      // The worn set, for the Perfected candidate scan alone: a Perfected copy
+      // on the body must keep the capstone row live, since the target step
+      // lists worn copies beside bagged ones. The same two reads
+      // openTargetPicker makes for the worn family, so one open cannot see two
+      // different bodies.
+      equipment: world.equipment,
+      equippedInstances: world.entities.get(world.playerId)?.equippedInstances ?? {},
+    };
+  }
+
+  /** One gate sub-line (skill floor, Perfected requirement): the plain meta
+   *  style plus the gate modifier the touch stylesheet sizes up. */
+  private gateMeta(text: string): string {
+    return `<span class="ctx-item-meta ${CTX_ITEM_GATE_CLASS}">${esc(text)}</span>`;
+  }
+
+  /** WHY a skill-gated row is inert, stated as the FLOOR rather than as the bare
+   *  fact that one exists: the crafting window's own requirement line ("Requires
+   *  Enchanting 100"), the same key and formatter crafting_window.ts and the
+   *  pattern tooltip use, so one sentence names a craft floor everywhere in the
+   *  HUD. EnchantPickRow.skillReq is what makes that possible, and reading it
+   *  here is what gives that field a consumer. The generic sentence stays the
+   *  SIM's refusal toast (enchanting_view.ts), where there is no row to read a
+   *  floor off.
+   *
+   *  It also remains the fallback for the two cases the line cannot be built: a
+   *  row carrying no floor to name (unreachable while skillMet answers off
+   *  skillReq, kept because an inert row explained by NOTHING is the one outcome
+   *  worse than a generic explanation), and a craft with no printable name, the
+   *  guard recipe_pattern_tooltip_view.ts applies so a raw snake_case id can
+   *  never reach a player. */
+  private skillGateText(skillReq: number | undefined): string {
+    const craftKey = craftNameKey(ENCHANTING_CRAFT_ID);
+    if (skillReq === undefined || craftKey === undefined)
+      return t('hudChrome.enchanting.enchantSkillTooLow');
+    return t('hudChrome.crafting.skillReqLine', {
+      craft: t(craftKey),
+      // formatNumber, not the raw number: t() interpolates with String(v), so a
+      // bare floor would never see Intl, unlike every other number this menu
+      // prints. Same options crafting_window.ts passes for the same line.
+      skill: formatNumber(skillReq, { maximumFractionDigits: 0 }),
+    });
+  }
+
   // Step one: the enchants that consume the chosen reagent, grouped into the
   // four tier sections and slot-sorted inside each (enchant_apply_view.ts owns
   // both decisions). Each row shows the localized enchant name, WHAT THE ENCHANT
   // DOES (its stat bonus, inline: the picker also lives on touch, where there is
   // no hover to reveal it), its target slot, and the per-reagent affordability;
-  // an unaffordable enchant is shown but not selectable (aria-disabled), and a
-  // SKILL-short one paints the same way with the skill line instead. Both
-  // refusals belong here rather than on the target list: they are facts about
-  // the enchant, and answering a skill shortfall with "No eligible item to
-  // enchant." told the player the wrong thing about their own bags.
+  // an unaffordable enchant is shown but not selectable (aria-disabled), and
+  // each unmet GATE (the Enchanting floor, the Perfected requirement) paints the
+  // same way with its own sub-line saying which one. Every refusal belongs here
+  // rather than on the target list: all three are facts about the ENCHANT, and
+  // answering any of them with "No eligible item to enchant." told the player
+  // the wrong thing about their own bags.
   private openEnchantPicker(reagentItemId: string, x: number, y: number): void {
     const world = this.deps.world();
-    // The same craftingIdentity read the target picker makes (see
-    // openTargetPicker): an unsynced online viewer reads 0 and the skill-gated
-    // rows list inert until the first cprof lands.
-    const enchantingSkill = world.craftingIdentity.craftSkills.enchanting ?? 0;
-    const sections = enchantSectionsForReagent(world.inventory, reagentItemId, enchantingSkill);
+    const sections = enchantSectionsForReagent(
+      world.inventory,
+      reagentItemId,
+      this.enchantViewer(),
+    );
     const title = esc(t('hudChrome.enchanting.pickerTitle'));
     if (sections.length === 0) {
       this.paint(
@@ -280,17 +355,24 @@ export class BagItemActionMenu {
         const effectHtml = effectsText
           ? `<span class="ctx-item-effect">${esc(effectsText)}</span>`
           : '';
-        // The skill shortfall gets its own sub-line, in the plain meta style the
-        // Worn and heroic tags use: it is a standing fact about the crafter, not
-        // a destructive warning, so it carries no danger tint. It sits beside
-        // the reagent line rather than replacing it, because a climbing
-        // enchanter wants to know the bill as well as the rung.
-        const skillHtml = pick.skillMet
+        // Each unmet GATE gets its own sub-line, in the plain meta style the
+        // Worn and heroic tags use: a standing fact about the crafter or the
+        // enchant, not a destructive warning, so neither carries the danger
+        // tint. They sit beside the reagent line rather than replacing it,
+        // because a climbing enchanter wants to know the bill as well as the
+        // rung. Both take the gate class, which is what earns them the touch
+        // size bump: on a phone this sub-line is the ONLY explanation of why a
+        // visible row cannot be tapped, so it is not reference fine print.
+        const skillHtml = pick.skillMet ? '' : this.gateMeta(this.skillGateText(pick.skillReq));
+        const perfectedHtml = pick.perfectedMet
           ? ''
-          : `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.enchantSkillTooLow'))}</span>`;
-        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>${skillHtml}`;
+          : this.gateMeta(t('hudChrome.enchanting.notPerfected'));
+        const html = `${esc(t(enchantNameKey(pick.enchantId)))}${effectHtml}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>${skillHtml}${perfectedHtml}`;
+        // One routing rule over every dimension: a row is selectable only when
+        // it clears ALL of them, so hover and click agree and no gate can be
+        // answered later, on the target list, with a sentence about the bags.
         rows.push(
-          pick.affordable && pick.skillMet
+          pick.affordable && pick.skillMet && pick.perfectedMet
             ? { act: `enchant:${pick.enchantId}`, html }
             : { html, disabled: true },
         );
@@ -392,24 +474,29 @@ export class BagItemActionMenu {
     const world = this.deps.world();
     // The self entity mirror carries equippedInstances in BOTH worlds (offline
     // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
-    // The viewer's flat Enchanting skill, for the Lucent tier's skill gate in
-    // the pure core (the sim's `insufficient_skill` deny, mirrored so the
-    // picker never offers a target the apply would refuse). craftingIdentity is
-    // the atomic craft-skill read both worlds implement; before an online
-    // client's first cprof it is empty, so an unsynced viewer reads 0 and the
-    // gated enchants simply list nothing until the mirror lands.
-    const enchantingSkill = world.craftingIdentity.craftSkills.enchanting ?? 0;
+    // KNOWN LIMIT, and phase 12's to settle: its ONLINE form is the trimmed
+    // `eqi` peer mirror, so it cannot carry the Perfected marker. The self
+    // surface IWorld.equipmentInstances is untrimmed in both hosts and would
+    // remove that limit with no wire change (see copyMeetsPerfectedGate in
+    // enchant_apply_view.ts, option 3), but the same read feeds the replace
+    // confirm's wireTrimmed arm, so switching it is a wider change than a
+    // picker fix. Inert until something mints the marker.
+    //
+    // The viewer projection carries the rest: the Enchanting skill for the
+    // Lucent tier's floor, and the `synced` flag that keeps an online client's
+    // all-zero startup mirror from reading as a real shortfall.
+    const viewer = this.enchantViewer();
     const worn = wornEnchantTargets(
       world.equipment,
       world.entities.get(world.playerId)?.equippedInstances ?? {},
       enchantId,
-      enchantingSkill,
+      viewer,
     );
     // Worn FIRST, because the bagged family needs it: an enchanted copy on the
     // body leaves a bagged plain copy of the same id just as ambiguous as an
     // enchanted bagged one would (#2421), and both paint into the one list a
     // player reads. enchantTargets owns that decision; this only supplies it.
-    const targets = enchantTargets(world.inventory, enchantId, worn, enchantingSkill);
+    const targets = enchantTargets(world.inventory, enchantId, worn, viewer);
     const title = esc(t('hudChrome.enchanting.targetTitle'));
     if (targets.length === 0 && worn.length === 0) {
       this.paint(

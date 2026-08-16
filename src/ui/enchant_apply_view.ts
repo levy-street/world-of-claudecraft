@@ -21,6 +21,15 @@
 // read of world.inventory; no wire round trip. enchant_apply_view never
 // decides an outcome: world.applyEnchant does, server-authoritative.
 //
+// Step one also carries the two PER-VIEWER gates the sim refuses on (the
+// Enchanting floor and the Perfected requirement) as FLAGS on the row rather
+// than as dropped rows, so each refusal is answered where it is true, on the
+// enchant, instead of falling through to step two's sentence about the player's
+// bags. Both read a viewer projection (EnchantViewerInput) rather than a bare
+// number, because an online client's progression mirror is an all-zero DEFAULT
+// until its first cprof delta lands and gating on that is worse than not
+// gating at all.
+//
 // Enchant display names have no i18n pipeline before this picker (EnchantDef.name
 // has never rendered), so enchantNameKey names the FIRST render sink key for the
 // thin consumer to resolve; never raw def.name.
@@ -85,6 +94,48 @@ export interface EnchantReagentRow {
   have: number;
 }
 
+/** The viewer state both steps project in, satisfied structurally by IWorld's
+ *  own reads (craftingIdentity plus the worn mirror). The
+ *  RecipePatternViewerInput precedent in recipe_pattern_tooltip_view.ts, and
+ *  for the same reason: the gates below answer off progression an online
+ *  client does not have for its first few frames. */
+export interface EnchantViewerInput {
+  /** craftingIdentity.synced: false ONLY on an online client that has not
+   *  received its first cprof delta yet.
+   *
+   *  `craftSkills` is an ALL-ZERO DEFAULT until that lands, so keying the skill
+   *  gate on it while unsynced paints "Requires Enchanting 100" on an inert row
+   *  at a master enchanter and empties both target lists. The skill dimension is
+   *  therefore SKIPPED WHOLE while unsynced (skillMeetsEnchant below): no floor
+   *  line, no inert row, no target filtering. The sim stays the authority and
+   *  refuses honestly with its own insufficient_skill toast if the shortfall is
+   *  real, which is the cheaper of the two errors by a wide margin: the wrong
+   *  refusal is silent and unexplained, and it corrects itself a snapshot
+   *  later, by which time the player has already gone looking for the problem. */
+  synced: boolean;
+  /** The viewer's flat Enchanting skill
+   *  (craftingIdentity.craftSkills.enchanting). Read only while `synced`. */
+  enchantingSkill: number;
+  /** The worn set (IWorld.equipment) and its per-slot payload mirror, read by
+   *  the PERFECTED candidate scan alone (perfectedCandidateExists below): the
+   *  target step lists the bagged and the worn families as one list, so a
+   *  Perfected copy on the BODY has to keep the capstone row live exactly as a
+   *  bagged one does. Omitted (the default) scans the bags only. The worn
+   *  BUILDER takes its own copies positionally, since resolving worn ROWS is its
+   *  whole job; it is the step-one row model that has no other way to see the
+   *  body. */
+  equipment?: Partial<Record<EquipSlot, string>>;
+  equippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
+}
+
+/** What a caller that supplies no viewer is treated as: SYNCED, at skill 0,
+ *  wearing nothing. Deliberately the offer-LESS direction on every dimension
+ *  (each gate applies in full), the same reasoning replaceInfoFor's
+ *  `wireTrimmed` follows: a forgotten argument must never promise an apply the
+ *  sim denies. The unsynced SKIP is opt-in for exactly that reason: it is one
+ *  narrow online startup window, and only a real viewer knows it is in one. */
+const GATED_VIEWER: EnchantViewerInput = { synced: true, enchantingSkill: 0 };
+
 /** One stat axis an enchant grants, as the picker renders it inline. */
 export interface EnchantEffectRow {
   /** The EnchantDef.statBonus key (str/agi/sta/int/spi/armor). */
@@ -105,30 +156,53 @@ export interface EnchantPickRow {
   affordable: boolean;
   /** The enchant's own Enchanting floor (EnchantDef.skillReq), ABSENT on every
    *  enchant that has none, which is every pre-Lucent one. Carried so the thin
-   *  consumer can say WHY a listed row is inert without re-reading ENCHANTS. */
+   *  consumer can say WHY a listed row is inert without re-reading ENCHANTS:
+   *  it paints the FLOOR through the crafting window's shared requirement line
+   *  ("Requires Enchanting 100", hudChrome.crafting.skillReqLine), rather than
+   *  the generic "your skill is too low" sentence, which stays the SIM's own
+   *  refusal toast where there is no row to read a number off. */
   skillReq?: number;
-  /** False only when `skillReq` is set and the viewer's Enchanting skill is
-   *  under it: the row is LISTED and painted inert, the unaffordable-reagents
-   *  treatment exactly. Dropping the row instead is what produced the false
-   *  "No eligible item to enchant." on the step-two picker: an enchant the
-   *  viewer cannot work is a fact about the ENCHANT, and answering it with a
-   *  sentence about their inventory sent them looking for gear they already
-   *  had. */
+  /** False only when `skillReq` is set, the viewer is SYNCED, and their
+   *  Enchanting skill is under it: the row is LISTED and painted inert, the
+   *  unaffordable-reagents treatment exactly. Dropping the row instead is what
+   *  produced the false "No eligible item to enchant." on the step-two picker:
+   *  an enchant the viewer cannot work is a fact about the ENCHANT, and
+   *  answering it with a sentence about their inventory sent them looking for
+   *  gear they already had. Always true for an UNSYNCED viewer (see
+   *  EnchantViewerInput.synced: an all-zero skill mirror is not a shortfall). */
   skillMet: boolean;
+  /** False only when the enchant requires a PERFECTED copy (EnchantDef
+   *  requiresPerfected) and no candidate copy carries the marker: the row is
+   *  LISTED and painted inert with its own line, the skill dimension exactly.
+   *  The two are routed identically on purpose, so neither can reach step two
+   *  and be answered with a sentence about the bags.
+   *
+   *  Candidates are the copies the TARGET BUILDERS would consider: every
+   *  slot-matching copy in the bags, plus the worn ones when the viewer supplies
+   *  the worn mirror (EnchantViewerInput.equipment). Already-enchanted copies
+   *  count, since they are replace rows rather than hidden ones.
+   *
+   *  A viewer holding no matching item at all reads false too, and that is the
+   *  intended answer, not a rounding error: the line states what the ENCHANT
+   *  demands, which is equally true of an ordinary copy and of none. Nothing
+   *  mints the marker before phase 12, so today every viewer sees exactly that
+   *  on the capstone row instead of the false "No eligible item to enchant."
+   *  the selectable row used to produce. */
+  perfectedMet: boolean;
 }
 
 /** The enchants that consume `reagentItemId`, in ENCHANTS declaration order,
  *  each with its effect facts, per-reagent affordability from the viewer's
- *  inventory, its target slot, and whether the viewer's Enchanting skill clears
- *  its own floor.
+ *  inventory, its target slot, and BOTH per-viewer gates (the Enchanting floor
+ *  and the Perfected requirement) as their own flags.
  *
- *  `enchantingSkill` DEFAULTS TO 0, the same offer-less direction the target
- *  builders below take: a caller that forgets it paints the skill-gated rows
+ *  `viewer` DEFAULTS to GATED_VIEWER, the offer-less direction the target
+ *  builders below take too: a caller that forgets it paints the gated rows
  *  inert rather than promising an apply the sim denies. */
 export function enchantsForReagent(
   inventory: readonly InvSlot[],
   reagentItemId: string,
-  enchantingSkill = 0,
+  viewer: EnchantViewerInput = GATED_VIEWER,
 ): EnchantPickRow[] {
   const rows: EnchantPickRow[] = [];
   for (const enchant of Object.values(ENCHANTS)) {
@@ -149,7 +223,8 @@ export function enchantsForReagent(
       effects,
       reagents,
       affordable: reagents.every((reagent) => reagent.have >= reagent.required),
-      skillMet: skillMeetsEnchant(enchant, enchantingSkill),
+      skillMet: skillMeetsEnchant(enchant, viewer),
+      perfectedMet: perfectedCandidateExists(enchant, inventory, viewer),
     };
     if (enchant.skillReq !== undefined) row.skillReq = enchant.skillReq;
     rows.push(row);
@@ -232,15 +307,24 @@ export function enchantTierTitleKey(tier: EnchantTier): TranslationKey {
  *  (src/sim/professions/enchanting.ts, `insufficient_skill`), mirrored so the
  *  picker never offers an apply the sim would refuse outright.
  *
- *  WHERE the refusal is shown is the point: it belongs on the ENCHANT row in
- *  step one, which states the skill line and paints inert (EnchantPickRow
+ *  UNSYNCED SHORT-CIRCUITS THE WHOLE DIMENSION, and that is the point of taking
+ *  a viewer rather than a number: before an online client's first cprof delta
+ *  the skill mirror is an all-zero DEFAULT, not a measurement, so gating on it
+ *  told a master enchanter their skill was too low and hid every target they
+ *  owned. Nothing here is a safety check (the server re-validates every apply),
+ *  so skipping it costs at most one honest sim refusal in a window that lasts a
+ *  snapshot. See EnchantViewerInput.synced.
+ *
+ *  WHERE the refusal is shown is the other half: it belongs on the ENCHANT row
+ *  in step one, which states the floor and paints inert (EnchantPickRow
  *  skillMet above), never on the step-two target list. Filtering the targets
  *  alone left the enchant selectable and then answered with "No eligible item
  *  to enchant.", which is false: the items were eligible and the skill was not.
  *  The target builders below keep the same gate as a backstop, so a caller that
  *  bypasses the picker cannot list a target either. */
-function skillMeetsEnchant(enchant: EnchantDef, enchantingSkill: number): boolean {
-  return enchant.skillReq === undefined || enchantingSkill >= enchant.skillReq;
+function skillMeetsEnchant(enchant: EnchantDef, viewer: EnchantViewerInput): boolean {
+  if (!viewer.synced) return true;
+  return enchant.skillReq === undefined || viewer.enchantingSkill >= enchant.skillReq;
 }
 
 /** Whether one specific copy may take `enchant`, on the sim's `not_perfected`
@@ -249,23 +333,76 @@ function skillMeetsEnchant(enchant: EnchantDef, enchantingSkill: number): boolea
  *  12, so today this hides the Lucent Infusion's target list entirely, exactly
  *  as the sim refuses every attempt.
  *
- *  KNOWN LIMIT, and a phase 12 obligation: the WORN family reads the trimmed
- *  `eqi` mirror online (signer/enchant/rolled only, server/game.ts data
+ *  KNOWN LIMIT, and a phase 12 obligation: the WORN family is fed the trimmed
+ *  `eqi` peer mirror online (signer/enchant/rolled only, server/game.ts data
  *  minimization), which does not carry `perfected`. When phase 12 starts
- *  minting the marker it has to decide whether the field reaches that wire, or
- *  an online client will hide a worn Perfected copy the sim would accept. Inert
- *  today (no copy carries the marker in either host). The exclusion is pinned by
- *  NAME in tests/snapshots.test.ts, in the eqi wire suite: it equips a copy
- *  stamped `perfected` and asserts the wired payload's key set is exactly
- *  signer and rolled. That is the pin to satisfy when phase 12 revisits this;
- *  the picker's own suite pins something different and weaker (that the
- *  server's eqi projection assigns only signer/enchant/rolled), so it would
- *  catch the widening without ever naming this field. */
+ *  minting the marker, an online client fed that mirror will hide a worn
+ *  Perfected copy the sim would accept. Inert today (no copy carries the marker
+ *  in either host).
+ *
+ *  THREE ways out, and only the first two touch the wire, which is why this is
+ *  not automatically a server change:
+ *    1. widen the `eqi` allowlist to carry `perfected`;
+ *    2. leave the wire alone and accept the hidden worn target;
+ *    3. feed this arm the SELF mirror instead. `IWorld.equipmentInstances` is
+ *       the whole `meta.equipmentInstance` payload in BOTH hosts (the server
+ *       ships it under `einst` on the self snapshot, untrimmed, and ClientWorld
+ *       mirrors it; char_window.ts already reads it for the paperdoll), so it
+ *       carries every field this gate wants with no wire change at all. The
+ *       picker's worn arm is a SELF surface: a player enchants their own gear,
+ *       never an inspected peer's. Taken that way, the `eqi` decision concerns
+ *       INSPECTING viewers only and this gate stops depending on it.
+ *  Option 3 is the recommendation for phase 12 and deliberately NOT taken here:
+ *  the entity-mirror read this picker makes today also feeds
+ *  preservedReplaceTraits' `wireTrimmed` arm, whose trimmed answer and its pins
+ *  (below, plus the eqi allowlist pin) would all have to move with it, which is
+ *  a wider change than a picker fix.
+ *
+ *  The exclusion is pinned by NAME in tests/snapshots.test.ts, in the eqi wire
+ *  suite: it equips a copy stamped `perfected` and asserts the wired payload's
+ *  key set is exactly signer and rolled. That is the pin to satisfy when phase
+ *  12 revisits this; the picker's own suite pins something different and weaker
+ *  (that the server's eqi projection assigns only signer/enchant/rolled), so it
+ *  would catch the widening without ever naming this field. */
 function copyMeetsPerfectedGate(
   enchant: EnchantDef,
   instance: ItemInstancePayload | undefined,
 ): boolean {
   return !enchant.requiresPerfected || instance?.perfected === true;
+}
+
+/** Whether ANY copy the target builders would consider passes the Perfected
+ *  gate: the step-one row model's half of that gate, so a requiresPerfected
+ *  enchant with nothing to land on paints inert instead of staying selectable
+ *  and answering step two with "No eligible item to enchant."
+ *
+ *  Walks the same candidate set the builders do (slot match, then the gate),
+ *  across BOTH families: the bags always, and the body when the viewer supplied
+ *  the worn mirror. Deliberately NOT the enchanted / replace split: an
+ *  already-enchanted Perfected copy is a replace row, so it is a candidate too.
+ *  Trivially true for every enchant that requires nothing, which is all of them
+ *  but the capstone. */
+function perfectedCandidateExists(
+  enchant: EnchantDef,
+  inventory: readonly InvSlot[],
+  viewer: EnchantViewerInput,
+): boolean {
+  if (!enchant.requiresPerfected) return true;
+  for (const slot of inventory) {
+    const def = ITEMS[slot.itemId];
+    if (!def || def.slot !== enchant.itemSlot) continue;
+    if (copyMeetsPerfectedGate(enchant, slot.instance)) return true;
+  }
+  const equipment = viewer.equipment ?? {};
+  const equippedInstances = viewer.equippedInstances ?? {};
+  for (const equipSlot of ALL_EQUIP_SLOTS) {
+    const itemId = equipment[equipSlot];
+    if (!itemId) continue;
+    const def = ITEMS[itemId];
+    if (!def || def.slot !== enchant.itemSlot) continue;
+    if (copyMeetsPerfectedGate(enchant, equippedInstances[equipSlot])) return true;
+  }
+  return false;
 }
 
 export interface EnchantPickSection {
@@ -279,16 +416,16 @@ export interface EnchantPickSection {
  *  are omitted, so a dust-only reagent still paints exactly one header. Pure:
  *  the input rows are re-bucketed, never mutated.
  *
- *  A skill-short row is BUCKETED like any other, never dropped: the Lucent
- *  section is what tells a climbing enchanter the rung exists at all, and it is
- *  the row itself that says the skill is short (skillMet above). */
+ *  A GATED row is BUCKETED like any other, never dropped: the Lucent section is
+ *  what tells a climbing enchanter the rung exists at all, and it is the row
+ *  itself that says which gate is short (skillMet / perfectedMet above). */
 export function enchantSectionsForReagent(
   inventory: readonly InvSlot[],
   reagentItemId: string,
-  enchantingSkill = 0,
+  viewer: EnchantViewerInput = GATED_VIEWER,
 ): EnchantPickSection[] {
   const byTier = new Map<EnchantTier, EnchantPickRow[]>();
-  for (const row of enchantsForReagent(inventory, reagentItemId, enchantingSkill)) {
+  for (const row of enchantsForReagent(inventory, reagentItemId, viewer)) {
     const tier = enchantTier(row.enchantId);
     const bucket = byTier.get(tier);
     if (bucket) bucket.push(row);
@@ -514,22 +651,23 @@ export interface EnchantTargetRow {
  *  its bagged plain twin just as bare as an enchanted bagged one would. Nothing
  *  else reads it, and the default (none) is the bagged-pair-only behavior.
  *
- *  `enchantingSkill` is the viewer's flat Enchanting skill, for the Lucent
- *  tier's two gates (skillMeetsEnchant / copyMeetsPerfectedGate above): a copy
- *  the sim would refuse never becomes a row. It DEFAULTS TO 0 deliberately,
- *  the same reasoning replaceInfoFor's `wireTrimmed` follows in reverse: the
- *  missing-argument answer has to be the one that offers LESS, and a caller
- *  that forgets it hides the four skill-gated enchants' targets rather than
- *  promising an apply the sim denies. */
+ *  `viewer` carries the Lucent tier's two gates (skillMeetsEnchant /
+ *  copyMeetsPerfectedGate above): a copy the sim would refuse never becomes a
+ *  row, and the UNSYNCED window skips the skill half whole rather than
+ *  filtering against an all-zero mirror. It DEFAULTS to GATED_VIEWER
+ *  deliberately, the same reasoning replaceInfoFor's `wireTrimmed` follows in
+ *  reverse: the missing-argument answer has to be the one that offers LESS, and
+ *  a caller that forgets it hides the four skill-gated enchants' targets rather
+ *  than promising an apply the sim denies. */
 export function enchantTargets(
   inventory: readonly InvSlot[],
   enchantId: string,
   worn: readonly WornEnchantTargetRow[] = [],
-  enchantingSkill = 0,
+  viewer: EnchantViewerInput = GATED_VIEWER,
 ): EnchantTargetRow[] {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
-  if (!skillMeetsEnchant(enchant, enchantingSkill)) return [];
+  if (!skillMeetsEnchant(enchant, viewer)) return [];
   const byItem = new Map<string, number>();
   const enchantedByItem = new Map<string, number>();
   for (const slot of inventory) {
@@ -616,18 +754,20 @@ export interface WornEnchantTargetRow {
  *  shared surfaces (IWorld.equipment and the self entity mirror
  *  Entity.equippedInstances), so this decides identically offline and online.
  *
- *  `enchantingSkill` gates exactly as it does on the bagged family above, same
- *  offer-less default, and the per-copy Perfected gate runs here too (with the
- *  worn-mirror limit copyMeetsPerfectedGate documents). */
+ *  `viewer` gates exactly as it does on the bagged family above, same offer-less
+ *  default and same unsynced skip, and the per-copy Perfected gate runs here too
+ *  (with the worn-mirror limit copyMeetsPerfectedGate documents). Its own
+ *  `equipment` / `equippedInstances` fields are NOT read here: this builder is
+ *  handed the worn set positionally, because resolving worn ROWS is its job. */
 export function wornEnchantTargets(
   equipment: Partial<Record<EquipSlot, string>>,
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>,
   enchantId: string,
-  enchantingSkill = 0,
+  viewer: EnchantViewerInput = GATED_VIEWER,
 ): WornEnchantTargetRow[] {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
-  if (!skillMeetsEnchant(enchant, enchantingSkill)) return [];
+  if (!skillMeetsEnchant(enchant, viewer)) return [];
   const rows: WornEnchantTargetRow[] = [];
   for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = equipment[slot];

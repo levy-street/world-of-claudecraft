@@ -17,6 +17,7 @@ import { ALL_EQUIP_SLOTS, type EquipSlot, type InvSlot, type ItemDef } from '../
 import {
   BagItemActionMenu,
   CTX_ITEM_DANGER_CLASS,
+  CTX_ITEM_GATE_CLASS,
   CTX_MENU_PICKER_CLASS,
 } from '../src/ui/bag_item_action_menu';
 import { disenchantYieldLines } from '../src/ui/disenchant_yield_view';
@@ -54,6 +55,12 @@ interface WorldStub {
    *  craftingIdentity for the Lucent tier's skill gate. Defaults to 0, a fresh
    *  character, which is what every pre-Lucent case here assumes. */
   enchantingSkill?: number;
+  /** craftingIdentity.synced. Defaults to TRUE, which is the offline Sim always
+   *  and an online client from its first cprof delta on: the state every case
+   *  here means unless it says otherwise. False is the online STARTUP window,
+   *  where craftSkills is an all-zero default rather than a measurement, and the
+   *  skill gate is skipped whole rather than answered from it. */
+  synced?: boolean;
 }
 
 function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {}) {
@@ -84,9 +91,13 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
   const world = {
     inventory: stub.inventory ?? [{ itemId: DUST, count: 99 }],
     equipment: stub.equipment ?? {},
-    // The atomic craft-skill mirror both real worlds implement; the picker
-    // reads Enchanting off it to mirror the sim's skill gate.
-    craftingIdentity: { craftSkills: { enchanting: stub.enchantingSkill ?? 0 } },
+    // The atomic crafting mirror both real worlds implement; the picker reads
+    // Enchanting off it to mirror the sim's skill gate, and `synced` to tell a
+    // real skill of 0 apart from an online client's not-yet-arrived mirror.
+    craftingIdentity: {
+      synced: stub.synced ?? true,
+      craftSkills: { enchanting: stub.enchantingSkill ?? 0 },
+    },
     playerId: 1,
     entities: new Map([[1, { equippedInstances: stub.equippedInstances ?? {} }]]),
     disenchantItem: (itemId: string, target?: { slotIndex: number }) => {
@@ -1243,5 +1254,176 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
     expect(sweptLists).toBeGreaterThanOrEqual(80);
     expect(sharedNameShapes, 'some slot has two ids rendering ONE name').toBeGreaterThan(0);
     expect(sharedLabelShapes, 'some slot fills two keys sharing ONE label').toBeGreaterThan(0);
+  });
+});
+
+// The step-one GATE arms (Masterwrought phase 10). A gated enchant is LISTED
+// and painted inert with a sub-line naming the gate, the unaffordable-row
+// treatment exactly, because both refusals are facts about the ENCHANT: routing
+// them to step two answered a skill shortfall or a missing Perfected marker with
+// "No eligible item to enchant.", a sentence about the player's bags.
+//
+// The default harness (skill 0, dust-only bag) makes a Lucent row unaffordable
+// AND skill-short at once, so it can say nothing about which gate did what.
+// Every case here holds the other dimensions clear on purpose.
+describe('Apply Enchant picker: the skill gate on a listed row', () => {
+  const LUCENT_REAGENT = 'lucent_reagent';
+  const LUCENT_WEAPON = 'enchant_weapon_lucent_might';
+  const FLOOR = ENCHANTS[LUCENT_WEAPON].skillReq as number;
+  /** The whole Lucent bill in bulk, so affordability is never what marks a row
+   *  in the skill cases below. */
+  const stocked = (): InvSlot[] => [
+    { itemId: LUCENT_REAGENT, count: 99 },
+    { itemId: 'arcane_shard', count: 99 },
+    { itemId: 'arcane_essence', count: 99 },
+    { itemId: 'arcane_dust', count: 99 },
+  ];
+  /** The floor line the row states, composed from CONTENT rather than from the
+   *  painter's own expression: the crafting window's shared requirement key,
+   *  which is the point of EnchantPickRow.skillReq having a consumer at all. A
+   *  row that fell back to the generic "Your Enchanting skill is too low"
+   *  sentence, or dropped the number, fails this. */
+  const FLOOR_LINE = `Requires Enchanting ${FLOOR}`;
+  const rowEl = (h: ReturnType<typeof harness>, enchantId: string): Element | undefined =>
+    [...h.el.querySelectorAll('.ctx-item')].find((el) =>
+      (el.textContent ?? '').startsWith(ENCHANTS[enchantId].name),
+    );
+  const metaTexts = (row: Element | undefined): string[] =>
+    [...(row?.querySelectorAll('.ctx-item-meta') ?? [])].map((meta) => meta.textContent ?? '');
+
+  it('paints a skill-short row inert and states the FLOOR, reagents in hand', () => {
+    const h = harness(768, { inventory: stocked(), enchantingSkill: FLOOR - 1 });
+    h.openPicker(LUCENT_REAGENT);
+    const row = rowEl(h, LUCENT_WEAPON);
+    expect(row, 'the enchant is listed, never dropped').toBeDefined();
+    expect(row?.getAttribute('aria-disabled')).toBe('true');
+    expect(row?.getAttribute('data-act'), 'an inert row carries no dispatch').toBeNull();
+    expect(metaTexts(row)).toContain(FLOOR_LINE);
+    // The gate line takes the modifier the touch stylesheet sizes up: on a phone
+    // it is the only explanation of why a visible row cannot be tapped.
+    const gate = [...(row?.querySelectorAll(`.${CTX_ITEM_GATE_CLASS}`) ?? [])];
+    expect(gate.map((el) => el.textContent)).toEqual([FLOOR_LINE]);
+    expect(gate[0].classList.contains(CTX_ITEM_META_CLASS)).toBe(true);
+    // It SITS BESIDE the reagent line rather than replacing it: a climbing
+    // enchanter wants the bill as well as the rung.
+    expect(row?.querySelectorAll('.ctx-reagent').length).toBeGreaterThan(0);
+  });
+
+  it('makes the same row actionable at the floor exactly, with no gate line', () => {
+    const h = harness(768, { inventory: stocked(), enchantingSkill: FLOOR });
+    h.openPicker(LUCENT_REAGENT);
+    const row = rowEl(h, LUCENT_WEAPON);
+    expect(row?.getAttribute('data-act')).toBe(`enchant:${LUCENT_WEAPON}`);
+    expect(row?.getAttribute('aria-disabled')).toBeNull();
+    expect(metaTexts(row)).not.toContain(FLOOR_LINE);
+    expect(row?.querySelectorAll(`.${CTX_ITEM_GATE_CLASS}`).length).toBe(0);
+  });
+
+  it('disables an UNAFFORDABLE but skilled row without claiming a skill shortfall', () => {
+    // The reagent alone, so the shard and essence lines are short while the
+    // skill clears. The row must be inert for the right stated reason.
+    const h = harness(768, {
+      inventory: [{ itemId: LUCENT_REAGENT, count: 99 }],
+      enchantingSkill: FLOOR,
+    });
+    h.openPicker(LUCENT_REAGENT);
+    const row = rowEl(h, LUCENT_WEAPON);
+    expect(row?.getAttribute('aria-disabled')).toBe('true');
+    expect(row?.getAttribute('data-act')).toBeNull();
+    expect(metaTexts(row)).not.toContain(FLOOR_LINE);
+    expect(row?.querySelectorAll('.ctx-reagent.unsat').length).toBeGreaterThan(0);
+  });
+
+  it('states the floor on a row that is short on BOTH dimensions at once', () => {
+    const h = harness(768, {
+      inventory: [{ itemId: LUCENT_REAGENT, count: 99 }],
+      enchantingSkill: FLOOR - 1,
+    });
+    h.openPicker(LUCENT_REAGENT);
+    const row = rowEl(h, LUCENT_WEAPON);
+    expect(row?.getAttribute('data-act')).toBeNull();
+    expect(metaTexts(row)).toContain(FLOOR_LINE);
+    expect(row?.querySelectorAll('.ctx-reagent.unsat').length).toBeGreaterThan(0);
+  });
+
+  it('skips the skill gate whole while the crafting mirror is UNSYNCED', () => {
+    // Before an online client's first cprof delta, craftSkills is an all-zero
+    // DEFAULT: gating on it paints this floor line at a master enchanter and
+    // empties the target step. The sim still refuses honestly if the shortfall
+    // turns out to be real.
+    const h = harness(768, { inventory: stocked(), synced: false, enchantingSkill: 0 });
+    h.openPicker(LUCENT_REAGENT);
+    const row = rowEl(h, LUCENT_WEAPON);
+    expect(row?.getAttribute('data-act')).toBe(`enchant:${LUCENT_WEAPON}`);
+    expect(row?.getAttribute('aria-disabled')).toBeNull();
+    expect(metaTexts(row)).not.toContain(FLOOR_LINE);
+    // The same all-but-`synced` viewer, now synced and genuinely short: inert
+    // with the line. One field is the whole difference.
+    const after = harness(768, { inventory: stocked(), synced: true, enchantingSkill: FLOOR - 1 });
+    after.openPicker(LUCENT_REAGENT);
+    const gated = rowEl(after, LUCENT_WEAPON);
+    expect(gated?.getAttribute('data-act')).toBeNull();
+    expect(metaTexts(gated)).toContain(FLOOR_LINE);
+  });
+});
+
+// The Perfected requirement, the skill gate's twin (LIG-3): nothing mints the
+// marker before phase 12, so a selectable capstone row could only ever reach
+// step two and answer "No eligible item to enchant." The row states the real
+// reason instead, and carries no dispatch to reach that sentence with.
+describe('Apply Enchant picker: the Perfected gate on the capstone row', () => {
+  const INFUSION = 'enchant_lucent_infusion';
+  const CAP = ENCHANTS[INFUSION].skillReq as number;
+  const CHEST = Object.keys(ITEMS).find((id) => ITEMS[id].slot === 'chest') as string;
+  const PERFECTED_LINE = 'Only a Perfected item can bear that enchant.';
+  const NO_TARGETS = 'No eligible item to enchant.';
+  /** The capstone bill plus an ORDINARY chest copy: every other dimension clear,
+   *  so the Perfected marker is the only thing left refusing. */
+  const bill = (chestInstance?: Record<string, unknown>): InvSlot[] => [
+    { itemId: 'lucent_reagent', count: 99 },
+    { itemId: 'arcane_shard', count: 99 },
+    { itemId: CHEST, count: 1, ...(chestInstance ? { instance: chestInstance } : {}) },
+  ];
+  const infusionRow = (h: ReturnType<typeof harness>): Element | undefined =>
+    [...h.el.querySelectorAll('.ctx-item')].find((el) =>
+      (el.textContent ?? '').startsWith(ENCHANTS[INFUSION].name),
+    );
+
+  it('paints the capstone inert with the Perfected line while no copy carries the marker', () => {
+    const h = harness(768, { inventory: bill(), enchantingSkill: CAP });
+    h.openPicker('lucent_reagent');
+    const row = infusionRow(h);
+    expect(row, 'the capstone is listed, so the rung stays visible').toBeDefined();
+    expect(row?.getAttribute('aria-disabled')).toBe('true');
+    expect(row?.getAttribute('data-act')).toBeNull();
+    const gate = [...(row?.querySelectorAll(`.${CTX_ITEM_GATE_CLASS}`) ?? [])];
+    expect(gate.map((el) => el.textContent)).toEqual([PERFECTED_LINE]);
+    expect(gate[0].classList.contains(CTX_ITEM_META_CLASS)).toBe(true);
+    // Not the DESTRUCTIVE treatment: a gate is a standing fact, not a warning
+    // that a tap will destroy something.
+    expect(gate[0].classList.contains(CTX_ITEM_DANGER_CLASS)).toBe(false);
+  });
+
+  it('leaves step two unreachable for it, so the false "no eligible item" cannot paint', () => {
+    const h = harness(768, { inventory: bill(), enchantingSkill: CAP });
+    h.openPicker('lucent_reagent');
+    // No row in the whole picker dispatches the capstone, which is what makes
+    // the sentence below unreachable rather than merely unlikely.
+    expect(h.rows().map((row) => row.act)).not.toContain(`enchant:${INFUSION}`);
+    expect(h.el.textContent ?? '').not.toContain(NO_TARGETS);
+  });
+
+  it('clears the gate on a Perfected copy, and THEN the target step lists it', () => {
+    // The positive control for both halves: the inert row above is this gate
+    // answering (not the slot match, the bill, or the skill), and once it is
+    // cleared the step it used to block works.
+    const h = harness(768, { inventory: bill({ perfected: true }), enchantingSkill: CAP });
+    h.openPicker('lucent_reagent');
+    const row = infusionRow(h);
+    expect(row?.getAttribute('data-act')).toBe(`enchant:${INFUSION}`);
+    expect(row?.querySelectorAll(`.${CTX_ITEM_GATE_CLASS}`).length).toBe(0);
+    h.click(`enchant:${INFUSION}`);
+    expect(h.rows().map((r) => r.act)).toEqual([`target:${CHEST}`]);
+    expect(h.el.textContent ?? '').not.toContain(NO_TARGETS);
   });
 });

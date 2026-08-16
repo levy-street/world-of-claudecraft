@@ -1736,8 +1736,12 @@ export class ClientWorld implements IWorld {
   // `cprof` (craftingIdentity) delta: applySnapshot REPLACES this map from
   // cprof.craftSkills and re-points craftingIdentity.craftSkills at the same
   // object, so the two reads can never disagree. Until the first cprof arrives
-  // the all-zero default stands and craftingIdentity.synced is false, which is
-  // what an unsynced viewer's gates key on (see the enchant picker's skill arm).
+  // the all-zero default stands and craftingIdentity.synced is false. That FLAG,
+  // never this map, is what a viewer-side gate keys on: the enchant picker
+  // (enchant_apply_view.ts) and the pattern tooltip (recipe_pattern_tooltip_view.ts)
+  // both SKIP their skill gates entirely while it is false, because an all-zero
+  // default is not a measurement and refusing on it tells a master crafter their
+  // skill is too low.
   craftSkills: Record<string, number> = emptyCraftSkills();
   craftingIdentity: CraftingIdentityView = {
     version: 1,
