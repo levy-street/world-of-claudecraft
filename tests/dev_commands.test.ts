@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -420,5 +421,90 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
     });
     sim.chat('/dev bg');
     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+  });
+
+  it('/dev market floods the book with a rich, all-tier spread of player listings', () => {
+    const sim = devSim();
+    const before = sim.marketListings.length;
+    sim.chat('/dev market');
+    const seeded = sim.marketListings.filter((l) => !l.house);
+    // A market-scale flood (the live market runs 1000+; the seed aims comparable).
+    expect(sim.marketListings.length).toBeGreaterThan(before);
+    expect(seeded.length).toBeGreaterThan(300);
+
+    // Duplicates exist: at least one item has several plain listings (so Hide
+    // duplicates / Lowest price only have something to collapse).
+    const plainByItem = new Map<string, number>();
+    for (const l of seeded) {
+      if (l.instance) continue;
+      plainByItem.set(l.itemId, (plainByItem.get(l.itemId) ?? 0) + 1);
+    }
+    expect([...plainByItem.values()].some((n) => n >= 2)).toBe(true);
+
+    // Every quality tier is represented, so the rarity filter + quality name colours
+    // all have data. Epics especially: EVERY listable epic gear item is present.
+    const qualities = new Set(seeded.map((l) => ITEMS[l.itemId]?.quality));
+    for (const q of ['common', 'uncommon', 'rare', 'epic', 'legendary']) {
+      expect(qualities.has(q as never), `tier ${q} must appear`).toBe(true);
+    }
+    const seededEpics = new Set(
+      seeded.map((l) => l.itemId).filter((id) => ITEMS[id]?.quality === 'epic'),
+    );
+    const allEpicGear = Object.entries(ITEMS).filter(
+      ([, d]) =>
+        d.quality === 'epic' &&
+        !d.soulbound &&
+        !d.noMarketList &&
+        ['armor', 'weapon', 'held_offhand', 'bag', 'tool'].includes(d.kind),
+    ).length;
+    expect(seededEpics.size).toBe(allEpicGear);
+
+    // Materials / consumables list in realistic STACKS (count > 1), which also
+    // exercises the market's per-unit "price each" display.
+    expect(seeded.some((l) => l.count > 1)).toBe(true);
+
+    // Enchanted copies carry a real enchant id (non-fungible, stay their own group).
+    const enchanted = seeded.filter((l) => l.instance?.enchant);
+    expect(enchanted.length).toBeGreaterThan(0);
+    expect(enchanted.every((l) => typeof l.instance?.enchant === 'string')).toBe(true);
+
+    // Heroic variants (a distinct item id) are present, to test heroic-stays-separate.
+    expect(seeded.some((l) => l.itemId.startsWith('heroic_'))).toBe(true);
+
+    // Every seeded listing never expires (survives the expiry sweep for the session).
+    expect(seeded.every((l) => l.expiresAt === Number.POSITIVE_INFINITY)).toBe(true);
+  });
+
+  it('/dev market is DETERMINISTIC: the same market regardless of game rng state', () => {
+    // It seeds from a fixed Rng, not the shared game rng, so two sims at different
+    // seeds and classes produce a byte-identical market. Predictable for testing.
+    const a = devSim(1);
+    a.chat('/dev market');
+    const b = new Sim({
+      seed: 999,
+      playerClass: 'mage',
+      autoEquip: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    b.chat('/dev market');
+    const sig = (s: Sim) =>
+      s.marketListings
+        .filter((l) => !l.house)
+        .map((l) => `${l.itemId}:${l.count}:${l.price}:${l.instance?.enchant ?? ''}`)
+        .join('|');
+    expect(sig(a)).toBe(sig(b));
+  });
+
+  it('/dev market is inert without dev commands enabled', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
+    const before = sim.marketListings.length;
+    sim.chat('/dev market');
+    expect(sim.marketListings.length).toBe(before);
   });
 });

@@ -7,9 +7,12 @@
 // IWorld surface, and the /listings readout call sites resolve unchanged.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
-// (enforced by tests/architecture.test.ts). The market draws NO rng.
+// (enforced by tests/architecture.test.ts). Normal market operation (list/buy/
+// collect/browse) draws NO rng; the ONE exception is the dev-only seedDevMarket
+// (/dev market), which draws from its OWN fresh fixed-seed Rng (never the shared
+// ctx.rng, so it cannot perturb the deterministic world) and never runs in production.
 
-import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
+import { bagCapacity, canGrantCopies, instancedCountCap, stackSizeOf } from './bags';
 import { rekeySigner } from './character_rename';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
@@ -45,6 +48,7 @@ import {
   recordSale,
   sanitizeSaleLog,
 } from './market_sale_log';
+import { Rng } from './rng';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -54,6 +58,7 @@ import {
   type Entity,
   INTERACT_RANGE,
   type InvSlot,
+  type ItemDef,
   type ItemInstancePayload,
 } from './types';
 
@@ -103,6 +108,82 @@ export const MARKET_HOUSE_STOCK = [
   { itemId: 'linen_pouch', count: 1, price: 250 },
   { itemId: 'travelers_knapsack', count: 1, price: 2000 },
 ] as const;
+
+// ---- /dev market seed config (dev-only, never production) --------------------
+// Fixed seed so `/dev market` produces the identical market every run (a fresh Rng
+// is minted from it, independent of game rng state).
+const DEV_MARKET_SEED = 424242;
+// Fake seller names, letters-only like real characters; picked per listing so the
+// seeded book reads like a busy market of many sellers.
+const DEV_MARKET_SELLERS: string[] = [
+  'Kaelra',
+  'Vane',
+  'Gnotib',
+  'Marsh',
+  'Aldwin',
+  'Perrin',
+  'Doran',
+  'Thorne',
+  'Brant',
+  'Cole',
+  'Stridente',
+  'Woodsman',
+];
+// Sentinel: list EVERY item in this tier, not a sample.
+const ALL = -1;
+// Item kinds counted as "gear" for the by-quality sampling below.
+const DEV_MARKET_GEAR_KINDS = new Set(['armor', 'weapon', 'held_offhand', 'bag', 'tool']);
+// Item kinds counted as consumables.
+const DEV_MARKET_CONSUMABLE_KINDS = new Set(['potion', 'elixir', 'food', 'drink']);
+// Materials live under the `junk` kind (ores, herbs, bars, essences); match the
+// real ones by name so vendor trash stays out of the market seed.
+const DEV_MARKET_MATERIAL_RE =
+  /ore|ingot|bar|herb|log|hide|leather|cloth|bolt|essence|dust|shard|thread|petal|root|bloom|leaf/;
+// How many items per gear quality tier. Epics and legendaries list EVERY one (the
+// good stuff should be fully represented); lower tiers sample so the rarity filter
+// has range without drowning the book in greens.
+const DEV_MARKET_TIER_SAMPLE: ReadonlyArray<readonly [string, number]> = [
+  ['common', 10],
+  ['uncommon', 24],
+  ['rare', 40],
+  ['epic', ALL],
+  ['legendary', ALL],
+];
+// Max interchangeable sellers per item, by quality. The live market runs 1000+
+// listings, so the seed aims for a comparable scale: heavy duplication on the mid
+// tiers (where collapse is worth exercising) and a few sellers even on the ~150
+// epics, which lands the whole book around a thousand rows.
+const DEV_MARKET_TIER_MAX_SELLERS: Record<string, number> = {
+  common: 6,
+  uncommon: 8,
+  rare: 6,
+  epic: 4,
+  legendary: 3,
+};
+// How many materials and consumables to sample (materials especially stack many
+// sellers deep in a real market, so they get a healthy population here too).
+const DEV_MARKET_MATERIALS = 24;
+const DEV_MARKET_CONSUMABLES = 16;
+// A believable per-quality base price (total copper), scaled so a legendary reads
+// as costly next to a common. Jittered per seller around this.
+const DEV_MARKET_TIER_BASE_PRICE: Record<string, number> = {
+  common: 1_500,
+  uncommon: 6_000,
+  rare: 40_000,
+  epic: 250_000,
+  legendary: 1_500_000,
+};
+// Real weapon-enchant ids for the enchanted copies (content/enchants.ts).
+const DEV_MARKET_ENCHANTS: string[] = [
+  'enchant_weapon_might',
+  'enchant_weapon_agility',
+  'enchant_weapon_intellect',
+];
+// How many enchanted weapon pairs (one plain + one enchanted of the same item) to
+// seed, and how many Heroic variants, so the non-fungible-stays-separate cases are
+// always present, not left to chance.
+const DEV_MARKET_ENCHANTED = 6;
+const DEV_MARKET_HEROICS = 6;
 // The current lowest active listing price for `itemId`, PER UNIT (issue #3043):
 // `MarketListing.price` is the total buyout for the whole stack, but the Sell
 // tab's "price each" field the player is about to fill in is per-unit, so this
@@ -482,6 +563,158 @@ export class Market {
     // older build already handed to persisted player listings (#2463).
     this.nextListingId = playerListingIdFloor(this.marketListings.map((l) => l.id));
     this.bumpBook();
+  }
+
+  // DEV ONLY (/dev market): flood the book with a rich, realistic spread of
+  // player-style listings so market features (Hide duplicates / Lowest price only,
+  // the rarity + type filters, the quality name colours, the coming class picker)
+  // all have real data to work against. Reached through the ctx callback
+  // `seedDevMarket`, gated by `ctx.devCommands` at the call site, so it can never
+  // run in production.
+  //
+  // The pool is the WHOLE listable item catalog (armor / weapon / bag, minus quest
+  // / soulbound / no-list), sampled ACROSS EVERY QUALITY TIER (common -> legendary)
+  // so rares, epics and a legendary or two show, not just starter greens. It also
+  // seeds a batch of enchanted weapon copies and a batch of Heroic variants, both
+  // of which are non-fungible and must stay their OWN groups (never folded into the
+  // plain copies) -- the exact case the grouping has to get right.
+  //
+  // DETERMINISTIC: it draws from a FRESH Rng with a fixed seed, not ctx.rng, so
+  // `/dev market` produces the identical market every run regardless of how much
+  // game rng was drawn before it (predictable for testing and screenshots). Rows
+  // are non-house player listings with Infinity expiry, so they survive the
+  // once-a-second expiry sweep for the whole session. Returns the count added.
+  seedDevMarket(): number {
+    const rng = new Rng(DEV_MARKET_SEED);
+    let added = 0;
+    const addListing = (
+      itemId: string,
+      price: number,
+      count = 1,
+      instance?: ItemInstancePayload,
+    ) => {
+      this.marketListings.push({
+        id: this.nextListingId++,
+        sellerKey: `dev:${this.nextListingId}`,
+        sellerName: rng.pick(DEV_MARKET_SELLERS),
+        itemId,
+        count,
+        price: Math.max(MARKET_MIN_PRICE, Math.round(price)),
+        expiresAt: Infinity,
+        house: false,
+      });
+      if (instance) this.marketListings[this.marketListings.length - 1].instance = instance;
+      added += 1;
+    };
+    // Per-UNIT base price. Gear is one-per-listing; a stackable item (junk/consumable,
+    // stackSizeOf > 1) prices per unit so a stack of N costs about N times as much,
+    // which also exercises the market's "price each" display.
+    const unitBase = (itemId: string): number =>
+      DEV_MARKET_TIER_BASE_PRICE[ITEMS[itemId]?.quality ?? 'common'] ?? 1000;
+    // List one item as 1..maxSellers interchangeable sellers at a jittered price, so
+    // duplicates exist to collapse and the cheapest-of-each pick is meaningful. A
+    // stackable item lists a realistic partial-to-full stack per seller.
+    const listWithSellers = (itemId: string, maxSellers: number) => {
+      const sellers = rng.int(1, maxSellers);
+      const cap = stackSizeOf(ITEMS[itemId]);
+      for (let s = 0; s < sellers; s++) {
+        // Stackable: a random stack from ~a quarter up to the full cap. Gear: 1.
+        const count = cap > 1 ? rng.int(Math.max(1, Math.floor(cap / 4)), cap) : 1;
+        addListing(itemId, unitBase(itemId) * count * rng.range(0.7, 1.6), count);
+      }
+    };
+
+    // The gear catalog grouped by quality, sorted by id within each tier for a
+    // STABLE selection order (Object.entries order is not guaranteed across builds).
+    const gearByQuality = new Map<string, string[]>();
+    for (const [id, def] of Object.entries(ITEMS)) {
+      if (!DEV_MARKET_GEAR_KINDS.has(def.kind)) continue;
+      if (def.soulbound || def.noMarketList) continue;
+      const q = def.quality ?? 'common';
+      const bucket = gearByQuality.get(q) ?? [];
+      bucket.push(id);
+      gearByQuality.set(q, bucket);
+    }
+    for (const bucket of gearByQuality.values()) bucket.sort();
+
+    // Epics and legendaries: list EVERY one (the good stuff should be fully
+    // represented). Lower tiers: a deterministic stride sample so the rarity filter
+    // has range without drowning the book in greens. Max sellers per item is
+    // quality-aware: the mid tiers get more duplicates (that is where collapse is
+    // worth exercising), while the ~150 epics get at most a couple each so the book
+    // does not balloon into the thousands.
+    for (const [quality, count] of DEV_MARKET_TIER_SAMPLE) {
+      const bucket = gearByQuality.get(quality) ?? [];
+      if (bucket.length === 0) continue;
+      const take = count === ALL ? bucket.length : Math.min(count, bucket.length);
+      const stride = count === ALL ? 1 : Math.max(1, Math.floor(bucket.length / take));
+      const maxSellers = DEV_MARKET_TIER_MAX_SELLERS[quality] ?? 2;
+      for (let i = 0; i < take; i++)
+        listWithSellers(bucket[(i * stride) % bucket.length], maxSellers);
+    }
+
+    // Materials (ores / herbs / bars, listed under the junk kind): the real ones,
+    // not vendor trash, matched by name so the market has a Materials-ish population
+    // for the filters. Deterministic sample across whatever qualities they carry.
+    const materials = Object.keys(ITEMS)
+      .filter((id) => ITEMS[id].kind === 'junk' && DEV_MARKET_MATERIAL_RE.test(id))
+      .filter((id) => !ITEMS[id].soulbound && !ITEMS[id].noMarketList)
+      .sort();
+    for (let i = 0; i < Math.min(DEV_MARKET_MATERIALS, materials.length); i++) {
+      listWithSellers(materials[(i * 3) % materials.length], 6);
+    }
+
+    // Consumables (potions / elixirs / food / drink): a sample so those item types
+    // appear and price/filter correctly.
+    const consumables = Object.keys(ITEMS)
+      .filter((id) => DEV_MARKET_CONSUMABLE_KINDS.has(ITEMS[id].kind))
+      .filter((id) => !ITEMS[id].soulbound && !ITEMS[id].noMarketList)
+      .sort();
+    for (let i = 0; i < Math.min(DEV_MARKET_CONSUMABLES, consumables.length); i++) {
+      listWithSellers(consumables[(i * 5) % consumables.length], 8);
+    }
+
+    // A batch of enchanted weapon copies, shaped like a real market's enchanted
+    // supply so the enchant-facing UI has something to work with. For each showcase
+    // weapon we seed: one plain copy, SEVERAL copies of one enchant from different
+    // sellers at jittered prices (a real market has many identical enchanted copies
+    // competing on price), and one copy of each OTHER enchant type on the same item
+    // (materially different goods). Weapons are unstacked (count 1); the enchant rides
+    // the 4th arg.
+    const weapons = [...(gearByQuality.get('uncommon') ?? []), ...(gearByQuality.get('rare') ?? [])]
+      .filter((id) => ITEMS[id]?.kind === 'weapon')
+      .sort();
+    for (let i = 0; i < Math.min(DEV_MARKET_ENCHANTED, weapons.length); i++) {
+      const itemId = weapons[(i * 3) % weapons.length];
+      addListing(itemId, unitBase(itemId) * rng.range(0.8, 1.2), 1);
+      const primaryEnchant = DEV_MARKET_ENCHANTS[i % DEV_MARKET_ENCHANTS.length];
+      const copies = rng.int(3, 5);
+      for (let c = 0; c < copies; c++) {
+        addListing(itemId, unitBase(itemId) * rng.range(1.3, 2.4), 1, { enchant: primaryEnchant });
+      }
+      for (const enchant of DEV_MARKET_ENCHANTS) {
+        if (enchant === primaryEnchant) continue;
+        addListing(itemId, unitBase(itemId) * rng.range(1.3, 2.4), 1, { enchant });
+      }
+    }
+
+    // A few Heroic variants (a distinct item id from their base), so "heroic stays
+    // its own group, never folded into the base item" is testable. Skips
+    // soulbound / noMarketList heroics the same way every other seed path does, so a
+    // future soulbound heroic gear id can never leak a fake listing.
+    const heroics = Object.keys(ITEMS)
+      .filter(
+        (id) =>
+          id.startsWith('heroic_') && (ITEMS[id].kind === 'armor' || ITEMS[id].kind === 'weapon'),
+      )
+      .filter((id) => !ITEMS[id].soulbound && !ITEMS[id].noMarketList)
+      .sort();
+    for (let i = 0; i < Math.min(DEV_MARKET_HEROICS, heroics.length); i++) {
+      listWithSellers(heroics[(i * 5) % heroics.length], 4);
+    }
+
+    this.bumpBook();
+    return added;
   }
 
   // List a stack from your bags for sale. The goods are escrowed (pulled from
