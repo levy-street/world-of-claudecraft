@@ -39,6 +39,7 @@ import {
   marketBuyConfirm,
   recheckMarketBuy,
 } from './market_buy_confirm_core';
+import { marketEnchantTagText } from './market_enchant_tag_view';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
@@ -764,6 +765,15 @@ export class MarketWindow {
       // the bracketed [HEROIC] tooltip tag, so a screen reader reads "Heroic", not
       // "left-bracket HEROIC right-bracket".
       const heroicStar = marketHeroicStar(item, esc(t('hudChrome.itemHeroicLabel')));
+      // Enchant tag: a compact "+N Stat" chip after the item name (e.g. "+2 Int"), so
+      // copies that differ only by enchant TYPE, which correctly stay as separate rows
+      // under Lowest-price collapse, are told apart at a glance without hovering. Empty
+      // for a plain/masterwork/signer-only copy; the enchant is still named in full on
+      // the row's tooltip. aria-hidden: the tooltip carries the accessible detail.
+      const enchantTagText = marketEnchantTagText(l.instance);
+      const enchantTag = enchantTagText
+        ? `<span class="mkt-ench" aria-hidden="true">${esc(enchantTagText)}</span>`
+        : '';
       // Gold-dominant, coinless, copper-trimmed price (market-scoped, see
       // market_price_view). The pure builder is i18n-free: pass the localized
       // short unit letters and the full localized amount (which rides the block's
@@ -776,16 +786,20 @@ export class MarketWindow {
       );
       row.innerHTML =
         `<span class="mkt-ico">${this.deps.itemIcon(item)}${badge}${heroicStar}</span>` +
-        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
+        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>${enchantTag}` +
         `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
         `<span class="mkt-price">${priceHtml}${each}</span>`;
       const btn = document.createElement('button');
       btn.className = `mkt-btn${l.mine ? ' cancel' : ''}`;
       btn.textContent = l.mine ? t('itemUi.market.reclaim') : t('itemUi.market.buy');
+      // The enchant tag is aria-hidden in the row (it is a terse visual chip), so fold
+      // it into the button's accessible item name here: two rows that differ only by
+      // enchant must sound different to a screen reader, not just look different.
+      const ariaItemName = enchantTagText ? `${itemName} ${enchantTagText}` : itemName;
       btn.setAttribute(
         'aria-label',
         t(l.mine ? 'itemUi.market.reclaimAria' : 'itemUi.market.buyAria', {
-          item: itemName,
+          item: ariaItemName,
           price: formatLocalizedMoney(l.price),
         }),
       );

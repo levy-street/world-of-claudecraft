@@ -67,6 +67,18 @@ const itemStringsEn = {
       critChance: 'Crit Chance',
       dodge: 'Dodge',
       parry: 'Parry',
+      // Short stat labels for tight surfaces (the market row's enchant tag,
+      // e.g. "+2 Int"), where the full stat name above does not fit. A separate
+      // key so a locale can choose its own abbreviation independently of the
+      // full word; a locale with no natural short form may repeat the full word.
+      short: {
+        armor: 'Armor',
+        str: 'Str',
+        agi: 'Agi',
+        sta: 'Sta',
+        int: 'Int',
+        spi: 'Spi',
+      },
     },
     tooltip: {
       qualityKind: '{quality} {kind}',

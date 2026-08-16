@@ -8924,7 +8924,15 @@ export const vi_VN: EnTranslations = {
       "dps": "Sát thương/giây",
       "critChance": "Tỉ Lệ Chí Mạng",
       "dodge": "Né Tránh",
-      "parry": "Đỡ Đòn"
+      "parry": "Đỡ Đòn",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

@@ -8924,7 +8924,15 @@ export const it_IT: EnTranslations = {
       "dps": "Danni/sec",
       "critChance": "Prob. critico",
       "dodge": "Schivata",
-      "parry": "Parata"
+      "parry": "Parata",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{kind} {quality}",

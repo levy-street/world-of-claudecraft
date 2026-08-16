@@ -8924,7 +8924,15 @@ export const ja_JP: EnTranslations = {
       "dps": "秒間ダメージ",
       "critChance": "クリティカル率",
       "dodge": "回避",
-      "parry": "受け流し"
+      "parry": "受け流し",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

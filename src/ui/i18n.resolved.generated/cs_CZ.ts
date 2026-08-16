@@ -8924,7 +8924,15 @@ export const cs_CZ: EnTranslations = {
       "dps": "Poškození/s",
       "critChance": "Šance na kritický zásah",
       "dodge": "Vyhnutí",
-      "parry": "Odražení"
+      "parry": "Odražení",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

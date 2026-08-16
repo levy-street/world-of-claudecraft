@@ -8924,7 +8924,15 @@ export const tr_TR: EnTranslations = {
       "dps": "Hasar/sn",
       "critChance": "Kritik Şansı",
       "dodge": "Sıyırma",
-      "parry": "Savuşturma"
+      "parry": "Savuşturma",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

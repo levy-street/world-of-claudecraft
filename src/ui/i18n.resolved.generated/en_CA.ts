@@ -8924,7 +8924,15 @@ export const en_CA: EnTranslations = {
       "dps": "Damage/sec",
       "critChance": "Crit Chance",
       "dodge": "Dodge",
-      "parry": "Parry"
+      "parry": "Parry",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

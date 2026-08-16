@@ -9,25 +9,165 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "es_ES": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "fr_FR": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "fr_CA": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "de_DE": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "zh_CN": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "zh_TW": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "ko_KR": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "ja_JP": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "pt_BR": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "ru_RU": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "cs_CZ": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "nl_NL": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "pl_PL": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "id_ID": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "tr_TR": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "sv_SE": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "vi_VN": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ],
+  "da_DK": [
+    "itemUi.stats.short.agi",
+    "itemUi.stats.short.armor",
+    "itemUi.stats.short.int",
+    "itemUi.stats.short.spi",
+    "itemUi.stats.short.sta",
+    "itemUi.stats.short.str"
+  ]
 };

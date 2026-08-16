@@ -8924,7 +8924,15 @@ export const nl_NL: EnTranslations = {
       "dps": "Schade/sec",
       "critChance": "Kritieke Kans",
       "dodge": "Ontwijken",
-      "parry": "Pareren"
+      "parry": "Pareren",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

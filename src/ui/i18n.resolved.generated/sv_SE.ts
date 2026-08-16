@@ -8924,7 +8924,15 @@ export const sv_SE: EnTranslations = {
       "dps": "Skada/sek",
       "critChance": "Kritisk chans",
       "dodge": "Undvikande",
-      "parry": "Parering"
+      "parry": "Parering",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

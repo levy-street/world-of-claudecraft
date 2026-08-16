@@ -119,9 +119,10 @@ export interface MarketQuery {
   rarity: MarketRarityFilter;
   sort: MarketSort;
   page: number;
-  // When true, Browse collapses all matching plain listings to the lowest-priced row per
-  // item id (see market_collapse.ts). Instanced copies remain distinct, and the viewer's
-  // own rows participate in the same selection (issue #3103).
+  // When true, Browse collapses all matching listings to the lowest-priced row per
+  // distinct goods (see market_collapse.ts): same item id, and for an instanced copy the
+  // same enchant + rolled stats, folding signer-only differences together. The viewer's
+  // own rows participate in the same selection (issue #3103, #3383).
   collapseLowest: boolean;
 }
 
