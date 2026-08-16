@@ -9002,7 +9002,7 @@ export const zh_TW: EnTranslations = {
       "useElixirAura": "使用：獲得{aura}效果，持續 {minutes} 分鐘。會取代同類的其他藥劑或卷軸。戰鬥中可用。",
       "flaskOnlyOne": "同時只能有一種藥壺效果。飲用另一瓶藥壺會頂替目前效果。",
       "flaskOutranks": "同屬性中更弱的藥劑或卷軸無法取代它。",
-      "flaskThroughDeath": "該效果在死亡後依然保留，但在登出後消失；評級比賽開始時會清空所有效果。",
+      "flaskThroughDeath": "該效果在死亡後依然保留，但在登出後消失；副本比賽開始與結束時都會清空所有效果。",
       "wellFed": "精神飽滿：吃完後使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。",
       "wellFedAura": "精神飽滿：吃完後獲得{aura}效果，持續 {minutes} 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。",
       "questItem": "任務物品",

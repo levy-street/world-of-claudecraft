@@ -4477,3 +4477,55 @@ describe('Thornhollow Fields: /bg reaches the whole match, both teams', () => {
     expect(errorTexts(sim.tick())).toContain('You are not in a battleground.');
   });
 });
+
+// Masterwrought phase 10 QA: the recorded flask accounting for Thornhollow
+// Fields, pinned BEHAVIORALLY (the caller scan in tests/resurrection.test.ts is
+// the proxy; this is the claim). A flask quaffed INSIDE an active match rides
+// through a death and the wave respawn (handleDeath filters through
+// aurasSurvivingDeath, and the wave raises the fighter with clearPrep: false),
+// which is the classic-era rule the ledger records. It does NOT ride through the
+// match's own parenthesis: seating and the countdown end run readyArenaFighter
+// with clearPrep: true (the clean slate), so a flask carried IN is gone at the
+// gates and one quaffed inside is gone at the end. Both halves are pinned so
+// the accounting cannot silently drift in either direction again.
+describe('flask auras across a Thornhollow Fields match (the phase 10 accounting)', () => {
+  const FLASK = 'ironhusk_flask';
+  const flaskAuras = (sim: Sim, pid: number) =>
+    must(sim.entities.get(pid), 'entity').auras.filter((a) => a.flask === true);
+
+  it('a flask quaffed inside the match rides through a death and the wave respawn', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    sim.addItem(FLASK, 1, pid);
+    sim.useItem(FLASK, pid);
+    expect(flaskAuras(sim, pid), 'the flask is worn before the death').toHaveLength(1);
+    kill(sim, pid, match.teams[1][0]);
+    expect(must(sim.entities.get(pid), 'entity').dead).toBe(true);
+    expect(flaskAuras(sim, pid), 'the death handler keeps the marker').toHaveLength(1);
+    sim.releaseSpirit(pid);
+    expect(flaskAuras(sim, pid), 'the graveyard release keeps it too').toHaveLength(1);
+    // The next wave raises the fighter (clearPrep: false): flask still worn.
+    for (let i = 0; i < 20 * (BG_WAVE_PERIOD + 1); i++) {
+      sim.tick();
+      if (!must(sim.entities.get(pid), 'entity').dead) break;
+    }
+    const e = must(sim.entities.get(pid), 'entity');
+    expect(e.dead, 'the wave raised the fighter').toBe(false);
+    expect(flaskAuras(sim, pid), 'the wave respawn keeps the flask').toHaveLength(1);
+  });
+
+  it('a flask carried IN is cleared at the countdown end (the clean slate the match starts on)', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    const pid = match.teams[0][0];
+    // Quaffed while the match is still forming up (seated, before active).
+    sim.addItem(FLASK, 1, pid);
+    sim.useItem(FLASK, pid);
+    expect(flaskAuras(sim, pid), 'worn during the form-up').toHaveLength(1);
+    toActive(sim, match);
+    expect(match.state).toBe('active');
+    expect(flaskAuras(sim, pid), 'the countdown end ran the clean slate').toHaveLength(0);
+  });
+});

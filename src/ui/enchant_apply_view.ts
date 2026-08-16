@@ -371,38 +371,47 @@ function copyMeetsPerfectedGate(
   return !enchant.requiresPerfected || instance?.perfected === true;
 }
 
-/** Whether ANY copy the target builders would consider passes the Perfected
- *  gate: the step-one row model's half of that gate, so a requiresPerfected
- *  enchant with nothing to land on paints inert instead of staying selectable
- *  and answering step two with "No eligible item to enchant."
+/** Whether step two would list ANY target for `enchant`, the skill dimension
+ *  set aside: the step-one row model's half of the Perfected gate, so a
+ *  requiresPerfected enchant with nothing to land on paints inert instead of
+ *  staying selectable and answering step two with "No eligible item to enchant."
  *
- *  Walks the same candidate set the builders do (slot match, then the gate),
- *  across BOTH families: the bags always, and the body when the viewer supplied
- *  the worn mirror. Deliberately NOT the enchanted / replace split: an
- *  already-enchanted Perfected copy is a replace row, so it is a candidate too.
- *  Trivially true for every enchant that requires nothing, which is all of them
- *  but the capstone. */
+ *  Answered BY THE TARGET BUILDERS THEMSELVES, never by a re-walk of their
+ *  candidate rules: the two builders below are what step two paints, and a
+ *  private mirror of their slot match plus the marker gate had already
+ *  diverged from them once (the builders also DROP an already-enchanted copy
+ *  whose enchant id no longer resolves, replaceInfoFor's defensive arm, so a
+ *  Perfected copy carrying a retired enchant would have read as a candidate
+ *  here while step two listed nothing). Both families ride: the bags always,
+ *  the body when the viewer supplied the worn mirror (an absent worn mirror is
+ *  an empty body, exactly what the worn builder sees). The skill dimension is
+ *  the ONE thing set aside, deliberately, so the row keeps painting one line
+ *  per unmet gate: the probe viewer is synced with an infinite skill, which
+ *  skillMeetsEnchant reads as met, and everything else about the viewer rides
+ *  through untouched. Trivially true for every enchant that requires nothing,
+ *  which is all of them but the capstone. */
 function perfectedCandidateExists(
   enchant: EnchantDef,
   inventory: readonly InvSlot[],
   viewer: EnchantViewerInput,
 ): boolean {
   if (!enchant.requiresPerfected) return true;
-  for (const slot of inventory) {
-    const def = ITEMS[slot.itemId];
-    if (!def || def.slot !== enchant.itemSlot) continue;
-    if (copyMeetsPerfectedGate(enchant, slot.instance)) return true;
+  const skillAside: EnchantViewerInput = {
+    ...viewer,
+    synced: true,
+    enchantingSkill: Number.POSITIVE_INFINITY,
+  };
+  if (
+    wornEnchantTargets(
+      viewer.equipment ?? {},
+      viewer.equippedInstances ?? {},
+      enchant.id,
+      skillAside,
+    ).length > 0
+  ) {
+    return true;
   }
-  const equipment = viewer.equipment ?? {};
-  const equippedInstances = viewer.equippedInstances ?? {};
-  for (const equipSlot of ALL_EQUIP_SLOTS) {
-    const itemId = equipment[equipSlot];
-    if (!itemId) continue;
-    const def = ITEMS[itemId];
-    if (!def || def.slot !== enchant.itemSlot) continue;
-    if (copyMeetsPerfectedGate(enchant, equippedInstances[equipSlot])) return true;
-  }
-  return false;
+  return enchantTargets(inventory, enchant.id, [], skillAside).length > 0;
 }
 
 export interface EnchantPickSection {

@@ -201,17 +201,23 @@ describe('resurrection: aurasSurvivingCleanSlate predicate', () => {
 });
 
 // The PvP half of the flask decision, which until now lived only in the
-// resurrection.ts header comment: arena entry and a Fiesta down wipe through
-// aurasSurvivingCleanSlate (so a flask never rides into a ranked bout), while
-// Thornhollow Fields and Protect Yumi deliberately do NOT wipe, so a death in
-// either mode runs the ordinary death filter and the flask survives it. The
-// second half is an ABSENCE, and no predicate arm above can assert one: every
-// test in this file drives the two functions directly, so re-pointing
-// battleground.ts at the harsher one would leave all of them green. What the
-// decision actually is, is WHICH modules call it, so that is what is pinned.
+// resurrection.ts header comment, pinned as WHICH modules reach the clean slate,
+// by BOTH routes: the direct call (arena entry, a Fiesta down) and the indirect
+// one, readyArenaFighter(e, { clearPrep: true }), whose clearPrep arm IS the
+// clean slate (src/sim/social/arena.ts). The phase 10 QA found the record wrong
+// on the indirect route: a Protect Yumi down runs fiestaDownEntity and every
+// Yumi revive re-seats with clearPrep: true, and Thornhollow Fields seats,
+// starts, ends, and drops a leaver with clearPrep: true; ONLY its wave respawn
+// (clearPrep: false) keeps a flask, which is the classic-era battleground-death
+// rule the ledger records, pinned behaviorally in tests/battleground.test.ts.
+// The accounting a flask lives under is therefore: overworld and PvE deaths
+// keep it, a battleground death keeps it, every instanced match's seat, start,
+// end (and each Fiesta or Yumi down and revive) clears it. Absences cannot be
+// asserted by driving the predicates, so the caller sets are pinned literally.
 describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate', () => {
   const SIM_ROOT = fileURLToPath(new URL('../src/sim', import.meta.url));
   const CLEAN_SLATE_CALL = 'aurasSurvivingCleanSlate(';
+  const INDIRECT_CALL = /readyArenaFighter\((?:ctx, )?[^)]*clearPrep: true/g;
   // Comments stripped first, so prose naming the helper (resurrection.ts and the
   // sim/moderation notes both do) cannot mint a call site that does not exist.
   // The line-comment arm keeps a `://` in a URL from eating the rest of its
@@ -221,7 +227,7 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-  it('is called from arena.ts and fiesta.ts, and from nowhere else in src/sim', () => {
+  it('is called from arena.ts and fiesta.ts, and from nowhere else in src/sim outside its own definition', () => {
     const files = tsFilesUnder(SIM_ROOT);
     // Vacuity floor near the real count: a walk that collapsed to the top level
     // (or to nothing) would find no caller at all and pass the set assertion
@@ -239,15 +245,34 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     expect(callers).toEqual(['social/arena.ts', 'social/fiesta.ts']);
   });
 
-  it('is NOT called from battleground.ts or yumi.ts: those modes keep their flasks', () => {
-    // Named directly rather than left to the set above, because THIS is the
-    // recorded decision: classic-era flasks persisted through battleground
-    // deaths, so Thornhollow Fields and Protect Yumi run the ordinary death
-    // filter and a flask rides through a death inside either mode.
-    for (const file of ['social/battleground.ts', 'social/yumi.ts']) {
-      const full = fileURLToPath(new URL(`../src/sim/${file}`, import.meta.url));
-      expect(codeOf(full).includes(CLEAN_SLATE_CALL), `${file} must not clean-slate`).toBe(false);
+  it('reaches the clean slate INDIRECTLY (readyArenaFighter clearPrep: true) from exactly the recorded sites', () => {
+    // The route the first cut of this scan missed: clearPrep: true runs
+    // aurasSurvivingCleanSlate inside readyArenaFighter, so a module that never
+    // names the predicate still wipes. Counted per file (call sites, not
+    // lines that mention it), and pinned as the literal table so a new seat or
+    // revive that wipes, or one that stops wiping, changes this record on
+    // purpose. battleground.ts: seat (bgSeat), the countdown end, the leaver
+    // reset, and the match end; its WAVE respawn passes clearPrep: false and is
+    // deliberately absent here. yumi.ts: the revive. fiesta.ts: the revive.
+    // arena.ts: resetForArena (the seat) and, with clearPrep: false, the
+    // countdown-end top-off that keeps a fighter's targets, absent here too.
+    const files = tsFilesUnder(SIM_ROOT);
+    const indirect = new Map<string, number>();
+    for (const f of files) {
+      const hits = codeOf(f.full).match(INDIRECT_CALL);
+      if (hits && hits.length > 0) indirect.set(f.file, hits.length);
     }
+    expect([...indirect.entries()].sort()).toEqual([
+      ['social/arena.ts', 1],
+      ['social/battleground.ts', 4],
+      ['social/fiesta.ts', 1],
+      ['social/yumi.ts', 1],
+    ]);
+    // And the one battleground respawn that KEEPS a flask is the wave, which
+    // passes clearPrep: false: pinned as the negative literal, since it is the
+    // classic-era rule the whole accounting is built around.
+    const bg = codeOf(fileURLToPath(new URL('../src/sim/social/battleground.ts', import.meta.url)));
+    expect(bg.match(/readyArenaFighter\(e, \{ clearPrep: false \}\)/g)?.length).toBe(1);
   });
 
   it('reads the sim tree only through the shared walker', () => {

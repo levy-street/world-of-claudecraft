@@ -196,9 +196,11 @@ describe('elixirTooltipLines', () => {
     const FLASK_RULES = [
       '<div class="tt-desc">Only one flask effect at a time. Drinking another flask replaces this one.</div>',
       '<div class="tt-desc">A weaker elixir or scroll of the same stat cannot replace it.</div>',
-      // The clean-slate clause is the arena/fiesta limit (aurasSurvivingCleanSlate)
-      // the QA audit found the line silent about; the death survival is unchanged.
-      '<div class="tt-desc">The effect remains through death, but ends when you log out; a ranked match starts with a clean slate.</div>',
+      // The clean-slate clause is the instanced-match limit (aurasSurvivingCleanSlate,
+      // reached directly at arena entry and Fiesta downs and indirectly through
+      // readyArenaFighter clearPrep: true at every seat, start, end, and Yumi
+      // revive) the QA audit found the line silent about; death survival is unchanged.
+      '<div class="tt-desc">The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.</div>',
     ];
 
     it('a flask adds its three rules under the shared Use line', () => {

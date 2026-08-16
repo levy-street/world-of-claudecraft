@@ -9002,7 +9002,7 @@ export const tr_TR: EnTranslations = {
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
       "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
       "flaskOutranks": "A weaker elixir or scroll of the same stat cannot replace it.",
-      "flaskThroughDeath": "The effect remains through death, but ends when you log out; a ranked match starts with a clean slate.",
+      "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "questItem": "Görev Eşyası",

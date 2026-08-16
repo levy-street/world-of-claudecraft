@@ -98,15 +98,23 @@ export function unstuckSicknessDuration(level: number): number {
 // the played-seconds countdown, so a wipe that dropped it would end the sanction
 // early and hand a marked player a one-keypress way out of it.
 //
-// The flask PvP accounting in full, because the two halves are decisions rather
-// than oversights. Arena entry (social/arena.ts) and a Fiesta down
-// (social/fiesta.ts) reset auras through aurasSurvivingCleanSlate below, which
-// keeps ONLY the Cheater mark, so flasks clear there along with everything
-// else: a ranked match starts from a clean slate, and nothing carried in from
-// the world rides through it. Thornhollow Fields (social/battleground.ts) and
-// Protect Yumi (social/yumi.ts) deliberately do NOT wipe, so a death inside
-// those modes runs this filter and the flask survives it: classic-era flasks
-// persisted through battleground deaths, and that is the recorded decision here.
+// The flask PvP accounting in full, corrected at the phase 10 QA (the first cut
+// of this note missed the indirect route). Two routes reach the clean slate
+// below, which keeps ONLY the Cheater mark: the direct call (arena entry in
+// social/arena.ts, a Fiesta down in social/fiesta.ts) and readyArenaFighter with
+// clearPrep: true, whose clearPrep arm IS the clean slate. Through that second
+// route Thornhollow Fields (social/battleground.ts) wipes at the seat, at the
+// countdown end, on a leaver, and at the match end, and Protect Yumi
+// (social/yumi.ts) wipes on every down (through fiestaDownEntity) and every
+// revive. So an instanced match is a parenthesis for a flask: nothing carried
+// in rides through the gates, and nothing quaffed inside comes back out. The
+// one PvP path that KEEPS a flask is a Thornhollow Fields DEATH: handleDeath
+// runs this filter, the graveyard release runs it again, and the wave respawn
+// raises the fighter with clearPrep: false, so a flask quaffed inside a match
+// rides through every death in it (classic-era flasks persisted through
+// battleground deaths, the recorded decision), until the match ends. Both
+// halves pinned: tests/battleground.test.ts (behavior) and
+// tests/resurrection.test.ts (the direct and indirect caller sets).
 export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
   return auras.filter(
     (a) =>

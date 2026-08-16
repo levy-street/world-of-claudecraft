@@ -34,6 +34,20 @@ const ESSENCE = 'arcane_essence';
  *  modifier is the second class on a replace flag alone. */
 const CTX_ITEM_META_CLASS = 'ctx-item-meta';
 
+// The two modifier classes are imported from the module under test and used as
+// selectors below, so a renamed VALUE would move both sides of every assertion
+// together while the stylesheet (which pins the literal selectors in
+// tests/ctx_menu_picker_sizing.test.ts) silently stopped matching: the 13px
+// touch bump on the only line that explains an untappable row would go dark
+// with every suite green. Pin the literals here, the way CTX_ITEM_META_CLASS is
+// a literal above.
+describe('the picker modifier classes are the literal CSS hooks', () => {
+  it('gate and danger class tokens match the stylesheet selectors byte for byte', () => {
+    expect(CTX_ITEM_GATE_CLASS).toBe('ctx-item-gate');
+    expect(CTX_ITEM_DANGER_CLASS).toBe('ctx-item-danger');
+  });
+});
+
 /** A live disenchantable def of the requested quality, so the confirm's yield
  *  preview is exercised against real content. */
 function defFor(quality: NonNullable<ItemDef['quality']>): ItemDef {
@@ -1411,6 +1425,41 @@ describe('Apply Enchant picker: the Perfected gate on the capstone row', () => {
     // the sentence below unreachable rather than merely unlikely.
     expect(h.rows().map((row) => row.act)).not.toContain(`enchant:${INFUSION}`);
     expect(h.el.textContent ?? '').not.toContain(NO_TARGETS);
+  });
+
+  it("clears the gate on a WORN Perfected copy through the menu's own viewer, bags unmarked", () => {
+    // The MENU is what supplies the worn set to the core (enchantViewer): a
+    // painter that stopped reading equipment / equippedInstances would leave
+    // every pure-core worn pin green while a player wearing the only Perfected
+    // copy got an inert capstone row. So the body carries the marker and the
+    // bags hold only the bill.
+    const h = harness(768, {
+      inventory: bill().filter((slot) => slot.itemId !== CHEST),
+      equipment: { chest: CHEST },
+      equippedInstances: { chest: { perfected: true } },
+      enchantingSkill: CAP,
+    });
+    h.openPicker('lucent_reagent');
+    const row = infusionRow(h);
+    expect(row?.getAttribute('data-act')).toBe(`enchant:${INFUSION}`);
+    expect(row?.querySelectorAll(`.${CTX_ITEM_GATE_CLASS}`).length).toBe(0);
+    h.click(`enchant:${INFUSION}`);
+    expect(h.rows().map((r) => r.act)).toEqual(['worn:chest']);
+  });
+
+  it('paints BOTH gate lines, the skill floor first, on a short applier holding an ordinary chest', () => {
+    // Two unmet dimensions at once: one line each, in source order (skill,
+    // then Perfected), and the row inert. Neither line may swallow the other.
+    const h = harness(768, { inventory: bill(), enchantingSkill: CAP - 1 });
+    h.openPicker('lucent_reagent');
+    const row = infusionRow(h);
+    expect(row?.getAttribute('aria-disabled')).toBe('true');
+    expect(row?.getAttribute('data-act')).toBeNull();
+    const gate = [...(row?.querySelectorAll(`.${CTX_ITEM_GATE_CLASS}`) ?? [])];
+    expect(gate.map((el) => el.textContent)).toEqual([
+      `Requires Enchanting ${CAP}`,
+      PERFECTED_LINE,
+    ]);
   });
 
   it('clears the gate on a Perfected copy, and THEN the target step lists it', () => {

@@ -108,7 +108,7 @@ const itemStringsEn = {
       flaskOnlyOne: 'Only one flask effect at a time. Drinking another flask replaces this one.',
       flaskOutranks: 'A weaker elixir or scroll of the same stat cannot replace it.',
       flaskThroughDeath:
-        'The effect remains through death, but ends when you log out; a ranked match starts with a clean slate.',
+        'The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.',
       // Well Fed (elixir_tooltip_view.ts): the buff a finished meal leaves.
       // The "after you finish eating" clause is load-bearing, not padding:
       // standing up early grants nothing at all, so the tooltip has to say

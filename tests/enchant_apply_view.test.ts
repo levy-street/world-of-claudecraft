@@ -1514,6 +1514,75 @@ describe('enchant_apply_view: perfectedMet on the step-one row', () => {
     expect(rowFor(BILL, viewerAt(CAP))?.perfectedMet).toBe(false);
   });
 
+  it('agrees with step two on an already-enchanted copy: a retired enchant id is no candidate', () => {
+    // The QA review's divergence: the target builders DROP an already-enchanted
+    // copy whose enchant id no longer resolves (replaceInfoFor's defensive arm,
+    // the sim's already_enchanted refusal), so a Perfected copy carrying a
+    // retired enchant must not clear the row either, or the row is actionable
+    // over an EMPTY step two, the exact false answer this flag exists to
+    // remove. The scan now asks the builders themselves; this pins the seam
+    // from both sides with the same viewer.
+    const retired = rowFor(
+      [
+        ...BILL,
+        {
+          itemId: CHEST,
+          count: 1,
+          instance: { perfected: true, enchant: 'enchant_retired_probe' },
+        },
+      ],
+      viewerAt(CAP),
+    );
+    expect(
+      ENCHANTS.enchant_retired_probe,
+      'the probe id really resolves to nothing',
+    ).toBeUndefined();
+    expect(retired?.perfectedMet).toBe(false);
+    expect(
+      enchantTargets(
+        [
+          ...BILL,
+          {
+            itemId: CHEST,
+            count: 1,
+            instance: { perfected: true, enchant: 'enchant_retired_probe' },
+          },
+        ],
+        INFUSION,
+        [],
+        viewerAt(CAP),
+      ),
+    ).toEqual([]);
+    // The positive control on the same shape: a Perfected copy carrying a LIVE
+    // enchant is a replace row in step two, so it clears the flag.
+    const live = ENCHANTS.enchant_chest_lucent_stamina;
+    expect(live, 'the live sibling chest enchant exists').toBeDefined();
+    const inventory: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true, enchant: live.id } },
+    ];
+    expect(rowFor(inventory, viewerAt(CAP))?.perfectedMet).toBe(true);
+    expect(enchantTargets(inventory, INFUSION, [], viewerAt(CAP)).map((row) => row.itemId)).toEqual(
+      [CHEST],
+    );
+  });
+
+  it('sets ONLY the skill dimension aside: a short applier still reads a Perfected copy as met', () => {
+    // perfectedMet must not fold the skill floor in (each unmet gate paints its
+    // own line), so a Perfected copy clears it at any skill while skillMet
+    // stays false, and an unsynced viewer clears neither more nor less.
+    const inventory: InvSlot[] = [
+      ...BILL,
+      { itemId: CHEST, count: 1, instance: { perfected: true } },
+    ];
+    const short = rowFor(inventory, viewerAt(CAP - 1));
+    expect(short?.skillMet).toBe(false);
+    expect(short?.perfectedMet).toBe(true);
+    const bare = rowFor([...BILL, { itemId: CHEST, count: 1 }], viewerAt(CAP - 1));
+    expect(bare?.skillMet).toBe(false);
+    expect(bare?.perfectedMet).toBe(false);
+  });
+
   it('is true on every enchant that requires nothing, so it gates only the capstone', () => {
     const dust = enchantsForReagent([{ itemId: 'arcane_dust', count: 99 }], 'arcane_dust');
     const free = dust.filter((row) => ENCHANTS[row.enchantId].requiresPerfected !== true);

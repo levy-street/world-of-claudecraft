@@ -2730,7 +2730,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用: {aura}の効果を得て、{minutes}分間持続します。同種の他のエリクサーや巻物の効果を上書きします。戦闘中に使用可能。',
   'itemUi.tooltip.flaskOnlyOne': 'フラスコの効果は同時に1つだけです。別のフラスコを飲むとこの効果を置き換えます。',
   'itemUi.tooltip.flaskOutranks': '同じ能力値のより弱いエリクサーや巻物では上書きできません。',
-  'itemUi.tooltip.flaskThroughDeath': 'この効果は死亡しても残りますが、ログアウトすると失われます。ランクマッチは白紙の状態から始まります。',
+  'itemUi.tooltip.flaskThroughDeath': 'この効果は死亡しても残りますが、ログアウトすると失われます。インスタンスマッチは開始時も終了時も白紙の状態になります。',
   'itemUi.tooltip.wellFed':
     '満腹：食べ終えると{stat}が {value} 上昇し、{minutes} 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。',
   'itemUi.tooltip.wellFedAura':
