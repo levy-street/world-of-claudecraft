@@ -344,6 +344,28 @@ Vellum.
     materials refined into rune and sigil inputs, the same role class as
     Lucent Reagent and Lucent Infusion; the composed names remain zero-hit,
     so this does not block, recorded for the maintainer.
+  - The four aura DISPLAY names (registered 2026-08-16 per ruling (9) of the
+    phase 10 QA; these are the buff-bar strings the flask and role-food items
+    grant, separate strings from the registered item names above; the shipped
+    elixir aura names were likewise never registered, so this closes a
+    pre-existing gap for the packet's own rows):
+    - **Ironhusk Vigor** (tank flask aura) GENERIC with recorded caveat: the
+      packet-coined Ironhusk (CLEAR above) compounded with the generic stat
+      word Vigor; the compound names a buff, not a piece of content, and
+      follows the shipped elixir aura register.
+    - **Warboar Might** (physical flask aura) GENERIC with recorded caveat:
+      the packet-coined Warboar (CLEAR with caveat above) plus Might, a stat
+      word this registry already carries as GENERIC in several appendix rows
+      (Colossal Might, Enchant Weapon - Might, Warlord's Might).
+    - **Runewater Clarity** (caster flask aura) GENERIC with recorded caveat:
+      the packet-coined Runewater (CLEAR above) plus Clarity, a generic
+      casting-focus stat word; the compound is packet-original.
+    - **Well Fed** (role-food completion buff) GENERIC with recorded caveat,
+      the caveat being the point of the row: this is WoW's VERBATIM same-role
+      food-buff name. Kept deliberately as a plain-English state description
+      in the Stunned/Exhausted class (genre-standard vocabulary describing the
+      character's condition rather than a coined mark), per the ruling; any
+      future trade-dress tightening starts here.
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
