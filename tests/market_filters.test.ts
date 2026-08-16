@@ -195,11 +195,11 @@ describe('World Market filters', () => {
     );
     expect(orphans, `items no browse category can reach: ${orphans.join(', ')}`).toEqual([]);
     // The other half of the exactly-one doctrine, over the WHOLE live
-    // catalog: no item answers two chips. The per-exemplar pins (bags, the
-    // mount, the pattern) each cover one id; this sweep is what reds when a
-    // predicate arm is widened onto a kind another arm already claims (the
-    // phase 11 review probe proved a recipe-or-quest widening survived every
-    // per-exemplar pin while this sweep catches it).
+    // catalog: no item answers two chips. The per-exemplar pins cover only
+    // their own kinds (every bag id, one mount id, one pattern id); this
+    // sweep is what reds when a predicate arm is widened onto a kind no
+    // exemplar carries (the phase 11 review probe proved a recipe-or-quest
+    // widening survived every per-exemplar pin while this sweep catches it).
     const multi = Object.keys(ITEMS)
       .map((id) => ({
         id,

@@ -4580,6 +4580,42 @@ recorded, or refuted with the file open)
   frontend reviews otherwise fully clean (parity pin 324 untouched, zero
   wire changes, S3 green, ko Recipe-family split 제조법/요리법 verified
   deliberate and correct).
+- ROUND-3 VERIFICATION (fresh verifier at cb0132d732): both prescribed
+  probes red exactly as specified (the quest-widening mutation that
+  survived round 1 now reds the at-most-one sweep naming the double-chip
+  ids; a nine-of-ten table removal reds the exactly-ten guard; a stray
+  draw above draw 6 reds ONLY the rift_clear_rewards golden while its
+  determinism half stays green); the self-diff guard judged structurally
+  unkillable by any single edit (every collapse mode is loud against the
+  non-empty external literal; the two recorded invisible-but-inert
+  residuals are behavior-free at the seam and owned by the equality and
+  reached-arm pins); every round-2 corrected claim verified true against
+  code and git history (the 211 mislabel reconciled empirically: 212
+  runnable parity tests at the build tip, 211 green beside the one
+  pre-mint red). ONE nit, fixed in the closing commit with the verifier's
+  own wording: the sweep comment's "each cover one id" undercounted the
+  bag exemplar loop. The chain closes here for the build session; the
+  phase 11 QA's fresh fan-out is the next independent set of eyes.
+- QA-CHECKLIST VERDICT (2026-08-16, at cb0132d732 after a delivery nudge):
+  READY, zero blocking; 49 test files / 1707 tests green in its own runs;
+  monolith ratchet verified untouched across the whole range; the
+  reword-staleness and heroic-phantom-variant candidates it raised were
+  self-refuted with evidence (do not re-raise: the five overlay refreshes
+  ARE the -2 deletions; generatedHeroicDefinitions stayed exactly 64).
+  Its two obligations: the market-chip screenshots (already the recorded
+  phase 17 deferral) and asset:budget, run at the tip: the failures are
+  the LONG-STANDING repo-wide overages (total 423.6 MiB vs 95, textures,
+  env, models/*; asset:budget is not a gate step and has no ui/items
+  category), and the phase's 28 WebPs total about 36 KB, three orders of
+  magnitude under every failing line: recorded, nothing owed here. Its
+  reviewer-dispatch list maps onto passes already on record (the
+  loot/vendor sim review = the architecture charter; rounds 1-3 probing =
+  the coverage charter; the round-3 verifier at the tip = the carve-out
+  re-audit). One authored-shape note it surfaced, recorded for the phase
+  15 measurement notes: patterns carry no stackSize BY DESIGN
+  (RecipeItemDef bars the field at the type level, the phase 02 unstacked
+  decision), so duplicate hoarding costs bag slots; phase 15 may weigh
+  whether that friction matters at the observed drop rates.
 - FINDINGS-ROUND REVIEW (round 2, fresh review + three source probes at
   1da7a4b775; the full suite at that tip: 39653 green with ONE red, the
   bag All-only census, admitted with rationale in b3c8e64d56, the
