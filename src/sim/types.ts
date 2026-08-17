@@ -3779,7 +3779,20 @@ export type QuestObjective =
   // NPC reaches its final waypoint with this player in credit range. count is
   // always 1; the run starts by interacting with the idle escortee while this
   // quest is active.
-  | (QuestObjectiveBase & { type: 'escort'; escortId: string });
+  | (QuestObjectiveBase & { type: 'escort'; escortId: string })
+  // Farm: credited by the plant and harvest ACTIONS in
+  // src/sim/professions/farming.ts (the gather precedent: inventory cannot
+  // prove the deed, and produce is a fungible material). `cropId` narrows the
+  // action to one crop; `patchId` is marker guidance only (quest_targets.ts
+  // encloses that patch's beds; without it every farming patch qualifies) and
+  // never gates the credit. A harvest credits on every outcome, withered
+  // included: the visit is the deed.
+  | (QuestObjectiveBase & {
+      type: 'farm';
+      action: 'plant' | 'harvest';
+      cropId?: string;
+      patchId?: string;
+    });
 
 // ---------------------------------------------------------------------------
 // Escort runs (src/sim/escort.ts): a quest NPC that walks an authored waypoint
