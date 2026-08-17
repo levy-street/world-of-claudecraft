@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "ce3a5ff826f74efacb69667b1362d8c8dd270c04e30532c35ad809856a534fde",
-  "catalogHash": "b3b4fe8b4f301a88da047e2ebec6f594fe24742aa7353b65770d5b19b09c9d23",
+  "bundleId": "c24c70d45104ad1fd0f18679f28b6db371ca2cae1aa5274167d092e9c484122c",
+  "catalogHash": "47e0a8feb3a38188b6eee622c9d2588e70255136c71c29aa917db2a8a95db29c",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -3053,6 +3053,18 @@
           "url": "/audio/sfx/mount_run_valorsteed.mp3?v=d4e79277b2cb",
           "bytes": 10701,
           "sha256": "d4e79277b2cb1da5d5941c6116136f2ca7104376e12d455c6306919a3e862002"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_summon_goblin_rocket_sled": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_summon_goblin_rocket_sled.mp3?v=6b3c967d6c91",
+          "bytes": 49571,
+          "sha256": "6b3c967d6c91bce90a64b28e678233f5640c3a88daa862adf5b0a3708d476720"
         }
       ],
       "gain": 1,

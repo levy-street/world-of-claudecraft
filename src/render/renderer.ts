@@ -324,6 +324,7 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
@@ -1539,7 +1540,6 @@ export class Renderer {
   // brightness without moving anything across BLOOM_THRESHOLD.
   private baseExposure = 1;
   private tmpV = new THREE.Vector3();
-  private tmpPuff = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
   private viewCandidatePool: ViewCandidate[] = [];
   private readonly characterLodPlan: CharacterLodBands = {
@@ -1987,6 +1987,8 @@ export class Renderer {
   // seed-bound ground sampler, built once so the per-frame Vale Cup ring update
   // allocates no closure (see the drape path in vale_cup_team_ring.ts).
   private groundSample = (x: number, z: number): number => groundHeight(x, z, this.sim.cfg.seed);
+  /** Bound once: the puff runs per landing and must not allocate a closure. */
+  private surfaceAtForPuff = (x: number, z: number, y: number) => this.surfaceAt(x, z, y);
   private selectionDrapeSupportY = 0;
   private selectionGroundSample = (x: number, z: number): number =>
     Math.max(this.groundSample(x, z), this.selectionDrapeSupportY);
@@ -4302,24 +4304,6 @@ export class Renderer {
   // Ground impact dust at a body's feet, coloured by the surface underfoot.
   // Water is skipped: splashes are the water system's job, and dust on a lake
   // reads as a bug. Power below the floor emits nothing at all.
-  private emitGroundPuff(x: number, y: number, z: number, power: number): void {
-    const p = Math.min(1, power);
-    if (p <= 0.02) return;
-    const surface = this.surfaceAt(x, z, y);
-    if (surface === 'water') return;
-    const color =
-      surface === 'stone'
-        ? 0x9b9a95
-        : surface === 'wood'
-          ? 0xa8895f
-          : surface === 'snow'
-            ? 0xe6eef5
-            : surface === 'dirt'
-              ? 0xa38257
-              : 0x8d9a63;
-    this.tmpPuff.set(x, y, z);
-    this.vfx.groundPuff(this.tmpPuff, p, color);
-  }
 
   private surfaceAt(x: number, z: number, y: number): Surface {
     return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
@@ -11710,11 +11694,11 @@ export class Renderer {
           // Impact dust, scaled by how hard the body actually came down and
           // tinted by what it came down on. This is the visual half of the
           // landing the camera already thumps for.
-          this.emitGroundPuff(ax, ay, az, (v.fallSpeed - 5) / 14);
+          emitGroundPuff(this.vfx, this.surfaceAtForPuff, ax, ay, az, (v.fallSpeed - 5) / 14);
         }
         // Striding up onto a ledge scuffs the surface: a wisp, not a landing.
         if (settled && dyRaw > 0.28 && !visuallyDead) {
-          this.emitGroundPuff(ax, ay, az, 0.08);
+          emitGroundPuff(this.vfx, this.surfaceAtForPuff, ax, ay, az, 0.08);
         }
         if (swimming && !v.wasSwimming && !visuallyDead)
           sink.movement('splash', ax, ay, az, isSelf);
@@ -12075,12 +12059,13 @@ export class Renderer {
           active.playCallPose(e.mountCastRemaining);
         }
         v.wasMountCasting = mountCasting;
-        // mountKey change = summon completed, dismount completed, or a live swap:
-        // fire the shimmer at the rider. Tracked separately from mountVisualKey,
-        // which lags async asset loading.
+        // mountKey change = summon completed, dismount completed, or a live
+        // swap: shimmer always, the mount's own call only on an APPEARANCE.
+        // Tracked separately from mountVisualKey, which lags asset loading.
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
+          if (e.mountKey !== '') this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf);
           // A mountKey change (dismount, a live mount swap, or a fresh summon
           // reusing this entity id) must drop any engine mount's windup/loop
           // state; otherwise the old loop node stays connected forever once

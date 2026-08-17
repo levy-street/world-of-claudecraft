@@ -129,6 +129,13 @@ export const SFX = [
     loop: true,
   },
   {
+    // The sled's summon call, fired once when the summon channel completes and
+    // the mount appears. Never on dismount, never for a rider already mounted
+    // when they come into view.
+    key: 'mount_summon_goblin_rocket_sled',
+    custom: true,
+  },
+  {
     key: 'mount_run_goblin_rocket_sled_stop',
     custom: true,
   },

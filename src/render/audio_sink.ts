@@ -68,6 +68,7 @@ export interface SpatialAudioSink {
   ): void;
   /** One custom running stride for a mounted entity. */
   mountRun(x: number, y: number, z: number, mountKey: string, self: boolean): void;
+  mountSummon(x: number, y: number, z: number, mountKey: string, self: boolean): void;
   /** Windup/loop/winddown engine audio for a mount with a dedicated take set
    *  (see src/game/mount_engine_state.ts); call every frame a rider is
    *  mounted and grounded. Returns true when `mountKey` actually has an

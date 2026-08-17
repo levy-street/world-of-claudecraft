@@ -86,7 +86,11 @@ const MONOLITHS: MonolithRow[] = [
     // merge lands at 13745. Pinned to that exact count rather than inheriting
     // upstream's 9 lines of slack, which is the same rule both parents already
     // followed: a merge takes the merged count, and any further growth reds.
-    ceiling: 13745,
+    // Lowered after extracting the landing/scuff dust into
+    // src/render/ground_puff.ts. The merged pin above had zero slack by design,
+    // so wiring the sled's summon call reddened it by exactly its one line; the
+    // extraction bought that back and then some, which is the ratchet's rule.
+    ceiling: 13730,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

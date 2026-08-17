@@ -190,5 +190,7 @@
     "wand_arcane": 5.2,
     "wand_holy": 5.3,
     "wand_shadow": 5.2
-  }
+  },
+  "mount_summon_goblin_rocket_sled": 6.2,
+  "mount_run_goblin_rocket_sled_stop": 4.5
 }

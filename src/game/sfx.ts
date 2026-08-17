@@ -91,6 +91,10 @@ const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   water: 'foot_water',
 };
 
+function summonClipKey(mountKey: string): string {
+  return `mount_summon_${mountKey}`;
+}
+
 function assetCacheKey(key: string, variantIndex: number): string {
   return variantIndex === 0 ? key : `${key}:${variantIndex}`;
 }
@@ -944,6 +948,30 @@ class Sfx {
     });
   }
   private footTick = 0;
+
+  /** The one-shot that fires when a mount actually APPEARS: the completion
+   *  edge of the summon channel, never on dismount, and never for a rider who
+   *  was already mounted when they came into view.
+   *
+   *  Gain 1, not the ~0.85 the per-stride gait cues use: this is a
+   *  once-per-summon hero cue, and the level it plays at comes from the key's
+   *  authored trim in sfx_gain_map.json (bounded by its measured peak
+   *  headroom), which is the right place to shape it.
+   *
+   *  YOUR OWN summon is personal feedback and plays flat, like the UI cues it
+   *  sits next to in the mix. The positional path would dock it twice over for
+   *  something happening directly under you: the audio listener is the CAMERA,
+   *  which trails the player, so a source at your own feet is already past
+   *  refDistance and attenuating before the panner also spreads it off centre.
+   *  Somebody ELSE's mount is a world event and stays spatial.
+   *
+   *  Silent for a mount with no authored take, so this is safe for every mount. */
+  mountSummon(x: number, y: number, z: number, mountKey: string, self: boolean): void {
+    const key = summonClipKey(mountKey);
+    if (!(key in SFX_CLIPS)) return;
+    if (self) this.playUi(key, { gain: 1, rate: 1, release: 0.6 });
+    else this.playAt(key, x, y, z, { gain: 1, rate: 1, release: 0.6 });
+  }
 
   /** One custom stride for a running mount. This is part of the world SFX mix,
    *  independent of the optional on-foot footstep toggle. */

@@ -164,11 +164,11 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 10 mount cues, and all 63 UI cues in one 271-key inventory', () => {
+  it('keeps the release catalog, all 10 mount cues, the sled summon call, and all 63 UI cues in one 272-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
     // 271 = 265 + the six Goblin Rocket Sled engine cues (forward and reverse,
     // each with its own start/loop/stop take).
-    expect(keys.size).toBe(271);
+    expect(keys.size).toBe(272);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(63);
     expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
@@ -246,7 +246,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(271);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(272);
   });
 });
 

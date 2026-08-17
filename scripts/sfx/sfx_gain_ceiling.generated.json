@@ -2535,6 +2535,17 @@
       }
     ]
   },
+  "mount_summon_goblin_rocket_sled": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mount_summon_goblin_rocket_sled.mp3",
+        "sha256": "6b3c967d6c91bce90a64b28e678233f5640c3a88daa862adf5b0a3708d476720",
+        "size": 49571,
+        "peakDb": -7.2
+      }
+    ]
+  },
   "move_jump": {
     "ceilingDb": 4.6,
     "tracks": [
