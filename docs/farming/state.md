@@ -5,8 +5,8 @@ decisions. If a phase file contradicts this file, this file wins and the phase f
 gets swept in the same pass (amend the QA twin too, always).
 
 Current phase: Phase 8 QA done 2026-08-17 (PASS-WITH-FOLLOWUPS; branch
-fix/farming-phase-08-qa off feature/farming-plan, merged --no-ff, hash in
-the progress.md Phase 8 QA record; next is Phase 9, world presence and
+fix/farming-phase-08-qa off feature/farming-plan, merged --no-ff as
+327fa964bd; next is Phase 9, world presence and
 go-live, docs/farming/phase-09-*.md starter). Phase 8 itself was done
 2026-08-14 (merged --no-ff as 0f4bd59145 from
 fix/farming-phase-08-harvest-journal). The Phase 8 QA round: 0 BLOCKING

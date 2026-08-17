@@ -22,7 +22,7 @@
 | Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merge hash in the Phase 7 notes tail) | 0 BLOCKING across three domain reviews plus qa-checklist and the gate-integrity cone pass; 5 SHOULD-FIX fixed in-phase plus 2 adopted notes (the QA round reconciled this row with the Notes: the old "7 SHOULD-FIX" counted both) |
 | Phase 7 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-14 | 2026-08-14 |
 | Phase 8 (Harvest Journal) | DONE 2026-08-14 | fix/farming-phase-08-harvest-journal (merge hash in the Phase 8 notes tail) | 2 BLOCKING (language fan-out registry, focus-across-rebuild) found by the frontend review and fixed in-phase; 0 BLOCKING elsewhere across parity, architecture, hot-path, and qa-checklist; the parity gap (no golden farmReady) closed with a deliberate re-mint |
-| Phase 8 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-08-qa (merge hash in the Phase 8 QA notes tail); 0 BLOCKING across eight lanes plus a verification round; one behavior fix (deviation (be), the simplified-mode journal entry), the (bd) ledger corrected, the guide controls row landed, the coverage gaps pinned, 24/24 mutants killed |
+| Phase 8 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-08-qa, merged --no-ff as 327fa964bd; 0 BLOCKING across eight lanes plus a verification round; one behavior fix (deviation (be), the simplified-mode journal entry), the (bd) ledger corrected, the guide controls row landed, the coverage gaps pinned, 24/24 mutants killed |
 | Phase 9 (world presence, go-live) | not started | | |
 | Phase 9 QA | not started | | |
 | Phase 10 (celebrations) | not started | | |
@@ -1876,7 +1876,10 @@ this run (nothing to prove standalone); the armory browser exception was
 not needed either. Exit code 0 (informational only; the markers are the
 verdict).
 
-Notes tail: MERGE_HASH_PLACEHOLDER. Handoff to Phase 9: vendor stock,
+Notes tail: merged --no-ff into feature/farming-plan as 327fa964bd (QA
+branch fix/farming-phase-08-qa deleted per D22; QA-side commit chain
+71c17f5719, 33bd33cfa2, bba9dc4010, 4ac39a7ca6, 7159cdeab4, 0e739d3519,
+17d7d37f2b, 4040ca5a2b, d9704a3636, f240ae048d). Handoff to Phase 9: vendor stock,
 seeds, the intro quest and go-live, with the ready notices going live the
 moment seeds are obtainable; carry the (ap), (bb), and (be) maintainer
 reads, the pin-art debt, the shard-weight harvest at go-public, and the
