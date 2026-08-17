@@ -2136,7 +2136,6 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${NPCS_DIR}/ewald.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
-    attach: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
   },
   // A militia sergeant with a sword and NO shield, which is the whole separation from
   // Coalfast: they share this body and stand two POIs apart, so the warden keeps the

@@ -2975,6 +2975,8 @@ export interface StaticObbPropDef {
   d: number;
   rot: number;
   height: number;
+  /** False when a merged mesh cannot hide this placement independently. */
+  camGhost?: boolean;
   /**
    * The asset renders x-mirrored (an asymmetric wing flipped end for end,
    * e.g. a town-wall wing whose tall lantern pillar swaps sides). Collision
