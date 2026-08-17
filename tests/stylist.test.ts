@@ -10,7 +10,11 @@ import { redesignPriceCopper } from '../src/sim/content/redesign_pricing';
 import { STYLIST_NPC_ID } from '../src/sim/content/stylist';
 import { BUILTIN_WORLD, NPCS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { MAX_REDESIGN_CREDITS, redesignCreditsOf } from '../src/sim/stylist';
+import {
+  MAX_REDESIGN_CREDITS,
+  redesignCreditPriceFor,
+  redesignCreditsOf,
+} from '../src/sim/stylist';
 import type { WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
@@ -77,11 +81,55 @@ describe('Stylist redesign credit purchase', () => {
 
   it('stacks: credits are an integer, so buying twice holds two', () => {
     const sim = makeSim();
-    const meta = readyBuyer(sim, 2);
+    standAtStylist(sim);
+    const meta = metaOf(sim);
+    const first = redesignPriceCopper(sim.player.level, 0);
+    const second = redesignPriceCopper(sim.player.level, 1);
+    meta.copper = first + second;
     buy(sim);
     buy(sim);
     expect(redesignCreditsOf(meta)).toBe(2);
     expect(meta.copper).toBe(0);
+  });
+
+  it('DOUBLES the price with each purchase, the requested ladder', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    standAtStylist(sim);
+    const meta = metaOf(sim);
+    const GOLD = 10_000;
+    // 5g, 10g, 20g, 40g at the cap: fund exactly that and expect nothing back.
+    meta.copper = 75 * GOLD;
+    const charged: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const before = meta.copper;
+      buy(sim);
+      charged.push(before - meta.copper);
+    }
+    expect(charged).toEqual([5 * GOLD, 10 * GOLD, 20 * GOLD, 40 * GOLD]);
+    expect(meta.copper).toBe(0);
+    expect(redesignCreditsOf(meta)).toBe(4);
+  });
+
+  it('SPENDING a credit does not walk the price back down', () => {
+    // The ladder keys off a lifetime counter, not the held count. If it read the
+    // held count, buy-spend-buy would cost the band price forever and the ladder
+    // would price nothing at all.
+    const sim = makeSim();
+    standAtStylist(sim);
+    const meta = metaOf(sim);
+    meta.copper = redesignPriceCopper(sim.player.level, 0);
+    buy(sim);
+    expect(redesignCreditsOf(meta)).toBe(1);
+    // Spend it, the way the redesign endpoint's live push does.
+    meta.redesignCredits = undefined;
+    // The next one still costs the SECOND rung, not the first.
+    expect(redesignCreditPriceFor(sim.player, meta)).toBe(redesignPriceCopper(sim.player.level, 1));
+    // ...and the band price is no longer enough to buy one.
+    meta.copper = redesignPriceCopper(sim.player.level, 0);
+    const events = buy(sim);
+    expect(events.some((e) => e.type === 'error')).toBe(true);
+    expect(redesignCreditsOf(meta)).toBe(0);
   });
 
   it('refuses on insufficient funds without charging or crediting', () => {

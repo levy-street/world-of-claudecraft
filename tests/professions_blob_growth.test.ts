@@ -161,6 +161,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // professions. Absent while zero, so it costs a shipped blob nothing until the
   // character actually buys one.
   'redesignCredits',
+  // Lifetime Stylist purchases behind the doubling price ladder; also cosmetic,
+  // also absent until the character buys one.
+  'redesignPurchases',
   'pbeBoostKit',
   'delveMarks',
   'delveClears',

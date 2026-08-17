@@ -553,7 +553,7 @@ import {
   spawnOverworldSpiritHealers,
   UNSTUCK_SICKNESS_ID,
 } from './spirit';
-import { buyRedesignCredit as buyRedesignCreditImpl } from './stylist';
+import { buyRedesignCredit as buyRedesignCreditImpl, redesignPurchasesOf } from './stylist';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
@@ -1309,6 +1309,11 @@ export interface PlayerMeta {
   // buy ahead. Optional and absent while zero (the zero-default omission
   // convention), so every pre-feature save loads as 0 with no migration.
   redesignCredits?: number;
+  // LIFETIME count of redesign credits bought, never decremented when one is
+  // spent. It is what the repeat-purchase price ladder reads, so it must not be
+  // the held count: spending a credit would otherwise walk the price back down
+  // to the band and the ladder would price nothing.
+  redesignPurchases?: number;
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
@@ -1840,6 +1845,9 @@ export interface CharacterState {
   // zero, so an existing character with no key reads as 0 and needs no migration.
   // The char-select roster and the redesign endpoint both read it from here.
   redesignCredits?: number;
+  // Lifetime redesign credits bought, never decremented. Drives the doubling
+  // price ladder; absent = never bought one.
+  redesignPurchases?: number;
   // PBE boost kit version applied (server/pbe_boost.ts); absent outside PBE.
   pbeBoostKit?: number;
   delveMarks?: number;
@@ -3400,6 +3408,14 @@ export class Sim {
         const credits = Math.max(0, Math.floor(s.redesignCredits));
         if (credits > 0) meta.redesignCredits = credits;
       }
+      // The lifetime purchase count behind the price ladder, clamped the same
+      // way. A save that predates the ladder but already holds credits reads as
+      // zero purchases, which prices its NEXT buy at the band: undercharging a
+      // grandfathered character rather than inventing a history it never had.
+      if (typeof s.redesignPurchases === 'number' && Number.isFinite(s.redesignPurchases)) {
+        const bought = Math.max(0, Math.floor(s.redesignPurchases));
+        if (bought > 0) meta.redesignPurchases = bought;
+      }
       if (typeof s.pbeBoostKit === 'number') meta.pbeBoostKit = s.pbeBoostKit;
       // Grandfather: players who had q_riding_lessons active in a mid-quest save
       // (state='active' or 'ready') but never received ridingTrained=true are
@@ -4239,6 +4255,7 @@ export class Sim {
       // Absent while zero (zero-default omission), so a character who has never
       // bought a redesign saves byte-identically to a pre-feature blob.
       ...(meta.redesignCredits ? { redesignCredits: meta.redesignCredits } : {}),
+      ...(meta.redesignPurchases ? { redesignPurchases: meta.redesignPurchases } : {}),
       // Absent outside the PBE (back-compat; server/pbe_boost.ts).
       ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
@@ -4391,6 +4408,12 @@ export class Sim {
   // --- IWorldCosmetics: buy a character-redesign credit ---
   buyRedesignCredit(npcId: number): void {
     this.buyRedesignCreditFor(npcId, this.primaryId);
+  }
+
+  // --- IWorldCosmetics: lifetime redesign purchases (prices the next one) ---
+  get redesignPurchases(): number {
+    const meta = this.players.get(this.primaryId);
+    return meta ? redesignPurchasesOf(meta) : 0;
   }
 
   /** Per-pid riding-lesson command surface (the server path); the IWorld member

@@ -500,7 +500,9 @@ export class QuestDialogController {
       // off the viewer's live level, so the row can never advertise a number the
       // authoritative purchase then disagrees with. Rendered through the
       // locale-aware formatMoney like every other price in the HUD.
-      const priceText = formatMoney(redesignPriceCopper(world.player.level));
+      const priceText = formatMoney(
+        redesignPriceCopper(world.player.level, world.redesignPurchases),
+      );
       html += `<button type="button" class="qd-list-item" data-stylist-buy="1" aria-label="${esc(t('stylist.buyCreditAria', { price: priceText }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('stylist.buyCredit', { price: priceText }))}</button>`;
     }
     this.deps.element.innerHTML = html;

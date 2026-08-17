@@ -37,4 +37,10 @@ export interface IWorldCosmetics {
   // later at character select, not here, so there is no success payload; failure
   // arrives as the usual vendor error toast.
   buyRedesignCredit(npcId: number): void;
+  // How many redesign credits this character has bought over its LIFETIME (never
+  // decremented when one is spent). The Stylist's dialog needs it to quote the
+  // price, because the band DOUBLES once per prior purchase: without it the
+  // button would advertise the first-purchase price forever while the Sim
+  // charged the real one.
+  redesignPurchases: number;
 }

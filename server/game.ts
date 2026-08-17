@@ -9439,6 +9439,10 @@ export class GameServer {
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).
     maybe('mntRtd', meta.ridingTrained === true ? true : null);
+    // Lifetime Stylist redesign purchases: the Stylist dialog prices its button
+    // off this (the band doubles per prior purchase), so without it the button
+    // would quote the first-purchase price forever. Delta-guarded and monotonic.
+    maybe('rdsgnP', meta.redesignPurchases ? meta.redesignPurchases : null);
     // Session-only lesson and race state must still reconcile after linkdead:
     // events sent while the socket is absent are not replayed on resume. These
     // self deltas are authoritative and clear stale client mirrors with false/null.

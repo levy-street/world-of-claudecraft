@@ -3634,6 +3634,8 @@ export class ClientWorld implements IWorld {
           .filter((k): k is MountKey => k !== '');
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
+      if (s.rdsgnP !== undefined)
+        this.selfRedesignPurchases = typeof s.rdsgnP === 'number' ? s.rdsgnP : 0;
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) {
         const view = s.mntRace as MountRaceView | null;
@@ -4500,6 +4502,9 @@ export class ClientWorld implements IWorld {
   }
   ridingTrained(): boolean {
     return this.selfRidingTrained;
+  }
+  get redesignPurchases(): number {
+    return this.selfRedesignPurchases;
   }
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
@@ -5440,6 +5445,10 @@ export class ClientWorld implements IWorld {
   // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
   // confirms the player purchased it from Marla.
   private selfRidingTrained = false;
+  // Lifetime Stylist redesign purchases, mirrored from `s.rdsgnP`. Prices the
+  // Stylist's button (the band doubles per prior purchase); 0 until the server
+  // says otherwise, which quotes the first-purchase price, the safe direction.
+  private selfRedesignPurchases = 0;
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};

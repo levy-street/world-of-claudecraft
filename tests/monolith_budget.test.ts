@@ -99,13 +99,14 @@ const MONOLITHS: MonolithRow[] = [
     // sign-off rather than being a routine ratchet move. v0.39.0 left this file
     // at 10899 against a 10900 ceiling, i.e. ONE line of headroom, so ANY new
     // command breaches it: the irreducible cost of one is an import, a delegate,
-    // and the dispatch arm that server/CLAUDE.md requires to stay inline until
+    // the dispatch arm that server/CLAUDE.md requires to stay inline until
     // the facet-ordered restructure (workstream #4) lands. The credit-push LOGIC
     // was extracted to server/redesign_credit_session.ts first, which is what
-    // held the residue to 13 lines instead of 38; src/main.ts and src/ui/hud.ts
+    // held the residue small; the rest is one maybe() delta key (the Stylist
+    // dialog prices its button off it). src/main.ts and src/ui/hud.ts
     // were brought back UNDER their ceilings the same way rather than raised.
     // Lower this again the moment workstream #4 moves the dispatch arms out.
-    ceiling: 10912,
+    ceiling: 10916,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

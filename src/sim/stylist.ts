@@ -59,10 +59,22 @@ export function redesignCreditsOf(meta: PlayerMeta): number {
   return typeof held === 'number' && Number.isFinite(held) && held > 0 ? Math.floor(held) : 0;
 }
 
-/** The price THIS character would pay right now, in copper. Exported for the
- *  dialog's price line, which must quote the same number the purchase charges. */
-export function redesignCreditPriceFor(e: Entity): number {
-  return redesignPriceCopper(e.level);
+/** How many redesign credits this character has bought over its LIFETIME. Never
+ *  decremented when one is spent, because it prices the NEXT purchase: keying the
+ *  ladder off the held count would walk the price back to the band every time a
+ *  credit was spent, which prices nothing. */
+export function redesignPurchasesOf(meta: PlayerMeta): number {
+  const bought = meta.redesignPurchases;
+  return typeof bought === 'number' && Number.isFinite(bought) && bought > 0
+    ? Math.floor(bought)
+    : 0;
+}
+
+/** The price THIS character would pay right now, in copper: its level band,
+ *  doubled once per credit already bought (capped). Exported for the dialog's
+ *  price line, which must quote the same number the purchase charges. */
+export function redesignCreditPriceFor(e: Entity, meta: PlayerMeta): number {
+  return redesignPriceCopper(e.level, redesignPurchasesOf(meta));
 }
 
 function findStylist(ctx: SimContext, npcId: number): Entity | null {
@@ -107,16 +119,20 @@ export function buyRedesignCredit(ctx: SimContext, npcId: number, pid?: number):
     ctx.error(meta.entityId, ERROR_CREDIT_CAP);
     return;
   }
-  // Priced off the buyer's CURRENT level and fixed here: the credit is worth one
-  // redesign forever, so out-levelling the band later never costs more, and a
-  // future re-band never reprices a credit already bought.
-  const price = redesignCreditPriceFor(p);
+  // Priced off the buyer's CURRENT level AND how many they have already bought,
+  // fixed here: the credit is worth one redesign forever, so out-levelling the
+  // band later never costs more and a future re-band never reprices a credit
+  // already owned.
+  const price = redesignCreditPriceFor(p, meta);
   if (meta.copper < price) {
     ctx.error(meta.entityId, ERROR_NO_MONEY);
     return;
   }
   meta.copper -= price;
   meta.redesignCredits = held + 1;
+  // The lifetime counter climbs with every purchase and never falls, so the next
+  // one costs double whether or not this credit is spent first.
+  meta.redesignPurchases = redesignPurchasesOf(meta) + 1;
   // TODO(economy-watch): once the Economy Watch gold ledger lands
   // (feature/economy-watch-p1), emit this spend as the closed-allowlist event
   // kind `cosmetic_redesign`. Until then the deduction is a plain PlayerMeta
