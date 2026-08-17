@@ -38,6 +38,7 @@
 import { activeGuard, parseAppearanceBody } from './characters';
 import type { CharacterRow } from './db';
 import { consumeRedesignCredit, getCharacter } from './db';
+import { ctxAccountId } from './http/context';
 import { withBody } from './http/middleware/body';
 import { CHARACTER_REROLL_POLICY, rateLimit } from './http/middleware/rate_limit';
 import { requireOwned } from './http/middleware/require_owned';
@@ -158,7 +159,11 @@ async function redesignHandler(ctx: Ctx): Promise<void> {
   // false would actively UN-hide a helm the player had hidden in world.
   const helmHidden = typeof body.helmHidden === 'boolean' ? body.helmHidden : null;
   const ok = await redesignDb.consumeRedesignCredit(
-    ctx.account?.accountId ?? 0,
+    // The shared reader, which THROWS when the guard somehow did not populate
+    // the account. Defaulting to 0 would silently run the UPDATE against a
+    // nonexistent account: it matches nothing, so it fails safe, but it fails
+    // as an indistinguishable "no credit" rather than the 500 it really is.
+    ctxAccountId(ctx),
     character.id,
     appearance,
     helmHidden,
