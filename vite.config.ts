@@ -538,6 +538,10 @@ export default defineConfig({
       '.claude/**',
       '.codex/**',
       '.agents/**',
+      // - .opencode/ is the OpenCode agent-runtime directory (native agents,
+      //   plugins). Any test files it may gain are plugin/runtime fixtures, not
+      //   product test sources; excluding it keeps them out of a bare vitest run.
+      '.opencode/**',
       '.worktrees/**',
       '.wt/**',
       '.venv/**',

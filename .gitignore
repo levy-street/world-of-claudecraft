@@ -97,6 +97,15 @@ Thumbs.db
 !.claude/commands/
 !.claude/hooks/
 !.claude/settings.json
+# .opencode/: track the shared OpenCode tooling (agents, plugins, lib, README) but
+# keep local OpenCode artifacts out of git. OpenCode generates package scaffolding
+# in .opencode/ at startup (bun install for plugin deps), which stays ignored by
+# the .opencode/* rule; only the intentional project files are unignored.
+.opencode/*
+!.opencode/agents/
+!.opencode/lib/
+!.opencode/plugins/
+!.opencode/README.md
 # Per-session QA/build scratch (gate logs, probe scripts); never committed.
 .claude-scratch/
 .cursor/
