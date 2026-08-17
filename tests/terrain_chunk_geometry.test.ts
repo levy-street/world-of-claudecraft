@@ -139,7 +139,18 @@ describe('generated chunk geometry is stable', () => {
     // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
     // and nothing rises anywhere. Both digests move because that window
     // straddles the rect edge at x = -180.
-    expect(digestOf(inRect)).toBe('39afe77d61ac348961d01e890aaddb00');
+    // Re-minted again for the farming go-live's four farmer NPCs: every NPC
+    // is a calm-anchor world fixture (terrain_calm_anchors.ts pads NPCS at
+    // rIn 6 / rOut 14), and Farmer Jessica stands beside the Eastbrook garden
+    // beds at (24.5, 32.5), so her pad reshapes the vale vertices around the
+    // patch. Localization checked against the dense height atlas
+    // (tests/terrain_height_parity.test.ts fixture, re-minted in the same
+    // commit): the four pads move 60 of its 282406 points, 0.02 percent, all
+    // inside the four farmers' pad footprints (the largest under Farmer
+    // Hollis's Highwatch stand, where the natural relief diverges most from
+    // the legacy field). The gap digest is checked below with the same
+    // literal it had: Jessica's pad is far inside the rect.
+    expect(digestOf(inRect)).toBe('affb4c8d6201b0832458a2c2bcd0f29b');
     // The gap super-chunks take the same re-mint.
     expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 
