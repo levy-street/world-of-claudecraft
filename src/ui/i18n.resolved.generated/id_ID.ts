@@ -7355,9 +7355,9 @@ export const id_ID: EnTranslations = {
       "ritePlayback": "Perhatikan altar-altar itu: hafalkan urutan menyalanya",
       "riteInput": "Tekan F di setiap altar sesuai urutan menyalanya ({current}/{total})",
       "riteOpen": "Relikuari terbuka: tekan F padanya untuk mengambil jarahanmu",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

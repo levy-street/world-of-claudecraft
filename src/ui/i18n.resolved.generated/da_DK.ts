@@ -7355,9 +7355,9 @@ export const da_DK: EnTranslations = {
       "ritePlayback": "Hold øje med skrinene: husk den rækkefølge, de lyser op i",
       "riteInput": "Tryk på F ved hvert skrin i den rækkefølge, de lyste op ({current}/{total})",
       "riteOpen": "Relikvariet er åbent: tryk på F på det for at kræve dit bytte",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

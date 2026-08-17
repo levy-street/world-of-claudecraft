@@ -7355,9 +7355,9 @@ export const vi_VN: EnTranslations = {
       "ritePlayback": "Quan sát các miếu thờ: ghi nhớ thứ tự chúng sáng lên",
       "riteInput": "Nhấn F tại từng miếu thờ theo thứ tự chúng đã sáng ({current}/{total})",
       "riteOpen": "Hộp thánh tích đã mở: nhấn F vào nó để nhận chiến lợi phẩm",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

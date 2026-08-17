@@ -7355,9 +7355,9 @@ export const pl_PL: EnTranslations = {
       "ritePlayback": "Obserwuj kapliczki: zapamiętaj kolejność, w jakiej się rozświetlają",
       "riteInput": "Naciśnij F przy każdej kapliczce w kolejności, w jakiej się rozświetliły ({current}/{total})",
       "riteOpen": "Relikwiarz jest otwarty: naciśnij przy nim F, aby odebrać łupy",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

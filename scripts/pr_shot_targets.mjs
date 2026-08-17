@@ -7885,17 +7885,17 @@ export const TARGETS = [
     },
   },
   {
-    key: 'delve-tracker-abandon',
-    label: 'Delve tracker: the Abandon Delve control',
+    key: 'delve-tracker-leave',
+    label: 'Delve tracker: the Leave Delve control',
     when: ['ui/hud/delve/delve_tracker_controller'],
     variants: [
       { key: 'tracker-desktop', scene: 'tracker', beforeLoad: lowGraphicsSeed },
-      { key: 'abandon-confirm-desktop', scene: 'confirm', beforeLoad: lowGraphicsSeed },
+      { key: 'leave-confirm-desktop', scene: 'confirm', beforeLoad: lowGraphicsSeed },
       { key: 'tracker-mobile', scene: 'tracker', mobile: true, beforeLoad: lowGraphicsSeed },
     ],
     // Enter a delve offline (the sim-side entry gate has no door proximity rule;
     // the level gate does apply) so the tracker strip paints, then for the
-    // confirm scene press the REAL Abandon Delve button so the shot proves the
+    // confirm scene press the REAL Leave Delve button so the shot proves the
     // dialog gates the leave. Tracker scenes clip to the strip; the confirm
     // scene stays full-frame because the dialog matters with the scene behind it.
     async capture(page, variant) {
@@ -7914,7 +7914,7 @@ export const TARGETS = [
       await pollForSize(page, '#delve-tracker');
       await wait(600);
       if (variant.scene === 'confirm') {
-        await page.evaluate(() => document.querySelector('#delve-tracker .dt-abandon')?.click());
+        await page.evaluate(() => document.querySelector('#delve-tracker .dt-leave')?.click());
         await pollForSize(page, '#confirm-dialog');
         return {};
       }

@@ -158,11 +158,13 @@ export function delveOccupancyRadius(run: DelveRun): number {
   return delveModuleZOffsetLayout(run.modules, mi) + span + 40;
 }
 
-/** True when a position sits inside a claimed run's room footprint. Rooms
- *  START at DELVE_MODULE_Z_START + layout.zMin (about -11, so slightly SOUTH
- *  of the origin) and extend north; the -40 south margin covers that walkable
- *  lip while staying far clear of the neighbor slot 620u away. Kept in step
- *  with the updateDelveRuns empty-sweep band. */
+/** True when a position sits inside a claimed run's room footprint. The band
+ *  is DELIBERATELY NARROWER than delveRunForPlayer's and the empty sweep's
+ *  symmetric ones: rooms start at DELVE_MODULE_Z_START + layout.zMin (about
+ *  -11, slightly SOUTH of the origin), so the -40 south margin covers that
+ *  walkable lip without reaching the neighbor slot 620u away. A companion
+ *  change narrows the sweep the same way; unifying the three predicates behind
+ *  one named-margin helper is the agreed follow-up. */
 export function delveRunContains(run: DelveRun, pos: { x: number; z: number }): boolean {
   const dz = pos.z - run.origin.z;
   return Math.abs(pos.x - run.origin.x) < 120 && dz > -40 && dz < delveOccupancyRadius(run);
@@ -439,14 +441,23 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
 export function leaveDelve(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
+  // No-run stays a silent no-op (an out-of-delve leave_delve means nothing);
+  // the guards below only speak up when there is a run the player expects to
+  // leave, so the tracker's Leave control never looks broken.
+  const run = delveRunForPlayer(ctx, r.meta.entityId);
+  if (!run) return;
   if (r.e.dead) {
-    // Delve deaths respawn in-run within seconds; error instead of a silent
-    // no-op so the tracker's Leave control never looks broken in that window.
+    // Delve deaths respawn in-run within seconds; error instead of silence.
     ctx.error(r.meta.entityId, "You can't do that while dead.");
     return;
   }
-  const run = delveRunForPlayer(ctx, r.meta.entityId);
-  if (!run) return;
+  if (r.e.inCombat) {
+    // A one-click mid-fight exit would be a free wipe-dodge: the mob leashes
+    // home and full-heals while the leaver keeps the claim, re-enters at the
+    // same module, and never spends one of the run's bounded deaths.
+    ctx.error(r.meta.entityId, "You can't do that while in combat.");
+    return;
+  }
   const delve = DELVES[run.delveId];
   // Tear down the leaver's live lockpick session, if any (preserves the attempt).
   if (run.lockpick && run.lockpick.ownerId === r.meta.entityId) ctx.abandonLockpick(run);

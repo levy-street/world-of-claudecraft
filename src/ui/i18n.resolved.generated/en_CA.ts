@@ -7355,9 +7355,9 @@ export const en_CA: EnTranslations = {
       "ritePlayback": "Watch the shrines: memorize the order they light up",
       "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
       "riteOpen": "The reliquary is open: press F on it to claim your spoils",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

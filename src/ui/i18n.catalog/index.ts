@@ -1188,13 +1188,13 @@ export const en = {
       ritePlayback: 'Watch the shrines: memorize the order they light up',
       riteInput: 'Press F at each shrine in the order they lit ({current}/{total})',
       riteOpen: 'The reliquary is open: press F on it to claim your spoils',
-      abandon: 'Leave Delve',
+      leave: 'Leave Delve',
     },
     // Confirm dialog behind the tracker's Leave Delve control. Copy is written
     // from the live mechanic: leaveDelve keeps the claim (the run stays
     // resumable until the empty sweep or Reset All Instances frees it), so the
     // copy says "leave" and promises re-entry, never "abandon".
-    abandonConfirm: {
+    leaveConfirm: {
       title: 'Leave the delve?',
       body: 'Return to the delve entrance? You can walk back in to continue this run.',
       confirm: 'Leave',

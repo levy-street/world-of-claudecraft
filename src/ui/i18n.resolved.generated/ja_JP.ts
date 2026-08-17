@@ -7355,9 +7355,9 @@ export const ja_JP: EnTranslations = {
       "ritePlayback": "祠を見よ：光る順番を覚えること",
       "riteInput": "光った順に各祠の前でFを押す（{current}/{total}）",
       "riteOpen": "聖遺物匣が開いた：Fで戦利品を受け取る",
-      "abandon": "デルヴを出る"
+      "leave": "デルヴを出る"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "デルヴから出ますか？",
       "body": "デルヴの入口に戻りますか？再び入れば、この攻略を続けられます。",
       "confirm": "出る",

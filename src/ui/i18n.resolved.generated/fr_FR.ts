@@ -7355,9 +7355,9 @@ export const fr_FR: EnTranslations = {
       "ritePlayback": "Observez les autels : mémorisez l'ordre dans lequel ils s'illuminent",
       "riteInput": "Appuyez sur F à chaque autel, dans l'ordre où ils se sont illuminés ({current}/{total})",
       "riteOpen": "Le reliquaire est ouvert : appuyez sur F dessus pour réclamer votre butin",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

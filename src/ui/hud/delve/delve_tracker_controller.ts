@@ -22,7 +22,7 @@ export interface DelveTrackerControllerDeps {
   mobName(mobId: string): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   closeRitePanel(restoreFocus: boolean): void;
-  /** Host-owned modal behind the Abandon Delve control (same dep shape as the
+  /** Host-owned modal behind the Leave Delve control (same dep shape as the
    *  delve board controller's purchase confirm). */
   confirmDialog(
     title: string,
@@ -129,7 +129,7 @@ export class DelveTrackerController {
       exitHint +
       `<div class="dt-obj">- ${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
       affixHtml +
-      `<button class="dt-abandon" type="button">${esc(t('delveUi.tracker.abandon'))}</button>`;
+      `<button class="dt-leave" type="button">${esc(t('delveUi.tracker.leave'))}</button>`;
     element.querySelectorAll<HTMLElement>('.dt-affix-icon').forEach((icon) => {
       const affixId = icon.dataset.affix ?? '';
       this.deps.attachTooltip(
@@ -138,15 +138,15 @@ export class DelveTrackerController {
       );
     });
     // Rebound on every repaint: innerHTML replacement drops old listeners.
-    // leaveDelve is the early-abandon path: back to the door, claim kept, so a
-    // confirmed abandon can still walk back in and continue the run.
-    element.querySelectorAll<HTMLElement>('.dt-abandon').forEach((button) => {
+    // leaveDelve is the early-leave path: back to the door, claim kept, so a
+    // confirmed leave can still walk back in and continue the run.
+    element.querySelectorAll<HTMLElement>('.dt-leave').forEach((button) => {
       button.addEventListener('click', () =>
         this.deps.confirmDialog(
-          t('delveUi.abandonConfirm.title'),
-          t('delveUi.abandonConfirm.body'),
-          t('delveUi.abandonConfirm.confirm'),
-          t('delveUi.abandonConfirm.cancel'),
+          t('delveUi.leaveConfirm.title'),
+          t('delveUi.leaveConfirm.body'),
+          t('delveUi.leaveConfirm.confirm'),
+          t('delveUi.leaveConfirm.cancel'),
           () => this.deps.world().leaveDelve(),
         ),
       );

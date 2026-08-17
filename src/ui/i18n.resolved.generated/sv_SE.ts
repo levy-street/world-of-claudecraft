@@ -7355,9 +7355,9 @@ export const sv_SE: EnTranslations = {
       "ritePlayback": "Se på helgedomarna: memorera ordningen de tänds i",
       "riteInput": "Tryck på F vid varje helgedom i den ordning de tändes ({current}/{total})",
       "riteOpen": "Relikvariet är öppet: tryck på F på det för att hämta ditt byte",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

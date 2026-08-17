@@ -7355,9 +7355,9 @@ export const zh_TW: EnTranslations = {
       "ritePlayback": "注視神龕：記住它們亮起的順序",
       "riteInput": "按亮起的順序在每座神龕前按 F（{current}/{total}）",
       "riteOpen": "聖物匣已開啟：在它面前按 F 領取戰利品",
-      "abandon": "離開秘探"
+      "leave": "離開秘探"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "離開秘探？",
       "body": "返回秘探入口？你可以再次進入，繼續本次秘探。",
       "confirm": "離開",

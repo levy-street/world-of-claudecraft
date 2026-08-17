@@ -7355,9 +7355,9 @@ export const cs_CZ: EnTranslations = {
       "ritePlayback": "Sleduj svatyně: zapamatuj si pořadí, v jakém se rozsvítí",
       "riteInput": "Stiskni F u každé svatyně v pořadí, v jakém se rozsvítily ({current}/{total})",
       "riteOpen": "Relikviář je otevřený: stiskni na něm F a vyzvedni kořist",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

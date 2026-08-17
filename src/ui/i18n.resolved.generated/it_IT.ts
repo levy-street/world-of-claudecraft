@@ -7355,9 +7355,9 @@ export const it_IT: EnTranslations = {
       "ritePlayback": "Osserva i santuari: memorizza l'ordine in cui si illuminano",
       "riteInput": "Premi F a ogni santuario nell'ordine in cui si sono illuminati ({current}/{total})",
       "riteOpen": "Il reliquiario è aperto: premi F su di esso per reclamare il bottino",
-      "abandon": "Leave Delve"
+      "leave": "Leave Delve"
     },
-    "abandonConfirm": {
+    "leaveConfirm": {
       "title": "Leave the delve?",
       "body": "Return to the delve entrance? You can walk back in to continue this run.",
       "confirm": "Leave",

@@ -113,10 +113,10 @@ describe('DelveTrackerController', () => {
     expect(closeRitePanel).toHaveBeenCalledWith(false);
   });
 
-  it('renders an abandon control that routes through the confirm dep', () => {
+  it('renders a leave control that routes through the confirm dep', () => {
     let html = '';
     const clickHandlers: Array<() => void> = [];
-    const abandonButton = {
+    const leaveButton = {
       addEventListener: (type: string, handler: () => void) => {
         if (type === 'click') clickHandlers.push(handler);
       },
@@ -129,7 +129,7 @@ describe('DelveTrackerController', () => {
       set innerHTML(value: string) {
         html = value;
       },
-      querySelectorAll: (selector: string) => (selector === '.dt-abandon' ? [abandonButton] : []),
+      querySelectorAll: (selector: string) => (selector === '.dt-leave' ? [leaveButton] : []),
     } as unknown as HTMLElement;
     const leaveDelve = vi.fn();
     const confirmDialog = vi.fn();
@@ -149,7 +149,7 @@ describe('DelveTrackerController', () => {
 
     controller.update();
 
-    expect(element.innerHTML).toContain('dt-abandon');
+    expect(element.innerHTML).toContain('dt-leave');
     expect(clickHandlers.length).toBe(1);
     clickHandlers[0]();
     // The click opens the confirm; leaving happens only on the dialog's OK.
