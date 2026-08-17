@@ -397,8 +397,8 @@ export const ru_RU: EnTranslations = {
       "unavailable": "В текущем состоянии выбраться нельзя."
     },
     "scene": {
-      "skipHint": "Skip scene (Esc)",
-      "waitingFor": "Waiting for {name}",
+      "skipHint": "Пропустить сцену (Esc)",
+      "waitingFor": "Ожидание: {name}",
       "timer": "{seconds}s"
     },
     "fct": {
@@ -1094,7 +1094,7 @@ export const ru_RU: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Нажми {key}, чтобы оседлать учебного Доблестного скакуна.",
-      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
+      "buyReinsPrompt": "Верховая езда освоена. Купи у Марлы поводья Доблестного скакуна за 10 золотых и используй их, чтобы сесть в седло.",
       "ownedMountPrompt": "Поводья лежат в сумке. Используйте их, чтобы сесть верхом.",
       "ridePrompt": "Следуй за светящейся меткой к линии старта и нажми «Начать заезд».",
       "begin": "Начать урок",
@@ -2818,11 +2818,11 @@ export const ru_RU: EnTranslations = {
       "empty": "Похоже, здесь ничего не опубликовано."
     },
     "memorial": {
-      "title": "Memorial",
-      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
-      "rollHeading": "Roll of Honour ({count})",
-      "roomRemaining": "The stone below the last name has been left bare.",
-      "close": "Close memorial"
+      "title": "Мемориал",
+      "dedication": "Смотрителям Чаячьей Гавани, что унесли печать в Разлом и не вернулись. Город хранит колокол в их память.",
+      "rollHeading": "Свиток почёта ({count})",
+      "roomRemaining": "Камень под последним именем оставлен пустым.",
+      "close": "Закрыть мемориал"
     },
     "bank": {
       "title": "Банк",
@@ -3843,34 +3843,34 @@ export const ru_RU: EnTranslations = {
   },
   "lb": {
     "fixture": {
-      "ferry": "The Farshore Ferry",
-      "tidemill": "The Tidemill",
-      "breach": "The Breach"
+      "ferry": "Паром Дальнего Берега",
+      "tidemill": "Приливная мельница",
+      "breach": "Прорыв"
     },
     "speaker": {
-      "tam": "Bellkeeper Tam",
-      "coalfast": "Warden Coalfast",
-      "ollun": "Riftwatch Ollun",
-      "edda": "Quartermaster Edda",
-      "saul": "Mender Saul"
+      "tam": "Звонарь Там",
+      "coalfast": "Страж Коулфаст",
+      "ollun": "Разломовед Оллун",
+      "edda": "Интендант Эдда",
+      "saul": "Целитель Саул"
     },
     "fare": {
-      "promptOut": "Passage to the Farshore: {price} copper.",
-      "promptBack": "Passage back to the mainland: {price} copper.",
-      "pay": "Pay the fare.",
-      "decline": "Not today."
+      "promptOut": "Переправа на Дальний берег: {price} меди.",
+      "promptBack": "Переправа обратно на большую землю: {price} меди.",
+      "pay": "Заплатить за переправу.",
+      "decline": "Не сегодня."
     },
     "q0": {
       "scene": {
-        "harbor": "A working harbor: nets drying, star-glass salvage crates stenciled for mainland buyers.",
-        "plinth": "Above the harbor steps a bronze warden faces inland. The newest name on the plinth is a century old: WARDEN HALE. There is room below it for more.",
-        "toll": "A bell tolls, once. Everyone in the street stops walking, and counts. Nothing follows, and the whole street exhales at once."
+        "harbor": "Рабочая гавань: сушатся сети, на ящиках со звездным стеклом клейма материковых покупателей.",
+        "plinth": "Над ступенями гавани бронзовый страж смотрит вглубь острова. Самому новому имени на постаменте сто лет: СТРАЖ ХЕЙЛ. Ниже осталось место.",
+        "toll": "Колокол бьет один раз. Все на улице замирают и считают. Продолжения нет, и вся улица разом выдыхает."
       },
       "tam": {
-        "stretchers": "The last one of those cost the whole watch a morning and two stretchers."
+        "stretchers": "Прошлый такой стоил всей страже утра и двух носилок."
       },
       "coalfast": {
-        "look": "The grey man looks at the dead stalker, then at you, slightly longer. Then he walks back toward the cliffs."
+        "look": "Седой посмотрел на мертвую тварь, потом на тебя, чуть дольше. И зашагал обратно к утесам."
       }
     }
   },
@@ -6145,31 +6145,31 @@ export const ru_RU: EnTranslations = {
       "label": "Параметры инструмента"
     },
     "cinematic": {
-      "title": "Cinematic",
-      "show": "Show panel",
-      "hide": "Hide panel",
-      "scene": "Scene",
-      "sceneOption": "{id} ({seconds}s)",
-      "time": "Time",
-      "timeReadout": "{current} / {duration}s",
-      "play": "Play",
-      "pause": "Pause",
-      "authoredCamera": "Authored camera",
-      "fade": "Fade: {percent}%",
-      "letterboxOn": "Letterbox: on",
-      "letterboxOff": "Letterbox: off",
-      "violations": "Violations",
-      "noViolations": "No violations at this time",
-      "violationRow": "{check} | op {opIndex} | {measured}",
-      "capture": "Capture keyframe",
-      "copy": "Copy block",
-      "output": "Generated camera capture",
-      "unavailable": "3D viewport loading",
-      "seedMismatch": "Capture needs the shipping world seed",
-      "captureSavedCopied": "Saved and copied",
-      "captureSaved": "Saved; block ready below",
-      "captureCopyOnly": "Copied; dev writer unavailable",
-      "captureReady": "Block ready below"
+      "title": "Кинематографическая сцена",
+      "show": "Показать панель",
+      "hide": "Скрыть панель",
+      "scene": "Сцена",
+      "sceneOption": "{id} ({seconds} с)",
+      "time": "Время",
+      "timeReadout": "{current} / {duration} с",
+      "play": "Воспроизвести",
+      "pause": "Пауза",
+      "authoredCamera": "Постановочная камера",
+      "fade": "Затемнение: {percent}%",
+      "letterboxOn": "Широкий формат: включен",
+      "letterboxOff": "Широкий формат: выключен",
+      "violations": "Нарушения",
+      "noViolations": "Сейчас нарушений нет",
+      "violationRow": "{check} | операция {opIndex} | {measured}",
+      "capture": "Захватить ключевой кадр",
+      "copy": "Копировать блок",
+      "output": "Созданный снимок камеры",
+      "unavailable": "Загрузка области просмотра 3D",
+      "seedMismatch": "Для захвата нужен рабочий ключ мира",
+      "captureSavedCopied": "Сохранено и скопировано",
+      "captureSaved": "Сохранено, блок готов ниже",
+      "captureCopyOnly": "Скопировано, средство записи разработки недоступно",
+      "captureReady": "Блок готов ниже"
     },
     "brush": {
       "title": "Кисть",
@@ -13802,22 +13802,22 @@ export const ru_RU: EnTranslations = {
         "name": "Рыбак Брам"
       },
       "lb_actor_coalfast": {
-        "name": "Warden Coalfast"
+        "name": "Смотритель Хладоуголь"
       },
       "lb_actor_ollun": {
-        "name": "Riftwatch Ollun"
+        "name": "Стражеразлома Оллун"
       },
       "lb_actor_edda": {
-        "name": "Quartermaster Edda"
+        "name": "Интендант Эдда"
       },
       "lb_actor_saul": {
-        "name": "Mender Saul"
+        "name": "Врачеватель Саул"
       },
       "lb_actor_tam": {
-        "name": "Bellkeeper Tam"
+        "name": "Звонарь Там"
       },
       "tidemill_stalker": {
-        "name": "The Tidemill Stalker"
+        "name": "Ловчий Приливной Мельницы"
       },
       "rift_hellguard": {
         "name": "Адский страж"
@@ -14380,19 +14380,19 @@ export const ru_RU: EnTranslations = {
         "greeting": "Он раскрылся прямо там, где сушат сети. Прямо там, где я стояла каждое утро всей своей жизни. Я больше не спускаюсь к берегу. Я вообще почти никуда больше не хожу."
       },
       "ferryman_ewald": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "Паромщик Эвальд",
+        "title": "Переправа на Дальний Берег",
+        "greeting": "На Дальний Берег, значит? Дружище, за рыбой туда давно никто не плавает. Поднимайся на борт, когда будешь готов, и слушай колокол, когда сойдёшь на берег: город слушает его так же, как ты смотришь на небо."
       },
       "ferryman_ewald_gullhaven": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "Паромщик Эвальд",
+        "title": "Переправа на Дальний Берег",
+        "greeting": "На Дальний Берег, значит? Дружище, за рыбой туда давно никто не плавает. Поднимайся на борт, когда будешь готов, и слушай колокол, когда сойдёшь на берег: город слушает его так же, как ты смотришь на небо."
       },
       "sergeant_marsh": {
-        "name": "Sergeant Marsh",
-        "title": "Town Militia",
-        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
+        "name": "Сержант Марш",
+        "title": "Городское ополчение",
+        "greeting": "Обучен? Тогда слушай, как пройдёт эта ночь. Моя линия держит дорогу. Если разлом выплюнет то, с чем нам не совладать, я укажу на тебя. Мельница твоя: ничто не должно войти за тобой и ничто не должно пройти мимо нас к городу. Ступай."
       },
       "forgemistress_darva": {
         "name": "Мастерица кузни Дарва",
@@ -16391,18 +16391,18 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_lb_q0_ashore": {
-        "title": "Ashore",
-        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
-        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "title": "На берегу",
+        "text": "Чаячья Гавань принимает прорывы день и ночь и всё равно держится. Если хочешь встать рядом с ними, начни там, где город истекает кровью: линия ополчения на Дозорном Лугу, к востоку от портовой лестницы и старой статуи.",
+        "completion": "Мельницу ты зачистил в одиночку, и Там не преувеличивает насчёт носилок. Мне не хватает разведчика, а полей слишком много. Этой ночью ты удержал землю, которую не обязан был держать, и в этом вся служба. Добро пожаловать в дозор.",
         "objectives": {
           "0": {
-            "label": "Report to Sergeant Marsh at the Watch Meadow"
+            "label": "Доложить сержанту Маршу у Дозорного Луга"
           },
           "1": {
-            "label": "Riftspawn slain"
+            "label": "Убить порождений разлома"
           },
           "2": {
-            "label": "Put down whatever is in the Tidemill"
+            "label": "Уничтожить то, что скрывается в Приливной Мельнице"
           }
         }
       },
@@ -16965,10 +16965,10 @@ export const ru_RU: EnTranslations = {
             "label": "Поля Разломов"
           },
           "5": {
-            "label": "The Breach"
+            "label": "Прорыв"
           },
           "6": {
-            "label": "The Wreckfields"
+            "label": "Поля Крушений"
           }
         }
       }
@@ -17010,49 +17010,49 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов."
       },
       "lb_tidemill": {
-        "name": "The Tidemill",
-        "enterText": "The mill door gives. Inside, the dark is listening.",
-        "leaveText": "You step out of the Tidemill into the evening air."
+        "name": "Приливная Мельница",
+        "enterText": "Дверь мельницы поддаётся. Внутри тьма прислушивается.",
+        "leaveText": "Ты выходишь из Приливной Мельницы в вечерний воздух."
       },
       "lb_riftline": {
-        "name": "The Rift-Line at Dusk",
-        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
-        "leaveText": "You leave the rift-line to the dawn watch."
+        "name": "Линия прорыва в сумерках",
+        "enterText": "Ворота луга закрываются за патрулём. Эта ночь принадлежит линии обороны.",
+        "leaveText": "Ты оставляешь линию прорыва рассветному дозору."
       },
       "lb_vault": {
-        "name": "The Drowned First Redoubt",
-        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
-        "leaveText": "You come up the cliff rope into daylight."
+        "name": "Затонувший Первый редут",
+        "enterText": "Верёвка уходит во тьму. Внизу старый редут лежит там, куда рухнул.",
+        "leaveText": "Ты поднимаешься по утёсной верёвке обратно к дневному свету."
       },
       "lb_council": {
-        "name": "The Redoubt Council",
-        "enterText": "The council room holds six chairs. One is empty.",
-        "leaveText": "You step out of the redoubt."
+        "name": "Совет редута",
+        "enterText": "В зале совета стоят шесть кресел. Одно пустует.",
+        "leaveText": "Ты выходишь из редута."
       },
       "lb_landing": {
-        "name": "The Landing at Night",
-        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
-        "leaveText": "You leave the Landing beach behind."
+        "name": "Ночной плацдарм",
+        "enterText": "Сигнальные костры догорают вдоль пляжа. Флот ждёт за отмелями.",
+        "leaveText": "Ты оставляешь берег плацдарма позади."
       },
       "lb_riftfields": {
-        "name": "The Riftfields Approach",
-        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
-        "leaveText": "You walk back down out of the Riftfields."
+        "name": "Подступы к Полям Разломов",
+        "enterText": "Четыре места оберегов окружают прорыв. Обряд держал его закрытым двенадцать веков.",
+        "leaveText": "Ты спускаешься обратно с Полей Разломов."
       },
       "lb_breach": {
-        "name": "Inside the Breach",
-        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
-        "leaveText": "You cross the threshold into ordinary night air."
+        "name": "Внутри Прорыва",
+        "enterText": "Свет неправильный, а небо ещё хуже. Сердце лежит впереди на открытом месте.",
+        "leaveText": "Ты переступаешь порог и возвращаешься в обычный ночной воздух."
       },
       "lb_lastwatch": {
-        "name": "The Last Watch",
-        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
-        "leaveText": "You close the redoubt door behind you."
+        "name": "Последний дозор",
+        "enterText": "Редут чист и пуст. Кто-то должен завершить этот дозор.",
+        "leaveText": "Ты закрываешь за собой дверь редута."
       },
       "lb_willowfen": {
-        "name": "Willowweep",
-        "enterText": "The willow does not move. The water does not either.",
-        "leaveText": "You leave the willow to its quiet."
+        "name": "Ивовый Плач",
+        "enterText": "Ива не шевелится. Вода тоже.",
+        "leaveText": "Ты оставляешь иву в её тишине."
       },
       "dawnhold_castle": {
         "name": "Замок Рассвета",

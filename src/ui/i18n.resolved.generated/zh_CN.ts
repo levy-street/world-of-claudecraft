@@ -397,8 +397,8 @@ export const zh_CN: EnTranslations = {
       "unavailable": "当前状态下无法使用脱困。"
     },
     "scene": {
-      "skipHint": "Skip scene (Esc)",
-      "waitingFor": "Waiting for {name}",
+      "skipHint": "跳过场景（Esc）",
+      "waitingFor": "等待{name}",
       "timer": "{seconds}s"
     },
     "fct": {
@@ -1094,7 +1094,7 @@ export const zh_CN: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
-      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
+      "buyReinsPrompt": "骑术已学会。花10金币向玛拉购买英勇战马缰绳，使用后即可骑乘。",
       "ownedMountPrompt": "你的缰绳已在背包中，使用它即可骑乘。",
       "ridePrompt": "跟随发光的标记前往起点线，然后点击开始比赛。",
       "begin": "开始课程",
@@ -2818,11 +2818,11 @@ export const zh_CN: EnTranslations = {
       "empty": "看起来没有张贴任何内容。"
     },
     "memorial": {
-      "title": "Memorial",
-      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
-      "rollHeading": "Roll of Honour ({count})",
-      "roomRemaining": "The stone below the last name has been left bare.",
-      "close": "Close memorial"
+      "title": "纪念碑",
+      "dedication": "献给那些带着封印走进裂口、再未归来的鸥港守望者。小镇为他们守着这口钟。",
+      "rollHeading": "英灵名录（{count}）",
+      "roomRemaining": "最后一个名字下方的石面仍然空着。",
+      "close": "关闭纪念碑"
     },
     "bank": {
       "title": "银行",
@@ -3843,34 +3843,34 @@ export const zh_CN: EnTranslations = {
   },
   "lb": {
     "fixture": {
-      "ferry": "The Farshore Ferry",
-      "tidemill": "The Tidemill",
-      "breach": "The Breach"
+      "ferry": "远岸渡船",
+      "tidemill": "潮汐磨坊",
+      "breach": "裂口"
     },
     "speaker": {
-      "tam": "Bellkeeper Tam",
-      "coalfast": "Warden Coalfast",
-      "ollun": "Riftwatch Ollun",
-      "edda": "Quartermaster Edda",
-      "saul": "Mender Saul"
+      "tam": "钟守塔姆",
+      "coalfast": "守望者科尔法斯特",
+      "ollun": "裂隙观察者奥伦",
+      "edda": "军需官艾达",
+      "saul": "医者扫罗"
     },
     "fare": {
-      "promptOut": "Passage to the Farshore: {price} copper.",
-      "promptBack": "Passage back to the mainland: {price} copper.",
-      "pay": "Pay the fare.",
-      "decline": "Not today."
+      "promptOut": "渡海去远岸：{price} 铜币。",
+      "promptBack": "渡海回大陆：{price} 铜币。",
+      "pay": "付船钱。",
+      "decline": "今天不去。"
     },
     "q0": {
       "scene": {
-        "harbor": "A working harbor: nets drying, star-glass salvage crates stenciled for mainland buyers.",
-        "plinth": "Above the harbor steps a bronze warden faces inland. The newest name on the plinth is a century old: WARDEN HALE. There is room below it for more.",
-        "toll": "A bell tolls, once. Everyone in the street stops walking, and counts. Nothing follows, and the whole street exhales at once."
+        "harbor": "一座劳作中的港口：渔网晾晒着，星璃打捞箱上印着大陆买家的戳记。",
+        "plinth": "港口台阶上方，一尊青铜守望者面朝内陆。基座上最新的名字已有百年：守望者海尔。名字下方还留有余位。",
+        "toll": "钟声响了一下。街上所有人都停下脚步，数着。没有后续，整条街同时松了口气。"
       },
       "tam": {
-        "stretchers": "The last one of those cost the whole watch a morning and two stretchers."
+        "stretchers": "上次出这么一个，搭进去全体守望一个上午，外加两副担架。"
       },
       "coalfast": {
-        "look": "The grey man looks at the dead stalker, then at you, slightly longer. Then he walks back toward the cliffs."
+        "look": "灰发男人看了看死去的怪物，又看了看你，目光略久。然后他朝崖边走了回去。"
       }
     }
   },
@@ -6145,31 +6145,31 @@ export const zh_CN: EnTranslations = {
       "label": "工具选项"
     },
     "cinematic": {
-      "title": "Cinematic",
-      "show": "Show panel",
-      "hide": "Hide panel",
-      "scene": "Scene",
-      "sceneOption": "{id} ({seconds}s)",
-      "time": "Time",
-      "timeReadout": "{current} / {duration}s",
-      "play": "Play",
-      "pause": "Pause",
-      "authoredCamera": "Authored camera",
-      "fade": "Fade: {percent}%",
-      "letterboxOn": "Letterbox: on",
-      "letterboxOff": "Letterbox: off",
-      "violations": "Violations",
-      "noViolations": "No violations at this time",
-      "violationRow": "{check} | op {opIndex} | {measured}",
-      "capture": "Capture keyframe",
-      "copy": "Copy block",
-      "output": "Generated camera capture",
-      "unavailable": "3D viewport loading",
-      "seedMismatch": "Capture needs the shipping world seed",
-      "captureSavedCopied": "Saved and copied",
-      "captureSaved": "Saved; block ready below",
-      "captureCopyOnly": "Copied; dev writer unavailable",
-      "captureReady": "Block ready below"
+      "title": "电影场景",
+      "show": "显示面板",
+      "hide": "隐藏面板",
+      "scene": "场景",
+      "sceneOption": "{id}（{seconds} 秒）",
+      "time": "时间",
+      "timeReadout": "{current} / {duration} 秒",
+      "play": "播放",
+      "pause": "暂停",
+      "authoredCamera": "使用编排镜头",
+      "fade": "淡出：{percent}%",
+      "letterboxOn": "宽银幕：开启",
+      "letterboxOff": "宽银幕：关闭",
+      "violations": "违规项",
+      "noViolations": "当前没有违规项",
+      "violationRow": "{check} | 操作 {opIndex} | {measured}",
+      "capture": "捕获关键帧",
+      "copy": "复制区块",
+      "output": "已生成的镜头捕获",
+      "unavailable": "3D 视口加载中",
+      "seedMismatch": "捕获需要正式世界种子",
+      "captureSavedCopied": "已保存并复制",
+      "captureSaved": "已保存，区块已在下方生成",
+      "captureCopyOnly": "已复制，开发写入器不可用",
+      "captureReady": "区块已在下方生成"
     },
     "brush": {
       "title": "笔刷",
@@ -13802,22 +13802,22 @@ export const zh_CN: EnTranslations = {
         "name": "渔民布拉姆"
       },
       "lb_actor_coalfast": {
-        "name": "Warden Coalfast"
+        "name": "守望者·煤耐"
       },
       "lb_actor_ollun": {
-        "name": "Riftwatch Ollun"
+        "name": "裂察·奥伦"
       },
       "lb_actor_edda": {
-        "name": "Quartermaster Edda"
+        "name": "军需官·艾达"
       },
       "lb_actor_saul": {
-        "name": "Mender Saul"
+        "name": "疗愈者·索尔"
       },
       "lb_actor_tam": {
-        "name": "Bellkeeper Tam"
+        "name": "守钟人·塔姆"
       },
       "tidemill_stalker": {
-        "name": "The Tidemill Stalker"
+        "name": "潮汐磨坊潜猎者"
       },
       "rift_hellguard": {
         "name": "地狱卫士"
@@ -14380,19 +14380,19 @@ export const zh_CN: EnTranslations = {
         "greeting": "它就在晾网的地方裂开了。就在那儿，我这辈子每天清晨都站着的地方。我再也不下到海岸去了。如今我哪儿都不太去了。"
       },
       "ferryman_ewald": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "摆渡人·埃瓦尔德",
+        "title": "远岸航线",
+        "greeting": "去远岸，是吗？朋友，如今没人为了打渔渡海了。准备好了就上船。上岸时留意钟声：镇上的人听钟，就像你看天色一样。"
       },
       "ferryman_ewald_gullhaven": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "摆渡人·埃瓦尔德",
+        "title": "远岸航线",
+        "greeting": "去远岸，是吗？朋友，如今没人为了打渔渡海了。准备好了就上船。上岸时留意钟声：镇上的人听钟，就像你看天色一样。"
       },
       "sergeant_marsh": {
-        "name": "Sergeant Marsh",
-        "title": "Town Militia",
-        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
+        "name": "马什中士",
+        "title": "城镇民兵",
+        "greeting": "受过训练？那今晚就这么办。我的防线守住大路。要是裂隙吐出我们压不住的东西，我就指向你。磨坊交给你：别让任何东西跟着你进去，也别让任何东西越过我们进镇。去吧。"
       },
       "forgemistress_darva": {
         "name": "达尔瓦锻造师",
@@ -16391,18 +16391,18 @@ export const zh_CN: EnTranslations = {
         }
       },
       "q_lb_q0_ashore": {
-        "title": "Ashore",
-        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
-        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "title": "上岸",
+        "text": "鸥港日夜承受着裂口的冲击，却始终坚守。若你想与他们并肩，就从小镇流血的地方开始：守望草甸的民兵防线，在港口台阶和旧雕像以东。",
+        "completion": "磨坊那一战是你独自打下的，塔姆说的担架也毫不夸张。我缺一名斥候，田野却嫌太多。今晚你守住了本不属于你的阵地，而这正是这份职责的全部。欢迎加入守望队。",
         "objectives": {
           "0": {
-            "label": "Report to Sergeant Marsh at the Watch Meadow"
+            "label": "向守望草甸的马什中士报到"
           },
           "1": {
-            "label": "Riftspawn slain"
+            "label": "消灭裂隙孽生体"
           },
           "2": {
-            "label": "Put down whatever is in the Tidemill"
+            "label": "解决潮汐磨坊里的东西"
           }
         }
       },
@@ -16965,10 +16965,10 @@ export const zh_CN: EnTranslations = {
             "label": "裂野"
           },
           "5": {
-            "label": "The Breach"
+            "label": "裂口"
           },
           "6": {
-            "label": "The Wreckfields"
+            "label": "沉船滩"
           }
         }
       }
@@ -17010,49 +17010,49 @@ export const zh_CN: EnTranslations = {
         "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
       },
       "lb_tidemill": {
-        "name": "The Tidemill",
-        "enterText": "The mill door gives. Inside, the dark is listening.",
-        "leaveText": "You step out of the Tidemill into the evening air."
+        "name": "潮汐磨坊",
+        "enterText": "磨坊的门让开了。里面，黑暗正在聆听。",
+        "leaveText": "你走出潮汐磨坊，回到傍晚的空气中。"
       },
       "lb_riftline": {
-        "name": "The Rift-Line at Dusk",
-        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
-        "leaveText": "You leave the rift-line to the dawn watch."
+        "name": "暮色裂隙防线",
+        "enterText": "草甸大门在巡逻队身后关闭。今夜属于这道防线。",
+        "leaveText": "你把裂隙防线留给黎明守卫。"
       },
       "lb_vault": {
-        "name": "The Drowned First Redoubt",
-        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
-        "leaveText": "You come up the cliff rope into daylight."
+        "name": "沉没的第一堡垒",
+        "enterText": "绳索向黑暗中放下。下方，旧堡垒躺在它坠落之处。",
+        "leaveText": "你沿悬崖绳索爬回日光之下。"
       },
       "lb_council": {
-        "name": "The Redoubt Council",
-        "enterText": "The council room holds six chairs. One is empty.",
-        "leaveText": "You step out of the redoubt."
+        "name": "堡垒议会",
+        "enterText": "议事厅里摆着六把椅子。其中一把空着。",
+        "leaveText": "你走出堡垒。"
       },
       "lb_landing": {
-        "name": "The Landing at Night",
-        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
-        "leaveText": "You leave the Landing beach behind."
+        "name": "夜间登陆场",
+        "enterText": "引航火沿海滩渐次燃烧。舰队在浅滩之外等待。",
+        "leaveText": "你把登陆海滩留在身后。"
       },
       "lb_riftfields": {
-        "name": "The Riftfields Approach",
-        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
-        "leaveText": "You walk back down out of the Riftfields."
+        "name": "裂隙原进路",
+        "enterText": "四座守卫祭坛环绕着裂口。封裂仪式已经维系了十二个世纪。",
+        "leaveText": "你从裂隙原向山下走去。"
       },
       "lb_breach": {
-        "name": "Inside the Breach",
-        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
-        "leaveText": "You cross the threshold into ordinary night air."
+        "name": "裂隙之内",
+        "enterText": "光线不对，天空更糟。那颗核心就在前方的开阔地上。",
+        "leaveText": "你跨过门槛，回到寻常的夜空之下。"
       },
       "lb_lastwatch": {
-        "name": "The Last Watch",
-        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
-        "leaveText": "You close the redoubt door behind you."
+        "name": "最后守望",
+        "enterText": "堡垒干净而空荡。总得有人结束这场守望。",
+        "leaveText": "你在身后关上堡垒大门。"
       },
       "lb_willowfen": {
-        "name": "Willowweep",
-        "enterText": "The willow does not move. The water does not either.",
-        "leaveText": "You leave the willow to its quiet."
+        "name": "泣柳泽",
+        "enterText": "柳树纹丝不动。水面也是。",
+        "leaveText": "你离开柳树，任它继续沉寂。"
       },
       "dawnhold_castle": {
         "name": "晨曦堡",

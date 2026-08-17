@@ -397,8 +397,8 @@ export const ja_JP: EnTranslations = {
       "unavailable": "現在の状態ではスタック解除を使用できません。"
     },
     "scene": {
-      "skipHint": "Skip scene (Esc)",
-      "waitingFor": "Waiting for {name}",
+      "skipHint": "シーンをスキップ（Esc）",
+      "waitingFor": "{name}を待っています",
       "timer": "{seconds}s"
     },
     "fct": {
@@ -1094,7 +1094,7 @@ export const ja_JP: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
-      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
+      "buyReinsPrompt": "騎乗を習得した。マーラから10ゴールドでヴァロースティードの手綱を購入し、使用して騎乗しよう。",
       "ownedMountPrompt": "手綱はバッグの中にあります。使用すると騎乗できます。",
       "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
       "begin": "レッスン開始",
@@ -2818,11 +2818,11 @@ export const ja_JP: EnTranslations = {
       "empty": "何も貼られていないようだ。"
     },
     "memorial": {
-      "title": "Memorial",
-      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
-      "rollHeading": "Roll of Honour ({count})",
-      "roomRemaining": "The stone below the last name has been left bare.",
-      "close": "Close memorial"
+      "title": "記念碑",
+      "dedication": "封印を携えて裂け目へ入り、二度と戻らなかったカモメ港の守り手たちへ。町は彼らのためにこの鐘を守り続ける。",
+      "rollHeading": "栄誉の名簿（{count}）",
+      "roomRemaining": "最後の名の下の石面は、まだ空けられたままだ。",
+      "close": "記念碑を閉じる"
     },
     "bank": {
       "title": "銀行",
@@ -3843,34 +3843,34 @@ export const ja_JP: EnTranslations = {
   },
   "lb": {
     "fixture": {
-      "ferry": "The Farshore Ferry",
-      "tidemill": "The Tidemill",
-      "breach": "The Breach"
+      "ferry": "遠つ岸の渡し船",
+      "tidemill": "潮の水車小屋",
+      "breach": "破れ目"
     },
     "speaker": {
-      "tam": "Bellkeeper Tam",
-      "coalfast": "Warden Coalfast",
-      "ollun": "Riftwatch Ollun",
-      "edda": "Quartermaster Edda",
-      "saul": "Mender Saul"
+      "tam": "鐘守タム",
+      "coalfast": "守り手コールファスト",
+      "ollun": "裂け目見のオルン",
+      "edda": "兵站係エッダ",
+      "saul": "癒し手ソール"
     },
     "fare": {
-      "promptOut": "Passage to the Farshore: {price} copper.",
-      "promptBack": "Passage back to the mainland: {price} copper.",
-      "pay": "Pay the fare.",
-      "decline": "Not today."
+      "promptOut": "遠つ岸への渡し賃：銅貨{price}枚。",
+      "promptBack": "本土へ戻る渡し賃：銅貨{price}枚。",
+      "pay": "渡し賃を払う。",
+      "decline": "今日はやめておく。"
     },
     "q0": {
       "scene": {
-        "harbor": "A working harbor: nets drying, star-glass salvage crates stenciled for mainland buyers.",
-        "plinth": "Above the harbor steps a bronze warden faces inland. The newest name on the plinth is a century old: WARDEN HALE. There is room below it for more.",
-        "toll": "A bell tolls, once. Everyone in the street stops walking, and counts. Nothing follows, and the whole street exhales at once."
+        "harbor": "働く港。網が干され、星硝子のサルベージ箱には本土の買い手の刻印がある。",
+        "plinth": "港の石段の上で、青銅の守り手が内陸を向いて立つ。台座のいちばん新しい名は百年前のもの。ウォーデン・ヘイル。その下には、まだ名を刻む余白がある。",
+        "toll": "鐘がひとつ鳴る。通りの誰もが足を止め、数をかぞえる。何も続かず、通り全体がいっせいに息をつく。"
       },
       "tam": {
-        "stretchers": "The last one of those cost the whole watch a morning and two stretchers."
+        "stretchers": "ああいうのが前に出たときは、見張り全員の午前と担架二台が犠牲になった。"
       },
       "coalfast": {
-        "look": "The grey man looks at the dead stalker, then at you, slightly longer. Then he walks back toward the cliffs."
+        "look": "灰色の男は倒れたストーカーを見つめ、それからあなたを、ほんの少し長く見る。そして崖の方へ歩き去っていく。"
       }
     }
   },
@@ -6145,31 +6145,31 @@ export const ja_JP: EnTranslations = {
       "label": "ツールオプション"
     },
     "cinematic": {
-      "title": "Cinematic",
-      "show": "Show panel",
-      "hide": "Hide panel",
-      "scene": "Scene",
-      "sceneOption": "{id} ({seconds}s)",
-      "time": "Time",
-      "timeReadout": "{current} / {duration}s",
-      "play": "Play",
-      "pause": "Pause",
-      "authoredCamera": "Authored camera",
-      "fade": "Fade: {percent}%",
-      "letterboxOn": "Letterbox: on",
-      "letterboxOff": "Letterbox: off",
-      "violations": "Violations",
-      "noViolations": "No violations at this time",
-      "violationRow": "{check} | op {opIndex} | {measured}",
-      "capture": "Capture keyframe",
-      "copy": "Copy block",
-      "output": "Generated camera capture",
-      "unavailable": "3D viewport loading",
-      "seedMismatch": "Capture needs the shipping world seed",
-      "captureSavedCopied": "Saved and copied",
-      "captureSaved": "Saved; block ready below",
-      "captureCopyOnly": "Copied; dev writer unavailable",
-      "captureReady": "Block ready below"
+      "title": "シネマティック",
+      "show": "パネルを表示",
+      "hide": "パネルを隠す",
+      "scene": "シーン",
+      "sceneOption": "{id}（{seconds}秒）",
+      "time": "時間",
+      "timeReadout": "{current} / {duration}秒",
+      "play": "再生",
+      "pause": "一時停止",
+      "authoredCamera": "演出カメラ",
+      "fade": "フェード：{percent}%",
+      "letterboxOn": "レターボックス：オン",
+      "letterboxOff": "レターボックス：オフ",
+      "violations": "違反項目",
+      "noViolations": "現在、違反はありません",
+      "violationRow": "{check} | 操作 {opIndex} | {measured}",
+      "capture": "キーフレームを取得",
+      "copy": "ブロックをコピー",
+      "output": "生成されたカメラ取得データ",
+      "unavailable": "3Dビューポートを読み込み中",
+      "seedMismatch": "取得には正式なワールドシードが必要です",
+      "captureSavedCopied": "保存してコピーしました",
+      "captureSaved": "保存しました。下にブロックを表示しています",
+      "captureCopyOnly": "コピーしました。開発用ライターは利用できません",
+      "captureReady": "下にブロックを表示しています"
     },
     "brush": {
       "title": "ブラシ",
@@ -13802,22 +13802,22 @@ export const ja_JP: EnTranslations = {
         "name": "漁師ブラム"
       },
       "lb_actor_coalfast": {
-        "name": "Warden Coalfast"
+        "name": "守将コールファスト"
       },
       "lb_actor_ollun": {
-        "name": "Riftwatch Ollun"
+        "name": "裂け目監視のオルン"
       },
       "lb_actor_edda": {
-        "name": "Quartermaster Edda"
+        "name": "補給将校エッダ"
       },
       "lb_actor_saul": {
-        "name": "Mender Saul"
+        "name": "癒し手サウル"
       },
       "lb_actor_tam": {
-        "name": "Bellkeeper Tam"
+        "name": "鐘守タム"
       },
       "tidemill_stalker": {
-        "name": "The Tidemill Stalker"
+        "name": "潮挽き水車場の追跡者"
       },
       "rift_hellguard": {
         "name": "ヘルガード"
@@ -14380,19 +14380,19 @@ export const ja_JP: EnTranslations = {
         "greeting": "網を干す、まさにあの場所で開いたんだ。あそこだよ、私が生まれてからずっと毎朝立っていた場所さ。もう岸へは下りない。もう、どこへもろくに行かなくなっちまった。"
       },
       "ferryman_ewald": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "渡し守エーヴァルト",
+        "title": "対岸への渡し",
+        "greeting": "遠つ岸へ行くのかい？なあ、いまどき漁のために海を渡る者はいない。支度ができたら乗りな。着いたら鐘の音に気をつけろ。町の連中は、あんたが空模様を読むように鐘を聴くんだ。"
       },
       "ferryman_ewald_gullhaven": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "渡し守エーヴァルト",
+        "title": "対岸への渡し",
+        "greeting": "遠つ岸へ行くのかい？なあ、いまどき漁のために海を渡る者はいない。支度ができたら乗りな。着いたら鐘の音に気をつけろ。町の連中は、あんたが空模様を読むように鐘を聴くんだ。"
       },
       "sergeant_marsh": {
-        "name": "Sergeant Marsh",
-        "title": "Town Militia",
-        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
+        "name": "マーシュ軍曹",
+        "title": "町の民兵",
+        "greeting": "訓練は済んだな？なら今夜の段取りだ。俺の隊列が街道を守る。裂け目が手に負えんものを吐き出したら、俺はお前を指す。水車小屋はお前に任せる。何もお前を追わせるな。何も俺たちを抜けて町へ行かせるな。行け。"
       },
       "forgemistress_darva": {
         "name": "鍛冶長ダルヴァ",
@@ -16391,18 +16391,18 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_lb_q0_ashore": {
-        "title": "Ashore",
-        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
-        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "title": "上陸",
+        "text": "カモメ港は昼も夜も裂け目の襲撃に耐え、なお持ちこたえている。共に立つ気なら、町が血を流す場所から始めろ。見張りの草原の民兵線だ。港の石段と古い像の東にある。",
+        "completion": "水車小屋の討伐はお前ひとりの手柄だ。タムの担架の話も誇張ではない。斥候は足りず、守る畑は多すぎる。今夜お前は、守る義理のなかった地を守り抜いた。それがこの仕事のすべてだ。見張り隊へようこそ。",
         "objectives": {
           "0": {
-            "label": "Report to Sergeant Marsh at the Watch Meadow"
+            "label": "見張り草地のマーシュ軍曹に報告する"
           },
           "1": {
-            "label": "Riftspawn slain"
+            "label": "裂け目の落とし子を倒す"
           },
           "2": {
-            "label": "Put down whatever is in the Tidemill"
+            "label": "潮挽き水車場にいる何かを始末する"
           }
         }
       },
@@ -16965,10 +16965,10 @@ export const ja_JP: EnTranslations = {
             "label": "裂け目野"
           },
           "5": {
-            "label": "The Breach"
+            "label": "破れ目"
           },
           "6": {
-            "label": "The Wreckfields"
+            "label": "難破の原"
           }
         }
       }
@@ -17010,49 +17010,49 @@ export const ja_JP: EnTranslations = {
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
       },
       "lb_tidemill": {
-        "name": "The Tidemill",
-        "enterText": "The mill door gives. Inside, the dark is listening.",
-        "leaveText": "You step out of the Tidemill into the evening air."
+        "name": "潮挽き水車場",
+        "enterText": "水車場の扉が開く。中では、闇が耳を澄ませている。",
+        "leaveText": "潮挽き水車場を出て、夕暮れの空気へ戻る。"
       },
       "lb_riftline": {
-        "name": "The Rift-Line at Dusk",
-        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
-        "leaveText": "You leave the rift-line to the dawn watch."
+        "name": "黄昏の裂け目防衛線",
+        "enterText": "草原の門が巡回隊の背後で閉じる。今夜は防衛線のものだ。",
+        "leaveText": "裂け目防衛線を夜明けの見張りに任せる。"
       },
       "lb_vault": {
-        "name": "The Drowned First Redoubt",
-        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
-        "leaveText": "You come up the cliff rope into daylight."
+        "name": "水没した第一要塞",
+        "enterText": "縄が闇へと繰り出されていく。眼下には、崩れ落ちたままの古い砦が横たわる。",
+        "leaveText": "崖の縄を登り、日の光の中へ戻る。"
       },
       "lb_council": {
-        "name": "The Redoubt Council",
-        "enterText": "The council room holds six chairs. One is empty.",
-        "leaveText": "You step out of the redoubt."
+        "name": "要塞評議会",
+        "enterText": "評議室には椅子が六脚ある。一脚だけ空いている。",
+        "leaveText": "要塞の外へ出る。"
       },
       "lb_landing": {
-        "name": "The Landing at Night",
-        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
-        "leaveText": "You leave the Landing beach behind."
+        "name": "夜の上陸地",
+        "enterText": "導き火が浜辺を焼く。船団は浅瀬の向こうで待っている。",
+        "leaveText": "上陸浜を後にする。"
       },
       "lb_riftfields": {
-        "name": "The Riftfields Approach",
-        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
-        "leaveText": "You walk back down out of the Riftfields."
+        "name": "裂け野への道",
+        "enterText": "四つの護りの祭場が裂け目を囲む。儀式は十二の世紀にわたりそれを閉ざしてきた。",
+        "leaveText": "裂け野を下って戻る。"
       },
       "lb_breach": {
-        "name": "Inside the Breach",
-        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
-        "leaveText": "You cross the threshold into ordinary night air."
+        "name": "裂け目の内側",
+        "enterText": "光がおかしく、空はそれ以上におかしい。核心はこの先の開けた地にある。",
+        "leaveText": "境を越え、いつもの夜気へ戻る。"
       },
       "lb_lastwatch": {
-        "name": "The Last Watch",
-        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
-        "leaveText": "You close the redoubt door behind you."
+        "name": "最後の見張り",
+        "enterText": "砦は片付き、人けがない。誰かがこの見張りを終わらせねばならない。",
+        "leaveText": "背後で要塞の扉を閉じる。"
       },
       "lb_willowfen": {
-        "name": "Willowweep",
-        "enterText": "The willow does not move. The water does not either.",
-        "leaveText": "You leave the willow to its quiet."
+        "name": "泣き柳沼",
+        "enterText": "柳は動かない。水もまた動かない。",
+        "leaveText": "柳を静寂の中に残して立ち去る。"
       },
       "dawnhold_castle": {
         "name": "ドーンホールド城",

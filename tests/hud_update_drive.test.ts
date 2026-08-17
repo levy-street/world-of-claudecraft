@@ -1655,7 +1655,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // release's own window/chrome churn), so it cannot be reconciled by
       // arithmetic across a merge. The numbers below were set from a suite run
       // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 47, chrome: 82, none: 17 });
+      // window 47 -> 48 on the Last Bell merge: the memorial plaque window row.
+    ).toEqual({ window: 48, chrome: 82, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1677,7 +1678,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // char_window painter holds no signature of its own to diff.
       hud: 7,
       callsite: 12,
-      none: 4,
+      // 5 = the Last Bell memorial plaque window: a cold, event-opened window
+      // (the sim's memorial event) with no repeating repaint, so no guard.
+      none: 5,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.

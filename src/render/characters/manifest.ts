@@ -193,6 +193,15 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   emote: KAYKIT_EMOTES,
 });
 
+// The Last Bell cast and break-spawned bodies were exported from the KayKit
+// rigs BEFORE the base's re-export added Hit_B_Stagger to every stock GLB, so
+// the bespoke files carry Hit_A alone. Re-exporting twelve hand-finished
+// bodies for a second flinch is not worth it; the single hit clip is correct.
+const lastBellKaykit = (attack: string[]): ClipMap => ({
+  ...kaykit(attack),
+  hit: ['Hit_A'],
+});
+
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
   ...kaykit(attack, 'Idle_Combat'),
   flourish,
@@ -2703,7 +2712,7 @@ export const VISUALS: Record<string, VisualDef> = {
   npc_coalfast: {
     url: `${NPCS_DIR}/coalfast.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
   },
   // His finale form: the same body and clips with the helm closed and the crest
   // Hale's memorial figure wears. Lazy: it is only ever placed inside the campaign's
@@ -2711,7 +2720,7 @@ export const VISUALS: Record<string, VisualDef> = {
   npc_coalfast_helm: {
     url: `${NPCS_DIR}/coalfast_helm.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     lazyPreload: true,
   },
   // The open journal is gone from his off hand on purpose: carried out in front it
@@ -2721,36 +2730,36 @@ export const VISUALS: Record<string, VisualDef> = {
   npc_ollun: {
     url: `${NPCS_DIR}/ollun.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['2H_Melee_Attack_Chop']),
+    clips: lastBellKaykit(['2H_Melee_Attack_Chop']),
   },
   npc_edda: {
     url: `${NPCS_DIR}/edda.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop']),
   },
   npc_saul: {
     url: `${NPCS_DIR}/saul.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop']),
   },
   // Tam's bell-striker is bespoke GEOMETRY on the body, not an attach: no shipped
   // weapon reads as one, and the campaign hands you that exact object afterwards.
   npc_tam: {
     url: `${NPCS_DIR}/tam.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop']),
   },
   npc_nell: {
     url: `${NPCS_DIR}/nell.glb`,
     // Shorter than every adult on the island: she is Bren's daughter, and the
     // scale is doing characterisation, not just documentation.
     height: HUMANOID_H * 0.865,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop']),
   },
   npc_ewald: {
     url: `${NPCS_DIR}/ewald.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop']),
   },
   // A militia sergeant with a sword and NO shield, which is the whole separation from
   // Coalfast: they share this body and stand two POIs apart, so the warden keeps the
@@ -2763,7 +2772,7 @@ export const VISUALS: Record<string, VisualDef> = {
   npc_marsh: {
     url: `${NPCS_DIR}/marsh.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
   },
 
   // -- The break-spawned -----------------------------------------------------
@@ -2781,12 +2790,13 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_riftspawn: {
     url: `${NPCS_DIR}/riftspawn_antler.glb`,
     height: 2.1,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
   },
   mob_breach_wretch: {
     url: `${NPCS_DIR}/breach_wretch.glb`,
     height: 2.1,
-    clips: skeletonClips(['1H_Melee_Attack_Chop']),
+    // Same pre-stagger export as the cast above: Hit_A is the file's one flinch.
+    clips: { ...skeletonClips(['1H_Melee_Attack_Chop']), hit: ['Hit_A'] },
   },
   // Off the skeleton golem, which read as forged, fitted, painted armour and so
   // implied a smith and a culture: exactly wrong for something a break spat out.
@@ -2802,7 +2812,7 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_sundered_horror: {
     url: `${NPCS_DIR}/sundered_horror_thicket.glb`,
     height: 2.8,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: lastBellKaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
   },
 
   // -- NPCs ------------------------------------------------------------------
