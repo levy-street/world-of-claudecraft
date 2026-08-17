@@ -39,7 +39,11 @@ const REPO_ROOT = path.join(__dirname, '..');
 // 0.185.1 bump): the lockfile moved again, the shipping GLB extras were
 // restamped in place (byte counts held), and the sha pins follow the
 // restamped bytes. No farm source file changed.
-const SOURCE_FINGERPRINT = 'eb34fbb1ef6a13fa269aef5286ab7c4048880cb39d5efdbc79858f740b10d34a';
+// Re-minted again at the seventeenth absorb (release/v0.39.0 tip f48c7a3a9b,
+// the castle and icon-art batch): the lockfile moved again (ten lines), the
+// same in-place restamp of both stamp sites per GLB, byte counts held, sha
+// pins re-recorded from the restamped bytes. No farm source file changed.
+const SOURCE_FINGERPRINT = 'a6855bc0aa412198ea367e40990f0ff28cb043d7dc3ca53974502ee3e726be9a';
 const SET_BYTES = 174_844;
 const PER_ASSET_BYTE_CEILING = 35 * 1024;
 const TRIANGLE_CEILING = 1_200;
@@ -85,105 +89,105 @@ interface AssetPin {
 const PINS: Readonly<Record<string, AssetPin>> = {
   farm_bed: {
     bytes: 6_880,
-    sha256: 'e45c89da2cbae422b1895f5effee74e5dc74a687f40226f76c3a54f3024557d3',
+    sha256: '11a2d2af758dfaa0f903654e3dc2af539dc9e9a39bcf6871f75453579bbdecc9',
     triangles: 228,
     footprintYd: [3, 2],
     heightYd: 0.34,
   },
   farm_sprout: {
     bytes: 5_168,
-    sha256: 'd928982b6c043cb824275f235b818272fb2d9b53821979b311b01648319a7d6e',
+    sha256: 'db70b2e7755f3cdf1ec3b93b59976c7c94fa59fe124e121705ff041affee3520',
     triangles: 108,
     footprintYd: [1.67, 0.97],
     heightYd: 0.25,
   },
   farm_grain_stage2: {
     bytes: 5_248,
-    sha256: 'f4ff3b9113934f6ae8cb01a6900f6455f029420230f223e739d68f206273c108',
+    sha256: '8a65d192dbbafac6c22af42db493dfda834ab52ca7e7cbda7412d864940554ba',
     triangles: 108,
     footprintYd: [1.81, 1.04],
     heightYd: 0.42,
   },
   farm_rootleaf_stage2: {
     bytes: 8_792,
-    sha256: 'eb7204d88aa0188293aefe83f87b119f52ec488576946b3e9baab61e930961e4',
+    sha256: 'e16a033062bf24b4b68e53e81fb4e6eeaa38461957f0a911bec2c08f4cfa470e',
     triangles: 240,
     footprintYd: [1.61, 1.31],
     heightYd: 0.22,
   },
   farm_gourd_stage2: {
     bytes: 9_580,
-    sha256: '60c85761656cddcf01c7be12395dc2892b31d2f4ee5910e4dc9de74192b42beb',
+    sha256: '7da1eda7683ead6e701f9bc5c4c676c7c5c656dc24ff9e320b3079c44c0d096c',
     triangles: 360,
     footprintYd: [1.8, 1.16],
     heightYd: 0.09,
   },
   farm_grain_stage3: {
     bytes: 10_988,
-    sha256: 'd3be526de12d831377b8423fe17a4016628cb4c559b0660d0cad9eed13141882',
+    sha256: 'f7586c2a53c6a092a67488d4ebe57bc73233c3c88df27f9e0f0313853f2bbf89',
     triangles: 288,
     footprintYd: [1.91, 1.31],
     heightYd: 0.82,
   },
   farm_rootleaf_stage3: {
     bytes: 17_776,
-    sha256: '965afd204c595da8844e1e666498a6ebcc9e1c04a3512cb45bdcf5f84478703e',
+    sha256: '0bc014dbca511ae8ed7a3eb8eba93168a65d53ed5bf702db7fa3c3867dda30e9',
     triangles: 540,
     footprintYd: [2.16, 1.49],
     heightYd: 0.37,
   },
   farm_gourd_stage3: {
     bytes: 16_460,
-    sha256: '4c6ccff3f20cde2a0d41e956f8901fd66e780a196221f2307db1a15efc2bf3bc',
+    sha256: '5124f2bcebed5c2b28b4def319bb41e52738b936bb9883ce5d6a1db18e37b941',
     triangles: 612,
     footprintYd: [2.46, 1.5],
     heightYd: 0.18,
   },
   farm_grain_stage4: {
     bytes: 12_212,
-    sha256: '1ec0eacfac4344f15478836cd3ff5bfece3824c71be6c195a198bc6ecdc61212',
+    sha256: '8d4870ef3f498de6fae231c4c61bfd00dd22f06f2bc16c282e2d4c1f0a727a20',
     triangles: 336,
     footprintYd: [2.54, 1.38],
     heightYd: 1.07,
   },
   farm_rootleaf_stage4: {
     bytes: 22_308,
-    sha256: '54ca407dfc16aa90e1dc7b27d7d2ef00a742f679126aa5f92e034dcaf82b5ecd',
+    sha256: '59a286872236b3f35c9efdc0ce8deb801ef2633c07ed471340a92c7f1f6c6003',
     triangles: 720,
     footprintYd: [2.72, 1.71],
     heightYd: 0.58,
   },
   farm_gourd_stage4: {
     bytes: 16_740,
-    sha256: 'a149dca0b948ff941a01bea5bab867286a399ed9d50011bd65e4432d8d3a9deb',
+    sha256: '149508b02b9d752c32a84ced562c9e8b367881c8b9937a83e5a6b4e79cc84ddb',
     triangles: 620,
     footprintYd: [2.63, 1.61],
     heightYd: 0.4,
   },
   farm_grain_withered: {
     bytes: 9_656,
-    sha256: 'ee65312bef7f04e4631482ee016ce56866b3ce4d5e2d0d42e7ad1930a590ef4a',
+    sha256: '7a95f4f25065704070065ad49613fc506d21fc2bafaf2484a0afd26acc1d6a09',
     triangles: 288,
     footprintYd: [2.17, 1.36],
     heightYd: 0.66,
   },
   farm_rootleaf_withered: {
     bytes: 11_724,
-    sha256: 'ab1d4535ae27cc97df09535d0af130f0cdc232dc06474bfdb0942ed33396068f',
+    sha256: 'aadbcf6e5f57c75c92c9b7e376d8573d5c30c7caaefaf040fc884cd7daa7afa9',
     triangles: 360,
     footprintYd: [2.12, 1.47],
     heightYd: 0.24,
   },
   farm_gourd_withered: {
     bytes: 13_872,
-    sha256: '9a0dcc3ddc43f4e4b1e155e5087f5100cbdc9191849de59d428673199eab0496',
+    sha256: '032e3676be85f4f85c44b918a370a9727fb9b67cd31660fb294745cbbf99a8eb',
     triangles: 576,
     footprintYd: [2.43, 1.42],
     heightYd: 0.14,
   },
   farm_compost_bin: {
     bytes: 7_440,
-    sha256: '66646afd0c96c9818a953c3669d34dad275dd541a277c950dfb0a025a3dbbf98',
+    sha256: '87da61275406dd3772825f8f30aa658525dfc9b2a64a6a959ddf45961902164d',
     triangles: 264,
     footprintYd: [1, 1],
     heightYd: 0.8,
