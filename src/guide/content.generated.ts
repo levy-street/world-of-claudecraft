@@ -11798,7 +11798,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "tier": 1,
         "quality": "common",
         "priceCopper": 20,
-        "vendors": []
+        "vendors": [
+          {
+            "name": "Farmer Jessica",
+            "hub": "Eastbrook"
+          }
+        ]
       },
       {
         "name": "Bronze Hoe",

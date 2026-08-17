@@ -1010,9 +1010,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // produce, fine twin. VALUES ARE PROVISIONAL and flagged for the
   // maintainer, following the locked pricing table.
   //
-  // Vendor status is DORMANT BY CHOICE, exactly the vale_wheat block's
-  // model: tier 1 and 2 seeds carry their buyValue now for the Phase 9
-  // farmer-NPC stocking (no vendorItems list names one until then), tier 3
+  // Vendor status follows the vale_wheat block's model: tier 1 and 2 seeds
+  // carry their buyValue and sit on the farmer NPCs' counters (the go-live:
+  // farmer_jessica and farmer_teasel, where their tier is farmed), tier 3
   // and 4 seeds carry none (supply is drop and market side by design), and
   // produce carries none, with ONE exception: brook_carrot, the D9 starter
   // fee vegetable, is vendor-priced so the watch-fee loop can be paid from

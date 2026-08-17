@@ -1936,9 +1936,9 @@ describe('Guide professions gathering accuracy', () => {
         // beds are patch content, never nodes), so the node aggregation stays
         // EMPTY on purpose and no respawn number ever publishes. The tool
         // ladder is the aggregation's real farming output since the Phase 5
-        // hoes: the four rungs, rung 1 the only priced one (dormant-by-choice
-        // vendor state; the row-by-row mirror below owns the rest of the
-        // fields).
+        // hoes: the four rungs, rung 1 the only priced one (seated on the
+        // tier-1 farmer NPC since the go-live; the row-by-row mirror below
+        // owns the rest of the fields).
         expect(g.nodes).toEqual([]);
         expect((g.tools ?? []).map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
           ['Garden Hoe', 1, 20],
@@ -1994,19 +1994,13 @@ describe('Guide professions gathering accuracy', () => {
       expect(rows[0].quality).toBe(def.quality ?? 'common');
       expect(rows[0].priceCopper).toBe(def.buyValue ?? null);
       if (def.buyValue != null) {
-        if (use.professionId === 'farming') {
-          // DORMANT BY CHOICE until the Phase 9 go-live: the garden hoe is
-          // vendor-PRICED from Phase 5 but no farmer NPC stocks it yet, so
-          // the page truthfully shows the price with no counter. The
-          // no-vendor state is pinned positively by the farming dormant arm
-          // in tests/professions_zone_rollout.test.ts; never extend this
-          // narrowing to the three node professions or to fishing.
-          expect(rows[0].vendors, `farming tool "${itemId}" must list no counter yet`).toEqual([]);
-        } else {
-          const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
-          expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
-          expect(rows[0].vendors.length).toBeGreaterThan(0);
-        }
+        // Every vendor-priced tool has a counter, the farming garden hoe
+        // included since the go-live seated it on the tier-1 farmer (the
+        // priced-but-unstocked narrowing this branch used to carry is gone;
+        // tests/professions_zone_rollout.test.ts pins the farmer stock).
+        const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
+        expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
+        expect(rows[0].vendors.length).toBeGreaterThan(0);
       } else {
         expect(rows[0].craftedBy).toBe(
           ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,
