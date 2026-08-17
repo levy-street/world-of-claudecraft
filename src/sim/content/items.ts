@@ -605,9 +605,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // has no nodes. Their pricing belongs with the rest of the fishing work.
   //
   // The three TIER-1 tools carry BOTH noVendorSell and noMarketList, and only
-  // those three. The gather quests hand a pick or a sickle over through
-  // requiredItems (zone1.ts), re-granting a missing one on accept, and
-  // q_prof_hobby_switch is repeatable, so the grant needs both flags:
+  // those three among the land tools (garden_hoe, the farming rung-one tool
+  // below, joined them at the farming go-live for the same reason: q_farm_intro
+  // hands it over through requiredItems). The gather quests hand a pick or a
+  // sickle over through requiredItems (zone1.ts), re-granting a missing one
+  // on accept, and q_prof_hobby_switch is repeatable, so the grant needs both
+  // flags:
   //
   // - noVendorSell closes the copper MINT. Without it, accept, sell for 4,
   //   abandon, repeat prints copper out of nothing.
@@ -925,13 +928,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   //
   // Husks carry NO buyValue on purpose: a vendor row without one renders and
   // then refuses, and they are not meant to be vendor-obtainable. Tier 1 and
-  // 2 seeds carry a positive buyValue per the locked pricing table, DORMANT
-  // BY CHOICE until the farmer NPCs stock them in the go-live phase (no
-  // vendorItems list names any seed yet); tier 3 and 4 seeds are
-  // deliberately never vendor-obtainable (drop and market supply only).
+  // 2 seeds carry a positive buyValue per the locked pricing table and sit
+  // on the farmer NPCs' counters (the go-live: farmer_jessica and
+  // farmer_teasel, where their tier is farmed); tier 3 and 4 seeds are
+  // deliberately never vendor-obtainable (seed-back and market supply only).
   // Produce follows the node materials' convention exactly (kind junk so it
   // browses under the market's material filter, common quality so
   // sellAllJunk never vendors it).
+  //
+  // vale_wheat_seed ALONE carries noVendorSell and noMarketList: q_farm_intro
+  // (zone1.ts) hands one over through requiredItems and re-grants a missing
+  // one on every giver talk while the quest is active, so like the
+  // quest-granted tier-1 tools the grant needs the copper mint (sell for 1,
+  // talk, sell again) and the market/mail route closed (the requiredItems
+  // fence in tests/professions_starter_tools.test.ts). Its value is spent by
+  // sowing it, which is the only thing the grant is for; the other seeds are
+  // bought or grown, never granted, and stay sellable and listable.
   vale_wheat_seed: {
     id: 'vale_wheat_seed',
     name: 'Vale Wheat Seed',
@@ -939,6 +951,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 1,
     buyValue: 4,
+    noVendorSell: true,
+    noMarketList: true,
   },
   vale_wheat: {
     id: 'vale_wheat',
@@ -1259,11 +1273,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // row this phase. FLAGGED FOR THE MAINTAINER: whether the Marks shop should
   // gain a hoe row later as the non-crafter route.
   //
-  // garden_hoe carries NO noVendorSell/noMarketList: those flags exist to
-  // close quest-grant mints and ONLY the three quest-granted tier-1 tools
-  // carry them (the banner above); no quest grants a hoe. If a farming
-  // starter quest ever hands one over through requiredItems, both flags must
-  // be added in that same change.
+  // garden_hoe carries BOTH noVendorSell and noMarketList since the farming
+  // go-live: q_farm_intro (zone1.ts) hands it over through requiredItems,
+  // re-granting a missing one on accept and on every giver talk, so like the
+  // three quest-granted tier-1 tools (the banner above) the grant needs the
+  // copper mint and the market/mail route closed (tests/
+  // professions_starter_tools.test.ts sweeps every requiredItems quest for
+  // exactly this fence). The crafted rungs below are never granted and stay
+  // sellable and listable.
   garden_hoe: {
     id: 'garden_hoe',
     name: 'Garden Hoe',
@@ -1272,6 +1289,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'farming', tier: 1 },
     sellValue: 4,
     buyValue: 20,
+    noVendorSell: true,
+    noMarketList: true,
   },
   bronze_hoe: {
     id: 'bronze_hoe',
