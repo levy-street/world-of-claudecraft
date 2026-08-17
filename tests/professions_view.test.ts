@@ -72,9 +72,14 @@ const attunedIdentity = identity({
   amendsRequired: 11,
 });
 
-function view(id: CraftingIdentityView, gathering: ProfessionsViewInput['gathering'] = []) {
+function view(
+  id: CraftingIdentityView,
+  gathering: ProfessionsViewInput['gathering'] = [],
+  farmPlotCount = 0,
+) {
   return buildProfessionsView({
     viewerName: 'Testchar',
+    farmPlotCount,
     identity: id,
     gathering,
     toolEffects: [],
@@ -148,6 +153,7 @@ describe('buildProfessionsView: model construction', () => {
     it('attaches to the matching profession and leaves the others null', () => {
       const model = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot()],
@@ -174,6 +180,7 @@ describe('buildProfessionsView: model construction', () => {
     it('marks a zero-charge slot spent, and only a zero-charge one', () => {
       const spent = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ charges: 0 })],
@@ -182,6 +189,7 @@ describe('buildProfessionsView: model construction', () => {
       expect(spent.gathering[0].effect?.spent).toBe(true);
       const oneLeft = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ charges: 1 })],
@@ -193,6 +201,7 @@ describe('buildProfessionsView: model construction', () => {
     it('DROPS an effect naming a profession with no row, rather than painting an orphan', () => {
       const model = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ professionId: 'fishing' })],
@@ -209,6 +218,7 @@ describe('buildProfessionsView: model construction', () => {
       // authority instead of re-deriving the gates.
       const model = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [],
@@ -229,6 +239,7 @@ describe('buildProfessionsView: model construction', () => {
       const withPick = (charges: number, inventory: { itemId: string; count: number }[]) =>
         buildProfessionsView({
           viewerName: 'Testchar',
+          farmPlotCount: 0,
           identity: attunedIdentity,
           gathering,
           toolEffects: [slot({ charges, maxCharges: 20 })],
@@ -258,6 +269,7 @@ describe('buildProfessionsView: model construction', () => {
       // no_gain, so the view must render NO button.
       const phantom = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [fullSelfSlot],
@@ -271,6 +283,7 @@ describe('buildProfessionsView: model construction', () => {
       // refusal, so still no button.
       const downgrade = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [fullSelfSlot],
@@ -284,6 +297,7 @@ describe('buildProfessionsView: model construction', () => {
       // provenance upgrade the server accepts, so the button must render.
       const upgrade = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [{ ...fullSelfSlot, selfCrafted: false }],
@@ -300,6 +314,7 @@ describe('buildProfessionsView: model construction', () => {
       // moves items around; a regression to bag order flips this pair.
       const model = buildProfessionsView({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [],
@@ -317,6 +332,7 @@ describe('buildProfessionsView: model construction', () => {
       // same-id same-count change in any of them must repaint the buttons.
       const base = {
         viewerName: 'Testchar' as const,
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ selfCrafted: true })],
@@ -339,6 +355,7 @@ describe('buildProfessionsView: model construction', () => {
       const renamed = professionsRefreshSig({
         ...base,
         viewerName: 'Freshname',
+        farmPlotCount: 0,
         inventory: [{ itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } }],
       });
       expect(renamed).not.toBe(own);
@@ -347,6 +364,7 @@ describe('buildProfessionsView: model construction', () => {
     it('the refresh signature moves when a charm or tool enters the bags', () => {
       const base = {
         viewerName: 'Testchar' as const,
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot()],
@@ -374,6 +392,7 @@ describe('buildProfessionsView: model construction', () => {
       // whatever it read when some OTHER field last moved it.
       const before = professionsRefreshSig({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot()],
@@ -381,6 +400,7 @@ describe('buildProfessionsView: model construction', () => {
       });
       const after = professionsRefreshSig({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ charges: 11 })],
@@ -392,6 +412,7 @@ describe('buildProfessionsView: model construction', () => {
       expect(
         professionsRefreshSig({
           viewerName: 'Testchar',
+          farmPlotCount: 0,
           identity: attunedIdentity,
           gathering,
           toolEffects: [slot()],
@@ -733,6 +754,75 @@ describe('switch cost', () => {
   });
 });
 
+describe('simplified-mode gathering rows (deviation (be), the Harvest Journal entry)', () => {
+  const rows = [
+    { professionId: 'mining', skill: 30, maxSkill: 100 },
+    { professionId: 'farming', skill: 0, maxSkill: 100 },
+    { professionId: 'herbalism', skill: 0, maxSkill: 100 },
+  ];
+  const unattuned = () => identity({ craftSkills: { ...ZERO_SKILLS, cooking: 10 } });
+
+  it('is EMPTY in full mode, where the whole gathering list paints', () => {
+    const model = view(attunedIdentity, rows, 3);
+    expect(model.mode).toBe('full');
+    expect(model.simplifiedGathering).toEqual([]);
+    expect(model.gathering.map((r) => r.professionId)).toEqual(['mining', 'farming', 'herbalism']);
+  });
+
+  it('keeps only the WORKED rows in simplified mode, injected order preserved', () => {
+    const model = view(unattuned(), rows);
+    expect(model.mode).toBe('simplified');
+    expect(model.simplifiedGathering.map((r) => r.professionId)).toEqual(['mining']);
+    // The full list is still there for whoever wants it; the two never alias.
+    expect(model.gathering).toHaveLength(3);
+  });
+
+  it('is empty for a fresh character (every gathering skill 0, nothing planted)', () => {
+    const fresh = rows.map((r) => ({ ...r, skill: 0 }));
+    expect(view(unattuned(), fresh).simplifiedGathering).toEqual([]);
+    expect(view(unattuned(), []).simplifiedGathering).toEqual([]);
+  });
+
+  it('adds the Farming row while ANY bed is planted, even at skill 0', () => {
+    // The first growth cycle: seed in the ground, no harvest yet, skill 0.
+    // The journal exists for exactly this moment, so its in-window entry
+    // must reach the farmer before the first skill point does.
+    const model = view(unattuned(), rows, 1);
+    expect(model.simplifiedGathering.map((r) => r.professionId)).toEqual(['mining', 'farming']);
+    // Only farming earns the planted-bed arm: another skill-0 row stays hidden.
+    expect(model.simplifiedGathering.some((r) => r.professionId === 'herbalism')).toBe(false);
+  });
+
+  it('shows the Farming row through skill alone once a crop has been brought in', () => {
+    const worked = rows.map((r) => (r.professionId === 'farming' ? { ...r, skill: 1 } : r));
+    expect(view(unattuned(), worked, 0).simplifiedGathering.map((r) => r.professionId)).toEqual([
+      'mining',
+      'farming',
+    ]);
+  });
+
+  it('applies the same rule while syncing (the other simplified trigger)', () => {
+    const model = view({ ...attunedIdentity, synced: false }, rows, 1);
+    expect(model.mode).toBe('simplified');
+    expect(model.simplifiedGathering.map((r) => r.professionId)).toEqual(['mining', 'farming']);
+  });
+
+  it('moves the refresh signature when the first bed is planted, and not on the second', () => {
+    const base = {
+      viewerName: 'Testchar',
+      identity: unattuned(),
+      gathering: rows,
+      toolEffects: [],
+      inventory: [],
+    };
+    const none = professionsRefreshSig({ ...base, farmPlotCount: 0 });
+    const one = professionsRefreshSig({ ...base, farmPlotCount: 1 });
+    const two = professionsRefreshSig({ ...base, farmPlotCount: 2 });
+    expect(one).not.toBe(none);
+    expect(two).toBe(one);
+  });
+});
+
 describe('progressive disclosure', () => {
   it('simplifies while unattuned with every craft below tier 1', () => {
     const model = view(identity({ craftSkills: { ...ZERO_SKILLS, cooking: 10 } }));
@@ -793,6 +883,7 @@ describe('professionsRefreshSig', () => {
   function input(over: Partial<CraftingIdentityView> = {}): ProfessionsViewInput {
     return {
       viewerName: 'Testchar',
+      farmPlotCount: 0,
       identity: identity({ craftSkills: { ...ZERO_SKILLS, cooking: 30 }, ...over }),
       gathering,
       toolEffects: [],
@@ -818,6 +909,7 @@ describe('professionsRefreshSig', () => {
     expect(
       professionsRefreshSig({
         viewerName: 'Testchar',
+        farmPlotCount: 0,
         identity: identity({ craftSkills: { cooking: 30 } }),
         gathering,
         toolEffects: [],

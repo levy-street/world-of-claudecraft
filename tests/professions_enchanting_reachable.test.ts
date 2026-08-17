@@ -34,6 +34,7 @@ describe('professions wheel: enchanting is reachable', () => {
   it('renders an enchanting craft row whose bar reflects craftSkills.enchanting', () => {
     const model = buildProfessionsView({
       viewerName: 'Testchar',
+      farmPlotCount: 0,
       toolEffects: [],
       inventory: [],
       identity: identity({ enchanting: 40, weaponcrafting: 10 }),
@@ -49,6 +50,7 @@ describe('professions wheel: enchanting is reachable', () => {
   it('moves the enchanting bar when the skill value moves', () => {
     const low = buildProfessionsView({
       viewerName: 'Testchar',
+      farmPlotCount: 0,
       identity: identity({ enchanting: 0 }),
       gathering: [],
       toolEffects: [],
@@ -56,6 +58,7 @@ describe('professions wheel: enchanting is reachable', () => {
     });
     const high = buildProfessionsView({
       viewerName: 'Testchar',
+      farmPlotCount: 0,
       identity: identity({ enchanting: 100 }),
       gathering: [],
       toolEffects: [],

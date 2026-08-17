@@ -69,6 +69,9 @@ interface WorldState {
   // input. Defaults to empty: no charms, no buttons, so the existing cases
   // keep asserting the button-free surface.
   inventory?: { itemId: string; count: number; instance?: { signer?: string } }[];
+  // The viewer's planted beds (IWorld `myFarmPlots`), the simplified body's
+  // Farming-row arm. Defaults to none, which is what every non-farmer reads.
+  farmPlots?: unknown[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (hero band,
@@ -131,6 +134,7 @@ function makeWindow(
         ),
         toolEffectSlots: state.toolEffects ?? [],
         inventory: state.inventory ?? [],
+        myFarmPlots: state.farmPlots ?? [],
         player: { name: 'Testchar' },
       }) as never,
     closeOthers: () => {},
@@ -282,6 +286,119 @@ describe('ProfessionsWindow: simplified call to action', () => {
   });
 });
 
+describe('ProfessionsWindow: the Harvest Journal entry (farming Phase 8, deviation (be))', () => {
+  const farmingRow = { professionId: 'farming', skill: 0, maxSkill: 100 };
+
+  /** A simplified-mode state: never attuned, every craft under the first
+   *  tier, so the identity paragraph and the ONE call to action paint. */
+  function simplifiedState(): WorldState {
+    const state = neverAttunedFullState();
+    state.identity.craftSkills = { cooking: 10 };
+    state.gathering = [];
+    return state;
+  }
+
+  it('renders the opener under the Farming row in full mode and routes its click to the dep', () => {
+    const state = baseState();
+    state.gathering = [{ professionId: 'mining', skill: 30, maxSkill: 300 }, farmingRow];
+    let opened = 0;
+    const { el } = makeWindow(state, {
+      openHarvestJournal: () => {
+        opened++;
+      },
+    });
+    const buttons = el.querySelectorAll<HTMLButtonElement>('button[data-harvest-journal]');
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0].textContent).toBe('Harvest Journal');
+    // Under the FARMING row, not the mining one.
+    expect(
+      buttons[0].closest('.prof-gather-row')?.querySelector('.prof-craft-name')?.textContent,
+    ).toBe('Farming');
+    buttons[0].click();
+    expect(opened).toBe(1);
+    // A reader, not a command: the click repaints nothing, so the very same
+    // button node is still there to press again.
+    expect(el.querySelector('button[data-harvest-journal]')).toBe(buttons[0]);
+    buttons[0].click();
+    expect(opened).toBe(2);
+  });
+
+  it('paints NO opener when the host has not wired the journal', () => {
+    const state = baseState();
+    state.gathering = [farmingRow];
+    const { el } = makeWindow(state);
+    expect(el.querySelector('.prof-gather-row')).not.toBeNull();
+    expect(el.querySelector('[data-harvest-journal]')).toBeNull();
+  });
+
+  it('never paints the opener under a non-farming row', () => {
+    const state = baseState();
+    state.gathering = [
+      { professionId: 'mining', skill: 30, maxSkill: 300 },
+      { professionId: 'herbalism', skill: 5, maxSkill: 300 },
+    ];
+    const { el } = makeWindow(state, { openHarvestJournal: () => {} });
+    expect(el.querySelectorAll('.prof-gather-row')).toHaveLength(2);
+    expect(el.querySelector('[data-harvest-journal]')).toBeNull();
+  });
+
+  it('reaches a pre-attunement farmer: simplified mode paints the worked Farming row and its opener', () => {
+    // The live-client finding this arm exists for: simplified mode painted no
+    // gathering section at all, so a farmer who had never crafted to tier 1
+    // had no in-window entry to the journal.
+    const state = simplifiedState();
+    state.gathering = [{ ...farmingRow, skill: 5 }];
+    let opened = 0;
+    const { el } = makeWindow(state, {
+      openHarvestJournal: () => {
+        opened++;
+      },
+    });
+    expect(el.querySelector('.prof-cta')).not.toBeNull();
+    expect(el.querySelector('.prof-hero')).toBeNull(); // still the simplified body
+    const row = mustQuery(el, '.prof-gathering .prof-gather-row');
+    expect(row.querySelector('.prof-craft-name')?.textContent).toBe('Farming');
+    const button = mustQuery(el, 'button[data-harvest-journal]') as HTMLButtonElement;
+    button.click();
+    expect(opened).toBe(1);
+  });
+
+  it('reaches a farmer whose FIRST crop is still growing (skill 0, a bed planted)', () => {
+    const state = simplifiedState();
+    state.gathering = [farmingRow];
+    state.farmPlots = [{ bedId: 'bed_eastbrook_1' }];
+    const { el } = makeWindow(state, { openHarvestJournal: () => {} });
+    expect(el.querySelector('.prof-gathering .prof-gather-row .prof-craft-name')?.textContent).toBe(
+      'Farming',
+    );
+    expect(el.querySelector('button[data-harvest-journal]')).not.toBeNull();
+  });
+
+  it('keeps a fresh character on the ONE call to action: no gathering section at all', () => {
+    const state = simplifiedState();
+    state.gathering = [
+      { professionId: 'mining', skill: 0, maxSkill: 300 },
+      farmingRow,
+      { professionId: 'herbalism', skill: 0, maxSkill: 300 },
+    ];
+    const { el } = makeWindow(state, { openHarvestJournal: () => {} });
+    expect(el.querySelector('.prof-cta')).not.toBeNull();
+    expect(el.querySelector('.prof-gathering')).toBeNull();
+    expect(el.querySelector('[data-harvest-journal]')).toBeNull();
+  });
+
+  it('paints only the WORKED rows in simplified mode (a miner sees Mining, not Farming)', () => {
+    const state = simplifiedState();
+    state.gathering = [{ professionId: 'mining', skill: 30, maxSkill: 300 }, farmingRow];
+    const { el } = makeWindow(state, { openHarvestJournal: () => {} });
+    const names = [...el.querySelectorAll('.prof-gathering .prof-craft-name')].map(
+      (n) => n.textContent,
+    );
+    expect(names).toEqual(['Mining']);
+    expect(el.querySelector('[data-harvest-journal]')).toBeNull();
+  });
+});
+
 describe('ProfessionsWindow: gathering rows', () => {
   it('renders one row per known gathering id and nothing for unknown ids', () => {
     const state = baseState();
@@ -420,6 +537,7 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
           professionsState: { skills: state.gathering },
           toolEffectSlots: [],
           inventory: state.inventory,
+          myFarmPlots: state.farmPlots ?? [],
           player: { name: 'Testchar' },
           slotToolEffect: (professionId: string, effectId: string) => {
             sent.push([professionId, effectId]);
@@ -464,6 +582,7 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
             professionsState: { skills: state.gathering },
             toolEffectSlots: [],
             inventory: state.inventory,
+            myFarmPlots: state.farmPlots ?? [],
             player: { name: 'Testchar' },
             slotToolEffect: (professionId: string, effectId: string) => {
               sent.push([professionId, effectId]);
@@ -668,6 +787,7 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
           professionsState: { skills: rechargeState.gathering },
           toolEffectSlots: rechargeState.toolEffects,
           inventory: rechargeState.inventory,
+          myFarmPlots: rechargeState.farmPlots ?? [],
           player: { name: 'Testchar' },
           rechargeToolEffect: (professionId: string) => {
             sent.push(professionId);
@@ -770,6 +890,7 @@ describe('ProfessionsWindow: tool-effect hover cards', () => {
         professionsState: { skills: state.gathering },
         toolEffectSlots: state.toolEffects,
         inventory: state.inventory,
+        myFarmPlots: state.farmPlots ?? [],
         player: { name: 'Testchar' },
         slotToolEffect: (professionId: string) => {
           slots.push(professionId);
@@ -849,6 +970,7 @@ describe('ProfessionsWindow: R40 prompt-mode surfaces', () => {
           professionsState: { skills: state.gathering },
           toolEffectSlots: state.toolEffects ?? [],
           inventory: state.inventory ?? [],
+          myFarmPlots: state.farmPlots ?? [],
           player: { name: 'Testchar' },
           slotToolEffect: (...args: unknown[]) => {
             sent.push(args);
