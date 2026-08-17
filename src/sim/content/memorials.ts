@@ -149,8 +149,16 @@ export const MEMORIAL_TERRAIN_EDITS: readonly HeightStamp[] = Object.freeze([
   // terrace pass begins, which is what keeps the path from running into the
   // terrace's own edge as a wall.
   { x: 807.0, z: 123.0, radius: 8, delta: 6.0, falloff: 'smooth', mode: 'level' },
+  // The three westernmost path pads carry a wider outer skirt: the coast
+  // relief update dropped the ground west of the path onto the tidal shelf,
+  // and an 8 yard rim over that divergence is a step past the climb gate on
+  // seeds where the shelf runs low. The skirts stay under 13 so none of them
+  // reaches the harbour street pocket's 4.40 pin at (788, 116).
+  { x: 801.0, z: 124.5, radius: 12, delta: 6.8, falloff: 'smooth', mode: 'level' },
   { x: 801.0, z: 124.5, radius: 8, delta: 6.8, falloff: 'smooth', mode: 'level' },
+  { x: 797.0, z: 127.5, radius: 12, delta: 7.6, falloff: 'smooth', mode: 'level' },
   { x: 797.0, z: 127.5, radius: 8, delta: 7.6, falloff: 'smooth', mode: 'level' },
+  { x: 795.5, z: 131.0, radius: 12, delta: 8.4, falloff: 'smooth', mode: 'level' },
   { x: 795.5, z: 131.0, radius: 8, delta: 8.4, falloff: 'smooth', mode: 'level' },
   { x: 797.5, z: 134.0, radius: 8, delta: 9.2, falloff: 'smooth', mode: 'level' },
   { x: 800.5, z: 130.5, radius: 8, delta: 9.7, falloff: 'smooth', mode: 'level' },
@@ -174,5 +182,8 @@ export const MEMORIAL_TERRAIN_EDITS: readonly HeightStamp[] = Object.freeze([
   // the north and east and a flat pass has a hard edge. The dome above is
   // walkable everywhere on its own; this pad only takes the last half-yard of
   // crown out of the terrace so the footing and the rail posts sit level.
-  { x: 805, z: 139.6, radius: 5.8, delta: 10.4, falloff: 'flat', mode: 'level' },
+  // Radius 6.0, not 5.8: the corner rail members stand at 5.83, and a member
+  // a hair outside the flat pass rides the smooth dome instead, where the
+  // path pads' wider west skirts now leave a visible fraction of their pull.
+  { x: 805, z: 139.6, radius: 6.0, delta: 10.4, falloff: 'flat', mode: 'level' },
 ] as HeightStamp[]);

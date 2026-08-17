@@ -411,10 +411,13 @@ describe('Gullhaven town buildings', () => {
   });
 
   it('gives every plot its own pad, derived from the building list', () => {
-    // Three town benches of three passes each, plus two stamps per building (a
-    // smooth blend and a flat floor). The pads are a SEPARATE export because they
-    // land after the memorial's grading in data.ts, not with the benches.
-    expect(GULLHAVEN_TOWN_BENCHES).toHaveLength(9);
+    // The east, north and south benches (three passes each), the west quarter
+    // re-benched for the natural-relief coast (the square, the four-pass inn
+    // approach, the four-pad wall berm and the west tip toe), the two
+    // fisher-row aprons (three passes each), plus two stamps per building (a
+    // smooth blend and a flat floor). The pads are a SEPARATE export because
+    // they land after the memorial's grading in data.ts, not with the benches.
+    expect(GULLHAVEN_TOWN_BENCHES).toHaveLength(41);
     expect(GULLHAVEN_PLOT_PADS).toHaveLength(GULLHAVEN_BUILDINGS.length * 2);
     for (const b of GULLHAVEN_BUILDINGS) {
       const mine = GULLHAVEN_PLOT_PADS.filter((e) => e.x === b.x && e.z === b.z);

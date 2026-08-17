@@ -60,8 +60,12 @@ import type { HeightStamp, StaticObbPropDef } from '../types';
  * and the coastline, which does not move by a single square yard.
  */
 const TOWN_BENCHES: readonly HeightStamp[] = Object.freeze([
-  // the east quarter: the town's houses, cut into the foot of the spine
+  // the east quarter: the town's houses, cut into the foot of the spine.
+  // Four passes: on the natural-relief field the spine's foot runs steeper,
+  // and the flat core's rim needs the extra mid pass to stay inside the
+  // movement climb gate where the bench meets the slope.
   { x: 843, z: 121, radius: 22, delta: 6.3, falloff: 'smooth', mode: 'level' },
+  { x: 843, z: 121, radius: 18, delta: 6.3, falloff: 'smooth', mode: 'level' },
   { x: 843, z: 121, radius: 15, delta: 6.3, falloff: 'smooth', mode: 'level' },
   { x: 843, z: 121, radius: 10, delta: 6.3, falloff: 'flat', mode: 'level' },
   // the north knoll, above the square, inside the north gate
@@ -72,6 +76,65 @@ const TOWN_BENCHES: readonly HeightStamp[] = Object.freeze([
   { x: 824, z: 146, radius: 18, delta: 7.9, falloff: 'smooth', mode: 'level' },
   { x: 824, z: 146, radius: 12, delta: 7.9, falloff: 'smooth', mode: 'level' },
   { x: 824, z: 146, radius: 8, delta: 7.9, falloff: 'flat', mode: 'level' },
+
+  // ---- the west quarter, re-benched for main's revised coast relief ----
+  // The natural-relief terrain update cut a tidal shelf into the town's west
+  // quarter: the square that measured 5.5 on the old field floors at 1.5 now,
+  // and the ground west of the inn falls to the tide line. The town owns the
+  // ground it stands on, so the square is benched back to its authored 5.50
+  // and the inn approach steps down toward the harbour street pocket the same
+  // way the east quarter steps down off the spine.
+  // the square: the hub's authored 5.50, held flat under the market
+  { x: 821, z: 116, radius: 19, delta: 5.5, falloff: 'smooth', mode: 'level' },
+  { x: 821, z: 116, radius: 13, delta: 5.5, falloff: 'smooth', mode: 'level' },
+  { x: 821, z: 116, radius: 8, delta: 5.5, falloff: 'flat', mode: 'level' },
+  // the inn approach, between the square and the harbour street pocket; four
+  // passes because the shelf under it diverges almost six yards from the
+  // street grade and the rim has to stay inside the movement climb gate
+  { x: 806, z: 107, radius: 16, delta: 4.9, falloff: 'smooth', mode: 'level' },
+  { x: 806, z: 107, radius: 12, delta: 4.9, falloff: 'smooth', mode: 'level' },
+  { x: 806, z: 107, radius: 8.5, delta: 4.9, falloff: 'smooth', mode: 'level' },
+  { x: 806, z: 107, radius: 6, delta: 4.9, falloff: 'flat', mode: 'level' },
+  // the street shoulder between the harbour pocket and the inn approach: the
+  // shelf gully under it otherwise shows through the two skirts as a step.
+  // Wide enough to hand off to the pocket's own r6 grading on the west side;
+  // the outer pass grazes the pocket centre at under a tenth of a weight,
+  // moving its 4.40 pin by 0.02, inside the pin's tolerance.
+  { x: 797.5, z: 113.5, radius: 12, delta: 4.6, falloff: 'smooth', mode: 'level' },
+  { x: 797.5, z: 113.5, radius: 8, delta: 4.6, falloff: 'smooth', mode: 'level' },
+  { x: 797.5, z: 113.5, radius: 5, delta: 4.6, falloff: 'smooth', mode: 'level' },
+  { x: 797.5, z: 113.5, radius: 3, delta: 4.6, falloff: 'flat', mode: 'level' },
+  // the wall berm: the northwest run crosses the new tide flat, so the curtain
+  // rides a raised shore berm the way a sea wall does, three pads rising with
+  // the run plus a low toe under the extended west tip
+  { x: 789, z: 102, radius: 13, delta: 1.2, falloff: 'smooth', mode: 'level' },
+  { x: 789, z: 102, radius: 10, delta: 1.2, falloff: 'smooth', mode: 'level' },
+  { x: 789, z: 102, radius: 7, delta: 1.2, falloff: 'smooth', mode: 'level' },
+  { x: 789, z: 102, radius: 4.5, delta: 1.2, falloff: 'flat', mode: 'level' },
+  { x: 797, z: 98, radius: 13, delta: 1.8, falloff: 'smooth', mode: 'level' },
+  { x: 797, z: 98, radius: 10, delta: 1.8, falloff: 'smooth', mode: 'level' },
+  { x: 797, z: 98, radius: 7, delta: 1.8, falloff: 'smooth', mode: 'level' },
+  { x: 797, z: 98, radius: 4.5, delta: 1.8, falloff: 'flat', mode: 'level' },
+  { x: 805, z: 95, radius: 13, delta: 2.4, falloff: 'smooth', mode: 'level' },
+  { x: 805, z: 95, radius: 10, delta: 2.4, falloff: 'smooth', mode: 'level' },
+  { x: 805, z: 95, radius: 7, delta: 2.4, falloff: 'smooth', mode: 'level' },
+  { x: 805, z: 95, radius: 4.5, delta: 2.4, falloff: 'flat', mode: 'level' },
+  { x: 779, z: 107.5, radius: 7, delta: 0.9, falloff: 'smooth', mode: 'level' },
+  { x: 779, z: 107.5, radius: 4, delta: 0.9, falloff: 'flat', mode: 'level' },
+  // the fisher-row aprons: wide smooth skirts at each cottage plot's own
+  // height. On the natural-relief field the row's plots diverge seven-plus
+  // yards from the shelf south of them, and softening that rim with the plot
+  // PADS is not allowed: pads land AFTER the memorial's grading, and a pad
+  // skirt wide enough to be walkable reaches the terrace rail ring twelve
+  // yards northeast and perches its corner posts off the 10.40 pad. Benches
+  // land BEFORE the memorial, so the terrace re-cut corrects whatever these
+  // touch and the pads afterwards only need their own tight floors.
+  { x: 820, z: 146, radius: 13.9, delta: 8.28, falloff: 'smooth', mode: 'level' },
+  { x: 820, z: 146, radius: 11.9, delta: 8.28, falloff: 'smooth', mode: 'level' },
+  { x: 820, z: 146, radius: 8.9, delta: 8.28, falloff: 'smooth', mode: 'level' },
+  { x: 810, z: 154.4, radius: 13.9, delta: 8.81, falloff: 'smooth', mode: 'level' },
+  { x: 810, z: 154.4, radius: 11.9, delta: 8.81, falloff: 'smooth', mode: 'level' },
+  { x: 810, z: 154.4, radius: 8.9, delta: 8.81, falloff: 'smooth', mode: 'level' },
 ] as HeightStamp[]);
 
 /**
@@ -149,7 +212,10 @@ export const GULLHAVEN_BUILDINGS: readonly GullhavenBuilding[] = Object.freeze([
   // bench's levelled core is sixteen yards across and a third 7 by 8 cottage
   // could only fit by leaning on the curtain.
   { kind: 'house', x: 820, z: 146, w: 7, d: 8, rot: Math.PI, pad: 8.28 },
-  { kind: 'house', x: 810, z: 155, w: 7, d: 8, rot: Math.PI, pad: 8.81 },
+  // z 154.4, not 155: measured against the wall CURVE (which cuts the corner
+  // between the authored waypoints) the plot's south face sat 3.25 yards from
+  // the curtain, inside the 3.5 yard clearance floor.
+  { kind: 'house', x: 810, z: 154.4, w: 7, d: 8, rot: Math.PI, pad: 8.81 },
 ]);
 
 /**
@@ -187,6 +253,12 @@ function plotPads(): HeightStamp[] {
     // so sizing on the side left every corner of the larger buildings outside the
     // level pad and back on the natural slope (1.86 yards out at the inn).
     const plot = Math.hypot(b.w, b.d) / 2 + 0.6;
+    // Two passes and deliberately TIGHT: pads land after the memorial's
+    // grading, and any skirt wider than 6 yards reaches the terrace rail
+    // ring from the fisher row and perches its corner posts off the 10.40
+    // pad. The heavy rim-softening on the natural-relief shelf is done by
+    // the fisher-row aprons in TOWN_BENCHES (pre-memorial), so a pad here
+    // only re-levels its own floor against ground already near its height.
     out.push({
       x: b.x,
       z: b.z,
@@ -223,6 +295,13 @@ export const GULLHAVEN_PLOT_PADS: readonly HeightStamp[] = Object.freeze(plotPad
  * pair of pieces steps more than half a yard.
  */
 export const GULLHAVEN_WALL_LINE: readonly (readonly [number, number])[] = Object.freeze([
+  // The west tip runs past the old shoreline point because the coast relief
+  // update pushed the water back: the run keeps going down the berm until the
+  // sea is again the flank. It holds z under 106 on the way out because the
+  // pier's seam ramp decks the band from z 107 up at these x, and a curtain
+  // piece must seat on terrain, not stand on the boardwalk (nor wall off the
+  // ramp itself).
+  [776.6, 105.9],
   [781, 106],
   [790.5, 101],
   [800.5, 96.5],
@@ -242,6 +321,12 @@ export const GULLHAVEN_WALL_LINE: readonly (readonly [number, number])[] = Objec
   [813, 162.5],
   [802, 164.5],
   [795, 165],
+  // Southwest run to the water. The coast relief update raised the old south
+  // shore into downs, so the curtain keeps walking southwest until it stands
+  // over the bay again and the sea is the flank on this end too.
+  [787, 169],
+  [780, 173],
+  [774, 176.5],
 ] as const);
 
 /**
