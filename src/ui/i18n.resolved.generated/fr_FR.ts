@@ -7354,7 +7354,14 @@ export const fr_FR: EnTranslations = {
       "riteChoose": "Approchez-vous du Reliquaire noyé et appuyez sur F pour commencer le rite",
       "ritePlayback": "Observez les autels : mémorisez l'ordre dans lequel ils s'illuminent",
       "riteInput": "Appuyez sur F à chaque autel, dans l'ordre où ils se sont illuminés ({current}/{total})",
-      "riteOpen": "Le reliquaire est ouvert : appuyez sur F dessus pour réclamer votre butin"
+      "riteOpen": "Le reliquaire est ouvert : appuyez sur F dessus pour réclamer votre butin",
+      "leave": "Leave Delve"
+    },
+    "leaveConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Tuer {boss}",

@@ -7354,7 +7354,14 @@ export const ja_JP: EnTranslations = {
       "riteChoose": "沈んだ聖遺物匣に近づき、Fで儀式を始める",
       "ritePlayback": "祠を見よ：光る順番を覚えること",
       "riteInput": "光った順に各祠の前でFを押す（{current}/{total}）",
-      "riteOpen": "聖遺物匣が開いた：Fで戦利品を受け取る"
+      "riteOpen": "聖遺物匣が開いた：Fで戦利品を受け取る",
+      "leave": "デルヴを出る"
+    },
+    "leaveConfirm": {
+      "title": "デルヴから出ますか？",
+      "body": "デルヴの入口に戻りますか？再び入れば、この攻略を続けられます。",
+      "confirm": "出る",
+      "cancel": "キャンセル"
     },
     "objective": {
       "kill_boss": "{boss}を討て",

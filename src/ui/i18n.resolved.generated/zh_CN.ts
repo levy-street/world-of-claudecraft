@@ -7354,7 +7354,14 @@ export const zh_CN: EnTranslations = {
       "riteChoose": "靠近沉溺圣物匣并按 F 开始仪式",
       "ritePlayback": "注视神龛：记住它们亮起的顺序",
       "riteInput": "按亮起的顺序在每座神龛前按 F（{current}/{total}）",
-      "riteOpen": "圣物匣已开启：在它面前按 F 领取战利品"
+      "riteOpen": "圣物匣已开启：在它面前按 F 领取战利品",
+      "leave": "离开探秘"
+    },
+    "leaveConfirm": {
+      "title": "离开探秘？",
+      "body": "返回探秘入口？你可以再次进入，继续本次探秘。",
+      "confirm": "离开",
+      "cancel": "取消"
     },
     "objective": {
       "kill_boss": "击杀{boss}",

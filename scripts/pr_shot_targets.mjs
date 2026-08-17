@@ -7885,6 +7885,43 @@ export const TARGETS = [
     },
   },
   {
+    key: 'delve-tracker-leave',
+    label: 'Delve tracker: the Leave Delve control',
+    when: ['ui/hud/delve/delve_tracker_controller'],
+    variants: [
+      { key: 'tracker-desktop', scene: 'tracker', beforeLoad: lowGraphicsSeed },
+      { key: 'leave-confirm-desktop', scene: 'confirm', beforeLoad: lowGraphicsSeed },
+      { key: 'tracker-mobile', scene: 'tracker', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    // Enter a delve offline (the sim-side entry gate has no door proximity rule;
+    // the level gate does apply) so the tracker strip paints, then for the
+    // confirm scene press the REAL Leave Delve button so the shot proves the
+    // dialog gates the leave. Tracker scenes clip to the strip; the confirm
+    // scene stays full-frame because the dialog matters with the scene behind it.
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        sim.setPlayerLevel(7);
+        sim.enterDelve('collapsed_reliquary', 'normal');
+      });
+      await pollForSize(page, '#delve-tracker');
+      await wait(600);
+      if (variant.scene === 'confirm') {
+        await page.evaluate(() => document.querySelector('#delve-tracker .dt-leave')?.click());
+        await pollForSize(page, '#confirm-dialog');
+        return {};
+      }
+      return { clip: '#delve-tracker' };
+    },
+  },
+  {
     key: 'held-weapon-variants',
     label: 'Held weapon model variants (mainhand + dual-wield offhand)',
     when: ['src/ui/weapon_variants.ts', 'tests/held_weapon_models.test.ts'],

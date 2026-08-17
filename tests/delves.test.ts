@@ -9,6 +9,7 @@ import {
   BUILTIN_WORLD,
   DELVE_BAND_X_MIN,
   DELVE_LIST,
+  DELVE_MODULE_Z_START,
   DELVE_MODULES,
   DELVE_X_MIN,
   DELVES,
@@ -35,16 +36,18 @@ import {
 } from '../src/sim/delves/drowned_litany_rooms';
 import {
   clampDelveModuleBounds,
+  delveRunContains,
   grantDelveRewards,
   rollDelveAffixes,
 } from '../src/sim/delves/runs';
 import { createMob } from '../src/sim/entity';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
+import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { solveLockActions } from '../src/sim/lockpick';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Rng } from '../src/sim/rng';
 import { DELVE_IMPLEMENTED_AFFIXES, Sim } from '../src/sim/sim';
-import { type DelveRun, DT, type WorldContent } from '../src/sim/types';
+import { type DelveRun, DT, INSTANCE_EMPTY_TIMEOUT, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const DELVE_TEST_WORLD: WorldContent = {
@@ -3902,5 +3905,282 @@ describe('delve slot recycle resets the roster watermark (dlv_solo_heroic)', () 
     pickFlawlessAs(sim, duoRun, a);
     expect(sim.players.get(a)!.deedsEarned.has('dlv_solo_heroic')).toBe(false);
     expect(sim.players.get(b)!.deedsEarned.has('dlv_solo_heroic')).toBe(false);
+  });
+});
+
+describe('Reset All Instances covers delve runs', () => {
+  // Delve runs are claimed to the durable instance key exactly like dungeon
+  // claims, so the shared Reset All Instances escape hatch must free them too
+  // (a wedged run otherwise pins the player until the empty sweep or a realm
+  // restart gets to it).
+  it('frees the caller claimed delve run instead of claiming there is nothing to reset', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    expect(run.partyKey).not.toBe(null);
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.drainEvents();
+    sim.resetDungeonInstances(sim.playerId);
+    const events = sim.drainEvents() as any[];
+    expect(run.partyKey).toBe(null);
+    expect(
+      events.some((ev) => ev.type === 'error' && ev.text === 'You have no instances to reset.'),
+    ).toBe(false);
+    expect(
+      events.some((ev) => ev.type === 'error' && ev.text === 'All instances have been reset.'),
+    ).toBe(true);
+  });
+
+  it('refuses while a player is still inside the delve run', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    sim.drainEvents();
+    sim.resetDungeonInstances(sim.playerId);
+    const events = sim.drainEvents() as any[];
+    expect(run.partyKey).not.toBe(null);
+    expect(
+      events.some(
+        (ev) =>
+          ev.type === 'error' &&
+          ev.text === 'You cannot reset instances while someone is still inside.',
+      ),
+    ).toBe(true);
+  });
+
+  it('refuses while the finale reward chest is still unlooted', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.rewardChestId = 987654;
+    run.objectState[987654] = {
+      kind: 'locked_chest',
+      triggered: false,
+      hp: 1,
+      maxHp: 1,
+      linkIds: [],
+      open: false,
+    } as any;
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.drainEvents();
+    sim.resetDungeonInstances(sim.playerId);
+    let events = sim.drainEvents() as any[];
+    expect(run.partyKey).not.toBe(null);
+    expect(
+      events.some(
+        (ev) =>
+          ev.type === 'error' &&
+          ev.text === 'You cannot reset instances while loot remains inside.',
+      ),
+    ).toBe(true);
+    // Opening the chest is not enough: spoils sitting in pendingLoot (opened,
+    // waiting on collectDelveChestLoot) still block the reset.
+    (run.objectState[987654] as any).looted = true;
+    (run.objectState[987654] as any).pendingLoot = [{ itemId: 'coarse_thread', count: 1 }];
+    sim.resetDungeonInstances(sim.playerId);
+    events = sim.drainEvents() as any[];
+    expect(run.partyKey).not.toBe(null);
+    expect(
+      events.some(
+        (ev) =>
+          ev.type === 'error' &&
+          ev.text === 'You cannot reset instances while loot remains inside.',
+      ),
+    ).toBe(true);
+    // Collecting the spoils releases the guard.
+    (run.objectState[987654] as any).pendingLoot = [];
+    sim.resetDungeonInstances(sim.playerId);
+    events = sim.drainEvents() as any[];
+    expect(run.partyKey).toBe(null);
+  });
+
+  it('a dungeon reset cooldown does not hold the delve rescue hostage', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
+    leaveDungeon(sim.ctx, pid);
+    sim.setDungeonDifficulty('heroic', pid);
+    sim.resetDungeonInstances(pid);
+    // Flip back: the replacement claim is resettable again but throttled.
+    sim.setDungeonDifficulty('normal', pid);
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(pid)!;
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.drainEvents();
+    sim.resetDungeonInstances(pid);
+    const events = sim.drainEvents() as any[];
+    expect(run.partyKey).toBe(null);
+    const inst = sim.ctx.instances.find(
+      (slot: any) => slot.dungeonId === 'hollow_crypt' && slot.partyKey !== null,
+    );
+    expect(inst).toBeDefined();
+    expect(
+      events.some((ev) => ev.type === 'error' && ev.text === 'All instances have been reset.'),
+    ).toBe(true);
+  });
+
+  it('a delve reset cooldown does not block an otherwise legal dungeon reset', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    enterReliquary(sim);
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.resetDungeonInstances(pid);
+    // Re-claim a delve while its reset cooldown is live, then set up a fully
+    // legal dungeon transition reset.
+    enterReliquary(sim);
+    const delveRun = sim.delveRunForPlayer(pid)!;
+    teleport(sim, door.x, door.z);
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
+    leaveDungeon(sim.ctx, pid);
+    sim.setDungeonDifficulty('heroic', pid);
+    sim.drainEvents();
+    sim.resetDungeonInstances(pid);
+    const events = sim.drainEvents() as any[];
+    const inst = sim.ctx.instances.find(
+      (slot: any) => slot.dungeonId === 'hollow_crypt' && slot.partyKey !== null,
+    )!;
+    expect(inst.difficulty).toBe('heroic');
+    expect(delveRun.partyKey).not.toBe(null);
+    expect(
+      events.some((ev) => ev.type === 'error' && ev.text === 'All instances have been reset.'),
+    ).toBe(true);
+  });
+
+  it('leaveDelve while in combat errors instead of granting a free disengage', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    expect(sim.delveRunForPlayer(sim.playerId)).not.toBe(null);
+    sim.player.inCombat = true;
+    sim.drainEvents();
+    sim.leaveDelve();
+    const events = sim.drainEvents() as any[];
+    expect(
+      events.some((ev) => ev.type === 'error' && ev.text === "You can't do that while in combat."),
+    ).toBe(true);
+    expect(isDelvePos(sim.player.pos.x)).toBe(true);
+  });
+
+  it('books the shared five-minute cooldown on a delve reset', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.resetDungeonInstances(sim.playerId);
+    expect(run.partyKey).toBe(null);
+    // Re-claim and immediately try to reset again: the re-roll loop must be
+    // capped at the empty sweep's own floor.
+    enterReliquary(sim);
+    const second = sim.delveRunForPlayer(sim.playerId)!;
+    teleport(sim, door.x, door.z);
+    sim.drainEvents();
+    sim.resetDungeonInstances(sim.playerId);
+    const events = sim.drainEvents() as any[];
+    expect(second.partyKey).not.toBe(null);
+    expect(
+      events.some(
+        (ev) =>
+          ev.type === 'error' && ev.text === 'Instances can only be reset once every 5 minutes.',
+      ),
+    ).toBe(true);
+    // The cooldown expires on the same clock as the empty sweep.
+    sim.time += INSTANCE_EMPTY_TIMEOUT;
+    sim.resetDungeonInstances(sim.playerId);
+    expect(second.partyKey).toBe(null);
+  });
+
+  it('refuses while a party member is still inside the delve run', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'ResetLead');
+    const member = sim.addPlayer('warrior', 'ResetMate');
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    for (const pid of [leader, member]) {
+      sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, pid);
+      const door = DELVES.collapsed_reliquary.doorPos;
+      const e = sim.entities.get(pid)!;
+      e.pos.x = door.x;
+      e.pos.z = door.z;
+      e.pos.y = terrainHeight(door.x, door.z, sim.cfg.seed);
+      e.prevPos = { ...e.pos };
+      sim.enterDelve('collapsed_reliquary', 'normal', pid);
+    }
+    const run = sim.delveRunForPlayer(leader)!;
+    // Leader walks out; the member stays inside.
+    const door = DELVES.collapsed_reliquary.doorPos;
+    const le = sim.entities.get(leader)!;
+    le.pos.x = door.x;
+    le.pos.z = door.z;
+    le.prevPos = { ...le.pos };
+    sim.drainEvents();
+    sim.resetDungeonInstances(leader);
+    const events = sim.drainEvents() as any[];
+    expect(run.partyKey).not.toBe(null);
+    expect(
+      events.some(
+        (ev) =>
+          ev.type === 'error' &&
+          ev.text === 'You cannot reset instances while someone is still inside.',
+      ),
+    ).toBe(true);
+  });
+
+  it('delveRunContains south margin covers every module layout south lip', () => {
+    // The -40 margin is load-bearing: a layout whose walkable floor started
+    // south of it would let reset validation miss a standing player. Pin it
+    // against the real layout table.
+    for (const [id, layout] of Object.entries(DELVE_MODULE_LAYOUTS)) {
+      expect(DELVE_MODULE_Z_START + layout.zMin, id).toBeGreaterThan(-40);
+    }
+  });
+
+  it('delveRunContains pins its margins at the boundaries', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    expect(delveRunContains(run, { x: run.origin.x, z: run.origin.z - 10 })).toBe(true);
+    expect(delveRunContains(run, { x: run.origin.x, z: run.origin.z - 45 })).toBe(false);
+    expect(delveRunContains(run, { x: run.origin.x + 119, z: run.origin.z + 10 })).toBe(true);
+    expect(delveRunContains(run, { x: run.origin.x + 121, z: run.origin.z + 10 })).toBe(false);
+  });
+
+  it('leaveDelve while dead errors instead of silently doing nothing', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    expect(sim.delveRunForPlayer(sim.playerId)).not.toBe(null);
+    killPlayer(sim);
+    sim.drainEvents();
+    sim.leaveDelve();
+    const events = sim.drainEvents() as any[];
+    expect(
+      events.some((ev) => ev.type === 'error' && ev.text === "You can't do that while dead."),
+    ).toBe(true);
+  });
+
+  it('frees delve claims even when the only dungeon claim fails the difficulty guard', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', sim.playerId)).toBe(true);
+    const inst = sim.ctx.instances.find(
+      (slot: any) => slot.dungeonId === 'hollow_crypt' && slot.partyKey !== null,
+    )!;
+    leaveDungeon(sim.ctx, sim.playerId);
+    sim.drainEvents();
+    // The dungeon claim is same-difficulty (not resettable), which used to hard
+    // stop the whole reset; the delve claim must still free.
+    sim.resetDungeonInstances(sim.playerId);
+    const events = sim.drainEvents() as any[];
+    expect(run.partyKey).toBe(null);
+    expect(inst.partyKey).not.toBe(null);
+    expect(
+      events.some((ev) => ev.type === 'error' && ev.text === 'All instances have been reset.'),
+    ).toBe(true);
   });
 });

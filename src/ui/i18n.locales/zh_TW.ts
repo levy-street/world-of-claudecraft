@@ -7046,6 +7046,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': '第 {current} 區，共 {total} 區',
   'delveUi.tracker.objective': '目標',
   'delveUi.tracker.title': '秘探',
+  'delveUi.tracker.leave': '離開秘探',
+  'delveUi.leaveConfirm.title': '離開秘探？',
+  'delveUi.leaveConfirm.body': '返回秘探入口？你可以再次進入，繼續本次秘探。',
+  'delveUi.leaveConfirm.confirm': '離開',
+  'delveUi.leaveConfirm.cancel': '取消',
   'sim.delve.alreadyInDelve': '你已經身處一場秘探之中。',
   'sim.delve.bossChest':
     '首領倒下了。一只受守護的聖物庫寶箱自祭壇升起，撬開它的鎖以取得你的戰利品。',

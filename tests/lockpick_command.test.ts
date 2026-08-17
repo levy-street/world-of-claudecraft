@@ -177,6 +177,10 @@ describe('lockpick, failure & abandon', () => {
     const chestId = standOnChest(sim, run);
     sim.lockpickEngage(chestId, 1);
     expect(run.lockpick).not.toBeNull();
+    // The boss kill leaves the lingering combat flag up, and leaveDelve now
+    // refuses in combat (the wipe-dodge guard, pinned in tests/delves.test.ts).
+    // Clear it: this test owns the teardown contract, not the combat gate.
+    sim.player.inCombat = false;
     sim.leaveDelve();
     expect(run.lockpick).toBeNull();
     expect(run.objectState[chestId].attemptAvailable).toBe(true);

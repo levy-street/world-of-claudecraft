@@ -523,9 +523,9 @@ describe('#2529 delve tracker: the fan-out arm was present but inert', () => {
   it('ignores a plain update() after a language switch and repaints on relocalize()', () => {
     const heading = bilingual('delveUi.tracker.title');
     const element = mount('delve-tracker', 'block');
-    const world = { delveRun: delveRun(), delveMarks: 3 } as Pick<
+    const world = { delveRun: delveRun(), delveMarks: 3, leaveDelve: () => {} } as Pick<
       IWorld,
-      'delveRun' | 'delveMarks'
+      'delveRun' | 'delveMarks' | 'leaveDelve'
     >;
     const controller = new DelveTrackerController({
       element,
@@ -534,6 +534,7 @@ describe('#2529 delve tracker: the fan-out arm was present but inert', () => {
       mobName: () => 'Deacon Varric',
       attachTooltip: () => {},
       closeRitePanel: () => {},
+      confirmDialog: () => {},
     });
     controller.update();
     const title = (): string => element.querySelector('.dt-header')?.textContent?.trim() ?? '';
@@ -562,11 +563,16 @@ describe('#2529 delve tracker: the fan-out arm was present but inert', () => {
     const closeRitePanel = vi.fn();
     const controller = new DelveTrackerController({
       element,
-      world: () => ({ delveRun: null, delveMarks: 0 }) as Pick<IWorld, 'delveRun' | 'delveMarks'>,
+      world: () =>
+        ({ delveRun: null, delveMarks: 0, leaveDelve: () => {} }) as Pick<
+          IWorld,
+          'delveRun' | 'delveMarks' | 'leaveDelve'
+        >,
       delveName: () => 'Collapsed Reliquary',
       mobName: () => 'Deacon Varric',
       attachTooltip: () => {},
       closeRitePanel,
+      confirmDialog: () => {},
     });
     setLanguage(OTHER);
     controller.relocalize();

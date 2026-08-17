@@ -7354,7 +7354,14 @@ export const pt_BR: EnTranslations = {
       "riteChoose": "Aproxime-se do Relicário Afogado e pressione F para iniciar o rito",
       "ritePlayback": "Observe os santuários: memorize a ordem em que acendem",
       "riteInput": "Pressione F em cada santuário na ordem em que acenderam ({current}/{total})",
-      "riteOpen": "O relicário está aberto: pressione F nele para reivindicar seus espólios"
+      "riteOpen": "O relicário está aberto: pressione F nele para reivindicar seus espólios",
+      "leave": "Leave Delve"
+    },
+    "leaveConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Abata {boss}",

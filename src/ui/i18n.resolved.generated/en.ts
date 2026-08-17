@@ -7354,7 +7354,14 @@ export const en: EnTranslations = {
       "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
       "ritePlayback": "Watch the shrines: memorize the order they light up",
       "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
-      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
+      "riteOpen": "The reliquary is open: press F on it to claim your spoils",
+      "leave": "Leave Delve"
+    },
+    "leaveConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Slay {boss}",

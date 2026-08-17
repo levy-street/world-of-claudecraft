@@ -17,6 +17,7 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
+import { claimedDelveRunsFor, delveRunContains, freeDelveRun } from '../delves/runs';
 import { createGroundObject, createMob } from '../entity';
 import {
   COMBAT_EXIT_MEMORY_SECONDS,
@@ -32,6 +33,7 @@ import { arenaQueueLeave } from '../social/arena';
 import { resurrectOnInstanceReentry } from '../spirit';
 import { dropThreat } from '../threat';
 import {
+  type DelveRun,
   dist2d,
   type Entity,
   INSTANCE_EMPTY_TIMEOUT,
@@ -769,7 +771,13 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
   const owned = ctx.instances.filter(
     (inst) => inst.partyKey === key && !RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId),
   );
-  if (owned.length === 0) {
+  // Delve runs claim on the same durable key and need the same escape hatch: a
+  // wedged run otherwise pins the party until the empty sweep frees it. Delves
+  // have no lockout or difficulty transition to protect, so a claimed run is
+  // always resettable (a fresh claim re-rolls seed and affixes; the 5 minute
+  // empty sweep was already that loop's floor).
+  const ownedDelveRuns = claimedDelveRunsFor(ctx, key);
+  if (owned.length === 0 && ownedDelveRuns.length === 0) {
     ctx.error(r.meta.entityId, 'You have no instances to reset.');
     return;
   }
@@ -784,14 +792,77 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
   const resettable = owned.filter(
     (inst) => inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected),
   );
-  if (resettable.length === 0) {
-    ctx.error(
-      r.meta.entityId,
-      'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
-    );
+  const ownerPids = resetOwnerPids(ctx, r.meta.entityId);
+
+  // The two halves are evaluated INDEPENDENTLY: each domain's guards gate only
+  // its own claims, so a dungeon cooldown, lockout, or corpse-loot hold cannot
+  // keep a wedged delve hostage, and a live delve cooldown cannot refuse an
+  // otherwise-legal dungeon reset. WITHIN a half validation stays atomic
+  // (validate every claim, then free them all). If either half frees, the one
+  // shared success line fires; if neither does, the dungeon half's error wins
+  // (matching the pre-delve message order).
+  const dungeonBlocker = dungeonResetBlocker(ctx, r.meta, ownerPids, owned, resettable, selected);
+  const delveBlocker =
+    ownedDelveRuns.length > 0 ? delveResetBlocker(ctx, ownerPids, ownedDelveRuns) : null;
+  const freeDungeons = resettable.length > 0 && dungeonBlocker === null;
+  const freeDelves = ownedDelveRuns.length > 0 && delveBlocker === null;
+  if (!freeDungeons && !freeDelves) {
+    ctx.error(r.meta.entityId, dungeonBlocker ?? delveBlocker ?? 'You have no instances to reset.');
     return;
   }
-  const ownerPids = resetOwnerPids(ctx, r.meta.entityId);
+
+  if (freeDungeons) {
+    // Reclaim each slot immediately at the selected difficulty. This commits the
+    // transition atomically: toggling the preference back afterward still rejoins
+    // this live claim, so Reset All cannot be turned into a Normal -> Heroic ->
+    // Normal zero-downtime boss-respawn loop.
+    for (const inst of resettable) {
+      freeInstance(ctx, inst);
+      claimInstance(ctx, inst, key, claimDifficultyForDungeon(inst.dungeonId, selected));
+      if (inst.exitId === null) throw new Error('Dungeon reset replacement claim has no identity.');
+      inst.resetAvailableAt = ctx.time + INSTANCE_EMPTY_TIMEOUT;
+      for (const ownerPid of ownerPids) {
+        ctx.dungeonResetLocks.set(resetCooldownKey(ctx, ownerPid, inst.dungeonId), {
+          availableAt: inst.resetAvailableAt,
+          claimId: inst.exitId,
+        });
+      }
+    }
+  }
+  if (freeDelves) {
+    // Delve claims free outright (no replacement claim): the next door entry
+    // claims a fresh slot with a fresh seed. Each free books the shared reset
+    // cooldown for every owner so the re-claim re-roll is capped at the empty
+    // sweep's own floor (claimId -1: a delve free has no replacement claim to
+    // exempt, so any live lock blocks).
+    for (const run of ownedDelveRuns) {
+      for (const ownerPid of ownerPids) {
+        ctx.dungeonResetLocks.set(resetCooldownKey(ctx, ownerPid, `delve:${run.delveId}`), {
+          availableAt: ctx.time + INSTANCE_EMPTY_TIMEOUT,
+          claimId: -1,
+        });
+      }
+      freeDelveRun(ctx, run);
+    }
+  }
+  ctx.error(r.meta.entityId, 'All instances have been reset.');
+}
+
+/** The dungeon half of Reset All Instances: the first reason these claims may
+ *  not reset right now, or null when the resettable set is clear to free.
+ *  Message order matches the pre-delve behavior exactly (transition guard,
+ *  cooldown, heroic lockout, then the atomic occupancy/loot validation). */
+function dungeonResetBlocker(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  ownerPids: number[],
+  owned: InstanceSlot[],
+  resettable: InstanceSlot[],
+  selected: 'normal' | 'heroic',
+): string | null {
+  if (owned.length > 0 && resettable.length === 0) {
+    return 'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.';
+  }
   if (
     resettable.some(
       (inst) =>
@@ -802,26 +873,21 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
         }),
     )
   ) {
-    ctx.error(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
-    return;
+    return 'Instances can only be reset once every 5 minutes.';
   }
   if (selected === 'heroic') {
     const locked = resettable.find((inst) =>
-      isRaidLocked(ctx, r.meta, heroicLockoutId(inst.dungeonId)),
+      isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId)),
     );
-    if (locked) {
-      ctx.error(r.meta.entityId, `You are locked to Heroic ${DUNGEONS[locked.dungeonId].name}.`);
-      return;
-    }
+    if (locked) return `You are locked to Heroic ${DUNGEONS[locked.dungeonId].name}.`;
   }
-
-  // Validate every claim before freeing any so Reset All is atomic. A living player,
-  // an unreleased corpse, or a released spirit still bound to a corpse in the claim
-  // keeps it alive for recovery and loot instead of being stranded by the reset.
+  // Validate every claim before any free so the half is atomic. A living player,
+  // an unreleased corpse, or a released spirit still bound to a corpse in the
+  // claim keeps it alive for recovery and loot instead of being stranded.
   for (const inst of resettable) {
     const origin = instanceOriginOf(inst);
-    for (const meta of ctx.players.values()) {
-      const player = ctx.entities.get(meta.entityId);
+    for (const playerMeta of ctx.players.values()) {
+      const player = ctx.entities.get(playerMeta.entityId);
       if (!player) continue;
       const bodyInside = instanceContains(origin, player.pos);
       const corpseInside =
@@ -830,33 +896,56 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
         player.corpseInstanceId === inst.exitId &&
         instanceContains(origin, player.corpsePos);
       if (bodyInside || corpseInside) {
-        ctx.error(r.meta.entityId, 'You cannot reset instances while someone is still inside.');
-        return;
+        return 'You cannot reset instances while someone is still inside.';
       }
     }
     if (inst.mobIds.some((id) => ctx.entities.get(id)?.lootable)) {
-      ctx.error(r.meta.entityId, 'You cannot reset instances while loot remains inside.');
-      return;
+      return 'You cannot reset instances while loot remains inside.';
     }
   }
+  return null;
+}
 
-  // Reclaim each slot immediately at the selected difficulty. This commits the
-  // transition atomically: toggling the preference back afterward still rejoins this
-  // live claim, so Reset All cannot be turned into a Normal -> Heroic -> Normal
-  // zero-downtime boss-respawn loop.
-  for (const inst of resettable) {
-    freeInstance(ctx, inst);
-    claimInstance(ctx, inst, key, claimDifficultyForDungeon(inst.dungeonId, selected));
-    if (inst.exitId === null) throw new Error('Dungeon reset replacement claim has no identity.');
-    inst.resetAvailableAt = ctx.time + INSTANCE_EMPTY_TIMEOUT;
-    for (const ownerPid of ownerPids) {
-      ctx.dungeonResetLocks.set(resetCooldownKey(ctx, ownerPid, inst.dungeonId), {
-        availableAt: inst.resetAvailableAt,
-        claimId: inst.exitId,
-      });
+/** The delve half of Reset All Instances: the first reason these claimed runs
+ *  may not free right now, or null when they are all clear. The cooldown is
+ *  what caps the re-roll loop (a fresh claim re-rolls seed, affixes, and the
+ *  Bountiful roll, and the empty sweep's five-minute floor no longer applies
+ *  once reset can free a run on demand). */
+function delveResetBlocker(ctx: SimContext, ownerPids: number[], runs: DelveRun[]): string | null {
+  for (const run of runs) {
+    if (ownerPids.some((ownerPid) => activeResetLock(ctx, ownerPid, `delve:${run.delveId}`))) {
+      return 'Instances can only be reset once every 5 minutes.';
+    }
+    for (const meta of ctx.players.values()) {
+      const p = ctx.entities.get(meta.entityId);
+      if (p && delveRunContains(run, p.pos)) {
+        return 'You cannot reset instances while someone is still inside.';
+      }
+    }
+    // Earned-but-unbanked rewards: the finale chest still closed, or ANY opened
+    // container (chest, coffer, rite reliquary) whose spoils sit in pendingLoot
+    // or partyLoot waiting on collectDelveChestLoot. Both would be destroyed
+    // with the run, so refuse like the dungeon corpse-loot arm does. Mid-run
+    // puzzle objects are deliberately NOT guarded (module_exit and graves carry
+    // `lootable` for the interact glow, and blocking on them would brick the
+    // wedged-run rescue).
+    const rewardChestUnopened =
+      run.rewardChestId !== null &&
+      !(run.objectState[run.rewardChestId] as { looted?: boolean } | undefined)?.looted;
+    const spoilsUncollected = Object.values(run.objectState).some(
+      (state) =>
+        (state.pendingLoot?.length ?? 0) > 0 ||
+        Object.values(state.partyLoot ?? {}).some((items) => items.length > 0),
+    );
+    if (
+      rewardChestUnopened ||
+      spoilsUncollected ||
+      run.mobIds.some((id) => ctx.entities.get(id)?.lootable)
+    ) {
+      return 'You cannot reset instances while loot remains inside.';
     }
   }
-  ctx.error(r.meta.entityId, 'All instances have been reset.');
+  return null;
 }
 
 // Kill-time lockout recipients for a claimed instance: every CURRENT member of

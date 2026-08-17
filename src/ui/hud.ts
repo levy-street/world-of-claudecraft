@@ -2137,6 +2137,8 @@ export class Hud {
       mobName: mobDisplayName,
       attachTooltip: (element, html) => this.attachTooltip(element, html),
       closeRitePanel: (restoreFocus) => this.closeRitePanel(restoreFocus),
+      confirmDialog: (title, body, okText, cancelText, onOk) =>
+        this.confirmDialog(title, body, okText, cancelText, onOk),
     });
     this.riftTracker = new RiftFloorTrackerController({
       element: $('#rift-tracker'),

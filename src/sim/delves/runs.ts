@@ -158,6 +158,23 @@ export function delveOccupancyRadius(run: DelveRun): number {
   return delveModuleZOffsetLayout(run.modules, mi) + span + 40;
 }
 
+/** True when a position sits inside a claimed run's room footprint. The band
+ *  is DELIBERATELY NARROWER than delveRunForPlayer's and the empty sweep's
+ *  symmetric ones: rooms start at DELVE_MODULE_Z_START + layout.zMin (about
+ *  -11, slightly SOUTH of the origin), so the -40 south margin covers that
+ *  walkable lip without reaching the neighbor slot 620u away. A companion
+ *  change narrows the sweep the same way; unifying the three predicates behind
+ *  one named-margin helper is the agreed follow-up. */
+export function delveRunContains(run: DelveRun, pos: { x: number; z: number }): boolean {
+  const dz = pos.z - run.origin.z;
+  return Math.abs(pos.x - run.origin.x) < 120 && dz > -40 && dz < delveOccupancyRadius(run);
+}
+
+/** The caller's claimed delve runs, the delve half of Reset All Instances. */
+export function claimedDelveRunsFor(ctx: SimContext, key: string): DelveRun[] {
+  return ctx.delveRuns.filter((run) => run.partyKey === key);
+}
+
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
   const byPlayer = delveRunForPlayer(ctx, e.id);
   if (byPlayer) return byPlayer;
@@ -414,17 +431,33 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   ctx.emit({ type: 'delveEntered', delveId, tierId, pid: r.meta.entityId });
 }
 
-// Early-abandon path: drop the player back at the board door without completing
-// (despawns the companion, restores the stowed pet, tears down any lockpick). The
-// shipped in-delve exit instead runs through the 'surface_exit' interactable ->
-// freeDelveRun, so this IWorld method (and its server 'leave_delve' command) is
-// currently only reachable as scaffolding for a future explicit "Abandon Delve"
-// control; kept wired in both worlds so that control needs no new plumbing.
+// Early-leave path: drop the player back at the board door without completing
+// (despawns the companion, restores the stowed pet, tears down any lockpick).
+// This backs the tracker's "Leave Delve" control (delve_tracker_controller.ts)
+// and its server 'leave_delve' command. It does NOT free the run: the claim is
+// kept so the leaver can walk back in and continue; the empty sweep (or Reset
+// All Instances) is what actually frees it. The completed-run exit instead runs
+// through the 'surface_exit' interactable -> freeDelveRun.
 export function leaveDelve(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
-  if (!r || r.e.dead) return;
+  if (!r) return;
+  // No-run stays a silent no-op (an out-of-delve leave_delve means nothing);
+  // the guards below only speak up when there is a run the player expects to
+  // leave, so the tracker's Leave control never looks broken.
   const run = delveRunForPlayer(ctx, r.meta.entityId);
   if (!run) return;
+  if (r.e.dead) {
+    // Delve deaths respawn in-run within seconds; error instead of silence.
+    ctx.error(r.meta.entityId, "You can't do that while dead.");
+    return;
+  }
+  if (r.e.inCombat) {
+    // A one-click mid-fight exit would be a free wipe-dodge: the mob leashes
+    // home and full-heals while the leaver keeps the claim, re-enters at the
+    // same module, and never spends one of the run's bounded deaths.
+    ctx.error(r.meta.entityId, "You can't do that while in combat.");
+    return;
+  }
   const delve = DELVES[run.delveId];
   // Tear down the leaver's live lockpick session, if any (preserves the attempt).
   if (run.lockpick && run.lockpick.ownerId === r.meta.entityId) ctx.abandonLockpick(run);

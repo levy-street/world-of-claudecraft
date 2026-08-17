@@ -7324,6 +7324,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': '구역 {current}/{total}',
   'delveUi.tracker.objective': '목표',
   'delveUi.tracker.title': '탐굴',
+  'delveUi.tracker.leave': '탐굴 나가기',
+  'delveUi.leaveConfirm.title': '탐굴에서 나가시겠습니까?',
+  'delveUi.leaveConfirm.body':
+    '탐굴 입구로 돌아가시겠습니까? 다시 들어가면 이번 탐굴을 계속할 수 있습니다.',
+  'delveUi.leaveConfirm.confirm': '나가기',
+  'delveUi.leaveConfirm.cancel': '취소',
   'sim.delve.alreadyInDelve': '이미 탐굴 중입니다.',
   'sim.delve.bossChest':
     '우두머리가 쓰러집니다. 봉인된 성물실 상자가 단상 위로 솟아오릅니다. 자물쇠를 따서 전리품을 차지하세요.',
