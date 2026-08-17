@@ -86,6 +86,7 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
@@ -193,6 +194,7 @@ import {
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
+import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
   aboveHorizon,
@@ -331,6 +333,7 @@ import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
+import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -888,21 +891,9 @@ const hemiOutdoorIntensity = (): number =>
 
 const SUN_INTENSITY = 3.5;
 const ENV_INTENSITY = 0.37;
-// dungeon interiors: kill the daylight so torchlight carries the scene
-// (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
-const DUNGEON_SUN_INTENSITY = 0.34;
-const DUNGEON_ENV_INTENSITY = 0.05;
-// The authored Infernal Citadel is larger than a procedural floor and carries
-// real budgeted brazier lights. A stronger ambient floor preserves the black-red
-// infernal grade while keeping its loops, bosses, and doors readable between pools.
-const INFERNAL_SUN_INTENSITY = 0.54;
-const INFERNAL_HEMI_INTENSITY = 0.32;
-const INFERNAL_ENV_INTENSITY = 0.1;
-const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away,
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
-const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // day/night: at night the key sun and sky bounce cool toward moonlight. These
 // are the fully-night blend weights (scaled each frame by the grade's nightAmt).
 const MOON_SUN_COLOR = 0x9fb2e0; // pale cool moonlight the warm sun eases toward
@@ -927,31 +918,6 @@ const DAY_HEMI_SKY_WARMTH = 0.3;
 const DAY_HEMI_GROUND_WARMTH = 0.22;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
-// character rim glow scales up underground so silhouettes split from the murk
-const DUNGEON_RIM_BOOST = 2.4;
-// The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
-// plus a healthy hemisphere keep the whole competitive space readable, with
-// the braziers/torches adding warmth rather than carrying the scene alone.
-const YUMI_MAZE_SUN_INTENSITY = 1.32;
-const YUMI_MAZE_HEMI_INTENSITY = 0.38;
-const YUMI_MAZE_ENV_INTENSITY = 0.25;
-const YUMI_MAZE_RIM_BOOST = 1.7;
-const WILDHEART_SUN_INTENSITY = 1.75;
-const WILDHEART_HEMI_INTENSITY = 0.59;
-const WILDHEART_ENV_INTENSITY = 0.28;
-const WILDHEART_RIM_BOOST = 1.5;
-// The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
-// ambient floor (over the candle-orange torch lights the interior itself
-// carries) so its halls read golden and inhabited while staying indoors-dim.
-// Scoped to interior 'lastkeep' only; every other underground interior keeps
-// the DUNGEON_* rig.
-const LASTKEEP_SUN_INTENSITY = 0.66;
-const LASTKEEP_HEMI_INTENSITY = 0.46;
-const LASTKEEP_ENV_INTENSITY = 0.14;
-const LASTKEEP_RIM_BOOST = 1.9;
-const LASTKEEP_SUN_COLOR = 0xffd9a8;
-const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
-const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_STALL_ATTRIBUTION_MS = 80;
 const PREWARM_MOB_TEMPLATE_IDS = [
@@ -1680,7 +1646,9 @@ export class Renderer {
   private impactSite: ImpactSiteView;
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
+  private bulwarkFeatures: BulwarkFeaturesView | null = null;
   private castleFeatures: CastleFeaturesView | null = null;
+  private dawnholdFeatures: DawnholdFeaturesView | null = null;
   private frostSky: FrostSkyView | null = null;
   private fenFeatures: FenFeaturesView | null = null;
   private amberFeatures: AmberFeaturesView | null = null;
@@ -4231,6 +4199,10 @@ export class Renderer {
           this.castleFeatures = buildCastleFeatures();
           this.attachZoneFeature(this.castleFeatures);
         }
+        if (!this.bulwarkFeatures) {
+          this.bulwarkFeatures = buildBulwarkFeatures();
+          this.attachZoneFeature(this.bulwarkFeatures);
+        }
         break;
       case 'frost':
         if (!this.frostSky) {
@@ -4272,6 +4244,10 @@ export class Renderer {
         if (!this.gardenFeatures) {
           this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
           this.attachZoneFeature(this.gardenFeatures);
+        }
+        if (!this.dawnholdFeatures) {
+          this.dawnholdFeatures = buildDawnholdFeatures();
+          this.attachZoneFeature(this.dawnholdFeatures);
         }
         break;
       case 'gale':
@@ -9362,19 +9338,7 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
-  private fogState:
-    | 'outdoor'
-    | 'dungeon'
-    | 'temple'
-    | 'nythraxis'
-    | 'delve'
-    | 'yumiMaze'
-    | 'battleground'
-    | 'underwater'
-    | 'rift'
-    | 'practice'
-    | 'wildheartField'
-    | 'lastkeep' = 'outdoor';
+  private fogState: FogSceneState = 'outdoor';
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -9571,6 +9535,27 @@ export class Renderer {
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
     return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
+  }
+
+  /** Settle the light rig for a fog state (interior_light_rig.ts owns the
+   * per-state numbers; the outdoor legs carry this frame's day/night grade,
+   * so leaving an interior at night stays night). */
+  private applyStateLightRig(state: FogSceneState): void {
+    const targets = {
+      sun: this.sun,
+      hemi: this.hemi,
+      scene: this.scene,
+      rim: sharedUniforms.uRimBoost,
+    };
+    if (state === 'rift') {
+      applyRiftLightRig(this.riftFogAuthored, targets);
+      return;
+    }
+    applyInteriorLightRig(state, targets, {
+      sunIntensity: SUN_INTENSITY * this.dnGrade.lightScale,
+      hemiIntensity: hemiOutdoorIntensity() * this.dnGrade.ambientScale,
+      envIntensity: this.envOutdoorIntensity * this.dnGrade.ambientScale,
+    });
   }
 
   /**
@@ -9913,6 +9898,7 @@ export class Renderer {
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
     const inLastKeep = interior === 'lastkeep';
+    const inDawnhold = interior === 'dawnhold';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -9929,17 +9915,19 @@ export class Renderer {
                   ? 'wildheartField'
                   : inLastKeep
                     ? 'lastkeep'
-                    : inside
-                      ? 'dungeon'
-                      : camY <
-                          waterLevelAt(
-                            this.camera.position.x,
-                            this.camera.position.z,
-                            this.sim.cfg.seed,
-                          ) -
-                            0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                    : inDawnhold
+                      ? 'dawnhold'
+                      : inside
+                        ? 'dungeon'
+                        : camY <
+                            waterLevelAt(
+                              this.camera.position.x,
+                              this.camera.position.z,
+                              this.sim.cfg.seed,
+                            ) -
+                              0.05
+                          ? 'underwater'
+                          : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9962,11 +9950,7 @@ export class Renderer {
       }
       this.fogState = 'rift';
       if (!this.lowGfx) {
-        const authored = this.riftFogAuthored;
-        this.sun.intensity = authored ? INFERNAL_SUN_INTENSITY : DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
+        this.applyStateLightRig('rift');
       }
       return;
     }
@@ -10000,6 +9984,13 @@ export class Renderer {
         fog.color.setHex(0x241610);
         fog.near = 30;
         fog.far = 150;
+      } else if (desired === 'dawnhold') {
+        // Dawnhold Castle: brighter and greener-warm than the keep's hearth
+        // murk: a pale sage-gold air pushed even further back, so the garden
+        // palace reads sunlit end to end.
+        fog.color.setHex(0x3d422a);
+        fog.near = 40;
+        fog.far = 190;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -10047,65 +10038,9 @@ export class Renderer {
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
+      // Which numbers each state means is interior_light_rig.ts's to own.
       if (!this.lowGfx) {
-        const mazeNight = desired === 'yumiMaze';
-        const wildheartSun = desired === 'wildheartField';
-        const keepHearth = desired === 'lastkeep';
-        const underground =
-          desired === 'dungeon' ||
-          desired === 'temple' ||
-          desired === 'nythraxis' ||
-          desired === 'delve';
-        // The maze runs its own night rig; otherwise returning outdoors restores the
-        // full daylight rig scaled by the current day/night grade, so stepping out
-        // of a cave at night stays night.
-        this.sun.intensity = mazeNight
-          ? YUMI_MAZE_SUN_INTENSITY
-          : wildheartSun
-            ? WILDHEART_SUN_INTENSITY
-            : keepHearth
-              ? LASTKEEP_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
-        this.hemi.intensity = mazeNight
-          ? YUMI_MAZE_HEMI_INTENSITY
-          : wildheartSun
-            ? WILDHEART_HEMI_INTENSITY
-            : keepHearth
-              ? LASTKEEP_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
-        this.scene.environmentIntensity = mazeNight
-          ? YUMI_MAZE_ENV_INTENSITY
-          : wildheartSun
-            ? WILDHEART_ENV_INTENSITY
-            : keepHearth
-              ? LASTKEEP_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.ambientScale;
-        sharedUniforms.uRimBoost.value = mazeNight
-          ? YUMI_MAZE_RIM_BOOST
-          : wildheartSun
-            ? WILDHEART_RIM_BOOST
-            : keepHearth
-              ? LASTKEEP_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
-        if (wildheartSun) {
-          this.sun.color.setHex(0xffd48c);
-          this.hemi.color.setHex(0xd8ebca);
-          this.hemi.groundColor.setHex(0x5b4a2d);
-        } else if (keepHearth) {
-          // hearth-gold key and bounce; the outdoor path re-grades these
-          // colors every frame once the player steps back outside
-          this.sun.color.setHex(LASTKEEP_SUN_COLOR);
-          this.hemi.color.setHex(LASTKEEP_HEMI_SKY_COLOR);
-          this.hemi.groundColor.setHex(LASTKEEP_HEMI_GROUND_COLOR);
-        }
+        this.applyStateLightRig(desired);
       }
       return;
     }
@@ -11044,7 +10979,7 @@ export class Renderer {
         if (wardstoneLit) {
           this.vfx.castSparkle(e.id, 'arcane', dt * 2.6);
         }
-        if (v.portal && vis) {
+        if (v.portal && vis && !v.portal.userData.staticDoor) {
           v.portal.rotation.z = this.time * 1.4;
           (v.portal.material as THREE.MeshBasicMaterial).opacity =
             0.45 + Math.sin(this.time * 2.2 + e.id) * 0.15;

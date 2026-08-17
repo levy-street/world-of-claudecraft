@@ -25,6 +25,7 @@ import {
   WELCOME_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
+import { applyMoneyDelta, emitPoolMovement } from '../economy_events';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
@@ -492,7 +493,20 @@ export class PostOffice {
     // same way the trade/market fix closed. A single plain entry can legitimately
     // span two provenance buckets (the market's boundstone_helm case), so it
     // splits into one parcel per bucket rather than merging them.
-    meta.copper -= coin + MAIL_POSTAGE;
+    applyMoneyDelta(this.ctx, meta, 'mail_postage', -MAIL_POSTAGE);
+    if (coin > 0) {
+      applyMoneyDelta(this.ctx, meta, 'mail_send', -coin, {
+        counterparty: { kind: 'pool', id: 'mail_escrow' },
+      });
+      // The escrow half. Balance is NULL because the mail escrow is a
+      // per-letter holding, not a running pot: the reconciler's escrow term
+      // sums the live book rather than replaying these rows, so there is no
+      // single figure to state and a 0 would be a false one.
+      emitPoolMovement(this.ctx, meta.entityId, 'mail_send', coin, null, {
+        kind: 'character',
+        id: meta.entityId,
+      });
+    }
     const parcels: InvSlot[] = [];
     for (const s of items) {
       if (s.instance && typeof s.instance === 'object') {
@@ -572,8 +586,17 @@ export class PostOffice {
     let mutated = false;
     // Coin is never capacity-gated: it always lands in the purse.
     if (m.copper > 0) {
-      meta.copper += m.copper;
-      this.result(meta.entityId, 'collected', { value: m.copper });
+      const claimed = m.copper;
+      // Null balance for the same reason as the send half above: the book is a
+      // pile of letters, not a pot with a running total.
+      emitPoolMovement(this.ctx, meta.entityId, 'mail_claim', -claimed, null, {
+        kind: 'character',
+        id: meta.entityId,
+      });
+      applyMoneyDelta(this.ctx, meta, 'mail_claim', claimed, {
+        counterparty: { kind: 'pool', id: 'mail_escrow' },
+      });
+      this.result(meta.entityId, 'collected', { value: claimed });
       m.copper = 0;
       mutated = true;
     }

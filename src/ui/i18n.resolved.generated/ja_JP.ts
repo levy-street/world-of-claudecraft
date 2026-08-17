@@ -953,6 +953,22 @@ export const ja_JP: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "地下蔵",
+        "state": "公務の階",
+        "residence": "居住の階",
+        "tower": "見張り塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "庭園の階",
+        "solar": "日だまりの間"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "北東",
@@ -12378,6 +12394,9 @@ export const ja_JP: EnTranslations = {
       "pristine_claw": {
         "name": "無傷の鉤爪"
       },
+      "dawnhold_posy": {
+        "name": "ドーンホールド庭園の小さな花束"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -16861,6 +16880,11 @@ export const ja_JP: EnTranslations = {
         "name": "最後の砦",
         "enterText": "最後の砦の冷たく静まり返った広間へ足を踏み入れた。",
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
+      },
+      "dawnhold_castle": {
+        "name": "ドーンホールド城",
+        "enterText": "花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。",
+        "leaveText": "日差しあふれる庭園の芝生へと戻った。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

@@ -10,6 +10,9 @@ import {
   MAZE_COLS,
   MAZE_ROWS,
   MAZE_WALL_DEPTH,
+  MAZE_WALL_HEIGHT,
+  MAZE_WALL_OVERLAP,
+  MAZE_WALL_SCALE,
   MAZE_X0,
   MAZE_Z1,
 } from '../sim/world';
@@ -27,8 +30,10 @@ export interface MazePieceSpot {
 // as one continuous grown hedge with no seams. The same uniform scale
 // lands the hedge depth just inside MAZE_WALL_DEPTH, so the collide box
 // sits a hair proud of the leaves instead of inside them.
-export const MAZE_WALL_OVERLAP = 0.75; // yd each piece reaches into its neighbor
-export const MAZE_WALL_SCALE = (MAZE_CELL + 2 * MAZE_WALL_OVERLAP) / 0.98; // 10.5 long, 6.1 high, 4.1 deep
+// MAZE_WALL_OVERLAP / MAZE_WALL_SCALE / MAZE_WALL_HEIGHT live in sim/world.ts
+// beside MAZE_WALL_DEPTH: colliders.ts builds the hedge boxes from them and
+// src/sim may not import src/render. Re-exported below so this module and its
+// test still read one source of truth.
 export const MAZE_ARCH_SCALE = MAZE_CELL / 0.98; // spans the opening, 7.7 high at the crown
 
 export interface GardenMazePlan {
@@ -67,9 +72,6 @@ export function planGardenMazePieces(): GardenMazePlan {
   }
   return { walls, arches };
 }
-
-// The hedges' visual top, for the camera to ride over.
-export const MAZE_WALL_HEIGHT = 0.57 * MAZE_WALL_SCALE; // 6.1yd at the current scale
 
 const CAM_LIFT_RAMP = 2.2; // yd of smooth rise approaching a hedge face
 
@@ -116,4 +118,15 @@ export function gardenMazeCameraLift(x: number, z: number): number {
 }
 
 // re-exported so the painter and its test share the exact cell math
-export { GARDEN_MAZE_GRID, MAZE_CELL, MAZE_COLS, MAZE_ROWS, MAZE_WALL_DEPTH, MAZE_X0, MAZE_Z1 };
+export {
+  GARDEN_MAZE_GRID,
+  MAZE_CELL,
+  MAZE_COLS,
+  MAZE_ROWS,
+  MAZE_WALL_DEPTH,
+  MAZE_WALL_HEIGHT,
+  MAZE_WALL_OVERLAP,
+  MAZE_WALL_SCALE,
+  MAZE_X0,
+  MAZE_Z1,
+};

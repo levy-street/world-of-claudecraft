@@ -36,6 +36,7 @@ import {
 } from '../content/vale_cup';
 import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { applyMoneyDelta } from '../economy_events';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
@@ -1217,7 +1218,7 @@ export function vcupPlaceBet(ctx: SimContext, pid: number, side: 'A' | 'B', amou
     ctx.error(pid, 'Not enough money.');
     return;
   }
-  meta.copper -= stake;
+  applyMoneyDelta(ctx, meta, 'wager_stake', -stake);
   if (side === 'A') match.bets.poolA += stake;
   else match.bets.poolB += stake;
   match.bets.wagers.set(pid, { side, stake: current + stake });
@@ -1238,7 +1239,7 @@ function settleBets(ctx: SimContext, match: VcMatch, winner: 'A' | 'B' | null): 
     const meta = ctx.players.get(pid);
     if (!meta) continue; // bettor left: their stake is forfeit (rare edge)
     if (refundAll) {
-      meta.copper += w.stake;
+      applyMoneyDelta(ctx, meta, 'wager_refund', w.stake);
       ctx.emit({
         type: 'vcupBetSettled',
         pid,
@@ -1251,7 +1252,7 @@ function settleBets(ctx: SimContext, match: VcMatch, winner: 'A' | 'B' | null): 
     if (w.side === winner) {
       const winnings = Math.floor((w.stake * losePool) / winPool);
       const payout = w.stake + winnings;
-      meta.copper += payout;
+      applyMoneyDelta(ctx, meta, 'wager_payout', payout);
       meta.vcupBetWins++;
       meta.vcupBetNet += winnings;
       ctx.emit({ type: 'vcupBetSettled', pid, outcome: 'won', stake: w.stake, payout });

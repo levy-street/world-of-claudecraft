@@ -15,6 +15,7 @@
 
 import type { LockpickView } from '../../world_api';
 import { lockpickPresetFor } from '../content/delves/lockpick_tiers';
+import { applyMoneyDelta } from '../economy_events';
 import {
   ANTE_TO_PAGES,
   ANTE_TO_STEP_TIMEOUT_MS,
@@ -263,7 +264,7 @@ function riftLockpickSucceed(ctx: SimContext, inst: RiftInstance, session: LockS
   const mult = session.lootTier === 'premium' ? 2.2 : session.lootTier === 'medium' ? 1.5 : 1;
   const copper = Math.round((inst.baseLevel + inst.floorCount) * 90 * mult);
   const meta = ctx.players.get(session.ownerId);
-  if (meta) meta.copper += copper;
+  if (meta) applyMoneyDelta(ctx, meta, 'rift_cache', copper);
   ctx.emit({
     type: 'lockpickBonus',
     tier: session.lootTier,

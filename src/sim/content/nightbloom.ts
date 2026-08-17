@@ -595,4 +595,22 @@ export const NIGHTBLOOM_PROPS: ZonePropsDef = {
     { x: -360, z: 1650, ringR: 7, columns: 5 },
   ],
   graveyards: [{ x: -354, z: 1660 }], // barrow field at the king's feet
+  // The night elders: the same standing giants the Wraithwood keeps, ten of
+  // them spread across the moonlit floor. Solid trunk colliders in the sim,
+  // crowns drawn by the realm's foliage pass. Every site was swept against
+  // the live terrain at the production seed and clears the water margin,
+  // the slope limit, the roads, Moonrest, every camp, every gather node,
+  // and the built rings and barrows.
+  greatTrees: [
+    { x: -336, z: 1492, r: 3.1 },
+    { x: -380, z: 1324, r: 2.8 },
+    { x: -468, z: 1432, r: 2.6 },
+    { x: -324, z: 1760, r: 2.8 },
+    { x: -248, z: 1384, r: 2.7 },
+    { x: -484, z: 1592, r: 3.0 },
+    { x: -304, z: 1616, r: 2.6 },
+    { x: -400, z: 1680, r: 2.6 },
+    { x: -216, z: 1524, r: 2.6 },
+    { x: -404, z: 1552, r: 3.0 },
+  ],
 };

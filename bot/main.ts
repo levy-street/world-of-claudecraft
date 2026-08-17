@@ -713,6 +713,10 @@ async function main(): Promise<void> {
       relay: cfg.relayChannelId,
       activity: cfg.activityChannelId,
       dailyRewards: cfg.dailyRewardsChannelId,
+      // Empty unless DISCORD_ECONOMY_ALERTS_CHANNEL_ID is set, on purpose: a
+      // gold conservation finding names a character and must not inherit a
+      // player-visible channel by default (bot/config.ts carries the reasoning).
+      economyAlerts: cfg.economyAlertsChannelId,
     },
     gameUrl: cfg.gameUrl,
     // Read fresh per run, never captured: the gate exists to notice the breaker

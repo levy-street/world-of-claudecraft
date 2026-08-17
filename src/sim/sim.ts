@@ -232,6 +232,7 @@ import { CASCADE_SCENARIO } from './dev/cascade_playtest';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import { arenaMapForSlot } from './dungeon_layout';
+import { applyMoneyDelta } from './economy_events';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -790,7 +791,6 @@ import {
 import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
 import {
-  crossesGardenHedge,
   groundHeight,
   nearSteepWalls,
   terrainSteepnessAt,
@@ -8189,12 +8189,13 @@ export class Sim {
           h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
         if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
       }
-      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       // The Great Maze's hedge walls are hard for mobs too (the maze patrol
-      // knights pace their dead ends instead of drifting through a hedge);
-      // crossesGardenHedge fast-rejects outside the maze, so the open-world
-      // fan pays two comparisons.
-      if (crossesGardenHedge(e.pos.x, e.pos.z, r.x, r.z)) continue;
+      // knights pace their dead ends instead of drifting through a hedge).
+      // resolveMovePoint now does that on its own: the hedges are real collider
+      // boxes, so this no longer needs its own segment test, and keeping one
+      // would reject every candidate for a body that ever ended up inside a
+      // hedge, leaving it stuck instead of letting the push-out carry it clear.
+      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
       if (progress > bestProgress) {
         bestProgress = progress;
@@ -9348,7 +9349,7 @@ export class Sim {
     if (!r) return;
     const result = resolveTrain(this.stationPlacements, r.meta, r.e.pos, recipeId);
     if (result.ok) {
-      r.meta.copper -= result.fee;
+      applyMoneyDelta(this.ctx, r.meta, 'train_fee', -result.fee);
       acquireRecipeImpl(this.ctx, r.meta.entityId, recipeId, 'trainer');
     }
     r.meta.lastTrainResult = result;
@@ -9829,7 +9830,7 @@ export class Sim {
   }
 
   private chargeTownFocusRespec(meta: PlayerMeta, cost: professionsFocus.RespecCost): void {
-    if (cost.coin > 0) meta.copper -= cost.coin;
+    if (cost.coin > 0) applyMoneyDelta(this.ctx, meta, 'respec', -cost.coin);
     if (cost.materials > 0) {
       this.removeItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, cost.materials, meta.entityId);
     }

@@ -72,6 +72,7 @@ import { bagCapacity, fitsAll } from '../bags';
 import { CRAFT_BATCH_MAX, CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
+import { applyMoneyDelta } from '../economy_events';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { forceDismount } from '../mounts';
 import { isCataloguedRelicMark, noteReliquaryMark } from '../reliquary';
@@ -659,7 +660,10 @@ export function resolveCraftForRecipe(
   // CRAFT_GOLD_SINK_COPPER_PER_BUDGET.
   if (meta) {
     const goldFee = Math.ceil(recipe.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
-    meta.copper = Math.max(0, meta.copper - goldFee);
+    // clampToZero carries the floor-at-zero rule above into the ledger: a broke
+    // crafter still crafts, and the row books what the purse actually gave up
+    // rather than the fee that was asked for.
+    applyMoneyDelta(ctx, meta, 'craft_fee', -goldFee, { clampToZero: true });
   }
   let selfSignedBonusApplied = false;
   // The masterwork signed-reagent input: a holding check over the recipe's

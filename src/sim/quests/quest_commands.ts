@@ -25,6 +25,7 @@
 
 import { bagCapacity, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
 import { ITEMS, QUESTS, questRewardItemId } from '../data';
+import { applyMoneyDelta } from '../economy_events';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
 import type { ArchetypeState } from '../professions/archetype';
@@ -437,7 +438,7 @@ export function turnInQuestCore(
   // Quest and chapter deed predicates read questsDone, so re-check this player.
   ctx.markDeedsDirty(meta.entityId);
   if (quest.copperReward > 0) {
-    meta.copper += quest.copperReward;
+    applyMoneyDelta(ctx, meta, 'quest_reward', quest.copperReward);
     ctx.emit({
       type: 'loot',
       text: `You receive ${formatMoney(quest.copperReward)}.`,
