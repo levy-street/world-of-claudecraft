@@ -68,12 +68,28 @@ export interface ReconcileRow {
   id: number;
   characterId: number;
   kind: EconomyEventKind;
+  /** `purse` is the character's own coin; `pool` is a holding area they moved. */
+  holder: 'purse' | 'pool';
   amount: number;
-  balanceAfter: number;
+  /** NULL on a pool row with no single running balance (a burn, a letter). */
+  balanceAfter: number | null;
   prevLedgerId: number | null;
   counterpartyKind: string | null;
   counterpartyId: string | null;
   simTick: number;
+}
+
+/**
+ * The character's own rows, in order. A pool row is attributed to the actor who
+ * MOVED the coin but states a market box's or a treasury's balance, so it is
+ * not part of their purse's history: folding one in would break the chain
+ * arithmetic on every market buy, mail send, and guild deposit, which is the
+ * highest-volume false positive this system could possibly produce.
+ */
+type PurseRow = ReconcileRow & { balanceAfter: number };
+
+function purseRows(rows: readonly ReconcileRow[]): PurseRow[] {
+  return rows.filter((r): r is PurseRow => r.holder === 'purse' && r.balanceAfter !== null);
 }
 
 /**
@@ -88,8 +104,12 @@ export interface ReconcileRow {
  * differs: a broken link with intact arithmetic is a dropped write (check the
  * writer's counters), while broken arithmetic is money that moved without a
  * row (check the code path).
+ *
+ * POOL rows are dropped first: they ride the actor's id for attribution but
+ * describe a holding area, so they are not links in this chain and never were.
  */
-export function checkChain(rows: readonly ReconcileRow[]): EconomyAlert[] {
+export function checkChain(mixed: readonly ReconcileRow[]): EconomyAlert[] {
+  const rows = purseRows(mixed);
   const alerts: EconomyAlert[] = [];
   for (let i = 1; i < rows.length; i++) {
     const prev = rows[i - 1];
@@ -150,6 +170,14 @@ export function checkPersistedBalance(
 /** Every term of the global supply identity, as the job measures them. */
 export interface SupplySnapshot {
   purses: number;
+  /**
+   * The personal bank. Structurally ZERO today and named anyway: `BankState`
+   * (src/sim/bank.ts) is an item vault with no copper field, so no coin can be
+   * there. Kept as an explicit zero rather than dropped so a future
+   * coin-carrying vault has a term to land in; deleting it would make that
+   * coin escape the identity silently, which is the one failure mode this
+   * whole file exists to prevent.
+   */
   bankVaults: number;
   guildTreasuries: number;
   unclaimedMailCoin: number;
@@ -169,6 +197,9 @@ export interface FlowTotals {
  * the realm.
  */
 export function totalFlows(rows: readonly ReconcileRow[]): FlowTotals {
+  // Faucet and sink rows are counted whatever their holder: a burn (the
+  // Merchant's cut) is a pool row and is exactly the sink that makes the
+  // buyer's debit balance.
   let minted = 0;
   let burned = 0;
   for (const r of rows) {
@@ -192,12 +223,26 @@ export function totalSupply(s: SupplySnapshot): number {
  * forever). A positive delta is coin the world holds that no faucet explains,
  * which is the duplication direction and the reason this is the check that
  * pages.
+ *
+ * TWO KNOWN SOURCES OF INCOMPLETE EVIDENCE, both quantified rather than assumed
+ * away, because the closing supply is measured from PERSISTED state while the
+ * ledger records movements the moment they happen:
+ *
+ *   - `droppedWrites`: rows the writer admits it never wrote. Unbounded in
+ *     effect (a dropped row's amount is unknown), so any non-zero count can
+ *     explain any delta, and the finding degrades to a warning outright.
+ *   - `unsettledCopper`: the total by which characters whose save has not yet
+ *     caught up to their last ledger row disagree with it. This one IS bounded,
+ *     and the bound is what keeps the check useful on a realm that is never
+ *     idle: a delta LARGER than the lag can possibly account for is a real
+ *     finding no matter how many players are mid-session, so only the part of
+ *     the delta within the bound is excused.
  */
 export function checkSupply(
   openingSupply: number,
   closingSupply: SupplySnapshot,
   flows: FlowTotals,
-  opts: { droppedWrites: number },
+  opts: { droppedWrites: number; unsettledCopper?: number },
 ): EconomyAlert[] {
   const expected = openingSupply + flows.minted - flows.burned;
   const actual = totalSupply(closingSupply);
@@ -205,7 +250,13 @@ export function checkSupply(
   if (delta === 0) return [];
   // Rows the writer admits it never wrote look exactly like rows a thief
   // prevented. Say so instead of pretending to know which it was.
-  const incomplete = opts.droppedWrites > 0;
+  const dropped = opts.droppedWrites > 0;
+  const lag = Math.abs(opts.unsettledCopper ?? 0);
+  const withinLag = Math.abs(delta) <= lag;
+  const incomplete = dropped || withinLag;
+  const because = dropped
+    ? `the writer dropped ${opts.droppedWrites} rows this window, so the ledger is known to be incomplete`
+    : `unsaved character state accounts for up to ${lag} copper of drift, which covers this`;
   return [
     {
       kind: incomplete ? 'evidence_incomplete' : 'supply_mismatch',
@@ -213,8 +264,8 @@ export function checkSupply(
       characterId: null,
       delta,
       detail: incomplete
-        ? `supply is off by ${delta} copper (holding ${actual}, faucets minus sinks predict ${expected}), but the writer dropped ${opts.droppedWrites} rows this window, so the ledger is known to be incomplete and this cannot be called a dupe`
-        : `supply is off by ${delta} copper: the world holds ${actual} but faucets minus sinks predict ${expected}. ${delta > 0 ? 'Coin exists that nothing minted.' : 'Coin vanished with no sink to explain it.'}`,
+        ? `supply is off by ${delta} copper (holding ${actual}, faucets minus sinks predict ${expected}), but ${because} and this cannot be called a dupe`
+        : `supply is off by ${delta} copper: the world holds ${actual} but faucets minus sinks predict ${expected}${lag > 0 ? `, and unsaved character state can account for at most ${lag} of that` : ''}. ${delta > 0 ? 'Coin exists that nothing minted.' : 'Coin vanished with no sink to explain it.'}`,
     },
   ];
 }
@@ -265,16 +316,26 @@ export function checkTransferSymmetry(rows: readonly ReconcileRow[]): EconomyAle
  */
 export function reconcileWindow(input: {
   rowsByCharacter: ReadonlyMap<number, readonly ReconcileRow[]>;
+  /**
+   * Persisted purses for SETTLED characters only: those whose save is known to
+   * postdate their last ledger row. The job owns that selection, because
+   * comparing an in-session player's half-saved purse against a ledger that is
+   * already ahead of it would report a critical on every active player and
+   * bury the one real finding under them.
+   */
   persistedCopper: ReadonlyMap<number, number>;
   openingSupply: number;
   closingSupply: SupplySnapshot;
   droppedWrites: number;
+  /** Total drift the UNSETTLED characters can account for; see `checkSupply`. */
+  unsettledCopper?: number;
 }): EconomyAlert[] {
   const alerts: EconomyAlert[] = [];
   const all: ReconcileRow[] = [];
   for (const [characterId, rows] of input.rowsByCharacter) {
     alerts.push(...checkChain(rows));
-    const last = rows.length > 0 ? rows[rows.length - 1].balanceAfter : null;
+    const purse = purseRows(rows);
+    const last = purse.length > 0 ? purse[purse.length - 1].balanceAfter : null;
     const persisted = input.persistedCopper.get(characterId);
     // A character with no persisted figure is not a finding: they may simply
     // not have been saved yet. Absence of evidence is not evidence of a dupe.
@@ -287,6 +348,7 @@ export function reconcileWindow(input: {
   alerts.push(
     ...checkSupply(input.openingSupply, input.closingSupply, totalFlows(all), {
       droppedWrites: input.droppedWrites,
+      unsettledCopper: input.unsettledCopper,
     }),
   );
   const rank: Record<EconomyAlertSeverity, number> = { critical: 0, warning: 1, info: 2 };

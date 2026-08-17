@@ -115,6 +115,7 @@ export function applyMoneyDelta(
     type: 'economy',
     pid: holder.entityId,
     kind,
+    holder: 'purse',
     amount: applied,
     balanceAfter: holder.copper,
     counterparty: opts?.counterparty ?? null,
@@ -134,15 +135,22 @@ export function applyMoneyDelta(
  *
  * `actorPid` is the character whose ACTION moved the pool, so the row stays
  * attributable; `poolBalanceAfter` is the POOL's balance, not a purse's, which
- * is why these rows sit out of the per-character chain check (the writer marks
- * them with a pool counterparty and the reconciler skips exactly those).
+ * is why the event is stamped `holder: 'pool'` and the reconciler keeps these
+ * rows out of the per-character chain entirely. The counterparty cannot carry
+ * that job: a burn row (the Merchant's cut) names no counterparty at all and
+ * would otherwise read as a purse row.
+ *
+ * Pass `null` for `poolBalanceAfter` when the movement's holder has no single
+ * running balance: a burn belongs to nobody, and the mail book is a pile of
+ * letters each holding its own coin. Passing 0 there would state a false
+ * balance in a keep-forever table.
  */
 export function emitPoolMovement(
   ctx: EconomyEmitContext,
   actorPid: number,
   kind: EconomyEventKind,
   delta: number,
-  poolBalanceAfter: number,
+  poolBalanceAfter: number | null,
   counterparty: EconomyCounterparty,
 ): void {
   if (!Number.isSafeInteger(delta) || delta === 0) return;
@@ -151,6 +159,7 @@ export function emitPoolMovement(
     type: 'economy',
     pid: actorPid,
     kind,
+    holder: 'pool',
     amount: delta,
     balanceAfter: poolBalanceAfter,
     counterparty,

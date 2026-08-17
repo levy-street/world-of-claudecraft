@@ -498,11 +498,11 @@ export class PostOffice {
       applyMoneyDelta(this.ctx, meta, 'mail_send', -coin, {
         counterparty: { kind: 'pool', id: 'mail_escrow' },
       });
-      // The escrow half. Balance is 0 because the mail escrow is a per-letter
-      // holding, not a running pot: the reconciler's escrow term sums the live
-      // book rather than replaying these rows, so a per-letter balance here
-      // would be a number nothing reads and everything could disagree with.
-      emitPoolMovement(this.ctx, meta.entityId, 'mail_send', coin, 0, {
+      // The escrow half. Balance is NULL because the mail escrow is a
+      // per-letter holding, not a running pot: the reconciler's escrow term
+      // sums the live book rather than replaying these rows, so there is no
+      // single figure to state and a 0 would be a false one.
+      emitPoolMovement(this.ctx, meta.entityId, 'mail_send', coin, null, {
         kind: 'character',
         id: meta.entityId,
       });
@@ -587,7 +587,9 @@ export class PostOffice {
     // Coin is never capacity-gated: it always lands in the purse.
     if (m.copper > 0) {
       const claimed = m.copper;
-      emitPoolMovement(this.ctx, meta.entityId, 'mail_claim', -claimed, 0, {
+      // Null balance for the same reason as the send half above: the book is a
+      // pile of letters, not a pot with a running total.
+      emitPoolMovement(this.ctx, meta.entityId, 'mail_claim', -claimed, null, {
         kind: 'character',
         id: meta.entityId,
       });

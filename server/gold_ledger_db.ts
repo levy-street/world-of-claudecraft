@@ -35,10 +35,21 @@ CREATE TABLE IF NOT EXISTS gold_ledger (
   account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
   character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
   kind TEXT NOT NULL,
+  -- 'purse' or 'pool': whose balance balance_after states. Only purse rows are
+  -- chained (see prev_ledger_id) and only purse rows are compared against the
+  -- persisted save blob; a pool row is booked against the actor who MOVED the
+  -- coin but describes a market collection box, a guild treasury, or a letter
+  -- in flight. Without this column those rows would sit in the actor's chain
+  -- stating a balance that is not their purse.
+  holder TEXT NOT NULL,
   -- Signed copper from the holder's point of view. BIGINT because the sim's
   -- own overflow guard is Number.MAX_SAFE_INTEGER, which does not fit INT.
   amount BIGINT NOT NULL,
-  balance_after BIGINT NOT NULL,
+  -- NULL when the holder has no single running balance: a burn belongs to
+  -- nobody, and the mail book is a pile of letters rather than one pot. NOT
+  -- NULL in practice on every purse row, but the constraint cannot say so
+  -- without a CHECK that would fire on a legitimate pool row.
+  balance_after BIGINT,
   -- The other side of a transfer, as a bounded kind plus its id: 'character',
   -- 'guild', or 'pool' (a market collection box, mail in flight). NULL on a
   -- faucet or a sink, where there is no second party by definition.
@@ -83,6 +94,7 @@ const INSERT_COLUMNS = [
   'account_id',
   'character_id',
   'kind',
+  'holder',
   'amount',
   'balance_after',
   'counterparty_kind',
@@ -104,6 +116,7 @@ function rowParams(r: GoldLedgerInsert): unknown[] {
     r.accountId,
     r.characterId,
     r.kind,
+    r.holder,
     r.amount,
     r.balanceAfter,
     r.counterpartyKind,
@@ -172,6 +185,11 @@ export async function insertGoldLedgerRowInTx(
  * The writer seeds its in-process chain map from this on first write after a
  * boot, so a restart continues the chain instead of restarting it at NULL and
  * blinding the chain check to the very first movement after every deploy.
+ *
+ * PURSE rows only, matching what the writer chains: a pool row is attributed to
+ * the actor but states a holding area's balance, so seeding from one would hand
+ * the next purse row a predecessor whose balance is not a purse and manufacture
+ * a balance_mismatch out of a healthy market buy.
  */
 export async function loadChainHeads(
   characterIds: readonly number[],
@@ -184,7 +202,7 @@ export async function loadChainHeads(
   const res = await pool.query<{ character_id: number; id: string; balance_after: string }>(
     `SELECT DISTINCT ON (character_id) character_id, id, balance_after
        FROM gold_ledger
-      WHERE character_id = ANY($1::int[])
+      WHERE character_id = ANY($1::int[]) AND holder = 'purse'
       ORDER BY character_id, id DESC`,
     [characterIds],
   );
@@ -206,7 +224,7 @@ export async function goldLedgerForCharacter(
   const limit = Math.min(Math.max(1, Math.floor(opts.limit ?? 500)), 5000);
   const sinceId = Math.max(0, Math.floor(opts.sinceId ?? 0));
   const res = await pool.query(
-    `SELECT id, realm, account_id, character_id, kind, amount, balance_after,
+    `SELECT id, realm, account_id, character_id, kind, holder, amount, balance_after,
             counterparty_kind, counterparty_id, prev_ledger_id, sim_tick, zone,
             pos_x, pos_z, session_id, created_at
        FROM gold_ledger
@@ -243,8 +261,9 @@ function mapRow(r: Record<string, unknown>): GoldLedgerRow {
     accountId: r.account_id === null ? null : Number(r.account_id),
     characterId: Number(r.character_id),
     kind: String(r.kind),
+    holder: r.holder === 'pool' ? 'pool' : 'purse',
     amount: Number(r.amount),
-    balanceAfter: Number(r.balance_after),
+    balanceAfter: r.balance_after === null ? null : Number(r.balance_after),
     counterpartyKind: r.counterparty_kind === null ? null : String(r.counterparty_kind),
     counterpartyId: r.counterparty_id === null ? null : String(r.counterparty_id),
     prevLedgerId: r.prev_ledger_id === null ? null : Number(r.prev_ledger_id),

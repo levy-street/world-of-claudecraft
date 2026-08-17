@@ -34,6 +34,7 @@ function row(over: Partial<ReconcileRow> = {}): ReconcileRow {
     id: overrideId ?? nextId++,
     characterId: 1,
     kind: 'vendor_sell',
+    holder: 'purse',
     amount: 0,
     balanceAfter: 0,
     prevLedgerId: null,
@@ -102,7 +103,7 @@ describe('balance_after chaining detects a bypassed mutation', () => {
     ]);
     // A mutation happened between the two rows without writing one: the purse
     // jumped by 5000 that no row explains.
-    rows[1].balanceAfter += 5000;
+    rows[1].balanceAfter = (rows[1].balanceAfter ?? 0) + 5000;
     const alerts = checkChain(rows);
     expect(kinds(alerts)).toEqual(['balance_mismatch']);
     expect(alerts[0].severity).toBe('critical');
@@ -328,5 +329,149 @@ describe('reconcileWindow', () => {
       droppedWrites: 0,
     });
     expect(alerts).toEqual([]);
+  });
+});
+
+describe('pool rows are attributed to the actor without joining their chain', () => {
+  // The exact evidence one market buy leaves: the buyer's purse debit, then the
+  // seller's collection box filling, then the Merchant's cut burning. All three
+  // carry the BUYER's character id, because the buyer is who moved the coin.
+  function marketBuy(characterId: number, purseBefore: number) {
+    const purchase = row({
+      characterId,
+      kind: 'market_purchase',
+      amount: -1000,
+      balanceAfter: purseBefore - 1000,
+      counterpartyKind: 'pool',
+      counterpartyId: 'market_escrow',
+    });
+    return [
+      purchase,
+      // The FULL price, matching the debit: the escrow briefly holds all of it
+      // and the cut comes out on the next row. A hold booked at the post-cut
+      // 950 would sit in a different (tick, magnitude) bucket from the -1000
+      // debit and both halves would read as orphans on every market buy.
+      row({
+        characterId,
+        kind: 'market_escrow_hold',
+        holder: 'pool',
+        amount: 1000,
+        balanceAfter: 1000,
+        counterpartyKind: 'character',
+        counterpartyId: '77',
+      }),
+      // The burn names no counterparty at all, which is why `holder` and not
+      // the counterparty column is what keeps it out of the chain.
+      row({ characterId, kind: 'market_fee', holder: 'pool', amount: -50, balanceAfter: 950 }),
+    ];
+  }
+
+  it('pairs the two halves of a real 5%-cut buy instead of calling both orphans', () => {
+    // The regression this shape exists for: the cut makes the debit and the
+    // hold differ, and a symmetry check that pairs on magnitude alone reports
+    // TWO criticals per market buy on a healthy realm.
+    expect(checkTransferSymmetry(marketBuy(3, 5000))).toEqual([]);
+  });
+
+  it('stays silent on a market buy instead of crying balance_mismatch', () => {
+    const buy = marketBuy(3, 5000);
+    // The buyer's next purse movement chains onto the debit, skipping the two
+    // pool rows physically between them.
+    const next = row({
+      characterId: 3,
+      kind: 'vendor_buy',
+      amount: -400,
+      balanceAfter: 3600,
+      prevLedgerId: buy[0].id,
+    });
+    expect(checkChain([...buy, next])).toEqual([]);
+  });
+
+  it('compares the save against the last PURSE row, not the last row', () => {
+    const buy = marketBuy(3, 5000);
+    const alerts = reconcileWindow({
+      rowsByCharacter: new Map([[3, buy]]),
+      // The purse really is at 4000. Reading the trailing market_fee row's
+      // balance instead would compare the save against a burn and page an
+      // operator for a healthy trade.
+      persistedCopper: new Map([[3, 4000]]),
+      openingSupply: 5000,
+      closingSupply: {
+        purses: 4000,
+        bankVaults: 0,
+        guildTreasuries: 0,
+        unclaimedMailCoin: 0,
+        marketEscrow: 950,
+        // 5000 - 50 burned = 4950, and the world holds 4000 + 950.
+      },
+      droppedWrites: 0,
+    });
+    expect(alerts).toEqual([]);
+  });
+
+  it('still counts a pool-side burn as a sink, or the identity would not close', () => {
+    // The Merchant's cut is only ever booked on a pool row. A totalFlows that
+    // skipped pool rows would leave the buyer's debit unexplained.
+    expect(totalFlows(marketBuy(3, 5000))).toEqual({ minted: 0, burned: 50 });
+  });
+});
+
+describe('unsaved character state degrades supply findings without blinding them', () => {
+  const held = (purses: number) => ({
+    purses,
+    bankVaults: 0,
+    guildTreasuries: 0,
+    unclaimedMailCoin: 0,
+    marketEscrow: 0,
+  });
+
+  it('excuses a gap the unsaved purses can account for', () => {
+    // Faucets predict 1000, the saves add up to 1300, and characters whose save
+    // has not caught up to their ledger disagree by 400. The gap is inside the
+    // lag, so it is a warning an operator can ignore, not a page.
+    const alerts = checkSupply(
+      0,
+      held(1300),
+      { minted: 1000, burned: 0 },
+      {
+        droppedWrites: 0,
+        unsettledCopper: 400,
+      },
+    );
+    expect(kinds(alerts)).toEqual(['evidence_incomplete']);
+    expect(alerts[0].severity).toBe('warning');
+  });
+
+  it('still pages when the gap is bigger than the lag can explain', () => {
+    // Same window, but the drift only covers 100 of the 300. The remaining 200
+    // is coin no amount of save lag can produce, so it pages. This is what
+    // keeps the check alive on a realm that is never idle.
+    const alerts = checkSupply(
+      0,
+      held(1300),
+      { minted: 1000, burned: 0 },
+      {
+        droppedWrites: 0,
+        unsettledCopper: 100,
+      },
+    );
+    expect(kinds(alerts)).toEqual(['supply_mismatch']);
+    expect(alerts[0].severity).toBe('critical');
+    expect(alerts[0].delta).toBe(300);
+  });
+
+  it('lets a dropped write outrank the lag bound, because its size is unknown', () => {
+    // A row the writer never wrote has an unknown amount, so it can explain any
+    // gap; no bound applies and the finding degrades whatever the lag says.
+    const alerts = checkSupply(
+      0,
+      held(9999),
+      { minted: 0, burned: 0 },
+      {
+        droppedWrites: 1,
+        unsettledCopper: 0,
+      },
+    );
+    expect(kinds(alerts)).toEqual(['evidence_incomplete']);
   });
 });

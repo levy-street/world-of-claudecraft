@@ -81,20 +81,27 @@ interface PendingRow {
 }
 
 /**
- * Split rows into ordered ROUNDS, each holding at most one row per character
- * and preserving each character's original relative order.
+ * Split rows into ordered ROUNDS, each holding at most one CHAINED row per
+ * character and preserving each character's original relative order.
  *
  * Exported pure so the property that matters is testable without a database:
- * round N holds every character's Nth row, so writing rounds in order writes
- * each character's rows in order, and every row can chain onto a predecessor
- * whose id is already known.
+ * round N holds every character's Nth purse row, so writing rounds in order
+ * writes each character's rows in order, and every chained row can point at a
+ * predecessor whose id is already known.
+ *
+ * Only PURSE rows consume a round slot. A pool row is never chained, so several
+ * of them can share one statement: a market buy (one purse row, then two pool
+ * rows) costs two rounds rather than three. They still land AFTER the purse row
+ * they follow, because id order is read as movement order on the admin page and
+ * collapsing them into round 0 would print the escrow filling before the debit
+ * that filled it.
  */
 export function splitIntoChainRounds(rows: readonly GoldLedgerInsert[]): GoldLedgerInsert[][] {
   const rounds: GoldLedgerInsert[][] = [];
   const seen = new Map<number, number>();
   for (const row of rows) {
     const n = seen.get(row.characterId) ?? 0;
-    seen.set(row.characterId, n + 1);
+    if (row.holder === 'purse') seen.set(row.characterId, n + 1);
     if (rounds[n] === undefined) rounds[n] = [];
     rounds[n].push(row);
   }
@@ -176,6 +183,7 @@ export class LedgerWriter {
       accountId: actor.accountId,
       characterId: actor.characterId,
       kind: ev.kind,
+      holder: ev.holder,
       amount: ev.amount,
       balanceAfter: ev.balanceAfter,
       counterpartyKind: cp.kind,
@@ -296,9 +304,16 @@ export class LedgerWriter {
     }
   }
 
-  // One statement's worth of rows, at most one per character.
+  // One statement's worth of rows, at most one CHAINED row per character.
   private async writeRound(rows: GoldLedgerInsert[]): Promise<void> {
     for (const row of rows) {
+      // A pool row is booked against the actor but describes a holding area, so
+      // it joins no chain: giving it a predecessor would make the actor's next
+      // purse row chain through a balance that is not a purse.
+      if (row.holder !== 'purse') {
+        row.prevLedgerId = null;
+        continue;
+      }
       const head = this.chain.get(row.characterId);
       row.prevLedgerId = head ? head.id : null;
     }
@@ -325,8 +340,13 @@ export class LedgerWriter {
     this.rowsWritten += ids.length;
     for (let i = 0; i < rows.length; i++) {
       const id = ids[i];
+      const row = rows[i];
       if (id === undefined) continue;
-      this.chain.set(rows[i].characterId, { id, balanceAfter: rows[i].balanceAfter });
+      // Pool rows never advance the head: the chain is a purse's history, and a
+      // pool balance parked there would be the predecessor of the character's
+      // next real movement.
+      if (row.holder !== 'purse' || row.balanceAfter === null) continue;
+      this.chain.set(row.characterId, { id, balanceAfter: row.balanceAfter });
     }
   }
 

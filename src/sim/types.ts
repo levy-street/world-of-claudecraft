@@ -6537,8 +6537,22 @@ export type SimEvent = { pid?: number } & (
       type: 'economy';
       pid: number;
       kind: EconomyEventKind;
+      // WHOSE balance `balanceAfter` describes. `purse` is the acting
+      // character's own coin, and those rows alone form their chain; `pool` is
+      // a holding area the sim owns but nobody carries (a market collection
+      // box, a guild treasury, a letter in flight), booked against the actor
+      // who MOVED it so the row stays attributable. Without this discriminator
+      // a pool row would sit in the actor's chain stating a balance that is not
+      // their purse, and the chain check would report a critical
+      // balance_mismatch on every market buy, mail send, and guild deposit.
+      holder: 'purse' | 'pool';
       amount: number;
-      balanceAfter: number;
+      // NULL when the holder has no single running balance to state: a burn
+      // (the Merchant's cut) belongs to nobody, and the mail book is a pile of
+      // letters each holding its own coin rather than one balance. A zero would
+      // be a lie in a keep-forever table, and no reader could tell that lie
+      // from a genuinely drained holder.
+      balanceAfter: number | null;
       counterparty: EconomyCounterparty;
       // The sim clock, never a wall clock. Two events from one tick share it,
       // which is what lets the reconciliation job reason about same-tick races.

@@ -15,8 +15,16 @@ export interface GoldLedgerInsert {
   accountId: number | null;
   characterId: number;
   kind: string;
+  // Whose balance `balanceAfter` states: the character's own purse, or a pool
+  // they moved coin into or out of. Only `purse` rows carry the per-character
+  // chain (see `prevLedgerId`); a pool row is attributed to the actor but
+  // describes a holding area, so folding it into the chain would break the
+  // arithmetic the chain check exists to test.
+  holder: 'purse' | 'pool';
   amount: number;
-  balanceAfter: number;
+  // NULL when the holder has no single running balance (a burn, a letter in
+  // flight). Always a number on a `purse` row.
+  balanceAfter: number | null;
   counterpartyKind: string | null;
   counterpartyId: string | null;
   prevLedgerId: number | null;

@@ -814,33 +814,32 @@ export class Market {
     );
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
+      const fee = listing.price - proceeds;
       const col = this.collectionFor(listing.sellerKey);
       col.copper += proceeds;
-      // The escrow half of the buyer's debit above: what the box actually
-      // received. Emitted against the BUYER's pid (the actor who moved it);
-      // the seller is named as the counterparty so an operator reading the
+      // The escrow half of the buyer's debit above, for the FULL price. The
+      // Merchant's cut comes out of the escrow on the next row rather than
+      // being netted off here, so the two halves of the transfer are equal and
+      // opposite: the reconciler pairs transfer rows by magnitude, and a hold
+      // booked at 95% would leave both halves looking like orphans on every
+      // single market buy. Emitted against the BUYER's pid (the actor who moved
+      // it); the seller is named as the counterparty so an operator reading the
       // buyer's page can see where the coin went.
       const seller = this.metaByMarketSellerKey(listing.sellerKey);
       emitPoolMovement(
         this.ctx,
         meta.entityId,
         'market_escrow_hold',
-        proceeds,
-        col.copper,
+        listing.price,
+        // The escrow's balance BEFORE the cut is taken: the box briefly holds
+        // the whole price, and the fee row below states what it holds after.
+        col.copper + fee,
         seller ? { kind: 'character', id: seller.entityId } : { kind: 'pool', id: 'market_escrow' },
       );
-      // The Merchant's cut: the difference between what the buyer paid and
-      // what the box received, destroyed. Booked as its own sink row so the
-      // supply identity balances without anyone having to re-derive
-      // MARKET_CUT from two other rows.
-      emitPoolMovement(
-        this.ctx,
-        meta.entityId,
-        'market_fee',
-        -(listing.price - proceeds),
-        col.copper,
-        null,
-      );
+      // The Merchant's cut, taken out of the escrow and destroyed. Booked as
+      // its own sink row so the supply identity balances without anyone having
+      // to re-derive MARKET_CUT from two other rows.
+      emitPoolMovement(this.ctx, meta.entityId, 'market_fee', -fee, col.copper, null);
       // Itemize the sale beside the gold it produced. The listing row is spliced
       // away on the next line, so this is the last point that still knows WHAT
       // sold; without it the seller's collection is a bare copper total.
@@ -864,9 +863,16 @@ export class Market {
     }
     if (listing.house) {
       // A filler listing has no seller and no collection box, so the entire
-      // price leaves the world. Without this row the buyer's market_purchase
-      // debit would look like an unexplained loss to the supply identity.
-      emitPoolMovement(this.ctx, meta.entityId, 'market_fee', -listing.price, 0, null);
+      // price leaves the world. Same two rows as a real sale all the same, with
+      // the cut equal to the whole price: the Merchant's till takes the
+      // transfer's other half (so the buyer's debit is not an orphan), then
+      // burns it (so the supply identity sees where the coin went). The till is
+      // not a pot anyone measures, hence the null balances.
+      emitPoolMovement(this.ctx, meta.entityId, 'market_escrow_hold', listing.price, null, {
+        kind: 'pool',
+        id: 'market_escrow',
+      });
+      emitPoolMovement(this.ctx, meta.entityId, 'market_fee', -listing.price, null, null);
     }
     this.ctx.emit({
       type: 'loot',
@@ -944,7 +950,10 @@ export class Market {
     this.bumpCollections();
     if (col.copper > 0) {
       const collected = col.copper;
-      // Pool side first, so the two rows read in the order the coin moved.
+      // Pool side first, so the two rows read in the order the coin moved. The
+      // 0 balance is REAL here, not the placeholder the burn rows pass null
+      // for: collecting empties the box, and `col.copper = 0` below is that
+      // same figure.
       emitPoolMovement(this.ctx, meta.entityId, 'market_escrow_release', -collected, 0, {
         kind: 'character',
         id: meta.entityId,

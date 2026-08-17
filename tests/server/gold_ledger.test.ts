@@ -52,6 +52,7 @@ function economyEvent(over: Partial<Extract<SimEvent, { type: 'economy' }>> = {}
     type: 'economy',
     pid: 1,
     kind: 'vendor_sell',
+    holder: 'purse',
     amount: 100,
     balanceAfter: 100,
     counterparty: null,
@@ -112,7 +113,7 @@ describe('LedgerWriter chain', () => {
     const rows = deps.rows.filter((r) => r.characterId === 901);
     // The identity the reconciler checks: previous balance plus this amount
     // equals this balance. A mutation that skipped the ledger breaks it here.
-    expect(rows[0].balanceAfter + rows[1].amount).toBe(rows[1].balanceAfter);
+    expect((rows[0].balanceAfter ?? 0) + rows[1].amount).toBe(rows[1].balanceAfter);
   });
 });
 
@@ -249,5 +250,64 @@ describe('LedgerWriter actor resolution', () => {
     w.observe([{ type: 'tradeDone', pid: 1 } as SimEvent], 1);
     await w.drain();
     expect(deps.rows).toHaveLength(0);
+  });
+});
+
+describe('LedgerWriter pool rows', () => {
+  // A market buy is the shape that broke: one purse row (the buyer's debit) and
+  // two pool rows (the seller's box filling, the Merchant's cut burning), all
+  // three booked against the SAME character id because the buyer is the actor.
+  const marketBuy = [
+    economyEvent({ pid: 1, kind: 'market_purchase', amount: -1000, balanceAfter: 4000 }),
+    economyEvent({
+      pid: 1,
+      kind: 'market_escrow_hold',
+      holder: 'pool',
+      amount: 950,
+      balanceAfter: 950,
+    }),
+    economyEvent({ pid: 1, kind: 'market_fee', holder: 'pool', amount: -50, balanceAfter: null }),
+  ];
+
+  it('leaves pool rows out of the chain instead of threading the actor through them', async () => {
+    const deps = fakeDeps();
+    const w = writerWith(deps);
+    w.observe(marketBuy, 1);
+    // A second purse movement, so the row AFTER the pool rows is the one that
+    // would have chained onto a box balance under the old behavior.
+    w.observe([economyEvent({ pid: 1, kind: 'vendor_buy', amount: -400, balanceAfter: 3600 })], 3);
+    await w.drain();
+
+    const rows = deps.rows.filter((r) => r.characterId === 901);
+    const purse = rows.filter((r) => r.holder === 'purse');
+    const pool = rows.filter((r) => r.holder === 'pool');
+    expect(pool).toHaveLength(2);
+    // A pool row joins no chain in either direction.
+    expect(pool.every((r) => r.prevLedgerId === null)).toBe(true);
+    // The purse chain skips straight over them: the vendor_buy points at the
+    // market_purchase, not at the escrow row physically between the two.
+    expect(purse.map((r) => r.kind)).toEqual(['market_purchase', 'vendor_buy']);
+    expect(purse[0].prevLedgerId).toBeNull();
+    // market_purchase is written first, so the fake hands it id 1; the pool
+    // rows that follow take 2 and 3 and neither becomes the predecessor.
+    expect(purse[1].prevLedgerId).toBe(1);
+    // And the arithmetic the reconciler checks still holds across the gap.
+    expect((purse[0].balanceAfter ?? 0) + purse[1].amount).toBe(purse[1].balanceAfter);
+  });
+
+  it('lets sibling pool rows share one statement instead of one round each', async () => {
+    const deps = fakeDeps();
+    const w = writerWith(deps);
+    w.observe(marketBuy, 1);
+    await w.drain();
+    // Two rounds, not three: the purse row goes first so ids still read in
+    // movement order, and the two pool rows then ride together because neither
+    // needs an id the other could chain onto.
+    expect(deps.batches).toBe(2);
+    expect(deps.rows.map((r) => r.kind)).toEqual([
+      'market_purchase',
+      'market_escrow_hold',
+      'market_fee',
+    ]);
   });
 });
