@@ -4261,6 +4261,7 @@ export const fr_CA: EnTranslations = {
       "groupCamera": "Caméra",
       "talents": "Talents",
       "professions": "Métiers",
+      "harvestJournal": "Harvest Journal",
       "arena": "Fenêtre JcJ (les arènes et les Champs de Thornhollow)",
       "leaderboard": "Classement",
       "deeds": "Livre des hauts faits",

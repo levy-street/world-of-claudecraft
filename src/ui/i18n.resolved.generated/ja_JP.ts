@@ -4261,6 +4261,7 @@ export const ja_JP: EnTranslations = {
       "groupCamera": "カメラ",
       "talents": "タレント",
       "professions": "生産職",
+      "harvestJournal": "収穫日誌",
       "arena": "PvPウィンドウ（アリーナとソーンホロウ平原）",
       "leaderboard": "リーダーボード",
       "deeds": "功績の書",

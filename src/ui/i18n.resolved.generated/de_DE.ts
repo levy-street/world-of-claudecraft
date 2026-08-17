@@ -4261,6 +4261,7 @@ export const de_DE: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Talente",
       "professions": "Berufe",
+      "harvestJournal": "Harvest Journal",
       "arena": "PvP-Fenster (die Arenen und die Thornhollow-Felder)",
       "leaderboard": "Bestenliste",
       "deeds": "Buch der Taten",

@@ -6016,6 +6016,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': '排行榜',
   'guide.controls.deeds': '功绩之书',
   'guide.controls.reliquary': '圣物库',
+  'guide.controls.harvestJournal': '收成日志',
   'guide.controls.sheathe': '收起/拔出武器',
   'guide.controls.crafting': '制作',
   'guide.controls.valeCup': '溪谷杯',

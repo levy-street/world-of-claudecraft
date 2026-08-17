@@ -5109,6 +5109,7 @@ export type TranslationKeyFlat =
   | 'guide.controls.groupInterface'
   | 'guide.controls.groupMovement'
   | 'guide.controls.groupPet'
+  | 'guide.controls.harvestJournal'
   | 'guide.controls.intro'
   | 'guide.controls.jumpSwim'
   | 'guide.controls.keyHeader'

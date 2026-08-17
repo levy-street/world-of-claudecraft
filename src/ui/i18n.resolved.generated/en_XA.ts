@@ -4261,6 +4261,7 @@ export const en_XA: EnTranslations = {
       "groupCamera": "[Çáɱéŕá]",
       "talents": "[Ţáļéñţš]",
       "professions": "[Þŕóƒéššíóñš]",
+      "harvestJournal": "[Ĥáŕʋéšţ Ĵóúŕñáļ]",
       "arena": "[ÞʋÞ ŵíñðóŵ (ţĥé áŕéñáš áñð Ţĥóŕñĥóļļóŵ Ƒíéļðš)]",
       "leaderboard": "[Ļéáðéŕƀóáŕð]",
       "deeds": "[Ɓóóķ óƒ Ðééðš]",

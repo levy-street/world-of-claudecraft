@@ -4261,6 +4261,7 @@ export const vi_VN: EnTranslations = {
       "groupCamera": "Máy quay",
       "talents": "Thiên Phú",
       "professions": "Nghề Nghiệp",
+      "harvestJournal": "Harvest Journal",
       "arena": "Cửa sổ PvP (các đấu trường và Cánh Đồng Trũng Gai)",
       "leaderboard": "Bảng xếp hạng",
       "deeds": "Sách Kỳ Công",

@@ -337,6 +337,7 @@ export const guideStrings = {
     groupCamera: 'Camera',
     talents: 'Talents',
     professions: 'Professions',
+    harvestJournal: 'Harvest Journal',
     arena: 'PvP window (the arenas and Thornhollow Fields)',
     leaderboard: 'Leaderboard',
     deeds: 'Book of Deeds',
