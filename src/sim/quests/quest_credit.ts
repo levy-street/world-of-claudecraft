@@ -6,7 +6,10 @@
 // through the seam; the foreign callers (handleDeath, the addItem/removeItem/buyBackItem
 // inventory hub, finalizeQuestAccept, interactNpcForQuests, and the N1 crypt
 // interactObjectForQuests) invoke them via ctx.onMobKilledForQuests /
-// ctx.onInventoryChangedForQuests / ctx.checkQuestReady.
+// ctx.onInventoryChangedForQuests / ctx.checkQuestReady. The farming action arm
+// (onCropFarmedForQuests) is imported DIRECTLY by professions/farming.ts, the
+// module-to-module shape its queueGatheringGrant import already uses: the
+// coordinator has no headroom for another callback wiring site.
 //
 // src/sim-pure: imports only sibling sim types + the QUESTS data table (no render/ui/
 // game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in Node, the
@@ -107,6 +110,30 @@ export function onNodeGatheredForQuests(
     }
     return true;
   });
+}
+
+/** Credit a farm objective only after the plant or harvest ACTION commits
+ *  (src/sim/professions/farming.ts plantCrop after the plot write and
+ *  harvestCrop after the grant, on EVERY harvest outcome, withered included:
+ *  the visit is the deed). The gather precedent: inventory cannot prove the
+ *  deed (produce is a fungible material and the seed is spent), so this arm
+ *  never reads bags. `cropId` narrows to one crop when the objective names
+ *  one; `patchId` is marker guidance only (quest_targets.ts) and never gates
+ *  the credit. Draws NO rng. */
+export function onCropFarmedForQuests(
+  ctx: SimContext,
+  action: 'plant' | 'harvest',
+  cropId: string,
+  meta: PlayerMeta,
+): void {
+  creditDiscreteQuestObjectives(
+    ctx,
+    meta,
+    (objective) =>
+      objective.type === 'farm' &&
+      objective.action === action &&
+      (objective.cropId === undefined || objective.cropId === cropId),
+  );
 }
 
 export function onInventoryChangedForQuests(ctx: SimContext, meta: PlayerMeta): void {
