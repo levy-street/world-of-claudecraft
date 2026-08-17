@@ -38,6 +38,32 @@ one. The shared shapes this phase builds against landed on the phase branch befo
 build fan-out: the QuestObjective 'farm' member (2953d6ccb2) and the NpcDef `farmer`
 flag (2f22f9a5e9).
 
+EXECUTED 2026-08-17 (deviations decided in-phase, ledgered as state.md (bg) to (bm);
+this block is the sweep the QA twin verifies against): the three non-Jessica farmers
+are Farmer Teasel (Fenbridge, 'Fen Paddy Farmer'), Farmer Hollis (Highwatch,
+'Highwatch Terrace Farmer'), and Farmer Verbena (the Evergarden parterre, 'Parterre
+Gardener'), Jessica is 'Allotment Keeper'; every farmer is `farmer: true` and stands 4
+to 6 yards off its patch (probed against the real Sim: no findSafePos nudge, in zone,
+dry, off roads and camps). The intro quest is q_farm_intro 'First Furrow' with the two
+'farm' objectives marker-hinted at patch_eastbrook (patchId never gates the credit,
+(bk)); its granted hoe and seed are fenced noVendorSell + noMarketList per the
+starter-tools doctrine, which makes a purchased garden hoe unsellable and leaves the
+seed re-grant a per-talk faucet closed at ready and open only through face-to-face
+trade ((bg), maintainer read owed). The credit arm is a module-to-module import from
+farming.ts, not a SimContext callback ((bj), sim.ts headroom). The R37 flip keeps the
+node-rung hub exclusion and replaces the dormant arm with the positive farmer-stock
+pin; garden_hoe is stocked at Jessica only ((bl)). Two kitchens work orders (vale_wheat
+x8 -> 16, marsh_rice x5 -> 20) ride the per-order cadence ((bm)). Every NPC is a
+terrain calm pad, so the deliberate re-mint covered the goldens AND the terrain atlas,
+the Eastbrook chunk digest, and five map plates ((bh)); the golden movement itself was
+machine-classified as the +4 id shift with two explained consequences. The husk-trade
+dialog row shares the vendor family's 1-yd offered-but-refused band ((bi)). NO
+server/ file moved (a comment only), so the privacy-security row was dispatched on the
+session's instruction rather than the matrix rule and passed. The tier-1 watch fee is
+TWO produce: the day-one shopping list is seed + compost + two carrots (28 copper) and
+the intro quest's 50 copper covers it. The QA twin's live-client journey must play the
+Highwatch shelf too ((bh)).
+
 ### Starter Prompt
 
 ```

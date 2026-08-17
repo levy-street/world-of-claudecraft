@@ -4,9 +4,50 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 9 (world presence, go-live) IN PROGRESS on
-fix/farming-phase-09-world-presence off feature/farming-plan at 26f330cea2.
-The SEVENTEENTH absorb opened it (2026-08-17): merge 89030e4e0f of
+Current phase: Phase 9 (world presence, GO-LIVE) done 2026-08-17 on
+fix/farming-phase-09-world-presence off feature/farming-plan at 26f330cea2
+(merged --no-ff back into feature/farming-plan; hash in progress.md; next is
+Phase 9 QA, docs/farming/phase-09-qa.md starter). FARMING IS LIVE on the
+merged branch: four static farmer NPCs (Farmer Jessica 'Allotment Keeper' at
+Eastbrook (24.5, 32.5), Farmer Teasel 'Fen Paddy Farmer' at Fenbridge (-21,
+333.5) with a fenbridge_layout row, Farmer Hollis 'Highwatch Terrace Farmer'
+at Highwatch (-18, 695.5), Farmer Verbena 'Parterre Gardener' at the Evergarden
+parterre (348.5, 867); D17-audited real plant words, none a farmer NPC in
+WoW, OSRS, Stardew, Palia, or Harvest Moon; all four `farmer: true`), vendor
+stock (Jessica: vale_wheat_seed 4, brook_carrot_seed 4, brook_carrot 16,
+compost 8, garden_hoe 20; Teasel: marsh_rice_seed 8, bog_beet_seed 8,
+compost; Hollis and Verbena: compost only; tier 3/4 seeds, growth_tonic,
+dishes, and hoe rungs 2-4 on NO counter), the intro quest q_farm_intro
+'First Furrow' at Jessica (requiredItems garden_hoe + vale_wheat_seed;
+objectives on the new QuestObjective 'farm' member, plant then harvest one
+Vale Wheat, marker-hinted at patch_eastbrook; xp 150 / copper 50; the magic
+sentence and the Harvest Journal pointer verbatim in BOTH her greeting and
+the completion text), the credit arm onCropFarmedForQuests
+(src/sim/quests/quest_credit.ts, called from plantCrop and all three
+harvestCrop terminal branches, withered included), the 'farm' marker arm in
+src/sim/quest_targets.ts (pushEnclosing over the patch beds), the husk-trade
+range gate (src/sim/professions/farmer_npcs.ts nearFarmerNpc over ctx.grid,
+FARMER_TRADE_RANGE = INTERACT_RANGE + 2 = 7, farmDenied 'no_farmer' appended
+to the reason union) with its gossip row [data-husk-trade] in the NPC
+dialog, two kitchens work orders at cook_marlow (vale_wheat x8 for 16
+copper, marsh_rice x5 for 20 copper, both floor(0.5 x sell) with the
+arithmetic comment), the R37 flips (deviation (bl)), the live guide page
+prose, and the deliberate re-mints (68 goldens for the +4 entity-id shift,
+machine-classified; the terrain atlas, the Eastbrook chunk digest, and the
+four farming-zone map plates plus the world strip because every NPC is a
+calm-anchor terrain pad, deviation (bh)). Golden md5 farming_session 8fe57fe3
+to 19c49aac (this phase's one deliberate move after the absorb's). Reviews:
+architecture 0 BLOCKING, cross-platform 0 BLOCKING (approve),
+frontend-seam 0 BLOCKING (pass with follow-ups), content-obligations PASS
+(no should-fix; deeds and Reliquary correctly Phase 10 / N-A),
+test-coverage PASS (14/14 mutants killed after its pins), privacy-security
+0 BLOCKING (ship-able; the trade-pipe note is (bg)), qa-checklist per the
+progress.md record. Baselines HELD: commands 202/215, IWorld 329 = 88 +
+241, facets 34, delta keys 87 (no wire member, no command, no facet member
+this phase). Monolith: hud.ts, renderer.ts, main.ts untouched; sim.ts a
+same-line-count comment reword (12659/12660). Deviations (bg) to (bm)
+below; maintainer reads owed on (bg) and (bh). The SEVENTEENTH absorb opened
+the phase (2026-08-17): merge 89030e4e0f of
 origin/release/v0.39.0 tip f48c7a3a9b (80 commits, 952 files, 74-file
 farming intersection; same minor version and a two-digit intersection, so
 a regular absorb, not the 06b shape). Headline systems: the castles feature
@@ -1876,10 +1917,161 @@ question does not arise (farming has no station).
     revert wiped the uncommitted pin it was proving; the battery's fix
     landed in its own commit before any further probe.
 
+- Phase 9 ledger (go-live, 2026-08-17). NPCs: farmer_jessica (zone1.ts
+  ZONE1_NPCS, appended last, inline pos (24.5, 32.5) facing -PI/2, color
+  0xa8843a, questIds ['q_farm_intro'], vendorItems ['vale_wheat_seed',
+  'brook_carrot_seed', 'brook_carrot', 'compost', 'garden_hoe']),
+  farmer_teasel (zone2.ts + fenbridge_layout.ts services.npcs row anchored
+  to patch_mirefen, (-21, 333.5), vendorItems ['marsh_rice_seed',
+  'bog_beet_seed', 'compost']), farmer_hollis (zone3.ts, (-18, 695.5),
+  ['compost']), farmer_verbena (evergarden.ts, (348.5, 867), ['compost']);
+  every def `farmer: true` (NpcDef flag, src/sim/types.ts); NPC_IDS rows in
+  src/ui/world_entity_i18n.ts; entities.npcs.<id>.{name,title,greeting}
+  with the five non-Latin fills; VOICE_ALIAS rows in
+  scripts/voices/npc_voice_prompts.mjs (jessica -> provisioner_fenna, teasel
+  -> trapper_brosk, hollis -> groundskeeper_bram, verbena ->
+  orchardist_pomeline) plus docs/design/npc_voices.md entries; every farmer
+  renders through the NPC_KEYS 'npc_villager' fallback (no explicit look
+  row; the Phase 13 art batch may assign one). Quest: q_farm_intro 'First
+  Furrow' (zone1.ts right after q_prof_intro; ZONE1_QUEST_ORDER after
+  q_prof_intro; QUEST_IDS after q_prof_intro; requiredItems ['garden_hoe',
+  'vale_wheat_seed']; objectives [{ type: 'farm', action: 'plant', cropId:
+  'vale_wheat', patchId: 'patch_eastbrook', count: 1, label: 'Vale Wheat
+  planted' }, { ...action: 'harvest'..., label: 'Vale Wheat harvested' }];
+  xp 150 / copper 50 / no item reward / no minLevel / no requiresQuest / no
+  rev). Work orders: q_prof_workorder_kitchens_wheat 'Kitchens Wheat Order'
+  (vale_wheat x8, copperReward 16) and q_prof_workorder_kitchens_rice
+  'Kitchens Rice Order' (marsh_rice x5, copperReward 20), both at
+  cook_marlow (questIds appended), xp 100, repeatable on
+  WORK_ORDER_CADENCE_TICKS, in ZONE1_QUEST_ORDER and QUEST_IDS after
+  q_prof_workorder_kitchens, in the tests/professions_work_orders.test.ts
+  WORK_ORDERS table. Items: NO new item; garden_hoe and vale_wheat_seed
+  gained noVendorSell + noMarketList (deviation (bg)). Types: QuestObjective
+  'farm' member (2953d6ccb2), NpcDef `farmer?: true` (2f22f9a5e9),
+  farmDenied reason 'no_farmer' appended (fifteenth reason). New modules:
+  src/sim/professions/farmer_npcs.ts (FARMER_TRADE_RANGE, isFarmerNpcEntity,
+  nearFarmerNpc). i18n keys: hudChrome.farming.denied.no_farmer ('You must
+  be near a farmer to trade husks for compost.'), hudChrome.farming.huskTrade
+  ('Trade husks for compost'), hudChrome.farming.huskTradeAria ('Trade
+  withered husks for compost with {name}'), guide.profPages.farm.bedsHeading
+  ('Working the beds') and .bedsBody (the live loop, two paragraphs), the
+  reworded guide.profPages.gatherIntro.farming and
+  guide.profPages.econ.workOrdersNote (its thirteen Latin fills corrected
+  in-phase because the old text stated a now-false one-order-per-master
+  rule; the other stale Latin farming fills stay owed to the release fill);
+  all wordy values with the five non-Latin fills; NO matcher rows (no new
+  ctx.error text; the deny is a text-free SimEvent). Tests (new):
+  tests/farmer_npc_placement.test.ts, tests/farm_intro_quest_content.test.ts,
+  tests/farm_intro_quest_journey.test.ts, tests/farmer_vendor_purchase.test.ts,
+  tests/farm_quest_objective.test.ts; (flipped) the R37 arms in
+  tests/professions_zone_rollout.test.ts, the convertHusks describe in
+  tests/professions_farming.test.ts, the guide farming-tool branch;
+  (re-pinned) eastbrook_gameplay_integration (ZONE1_NPCS key list +
+  farmer_jessica, town payload digest, cook_marlow.questIds), fenbridge
+  layout payload digest, quest_marker_kind repeatables 11 to 13,
+  farming_view/farm_event_feedback reason lists, gossip_menu content
+  literals, professions_starter_tools TIER_1/HIGHER tool sets, terrain
+  chunk digest, the terrain atlas fixture, four map plates + world strip.
+  Shot targets: farmer-jessica, farm-intro-quest-dialog, farmer-gossip-menu,
+  farmer-vendor-grid in scripts/pr_shot_targets.mjs (stageFarmerJessica
+  helper); screenshots under docs/screenshots/farming-phase-09 with the CI
+  cone row in all five ci.yml blocks and the SPARSE_CONE literal.
+  LIVE-SURFACE FLIP: seeds (tiers 1 and 2), compost, brook_carrot and the
+  garden hoe are purchasable, the intro quest exists, husk conversion is
+  reachable at every farmer, the ready notices fire for real crops, the
+  plant-grow-harvest-cook loop is open; still unreachable: farming deeds and
+  golden_harvest (Phase 10), well-fed dishes (Phase 11), the feast (Phase
+  12).
+  (bg) THE INTRO GRANT FENCE, maintainer read owed: the requiredItems
+  re-grant makes garden_hoe and vale_wheat_seed quest-granted items, and
+  the starter-tools doctrine (tests/professions_starter_tools.test.ts,
+  "every requiredItems quest anywhere keeps its item out of the stores the
+  predicate cannot see", plus the items.ts garden_hoe banner) demands
+  noVendorSell + noMarketList on both, so a PURCHASED garden hoe (20
+  copper) or seed can never be sold back, mailed, guild-banked, or listed,
+  only sown, used, or discarded (the copper_mining_pick precedent: also
+  vendor-stocked and fenced). The seed re-grant is a small free-seed faucet:
+  one 4-copper seed per giver talk while the quest is ACTIVE, bounded by
+  the beds a player can hold planted before the first harvest turns the
+  quest ready (the re-grant runs for active quests only, verified in
+  tests/farm_intro_quest_journey.test.ts). Face-to-face trade
+  (src/sim/social/trade.ts, kind quest / soulbound / rift gear only) is the
+  ONE exchange pipe that does not read the two flags, so a cooperative pair
+  can pass free seeds or hoes (the produce is unfenced and vendorable):
+  a 4-copper-per-cycle balance leak shared with every requiredItems item,
+  not a security hole. Options for the maintainer: extend the trade guard
+  to honor noVendorSell/noMarketList (a general trade rule change), or
+  accept and record. Left as-is this phase.
+  (bh) NPCs ARE TERRAIN: every NPCS row is a calm-anchor pad
+  (src/sim/terrain_calm_anchors.ts, rIn 6 / rOut 14), so seating four
+  farmers reshaped the ground inside their skirts (the dense atlas moved 60
+  of 282406 points, 0.02 percent, all inside the four footprints; the
+  largest under Farmer Hollis at Highwatch, up to 4.3 yd where the natural
+  relief diverges most from the legacy field, and about 0.6 yd under
+  bed_thornpeak_5; centimeters at the other three). tests/farm_patch_placement
+  stays green (dry, slope, reachable, roads, camps), the beds and props seat
+  on the same terrainHeight, and the full spawn roster (templateId + pos,
+  three seeds) is otherwise identical: no pre-existing NPC, camp, or mob was
+  nudged. Re-minted deliberately with the goldens: the atlas fixture, the
+  Eastbrook chunk vertex digest, and the four farming-zone map plates plus
+  the world strip (the other eleven plates came out byte-identical). QA:
+  eyeball the Highwatch shelf on the live client; if the mound reads badly,
+  re-seat Hollis where the natural relief matches the legacy field. Future
+  NPC placements should probe the pad delta, not just slope.
+  (bi) THE OFFERED-BUT-REFUSED BAND: the husk-trade row is offered on the
+  NpcDef flag, the sim demands FARMER_TRADE_RANGE 7, and the NPC dialog
+  closes at NPC_WINDOW_CLOSE_RANGE 8, so a 1-yd band exists where the row
+  is clickable and answers 'no_farmer'; identical to the vendor family
+  (buyItem refuses past 7, the window closes at 8), accepted as
+  family-consistent.
+  (bj) THE CREDIT ARM IS A MODULE IMPORT: professions/farming.ts imports
+  onCropFarmedForQuests from quests/quest_credit.ts directly (the sibling
+  crediters are SimContext callbacks wired in sim.ts, which sits one line
+  under its ceiling); the registry comment in src/sim/sim_context.ts names
+  it; the architecture review ruled it acceptable (a pure sibling taking
+  ctx first, the ./gathering precedent). Fold it into the seam if a later
+  extraction frees sim.ts headroom.
+  (bk) patchId IS MARKER-ONLY: the intro quest names patch_eastbrook so the
+  map circles those beds, but a Vale Wheat sown or harvested at any patch
+  credits (pinned in tests/farm_quest_objective.test.ts); the quest text
+  says "the beds beside me"; accepted, a walk elsewhere is its own effort.
+  (bl) THE R37 FLIP SHAPE: the (aa) exclusion of farming from the generic
+  node-rung hub walk is KEPT (farming has no nodes; the hub rule would
+  demand garden_hoe at EVERY zone hub, and the phase stocks the buy-ahead
+  hoe at the tier-1 counter only, the R20 shape); the dormant "no NPC
+  vendors any farming item" arm is REPLACED by the positive farmer-stock pin
+  (exact vendorItems per farmer, per-row positive buyValue, the four seed
+  prices as literals, no other NPC / heroic / delve counter naming a
+  farming item, tier 3/4 seeds + tonic + dishes + hoe rungs 2-4 nowhere);
+  the vendor-craftable-recipe arm is retitled and kept (brook_carrot on the
+  counter leaves every FARM_RECIPES row with an unstocked, unpriced
+  reagent); the guide's farming-tool "no counter yet" branch is deleted so
+  garden_hoe follows the generic stocked branch.
+  (bm) TWO WORK ORDERS PER MASTER: no pin forbids it (the cadence is per
+  quest id), so cook_marlow posts wheat and rice orders beside the game-meat
+  one; the guide's workOrdersNote was reworded to per-order clocks and its
+  thirteen Latin fills corrected in-phase (the old text stated one order per
+  master).
+  Residuals recorded, not fixed: src/sim/map_doc.ts's NPC sanitizer drops
+  the farmer flag (as it drops cardMaster and warfareVendor: an
+  editor-authored farmer would lack the trade; add the line if the editor is
+  meant to author farmers); no NPC_KEYS look rows for the four farmers
+  (villager fallback, the cook_marlow shape); no committed voice lines yet
+  (aliases only; scripts/gen_npc_lines.mjs is a conscious follow-up); the
+  requiredItems sweep floor in tests/professions_starter_tools.test.ts stays
+  at >= 5 with six such quests (derived, so q_farm_intro IS covered);
+  "Shift+K" appears in three shipped strings while the bind is rebindable
+  (the guide controls row is the one tie).
+
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
 - Crop display names: ids are locked (D11), English display names get a maintainer
   lore pass in the content phase PR.
+- Phase 9 reads owed: (bg) the intro grant fence (accept the trade-pipe leak or
+  extend the trade guard to honor noVendorSell/noMarketList), (bh) the Highwatch
+  farmer's terrain pad (re-seat if the mound reads badly), and the four farmer
+  titles/greetings as authored (Allotment Keeper, Fen Paddy Farmer, Highwatch
+  Terrace Farmer, Parterre Gardener).
 - Exact tuning constants: growth durations per tier inside the D5 bands, the gain
   schedule, harvest-lives save-chance endpoints, well-fed magnitudes and durations,
   feast charge count and expiry. Phases propose concrete values in the PR body and
