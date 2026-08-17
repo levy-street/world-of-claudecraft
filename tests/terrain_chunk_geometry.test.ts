@@ -145,9 +145,17 @@ describe('generated chunk geometry is stable', () => {
     // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
     // and nothing rises anywhere. Both digests move because that window
     // straddles the rect edge at x = -180.
-    expect(digestOf(inRect)).toBe('39afe77d61ac348961d01e890aaddb00');
+    // Re-minted for the Last Bell packet's v0.39.0 merge: the campaign's
+    // asymmetric world bounds (WORLD_MIN_X) renormalize every chunk's UVs over
+    // WORLD_MIN_X..WORLD_MAX_X, so in-rect bytes move with the world box even
+    // though no Vale height changed.
+    expect(digestOf(inRect)).toBe('837397b5ae5c814a0832046cf0c8e0f1');
     // The gap super-chunks take the same re-mint.
-    expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
+    // Re-minted for the Last Bell packet's v0.39.0 merge: the asymmetric
+    // world box moves gap-chunk UVs like the in-rect pin above, and the
+    // Gullhaven west-quarter benches, wall berm, and extended curtain line
+    // deliberately regrade the Farshore gap cells they stand on.
+    expect(digestOf(gapFill)).toBe('31e8f041534da521ccd54e8028b5ea07');
 
     terrain.cancelStreaming();
   });

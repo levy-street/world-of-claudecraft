@@ -1060,6 +1060,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountFlair',
       'activeLootRolls',
       'activeMasterLootRolls',
+      'answerSceneChoice',
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
@@ -1881,8 +1882,8 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
-    // Reliquary facet on this branch: 33 total.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    // Reliquary facet; +1 Last Bell scenes facet: 34 total.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {

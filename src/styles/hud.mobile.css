@@ -6263,6 +6263,7 @@
      touched here, so connection loss still surfaces during a cutscene. */
   body.mobile-touch.cinematic-mode #mobile-controls {
     display: none !important;
+  }
   body.mobile-touch #bg-proposal-popup .btn {
     min-height: 40px;
     box-sizing: border-box;

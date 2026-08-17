@@ -2236,7 +2236,11 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         // far-band super-chunk covers a 2x2 block, so its release must clear
         // every cell it attached, not just the one nearest its origin.
         const span = Math.max(1, Math.round(chunk.size / CHUNK_SIZE));
-        const cx0 = Math.round((chunk.x0 + WORLD_MAX_X) / CHUNK_SIZE);
+        // WORLD_MIN_X, exactly like attachChunk's claim path: the campaign
+        // bounds are asymmetric, so the mirrored +WORLD_MAX_X origin this
+        // shipped with reconstructed the wrong cell for every chunk and the
+        // eviction either skipped or cleared its neighbour's cells.
+        const cx0 = Math.round((chunk.x0 - WORLD_MIN_X) / CHUNK_SIZE);
         const cz0 = Math.round((chunk.z0 - WORLD_MIN_Z) / CHUNK_SIZE);
         // The origin cell alone decides ownership: attachChunk's superOk gate
         // only ever forms a super-chunk when all four of its cells already

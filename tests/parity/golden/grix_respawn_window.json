@@ -8,12 +8,12 @@
     "second kill after an in-place respawnMob rolls an independent window value"
   ],
   "draws": 17,
-  "drawDigest": "1f988a97",
+  "drawDigest": "947279a5",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
+      "nextId": 988,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 966,
-      "state": "0e048d08",
-      "events": "08b654a2",
+      "nextId": 990,
+      "state": "d9936748",
+      "events": "1d35545c",
       "rng": {
         "draws": 8,
-        "digest": "0abbf3ef"
+        "digest": "c26a1b44"
       },
       "label": "first-kill",
       "players": [
@@ -81,7 +81,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 988,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -130,7 +130,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 964
+              "sourceId": 988
             }
           ],
           "blockChance": 0.05,
@@ -142,7 +142,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 964,
+          "id": 988,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -185,7 +185,7 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            964
+            988
           ],
           "comboUntil": -1,
           "corpseTimer": 60,
@@ -196,7 +196,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 965,
+          "id": 989,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -205,7 +205,7 @@
           },
           "level": 7,
           "loot": {
-            "copper": 140,
+            "copper": 115,
             "items": [
               {
                 "count": 1,
@@ -214,20 +214,12 @@
               {
                 "count": 1,
                 "itemId": "lesser_healing_potion"
-              },
-              {
-                "count": 1,
-                "itemId": "tunnelkings_spade"
-              },
-              {
-                "count": 1,
-                "itemId": "hollowbone_hauberk"
               }
             ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            964
+            988
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -240,7 +232,7 @@
             "y": 1.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 1799.057371,
+          "respawnTimer": 1175.93463,
           "spawnPos": {
             "x": 4,
             "y": 1.5
@@ -248,7 +240,7 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 964,
+          "tappedById": 988,
           "templateId": "grix_the_tunnelking",
           "weapon": {
             "max": 58,
@@ -261,12 +253,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 966,
-      "state": "ce9d9873",
-      "events": "f597efc4",
+      "nextId": 990,
+      "state": "9936e6ff",
+      "events": "e210adfe",
       "rng": {
         "draws": 17,
-        "digest": "1f988a97"
+        "digest": "947279a5"
       },
       "label": "second-kill",
       "players": [
@@ -315,7 +307,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 988,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -364,7 +356,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 964
+              "sourceId": 988
             }
           ],
           "blockChance": 0.05,
@@ -376,7 +368,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 964,
+          "id": 988,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -419,7 +411,7 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            964
+            988
           ],
           "comboUntil": -1,
           "corpseTimer": 60,
@@ -430,7 +422,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 965,
+          "id": 989,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -439,7 +431,7 @@
           },
           "level": 7,
           "loot": {
-            "copper": 130,
+            "copper": 200,
             "items": [
               {
                 "count": 1,
@@ -451,21 +443,13 @@
               },
               {
                 "count": 1,
-                "itemId": "tunnelkings_spade"
-              },
-              {
-                "count": 1,
-                "itemId": "moggers_copper_cudgel"
-              },
-              {
-                "count": 1,
-                "itemId": "briarroot_staff"
+                "itemId": "hollowbone_hauberk"
               }
             ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            964
+            988
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -478,7 +462,7 @@
             "y": 1.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 1463.975608,
+          "respawnTimer": 1347.616409,
           "spawnPos": {
             "x": 4,
             "y": 1.5
@@ -486,9 +470,9 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 964,
+          "tappedById": 988,
           "templateId": "grix_the_tunnelking",
-          "wanderTimer": 7.012083,
+          "wanderTimer": 3.673547,
           "weapon": {
             "max": 58,
             "min": 37,
@@ -500,12 +484,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 966,
-      "state": "ce9d9873",
+      "nextId": 990,
+      "state": "9936e6ff",
       "events": "741638a5",
       "rng": {
         "draws": 17,
-        "digest": "1f988a97"
+        "digest": "947279a5"
       },
       "label": "final",
       "players": [
@@ -554,7 +538,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 988,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -603,7 +587,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 964
+              "sourceId": 988
             }
           ],
           "blockChance": 0.05,
@@ -615,7 +599,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 964,
+          "id": 988,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -658,7 +642,7 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            964
+            988
           ],
           "comboUntil": -1,
           "corpseTimer": 60,
@@ -669,7 +653,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 965,
+          "id": 989,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -678,7 +662,7 @@
           },
           "level": 7,
           "loot": {
-            "copper": 130,
+            "copper": 200,
             "items": [
               {
                 "count": 1,
@@ -690,21 +674,13 @@
               },
               {
                 "count": 1,
-                "itemId": "tunnelkings_spade"
-              },
-              {
-                "count": 1,
-                "itemId": "moggers_copper_cudgel"
-              },
-              {
-                "count": 1,
-                "itemId": "briarroot_staff"
+                "itemId": "hollowbone_hauberk"
               }
             ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            964
+            988
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -717,7 +693,7 @@
             "y": 1.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 1463.975608,
+          "respawnTimer": 1347.616409,
           "spawnPos": {
             "x": 4,
             "y": 1.5
@@ -725,9 +701,9 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 964,
+          "tappedById": 988,
           "templateId": "grix_the_tunnelking",
-          "wanderTimer": 7.012083,
+          "wanderTimer": 3.673547,
           "weapon": {
             "max": 58,
             "min": 37,

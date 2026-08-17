@@ -7,6 +7,7 @@ import {
   STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
+  WORLD_MIN_X,
   WORLD_MIN_Z,
   ZONES,
 } from '../src/sim/data';
@@ -23,12 +24,15 @@ function cellsOwnedBy(zoneId: string, chunkSize: number): [number, number][] {
     minZ: zone.zMin,
     maxZ: zone.zMax,
   }));
-  const chunksX = Math.ceil((WORLD_MAX_X * 2) / chunkSize);
+  // The campaign bounds are asymmetric (the Farshore extends east), so chunk
+  // indices originate at WORLD_MIN_X exactly like terrain.ts's own indexing,
+  // never the mirrored -MAX form.
+  const chunksX = Math.ceil((WORLD_MAX_X - WORLD_MIN_X) / chunkSize);
   const chunksZ = Math.ceil((WORLD_MAX_Z - WORLD_MIN_Z) / chunkSize);
   const owned: [number, number][] = [];
   for (let cz = 0; cz < chunksZ; cz++) {
     for (let cx = 0; cx < chunksX; cx++) {
-      const x = -WORLD_MAX_X + (cx + 0.5) * chunkSize;
+      const x = WORLD_MIN_X + (cx + 0.5) * chunkSize;
       const z = WORLD_MIN_Z + (cz + 0.5) * chunkSize;
       const owner = ZONES[owningRectIndex(x, z, zoneRects)];
       if (owner.id === zoneId) owned.push([cx, cz]);

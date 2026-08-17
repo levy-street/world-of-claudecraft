@@ -5,11 +5,15 @@ const moderation = vi.hoisted(() => ({
   muteAccountChat: vi.fn(async () => {}),
   moderateAccount: vi.fn(async () => {}),
   forceCharacterRename: vi.fn(async () => ({ accountId: 0 })),
+  // join() refreshes the cheater mark; without the export the refresh throws
+  // and the join path that spectate rides never completes.
+  accountCheaterMarkSeconds: vi.fn(async () => 0),
 }));
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   // leave() flushes character + market in one call; without this export the
   // leave save throws and sits out the full real-timer retry backoff (3.75s).
   saveCharacterAndMarketState: vi.fn(async () => {}),
@@ -744,7 +748,7 @@ describe('moderator spectate integration', () => {
     });
   });
 
-  it('converges represented scene and choice state on spectate enter and exit', () => {
+  it('converges represented scene and choice state on spectate enter and exit', async () => {
     registerScene({
       id: 'scn_test_spectate_lock_convergence',
       duration: 10,
@@ -783,6 +787,11 @@ describe('moderator spectate integration', () => {
 
     command(server, moderator, '/spectate Suspect');
 
+    // Spectate state changes are audit-gated (the audit write resolves before
+    // the apply), so the frame lands a task later, never synchronously.
+    await vi.waitFor(() =>
+      expect(frames(moderatorWs).some((frame) => frame.t === 'spectate')).toBe(true),
+    );
     const entered = frames(moderatorWs).find((frame) => frame.t === 'spectate');
     expect(entered).toMatchObject({
       name: 'Suspect',
@@ -809,14 +818,16 @@ describe('moderator spectate integration', () => {
     moderatorWs.send.mockClear();
     command(server, moderator, '/unspectate');
 
-    expect(frames(moderatorWs)).toContainEqual({
-      t: 'spectate',
-      name: null,
-      pid: moderator.pid,
-      time: expect.any(Number),
-      sceneState: null,
-      sceneChoiceState: null,
-    });
+    await vi.waitFor(() =>
+      expect(frames(moderatorWs)).toContainEqual({
+        t: 'spectate',
+        name: null,
+        pid: moderator.pid,
+        time: expect.any(Number),
+        sceneState: null,
+        sceneChoiceState: null,
+      }),
+    );
   });
 
   it('switches targets without moving the saved return point', async () => {
@@ -1078,15 +1089,22 @@ describe('server-side teleports end a live profession session', () => {
 
     const modEntity = assignSession(server, moderator.pid);
     command(server, moderator, '/spectate "Suspect"');
+    // Subset match: the spectate frame also carries pid/time and the
+    // represented scene/choice state (the convergence fields), which this
+    // test deliberately does not re-pin.
     await vi.waitFor(() =>
-      expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: 'Suspect' }),
+      expect(frames(moderatorWs)).toContainEqual(
+        expect.objectContaining({ t: 'spectate', name: 'Suspect' }),
+      ),
     );
     expectEnded(modEntity);
 
     assignSession(server, moderator.pid);
     command(server, moderator, '/unspectate');
     await vi.waitFor(() =>
-      expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null }),
+      expect(frames(moderatorWs)).toContainEqual(
+        expect.objectContaining({ t: 'spectate', name: null }),
+      ),
     );
     expectEnded(modEntity);
   });

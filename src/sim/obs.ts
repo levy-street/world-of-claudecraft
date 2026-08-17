@@ -372,12 +372,6 @@ export function encodeObs(sim: Sim): number[] {
     }
   }
 
-  // --- Paladin class resource (3), appended to preserve every existing index ---
-  // Non-Paladins emit zeros so the cross-class observation shape stays fixed.
-  const devotion = p.paladinDevotion;
-  obs.push(devotion ? devotion.value / MAX_DEVOTION : 0);
-  obs.push(devotion ? devotion.ascensionCharges / ASCENSION_CHARGES : 0);
-  obs.push(devotion ? devotion.ascensionRemaining / ASCENSION_DURATION : 0);
   // --- scene/choice controls (8, appended so every established slot stays stable) ---
   const scene = sim.sceneReconnectStateFor(p.id);
   const choice = sim.sceneChoiceReconnectStateFor(p.id);
@@ -394,6 +388,12 @@ export function encodeObs(sim: Sim): number[] {
   for (let index = 0; index < MAX_SCENE_CHOICE_OPTIONS; index++) {
     obs.push(choice !== null && index < choice.options.length ? 1 : 0);
   }
+  // --- Paladin class resource (3), appended LAST: the env protocol reads it at slice(-3) ---
+  // Non-Paladins emit zeros so the cross-class observation shape stays fixed.
+  const devotion = p.paladinDevotion;
+  obs.push(devotion ? devotion.value / MAX_DEVOTION : 0);
+  obs.push(devotion ? devotion.ascensionCharges / ASCENSION_CHARGES : 0);
+  obs.push(devotion ? devotion.ascensionRemaining / ASCENSION_DURATION : 0);
 
   return obs;
 }

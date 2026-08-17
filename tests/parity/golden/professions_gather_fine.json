@@ -12,13 +12,13 @@
     "gatherResult itemId carries the resolved grade"
   ],
   "draws": 6,
-  "drawDigest": "1272a77a",
+  "drawDigest": "4cb70479",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 965,
-      "state": "649d4b7d",
+      "nextId": 989,
+      "state": "a1cc60a3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -56,7 +56,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 980,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -96,7 +96,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 980
             }
           ],
           "blockChance": 0.05,
@@ -109,7 +109,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 960,
+          "id": 980,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -153,12 +153,12 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 965,
-      "state": "3df746c2",
-      "events": "06fbbee6",
+      "nextId": 989,
+      "state": "fdcb0938",
+      "events": "aa2f0680",
       "rng": {
         "draws": 2,
-        "digest": "00a2a78c"
+        "digest": "8b7913d3"
       },
       "label": "fine-grade-at-full-tier-vein",
       "players": [
@@ -214,7 +214,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 980,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -274,7 +274,7 @@
               "name": "Battle Stance",
               "remaining": 3597.45,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 980
             }
           ],
           "blockChance": 0.05,
@@ -288,7 +288,7 @@
           "fallStartY": -2.134597,
           "fiveSecondRule": 101.55,
           "hp": 100,
-          "id": 960,
+          "id": 980,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -332,12 +332,12 @@
     {
       "tick": 104,
       "time": 5.2,
-      "nextId": 965,
-      "state": "b49ae345",
-      "events": "b57bda44",
+      "nextId": 989,
+      "state": "d5bcd193",
+      "events": "1cc5682e",
       "rng": {
         "draws": 4,
-        "digest": "49d036fe"
+        "digest": "926596e4"
       },
       "label": "plain-grade-at-lower-tier-vein",
       "players": [
@@ -394,7 +394,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 980,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -462,7 +462,7 @@
               "name": "Battle Stance",
               "remaining": 3594.8,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 980
             }
           ],
           "blockChance": 0.05,
@@ -476,7 +476,7 @@
           "fallStartY": -2.314273,
           "fiveSecondRule": 104.2,
           "hp": 100,
-          "id": 960,
+          "id": 980,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -520,12 +520,12 @@
     {
       "tick": 157,
       "time": 7.85,
-      "nextId": 965,
-      "state": "ff041856",
-      "events": "a30330f0",
+      "nextId": 989,
+      "state": "929dff2b",
+      "events": "ba96727f",
       "rng": {
         "draws": 6,
-        "digest": "1272a77a"
+        "digest": "4cb70479"
       },
       "label": "wrong-profession-tool-does-not-upgrade",
       "players": [
@@ -584,7 +584,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 980,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -621,7 +621,7 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 2,
+              "count": 3,
               "instance": {
                 "signer": "Adventurer"
               },
@@ -660,7 +660,7 @@
               "name": "Battle Stance",
               "remaining": 3592.15,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 980
             }
           ],
           "blockChance": 0.05,
@@ -674,7 +674,7 @@
           "fallStartY": -2.247485,
           "fiveSecondRule": 106.85,
           "hp": 100,
-          "id": 960,
+          "id": 980,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -718,12 +718,12 @@
     {
       "tick": 159,
       "time": 7.95,
-      "nextId": 965,
-      "state": "4524b61b",
+      "nextId": 989,
+      "state": "e6370546",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "1272a77a"
+        "digest": "4cb70479"
       },
       "label": "final",
       "players": [
@@ -782,7 +782,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 960,
+          "entityId": 980,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -819,7 +819,7 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 2,
+              "count": 3,
               "instance": {
                 "signer": "Adventurer"
               },
@@ -858,7 +858,7 @@
               "name": "Battle Stance",
               "remaining": 3592.05,
               "school": "physical",
-              "sourceId": 960
+              "sourceId": 980
             }
           ],
           "blockChance": 0.05,
@@ -872,7 +872,7 @@
           "fallStartY": -2.247485,
           "fiveSecondRule": 106.95,
           "hp": 100,
-          "id": 960,
+          "id": 980,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

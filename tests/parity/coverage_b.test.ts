@@ -214,7 +214,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // camp fix: the tie SHAPE is preserved (two rollers level at the top), only
     // which rollers tie, the third roll, and the tie-break's winner move, because
     // these branches shift the shared rng and never master-loot logic itself.
-    expect(needRolls).toEqual([46, 60, 60]); // c and d tie at the top, b below
+    // Re-hunted again (seed 38 -> 67) by the Last Bell packet's v0.39.0 merge.
+    expect(needRolls).toEqual([7, 85, 85]); // c and d tie at the top, b below
     // The tie-break picked d, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a

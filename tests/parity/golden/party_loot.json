@@ -8,12 +8,12 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "6f587c5e",
+  "drawDigest": "57f0cacf",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
+      "nextId": 988,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 967,
-      "state": "6d3410b8",
-      "events": "b0609354",
+      "nextId": 991,
+      "state": "1bff80f9",
+      "events": "29a5fb0e",
       "rng": {
         "draws": 2,
-        "digest": "6f587c5e"
+        "digest": "57f0cacf"
       },
       "label": "final",
       "players": [
@@ -61,6 +61,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
+              "greyjaw_hide_boots",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -73,7 +74,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 964,
+          "entityId": 988,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -86,14 +87,25 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
-            "counts": {},
-            "firstFind": {}
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
+            "firstFind": {
+              "greyjaw_hide_boots": {}
+            },
+            "recent": [
+              "greyjaw_hide_boots"
+            ]
           },
           "renown": 5,
           "talents": {
@@ -127,7 +139,6 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
-              "greyjaw_hide_boots",
               "spring_water"
             ]
           },
@@ -139,7 +150,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 965,
+          "entityId": 989,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -155,25 +166,14 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
-            "counts": {
-              "greyjaw_hide_boots": 1
-            },
-            "firstFind": {
-              "greyjaw_hide_boots": {}
-            },
-            "recent": [
-              "greyjaw_hide_boots"
-            ]
+            "counts": {},
+            "firstFind": {}
           },
           "renown": 5,
           "talents": {
@@ -194,7 +194,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 964
+              "sourceId": 988
             }
           ],
           "blockChance": 0.05,
@@ -207,7 +207,7 @@
           "fallStartY": 0.963955,
           "fiveSecondRule": 99.15,
           "hp": 100,
-          "id": 964,
+          "id": 988,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -257,7 +257,7 @@
           "fallStartY": 0.789491,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 965,
+          "id": 989,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -309,7 +309,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 966,
+          "id": 990,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -334,7 +334,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 964,
+          "tappedById": 988,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
