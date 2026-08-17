@@ -184,8 +184,12 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
+// Re-minted for the merge of release/v0.39.0 into the Last Bell release
+// packet: the release side moves renderer.ts, so the rendererIntegration leaf
+// mints a value matching neither parent (remint_polish_provenance.mjs, which
+// swept the four evidence seals). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '63eae2164f990137dccffd0df83eb3c048a1c8927d125501b717ea3b27b39495';
+  '40ce575aa7a2289859d496c5dc6c7837ae2d61e37299a8802426c02f21ff5249';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -549,7 +553,12 @@ describe('Eastbrook polish capture contract', () => {
       // threading and deck-rider consumers. Both paths are inactive in the
       // accepted Eastbrook scenes, so the evidence still depicts this tree.
       // No recapture.
-      fingerprint: '38e18cc022e3c78374e66a1bc2cde7916d1d6a0460d1bbde652651b409050125',
+      // Re-pinned for the merge of release/v0.39.0 into the Last Bell release
+      // packet: the merged renderer.ts moves the runtimeRender.renderer leaf,
+      // so both this literal and PINNED_POLISH_COMPOSITE_FINGERPRINT above
+      // re-mint to the same composite (remint_polish_provenance.mjs). No
+      // capture was retaken.
+      fingerprint: '40ce575aa7a2289859d496c5dc6c7837ae2d61e37299a8802426c02f21ff5249',
       components: {
         captureContract: {
           id: 'polish-v2',
