@@ -1432,6 +1432,13 @@ export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
 export interface LootEntry {
   itemId?: string;
   copper?: number;
+  // Heroic-claim money base: when the kill carries a live heroic instance
+  // claim, the loot roller substitutes this for `copper` as the roll base
+  // (same 0.6x to 1.4x band on the same single draw). Authored only on
+  // dungeon final bosses via the HEROIC_FINALE_COPPER /
+  // NYTHRAXIS_HEROIC_COPPER bases in content/dungeon_difficulty.ts, and it
+  // always rides a truthy `copper` (the roller's money arm gates on copper).
+  heroicCopper?: number;
   chance: number; // 0..1
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
@@ -3344,6 +3351,13 @@ export interface NpcDef {
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
+  // A farmer NPC (the farming go-live): the range anchor of the husk-to-compost
+  // trade (src/sim/professions/farming.ts convertHusks refuses out of reach of
+  // one) and the gossip row that offers it. A FLAG rather than a hard-keyed id
+  // list (the warfareVendor precedent) so a fifth farmer needs no constant
+  // widened. Vending stays emergent from vendorItems; the watch fee is a
+  // plant-time bag payment and never gates on this flag (D9).
+  farmer?: true;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -3422,6 +3436,13 @@ export interface DungeonObjectSpawn {
   z: number;
   templateId?: 'dungeon_door' | 'dungeon_exit';
   dungeonId?: string;
+  /**
+   * This object is an encounter mechanic players INTERACT with, never a pickup, even
+   * though its item id is a quest collectable elsewhere in the world (the Nythraxis
+   * arena wardstones reuse the Sunken Bastion ward stone). The quest-collectable
+   * display gate (quest_gated_entity.ts) never hides a flagged object.
+   */
+  interactOnly?: boolean;
 }
 
 export interface DungeonDef {
@@ -3429,6 +3450,12 @@ export interface DungeonDef {
   name: string;
   index: number; // x-band for instance origins; must be unique
   doorPos: { x: number; z: number }; // overworld entrance portal
+  /** where leaving drops the player, relative to doorPos (default 0,-4);
+   *  doors flush against a building face need a FORWARD drop instead */
+  leaveOffset?: { x: number; z: number };
+  /** render the entrance membrane still (no swirl spin): for doors that
+   *  read as a building's own doorway rather than a magic portal */
+  staticDoor?: boolean;
   overworldDoor?: boolean; // false for rooms only reached by internal instance doors
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
@@ -3438,7 +3465,8 @@ export interface DungeonDef {
   bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep'; // renderer + collider interior builder key
+  // renderer + collider interior builder key
+  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep' | 'dawnhold';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -3700,6 +3728,16 @@ export interface ZonePropsDef {
     r?: number;
     h?: number;
     scale?: number;
+    /** Rectangular collider half-extents in the model's LOCAL axes, already
+     * scaled. Supply BOTH to collide as the model's real box instead of a
+     * circle: these models are rectangles, and a circle that contains one
+     * bulges past its flat walls (an invisible wall a stride out) while a
+     * circle inside one cuts its corners off. `rot` orients the box, so these
+     * never need swapping for a rotated building. `r` is unchanged and still
+     * the CLEARANCE radius that scatter, roads and parterre keep-outs read, so
+     * it must stay set even when a box is given. */
+    hw?: number;
+    hd?: number;
     /** ride the water surface instead of the seabed (moored ships/boats);
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
@@ -3748,7 +3786,20 @@ export type QuestObjective =
   // NPC reaches its final waypoint with this player in credit range. count is
   // always 1; the run starts by interacting with the idle escortee while this
   // quest is active.
-  | (QuestObjectiveBase & { type: 'escort'; escortId: string });
+  | (QuestObjectiveBase & { type: 'escort'; escortId: string })
+  // Farm: credited by the plant and harvest ACTIONS in
+  // src/sim/professions/farming.ts (the gather precedent: inventory cannot
+  // prove the deed, and produce is a fungible material). `cropId` narrows the
+  // action to one crop; `patchId` is marker guidance only (quest_targets.ts
+  // encloses that patch's beds; without it every farming patch qualifies) and
+  // never gates the credit. A harvest credits on every outcome, withered
+  // included: the visit is the deed.
+  | (QuestObjectiveBase & {
+      type: 'farm';
+      action: 'plant' | 'harvest';
+      cropId?: string;
+      patchId?: string;
+    });
 
 // ---------------------------------------------------------------------------
 // Escort runs (src/sim/escort.ts): a quest NPC that walks an authored waypoint
@@ -5073,12 +5124,15 @@ export type UnstuckEvent =
 
 // A player resurrection that has been offered but not yet accepted. The Sim owns
 // one authoritative offer per dead target. The cast-time destination is retained
-// only as a fallback if the caster no longer exists when the target accepts.
+// as a fallback if the caster no longer exists, has died, or has left resurrection
+// reach of the body when the target accepts; maxRange is the reach the producing
+// cast enforced, re-applied to the arrival anchor at accept time.
 export interface PendingResurrection {
   casterId: number;
   hpFrac: number;
   fallbackDestination: Vec3;
   expiresAt: number;
+  maxRange: number;
 }
 
 export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist' | 'evade';
@@ -6608,7 +6662,12 @@ export type SimEvent = { pid?: number } & (
         // 'locked' twin). Fired when the raw held count would have passed
         // the gate that the unlocked count failed, for any of the five
         // farming spends.
-        | 'locked';
+        | 'locked'
+        // The farming go-live, appended: convert_husks refused because no
+        // farmer NPC stands within FARMER_TRADE_RANGE of the sender
+        // (professions/farmer_npcs.ts). Its own reason rather than 'range',
+        // whose HUD line names a crop bed; the trade has no bed.
+        | 'no_farmer';
       bedId?: string;
       cropId?: string;
     }

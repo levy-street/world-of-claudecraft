@@ -816,6 +816,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Проверьте карту мира ({key}), чтобы увидеть, где вас ждут задания.',
   'hudChrome.tutorial.nextTipSocial':
     'Откройте раздел «Общение» ({key}), чтобы найти группу для сложных боёв.',
+  'hudChrome.lastkeepMap.story.undercroft': 'Подклет',
+  'hudChrome.lastkeepMap.story.state': 'Парадный этаж',
+  'hudChrome.lastkeepMap.story.residence': 'Жилой этаж',
+  'hudChrome.lastkeepMap.story.tower': 'Дозорная башня',
+  'hudChrome.dawnholdMap.story.ground': 'Садовый этаж',
+  'hudChrome.dawnholdMap.story.solar': 'Светлица',
   'hudChrome.raidLockout.title': 'Блокировки рейдов',
   'hudChrome.raidLockout.allReady': 'Все рейды доступны',
   'hudChrome.raidLockout.daysHours': '{d}д {h}ч',
@@ -3899,6 +3905,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     'Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Рудная жила разработана',
+  'entities.quests.q_farm_intro.title': 'Первая борозда',
+  'entities.quests.q_farm_intro.text':
+    'Возьми эту мотыгу и щепоть семян долинной пшеницы, {playerName}. Посей семена на одной из грядок рядом со мной, а потом займись своими делами. Возвращайся, когда захочешь, и собери урожай; я буду здесь.',
+  'entities.quests.q_farm_intro.completion':
+    'Вот он, твой первый урожай в собственных руках. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер. Приходи за семенами всякий раз, как позовут грядки, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': 'Долинная пшеница посажена',
+  'entities.quests.q_farm_intro.objectives.1.label': 'Долинная пшеница собрана',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -9004,6 +9017,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.bad_bed': 'Там нет грядки.',
   'hudChrome.farming.denied.bad_crop': 'Это здесь посадить нельзя.',
   'hudChrome.farming.denied.range': 'Вы слишком далеко от этой грядки.',
+  'hudChrome.farming.denied.no_farmer':
+    'Чтобы обменять шелуху на компост, нужно стоять рядом с фермером.',
+  'hudChrome.farming.huskTrade': 'Обменять шелуху на компост',
+  'hudChrome.farming.huskTradeAria': 'Обменять засохшую шелуху на компост у {name}',
   'hudChrome.farming.denied.bed_taken': 'Там у вас уже растет урожай.',
   'hudChrome.farming.denied.skill': 'Ваш навык земледелия слишком низок для этой культуры.',
   'hudChrome.farming.denied.no_seed': 'У вас нет семян этой культуры.',
@@ -10399,6 +10416,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': 'Хозяин кухни',
   'entities.npcs.cook_marlow.greeting':
     'Из моей кухни ничего не выходит полусырым, {className}. Садись, поешь, а потом обратно в путь.',
+  'entities.npcs.farmer_jessica.name': 'Фермер Джессика',
+  'entities.npcs.farmer_jessica.title': 'Хранительница огородов',
+  'entities.npcs.farmer_jessica.greeting':
+    'Доброй земли и ясной погоды, {playerName}. Купи у меня семена, посей их на одной из этих грядок и ступай по своим делам. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер.',
+  'entities.npcs.farmer_teasel.name': 'Фермер Тизель',
+  'entities.npcs.farmer_teasel.title': 'Болотный рисовод',
+  'entities.npcs.farmer_teasel.greeting':
+    'Семена болотного риса и болотной свёклы, {className}, и компост, чтобы их подкормить. Вода с чеков уходит медленно, так что смотри под ноги.',
+  'entities.npcs.farmer_hollis.name': 'Фермер Холлис',
+  'entities.npcs.farmer_hollis.title': 'Террасник Хайвотча',
+  'entities.npcs.farmer_hollis.greeting':
+    'Террасы дают столько, сколько позволяет гора, {className}. Я продаю компост, а если твой урожай засохнет, я переработаю шелуху обратно в добрую землю.',
+  'entities.npcs.farmer_verbena.name': 'Фермер Вербена',
+  'entities.npcs.farmer_verbena.title': 'Садовница партера',
+  'entities.npcs.farmer_verbena.greeting':
+    'Осторожнее с бордюром, {playerName}, эти грядки гордость партера. Я продаю компост, а любую засохшую шелуху, что ты принесёшь, превращу в новый.',
   'entities.npcs.weaver_ottilie.name': 'Ткачиха Оттилия',
   'entities.npcs.weaver_ottilie.title': 'Хозяйка ткацкого стана',
   'entities.npcs.weaver_ottilie.greeting':
@@ -10673,10 +10706,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
-  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
+  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
+  'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',
+  'entities.items.dawnhold_posy.name': 'Букетик из сада Замка Рассвета',
+  'entities.dungeons.dawnhold_castle.enterText':
+    'Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.',
+  'entities.dungeons.dawnhold_castle.leaveText':
+    'Вы возвращаетесь на залитую солнцем садовую лужайку.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',
@@ -11153,6 +11192,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     'Вот теперь кладовая полна. Вот твоя плата. Возвращайся, когда сумки снова потяжелеют.',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': 'Мясо дичи доставлено',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': 'Наряд на работу: кухни, пшеница',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    'Хлеб сам себя не испечет, {playerName}, а мои лари с мукой скребут по дну. Принеси мне восемь снопов долинной пшеницы, и я честно заплачу за всю партию. Сам вырастил или купил на рынке, мне все равно, лишь бы мололось.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    'Сухое доброе зерно, и вдоволь. Вот твоя плата, отсчитана до монеты. Когда подойдет следующий урожай, ты знаешь, в какую дверь стучать.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': 'Долинная пшеница доставлена',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': 'Наряд на работу: кухни, рис',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    'Болотный люд клянется своим рисом, {playerName}, и я намерен выяснить почему. Добудь мне пять мер болотного риса, и здесь тебя будут ждать деньги. И смотри, не намочи его в дороге: мокрый рис это каша, а каши я не заказывал.',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    'Крупный и сухой, каждое зернышко. Вот твои деньги. Пока болото родит, я плачу.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': 'Болотный рис доставлен',
   'entities.quests.q_prof_workorder_loom.title': 'Наряд на работу: ткацкий станок',
   'entities.quests.q_prof_workorder_loom.text':
     'Станок стоит без дела, а праздные руки тратят дневной свет впустую, {playerName}. Принеси мне шесть мотков паучьего шёлка, и я заплачу по честной ставке, отсчитанной до последней медной монеты.',
@@ -11465,7 +11516,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     'Рыбная ловля тянет улов из открытой воды каждой зоны в ритме поклевки и подсечки и ограничена 200.',
   'guide.profPages.gatherIntro.farming':
-    'Земледелие: единственное собирательское ремесло, где урожай растят, а не добывают. Посейте семена на возделанных грядках: растения растут и без вас, а вернувшись, вы соберете созревший урожай. У каждого земледельческого поселения есть свой участок, от наделов Eastbrook до партера Evergarden, и на каждой ступени этой лестницы растет своя пара культур, а умелые руки снимают и отборный сорт. Работа начинается с мотыги: Garden Hoe открывает первые грядки, а ступени выше куют инженеры. Навык растет на собственном счетчике до предела 100.',
+    'Земледелие: единственное собирательское ремесло, где урожай растят, а не добывают. Посейте семена на возделанных грядках: растения растут по своим часам, с вами или без вас, а вернувшись когда угодно, вы соберете созревший урожай, потому что на грядке ничто не портится. У каждого участка стоит земледелец, от наделов Eastbrook через Fenbridge и Highwatch до партера Evergarden, а начинается ремесло с Farmer Jessica в Eastbrook: она продает Garden Hoe и первые семена, а ее поручение проводит новичка через первый урожай. На каждой ступени лестницы растет своя пара культур, умелые руки снимают и отборный сорт, а мотыги для более трудной земли выше первых грядок куют инженеры. Навык растет на собственном счетчике до предела 100.',
   'guide.profPages.rhythmHeading': 'Ритм сбора',
   'guide.profPages.rhythmBody':
     'Сбор идет как видимое действие: базовые {base} секунды, не короче {floor}; каждая ступень инструмента выше залежи срезает {tool} секунды, а каждый разряд мастерства еще {band}.',
@@ -11530,7 +11581,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': 'Бесплатно',
   'guide.profPages.econ.workOrdersHeading': 'Рабочие заказы',
   'guide.profPages.econ.workOrdersNote':
-    'Каждый мастер платит {pct}% от торговой цены за связку своего ходового материала, и заказ повторяется каждые {minutes} минут.',
+    'Каждый мастер вывешивает наряды, по одному на ходовой материал, и платит {pct}% от торговой цены за затребованную связку. У каждого наряда свои часы на {minutes} минут: сданный наряд закрывается до конца отсчета, а остальные наряды того же мастера остаются открытыми.',
   'guide.profPages.econ.colOrder': 'Заказ',
   'guide.profPages.econ.colMaster': 'Мастер',
   'guide.profPages.econ.colAsks': 'Просит',
@@ -11688,6 +11739,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
   'guide.profPages.gatherDeeds.farming':
     'У земледелия пока нет собственных деяний: теперь, когда грядки и культуры укоренились, вехи и деяния предела, что отмечают другие ремесла, придут с одним из будущих обновлений. Его мастерство уже засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах, так что земледелец заполнит эту страницу наравне со всеми. Деяния дают только титулы и известность, но никогда не силу.',
+  'guide.profPages.farm.bedsHeading': 'Работа на грядках',
+  'guide.profPages.farm.bedsBody':
+    'Цикл короток. Купите семена и компост у земледельца возле грядок: Jessica в Eastbrook держит пару долинных культур, земледелец в Fenbridge пару болотных, а семена Highwatch и Evergarden не продает ни один прилавок: они по одному-два возвращаются с урожая высокой ступени, а в остальном ходят через World Market. Сейте с мотыгой в сумке и, если хотите, склоните шансы в свою пользу: компост с прилавка и присмотр земледельца, оплаченный урожаем при посеве, повышают шанс культуры выжить, тоник роста от алхимика дает урожаю шанс стать больше, а когда ваш навык поднимется на целую полосу выше ступени культуры, она перестанет гибнуть вовсе. Затем просто уходите. Грядка растет, пока вы не в игре, созревший урожай ждет сколько угодно, а Журнал урожая (Shift+K или строка Земледелие в окне профессий) показывает каждую засеянную грядку с ее таймером.\n\nПогибшая культура оставляет вместо урожая засохшую шелуху, и любой земледелец обменяет шелуху на компост, так что плохой сезон покупает страховку следующему. Собранное кормит кухни: урожай готовится в блюда на кухнях, а заказы Cook Marlow на пшеницу и рис забирают Vale Wheat и Marsh Rice за монету по тем же часам, что и любой другой наряд.',
   'guide.profPages.fish.startHeading': 'С чего начать',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole стоит 20 меди у Fisherman Brandt в Eastbrook (ищите Old Salt, что зыркает на Mirror Lake с восточной окраины города); Tinker Gizzel, Provisioner Hale в Fenbridge и Quartermaster Bree в Highwatch тоже держат удочки. Используйте удочку лицом к воде, достаточно глубокой, чтобы держать рыбу, примерно до 24 ярдов перед вами, и ваш поплавок улетает.\n\nНельзя забрасывать в бою, вплавь или мертвым: заброс с берега, это задуманная поза, и любая рыбная вода годится, в каждой зоне.',

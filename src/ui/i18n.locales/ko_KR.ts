@@ -806,6 +806,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '퀘스트 기록({key})을 열어 근처의 다음 임무를 확인하세요.',
   'hudChrome.tutorial.nextTipMap': '월드 맵({key})에서 퀘스트가 있는 곳을 확인하세요.',
   'hudChrome.tutorial.nextTipSocial': '소셜({key})을 열어 강력한 전투를 위한 파티를 찾아보세요.',
+  'hudChrome.lastkeepMap.story.undercroft': '지하 저장고',
+  'hudChrome.lastkeepMap.story.state': '의전층',
+  'hudChrome.lastkeepMap.story.residence': '주거층',
+  'hudChrome.lastkeepMap.story.tower': '망루',
+  'hudChrome.dawnholdMap.story.ground': '정원층',
+  'hudChrome.dawnholdMap.story.solar': '일광실',
   'hudChrome.raidLockout.title': '공격대 잠금',
   'hudChrome.raidLockout.allReady': '모든 공격대 준비됨',
   'hudChrome.raidLockout.daysHours': '{d}일 {h}시간',
@@ -3848,6 +3854,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     '보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
   'entities.quests.q_prof_intro.objectives.0.label': '광맥 채굴',
+  'entities.quests.q_farm_intro.title': '첫 고랑',
+  'entities.quests.q_farm_intro.text':
+    '이 괭이와 골짜기 밀 씨앗 한 줌을 받으세요, {playerName}. 제 옆의 밭 하나에 씨앗을 심고, 하던 일을 보러 가세요. 언제든 원할 때 돌아와서 작물을 거두면 됩니다. 저는 여기 있을 테니까요.',
+  'entities.quests.q_farm_intro.completion':
+    '자, 첫 작물이 당신 손에 들어왔네요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요. 밭이 부르면 언제든 씨앗을 사러 오세요, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': '골짜기 밀 심기',
+  'entities.quests.q_farm_intro.objectives.1.label': '골짜기 밀 수확',
   'entities.quests.q_wolves.title': '문 앞의 늑대들',
   'entities.quests.q_wolves.text':
     '숲늑대들이 북쪽 길의 여행자들을 물어뜯고 있습니다, {playerName}. 8마리를 처치해 이스트브룩이 숨 돌리게 해 주십시오.',
@@ -8811,6 +8824,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.bad_bed': '그곳에는 작물밭이 없습니다.',
   'hudChrome.farming.denied.bad_crop': '그것은 여기에 심을 수 없습니다.',
   'hudChrome.farming.denied.range': '그 작물밭에서 너무 멀리 떨어져 있습니다.',
+  'hudChrome.farming.denied.no_farmer': '껍질을 퇴비로 바꾸려면 농부 근처에 있어야 합니다.',
+  'hudChrome.farming.huskTrade': '껍질을 퇴비로 교환',
+  'hudChrome.farming.huskTradeAria': '{name}에게 시든 껍질을 퇴비로 교환',
   'hudChrome.farming.denied.bed_taken': '그곳에는 이미 작물이 자라고 있습니다.',
   'hudChrome.farming.denied.skill': '그 작물을 재배하기에는 농사 숙련도가 부족합니다.',
   'hudChrome.farming.denied.no_seed': '그 작물의 씨앗이 없습니다.',
@@ -10211,6 +10227,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '주방의 주인',
   'entities.npcs.cook_marlow.greeting':
     '내 주방에서 설익은 채 나가는 것은 없다, {className}. 앉아서 먹고, 다시 나가라.',
+  'entities.npcs.farmer_jessica.name': '농부 제시카',
+  'entities.npcs.farmer_jessica.title': '텃밭 지기',
+  'entities.npcs.farmer_jessica.greeting':
+    '좋은 흙과 맑은 날씨를 빌어요, {playerName}. 제게서 씨앗을 사서 저기 밭 하나에 심고, 하던 일을 보러 가세요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요.',
+  'entities.npcs.farmer_teasel.name': '농부 티즐',
+  'entities.npcs.farmer_teasel.title': '습지 논 농부',
+  'entities.npcs.farmer_teasel.greeting':
+    '습지 쌀과 늪지 비트 씨앗, 그리고 거름으로 쓸 퇴비요, {className}. 논은 물이 더디게 빠지니 발밑을 조심하시오.',
+  'entities.npcs.farmer_hollis.name': '농부 홀리스',
+  'entities.npcs.farmer_hollis.title': '하이워치 계단밭 농부',
+  'entities.npcs.farmer_hollis.greeting':
+    '계단밭은 산이 허락하는 만큼만 내주지, {className}. 퇴비를 팔고 있고, 그대의 작물이 시들어 올라오면 그 껍질을 다시 좋은 흙으로 만들어 주겠소.',
+  'entities.npcs.farmer_verbena.name': '농부 버베나',
+  'entities.npcs.farmer_verbena.title': '파르테르 정원사',
+  'entities.npcs.farmer_verbena.greeting':
+    '가장자리를 조심하세요, {playerName}, 이 밭들은 파르테르의 자랑이니까요. 파는 건 퇴비이고, 가져오신 시든 껍질은 무엇이든 퇴비로 바꿔 드리겠어요.',
   'entities.npcs.weaver_ottilie.name': '직조공 오틸리에',
   'entities.npcs.weaver_ottilie.title': '베틀의 주인',
   'entities.npcs.weaver_ottilie.greeting':
@@ -10486,11 +10518,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText':
     '돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다.',
   'entities.dungeons.the_last_keep.name': '마지막 요새',
-  'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
+  'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
+  'entities.dungeons.dawnhold_castle.name': '던홀드 성',
+  'entities.items.dawnhold_posy.name': '던홀드 정원 꽃다발',
+  'entities.dungeons.dawnhold_castle.enterText':
+    '꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.',
+  'entities.dungeons.dawnhold_castle.leaveText': '햇살 가득한 정원 잔디밭으로 다시 나옵니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
   'entities.items.wildheart_hexwood_staff.name': '분지의 사술나무 지팡이',
   'entities.items.wildheart_fangknife.name': '줄가르의 송곳니칼',
@@ -10958,6 +10995,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     '이제야 창고가 가득하군. 여기 자네 삯일세. 가방이 또 묵직해지면 다시 오게.',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '야생 고기 납품',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': '주방 밀 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    '빵은 저 혼자 구워지지 않는다네, {playerName}. 내 밀가루 통이 바닥을 긁고 있어. 골짜기 밀 여덟 단을 가져오면 몽땅 정직한 값으로 사겠네. 자네 손으로 길렀든 시장에서 샀든 상관없어, 갈리기만 하면 되니까.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    '잘 마른 낟알이군, 양도 넉넉하고. 여기 자네 삯일세, 정확히 세어 두었네. 다음 수확이 나오면 어느 문을 두드려야 할지 알겠지.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': '골짜기 밀 납품',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': '주방 쌀 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    '습지 사람들은 자기네 쌀이 최고라고 우기지, {playerName}. 왜 그런지 알아볼 참이야. 습지 쌀 다섯 되를 가져오면 여기 돈이 기다리고 있네. 길에서 젖지 않게 조심하게. 젖은 쌀은 죽이고, 나는 죽을 주문한 적이 없으니까.',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    '통통하고 잘 말랐군, 낟알 하나하나가. 여기 자네 돈일세. 습지가 계속 내주는 한, 나도 계속 내겠네.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': '습지 쌀 납품',
   'entities.quests.q_prof_workorder_loom.title': '베틀 작업 의뢰',
   'entities.quests.q_prof_workorder_loom.text':
     '베틀이 비었고, 노는 손은 대낮을 허비하지, {playerName}. 거미 비단 여섯 타래를 가져오면 동전 한 닢까지 헤아려 공정한 삯을 치러 주겠다.',
@@ -11268,7 +11317,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다.',
   'guide.profPages.gatherIntro.farming':
-    '농사는 캐내는 것이 아니라 돌보아 기르는 유일한 채집 기술이다. 손질한 밭에 씨앗을 심으면 자리를 비워도 작물이 자라고, 돌아와 익은 것을 뽑으면 된다. Eastbrook의 텃밭부터 Evergarden의 화단까지 농사 거점마다 전용 밭이 있으며, 사다리의 단마다 고유한 작물이 한 쌍씩 자라고 솜씨가 늘면 상급 등급도 거둔다. 일은 괭이에서 시작한다. Garden Hoe가 첫 밭을 맡고, 그 위 단계의 괭이는 기술자가 만든다. 숙련은 전용 카운터로 상한 100까지 오른다.',
+    '농사는 캐내는 것이 아니라 돌보아 기르는 유일한 채집 기술이다. 손질한 밭에 씨앗을 심으면 자리를 비워도 작물은 제 시계대로 자라고, 언제 돌아오든 익은 것을 뽑으면 된다. 밭에 있는 것은 결코 상하지 않기 때문이다. Eastbrook의 텃밭에서 Fenbridge와 Highwatch를 지나 Evergarden의 화단까지, 밭터마다 농부가 곁에 서 있으며 Eastbrook의 Farmer Jessica가 이 기술의 출발점이다. 그녀는 Garden Hoe와 첫 씨앗을 팔고, 그녀의 심부름이 새내기 농부에게 첫 작물을 기르는 법을 알려 준다. 사다리의 단마다 고유한 작물이 한 쌍씩 자라고 솜씨가 늘면 상급 등급도 거두며, 첫 밭보다 거친 땅을 위한 괭이는 기술자가 만든다. 숙련은 전용 카운터로 상한 100까지 오른다.',
   'guide.profPages.rhythmHeading': '채집의 리듬',
   'guide.profPages.rhythmBody':
     '채집은 눈에 보이는 시전이다. 기본 {base}초에 최소 {floor}초까지, 도구가 채집물보다 한 티어 높을 때마다 {tool}초, 숙련도 구간마다 {band}초씩 짧아진다.',
@@ -11331,7 +11380,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': '무료',
   'guide.profPages.econ.workOrdersHeading': '작업 주문',
   'guide.profPages.econ.workOrdersNote':
-    '장인마다 자기 단골 재료 한 묶음을 상점가의 {pct}%에 사들이며, {minutes}분마다 되풀이할 수 있다.',
+    '장인마다 단골 재료별로 작업 의뢰를 내걸고, 요구한 묶음을 상점가의 {pct}%에 사들인다. 의뢰마다 {minutes}분짜리 시계가 따로 돌아, 납품한 의뢰만 닫히고 같은 장인의 다른 의뢰는 열려 있다.',
   'guide.profPages.econ.colOrder': '작업 주문',
   'guide.profPages.econ.colMaster': '장인',
   'guide.profPages.econ.colAsks': '요구',
@@ -11397,6 +11446,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.',
   'guide.profPages.gatherDeeds.farming':
     '농사에는 아직 고유 업적이 없다. 밭과 작물이 자리 잡은 지금, 다른 전문직을 장식하는 이정표와 상한 업적은 이후 업데이트로 들어온다. 숙련은 이미 Master Gatherer(아무 세 채집 기술 100)에 포함되므로 농부도 남들과 같은 방식으로 그 페이지를 채운다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다.',
+  'guide.profPages.farm.bedsHeading': '밭 일구기',
+  'guide.profPages.farm.bedsBody':
+    '순서는 짧다. 밭 곁의 농부에게서 씨앗과 퇴비를 산다. Eastbrook의 Jessica는 골짜기 두 종을, Fenbridge의 농부는 습지 두 종을 갖추고 있지만 Highwatch와 Evergarden의 씨앗은 어느 상점에도 없다. 높은 단의 수확에서 한두 알씩 되돌아오거나, 아니면 World Market에서 오간다. 가방에 괭이를 넣고 씨를 심고, 원한다면 승산을 높여라. 상점의 퇴비와 심을 때 농작물로 치르는 농부의 관리는 둘 다 작물이 무사히 자랄 확률을 올리고, 연금술사의 성장 토닉은 수확이 늘어날 기회를 주며, 숙련이 작물의 단보다 한 구간 위로 오르면 그 작물은 다시는 실패하지 않는다. 그다음은 자리를 뜨면 된다. 로그아웃 중에도 밭은 계속 자라고, 익은 작물은 놔둔 만큼 기다리며, 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)가 심어 둔 모든 밭을 타이머와 함께 보여 준다.\n\n실패한 작물은 농작물 대신 시든 껍질을 남기고, 어느 농부든 껍질을 퇴비로 바꿔 주니 나쁜 한 철이 다음 철의 보험을 사 주는 셈이다. 거둔 것은 주방을 먹여 살린다. 농작물은 주방에서 요리가 되고, Cook Marlow의 밀과 쌀 의뢰는 Vale Wheat와 Marsh Rice를 다른 모든 작업 의뢰와 같은 시계로 사들인다.',
   'guide.profPages.fish.startHeading': '시작하기',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole은 Eastbrook의 Fisherman Brandt가 20동에 판다(마을 동쪽 끝에서 Mirror Lake를 노려보는 노련한 낚시꾼이다). Tinker Gizzel, Fenbridge의 Provisioner Hale, Highwatch의 Quartermaster Bree도 재고가 있다. 전방 약 24야드 안의 충분히 깊은 물을 바라보고 낚싯대를 쓰면 찌가 날아간다. 전투 중, 수영 중, 사망 중에는 던질 수 없다. 물가에서 던지는 것이 정석이고, 어느 지역의 낚시 가능한 물이든 좋다.',

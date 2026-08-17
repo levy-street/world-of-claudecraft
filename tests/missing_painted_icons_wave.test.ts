@@ -28,6 +28,7 @@ const itemConsistencyManifestPath = path.join(
   repoRoot,
   'docs/achievements/item-art-consistency-2026-08-09/accepted-art.json',
 );
+const GENERATED_ABILITY_SOURCE_PACK = 'woc_openai_missing_painted_icons_2026_08_01';
 
 interface ReferenceRecord {
   path: string;
@@ -164,6 +165,14 @@ interface AbilityMappingEntry {
   license?: string;
   references?: ReferenceRecord[];
   generationPrompt?: string;
+  provenanceRecord?: string;
+  acceptedSha256?: string;
+  acceptedBytes?: number;
+  supersedes?: {
+    sourcePack: string;
+    shippingSha256: string;
+    shippingBytes: number;
+  };
 }
 
 function manifest(): AcceptedArtManifest {
@@ -178,6 +187,28 @@ function resolvedShippingPin(asset: RasterAsset): {
   acceptedSha256: string;
   acceptedBytes: number;
 } {
+  if (asset.kind === 'ability') {
+    const ability = ABILITIES[asset.id];
+    if (!ability) throw new Error(`manifest ability ${asset.id} is not canonical`);
+    const mapping = JSON.parse(
+      readFileSync(path.join(repoRoot, `public/ui/skills/${ability.class}/mapping.json`), 'utf8'),
+    ) as { abilities: AbilityMappingEntry[] };
+    const owner = mapping.abilities.find(({ abilityId }) => abilityId === asset.id);
+    if (!owner || owner.sourcePack === GENERATED_ABILITY_SOURCE_PACK) return asset;
+
+    expect(owner.supersedes, `${asset.id} historical generated-art lineage`).toMatchObject({
+      sourcePack: GENERATED_ABILITY_SOURCE_PACK,
+      shippingSha256: asset.acceptedSha256,
+      shippingBytes: asset.acceptedBytes,
+    });
+    expect(owner.provenanceRecord, `${asset.id} replacement provenance`).toBeTruthy();
+    expect(owner.acceptedSha256, `${asset.id} replacement SHA-256`).toMatch(/^[0-9a-f]{64}$/);
+    expect(owner.acceptedBytes, `${asset.id} replacement bytes`).toBeGreaterThan(0);
+    return {
+      acceptedSha256: owner.acceptedSha256 as string,
+      acceptedBytes: owner.acceptedBytes as number,
+    };
+  }
   if (asset.kind !== 'item') return asset;
   const replacementManifest = itemConsistencyManifest();
   const supersession = replacementManifest.supersedes.find(({ itemId }) => itemId === asset.id);
@@ -229,7 +260,6 @@ function expectedAssetLocations(asset: RasterAsset): {
   return { runtimeUrl, shippingPath: `public${runtimeUrl}` };
 }
 
-const GENERATED_ABILITY_SOURCE_PACK = 'woc_openai_missing_painted_icons_2026_08_01';
 const ALLOWED_REFERENCE_ROLES = [
   'composition reference',
   'frame reference',
@@ -237,8 +267,8 @@ const ALLOWED_REFERENCE_ROLES = [
   'subject reference',
 ] as const;
 
-// Choice-row talents, modifier art, retired summon paintings, and pet signature
-// actions are image ids without live ABILITIES rows by design.
+// Choice-row talents, modifier art, retired summon paintings, pet signature
+// actions, and shared pet commands are image ids without live ABILITIES rows by design.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'anger_management',
   'attack',
@@ -255,6 +285,14 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'gloomshade_abyssal_chain',
   'lingering_dread',
   'overflowing_power',
+  'pet_aggressive',
+  'pet_attack',
+  'pet_defensive',
+  'pet_feed',
+  'pet_growl',
+  'pet_mend',
+  'pet_passive',
+  'pet_water_jet',
   'pursuit',
   'second_wind',
   'snap_polymorph',
@@ -506,9 +544,12 @@ describe('missing painted ability integration', () => {
       };
       expect(mapping.licenseScope).toContain('explicitly override');
       allEntries.push(...mapping.abilities.map((entry) => ({ className, entry })));
-      const generated = mapping.abilities.filter(
-        (entry) => entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK,
-      );
+      const generated = mapping.abilities.filter((entry) => {
+        return (
+          entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK ||
+          entry.supersedes?.sourcePack === GENERATED_ABILITY_SOURCE_PACK
+        );
+      });
       for (const entry of generated) {
         mapped.push(entry.abilityId);
         const asset = assetById.get(entry.abilityId);
@@ -517,10 +558,21 @@ describe('missing painted ability integration', () => {
         expect(entry.owner).toBe('World of ClaudeCraft');
         expect(entry.license).toContain('project asset');
         expect(entry.license).not.toContain('CraftPix');
-        expect(entry.sourceFile).toBe(asset?.source.path);
         expect(entry.output).toBe(`${entry.abilityId}.webp`);
-        expect(entry.references).toEqual(asset?.generation.references);
-        expect(entry.generationPrompt).toBe(asset?.generation.prompt);
+        if (entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK) {
+          expect(entry.sourceFile).toBe(asset?.source.path);
+          expect(entry.references).toEqual(asset?.generation.references);
+          expect(entry.generationPrompt).toBe(asset?.generation.prompt);
+        } else {
+          expect(entry.supersedes).toMatchObject({
+            sourcePack: GENERATED_ABILITY_SOURCE_PACK,
+            shippingSha256: asset?.acceptedSha256,
+            shippingBytes: asset?.acceptedBytes,
+          });
+          expect(entry.provenanceRecord).toBeTruthy();
+          expect(entry.acceptedSha256).toMatch(/^[0-9a-f]{64}$/);
+          expect(entry.acceptedBytes).toBeGreaterThan(0);
+        }
       }
     }
     expect(sorted(mapped)).toEqual(accepted.targetSets.abilities);
@@ -529,14 +581,20 @@ describe('missing painted ability integration', () => {
     for (const id of accepted.targetSets.abilities) {
       const owners = allEntries.filter(({ entry }) => entry.abilityId === id);
       expect(owners, `${id} must have exactly one mapping owner`).toHaveLength(1);
-      expect(owners[0].entry.sourcePack, `${id} mapping owner`).toBe(GENERATED_ABILITY_SOURCE_PACK);
+      expect(
+        owners[0].entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK ||
+          owners[0].entry.supersedes?.sourcePack === GENERATED_ABILITY_SOURCE_PACK,
+        `${id} mapping owner or explicit supersession`,
+      ).toBe(true);
       expect(owners[0].className, `${id} mapping class`).toBe(ABILITIES[id].class);
     }
     expect(
       allEntries
         .filter(
           ({ entry }) =>
-            targets.has(entry.abilityId) && entry.sourcePack !== GENERATED_ABILITY_SOURCE_PACK,
+            targets.has(entry.abilityId) &&
+            entry.sourcePack !== GENERATED_ABILITY_SOURCE_PACK &&
+            entry.supersedes?.sourcePack !== GENERATED_ABILITY_SOURCE_PACK,
         )
         .map(({ entry }) => entry.abilityId),
       'generated abilities must not also appear as ordinary CraftPix entries',
@@ -624,9 +682,16 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'pvp_card_duel_first_win',
     ]);
     // Later releases appended more deeds after this historical wave. The
-    // release art audit painted those additions too, so the one exhaustive
-    // DEED_ART_PENDING ledger is empty and no live deed uses fallback art.
-    expect(DEED_ORDER).toHaveLength(271);
+    // release art audit painted those additions, so the wave's own claim is
+    // unchanged: every deed that existed when it landed is painted. The only
+    // artless ids are the walk-in castle visit pair appended after the audit,
+    // riding the category-crest fallback the Icons authoring rule in
+    // docs/design/deeds.md sanctions until their 512px sources are
+    // commissioned (flagged in docs/achievements/icon-brief.md). Read from
+    // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts),
+    // so this file cannot end up naming a different pending set than the
+    // other two art suites. Exhaustive: a third artless deed still reds here.
+    expect(DEED_ORDER).toHaveLength(273);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

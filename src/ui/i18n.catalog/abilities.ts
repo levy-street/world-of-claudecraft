@@ -1144,7 +1144,7 @@ const classAbilityNamesEn = {
       [
         'recall_the_fallen',
         'Recall the Fallen',
-        'Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.',
+        'Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight.',
       ],
       [
         'beacon_of_light',
@@ -2405,17 +2405,17 @@ const classAbilityNamesEn = {
       [
         'temporal_reversal',
         'Temporal Reversal',
-        "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+        "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)",
       ],
       [
         'collective_reversal',
         'Collective Reversal',
-        'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+        'Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
       ],
       [
         'ancestor_return',
         "Ancestors' Return",
-        'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
+        'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
       ],
       [
         'temporal_rewind',

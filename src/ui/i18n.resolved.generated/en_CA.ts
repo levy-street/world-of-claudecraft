@@ -958,6 +958,22 @@ export const en_CA: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -3096,8 +3112,11 @@ export const en_CA: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const en_CA: EnTranslations = {
         "logging": "Logging fells timber from stands of trees across the whole world: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, highpine in Thornpeak Heights, and starter stands in every younger zone, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
         "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, sunpetal in Thornpeak Heights, and starter patches in every younger zone, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
         "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "The gathering rhythm",
       "rhythmBody": "A harvest is a short visible cast, not an instant grab: {base} seconds base, never below a {floor} second floor. Carrying a tool above the node's tier, one your proficiency lets you wield, speeds you up by {tool} seconds per tier above it, and each proficiency band you cross trims another {band} seconds; merely matching the node's tier gets you in the door, it is the tiers above it that make you fast.\n\nA full bag politely refuses the cast before it starts, so nothing is wasted mid-swing, and every harvest pays a small slice of character XP, scaled by the node's level against your own the way kill XP scales: a trivial gray node teaches a capped character nothing.",
@@ -5834,6 +5853,10 @@ export const en_CA: EnTranslations = {
         "koiHeading": "The Sunglint Koi",
         "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 at band 2, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Crafting Economy",
         "intro": "How coin moves through the trades: the exact fees and sinks, what actually sells, the World Market's rules, work orders, commissions, and why crafted power stops below the raid floor.",
@@ -5856,7 +5879,7 @@ export const en_CA: EnTranslations = {
         "marketHeading": "The World Market and its cut",
         "marketBody": "The World Market is the realm-wide exchange, kept by the Merchant in Eastbrook and Auctioneer Voss in Highwatch. Listing is free: there is no deposit, and an unsold listing simply comes back to you. The house takes its cut only when something actually sells: 5 percent of the sale price, and the rest waits for you to collect.\n\nSpecial pieces are welcome too: a signed, masterwork, or enchanted copy goes up as its own single-copy listing that carries its identity onto the tooltip, signature and all, and it never mixes with a plain stack. The one refusal is a bound copy: a piece locked by the Maker's Bond, or still armed to bind, stays out of the Market and the mail alike, so a bond can never be laundered away. Price special work yourself; the plain listings only tell you what the plain version fetches.",
         "workOrdersHeading": "Work orders",
-        "workOrdersNote": "Each station master posts a standing work order: bring a stack of their craft's staple material and get paid on the spot, plus a little quest experience. The pay is deliberately {pct}% of what a vendor would give you for the same stack, rounded down, so a work order is never the profitable way to sell materials, just a reason to swing by the station.\n\nEvery order runs on its own {minutes} minute clock per character: turn one in and that master has nothing more for you until the timer laps. The marks over a master's head and on your maps keep the score for you: a bright blue ! is repeatable work you have handled before, and the same mark dimmed is repeatable work still inside its clock, offered again once the window laps. Treat them as a small bonus on materials you were gathering anyway, not a business.",
+        "workOrdersNote": "Each station master posts standing work orders, one per staple material: bring the stack an order asks for and get paid on the spot, plus a little quest experience. The pay is deliberately {pct}% of what a vendor would give you for the same stack, rounded down, so a work order is never the profitable way to sell materials, just a reason to swing by the station.\n\nEvery order runs on its own {minutes} minute clock per character: turn one in and that order is closed to you until the timer laps, while a master's other orders stay open. The marks over a master's head and on your maps keep the score for you: a bright blue ! is repeatable work you have handled before, and the same mark dimmed is repeatable work still inside its clock, offered again once the window laps. Treat them as a small bonus on materials you were gathering anyway, not a business.",
         "colOrder": "Work order",
         "colMaster": "Master",
         "colAsks": "Asks for",
@@ -9694,7 +9717,7 @@ export const en_CA: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "description": "Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight."
       },
       "beacon_of_light": {
         "name": "Beacon of Light",
@@ -10736,15 +10759,15 @@ export const en_CA: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Temporal Reversal",
-        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+        "description": "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)"
       },
       "collective_reversal": {
         "name": "Collective Reversal",
-        "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
+        "description": "Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
       },
       "ancestor_return": {
         "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "description": "Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
       },
       "temporal_rewind": {
         "name": "Rewind",
@@ -12455,6 +12478,9 @@ export const en_CA: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Pristine Claw"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
@@ -14494,6 +14520,26 @@ export const en_CA: EnTranslations = {
         "title": "Master of the Apothecary",
         "greeting": "Measure twice and pour once, {className}. The apothecary has no patience for spilled reagents."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidewatcher",
@@ -14508,6 +14554,19 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ore vein harvested"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Game Meat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const en_CA: EnTranslations = {
         "name": "The Last Keep",
         "enterText": "You step into the cold, silent halls of the Last Keep.",
         "leaveText": "You pull the keep door shut and step back into the Drakelands wind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "The Drowned Temple",

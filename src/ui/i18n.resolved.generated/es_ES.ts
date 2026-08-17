@@ -958,6 +958,22 @@ export const es_ES: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -3096,8 +3112,11 @@ export const es_ES: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const es_ES: EnTranslations = {
         "logging": "La Tala corta madera de arboledas repartidas por todo el mundo: corteza de hierro en el Valle de Eastbrook, madera de ceniza en la Ciénaga de Mirefen, pino cumbre en las Alturas de Thornpeak y arboledas iniciales en cada zona más joven, la materia prima para astiles, bastones y el banco del ingeniero. Abierta a todos desde el nivel 1 con un hacha de leñador en las bolsas (20 cobres en los mostradores de Eastbrook, Fenbridge y Highwatch), registrada en su propio contador hasta un tope de 100.",
         "herbalism": "La Herboristería recoge lo que crece silvestre: hoja de brillo en el Valle de Eastbrook, hoja dorada en la Ciénaga de Mirefen, pétalo de sol en las Alturas de Thornpeak y matas iniciales en cada zona más joven, la hoja y el tallo que mantienen en marcha los oficios de botica. Abierta a todos desde el nivel 1 con una hoz de herborista en las bolsas (20 cobres en los mostradores de Eastbrook, Fenbridge y Highwatch), registrada en su propio contador hasta un tope de 100.",
         "fishing": "La Pesca es la rara entre los oficios de recolección, y la más profunda: un minijuego de verdad de picada y cobranza, tablas de capturas propias en cada una de las tres zonas centrales (las aguas jóvenes más allá sirven de momento la tabla del Valle) y un tope de pericia de 200, el doble que las demás. Compra una caña, ponte de cara al agua abierta y lanza.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "El ritmo de recolección",
       "rhythmBody": "Una cosecha es un lanzamiento corto y visible, no un agarre instantáneo: {base} segundos de base, nunca por debajo de un mínimo de {floor} segundos. Llevar una herramienta por encima del nivel del nodo, una que tu pericia te permita manejar, te acelera {tool} segundos por cada nivel por encima de él, y cada franja de pericia que cruzas recorta otros {band} segundos; igualar sin más el nivel del nodo te abre la puerta, son los niveles por encima los que te hacen rápido.\n\nUna bolsa llena rechaza cortésmente el lanzamiento antes de que empiece, así que no se desperdicia nada a medio golpe, y cada cosecha paga una pequeña porción de XP de personaje, escalada según el nivel del nodo frente al tuyo igual que escala la XP por muertes: un nodo gris trivial no le enseña nada a un personaje al tope.",
@@ -5834,6 +5853,10 @@ export const es_ES: EnTranslations = {
         "koiHeading": "El Koi Destello Solar",
         "koiBody": "Cada masa de agua del juego esconde el mismo premio: el Koi Destello Solar, un brillo poco común en el sedal que vale 75 cobres para un vendedor y bastante más para tu orgullo. Sus probabilidades responden a tu franja de capturas y a nada más, iguales en todas las zonas: una fila del 1 por ciento de la tabla de capturas en la franja 0, 3 en la franja 1 y 6 en la franja 2, tirada en cada lanzamiento que recoges, así que el koi le llega al pescador que se ganó las tablas profundas. Sacar uno registra Destello de Esperanza en tu Libro de Gestas, una marca de coleccionista con cero Renombre. Cuando ocurra, el registro se asegura de que te enteres."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Economía de Artesanía",
         "intro": "Cómo fluyen las monedas a través de los oficios: las tarifas y sumideros exactos, qué se vende realmente, las reglas del Mercado Mundial, las órdenes de trabajo, los encargos y por qué el poder artesanal se detiene por debajo del suelo de la banda.",
@@ -5856,7 +5879,7 @@ export const es_ES: EnTranslations = {
         "marketHeading": "El Mercado Mundial y su comisión",
         "marketBody": "El Mercado Mundial es el intercambio de todo el reino, administrado por el Mercader en Eastbrook y el Subastador Voss en Highwatch. Publicar es gratis: no hay depósito, y una publicación sin vender simplemente te regresa. La casa toma su comisión solo cuando algo realmente se vende: 5 por ciento del precio de venta, y el resto te espera para cobrarlo.\n\nUn límite importante: el Mercado solo intermedia bienes corrientes. Una copia firmada, de obra maestra, encantada o vinculada nunca entra en una publicación, por lo que las piezas especiales cambian de manos cara a cara en una ventana de intercambio, que lleva la identidad completa de un objeto, firma incluida. Ponles precio tú mismo; el Mercado solo te dice lo que vale la versión corriente.",
         "workOrdersHeading": "Órdenes de trabajo",
-        "workOrdersNote": "Cada maestro de estación publica una orden de trabajo permanente: trae una pila del material básico de su oficio y te pagan en el momento, más un poco de experiencia de misión. El pago es deliberadamente un {pct}% de lo que un vendedor te daría por la misma pila, redondeado hacia abajo, así que una orden de trabajo nunca es la forma rentable de vender materiales, solo una razón para pasar por la estación.\n\nCada orden funciona con su propio temporizador de {minutes} minutos por personaje: entrega una y ese maestro no tiene nada más para ti hasta que el temporizador vuelva a dar la vuelta. Trátalas como un pequeño bono sobre materiales que ibas a recolectar de todas formas, no como un negocio.",
+        "workOrdersNote": "Cada maestro de estación publica órdenes de trabajo permanentes, una por material básico: trae la pila que pide una orden y te pagan en el momento, más un poco de experiencia de misión. El pago es deliberadamente un {pct}% de lo que un vendedor te daría por la misma pila, redondeado hacia abajo, así que una orden de trabajo nunca es la forma rentable de vender materiales, solo una razón para pasar por la estación.\n\nCada orden funciona con su propio temporizador de {minutes} minutos por personaje: entrega una y esa orden queda cerrada para ti hasta que el temporizador vuelva a dar la vuelta, mientras las demás órdenes del maestro siguen abiertas. Trátalas como un pequeño bono sobre materiales que ibas a recolectar de todas formas, no como un negocio.",
         "colOrder": "Orden de trabajo",
         "colMaster": "Maestro",
         "colAsks": "Pide",
@@ -12456,6 +12479,9 @@ export const es_ES: EnTranslations = {
       "pristine_claw": {
         "name": "Garra Prístina"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -14494,6 +14520,26 @@ export const es_ES: EnTranslations = {
         "title": "Maestro del boticario",
         "greeting": "Mida dos veces y vierta una vez, {className}. El boticario no tiene paciencia con los reactivos derramados."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Vigía de la Marea",
@@ -14508,6 +14554,19 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Veta de mineral extraída"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Carne de caza entregada"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const es_ES: EnTranslations = {
         "name": "La Última Fortaleza",
         "enterText": "Entras en los fríos y silenciosos salones del Last Keep.",
         "leaveText": "Cierras tras de ti la puerta de la fortaleza y vuelves al viento de los Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "El Templo Ahogado",

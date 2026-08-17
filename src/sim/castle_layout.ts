@@ -14,14 +14,28 @@
 // bailey sits at padH and the inner ward, the keep's raised terrace,
 // 2.6 above it behind a retaining edge with two stair cuts. Pure leaf:
 // deterministic, no rng, no SimContext.
+import { hexBuildingBox } from './hex_building_dims';
 import type { BlockerDef } from './types';
 
 export const CASTLE = {
   // the graded grounds (terrain levels to the local pad target; the skirt
   // blends out to the waste; the west reach carries the barbican forecourt)
   pad: { x0: 334, x1: 452, z0: 1980, z1: 2085, h: 6 },
-  // the inner ward: the keep's raised terrace
-  ward: { x0: 398, x1: 433.4, z0: 1991.4, z1: 2018, h: 8.6 },
+  // The inner ward: the keep's raised terrace (z0 sits back far enough that the
+  // alley flight lane clears the thicker near wall).
+  //
+  // The .6 on x0 and z1 is load-bearing, not decoration. terrainSteepnessAt
+  // memoizes on 1-yard cells sampled at the CENTRE, so a retaining face whose
+  // foot sits near a whole number stamps the cliff's steepness onto up to half a
+  // cell of dead level floor either side of it. On the flat below that reads as
+  // steep with no downhill (a freeze, now also handled in player_motion); on the
+  // terrace above it reads as steep WITH a downhill and shoves a standing player
+  // off the drop. Both vanish once the face lands mid-cell. The safe window for
+  // a foot at coordinate a is frac(a) in [0.35, 0.85): z0 1992.6 and the east
+  // blend foot 432.7 were already inside it, x0 398 and z1 2018 were not. x0
+  // goes WEST to 397.6 rather than east to 398.4 because hexrBarracks (x 403.5,
+  // r 5.2) reaches to 398.3 and would then overhang the terrace edge.
+  ward: { x0: 397.6, x1: 433.4, z0: 1992.6, z1: 2018.6, h: 8.6 },
   // the curtain wall square: wall centerlines
   wx0: 360,
   wx1: 436.8,
@@ -29,8 +43,9 @@ export const CASTLE = {
   wz1: 2071.8,
   /** wall module length (KayKit wall is 4 units at scale 1.75) */
   module: 7,
-  /** wall thickness: the lift plateau strip (the walkable wall-walk width) */
-  wallTh: 2.4,
+  /** wall thickness: the lift plateau strip (the walkable wall-walk width;
+   *  the render skins BOTH faces with wall modules at this thickness) */
+  wallTh: 3.0,
   /** the wall-walk's ABSOLUTE height (walls stand on the bailey pad) */
   walkAbs: 13,
   /** the tall southeast watchtower chamber's ABSOLUTE floor height */
@@ -62,9 +77,10 @@ export const CASTLE_GATES = {
   postern: { a0: 407.6, a1: 410.2 },
   /** the east breach: the wall the drakes brought down, a rubble climb */
   breach: { a0: 2047.4, a1: 2054.4 },
-  /** the barbican's outer gate, aligned with the main gate on the road line
-   *  (the outer doorway renders at wall scale 1, so its opening is narrower) */
-  outer: { a0: 2028.9, a1: 2030.9 },
+  /** the barbican's outer gate on the road line: the doorway module sits on
+   *  its 4-unit grid slot (center 2030), and the walkable span keeps a
+   *  margin inside the arch's 2yd foot opening (2029 to 2031) */
+  outer: { a0: 2029.15, a1: 2030.85 },
 } as const;
 
 // The barbican: a low-walled forecourt in front of the main gate, its own
@@ -95,7 +111,10 @@ export const GARDEN = {
   hAbs: 9,
   th: 1.6,
   /** the two doorway gaps in the south wall (x spans) */
-  gates: [{ a0: 365, a1: 368.5 }],
+  gates: [
+    { a0: 365, a1: 368.5 },
+    { a0: 428, a1: 431.5 },
+  ],
 } as const;
 
 // Towers: four corner bastions (the SE is the tall watch) plus three
@@ -140,10 +159,23 @@ export interface CastleRamp {
   h1: number;
 }
 export const CASTLE_RAMPS: readonly CastleRamp[] = [
-  // west flight: bailey floor up the inner face to the west walk...
-  { axis: 'z', b0: 361.0, b1: 363.6, a0: 2040, a1: 2058.6, h0: 6, h1: CASTLE.walkAbs },
-  // ...and its flat landing, bridging the flight top onto the SW bastion
-  { axis: 'z', b0: 361.0, b1: 363.6, a0: 2058.6, a1: 2069, h0: CASTLE.walkAbs, h1: CASTLE.walkAbs },
+  // west flight: bailey floor up the inner face to the west walk (the band
+  // tucks 0.3 INTO the thicker wall strip so no low sliver opens between
+  // flight and walk; the wall's own max() simply wins over that edge)
+  { axis: 'z', b0: 361.2, b1: 364.0, a0: 2040, a1: 2058.6, h0: 6, h1: CASTLE.walkAbs },
+  // ...and its flat landing, bridging the flight top onto the SW bastion. It
+  // runs INTO the south wall strip, not up to it: stopping short left a lane
+  // of bailey floor between the landing's end wall and the south curtain that
+  // narrowed to nothing in the corner.
+  {
+    axis: 'z',
+    b0: 361.2,
+    b1: 364.0,
+    a0: 2058.6,
+    a1: CASTLE.wz1 - CASTLE.wallTh / 2 + 0.3,
+    h0: CASTLE.walkAbs,
+    h1: CASTLE.walkAbs,
+  },
   // the alley flight: squeezed between the north wall and the ward's
   // retaining edge, climbing east to the NE walk. The band runs THROUGH the
   // ward's retaining blend (the overlap rule above): stopping at the rect line
@@ -170,14 +202,130 @@ export const CASTLE_RAMPS: readonly CastleRamp[] = [
   },
 ] as const;
 
-// The ward's two stair cuts through its south retaining edge: bands where
-// the terrace height ramps down to the bailey instead of dropping sheer.
-export const WARD_STEPS = [
-  { x0: 404, x1: 407.5 },
-  { x0: 421, x1: 424.5 },
+// The ward's grand stair: ONE broad cut through the south retaining edge,
+// four of the old flight widths flush side by side (14yd), centered on the
+// keep's door axis so the terrace approach reads as a single processional
+// ramp spanning the keep foundations instead of two narrow side stairs.
+export const WARD_STEPS = [{ x0: 414, x1: 428 }] as const;
+
+/**
+ * An OUTSIDE way up: corbelled shelves climbing the east curtain, so the
+ * wall-walk is reachable by parkour as well as by the flights. Tops are
+ * ABSOLUTE (the pad here is 6.0, the walk 13.0) and each rise sits in a
+ * band the engine can actually cross: 1.3 vault off the pad, then 2.0 and
+ * 2.1 ledge climbs, then a 1.6 vault onto the walk. Pinned by
+ * tests/castle_ledges.
+ *
+ * Each shelf's inner face sits FLUSH on the curtain's outer face (438.3).
+ * Standing them off the wall left a slot of bailey-level floor behind them,
+ * too narrow to turn around in, which is what a corbel is not: a corbel grows
+ * out of the wall it is cut into.
+ */
+export interface CastleWallLedge {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  /** absolute shelf height */
+  top: number;
+}
+export const CASTLE_WALL_LEDGES: readonly CastleWallLedge[] = [
+  { x: 439.8, z: 2040, hw: 1.5, hd: 1.8, top: 7.3 },
+  { x: 439.7, z: 2036, hw: 1.4, hd: 1.8, top: 9.35 },
+  { x: 439.7, z: 2032, hw: 1.4, hd: 1.8, top: 11.4 },
 ] as const;
 /** the step ramps run from the ward edge z1 down to bailey over this run */
 export const WARD_STEP_RUN = 4;
+
+// THE WALL-WALK'S OUTER PARAPET.
+//
+// The curtain is terrain, and terrain gives a body no standoff at a DOWN edge:
+// terrainWallStandoff only pushes away from RISING ground. So the walk was a
+// 3.0yd strip with nothing at either lip, and a player drifting four ticks off
+// the centreline simply left it, seven yards down into the bailey. The drawn
+// stone says otherwise: castle_features already lays a crenellated battlement
+// along the outer edge and a rail along the inner one. This is that battlement
+// made solid, so the wall you see is the wall you are held by.
+//
+// OUTER edge only, which is what was asked for and also the right call: the
+// inner lip overlooks the bailey a player often wants to drop into on purpose,
+// and railing both would turn the circuit into a corridor.
+/** centre of the parapet band, measured out from the wall centreline */
+export const PARAPET_INSET = 1.2;
+/** half-thickness of the band (the drawn merlon is 0.4 deep) */
+export const PARAPET_HALF = 0.2;
+/** the parapet's top over the walk it stands on */
+export const PARAPET_RISE = 1.56;
+
+export interface CastleParapet {
+  axis: 'x' | 'z';
+  /** the across coordinate: the band's CENTRE, already offset outward */
+  line: number;
+  a0: number;
+  a1: number;
+  /** ABSOLUTE top of the stone */
+  top: number;
+}
+
+/** Subtract a set of gaps from one run, yielding the spans that remain. */
+function splitRun(a0: number, a1: number, gaps: { a0: number; a1: number }[]): [number, number][] {
+  let spans: [number, number][] = [[a0, a1]];
+  for (const g of gaps) {
+    const next: [number, number][] = [];
+    for (const [s0, s1] of spans) {
+      if (g.a1 <= s0 || g.a0 >= s1) {
+        next.push([s0, s1]);
+        continue;
+      }
+      if (g.a0 > s0) next.push([s0, g.a0]);
+      if (g.a1 < s1) next.push([g.a1, s1]);
+    }
+    spans = next;
+  }
+  return spans.filter(([s0, s1]) => s1 - s0 > 1);
+}
+
+/**
+ * The parapet spans, with a gap wherever one would break something that works.
+ *
+ * Three kinds of gap, and the third is the subtle one:
+ *  - every GATE mouth, so the walk still opens over the way in;
+ *  - the watch flight, which climbs the south wall itself and rises clear above
+ *    parapet height, so a band there would be buried in the ramp;
+ *  - the CLIMBING SHELVES on the east curtain. fitsOn (physics/ledge.ts) vetoes
+ *    a ledge grab whose landing lands inside anything carrying a movement top,
+ *    whether or not it is standable, so a parapet over the shelves' approach
+ *    would silently kill the whole outside climb. The gap covers the run, not
+ *    just the one shelf that tops out.
+ */
+export function castleParapetSegments(): CastleParapet[] {
+  const hw = CASTLE.towerHw;
+  const top = CASTLE.walkAbs + PARAPET_RISE;
+  const G = CASTLE_GATES;
+  const ledgeGap = { a0: 2026, a1: 2044 }; // CASTLE_WALL_LEDGES climb z 2032..2040
+  const out: CastleParapet[] = [];
+  const add = (
+    axis: 'x' | 'z',
+    line: number,
+    outward: -1 | 1,
+    a0: number,
+    a1: number,
+    gaps: { a0: number; a1: number }[],
+  ): void => {
+    for (const [s0, s1] of splitRun(a0, a1, gaps)) {
+      out.push({ axis, line: line + outward * PARAPET_INSET, a0: s0, a1: s1, top });
+    }
+  };
+  // west curtain, outward is -x; the main gate parts it
+  add('z', CASTLE.wx0, -1, CASTLE.wz0 + hw, CASTLE.wz1 - hw, [G.main]);
+  // east curtain, outward is +x; the breach and the climbing shelves part it
+  add('z', CASTLE.wx1, 1, CASTLE.wz0 + hw, CASTLE.wz1 - hw, [ledgeGap, G.breach]);
+  // north curtain, outward is -z; the postern parts it
+  add('x', CASTLE.wz0, -1, CASTLE.wx0 + hw, CASTLE.wx1 - hw, [G.postern]);
+  // south curtain, outward is +z, solid, but stop at the watch flight's foot
+  add('x', CASTLE.wz1, 1, CASTLE.wx0 + hw, 424, []);
+  return out;
+}
 
 // The bailey and ward buildings. The ward pair (keep, great hall) stand on
 // the raised terrace; everything else on the bailey floor. Placement honors
@@ -190,47 +338,184 @@ export interface CastleBuilding {
   scale: number;
   r: number;
   h: number;
+  /** stands on the ward terrace (placement checks use this, not the key) */
+  ward?: boolean;
+  /** part of the composed keep mass: allowed to touch its complex mates */
+  keepComplex?: boolean;
+  /** Collide as the model's measured BOX rather than as `r`. Opt-in per
+   * building because it is not always an improvement: the keep's circle is
+   * already inside its mesh, and boxing it would close the alley flight's lane
+   * to under a body's width. `r` stays authored either way, as the clearance
+   * radius scatter and roads read. */
+  boxed?: boolean;
+}
+
+/**
+ * The bailey and ward buildings as `decorProps`, with a measured box on every
+ * entry flagged `boxed`. Derived, never hand-typed: the half-extents come from
+ * the shipped model via hex_building_dims, so a re-scaled building cannot drift
+ * away from its own collision.
+ */
+export function castleBuildingProps(): {
+  key: string;
+  x: number;
+  z: number;
+  rot: number;
+  scale: number;
+  r: number;
+  h: number;
+  hw?: number;
+  hd?: number;
+}[] {
+  return CASTLE_BUILDINGS.map((b) => {
+    const box = b.boxed ? hexBuildingBox(b.key, b.scale) : null;
+    return {
+      key: b.key,
+      x: b.x,
+      z: b.z,
+      rot: b.rot,
+      scale: b.scale,
+      r: b.r,
+      h: b.h,
+      ...(box ?? {}),
+    };
+  });
 }
 export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
-  // THE WARD: the keep (its door, the Last Keep interior, faces +z toward
-  // the ward steps) and the great hall at its side
-  { key: 'hexrCastle', x: 421, z: 2003, rot: 0, scale: 9, r: 8.5, h: 34 },
-  { key: 'hexrTownhall', x: 405, z: 2006.5, rot: 0, scale: 7, r: 5.8, h: 15 },
-  // THE BAILEY, northwest military quarter: catapult tower, archery range,
-  // and the servants' house
-  { key: 'hexrTowerCatapult', x: 367, z: 1995, rot: Math.PI / 2, scale: 7, r: 4, h: 14 },
-  { key: 'hexrArcheryrange', x: 383, z: 1996, rot: 0, scale: 7, r: 5.5, h: 12.5 },
-  { key: 'hexrHomeB', x: 366.2, z: 2006, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9 },
+  // THE WARD: the keep with a barracks hall wing set beside it, the pair
+  // composing the terrace; the keep's own door faces +z, straight down the
+  // ward toward the portal.
+  //
+  // The wing used to be pulled in tight enough that the two collision circles
+  // CROSSED. Two crossing circles always meet at a cusp, and a cusp is a
+  // notch that tapers to nothing: walk in and you cannot turn around. It
+  // cannot be fenced off either. Sealing a cusp means overlapping the circle's
+  // own standoff, and then the fence and the circle push a body opposite ways
+  // and cancel, which holds it solid. So the wing stands clear instead, and
+  // the 2.3yd between the two masses is a real passage across the terrace.
+  {
+    key: 'hexrCastle',
+    x: 421,
+    z: 2001.5,
+    rot: 0,
+    scale: 9.5,
+    r: 9,
+    h: 36,
+    ward: true,
+    keepComplex: true,
+  },
+  {
+    key: 'hexrBarracks',
+    x: 403.5,
+    z: 2001.5,
+    rot: Math.PI / 2,
+    scale: 6.5,
+    r: 5.2,
+    h: 11,
+    ward: true,
+    keepComplex: true,
+    boxed: true,
+  },
+  // the great hall, moved down into the bailey to free the terrace
+  { key: 'hexrTownhall', x: 390, z: 2016, rot: 0, scale: 7, r: 5.8, h: 15, boxed: true },
+  // THE BAILEY. Every mass here collides as a circle, and a circle that comes
+  // within a body diameter of the curtain, a stair mass, a bastion, or its
+  // neighbour leaves a tapering alley the player can walk into and wedge in
+  // (the arcs cross, or graze a straight riser, and the floor between is
+  // inside the rendered stonework). So the quarters are spaced to keep a real
+  // lane, at least 1.6yd of standable floor, around every building on every
+  // side: the bailey reads as a walled town with a circulation ring rather
+  // than sheds shoved against the wall. Pinned by
+  // tests/last_keep_flank_traps.test.ts.
+  //
+  // northwest military quarter: catapult tower, archery range, and the
+  // servants' house
+  {
+    key: 'hexrTowerCatapult',
+    x: 369,
+    z: 1997,
+    rot: Math.PI / 2,
+    scale: 7,
+    r: 4,
+    h: 14,
+    boxed: true,
+  },
+  { key: 'hexrArcheryrange', x: 384, z: 1998.5, rot: 0, scale: 7, r: 5.5, h: 12.5, boxed: true },
+  { key: 'hexrHomeB', x: 370.5, z: 2008.5, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9, boxed: true },
   // the forge and market quarter by the gate road
-  { key: 'hexrBlacksmith', x: 368, z: 2020, rot: Math.PI / 2, scale: 7, r: 5, h: 7 },
+  { key: 'hexrBlacksmith', x: 371, z: 2021, rot: Math.PI / 2, scale: 7, r: 5, h: 7, boxed: true },
+  // The market and the stables are the two entries whose real box is BIGGER
+  // than the circle they were given, not smaller, so boxing them would take
+  // bailey away rather than give it back. Both are open compounds (a stall run
+  // and a fenced paddock, barely a fifth solid at chest height), so their true
+  // rectangle is a poor description of them either way: the honest fix is a
+  // collider that follows the fence and leaves the yard open, which one box
+  // cannot express. Circles until then, and their corners stay approximate.
   { key: 'hexrMarket', x: 388, z: 2040, rot: -Math.PI / 2, scale: 6.5, r: 4.5, h: 6.5 },
-  { key: 'hexrHomeA', x: 376, z: 2039, rot: Math.PI, scale: 6, r: 3.8, h: 6 },
-  // the south quarter: stables, the twin barracks, chapel, and the inn
-  { key: 'hexrStables', x: 370, z: 2052, rot: 0.35, scale: 7, r: 5.5, h: 4.5 },
-  { key: 'hexrBarracks', x: 386, z: 2062, rot: Math.PI, scale: 7.5, r: 6, h: 12.5 },
-  { key: 'hexrBarracks', x: 400, z: 2063, rot: 0, scale: 7.5, r: 6, h: 12.5 },
-  { key: 'hexrChurch', x: 413, z: 2060, rot: -Math.PI / 2, scale: 7.5, r: 5.5, h: 12.5 },
-  { key: 'hexrTavern', x: 421, z: 2043, rot: Math.PI, scale: 7.5, r: 5.5, h: 10.5 },
+  { key: 'hexrHomeA', x: 376, z: 2039, rot: Math.PI, scale: 6, r: 3.8, h: 6, boxed: true },
+  // the south quarter: stables, the twin barracks, chapel, and the inn. The
+  // stables stand clear of the west flight's mass, not beside it.
+  { key: 'hexrStables', x: 373, z: 2052, rot: 0.35, scale: 7, r: 5.5, h: 4.5 },
+  { key: 'hexrBarracks', x: 386.5, z: 2061, rot: Math.PI, scale: 7.5, r: 6, h: 12.5, boxed: true },
+  { key: 'hexrBarracks', x: 401, z: 2059.8, rot: 0, scale: 7.5, r: 6, h: 12.5, boxed: true },
+  {
+    key: 'hexrChurch',
+    x: 416,
+    z: 2059,
+    rot: -Math.PI / 2,
+    scale: 7.5,
+    r: 5.5,
+    h: 12.5,
+    boxed: true,
+  },
+  { key: 'hexrTavern', x: 421, z: 2043, rot: Math.PI, scale: 7.5, r: 5.5, h: 10.5, boxed: true },
 ] as const;
 
-// The keep and the great hall stand 1.2yd apart on the ward terrace, closer
-// than a player body can use. Their collision circles are INSCRIBED in square
-// meshes, so that slot's floor sits inside both rendered buildings: a player
-// who squeezed in stood under the stonework (it reads as being underground)
-// with barely room to turn around. Two invisible blocker walls close the neck
-// at the point where the gap is still wide enough to stand in, so the slot can
-// never be entered from either end. The terrace east of the keep (2.4yd clear)
-// stays the way around to the ward's north yard.
+// THE KEEP'S FOUNDATION SEALS. Every mass on the ward terrace collides as a
+// CIRCLE inscribed in a SQUARE mesh, so the mesh corners always overhang
+// walkable ground: wherever two of those arcs (or an arc and a stair mass)
+// come within a body diameter, the floor between them is inside the rendered
+// stonework and a player who walks in wedges there, unable to turn around.
+// Player report: "you get stuck along the side of the foundation."
+//
+// Growing a radius only MOVES a circle-crossing cusp, it never removes one, so
+// each pinch is closed at its MOUTH instead: an invisible wall whose two ends
+// sit inside solid geometry, placed where the gap is still wide enough to
+// stand in. Every route the ward needs stays open: the terrace east of the
+// keep is the way around to the north yard, and the keep's door lane between
+// the arch jambs carries no seal at all (the keep's own door apron solves that
+// one, see dungeons.ts the_last_keep doorPos).
+//
+// A seal is only ever safe where nothing can PUT a player behind it. Never
+// place one across ground a mass depenetrates into, above all the keep facade:
+// the instance-return path drops a logged-out character at doorPos.z - 4,
+// inside the keep's circle, and the circle then pushes them south onto
+// whatever is there.
 //
 // Same idiom as JAIL_BLOCKERS: fence-width, camera-ghost, never jumpable, and
 // pure static data (no rng, no tick-order effect). Merged into the built-in
 // world's blockers in data.ts, so all three hosts collide identically.
+// Pinned by tests/last_keep_flank_traps.test.ts (the reachable-wedge scan).
 export const CASTLE_BLOCKERS: readonly BlockerDef[] = [
-  // the slot's north mouth: from inside the great hall's circle to inside the
-  // keep's, so neither end can be walked around
-  { x1: 410.2, z1: 2003.9, x2: 412.6, z2: 2003.9 },
-  // the slot's south mouth
-  { x1: 410.2, z1: 2006.1, x2: 412.6, z2: 2006.1 },
+  // The old pair at z 2003.9/2006.1 is gone: once the great hall moved down
+  // into the bailey they sat inside both remaining masses and did nothing. The
+  // keep/barracks cusps they were re-aimed at are gone too, solved above by
+  // standing the wing clear rather than by fencing.
+  //
+  // THE ALLEY FLIGHT'S SOUTH FACE. East of x 425.5 the flight has climbed more
+  // than a step above the terrace beside it, and the keep's arc runs back
+  // toward it, so the strip between the two closes from 2.2yd to nothing at
+  // x 425.8. Sealed at the east mouth, flight mass to keep arc; west of the
+  // seal the strip is only ever entered by walking round the keep's east
+  // terrace, which this closes.
+  //
+  // NOTE the x: a blocker is not the thin segment it reads as. It becomes an
+  // OBB padded by FENCE_HALF_DEPTH and FENCE_END_PAD, and a body stands off
+  // that by its own radius, so its real reach is 0.85yd, not 0.5. Sizing one
+  // as a bare segment is how the first cut of this pass put a blocker's
+  // standoff PAST the keep's own: the two push vectors then cancel and the
+  // player is held, which is the exact defect these seals exist to remove.
+  { x1: 427.6, z1: 1993.2, x2: 427.6, z2: 1995.3 },
 ] as const;
 
 // Ember crystals of varying sizes around the grounds and approach (drawn by

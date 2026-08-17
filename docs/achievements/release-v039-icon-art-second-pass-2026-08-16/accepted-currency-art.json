@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 1,
+  "batch": "release-v0.39.0-second-pass-currency",
+  "createdOn": "2026-08-16",
+  "generator": {
+    "tool": "OpenAI built-in image generation",
+    "workflow": "imagegen",
+    "useCase": "stylized-concept",
+    "callsPerAsset": 1,
+    "variantsPerCall": 1,
+    "referenceImagesPassedToGenerator": false,
+    "note": "Repository references were inspected for semantics and visual continuity before prompting. Brand-new generations intentionally omitted referenced_image_paths and num_last_images_to_include."
+  },
+  "semanticSources": [
+    {
+      "path": "src/styles/components.css",
+      "role": "Live 11px circular-crop usage for coin_gold, coin_silver, coin_copper, and woc_token."
+    },
+    {
+      "path": "src/ui/hud/vendor/vendor_window.ts",
+      "role": "Live coin and Honor vendor-price usage."
+    },
+    {
+      "path": "src/ui/hud/vendor/warfare_vendor_window.ts",
+      "role": "Live Honor balance, affordability, and permanent Warfare purchase usage."
+    },
+    {
+      "path": "docs/design/warfare.md",
+      "role": "Canonical Honor earning, per-character ownership, and Warfare gear economy semantics."
+    },
+    {
+      "path": "docs/prd/delves.md",
+      "role": "Delve Mark earning and companion-upgrade currency semantics."
+    },
+    {
+      "path": "public/claudium/CLAUDIUM_VISUAL_ID.md",
+      "role": "Canonical separation between premium Claudium and tradable gold WOC token identities."
+    }
+  ],
+  "visualReferences": [
+    {
+      "id": "claudium_coin_master",
+      "path": "public/claudium/icons/claudium_coin_master.png",
+      "role": "Current premium arcane crescent-and-gem token language; used to keep woc_token related but visibly gold and distinct from platinum Claudium.",
+      "usedAsGenerationInput": false,
+      "sha256": "a7fb247494333137c30f67a263fd46cc58dea45e04d7551442f3db7899905660",
+      "width": 1024,
+      "height": 1024,
+      "format": "png",
+      "colorSpace": "sRGB",
+      "channels": 4,
+      "hasAlpha": true,
+      "bytes": 1288704
+    },
+    {
+      "id": "woc_logo_square",
+      "path": "public/woc_logo_square.webp",
+      "role": "Project-owned hooked gold motif, navy field, and restrained cardinal-garnet palette for woc_token continuity without lettering.",
+      "usedAsGenerationInput": false,
+      "sha256": "831de50b4d2fa930e342029d1c30284340bc7ca22e91a15f97b1460ed6fa86fb",
+      "width": 1254,
+      "height": 1254,
+      "format": "webp",
+      "colorSpace": "sRGB",
+      "channels": 3,
+      "hasAlpha": false,
+      "bytes": 219470
+    },
+    {
+      "id": "heroic_mark",
+      "path": "public/ui/items/heroic_mark.webp",
+      "role": "Existing 128px painted medallion benchmark and a deliberate silhouette-differentiation target for Honor and Delve Marks.",
+      "usedAsGenerationInput": false,
+      "sha256": "4f7311726f957b16a532893f10e5c7b6d3210bc8b846a97655fbb285b065e0ed",
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "colorSpace": "sRGB",
+      "channels": 3,
+      "hasAlpha": false,
+      "bytes": 5060
+    },
+    {
+      "id": "eastbrook_buckler",
+      "path": "public/ui/items/eastbrook_buckler.webp",
+      "role": "Existing tactile worn-metal rendering, warm-key/cool-shadow lighting, and deep-vignette benchmark.",
+      "usedAsGenerationInput": false,
+      "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156",
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "colorSpace": "sRGB",
+      "channels": 3,
+      "hasAlpha": false,
+      "bytes": 3286
+    },
+    {
+      "id": "arcanite_mining_pick",
+      "path": "public/ui/items/arcanite_mining_pick.webp",
+      "role": "Existing mining-tool silhouette and painted item-icon benchmark for delve_mark.",
+      "usedAsGenerationInput": false,
+      "sha256": "1f68e6bfbc521b2eb7c67cf7931bad05d1c68d68b132b7cf328d6c0d135f43b6",
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "colorSpace": "sRGB",
+      "channels": 3,
+      "hasAlpha": false,
+      "bytes": 1820
+    }
+  ],
+  "processing": {
+    "tool": "sharp",
+    "version": "0.35.3",
+    "operations": [
+      "Flatten over #0b111c if alpha is present",
+      "Remove alpha",
+      "Resize to 128x128 with Lanczos3 and fit=fill",
+      "Convert to sRGB",
+      "Encode WebP at quality=82, smartSubsample=true, effort=6"
+    ],
+    "shippingRequirements": {
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "colorSpace": "sRGB",
+      "fullyOpaque": true,
+      "maximumBytes": 15360
+    }
+  },
+  "review": {
+    "assetOrder": ["coin_gold", "coin_silver", "coin_copper", "woc_token", "honor", "delve_mark"],
+    "colorScales": [128, 48, 32, 16, 11],
+    "grayscaleScales": [32, 16, 11],
+    "circularCropScales": [128, 48, 32, 16, 11],
+    "artifacts": [
+      {
+        "path": "tmp/imagegen/v039-second-pass/currency/review/multiscale-color.png",
+        "sha256": "8e727d688956e773fe07e804ffa6bac2b1c4c6dbe4e783d12c796ed60f13bc58",
+        "width": 864,
+        "height": 720,
+        "role": "Native-size color review, row order 128, 48, 32, 16, 11."
+      },
+      {
+        "path": "tmp/imagegen/v039-second-pass/currency/review/micro-grayscale.png",
+        "sha256": "a267197198ef6a6983496447cd89e60ffe65259f15df5d89b841d38a86ed1386",
+        "width": 864,
+        "height": 432,
+        "role": "Native-size grayscale review, row order 32, 16, 11."
+      },
+      {
+        "path": "tmp/imagegen/v039-second-pass/currency/review/circular-crops.png",
+        "sha256": "6073d16512864ef952bd7db4a037335e56766a96edcd88505084ffd06a6af369",
+        "width": 864,
+        "height": 720,
+        "role": "Native-size CSS-equivalent circular clipping review, row order 128, 48, 32, 16, 11."
+      }
+    ],
+    "method": "Manual visual inspection of the shipping WebPs and native-size contact sheets, plus automated metadata, opacity, byte-limit, and hash checks."
+  },
+  "assets": [
+    {
+      "id": "coin_gold",
+      "semanticBrief": "Universal realm gold denomination used in bags, banks, trade, markets, and vendors; must read as warm gold at the 11px coin crop.",
+      "prompt": "Use case: stylized-concept. Asset type: a single opaque square micro-currency icon for a premium classic dark-fantasy MMORPG UI. Paint one complete tangible token as the only subject, centered and near-front with a slight three-quarter tilt, circular silhouette, generous safe padding, about 72 percent of the square. Premium hand-painted fantasy game art, tactile minted material, controlled brush texture, crisp focal relief and softer outer vignette, warm top-left key light and cool bottom-right shadow. Fully opaque deep charcoal-navy painted background, no scene. Designed to stay unmistakable at 128, 48, 32, 16, and 11 pixels and inside a circular CSS crop: use a bold simple silhouette and thick readable relief. A physical raised coin rim is allowed, but no baked UI frame or icon border. Exactly one object. No stack, extra coins, hands, characters, text, letters, numbers, pseudo-writing, alphabetic glyphs, watermark, signature, transparency, checkerboard, UI chrome, rarity frame, photorealism, raw 3D render, or flat vector style. Subject: a rich warm 22-karat gold realm coin with convincing gold color, lightly worn ridged edge, and a large bold crowned eight-ray sun embossed in high relief. Make the crown-and-sun read as one strong heraldic shape even in grayscale; restrained amber gleam, dark recesses, tiny age marks, no gemstones.",
+      "referenceIds": ["eastbrook_buckler"],
+      "generatorOutputFilename": "exec-d1c67537-cb54-449c-bee8-0244b4451377.png",
+      "raw": {
+        "path": "tmp/imagegen/v039-second-pass/currency/raw/coin_gold.png",
+        "sha256": "9f3309ad0841a5ff1627e87f0c63a21885f51c2960f97f81cf91617ffca23291",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 2507219
+      },
+      "output": {
+        "path": "public/ui/currency/coin_gold.webp",
+        "sha256": "44a60a3bf0335dd20b7e2ce7ff31b6cc93b79f13d77300e204450b40af2ca91d",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 4000
+      },
+      "decision": {
+        "status": "accepted",
+        "attempt": 1,
+        "regenerated": false,
+        "colorScales": "pass: warm gold and crowned radial sun remain distinct through 11px",
+        "grayscale": "pass: radial relief separates from crescent and organic leaf denominations",
+        "circularCrop": "pass: complete rim and dark safety ring remain visible at every reviewed scale"
+      }
+    },
+    {
+      "id": "coin_silver",
+      "semanticBrief": "Universal realm silver denomination used in bags, banks, trade, markets, and vendors; must read as cool silver at the 11px coin crop.",
+      "prompt": "Use case: stylized-concept. Asset type: a single opaque square micro-currency icon for a premium classic dark-fantasy MMORPG UI. Paint one complete tangible token as the only subject, centered and near-front with a slight three-quarter tilt, circular silhouette, generous safe padding, about 72 percent of the square. Premium hand-painted fantasy game art, tactile minted material, controlled brush texture, crisp focal relief and softer outer vignette, warm top-left key light and cool bottom-right shadow. Fully opaque deep charcoal-navy painted background, no scene. Designed to stay unmistakable at 128, 48, 32, 16, and 11 pixels and inside a circular CSS crop: use a bold simple silhouette and thick readable relief. A physical raised coin rim is allowed, but no baked UI frame or icon border. Exactly one object. No stack, extra coins, hands, characters, text, letters, numbers, pseudo-writing, alphabetic glyphs, watermark, signature, transparency, checkerboard, UI chrome, rarity frame, photorealism, raw 3D render, or flat vector style. Subject: a cool moonlit sterling-silver realm coin with convincing pale silver color, lightly worn beaded edge, and one large crescent moon cradling a single four-point star embossed in high relief. Make the moon-and-star read as one strong heraldic shape even in grayscale; restrained blue-white gleam, dark recesses, tiny age marks, no gemstones.",
+      "referenceIds": ["eastbrook_buckler"],
+      "generatorOutputFilename": "exec-c094d3cb-f9f5-4f4d-8535-340049c3c07f.png",
+      "raw": {
+        "path": "tmp/imagegen/v039-second-pass/currency/raw/coin_silver.png",
+        "sha256": "a502830d1d63401766cd9788cebb63e343367b4cfc0f0ee00667e8af6d23dda2",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 2489253
+      },
+      "output": {
+        "path": "public/ui/currency/coin_silver.webp",
+        "sha256": "47b1d3fb475b1aeb620812df5c9bfe921593bc521dcac70a9a6cc65165a89e05",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 3216
+      },
+      "decision": {
+        "status": "accepted",
+        "attempt": 1,
+        "regenerated": false,
+        "colorScales": "pass: cool silver and crescent-star remain distinct through 11px",
+        "grayscale": "pass: high-value crescent remains the clearest denomination silhouette",
+        "circularCrop": "pass: complete rim and dark safety ring remain visible at every reviewed scale"
+      }
+    },
+    {
+      "id": "coin_copper",
+      "semanticBrief": "Universal realm copper denomination used in bags, banks, trade, markets, and vendors; must read as reddish copper at the 11px coin crop.",
+      "prompt": "Use case: stylized-concept. Asset type: a single opaque square micro-currency icon for a premium classic dark-fantasy MMORPG UI. Paint one complete tangible token as the only subject, centered and near-front with a slight three-quarter tilt, circular silhouette, generous safe padding, about 72 percent of the square. Premium hand-painted fantasy game art, tactile minted material, controlled brush texture, crisp focal relief and softer outer vignette, warm top-left key light and cool bottom-right shadow. Fully opaque deep charcoal-navy painted background, no scene. Designed to stay unmistakable at 128, 48, 32, 16, and 11 pixels and inside a circular CSS crop: use a bold simple silhouette and thick readable relief. A physical raised coin rim is allowed, but no baked UI frame or icon border. Exactly one object. No stack, extra coins, hands, characters, text, letters, numbers, pseudo-writing, alphabetic glyphs, watermark, signature, transparency, checkerboard, UI chrome, rarity frame, photorealism, raw 3D render, or flat vector style. Subject: a warm reddish-copper realm coin with convincing burnished copper color and subtle green-brown age in the recesses, lightly worn hammered edge, and one large sturdy oak leaf with a single acorn embossed in high relief. Make the leaf-and-acorn read as one strong heraldic shape even in grayscale; restrained orange gleam, dark recesses, no gemstones.",
+      "referenceIds": ["eastbrook_buckler"],
+      "generatorOutputFilename": "exec-0a89e47b-42d1-499a-8c16-69cd140fb742.png",
+      "raw": {
+        "path": "tmp/imagegen/v039-second-pass/currency/raw/coin_copper.png",
+        "sha256": "5f38bef6d11240ce907e5d807b41a79e60062c0c33156129b74fa855848f15b7",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 2188162
+      },
+      "output": {
+        "path": "public/ui/currency/coin_copper.webp",
+        "sha256": "f01372ad1f7010846dca9b87ca1c5654ee55340d9a7bea189092e1e6a6c10ba4",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 3454
+      },
+      "decision": {
+        "status": "accepted",
+        "attempt": 1,
+        "regenerated": false,
+        "colorScales": "pass: reddish copper and diagonal oak relief remain distinct through 11px",
+        "grayscale": "pass: organic diagonal mass remains darker than silver and unlike the gold radial motif",
+        "circularCrop": "pass: complete rim and dark safety ring remain visible at every reviewed scale"
+      }
+    },
+    {
+      "id": "woc_token",
+      "semanticBrief": "Project-owned tradable gold WOC token used as a payment rail for Claudium; must be visually related to the current project token identity while remaining distinct from ordinary gold and premium platinum Claudium.",
+      "prompt": "Use case: stylized-concept. Asset type: a single opaque square micro-currency icon for a premium classic dark-fantasy MMORPG UI. Paint one complete tangible token as the only subject, centered and near-front with a slight three-quarter tilt, circular silhouette, generous safe padding, about 72 percent of the square. Premium hand-painted fantasy game art, tactile minted material, controlled brush texture, crisp focal relief and softer outer vignette, warm top-left key light and cool bottom-right shadow. Fully opaque deep charcoal-navy painted background, no scene. Designed to stay unmistakable at 128, 48, 32, 16, and 11 pixels and inside a circular CSS crop: use a bold simple silhouette and thick readable relief. A physical raised coin rim is allowed, but no baked UI frame or icon border. Exactly one object. No stack, extra coins, hands, characters, text, letters, numbers, pseudo-writing, alphabetic glyphs, watermark, signature, transparency, checkerboard, UI chrome, rarity frame, photorealism, raw 3D render, or flat vector style. Subject: a prestigious project-owned tradable gold token, clearly distinct from an ordinary gold coin. A thick rich-gold outer medallion surrounds a deep obsidian-navy enamel inset. Its dominant central identity is an original non-alphabetic magical sigil made from two opposing hooked crescent-comet strokes cradling one small faceted midnight-blue gem, inspired by an arcane crescent-and-gem token tradition but not shaped as any letter. Add four tiny garnet studs at the cardinal points only if they remain subordinate. Strong gold-on-navy contrast, luxurious but battle-world appropriate, no words or initials.",
+      "referenceIds": ["claudium_coin_master", "woc_logo_square", "eastbrook_buckler"],
+      "generatorOutputFilename": "exec-d8858f3f-1440-49d3-915e-9b552919ae5d.png",
+      "raw": {
+        "path": "tmp/imagegen/v039-second-pass/currency/raw/woc_token.png",
+        "sha256": "fbec25c53693b57ccd51556464c0be55f74feea62cf124690c6f695b13fdb715",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 2022490
+      },
+      "output": {
+        "path": "public/ui/currency/woc_token.webp",
+        "sha256": "df2517f10eb3973e04d6bd671bac8a6ac1a6bff78580dd3c3f5cbb3950ab2af8",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 4180
+      },
+      "decision": {
+        "status": "accepted",
+        "attempt": 1,
+        "regenerated": false,
+        "colorScales": "pass: gold-on-navy hooked spiral and blue core remain distinct from coin_gold through 11px",
+        "grayscale": "pass: concentric spiral relief remains a unique special-token silhouette",
+        "circularCrop": "pass: all gold arcs and the complete physical rim remain inside the crop"
+      }
+    },
+    {
+      "id": "honor",
+      "semanticBrief": "Soulbound per-character PvP currency earned from ranked Arena, Fiesta, and Thornhollow Fields and spent irreversibly with Warfare quartermasters.",
+      "prompt": "Use case: stylized-concept. Asset type: a single opaque square micro-currency icon for a premium classic dark-fantasy MMORPG UI. Paint one complete tangible token as the only subject, centered and near-front with a slight three-quarter tilt, circular silhouette, generous safe padding, about 72 percent of the square. Premium hand-painted fantasy game art, tactile minted material, controlled brush texture, crisp focal relief and softer outer vignette, warm top-left key light and cool bottom-right shadow. Fully opaque deep charcoal-navy painted background, no scene. Designed to stay unmistakable at 128, 48, 32, 16, and 11 pixels and inside a circular CSS crop: use a bold simple silhouette and thick readable relief. A physical raised coin rim is allowed, but no baked UI frame or icon border. Exactly one object. No stack, extra coins, hands, characters, text, letters, numbers, pseudo-writing, alphabetic glyphs, watermark, signature, transparency, checkerboard, UI chrome, rarity frame, photorealism, raw 3D render, or flat vector style. Subject: a scarred valor medallion earned in ranked fantasy warfare, forged from dark antique steel and bright worn silver. Two short crossed blades form the dominant high-relief silhouette behind a compact crimson enamel heater shield, contained within a battered round medal with three deliberate edge nicks. Heroic, severe, battle-tested, prestigious; strong light-dark separation and a tiny restrained red accent; no gore, skull, faction letters, ribbon, or modern military styling.",
+      "referenceIds": ["heroic_mark", "eastbrook_buckler"],
+      "generatorOutputFilename": "exec-eb07c011-bdb9-4b61-9c21-74c0aee024c7.png",
+      "raw": {
+        "path": "tmp/imagegen/v039-second-pass/currency/raw/honor.png",
+        "sha256": "79dae467c05fc53d09c980916f3975f31cadf77a70b61571778fe00fa7f2a3e0",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 2221162
+      },
+      "output": {
+        "path": "public/ui/currency/honor.webp",
+        "sha256": "6278d6a508eab28c8092186d8cfdc13f326175172c9d78891dea92e44984df14",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 3598
+      },
+      "decision": {
+        "status": "accepted",
+        "attempt": 1,
+        "regenerated": false,
+        "colorScales": "pass: crossed blades, battered steel, and red shield remain readable through 11px",
+        "grayscale": "pass: crossed-blade X and central shield remain distinct from every coin and mark",
+        "circularCrop": "pass: blade pommels, tips, notched rim, and shield remain complete"
+      }
+    },
+    {
+      "id": "delve_mark",
+      "semanticBrief": "Ancient subterranean currency earned from replayable Delves and spent at the delve keeper on companion upgrades and exclusive gear or tools.",
+      "prompt": "Use case: stylized-concept. Asset type: a single opaque square micro-currency icon for a premium classic dark-fantasy MMORPG UI. Paint one complete tangible token as the only subject, centered and near-front with a slight three-quarter tilt, circular silhouette, generous safe padding, about 72 percent of the square. Premium hand-painted fantasy game art, tactile minted material, controlled brush texture, crisp focal relief and softer outer vignette, warm top-left key light and cool bottom-right shadow. Fully opaque deep charcoal-navy painted background, no scene. Designed to stay unmistakable at 128, 48, 32, 16, and 11 pixels and inside a circular CSS crop: use a bold simple silhouette and thick readable relief. A physical raised coin rim is allowed, but no baked UI frame or icon border. Exactly one object. No stack, extra coins, hands, characters, text, letters, numbers, pseudo-writing, alphabetic glyphs, watermark, signature, transparency, checkerboard, UI chrome, rarity frame, photorealism, raw 3D render, or flat vector style. Subject: an ancient subterranean delve mark, a weighty aged-brass and dark-bronze reliquary medallion. A bold hooded miner's lantern with one warm amber flame is the dominant central relief, crossed by one simple diagonal mining pick behind it, all framed by a compact pointed reliquary-arch silhouette. Deep soot, stone dust, slight turquoise verdigris in recesses, warm light against cold cave-metal shadow. Mysterious, archaeological, hard-earned; keep lantern and pick thick and legible, no runic writing, cave scene, extra tools, chain, or loose gems.",
+      "referenceIds": ["heroic_mark", "eastbrook_buckler", "arcanite_mining_pick"],
+      "generatorOutputFilename": "exec-d4ed895b-0581-4d53-8cc1-8401db948d7d.png",
+      "raw": {
+        "path": "tmp/imagegen/v039-second-pass/currency/raw/delve_mark.png",
+        "sha256": "c85353a603a3d2d1ababffb9f673089d475a6c1ba845df7be2980eee9b8305db",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 2239432
+      },
+      "output": {
+        "path": "public/ui/currency/delve_mark.webp",
+        "sha256": "e0b09823043d2caf88f9088845b638fca65f0ccd9245f44f404904c8909e958d",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 3920
+      },
+      "decision": {
+        "status": "accepted",
+        "attempt": 1,
+        "regenerated": false,
+        "colorScales": "pass: warm vertical lantern, pick diagonal, and brass reliquary remain readable through 11px",
+        "grayscale": "pass: bright central lantern and tall reliquary silhouette remain unique",
+        "circularCrop": "pass: lantern, pick, pointed arch, and complete physical rim remain inside the crop"
+      }
+    }
+  ]
+}

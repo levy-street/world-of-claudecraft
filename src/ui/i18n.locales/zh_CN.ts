@@ -787,6 +787,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '打开任务日志（{key}）查找附近的下一个任务。',
   'hudChrome.tutorial.nextTipMap': '查看世界地图（{key}）了解任务所在位置。',
   'hudChrome.tutorial.nextTipSocial': '打开社交面板（{key}）寻找队伍应对更强的战斗。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下穹室',
+  'hudChrome.lastkeepMap.story.state': '正殿层',
+  'hudChrome.lastkeepMap.story.residence': '起居层',
+  'hudChrome.lastkeepMap.story.tower': '瞭望塔',
+  'hudChrome.dawnholdMap.story.ground': '庭园层',
+  'hudChrome.dawnholdMap.story.solar': '日光厅',
   'hudChrome.raidLockout.title': '团队副本锁定',
   'hudChrome.raidLockout.allReady': '所有团队副本就绪',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小时',
@@ -3730,6 +3736,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     '看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。',
   'entities.quests.q_prof_intro.objectives.0.label': '已开采矿脉',
+  'entities.quests.q_farm_intro.title': '第一道犁沟',
+  'entities.quests.q_farm_intro.text':
+    '拿着这把锄头和一小撮谷地小麦种子，{playerName}。把种子播到我旁边任意一块田畦里，然后去忙你的事。想什么时候回来收庄稼都行；我会在这儿。',
+  'entities.quests.q_farm_intro.completion':
+    '瞧，你亲手种出的第一茬庄稼。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。田畦召唤你的时候，随时回来买种子，{playerName}。',
+  'entities.quests.q_farm_intro.objectives.0.label': '已种下谷地小麦',
+  'entities.quests.q_farm_intro.objectives.1.label': '已收获谷地小麦',
   'entities.quests.q_wolves.title': '门前群狼',
   'entities.quests.q_wolves.text':
     '森林狼已经敢扑咬北路旅人，{playerName}。击败8只森林狼，让东溪能松一口气。',
@@ -8438,6 +8451,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.bad_bed': '那里没有田畦。',
   'hudChrome.farming.denied.bad_crop': '你无法在这里种植它。',
   'hudChrome.farming.denied.range': '你离那片田畦太远了。',
+  'hudChrome.farming.denied.no_farmer': '你必须靠近农夫才能用谷壳换堆肥。',
+  'hudChrome.farming.huskTrade': '用谷壳换堆肥',
+  'hudChrome.farming.huskTradeAria': '与{name}用枯萎谷壳换取堆肥',
   'hudChrome.farming.denied.bed_taken': '你已经在那里种下了作物。',
   'hudChrome.farming.denied.skill': '你的耕作技能不足以种植该作物。',
   'hudChrome.farming.denied.no_seed': '你没有该作物的种子。',
@@ -9782,6 +9798,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '厨房大师',
   'entities.npcs.cook_marlow.greeting':
     '没有半生不熟的东西能离开我的厨房，{className}。坐下吃完，再回去闯荡。',
+  'entities.npcs.farmer_jessica.name': '农妇杰西卡',
+  'entities.npcs.farmer_jessica.title': '菜园管事',
+  'entities.npcs.farmer_jessica.greeting':
+    '祝你土好天晴，{playerName}。从我这里买粒种子，播到那边任意一块田畦里，然后该忙什么忙什么去。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。',
+  'entities.npcs.farmer_teasel.name': '农夫蒂泽尔',
+  'entities.npcs.farmer_teasel.title': '沼地稻田农夫',
+  'entities.npcs.farmer_teasel.greeting': '沼泽稻米和沼泽甜菜的种子，{className}，还有喂养它们的堆肥。稻田排水慢，脚下留神。',
+  'entities.npcs.farmer_hollis.name': '农夫霍利斯',
+  'entities.npcs.farmer_hollis.title': '高望梯田农夫',
+  'entities.npcs.farmer_hollis.greeting': '梯田只给山肯给的那么多，{className}。我卖堆肥，要是你的庄稼枯萎了，我可以把谷壳重新沤成好土给你。',
+  'entities.npcs.farmer_verbena.name': '农妇维贝娜',
+  'entities.npcs.farmer_verbena.title': '花坛园丁',
+  'entities.npcs.farmer_verbena.greeting':
+    '当心镶边，{playerName}，这些田畦可是花坛的骄傲。我卖的是堆肥，你带来的枯萎谷壳，我都能给你变成更多堆肥。',
   'entities.npcs.weaver_ottilie.name': '奥蒂莉织工',
   'entities.npcs.weaver_ottilie.title': '织机大师',
   'entities.npcs.weaver_ottilie.greeting': '当心丝线，{className}。在织机前，稳的手胜过有力的手。',
@@ -10032,10 +10062,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。',
   'entities.dungeons.wildheart_basin.leaveText': '你从石牙之下穿回棕榈之境的阳光中。',
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
-  'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
+  'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
+  'entities.dungeons.dawnhold_castle.name': '晨曦堡',
+  'entities.items.dawnhold_posy.name': '晨曦堡花园小花束',
+  'entities.dungeons.dawnhold_castle.enterText': '你走进晨曦堡温暖而花香四溢的厅堂。',
+  'entities.dungeons.dawnhold_castle.leaveText': '你回到阳光洒落的花园草坪上。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖尔加的獠牙匕首',
@@ -10492,6 +10526,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     '这才叫满仓。这是你的酬劳。等你的行囊又沉了，就再来。',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '已交付野味肉',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': '厨房小麦工单',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    '面包不会自己烤出来，{playerName}，我的面粉柜都快见底了。给我送来八捆谷地小麦，我按实价付你整批的钱。是你亲手种的还是从市场买的，我不在乎，磨得出粉就行。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    '好干爽的粮食，还不少。这是你的酬劳，一枚不差。下一茬收上来的时候，你知道该敲哪扇门。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': '已交付谷地小麦',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': '厨房稻米工单',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    '沼泽人对自家的米赞不绝口，{playerName}，我倒要弄明白是为什么。给我弄来五升沼泽稻米，钱就在这儿等着你。路上留神别弄湿了：湿米就是粥，我可没点过粥。',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    '粒粒饱满干爽。这是你的钱。只要沼泽还长米，我就一直收。',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': '已交付沼泽稻米',
   'entities.quests.q_prof_workorder_loom.title': '织机工单',
   'entities.quests.q_prof_workorder_loom.text':
     '织机空转，闲着的手白白浪费日头，{playerName}。给我带来六束蜘蛛丝，我会按公道的价钱付你，一个铜板都算清楚。',
@@ -10793,7 +10839,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。',
   'guide.profPages.gatherIntro.farming':
-    '耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人不在时作物照样生长，回来时拔起成熟的收成。从Eastbrook的份地到Evergarden的花圃，每处耕作据点都有自己的田畦，阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级。农活由锄头开启：Garden Hoe照看起步的田畦，更高各级则由工程师打造。熟练在专属计数上累积，上限为100。',
+    '耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人在与不在作物都按自己的钟点生长，无论何时回来都能拔起成熟的收成，因为田畦里的东西从不腐坏。从Eastbrook的份地经Fenbridge、Highwatch直到Evergarden的花圃，每处田畦旁都站着一位农夫，而Eastbrook的Farmer Jessica是这门手艺的起点：她出售Garden Hoe和最初的种子，她的差事会带新手农夫种完第一茬。阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级，起步田畦之上更难耕的土地所需的锄头则由工程师打造。熟练在专属计数上累积，上限为100。',
   'guide.profPages.rhythmHeading': '采集节奏',
   'guide.profPages.rhythmBody':
     '采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。',
@@ -10854,7 +10900,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': '免费',
   'guide.profPages.econ.workOrdersHeading': '工作订单',
   'guide.profPages.econ.workOrdersNote':
-    '每位大师都会以商店价的{pct}%收购一批本行常用材料，每{minutes}分钟可重复一次。',
+    '每位大师都张贴工单，每种常用材料一张，按商店价的{pct}%收购工单要求的一批。每张工单各有{minutes}分钟的计时：交付后只有那张工单关闭，同一位大师的其他工单照常开放。',
   'guide.profPages.econ.colOrder': '工作订单',
   'guide.profPages.econ.colMaster': '大师',
   'guide.profPages.econ.colAsks': '需求',
@@ -10919,6 +10965,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。',
   'guide.profPages.gatherDeeds.farming':
     '耕作暂无专属功业：如今田畦与作物已经扎根，标记其他行业的里程碑与上限功业将随后续更新一并到来。它的熟练已经计入Master Gatherer（任意三项采集达到100），耕作者能像旁人一样填满那一页。功业只给头衔与名望，绝不给予力量。',
+  'guide.profPages.farm.bedsHeading': '打理田畦',
+  'guide.profPages.farm.bedsBody':
+    '流程很短。向田畦旁的农夫购买种子和堆肥：Eastbrook的Jessica备有谷地的两种，Fenbridge的农夫备有沼泽的两种，而Highwatch和Evergarden的种子没有任何柜台出售，它们只会从高阶收成中一两粒地返还，其余则在World Market上流转。行囊里带着锄头播种，愿意的话再压一压胜算：柜台的堆肥和播种时用农产品支付的农夫看护都会提高作物成活的几率，炼金术士的生长滋补剂让收成有机会更丰，而一旦你的熟练比作物所在阶高出整整一档，那种作物就再也不会失败。然后走开就好。你下线时田畦照样生长，成熟的作物你放多久它等多久，收成日志（Shift+K，或专业窗口的耕作一行）列出你种下的每一畦及其计时。\n\n失败的作物留下枯萎的谷壳而非农产品，任何农夫都会用谷壳换堆肥，于是坏年景买下了下一季的保险。收上来的东西供养厨房：农产品在厨房烹成菜肴，Cook Marlow的小麦和稻米工单按与其他任何工单相同的钟点，用铜币收走你的Vale Wheat和Marsh Rice。',
   'guide.profPages.fish.startHeading': '入门',
   'guide.profPages.fish.startBody':
     '一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。',

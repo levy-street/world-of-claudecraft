@@ -31,8 +31,16 @@ const SCENERY_IDS = [...new Set(GROUND_OBJECTS.map((d) => d.itemId))].filter(
   (id) => !isCollectTarget(id),
 );
 
+// An OVERWORLD object (x = 0 sits in no instance band): the arm consults the dungeon a
+// collectable stands in for the interact-only exemption, so a fixture needs a position
+// like every live entity. The instance arm is tests/nythraxis_wardstone_quest_gate.ts.
 const objectEntity = (itemId: string | null): Entity =>
-  ({ kind: 'object', templateId: `ground_${itemId}`, objectItemId: itemId }) as unknown as Entity;
+  ({
+    kind: 'object',
+    templateId: `ground_${itemId}`,
+    objectItemId: itemId,
+    pos: { x: 0, y: 0, z: 0 },
+  }) as unknown as Entity;
 
 const log = (questId: string, state: QuestProgress['state']): Map<string, QuestProgress> =>
   new Map([[questId, { questId, counts: [0, 0], state }]]);

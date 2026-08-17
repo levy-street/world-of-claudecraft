@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { POWERUPS } from '../src/sim/content/augments';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import {
   auraIconCssBackground,
@@ -9,7 +10,15 @@ import {
   RUNTIME_AURA_ICON_SOURCE_IDS,
   resolveAuraIconId,
 } from '../src/ui/aura_icon_view';
-import { abilityImageUrl, hasAbilityIconIdentity, hasAuraRecipe } from '../src/ui/icons';
+import {
+  AURA_IMAGE_IDS,
+  abilityImageUrl,
+  auraImageUrl,
+  hasAbilityIconIdentity,
+  hasAuraImageIdentity,
+  hasAuraRecipe,
+} from '../src/ui/icons';
+import { observeFiestaPowerupAuras } from './helpers/fiesta_powerup_aura_observer';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -100,6 +109,32 @@ const NON_CHOICE_RUNTIME_AURA_SOURCES = [
   ['fury_enrage', 'enrage_passive'],
   ['ignite', 'ignition'],
   ['natures_fury', 'hurricane'],
+] as const;
+
+const DIRECT_RUNTIME_AURA_SOURCES = [
+  ['convergence_cd', 'elemental_convergence'],
+  ['convergence_mark', 'elemental_convergence'],
+  ['feed_pet', 'pet_feed'],
+  ['heating_up', 'fireball'],
+  ['shaman_thunder_charges', 'thunder_reservoir'],
+  ['shaman_warspirit_cadence', 'warspirit_cadence'],
+  ['water_jet', 'pet_water_jet'],
+  ['water_jet_slow', 'pet_water_jet'],
+] as const;
+
+const REUSED_PAINTED_RUNTIME_AURA_SOURCES = [
+  ['avenging_wrath_buff_healing_done', 'avenging_wrath'],
+  ['avenging_wrath_buff_crit', 'avenging_wrath'],
+  ['avenging_wrath_buff_haste', 'avenging_wrath'],
+  ['bastion_rite_buff_block', 'bastion_rite'],
+  ['bladed_echo', 'whirlwind'],
+  ['power_infusion_buff_dmg_done_1', 'power_infusion'],
+  ['power_infusion_buff_heal_done_2', 'power_infusion'],
+  ['evasion_shield_wall', 'evasion'],
+  ['marked_prey', 'kidney_shot'],
+  ['deathmark', 'garrote'],
+  ['pet_aspect_of_the_cheetah', 'aspect_of_the_cheetah'],
+  ['pet_aspect_of_the_hawk', 'aspect_of_the_hawk'],
 ] as const;
 
 // Class-overhaul state uses semantic wire ids that are neither AbilityDef ids
@@ -227,7 +262,7 @@ const AURA_RESPONSE_KINDS = new Set(['empowerNext', 'absorb', 'aura', 'echo']);
 
 describe('resolveAuraIconId', () => {
   const resolve = (id: string, kind = 'buff'): string =>
-    resolveAuraIconId({ id, kind }, hasAbilityIconIdentity, hasAuraRecipe);
+    resolveAuraIconId({ id, kind }, hasAbilityIconIdentity, hasAuraRecipe, hasAuraImageIdentity);
 
   it('keeps exact ability, modifier-art, and dedicated aura identities intact', () => {
     expect(resolve('moonfire', 'dot')).toBe('moonfire');
@@ -247,6 +282,9 @@ describe('resolveAuraIconId', () => {
 
   it('maps every aura-producing choice proc and exact semantic producer to painted art', () => {
     const choiceSources: [string, string][] = [];
+    const fiestaPowerupSources = observeFiestaPowerupAuras().flatMap(({ definition, auras }) =>
+      auras.map(({ id }) => [id, definition.id] as const),
+    );
     for (const tree of Object.values(CHOICE_ROWS)) {
       for (const row of tree.rows) {
         for (const option of row.options) {
@@ -269,22 +307,53 @@ describe('resolveAuraIconId', () => {
     const expected = new Map<string, string>([
       ...choiceSources,
       ...NON_CHOICE_RUNTIME_AURA_SOURCES,
+      ...DIRECT_RUNTIME_AURA_SOURCES,
+      ...fiestaPowerupSources,
+      ...REUSED_PAINTED_RUNTIME_AURA_SOURCES,
       ...POST_OVERHAUL_RUNTIME_AURA_SOURCES,
     ]);
     expect([...RUNTIME_AURA_ICON_SOURCE_IDS.entries()].sort()).toEqual(
       [...expected.entries()].sort(),
     );
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(111);
+    expect(DIRECT_RUNTIME_AURA_SOURCES).toHaveLength(8);
+    expect(fiestaPowerupSources).toHaveLength(
+      POWERUPS.reduce((count, definition) => count + definition.buffs.length, 0),
+    );
+    expect(REUSED_PAINTED_RUNTIME_AURA_SOURCES).toHaveLength(12);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(139);
     for (const [id, source] of expected) {
-      const imageUrl = abilityImageUrl(source);
-      expect(imageUrl, `${id} -> ${source} static painted source`).toMatch(
-        /^\/ui\/skills\/[a-z]+\/[a-z0-9_]+\.webp$/,
+      const paintedIdentity = hasAuraImageIdentity(id) ? id : source;
+      const imageUrl = auraImageUrl(paintedIdentity);
+      expect(imageUrl, `${id} -> ${paintedIdentity} static painted source`).toMatch(
+        /^\/ui\/(?:skills\/[a-z]+|auras|fiesta\/powerups)\/[a-z0-9_]+\.webp$/,
       );
       expect(
         existsSync(path.join(repoRoot, 'public', (imageUrl as string).slice(1))),
-        `${id} -> ${source} shipped WebP`,
+        `${id} -> ${paintedIdentity} shipped WebP`,
       ).toBe(true);
-      expect(resolve(id), id).toBe(source);
+      expect(resolve(id), id).toBe(paintedIdentity);
+    }
+  });
+
+  it('carries every reused semantic aura through resolution to its painted ability URL', () => {
+    for (const [id, source] of REUSED_PAINTED_RUNTIME_AURA_SOURCES) {
+      const iconId = resolve(id);
+      expect(iconId, id).toBe(source);
+      expect(auraImageUrl(iconId), `${id} resolved URL`).toBe(abilityImageUrl(source));
+    }
+  });
+
+  it('keeps exact aura WebP identities even when they have no procedural recipe', () => {
+    expect(AURA_IMAGE_IDS.size).toBeGreaterThan(0);
+    for (const id of AURA_IMAGE_IDS) {
+      const iconId = resolveAuraIconId(
+        { id, kind: 'debuff' },
+        () => false,
+        () => false,
+        hasAuraImageIdentity,
+      );
+      expect(iconId, id).toBe(id);
+      expect(auraImageUrl(iconId), `${id} resolved URL`).not.toBeNull();
     }
   });
 
@@ -324,12 +393,27 @@ describe('resolveAuraIconId', () => {
     }
   });
 
-  it('uses hunter frenzy art only for the player producer sharing the mob wire id', () => {
+  it('splits the player and mob producers that share the pack frenzy wire id', () => {
     const imageUrl = abilityImageUrl('unleash_beast');
     expect(imageUrl).toBe('/ui/skills/hunter/unleash_beast.webp');
     expect(existsSync(path.join(repoRoot, 'public', (imageUrl as string).slice(1)))).toBe(true);
     expect(resolve('pack_frenzy', 'hunter_frenzy')).toBe('unleash_beast');
-    expect(resolve('pack_frenzy', 'buff_haste')).toBe('aura_buff_haste');
+    expect(resolve('pack_frenzy', 'buff_haste')).toBe('mob_pack_frenzy');
+    expect(auraImageUrl('mob_pack_frenzy')).toBe('/ui/auras/mob_pack_frenzy.webp');
+  });
+
+  it('routes exact mob aura wire identities to their closed painted families', () => {
+    for (const [id, kind, expected] of [
+      ['aoe_slow', 'slow', 'mob_aoe_slow'],
+      ['mob_charge_stun', 'stun', 'mob_charge_stun'],
+      ['raise_bone_mage', 'spell_vuln', 'mob_spell_vuln'],
+      ['venom_duskwisp', 'poison', 'mob_venom'],
+    ] as const) {
+      expect(resolve(id, kind), id).toBe(expected);
+      const imageUrl = auraImageUrl(expected);
+      expect(imageUrl, expected).toBe(`/ui/auras/${expected}.webp`);
+      expect(existsSync(path.join(repoRoot, 'public', (imageUrl as string).slice(1)))).toBe(true);
+    }
   });
 
   it('recovers painted modifier identities from generated timer suffixes', () => {
@@ -351,18 +435,30 @@ describe('resolveAuraIconId', () => {
         { id: 'source_ability_pet_pet_spellhaste', kind: 'buff_spellhaste' },
         probe,
         () => false,
+        () => false,
       ),
     ).toBe('source_ability');
     expect(
-      resolveAuraIconId({ id: 'source_ability_absorb', kind: 'absorb' }, probe, () => false),
+      resolveAuraIconId(
+        { id: 'source_ability_absorb', kind: 'absorb' },
+        probe,
+        () => false,
+        () => false,
+      ),
     ).toBe('source_ability');
     expect(
-      resolveAuraIconId({ id: 'source_ability_dmg', kind: 'buff_dmg_done' }, probe, () => false),
+      resolveAuraIconId(
+        { id: 'source_ability_dmg', kind: 'buff_dmg_done' },
+        probe,
+        () => false,
+        () => false,
+      ),
     ).toBe('source_ability');
   });
 
-  it('leaves shared fear and mob-authored prefix IDs on their generic identities', () => {
-    expect(resolve('fear_incap', 'incapacitate')).toBe('aura_incapacitate');
+  it('keeps shared fear exact while leaving mob-authored prefix IDs generic', () => {
+    expect(resolve('fear_incap', 'incapacitate')).toBe('fear_incap');
+    expect(auraImageUrl('fear_incap')).toBe('/ui/auras/fear_incap.webp');
     expect(resolve('blind_willow_sprite', 'blind')).toBe('aura_blind');
     expect(resolve('silence_abyssal_horror', 'silence')).toBe('aura_silence');
   });
@@ -376,24 +472,31 @@ describe('resolveAuraIconId', () => {
 
   it('caches stable wire identities before they return to the frame path', () => {
     let abilityProbes = 0;
-    let auraProbes = 0;
+    let recipeProbes = 0;
+    let auraImageProbes = 0;
     const cached = createAuraIconResolver(
       (id) => {
         abilityProbes++;
         return id === 'painted_source';
       },
       () => {
-        auraProbes++;
+        recipeProbes++;
         return false;
+      },
+      (id) => {
+        auraImageProbes++;
+        return id === 'painted_aura';
       },
     );
 
     expect(cached({ id: 'painted_source_ap', kind: 'buff_ap' })).toBe('painted_source');
-    const firstCounts = [abilityProbes, auraProbes];
+    expect(cached({ id: 'painted_aura', kind: 'debuff' })).toBe('painted_aura');
+    const firstCounts = [abilityProbes, recipeProbes, auraImageProbes];
     for (let frame = 0; frame < 120; frame++) {
       expect(cached({ id: 'painted_source_ap', kind: 'buff_ap' })).toBe('painted_source');
+      expect(cached({ id: 'painted_aura', kind: 'debuff' })).toBe('painted_aura');
     }
-    expect([abilityProbes, auraProbes]).toEqual(firstCounts);
+    expect([abilityProbes, recipeProbes, auraImageProbes]).toEqual(firstCounts);
 
     // A server changing the kind for the same id must recompute the generic
     // identity instead of returning the stale kind-specific fallback.
@@ -404,6 +507,10 @@ describe('resolveAuraIconId', () => {
   it('bounds the frame-path identity cache and evicts the oldest wire id first', () => {
     let probes = 0;
     const cached = createAuraIconResolver(
+      () => {
+        probes++;
+        return false;
+      },
       () => {
         probes++;
         return false;
@@ -484,9 +591,16 @@ describe('resolveAuraIconId', () => {
 
   it('wires the cached identity and layered URL resolvers into every HUD aura surface', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const runtime = readFileSync(
+      new URL('../src/ui/aura_icon_runtime.ts', import.meta.url),
+      'utf8',
+    );
     expect(hud.match(/iconId: resolveHudAuraIconId/g)).toHaveLength(2);
     expect(hud.match(/resolveIconUrl: resolveHudAuraIconUrl/g)).toHaveLength(3);
-    expect(hud).toContain("(id) => cachedProceduralIconDataUrl('aura', id)");
-    expect(hud).toContain("crestIconUrl('status_combat')");
+    expect(runtime).toMatch(
+      /createAuraIconResolver\(\s*hasAbilityIconIdentity,\s*hasAuraRecipe,\s*hasAuraImageIdentity,\s*\)/,
+    );
+    expect(runtime).toContain("(id) => cachedProceduralIconDataUrl('aura', id)");
+    expect(runtime).toContain("crestIconUrl('status_combat')");
   });
 });

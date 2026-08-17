@@ -51,7 +51,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
-    ceiling: 19433,
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    ceiling: 19488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -60,15 +65,28 @@ const MONOLITHS: MonolithRow[] = [
     // stranded-light reparent and the registry prune into
     // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
     // lowers the ceiling, never raises it).
-    // This branch lowered again after extracting the delve module interior
-    // scheduler into src/render/delve_interior_scheduler.ts; the release arm
-    // raised for the desktop-client-update packet's thin-consumer wiring
-    // (frame_present, dpr_watch, static_matrix, shadow cadence hookup) then
-    // lowered via its rig_visibility_freeze.ts extraction and pinned its own
-    // merged count. Merging release/v0.39.0: the merged file lands between the
-    // two pins (branch 13700, release 13754), so the ceiling is the exact
-    // merged count per the ratchet's rule: any further growth reds again.
-    ceiling: 13725,
+    // Lowered again after extracting the secondary-context preview warming
+    // policy into src/render/preview_prewarm_lane.ts. Earlier steps down: the
+    // per-status manifest rollup to summarizePrewarmManifest
+    // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
+    // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
+    // Raised for the desktop-client-update packet (thin-consumer wiring to the
+    // extracted modules: frame_present, dpr_watch, static_matrix, shadow cadence
+    // hookup), then lowered by that branch's rig_visibility_freeze.ts extraction.
+    // Merging release/v0.38.0 again: upstream lowered its own pin twice more
+    // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
+    // file lands between the two pins, so the ceiling is the exact merged count
+    // per the ratchet's rule: any further growth reds again.
+    // Lowered again by the castle branch's interior_light_rig.ts extraction;
+    // after merging main the merged file lands below both prior pins, so the
+    // ceiling is the exact merged count.
+    // This branch lowered separately after extracting the delve module interior
+    // scheduler into src/render/delve_interior_scheduler.ts. Merging
+    // release/v0.39.0 (the castle and icon-art batch): the two extractions
+    // compose, the merged file lands below both prior pins (branch 13725,
+    // release 13689), so the ceiling is the exact merged count per the
+    // ratchet's rule: any further growth reds again.
+    ceiling: 13660,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

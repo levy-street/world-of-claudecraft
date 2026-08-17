@@ -6,6 +6,7 @@ import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/qu
 import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
+import { currencyIconHtml, heroicMarkIconHtml } from '../../currency_art';
 import { decorativeArtImg } from '../../decorative_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
@@ -378,6 +379,10 @@ export class QuestDialogController {
     );
     const hasValeCup = npc.templateId === 'groundskeeper_bram';
     const hasCardMaster = !!definition?.cardMaster;
+    // A farmer NPC (the farming go-live) offers the husk-to-compost trade,
+    // the one UI affordance that sends convert_husks; gated on the NpcDef
+    // flag like the card master, never on an id.
+    const hasFarmer = definition?.farmer === true;
     if (
       closeIfEmpty &&
       gossipMenuIsEmpty({
@@ -391,6 +396,7 @@ export class QuestDialogController {
         hasVcup: hasValeCup,
         hasCardMaster,
         hasTraining,
+        hasFarmer,
       })
     ) {
       this.close();
@@ -441,7 +447,7 @@ export class QuestDialogController {
       html += `<button type="button" class="qd-list-item" data-discuss="${esc(questId)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
     }
     if (hasVendor) {
-      html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     // Crafting shortcut: the master's Crafting option opens the crafting
     // window straight to their own craft's tab (the viewer's stronger craft
@@ -473,12 +479,12 @@ export class QuestDialogController {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
     if (hasHeroicVendor) {
-      html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     if (hasWarfareVendor) {
       // Its OWN label and accessible name: this row sits beside the generic
       // goods row above at a flagged NPC, so it can never reuse "Browse Goods".
-      html += `<button type="button" class="qd-list-item" data-warfare-shop="1" aria-label="${esc(t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('hudChrome.warfareShop.gossipOption'))}</button>`;
+      html += `<button type="button" class="qd-list-item" data-warfare-shop="1" aria-label="${esc(t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }))}">${currencyIconHtml('honor')} ${esc(t('hudChrome.warfareShop.gossipOption'))}</button>`;
     }
     if (hasDelveBoard) {
       const delve = Object.values(DELVES).find((entry) => entry.boardNpcId === npc.templateId);
@@ -490,6 +496,12 @@ export class QuestDialogController {
     }
     if (hasCardMaster) {
       html += `<button type="button" class="qd-list-item" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
+    }
+    if (hasFarmer) {
+      // The trade's feedback is the sim's own: the farmHusksConverted line
+      // and the farmDenied toasts (farm_event_feedback.ts), so the row sends
+      // and closes like the market row rather than opening a window.
+      html += `<button type="button" class="qd-list-item" data-husk-trade="1" aria-label="${esc(t('hudChrome.farming.huskTradeAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.farming.huskTrade'))}</button>`;
     }
     this.deps.element.innerHTML = html;
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {
@@ -515,6 +527,10 @@ export class QuestDialogController {
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-vcup]', this.deps.openValeCup);
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
+    // The husk trade goes straight to the world (IWorldFarming.convertHusks,
+    // both worlds; online it is the convert_husks command): no new dep, no
+    // window. The live world is read at click time, never captured at render.
+    this.bindRoute('[data-husk-trade]', () => this.deps.world().convertHusks());
     this.bindClose();
     this.showAndFocus();
   }

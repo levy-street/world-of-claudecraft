@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BLOCK_EPISODE_MAX_MS,
   hasAuthoritativeSelfPositionDiscontinuity,
   SELF_MOTION_CAP_MAX_MS,
   SELF_MOTION_CAP_MIN_MS,
@@ -7,6 +8,7 @@ import {
   type SelfMotionFrame,
   SelfMotionPredictor,
   updateSelfRenderFallback,
+  type Vec3Like,
 } from '../src/render/self_motion';
 import { Sim } from '../src/sim/sim';
 import { type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
@@ -77,11 +79,36 @@ class Lab {
   // between the last delivery and the resume delivery n plus 1 intervals.
   skipDeliveries = 0;
 
+  // Snapshots produced during a frame, held back until the frame's tail: a
+  // long render frame blocks the main thread, so the socket is only drained
+  // AFTER the frame the messages arrived in (see the long-frame lane below).
+  private pending: { x: number; y: number; z: number }[] = [];
+  private readonly deliverAfter: boolean;
+  private readonly deliveryMs: number;
+  private readonly serverDeaf: boolean;
+  /** While true the frame tail keeps the queue: a scripted delivery burst. */
+  holdSnapshots = false;
+
   constructor(
     readonly lagMs: number,
     readonly frameMs = FRAME_MS,
-    opts: { start?: { x: number; z: number }; facing?: number } = {},
+    opts: {
+      start?: { x: number; z: number };
+      facing?: number;
+      /** Drain the socket in the frame's TAIL instead of before the step. */
+      deliverAfter?: boolean;
+      /** Wall-clock spacing of deliveries, which is what the mirror's EWMA
+       *  measures. Above the 50 ms tick cadence it models a coalescing link:
+       *  the server still ticks at 20 Hz, the snapshots arrive in pairs. */
+      deliveryMs?: number;
+      /** The server never receives the local intent: worst-case divergence,
+       *  the display predicting a run the authority never performs. */
+      serverDeaf?: boolean;
+    } = {},
   ) {
+    this.deliverAfter = opts.deliverAfter ?? false;
+    this.deliveryMs = opts.deliveryMs ?? SNAP_MS;
+    this.serverDeaf = opts.serverDeaf ?? false;
     this.srv = new Sim({
       seed: SEED,
       playerClass: 'warrior',
@@ -107,6 +134,7 @@ class Lab {
 
   // What the server has received by time t (inputs travel lagMs).
   private serverInputAt(tMs: number): MoveInput {
+    if (this.serverDeaf) return this.inputLog[0].input;
     let eff = this.inputLog[0].input;
     for (const e of this.inputLog) {
       if (e.atMs + this.lagMs <= tMs) eff = e.input;
@@ -114,9 +142,13 @@ class Lab {
     return eff;
   }
 
-  frame(): FrameResult {
-    this.nowMs += this.frameMs;
-    this.sinceTickMs += this.frameMs;
+  /** `drainFirst` models the other browser ordering: the socket is drained
+   *  just BEFORE the rAF callback, so the long frame's step already sees the
+   *  burst (fresh anchor, prevPos re-anchored at the drawn pose). */
+  frame(frameMsOverride?: number, drainFirst = false): FrameResult {
+    const frameMs = frameMsOverride ?? this.frameMs;
+    this.nowMs += frameMs;
+    this.sinceTickMs += frameMs;
     let delivered = false;
     while (this.sinceTickMs >= SNAP_MS) {
       this.sinceTickMs -= SNAP_MS;
@@ -128,6 +160,10 @@ class Lab {
         this.skipDeliveries--;
         continue;
       }
+      if (this.deliverAfter) {
+        this.pending.push({ ...this.srv.player.pos });
+        continue;
+      }
       // the 20 Hz snapshot: prev pose = last wire pose, pose = fresh server pose
       this.self.prevPos = { ...this.self.pos };
       this.self.pos = { ...this.srv.player.pos };
@@ -136,7 +172,15 @@ class Lab {
       this.lastSnapMs = this.nowMs;
       delivered = true;
     }
-    const alpha = Math.min(1.25, (this.nowMs - this.lastSnapMs) / SNAP_MS);
+    // At the default cadence every produced tick is delivered as it appears;
+    // a coalescing link (deliveryMs above the tick spacing) holds them back.
+    const dueForDelivery =
+      this.deliveryMs <= SNAP_MS || this.nowMs - this.lastSnapMs >= this.deliveryMs;
+    if (drainFirst && this.pending.length > 0 && !this.holdSnapshots && dueForDelivery) {
+      this.drainPending();
+      delivered = true;
+    }
+    const alpha = Math.min(1.25, (this.nowMs - this.lastSnapMs) / this.deliveryMs);
     const frame: SelfMotionFrame = {
       enabled: this.enabled,
       moveInput: this.localInput,
@@ -144,7 +188,9 @@ class Lab {
       echoMs: this.lagMs,
       jitterMs: 0,
       alpha,
-      frameDt: this.frameMs / 1000,
+      frameDt: frameMs / 1000,
+      snapAgeMs: this.lastSnapMs > 0 ? this.nowMs - this.lastSnapMs : 0,
+      snapIntervalMs: this.deliveryMs,
     };
     const out = this.predictor.step(this.self, frame);
     const a = {
@@ -158,7 +204,32 @@ class Lab {
       y: this.self.prevPos.y + (this.self.pos.y - this.self.prevPos.y) * leashAlpha,
       z: this.self.prevPos.z + (this.self.pos.z - this.self.prevPos.z) * leashAlpha,
     };
+    if (this.pending.length > 0 && !this.holdSnapshots && dueForDelivery) {
+      this.drainPending();
+      delivered = true;
+    }
     return { pose: out ? { ...out } : null, a, ac, delivered };
+  }
+
+  // ClientWorld.applyWire re-anchors prevPos at the pose the renderer last
+  // DREW (contAlpha, capped 1.25), not at the previous server pose, so a burst
+  // of queued snapshots leaves prevPos at the drawn pose and pos at the newest
+  // tick: the anchor then sweeps several ticks over one snapshot interval.
+  private drainPending(): void {
+    for (const pos of this.pending) {
+      const contAlpha =
+        this.lastSnapMs > 0 ? Math.min(1.25, (this.nowMs - this.lastSnapMs) / this.deliveryMs) : 1;
+      this.self.prevPos = {
+        x: this.self.prevPos.x + (this.self.pos.x - this.self.prevPos.x) * contAlpha,
+        y: this.self.prevPos.y + (this.self.pos.y - this.self.prevPos.y) * contAlpha,
+        z: this.self.prevPos.z + (this.self.pos.z - this.self.prevPos.z) * contAlpha,
+      };
+      this.self.pos = { ...pos };
+      this.self.dead = this.srv.player.dead;
+      this.self.ghost = this.srv.player.ghost;
+      this.lastSnapMs = this.nowMs;
+    }
+    this.pending = [];
   }
 
   budget(): number {
@@ -211,6 +282,8 @@ describe('SelfMotionPredictor', () => {
       jitterMs: 0,
       alpha: 1,
       frameDt: 0.05,
+      snapAgeMs: 0,
+      snapIntervalMs: SNAP_MS,
     };
     const predictive = new SelfMotionPredictor(SEED);
     const ordinary = new SelfMotionPredictor(SEED);
@@ -495,6 +568,11 @@ describe('SelfMotionPredictor', () => {
       controlMeanLead: number;
       worstLateral: number;
       serverLateral: number;
+      /** Most negative per-frame step over the WHOLE run, not just the resume
+       *  window: the sub-tick interpolation must never run backward, including
+       *  on a frame where the leash clips more than the kernel step it just
+       *  took (which is what the prevPos collapse in step() prevents). */
+      worstStep: number;
     }
 
     function runStall(gapMs: number): StallTrace {
@@ -508,6 +586,7 @@ describe('SelfMotionPredictor', () => {
       let lastZ = Number.NaN;
       let worstLateral = 0;
       let serverLateral = 0;
+      let worstStep = 0;
       const errOf = (r: FrameResult): number => {
         if (!r.pose) throw new Error('predictor disabled unexpectedly');
         return Math.hypot(r.pose.x - r.ac.x, r.pose.z - r.ac.z);
@@ -517,6 +596,7 @@ describe('SelfMotionPredictor', () => {
         worstLateral = Math.max(worstLateral, Math.abs(r.pose.x));
         serverLateral = Math.max(serverLateral, Math.abs(lab.srv.player.pos.x));
         const step = r.pose.z - lastZ;
+        if (!Number.isNaN(step)) worstStep = Math.min(worstStep, step);
         lastZ = r.pose.z;
         return step;
       };
@@ -582,6 +662,7 @@ describe('SelfMotionPredictor', () => {
         controlMeanLead,
         worstLateral,
         serverLateral,
+        worstStep,
       };
     }
 
@@ -633,6 +714,9 @@ describe('SelfMotionPredictor', () => {
         // assert is a real claim about the predictor and not about terrain.
         expect(run.serverLateral).toBeLessThanOrEqual(1e-9);
         expect(run.worstLateral).toBeLessThanOrEqual(1e-9);
+        // g: not one backward frame anywhere in the run, stall and recovery
+        // included, not just the resume window sampled above
+        expect(run.worstStep).toBeGreaterThanOrEqual(-0.03);
       },
     );
 
@@ -664,7 +748,488 @@ describe('SelfMotionPredictor', () => {
         expect(err, `recovery frame ${i}`).toBeLessThanOrEqual(run.budget + 1e-6);
       });
       expect(run.worstLateral).toBeLessThanOrEqual(1e-9);
+      // The resume sweep here clips MORE than the kernel step the frame took,
+      // which leaves prevPos ahead of the clamped pos; without the collapse in
+      // step() the sub-tick interpolation walks the display backward on that
+      // frame. Measured at about -0.05 yd with the collapse removed.
+      expect(run.worstStep).toBeGreaterThanOrEqual(-0.03);
     });
+  });
+
+  // A long render frame (a shader link, a GC pause, a texture decode) blocks
+  // the main thread, so the snapshots that arrive DURING it are only applied
+  // after it: inside the frame the anchor is frozen, and right after it a
+  // burst of queued snapshots re-anchors prevPos at the drawn pose and sweeps
+  // the anchor several ticks across one snapshot interval. The display must
+  // keep running at its steady speed through both halves: the kernel is
+  // trusted while the anchor is stale (long frame) and while the burst sweep
+  // settles, or the avatar stalls inside the long frame and rushes after it.
+  describe('long render frames', () => {
+    const SPEED_MIN = 5.0; // yd/s: RUN_SPEED is 7
+    const SPEED_MAX = 9.0;
+    const AFTER_FRAMES = 12;
+    const WARMUP_FRAMES = 120; // 2 s, settled on the steady lead
+    const HOLD_FRAMES = 9; // ~150 ms: three snapshots queue up
+    const BURST_FRAMES = 30; // the burst arm repays a real network gap, see below
+    // Long enough to outlast BLOCK_EPISODE_MAX_MS with frames to spare, so the
+    // cap expiring is observable inside the gap rather than at its edge.
+    const GAP_MS = 700;
+    // The sweep replays the whole gap over one snapshot interval, and the
+    // leash then walks its 4.7 yd loan back to the honest budget, which costs
+    // one short re-phasing trim around the fortieth frame. Long enough that
+    // the tail is settled run speed again.
+    const GAP_RECOVERY_FRAMES = 60;
+
+    interface Step {
+      label: string;
+      dtMs: number;
+      /** Horizontal display speed over this frame, yd/s. */
+      speed: number;
+      /** Signed advance along the run direction (+z), yd. */
+      forward: number;
+      /** Horizontal distance to the leash's own anchor (alpha capped at 1). */
+      err: number;
+    }
+
+    const trace = (steps: Step[]): string =>
+      `\n${steps
+        .map(
+          (s) =>
+            `  ${s.label.padStart(6)} dt=${s.dtMs.toFixed(1).padStart(6)}ms ` +
+            `v=${s.speed.toFixed(2).padStart(6)} yd/s fwd=${s.forward.toFixed(3)} ` +
+            `err=${s.err.toFixed(3)}`,
+        )
+        .join('\n')}`;
+
+    // The collider-free open-field lane (same reason as the stall lane above:
+    // the authored town wall would clamp the server and hide the artifact).
+    function warmLab(lagMs: number): Lab {
+      const lab = new Lab(lagMs, FRAME_MS, { start: { x: 0, z: -1000 }, deliverAfter: true });
+      lab.setInput(mi({ forward: true }));
+      for (let i = 0; i < WARMUP_FRAMES; i++) lab.frame();
+      return lab;
+    }
+
+    // Runs `count` frames of `dtMs` and returns one Step per frame, each
+    // measured against the pose the previous frame drew.
+    function recorder(
+      lab: Lab,
+    ): (label: string, dtMs: number, count?: number, drainFirst?: boolean) => Step[] {
+      let prev = { x: Number.NaN, z: Number.NaN };
+      return (label, dtMs, count = 1, drainFirst = false): Step[] => {
+        const out: Step[] = [];
+        for (let i = 0; i < count; i++) {
+          const r = lab.frame(dtMs, drainFirst);
+          if (!r.pose) throw new Error('predictor disabled unexpectedly');
+          const pose = { x: r.pose.x, z: r.pose.z };
+          if (!Number.isNaN(prev.x)) {
+            out.push({
+              label: count > 1 ? `${label}${i + 1}` : label,
+              dtMs,
+              speed: Math.hypot(pose.x - prev.x, pose.z - prev.z) / (dtMs / 1000),
+              forward: pose.z - prev.z,
+              err: Math.hypot(pose.x - r.ac.x, pose.z - r.ac.z),
+            });
+          }
+          prev = pose;
+        }
+        return out;
+      };
+    }
+
+    function runLongFrame(lagMs: number, longMs: number): Step[] {
+      const lab = warmLab(lagMs);
+      const record = recorder(lab);
+      record('warm', FRAME_MS); // seeds the previous pose, produces no step
+      return [...record('long', longMs), ...record('+', FRAME_MS, AFTER_FRAMES)];
+    }
+
+    // The real-browser ordering, measured with injected blocks: after the long
+    // frame Chrome runs several SHORT catch-up frames (8 to 17 ms) before it
+    // drains the socket, so the anchor stays frozen for 4 to 6 more frames and
+    // the queued snapshots land as one burst only then.
+    function runWithheldBurst(
+      lagMs: number,
+      longMs: number,
+      heldFrames: number,
+      heldMs: number,
+    ): Step[] {
+      const lab = warmLab(lagMs);
+      const record = recorder(lab);
+      record('warm', FRAME_MS);
+      lab.holdSnapshots = true;
+      const blocked = [...record('long', longMs), ...record('held', heldMs, heldFrames)];
+      lab.holdSnapshots = false;
+      // the next frame's tail drains the whole queue at once
+      return [...blocked, ...record('+', FRAME_MS, AFTER_FRAMES + 1)];
+    }
+
+    // The other browser ordering, also measured: the socket is drained just
+    // before the long frame's rAF callback, so the anchor is FRESH but
+    // ClientWorld has re-anchored prevPos at the drawn pose with pos several
+    // ticks ahead. Nothing looks stale, and the leash clips the frame's own
+    // multi-step advance unless the hitch itself is recognised.
+    function runDeliverBefore(lagMs: number, longMs: number): Step[] {
+      const lab = warmLab(lagMs);
+      const record = recorder(lab);
+      record('warm', FRAME_MS);
+      const long = record('long', longMs, 1, true);
+      return [...long, ...record('+', FRAME_MS, AFTER_FRAMES)];
+    }
+
+    function runBurst(lagMs: number): Step[] {
+      const lab = warmLab(lagMs);
+      const record = recorder(lab);
+      record('warm', FRAME_MS);
+      lab.holdSnapshots = true;
+      record('hold', FRAME_MS, HOLD_FRAMES);
+      lab.holdSnapshots = false;
+      const burst = record('burst', FRAME_MS); // its tail applies all three at once
+      return [...burst, ...record('+', FRAME_MS, BURST_FRAMES)];
+    }
+
+    const expectSteadyBand = (steps: Step[], maxSpeed = SPEED_MAX): void => {
+      const report = trace(steps);
+      for (const step of steps) {
+        expect(step.speed, `${step.label}${report}`).toBeGreaterThanOrEqual(SPEED_MIN);
+        expect(step.speed, `${step.label}${report}`).toBeLessThanOrEqual(maxSpeed);
+        expect(step.forward, `${step.label}${report}`).toBeGreaterThanOrEqual(0);
+      }
+    };
+
+    // The 250 ms rows carry a wider ceiling for a cause outside this fix: 250
+    // ms IS the main-loop frame clamp, so the kernel accumulator drops the
+    // remainder it was already holding and the display owes the server up to
+    // one tick of ground. The servo repays that at a bounded rate over the
+    // following frames (observed peak 9.67 yd/s); the artifact this test pins
+    // against ran at 13.8 and stalled to 1.3 first.
+    it.each([
+      [40, 100, SPEED_MAX],
+      [40, 156, SPEED_MAX],
+      [40, 250, 10.0],
+      [120, 100, SPEED_MAX],
+      [120, 156, SPEED_MAX],
+      [120, 250, 10.0],
+    ])(
+      'holds the steady display speed across a %ims-echo, %ims render frame',
+      (lagMs, longMs, maxSpeed) => {
+        expectSteadyBand(runLongFrame(lagMs, longMs), maxSpeed);
+      },
+    );
+
+    it.each([
+      [40, 100, 4, 10],
+      [40, 156, 4, 10],
+      [120, 100, 4, 10],
+      [120, 156, 4, 10],
+      [40, 100, 6, FRAME_MS],
+      [40, 156, 6, FRAME_MS],
+      [120, 100, 6, FRAME_MS],
+      [120, 156, 6, FRAME_MS],
+    ])(
+      'holds the steady display speed at %ims echo across a %ims frame plus %i withheld frames of %ims',
+      (lagMs, longMs, heldFrames, heldMs) => {
+        expectSteadyBand(runWithheldBurst(lagMs, longMs, heldFrames, heldMs));
+      },
+    );
+
+    it.each([
+      [40, 100],
+      [40, 156],
+      [120, 100],
+      [120, 156],
+    ])(
+      'holds the steady display speed at %ims echo across a %ims frame whose burst lands first',
+      (lagMs, longMs) => {
+        expectSteadyBand(runDeliverBefore(lagMs, longMs));
+      },
+    );
+
+    // The isolation term in the hitch trigger, pinned from the regime it
+    // protects: at a steady 8 fps nothing is hitching, no episode may open,
+    // and the servo must keep correcting every frame. Sibling of 'keeps
+    // corrections gentle under load-hitch frame times', which pins the same
+    // regime from the smoothness side.
+    it('keeps the divergence servo alive at steady low fps', () => {
+      const lab = new Lab(100, 125, { start: { x: 0, z: -1000 } });
+      lab.setInput(mi({ forward: true }));
+      for (let i = 0; i < 20; i++) lab.frame();
+      lab.srv.player.pos.x += 1; // a server-side sidestep, well under the 6 yd snap
+      const errs: number[] = [];
+      for (let i = 0; i < 8; i++) {
+        const r = lab.frame();
+        if (!r.pose) throw new Error('predictor disabled unexpectedly');
+        errs.push(Math.abs(r.pose.x - r.ac.x));
+      }
+      const report = `\n  lateral error by frame: ${errs.map((e) => e.toFixed(3)).join(' ')}`;
+      // Strictly closing every frame is the decisive part: a held servo would
+      // park the error on the leash boundary (0.75 yd here) instead. The rate
+      // is the module's own bound, not this test's choice: at a 100 ms echo the
+      // blend runs at min(12, 500/measureMs) with its dt capped at 1/30, about
+      // 15% of the gap per frame, so a 1 yd sidestep is two thirds gone by the
+      // sixth frame and under 0.15 yd by the eighth.
+      errs.forEach((err, i) => {
+        if (i > 0) expect(err, `frame ${i}${report}`).toBeLessThan(errs[i - 1]);
+      });
+      expect(errs[5], report).toBeLessThan(0.25);
+      expect(errs[7], report).toBeLessThan(0.15);
+    });
+
+    // The declared worst case, and the one the broadcast-stall arms cannot
+    // reach: an isolated hitch opens an episode and THEN the network gaps for
+    // half a second, so the lending mechanism meets a genuine stall already
+    // switched on. The episode cap is what bounds it.
+    it.each([
+      [40, 156],
+      [120, 156],
+    ])(
+      'caps the episode when a %ims-echo hitch of %ims is followed by a 500 ms gap',
+      (lagMs, longMs) => {
+        const lab = warmLab(lagMs);
+        const record = recorder(lab);
+        record('warm', FRAME_MS);
+        lab.holdSnapshots = true;
+        const gapFrames = Math.round(GAP_MS / FRAME_MS);
+        const blocked = [...record('long', longMs), ...record('gap', FRAME_MS, gapFrames)];
+        lab.holdSnapshots = false;
+        // A 700 ms gap needs a longer tail than the short-burst arms: the
+        // resume sweep is the whole gap replayed over one snapshot interval.
+        const post = record('+', FRAME_MS, GAP_RECOVERY_FRAMES);
+        const report = trace([...blocked, ...post]);
+        // a: the lending is bounded by the episode cap, stated from the
+        // constants: the plain leash budget plus what one capped episode plus
+        // its opening frame can cover at run speed.
+        const bound = lab.budget() + (RUN_SPEED * (BLOCK_EPISODE_MAX_MS + longMs)) / 1000;
+        for (const step of [...blocked, ...post]) {
+          expect(step.err, `${step.label}${report}`).toBeLessThanOrEqual(bound);
+        }
+        // b: the cap expires INSIDE the gap and the display drops back onto
+        // the plain leash freeze: the error stops growing and the display
+        // stops advancing while the anchor stays frozen. With no cap the
+        // lending would run for the whole gap and both would keep going.
+        const frozen = blocked.slice(-6);
+        const errs = frozen.map((step) => step.err);
+        expect(Math.max(...errs) - Math.min(...errs), report).toBeLessThan(0.02);
+        for (const step of frozen) {
+          expect(step.speed, `frozen ${step.label}${report}`).toBeLessThan(1);
+        }
+        // c: the burst re-contains it on the stall arms' own terms
+        for (const step of post) {
+          expect(step.forward, `${step.label}${report}`).toBeGreaterThanOrEqual(-0.03);
+        }
+        expectSteadyBand(post.slice(-8));
+      },
+    );
+
+    // The loan is temporary, pinned where it matters: a plain broadcast gap
+    // arriving later must be contained by the PLAIN leash, not by whatever
+    // room the earlier hitch was lent. A loan that never drained would ride
+    // straight through this.
+    it.each([[40], [120]])(
+      'drains the loan so a later broadcast gap is contained by the plain leash at %ims echo',
+      (lagMs) => {
+        const lab = warmLab(lagMs);
+        const record = recorder(lab);
+        record('warm', FRAME_MS);
+        record('long', 156);
+        record('settle', FRAME_MS, 60); // 1 s of ordinary frames: the loan drains
+        lab.holdSnapshots = true; // now a network gap, with no hitch of its own
+        const stall = record('stall', FRAME_MS, Math.round(250 / FRAME_MS));
+        const report = trace(stall);
+        for (const step of stall) {
+          expect(step.err, `${step.label}${report}`).toBeLessThanOrEqual(lab.budget() + 1e-6);
+        }
+        // and the gap really does drive the display into that boundary
+        expect(Math.max(...stall.map((step) => step.err)), report).toBeGreaterThan(
+          lab.budget() * 0.8,
+        );
+      },
+    );
+
+    // The trigger is RELATIVE to the mirror's measured interval, not to a
+    // hardcoded 50 ms. On a coalescing link that delivers every 70 ms, a 60 ms
+    // frame is an ordinary frame (shorter than the interval, nothing was
+    // swallowed) and must be left to the plain leash, while a 90 ms one is a
+    // hitch and gets its episode.
+    const COALESCED_MS = 70;
+    function runCoalesced(lagMs: number, longMs: number): Step[] {
+      const lab = new Lab(lagMs, FRAME_MS, {
+        start: { x: 0, z: -1000 },
+        deliverAfter: true,
+        deliveryMs: COALESCED_MS,
+      });
+      lab.setInput(mi({ forward: true }));
+      for (let i = 0; i < WARMUP_FRAMES; i++) lab.frame();
+      const record = recorder(lab);
+      record('warm', FRAME_MS);
+      return [...record('long', longMs), ...record('+', FRAME_MS, AFTER_FRAMES)];
+    }
+
+    it.each([[40], [120]])(
+      'treats a 90 ms frame as a hitch when the interval is 70 ms at %ims echo',
+      (lagMs) => {
+        const steps = runCoalesced(lagMs, 90);
+        const report = trace(steps);
+        // the frame's own ground, less the fixed-step accumulator's phase (the
+        // kernel lands whole 50 ms ticks, so a 90 ms frame carries one or two)
+        expect(steps[0].forward, `long${report}`).toBeGreaterThan(0.9 * RUN_SPEED * 0.09);
+        expectSteadyBand(steps);
+      },
+    );
+
+    // The other half of the same claim, and the one a fixed 50 ms threshold
+    // would get wrong: under the measured interval nothing was swallowed, so
+    // the frame is ordinary and the servo must NOT be held. Read through a
+    // server-side sidestep injected just before the frame in question: the
+    // ordinary frame keeps closing it, the hitch defers it for the settle
+    // window. A 50 ms threshold defers both, a 100 ms one defers neither.
+    it('scales the hitch trigger to the measured interval, not to a fixed 50 ms', () => {
+      const lateralErrs = (longMs: number): number[] => {
+        const lab = new Lab(40, FRAME_MS, {
+          start: { x: 0, z: -1000 },
+          deliverAfter: true,
+          deliveryMs: COALESCED_MS,
+        });
+        lab.setInput(mi({ forward: true }));
+        for (let i = 0; i < WARMUP_FRAMES; i++) lab.frame();
+        // Under the plain leash budget on purpose: inside it only the servo
+        // can close the gap, so this reads the servo and not the clamp.
+        lab.srv.player.pos.x += 0.35;
+        lab.frame(longMs);
+        const errs: number[] = [];
+        for (let i = 0; i < 6; i++) {
+          const r = lab.frame();
+          if (!r.pose) throw new Error('predictor disabled unexpectedly');
+          errs.push(Math.abs(r.pose.x - r.ac.x));
+        }
+        return errs;
+      };
+      const ordinary = lateralErrs(60);
+      const hitch = lateralErrs(90);
+      const report =
+        `\n  60 ms frame: ${ordinary.map((e) => e.toFixed(3)).join(' ')}` +
+        `\n  90 ms frame: ${hitch.map((e) => e.toFixed(3)).join(' ')}`;
+      // the ordinary frame leaves the servo running, so the divergence turns
+      // around inside the window; the hitch defers it through its settle
+      // window, where it is still opening
+      expect(ordinary[5], report).toBeLessThan(ordinary[4]);
+      expect(ordinary[5], report).toBeLessThan(0.5);
+      expect(hitch[5], report).toBeGreaterThan(hitch[4]);
+    });
+
+    // Recurrence bound. A machine hitching every few frames must not be able
+    // to keep the servo held forever: measured against a server that never
+    // receives the intent (the display predicts a run the authority never
+    // performs), the display has to stay on the leash instead of walking out
+    // to the 6 yd re-adopt. SERVO_REFRACTORY_INTERVALS is what bounds it.
+    it('bounds the display against a diverging server through repeated hitches', () => {
+      const lab = new Lab(100, FRAME_MS, {
+        start: { x: 0, z: -1000 },
+        deliverAfter: true,
+        serverDeaf: true,
+      });
+      lab.setInput(mi({ forward: true }));
+      const record = recorder(lab);
+      record('warm', FRAME_MS);
+      const hitching: Step[] = [];
+      for (let cycle = 0; cycle < 15; cycle++) {
+        hitching.push(...record('run', FRAME_MS, 5), ...record('hitch', 120));
+      }
+      const settling = record('calm', FRAME_MS, 60);
+      const report = trace([...hitching, ...settling]);
+      const peak = Math.max(...hitching.map((step) => step.err));
+      expect(peak, `peak${report}`).toBeLessThan(2.5);
+      expect(peak, `peak${report}`).toBeLessThan(Math.sqrt(SELF_MOTION_SNAP_DIST_SQ));
+      // and once the hitching stops the servo closes it back onto the leash
+      expect(settling[settling.length - 1].err, `settled${report}`).toBeLessThan(
+        lab.budget() + 1e-6,
+      );
+    });
+
+    // Defensive inputs: ClientWorld hands over its live EWMA and last-apply
+    // age, and a fresh or reset mirror can present 0 or a negative sentinel.
+    // The core floors both, so the two frame shapes must be indistinguishable.
+    it('treats a degenerate interval and a negative snapshot age as the floored pair', () => {
+      const sim = new Sim({
+        seed: SEED,
+        playerClass: 'warrior',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
+      sim.setPlayerLevel(60);
+      teleport(sim, 0, -1000);
+      sim.player.facing = 0;
+      const mirror = (): Entity => ({
+        ...sim.player,
+        pos: { ...sim.player.pos },
+        prevPos: { ...sim.player.prevPos },
+      });
+      const sentinel = { self: mirror(), predictor: new SelfMotionPredictor(SEED) };
+      const floored = { self: mirror(), predictor: new SelfMotionPredictor(SEED) };
+      const step = (
+        arm: { self: Entity; predictor: SelfMotionPredictor },
+        frameDt: number,
+        snapAgeMs: number,
+        snapIntervalMs: number,
+      ): Vec3Like => {
+        const out = arm.predictor.step(arm.self, {
+          enabled: true,
+          moveInput: mi({ forward: true }),
+          displayFacing: 0,
+          echoMs: 100,
+          jitterMs: 0,
+          alpha: 1,
+          frameDt,
+          snapAgeMs,
+          snapIntervalMs,
+        });
+        if (!out) throw new Error('predictor disabled unexpectedly');
+        expect(Number.isFinite(out.x) && Number.isFinite(out.y) && Number.isFinite(out.z)).toBe(
+          true,
+        );
+        return { ...out };
+      };
+      const pair = (frameDt: number, ageMs: number): { a: Vec3Like; b: Vec3Like } => ({
+        a: step(sentinel, frameDt, ageMs < 0 ? -1 : ageMs, 0),
+        b: step(floored, frameDt, Math.max(0, ageMs), 20),
+      });
+      for (let i = 0; i < 30; i++) pair(FRAME_MS / 1000, -1);
+      const before = pair(FRAME_MS / 1000, -1);
+      const hitch = pair(0.156, -1); // the isolated long frame
+      const after = pair(FRAME_MS / 1000, 300); // ...and a stale frame behind it
+      expect(hitch.a).toEqual(hitch.b);
+      expect(after.a).toEqual(after.b);
+      // the episode still opened despite the sentinel: full kernel ground, not
+      // the base-budget clamp, and the frame after it keeps advancing
+      expect(hitch.a.z - before.a.z).toBeGreaterThan(0.9);
+      expect(after.a.z).toBeGreaterThan(hitch.a.z);
+    });
+
+    // The boundary of the fix, pinned from the other side. A delivery burst
+    // with no long frame is a NETWORK gap: nothing local explains the stale
+    // anchor, so it stays in the broadcast-stall regime above (the display
+    // freezes on the leash, then the resume sweep repays the gap). The
+    // staleness allowance must not leak into it, or the leash containment the
+    // stall arms pin would quietly stop holding.
+    it.each([
+      [40, 15.5],
+      [120, 12.0],
+    ])(
+      'leaves a delivery burst with no long frame frozen on the leash at %ims echo',
+      (lagMs, peakYdS) => {
+        const steps = runBurst(lagMs);
+        const report = trace(steps);
+        // the freeze itself: the frame whose tail applies the burst still steps
+        // against the frozen anchor, so it shows the leash, not the kernel
+        expect(steps[0].speed, `frozen${report}`).toBeLessThan(2);
+        // the repayment: forward, bounded, and back on the steady band by the end
+        for (const step of steps) {
+          expect(step.forward, `${step.label}${report}`).toBeGreaterThanOrEqual(-0.03);
+          expect(step.speed, `${step.label}${report}`).toBeLessThanOrEqual(peakYdS);
+        }
+        expectSteadyBand(steps.slice(-8));
+      },
+    );
   });
 
   it('starts the jump arc locally without waiting for the server', () => {

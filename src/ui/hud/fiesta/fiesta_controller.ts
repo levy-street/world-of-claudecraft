@@ -1,4 +1,4 @@
-import { type AugmentCategory, augmentCategory } from '../../../sim/content/augments';
+import { augmentCategory } from '../../../sim/content/augments';
 import type {
   FiestaAugmentOffer,
   FiestaMatchInfo,
@@ -12,6 +12,7 @@ import {
 } from '../../crest_image_fallback';
 import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t, tOptional } from '../../i18n';
+import { fiestaAugmentFallbackSvg, fiestaAugmentImageUrl } from './fiesta_art';
 
 export interface FiestaAudioPort {
   click(): void;
@@ -115,7 +116,7 @@ export class FiestaController {
     if (element.dataset.sig !== signature) {
       element.dataset.sig = signature;
       element.innerHTML =
-        `<span class="fpend-gem">${this.augmentCategorySvg('utility')}</span>` +
+        '<span class="fpend-gem" aria-hidden="true"></span>' +
         `<span class="fpend-text">${esc(t('fiesta.pending.label'))}</span>`;
     }
   }
@@ -253,11 +254,14 @@ export class FiestaController {
     if (!cards) return;
     for (const id of offer.choices) {
       const category = augmentCategory(id);
+      const imageUrl = fiestaAugmentImageUrl(id);
       const card = this.deps.document.createElement('button');
       card.type = 'button';
       card.className = `fa-card ${offer.tier}`;
       card.innerHTML =
-        `<span class="fa-icon cat-${category}">${this.augmentCategorySvg(category)}</span>` +
+        (imageUrl
+          ? `<img class="fa-icon cat-${category}" src="${imageUrl}" alt="" draggable="false">`
+          : `<span class="fa-icon cat-${category}" aria-hidden="true">${fiestaAugmentFallbackSvg(category)}</span>`) +
         `<span class="fa-name">${esc(this.augmentName(id))}</span>` +
         `<span class="fa-desc">${esc(this.augmentDescription(id))}</span>` +
         `<span class="fa-cat cat-${category}">${esc(t(`fiesta.category.${category}` as TranslationKey))}</span>`;
@@ -274,6 +278,18 @@ export class FiestaController {
         this.deps.world().arenaAugmentPick(id);
         this.closeAugments();
       });
+      const image = card.querySelector<HTMLImageElement>('img.fa-icon');
+      image?.addEventListener(
+        'error',
+        () => {
+          const fallback = this.deps.document.createElement('span');
+          fallback.className = `fa-icon cat-${category}`;
+          fallback.setAttribute('aria-hidden', 'true');
+          fallback.innerHTML = fiestaAugmentFallbackSvg(category);
+          image.replaceWith(fallback);
+        },
+        { once: true },
+      );
       cards.appendChild(card);
     }
   }
@@ -283,19 +299,6 @@ export class FiestaController {
     if (!element) return;
     element.style.display = 'none';
     element.innerHTML = '';
-  }
-
-  private augmentCategorySvg(category: AugmentCategory): string {
-    const paths: Record<AugmentCategory, string> = {
-      offense: '<path d="M3 21l6-6m0 0l9-9 2 2-9 9m-2-2l-2 2 2 2 2-2m-2-2l2 2"/>',
-      defense: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/>',
-      sustain:
-        '<path d="M12 21s-7-4.6-9.2-9C1.3 8.7 3 5 6.5 5c2 0 3.5 1.5 5.5 4 2-2.5 3.5-4 5.5-4C21 5 22.7 8.7 21.2 12 19 16.4 12 21 12 21z"/>',
-      mobility: '<path d="M5 18l6-6-6-6m7 12l6-6-6-6"/>',
-      utility:
-        '<path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>',
-    };
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${paths[category]}</svg>`;
   }
 
   private teardown(): void {

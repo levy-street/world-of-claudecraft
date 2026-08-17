@@ -427,10 +427,11 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
       // FARMING IS EXCLUDED from this scan exactly as fishing is (the
       // landTools collector above): the hub rule is about the rungs a zone's
       // own NODES use, and farming has no nodes (D2, fishing-shaped). Its
-      // vendor state is dormant by choice until the Phase 9 farmer NPCs
-      // stock the counters, and the farming ladder's own dormant-state arm
-      // below pins that no-vendor truth positively. Do not widen this
-      // exclusion to the three node professions.
+      // counters are the FARMER NPCs beside each patch (one per farming hub,
+      // outside the hub circle), and the farming ladder's own go-live arm
+      // below pins their stock positively: the rung-one hoe sits on the
+      // tier-1 farmer alone and no farming item sits on any other counter.
+      // Do not widen this exclusion to the three node professions.
       for (const [itemId, def] of landTools) {
         if (def.use?.type !== 'gatherTool') continue;
         if (def.use.professionId === 'farming') {
@@ -705,8 +706,8 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
 
 // ---------------------------------------------------------------------------
 // THE FARMING LADDER (Phase 5): farming is the fifth gathering profession and
-// deliberately fishing-shaped on land (D2): no GatherNodeType, no vendor
-// stocking until Phase 9, and its own zone tier column. Every arm below is
+// deliberately fishing-shaped on land (D2): no GatherNodeType, its stock on
+// the farmer NPCs alone (the go-live), and its own zone tier column. Every arm below is
 // keyed to the FARMING_ZONE_TIERS literal set, never derived from
 // GATHER_NODES (deviation (j)): the farming column intentionally disagrees
 // with the ground at evergarden, so a node-derived expectation would either
@@ -828,9 +829,9 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
   });
 
   it('tier 1 and 2 seeds are vendor-priced, tier 3 and 4 seeds never (both directions)', () => {
-    // Literal id lists on both sides (the locked pricing table): dormant by
-    // choice until Phase 9 stocks the priced four, drop-and-market supply
-    // only for the high four.
+    // Literal id lists on both sides (the locked pricing table): the priced
+    // four sit on the farmer counters (the go-live arm below), seed-back and
+    // market supply only for the high four (D11).
     const PRICED_SEEDS = [
       'bog_beet_seed',
       'brook_carrot_seed',
@@ -864,6 +865,13 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // The D9 fee vegetable: priced so the watch fee is payable from vendor
     // stock before a first harvest.
     expect(ITEMS.brook_carrot?.buyValue).toBe(16);
+    // The four stocked seed prices as literals: the day-one entry cost of the
+    // trade and the size of the intro quest's re-grant, so a retune is a
+    // visible edit rather than a positive-only pass.
+    expect(ITEMS.vale_wheat_seed?.buyValue).toBe(4);
+    expect(ITEMS.brook_carrot_seed?.buyValue).toBe(4);
+    expect(ITEMS.marsh_rice_seed?.buyValue).toBe(8);
+    expect(ITEMS.bog_beet_seed?.buyValue).toBe(8);
     let produceSwept = 0;
     for (const crop of Object.values(FARM_CROPS)) {
       if (crop.produceItemId !== 'brook_carrot') {
@@ -1018,41 +1026,108 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     }
   });
 
-  it('no NPC vendors any farming item: stocking is dormant by choice until Phase 9', () => {
-    // THE DORMANT ARM the hub-rule narrowing above leans on. The Phase 9
-    // go-live stocks the farmer NPCs (seeds, compost, the garden hoe); until
-    // that phase no vendorItems list anywhere may name a farming item, so a
-    // premature stocking row reds HERE rather than sliding through the
-    // narrowed hub sweep.
+  it('the farmer NPCs stock EXACTLY the go-live counters, and no other counter carries a farming item', () => {
+    // THE GO-LIVE ARM the hub-rule narrowing above leans on, the positive
+    // twin of the dormant arm it replaced. Farming's vendor surface is the
+    // four farmer NPCs beside the four patches and nothing else: the tier-1
+    // and tier-2 seeds where their tier is farmed, the D9 fee vegetable and
+    // the rung-one hoe at the tier-1 farmer alone, and compost at every
+    // farmer (the husk trade's anchor). Literal lists, ORDER INCLUDED: the
+    // vendor grid renders in this order and a re-sorted row is a content
+    // change to be made on purpose.
+    const FARMER_STOCK: Readonly<Record<string, readonly string[]>> = {
+      farmer_jessica: [
+        'vale_wheat_seed',
+        'brook_carrot_seed',
+        'brook_carrot',
+        'compost',
+        'garden_hoe',
+      ],
+      farmer_teasel: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
+      farmer_hollis: ['compost'],
+      farmer_verbena: ['compost'],
+    };
+    for (const [npcId, stock] of Object.entries(FARMER_STOCK)) {
+      const npc = NPCS[npcId];
+      expect(npc, `${npcId} must exist`).toBeDefined();
+      expect(npc.farmer, `${npcId} carries the farmer flag`).toBe(true);
+      expect(npc.vendorItems, `${npcId} stock`).toEqual(stock);
+      // THE DEAD-ROW TRAP (D11): a stocked row without a positive buyValue
+      // renders in the grid and refuses at purchase, so every stocked row is
+      // asserted priced HERE, per row, beside the stock it is on.
+      for (const itemId of stock) {
+        expect(ITEMS[itemId], `${npcId} stocks unknown item ${itemId}`).toBeDefined();
+        expect(
+          ITEMS[itemId]?.buyValue ?? 0,
+          `${npcId} stocks ${itemId} without a positive buyValue (a dead row)`,
+        ).toBeGreaterThan(0);
+      }
+    }
+    // The flag set IS the stock table: a fifth flagged farmer must join the
+    // literal above (and decide its stock) rather than ship an unpinned row.
+    expect(
+      Object.values(NPCS)
+        .filter((npc) => npc.farmer === true)
+        .map((npc) => npc.id)
+        .sort(),
+    ).toEqual(Object.keys(FARMER_STOCK).sort());
+    // The needle set for the sweeps below: 27 materials plus the four hoes.
     const farmingItemIds = new Set<string>([
       ...FARM_MATERIAL_ITEM_IDS,
       ...farmingTools.map(([itemId]) => itemId),
     ]);
-    // 27 materials plus the four hoes: the sweep's needle set is real.
     expect(farmingItemIds.size).toBe(31);
+    // NO OTHER NPC vendors a farming item: the four farmers are the whole
+    // surface, so a seed or a hoe drifting onto a station master's counter
+    // reds here rather than sliding through the narrowed hub sweep above.
     let vendorRowsSeen = 0;
     for (const [npcId, npc] of Object.entries(NPCS)) {
+      if (npcId in FARMER_STOCK) continue;
       for (const itemId of npc.vendorItems ?? []) {
         vendorRowsSeen += 1;
         expect(
           farmingItemIds.has(itemId),
-          `${npcId} vendors farming item ${itemId} before the Phase 9 go-live`,
+          `${npcId} vendors farming item ${itemId}; only the farmer NPCs may`,
         ).toBe(false);
       }
     }
-    // The counter-example: the walk really saw the world's counters (a
-    // non-farming vendor row exists somewhere), so the absence above is a
-    // real sweep rather than an empty loop.
+    // The counter-example: the walk really saw the world's other counters.
     expect(vendorRowsSeen).toBeGreaterThan(0);
+    // The NEVER-STOCKED set, on every purchase surface (NPC counters, the
+    // heroic vendor, the delve shops): tier 3 and 4 seeds (seed-back and
+    // market only, D11), growth_tonic (crafted only), every FARM_RECIPES
+    // output (the dishes and the tonic), and the three crafted hoes (R23,
+    // craft-only). Literal where the doctrine is literal, derived from the
+    // recipe table where it is a table.
+    const NEVER_STOCKED = new Set<string>([
+      'highland_barley_seed',
+      'frost_gourd_seed',
+      'gilded_sunmelon_seed',
+      'evergarden_greens_seed',
+      'growth_tonic',
+      'bronze_hoe',
+      'skysilver_hoe',
+      'osmium_hoe',
+      ...FARM_RECIPES.map((recipe) => recipe.resultItemId),
+    ]);
+    // Non-vacuity of the needle set: nine recipe outputs plus the eight
+    // literals above, growth_tonic counted once (it is both).
+    expect(FARM_RECIPES).toHaveLength(9);
+    expect(NEVER_STOCKED.size).toBe(16);
+    for (const [npcId, npc] of Object.entries(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) {
+        expect(NEVER_STOCKED.has(itemId), `${npcId} stocks never-stocked ${itemId}`).toBe(false);
+      }
+    }
     // The two NON-NPC purchase counters (the Marks route) are acquisition
-    // surfaces too: a heroic or delve row naming a farming item would open a
-    // faucet this arm's NPC walk cannot see. Same dormancy claim, same
-    // per-table non-vacuity as the tools sweep above.
+    // surfaces too: a heroic or delve row naming ANY farming item would open
+    // a faucet the NPC walk cannot see, so both tables stay farming-free
+    // entirely, never-stocked set included, with per-table non-vacuity.
     expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
     for (const offer of HEROIC_VENDOR_STOCK) {
       expect(
-        farmingItemIds.has(offer.itemId),
-        `heroic vendor stocks farming item ${offer.itemId} before the Phase 9 go-live`,
+        farmingItemIds.has(offer.itemId) || NEVER_STOCKED.has(offer.itemId),
+        `heroic vendor stocks farming item ${offer.itemId}`,
       ).toBe(false);
     }
     let delveRowsSeen = 0;
@@ -1060,28 +1135,29 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       for (const entry of entries) {
         delveRowsSeen += 1;
         expect(
-          farmingItemIds.has(entry.itemId),
-          `${delveId} delve shop stocks farming item ${entry.itemId} before the Phase 9 go-live`,
+          farmingItemIds.has(entry.itemId) || NEVER_STOCKED.has(entry.itemId),
+          `${delveId} delve shop stocks farming item ${entry.itemId}`,
         ).toBe(false);
       }
     }
     expect(delveRowsSeen).toBeGreaterThan(0);
   });
 
-  it('no Phase 6 farm recipe is craftable from vendor stock alone before the Phase 9 go-live', () => {
-    // THE DORMANCY NEGATIVE the arm above implies but does not cover. Dormant
-    // STOCKING is only half the go-live guarantee: a farm recipe whose WHOLE
-    // reagent list can be bought off a counter would be live today, farm or no
-    // farm, and would mint its output (and its cooking skill-ups) years before
-    // the patches open. So every FARM_RECIPES row must keep at least one
-    // reagent no live NPC stocks. For the eight dishes that reagent is farm
-    // produce, which nobody can grow before the go-live phase; for the tonic it
-    // is silverleaf_herb, wild-gathered and priceless by doctrine.
+  it('no farm recipe is craftable from vendor stock alone', () => {
+    // THE COUNTER-FED NEGATIVE the stock arm above implies but does not
+    // cover. Stocking the farmer counters is only half the guarantee: a farm
+    // recipe whose WHOLE reagent list can be bought off a counter would mint
+    // its output (and its cooking skill-ups) with no crop ever grown. So
+    // every FARM_RECIPES row must keep at least one reagent no NPC stocks.
+    // For the eight dishes that reagent is farm produce (brook_carrot is the
+    // one stocked produce, D9, and its pottage keeps vale_wheat and the fine
+    // twin off every counter); for the tonic it is silverleaf_herb,
+    // wild-gathered and priceless by doctrine.
     //
-    // DELIBERATE and ledgered as deviation (ai): the tonic IS craftable
-    // pre-go-live by a player who gathers the herbs. That is exactly D7's
-    // cross-profession trade, whose faucet is the herb line rather than the
-    // farm, so this arm asserts unstocked-ness, never uncraftability.
+    // DELIBERATE and ledgered as deviation (ai): the tonic IS craftable by a
+    // player who gathers the herbs. That is exactly D7's cross-profession
+    // trade, whose faucet is the herb line rather than the farm, so this arm
+    // asserts unstocked-ness, never uncraftability.
     // The stocked universe is EVERY purchase surface, not just NPC counters:
     // the heroic vendor and the delve shops sell for Marks with no buyValue
     // and no vendorItems row, so a farm reagent (or a dish) stocked there
@@ -1131,14 +1207,13 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         `${recipe.id} needs at least one reagent with no vendor buy price`,
       ).toBeGreaterThan(0);
       // The symmetric OUTPUT arm: no NPC may stock a farm dish or the tonic
-      // either (the farming-item arm above cannot see them: dishes are kind
+      // either (the farming-item sweep cannot see them: dishes are kind
       // food, outside FARM_MATERIAL_ITEM_IDS). buyValue undefined already
       // makes a stock row render-and-refuse, but the honest claim is that no
-      // row exists at all before the Phase 9 go-live.
-      expect(
-        stockedItemIds.has(recipe.resultItemId),
-        `an NPC stocks ${recipe.resultItemId} before the Phase 9 go-live`,
-      ).toBe(false);
+      // row exists at all.
+      expect(stockedItemIds.has(recipe.resultItemId), `an NPC stocks ${recipe.resultItemId}`).toBe(
+        false,
+      );
     }
   });
 });

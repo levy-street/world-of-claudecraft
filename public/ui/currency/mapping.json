@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "family": "currency",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "iconSize": 128,
+  "runtimeDir": "public/ui/currency",
+  "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json",
+  "acceptedCohortManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-currency-art.json",
+  "acceptedCohortSha256": "d71254050852510a7d1eb374e6693d360291bc5db261a55e146be67d9d7a3cb4",
+  "assets": [
+    {
+      "id": "coin_gold",
+      "output": "coin_gold.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/currency/raw/coin_gold.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A worn warm-gold realm coin embossed with one crowned eight-ray sun.",
+      "references": ["public/ui/items/eastbrook_buckler.webp"],
+      "sourceSha256": "9f3309ad0841a5ff1627e87f0c63a21885f51c2960f97f81cf91617ffca23291",
+      "acceptedSha256": "44a60a3bf0335dd20b7e2ce7ff31b6cc93b79f13d77300e204450b40af2ca91d",
+      "acceptedBytes": 4000
+    },
+    {
+      "id": "coin_silver",
+      "output": "coin_silver.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/currency/raw/coin_silver.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A cool sterling-silver realm coin embossed with one crescent moon and star.",
+      "references": ["public/ui/items/eastbrook_buckler.webp"],
+      "sourceSha256": "a502830d1d63401766cd9788cebb63e343367b4cfc0f0ee00667e8af6d23dda2",
+      "acceptedSha256": "47b1d3fb475b1aeb620812df5c9bfe921593bc521dcac70a9a6cc65165a89e05",
+      "acceptedBytes": 3216
+    },
+    {
+      "id": "coin_copper",
+      "output": "coin_copper.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/currency/raw/coin_copper.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A reddish-copper realm coin embossed with one oak leaf and acorn.",
+      "references": ["public/ui/items/eastbrook_buckler.webp"],
+      "sourceSha256": "5f38bef6d11240ce907e5d807b41a79e60062c0c33156129b74fa855848f15b7",
+      "acceptedSha256": "f01372ad1f7010846dca9b87ca1c5654ee55340d9a7bea189092e1e6a6c10ba4",
+      "acceptedBytes": 3454
+    },
+    {
+      "id": "woc_token",
+      "output": "woc_token.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/currency/raw/woc_token.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A project-owned gold token with an original hooked-crescent sigil and midnight-blue core.",
+      "references": [
+        "public/claudium/icons/claudium_coin_master.png",
+        "public/woc_logo_square.webp",
+        "public/ui/items/eastbrook_buckler.webp"
+      ],
+      "sourceSha256": "fbec25c53693b57ccd51556464c0be55f74feea62cf124690c6f695b13fdb715",
+      "acceptedSha256": "df2517f10eb3973e04d6bd671bac8a6ac1a6bff78580dd3c3f5cbb3950ab2af8",
+      "acceptedBytes": 4180
+    },
+    {
+      "id": "honor",
+      "output": "honor.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/currency/raw/honor.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A scarred steel valor medallion with crossed blades and a crimson shield.",
+      "references": [
+        "public/ui/items/heroic_mark.webp",
+        "public/ui/items/eastbrook_buckler.webp"
+      ],
+      "sourceSha256": "79dae467c05fc53d09c980916f3975f31cadf77a70b61571778fe00fa7f2a3e0",
+      "acceptedSha256": "6278d6a508eab28c8092186d8cfdc13f326175172c9d78891dea92e44984df14",
+      "acceptedBytes": 3598
+    },
+    {
+      "id": "delve_mark",
+      "output": "delve_mark.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/currency/raw/delve_mark.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An aged-brass reliquary medallion bearing a lit miner's lantern and diagonal pick.",
+      "references": [
+        "public/ui/items/heroic_mark.webp",
+        "public/ui/items/eastbrook_buckler.webp",
+        "public/ui/items/arcanite_mining_pick.webp"
+      ],
+      "sourceSha256": "c85353a603a3d2d1ababffb9f673089d475a6c1ba845df7be2980eee9b8305db",
+      "acceptedSha256": "e0b09823043d2caf88f9088845b638fca65f0ccd9245f44f404904c8909e958d",
+      "acceptedBytes": 3920
+    }
+  ]
+}

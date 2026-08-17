@@ -1436,6 +1436,25 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     greeting:
       'Measure twice and pour once, $C. The apothecary has no patience for spilled reagents.',
   },
+  // The farming go-live: the tier-3 farmer on the terraces below Highwatch
+  // (content/farm_patches.ts patch_thornpeak), north of the beds on the flat
+  // of the shelf, facing south across them (facing PI looks along -z). Stock:
+  // compost only. Tier-3 seed is seed-back and market only (D11), so his
+  // counter is the husk trade's anchor and the compost restock, nothing more.
+  // tests/farmer_npc_placement.test.ts pins the seat beside the beds.
+  farmer_hollis: {
+    id: 'farmer_hollis',
+    name: 'Farmer Hollis',
+    title: 'Highwatch Terrace Farmer',
+    pos: { x: -18, z: 695.5 },
+    facing: Math.PI,
+    color: 0x8c6a4a,
+    questIds: [],
+    vendorItems: ['compost'],
+    farmer: true,
+    greeting:
+      'The terraces give what the mountain allows, $C. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you.',
+  },
 };
 
 // ---------------------------------------------------------------------------

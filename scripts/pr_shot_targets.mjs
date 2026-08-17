@@ -9458,6 +9458,152 @@ export const TARGETS = [
     },
   },
   {
+    key: 'farmer-jessica',
+    label: 'Farmer Jessica beside the Eastbrook garden beds (the farming go-live face)',
+    when: ['professions/farmer_npcs', 'content/zone1'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      // Let the deferred farm GLBs and the NPC mesh land; keep dismissing
+      // overlays right up to the shot.
+      for (let i = 0; i < 10; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'farm-intro-quest-dialog',
+    label:
+      'Farmer Jessica gossip menu and the First Furrow quest detail (magic sentence, journal pointer)',
+    when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farm-intro-quest-dialog setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await wait(300);
+      // The gossip menu itself (quest row, Browse Goods, Trade husks for
+      // compost) is the first frame's claim; then the quest detail with the
+      // intro text is the second. One target, two shots would need two
+      // variants per viewport, so this shot holds the DETAIL view (the text
+      // is the design promise) with the menu already proven by the row test.
+      await page.evaluate(() => {
+        document.querySelector('#quest-dialog [data-quest="q_farm_intro"]')?.click();
+      });
+      await wait(400);
+      // The detail view is the narrative block plus the objectives sub-list;
+      // the accept button is a plain <button> the controller appends after it.
+      const detail = await page.evaluate(() => {
+        const dialog = document.querySelector('#quest-dialog');
+        return (
+          Boolean(dialog?.querySelector('.qd-obj')) &&
+          Boolean(dialog?.querySelector('button:not(.qd-list-item):not(.x-btn)'))
+        );
+      });
+      if (!detail) throw new Error('the First Furrow detail did not render');
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'farmer-gossip-menu',
+    label: 'Farmer Jessica gossip menu: quest, Browse Goods, Trade husks for compost',
+    when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farmer-gossip-menu setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await wait(400);
+      const rows = await page.evaluate(() => ({
+        quest: Boolean(document.querySelector('#quest-dialog [data-quest="q_farm_intro"]')),
+        goods: Boolean(document.querySelector('#quest-dialog [data-vendor]')),
+        husks: Boolean(document.querySelector('#quest-dialog [data-husk-trade]')),
+      }));
+      if (!rows.quest || !rows.goods || !rows.husks) {
+        throw new Error(`gossip rows missing: ${JSON.stringify(rows)}`);
+      }
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'farmer-vendor-grid',
+    label: 'Farmer Jessica vendor grid: tier-1 seeds, brook carrot, compost, garden hoe',
+    when: ['professions/farmer_npcs', 'content/zone1'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        sim.copper = 5000;
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farmer-vendor-grid setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#vendor-window');
+      if (!open) throw new Error('vendor window did not open');
+      await wait(400);
+      // Count the GOODS grid's item rows only: the window also lists the
+      // buyback grid, and every stackable good carries a bulk-buy row under
+      // it (.vendor-item-bulk), so Jessica's five goods paint as nine rows.
+      const rows = await page.evaluate(
+        () =>
+          document.querySelectorAll(
+            '#vendor-window .vendor-goods-grid[data-grid="goods"] .vendor-item:not(.vendor-item-bulk)',
+          ).length,
+      );
+      if (rows !== 5) throw new Error(`expected 5 goods rows, saw ${rows}`);
+      return { clip: '#vendor-window' };
+    },
+  },
+  {
     key: 'swing-timer',
     label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
     when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],
@@ -9595,6 +9741,67 @@ export const TARGETS = [
 // Shared staging for the farming Phase 8 shots: stand in the Eastbrook patch,
 // plant the four beds one cast at a time, and spread the timers into a
 // growth ladder (the farm-patches target above documents every step's why).
+// Stand the player in front of Farmer Jessica (the farming go-live face) so
+// she fills the camera's forward view beside the Eastbrook garden beds. On a
+// base build without her the player still stands at her authored spot, which
+// is the honest BEFORE at identical framing (empty ground beside the beds).
+async function stageFarmerJessica(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
+  const staged = await page.evaluate(() => {
+    const game = window.__game;
+    const sim = game?.sim;
+    const player = sim?.player;
+    if (!game || !sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+    const spot = jess ? { x: jess.pos.x, z: jess.pos.z } : { x: 24.5, z: 32.5 };
+    // Camera-forward is (sin yaw, cos yaw): stand 4.5 yd behind the spot along
+    // that bearing so Jessica sits squarely ahead of the player.
+    const yaw = game.input.camYaw;
+    player.pos.x = spot.x - Math.sin(yaw) * 4.5;
+    player.pos.z = spot.z - Math.cos(yaw) * 4.5;
+    player.prevPos = { ...player.pos };
+    // The patch sits in Forest Wolf territory: shove hostiles away so nothing
+    // interrupts or walks into the frame.
+    for (const e of sim.entities.values()) {
+      if (!e?.hostile || !e.pos) continue;
+      const dx = e.pos.x - spot.x;
+      const dz = e.pos.z - spot.z;
+      if (dx * dx + dz * dz < 60 * 60) {
+        e.pos.x += 500;
+        e.pos.z += 500;
+      }
+    }
+    return { ok: true, jessica: Boolean(jess) };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+    });
+    await wait(400);
+  }
+  return staged;
+}
+
 async function stageEastbrookBeds(page) {
   await page.waitForFunction(
     () => {

@@ -49,6 +49,33 @@ export interface AuthoredDecor {
   r?: number;
 }
 
+/**
+ * A parkour LEDGE: a standable shelf inside an authored interior.
+ *
+ * The castle interiors had no grabbable geometry at all, because
+ * authoredColliders only ever emitted full-height wall boxes and decor
+ * circles, so `supportHeightAt` answered -Infinity everywhere inside and
+ * both the vault and the ledge climb were inert. A ledge emits a box with a
+ * real `moveTopY` + `standable`, which is exactly what those two systems
+ * read (supportHeightAt routes interiors through
+ * bestStandableTop(interiorCollidersFor(...))).
+ *
+ * `top` is the shelf height ABOVE the room floor it sits in. Two bands are
+ * usable and the gap between them is not:
+ *   - VAULT, up to 1.68: jump apex 0.98 plus MANTLE_REACH 0.7
+ *   - CLIMB, 1.8 to 2.2: CLIMB_MIN_OVERHEAD up to LEDGE_GRAB_MAX
+ * A shelf between 1.68 and 1.8 can be neither jumped onto nor grabbed, so
+ * authoring one there is a dead end (tests/castle_ledges pins the bands).
+ */
+export interface AuthoredLedge {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  /** shelf height above the floor of the room it stands in */
+  top: number;
+}
+
 /** A wall run along one axis. `axis: 'x'` means the wall extends along x at a
  * constant z (= `fixed`), spanning [a, b]. */
 export interface WallSeg {
@@ -204,6 +231,7 @@ export function authoredColliders(
   doors: readonly AuthoredDoor[],
   decor: readonly AuthoredDecor[] = [],
   wallHw = 1,
+  ledges: readonly AuthoredLedge[] = [],
 ): Collider[] {
   const out: Collider[] = [];
   for (const s of authoredWallSegments(rooms, doors)) {
@@ -217,6 +245,21 @@ export function authoredColliders(
   }
   for (const d of decor) {
     if (d.r !== undefined && d.r > 0) out.push({ type: 'circle', x: d.x, z: d.z, r: d.r });
+  }
+  // Parkour shelves. `top` is authored above the room floor, so resolve it
+  // against the lift the ledge actually stands on and hand the engine an
+  // absolute surface, the same value supportHeightAt compares to.
+  for (const l of ledges) {
+    out.push({
+      type: 'obb',
+      x: l.x,
+      z: l.z,
+      hw: l.hw,
+      hd: l.hd,
+      rot: 0,
+      moveTopY: authoredLiftAt(rooms, doors, l.x, l.z) + l.top,
+      standable: true,
+    });
   }
   return out;
 }

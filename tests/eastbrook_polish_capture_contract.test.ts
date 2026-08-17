@@ -193,8 +193,11 @@ interface AttributionTargetFixture {
 // Re-minted for the sixteenth farming absorb (release/v0.39.0 tip merged into
 // the sync branch): both parents move renderer.ts again, so the merged tree
 // mints a value matching neither parent. No capture was retaken.
+// Re-minted for the seventeenth farming absorb (release/v0.39.0 tip
+// f48c7a3a9b, the castle and icon-art batch): both parents moved renderer.ts
+// again, so the composite matches neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'bbcfe52bf6cd3de9184b9594983981dafa1a59bc13def69fef424e0b75bc0f3d';
+  'acf784470a62c55e7ce27e528429f7bc78f4022dc431f1efe544cc9cae2830cc';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

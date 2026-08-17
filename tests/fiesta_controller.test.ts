@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const crestIconMocks = vi.hoisted(() => ({
@@ -206,11 +207,44 @@ describe('FiestaController', () => {
 
     const cards = test.augments.querySelectorAll<HTMLButtonElement>('.fa-card');
     expect(cards).toHaveLength(3);
+    expect(cards[0].querySelector<HTMLImageElement>('.fa-icon')?.src).toContain(
+      '/ui/fiesta/augments/aug_brutality.webp',
+    );
     cards[1].click();
     expect(test.arenaAugmentPick).toHaveBeenCalledWith('aug_toughness');
     expect(test.audio.click).toHaveBeenCalledTimes(1);
     expect(test.augments.style.display).toBe('none');
     expect(test.augments.innerHTML).toBe('');
+  });
+
+  it('keeps category art when an augment image is unknown or fails to decode', () => {
+    const test = harness();
+    test.fiesta.offer = {
+      tier: 'silver',
+      wave: 1,
+      choices: ['aug_brutality', 'future_augment', 'aug_keen_eye'],
+    };
+
+    test.controller.update();
+
+    const cards = test.augments.querySelectorAll<HTMLButtonElement>('.fa-card');
+    const primary = cards[0].querySelector<HTMLImageElement>('img.fa-icon');
+    expect(primary?.src).toContain('/ui/fiesta/augments/aug_brutality.webp');
+    primary?.dispatchEvent(new Event('error'));
+    expect(cards[0].querySelector('img.fa-icon')).toBeNull();
+    expect(cards[0].querySelector('.fa-icon svg')).not.toBeNull();
+    expect(cards[1].querySelector('img.fa-icon')).toBeNull();
+    expect(cards[1].querySelector('.fa-icon svg')).not.toBeNull();
+    expect(cards[1].querySelector('.fa-icon')?.classList.contains('cat-utility')).toBe(true);
+  });
+
+  it('keeps the touch offer inside a short zoomed landscape viewport', () => {
+    const css = readFileSync('src/styles/hud.mobile.css', 'utf8');
+    expect(css).toContain('body.mobile-touch #fiesta-augments {');
+    expect(css).toContain('top: calc(max(8px, env(safe-area-inset-top)) / var(--ui-scale, 1));');
+    expect(css).toContain('bottom: auto;');
+    expect(css).toContain('@media (max-height: 480px) and (orientation: landscape)');
+    expect(css).toContain('max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 16px);');
   });
 
   it('localizes each augment card aria-label through one composed t() key', () => {

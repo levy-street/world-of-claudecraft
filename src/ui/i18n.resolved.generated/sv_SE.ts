@@ -958,6 +958,22 @@ export const sv_SE: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",
@@ -3096,8 +3112,11 @@ export const sv_SE: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const sv_SE: EnTranslations = {
         "logging": "Skogsavverkning fäller timmer från trädbestånd över hela världen: järnbark i Östbäcksdalen, askved i Dykärrsträsket, högtall i Törntoppshöjderna och nybörjarbestånd i varje yngre zon, råvaran till skaft, stavar och ingenjörens bänk. Öppen för alla från nivå 1 med en skogsavverkningsyxa i väskorna (20 koppar vid diskarna i Östbäck, Fenbron och Högvakt), spårad på en egen räknare till ett tak på 100.",
         "herbalism": "Örtkunskap samlar det som växer vilt: skimmerblad i Östbäcksdalen, guldblad i Dykärrsträsket, solkronblad i Törntoppshöjderna och nybörjarfläckar i varje yngre zon, bladet och stjälken som håller apotekaryrkena kokande. Öppen för alla från nivå 1 med en örtinsamlingsskära i väskorna (20 koppar vid diskarna i Östbäck, Fenbron och Högvakt), spårad på en egen räknare till ett tak på 100.",
         "fishing": "Fiske är det udda inslaget bland insamlingsyrkena, och det djupaste: ett riktigt napp-och-indragning-minispel, egna fångsttabeller i var och en av kärnlandets tre zoner (de unga vattnen bortom dem serverar tills vidare alla Dalens tabell), och ett skicklighetstak på 200, dubbelt mot de andra. Köp ett metspö, vänd dig mot öppet vatten och kasta.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Insamlingsrytmen",
       "rhythmBody": "En skörd är en kort synlig kanalisering, inte ett omedelbart grepp: {base} sekunder i grunden, aldrig under ett golv på {floor} sekunder. Att bära ett verktyg över nodens nivå, ett som din skicklighet låter dig hantera, snabbar upp dig med {tool} sekunder per nivå över den, och varje skicklighetsband du passerar skalar bort ytterligare {band} sekunder; att bara matcha nodens nivå släpper in dig genom dörren, det är nivåerna över den som gör dig snabb.\n\nEn full väska avböjer artigt kanaliseringen innan den börjar, så inget går till spillo mitt i svingen, och varje skörd ger en liten skiva karaktärserfarenhet, skalad efter nodens nivå mot din egen på samma sätt som erfarenhet för dödade fiender skalas: en trivial grå nod lär en karaktär vid taket ingenting.",
@@ -5834,6 +5853,10 @@ export const sv_SE: EnTranslations = {
         "koiHeading": "Solglintens koi",
         "koiBody": "Varje vattendrag i spelet gömmer samma pris: Solglintens koi, en ovanlig glimt på linan värd 75 koppar hos en handlare och en hel del mer för din stolthet. Dess odds svarar mot ditt fångstband och ingenting annat, desamma i varje zon: en rad på 1 procent i fångsttabellen vid band 0, 3 vid band 1 och 6 vid band 2, dragen vid varje indraget kast, så koin kommer till den fiskare som förtjänat de djupa tabellerna. Att landa en registrerar Glimmer av hopp i din Bedrifternas bok, ett samlarmärke utan ryktbarhet. När det händer ser loggen till att du vet om det."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Hantverksekonomi",
         "intro": "Hur mynt rör sig genom handlarna: de exakta avgifterna och sänkorna, vad som faktiskt säljer, Världsmarknadens regler, arbetsordrar, bestellningar, och varfor tillverkad styrka stannar under raidgolvet.",
@@ -5856,7 +5879,7 @@ export const sv_SE: EnTranslations = {
         "marketHeading": "Världsmarknaden och dess andel",
         "marketBody": "Världsmarknaden är rikets täckande börs, skött av Köpmannen i Östbäck och Auktionist Voss i Highwatch. Listning är gratis: det finns ingen deposition, och en osåld listning kommer bara tillbaka till dig. Huset tar sin andel bara när något faktiskt säljer: 5 procent av försäljningspriset, och resten väntar på dig att hämta.\n\nEn viktig begränsning: Marknaden förmedlar bara vanliga varor. En signerad, mästerverk, förtrollad eller bunden kopia sveps aldrig in i en listning, så de speciella pjäserna byter händer ansikte mot ansikte i ett handelsfönster, som bär ett föremåls fullständiga identitet, signatur och allt. Prissätt dessa själv; Marknaden berättar bara vad den vanliga versionen inbringar.",
         "workOrdersHeading": "Arbetsordrar",
-        "workOrdersNote": "Varje stationsmästare lägger ut en stående arbetsorder: ta med en stapel av deras hantverks bastanta material och få betalt på fläcken, plus lite uppdragserfarenhet. Betalningen är avsiktligt {pct}% av vad en handlare skulle ge dig för samma stapel, avrundat nedåt, så en arbetsorder är aldrig det lönsamma sättet att sälja material, bara en anledning att svänga förbi stationen.\n\nVarje order rullar på sin egen {minutes} minuters klocka per karaktär: lämna in en och den mästaren har inget mer för dig tills timern löper om. Behandla dem som en liten bonus på material du ändå samlade, inte en affärsverksamhet.",
+        "workOrdersNote": "Varje stationsmästare lägger ut stående arbetsordrar, en per basmaterial: ta med den stapel en order ber om och få betalt på fläcken, plus lite uppdragserfarenhet. Betalningen är avsiktligt {pct}% av vad en handlare skulle ge dig för samma stapel, avrundat nedåt, så en arbetsorder är aldrig det lönsamma sättet att sälja material, bara en anledning att svänga förbi stationen.\n\nVarje order rullar på sin egen {minutes} minuters klocka per karaktär: lämna in en och den ordern är stängd för dig tills timern löper om, medan mästarens övriga ordrar förblir öppna. Behandla dem som en liten bonus på material du ändå samlade, inte en affärsverksamhet.",
         "colOrder": "Arbetsorder",
         "colMaster": "Mästare",
         "colAsks": "Begär",
@@ -12456,6 +12479,9 @@ export const sv_SE: EnTranslations = {
       "pristine_claw": {
         "name": "Orörd klo"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -14494,6 +14520,26 @@ export const sv_SE: EnTranslations = {
         "title": "Apotekerns mästare",
         "greeting": "Mät två gånger och häll en gång, {className}. Apotekaren har inget tålamod för utspillda reagenser."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidvattenväktare",
@@ -14508,6 +14554,19 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Malmåder skördad"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Viltkött levererat"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästet",
         "enterText": "Du kliver in i de kalla, tysta hallarna i Sista fästet.",
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",

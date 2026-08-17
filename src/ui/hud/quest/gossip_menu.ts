@@ -25,6 +25,10 @@ export interface GossipMenuContent {
   hasVcup: boolean;
   hasCardMaster: boolean;
   hasTraining: boolean;
+  /** A farmer NPC's husk-to-compost trade row (the farming go-live, gated on
+   *  the NpcDef farmer flag). Its own field so a farmer with no quest and no
+   *  stock still keeps the dialog open for the trade. */
+  hasFarmer: boolean;
 }
 
 export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
@@ -38,6 +42,7 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasDelveBoard &&
     !content.hasVcup &&
     !content.hasCardMaster &&
-    !content.hasTraining
+    !content.hasTraining &&
+    !content.hasFarmer
   );
 }

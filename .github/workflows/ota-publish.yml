@@ -144,10 +144,15 @@ jobs:
           # proves the whole chain, not just the upload; an offer WITHOUT the
           # embedded delta manifest means the entry list failed validation and
           # every device would silently take the full zip, so that fails too.
+          # The probe MUST send a delta-capable plugin_version: the server
+          # fail-safes the plugin gate (pluginSupportsDeltaManifest) to
+          # zip-only when the field is absent, so a probe without it reads a
+          # healthy delta channel as a validation failure (the 0.37.0 deploy
+          # false-alarmed on exactly this).
           for attempt in $(seq 1 12); do
             offer="$(curl -sS --max-time 30 -X POST https://worldofclaudecraft.com/api/ota/updates \
               -H 'content-type: application/json' \
-              -d '{"platform":"ios","version_name":"builtin","version_build":"0.0.1"}')"
+              -d '{"platform":"ios","version_name":"builtin","version_build":"0.0.1","plugin_version":"8.0.0"}')"
             offered="$(echo "${offer}" | jq -r '.version // empty')"
             if [ "${offered}" = "${VERSION}" ]; then
               entries="$(echo "${offer}" | jq -r '.manifest | length // 0')"

@@ -958,6 +958,22 @@ export const tr_TR: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "K",
       "NE": "KD",
@@ -3096,8 +3112,11 @@ export const tr_TR: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const tr_TR: EnTranslations = {
         "logging": "Odun Kesimi tüm dünyaya yayılmış ağaç kümelerinden kereste devirir: Doğudere Vadisi'nde demirkabuk, Mirefen Bataklığı'nda kül ağacı, Dikenzirve Tepeleri'nde yüksekçam ve her genç bölgede başlangıç kümeleri; saplar, asalar ve mühendisin tezgahı için ham stok. Çantanızda bir oduncu baltası varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
         "herbalism": "Bitkicilik yabanda yetişeni toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak, Dikenzirve Tepeleri'nde güneşyaprağı ve her genç bölgede başlangıç öbekleri; eczacılık mesleklerinin kazanını kaynatan yaprak ve sap. Çantanızda bir bitkicilik orağı varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
         "fishing": "Balıkçılık, toplama meslekleri arasında kuralın dışında kalanı ve en derinidir: gerçek bir ısır-ve-çek mini oyunu, üç ana bölgenin her birinde kendine ait av tabloları (bunların ötesindeki genç sular şimdilik hep Vadi'nin tablosunu sunar) ve diğerlerinin iki katı olan 200'lük bir yetkinlik tavanı. Bir olta alın, açık suya dönün ve oltayı atın.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Toplama ritmi",
       "rhythmBody": "Bir hasat, anında bir kapış değil kısa ve görünür bir toplama yayıdır: temelde {base} saniye, asla {floor} saniyelik tabanın altına inmez. Düğümün kademesinin üzerinde, yetkinliğinizin kullanmanıza izin verdiği bir alet taşımak sizi üstündeki her kademe için {tool} saniye hızlandırır ve geçtiğiniz her yetkinlik bandı {band} saniye daha kırpar; düğümün kademesini yalnızca tutturmak sizi kapıdan içeri sokar, hızlı yapan ise onun üzerindeki kademelerdir.\n\nDolu bir çanta, toplama yayını daha başlamadan kibarca reddeder, böylece darbenin ortasında hiçbir şey ziyan olmaz; ayrıca her hasat küçük bir dilim karakter XP'si öder, tıpkı öldürme XP'sinin ölçeklendiği gibi düğümün seviyesi sizinkine göre ölçeklenir: önemsiz, gri bir düğüm tavana ulaşmış bir karaktere hiçbir şey öğretmez.",
@@ -5834,6 +5853,10 @@ export const tr_TR: EnTranslations = {
         "koiHeading": "Günışıltısı Sazan",
         "koiBody": "Oyundaki her su kütlesi aynı ödülü saklar: Günışıltısı Sazan, misinada sıradan dışı bir parıltı, bir satıcıya 75 bakır, gururunuza ise epeyce fazlası değerinde. Olasılığı yalnızca av bandınıza yanıt verir, başka hiçbir şeye; her bölgede aynıdır: av tablosunda bant 0'da yüzde 1'lik bir satır, bant 1'de 3, bant 2'de 6; ve çekilen her atışta çekiliş yapılır, yani sazan derin tabloları hak etmiş balıkçıya gelir. Bir tane yakalamak Yiğitlikler Kitabınıza Umut Işıltısı'nı yazar, sıfır Ün'lü bir koleksiyoncu işareti. Gerçekleştiğinde kayıt bunu bilmenizi sağlar."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Zanaat Ekonomisi",
         "intro": "Altın meslekler arasında nasıl akar: tam ücretler ve rezervler, gerçekte ne satar, Dünya Pazarı kuralları, iş emirleri, komisyonlar ve zanaatla yapılan gücün neden baskın tabanının altında kaldığı.",
@@ -5856,7 +5879,7 @@ export const tr_TR: EnTranslations = {
         "marketHeading": "Dünya Pazarı ve komisyonu",
         "marketBody": "Dünya Pazarı, Doğudere'deki Tüccar ve Highwatch'taki Müzayedeci Voss tarafından yönetilen diyar genelindeki borsadır. İlan ücretsizdir: depozito yoktur ve satılmayan ilan size geri gelir. Ev payını yalnızca bir şey gerçekten satıldığında alır: satış fiyatının yüzde 5'i, gerisi de toplamanızı bekler.\n\nÖnemli bir sınır: Pazar yalnızca düz ürünlere aracılık eder. İmzalı, şaheser, büyülü veya bağlı bir kopya asla bir ilana dahil edilmez, bu nedenle özel parçalar yüz yüze bir ticaret penceresinde el değiştirir; bu pencere imzası dahil bir eşyanın tam kimliğini taşır. Bunları kendiniz fiyatlandırın; Pazar yalnızca düz versiyonun ne getirdiğini söyler.",
         "workOrdersHeading": "İş emirleri",
-        "workOrdersNote": "Her tezgah ustası sürekli bir iş emri verir: zanaatnın temel malzemesinden bir yığın getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o usta timer'ı dönene kadar sizin için başka bir şeyi yoktur. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
+        "workOrdersNote": "Her tezgah ustası sürekli iş emirleri verir, her temel malzeme için bir tane: bir emrin istediği yığını getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o emir sayaç dönene kadar size kapalı kalır, ustanın diğer emirleri ise açık kalır. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
         "colOrder": "İş emri",
         "colMaster": "Usta",
         "colAsks": "Talep fiyatı",
@@ -12456,6 +12479,9 @@ export const tr_TR: EnTranslations = {
       "pristine_claw": {
         "name": "Kusursuz Pençe"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -14494,6 +14520,26 @@ export const tr_TR: EnTranslations = {
         "title": "Eczacı Ustası",
         "greeting": "İki kez ölçün ve bir kez dökün, {className}. Eczacının dökülen reaktiflere karşı sabrı yoktur."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Gelgit Gözcüsü",
@@ -14508,6 +14554,19 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Maden damarı işlendi"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Av Eti teslim edildi"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const tr_TR: EnTranslations = {
         "name": "Son Kale",
         "enterText": "Son Kale'nin soğuk, sessiz koridorlarına adım atıyorsun.",
         "leaveText": "Kale kapısını arkandan kapatıp Ejder Topraklarının rüzgarına geri dönüyorsun."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",

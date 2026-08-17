@@ -29,6 +29,11 @@ import { setItemLocked } from '../src/sim/item_lock';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import type { PlotState } from '../src/sim/professions/farm_projection';
 import {
+  FARMER_TRADE_RANGE,
+  isFarmerNpcEntity,
+  nearFarmerNpc,
+} from '../src/sim/professions/farmer_npcs';
+import {
   canPlantCrop,
   convertHusks,
   FARM_COMPOST_ITEM_ID,
@@ -68,7 +73,15 @@ import {
 } from '../src/sim/professions/tools';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
-import { DT, FARMING_CAST_ID, isNonSpellCast, type SimEvent } from '../src/sim/types';
+import {
+  DT,
+  dist2d,
+  type Entity,
+  FARMING_CAST_ID,
+  INTERACT_RANGE,
+  isNonSpellCast,
+  type SimEvent,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const CROP_ID = 'vale_wheat';
@@ -141,6 +154,35 @@ function standAtBed(sim: Sim, bedId: string): void {
   p.pos.z = bed.z;
   p.pos.y = terrainHeight(bed.x, bed.z, sim.cfg.seed);
   p.prevPos = { ...p.pos };
+}
+
+/** The spawned entity of an NPC template (a farmer for the husk trade's
+ *  range gate, or any other NPC for its negative arm). */
+function npcEntity(sim: Sim, templateId: string): Entity {
+  const entity = [...sim.entities.values()].find(
+    (e) => e.kind === 'npc' && e.templateId === templateId,
+  );
+  if (!entity) throw new Error(`no such npc: ${templateId}`);
+  return entity;
+}
+
+/** Stand the harness farmer `offset` yd from an NPC (default: one step from
+ *  farmer_jessica, the tier-1 farmer, well inside FARMER_TRADE_RANGE). The
+ *  husk trade gates on a farmer NPC in reach (the go-live), so every arm about
+ *  the trade itself stands here rather than at a bed. */
+function standByNpc(sim: Sim, templateId = 'farmer_jessica', offset = 1): void {
+  const npc = npcEntity(sim, templateId);
+  const p = sim.player;
+  p.pos.x = npc.pos.x + offset;
+  p.pos.z = npc.pos.z;
+  p.pos.y = terrainHeight(p.pos.x, p.pos.z, sim.cfg.seed);
+  p.prevPos = { ...p.pos };
+}
+
+/** Every spawned farmer NPC (the flag walk, so a fifth farmer joins the arms
+ *  below without an id list here). */
+function farmerEntities(sim: Sim): Entity[] {
+  return [...sim.entities.values()].filter((e) => isFarmerNpcEntity(e));
 }
 
 function giveSeeds(h: Harness, n = 1): void {
@@ -2367,6 +2409,10 @@ describe('convertHusks: the husk trade, draw-free on every path', () => {
   let h: Harness;
   beforeEach(() => {
     h = makeHarness();
+    // The trade gates on a farmer NPC in reach (the go-live), so the arms
+    // about the trade itself stand beside the tier-1 farmer; the range gate
+    // has its own describe below.
+    standByNpc(h.sim);
   });
 
   function convert(): void {
@@ -2444,18 +2490,185 @@ describe('convertHusks: the husk trade, draw-free on every path', () => {
     expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
   });
 
-  it('needs no bed, no range and no cast: the location gate is the documented Phase 9 deferral', () => {
-    // The permissive gate, exercised rather than assumed: standing nowhere
-    // near a farm, mid-cast, the trade still lands. The go-live phase adds
-    // the farmer-NPC range arm and flips this arm with it.
-    h.sim.player.pos.x += 500;
-    h.sim.player.pos.z += 500;
+  it('needs no bed and no cast: beside the farmer, mid-cast, the trade lands', () => {
+    // The go-live kept the no-busy-gate rationale: standing beside the farmer
+    // (nowhere near a bed's working reach), mid-cast, the trade still lands.
+    // The bed-free half of the old permissive arm; the LOCATION half flipped
+    // into the range describe below.
     giveSeeds(h);
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
     h.sim.player.castingAbility = FARMING_CAST_ID;
     h.sim.player.castRemaining = 1;
+    for (const bedId of FARM_BED_IDS) {
+      const bed = farmBedById(bedId);
+      if (!bed) throw new Error(bedId);
+      expect(Math.hypot(h.sim.player.pos.x - bed.x, h.sim.player.pos.z - bed.z)).toBeGreaterThan(
+        INTERACT_RANGE,
+      );
+    }
     convert();
     expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+});
+
+describe('convertHusks: the farmer-NPC range gate (the go-live)', () => {
+  let h: Harness;
+  beforeEach(() => {
+    h = makeHarness();
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+  });
+
+  function convert(): void {
+    convertHusks(h.sim.ctx, h.sim.player, h.meta);
+  }
+
+  it('pins the trade reach to its literal: 7, the buyItem and banker reach', () => {
+    // The wire-name-constant rule: one literal pin, then the relation to the
+    // reach it copies (INTERACT_RANGE + 2 is what buyItem and nearBanker use).
+    expect(FARMER_TRADE_RANGE).toBe(7);
+    expect(FARMER_TRADE_RANGE).toBe(INTERACT_RANGE + 2);
+  });
+
+  it('beside farmer_jessica with a batch of husks: compost granted, husks spent, one event', () => {
+    standByNpc(h.sim);
+    expect(nearFarmerNpc(h.sim.ctx, h.sim.player)).toBe(true);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => convert())).toBe(0);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(0);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([
+      { type: 'farmHusksConverted', pid: h.pid, husks: FARM_HUSKS_PER_COMPOST, compost: 1 },
+    ]);
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([]);
+  });
+
+  it('20 yd from every farmer: farmDenied no_farmer, nothing spent, no compost, zero draws', () => {
+    // Nowhere near a farmer, at the harness bed (the tier-1 patch is BESIDE
+    // the farmer, not on top of her: the bed a player works is not the
+    // counter). Then further still, so the claim is about every farmer.
+    h.sim.player.pos.x += 500;
+    h.sim.player.pos.z += 500;
+    const farmers = farmerEntities(h.sim);
+    expect(farmers.length).toBe(4);
+    for (const farmer of farmers) {
+      expect(dist2d(h.sim.player.pos, farmer.pos), farmer.templateId).toBeGreaterThan(20);
+    }
+    expect(nearFarmerNpc(h.sim.ctx, h.sim.player)).toBe(false);
+    const from = h.sim.events.length;
+    expect(countDraws(h.sim, () => convert())).toBe(0);
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([
+      { type: 'farmDenied', pid: h.pid, reason: 'no_farmer' },
+    ]);
+    expect(eventsOf(h.sim, from, 'farmHusksConverted')).toEqual([]);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_HUSKS_PER_COMPOST);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+  });
+
+  it('is inclusive at the boundary and refuses one step beyond it', () => {
+    // Exactly FARMER_TRADE_RANGE away trades (the <= arm, like nearBanker);
+    // a hair past it does not. Both arms on the SAME bags, so the boundary
+    // is the only thing that moved.
+    const jessica = npcEntity(h.sim, 'farmer_jessica');
+    h.sim.player.pos.x = jessica.pos.x + FARMER_TRADE_RANGE + 0.01;
+    h.sim.player.pos.z = jessica.pos.z;
+    h.sim.player.prevPos = { ...h.sim.player.pos };
+    let from = h.sim.events.length;
+    convert();
+    expect(eventsOf(h.sim, from, 'farmDenied').map((e) => e.reason)).toEqual(['no_farmer']);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+    h.sim.player.pos.x = jessica.pos.x + FARMER_TRADE_RANGE;
+    h.sim.player.prevPos = { ...h.sim.player.pos };
+    from = h.sim.events.length;
+    convert();
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([]);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+
+  it('answers the range gate BEFORE the batch arithmetic: far away with no husks is still no_farmer', () => {
+    // The stated gate order: a far-away sender learns the real reason, never
+    // a phantom shortage.
+    h.sim.removeItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    h.sim.player.pos.x += 500;
+    const from = h.sim.events.length;
+    convert();
+    expect(eventsOf(h.sim, from, 'farmDenied').map((e) => e.reason)).toEqual(['no_farmer']);
+    // And beside the farmer the same empty bags answer no_husks: the shortage
+    // arm is reachable only at the counter.
+    standByNpc(h.sim);
+    const from2 = h.sim.events.length;
+    convert();
+    expect(eventsOf(h.sim, from2, 'farmDenied').map((e) => e.reason)).toEqual(['no_husks']);
+  });
+
+  it('trades at EVERY farmer, resolved by the flag: all four hubs, no id list', () => {
+    for (const farmer of farmerEntities(h.sim)) {
+      const hf = makeHarness();
+      hf.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, hf.pid);
+      standByNpc(hf.sim, farmer.templateId);
+      convertHusks(hf.sim.ctx, hf.sim.player, hf.meta);
+      expect(hf.sim.countItem(FARM_COMPOST_ITEM_ID, hf.pid), farmer.templateId).toBe(1);
+    }
+    // The walk really covered the four go-live farmers.
+    expect(
+      farmerEntities(h.sim)
+        .map((e) => e.templateId)
+        .sort(),
+    ).toEqual(['farmer_hollis', 'farmer_jessica', 'farmer_teasel', 'farmer_verbena']);
+  });
+
+  it('a non-farmer NPC in reach does not count: beside the cook it is no_farmer', () => {
+    // The flag, not "any NPC": a vendor without the farmer flag is no counter
+    // for husks, and a player at the wrong stall learns so.
+    standByNpc(h.sim, 'cook_marlow');
+    expect(nearFarmerNpc(h.sim.ctx, h.sim.player)).toBe(false);
+    const from = h.sim.events.length;
+    convert();
+    expect(eventsOf(h.sim, from, 'farmDenied').map((e) => e.reason)).toEqual(['no_farmer']);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_HUSKS_PER_COMPOST);
+  });
+
+  it('the DEAD arm still refuses first, near a farmer or far from every one', () => {
+    // Dead beside the farmer: the shared dead line, no farmDenied at all.
+    standByNpc(h.sim);
+    h.sim.player.dead = true;
+    let from = h.sim.events.length;
+    convert();
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([]);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_HUSKS_PER_COMPOST);
+    // Dead and far: still the dead line, never no_farmer (the dead check is
+    // the first gate).
+    h.sim.player.pos.x += 500;
+    from = h.sim.events.length;
+    convert();
+    expect(eventsOf(h.sim, from, 'farmDenied')).toEqual([]);
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(0);
+    // Anti-vacuous: alive again beside the farmer, the same bags convert.
+    h.sim.player.dead = false;
+    standByNpc(h.sim);
+    convert();
+    expect(h.sim.countItem(FARM_COMPOST_ITEM_ID, h.pid)).toBe(1);
+  });
+
+  it('D9: the watch fee is a plant-time bag payment, paid at the bed far from every farmer', () => {
+    // The gate is the HUSK TRADE's alone. Planting with the watch knob at the
+    // harness bed, with no farmer in reach, succeeds and spends the fee.
+    const hp = makeHarness();
+    expect(nearFarmerNpc(hp.sim.ctx, hp.sim.player)).toBe(false);
+    for (const farmer of farmerEntities(hp.sim)) {
+      expect(dist2d(hp.sim.player.pos, farmer.pos), farmer.templateId).toBeGreaterThan(
+        FARMER_TRADE_RANGE,
+      );
+    }
+    hp.sim.addItem(SEED_ID, 1, hp.pid);
+    hp.sim.addItem(PRODUCE_ID, 3, hp.pid);
+    const from = hp.sim.events.length;
+    plantCrop(hp.sim.ctx, hp.sim.player, hp.meta, BED, CROP_ID, { watch: true });
+    expect(eventsOf(hp.sim, from, 'farmDenied')).toEqual([]);
+    expect(eventsOf(hp.sim, from, 'farmPlanted')).toHaveLength(1);
+    expect((hp.meta.farmPlots.get(BED) as PlotState).watch).toBe(true);
+    // Tier-1 fee is 2 produce (farm_watch_fee.ts): 3 in, 1 left.
+    expect(hp.sim.countItem(PRODUCE_ID, hp.pid)).toBe(1);
+    expect(hp.sim.countItem(SEED_ID, hp.pid)).toBe(0);
   });
 });
 
@@ -2748,6 +2961,7 @@ describe('the Sim delegates', () => {
 
   it('forwards convertHusks, and no-ops on an unknown pid', () => {
     const h = makeHarness();
+    standByNpc(h.sim);
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
     // The unknown pid FIRST, while the husks are still in the bags: after the
     // real call there is nothing left to convert, so ordering it second would
@@ -2895,6 +3109,7 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
 
   it('locked husks join neither the batch count nor the spend', () => {
     const h = makeHarness();
+    standByNpc(h.sim);
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, 2 * FARM_HUSKS_PER_COMPOST, h.pid);
     for (let i = 0; i < FARM_HUSKS_PER_COMPOST; i++) {
       lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);
@@ -2911,6 +3126,7 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
 
   it('all-locked husks refuse the trade as locked with the husks kept', () => {
     const h = makeHarness();
+    standByNpc(h.sim);
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
     for (let i = 0; i < FARM_HUSKS_PER_COMPOST; i++) {
       lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);

@@ -763,7 +763,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // Professions 2.0: the Apothecary pair's (alchemy + cooking) anchor
     // master. Attunement, make-amends return, and the repeatable kitchens work
     // order live here.
-    questIds: ['q_prof_attune_apothecary', 'q_prof_amends_apothecary', 'q_prof_workorder_kitchens'],
+    questIds: [
+      'q_prof_attune_apothecary',
+      'q_prof_amends_apothecary',
+      'q_prof_workorder_kitchens',
+      'q_prof_workorder_kitchens_wheat',
+      'q_prof_workorder_kitchens_rice',
+    ],
     vendorItems: [
       'baked_bread',
       'spring_water',
@@ -820,6 +826,35 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },
+  // The farming go-live: the tier-1 farmer, the face of the Eastbrook
+  // allotments (content/farm_patches.ts patch_eastbrook) and the front door
+  // of the profession (q_farm_intro). She stands OUTSIDE the town wall on the
+  // lane side of the beds (the north-east lane passes 5 yd off her shoulder),
+  // so like groundskeeper_bram she carries an INLINE pos rather than an
+  // eastbrook_layout row: the layout is the town's placement table and she is
+  // not a town NPC. Facing the beds (atan2(dx, dz) toward the patch anchor:
+  // -x from where she stands). Her stock is the D9/D11 opening counter:
+  // tier-1 seeds, the one vendor-priced produce (brook_carrot, the starter
+  // watch fee), compost, and the rung-one hoe; tier 3/4 seeds and the crafted
+  // hoes are stocked NOWHERE (tests/professions_zone_rollout.test.ts). Her
+  // placement (never nudged by findSafePos, beside the beds, off the road,
+  // in her zone) is pinned by tests/farmer_npc_placement.test.ts.
+  farmer_jessica: {
+    id: 'farmer_jessica',
+    name: 'Farmer Jessica',
+    title: 'Allotment Keeper',
+    pos: { x: 24.5, z: 32.5 },
+    facing: -Math.PI / 2,
+    color: 0xa8843a,
+    questIds: ['q_farm_intro'],
+    vendorItems: ['vale_wheat_seed', 'brook_carrot_seed', 'brook_carrot', 'compost', 'garden_hoe'],
+    farmer: true,
+    // The two teaching sentences below are pinned VERBATIM (the go-live
+    // greeting arm): the anti-chore promise, and the pointer to the Harvest
+    // Journal, the one durable surface that shows every planted bed's timer.
+    greeting:
+      'Good soil and fair weather, $N. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -860,6 +895,60 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     // found that out). questFallbackGrants hands the pick over on accept and
     // re-grants it if it is ever lost, exactly like a prerequisite quest item.
     requiredItems: ['copper_mining_pick'],
+  },
+  // Farming onboarding (the farming go-live, D20): the profession's front
+  // door, on the q_prof_intro template. Two ACTION objectives on the farm
+  // arm of the objective union (plant one Vale Wheat in the Eastbrook patch,
+  // then harvest it), credited by the plant and harvest commands themselves
+  // (quests/quest_credit.ts): inventory ownership cannot prove a harvest,
+  // since produce also arrives from the market and work-order pouches. No
+  // minLevel and no prerequisite: like q_prof_intro it is a level-1 entry
+  // point at its own NPC. Fallback grants: the rung-one hoe (the step-12
+  // hoe gate refuses a bare-handed plant) and ONE seed, so a day-one
+  // character with zero copper is never dead-ended at the first bed. NOTE
+  // the seed is CONSUMED by planting, and requiredItems re-grants on every
+  // giver talk while the quest is ACTIVE, so this is a small free-seed
+  // faucet: one 4-copper seed per talk, bounded by the beds a player can
+  // hold planted before the first harvest turns the quest ready (the
+  // re-grant runs for active quests only, never once ready or done). The
+  // seed itself is fenced (noVendorSell, noMarketList: no vendor, market,
+  // mail, or guild-bank cash-out), so the faucet feeds beds, not coin;
+  // face-to-face trade is the one exchange pipe that does not read those
+  // flags (a cooperative pair can pass free seeds), ledgered for the
+  // maintainer in docs/farming/state.md. Accepted at go-live.
+  q_farm_intro: {
+    id: 'q_farm_intro',
+    name: 'First Furrow',
+    giverNpcId: 'farmer_jessica',
+    turnInNpcId: 'farmer_jessica',
+    text: 'Take this hoe and a pinch of vale wheat seed, $N. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.',
+    // The two teaching sentences are pinned VERBATIM by
+    // tests/farm_intro_quest_content.test.ts (the D20 magic sentence and the
+    // Harvest Journal pointer, the same two Jessica's greeting carries).
+    completionText:
+      'There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, $N.',
+    objectives: [
+      {
+        type: 'farm',
+        action: 'plant',
+        cropId: 'vale_wheat',
+        patchId: 'patch_eastbrook',
+        count: 1,
+        label: 'Vale Wheat planted',
+      },
+      {
+        type: 'farm',
+        action: 'harvest',
+        cropId: 'vale_wheat',
+        patchId: 'patch_eastbrook',
+        count: 1,
+        label: 'Vale Wheat harvested',
+      },
+    ],
+    xpReward: 150,
+    copperReward: 50,
+    itemRewards: {},
+    requiredItems: ['garden_hoe', 'vale_wheat_seed'],
   },
   q_wolves: {
     id: 'q_wolves',
@@ -1415,6 +1504,49 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     shareable: false,
     repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
   },
+  // Farming go-live: the kitchens take the two early-tier crops off a
+  // farmer's hands on the same work-order contract (fungible produce only:
+  // farming's fine twins have no downward grade substitution, so a Fine Vale
+  // Wheat never fills a plain-wheat order). Two rows, one per early tier, so
+  // both the Eastbrook and the Fenbridge beds have a coin sink from day one.
+  q_prof_workorder_kitchens_wheat: {
+    id: 'q_prof_workorder_kitchens_wheat',
+    name: 'Kitchens Wheat Order',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'Bread does not bake itself, $N, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.',
+    completionText:
+      'Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.',
+    objectives: [
+      { type: 'collect', itemId: 'vale_wheat', count: 8, label: 'Vale Wheat delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 8 * 4) = 16 (vale_wheat sellValue 4).
+    copperReward: 16,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
+  q_prof_workorder_kitchens_rice: {
+    id: 'q_prof_workorder_kitchens_rice',
+    name: 'Kitchens Rice Order',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'The marsh folk swear by their rice, $N, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.',
+    completionText:
+      'Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.',
+    objectives: [
+      { type: 'collect', itemId: 'marsh_rice', count: 5, label: 'Marsh Rice delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 5 * 8) = 20 (marsh_rice sellValue 8).
+    copperReward: 20,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
   q_prof_workorder_loom: {
     id: 'q_prof_workorder_loom',
     name: 'Loom Work Order',
@@ -1490,6 +1622,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
 
 export const ZONE1_QUEST_ORDER = [
   'q_prof_intro',
+  'q_farm_intro',
   'q_wolves',
   'q_boars',
   'q_spiders',
@@ -1519,6 +1652,8 @@ export const ZONE1_QUEST_ORDER = [
   'q_prof_amends_bombardier',
   'q_prof_workorder_forge',
   'q_prof_workorder_kitchens',
+  'q_prof_workorder_kitchens_wheat',
+  'q_prof_workorder_kitchens_rice',
   'q_prof_workorder_loom',
   'q_prof_workorder_toolworks',
   'q_prof_hobby_switch',

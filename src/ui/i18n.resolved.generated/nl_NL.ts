@@ -958,6 +958,22 @@ export const nl_NL: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NO",
@@ -3096,8 +3112,11 @@ export const nl_NL: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const nl_NL: EnTranslations = {
         "logging": "Houtkap velt hout uit houtopstanden over de hele wereld: ijzerschors in Oostbeekdal, essenhout in Slijkveenmoeras, hoogden in Doorntop-Hoogten, en startopstanden in elke jongere zone, de ruwe voorraad voor stelen, staven en de werkbank van de knutselaar. Vanaf niveau 1 voor iedereen open met een kapbijl in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
         "herbalism": "Kruidenkunde verzamelt wat in het wild groeit: glansloofkruid in Oostbeekdal, goudblad in Slijkveenmoeras, zonnebloem in Doorntop-Hoogten, en startvelden in elke jongere zone, het blad en de stengel die de apothekersvakken aan het brouwen houden. Vanaf niveau 1 voor iedereen open met een kruidenkunde-sikkel in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
         "fishing": "Vissen is de vreemde eend onder de verzamelvakken, en het diepste: een echt aanslaan-en-inhalen-minispel, eigen vangsttabellen in elk van de drie kernlandzones (de jonge wateren daarbuiten bedienen voorlopig allemaal de tabel van het Dal), en een vaardigheidsgrens van 200, het dubbele van de rest. Koop een hengel, keer je naar open water, en werp uit.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Het verzamelritme",
       "rhythmBody": "Een oogst is een korte zichtbare worp, geen directe greep: {base} seconden basis, nooit onder een ondergrens van {floor} seconde. Gereedschap dragen boven de rang van het grondstoffenpunt, dat je vaardigheid je laat hanteren, versnelt je met {tool} seconde per rang daarboven, en elke vaardigheidsband die je passeert knipt er nog {band} seconde af; de rang van het grondstoffenpunt alleen maar evenaren brengt je door de deur, het zijn de rangen daarboven die je snel maken.\n\nEen volle tas weigert de worp beleefd voordat die begint, zodat er niets halverwege de zwaai verloren gaat, en elke oogst betaalt een klein plakje personage-XP, geschaald naar het niveau van het grondstoffenpunt tegenover het jouwe zoals kill-XP schaalt: een triviaal grijs grondstoffenpunt leert een afgetopt personage niets.",
@@ -5834,6 +5853,10 @@ export const nl_NL: EnTranslations = {
         "koiHeading": "De Zonglinstering-Koi",
         "koiBody": "Elk water in het spel verbergt dezelfde prijs: de Zonglinstering-Koi, een ongewone glans aan de lijn die 75 koper waard is bij een handelaar en aanzienlijk meer voor je trots. Zijn kansen antwoorden op je vangstband en op niets anders, in elke zone hetzelfde: een rij van 1 procent van de vangsttabel op band 0, 3 op band 1 en 6 op band 2, getrokken bij elke binnengehaalde worp, dus de koi komt naar de hengelaar die de diepe tabellen heeft verdiend. Er een landen legt Glinstering van Hoop vast in je Boek der Daden, een verzamelaarsmerk zonder Roem. Wanneer het gebeurt, zorgt het logboek ervoor dat je het weet."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Ambachteconomie",
         "intro": "Hoe munt door de ambachten stroomt: de exacte vergoedingen en afvoerputten, wat er werkelijk verkoopt, de regels van de Wereldmarkt, werkopdrachten, opdrachten, en waarom ambachtskracht stopt onder de raidgrens.",
@@ -5856,7 +5879,7 @@ export const nl_NL: EnTranslations = {
         "marketHeading": "De Wereldmarkt en zijn korting",
         "marketBody": "De Wereldmarkt is de rijksbrede beurs, beheerd door de Koopman in Oostbeek en Veilingmeester Voss in Highwatch. Plaatsen is gratis: er is geen deposito, en een onverkochte plaatsing komt gewoon terug bij je. Het huis neemt zijn deel alleen wanneer iets daadwerkelijk verkoopt: 5 procent van de verkoopprijs, en de rest wacht tot je het ophaalt.\n\nEén belangrijke beperking: de Markt bemiddelt alleen in gewone goederen. Een gesigneerde, meesterwerk-, betoverde of gebonden kopie wordt nooit in een plaatsing meegenomen, dus de bijzondere stukken wisselen van eigenaar van aangezicht tot aangezicht in een ruilvenster, dat de volledige identiteit van een voorwerp draagt, handtekening en al. Prijs die zelf in; de Markt vertelt je alleen wat de gewone versie opbrengt.",
         "workOrdersHeading": "Werkopdrachten",
-        "workOrdersNote": "Elke stationsmeester plaatst een vaste werkopdracht: breng een stapel van het basismateriaal van zijn ambacht en word ter plekke betaald, plus een beetje questvervaring. De betaling is bewust {pct}% van wat een handelaar je zou geven voor dezelfde stapel, naar beneden afgerond, dus een werkopdracht is nooit de winstgevende manier om materialen te verkopen, alleen een reden om langs het station te rijden.\n\nElke opdracht loopt op zijn eigen {minutes} minuten klok per personage: lever er een in en die meester heeft niets meer voor je totdat de timer zijn ronde heeft gedaan. Behandel ze als een kleine bonus op materialen die je toch al aan het verzamelen was, niet als een bedrijf.",
+        "workOrdersNote": "Elke stationsmeester plaatst vaste werkopdrachten, een per basismateriaal: breng de stapel waar een opdracht om vraagt en word ter plekke betaald, plus een beetje questvervaring. De betaling is bewust {pct}% van wat een handelaar je zou geven voor dezelfde stapel, naar beneden afgerond, dus een werkopdracht is nooit de winstgevende manier om materialen te verkopen, alleen een reden om langs het station te rijden.\n\nElke opdracht loopt op zijn eigen {minutes} minuten klok per personage: lever er een in en die opdracht is voor je gesloten totdat de timer zijn ronde heeft gedaan, terwijl de andere opdrachten van de meester open blijven. Behandel ze als een kleine bonus op materialen die je toch al aan het verzamelen was, niet als een bedrijf.",
         "colOrder": "Werkopdracht",
         "colMaster": "Meester",
         "colAsks": "Vraagt voor",
@@ -12456,6 +12479,9 @@ export const nl_NL: EnTranslations = {
       "pristine_claw": {
         "name": "Ongerepte Klauw"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -14494,6 +14520,26 @@ export const nl_NL: EnTranslations = {
         "title": "Meester van de apotheek",
         "greeting": "Meet twee keer en giet één keer, {className}. De apotheker heeft geen geduld voor gemorste reagentia."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tijwachter",
@@ -14508,6 +14554,19 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ertsslagader geoogst"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wildvlees afgeleverd"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const nl_NL: EnTranslations = {
         "name": "De Laatste Burcht",
         "enterText": "Je stapt de koude, stille hallen van de Laatste Burcht binnen.",
         "leaveText": "Je trekt de burchtdeur dicht en stapt terug de wind van de Drakenlanden in."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "De Verdronken Tempel",

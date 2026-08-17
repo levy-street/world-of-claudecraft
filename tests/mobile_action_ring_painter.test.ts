@@ -285,6 +285,7 @@ describe('MobileActionRingPainter: cooldown/empty rendering parity with the desk
       args: [els[1].label, 'background-image', 'URL(ability:fireball)'],
     });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[1].btn, 'empty', false] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [els[1].btn, 'ability', true] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[0].btn, 'empty', false] });
   });
 });

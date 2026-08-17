@@ -9,6 +9,7 @@
 // mirror produce identical output, and (unlike world.entities) none of it is
 // interest-radius limited: a camp or quest giver far across the zone still resolves.
 
+import { FARM_PATCHES } from './content/farm_patches';
 import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import { nodeMaterialFor } from './professions/gathering';
 import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
@@ -360,6 +361,21 @@ export function questObjectiveAreas(
   const pushYieldClusters = (ref: QuestObjectiveRef, itemId: string): void => {
     for (const group of nodeYieldClusters(itemId)) pushEnclosing(ref, group);
   };
+  // One enclosing circle per farming patch for a farm objective: the patch
+  // the objective names by patchId, else EVERY patch, because the credit arm
+  // (quests/quest_credit.ts onCropFarmedForQuests) never reads patchId, so a
+  // patchless objective is honestly earned at any bed in the world. Beds are
+  // static content like GATHER_NODES (no entity id to resolve).
+  const pushFarmPatches = (ref: QuestObjectiveRef, patchId: string | undefined): void => {
+    for (const patch of FARM_PATCHES) {
+      if (patchId !== undefined && patch.id !== patchId) continue;
+      // fresh {x,z}: never alias the deep-frozen FARM_PATCHES content
+      pushEnclosing(
+        ref,
+        patch.beds.map((bed) => ({ x: bed.x, z: bed.z })),
+      );
+    }
+  };
   for (const { questId, objectiveIndex, obj } of incompleteObjectives(questLog)) {
     const ref: QuestObjectiveRef = { questId, objectiveIndex };
     if (obj.type === 'kill' && obj.targetMobId) pushMobCamps(ref, obj.targetMobId);
@@ -389,6 +405,8 @@ export function questObjectiveAreas(
       // The escort begins where the idle escortee stands (its def start point).
       const escort = ESCORTS[obj.escortId];
       if (escort) push(ref, { x: escort.start.x, z: escort.start.z }, POINT_AREA_RADIUS);
+    } else if (obj.type === 'farm') {
+      pushFarmPatches(ref, obj.patchId);
     }
   }
   return out;

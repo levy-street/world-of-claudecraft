@@ -1054,6 +1054,14 @@ export const VOICE_ALIAS = {
   // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
   // greeting carries, once an ElevenLabs key is available to design and render it.
   warmarshal_draven_kole: 'fury',
+  // The four farmer NPCs (the farming go-live) borrow ROLE-MATCHED designed
+  // voices for now, the Draven Kole precedent: each has its own description
+  // in docs/design/npc_voices.md and is promoted to its own VOICE_PROMPTS
+  // entry once an ElevenLabs key is available to design and render it.
+  farmer_jessica: 'provisioner_fenna',
+  farmer_teasel: 'trapper_brosk',
+  farmer_hollis: 'groundskeeper_bram',
+  farmer_verbena: 'orchardist_pomeline',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

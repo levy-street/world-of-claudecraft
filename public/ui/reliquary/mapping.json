@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "family": "reliquary",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "iconSize": 128,
+  "runtimeDir": "public/ui/reliquary",
+  "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json",
+  "assets": [
+    {
+      "id": "perfect_specimen",
+      "runtimeIdentity": "gather_event:perfect_specimen",
+      "name": "Perfect Specimen",
+      "output": "perfect_specimen.webp",
+      "url": "/ui/reliquary/perfect_specimen.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/reliquary-perfect-specimen/raw/perfect_specimen.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A corked glass field-specimen vial holding one pristine ivory monster claw in luminous cyan preservative.",
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: transparent-background painted MMORPG profession/reliquary icon",
+        "Primary request: create one fresh, original Perfect Specimen trophy icon for World of ClaudeCraft, matching the supplied profession icons' tactile hand-painted fantasy style and strong tiny-size silhouette.",
+        "Canonical mechanic: a rare perfect biological specimen recovered while harvesting a defeated creature, preserved as a prized Reliquary field note.",
+        "Input images: Image 1 is the material and glass-painting reference from Alchemy; Image 2 is the transparent cutout, contour, and botanical massing reference; Image 3 is the compact centered silhouette and warm-metal finish reference. Do not copy their exact objects.",
+        "Subject: one complete squat apothecary specimen vial with a dark cork and brass neck clasp, filled with luminous cold cyan preservative. Suspended inside is one unmistakable small ivory monster claw with a single emerald vein, pristine and intact. Thick reflective glass, tactile cork, and a compact trophy-like silhouette.",
+        "Composition: centered complete object, about 76 percent of the square, generous safe margins, no crop. Readable at 16, 32, and 48 pixels. Warm top-left key light, cool deep lower-right shadow, crisp focal edges and simplified internal detail.",
+        "Background: perfectly flat solid #FF00FF outside the object for deterministic chroma keying. Absolutely no magenta anywhere inside the vial, glass, reflections, cork, metal, claw, liquid, glow, or shadow. No external cast shadow or glow beyond the object silhouette.",
+        "Style: premium hand-painted dark-fantasy MMORPG profession art, broad value groups, heavy near-black outer contour, controlled saturation, tactile materials.",
+        "Constraints: one object only; no text, letters, numbers, runes, logo, watermark, badge, frame, rarity chrome, circular medallion, modern graphic design, flat vector style, photorealism, extra bottles, hands, character, or scenery."
+      ],
+      "references": [
+        {
+          "path": "public/ui/professions/prof_alchemy.webp",
+          "role": "glass material and painted-liquid reference"
+        },
+        {
+          "path": "public/ui/professions/gather_herbalism.webp",
+          "role": "transparent cutout, contour, and compact massing reference"
+        },
+        {
+          "path": "public/ui/professions/masterwork_seal.webp",
+          "role": "centered silhouette and warm-metal finish reference"
+        }
+      ],
+      "sourceSha256": "8e1e9c1572a097333a44defbc0cf5bf61d095bf27b8e8961fd7a0a86fad9f6df",
+      "sourceBytes": 1875920,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "builtInImagegenCalls": 1,
+      "acceptedAttempt": 1,
+      "acceptedSha256": "01bbc0dbc951a4b5491cfe7de0e4a0c835f4665033a74503cc1a2a3a975dffd7",
+      "acceptedBytes": 6550,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": false,
+      "processing": "Magenta-ness alpha key with 60 to 140 soft ramp, edge despill, alpha trim, contain to 116 pixels, 6-pixel transparent pad, WebP q88 alpha q100.",
+      "decision": "accepted",
+      "reviewNotes": "The complete vial, cyan preservative, and ivory claw remain distinct at 128, 64, 32, and 16 pixels after deterministic magenta keying and despill."
+    }
+  ]
+}

@@ -21,6 +21,7 @@ interface ContextTrace {
   fill: ReturnType<typeof vi.fn>;
   stroke: ReturnType<typeof vi.fn>;
   arc: ReturnType<typeof vi.fn>;
+  quadraticCurveTo: ReturnType<typeof vi.fn>;
   fillStyles: string[];
   strokeStyles: string[];
   globalAlphas: number[];
@@ -37,7 +38,7 @@ function context(trace: ContextTrace): CanvasRenderingContext2D {
     closePath: noop,
     moveTo: noop,
     lineTo: noop,
-    quadraticCurveTo: noop,
+    quadraticCurveTo: trace.quadraticCurveTo,
     arc: trace.arc,
     rect: noop,
     clip: noop,
@@ -92,6 +93,7 @@ beforeEach(() => {
       fill: vi.fn(),
       stroke: vi.fn(),
       arc: vi.fn(),
+      quadraticCurveTo: vi.fn(),
       fillStyles: [],
       strokeStyles: [],
       globalAlphas: [],
@@ -507,6 +509,31 @@ describe('nameplate canvas surface', () => {
     expect(imageBlits).toHaveLength(4);
   });
 
+  it('routes the loot marker through the authored satchel-and-glint canvas art', () => {
+    const parent = document.createElement('div');
+    const surface = new NameplateCanvasSurface(parent);
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Lootable Target',
+      marker: 'loot',
+      markerTone: 'loot',
+    });
+
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+
+    expect(traces[0].quadraticCurveTo).toHaveBeenCalledTimes(6);
+    expect(traces[0].arc).toHaveBeenCalledTimes(1);
+    expect(traces[0].fill).toHaveBeenCalledTimes(1);
+    expect(traces[0].stroke).toHaveBeenCalledTimes(4);
+    const rasterizedText = traces.flatMap((trace) =>
+      trace.fillText.mock.calls.map(([value]) => value),
+    );
+    expect(rasterizedText).not.toContain('$');
+    expect(rasterizedText).not.toContain('loot');
+  });
+
   it('strokes the Book of Deeds accent as shapes, minting no new text sprite', () => {
     const parent = document.createElement('div');
     const surface = new NameplateCanvasSurface(parent);
@@ -623,6 +650,44 @@ describe('nameplate canvas surface', () => {
       const accent = borderAccent('deepward');
       expect(strokeStyles).not.toContain(accent?.frame);
       expect(strokeStyles).not.toContain(accent?.glow);
+    } finally {
+      if (previousMatchMedia) {
+        Object.defineProperty(window, 'matchMedia', previousMatchMedia);
+      } else {
+        Reflect.deleteProperty(window, 'matchMedia');
+      }
+    }
+  });
+
+  it('draws the forced-color loot marker as a system-color satchel with no text fallback', () => {
+    const previousMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn(() => ({ matches: true })),
+    });
+    try {
+      const surface = new NameplateCanvasSurface(document.createElement('div'));
+      const state = createNameplateCanvasState();
+      Object.assign(state, {
+        initialized: true,
+        marker: 'loot',
+        markerTone: 'loot',
+      });
+
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 220);
+
+      expect(traces[0].fillStyles).toContain('CanvasText');
+      expect(traces[0].strokeStyles).toContain('Canvas');
+      expect(traces[0].quadraticCurveTo).toHaveBeenCalledTimes(6);
+      expect(traces[0].arc).toHaveBeenCalledTimes(1);
+      expect(traces[0].fill).toHaveBeenCalledTimes(1);
+      expect(traces[0].stroke).toHaveBeenCalledTimes(4);
+      const rasterizedText = traces.flatMap((trace) =>
+        trace.fillText.mock.calls.map(([value]) => value),
+      );
+      expect(rasterizedText).not.toContain('$');
+      expect(rasterizedText).not.toContain('loot');
     } finally {
       if (previousMatchMedia) {
         Object.defineProperty(window, 'matchMedia', previousMatchMedia);

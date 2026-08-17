@@ -370,9 +370,7 @@ describe('release v0.34 additional painted art', () => {
 
     expect(martensGuiseHash).not.toBe(RETIRED_HASHES.duplicatedMarten);
     expect(martensGuiseHash).not.toBe(prowlHash);
-    expect(byKind.ability.get(RETIRED_HASHES.duplicatedMarten)).toEqual([
-      'public/ui/skills/druid/prowl.webp',
-    ]);
+    expect(byKind.ability.has(RETIRED_HASHES.duplicatedMarten)).toBe(false);
     expect(satchelHash).not.toBe(RETIRED_HASHES.hueShiftedSatchel);
     expect(satchelHash).not.toBe(linenHash);
     expect(byKind.item.has(RETIRED_HASHES.hueShiftedSatchel)).toBe(false);

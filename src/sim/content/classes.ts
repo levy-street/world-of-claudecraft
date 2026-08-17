@@ -2609,7 +2609,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetsDead: true,
     effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
     description:
-      "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+      "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)",
   },
   // ---- Chronomancy out-of-combat mass resurrection. The base seven-second cast
   // and mana cost are provisional playtest values. It has no target and rewinds all
@@ -2634,7 +2634,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
     description:
-      'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+      'Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
   },
   // ---- Chronomancy (healer) "Correct" pillar: Rewind (Rebobinar), the raid
   // cooldown. docs/prd/mage-chronomancy.md. Instant, no target, self-centered 40 yd
@@ -4718,7 +4718,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
     description:
-      'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
+      'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
   },
   healing_wave: {
     id: 'healing_wave',

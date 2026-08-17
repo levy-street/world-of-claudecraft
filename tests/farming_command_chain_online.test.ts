@@ -387,6 +387,20 @@ function standAtBed(server: GameServer, pid: number, bedId: string): void {
   p.prevPos = { ...p.pos };
 }
 
+/** Stand a player one step from a farmer NPC: the husk trade gates on a
+ *  farmer in reach (the go-live), so the convert arms below stand here. */
+function standByFarmer(server: GameServer, pid: number, templateId = 'farmer_jessica'): void {
+  const farmer = [...server.sim.entities.values()].find(
+    (e) => e.kind === 'npc' && e.templateId === templateId,
+  );
+  if (!farmer) throw new Error(`no such farmer: ${templateId}`);
+  const p = server.sim.entities.get(pid);
+  if (!p) throw new Error(`no entity for pid ${pid}`);
+  p.pos.x = farmer.pos.x + 1;
+  p.pos.z = farmer.pos.z;
+  p.prevPos = { ...p.pos };
+}
+
 describe('farmPlanted is a HEAVY_SELF_EVENTS member: the planter self-mirror re-diffs', () => {
   it('dirties the planter on a successful plant, whose seed spend rides no loot event', () => {
     const server = new GameServer();
@@ -822,6 +836,9 @@ describe('the four farm events reach the actor, and only the actor', () => {
     const { fc: bystanderFc } = joinWithSocket(server, 2, 'Bystander');
     const pid = session.pid as number;
     server.sim.addItem('withered_husks', 2, pid);
+    // The trade gates on a farmer NPC in reach (the go-live): the trader
+    // stands at the tier-1 farmer, the bystander stays at spawn.
+    standByFarmer(server, pid);
     // Flush the setup grant's own loot event before measuring (the fixture
     // vacuity discipline the HEAVY_SELF arms above document).
     routeTick(server);

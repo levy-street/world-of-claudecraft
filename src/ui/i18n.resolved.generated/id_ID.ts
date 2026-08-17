@@ -958,6 +958,22 @@ export const id_ID: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "U",
       "NE": "TL",
@@ -3096,8 +3112,11 @@ export const id_ID: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const id_ID: EnTranslations = {
         "logging": "Penebangan menumbangkan kayu dari rumpun pohon di seluruh dunia: ironbark di Lembah Eastbrook, ashwood di Rawa Mirefen, highpine di Dataran Tinggi Thornpeak, dan rumpun pemula di setiap zona yang lebih muda, bahan mentah untuk gagang, staf, dan bangku sang insinyur. Terbuka untuk semua orang sejak level 1 dengan kapak penebangan di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
         "herbalism": "Herbalisme mengumpulkan apa yang tumbuh liar: sheenleaf di Lembah Eastbrook, goldleaf di Rawa Mirefen, sunpetal di Dataran Tinggi Thornpeak, dan petak pemula di setiap zona yang lebih muda, daun dan batang yang membuat perdagangan apoteker terus menyeduh. Terbuka untuk semua orang sejak level 1 dengan sabit herbalisme di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
         "fishing": "Memancing adalah yang paling berbeda di antara perdagangan pengumpulan, sekaligus yang paling dalam: minigame gigit-dan-tarik yang sungguhan, tabel tangkapan tersendiri di masing-masing tiga zona tanah inti (perairan muda di luar itu semuanya menyajikan tabel Lembah untuk saat ini), dan batas kecakapan 200, dua kali lipat yang lain. Beli joran, hadapi air terbuka, dan lemparkan kailmu.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Ritme pengumpulan",
       "rhythmBody": "Panen adalah rapal singkat yang terlihat, bukan comotan instan: {base} detik dasar, tidak pernah di bawah lantai {floor} detik. Membawa alat di atas tingkat simpul, yang kecakapanmu izinkan untuk kamu gunakan, mempercepatmu {tool} detik per tingkat di atasnya, dan setiap band kecakapan yang kamu lewati memangkas {band} detik lagi; sekadar menyamai tingkat simpul hanya membuatmu masuk pintu, tingkat-tingkat di atasnyalah yang membuatmu cepat.\n\nTas yang penuh menolak rapal itu dengan sopan sebelum dimulai, sehingga tidak ada yang terbuang di tengah ayunan, dan setiap panen membayar sepotong kecil XP karakter, diskalakan berdasarkan level simpul terhadap levelmu sendiri seperti XP dari membunuh: simpul abu-abu yang remeh tidak mengajarkan apa pun kepada karakter yang sudah mentok.",
@@ -5834,6 +5853,10 @@ export const id_ID: EnTranslations = {
         "koiHeading": "Koi Kerlip Surya",
         "koiBody": "Setiap perairan dalam permainan menyembunyikan hadiah yang sama: Koi Kerlip Surya, kilau tidak umum di ujung kail yang bernilai 75 tembaga bagi penjaja dan jauh lebih berharga bagi harga dirimu. Peluangnya hanya menjawab band tangkapanmu dan tidak ada yang lain, sama di setiap zona: baris 1 persen dari tabel tangkapan pada band 0, 3 pada band 1, dan 6 pada band 2, diundi pada setiap lemparan yang berhasil ditarik, sehingga sang koi datang kepada pemancing yang telah mendapatkan tabel-tabel dalam. Mendaratkan satu ekor mencatat Kilau Harapan di Kitab Jasamu, tanda kolektor tanpa Kemasyhuran. Saat itu terjadi, log memastikan kamu mengetahuinya."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Ekonomi Kerajinan",
         "intro": "Cara koin bergerak melalui perdagangan: biaya dan saluran pembuangan yang tepat, apa yang benar-benar terjual, aturan Pasar Dunia, pesanan kerja, karya pesanan, dan mengapa daya buatan berhenti di bawah batas raid.",
@@ -5856,7 +5879,7 @@ export const id_ID: EnTranslations = {
         "marketHeading": "Pasar Dunia dan potongannya",
         "marketBody": "Pasar Dunia adalah bursa seluruh realm, dijaga oleh Pedagang di Eastbrook dan Pelelang Voss di Highwatch. Pendaftaran gratis: tidak ada setoran, dan daftar yang tidak terjual hanya kembali kepadamu. Rumah mengambil potongannya hanya ketika sesuatu benar-benar terjual: 5 persen dari harga jual, dan sisanya menunggumu untuk diambil.\n\nSatu batas penting: Pasar hanya menjadi perantara barang biasa. Salinan yang ditandatangani, karya besar, terpesonan, atau terikat tidak pernah masuk ke daftar, sehingga item istimewa berpindah tangan secara langsung di jendela perdagangan, yang membawa identitas lengkap item, termasuk tanda tangan. Tentukan harga sendiri; Pasar hanya memberi tahu kamu berapa harga versi biasanya.",
         "workOrdersHeading": "Pesanan kerja",
-        "workOrdersNote": "Setiap master stasiun memposting pesanan kerja tetap: bawa setumpuk bahan pokok kerajinan mereka dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan master itu tidak punya apa-apa lagi untukmu hingga penghitung waktu berputar. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.",
+        "workOrdersNote": "Setiap master stasiun memposting pesanan kerja tetap, satu per bahan pokok: bawa tumpukan yang diminta sebuah pesanan dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan pesanan itu tertutup untukmu hingga penghitung waktu berputar, sementara pesanan lain dari master tetap terbuka. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.",
         "colOrder": "Pesanan kerja",
         "colMaster": "Master",
         "colAsks": "Meminta",
@@ -12456,6 +12479,9 @@ export const id_ID: EnTranslations = {
       "pristine_claw": {
         "name": "Cakar Murni"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -14494,6 +14520,26 @@ export const id_ID: EnTranslations = {
         "title": "Master Apoteker",
         "greeting": "Ukur dua kali dan tuang sekali, {className}. Apoteker tidak mempunyai kesabaran terhadap reagen yang tumpah."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Pengawas Pasang",
@@ -14508,6 +14554,19 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Urat bijih dipanen"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Daging Buruan dikirim"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const id_ID: EnTranslations = {
         "name": "Benteng Terakhir",
         "enterText": "Kau melangkah masuk ke aula-aula dingin dan sunyi Last Keep.",
         "leaveText": "Kau menutup pintu benteng itu dan melangkah kembali ke angin Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Kuil Tenggelam",

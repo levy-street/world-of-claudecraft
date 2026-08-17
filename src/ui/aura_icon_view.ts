@@ -2,6 +2,8 @@
 // runtime aura IDs from an ability (`<ability>_ap`, `<ability>_buff_ap`, and so
 // on), while the painted artwork remains keyed by the source ability ID.
 
+import { resolveMobAuraIconIdentity } from './mob_aura_icon_art';
+
 export interface AuraIconIdentity {
   id: string;
   kind: string;
@@ -49,11 +51,6 @@ const GENERATED_AURA_SUFFIXES = [
 const GENERATED_AURA_SUFFIX_MARKERS = GENERATED_AURA_SUFFIXES.map((suffix) => `_${suffix}`);
 const AURA_ICON_CACHE_MAX = 256;
 
-// This shared control aura can come from player Fear, three area-fear spells,
-// or a mob. The wire summary carries no source ability, so generic control art
-// is more truthful than assigning every instance to the Priest spell.
-const AMBIGUOUS_GENERATED_AURA_IDS: ReadonlySet<string> = new Set(['fear_incap']);
-
 // Some simulation IDs are semantic proc/state names rather than mechanical
 // `<ability>_<suffix>` derivatives. Keep this CLOSED alias inventory explicit:
 // choice-row coverage derives the surviving ProcDef producers in tests and the
@@ -62,9 +59,17 @@ const AMBIGUOUS_GENERATED_AURA_IDS: ReadonlySet<string> = new Set(['fear_incap']
 export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map([
   ['aegis_first_dawn_speed', 'aegis_first_dawn'],
   ['aether_surge_free', 'arcane_surge'],
+  ['avenging_wrath_buff_crit', 'avenging_wrath'],
+  ['avenging_wrath_buff_haste', 'avenging_wrath'],
+  ['avenging_wrath_buff_healing_done', 'avenging_wrath'],
+  ['bastion_rite_buff_block', 'bastion_rite'],
+  ['bladed_echo', 'whirlwind'],
   ['bloodhook_bleed', 'bloodhook'],
   ['bloodhook_pending', 'bloodhook'],
+  ['convergence_cd', 'elemental_convergence'],
+  ['convergence_mark', 'elemental_convergence'],
   ['dawns_wrath', 'hammer_of_wrath'],
+  ['deathmark', 'garrote'],
   ['desolation', 'conflagrate'],
   ['divine_steed_burst', 'divine_ascension'],
   ['drain_life_fate_threads', 'drain_life'],
@@ -73,7 +78,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['dusk_economy', 'stealth'],
   ['duskfire_claim', 'shadowburn'],
   ['elemental_mastery_vent', 'elemental_mastery'],
+  ['evasion_shield_wall', 'evasion'],
   ['feral_instinct_energy', 'feral_charge'],
+  ['feed_pet', 'pet_feed'],
   ['funeral_harvest_mark', 'funeral_harvest'],
   ['fury_enrage', 'enrage_passive'],
   ['gloam', 'veilstrike'],
@@ -95,16 +102,30 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['hunter_pack_rally_spellhaste', 'pack_rally'],
   ['hunter_predators_pace', 'measured_shot'],
   ['hunter_predators_pace_icd', 'measured_shot'],
+  ['heating_up', 'fireball'],
   ['ignite', 'ignition'],
   ['lich_form_army', 'metamorphosis'],
   ['lich_form_army_haste', 'metamorphosis'],
   ['loping_stride', 'cat_form'],
+  ['marked_prey', 'kidney_shot'],
   ['marrowbreak_guard', 'marrowbreak'],
   ['natures_fury', 'hurricane'],
   ['oath_chain_pull', 'oath_chain'],
   ['pack_ferocity', 'pack_command'],
   ['perpetual_sun_generation', 'divine_ascension'],
+  ['pet_aspect_of_the_cheetah', 'aspect_of_the_cheetah'],
+  ['pet_aspect_of_the_hawk', 'aspect_of_the_hawk'],
   ['possess_evil_eye_sentence_echo', 'possess_evil_eye'],
+  ['power_infusion_buff_dmg_done_1', 'power_infusion'],
+  ['power_infusion_buff_heal_done_2', 'power_infusion'],
+  ['powerup_pow_berserker_buff_ap', 'pow_berserker'],
+  ['powerup_pow_berserker_buff_speed', 'pow_berserker'],
+  ['powerup_pow_colossus_buff_scale', 'pow_colossus'],
+  ['powerup_pow_colossus_slow', 'pow_colossus'],
+  ['powerup_pow_moon_boots_buff_jump', 'pow_moon_boots'],
+  ['powerup_pow_moon_boots_buff_speed', 'pow_moon_boots'],
+  ['powerup_pow_speed_demon_buff_scale', 'pow_speed_demon'],
+  ['powerup_pow_speed_demon_buff_speed', 'pow_speed_demon'],
   ['pri_inner_fire', 'martyrs_aegis'],
   ['pri_measured_faith', 'lesser_heal'],
   ['priest_doctrine', 'power_word_shield'],
@@ -148,10 +169,12 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['shaman_stonebound_ward_smooth', 'lightning_shield'],
   ['shaman_stoneward', 'stoneward'],
   ['shaman_stormsurge_ready', 'stormstrike'],
+  ['shaman_thunder_charges', 'thunder_reservoir'],
   ['shaman_ward_cycle_icd', 'lightning_shield'],
   ['shaman_warded_elements', 'lightning_shield'],
   ['shaman_wayfarer_grace', 'ghost_wolf'],
   ['shaman_wayfarer_grace_icd', 'ghost_wolf'],
+  ['shaman_warspirit_cadence', 'warspirit_cadence'],
   ['shrapnel_wound', 'shrapnel_charge'],
   ['solar_reprisal', 'vowkeeper_strike'],
   ['solar_step_slow_immunity', 'solar_step'],
@@ -163,6 +186,8 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['veilbound_mark', 'veilbound_march'],
   ['veilbound_march_armor', 'veilbound_march'],
   ['venom_ritual', 'venomrend'],
+  ['water_jet', 'pet_water_jet'],
+  ['water_jet_slow', 'pet_water_jet'],
   ['wlk_blacktide_speed', 'wlk_r5_improved_corruption'],
   ['wlk_curse_mastery', 'wlk_r17_demonic_resilience'],
   ['wlk_forbidden_reflection', 'wlk_r20_grimoire_of_haste'],
@@ -253,38 +278,61 @@ function stripGeneratedSuffix(id: string): string | null {
 /**
  * Choose the stable icon identity for a runtime aura.
  *
- * Exact abilities and dedicated aura recipes keep their own identity. For a
- * generated ID, peel only simulation-authored suffix shapes so the closest
- * known source identity supplies its painted art. Unknown or ambiguous auras
- * retain the established generic `aura_<kind>` fallback.
+ * Exact abilities, dedicated aura images, and dedicated aura recipes keep
+ * their own identity. For a generated ID, peel only simulation-authored
+ * suffix shapes so the closest known source identity supplies its painted
+ * art. Unknown or ambiguous auras retain the established generic
+ * `aura_<kind>` fallback.
  */
 export function resolveAuraIconId(
   aura: AuraIconIdentity,
   hasAbilityIconIdentity: AuraIdentityProbe,
   hasAuraRecipe: AuraIdentityProbe,
+  hasAuraImageIdentity: AuraIdentityProbe,
 ): string {
   const kindSources = RUNTIME_AURA_ICON_SOURCE_IDS_BY_KIND.get(aura.id);
   if (kindSources) {
     const source = kindSources.get(aura.kind);
-    return source && hasAbilityIconIdentity(source) ? source : `aura_${aura.kind}`;
+    if (source && (hasAbilityIconIdentity(source) || hasAuraImageIdentity(source))) return source;
   }
 
-  if (hasAbilityIconIdentity(aura.id) || hasAuraRecipe(aura.id)) return aura.id;
+  // The audited mob map is exact rather than prefix-derived. It must precede
+  // the ordinary ability probe because one pet-authored spell-vulnerability
+  // aura uses `raise_bone_mage`, which is also a player ability ID.
+  const mobSource = resolveMobAuraIconIdentity(aura.id);
+  if (mobSource && hasAuraImageIdentity(mobSource)) return mobSource;
+
+  // A kind-sensitive player identity that did not match its player kind must
+  // not fall through to a similarly named ability. The only current shared ID
+  // (`pack_frenzy`) resolves above to mob art for its mob-authored kind.
+  if (kindSources) return `aura_${aura.kind}`;
+
+  if (hasAbilityIconIdentity(aura.id) || hasAuraImageIdentity(aura.id) || hasAuraRecipe(aura.id)) {
+    return aura.id;
+  }
 
   const semanticSource = RUNTIME_AURA_ICON_SOURCE_IDS.get(aura.id);
-  if (semanticSource && hasAbilityIconIdentity(semanticSource)) return semanticSource;
+  if (
+    semanticSource &&
+    (hasAbilityIconIdentity(semanticSource) || hasAuraImageIdentity(semanticSource))
+  ) {
+    return semanticSource;
+  }
 
   const familySource = runtimeAuraFamilySource(aura.id);
-  if (familySource && hasAbilityIconIdentity(familySource)) return familySource;
-
-  if (AMBIGUOUS_GENERATED_AURA_IDS.has(aura.id)) return `aura_${aura.kind}`;
+  if (
+    familySource &&
+    (hasAbilityIconIdentity(familySource) || hasAuraImageIdentity(familySource))
+  ) {
+    return familySource;
+  }
 
   let candidate = aura.id;
   for (;;) {
     const stripped = stripGeneratedSuffix(candidate);
     if (!stripped) break;
     candidate = stripped;
-    if (hasAbilityIconIdentity(candidate)) return candidate;
+    if (hasAbilityIconIdentity(candidate) || hasAuraImageIdentity(candidate)) return candidate;
   }
 
   return `aura_${aura.kind}`;
@@ -299,13 +347,19 @@ export function resolveAuraIconId(
 export function createAuraIconResolver(
   hasAbilityIconIdentity: AuraIdentityProbe,
   hasAuraRecipe: AuraIdentityProbe,
+  hasAuraImageIdentity: AuraIdentityProbe,
 ): (aura: AuraIconIdentity) => string {
   const cache = new Map<string, { kind: string; iconId: string }>();
   return (aura) => {
     const cached = cache.get(aura.id);
     if (cached?.kind === aura.kind) return cached.iconId;
 
-    const iconId = resolveAuraIconId(aura, hasAbilityIconIdentity, hasAuraRecipe);
+    const iconId = resolveAuraIconId(
+      aura,
+      hasAbilityIconIdentity,
+      hasAuraRecipe,
+      hasAuraImageIdentity,
+    );
     if (!cached && cache.size >= AURA_ICON_CACHE_MAX) {
       const oldest = cache.keys().next().value;
       if (oldest !== undefined) cache.delete(oldest);

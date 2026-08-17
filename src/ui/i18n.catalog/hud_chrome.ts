@@ -728,6 +728,29 @@ export const hudChromeStrings = {
     clockMs: '{minutes}:{seconds}',
     clockHms: '{hours}:{minutes}:{seconds}',
   },
+  // The Last Keep interior map (the castle floor plan the minimap / world map
+  // show inside the instance). The title composes the localized dungeon name
+  // (entities.dungeons.the_last_keep.name, via dungeonDisplayName) with the
+  // story the player currently stands on.
+  lastkeepMap: {
+    title: '{keep}: {story}',
+    story: {
+      undercroft: 'The Undercroft',
+      state: 'The State Floor',
+      residence: 'The Residence',
+      tower: 'The Watch Tower',
+    },
+  },
+  // Dawnhold Castle interior map (the Evergarden garden palace), same shape:
+  // the title composes the localized dungeon name
+  // (entities.dungeons.dawnhold_castle.name) with the current story.
+  dawnholdMap: {
+    title: '{keep}: {story}',
+    story: {
+      ground: 'The Garden Floor',
+      solar: 'The Solar',
+    },
+  },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
   // Spanish, "O" in French/Italian/Portuguese, "З" in Russian).
@@ -3878,7 +3901,17 @@ export const hudChromeStrings = {
       // generic shortage (the crafting.reagentLocked twin). One line for all
       // five farming spends: the event does not say which leg was locked.
       locked: 'An item that would pay for that is locked.',
+      // The farming go-live: the husk trade's range gate (convertHusks refuses
+      // out of reach of a farmer NPC, professions/farmer_npcs.ts). Its own
+      // leaf rather than `range` above, whose English names a crop bed.
+      no_farmer: 'You must be near a farmer to trade husks for compost.',
     },
+    // The farmer NPC's gossip row (the farming go-live): the one UI affordance
+    // that sends convert_husks, offered in the dialog of every NpcDef carrying
+    // the farmer flag (hud/quest/quest_dialog_controller.ts). The trade's own
+    // feedback is the husksConverted line below and the denied toasts above.
+    huskTrade: 'Trade husks for compost',
+    huskTradeAria: 'Trade withered husks for compost with {name}',
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's
     // hub line stands down for it (silent + callerLogs, the #2430 one-line

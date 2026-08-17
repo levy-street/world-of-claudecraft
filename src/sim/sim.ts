@@ -817,7 +817,6 @@ import {
 import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
 import {
-  crossesGardenHedge,
   groundHeight,
   nearSteepWalls,
   terrainSteepnessAt,
@@ -8282,12 +8281,13 @@ export class Sim {
           h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
         if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
       }
-      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       // The Great Maze's hedge walls are hard for mobs too (the maze patrol
-      // knights pace their dead ends instead of drifting through a hedge);
-      // crossesGardenHedge fast-rejects outside the maze, so the open-world
-      // fan pays two comparisons.
-      if (crossesGardenHedge(e.pos.x, e.pos.z, r.x, r.z)) continue;
+      // knights pace their dead ends instead of drifting through a hedge).
+      // resolveMovePoint now does that on its own: the hedges are real collider
+      // boxes, so this no longer needs its own segment test, and keeping one
+      // would reject every candidate for a body that ever ended up inside a
+      // hedge, leaving it stuck instead of letting the push-out carry it clear.
+      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
       if (progress > bestProgress) {
         bestProgress = progress;
@@ -12593,8 +12593,8 @@ export class Sim {
 
   // Trade withered husks for compost. Thin delegate like its two siblings
   // above; draw-free on every path (the ratio is a constant), and the
-  // permissive location gate is documented at the action (the farmer-NPC
-  // range arm lands with the NPCs in the go-live phase).
+  // farmer-NPC range gate lives at the action (professions/farmer_npcs.ts
+  // nearFarmerNpc: in reach of a farmer-flagged NPC, else farmDenied).
   convertHusks(pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;

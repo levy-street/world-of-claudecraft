@@ -958,6 +958,22 @@ export const vi_VN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -3096,8 +3112,11 @@ export const vi_VN: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const vi_VN: EnTranslations = {
         "logging": "Đốn Gỗ hạ cây lấy gỗ từ những cụm cây khắp cả thế giới: vỏ sắt ở Thung Lũng Đông Khê, tần bì tro ở Đầm Lầy Bùn Sâu, gỗ cổ thụ ở Cao Nguyên Đỉnh Gai, và các cụm cây khởi đầu ở mọi khu vực non trẻ hơn, nguồn gỗ thô cho cán vũ khí, trượng, và bàn làm việc của kỹ sư. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây rìu đốn gỗ trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "herbalism": "Thảo Dược Học thu hái những gì mọc hoang: lá bạc ở Thung Lũng Đông Khê, lá vàng ở Đầm Lầy Bùn Sâu, cánh mặt trời ở Cao Nguyên Đỉnh Gai, và các khóm khởi đầu ở mọi khu vực non trẻ hơn, thứ lá và thân giữ cho các nghề bào chế luôn có gì để nấu. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây liềm thảo dược trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "fishing": "Câu Cá là kẻ khác biệt giữa các nghề thu thập, và cũng là nghề sâu nhất: một trò nhỏ cắn mồi và giật cần thực thụ, có bảng cá riêng ở mỗi khu vực trong ba vùng lõi (những vùng nước non trẻ xa hơn hiện đều dùng bảng của Thung Lũng), và giới hạn thành thạo 200, gấp đôi các nghề khác. Hãy mua một cần câu, quay mặt ra vùng nước rộng, và buông câu.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Nhịp thu hoạch",
       "rhythmBody": "Một lần thu hoạch là một thao tác niệm ngắn nhìn thấy được, không phải cú chộp tức thì: {base} giây cơ bản, không bao giờ xuống dưới cái sàn {floor} giây. Mang theo một công cụ trên bậc của điểm tài nguyên, loại mà thành thạo của bạn cho phép sử dụng, sẽ làm bạn nhanh thêm {tool} giây cho mỗi bậc cao hơn nó, và mỗi dải thành thạo bạn vượt qua lại gọt thêm {band} giây nữa; chỉ khớp đúng bậc của điểm tài nguyên thì mới lọt được vào cửa, chính những bậc cao hơn nó mới làm bạn nhanh.\n\nMột chiếc túi đầy sẽ lịch sự từ chối thao tác trước khi nó bắt đầu, nên không có gì bị phí giữa chừng, và mỗi lần thu hoạch đều trả một lát kinh nghiệm nhân vật nho nhỏ, co giãn theo cấp của điểm tài nguyên đối chiếu với cấp của chính bạn, giống hệt cách kinh nghiệm giết quái co giãn: một điểm tài nguyên xám tầm thường chẳng dạy được gì cho một nhân vật đã đạt trần.",
@@ -5834,6 +5853,10 @@ export const vi_VN: EnTranslations = {
         "koiHeading": "Cá Koi Ánh Nắng",
         "koiBody": "Mọi vùng nước trong trò chơi đều giấu cùng một phần thưởng: Cá Koi Ánh Nắng, một tia lấp lánh khác thường trên dây câu đáng 75 đồng với người bán và đáng hơn thế nhiều với lòng tự hào của bạn. Xác suất của nó chỉ đáp lại ngưỡng câu của bạn chứ không gì khác, giống nhau ở mọi khu vực: một dòng 1 phần trăm của bảng cá ở ngưỡng 0, 3 ở ngưỡng 1, và 6 ở ngưỡng 2, được tung mỗi lần giật cần thành công, nên con koi tìm đến người câu đã kiếm được những bảng sâu. Bắt được một con sẽ ghi Tia Hy Vọng vào Sách Kỳ Công của bạn, một dấu ấn sưu tập không Danh Vọng. Khi điều đó xảy ra, nhật ký sẽ đảm bảo bạn biết."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Kinh Tế Chế Tác",
         "intro": "Cách tiền vàng lưu chuyển qua các nghề: mức phí và khoản tiêu hao chính xác, những gì thực sự bán được, các quy tắc của Chợ Thế Giới, đơn hàng, ủy thác, và lý do sức mạnh đồ chế tác dừng lại dưới ngưỡng raid.",
@@ -5856,7 +5879,7 @@ export const vi_VN: EnTranslations = {
         "marketHeading": "Chợ Thế Giới và hoa hồng của nó",
         "marketBody": "Chợ Thế Giới là sàn giao dịch toàn vương quốc, do Thương Nhân ở Đông Khê và Đấu Giá Voss ở Highwatch quản lý. Đăng rao miễn phí: không có tiền đặt cọc, và một rao bán không ai mua sẽ đơn giản trở về tay bạn. Nhà cái chỉ lấy hoa hồng khi thứ gì đó thực sự được bán: 5 phần trăm giá bán, phần còn lại chờ bạn đến thu.\n\nMột giới hạn quan trọng: Chợ chỉ môi giới hàng hóa thông thường. Một bản có dấu thợ, kiệt tác, pháp khắc, hoặc đã ràng buộc không bao giờ được đưa vào rao bán, nên những món đặc biệt đổi tay trực tiếp qua cửa sổ giao dịch, vốn mang đầy đủ danh tính của vật phẩm, gồm cả dấu thợ. Tự định giá những thứ đó; Chợ chỉ cho bạn biết bản thông thường được mua bao nhiêu.",
         "workOrdersHeading": "Đơn hàng",
-        "workOrdersNote": "Mỗi chủ bàn đăng một đơn hàng thường trực: mang đến một đống nguyên liệu chủ lực của nghề họ và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và vị chủ bàn đó không có gì thêm cho bạn cho đến khi hết giờ. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.",
+        "workOrdersNote": "Mỗi chủ bàn đăng các đơn hàng thường trực, mỗi nguyên liệu chủ lực một đơn: mang đến đúng đống nguyên liệu mà đơn yêu cầu và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và đơn đó đóng lại với bạn cho đến khi hết giờ, còn các đơn khác của chủ bàn vẫn mở. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.",
         "colOrder": "Đơn hàng",
         "colMaster": "Bậc thầy",
         "colAsks": "Yêu cầu cho",
@@ -12456,6 +12479,9 @@ export const vi_VN: EnTranslations = {
       "pristine_claw": {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -14494,6 +14520,26 @@ export const vi_VN: EnTranslations = {
         "title": "Bậc thầy của nhà bào chế thuốc",
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Người Canh Thủy Triều",
@@ -14508,6 +14554,19 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Mỏ quặng đã khai thác"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Thịt Thú Rừng đã giao"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const vi_VN: EnTranslations = {
         "name": "Pháo Đài Cuối Cùng",
         "enterText": "Bạn bước vào những đại sảnh lạnh lẽo, tĩnh lặng của Last Keep.",
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

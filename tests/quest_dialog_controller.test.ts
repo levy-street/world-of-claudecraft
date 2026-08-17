@@ -46,6 +46,7 @@ function harness(
   const acceptQuest = vi.fn();
   const turnInQuest = vi.fn();
   const reportTelemetry = vi.fn();
+  const convertHusks = vi.fn();
   const world = {
     entities,
     cfg: { playerClass: 'warrior' },
@@ -75,6 +76,7 @@ function harness(
     acceptQuest,
     turnInQuest,
     reportTelemetry,
+    convertHusks,
   } as unknown as IWorld;
   const release = vi.fn();
   const focusFirst = vi.fn();
@@ -156,6 +158,7 @@ function harness(
     acceptQuest,
     turnInQuest,
     reportTelemetry,
+    convertHusks,
     release,
     focusFirst,
     trapOpener,
@@ -474,6 +477,7 @@ describe('QuestDialogController', () => {
     const vendor = harness(vendorNpc);
     vendor.controller.open(vendorNpc.id);
     const vendorButton = vendor.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(vendorButton?.innerHTML).toContain('/ui/currency/coin_gold.webp');
     vendorButton?.focus();
     vendorButton?.click();
     expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id, vendor.trapOpener);
@@ -491,6 +495,7 @@ describe('QuestDialogController', () => {
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
     const heroicButton = heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]');
+    expect(heroicButton?.innerHTML).toContain('/ui/items/heroic_mark.webp');
     heroicButton?.focus();
     heroicButton?.click();
     expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42, heroic.trapOpener);
@@ -536,6 +541,7 @@ describe('QuestDialogController', () => {
     const shop = both.element.querySelector<HTMLButtonElement>('[data-warfare-shop]');
     expect(goods, 'no generic goods row at a flagged NPC, even with stock').toBeNull();
     expect(shop, 'the WARFARE shop row').not.toBeNull();
+    expect(shop?.innerHTML).toContain('/ui/currency/honor.webp');
     expect(shop?.textContent).toContain(t('hudChrome.warfareShop.gossipOption'));
     expect(shop?.getAttribute('aria-label')).toBe(
       t('hudChrome.warfareShop.gossipOptionAria', { name: `npc:${flaggedId}` }),
@@ -612,6 +618,64 @@ describe('QuestDialogController', () => {
     button?.click();
     expect(master.openTrain).toHaveBeenCalledWith(46);
     expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('a farmer NPC offers the husk-trade row and the click sends convertHusks once, then closes', () => {
+    // The farming go-live: every NpcDef carrying the farmer flag renders the
+    // [data-husk-trade] row (the ONE UI affordance for convert_husks). The
+    // fixture entity has NO quests and NO vendor rows, so the row is what
+    // keeps this dialog worth opening at all. The click goes straight to the
+    // live world (IWorldFarming.convertHusks) exactly once, and the dialog
+    // closes like every other non-quest destination (the market-row shape).
+    const farmerId = Object.values(NPCS).find((definition) => definition.farmer)?.id;
+    if (!farmerId) throw new Error('farmer NPC fixture not found');
+    const farmer = harness(npc(48, farmerId));
+    farmer.controller.open(48);
+    expect(farmer.element.style.display).toBe('block');
+    const button = farmer.element.querySelector<HTMLButtonElement>('[data-husk-trade]');
+    expect(button).not.toBeNull();
+    expect(button?.textContent).toContain(t('hudChrome.farming.huskTrade'));
+    expect(button?.getAttribute('aria-label')).toBe(
+      t('hudChrome.farming.huskTradeAria', { name: `npc:${farmerId}` }),
+    );
+    // The English literals once, beside the t() form: a key swap to any other
+    // existing key would keep the t() comparisons green on their own.
+    expect(button?.textContent).toContain('Trade husks for compost');
+    expect(button?.getAttribute('aria-label')).toBe(
+      `Trade withered husks for compost with npc:${farmerId}`,
+    );
+    // No shop row for an empty stock, so the trade row is the only action.
+    expect(farmer.element.querySelector('[data-vendor]')).toBeNull();
+    expect(farmer.convertHusks).not.toHaveBeenCalled();
+    button?.click();
+    expect(farmer.convertHusks).toHaveBeenCalledTimes(1);
+    expect(farmer.release).toHaveBeenCalledWith(false);
+    expect(farmer.controller.isOpen).toBe(false);
+  });
+
+  it('a farmer with stock renders the trade row BESIDE the goods row', () => {
+    // The two go-live counters at once: Jessica sells seeds and trades husks
+    // from the same dialog, so neither row may suppress the other.
+    const stocked = npc(49, 'farmer_jessica');
+    stocked.vendorItems = [...(NPCS.farmer_jessica.vendorItems ?? [])];
+    const jessica = harness(stocked);
+    jessica.controller.open(49);
+    expect(jessica.element.querySelector('[data-vendor]')).not.toBeNull();
+    expect(jessica.element.querySelector('[data-husk-trade]')).not.toBeNull();
+  });
+
+  it('a non-farmer NPC renders no husk-trade row', () => {
+    const plainId = Object.values(NPCS).find(
+      (definition) =>
+        !definition.banker &&
+        !definition.farmer &&
+        !(CHRONICLER_TEMPLATE_IDS as readonly string[]).includes(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-farmer NPC fixture not found');
+    const plain = harness(npc(50, plainId));
+    plain.controller.open(50);
+    expect(plain.element.querySelector('[data-husk-trade]')).toBeNull();
+    expect(plain.convertHusks).not.toHaveBeenCalled();
   });
 
   it('a non-master NPC renders no Train option', () => {

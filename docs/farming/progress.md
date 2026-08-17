@@ -23,7 +23,7 @@
 | Phase 7 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-14 | 2026-08-14 |
 | Phase 8 (Harvest Journal) | DONE 2026-08-14 | fix/farming-phase-08-harvest-journal (merge hash in the Phase 8 notes tail) | 2 BLOCKING (language fan-out registry, focus-across-rebuild) found by the frontend review and fixed in-phase; 0 BLOCKING elsewhere across parity, architecture, hot-path, and qa-checklist; the parity gap (no golden farmReady) closed with a deliberate re-mint |
 | Phase 8 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-08-qa, merged --no-ff as 327fa964bd; 0 BLOCKING across eight lanes plus a verification round; one behavior fix (deviation (be), the simplified-mode journal entry), the (bd) ledger corrected, the guide controls row landed, the coverage gaps pinned, 24/24 mutants killed |
-| Phase 9 (world presence, go-live) | not started | | |
+| Phase 9 (world presence, go-live) | DONE 2026-08-17 | fix/farming-phase-09-world-presence (seventeenth absorb 89030e4e0f first; merge hash in the Phase 9 notes tail) | 0 BLOCKING across architecture, cross-platform, frontend, content-obligations, test-coverage, privacy-security, and qa-checklist; every SHOULD-FIX taken in-phase or ledgered as (bg) to (bm); 14/14 mutants killed; farming is LIVE |
 | Phase 9 QA | not started | | |
 | Phase 10 (celebrations) | not started | | |
 | Phase 10 QA | not started | | |
@@ -1885,8 +1885,234 @@ moment seeds are obtainable; carry the (ap), (bb), and (be) maintainer
 reads, the pin-art debt, the shard-weight harvest at go-public, and the
 go-live checklist additions recorded in earlier phases.
 
-### Phase 9
-(not started)
+### Phase 9 pre-flight: the seventeenth absorb (2026-08-17)
+Branch fix/farming-phase-09-world-presence off feature/farming-plan at
+26f330cea2 (the Phase 8 QA tip). origin/release/v0.39.0 had moved to
+f48c7a3a9b (80 commits, 952 files, 74-file farming intersection; same
+minor version, two-digit intersection: a regular absorb, not the 06b
+shape). Merge 89030e4e0f, then three heals and two shared shapes:
+d07b578e5d (farm-props lockfile seal, the third firing: byte-level restamp
+of both stamp sites in all fifteen GLBs, sizes held, sha pins
+re-recorded, assets manifest regen), 58d4332993 (farming_session golden
+re-mint for the castles' one static entity, machine-classified as a pure
+entity-id +1 shift: 111 leaves, draws/drawDigest/ticks/coverage
+byte-identical, md5 50a2e54c to 8fe57fe3, the (am) shape), 11e0940da0 (the
+release's icon-art hotbar-item seal at 72 painted failed on the merged
+tree only, farming's twelve hotbar-eligible pending-art items; healed by
+the ART-SUBJECT rule with a hard pending literal 12, the release literal
+and sealed record byte-identical: a new (al)-class member, see the
+state.md (al) paragraph), 2953d6ccb2 (the QuestObjective 'farm' member)
+and 2f22f9a5e9 (the NpcDef `farmer` flag), landed alone so the three
+build slices compile against one shape. Conflicts (40) by doctrine: the
+renderer.ts import block, the renderer ceiling at the exact merged count
+13660 (both parents' extractions compose), the items catalog
+(dawnhold_posy ahead of the farming block), 25 regenerated i18n bundles,
+the char_window test name, the item art audit literals 823/838 with
+pendingArtCount 39 kept, the (al) evidence family and the Eastbrook polish
+provenance re-minted through their CLIs. Baselines held with zero
+movement: commands 202/215, IWorld 329 = 88 + 241, facets 34, delta keys
+87; wiki:content and i18n:gen byte-identical; ci:changed rc 0; the
+farming battery 29 files 807 green; parity 216 green after the isolated
+re-mint. Monolith headroom after the absorb: hud.ts 5, renderer.ts 0,
+sim.ts 1, main.ts 1, server/game.ts 104 (Phase 9 touches none of the four).
+Release-merge audit as a 4-lane Workflow, 4/4 delivered first try: overlaps
+CLEAN, sim arms CLEAN, world content 0 BLOCKING with three should-fixes
+taken as ledger notes (the seventeenth-absorb entry itself; the Phase 10
+deed totals now 273 / 3155 / 11 exploration titles; the release moved the
+hedge_knight camp to (306,872) r 8, 27 yd west of bed_evergarden_1, so the
+tier-4 farmer sits east of the beds), i18n and evidence CLEAN with the one
+BLOCKING (the hotbar seal) fixed as 11e0940da0. Traps: (1) `git checkout
+--theirs` on a conflicted pin suite discards the branch's non-conflicting
+arms; restore with `git checkout -m` and resolve hunk by hunk. (2) The
+release re-records ITS goldens for a static-entity shift but can never
+re-record the branch-only farming_session: expect the (am) re-mint on any
+absorb that adds static world content, classify before minting.
+
+### Phase 9 (2026-08-17, world presence, GO-LIVE, local-only per D22)
+Branch fix/farming-phase-09-world-presence off feature/farming-plan at
+26f330cea2; the seventeenth absorb ran first (the pre-flight section
+above). Merged --no-ff into feature/farming-plan (hash in the notes tail);
+the phase branch deleted. Farming is LIVE on the merged branch.
+
+Acceptance (the phase file's list, with check states):
+- [x] All four farmer NPCs exist at their hubs with the specified roles;
+      the three new names are original and IP-safe per D17 and recorded in
+      state.md: Farmer Jessica (Allotment Keeper, Eastbrook), Farmer Teasel
+      (Fen Paddy Farmer, Fenbridge), Farmer Hollis (Highwatch Terrace Farmer,
+      Highwatch), Farmer Verbena (Parterre Gardener, the Evergarden parterre).
+      Audit: repo-clean, real plant words (jessamine, teasel, holly, verbena),
+      not farmer NPCs in WoW, OSRS, Stardew, Palia, or Harvest Moon (Sedge,
+      Sorrel, Osier, Tansy, Cress were rejected as taken or IP-adjacent).
+- [x] Every stocked vendor row has a positive buyValue; a purchase probe of
+      every row succeeds (tests/farmer_vendor_purchase.test.ts buys every row
+      at every farmer through Sim.buyItem: item count up, copper down by the
+      price, plus too-far and wrong-counter negatives).
+- [x] Tier 3 and 4 seeds are stocked NOWHERE (the go-live arm in
+      tests/professions_zone_rollout.test.ts: NEVER_STOCKED = the four
+      tier-3/4 seeds, growth_tonic, three crafted hoes, nine dishes, on no
+      NPC / heroic / delve counter, per-table non-vacuity).
+- [x] q_farm_intro is acceptable at Jessica by a fresh character;
+      requiredItems grants the rung-one hoe and one vale wheat seed; the
+      objective credits the plant and harvest actions, not inventory; markers
+      point at the Eastbrook beds (tests/farm_intro_quest_journey.test.ts,
+      tests/farm_quest_objective.test.ts, tests/quest_targets.test.ts).
+- [x] The completion text and Jessica's greeting both contain the magic
+      sentence (verbatim pins in three suites; mutation M12 killed).
+- [x] Husk conversion works in range of a farmer NPC and refuses out of range
+      (both arms plus the exact boundary at 7 and one step past); the watch
+      fee stays a plant-time bag payment with NO NPC range gate (the D9 arm:
+      a knobbed plant far from every farmer succeeds and spends the fee).
+- [x] The work-order rows pay floor(0.5 x summed vendor sellValue), carry the
+      arithmetic comment, and tests/professions_work_orders.test.ts passes
+      (wheat x8 -> 16, rice x5 -> 20; mutation M14 killed).
+- [x] The R37 hub-stocking arms are on and tests/professions_zone_rollout
+      passes (deviation (bl) for the flip shape).
+- [x] The parity regen is verified mechanical and lands as its own commit
+      (5676e12b73); tests/parity is green after it. Classification: 4594
+      leaves an entity id +4, 1585 digests folding those ids, draws and
+      draw digests byte-identical in every frame of every golden, the two
+      remaining deltas explained (the culling wolf's private idle lane is
+      seeded from its id; the farming_session player y follows the terrain
+      under Jessica's calm pad); the full spawn roster is otherwise identical
+      across three seeds. The SAME commit re-mints the terrain atlas, the
+      Eastbrook chunk digest, and five map plates (deviation (bh)).
+- [x] The full new-player journey probe passed on a live headless sim and its
+      transcript is below; the throwaway probe file is deleted (tree clean).
+- [x] The wiki is regenerated and the freshness gate passes.
+- [x] Every new player-visible string is an English t() key or an
+      entities.* content string with the five non-Latin fills; S3 passes.
+- [x] tsc, the named suites, ci:changed, and gate_select are green (gate
+      record in the notes tail).
+- [x] Screenshots (desktop and mobile) of Jessica, the quest dialog, the
+      gossip menu, and the vendor grid are committed under
+      docs/screenshots/farming-phase-09.
+
+Notes (the would-be PR body).
+Summary: the go-live merge. Farmer NPCs (four, static, D23), the intro quest
+on the q_prof_intro template with the new 'farm' action objective, vendor
+stock, the husk-trade range gate and its dialog row, two produce work orders,
+the R37 flips, the live guide page, i18n with fills, the deliberate golden and
+terrain re-mints, and 4.2 MB of screenshots.
+Commits (phase-side, after the absorb): 2953d6ccb2 the QuestObjective 'farm'
+member; 2f22f9a5e9 the NpcDef farmer flag; b306ce44cb absorb ledgers; the
+three slice merges 744eecc7cd (A: 383e942f13 NPCs + quest row, c22b313880
+gate + gossip row, 7b38508688 R37 flips + probes, 63d5b49b07 the item fence),
+9c69e7323b (C: 0d35513412 work orders, 6a4b7733d0 guide prose, 2ccf93f599
+produce-only pin), 1112dc8218 (B: 134aff9bda credit arm, 53b808c67c marker
+arm, aefa36f79a + a978639b7b docs rows, babc83b192 tests); 43330b54e8 the
+sim.ts delegate comment (same line count); fd0c3df42b the end-to-end journey
+suite; 5676e12b73 the isolated re-mint; acdc9d3dcb the thirteen Latin
+work-order fills; 0bfbaa142b the review-round pins; then the docs, shot
+targets, and screenshots commit(s) named in the tail.
+Orchestration: three implementer agents in THREE SEPARATE git worktrees
+(~/Documents/woc-farm-p9-{a,b,c}, branches p9/agent-{a,b,c}), because all
+three slices touch zone1.ts and the i18n overlays (the Phase 5 shared-file
+lesson): A = NPCs + vendors + the quest CONTENT ROW (tests/progression pins
+giver-exists AND giver.questIds-includes, so Jessica and q_farm_intro must
+land together) + the husk gate + the gossip row + R37; B = the credit arm and
+marker with SYNTHETIC quests (the tests/profession_quest_objectives idiom);
+C = work orders + the guide. Both shared shapes were landed by the
+orchestrator first so every worktree compiled. Workflow delivered 3/3 first
+try (zero deaths); the merges conflicted only on the generated pending.ts
+(regen) and the Eastbrook payload digest (re-minted on the merged tree). The
+review fan-out: architecture, cross-platform, frontend via Workflow (3/3);
+content-obligations and test-coverage died report-less there (the recurring
+custom-agentType class) and delivered first try on the Agent tool with the
+report-via-SendMessage line; privacy-security likewise on the Agent tool.
+Journey probe transcript (a live headless Sim, seed 9, injected advanceable
+clock; the probe file was deleted afterwards):
+  start: level 1, copper 500, bags empty of farming items
+  accept q_farm_intro at Jessica: hoe=1 seed=1
+  buy seed+compost+2 brook_carrot (the tier-1 watch fee is two produce): copper 500 -> 456 (expected -44)
+  plant denies: []
+  plant vale_wheat with compost+watch: farmPlanted=1, quest counts=[1,0], compost left=0, brook_carrot left=0
+  advance 45 min: farmReady events=1 {"type":"farmReady","pid":964,"ready":1}
+  harvest: farmHarvested=1 farmWithered=0 wheat=4 fine=0 husks=0 quest=ready counts=[1,1]
+  turn in: state=done xp +150 copper +50
+  convert husks beside Jessica: farmHusksConverted=1 compost=1 denied=[]
+  convert husks 30 yd away: denied=["no_farmer"] compost=1
+  craft cast started=true
+  cook vale_hearth_loaf: loaf=1 known=true cooking=1
+Notable facts the probe surfaced: the tier-1 watch fee is TWO produce (the
+first knobbed plant refused with no_fee_produce on one brook_carrot; the
+day-one shopping list is seed + compost + two carrots = 28 copper, and the
+intro quest's 50 copper covers it); a plant credits at the call (the cast is
+flavor); tick() hands the event buffer over and clears it, so a probe reads
+events before ticking or from the tick return.
+Review verdicts: architecture 0 BLOCKING / 5 SHOULD-FIX (all taken or
+ledgered: the regen classification evidenced by the roster diff; the
+garden_hoe fence ledgered at (bg) with the copper-pick precedent; the seed
+faucet comment corrected; the grid-before-first-tick concern is covered by
+the never-ticked harness suites; the boundary arm exists) / 4 NICE (the
+seam pointer added; patchId pinned; the rest ledgered); cross-platform
+APPROVE, 0 BLOCKING (patchId pin added; the no_farmer payload asymmetry
+noted); frontend PASS-WITH-FOLLOWUPS, 0 BLOCKING (the range band is (bi),
+the Latin work-order fills corrected, the literal pins added; the crafting
+glyph reuse and the WCAG label-in-name split are family-wide nits, ledgered);
+content-obligations PASS, 0 SHOULD-FIX (deeds and Reliquary correctly not
+due; the map_doc flag, NPC_KEYS look, and voice render are residuals);
+test-coverage PASS (five should-fixes all taken: seed price literals, the
+alias pin replaced by the frozen-row guard, the guide name tie, the patchId
+credit arm, positive controls); privacy-security SHIP-ABLE, 0 BLOCKING (the
+trade pipe is (bg); refusal spam is rate-capped ahead of the heavy-self
+re-diff; no SQL/auth/secrets/dev gating touched); qa-checklist in the tail.
+Mutations (after committing, through a runner that refuses a dirty target
+file): 14/14 KILLED with named reds: trade range +3, the gate dropped, the
+withered-branch credit dropped, the plant credit dropped, the action match
+dropped, the patchId marker filter dropped, Jessica's seed row dropped, the
+seed fence dropped, Hollis's farmer flag dropped, the gossip row gated off,
+the seed price retuned to 400, the magic sentence dropped from the
+greeting, the seed dropped from requiredItems, the rice payout off by one.
+Deviations decided in-phase: (bg) to (bm) in state.md (the grant fence and
+its trade-pipe leak; NPCs are terrain pads; the offered-but-refused band;
+the module-import credit arm; patchId marker-only; the R37 flip shape; two
+orders per master). Deferrals: farming deeds and golden_harvest (Phase 10 by
+plan; the deed totals to re-pin from are 273 / 3155 / 11 exploration
+titles); NPC_KEYS look rows and voice line renders (Phase 13 art batch);
+the map_doc farmer flag (editor curation call); the Latin farming fills
+other than workOrdersNote (release fill); the trade-guard widening (bg).
+Screenshots (LOW preset; mobile is landscape 844x390):
+docs/screenshots/farming-phase-09/before-jessica-desktop.png and
+before-jessica-mobile.png (the empty ground beside the Eastbrook beds at
+identical framing), after-jessica-desktop.png / after-jessica-mobile.png
+(Farmer Jessica beside the beds with the quest glyph),
+after-gossip-menu-desktop.png / -mobile.png (greeting with both sentences,
+the First Furrow row, Browse Goods, Trade husks for compost),
+after-quest-dialog-desktop.png / -mobile.png (the First Furrow detail),
+after-vendor-grid-desktop.png / -mobile.png (five goods with bulk rows:
+Vale Wheat Seed 4, Brook Carrot Seed 4, Brook Carrot 16, Compost 8, Garden
+Hoe 20). Captured with scripts/pr_screenshots.mjs through the four new
+targets in scripts/pr_shot_targets.mjs (farmer-jessica,
+farm-intro-quest-dialog, farmer-gossip-menu, farmer-vendor-grid; the
+stageFarmerJessica helper); the before shots ran the same targets against
+the pre-phase worktree's dev server, where the dialog and vendor targets
+fail honestly (no farmer_jessica entity) and the world target falls back to
+her authored spot.
+Traps this phase: (1) tick() returns AND clears the event buffer (twice bitten:
+read events before ticking, or from the tick return). (2) The vendor goods
+grid paints a bulk-buy row under every stackable good, so five goods are
+nine .vendor-item rows: count :not(.vendor-item-bulk). (3) A shot diff that
+touches quest_dialog_controller.ts matches a dozen crafting targets and
+times out the runner; narrow DIFF_FILE to the one new module. (4) `git
+checkout --theirs` on a conflicted pin suite discards the branch's
+non-conflicting arms (restore with `git checkout -m`). (5) Every NPC is a
+terrain pad: seating one moves the atlas, the chunk digest, and the map
+plates (bh). (6) The release re-records ITS goldens for a static-entity
+shift and can never re-record the branch-only farming_session; classify
+before minting.
+GATE RECORD: run 1 on the frozen tree 35439199fc, `BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs`: mode=full (the
+planner's broad/unclassified arm on tests/fixtures/terrain_height_parity
+.v1.f64le.gz plus tests/helpers/bare_client.ts), "[gate:select] PASS: all 12
+steps green (vitest workers: 8)", 2859 test files / 40,034 tests passed, 2
+expected fail, 115 skipped, zero "[gate:select] FAIL at" or "[gate] FAIL"
+lines, no druid_engines timeout, full-suite vitest 823 s, browser regression
+19 files 129 green, shell rc 0. gate-integrity-reviewer over the cone rows:
+PASS (additive checkout only; the full fallback is owned by the terrain
+fixture; the goldens, plates, and PNGs are inert nonCode with their consumers
+on the always-run floor). qa-checklist: READY, 0 BLOCKING (its should-fixes:
+the (bg) and (bh) maintainer reads, and the garden_hoe reagent knock-on now
+in (bg)).
 
 ### Phase 10
 (not started)

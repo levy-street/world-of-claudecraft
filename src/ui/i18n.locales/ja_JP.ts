@@ -808,6 +808,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipMap': 'ワールドマップ（{key}）でクエストの場所を確認しましょう。',
   'hudChrome.tutorial.nextTipSocial':
     'ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下蔵',
+  'hudChrome.lastkeepMap.story.state': '公務の階',
+  'hudChrome.lastkeepMap.story.residence': '居住の階',
+  'hudChrome.lastkeepMap.story.tower': '見張り塔',
+  'hudChrome.dawnholdMap.story.ground': '庭園の階',
+  'hudChrome.dawnholdMap.story.solar': '日だまりの間',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -3872,6 +3878,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     'どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。',
   'entities.quests.q_prof_intro.objectives.0.label': '鉱脈を採掘',
+  'entities.quests.q_farm_intro.title': '最初の畝',
+  'entities.quests.q_farm_intro.text':
+    'この鍬と渓谷小麦の種をひとつまみ持っていきなさい、{playerName}。私のそばの畑のどれかに種を蒔いて、あとは自分の用事を済ませておいで。いつでも好きな時に戻って作物を収穫すればいい。私はここにいるから。',
+  'entities.quests.q_farm_intro.completion':
+    'ほら、初めての作物が自分の手の中に。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。畑に呼ばれたら、いつでも種を買いにおいで、{playerName}。',
+  'entities.quests.q_farm_intro.objectives.0.label': '渓谷小麦を植えた',
+  'entities.quests.q_farm_intro.objectives.1.label': '渓谷小麦を収穫した',
   'entities.quests.q_wolves.title': '戸口の狼',
   'entities.quests.q_wolves.text':
     '森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。',
@@ -8828,6 +8841,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.bad_bed': 'そこに作物畑はありません。',
   'hudChrome.farming.denied.bad_crop': 'それはここには植えられません。',
   'hudChrome.farming.denied.range': 'その作物畑から離れすぎています。',
+  'hudChrome.farming.denied.no_farmer': '籾殻を堆肥と交換するには農夫のそばにいなければなりません。',
+  'hudChrome.farming.huskTrade': '籾殻を堆肥と交換する',
+  'hudChrome.farming.huskTradeAria': '{name}と枯れた籾殻を堆肥に交換する',
   'hudChrome.farming.denied.bed_taken': 'そこにはすでに作物が育っています。',
   'hudChrome.farming.denied.skill': 'その作物を育てるには農耕スキルが足りません。',
   'hudChrome.farming.denied.no_seed': 'その作物の種を持っていません。',
@@ -10224,6 +10240,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '厨房の主',
   'entities.npcs.cook_marlow.greeting':
     '私の厨房から生煮えのまま出ていくものはない、{className}。座って食べて、それからまた行きな。',
+  'entities.npcs.farmer_jessica.name': '農婦ジェシカ',
+  'entities.npcs.farmer_jessica.title': '菜園の管理人',
+  'entities.npcs.farmer_jessica.greeting':
+    '良い土と良い天気を、{playerName}。私から種を買って、そこの畑のどれかに蒔いたら、あとは好きに過ごしなさい。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。',
+  'entities.npcs.farmer_teasel.name': '農夫ティーゼル',
+  'entities.npcs.farmer_teasel.title': '湿地の水田農夫',
+  'entities.npcs.farmer_teasel.greeting': '湿原米と沼地ビートの種、それに肥やしの堆肥だ、{className}。水田は水はけが悪い、足元に気をつけな。',
+  'entities.npcs.farmer_hollis.name': '農夫ホリス',
+  'entities.npcs.farmer_hollis.title': 'ハイウォッチの段々畑農夫',
+  'entities.npcs.farmer_hollis.greeting':
+    '段々畑は山が許すぶんだけ実る、{className}。堆肥を売っているし、あんたの作物が枯れて上がってきたら、その籾殻を良い土に戻してやろう。',
+  'entities.npcs.farmer_verbena.name': '農婦ヴァーベナ',
+  'entities.npcs.farmer_verbena.title': 'パルテールの庭師',
+  'entities.npcs.farmer_verbena.greeting':
+    '縁取りに気をつけて、{playerName}、この畑はパルテールの誇りなんだから。売っているのは堆肥、それと持ってきた枯れた籾殻はどれも堆肥に変えてあげる。',
   'entities.npcs.weaver_ottilie.name': '織り手オッティリー',
   'entities.npcs.weaver_ottilie.title': '機織り場の主',
   'entities.npcs.weaver_ottilie.greeting':
@@ -10497,10 +10528,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
   'entities.dungeons.the_last_keep.name': '最後の砦',
-  'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
+  'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
+  'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',
+  'entities.items.dawnhold_posy.name': 'ドーンホールド庭園の小さな花束',
+  'entities.dungeons.dawnhold_castle.enterText':
+    '花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。',
+  'entities.dungeons.dawnhold_castle.leaveText': '日差しあふれる庭園の芝生へと戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',
@@ -10972,6 +11008,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     'よし、これで食料庫は満杯だ。これがお前の報酬だ。また袋が重くなったら戻ってこい。',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '野獣の肉を納品',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': '厨房の小麦受注',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    'パンは勝手に焼けてくれやしない、{playerName}。うちの粉櫃は底が見えてきた。渓谷小麦を八束持ってきてくれれば、まとめて正当な貨幣を払う。自分の手で育てたものでも市場で買ったものでも構わん、挽けるなら文句はない。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    'よく乾いた粒だ、量もたっぷりある。これがお前の報酬だ、きっちり数えてある。次の収穫が上がったら、どの戸を叩けばいいか分かってるな。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': '渓谷小麦を納品',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': '厨房の米受注',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    '湿地の連中は自分たちの米を自慢してやまない、{playerName}。その理由を確かめてやるつもりだ。湿原米を五升持ってきてくれれば、ここに貨幣を用意しておく。道中は濡らすなよ。濡れた米は粥だ、俺は粥を頼んだ覚えはない。',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    'ふっくらして乾いている、どの粒もな。これがお前の貨幣だ。湿地が実らせ続ける限り、俺も払い続ける。',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': '湿原米を納品',
   'entities.quests.q_prof_workorder_loom.title': '織機の受注',
   'entities.quests.q_prof_workorder_loom.text':
     '織機が空回りし、遊ぶ手は日の光を無駄にします、{playerName}。蜘蛛の糸を六かせ持ってきなさい。公正な相場で、銅貨一枚まで数えてお支払いします。',
@@ -11281,7 +11329,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherIntro.fishing':
     '釣りはアタリとリールの呼吸で各ゾーンの開けた水辺から獲物を釣り上げます。上限は200です。',
   'guide.profPages.gatherIntro.farming':
-    '農耕は奪うのではなく世話をして育てる唯一の採集職です。手入れした畑に種をまけば留守の間も作物は育ち、戻ったときに実りを引き抜けます。Eastbrookの割当地からEvergardenの花壇まで、農耕の拠点ごとに専用の畑があり、はしごの段ごとに固有の作物が一対ずつ実って、腕が上がれば上質な等級も採れます。仕事の入口は鍬です。Garden Hoeが最初の畑を受け持ち、その上の段の鍬はエンジニアが作ります。熟練度は専用のカウンターで上限100まで数えられます。',
+    '農耕は奪うのではなく世話をして育てる唯一の採集職です。手入れした畑に種をまけば、留守の間も作物は自分の時計で育ち、いつ戻っても実りを引き抜けます。畑にあるものは決して腐らないからです。Eastbrookの割当地からFenbridge、Highwatchを経てEvergardenの花壇まで、どの畑のそばにも農夫が立ち、EastbrookのFarmer Jessicaがこの職の入口です。彼女はGarden Hoeと最初の種を売り、その使いは新米農夫に最初の作物の育て方を教えてくれます。はしごの段ごとに固有の作物が一対ずつ実り、腕が上がれば上質な等級も採れ、最初の畑より手強い土地の鍬はエンジニアが作ります。熟練度は専用のカウンターで上限100まで数えられます。',
   'guide.profPages.rhythmHeading': '採集のリズム',
   'guide.profPages.rhythmBody':
     '採集は目に見える詠唱です。基本{base}秒、最短{floor}秒で、道具がノードより1ティア高いごとに{tool}秒、熟練度バンドごとに{band}秒短くなります。',
@@ -11344,7 +11392,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': '無料',
   'guide.profPages.econ.workOrdersHeading': '作業依頼',
   'guide.profPages.econ.workOrdersNote':
-    '各師匠は自分の定番素材の束を店売り価格の{pct}%で買い取り、{minutes}分ごとに繰り返せます。',
+    '各師匠は定番素材ごとに受注を出しており、求められた束を店売り価格の{pct}%で買い取ります。受注ごとに{minutes}分の時計が別々に回り、納品した受注だけが閉じ、同じ師匠の他の受注は開いたままです。',
   'guide.profPages.econ.colOrder': '作業依頼',
   'guide.profPages.econ.colMaster': '師匠',
   'guide.profPages.econ.colAsks': '要求',
@@ -11410,6 +11458,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。',
   'guide.profPages.gatherDeeds.farming':
     '農耕には専用の功績がまだありません。畑と作物が根付いた今、他の職を彩る到達と上限の功績は今後の更新で加わります。熟練はすでにMaster Gatherer（いずれか三職で100）に数えられるため、農夫もそのページを皆と同じように埋められます。功績は称号と名声だけを与え、力を与えることはありません。',
+  'guide.profPages.farm.bedsHeading': '畑の手入れ',
+  'guide.profPages.farm.bedsBody':
+    '手順は短いものです。畑のそばの農夫から種と堆肥を買います。EastbrookのJessicaは渓谷の二種、Fenbridgeの農夫は湿地の二種を置いていますが、HighwatchとEvergardenの種はどこの店にもありません。高い段の収穫から一つ二つ戻ってくるか、それ以外はWorld Marketで手に入れます。鍬を袋に入れて種をまき、望むなら勝ちの目を上げましょう。店の堆肥と、まくときに農作物で払う農夫の見回りはどちらも作物が無事に育つ確率を上げ、錬金術師の成長トニックは収穫が増える見込みを与え、熟練が作物の段より丸一帯上がれば、その作物はもう決して枯れません。あとは立ち去るだけです。ログアウト中も畑は育ち続け、熟した作物はいつまでも待っていて、収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）が植えた畑すべてをタイマーつきで一覧にします。\n\n枯れた作物は農作物の代わりに枯れた籾殻を残し、どの農夫でも籾殻を堆肥に換えてくれるので、悪い季節は次の季節の保険を買います。持ち帰ったものは厨房を支えます。農作物は厨房で料理になり、Cook Marlowの小麦と米の受注はVale WheatとMarsh Riceを、他のどの受注とも同じ時計で買い取ってくれます。',
   'guide.profPages.fish.startHeading': 'はじめかた',
   'guide.profPages.fish.startBody':
     'Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿で、どの地方の釣れる水域でも構いません。',

@@ -958,6 +958,22 @@ export const cs_CZ: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "S",
       "NE": "SV",
@@ -3096,8 +3112,11 @@ export const cs_CZ: EnTranslations = {
         "no_fee_produce": "You have no produce to pay the watch fee.",
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked."
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost."
       },
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade withered husks for compost with {name}",
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",
@@ -5779,7 +5798,7 @@ export const cs_CZ: EnTranslations = {
         "logging": "Dřevorubectví kácí dřevo ze skupin stromů po celém světě: železokůru v Eastbrookském údolí, jasan v Mirefenském močálu, horskou borovici v Thornpeakských výšinách a začátečnické skupiny v každé mladší zóně, surovinu pro topůrka, hole a strojírův pracovní stůl. Otevřené každému od 1. úrovně s dřevorubeckou sekerou v brašnách (20 měďáků u přepážek v Eastbrooku, Fenbridge a Highwatchi), vedené na vlastním počitadle až ke stropu 100.",
         "herbalism": "Bylinkářství sbírá to, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu, sluncokvět v Thornpeakských výšinách a začátečnické porosty v každé mladší zóně, list a stonek, které drží lékárnická řemesla v chodu. Otevřené každému od 1. úrovně s bylinkářským srpem v brašnách (20 měďáků u přepážek v Eastbrooku, Fenbridge a Highwatchi), vedené na vlastním počitadle až ke stropu 100.",
         "fishing": "Rybaření je mezi sběratelskými živnostmi ta zvláštní, a zároveň nejhlubší: skutečná minihra na záběr a navíjení, vlastní tabulky úlovků v každé ze tří vnitrozemských zón (mladé vody za nimi zatím všechny obsluhuje tabulka Údolí) a strop zdatnosti 200, dvojnásobek ostatních. Kup prut, postav se čelem k otevřené vodě a nahoď.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe when you come back. Every farming hub keeps a bed site of its own, from the Eastbrook allotments up to the Evergarden parterre, and each rung of that ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull. A hoe opens the work: the garden hoe covers the starter beds, and engineers craft the rungs above it for the tougher ground. Tracked on its own counter to a cap of 100."
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Rytmus sběru",
       "rhythmBody": "Sklizeň je krátké viditelné nahození, ne okamžité chňapnutí: {base} sekundy základ, nikdy ne pod dolní hranici {floor} sekundy. Nošení nástroje nad úrovní naleziště, takového, který ti tvá dovednost dovolí použít, tě zrychlí o {tool} sekundy za každou úroveň nad ní a každé překročené dovednostní pásmo ukrojí ještě {band} sekundy; pouhé vyrovnání úrovně naleziště tě dostane do dveří, rychlým tě dělají teprve úrovně nad ní.\n\nPlná brašna zdvořile odmítne nahození ještě před začátkem, takže se uprostřed rozmachu nic nepromarní, a každá sklizeň vyplatí malý díl zkušeností postavy, škálovaný úrovní naleziště proti té tvé stejně, jako se škálují zkušenosti za zabití: triviální šedé naleziště postavě na stropu nedá nic.",
@@ -5834,6 +5853,10 @@ export const cs_CZ: EnTranslations = {
         "koiHeading": "Slunolesklý koi",
         "koiBody": "Každá vodní plocha ve hře skrývá stejnou výhru: Slunolesklého koie, neobvyklý záblesk na vlasci, který má u prodejce cenu 75 měďáků a o dost víc pro tvou hrdost. Jeho šance odpovídají tvému pásmu úlovků a ničemu jinému, ve všech zónách stejně: 1 procento řádku tabulky úlovků v pásmu 0, 3 v pásmu 1 a 6 v pásmu 2, losováno při každém navinutém nahození, takže koi připlave k rybáři, který si hluboké tabulky vysloužil. Ulovení jednoho zapíše do tvé Knihy skutků Záblesk naděje, sběratelský odkaz s nulovým Věhlasem. Až se to stane, log se postará, abys o tom věděl."
       },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order."
+      },
       "econ": {
         "title": "Řemeslná ekonomika",
         "intro": "Jak se mince pohybují skrze řemesla: přesné poplatky a odlivy, co se skutečně prodává, pravidla Světového trhu, pracovní příkazy, zakázky a proč výkon z řemesel nepřesahuje nájezdovou hranici.",
@@ -5856,7 +5879,7 @@ export const cs_CZ: EnTranslations = {
         "marketHeading": "Světový trh a jeho podíl",
         "marketBody": "Světový trh je celosférickí burza spravovaná Obchodníkem v Eastbrooku a Dražitelem Vossem v Highwatchi. Vystavení je zdarma: žádná záloha a nevyužité vystavení se ti jednoduše vrátí. Dům si bere podíl pouze tehdy, když se něco skutečně prodá: 5 procent z prodejní ceny a zbytek na tebe čeká k vybrání.\n\nJedno důležité omezení: Trh zprostředkovává pouze běžné zboží. Podepsaná, mistrovská, okouzlená nebo vázaná kopie nikdy nevstoupí do výpisu, takže zvláštní kusy přecházejí z ruky do ruky tváří v tvář v okně výměny, které nese plnou identitu předmětu, podpis i vše ostatní. Cenu si určuj sám; Trh ti jen ukáže, co platí za běžnou verzi.",
         "workOrdersHeading": "Pracovní příkazy",
-        "workOrdersNote": "Každý správce stanice zveřejňuje stálý pracovní příkaz: přines hromadu základního materiálu pro dané řemeslo a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten mistr pro tebe nic dalšího nemá, dokud časovač neoběhne. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.",
+        "workOrdersNote": "Každý správce stanice zveřejňuje stálé pracovní příkazy, jeden na každý základní materiál: přines hromadu, o kterou příkaz žádá, a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten příkaz je pro tebe uzavřený, dokud časovač neoběhne, zatímco ostatní příkazy mistra zůstávají otevřené. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.",
         "colOrder": "Pracovní příkaz",
         "colMaster": "Mistr",
         "colAsks": "Požaduje za",
@@ -12456,6 +12479,9 @@ export const cs_CZ: EnTranslations = {
       "pristine_claw": {
         "name": "Nedotčený dráp"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -14494,6 +14520,26 @@ export const cs_CZ: EnTranslations = {
         "title": "Mistr lékárny",
         "greeting": "Dvakrát měř a jednou nalij, {className}. Lékárník nemá trpělivost na rozlité reagencie."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Hlídač přílivu",
@@ -14508,6 +14554,19 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vytěžena rudná žíla"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Doručeno zvěřinové maso"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Poslední tvrz",
         "enterText": "Vstupuješ do chladných, tichých síní Poslední tvrze.",
         "leaveText": "Zavíráš bránu tvrze za sebou a vracíš se do větru Dračích zemí."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Utopený chrám",

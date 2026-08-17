@@ -282,10 +282,10 @@ describe('Drowned Litany shop stock (data pins)', () => {
     // DERIVED from the item table, never a second hand-written list: a ninth
     // crafted tool added to content and forgotten here fails, which is the
     // whole point of the route existing.
-    // FARMING IS EXCLUDED, dormant by choice (state.md ledger (aa) doctrine):
-    // the crafted osmium_hoe deliberately has NO Marks route this phase
-    // (nothing farming is player-reachable until Phase 9 go-live, and whether
-    // the top hoe ever joins a delve shop is the Phase 9/10 decision). The
+    // FARMING IS EXCLUDED, by choice (state.md ledger (aa) doctrine): the
+    // crafted osmium_hoe deliberately has NO Marks route (the go-live seated
+    // seeds, compost and the garden hoe on the farmer NPCs and nothing else;
+    // whether the top hoe ever joins a delve shop is a later decision). The
     // farming rollout arms in tests/professions_zone_rollout.test.ts pin the
     // craft-only acquisition positively; do not widen this exclusion to the
     // node professions or fishing.

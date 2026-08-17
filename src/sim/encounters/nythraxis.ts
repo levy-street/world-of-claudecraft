@@ -26,6 +26,7 @@
 // through the seam.
 
 import { isStunned, isUnbreakableControlAura } from '../combat/cc';
+import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
@@ -561,9 +562,12 @@ function willBeInNythraxisRoomAfterResurrection(
   if (entity.kind !== 'player' || !entity.dead) return false;
   const offer = ctx.pendingResurrections.get(entity.id);
   if (!offer || ctx.time >= offer.expiresAt) return false;
-  const caster = ctx.entities.get(offer.casterId);
+  // The one arrival-destination rule lives in resurrection_offer.ts: the live
+  // caster anchors only while within the offer's reach of the body, else the
+  // cast-time fallback. Deriving it here keeps this prediction in lockstep with
+  // where the accept will actually place the player.
   const destination =
-    caster?.kind === 'player' && !caster.dead ? caster.pos : offer.fallbackDestination;
+    resurrectionArrivalAnchor(ctx, offer, entity)?.pos ?? offer.fallbackDestination;
   return dist2d(destination, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS;
 }
 

@@ -1,6 +1,7 @@
 import { COMPANION_UPGRADE_COSTS, DELVES, ITEMS } from '../../../sim/data';
 import type { ItemDef, SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
+import { currencyIconHtml } from '../../currency_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -108,7 +109,7 @@ export class DelveBoardController {
     element.innerHTML =
       `<div class="panel-title"><span>${esc(t('delveUi.board.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="delve-board-name">${esc(delveName)}</div>` +
-      `<div class="delve-board-meta">${esc(t('delveUi.board.marks', { count: marks }))}</div>` +
+      `<div class="delve-board-meta">${currencyIconHtml('delve_mark')}${esc(t('delveUi.board.marks', { count: marks }))}</div>` +
       `<div class="delve-board-req${world.player.level >= delve.minLevel ? '' : ' req-unmet'}">${esc(t('delveUi.board.minLevel', { level: formatNumber(delve.minLevel, { maximumFractionDigits: 0 }) }))}</div>` +
       `<div class="delve-board-req${partyTooLarge ? ' req-unmet' : ''}">${esc(t('delveUi.board.partyTooLarge', { max: formatNumber(delve.maxPlayers, { maximumFractionDigits: 0 }) }))}</div>` +
       `<div class="delve-tabs" role="tablist" aria-label="${esc(t('delveUi.board.title'))}">${tabButton('delve', t('delveUi.board.tabDelve'))}${tabButton('shop', t('delveUi.board.tabShop'))}</div>` +
@@ -166,7 +167,7 @@ export class DelveBoardController {
       companionAction =
         `<button type="button" class="btn delve-companion-upgrade" data-companion-upgrade="${esc(companionId)}"` +
         ` aria-label="${esc(t('delveUi.board.companion.upgradeAria', { name: companionName, rank: nextRankLabel, marks: costMarks }))}"` +
-        `${affordable ? '' : ' disabled'}>${esc(t('delveUi.board.companion.upgrade', { rank: nextRankLabel, marks: costMarks }))}</button>`;
+        `${affordable ? '' : ' disabled'}>${currencyIconHtml('delve_mark')}${esc(t('delveUi.board.companion.upgrade', { rank: nextRankLabel, marks: costMarks }))}</button>`;
     }
     const tierRow = (['normal', 'heroic'] as const)
       .map((tier) => {
@@ -216,7 +217,7 @@ export class DelveBoardController {
           `<div class="delve-shop-row${offer.unlocked ? '' : ' locked'}" role="listitem" data-shop-item="${esc(offer.itemId)}">` +
           `${this.deps.itemIcon(item)}` +
           `<div class="delve-shop-info"><span class="delve-shop-name" style="color:${qualityColor}">${esc(name)}</span>` +
-          `<span class="delve-shop-price${priceClass}">${esc(priceLabel)}</span></div>${action}</div>`
+          `<span class="delve-shop-price${priceClass}">${currencyIconHtml('delve_mark')}${esc(priceLabel)}</span></div>${action}</div>`
         );
       })
       .join('');

@@ -334,6 +334,8 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
       jitterMs: 0,
       alpha: 1,
       frameDt: 1 / 60,
+      snapAgeMs: 0,
+      snapIntervalMs: 50,
     };
 
     expect(predictor.step(sim.player, frame)).not.toBeNull();

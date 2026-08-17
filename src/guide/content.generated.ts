@@ -5566,6 +5566,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "exp_the_last_keep",
+    "name": "The Quiet Halls",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_dawnhold_castle",
+    "name": "An Open Door in the Garden",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 
@@ -11784,7 +11798,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "tier": 1,
         "quality": "common",
         "priceCopper": 20,
-        "vendors": []
+        "vendors": [
+          {
+            "name": "Farmer Jessica",
+            "hub": "Eastbrook"
+          }
+        ]
       },
       {
         "name": "Bronze Hoe",
@@ -12813,6 +12832,24 @@ export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
         "material": "Game Meat",
         "count": 8,
         "coinCopper": 16
+      },
+      {
+        "id": "q_prof_workorder_kitchens_wheat",
+        "name": "Kitchens Wheat Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Vale Wheat",
+        "count": 8,
+        "coinCopper": 16
+      },
+      {
+        "id": "q_prof_workorder_kitchens_rice",
+        "name": "Kitchens Rice Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Marsh Rice",
+        "count": 5,
+        "coinCopper": 20
       },
       {
         "id": "q_prof_workorder_loom",

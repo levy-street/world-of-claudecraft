@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-v039-icon-art-first-pass-2026-08-16",
+    "acceptedDate": "2026-08-16",
+    "baseRelease": "release/v0.39.0",
+    "baseCommit": "d2d1a8ad5c11",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "rasterPaintings": 9,
+    "petActionCommands": 8,
+    "exactRuntimeAuras": 1
+  },
+  "generationContract": {
+    "oneCallPerDistinctAsset": true,
+    "freshDistinctCompositions": true,
+    "sourceRetention": "Accepted 1254px masters remain under the gitignored tmp/imagegen tree in this worktree.",
+    "processing": "Each square sRGB master was scaled to exact 128px and encoded as opaque WebP at quality 82 by scripts/convert_skill_icons_webp.mjs with its 15 KiB gate.",
+    "review": "Every source and shipping icon was inspected as a family at 128px and at its relevant 13px to 48px runtime sizes."
+  },
+  "contract": {
+    "width": 128,
+    "height": 128,
+    "maxBytes": 15360,
+    "alpha": "opaque",
+    "colourspace": "srgb"
+  },
+  "assets": [
+    {
+      "kind": "ability",
+      "id": "pet_attack",
+      "runtimeUrl": "/ui/skills/pet/pet_attack.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_attack.png",
+      "sourceBytes": 1895949,
+      "sourceSha256": "d5cae82f10bc9d1d79c6c52bd642fc6da481ecce50d232463b4b03b3fa97f87e",
+      "acceptedBytes": 3374,
+      "acceptedSha256": "0c76dc1ae06ab0ce3fe4870ef57d5ae3f82f554a4aef3209e296066f0805df24",
+      "references": [
+        "public/ui/skills/hunter/bestial_wrath.webp",
+        "public/ui/skills/hunter/counter_shot.webp",
+        "public/ui/skills/warrior/deep_wounds.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: borderless square game action-bar icon for the shared pet command family in World of ClaudeCraft\nPrimary request: create fresh, distinct, premium hand-painted dark-fantasy MMORPG icon art for Pet Attack (pet_attack)\nCanonical mechanic: commands the player's summoned animal, elemental, or demon companion to attack the current hostile target.\nSubject: one powerful forward-thrusting companion paw, with four clearly separated claws sweeping toward a small distant hostile-target spark; show decisive commanded motion, not uncontrolled rage. Keep the paw creature-neutral so it can represent beast, elemental, or demon pets. Do not depict a full humanoid, weapon, button cursor, paw-print emblem, or blood.\nScene/backdrop: fully opaque full-square atmospheric background, blackened umber and deep charcoal with restrained amber-red motion light.\nComposition/framing: one dominant readable diagonal action, visually centered, subject fills 78 to 86 percent with safe margins; the claws and target spark must remain recognizable at 32px, 40px, and 48px. Strong silhouette, three broad value groups, crisp focal edges with softer peripheral atmosphere.\nReference roles: bestial_wrath is subject mood and animal-energy reference only; counter_shot is the clarity, impact, and premium painted-finish reference; deep_wounds is the dark-value and controlled crimson reference. Create a new composition and do not copy their exact subjects.\nLighting/mood: deep values, restrained saturation, warm rim light on the striking paw, clear target-directed motion.\nConstraints: opaque square; no transparency; no text, letters, numbers, border, frame, rarity chrome, UI button chrome, watermark, modern graphic design, flat glyph, logo, gore, blood splatter, duplicated paws, cropped claws, or tiny decorative detail."
+    },
+    {
+      "kind": "ability",
+      "id": "pet_growl",
+      "runtimeUrl": "/ui/skills/pet/pet_growl.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_growl.png",
+      "sourceBytes": 2006614,
+      "sourceSha256": "83e019b6f890dd2f36d1fd4595e1278138be656dd4956f752ae512b33ca9fdab",
+      "acceptedBytes": 3800,
+      "acceptedSha256": "6d0a72d49deeb79855c8899d9b07d566b6279548da21cc35132be38c1522bb17",
+      "references": [
+        "public/ui/skills/druid/challenging_roar.webp",
+        "public/ui/skills/hunter/bestial_wrath.webp",
+        "public/ui/skills/hunter/counter_shot.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: borderless square game action-bar icon for the shared pet command family in World of ClaudeCraft\nPrimary request: create fresh, distinct, premium hand-painted dark-fantasy MMORPG icon art for Pet Growl and Taunt (pet_growl)\nCanonical mechanic: commands the companion to engage the hostile target and use Growl in range, forcing its attention; 10 second cooldown and optional autocast.\nSubject: a close three-quarter view of a creature-neutral companion muzzle snarling with visible fangs, releasing two bold ochre-gold concentric sound waves toward a single small red hostile eye or target glint. The image must communicate provocation and threat control, not raw damage. Use a generalized shadowed beast silhouette rather than a recognizable species.\nScene/backdrop: fully opaque full-square atmospheric background in deep umber, smoked gold, and blackened brown, with a restrained crimson target accent.\nComposition/framing: one dominant snarling muzzle and two readable outward waves, centered, filling 78 to 86 percent with safe margins; clear at 32px, 40px, and 48px. Strong silhouette, three broad value groups, crisp fangs and wave edges, soft peripheral atmosphere.\nReference roles: challenging_roar is the growling subject reference only; bestial_wrath is the animal-energy and dark MMORPG palette reference; counter_shot is the clean action direction and premium painted-finish reference. Create a fresh composition that cannot be confused with challenging_roar.\nLighting/mood: controlled gold rim light around muzzle and waves, deep shadows, tense commanding mood.\nConstraints: opaque square; no transparency; no text, letters, numbers, border, frame, rarity chrome, UI button chrome, watermark, modern graphic design, flat glyph, logo, gore, blood, full-body animal, duplicated heads, or tiny decorative detail."
+    },
+    {
+      "kind": "ability",
+      "id": "pet_water_jet",
+      "runtimeUrl": "/ui/skills/pet/pet_water_jet.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_water_jet.png",
+      "sourceBytes": 2507001,
+      "sourceSha256": "f585c7472a90892b0679f472aaf0db36b22dde1bd50d90d8211965a6acfa41e1",
+      "acceptedBytes": 5458,
+      "acceptedSha256": "ad2716d07210c5c3c6a41635f7ede47c90ddd5784264e44446ab66b5e7b82077",
+      "references": [
+        "public/ui/skills/mage/deep_freeze.webp",
+        "public/ui/skills/mage/ice_lance.webp",
+        "public/ui/skills/hunter/counter_shot.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: borderless square game action-bar icon for the shared pet command family in World of ClaudeCraft\nPrimary request: create fresh, distinct, premium hand-painted dark-fantasy MMORPG icon art for Water Jet (pet_water_jet)\nCanonical mechanic: commands the Mage's Water Elemental to channel a slowing stream into a hostile target for 3 seconds; 8 second cooldown and optional autocast.\nSubject: a translucent elemental hand at lower left driving one continuous, forceful turquoise water stream diagonally toward upper right; the stream wraps the ankle silhouette of a small distant hostile target in a single bright icy-blue slowing ring. Clearly depict flowing water under pressure, not a fireball, lightning bolt, snowflake, ice lance, or frozen block.\nScene/backdrop: fully opaque full-square atmospheric background of midnight navy, deep teal, and cold cyan mist.\nComposition/framing: one dominant diagonal water stream with the elemental hand and slowing ring as secondary anchors, centered overall, filling 78 to 86 percent with safe margins; readable at 32px, 40px, and 48px. Strong silhouette, three broad value groups, crisp stream crest and hand edges with soft spray at the periphery.\nReference roles: deep_freeze is the deep-blue value structure and premium painted-finish reference; ice_lance is the Mage frost palette reference only; counter_shot is the clear target-directed action and small-size readability reference. Create a new borderless composition and do not copy their exact subjects.\nLighting/mood: luminous turquoise core in the stream, dark aquatic depth, controlled cool glow, urgent directed motion.\nConstraints: opaque square; no transparency; no text, letters, numbers, border, frame, rarity chrome, UI button chrome, watermark, modern graphic design, flat glyph, logo, generic snowflake emblem, full character portrait, duplicated hands, cropped focal subject, or tiny decorative detail."
+    },
+    {
+      "kind": "ability",
+      "id": "pet_mend",
+      "runtimeUrl": "/ui/skills/pet/pet_mend.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_mend.png",
+      "sourceBytes": 1798250,
+      "sourceSha256": "5ed59bfca74d16e199b32b95d1bb5e2e1be2cfff2c05372bd42dd4c10238722b",
+      "acceptedBytes": 3600,
+      "acceptedSha256": "ca3b1c453100b20a457a0044fccaf704d4825da304913770d03ef0ea01499b61",
+      "references": [
+        "public/ui/skills/warlock/death_coil.webp",
+        "public/ui/skills/warlock/gloomshade_abyssal_chain.webp",
+        "public/ui/skills/warlock/drain_life.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: borderless square game action-bar icon for the shared pet command family in World of ClaudeCraft\nPrimary request: create fresh, distinct, premium hand-painted dark-fantasy MMORPG icon art for Heal Demon (pet_mend)\nCanonical mechanic: a Warlock spends mana to channel healing energy into the summoned demon over 5 seconds.\nSubject: a spectral violet Warlock hand at lower left channeling one thick, continuous ribbon of purple-magenta energy into a cracked ember-red core set inside a shadowed horned demon chest silhouette at upper right; the cracks visibly seal where the energy reaches them. Communicate demonic mending and sustained channeling, not life drain, resurrection, holy healing, food, or affection.\nScene/backdrop: fully opaque full-square atmospheric background in near-black plum, deep violet, and restrained ember red.\nComposition/framing: one dominant curved channel ribbon connecting hand to cracked demon core, centered overall, filling 78 to 86 percent with safe margins; readable at 32px, 40px, and 48px. Strong silhouette and three broad value groups, crisp energy connection and core cracks, soft shadow atmosphere at edges.\nReference roles: death_coil is the premium violet-magenta painted-finish and energy-flow reference; gloomshade_abyssal_chain is the dark demonic material and controlled highlights reference; drain_life is only the sustained channel direction reference. Create a fresh composition that clearly flows toward and repairs the demon, not away from it.\nLighting/mood: ominous but restorative, controlled violet glow on the horned silhouette, ember core shifting from cracked red to sealed purple.\nConstraints: opaque square; no transparency; no text, letters, numbers, border, frame, rarity chrome, UI button chrome, watermark, modern graphic design, flat glyph, logo, holy gold, green nature magic, food, anatomical gore, blood, full humanoid portrait, duplicated hands, or tiny decorative detail."
+    },
+    {
+      "kind": "ability",
+      "id": "pet_feed",
+      "runtimeUrl": "/ui/skills/pet/pet_feed.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_feed.png",
+      "sourceBytes": 2017879,
+      "sourceSha256": "b4d346252229950fecc6541bfd3c13f54742c100118a173b2ac59e56aa5c7611",
+      "acceptedBytes": 4050,
+      "acceptedSha256": "7c0606789fc652abcc161e6d2983c0ea75b21ab472d365185a91b838d64e2f20",
+      "references": [
+        "public/ui/skills/hunter/bestial_wrath.webp",
+        "public/ui/skills/hunter/mend_pet.webp",
+        "public/ui/skills/warlock/gloomshade_abyssal_chain.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: square MMORPG pet-command action-bar icon\nInput images: Images 1, 2, and 3 are visual-finish references only. Match their premium hand-painted dark-fantasy rendering, dense brushwork, dramatic depth, and small-size readability. Do not copy their subjects or compositions.\nPrimary request: Create the Feed Pet command icon as a leather-gloved hunter hand offering a rustic roasted meat haunch directly to an eager animal companion muzzle.\nScene/backdrop: Full opaque square atmospheric backdrop of a dim woodland camp, warm earth and restrained amber firelight, darkest at the corners, with no empty transparency.\nSubject: A substantial bone-in roasted meat haunch is the clear central focal point, held securely in one practical worn leather glove. A friendly but eager furred animal muzzle leans toward the food, clearly about to accept it. Show only enough muzzle to communicate a living beast companion, not a monster attack.\nStyle/medium: Premium borderless hand-painted dark-fantasy MMORPG ability art, richly textured and dimensional, not a flat glyph and not modern graphic design.\nComposition/framing: Square 1:1. The hand, haunch, and muzzle form one bold centered interaction filling about 84 percent of the canvas with safe margins. Strong silhouettes and broad warm-cool value grouping must remain legible at 32, 40, and 48 pixels.\nLighting/mood: Warm practical care between hunter and companion, muted amber firelight, rich umber, roast-brown, charcoal, and natural fur tones.\nMaterials/textures: Crisp roasted meat surface, pale sturdy bone, creased weathered leather glove, natural fur and nose, restrained painterly camp haze.\nConstraints: Cohesive with the reference icons' finish. Full opaque artwork to every edge. Exactly one gloved hand, one meat haunch, and one animal muzzle. No magic glow, green spell energy, heart, plus sign, healing symbol, plate, utensils, feast table, humanoid face, blood, gore, text, letters, numbers, border, frame, badge, UI chrome, or watermark.\nAvoid: neon saturation, cute pet-food branding, cartoon treat, raw bloody meat, glossy 3D render, photorealism, vector art, flat iconography, decorative border."
+    },
+    {
+      "kind": "ability",
+      "id": "pet_passive",
+      "runtimeUrl": "/ui/skills/pet/pet_passive.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_passive.png",
+      "sourceBytes": 1998653,
+      "sourceSha256": "827939d774a90e7157f6e95b88e24228168727612f3715064900e8a2caa15c20",
+      "acceptedBytes": 3214,
+      "acceptedSha256": "8e73cfaf51c6f7494a392c52bd4b18d95762765f60c2a38db8a3d64d067efd58",
+      "references": [
+        "public/ui/skills/hunter/bestial_wrath.webp",
+        "public/ui/skills/hunter/mend_pet.webp",
+        "public/ui/skills/warlock/gloomshade_abyssal_chain.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: square MMORPG pet-command action-bar icon\nInput images: Images 1, 2, and 3 are visual-finish references only. Match their premium hand-painted dark-fantasy rendering, dense brushwork, dramatic depth, and small-size readability. Do not copy their subjects or compositions.\nPrimary request: Create the Passive pet-command icon as a calm, alert companion paw resting naturally with its claws fully retracted.\nScene/backdrop: Full opaque square atmospheric backdrop of shadowed forest earth and very subtle mossy haze, darkest at the corners, with no empty transparency.\nSubject: One large animal forepaw resting diagonally across a worn patch of earth, relaxed but ready. The paw anatomy must read immediately as a loyal beast companion at heel. Claws are fully retracted, with no injury, spell effect, or sleep symbol.\nStyle/medium: Premium borderless hand-painted dark-fantasy MMORPG ability art, richly textured and dimensional, not a flat glyph and not modern graphic design.\nComposition/framing: Square 1:1. One bold centered motif fills about 80 percent of the canvas with safe margins. Strong silhouette and broad value grouping must remain legible at 32, 40, and 48 pixels.\nLighting/mood: Quiet vigilance, soft low amber rim light, muted moss green and umber, deep charcoal shadows.\nMaterials/textures: Natural fur, leathery paw pads, compacted earth, restrained painterly atmosphere.\nConstraints: Cohesive with the reference icons' finish. Full opaque artwork to every edge. No text, letters, numbers, border, frame, badge, UI chrome, watermark, heart, plus sign, healing glow, closed eye, sleeping pose, Z symbol, raised claws, blood, or extra limbs.\nAvoid: neon saturation, glossy 3D render, photorealism, vector art, flat iconography, cartoon styling, logos, decorative border."
+    },
+    {
+      "kind": "ability",
+      "id": "pet_defensive",
+      "runtimeUrl": "/ui/skills/pet/pet_defensive.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_defensive.png",
+      "sourceBytes": 2649770,
+      "sourceSha256": "5f7fef746b165ecb241945566112438639877271be7391328ef658b1265f217e",
+      "acceptedBytes": 3294,
+      "acceptedSha256": "b2d04ae1e2e0cf1cc3c751a0be4cd6181a3981d72471c1d676e8217fe75a8242",
+      "references": [
+        "public/ui/skills/hunter/bestial_wrath.webp",
+        "public/ui/skills/hunter/mend_pet.webp",
+        "public/ui/skills/paladin/holy_shield.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: square MMORPG pet-command action-bar icon\nInput images: Images 1 and 2 are visual-finish references only. Match their premium hand-painted dark-fantasy rendering, dense brushwork, dramatic depth, and small-size readability. Image 3 is a shield-subject reference only; use the clear shield silhouette, but do not copy its holy magic, composition, or ornament.\nPrimary request: Create the Defensive pet-command icon as a loyal beast paw braced protectively behind a battered steel-and-leather shield.\nScene/backdrop: Full opaque square atmospheric backdrop of smoke-darkened earth and restrained amber haze, darkest at the corners, with no empty transparency.\nSubject: A sturdy, plainly forged round or kite shield dominates the foreground, angled toward an incoming threat. One powerful furred companion paw is visibly planted behind and against the shield, clearly holding the defensive line. The shield is battered steel reinforced with weathered brown leather, practical rather than royal or holy.\nStyle/medium: Premium borderless hand-painted dark-fantasy MMORPG ability art, richly textured and dimensional, not a flat glyph and not modern graphic design.\nComposition/framing: Square 1:1. One bold centered protective motif fills about 82 percent of the canvas with safe margins. Strong shield-and-paw silhouette and broad value grouping must remain legible at 32, 40, and 48 pixels.\nLighting/mood: Resolute protection, cool steel-blue highlights balanced by warm amber rim light, deep charcoal shadows.\nMaterials/textures: Hammered scratched steel, worn leather straps and edging, coarse animal fur, restrained painterly smoke.\nConstraints: Cohesive with the reference icons' finish. Full opaque artwork to every edge. No humanoid hand or arm. No text, letters, numbers, border, frame, badge, UI chrome, watermark, cross, crest, crown, rune, halo, holy symbol, floating magic ring, or extra limbs.\nAvoid: neon saturation, golden holy spell effects, pristine ceremonial shield, glossy 3D render, photorealism, vector art, flat iconography, cartoon styling, logos, decorative border."
+    },
+    {
+      "kind": "ability",
+      "id": "pet_aggressive",
+      "runtimeUrl": "/ui/skills/pet/pet_aggressive.webp",
+      "sourcePath": "tmp/imagegen/v039-pet-action-icons/raw/pet_aggressive.png",
+      "sourceBytes": 2047090,
+      "sourceSha256": "afb1f3d392a1f10b7fa4921875d10f6cf793a4843819aceeaf80a2b047b83717",
+      "acceptedBytes": 3060,
+      "acceptedSha256": "2bddd621dc9d530964f9eaafec9144a63a9e4083b26fe0475f4449a9d4bd2531",
+      "references": [
+        "public/ui/skills/hunter/bestial_wrath.webp",
+        "public/ui/skills/hunter/mend_pet.webp",
+        "public/ui/skills/warlock/gloomshade_abyssal_chain.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: square MMORPG pet-command action-bar icon\nInput images: Images 1, 2, and 3 are visual-finish references only. Match their premium hand-painted dark-fantasy rendering, dense brushwork, dramatic depth, and small-size readability. Do not copy their subjects or compositions.\nPrimary request: Create the Aggressive pet-command icon as exactly three fresh diagonal claw slashes backed by the shadowed suggestion of a lunging predator and one fierce eye.\nScene/backdrop: Full opaque square atmospheric backdrop of blackened steel, smoke, and deep shadow, darkest at the corners, with no empty transparency.\nSubject: Exactly three bold parallel claw cuts sweep diagonally through the center, freshly torn into a dark weathered surface. Behind the cuts, reveal only a restrained partial predator silhouette and one intent eye lunging forward from shadow. This must communicate an aggressive combat stance, not a single attack impact.\nStyle/medium: Premium borderless hand-painted dark-fantasy MMORPG ability art, richly textured and dimensional, not a flat glyph and not modern graphic design.\nComposition/framing: Square 1:1. The three-slash motif fills about 82 percent of the canvas with safe margins. Large broad shapes and strong light-dark grouping must remain legible at 32, 40, and 48 pixels.\nLighting/mood: Controlled menace and forward pressure, restrained crimson inner light inside the fresh cuts, blackened steel gray, ember-red eye, deep charcoal shadows.\nMaterials/textures: Gouged metal or stone, sharp torn edges, coarse shadowed fur, restrained smoke and embers.\nConstraints: Cohesive with the reference icons' finish. Full opaque artwork to every edge. Exactly three claw slashes. No visible attacking paw or hand, no blood spray, no gore, no victim, no text, letters, numbers, border, frame, badge, UI chrome, watermark, rune, or extra eyes.\nAvoid: neon red, excessive fire, generic red X, abstract logo, glossy 3D render, photorealism, vector art, flat iconography, cartoon styling, decorative border."
+    },
+    {
+      "kind": "aura",
+      "id": "cheater_mark",
+      "runtimeUrl": "/ui/auras/cheater_mark.webp",
+      "sourcePath": "tmp/imagegen/v039-aura-icons/raw/cheater_mark.png",
+      "sourceBytes": 2334597,
+      "sourceSha256": "7c83a9c969deb20752007f22c74fc2f42334f07fd4b964a960aaaa54c6903af3",
+      "acceptedBytes": 3780,
+      "acceptedSha256": "862a4533dc3199f28e275ae8ff31819081168d0e96c3fba46d6814a475679f67",
+      "references": [
+        "public/ui/skills/warlock/evil_eye.webp",
+        "public/ui/skills/warlock/ruinous_brand.webp",
+        "public/ui/skills/rogue/cold_blood.webp"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: borderless square game aura icon for World of ClaudeCraft\nPrimary request: create fresh, distinct, premium hand-painted dark-fantasy MMORPG aura art for Marked as a Cheater (cheater_mark)\nCanonical mechanic: an operator-applied, account-wide, public sanction marker that is power-neutral, undispellable, and remains visibly attached to every character on the account until its played-time countdown expires. This is a warning identity, not a damage spell or combat handicap.\nSubject: one bold asymmetrical blood-red brand sigil burned into a rough near-black surface, with a single bone-white vigilant eye embedded at its center. The sigil must be an original non-alphabetic warning shape with three thick hooked strokes, visibly scorched and branded, while the eye communicates that the wearer is seen. Do not use a real-world letter, numeral, religious mark, occult pentagram, corporate logo, or familiar game emblem.\nScene/backdrop: fully opaque full-square field of charcoal-black hide or weathered stone, deep dried-crimson glow inside the brand, faint smoke at the corners.\nComposition/framing: one dominant centered brand and eye, filling 76 to 84 percent with safe margins; extremely strong silhouette and three broad value groups. It must remain unmistakable at 13px, 16px, 28px, 34px, and 40px, including grayscale. Crisp eye and thick brand edges, almost no micro-detail.\nReference roles: evil_eye is the single-eye readability and premium painted-finish reference; ruinous_brand is the scorched-brand material and restrained red-violet palette reference; cold_blood is the centered high-contrast small-icon clarity reference. Create an original subject and composition.\nLighting/mood: severe, ominous, watchful, controlled blood-red emission against deep shadow; the bone eye is the brightest focal point.\nConstraints: opaque square; no transparency; no text, letters, numbers, border, frame, rarity chrome, UI button chrome, watermark, modern graphic design, flat glyph, logo, pentagram, skull, gore, dripping blood, weapon, full face, duplicated eyes, decorative runic writing, or tiny peripheral detail."
+    }
+  ]
+}

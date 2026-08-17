@@ -17,11 +17,14 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // main's hammer_of_wrath execute gate thinning the rotation's Devotion grants
 // above 20% target health; flagged for the owner's review, band intact.
 // Re-pinned for the v0.36 composition: holy 41.25 to 42.45, protection 38.65
-// to 38.1, retribution 54.35 to 48.35. The wide 35-65s design band still holds.
+// to 38.1, retribution 54.35 to 48.35. Re-pinned again on the v0.37.0 castle
+// base, whose world content forks the shared stream: holy 42.45 to 41.25,
+// protection 38.1 to 38.65, retribution 48.35 to 55.75. The wide 35-65s
+// design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
-  holy: 42.45,
-  protection: 38.1,
-  retribution: 48.35,
+  holy: 41.25,
+  protection: 38.65,
+  retribution: 55.75,
 };
 
 function addDummy(sim: Sim): Entity {

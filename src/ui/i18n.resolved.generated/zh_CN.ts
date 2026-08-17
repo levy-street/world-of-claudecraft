@@ -958,6 +958,22 @@ export const zh_CN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "地下穹室",
+        "state": "正殿层",
+        "residence": "起居层",
+        "tower": "瞭望塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "庭园层",
+        "solar": "日光厅"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "东北",
@@ -3096,8 +3112,11 @@ export const zh_CN: EnTranslations = {
         "no_fee_produce": "你没有可以支付看守费的农产品。",
         "no_tonic": "你没有生长滋补剂。",
         "tool": "你没有适合该作物的耕作锄。",
-        "locked": "有一件可用于支付的物品已被锁定。"
+        "locked": "有一件可用于支付的物品已被锁定。",
+        "no_farmer": "你必须靠近农夫才能用谷壳换堆肥。"
       },
+      "huskTrade": "用谷壳换堆肥",
+      "huskTradeAria": "与{name}用枯萎谷壳换取堆肥",
       "husksConvertedLine": "你用{husksName} x{husks}换取了{name}。",
       "husksConvertedLineQty": "你用{husksName} x{husks}换取了{name} x{qty}。",
       "readyLine": "有一块作物可以收获了。",
@@ -5779,7 +5798,7 @@ export const zh_CN: EnTranslations = {
         "logging": "伐木在三大区域的林地中砍伐木材：东溪谷产铁皮木，泥沼湿地产梣木，荆峰高地产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，只需背包里备有一把伐木斧（任意主城20铜），以独立计数器追踪，上限为100。",
         "herbalism": "草药学采集野生植物：东溪谷产润光叶，泥沼湿地产金叶，荆峰高地产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，只需背包里备有一把草药镰（任意主城20铜），以独立计数器追踪，上限为100。",
         "fishing": "钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。",
-        "farming": "耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人不在时作物照样生长，回来时拔起成熟的收成。从Eastbrook的份地到Evergarden的花圃，每处耕作据点都有自己的田畦，阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级。农活由锄头开启：Garden Hoe照看起步的田畦，更高各级则由工程师打造。熟练在专属计数上累积，上限为100。"
+        "farming": "耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人在与不在作物都按自己的钟点生长，无论何时回来都能拔起成熟的收成，因为田畦里的东西从不腐坏。从Eastbrook的份地经Fenbridge、Highwatch直到Evergarden的花圃，每处田畦旁都站着一位农夫，而Eastbrook的Farmer Jessica是这门手艺的起点：她出售Garden Hoe和最初的种子，她的差事会带新手农夫种完第一茬。阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级，起步田畦之上更难耕的土地所需的锄头则由工程师打造。熟练在专属计数上累积，上限为100。"
       },
       "rhythmHeading": "采集节奏",
       "rhythmBody": "采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。",
@@ -5834,6 +5853,10 @@ export const zh_CN: EnTranslations = {
         "koiHeading": "日辉锦鲤",
         "koiBody": "全世界的每片水域都藏着同一份大奖：日辉锦鲤，一尾优秀品质的闪光锦鲤，卖给商人值75铜，对你的自豪感则远不止此。它的几率固定为每次起竿3%（Thornpeak的冷水中为4%），不随等级段变化，因此码头上的新手与Master Angler机会均等。钓起它会在功业之书记下Glimmer of Hope（零声望的收藏印记）。当那一刻来临，战斗日志会让你知道。"
       },
+      "farm": {
+        "bedsHeading": "打理田畦",
+        "bedsBody": "流程很短。向田畦旁的农夫购买种子和堆肥：Eastbrook的Jessica备有谷地的两种，Fenbridge的农夫备有沼泽的两种，而Highwatch和Evergarden的种子没有任何柜台出售，它们只会从高阶收成中一两粒地返还，其余则在World Market上流转。行囊里带着锄头播种，愿意的话再压一压胜算：柜台的堆肥和播种时用农产品支付的农夫看护都会提高作物成活的几率，炼金术士的生长滋补剂让收成有机会更丰，而一旦你的熟练比作物所在阶高出整整一档，那种作物就再也不会失败。然后走开就好。你下线时田畦照样生长，成熟的作物你放多久它等多久，收成日志（Shift+K，或专业窗口的耕作一行）列出你种下的每一畦及其计时。\n\n失败的作物留下枯萎的谷壳而非农产品，任何农夫都会用谷壳换堆肥，于是坏年景买下了下一季的保险。收上来的东西供养厨房：农产品在厨房烹成菜肴，Cook Marlow的小麦和稻米工单按与其他任何工单相同的钟点，用铜币收走你的Vale Wheat和Marsh Rice。"
+      },
       "econ": {
         "title": "制作经济",
         "intro": "专业经济背后的确切费用、回收与报酬。",
@@ -5856,7 +5879,7 @@ export const zh_CN: EnTranslations = {
         "marketHeading": "世界市场与抽成",
         "marketBody": "世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。特殊物品同样欢迎：署名、杰作或附魔的副本会以单件挂单上架，提示中带着完整的身份与署名，且绝不与普通堆叠混同。唯一拒收的是已绑定的副本：被制作者之约锁定（或仍待绑定）的物品既不能上市也不能邮寄，绑定无法被洗白。特殊物品请自行定价；普通挂单只能告诉你普通版的行情。",
         "workOrdersHeading": "工作订单",
-        "workOrdersNote": "每位大师都会以商店价的{pct}%收购一批本行常用材料，每{minutes}分钟可重复一次。",
+        "workOrdersNote": "每位大师都张贴工单，每种常用材料一张，按商店价的{pct}%收购工单要求的一批。每张工单各有{minutes}分钟的计时：交付后只有那张工单关闭，同一位大师的其他工单照常开放。",
         "colOrder": "工作订单",
         "colMaster": "大师",
         "colAsks": "需求",
@@ -12456,6 +12479,9 @@ export const zh_CN: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "dawnhold_posy": {
+        "name": "晨曦堡花园小花束"
+      },
       "vale_wheat_seed": {
         "name": "谷地小麦种子"
       },
@@ -14494,6 +14520,26 @@ export const zh_CN: EnTranslations = {
         "title": "药坊大师",
         "greeting": "量两次，倒一次，{className}。药坊里容不得洒掉的药剂。"
       },
+      "farmer_jessica": {
+        "name": "农妇杰西卡",
+        "title": "菜园管事",
+        "greeting": "祝你土好天晴，{playerName}。从我这里买粒种子，播到那边任意一块田畦里，然后该忙什么忙什么去。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。"
+      },
+      "farmer_teasel": {
+        "name": "农夫蒂泽尔",
+        "title": "沼地稻田农夫",
+        "greeting": "沼泽稻米和沼泽甜菜的种子，{className}，还有喂养它们的堆肥。稻田排水慢，脚下留神。"
+      },
+      "farmer_hollis": {
+        "name": "农夫霍利斯",
+        "title": "高望梯田农夫",
+        "greeting": "梯田只给山肯给的那么多，{className}。我卖堆肥，要是你的庄稼枯萎了，我可以把谷壳重新沤成好土给你。"
+      },
+      "farmer_verbena": {
+        "name": "农妇维贝娜",
+        "title": "花坛园丁",
+        "greeting": "当心镶边，{playerName}，这些田畦可是花坛的骄傲。我卖的是堆肥，你带来的枯萎谷壳，我都能给你变成更多堆肥。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
@@ -14508,6 +14554,19 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已开采矿脉"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "第一道犁沟",
+        "text": "拿着这把锄头和一小撮谷地小麦种子，{playerName}。把种子播到我旁边任意一块田畦里，然后去忙你的事。想什么时候回来收庄稼都行；我会在这儿。",
+        "completion": "瞧，你亲手种出的第一茬庄稼。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。田畦召唤你的时候，随时回来买种子，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已种下谷地小麦"
+          },
+          "1": {
+            "label": "已收获谷地小麦"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已交付野味肉"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "厨房小麦工单",
+        "text": "面包不会自己烤出来，{playerName}，我的面粉柜都快见底了。给我送来八捆谷地小麦，我按实价付你整批的钱。是你亲手种的还是从市场买的，我不在乎，磨得出粉就行。",
+        "completion": "好干爽的粮食，还不少。这是你的酬劳，一枚不差。下一茬收上来的时候，你知道该敲哪扇门。",
+        "objectives": {
+          "0": {
+            "label": "已交付谷地小麦"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "厨房稻米工单",
+        "text": "沼泽人对自家的米赞不绝口，{playerName}，我倒要弄明白是为什么。给我弄来五升沼泽稻米，钱就在这儿等着你。路上留神别弄湿了：湿米就是粥，我可没点过粥。",
+        "completion": "粒粒饱满干爽。这是你的钱。只要沼泽还长米，我就一直收。",
+        "objectives": {
+          "0": {
+            "label": "已交付沼泽稻米"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const zh_CN: EnTranslations = {
         "name": "最后的堡垒",
         "enterText": "你踏入最后的堡垒那冰冷而寂静的大厅。",
         "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
+      },
+      "dawnhold_castle": {
+        "name": "晨曦堡",
+        "enterText": "你走进晨曦堡温暖而花香四溢的厅堂。",
+        "leaveText": "你回到阳光洒落的花园草坪上。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

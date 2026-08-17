@@ -52,21 +52,201 @@
     },
     {
       "abilityId": "aspect_of_the_hawk",
-      "sourcePack": "generic-rpg100",
-      "sourceFile": "skill 27.png",
-      "output": "aspect_of_the_hawk.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/aspect_of_the_hawk.png",
+      "output": "aspect_of_the_hawk.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A proud harrier hawk with half-spread wings and restrained amber-gold hunting power along its feathers.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/hunter/aspect_of_the_wild.webp",
+          "role": "match its premium animal-aspect portrait language, earthy Hunter palette, and amber aura"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/hunter/aspect_of_the_monkey.webp",
+          "role": "use its readable single-animal silhouette and warm painted feather/fur detail, not its species"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/hunter/bestial_wrath.webp",
+          "role": "borrow its strong eye focus, dramatic dark backdrop, and action-bar contrast without using red rage energy"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Hunter skill \"Harrier's Guise\" (runtime ID aspect_of_the_hawk). It is an exclusive long-duration aspect that increases the Hunter's attack power.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Depict one fierce harrier hawk in a proud three-quarter portrait, hooked beak forward and wings half-spread behind it as one strong triangular silhouette. A restrained amber-gold hunting aura gathers along the wing edges and breast, while a single distant arrowhead-shaped glint points forward to imply heightened attack power. The hawk fills about 84% of the square with safe margins. Burnished brown feathers, dark forest green, weathered gold, and charcoal shadow; tactile painterly plumage and crisp value separation at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. aspect_of_the_wild.webp - match its premium animal-aspect portrait language, earthy Hunter palette, and amber aura.\n2. aspect_of_the_monkey.webp - use its readable single-animal silhouette and warm painted feather/fur detail, not its species.\n3. bestial_wrath.webp - borrow its strong eye focus, dramatic dark backdrop, and action-bar contrast without using red rage energy.\n\nNo eagle crest or heraldic emblem, owl, raven, multiple animals, bow, full arrow, attack impact, blood, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "bb02c3991b7e22bb008382afed61f03265ffccbca66be473accf8dbf92cac12f",
+      "sourceBytes": 2153118,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "a278be6f7d64929d3bfb63bb0cc1fb88daed554e7062dad09af5fca147ddb71b",
+      "acceptedBytes": 4522,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "generic-rpg100",
+        "sourceFile": "skill 27.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "aspect_of_the_hawk.webp",
+        "shippingSha256": "529d6fc108dd93be2eae47425a68eb115aa72d21921e168d2a876a01b9c92fdf",
+        "shippingBytes": 4554,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "tame_beast",
-      "sourcePack": "generic-skill100",
-      "sourceFile": "skill icon 75.png",
-      "output": "tame_beast.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/tame_beast.png",
+      "output": "tame_beast.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A weathered hunter glove meeting a cautious gray-wolf muzzle around a newly forming green-gold braided bond.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/hunter/mend_pet.webp",
+          "role": "use its close hunter-hand-and-animal interaction, tactile glove/fur materials, and green Nature lighting, but remove all healing cues"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/hunter/aspect_of_the_wild.webp",
+          "role": "match its premium wild-animal anatomy, earthy Hunter palette, and atmospheric depth"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/hunter/pack_command.webp",
+          "role": "borrow its compact pet-command composition and strong focal contrast without copying its action"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Hunter skill \"Wildbond\" (runtime ID tame_beast). It is a six-second cast that patiently tames an eligible wild beast as the Hunter's one companion. This is a new bond, not pet healing or domination.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show a weathered leather-gloved hunter hand held palm-down and still, meeting the cautious nose and brow of one gray wild wolf approaching from the opposite side. Between hand and muzzle, one thin braided strand of moss-green and amber light is just beginning to knot, visibly incomplete to suggest a careful taming cast. Hand, wolf muzzle, and forming bond fill roughly 84% of the square with safe margins. Warm leather, charcoal fur, forest green, muted amber, and deep woodland shadow; intimate hand-painted dark-fantasy realism with bold shapes at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. mend_pet.webp - use its close hunter-hand-and-animal interaction, tactile glove/fur materials, and green Nature lighting, but remove all healing cues.\n2. aspect_of_the_wild.webp - match its premium wild-animal anatomy, earthy Hunter palette, and atmospheric depth.\n3. pack_command.webp - borrow its compact pet-command composition and strong focal contrast without copying its action.\n\nNo leash, chain, cage, collar, whip, glowing heart, medical cross, healing beam, threatening weapon, aggressive bite, magical domination eye, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "5f18e2399cbfa8847ab71517b435d3b8e00e01666a12d6e1110c6d1fc897e604",
+      "sourceBytes": 2000612,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "54ec0991bb9a48fda36e818114e4a83731fd88053917455d9ca752d70e23b887",
+      "acceptedBytes": 3254,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "generic-skill100",
+        "sourceFile": "skill icon 75.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "tame_beast.webp",
+        "shippingSha256": "70e4613a50fc4b12989f7dc25b235dbf5d4a20c9b7902db4753c4b708c71a109",
+        "shippingBytes": 2726,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "dismiss_pet",
-      "sourcePack": "generic-rpg100",
-      "sourceFile": "skill 70.png",
-      "output": "dismiss_pet.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/dismiss_pet.png",
+      "output": "dismiss_pet.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A large open hunter glove, unraveling green-gold bond, and healthy gray wolf turned peacefully toward the wild.",
+      "references": [
+        {
+          "order": 1,
+          "path": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/tame_beast.png",
+          "role": "newly approved companion-family source; preserve its tactile glove, gray-wolf anatomy, braided green-gold bond language, palette, and painterly finish, but reverse the interaction into release"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/hunter/aspect_of_the_wild.webp",
+          "role": "use its healthy wild-animal dignity, earthy Hunter colors, and atmospheric depth"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/hunter/trailbreak.webp",
+          "role": "borrow its compact directional path light and sense of leaving, not its boot subject"
+        }
+      ],
+      "generationPrompt": "Corrective repaint for a square 1:1 ability icon for World of ClaudeCraft's Hunter skill \"Release Companion\" (runtime ID dismiss_pet). It peacefully releases the Hunter's current pet back to the wild. This is a voluntary farewell, not death, banishment, fear, or combat.\n\nThe prior scenic version failed at 16 pixels because the hand and departing wolf were too small and separated by too much empty forest. Make this revision an extremely tight action-bar composition: a large open leather-gloved hunter palm fills the lower-left 38% of the square, and a large healthy gray-wolf head, shoulder, and upper back fill the upper-right 48%, turned clearly away toward warm forest light. Between the open palm and the wolf's departing shoulder, one thick braided moss-green-and-amber bond strand visibly unravels into three large motes. The glove, unraveling strand, and turned-away wolf must overlap the central region as one bold rising diagonal silhouette occupying 88% of the square with safe margins. Keep background detail subordinate and dark. Warm earth-brown leather, charcoal fur, forest green, muted amber, deep woodland shadow.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Optimize first for unmistakable readability at 16, 32, and 48 pixels: broad shapes, simplified values, bright bond against dark gap, no large empty area.\n\nReference roles, in exact supplied order:\n1. tame_beast.png - preserve its exact tactile glove, gray-wolf anatomy, braided green-gold bond language, palette, and painterly finish, but reverse the interaction into release.\n2. aspect_of_the_wild.webp - use its healthy wild-animal dignity, earthy Hunter colors, and atmospheric depth.\n3. trailbreak.webp - borrow its compact directional path light and sense of leaving, not its boot subject.\n\nNo distant full-body animal, panoramic forest scene, tiny subjects, corpse, wound, ghost, skull, grave, cage, chain, broken collar, kicked or frightened pet, red banishment portal, explosive magic, hunter weapon, tears, heart, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparency, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "eb5fc3723709720a2de51f21e82a44276f2abe151e8b0fd04c77394d656b65c7",
+      "sourceBytes": 2129225,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "52eadf332e1a375638833b36c6751e020b8f1b9fe04282296d2464e3547a70cb",
+      "acceptedBytes": 4022,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "generic-rpg100",
+        "sourceFile": "skill 70.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "dismiss_pet.webp",
+        "shippingSha256": "990fadabd966ea9577b48ec1652361b468b002ea8c35e9c7e42bd501d9203e79",
+        "shippingBytes": 3502,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "revive_pet",
@@ -473,7 +653,7 @@
   ],
   "note": "The v0.29 Hunter class rework icons are original project-generated art. Earlier abilities retain their recorded CraftPix provenance. Existing procedural recipes remain available as runtime resilience if a static asset cannot load.",
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v034_audit_2026_08_02 entries are project-generated and explicitly override it.",
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v034_audit_2026_08_02 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it.",
   "generatedArt": {
     "source": "OpenAI image generation through Codex",
     "generatedOn": "2026-07-25",

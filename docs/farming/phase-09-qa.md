@@ -8,6 +8,26 @@ red, only a player-facing refusal), confirms the work-order payout arithmetic ag
 its guard, and proves the atomicity claim: everything this phase opened is reachable,
 and everything later phases own is still not.
 
+PHASE 9 EXECUTED 2026-08-17 (read before the prompt below; state.md (bg) to (bm)
+are the in-phase deviations): no PR exists (D22): audit the phase-side commit chain of
+the merge into feature/farming-plan recorded in progress.md's Phase 9 notes tail,
+EXCLUDING the seventeenth absorb (89030e4e0f, d07b578e5d, 58d4332993, 11e0940da0, which
+carry their own audit). Rulings the QA verifies rather than re-decides: the four farmer
+names and titles (Jessica Allotment Keeper, Teasel Fen Paddy Farmer, Hollis Highwatch
+Terrace Farmer, Verbena Parterre Gardener); the intro grant fence and its trade-pipe
+leak ((bg), owed to the maintainer, not to this QA); the terrain pads ((bh): eyeball
+the Highwatch shelf around Farmer Hollis on the live client and report whether the
+mound reads badly; the beds' placement suite is green); the offered-but-refused band
+((bi), family-consistent); the module-import credit arm ((bj)); patchId marker-only
+((bk)); the R37 flip shape with garden_hoe at Jessica only ((bl)); two orders per
+master ((bm)). The journey probe recipe in progress.md notes the tier-1 watch fee is
+two produce and that tick() drains the event buffer. The live-client journey should
+also open the professions window's Farming row and Shift+K after the first plant (the
+Phase 8 (be) surfaces the intro copy points at). Expected reachable now: seeds tiers 1
+and 2, compost, brook_carrot, garden_hoe, the intro quest, husk conversion at every
+farmer, the ready notices, the cook loop; still unreachable: farming deeds,
+golden_harvest, well-fed dishes, the feast.
+
 ### QA Starter Prompt
 
 ```

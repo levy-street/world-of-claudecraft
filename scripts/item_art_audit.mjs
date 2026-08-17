@@ -99,14 +99,14 @@ const build = await buildItemArtAudit({
   mapping,
   pendingArtIds: [...pendingArtIds].sort(),
   expected: {
-    catalogCount: 822,
+    catalogCount: 823,
     // The ART-SUBJECT count: live defs minus the declared procedural-art
     // debt (ITEM_ART_PENDING, exact-set-pinned in tests/item_icons.test.ts).
-    // 837 is the v0.38.0 reviewed universe (the 2026-08-09 831 plus the
-    // release's six art-shipping additions) and stays a hard literal: a
-    // new item ships art (joining this count) or joins the pending pin, and
-    // either move is a visible, deliberate edit.
-    liveItemCount: 837,
+    // 838 is the v0.39.0 reviewed universe (the 2026-08-09 831 plus the
+    // release's seven art-shipping additions, the Dawnhold posy last) and
+    // stays a hard literal: a new item ships art (joining this count) or
+    // joins the pending pin, and either move is a visible, deliberate edit.
+    liveItemCount: 838,
     // The other half of the art-subject split: the declared procedural-art
     // debt, pinned as its own literal so the audit reds on new debt even
     // when it runs standalone (the vitest exact-set pin in

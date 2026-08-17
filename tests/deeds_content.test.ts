@@ -63,13 +63,15 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 271 deeds worth 3145 total Renown', () => {
+  it('ships exactly 273 deeds worth 3155 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0, so the Renown sum is UNCHANGED from
-    // the release base: catalog prestige never scores the board).
-    expect(DEED_ORDER.length).toBe(271);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3145);
+    // the release base: catalog prestige never scores the board), plus the
+    // walk-in castle visit pair (exp_the_last_keep, exp_dawnhold_castle,
+    // renown 5 each).
+    expect(DEED_ORDER.length).toBe(273);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3155);
   });
 
   it('ships the audited per-category counts', () => {
@@ -88,7 +90,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       social: 18,
-      exploration: 9,
+      exploration: 11,
       feat: 3,
       hidden: 9,
     });
@@ -214,6 +216,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_illum_nythraxis_heroic',
       'col_reliquary_illum_thunzharr',
       'col_reliquary_illum_gravewyrm_heroic',
+      // The walk-in castle visit pair appends last: the Last Keep's deed
+      // retro-fixes its shipped-without-deeds gap, Dawnhold's lands with
+      // its castle (both keyed on the enterDungeon markVisited emit).
+      'exp_the_last_keep',
+      'exp_dawnhold_castle',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -308,6 +315,22 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
     expect(DEEDS.dgn_rift_s_rank.hidden ?? false).toBe(false);
     expect(DEEDS.dgn_rift_s_rank.feat ?? false).toBe(false);
+  });
+
+  it('pins the walk-in castle visits: renown and trigger literals', () => {
+    // The castle visit pair: routine renown-5 walk-ins, no reward beyond it.
+    expect(DEEDS.exp_the_last_keep.renown).toBe(5);
+    expect(DEEDS.exp_the_last_keep.trigger).toEqual({
+      kind: 'visit',
+      markId: 'dungeon:the_last_keep',
+    });
+    expect(DEEDS.exp_the_last_keep.reward).toBeUndefined();
+    expect(DEEDS.exp_dawnhold_castle.renown).toBe(5);
+    expect(DEEDS.exp_dawnhold_castle.trigger).toEqual({
+      kind: 'visit',
+      markId: 'dungeon:dawnhold_castle',
+    });
+    expect(DEEDS.exp_dawnhold_castle.reward).toBeUndefined();
   });
 
   it('pins the professions additions: renown and trigger literals', () => {
@@ -555,7 +578,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
-  const FROZEN_CATALOG_SHA256 = 'e372e3f95f7b6063f461b9f00561eecf97849300f543dc88ddda97e487afe683';
+  // Re-baselined for the walk-in castle visit pair (exp_the_last_keep,
+  // exp_dawnhold_castle), which appends last; no shipped trigger or renown
+  // changed (the pair is new, every prior row reproduces the previous
+  // literal exactly).
+  const FROZEN_CATALOG_SHA256 = '36e9f3077709035c6f617f355572d5d911a0bde1ff6dd2676aace5505dd70a21';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -748,14 +775,14 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the evergarden
-    // first-cast closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and exp_dawnhold_castle
+    // closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Phase 18 Reliquary completion ladder appends after the WARFARE
-    // ladder; the Gravewyrm Illumination deed closes the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_reliquary_illum_gravewyrm_heroic');
+    // The walk-in castle visit pair appends after the Phase 18 Reliquary
+    // completion ladder; Dawnhold's deed closes the tail.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_dawnhold_castle');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

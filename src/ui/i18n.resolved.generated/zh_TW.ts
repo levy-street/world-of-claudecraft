@@ -958,6 +958,22 @@ export const zh_TW: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "地下穹室",
+        "state": "正殿層",
+        "residence": "起居層",
+        "tower": "瞭望塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "庭園層",
+        "solar": "日光廳"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "東北",
@@ -3096,8 +3112,11 @@ export const zh_TW: EnTranslations = {
         "no_fee_produce": "你沒有可以支付看守費的農產品。",
         "no_tonic": "你沒有生長滋補劑。",
         "tool": "你沒有適合該作物的耕作鋤。",
-        "locked": "有一件可用於支付的物品已被鎖定。"
+        "locked": "有一件可用於支付的物品已被鎖定。",
+        "no_farmer": "你必須靠近農夫才能用穀殼換堆肥。"
       },
+      "huskTrade": "用穀殼換堆肥",
+      "huskTradeAria": "與{name}用枯萎穀殼換取堆肥",
       "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
       "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。",
       "readyLine": "有一塊作物可以收成了。",
@@ -5779,7 +5798,7 @@ export const zh_TW: EnTranslations = {
         "logging": "伐木在三大區域的林地中砍伐木材：東溪谷產鐵皮木，泥沼濕地產梣木，荊峰高地產高松，供給武器柄材、法杖與工程師工坊。從1級起人人皆可伐木，只需背包中備有一把伐木斧（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
         "herbalism": "藥草學採集野地所生的草藥：東溪谷產潤光葉，泥沼濕地產金葉，荊峰高地產日瓣草，這些葉與莖讓藥劑類行業得以持續調製。從1級起人人皆可採集，只需背包中備有一把草藥鐮（各區域主城20銅幣），以獨立計數器追蹤，上限為100。",
         "fishing": "釣魚通過咬鉤與收線的節奏，在每個區域的開闊水面垂釣，上限為200。",
-        "farming": "耕作是唯一以照料代替採掘的採集行業：在整治好的田畦中播下種子，人不在時作物照樣生長，回來時拔起成熟的收成。從Eastbrook的份地到Evergarden的花圃，每處耕作據點都有自己的田畦，階梯的每一級都長著一對專屬作物，手藝到家還能收下精良等級。農活由鋤頭開啟：Garden Hoe照看起步的田畦，更高各級則由工程師打造。熟練在專屬計數上累積，上限為100。"
+        "farming": "耕作是唯一以照料代替採掘的採集行業：在整治好的田畦中播下種子，人在與不在作物都按自己的鐘點生長，無論何時回來都能拔起成熟的收成，因為田畦裡的東西從不腐壞。從Eastbrook的份地經Fenbridge、Highwatch直到Evergarden的花圃，每處田畦旁都站著一位農夫，而Eastbrook的Farmer Jessica是這門手藝的起點：她出售Garden Hoe和最初的種子，她的差事會帶新手農夫種完第一茬。階梯的每一級都長著一對專屬作物，手藝到家還能收下精良等級，起步田畦之上更難耕的土地所需的鋤頭則由工程師打造。熟練在專屬計數上累積，上限為100。"
       },
       "rhythmHeading": "採集節奏",
       "rhythmBody": "採集是一段可見的施法：基礎{base}秒，最短不低於{floor}秒；工具每高於節點一階縮短{tool}秒，每個熟練度區間再縮短{band}秒。",
@@ -5834,6 +5853,10 @@ export const zh_TW: EnTranslations = {
         "koiHeading": "日輝錦鯉",
         "koiBody": "全世界的每片水域都藏著同一份大獎：日輝錦鯉，一尾優秀品質的閃光錦鯉，賣給商人值75銅，對你的自豪感則遠不止此。牠的機率固定為每次起竿3%（Thornpeak的冷水中為4%），不隨技能變化，因此碼頭上的新手與Master Angler機會均等。釣起牠會在功業之書記下Glimmer of Hope（零聲望的收藏印記）。"
       },
+      "farm": {
+        "bedsHeading": "打理田畦",
+        "bedsBody": "流程很短。向田畦旁的農夫購買種子和堆肥：Eastbrook的Jessica備有谷地的兩種，Fenbridge的農夫備有沼澤的兩種，而Highwatch和Evergarden的種子沒有任何櫃檯出售，它們只會從高階收成中一兩粒地返還，其餘則在World Market上流轉。行囊裡帶著鋤頭播種，願意的話再壓一壓勝算：櫃檯的堆肥和播種時用農產品支付的農夫看護都會提高作物成活的機率，鍊金術士的生長滋補劑讓收成有機會更豐，而一旦你的熟練比作物所在階高出整整一檔，那種作物就再也不會失敗。然後走開就好。你下線時田畦照樣生長，成熟的作物你放多久它等多久，收成日誌（Shift+K，或專業視窗的耕作一行）列出你種下的每一畦及其計時。\n\n失敗的作物留下枯萎的穀殼而非農產品，任何農夫都會用穀殼換堆肥，於是壞年景買下了下一季的保險。收上來的東西供養廚房：農產品在廚房烹成菜餚，Cook Marlow的小麥和稻米工單按與其他任何工單相同的鐘點，用銅幣收走你的Vale Wheat和Marsh Rice。"
+      },
       "econ": {
         "title": "製作經濟",
         "intro": "專業經濟背後的確切費用、回收與報酬。",
@@ -5856,7 +5879,7 @@ export const zh_TW: EnTranslations = {
         "marketHeading": "世界市場與抽成",
         "marketBody": "世界市場是全服交易所，由Eastbrook的Merchant與Highwatch的Auctioneer Voss主持。掛單免費，沒有押金，流拍原樣退回；只在成交時抽取5%。特殊物品同樣歡迎：署名、傑作或附魔的副本會以單件掛單上架，提示中帶著完整的身分與署名，且絕不與普通堆疊混同。唯一拒收的是已綁定的副本：被製作者之約鎖定（或仍待綁定）的物品既不能上市也不能郵寄，綁定無法被洗白。特殊物品請自行定價；普通掛單只能告訴你普通版的行情。",
         "workOrdersHeading": "工作訂單",
-        "workOrdersNote": "每位大師都會以商店價的{pct}%收購一批本行常用材料，每{minutes}分鐘可重複一次。",
+        "workOrdersNote": "每位大師都張貼工單，每種常用材料一張，按商店價的{pct}%收購工單要求的一批。每張工單各有{minutes}分鐘的計時：交付後只有那張工單關閉，同一位大師的其他工單照常開放。",
         "colOrder": "工作訂單",
         "colMaster": "大師",
         "colAsks": "需求",
@@ -12456,6 +12479,9 @@ export const zh_TW: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "dawnhold_posy": {
+        "name": "晨曦堡花園小花束"
+      },
       "vale_wheat_seed": {
         "name": "谷地小麥種子"
       },
@@ -14494,6 +14520,26 @@ export const zh_TW: EnTranslations = {
         "title": "藥坊大師",
         "greeting": "量兩次，倒一次，{className}。藥坊裡容不得灑掉的藥劑。"
       },
+      "farmer_jessica": {
+        "name": "農婦潔西卡",
+        "title": "菜園管事",
+        "greeting": "祝你土好天晴，{playerName}。從我這裡買粒種子，播到那邊任意一塊田畦裡，然後該忙什麼忙什麼去。你不在的時候它也一直在長，而且永遠不會壞。收成日誌（Shift+K，或專業視窗裡的耕作一行）列出了每塊已播種的田畦和它的計時。"
+      },
+      "farmer_teasel": {
+        "name": "農夫蒂澤爾",
+        "title": "沼地稻田農夫",
+        "greeting": "沼澤稻米和沼澤甜菜的種子，{className}，還有餵養它們的堆肥。稻田排水慢，腳下留神。"
+      },
+      "farmer_hollis": {
+        "name": "農夫霍利斯",
+        "title": "高望梯田農夫",
+        "greeting": "梯田只給山肯給的那麼多，{className}。我賣堆肥，要是你的莊稼枯萎了，我可以把穀殼重新漚成好土給你。"
+      },
+      "farmer_verbena": {
+        "name": "農婦維貝娜",
+        "title": "花壇園丁",
+        "greeting": "當心鑲邊，{playerName}，這些田畦可是花壇的驕傲。我賣的是堆肥，你帶來的枯萎穀殼，我都能給你變成更多堆肥。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
         "title": "守潮者",
@@ -14508,6 +14554,19 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已開採礦脈"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "第一道犁溝",
+        "text": "拿著這把鋤頭和一小撮谷地小麥種子，{playerName}。把種子播到我旁邊任意一塊田畦裡，然後去忙你的事。想什麼時候回來收莊稼都行；我會在這兒。",
+        "completion": "瞧，你親手種出的第一茬莊稼。你不在的時候它也一直在長，而且永遠不會壞。收成日誌（Shift+K，或專業視窗裡的耕作一行）列出了每塊已播種的田畦和它的計時。田畦召喚你的時候，隨時回來買種子，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已種下谷地小麥"
+          },
+          "1": {
+            "label": "已收穫谷地小麥"
           }
         }
       },
@@ -15404,6 +15463,26 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已交付野味肉"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "廚房小麥工單",
+        "text": "麵包不會自己烤出來，{playerName}，我的麵粉櫃都快見底了。給我送來八捆谷地小麥，我按實價付你整批的錢。是你親手種的還是從市場買的，我不在乎，磨得出粉就行。",
+        "completion": "好乾爽的糧食，還不少。這是你的酬勞，一枚不差。下一茬收上來的時候，你知道該敲哪扇門。",
+        "objectives": {
+          "0": {
+            "label": "已交付谷地小麥"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "廚房稻米工單",
+        "text": "沼澤人對自家的米讚不絕口，{playerName}，我倒要弄明白是為什麼。給我弄來五升沼澤稻米，錢就在這兒等著你。路上留神別弄濕了：濕米就是粥，我可沒點過粥。",
+        "completion": "粒粒飽滿乾爽。這是你的錢。只要沼澤還長米，我就一直收。",
+        "objectives": {
+          "0": {
+            "label": "已交付沼澤稻米"
           }
         }
       },
@@ -17056,6 +17135,11 @@ export const zh_TW: EnTranslations = {
         "name": "最後的堡壘",
         "enterText": "你踏入最後的堡壘那冰冷而寂靜的大廳。",
         "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
+      },
+      "dawnhold_castle": {
+        "name": "晨曦堡",
+        "enterText": "你走進晨曦堡溫暖而花香四溢的廳堂。",
+        "leaveText": "你回到陽光灑落的花園草坪上。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

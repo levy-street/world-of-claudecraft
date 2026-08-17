@@ -4,8 +4,11 @@
 // through the curtain walls or the ward's retaining edge. The walls are
 // castleLift terrain (the beacon idiom) over terraced pads, so these are
 // movement-kernel walks against the live sim, not geometry assertions.
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CASTLE, CASTLE_GATES, castleLift } from '../src/sim/castle_layout';
+import { CASTLE, CASTLE_BUILDINGS, CASTLE_GATES, castleLift } from '../src/sim/castle_layout';
+import { DUNGEONS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -95,28 +98,58 @@ describe('the Last Keep castle grounds', () => {
       walkTo(sim, p, meta, { x: 350, z: 2020 }, 20 * 8);
       expect(p.pos.x, 'the barbican wall should stop the walker').toBeLessThan(340.8);
     }
-    // in through the garden's west doorway
+    // its side walls seal the forecourt (no slipping in around the gates)
     {
-      const { sim, p, meta } = makeWalker({ x: 366.75, z: 2088 });
-      expect(walkTo(sim, p, meta, { x: 366.75, z: 2079 }), 'garden doorway').toBe(true);
+      const { sim, p, meta } = makeWalker({ x: 350, z: 2011 });
+      walkTo(sim, p, meta, { x: 350, z: 2025 }, 20 * 8);
+      expect(p.pos.z, 'the barbican side wall should stop the walker').toBeLessThan(2014.9);
     }
-    // the garden wall itself refuses the shortcut
+    // in through the garden's west AND east doorways
+    for (const gx of [366.75, 429.75]) {
+      const { sim, p, meta } = makeWalker({ x: gx, z: 2088 });
+      expect(walkTo(sim, p, meta, { x: gx, z: 2079 }), `garden doorway at x ${gx}`).toBe(true);
+    }
+    // the garden wall itself refuses the shortcut, and so does its east return
     {
       const { sim, p, meta } = makeWalker({ x: 400, z: 2088 });
       walkTo(sim, p, meta, { x: 400, z: 2079 }, 20 * 8);
       expect(p.pos.z, 'the garden wall should stop the walker').toBeGreaterThan(2084.1);
     }
+    {
+      const { sim, p, meta } = makeWalker({ x: 440, z: 2078 });
+      walkTo(sim, p, meta, { x: 430, z: 2078 }, 20 * 8);
+      expect(p.pos.x, 'the garden east return should stop the walker').toBeGreaterThan(436);
+    }
   });
 
-  it('the ward steps climb the terrace and its edge refuses shortcuts', () => {
+  it('the gate flanks refuse a walker: the walkable span stays inside the arch', () => {
+    // the main gatehouse module's solid flanks (span narrowed in v3)
     {
-      const { sim, p, meta } = makeWalker({ x: 405.75, z: 2026 });
-      expect(walkTo(sim, p, meta, { x: 405.75, z: 2014 }), 'ward step').toBe(true);
+      const { sim, p, meta } = makeWalker({ x: 354, z: 2027.3 });
+      walkTo(sim, p, meta, { x: 366, z: 2027.3 }, 20 * 8);
+      expect(p.pos.x, 'the gatehouse flank should stop the walker').toBeLessThan(CASTLE.wx0 - 0.4);
+    }
+    // the barbican outer doorway's flank
+    {
+      const { sim, p, meta } = makeWalker({ x: 336, z: 2028.2 });
+      walkTo(sim, p, meta, { x: 348, z: 2028.2 }, 20 * 8);
+      expect(p.pos.x, 'the outer doorway flank should stop the walker').toBeLessThan(340.8);
+    }
+  });
+
+  it('the grand ward stair climbs the terrace and the edge refuses shortcuts', () => {
+    // up the processional stair on the keep's door axis, and at both of the
+    // wide cut's flanks (one broad ramp, not two narrow ones)
+    // (targets stop short of the keep door's 2yd walk-in trigger at 2012.3)
+    for (const x of [416, 421, 426]) {
+      const { sim, p, meta } = makeWalker({ x, z: 2026 });
+      expect(walkTo(sim, p, meta, { x, z: 2016 }), `grand stair at x ${x}`).toBe(true);
       expect(p.pos.y, 'on the terrace').toBeGreaterThan(CASTLE.ward.h - 0.4);
     }
+    // off the stair span, the retaining edge still refuses the shortcut
     {
-      const { sim, p, meta } = makeWalker({ x: 413.5, z: 2024 });
-      walkTo(sim, p, meta, { x: 413.5, z: 2012 }, 20 * 8);
+      const { sim, p, meta } = makeWalker({ x: 405, z: 2024 });
+      walkTo(sim, p, meta, { x: 405, z: 2012 }, 20 * 8);
       expect(p.pos.z, 'the retaining edge should stop the walker').toBeGreaterThan(
         CASTLE.ward.z1 + 0.4,
       );
@@ -162,12 +195,64 @@ describe('the Last Keep castle grounds', () => {
     }
   });
 
-  it('the keep door spot and its leave-drop are open terrace ground', () => {
-    // doorPos in content/dungeons.ts, and the leave teleport at z - 4
-    for (const z of [2016.5, 2012.5]) {
-      expect(castleLift(413.5, z)).toBe(0);
-      expect(Math.abs(groundHeight(413.5, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
+  it('the keep door stands proud of the facade on its axis; the leave-drop lands clear in front', () => {
+    const def = DUNGEONS.the_last_keep;
+    const keep = CASTLE_BUILDINGS.find((b) => b.key === 'hexrCastle');
+    if (!keep) throw new Error('no keep');
+    // The portal stands on the keep's door axis, as a PORCH in front of the
+    // model face (half the native 2.26 depth at the authored scale) rather
+    // than flush on it. Flush is what the first cut did, and it put the arch's
+    // stone jambs within 0.3yd of the keep's collision circle: the floor
+    // pinched between them was too narrow for a body to turn around in, one
+    // sliver either side of the doorway. The apron cannot be fenced off
+    // instead, because the instance-restore path drops a player inside the
+    // keep's own circle and it depenetrates them south across this ground.
+    expect(def.doorPos.x).toBe(keep.x);
+    const face = keep.z + (2.26 * keep.scale) / 2;
+    const porch = def.doorPos.z - face;
+    expect(porch, 'the door sank back inside the facade').toBeGreaterThan(0);
+    expect(porch, 'the door drifted off its own keep').toBeLessThan(2);
+    // The load-bearing half: every jamb must clear the keep's collision circle
+    // by a full corridor. JAMB_X is the jamb's offset either side of the axis,
+    // and a jamb's north face plus a body radius is how close a body may come.
+    const JAMB_X = 1.5;
+    const JAMB_HD = 0.56;
+    const BODY = 0.5;
+    for (const sx of [-JAMB_X - 0.35, -JAMB_X + 0.35, JAMB_X - 0.35, JAMB_X + 0.35]) {
+      const x = def.doorPos.x + sx;
+      const arc = keep.z + Math.sqrt((keep.r + BODY) ** 2 - (x - keep.x) ** 2);
+      const jambFace = def.doorPos.z - JAMB_HD - BODY;
+      expect(jambFace - arc, `jamb sliver at x ${x.toFixed(2)}`).toBeGreaterThan(1.4);
     }
+    // both the door spot and the leave-drop are open terrace ground, and
+    // the drop lands OUTSIDE the keep's decor collider
+    const drop = def.leaveOffset ?? { x: 0, z: -4 };
+    for (const [x, z] of [
+      [def.doorPos.x, def.doorPos.z],
+      [def.doorPos.x + drop.x, def.doorPos.z + drop.z],
+    ] as const) {
+      expect(castleLift(x, z)).toBe(0);
+      expect(Math.abs(groundHeight(x, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
+    }
+    expect(
+      Math.hypot(def.doorPos.x + drop.x - keep.x, def.doorPos.z + drop.z - keep.z),
+    ).toBeGreaterThan(keep.r + 0.4);
+  });
+
+  it('the doorway module keeps a separable door leaf (the open-arch filter depends on it)', () => {
+    // castle_features SKIP_PARTS drops the /_door$/ part so gates render as
+    // open arches; if a re-export merges or renames that node, the door
+    // leaf would silently render closed over walkable ground
+    const raw = fs.readFileSync(
+      path.resolve(__dirname, '../public/models/biome/kcas_wall_doorway.glb'),
+    );
+    const jsonLen = raw.readUInt32LE(12);
+    const gltf = JSON.parse(raw.subarray(20, 20 + jsonLen).toString('utf8')) as {
+      nodes?: { name?: string; mesh?: number }[];
+    };
+    const meshNodes = (gltf.nodes ?? []).filter((n) => n.mesh !== undefined);
+    expect(meshNodes.some((n) => /_door$/i.test(n.name ?? ''))).toBe(true);
+    expect(meshNodes.some((n) => !/_door$/i.test(n.name ?? ''))).toBe(true);
   });
 
   it('the tall towers stand at their heights and stay unreachable from the walk', () => {
