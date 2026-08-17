@@ -95,6 +95,7 @@ interface Harness {
   lock: ReturnType<typeof fakeLock>;
   cursor: EconomyReconcileCursor | null;
   filed: EconomyAlert[];
+  notified: EconomyAlert[];
   info: string[];
   errors: string[];
 }
@@ -109,6 +110,7 @@ function harness(
     droppedWrites: number;
     maxRowId: number;
     windowRows: number;
+    alreadyOpen: string[];
   }> = {},
 ): Harness {
   const lock = fakeLock();
@@ -116,6 +118,7 @@ function harness(
     lock,
     cursor: over.cursor === undefined ? { lastRowId: 0, openingSupply: 0 } : over.cursor,
     filed: [],
+    notified: [],
     info: [],
     errors: [],
     deps: null as unknown as EconomyReconcileDeps,
@@ -131,9 +134,14 @@ function harness(
     onlineCharacterIds: () => over.online ?? new Set<number>(),
     droppedWrites: () => over.droppedWrites ?? 0,
     insertAlerts: async (alerts) => {
-      h.filed.push(...alerts);
-      return alerts.length;
+      // The real table dedupes against its open queue; a case that needs to
+      // model a duplicate sets `alreadyOpen` and this returns only the rest,
+      // which is exactly what the notification is driven off.
+      const fresh = alerts.filter((a) => !(over.alreadyOpen ?? []).includes(a.kind));
+      h.filed.push(...fresh);
+      return [...fresh];
     },
+    notify: (filed) => h.notified.push(...filed),
     loadCursor: async () => h.cursor,
     saveCursor: async (c) => {
       h.cursor = c;
@@ -393,5 +401,48 @@ describe('a failing pass does not consume the window', () => {
     // The lock is still released on the way out, or every later pass would lose
     // the try-lock and reconciliation would silently stop.
     expect(h.lock.released).toBe(1);
+  });
+});
+
+describe('the operator is told about filings, not about findings', () => {
+  const robbed = {
+    characterId: 4,
+    ledgerBalance: 100,
+    persistedCopper: 9_999,
+    ledgerAt: NOW - 2 * HOUR,
+    savedAt: NOW - HOUR,
+  };
+
+  it('notifies exactly what the table accepted', async () => {
+    const h = harness({
+      cursor: { lastRowId: 9, openingSupply: 0 },
+      disagreements: [disagreement(robbed)],
+      closing: supply({ purses: 9_999 }),
+      maxRowId: 9,
+    });
+    const result = await createEconomyReconcileJob(h.deps).runOnce();
+    expect(h.notified.map((a) => a.kind)).toEqual(h.filed.map((a) => a.kind));
+    expect(h.notified.some((a) => a.kind === 'balance_mismatch')).toBe(true);
+    expect(result?.filed).toBe(h.filed.length);
+  });
+
+  it('stays quiet when the finding is already an open row', async () => {
+    // The pass re-finds an unresolved violation every fifteen minutes. The table
+    // dedupes it against the open queue, and the notification follows the table:
+    // otherwise one incident interrupts a human four times an hour until they
+    // mute the channel, and the message they then miss is the second incident.
+    const h = harness({
+      cursor: { lastRowId: 9, openingSupply: 0 },
+      disagreements: [disagreement(robbed)],
+      closing: supply({ purses: 9_999 }),
+      maxRowId: 9,
+      alreadyOpen: ['balance_mismatch', 'supply_mismatch', 'evidence_incomplete'],
+    });
+    const result = await createEconomyReconcileJob(h.deps).runOnce();
+    // Still FOUND, which is what the metrics count, and still reported back.
+    expect(result?.alerts.length).toBeGreaterThan(0);
+    // But nothing new landed, so nobody is interrupted.
+    expect(h.notified).toEqual([]);
+    expect(result?.filed).toBe(0);
   });
 });

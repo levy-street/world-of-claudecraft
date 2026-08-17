@@ -1758,6 +1758,7 @@ describe('discord/outbox', () => {
       activity: { items: [] },
       winners: NO_WINNERS,
       linkChanges: { items: [] },
+      economyAlerts: { items: [], suppressed: 0 },
     });
   });
 
@@ -1779,6 +1780,7 @@ describe('discord/outbox', () => {
       activity: { items: [] },
       winners: NO_WINNERS,
       linkChanges: { items: [] },
+      economyAlerts: { items: [], suppressed: 0 },
     });
   });
 
@@ -1869,7 +1871,13 @@ describe('discord/outbox', () => {
 
     const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
 
-    expect(Object.keys(dataOf(r.body))).toEqual(['relay', 'activity', 'winners', 'linkChanges']);
+    expect(Object.keys(dataOf(r.body))).toEqual([
+      'relay',
+      'activity',
+      'winners',
+      'linkChanges',
+      'economyAlerts',
+    ]);
   });
 
   it('emits relay items in the retired relay GET item shape, nulls for an unlinked issuer', async () => {

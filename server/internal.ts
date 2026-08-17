@@ -29,6 +29,11 @@ import {
   requeueLinkChanges,
 } from './discord_link_changes';
 import { drainRelay, type QueuedRelay, requeueRelay } from './discord_relay';
+import {
+  drainEconomyAlerts,
+  type EconomyAlertDrain,
+  requeueEconomyAlerts,
+} from './economy_alert_outbox';
 import type { GameServer } from './game';
 import {
   DEPLOY_SECRET_ENV,
@@ -424,10 +429,16 @@ export const outboxHandler: RouteHandler = async (ctx) => {
   let relayItems: QueuedRelay[] = [];
   let activityItems: QueuedActivity[] = [];
   let linkChangeItems: QueuedLinkChange[] = [];
+  let economyAlerts: EconomyAlertDrain = { items: [], suppressed: 0 };
   try {
     relayItems = drainRelay();
     activityItems = drainActivity();
     linkChangeItems = drainLinkChanges(OUTBOX_LINK_CHANGE_PAGE);
+    // No Discord-link decoration for these: an economy finding is addressed to
+    // whoever is on call, not to the character it names, and resolving the
+    // player's Discord identity would put a "we suspect this account" ping in
+    // front of the account.
+    economyAlerts = drainEconomyAlerts();
     const accountIds = new Set<number>();
     for (const it of relayItems) accountIds.add(it.accountId);
     for (const it of activityItems) {
@@ -497,6 +508,7 @@ export const outboxHandler: RouteHandler = async (ctx) => {
       activity: { items: activity },
       winners,
       linkChanges: { items: linkChanges },
+      economyAlerts,
     });
   } catch (err) {
     // The queues are the bot's only copy of these items, so a failed response
@@ -505,6 +517,7 @@ export const outboxHandler: RouteHandler = async (ctx) => {
     requeueRelay(relayItems);
     requeueActivity(activityItems);
     requeueLinkChanges(linkChangeItems);
+    requeueEconomyAlerts(economyAlerts);
     throw err;
   }
 };

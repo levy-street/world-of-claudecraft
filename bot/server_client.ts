@@ -1,7 +1,13 @@
 // Client for the game server's secret-gated /internal/discord/* endpoints. The
 // bot reads flex/role data and pushes presence + reward grants; it authenticates
 // with the shared DISCORD_BOT_SECRET (x-woc-discord-secret), NOT a user bearer.
-import type { ActivityItem, DailyRewardWinnersDay, FlexData, RelayItem } from './logic';
+import type {
+  ActivityItem,
+  DailyRewardWinnersDay,
+  EconomyAlertItem,
+  FlexData,
+  RelayItem,
+} from './logic';
 import type { PresenceCounters } from './presence_counters';
 
 interface Envelope<T> {
@@ -72,6 +78,9 @@ export interface OutboxEnvelope {
   activity: { items: ActivityItem[] };
   winners: { days: DailyRewardWinnersDay[] };
   linkChanges: { items: OutboxLinkChangeItem[] };
+  /** Gold conservation findings for the operator channel, plus however many the
+   *  server's bounded notification queue refused since the last drain. */
+  economyAlerts: { items: EconomyAlertItem[]; suppressed: number };
 }
 
 /** What a members-meta push reports back. */

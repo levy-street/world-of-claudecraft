@@ -972,3 +972,97 @@ export function isSelfNickEcho(
   for (const id of incomingSet) if (!cachedSet.has(id)) return false;
   return true;
 }
+
+// ── Economy conservation alerts (the operator channel) ───────────────────────
+
+/**
+ * One gold conservation finding, as the server hands it over
+ * (server/economy_alert_outbox.ts). Only criticals are ever sent: a warning
+ * means the reconciler could not tell a finding from save lag, and interrupting
+ * a human for those is how the channel gets muted before the real dupe arrives.
+ */
+export interface EconomyAlertItem {
+  realm: string;
+  kind: string;
+  severity: string;
+  characterId: number | null;
+  delta: number;
+  detail: string;
+}
+
+/** Discord's own hard bound on an embed description. */
+const EMBED_DESCRIPTION_MAX = 4096;
+
+/** Human labels for the finding kinds. Unknown kinds fall back to the raw id
+ *  rather than being dropped: a newer server mid-deploy must still be heard. */
+const ECONOMY_ALERT_TITLES: Record<string, string> = {
+  chain_break: 'Ledger chain break',
+  balance_mismatch: 'Purse disagrees with the ledger',
+  supply_mismatch: 'Coin supply does not balance',
+  orphaned_transfer: 'Half a transfer is missing',
+  evidence_incomplete: 'Conservation evidence incomplete',
+};
+
+/** Copper as g/s/c, the in-game reading, so an operator does not divide by hand. */
+function copper(amount: number): string {
+  const sign = amount < 0 ? '-' : '';
+  const n = Math.abs(Math.trunc(amount));
+  const g = Math.floor(n / 10000);
+  const s = Math.floor((n % 10000) / 100);
+  const c = n % 100;
+  const parts: string[] = [];
+  if (g > 0) parts.push(`${g.toLocaleString('en-US')}g`);
+  if (s > 0) parts.push(`${s}s`);
+  if (c > 0 || parts.length === 0) parts.push(`${c}c`);
+  return `${sign}${parts.join(' ')}`;
+}
+
+/**
+ * Render one finding for the operator channel.
+ *
+ * `allowed_mentions: { parse: [] }` like every other builder here, and it earns
+ * its place twice over on this one: the detail string is server-generated
+ * English, but it carries operator-supplied-adjacent content (a character id, a
+ * kind) into a channel, and an embed that could @-mention would let a crafted
+ * value ping a room during an incident.
+ */
+export function buildEconomyAlertMessage(item: EconomyAlertItem): Record<string, unknown> {
+  const title = ECONOMY_ALERT_TITLES[item.kind] ?? item.kind;
+  const fields: Record<string, unknown>[] = [
+    { name: 'Realm', value: item.realm, inline: true },
+    // Signed, and the sign is the whole story: positive is coin the world holds
+    // that the ledger cannot explain, which is the duplication direction.
+    { name: 'Off by', value: `${item.delta > 0 ? '+' : ''}${copper(item.delta)}`, inline: true },
+  ];
+  if (item.characterId !== null) {
+    // The id, never a name: this channel is read by whoever is on call, and a
+    // finding is a question about a character, not yet an accusation.
+    fields.push({ name: 'Character', value: `#${item.characterId}`, inline: true });
+  }
+  return {
+    embeds: [
+      {
+        color: 0xd9_3a_3a,
+        title: `Gold conservation: ${title}`,
+        description: item.detail.slice(0, EMBED_DESCRIPTION_MAX),
+        fields,
+        footer: { text: 'World of ClaudeCraft - economy watch' },
+      },
+    ],
+    allowed_mentions: { parse: [] },
+  };
+}
+
+/**
+ * The "and N more" line, for findings the server's queue refused.
+ *
+ * Sent as its own message rather than folded into the last embed, because it is
+ * the one thing here that must not be lost if the batch is truncated: a partial
+ * view that does not say it is partial is worse than no view.
+ */
+export function buildEconomyAlertSuppressedMessage(count: number): Record<string, unknown> {
+  return {
+    content: `:warning: ${count} further gold conservation finding${count === 1 ? '' : 's'} were not delivered (notification queue full). Every one of them is in the \`economy_alerts\` table.`,
+    allowed_mentions: { parse: [] },
+  };
+}

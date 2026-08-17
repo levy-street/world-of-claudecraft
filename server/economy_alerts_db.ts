@@ -58,12 +58,17 @@ CREATE INDEX IF NOT EXISTS economy_alerts_character ON economy_alerts(character_
  * finding, same character, same magnitude. Acknowledging a row therefore
  * re-arms it, which is intended, because a finding that recurs AFTER an
  * operator called it handled is new information.
+ *
+ * Returns the alerts that ACTUALLY landed, not a count, because the operator
+ * notification is driven off this list. A ping per finding-per-pass would mean
+ * one unresolved violation interrupting a human every fifteen minutes until they
+ * muted the channel; a ping per newly-filed row means one incident, one ping.
  */
 export async function insertEconomyAlerts(
   realm: string,
   alerts: readonly EconomyAlert[],
-): Promise<number> {
-  let inserted = 0;
+): Promise<EconomyAlert[]> {
+  const inserted: EconomyAlert[] = [];
   for (const a of alerts) {
     const res = await pool.query(
       `INSERT INTO economy_alerts (realm, kind, severity, character_id, delta, detail)
@@ -76,7 +81,7 @@ export async function insertEconomyAlerts(
         )`,
       [realm, a.kind, a.severity, a.characterId, a.delta, a.detail],
     );
-    inserted += res.rowCount ?? 0;
+    if ((res.rowCount ?? 0) > 0) inserted.push(a);
   }
   return inserted;
 }

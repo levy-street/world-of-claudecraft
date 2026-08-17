@@ -206,6 +206,7 @@ import {
   handleNativeDiscordExchange,
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
+import { notifyEconomyAlerts } from './economy_alert_outbox';
 import { insertEconomyAlerts, pruneEconomyAlerts } from './economy_alerts_db';
 import {
   economySupplySnapshot,
@@ -3566,6 +3567,10 @@ export async function startServer(): Promise<http.Server> {
           },
           droppedWrites: () => goldLedgerStats().droppedWrites,
           insertAlerts: (alerts) => insertEconomyAlerts(REALM, alerts),
+          // The bot drains this queue through the consolidated Discord outbox.
+          // At most once by design: a lost ping costs latency, never evidence,
+          // because economy_alerts holds every finding durably regardless.
+          notify: (filed) => notifyEconomyAlerts(REALM, filed),
           loadCursor: async () => {
             const stored = await loadWorldState<{ lastRowId?: unknown; openingSupply?: unknown }>(
               `economy_reconcile:${REALM}`,

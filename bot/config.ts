@@ -42,6 +42,16 @@ export interface BotConfig {
   activityChannelId: string;
   /** Channel id for daily rewards top-10 winner announcements. */
   dailyRewardsChannelId: string;
+  /**
+   * Channel id for gold conservation findings. OPERATORS ONLY, and deliberately
+   * with NO fallback to the relay or test channel the way the feeds above have:
+   * a finding names a character id and says the ledger cannot explain their
+   * coin, so posting one where players can read it accuses somebody in public
+   * and tells a real duplicator they have been noticed. Unset means these
+   * notifications are simply not delivered, which is safe: every finding is in
+   * the economy_alerts table regardless, and the metrics still alert.
+   */
+  economyAlertsChannelId: string;
   /** Public game URL shown in bot replies. */
   gameUrl: string;
   /** Sync each linked member's Discord nickname to include their in-game level. */
@@ -139,6 +149,9 @@ export function loadConfig(): BotConfig {
       process.env.DISCORD_TEST_CHANNEL_ID ||
       '',
     dailyRewardsChannelId: process.env.DISCORD_DAILY_REWARDS_CHANNEL_ID || '',
+    // No `||` chain here on purpose; see the field's note. An operator alert
+    // must never inherit a player-visible channel by default.
+    economyAlertsChannelId: process.env.DISCORD_ECONOMY_ALERTS_CHANNEL_ID || '',
     gameUrl: process.env.PUBLIC_GAME_URL || 'https://worldofclaudecraft.com',
     syncNicknames: process.env.DISCORD_SYNC_NICKNAMES !== '0',
     maxRps: positiveNumberFromEnv(process.env.DISCORD_MAX_RPS, DEFAULT_MAX_RPS),

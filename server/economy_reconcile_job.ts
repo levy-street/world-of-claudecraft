@@ -98,7 +98,16 @@ export interface EconomyReconcileDeps {
   /** The writer's dropped-row count, which bounds how much this pass can claim
    *  to know (see `checkSupply`). */
   droppedWrites(): number;
-  insertAlerts(alerts: readonly EconomyAlert[]): Promise<number>;
+  /** File the findings and answer the ones that ACTUALLY landed: the table
+   *  dedupes against its open queue, and only a newly filed row is news. */
+  insertAlerts(alerts: readonly EconomyAlert[]): Promise<EconomyAlert[]>;
+  /**
+   * Tap the operator on the shoulder about newly filed findings. Separate from
+   * `insertAlerts` because the two have different delivery contracts: the table
+   * is durable and the notification is at most once, and conflating them would
+   * make a failed Discord post look like a lost finding.
+   */
+  notify(filed: readonly EconomyAlert[]): void;
   loadCursor(): Promise<EconomyReconcileCursor | null>;
   saveCursor(cursor: EconomyReconcileCursor): Promise<void>;
   intervalMs?: number;
@@ -267,7 +276,11 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
     // resolved.
     for (const a of alerts) metrics.finding(a.kind, a.severity);
 
-    const filed = alerts.length > 0 ? await deps.insertAlerts(alerts) : 0;
+    const filed = alerts.length > 0 ? await deps.insertAlerts(alerts) : [];
+    // Notified from what was FILED, never from what was found: an unresolved
+    // violation is re-found on every pass, and pinging a human every fifteen
+    // minutes about it is how a channel gets muted before the second incident.
+    if (filed.length > 0) deps.notify(filed);
 
     // The cursor advances to the last row READ, never to `untilId`: the window
     // is row-capped, so a backlog leaves rows between the two, and jumping to
@@ -298,9 +311,16 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
     // is unhappy is indistinguishable from a reconciler that has stopped
     // running, and this one is the only thing watching the gold supply.
     onInfo(
-      `economy reconcile: ${rows.length} rows through id ${lastRowId}, ${alerts.length} finding(s), ${filed} filed, ${unsettledCopper} copper of unsaved drift${complete ? '' : ' (window capped, more rows pending)'}`,
+      `economy reconcile: ${rows.length} rows through id ${lastRowId}, ${alerts.length} finding(s), ${filed.length} filed, ${unsettledCopper} copper of unsaved drift${complete ? '' : ' (window capped, more rows pending)'}`,
     );
-    return { ran: true, rowsRead: rows.length, alerts, filed, unsettledCopper, cursor };
+    return {
+      ran: true,
+      rowsRead: rows.length,
+      alerts,
+      filed: filed.length,
+      unsettledCopper,
+      cursor,
+    };
   }
 
   async function runOnce(): Promise<EconomyReconcilePassResult | null> {
