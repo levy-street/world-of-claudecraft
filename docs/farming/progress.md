@@ -1859,7 +1859,22 @@ inspects no event types). Baselines held with zero movement: command_schema
 50a2e54c3e809a1a4aa0ecf99ea43c5f, monolith hud.ts/renderer.ts untouched at
 their zero-headroom ceilings, sim.ts untouched (12659/12660).
 
-GATE_RECORD_PLACEHOLDER
+GATE RECORD (judged by log markers per the standing rule; run on the
+frozen committed tree at d9704a3636 with BROWSER_PATH set and
+GATE_MAX_WORKERS=8, the sixteenth-absorb lesson): run 1 hit the full-suite
+fallback as expected ("mode=full (broad/unclassified change
+(tests/helpers/bare_client.ts)"), diff base origin/release/v0.39.0, 351
+changed paths, and printed "[gate:select] PASS: all 12 steps green (vitest
+workers: 8)": i18n + wiki + sfx artifacts, i18n freshness, sfx and media
+manifest regen, manifest trackedness and freshness, malware scan, biome on
+the changed files, the full vitest suite (2823 files, 39,721 passed, 2
+expected-fail, 115 skipped, ZERO FAIL lines), the browser regressions (19
+files, 129 passed, the a11y professions arm included), typecheck plus the
+env/server/bot builds, and the client build; about 14 minutes wall on this
+box. The pre-registered druid_engines contention timeout did NOT occur
+this run (nothing to prove standalone); the armory browser exception was
+not needed either. Exit code 0 (informational only; the markers are the
+verdict).
 
 Notes tail: MERGE_HASH_PLACEHOLDER. Handoff to Phase 9: vendor stock,
 seeds, the intro quest and go-live, with the ready notices going live the
