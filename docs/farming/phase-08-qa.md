@@ -27,6 +27,22 @@ EXIT marker" phrase below: no such marker exists; judge gates by
 "[gate:select] FAIL at" / "[gate] FAIL" / "[gate:select] PASS: all N steps
 green" alone.
 
+EXECUTED 2026-08-17 (PASS-WITH-FOLLOWUPS; branch fix/farming-phase-08-qa off
+feature/farming-plan, merged --no-ff per D22, hash in the progress.md Phase 8 QA
+record; no push, no PR). Eight audit lanes (correctness, coverage, dead code, live
+client, frontend-seam, cross-platform, architecture, qa-checklist) plus a
+verification round (fresh frontend-seam, the privacy-security lane the phase never
+recorded, test-coverage, three skeptics, a completeness critic): 0 BLOCKING. The
+one behavior fix is state.md deviation (be) (the simplified professions window
+now paints the worked gathering rows plus the planted Farming row, so a
+pre-attunement farmer reaches the journal from the (az) entry); (bd) was amended
+(oak green on the zone map, station orange on the minimap); the unledgered
+residuals are recorded at (bf), residual (1) corrected; the guide controls page
+gained the Shift+K row and a BIND_ACTIONS completeness pin; and the pin gaps the
+coverage lanes named are closed (see the progress.md record for the list, the
+24-mutant decisiveness pass, and the gate record). Baselines held with zero
+movement.
+
 Independent verification of Phase 8 in a fresh session. The emphasis is honesty and
 restraint: the countdown must be correct under a skewed client clock, the login notice
 must fire exactly once for a ready crop on a fresh session, the online sweep must emit
@@ -166,7 +182,7 @@ STOPPING RULES
 - Stop if the phase diff cannot be identified cleanly.
 
 Close: re-run node scripts/gate_select.mjs after fixes (the armory browser red is
-the standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; PR CI is the
+the standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL"; there is no separate exit marker); PR CI is the
 arbiter) and push the fix commits to the phase PR.
 Packet teardown never happens in this phase; it belongs to Phase 13 QA only.
 ```
