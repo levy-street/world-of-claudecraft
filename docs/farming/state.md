@@ -540,7 +540,13 @@ question does not arise (farming has no station).
   `tests/recipe_economy.test.ts`, `tests/professions_work_orders.test.ts`,
   `tests/deeds_content.test.ts`, `npm run wiki:content` freshness.
 - UI change: the window's own suite + `tests/hud_perf_budget.test.ts` bucket +
-  a mobile screenshot script against a phone viewport.
+  a mobile screenshot script against a phone viewport (LANDSCAPE 844x390: the
+  game gates portrait). When a window's IWorld READS widen (a new `world.X`
+  in its input builder), the "window's own suite" also means every rig that
+  stubs its world, including the real-browser one:
+  `npx vitest run --config vitest.browser.config.ts tests/browser/a11y.browser.test.ts -t "<window>"`
+  (the Phase 8 QA lesson: the node rigs were green and the a11y stub threw
+  on open; only the gate's browser step would have caught it).
 - Phase end: `node scripts/gate_select.mjs` (the fast pre-merge gate);
   `npm run gate` for the deep check. Known environmental red: the armory browser
   pixel test; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL at", the full gate "[gate] FAIL"; the pass line is "[gate:select] PASS: all N steps green"), never trust a piped exit code, and PR CI
