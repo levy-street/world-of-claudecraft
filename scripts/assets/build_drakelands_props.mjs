@@ -28,11 +28,12 @@ import sharp from 'sharp';
 // these targets.
 const ITEMS = [
   { src: 'lava+pool+3d+model.glb', out: 'lava_pool.glb', target: 4000 },
-  { src: 'lava+river++v1+3d+model.glb', out: 'lava_river_a.glb', target: 4000 },
-  { src: 'lava+friver+v2+3d+model.glb', out: 'lava_river_b.glb', target: 4000 },
-  { src: 'lava+river+v3+3d+model.glb', out: 'lava_river_c.glb', target: 4000 },
+  // the ONE connector piece: the flattest of the three source rivers and
+  // the one with the longest full-width plateau, so a tiled run reads as a
+  // single channel (the other two and the terrace were retired with the
+  // move to a three-asset vocabulary)
+  { src: 'lava+river+v3+3d+model.glb', out: 'lava_river_mid.glb', target: 4000 },
   { src: 'lava+river+end+3d+model.glb', out: 'lava_river_end.glb', target: 4000 },
-  { src: 'lava+terrace+3d+model.glb', out: 'lava_terrace.glb', target: 4000 },
   { src: 'dragon+treasure+hoard+3d+model.glb', out: 'dragon_hoard.glb', target: 8000 },
   { src: 'dragon+eggs+3d+model.glb', out: 'dragon_eggs.glb', target: 5000 },
   { src: 'giant+red+crystal+flowers+3d+model.glb', out: 'ember_lily.glb', target: 4000 },

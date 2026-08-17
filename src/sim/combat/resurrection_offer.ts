@@ -4,8 +4,9 @@
 
 import type { SimContext } from '../sim_context';
 import { revivePlayerAt } from '../spirit';
-import type { Aura, Entity } from '../types';
+import type { Aura, Entity, PendingResurrection } from '../types';
 import { isUnbreakableControlAura } from './cc';
+import { resurrectionReachError } from './resurrection_reach';
 
 export const RESURRECTION_OFFER_SECONDS = 30;
 
@@ -14,6 +15,7 @@ export function offerResurrection(
   caster: Entity,
   target: Entity,
   hpFrac: number,
+  maxRange: number,
 ): boolean {
   if (target.kind !== 'player' || !target.dead) return false;
   // Thornhollow Fields revives on the team wave only: no player-cast rez (including
@@ -24,9 +26,32 @@ export function offerResurrection(
     hpFrac,
     fallbackDestination: { ...caster.pos },
     expiresAt: ctx.time + RESURRECTION_OFFER_SECONDS,
+    maxRange,
   });
   ctx.emit({ type: 'resurrectionOffer', fromName: caster.name, pid: target.id });
   return true;
+}
+
+// The live caster is the arrival anchor only while still within the offer's
+// resurrection reach (range + line of sight) of the body being raised. Without
+// the reach arm, a caster could cast the rez beside a corpse outside a locked
+// instance door and walk inside during the offer window, and the accept would
+// teleport a lockout-barred player past the door gate (instances/dungeons.ts
+// owns that gate; the fallback is where the offer was cast, which the cast
+// already proved reachable from the body). THE one arrival-destination rule:
+// the accept below and the Nythraxis transition-stun prediction
+// (encounters/nythraxis.ts) must both derive it from here, never re-inline it.
+export function resurrectionArrivalAnchor(
+  ctx: SimContext,
+  offer: PendingResurrection,
+  dead: Entity,
+): Entity | null {
+  const caster = ctx.entities.get(offer.casterId);
+  return caster?.kind === 'player' &&
+    !caster.dead &&
+    resurrectionReachError(ctx, caster, dead, offer.maxRange) === null
+    ? caster
+    : null;
 }
 
 export function respondToResurrection(ctx: SimContext, accept: boolean, pid?: number): void {
@@ -36,8 +61,7 @@ export function respondToResurrection(ctx: SimContext, accept: boolean, pid?: nu
   if (!offer) return;
   ctx.pendingResurrections.delete(r.e.id);
   if (!accept || ctx.time >= offer.expiresAt || !r.e.dead) return;
-  const caster = ctx.entities.get(offer.casterId);
-  const arrivalAnchor = caster?.kind === 'player' && !caster.dead ? caster : null;
+  const arrivalAnchor = resurrectionArrivalAnchor(ctx, offer, r.e);
   const destination = arrivalAnchor?.pos ?? offer.fallbackDestination;
   revivePlayerAt(ctx, r.e.id, destination, offer.hpFrac);
   if (arrivalAnchor) inheritArrivalAnchorControl(ctx, arrivalAnchor, r.e);

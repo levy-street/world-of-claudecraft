@@ -953,6 +953,22 @@ export const ru_RU: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Подклет",
+        "state": "Парадный этаж",
+        "residence": "Жилой этаж",
+        "tower": "Дозорная башня"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Садовый этаж",
+        "solar": "Светлица"
+      }
+    },
     "compass": {
       "N": "С",
       "NE": "СВ",
@@ -12378,6 +12394,9 @@ export const ru_RU: EnTranslations = {
       "pristine_claw": {
         "name": "Безупречный коготь"
       },
+      "dawnhold_posy": {
+        "name": "Букетик из сада Замка Рассвета"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -16861,6 +16880,11 @@ export const ru_RU: EnTranslations = {
         "name": "Последний оплот",
         "enterText": "Вы входите в холодные безмолвные залы Последнего оплота.",
         "leaveText": "Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов."
+      },
+      "dawnhold_castle": {
+        "name": "Замок Рассвета",
+        "enterText": "Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.",
+        "leaveText": "Вы возвращаетесь на залитую солнцем садовую лужайку."
       },
       "drowned_temple": {
         "name": "Утонувший храм",

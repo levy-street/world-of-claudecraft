@@ -17,6 +17,27 @@
 //  2. Bounded: the horizontal error from the authoritative pose is leashed to
 //     what the player could legitimately cover in the latency cap; a server
 //     teleport (or any gap over the renderer's 6 yd snap rule) resets outright.
+//     One exception, and only one, the BLOCK EPISODE. A render frame longer
+//     than a snapshot interval blocks the main thread, and the snapshots that
+//     arrived meanwhile land in one burst. The browser orders that burst
+//     either way, and both orderings break the display:
+//       - burst applied after the frame: the anchor is frozen inside the frame
+//         (alpha caps at 1), so the leash, sized for a fresh anchor, clips the
+//         kernel's correct multi-step advance;
+//       - burst applied before the frame's step: the anchor is fresh, but
+//         ClientWorld has just re-anchored prevPos at the DRAWN pose with pos
+//         several ticks ahead, so at alpha ~0 it sits behind the display by
+//         more than the budget and the leash clips just the same; the display
+//         then stalls while the anchor sweeps under it.
+//     Neither is divergence: it is the local block seen from here, and the
+//     kernel ran the same movement math the server ran. So an ISOLATED long
+//     frame opens an episode where the block is trusted: the servo sits out
+//     the burst sweep and the leash lends the lead the kernel took, drained
+//     back afterwards. The episode is bounded (BLOCK_EPISODE_MAX_MS) and
+//     isolation excludes steady low fps, where every frame is long and nothing
+//     is hitching. A NETWORK gap looks the same from here but earns neither:
+//     freezing the display on the leash is the right answer when nothing local
+//     explains the stale anchor.
 //  3. Invisible to logic: the output feeds only the renderer's
 //     selfRenderPosition (mesh + camera). It never writes into ClientWorld
 //     mirrored state, IWorld reads, or the input stream.
@@ -66,6 +87,19 @@ export const SELF_MOTION_DEADBAND_YD = 0.05;
 // Same teleport rule the renderer's self smoother uses (6 yd).
 export const SELF_MOTION_SNAP_DIST_SQ = 6 * 6;
 const MAX_FRAME_DT = 0.25; // matches the main-loop frame clamp
+// The block episode (see the header): how long a hitch may keep lending leash
+// room. It must outlast the browser's post-block catch-up frames with room to
+// spare, and it must END, because a real network stall starting right after a
+// hitch is indistinguishable from here and must fall back to the leash freeze
+// rather than run the display away. 500 ms is the top of the broadcast-gap
+// regime the stall arms in tests/self_motion.test.ts pin, so past it the
+// network answer is the right one.
+export const BLOCK_EPISODE_MAX_MS = 500;
+// Settle window after a block, in snapshot intervals: see servoHoldMs below.
+const SERVO_SETTLE_INTERVALS = 2;
+// The mirror's interval EWMA can arrive degenerate (a fresh or reset
+// ClientWorld); floor it the way every other consumer does (online.ts alpha).
+const MIN_SNAP_INTERVAL_MS = 20;
 const LEASH_SLACK_YD = 0.05;
 // Pose-history ring: enough to look SELF_MOTION_CAP_MAX_MS into the past with
 // headroom even on high-refresh displays (128 entries covers 267 ms at 480 fps
@@ -84,6 +118,10 @@ export interface SelfMotionFrame {
   /** The frame's snapshot alpha (same value handed to renderer.sync). */
   alpha: number;
   frameDt: number;
+  /** Wall-clock ms since the last snapshot was APPLIED to the mirror (0 when none yet). */
+  snapAgeMs: number;
+  /** The mirror's adaptive inter-snapshot interval in ms (ClientWorld.snapInterval). */
+  snapIntervalMs: number;
 }
 
 export interface Vec3Like {
@@ -165,6 +203,15 @@ export class SelfMotionPredictor {
   private lastGhost = false;
   private acc = 0;
   private timeMs = 0;
+  // Long-frame block bookkeeping: the leash room the frozen anchor owes the
+  // display, the post-burst settle window the servo sits out, and what is left
+  // of the local-block episode a long frame opened (step()).
+  private staleAllowanceYd = 0;
+  private servoHoldMs = 0;
+  private blockEpisodeMs = 0;
+  private prevFrameDtMs = 0;
+  // Lending capacity earned while the anchor is blocked, in yards of run.
+  private episodeCapYd = 0;
   // Ring of end-of-frame display poses, for the "where was the prediction one
   // latency cap ago" comparison. Preallocated; hist* index HISTORY_SIZE slots.
   private histCount = 0;
@@ -209,6 +256,11 @@ export class SelfMotionPredictor {
     this.histCount = 0;
     this.histHead = 0;
     this.leadMs = 0;
+    this.staleAllowanceYd = 0;
+    this.servoHoldMs = 0;
+    this.blockEpisodeMs = 0;
+    this.prevFrameDtMs = 0;
+    this.episodeCapYd = 0;
   }
 
   private recordHistory(x: number, y: number, z: number): void {
@@ -308,6 +360,11 @@ export class SelfMotionPredictor {
       };
       this.actor = actor;
       this.acc = 0;
+      this.staleAllowanceYd = 0;
+      this.servoHoldMs = 0;
+      this.blockEpisodeMs = 0;
+      this.prevFrameDtMs = 0;
+      this.episodeCapYd = 0;
       // The old display trajectory is meaningless relative to the new anchor
       // (teleport / life-state flip); comparing against it would fling the pose.
       this.histCount = 0;
@@ -381,6 +438,53 @@ export class SelfMotionPredictor {
     }
     const frac = this.acc / DT;
 
+    const runSpeed = RUN_SPEED * moveSpeedMult(actor, 0);
+    // The local block episode (rationale: the header's Bounded exception).
+    // An ISOLATED long frame is the trigger, staleness not required: in the
+    // deliver-before ordering there is no staleness to see. Isolation is what
+    // keeps steady low fps out, where nothing is hitching and the servo must
+    // keep correcting every frame.
+    const snapIntervalMs = Math.max(MIN_SNAP_INTERVAL_MS, frame.snapIntervalMs);
+    const staleMs = Math.max(0, Math.max(0, frame.snapAgeMs) - snapIntervalMs);
+    const frameDtMs = dt * 1000;
+    const hitchFrame = frameDtMs > snapIntervalMs && this.prevFrameDtMs <= snapIntervalMs;
+    this.prevFrameDtMs = frameDtMs;
+    // The episode outlives the frame that opened it: the browser can run
+    // several short catch-up frames before it drains the socket, and judging
+    // those on their own length would put the stall back a few frames later.
+    if (hitchFrame) {
+      this.blockEpisodeMs = BLOCK_EPISODE_MAX_MS;
+      this.episodeCapYd = 0;
+    } else if (this.blockEpisodeMs > 0)
+      this.blockEpisodeMs = staleMs > 0 ? Math.max(0, this.blockEpisodeMs - frameDtMs) : 0;
+    const blockedFrame = hitchFrame || this.blockEpisodeMs > 0;
+    if (blockedFrame) {
+      // Two snapshot intervals, counted down only once the snapshots flow
+      // again: one for the burst sweep itself, and one more because the sweep
+      // starts from the DRAWN pose (ClientWorld re-anchors prevPos there), so
+      // the first anchor the servo can trust as an independent reading is one
+      // interval past the sweep. Resuming inside that window reads the sweep
+      // as divergence, which is the rush half of the original artifact.
+      this.servoHoldMs = SERVO_SETTLE_INTERVALS * snapIntervalMs;
+    } else {
+      this.servoHoldMs = Math.max(0, this.servoHoldMs - frameDtMs);
+    }
+    // A stale anchor the display has already been lent room against is not a
+    // reference: correcting toward it would drag the pose off the position the
+    // block's own kernel steps put it at (and the next burst confirms), then
+    // make it rush back. Freeze instead, which is the plain leash behavior.
+    // Two intervals, not one: at 60 fps the newest snapshot routinely ages a
+    // frame past the interval, and treating that phase noise as a frozen
+    // anchor would suspend the servo for as long as any loan is outstanding.
+    const staleWithLoan = staleMs > snapIntervalMs && this.staleAllowanceYd > 0;
+    // The settle window belongs to the burst that ends the block, so hold it
+    // full while the anchor is frozen: draining it during the freeze would
+    // leave the servo facing the resume sweep with no cover, reading it as
+    // divergence and hauling the display back off the pose the burst is about
+    // to confirm.
+    if (staleWithLoan) this.servoHoldMs = SERVO_SETTLE_INTERVALS * snapIntervalMs;
+    const servoActive = !blockedFrame && !staleWithLoan && this.servoHoldMs <= 0;
+
     // Divergence correction: the authoritative anchor shows where the server
     // had the player ~capMs ago, so compare it against where the LOCAL display
     // was capMs ago. During agreed motion (steady run, start, stop, jump arc)
@@ -392,7 +496,7 @@ export class SelfMotionPredictor {
     const capMs = clamp(latencyMs, SELF_MOTION_CAP_MIN_MS, SELF_MOTION_CAP_MAX_MS);
     const measureMs = clamp(latencyMs, SELF_MOTION_CAP_MIN_MS, SELF_MOTION_MEASURE_MAX_MS);
     const past = this.sampleHistory(this.timeMs - measureMs);
-    if (past) {
+    if (past && servoActive) {
       // The blend dt is clamped tighter than the frame clamp: at load-hitch
       // frame times (100-250ms at world entry, or on weak hardware) an
       // unclamped exponential eats ~95% of the error in ONE frame, turning
@@ -424,10 +528,38 @@ export class SelfMotionPredictor {
     // budget is the honest upper bound; only corrections consume the slack).
     // Vertical is exempt (a jump apex must not be leash-clipped; gravity
     // bounds it).
-    const budget = (RUN_SPEED * moveSpeedMult(actor, 0) * capMs) / 1000 + LEASH_SLACK_YD;
+    const baseBudget = (runSpeed * capMs) / 1000 + LEASH_SLACK_YD;
     const ex = actor.pos.x - ax;
     const ez = actor.pos.z - az;
     const elen = Math.hypot(ex, ez);
+    if (blockedFrame) {
+      // Lend at RUN SPEED IN WALL CLOCK, and only what THIS episode has
+      // earned. Wall clock rather than a tick per frame because the fixed-step
+      // accumulator lands a whole 50 ms step inside a 10 ms catch-up frame and
+      // clipping THAT is the stall again. Per episode rather than cumulative
+      // because otherwise a machine hitching every few frames ratchets the
+      // boundary outward at every hitch and, against a server that never
+      // confirms the motion, walks the display to the 6 yd re-adopt.
+      this.episodeCapYd += runSpeed * dt;
+      this.staleAllowanceYd = Math.max(
+        this.staleAllowanceYd,
+        Math.min(elen - baseBudget, this.episodeCapYd),
+      );
+    } else {
+      // The allowance drains at run speed once the snapshots flow again, but
+      // never below the lead currently in use: draining THROUGH the live lead
+      // would clamp the display back at run speed, the same stall this fix
+      // removes, one beat later. Shrinking the lead is the servo's job, and
+      // the allowance follows it down (it only ever grows while blocked).
+      this.staleAllowanceYd = Math.max(
+        0,
+        Math.min(
+          this.staleAllowanceYd,
+          Math.max(elen - baseBudget, this.staleAllowanceYd - runSpeed * dt),
+        ),
+      );
+    }
+    const budget = baseBudget + this.staleAllowanceYd;
     if (elen > budget) {
       // Clamp pos ONLY (unlike the correction blend above): prevPos keeps the
       // last displayed point, so the sub-frame interpolation glides onto the
@@ -442,7 +574,6 @@ export class SelfMotionPredictor {
     this.out.y = actor.prevPos.y + (actor.pos.y - actor.prevPos.y) * frac;
     this.out.z = actor.prevPos.z + (actor.pos.z - actor.prevPos.z) * frac;
     this.recordHistory(this.out.x, this.out.y, this.out.z);
-    const runSpeed = RUN_SPEED * moveSpeedMult(actor, 0);
     this.leadMs =
       runSpeed > 0 ? (Math.hypot(this.out.x - ax, this.out.z - az) / runSpeed) * 1000 : 0;
     return this.out;

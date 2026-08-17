@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 822,
-    "liveItemDefinitions": 837,
+    "itemArtFilesReviewed": 823,
+    "liveItemDefinitions": 838,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -303,7 +303,7 @@
       "elixir": 4,
       "food": 21,
       "held_offhand": 9,
-      "junk": 81,
+      "junk": 82,
       "mount": 9,
       "potion": 13,
       "quest": 97,
@@ -370,7 +370,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 822,
+    "passCount": 823,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -511,6 +511,7 @@
       "cultist_flayer",
       "curved_tusk",
       "cyan_magenta_armor_plate",
+      "dawnhold_posy",
       "deacon_reliquary_helm",
       "deacons_cleaver",
       "deathless_greatblade",
@@ -1199,7 +1200,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 822 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10."
+    "summary": "All 823 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12."
   },
   "nonVisualContentWatch": [
     {
@@ -1356,8 +1357,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "ea04f7224e4a13e35d098c6a1cc96dbda6b38df43fdff6252d1eae0dfcd98933",
-      "bytes": 451256
+      "sha256": "33d4dbff43be4e9f8628756571bc1a0ff33ad8069b607979ba9fbacbdd6b9b6e",
+      "bytes": 451762
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1371,7 +1372,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "acad50b8d261f88630e3ca323322d1522a4cfa0b3ea024111662fbdcda822c89",
+    "sheetSetSha256": "3c5ad46c56f049fab4696791e8d487e389f505dd0313a6b1037af58e60919110",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2399,128 +2400,128 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--128-color.png",
-        "sha256": "d0a9544b9687fc07aa9c3c6b79e5cc77b42b3093540c219d829d020c346f5d4c",
-        "bytes": 2450502,
+        "sha256": "09ef972f5992ffc68d044e40fb1067a37e6ca9dcd52181ca5a65ae35c0944552",
+        "bytes": 2443842,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--40-color.png",
-        "sha256": "3fd89f1b4d848872f8ff581f652891f74542f5497726ee689a353559c1a5e277",
-        "bytes": 445604,
+        "sha256": "6eb0b8c67a90ec06e57791e99e9078e37e02aa7eec09f0defccebab1e7e5a7dc",
+        "bytes": 444306,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--28-color.png",
-        "sha256": "942a99a8bb94820036721243a487c5ad8141289de2a347281085d5f05db582b0",
-        "bytes": 295634,
+        "sha256": "7231a0290cb4cb8727641ec6d188ceb24df2ee1d637a78ba13803b0917ed98c4",
+        "bytes": 294708,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--22-color.png",
-        "sha256": "e36d919b08de40357dc0d023849351bf1ad16f7263ec36b6d770b325123841e0",
-        "bytes": 225367,
+        "sha256": "ac3ac0ee6affb08a3409b86060c940a9dfa43a5e6dfcb5b1167edb51be925b86",
+        "bytes": 224735,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--28-grayscale.png",
-        "sha256": "5486fd0c390ed93138eeeb9c6a83ed214a8d51a324df4b3526374fa584c5bdaa",
-        "bytes": 206563,
+        "sha256": "71919daa33e77e85c3768dee3380264614cff0049c9c36af2ac99e35af468899",
+        "bytes": 206355,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--64-circle.png",
-        "sha256": "3a2df8c4eacea6978e2bb7071a6611fb4168aa72a3ff834cb9241809d13f1fac",
-        "bytes": 781902,
+        "sha256": "fa04bfac4b314eb05e305a7b7ffaf67f3fd514eaaa48468f88f696c93ab9c623",
+        "bytes": 779885,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--small-multiview.png",
-        "sha256": "1c3c6d470d6139eceed53ba908e75fad414ff88fc0d007e02f51e5673f3c9a60",
-        "bytes": 1443232,
+        "sha256": "7dc78204d5ac0b2637b880dfa67a8345f3125a20c8feb6bf281bca93eb3d10e2",
+        "bytes": 1440721,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--identity.png",
-        "sha256": "28513367bade24fd47d2ea91e9b65790cba766c59d9cfa5c35f9481e093504a8",
-        "bytes": 2528772,
+        "sha256": "a24301b37015be69d816b4c5359a7ca2fd72f7d51c9c41642f030de21cba7ffa",
+        "bytes": 2521411,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--128-color.png",
-        "sha256": "362d191802541d083dcc23395f73ac693b41c3f22e9e8b3fbc9672c2f0d90d25",
-        "bytes": 37618,
+        "sha256": "f11fc350bbbc9ac4633ed0b1d97d92de7070266b92c3f7029f4f1f70addb125c",
+        "bytes": 62729,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--40-color.png",
-        "sha256": "073855bb25702232728921a42192194b0556cef59f8905a1e5422c2ae4f3a58e",
-        "bytes": 11209,
+        "sha256": "b563c45967b47610580ee62b338a0da469ba13cf78922511cc297240fabfa2d3",
+        "bytes": 16343,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--28-color.png",
-        "sha256": "f2c7dc5df048add49a8d7c4029966fd5093c8b49bbd55a2698535172023aaede",
-        "bytes": 9483,
+        "sha256": "4dbf259661e6734013797d69f668ad84f30a23b7dfcbe2cda5ce4c8e10d59f28",
+        "bytes": 13215,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--22-color.png",
-        "sha256": "0e7913410b0d9c80cccaa4aab849b9722e14a2ad285bc2693270a0c923882707",
-        "bytes": 8423,
+        "sha256": "1324c0489676c64783693d1c41826d758153e8cecd7a6db86cef6e2b2cd24cc7",
+        "bytes": 11223,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--28-grayscale.png",
-        "sha256": "6c95372601a265dab49057772e93fa98f6631e7293e4b538c3f2a72f0e8acc1b",
-        "bytes": 9480,
+        "sha256": "1f688326deb0437dc6994d7a6c0f9071fdfa5c08d63d00fe5d6e98584bed5a14",
+        "bytes": 12111,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--64-circle.png",
-        "sha256": "212146df4489aca87b7a5372161013c58dfc735bb0ebfc968e5fbf5d3d01eb59",
-        "bytes": 15731,
+        "sha256": "abfefd0f31167792ac39e2f1adc0d5a1030e4496251ec56af7e9c5369991368d",
+        "bytes": 24435,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--small-multiview.png",
-        "sha256": "a975da5132db95d59e4c0fd36d2437fdc5152d85ee6cc2d07e2165aec9691dd9",
-        "bytes": 29225,
+        "sha256": "d5e6660100596c522c83d638b0d567b06f0b303f707d0f62613226bd62ee5adc",
+        "bytes": 45652,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--identity.png",
-        "sha256": "d58561af7608278a5483760af1b0fce662a68d9c6ab125eac5f732c1c62bd238",
-        "bytes": 42085,
+        "sha256": "0c0c2da3717062cd245c76f670c8816bdc0461f6f894d76a1448e9e0f38ffdf7",
+        "bytes": 68285,
         "width": 1800,
         "height": 248,
         "format": "png"
@@ -3038,6 +3039,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "17fe7b0b1ca629831283710441306ef01c54b04cc8c26d70bec361439e07c2ff"
+    "shippingCatalogSha256": "cc5fc2f49d88532ef79bf342c0c56f14a798ff566f586dac55291ef44c88be87"
   }
 }

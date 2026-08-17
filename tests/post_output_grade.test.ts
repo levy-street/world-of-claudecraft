@@ -8,7 +8,7 @@ describe('fused output and grade shader', () => {
     const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');
     const bloomSampleAt = shader.indexOf('vec4 bloom = texture(tBloom, inputUv);');
     const bloomBlendAt = shader.indexOf(
-      'outputColor.rgb = quantizeHalf(outputColor.rgb + bloom.rgb * bloom.a);',
+      'outputColor.rgb = quantizeHalf(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a));',
     );
     const toneMapAt = shader.indexOf('outputColor.rgb = ACESFilmicToneMapping(outputColor.rgb);');
     const srgbAt = shader.indexOf('outputColor = sRGBTransferOETF(outputColor);');
@@ -39,6 +39,27 @@ describe('fused output and grade shader', () => {
     expect(shader).toContain('unpackHalf2x16(packHalf2x16(vec2(value.b, 0.0))).x');
     expect(shader).toContain('pc_fragColor = vec4(c, 1.0);');
     expect(shader).toContain('vec2 inputUv = min(vUv * uInputUvRect.xy, uInputUvRect.zw);');
+  });
+
+  it('rewrites NaN to zero on both composer-target reads before the tonemap', () => {
+    // A single NaN fragment in the HalfFloat beauty target is smeared frame-wide
+    // by the bloom blur and tonemaps to black on the composer tiers, while the
+    // UNSIGNED_BYTE direct-to-canvas tiers clamp it away. Some drivers (ANGLE's
+    // OpenGL backend with NVIDIA on Linux) emit those NaNs from the IBL/PBR path,
+    // so OutputGradePass must scrub NaN out of BOTH the beauty read and the
+    // (already blur-spread) bloom read. Losing either scrub brings the black back.
+    const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
+    expect(shader).toContain('(v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0');
+    const helperAt = shader.indexOf('vec3 sanitizeFinite(vec3 v) {');
+    const beautyScrubAt = shader.indexOf('outputColor.rgb = sanitizeFinite(outputColor.rgb);');
+    const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');
+    const bloomScrubAt = shader.indexOf('sanitizeFinite(bloom.rgb * bloom.a)');
+    const toneMapAt = shader.indexOf('outputColor.rgb = ACESFilmicToneMapping(outputColor.rgb);');
+    expect(helperAt).toBeGreaterThan(-1);
+    expect(beautyScrubAt).toBeGreaterThan(diffuseSampleAt);
+    expect(bloomScrubAt).toBeGreaterThan(-1);
+    expect(toneMapAt).toBeGreaterThan(beautyScrubAt);
+    expect(toneMapAt).toBeGreaterThan(bloomScrubAt);
   });
 
   it('only calls tonemapping functions the installed three chunk defines', () => {

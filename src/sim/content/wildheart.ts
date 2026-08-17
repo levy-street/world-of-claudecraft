@@ -3,6 +3,7 @@
 // flooded jungle caldera with two routes around a central beast island. Both
 // paths climb into one ritual terrace beneath a colossal jaguar shrine.
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import { HEROIC_FINALE_COPPER } from './dungeon_difficulty';
 
 export const WILDHEART_ITEMS: Record<string, ItemDef> = {
   // Rogue dagger (drops from the Fanglord Beastmaster, the Wildheart Basin
@@ -323,7 +324,12 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       enrage: 'THE WILD HEART BEATS THROUGH ME!',
     },
     loot: [
-      { copper: 55000, chance: 1 },
+      // 15000c base (rolls 9000c to 21000c, roughly 1g to 2g): the same
+      // gold-farm nerf Korzul took (the old 55000c paid 3.3g to 7.7g per
+      // pop). bossChainPull slows a Zulgar farm but does not stop it. The
+      // daily-lockout heroic clear pays the 10g finale base instead;
+      // tests/heroic_finale_gold.test.ts pins the ladder.
+      { copper: 15000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.8 },
       // Guaranteed uncommon (chances sum to 1.0, exactly one drops): the Korzul
       // korzul_guaranteed_uncommon pattern, one piece per armor class.

@@ -290,8 +290,11 @@ describe('Temporal Reversal: combat resurrection', () => {
     expect(events).toContainEqual(
       expect.objectContaining({ type: 'resurrectionOffer', pid: allyId, fromName: p.name }),
     );
-    p.pos.x += 50;
-    p.pos.z += 50;
+    // The caster drifts but stays within resurrection reach of the body, so the
+    // live caster remains the arrival anchor (out-of-reach accepts fall back to
+    // the cast spot instead: tests/resurrection_reach.test.ts).
+    p.pos.x += 10;
+    p.pos.z += 10;
     const currentCasterPosition = { x: p.pos.x, z: p.pos.z };
     sim.respondToResurrection(true, allyId);
     expect(ally.dead).toBe(false);

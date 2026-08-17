@@ -80,7 +80,7 @@ export const BAKED_MAP_BG = {
   "world_strip": {
     "w": 140,
     "h": 337,
-    "rowHash": "5444352a"
+    "rowHash": "112a75a2"
   }
 },
 } as const;

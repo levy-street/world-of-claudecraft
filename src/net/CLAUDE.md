@@ -210,7 +210,14 @@ failure, kept as stable English that `main.ts` re-localizes.
   (targeting, range checks, quest triggers, and interest all use authoritative
   positions), and (d) never affects what is sent to the server. Widening any of
   those four constraints is a maintainer decision, see
-  `docs/online-movement-latency.md`.
+  `docs/online-movement-latency.md`. One amendment is already in force, for the
+  long render frame: when a frame outlasts the mirror's snapshot interval the
+  browser applies the snapshots it swallowed in one burst, so for that block
+  episode (a) the leash budget may exceed the latency cap by the ground the
+  frozen anchor did not cover, bounded by `BLOCK_EPISODE_MAX_MS` of run speed,
+  and (b) the blend toward the server pose is held for the settle window that
+  the burst sweep needs. Both live in `src/render/self_motion.ts` and are
+  pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright by the server, corpse-guard only)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`

@@ -51,7 +51,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
-    ceiling: 19433,
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    ceiling: 19488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -72,7 +77,10 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
-    ceiling: 13754,
+    // Lowered again by the castle branch's interior_light_rig.ts extraction;
+    // after merging main the merged file lands below both prior pins, so the
+    // ceiling is the exact merged count.
+    ceiling: 13689,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

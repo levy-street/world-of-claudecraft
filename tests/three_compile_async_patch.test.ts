@@ -175,6 +175,84 @@ describe('three compileAsync disposal race patch', () => {
   });
 });
 
+describe('three degenerate normal guard patch', () => {
+  // The one SHADER hunk of the same patch file, pinned here beside the
+  // compileAsync hunks because they share one .patch and one scope note: the
+  // patch covers build/three.module.js only, and the bundle-scope guard below
+  // is what proves nothing in this tree consumes an unpatched sibling.
+  //
+  // three's stock normal_fragment_begin runs normalize() on an interpolated
+  // vertex normal whose length underflows to zero on grass tufts and grazing
+  // building edges, which yields NaN. That NaN poisons both cube_uv IBL inputs
+  // (the sample direction through geometryNormal, and material.roughness
+  // through geometryRoughness = dFdx/dFdy of nonPerturbedNormal) and the bloom
+  // blur smears it frame wide, so OutputGradePass tonemapped the whole frame to
+  // black on Linux + NVIDIA + Chrome (ANGLE-GL). The guard resets the normal to
+  // a valid unit vector when its squared length is zero; it is a no-op for
+  // finite normals.
+  it('keeps the guard applied on both normal_fragment_begin arms', () => {
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    // The smooth arm, pinned TOGETHER with the #ifdef DOUBLE_SIDED that follows
+    // it: the guard has to sit BEFORE the faceDirection flip, so the fallback
+    // normal is flipped too. Guarding after the flip would still catch the NaN
+    // (dot(NaN,NaN) > 0.0 is false) but would hand a back face a front-facing
+    // fallback, so the order is the assertion, not just the presence.
+    expect(
+      source.includes(
+        'vec3 normal = normalize( vNormal ); normal = dot( normal, normal ) > 0.0 ' +
+          '? normal : vec3( 0.0, 0.0, 1.0 );\\n\\t#ifdef DOUBLE_SIDED\\n\\t\\tnormal *= faceDirection;',
+      ),
+      'the degenerate-normal guard is missing on the smooth arm, or no longer precedes the DOUBLE_SIDED flip; re-run pnpm install',
+    ).toBe(true);
+    // The FLAT_SHADED arm, anchored on the #else that closes it: dFdx/dFdy of
+    // vViewPosition degenerates the same way on a zero-area fragment quad.
+    expect(
+      source.includes(
+        'vec3 normal = normalize( cross( fdx, fdy ) ); normal = dot( normal, normal ) > 0.0 ' +
+          '? normal : vec3( 0.0, 0.0, 1.0 );\\n#else',
+      ),
+      'the degenerate-normal guard is missing on the FLAT_SHADED arm; re-run pnpm install',
+    ).toBe(true);
+  });
+
+  it('leaves no unguarded normalize spelling behind on either arm', () => {
+    // The patch REPLACES the stock chunk string, it does not add a second one:
+    // both stock spellings must be gone, or a build is still compiling the
+    // unguarded chunk. Positive control: the deliberately unpatched three.cjs
+    // carries each spelling exactly once, so both GONE needles are proven
+    // matchable rather than vacuously absent.
+    const source = readFileSync(
+      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+      'utf8',
+    );
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    const stockSmooth = 'normalize( vNormal );\\n\\t#ifdef DOUBLE_SIDED';
+    const stockFlat = 'normalize( cross( fdx, fdy ) );\\n#else';
+    expect(
+      source.includes(stockSmooth),
+      'the unguarded normalize( vNormal ) spelling is back; the normal guard no longer replaces it',
+    ).toBe(false);
+    expect(
+      source.includes(stockFlat),
+      'the unguarded FLAT_SHADED normalize spelling is back; the normal guard no longer replaces it',
+    ).toBe(false);
+    expect(
+      unpatchedSibling.split(stockSmooth).length - 1,
+      'the unpatched three.cjs control no longer matches the smooth-arm needle; the GONE pin above may be vacuous',
+    ).toBe(1);
+    expect(
+      unpatchedSibling.split(stockFlat).length - 1,
+      'the unpatched three.cjs control no longer matches the FLAT_SHADED needle; the GONE pin above may be vacuous',
+    ).toBe(1);
+  });
+});
+
 // The scan half of the scope note above, so the note is enforced rather than
 // trusted: the day a module consumes build/three.cjs (via a bare CommonJS
 // require), names any unpatched bundle (three.module.min.js and the r185

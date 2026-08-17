@@ -8,12 +8,13 @@ import type { Collider } from './colliders';
 import {
   type AuthoredDecor,
   type AuthoredDoor,
+  type AuthoredLedge,
   type AuthoredRoom,
   authoredColliders,
   authoredLiftAt,
 } from './rift/authored';
 
-export type { AuthoredDecor, AuthoredDoor, AuthoredRoom };
+export type { AuthoredDecor, AuthoredDoor, AuthoredLedge, AuthoredRoom };
 
 /**
  * The per-slot dressing roll for a wall-side obstacle: the ONE draw both the
@@ -156,6 +157,8 @@ export interface DungeonLayout {
   rooms?: AuthoredRoom[];
   doors?: AuthoredDoor[];
   decor?: AuthoredDecor[];
+  /** Parkour shelves: standable tops the vault and the ledge climb read. */
+  ledges?: AuthoredLedge[];
 }
 
 // The four hand-authored KayKit interior "kits" a procedural rift can build on.
@@ -530,7 +533,9 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   // The chapel alone is candle-lit (its shrine and candle rows are dressing).
   keepBrazier(-40, 70),
   keepBrazier(-26, 82),
-  keepBrazier(-20.5, 80.6),
+  // west of the guest_west door axis (x -20.5): the door's 1.5yd clear
+  // lane through z 78..79.75 must stay collider-free
+  keepBrazier(-23, 80.6),
   keepBrazier(-11.3, 84.5),
   keepBrazier(22.5, 88.5),
   keepBrazier(-36, 59.8),
@@ -558,6 +563,22 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   keepBrazier(24, 32),
 ];
 
+/**
+ * The Last Keep's parkour shelves: the same two-beat vault-then-climb chain
+ * as Dawnhold's, run along the great hall and the ballroom. See
+ * DAWNHOLD_LEDGES for the band arithmetic.
+ */
+export const LASTKEEP_LEDGES: readonly AuthoredLedge[] = [
+  // the great hall: up the east flank toward the throne end
+  { x: 12.2, z: 14, hw: 1.6, hd: 2.8, top: 1.3 },
+  { x: 12.2, z: 22, hw: 1.6, hd: 2.8, top: 3.35 },
+  { x: 12.2, z: 30, hw: 1.6, hd: 2.8, top: 3.35 },
+  // the ballroom: a musicians' shelf up the north wall
+  { x: -35.2, z: 21.4, hw: 2.6, hd: 1.4, top: 1.2 },
+  { x: -29, z: 21.4, hw: 2.6, hd: 1.4, top: 3.25 },
+  { x: -22, z: 21.4, hw: 2.6, hd: 1.4, top: 3.25 },
+] as const;
+
 export const LASTKEEP_LAYOUT: DungeonLayout = {
   zMin: -16,
   zMax: 100,
@@ -569,12 +590,14 @@ export const LASTKEEP_LAYOUT: DungeonLayout = {
   // The dais marker sits under the lifted throne-dais room: placeDais' platform
   // blocks and rim decor (drawn from y 0) are entirely buried inside the room's
   // solid riser, so the authored dais room IS the visible boss-stage geometry.
-  dais: { x: 0, z: 59, r: 4 },
+  // r 3 keeps the whole disc inside the room rect (z 56..62).
+  dais: { x: 0, z: 59, r: 3 },
   wallX: 42,
   endWallHw: 43,
   floorHalfX: 42,
   rooms: LASTKEEP_ROOMS.map((r) => ({ ...r })),
   doors: LASTKEEP_DOORS.map((d) => ({ ...d })),
+  ledges: LASTKEEP_LEDGES.map((l) => ({ ...l })),
   decor: LASTKEEP_DECOR.map((d) => ({ ...d })),
 };
 
@@ -584,6 +607,186 @@ export const LASTKEEP_LAYOUT: DungeonLayout = {
  * players stand on the same lifts the renderer builds risers and stairs for. */
 export function lastKeepLiftAt(lx: number, lz: number): number {
   return authoredLiftAt(LASTKEEP_ROOMS, LASTKEEP_DOORS, lx, lz);
+}
+
+// Dawnhold Castle (interior 'dawnhold'): the Evergarden's zero-combat garden
+// palace, the Last Keep idiom at a smaller, gentler scale. One warm main floor
+// (entrance hall, great parlor with its hearth, dining room, kitchen, a
+// conservatory garden room full of planters, a library nook, and a small
+// chapel) plus a small upper story (gallery, bedroom suite, and the sunlit
+// solar) reached over one half-landing stair room. No undercroft, no cells,
+// no bones: daylight through a garden palace. Every lift change happens
+// across a door (max 1.5 per step), so authoredLiftAt turns each into a
+// ramp-band stair shared by sim and render. The kcas furnishing (tables,
+// beds, planters, flowers, green banners) is instanced by the renderer's
+// dawnhold dressing pass (src/render/dawnhold_dressing.ts) from these same
+// room rects.
+
+const DAWNHOLD_R_BRAZIER = 0.85;
+const DAWNHOLD_R_STATUE = 0.75;
+const DAWNHOLD_R_HEARTH = 1.3;
+const DAWNHOLD_R_CAULDRON = 0.7;
+
+export const DAWNHOLD_SOLAR_LIFT = 3.0; // the upper story
+const DAWNHOLD_STAIR_LIFT = 1.5; // the half landing up to it
+
+const dawnholdBrazier = (x: number, z: number): AuthoredDecor => ({
+  key: 'infernal_brazier',
+  x,
+  z,
+  yaw: 0,
+  r: DAWNHOLD_R_BRAZIER,
+});
+
+export const DAWNHOLD_ROOMS: readonly AuthoredRoom[] = [
+  // THE MAIN FLOOR (lift 0): eight rooms around the great parlor.
+  { id: 'hall_entrance', x0: -9, x1: 9, z0: -16, z1: 0 },
+  // The bright heart of the palace: the hearth parlor every wing opens onto.
+  { id: 'great_parlor', x0: -13, x1: 13, z0: 0, z1: 24 },
+  { id: 'dining_room', x0: -27, x1: -13, z0: -2, z1: 12 },
+  { id: 'kitchen', x0: -27, x1: -13, z0: 12, z1: 26 },
+  // The conservatory: the east wing garden room, planters wall to wall.
+  { id: 'garden_room', x0: 13, x1: 33, z0: -4, z1: 20 },
+  { id: 'library_nook', x0: 13, x1: 27, z0: 20, z1: 30 },
+  { id: 'chapel', x0: -13, x1: -3, z0: 24, z1: 34 },
+  // THE UPPER STORY (lift 3.0) over one half-landing stair room: the
+  // gallery landing, the bedroom suite, and the sunlit solar.
+  { id: 'stair_solar', x0: 3, x1: 13, z0: 24, z1: 34, lift: DAWNHOLD_STAIR_LIFT },
+  { id: 'gallery', x0: -9, x1: 13, z0: 34, z1: 42, lift: DAWNHOLD_SOLAR_LIFT },
+  { id: 'bedroom_suite', x0: -25, x1: -9, z0: 34, z1: 48, lift: DAWNHOLD_SOLAR_LIFT },
+  { id: 'solar', x0: 13, x1: 27, z0: 34, z1: 46, lift: DAWNHOLD_SOLAR_LIFT },
+  // THE WINGS. Appended, never inserted: the render dressing, the collider
+  // set and the map plate all walk this array in order. Every door below
+  // was sited by scanning its wall for a band where no dressing spot's
+  // clearance circle reaches the opening, counting WALL-MOUNTED fixtures
+  // too (the pinned lane test exempts those, which is how a sconce ends up
+  // hanging in a doorway).
+  // The guard rooms flanking the entrance hall, so the way in opens onto a
+  // choice instead of a corridor.
+  { id: 'west_guard', x0: -23, x1: -9, z0: -14, z1: -4 },
+  { id: 'east_guard', x0: 9, x1: 23, z0: -14, z1: -4 },
+  // The orangery: the conservatory's own long glass wing, east again.
+  { id: 'orangery', x0: 33, x1: 45, z0: 0, z1: 20 },
+  // The east half landing. This is the SECOND way upstairs: the library
+  // climbs to it and it climbs to the solar, so the upper story is a loop
+  // (parlor, solar stair, gallery, solar, east stair, library, garden)
+  // rather than one dead-end staircase.
+  { id: 'stair_east', x0: 13, x1: 27, z0: 30, z1: 34, lift: DAWNHOLD_STAIR_LIFT },
+  // The turret room off the bedroom suite, at the top of the house.
+  { id: 'north_turret', x0: -25, x1: -9, z0: 48, z1: 56, lift: DAWNHOLD_SOLAR_LIFT },
+];
+
+export const DAWNHOLD_DOORS: readonly AuthoredDoor[] = [
+  { x: 0, z: 0, hw: 3, hd: 1 }, // entrance hall -> great parlor (the wide arch)
+  { x: -13, z: 6, hw: 1, hd: 1.4 }, // great parlor -> dining room
+  { x: -20, z: 12, hw: 1.6, hd: 1 }, // dining room -> kitchen
+  { x: -13, z: 18, hw: 1, hd: 1.4 }, // kitchen -> great parlor (the service door)
+  { x: 13, z: 10, hw: 1, hd: 2.2 }, // great parlor -> garden room (the garden arch)
+  { x: 20, z: 20, hw: 1.5, hd: 1 }, // garden room -> library nook
+  { x: -8, z: 24, hw: 1.2, hd: 1 }, // great parlor -> chapel
+  { x: 8, z: 24, hw: 1.6, hd: 1 }, // great parlor -> solar stair (+1.5)
+  { x: 8, z: 34, hw: 1.6, hd: 1 }, // solar stair -> gallery (+1.5)
+  { x: 13, z: 27, hw: 1, hd: 1.4 }, // solar stair -> library nook (the return loop)
+  { x: -9, z: 38, hw: 1, hd: 1.4 }, // gallery -> bedroom suite
+  { x: 13, z: 38, hw: 1, hd: 1.4 }, // gallery -> solar
+  // the wings (see the room table for how these positions were sited)
+  { x: -9, z: -8, hw: 1, hd: 1.4 }, // entrance hall -> west guard room
+  { x: 9, z: -9, hw: 1, hd: 1.4 }, // entrance hall -> east guard room
+  { x: 33, z: 11, hw: 1, hd: 1.4 }, // garden room -> orangery
+  { x: 14.5, z: 30, hw: 1.4, hd: 1 }, // library nook -> east stair (+1.5)
+  { x: 20.5, z: 34, hw: 1.4, hd: 1 }, // east stair -> solar (+1.5)
+  { x: -21, z: 48, hw: 1.4, hd: 1 }, // bedroom suite -> north turret
+];
+
+export const DAWNHOLD_DECOR: readonly AuthoredDecor[] = [
+  // Entrance hall: warm braziers by the door, garden statues flanking the
+  // parlor arch (clear of the arch opening at |x| <= 3).
+  dawnholdBrazier(-6, -13.5),
+  dawnholdBrazier(6, -13.5),
+  { key: 'infernal_statue', x: -5, z: -1.8, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  { key: 'infernal_statue', x: 5, z: -1.8, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  // Great parlor: the hearth on the east wall between its two doors, a broad
+  // rug at the room's heart, firelight in the corners, and a statue pair on
+  // the north wall between the chapel and stair doors.
+  { key: 'hell_forge', x: 11.6, z: 17, yaw: -Math.PI / 2, r: DAWNHOLD_R_HEARTH },
+  { key: 'rug', x: 0, z: 12, yaw: 0 },
+  dawnholdBrazier(-11, 3.2),
+  dawnholdBrazier(-11, 21),
+  dawnholdBrazier(11, 3.2),
+  { key: 'infernal_statue', x: -3.8, z: 22.9, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  { key: 'infernal_statue', x: 3.8, z: 22.9, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  // Dining room: hearth-light in the corners off both door lanes.
+  dawnholdBrazier(-25.3, -0.5),
+  dawnholdBrazier(-14.7, 10.8),
+  // Kitchen: the cook's hearth on the west wall, the stock cauldron beside it.
+  { key: 'hell_forge', x: -25.3, z: 20, yaw: Math.PI / 2, r: DAWNHOLD_R_HEARTH },
+  { key: 'slag_cauldron', x: -23.6, z: 17.2, yaw: 0.6, r: DAWNHOLD_R_CAULDRON },
+  dawnholdBrazier(-14.8, 24.8),
+  // Garden room: garden statues among the beds, a little warm firelight so
+  // the conservatory still glows at dusk.
+  { key: 'infernal_statue', x: 16.6, z: -2.3, yaw: 0, r: DAWNHOLD_R_STATUE },
+  { key: 'infernal_statue', x: 29.5, z: 18.4, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  dawnholdBrazier(14.6, 8),
+  dawnholdBrazier(31.3, 14.5),
+  // Gallery: a runner rug between the two wings, firelight at both ends
+  // (clear of the stair ramp band at x 6.4..9.6, z 31..37).
+  { key: 'rug', x: 2, z: 38, yaw: Math.PI / 2 },
+  dawnholdBrazier(-7.5, 40.8),
+  dawnholdBrazier(11.2, 35.4),
+  // Bedroom suite: quiet hearth-light off the gallery door lane.
+  dawnholdBrazier(-23.5, 35.5),
+  dawnholdBrazier(-10.4, 46.5),
+  // Solar: one warm brazier by the stair-side wall; daylight does the rest.
+  dawnholdBrazier(14.5, 35.3),
+  { key: 'infernal_statue', x: 25.5, z: 44.5, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+];
+
+/**
+ * Dawnhold's parkour shelves. Two chains, each a VAULT onto a low shelf and
+ * then a ledge CLIMB from that shelf to a high one, so the room is climbed
+ * in two beats rather than one impossible hop. Heights are above the room
+ * floor: the vault ceiling is 1.88 and the climb band is 2.025 to 2.2 (the
+ * v0.35 climb tuning), which is why every high shelf sits 2.05 over the low
+ * one rather than over the floor.
+ */
+export const DAWNHOLD_LEDGES: readonly AuthoredLedge[] = [
+  // the great parlor: up the west flank, along, and out over the hearth
+  { x: -11.4, z: 6, hw: 1.4, hd: 2.6, top: 1.3 },
+  { x: -11.4, z: 13, hw: 1.4, hd: 2.6, top: 3.35 },
+  { x: -11.4, z: 20, hw: 1.4, hd: 2.6, top: 3.35 },
+  // the garden room: a planter shelf climbing toward the conservatory glass
+  { x: 31.2, z: 0, hw: 1.4, hd: 2.4, top: 1.2 },
+  { x: 31.2, z: 6.5, hw: 1.4, hd: 2.4, top: 3.25 },
+  { x: 31.2, z: 13, hw: 1.4, hd: 2.4, top: 3.25 },
+] as const;
+
+export const DAWNHOLD_LAYOUT: DungeonLayout = {
+  zMin: -16,
+  zMax: 56,
+  sideWallZ: 16,
+  sideWallHd: 32,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  // The dais marker hides under the lifted solar: placeDais' 0.6u platform and
+  // rim decor (drawn from y 0) are entirely buried inside the room's solid 3.0
+  // riser, the same trick the Last Keep's throne dais uses.
+  dais: { x: 20, z: 40, r: 2.5 },
+  wallX: 45,
+  endWallHw: 46,
+  floorHalfX: 45,
+  rooms: DAWNHOLD_ROOMS.map((r) => ({ ...r })),
+  doors: DAWNHOLD_DOORS.map((d) => ({ ...d })),
+  decor: DAWNHOLD_DECOR.map((d) => ({ ...d })),
+  ledges: DAWNHOLD_LEDGES.map((l) => ({ ...l })),
+};
+
+/** Raised-floor height of Dawnhold Castle's interior at instance-local (x, z).
+ * The groundHeight arm for interior 'dawnhold' (src/sim/world.ts) reads this,
+ * the same per-interior relief idiom as lastKeepLiftAt, so players stand on
+ * the same lifts the renderer builds risers and stairs for. */
+export function dawnholdKeepLiftAt(lx: number, lz: number): number {
+  return authoredLiftAt(DAWNHOLD_ROOMS, DAWNHOLD_DOORS, lx, lz);
 }
 
 // The Ashen Coliseum (interior 'arena'): a fully-enclosed pit, no door, no
@@ -808,7 +1011,13 @@ export function layoutColliders(
   if (layout.rooms) {
     // Authored room-graph floor: its rooms + doors ARE the shell, and its decor
     // carries the measured prop radii. Nothing else on the layout applies.
-    return authoredColliders(layout.rooms, layout.doors ?? [], layout.decor ?? [], DUNGEON_WALL_HW);
+    return authoredColliders(
+      layout.rooms,
+      layout.doors ?? [],
+      layout.decor ?? [],
+      DUNGEON_WALL_HW,
+      layout.ledges ?? [],
+    );
   }
   if (layout.shellPolygon) {
     // Non-rectangular room: the polygon's own edges ARE the walls (front, back,

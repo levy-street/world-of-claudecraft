@@ -145,18 +145,28 @@ describe('biome-haze layer survival across the program-preserving clone', () => 
   });
 });
 
-describe('the castle stone slabs use the program-preserving clone', () => {
-  it('clones the surfaceMat slab sources through material_clone_hooks', () => {
+describe('the castle stone slabs stay program-cache-safe', () => {
+  it('draws every raw mass from castle_stone, whose factories ride surfaceMat', () => {
+    // The slab masses moved off the clone-then-patch idiom entirely: their
+    // materials come from castle_stone.ts, whose factories return surfaceMat
+    // results directly (haze hook and program-cache identity by
+    // construction, deduped per tone) with the course tiling on the
+    // GEOMETRY (tileCastleUv), so no per-mass clone exists to drop a hook.
+    // Pin both halves: the factories route through surfaceMat and never
+    // clone, and the feature module builds its masses from castle_stone
+    // rather than minting patched surfaceMat clones of its own.
+    const stone = readFileSync(new URL('../src/render/castle_stone.ts', import.meta.url), 'utf8');
+    expect(stone).toContain("import { surfaceMat } from './gfx'");
+    expect(stone).toContain('return surfaceMat({');
+    expect(stone).not.toContain('.clone()');
     const castle = readFileSync(
       new URL('../src/render/castle_features.ts', import.meta.url),
       'utf8',
     );
-    const start = castle.indexOf('const stoneSlab = (');
-    expect(start).toBeGreaterThan(-1);
-    const slice = castle.slice(start, castle.indexOf('const slab = (', start));
-    expect(slice).toContain('cloneMaterialWithHooks(surfaceMat({ color, roughness }))');
-    expect(slice).toContain('cloneMaterialWithHooks(stoneSlab(');
-    expect(slice).not.toContain('.clone()');
+    expect(castle).toContain("from './castle_stone'");
+    expect(castle).toContain('castleStoneMat(');
+    expect(castle).toContain('castleStoneBox(');
+    expect(castle).not.toContain('cloneMaterialWithHooks(surfaceMat(');
   });
 });
 

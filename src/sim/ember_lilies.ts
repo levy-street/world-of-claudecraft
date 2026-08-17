@@ -8,6 +8,7 @@
 // and on any slope one edge lifts clear of the dirt and the whole plant
 // reads as floating. Pure leaf: deterministic, memoized, no SimContext.
 
+import { bulwarkClear } from './bulwark_layout';
 import { castleClear } from './castle_layout';
 import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberNearestOnLink } from './ember_lava_layout';
 import { hash2 } from './rng';
@@ -30,8 +31,9 @@ export interface EmberLily {
   r: number;
 }
 
-// the dragon dens keep their shelves clear (matches render/ember_features)
-const EMBER_DENS = [
+/** The dragon dens. Exported so the render layer dresses the same two
+ *  shelves this leaf clears, rather than re-typing the coordinates. */
+export const EMBER_DENS = [
   { x: 419, z: 2266 },
   { x: 302, z: 2258 },
 ] as const;
@@ -43,6 +45,7 @@ export function emberScatterClear(x: number, z: number): boolean {
   if (roadDistance(x, z) < 6) return false;
   if (Math.hypot(x - WYRMWATCH.x, z - WYRMWATCH.z) < WYRMWATCH.r) return false;
   if (!castleClear(x, z)) return false; // the Last Keep's grounds
+  if (!bulwarkClear(x, z)) return false; // the Ashen Bulwark's headland pad
   for (const pool of EMBER_LAVA_POOLS) {
     if (Math.hypot(x - pool.x, z - pool.z) < pool.r * 1.5 + 6) return false;
   }
