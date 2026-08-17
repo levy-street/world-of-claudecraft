@@ -1,0 +1,31 @@
+{
+  "settings": {
+    "moduleResolution": "bundler",
+    "target": "ES2026",
+    "useDefineForClassFields": "true",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "comments": false,
+    "hooks": {
+      "denyGeneratedEdit": ".opencode/hooks/deny-generated-edit.sh",
+      "ensureHooks": ".opencode/hooks/ensure-hooks.sh",
+      "qaStop": ".opencode/hooks/qa-stop.sh"
+    },
+    "remoteStorage": {
+      "id": "default",
+      "name": "Default"
+    },
+    "plugins": {
+      "@opencode-ai/plugin": {
+        "version": "1.18.18"
+      }
+    }
+  }
+}

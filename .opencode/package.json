@@ -1,0 +1,8 @@
+{
+  "name": ".opencode",
+  "private": true,
+  "packageManager": "pnpm@10.34.5",
+  "dependencies": {
+    "@opencode-ai/plugin": "1.18.18"
+  }
+}
