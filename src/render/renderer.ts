@@ -11746,7 +11746,7 @@ export class Renderer {
             v.stepAccum += loco.speed * dt;
             if (v.stepAccum >= MOUNT_STRIDE_RUN) {
               v.stepAccum = 0;
-              sink.mountRun(ax, ay, az, e.mountKey, isSelf);
+              sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf);
             }
           } else {
             v.stepAccum = MOUNT_STRIDE_RUN * 0.6;

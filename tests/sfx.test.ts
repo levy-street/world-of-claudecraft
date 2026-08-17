@@ -22,6 +22,18 @@ interface FakeSource {
   stop(t?: number): void;
 }
 
+// Mounts that deliberately ship no stride cue of their own and borrow the
+// player's surface footfall instead (Sfx.mountRun's fallback branch). Pinned
+// here rather than derived from the manifest, so silently losing some OTHER
+// mount's cue still fails the coverage tests below instead of quietly
+// redefining what full coverage means.
+const FOOTFALL_MOUNTS = new Set(['lanternback_troll']);
+const CUSTOM_STRIDE_MOUNTS = MOUNT_KEYS.filter((mountKey) => !FOOTFALL_MOUNTS.has(mountKey));
+// SFX_CLIPS is a generated object LITERAL type, so a mount_run_ key that is
+// legitimately absent cannot index it directly. Widen it for the lookups that
+// are allowed to miss.
+const CLIPS_BY_KEY: Partial<Record<string, SfxEntry>> = SFX_CLIPS;
+
 const sources: FakeSource[] = [];
 let nowT = 0;
 let gainAutomationCalls: string[] = [];
@@ -125,7 +137,7 @@ beforeEach(() => {
   // Inject decoded buffers directly (skip async fetch/decode in preload).
   const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
   buffers.set('foot_grass', { duration: 0.48 });
-  for (const [index, mountKey] of MOUNT_KEYS.entries()) {
+  for (const [index, mountKey] of CUSTOM_STRIDE_MOUNTS.entries()) {
     buffers.set(`mount_run_${mountKey}`, { duration: 0.5 + index / 100 });
   }
   buffers.set('foot_wood', WOOD_BUFFER);
@@ -264,15 +276,25 @@ describe('mount running audio', () => {
     // its manifest entry correctly carries loop: true, unlike every other
     // mount's plain per-stride gait clip.
     const ENGINE_LOOP_MOUNTS = new Set(['terrorspark_groundshaker']);
-    for (const mountKey of MOUNT_KEYS) {
-      const entry = SFX_CLIPS[`mount_run_${mountKey}`];
+    for (const mountKey of CUSTOM_STRIDE_MOUNTS) {
+      const entry = CLIPS_BY_KEY[`mount_run_${mountKey}`];
       expect(entry).toMatchObject({
         loop: ENGINE_LOOP_MOUNTS.has(mountKey),
         spatial: true,
       });
-      expect(entry.url).toMatch(
+      expect(entry?.url).toMatch(
         new RegExp(`^/audio/sfx/mount_run_${mountKey}\\.mp3\\?v=[0-9a-f]{12}$`),
       );
+    }
+  });
+
+  it('ships no stride entry for the mounts that borrow a footfall', () => {
+    // The absence IS the wiring: mountRun picks the fallback branch purely
+    // because the key is missing, so an entry sneaking back in would silently
+    // switch these two mounts off the player footfall again.
+    for (const mountKey of FOOTFALL_MOUNTS) {
+      expect(MOUNT_KEYS).toContain(mountKey);
+      expect(CLIPS_BY_KEY[`mount_run_${mountKey}`]).toBeUndefined();
     }
   });
 
@@ -285,7 +307,7 @@ describe('mount running audio', () => {
 
   it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
-    const expected = MOUNT_KEYS.flatMap((mountKey) => [
+    const expected = CUSTOM_STRIDE_MOUNTS.flatMap((mountKey) => [
       `mount_run_${mountKey}.mp3`,
       ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
         (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
@@ -308,33 +330,60 @@ describe('mount running audio', () => {
     const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
     const played = new Set<unknown>();
 
-    for (const mountKey of MOUNT_KEYS) {
+    for (const mountKey of CUSTOM_STRIDE_MOUNTS) {
       nowT += 0.5;
-      sfx.mountRun(0, 0, 0, mountKey, true);
+      sfx.mountRun(0, 0, 0, mountKey, 'grass', true);
       const src = sources.at(-1)!;
       expect(src.buffer).toBe(buffers.get(`mount_run_${mountKey}`));
       played.add(src.buffer);
     }
 
-    expect(played.size).toBe(MOUNT_KEYS.length);
+    expect(played.size).toBe(CUSTOM_STRIDE_MOUNTS.length);
+  });
+
+  it('falls back to the surface footfall for a mount with no stride cue', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    for (const mountKey of FOOTFALL_MOUNTS) {
+      nowT += 0.5;
+      sfx.mountRun(0, 0, 0, mountKey, 'wood', true);
+      expect(lastSource().buffer).toBe(buffers.get('foot_wood'));
+    }
+    // and it tracks the ground, rather than being pinned to one clip
+    nowT += 0.5;
+    sfx.mountRun(0, 0, 0, 'lanternback_troll', 'grass', true);
+    expect(lastSource().buffer).toBe(buffers.get('foot_grass'));
+  });
+
+  it('alternates left/right on the fallback so strides are not one sample', () => {
+    nowT += 0.5;
+    sfx.mountRun(0, 0, 0, 'lanternback_troll', 'wood', true);
+    const first = lastSource().playbackRate.value;
+    nowT += 0.5;
+    sfx.mountRun(0, 0, 0, 'lanternback_troll', 'wood', true);
+    expect(lastSource().playbackRate.value).not.toBeCloseTo(first, 3);
   });
 
   it('plays independently of the optional on-foot footstep toggle', () => {
+    // Both branches: a mount is world audio whether or not it borrows a
+    // footfall clip, so the footstep setting must not silence either one.
     sfx.setFootstepsEnabled(false);
-    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    sfx.mountRun(0, 0, 0, 'valorsteed', 'grass', true);
     expect(sources.at(-1)!.started).toBe(true);
+    nowT += 0.5;
+    sfx.mountRun(0, 0, 0, 'lanternback_troll', 'grass', true);
+    expect(lastSource().started).toBe(true);
   });
 
   it('truncates each stride before the next mounted running beat', () => {
-    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    sfx.mountRun(0, 0, 0, 'valorsteed', 'grass', true);
     const src = sources.at(-1)!;
     expect(src.stopAt).not.toBeNull();
     expect(src.stopAt! - nowT).toBeLessThan(0.5);
   });
 
-  it('ignores unknown mount keys', () => {
+  it('ignores a surface with no footfall cue on the fallback', () => {
     const before = sources.length;
-    sfx.mountRun(0, 0, 0, 'unknown_mount', true);
+    sfx.mountRun(0, 0, 0, 'lanternback_troll', 'lava', true);
     expect(sources.length).toBe(before);
   });
 });

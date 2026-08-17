@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "cbd768a0a194be10aba70f9ef07051a51c2dcaf476d77399aeffe63ff65c5df6",
-  "catalogHash": "b69828f67abb719ec940210d7051d7dbf2ae718dcc6ca894b0c030a8a2be5fff",
+  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
+  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2885,18 +2885,6 @@
           "url": "/audio/sfx/mount_run_grag_bear.mp3?v=eba127f1f821",
           "bytes": 18224,
           "sha256": "eba127f1f8219e5d6a7512c4797735399e154e9f129bfc8c67a187941cb59fe7"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
-    "mount_run_lanternback_troll": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/mount_run_lanternback_troll.mp3?v=c4a23db07f74",
-          "bytes": 16343,
-          "sha256": "c4a23db07f7436818b35ae521336d879c4abf18e932526f3df74edd751695f18"
         }
       ],
       "gain": 1,

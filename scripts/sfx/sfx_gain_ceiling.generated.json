@@ -2381,17 +2381,6 @@
       }
     ]
   },
-  "mount_run_lanternback_troll": {
-    "ceilingDb": 5.2,
-    "tracks": [
-      {
-        "filename": "mount_run_lanternback_troll.mp3",
-        "sha256": "c4a23db07f7436818b35ae521336d879c4abf18e932526f3df74edd751695f18",
-        "size": 16343,
-        "peakDb": -6.2
-      }
-    ]
-  },
   "mount_run_shadowjump_toad": {
     "ceilingDb": 5.3,
     "tracks": [

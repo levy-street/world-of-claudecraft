@@ -189,8 +189,10 @@ interface AttributionTargetFixture {
 // Re-minted for the Lanternback Troll: the rideable-mount lifecycle moved out of
 // renderer.ts into mount_lifecycle.ts, and renderer.ts is a provenance input.
 // No capture was retaken.
+// Re-minted again after mountRun took a `surface` argument so the troll could
+// reach the footfall fallback. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f1b5afa2ac38b7b7e0a8a3b44ee0632c0c83502857455e64ecfbaff4cf4ce691';
+  '0784de1feba0a8e80633d9a7d4a059f9ff0e82d16c01859f103c0b38aee73ed9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
