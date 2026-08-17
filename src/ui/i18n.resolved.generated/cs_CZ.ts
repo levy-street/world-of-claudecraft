@@ -4261,6 +4261,7 @@ export const cs_CZ: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Talenty",
       "professions": "Profese",
+      "harvestJournal": "Harvest Journal",
       "arena": "Okno PvP (arény a Thornhollowská pole)",
       "leaderboard": "Žebříček",
       "deeds": "Kniha skutků",

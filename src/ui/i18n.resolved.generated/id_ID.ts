@@ -4261,6 +4261,7 @@ export const id_ID: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Bakat",
       "professions": "Profesi",
+      "harvestJournal": "Harvest Journal",
       "arena": "Jendela PvP (arena dan Medan Thornhollow)",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",

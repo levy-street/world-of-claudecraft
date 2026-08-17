@@ -6018,6 +6018,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': '排行榜',
   'guide.controls.deeds': '功績之書',
   'guide.controls.reliquary': '聖物庫',
+  'guide.controls.harvestJournal': '收成日誌',
   'guide.controls.sheathe': '收起/拔出武器',
   'guide.controls.crafting': '製作',
   'guide.controls.valeCup': '溪谷盃',

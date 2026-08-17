@@ -4261,6 +4261,7 @@ export const pt_BR: EnTranslations = {
       "groupCamera": "Câmera",
       "talents": "Talentos",
       "professions": "Profissões",
+      "harvestJournal": "Harvest Journal",
       "arena": "Janela JxJ (as arenas e os Campos de Thornhollow)",
       "leaderboard": "Placar de líderes",
       "deeds": "Livro dos Feitos",

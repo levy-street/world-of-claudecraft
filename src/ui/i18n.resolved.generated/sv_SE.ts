@@ -4261,6 +4261,7 @@ export const sv_SE: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Talanger",
       "professions": "Yrken",
+      "harvestJournal": "Harvest Journal",
       "arena": "PvP-fönstret (arenorna och Törnhålefälten)",
       "leaderboard": "Topplista",
       "deeds": "Bedrifternas bok",

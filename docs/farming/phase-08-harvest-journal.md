@@ -43,6 +43,25 @@ file's correction names is NOT used: a farm patch is static content, so the pins
 ride the crafting-station/civic-service family (marker unions, painters, tooltip
 adapter, accessibility core), never MapMarkerSemantic ((bd)).
 
+QA SWEEP (2026-08-17, Phase 8 QA, PASS-WITH-FOLLOWUPS; the full record is the
+progress.md Phase 8 QA section, the rulings state.md (be) and (bf) plus the (bd)
+amendment): the (az) entry surface did not exist for a pre-attunement farmer (the
+professions window's simplified body painted no gathering section), fixed in the
+pure core as deviation (be): simplified mode paints the WORKED gathering rows plus
+the Farming row while a bed is planted, so the Farming-row opener reaches every
+farmer, maintainer read owed. The (bd) line "STATION family color on BOTH surfaces"
+was corrected: the zone-map sprout is oak green (--color-map-oak), the minimap's is
+the station orange; unification is the Phase 13 art batch's call. STEP 5's second
+criterion ("server-anchored" countdowns) reads through (ay): online farmNowMs() is
+Date.now by the (ap) acceptance, so the honest contract is status-first rendering
+(a zero countdown under a growing status is "finishing", never Ready), and that is
+what the suites pin, now including the settled arms with the deadline behind the
+clock. The public guide's controls page gained the Shift+K row (a same-change
+obligation Phase 8 missed) plus a BIND_ACTIONS completeness pin. The four review
+residuals the phase left unledgered are recorded at state.md (bf), with residual (1)
+corrected (the login check is unreachable offline; the loading-overlay concern is a
+sweep notice).
+
 ### Starter Prompt
 
 ```
@@ -286,7 +305,7 @@ STOPPING RULES
 - Stop if a review BLOCKING cannot be fixed without out-of-scope changes.
 
 Close: gate via node scripts/gate_select.mjs (the armory browser red is the
-standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker; the
+standing environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL"; there is no separate exit marker, judge by "[gate:select] PASS: all N steps green" or the FAIL lines alone); the
 gate log is the arbiter per D22: no push, no PR). Merge --no-ff into
 feature/farming-plan, delete the phase branch, and put the would-be PR body in
 progress.md Notes, with before/after screenshots (desktop and mobile) captured

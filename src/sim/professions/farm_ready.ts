@@ -60,13 +60,21 @@ export function notifyFarmReady(ctx: SimContext, meta: PlayerMeta): void {
     const status = farmPlotStatus(plot, nowMs, skill, farmCropTier(plot.cropId));
     if (status === 'growing') continue;
     // Flipped BEFORE the counts are used to emit anything (the mailWelcomed
-    // ordering): a throw between here and the emit costs one notice, never a
-    // repeating one.
+    // ordering): a throw between here and the emit costs the plots already
+    // flipped in this pass their notice and splits the rest onto the next
+    // sweep, never a repeating one. (Practically unreachable: the only
+    // callees inside this loop are a stored-roll comparison and a table read.)
     plot.notified = true;
     if (status === 'withered') withered++;
     else ready++;
   }
   if (ready + withered === 0) return;
+  // The notice is TRANSIENT by design (state.md deviation (bb)): a farmer
+  // whose socket is not open when this frame is routed (the linkdead grace,
+  // or a disconnect inside the one tick between addPlayer and its drain)
+  // never hears it, and the flag above stays flipped, so nothing repeats it.
+  // Accepted because every durable surface (journal, pins, the bed's own
+  // status) shows the same truth on resume; maintainer read owed.
   ctx.emit(
     withered > 0
       ? { type: 'farmReady', pid: meta.entityId, ready, withered }

@@ -1005,9 +1005,11 @@ export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void
 // the tick sweep
 // ---------------------------------------------------------------------------
 
-/** The farming per-tick sweep. Draws ZERO rng and emits nothing, so its
- *  position in the tick tail cannot fork the draw order (the updateProfNudges
- *  and updateDeeds precedent in the same tail).
+/** The farming per-tick sweep. Draws ZERO rng and emits only the personal,
+ *  text-free ready notice, so its position in the tick tail cannot fork the
+ *  draw order (the updateProfNudges and updateDeeds precedent in the same
+ *  tail); a reorder would still move farmReady's place in the drained event
+ *  buffer, which is why it stays APPENDED where the growth phase put it.
  *
  *  Its ONE job is the ready notice (the ready-notice phase filled the body the
  *  growth phase reserved): announcing the plots that finished since the last

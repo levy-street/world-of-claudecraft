@@ -6218,6 +6218,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': '순위표',
   'guide.controls.deeds': '업적의 서',
   'guide.controls.reliquary': '성물고',
+  'guide.controls.harvestJournal': '수확 일지',
   'guide.controls.sheathe': '무기 넣기/빼기',
   'guide.controls.crafting': '제작',
   'guide.controls.valeCup': '베일 컵',

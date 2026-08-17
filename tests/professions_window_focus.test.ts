@@ -59,6 +59,8 @@ interface WorldState {
   // input. Defaults to empty: no charms, no buttons, so the existing cases
   // keep asserting the button-free surface.
   inventory?: { itemId: string; count: number }[];
+  // The viewer's planted beds (IWorld `myFarmPlots`); none by default.
+  farmPlots?: unknown[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (ring, ten
@@ -110,6 +112,7 @@ function makeWindow(
         ),
         toolEffectSlots: state.toolEffects ?? [],
         inventory: state.inventory ?? [],
+        myFarmPlots: state.farmPlots ?? [],
         player: { name: 'Testchar' },
       }) as never,
     closeOthers: () => {},

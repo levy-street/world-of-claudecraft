@@ -284,12 +284,20 @@ export class ProfessionsWindow {
       // The R40 "Ask each use" toggles (painter-local, survives rebuilds in
       // this field the way the section scroller does). Sorted for the sig.
       slotModePrompt: [...this.slotModePrompt].sort(),
+      // The viewer's planted beds (the same IWorld read the Harvest Journal
+      // lists): the simplified body's Farming-row arm keys on it.
+      farmPlotCount: world.myFarmPlots.length,
     };
   }
 
   // -------------------------------------------------------------------------
   // Simplified mode (syncing / unattuned pre-first-tier): the identity
-  // paragraph plus ONE call to action, tutorial line promoted.
+  // paragraph plus ONE call to action, tutorial line promoted, then (since
+  // the farming Phase 8 QA, state.md deviation (be)) the gathering rows the
+  // player has actually WORKED plus the Farming row while a bed is planted,
+  // painted as bar and Harvest Journal opener ONLY: no slot, recharge, or
+  // ask-each-use control reaches this body, so the one call to action stays
+  // the only thing here that spends.
   // -------------------------------------------------------------------------
 
   private simplifiedHtml(model: ProfessionsViewModel): string {
@@ -325,7 +333,15 @@ export class ProfessionsWindow {
     return (
       `<p class="prof-identity-paragraph">${esc(paragraph)}</p>` +
       `<section class="prof-cta"><h3 class="prof-section-header">${esc(t('hudChrome.professions.ctaHeader'))}</h3>` +
-      `<p class="prof-cta-line">${esc(cta)}</p>${tutorial}</section>`
+      `<p class="prof-cta-line">${esc(cta)}</p>${tutorial}</section>` +
+      // The gathering rows the player has actually WORKED (plus Farming while
+      // a crop is in the ground), the same row markup the full mode paints
+      // MINUS the tool-effect controls (they spend; the simplified body's
+      // only spender stays its call to action), so a pre-attunement farmer
+      // reaches the Harvest Journal from this window too (deviation (be)).
+      // Empty for a fresh character: the core decides, and the section
+      // paints nothing at all when the list is empty.
+      this.gatheringSectionHtml(model.simplifiedGathering, { effects: false })
     );
   }
 
@@ -341,7 +357,7 @@ export class ProfessionsWindow {
       this.craftsHtml(model) +
       this.perksHtml(model) +
       this.nudgesHtml(model) +
-      this.gatheringHtml(model)
+      this.gatheringSectionHtml(model.gathering, { effects: true })
     );
   }
 
@@ -525,8 +541,18 @@ export class ProfessionsWindow {
     return `<ul class="prof-nudges" role="list">${items}</ul>`;
   }
 
-  private gatheringHtml(model: ProfessionsViewModel): string {
-    const rows = model.gathering
+  // The gathering section over an explicit row list: the full mode paints
+  // every row WITH its tool-effect controls, the simplified body only the
+  // worked ones (the core's simplifiedGathering) as bar plus journal opener
+  // (`effects: false`: the slot, recharge, and ask-each-use controls all
+  // spend, and the simplified body's one call to action is meant to be its
+  // only spender), through this ONE builder so the two modes can never
+  // paint the row itself differently.
+  private gatheringSectionHtml(
+    gathering: readonly ProfessionsGatheringRow[],
+    opts: { effects: boolean },
+  ): string {
+    const rows = gathering
       .map((row) => {
         // The shared hasOwn-safe getter (one idiom for the rule): the id is
         // wire-mirrored, and a bare index on a prototype key would resolve a
@@ -545,7 +571,7 @@ export class ProfessionsWindow {
             }),
           )}</span></div>` +
           `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div>` +
-          this.gatherEffectHtml(row) +
+          (opts.effects ? this.gatherEffectHtml(row) : '') +
           this.harvestJournalHtml(row) +
           `</div></li>`
         );

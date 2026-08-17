@@ -4261,6 +4261,7 @@ export const zh_CN: EnTranslations = {
       "groupCamera": "镜头",
       "talents": "天赋",
       "professions": "专业",
+      "harvestJournal": "收成日志",
       "arena": "PvP 窗口（竞技场与荆谷原野）",
       "leaderboard": "排行榜",
       "deeds": "功绩之书",

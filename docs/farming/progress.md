@@ -22,7 +22,7 @@
 | Phase 7 (render and juice) | DONE 2026-08-14 | fix/farming-phase-07-render-and-juice (merge hash in the Phase 7 notes tail) | 0 BLOCKING across three domain reviews plus qa-checklist and the gate-integrity cone pass; 5 SHOULD-FIX fixed in-phase plus 2 adopted notes (the QA round reconciled this row with the Notes: the old "7 SHOULD-FIX" counted both) |
 | Phase 7 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-14 | 2026-08-14 |
 | Phase 8 (Harvest Journal) | DONE 2026-08-14 | fix/farming-phase-08-harvest-journal (merge hash in the Phase 8 notes tail) | 2 BLOCKING (language fan-out registry, focus-across-rebuild) found by the frontend review and fixed in-phase; 0 BLOCKING elsewhere across parity, architecture, hot-path, and qa-checklist; the parity gap (no golden farmReady) closed with a deliberate re-mint |
-| Phase 8 QA | not started | | |
+| Phase 8 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-08-qa (merge hash in the Phase 8 QA notes tail); 0 BLOCKING across eight lanes plus a verification round; one behavior fix (deviation (be), the simplified-mode journal entry), the (bd) ledger corrected, the guide controls row landed, the coverage gaps pinned, 24/24 mutants killed |
 | Phase 9 (world presence, go-live) | not started | | |
 | Phase 9 QA | not started | | |
 | Phase 10 (celebrations) | not started | | |
@@ -1565,6 +1565,19 @@ after-map-pins-desktop.png and after-map-pins-mobile.png (the zone map),
 and before-professions-entry-desktop.png to
 after-professions-entry-desktop.png (the entry button).
 
+Notes tail (added by the Phase 8 QA round, 2026-08-17, because the status
+row pointed here for it): merged --no-ff into feature/farming-plan as
+0f4bd59145 (phase branch fix/farming-phase-08-harvest-journal deleted per
+D22); phase-side commit chain ccf875aaf7, 952f23d82b, a8384acf85,
+d8b70bbfec, 06ad9e9df1, a66ee43ef2, 8420f0bd8d, 17ef15a51f. Surprises and
+deferrals live in the state.md (ay)-(bd) block; the frontend review's one
+RULED should-fix was not named by the phase session (its content is not
+recoverable from the record; the QA round found no open frontend
+should-fix against the shipped code, so nothing is owed). Carry to Phase
+9: the ready notices fire only for dev-created crops until seeds are
+obtainable (the live-surface note), the (bb) linkdead maintainer read,
+the (ap) farmNowMs read, and the painted pin art (Phase 13).
+
 ### Phase 8 QA pre-flight: the v0.39.0 release sync (sixteenth absorb)
 Ran 2026-08-15 as its own mid-phase per the D22 minor-version rule, BEFORE
 Phase 8 QA (user instruction: sync only, QA re-runs in a fresh session).
@@ -1620,6 +1633,254 @@ GATE_MAX_WORKERS=8: "[gate:select] PASS: all 12 steps green (vitest
 workers: 8)", 39,695 passed, zero FAIL lines. Lesson for future gates on
 this box: prefer GATE_MAX_WORKERS=8 when the full-suite fallback is
 expected.
+
+### Phase 8 QA (2026-08-17, PASS-WITH-FOLLOWUPS, local-only per D22)
+Branch fix/farming-phase-08-qa off feature/farming-plan at df340ea91f (the
+sixteenth-absorb tip; the newest release branch was still origin/release/v0.39.0
+at d2d1a8ad5c, already absorbed, zero commits ahead, so no absorb ran this
+round). Audit target: the Phase 8 merge 0f4bd59145's phase-side chain
+091e02931b..17ef15a51f, the fifteenth absorb excluded. Merged --no-ff into
+feature/farming-plan (hash in the notes tail below); the QA branch deleted.
+
+Fan-out: one very-thorough context loader, then eight parallel lanes
+(correctness with a throwaway real-tick probe file, coverage/pin quality,
+dead code plus i18n plus doc hygiene, a live-client drive of the real dev
+client on the LOW preset, frontend-seam-reviewer, cross-platform-sync,
+architecture-reviewer, qa-checklist), all delivered first try (Workflow,
+0 dead lanes). Verdicts: 0 BLOCKING everywhere; 13 SHOULD-FIX and 34
+NICE-TO-HAVE after dedupe. Then a verification round over the fix diff: a
+FRESH frontend-seam-reviewer, the privacy-security-review the phase never
+recorded (its matrix row had matched: server/heavy_self.ts plus the dev
+GUI row), the test-coverage-auditor over the new pins, three adversarial
+skeptics (regression, design, and the online arms), and a completeness
+critic. Verification results: frontend-seam PASS-WITH-FOLLOWUPS, 3
+SHOULD-FIX all taken (the simplified-mode doctrine banner was stale; the
+shared row builder also painted the SPENDING tool-effect controls in the
+simplified body, now bar plus opener only through an effects flag; that
+per-mode difference is pinned); test-coverage-auditor 3 SHOULD-FIX all
+taken (the online negative arm asserts its quiet-tick list is non-empty;
+the guide keycap-set pin records why a page-wide set suffices, the
+keybinds collision guard is what makes it so; a live plant-while-open arm
+proves the presence fold repaints an open window once and not on the
+second bed); the regression skeptic REFUTED the "every existing pin stays
+green" claim with a real gate red (the browser a11y suite's professions
+stub had no myFarmPlots and threw on open; fixed, the stub gains the
+member); the design skeptic did NOT refute (no written doctrine forbids
+worked rows in simplified mode; the original commits define the mode by
+trigger, not by hiding gathering; mobile has NO other journal launcher, so
+ledger-only was untenable on touch; the one-predicate revert is real for
+the visible behavior, a full removal also drops the input and its fixtures);
+the online skeptic did NOT refute (tick alignment reasoned and probed:
+ripen at tick 22, notice at tick 40 with 17 quiet ticks; the welcome letter
+is one-shot on the first residue; the membership drop reds both arms; two
+hardenings taken); the critic's one BLOCKING was the same a11y red, its
+should-fixes are this record. privacy-security-review (the Workflow lane
+died report-less, the recurring class; the Agent-tool redispatch with the
+mandatory report-via-SendMessage line delivered first try) PASS: 0
+BLOCKING, 0 SHOULD-FIX; verified server authority (the journal sends
+nothing, readiness never client-derived), the personal counts-only routing,
+the DoS shape of the heavy-self join (three notified writers only: the
+sweep flip, the plant re-arm, the load; the only client re-arm is a fully
+gated plant plus a growth cycle), dev gating on both arms (ctx.devCommands
+from ALLOW_DEV_COMMANDS, the GUI row behind devCommandsAvailable, the
+SAFE_TOKEN bed field), escape-clean rendering (every innerHTML
+interpolation through esc(); the rebind writes textContent; bed ids are
+allowlisted at the sim), no PII/secrets/egress, determinism, and the QA
+diff's self-only farmPlotCount read. Three notes ledgered: a login-path
+notice whose in-memory flip is never persisted (a drop before the next
+character save) replays on the next join, bounded by a full authenticated
+login per replay; the client arm trusts ev.ready to be numeric (negative,
+NaN, and zero print nothing; a truthy string would render cosmetically);
+one unescaped focusKey selector splice in the journal, safe today because
+the key is this module's own literal read back from its dataset. Fix
+commits from
+the round: 17d7d37f2b (the effects flag, the a11y stub, the banner, the
+two online hardenings, the live plant arm, the guide pin note) and
+4040ca5a2b (the two-farmer arm's honest scope: pids ascend by join, so
+insertion and pid order coincide by construction; the arm pins the
+observable, two events, one tick, first-joined first). Four more mutants
+after those commits (effects flag forced on, simplified passing effects on,
+the membership drop against the hardened online arms, the sig fold dropped
+against the live arm) plus the skill boundary loosened to >= 0: all
+KILLED, 29/29 for the round.
+
+Live-client evidence (the Phase 8 QA live drive, offline dev client on the
+LOW preset, 1600x900 and 844x390): the novice empty state opened by the REAL
+Shift+K keybind (canvas focused) with the noviceTitle/noviceBody copy; the
+skilled empty state after farming skill 5; three beds planted through the
+real plantCrop cast (two needed a retry, the interrupt class), the journal
+listing crop, bed line, stage, care chips, and a countdown that read "Ready
+in 1m 29s" then "Ready in 1m 26s" 2.5 s later, the 2 h row on the
+hours/minutes arm; a plot shaped to ripen under the OPEN journal repainted
+to "Ready to harvest" with no countdown attribute within one 1 Hz tick and
+the ready notice fired on banner, chat log, and the chat live region; each
+of the four zone maps carried exactly one farm pin (one per ZONE map, the
+station doctrine) with the "Garden Beds" tooltip on hover; the minimap pin
+is canvas-only (verified by the builder suite, screenshot at the site);
+mobile: no horizontal overflow with all three chips, chip type 10px
+(residual (bf)(4)); the professions-row entry was ABSENT for the
+pre-attunement farmer, the finding behind (be). Save shape: NO persisted
+shape moved (farm_persist.ts, server/db.ts, and the round-trip pins are
+absent from both the phase and QA diffs; the QA diff's src/sim changes are
+comment-only). UI_PURE_CORES: harvest_journal_view.ts registered
+(tests/architecture.test.ts) and professions_view.ts remains registered;
+the QA added no new core.
+
+Validation runs on the frozen tree before the gate: tsc clean; biome on
+every changed non-generated file 0 errors, format clean; the changed
+suites green (farm_ready, harvest_journal_view/window, farm_event_feedback,
+game_audio, keybinds, professions_graphics_fairness, professions_view,
+professions_window_layout/focus, professions_enchanting_reachable,
+farming_command_chain_online, guide, hud_perf_budget, hud_update_drive,
+language_fanout_registry, crafting_launcher, window_drag,
+hud_map_marker_lifecycle, professions_farming(_state), farm_props_asset,
+i18n_semantic_regressions, i18n_completeness, localization_fixes,
+architecture, monolith_budget, world_api_parity, snapshots,
+command_schema); the browser a11y professions arm green after the stub
+fix; npm run i18n:build and npm run wiki:content leave no generated diff.
+
+Findings fixed (every SHOULD-FIX, plus the cheap NICE-TO-HAVEs), as
+Conventional Commits with explicit paths:
+- 71c17f5719 docs(farming): the six stale comments (farm_event_feedback
+  "five arms" to six; the updateFarming docblock claimed "emits nothing"
+  after it started emitting farmReady, a stronger reorder license than the
+  body earns; the flip-before-emit note (a mid-loop throw SPLITS a notice,
+  the already-flipped plots lose theirs, practically unreachable); the
+  heavy-self entry now names `status` as the client-visible field the mark
+  keeps fresh with `notified` as the byte that makes the row differ, and
+  the farming_commands.ts mirror paragraph agrees; the banner comment
+  states BOTH directions of the replace-not-queue slot; the journal's
+  second-open refresh is documented; the (bb) acceptance sits at the emit).
+- 33bd33cfa2 test(farming): the pin gaps: the settled timer arms were
+  tested only with status AHEAD of the clock (the authority only ever says
+  ready or withered once the deadline is behind it), so a branch order that
+  let the zero clamp win over the withered check survived both suites; now
+  the past-deadline ready and withered arms exist in the view core and the
+  window; the farmReady audio route and its feedback gate; the Shift+K
+  default plus a whole-table default-collision guard (the one sanctioned
+  pair, KeyA for turnLeft and attackMove, is the exact expected set); the
+  fairness row names both pin painters explicitly; a focus no-steal
+  negative arm for the whole repaint; the two-farmer insertion-order sweep
+  arm ((bc)); the mixed-notice single cue asserted before the cross-check
+  drive; a dozen-residue silent tail after the one notice.
+- bba9dc4010 feat(ui): THE ONE BEHAVIOR FIX, deviation (be): the live drive
+  proved the (az) entry surface missing for a pre-attunement farmer (the
+  simplified professions body painted no gathering section, so only
+  Shift+K reached the journal); the pure core now derives
+  simplifiedGathering (worked rows, skill above 0, plus the Farming row
+  while any bed is planted through the new required farmPlotCount input,
+  folded into the refresh signature as presence), the window paints it
+  beneath the call to action through the one gatheringSectionHtml builder;
+  full mode and the fresh-character window unchanged; the opener itself
+  (untested in either arm before) is now pinned: presence under the
+  Farming row, click routing without repaint, absence without the dep,
+  under other rows, and for a fresh character; both simplified triggers.
+  Screenshots (LOW preset, desktop and mobile landscape):
+  docs/screenshots/farming-phase-08/before-professions-simplified-desktop.png
+  to after-professions-simplified-desktop.png and
+  before-professions-simplified-mobile.png to
+  after-professions-simplified-mobile.png (the existing coned subtree, so
+  no ci.yml cone row moved).
+- 4ac39a7ca6 + 7159cdeab4 test(server): farmReady's HEAVY_SELF_EVENTS
+  membership was pinned only as set membership; two arms now ride the real
+  GameServer path (the sweep tick that announces the ripened plot dirties
+  the session and no quiet tick before it does; the very next broadcast
+  carries status ready with notified true against a pre-notice baseline).
+  The mutation pass caught the first cut: the join's welcome letter is
+  delivered on the same first 1 Hz residue and mailArrived is itself a
+  member, so the arm rode out that boundary before ripening; with the
+  membership dropped both arms red (the next-snapshot one too, so the
+  staggered backstop was not covering it).
+- 0e739d3519 feat(guide): the Shift+K row on the public guide's controls
+  page (a same-change obligation Phase 8 missed; the existing pins
+  enumerate binds by hand), the guide.controls.harvestJournal key with the
+  five non-Latin fills M16 demands (the same strings the window title
+  carries), the regenerated resolved bundles, a row pin, and the
+  completeness pin the earlier waves lacked (every Interface bind default
+  must appear among the page's keycaps, read live through keyLabel).
+- Docs (this commit and the gate-record commit): state.md head, (bd)
+  amendment, (be), (bf), the i18n ledger row; the phase file and this QA
+  file swept (the nonexistent "GATE EXIT marker" phrase retracted in both
+  Close lines; STEP 5's skew wording read through (ay)); this section; the
+  Phase 8 notes tail above.
+
+Decisiveness: after committing, 24 single-edit mutants (plus five more
+after the verification round, 29 in all) planted one at a
+time on the committed tree and restored by checkout, every one KILLED with
+named failing tests (rc plus names plus the summary line): the notified
+flip, the zero guard, the count swap, the addPlayer login call, the % 40
+cadence (killed by farm_ready.test.ts because tickCount is pre-incremented;
+NOTE the parity beat's 41 consecutive ticks always contain a multiple of
+40, so the golden does NOT pin the cadence), the growing-skip inversion,
+the farmPlotStatus boundary loosened to <=; the view core's ready-from-
+countdown, status-after-countdown, and BOTH settled arms gated behind the
+deadline (the two the new arms exist for); the window's countdown elision,
+the unconditional focus carry, and the signature's timer.kind; the feedback
+plural swap and the banner drop; the heavy-self membership drop (kills the
+set pin AND both online arms); the professions opener guard, the
+simplified list forced empty, the planted-bed arm dropped, the simplified
+body omitting the rows, the signature ignoring plots; the guide row
+dropped; the audio cue swapped.
+
+Deferred with reasons (ledgered, not fixed): the ambient banner is a
+replace-not-queue slot in both directions (comment states it; the log lines
+and the durable surfaces carry the truth); no aria-live announcement when a
+row flips to Ready under an open journal (the chat line reaches the log
+live region; a status line inside the dialog is a design follow-up); the
+.hj-row rgba scrim and the bare 100vh fallback behind --app-vh (family
+idioms; verify in the mobile E2E if ever doubted); the raw item-id fallback
+on catalog drift (documented degradation); spectators receive the watched
+farmer's farmReady and its heavy-self mark (pre-existing generic spectator
+semantics for every member); the four em dashes in keybinds.ts (pre-existing,
+attributed to e9c54bc7d2, not this diff); the 1 Hz interval has no
+teardown outside close() (world() is a live getter, so a world swap is
+followed, no HUD-wide dispose hook exists for any self-driven cold window (daily_rewards clears its intervals on close the same way), and Escape plus closeAll route through closeManagedWindow to close(), which disposes the clock; not a gap); map pins are one per ZONE map, so
+"the four patch sites" reads as four zone maps (doc precision; the PR body
+above is amended by this note); the minimap farm pin has no live state
+hook (canvas-only; the builder is unit-pinned); the pre-existing
+`describe.skip` in hud_perf_budget's gated tour; and the four residuals
+now at state.md (bf) with residual (1) corrected. Not fixed by choice: (bd)
+per-surface pin color (oak on the zone map, station orange on the minimap;
+docs corrected, unification is the Phase 13 art batch's call).
+
+Verified as ledgered (the rulings, not re-litigated): (ay) status-first
+countdown with the decisive skew pin; (az) the two entries and no rail
+button; (ba) no command from the journal; (bb) the linkdead loss, with the
+one-tick join window confirmed against the server's join path (addPlayer to
+clients.set with no await between, the resume arm bypassing addPlayer, the
+events drained by the next tick's routing pass); (bc) unsharded on the
+crowded residue in player-map order (now pinned across two farmers); (bd)
+the static-marker family, never MapMarkerSemantic. Three-host: the login
+check is reachable only where a saved state is restored (the server host
+and the tests: the offline Sim constructs its player with no state, so the
+offline emitter is the sweep alone; the RL host runs the same tick and
+inspects no event types). Baselines held with zero movement: command_schema
+202/215, IWorld 329 = 88 + 241 (no facet touched), delta keys 87, golden
+50a2e54c3e809a1a4aa0ecf99ea43c5f, monolith hud.ts/renderer.ts untouched at
+their zero-headroom ceilings, sim.ts untouched (12659/12660).
+
+GATE RECORD (judged by log markers per the standing rule; run on the
+frozen committed tree at d9704a3636 with BROWSER_PATH set and
+GATE_MAX_WORKERS=8, the sixteenth-absorb lesson): run 1 hit the full-suite
+fallback as expected ("mode=full (broad/unclassified change
+(tests/helpers/bare_client.ts)"), diff base origin/release/v0.39.0, 351
+changed paths, and printed "[gate:select] PASS: all 12 steps green (vitest
+workers: 8)": i18n + wiki + sfx artifacts, i18n freshness, sfx and media
+manifest regen, manifest trackedness and freshness, malware scan, biome on
+the changed files, the full vitest suite (2823 files, 39,721 passed, 2
+expected-fail, 115 skipped, ZERO FAIL lines), the browser regressions (19
+files, 129 passed, the a11y professions arm included), typecheck plus the
+env/server/bot builds, and the client build; about 14 minutes wall on this
+box. The pre-registered druid_engines contention timeout did NOT occur
+this run (nothing to prove standalone); the armory browser exception was
+not needed either. Exit code 0 (informational only; the markers are the
+verdict).
+
+Notes tail: MERGE_HASH_PLACEHOLDER. Handoff to Phase 9: vendor stock,
+seeds, the intro quest and go-live, with the ready notices going live the
+moment seeds are obtainable; carry the (ap), (bb), and (be) maintainer
+reads, the pin-art debt, the shard-weight harvest at go-public, and the
+go-live checklist additions recorded in earlier phases.
 
 ### Phase 9
 (not started)

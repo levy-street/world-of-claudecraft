@@ -85,6 +85,37 @@ describe('harvest journal: the time cell', () => {
     expect(timer).toEqual({ kind: 'withered' });
   });
 
+  // THE AUTHORITY'S OWN SHAPE. farmPlotStatus only ever says 'ready' or
+  // 'withered' once nowMs has passed readyAtMs, so the two settled arms above
+  // (status ahead of the clock) prove the override direction, and these two
+  // prove the everyday one: a settled status with the deadline BEHIND it must
+  // still read as the status, never as the zero clamp. This is the pair a
+  // branch order that let the clamp win over the withered check would fail
+  // (every real withered bed would read 'Finishing up' forever).
+  it('renders ready from status once the deadline has passed, never the zero clamp', () => {
+    expect(
+      harvestJournalTimer(plot({ status: 'ready', readyAtMs: 10 * MINUTE }), 11 * MINUTE),
+    ).toEqual({ kind: 'ready' });
+    const rows = rowsOf([plot({ status: 'ready', readyAtMs: 10 * MINUTE })], 11 * MINUTE);
+    expect(rows[0]?.timer).toEqual({ kind: 'ready' });
+  });
+
+  it('renders withered from status once the deadline has passed, never the zero clamp', () => {
+    expect(
+      harvestJournalTimer(plot({ status: 'withered', readyAtMs: 10 * MINUTE }), 11 * MINUTE),
+    ).toEqual({ kind: 'withered' });
+    const rows = rowsOf([plot({ status: 'withered', readyAtMs: 10 * MINUTE })], 11 * MINUTE);
+    expect(rows[0]?.timer).toEqual({ kind: 'withered' });
+    // And far past it (the same skew the growing arm below is tested at):
+    // the authority's word does not age into a countdown.
+    expect(
+      harvestJournalTimer(
+        plot({ status: 'withered', readyAtMs: 10 * MINUTE }),
+        10 * MINUTE + 6 * HOUR,
+      ),
+    ).toEqual({ kind: 'withered' });
+  });
+
   it("zero-clamps to 'finishing' when the deadline has passed but status is still growing", () => {
     const timer = harvestJournalTimer(plot({ readyAtMs: 10 * MINUTE }), 10 * MINUTE + SECOND);
     expect(timer).toEqual({ kind: 'finishing' });

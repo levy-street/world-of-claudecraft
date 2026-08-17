@@ -144,6 +144,10 @@ export class HarvestJournalWindow {
 
   open(): void {
     if (this.isOpen) {
+      // A second open (the professions row re-clicked while the journal is
+      // up) is a deliberate refresh: one cold whole-repaint, no interval
+      // re-arm, and focus-safe (the opener sits outside this root, so the
+      // repaint's focus carry is a no-op).
       this.render();
       return;
     }

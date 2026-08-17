@@ -8,7 +8,7 @@ import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
 // The English the /c/ public sheet resolves a mark id to. Imported here so the
 // generator's own hand table cannot drift away from what the sheet says.
 import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
-import { BIND_ACTIONS } from '../src/game/keybinds';
+import { BIND_ACTIONS, keyLabel } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
   GUIDE_DEEDS,
@@ -1456,6 +1456,47 @@ describe('Guide controls reference completeness', () => {
     expect(html).toContain('<kbd>Shift+H</kbd></td><td>Damage meters');
     expect(html).toContain('<kbd>Ctrl+6</kbd></td><td>Pet: Mark');
     expect(html).toContain('<kbd>Shift+Tab</kbd></td><td>Cycle target backward');
+  });
+
+  // Third wave, found by the farming Phase 8 QA: the Harvest Journal shipped a
+  // defaulted window bind (Shift+K) with no controls row, exactly the drift
+  // class the two waves above were written against. Same per-bind contract.
+  it('documents the Harvest Journal bind and keeps it in step with the game default', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+K</kbd></td><td>Harvest Journal</td>');
+    expect(BIND_ACTIONS.find((a) => a.id === 'harvestJournal')?.defaults).toEqual(['Shift+KeyK']);
+  });
+
+  // The COMPLETENESS pin the three waves above were missing: every Interface
+  // window bind's default keycap must appear in the controls reference, so
+  // the next shipped bind reds here instead of drifting silently. Both halves
+  // read the live tables (BIND_ACTIONS through the same keyLabel the options
+  // panel prints, the page through its rendered <kbd> cells). A page-wide
+  // keycap SET is enough here because tests/keybinds.test.ts pins that no two
+  // shipped defaults share a code (the one sanctioned KeyA pair aside), so a
+  // new Interface bind cannot borrow another action's keycap to pass: its
+  // keycap is on the page only if a row was written for it.
+  it('lists every Interface bind default on the controls page', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    const kbds = new Set([...html.matchAll(/<kbd>([^<]+)<\/kbd>/g)].map((m) => m[1]));
+    const missing = BIND_ACTIONS.filter(
+      (a) => a.category === 'Interface' && !a.defaults.some((code) => kbds.has(keyLabel(code))),
+    ).map((a) => a.id);
+    expect(missing).toEqual([]);
+    // Anti-vacuous: the scrape really read keycaps, and the two shifted rows
+    // this pin was written for are among them.
+    expect(kbds.has('Shift+P')).toBe(true);
+    expect(kbds.has('Shift+K')).toBe(true);
   });
 
   it('keeps the second-wave binds in step with the game defaults', () => {

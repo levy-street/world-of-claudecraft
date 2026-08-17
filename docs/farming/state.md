@@ -4,9 +4,24 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 8 done 2026-08-14 (merged --no-ff as 0f4bd59145 from
-fix/farming-phase-08-harvest-journal; next is Phase 8 QA,
-docs/farming/phase-08-qa.md). The SIXTEENTH absorb ran 2026-08-15 as its
+Current phase: Phase 8 QA done 2026-08-17 (PASS-WITH-FOLLOWUPS; branch
+fix/farming-phase-08-qa off feature/farming-plan, merged --no-ff, hash in
+the progress.md Phase 8 QA record; next is Phase 9, world presence and
+go-live, docs/farming/phase-09-*.md starter). Phase 8 itself was done
+2026-08-14 (merged --no-ff as 0f4bd59145 from
+fix/farming-phase-08-harvest-journal). The Phase 8 QA round: 0 BLOCKING
+across eight audit lanes; the one behavior fix is deviation (be)
+(simplified-mode gathering rows so a pre-attunement farmer reaches the
+journal from the professions window); the (bd) ledger line was corrected
+(the zone-map sprout is oak green, the minimap's is station orange); the
+four unledgered residuals are recorded at (bf); the guide controls page
+gained the Shift+K row plus a BIND_ACTIONS completeness pin; and the pin
+gaps the coverage lanes named are closed (settled timer arms past the
+deadline, the audio route and gate, the keybind default and collision
+guard, the focus no-steal arm, the two-farmer sweep order, the online
+farmReady heavy-self proof over the real broadcast). Baselines held with
+zero movement (202/215, IWorld 329 = 88 + 241, delta keys 87, golden
+50a2e54c). The SIXTEENTH absorb ran 2026-08-15 as its
 own mid-phase sync BEFORE Phase 8 QA (the D22 minor-version rule; branch
 fix/farming-sync-v0.39.0, merge eaaf07f658 of release/v0.39.0 tip
 d2d1a8ad5c: 320 commits, 555 files, 74-file farming intersection;
@@ -653,6 +668,9 @@ question does not arise (farming has no station).
   value carries its five non-Latin M16 fills (the dev rows are English-only,
   outside the completeness suite's player-surface scope). No matcher rows
   (farmReady is a text-free counts-only SimEvent, the standing pattern).
+  Phase 8 QA: guide.controls.harvestJournal (the public guide's controls
+  page row for Shift+K, English plus the same five non-Latin fills the
+  window title carries; M16 counts "Harvest Journal" as wordy).
   Phase 6: eight item-name rows in the items
   catalog (the dishes; English plus the five non-Latin fills per M16) and ONE
   hudChrome key, materialHint.growthTonic (the crafted tonic's tooltip purpose
@@ -1449,6 +1467,77 @@ question does not arise (farming has no station).
   architecture review rides the status seam: a plot announced withered can
   later project ready after a proficiency gain (monotonic, one-direction),
   with no correcting notice; the bed itself shows the truth.
+  (bd) AMENDMENT (Phase 8 QA, 2026-08-17): "STATION family color on BOTH
+  surfaces" is true of the minimap only. The minimap sprout fills with
+  --color-minimap-station (the station family's orange, the static-service
+  doctrine); the ZONE MAP sprout fills with --color-map-oak (the map
+  palette's oak green, chosen in map_window_painter.ts so a growing site
+  never reads as the herb-node readiness green while still reading as a
+  plant), NOT the map station badge's --color-map-stall. Both painters argue
+  their own choice and both painter tests pin the literal token, so the
+  code and tests are honest; only this ledger line was wrong. Left as a
+  per-surface choice for the Phase 13 painted-art batch to unify (one
+  MapMarkerArtId would replace both procedural fills); maintainer glance
+  invited then, no code change in QA.
+  Phase 8 QA deviations and rulings (2026-08-17, branch
+  fix/farming-phase-08-qa):
+  (be) SIMPLIFIED-MODE GATHERING ROWS, maintainer read owed at feature
+  review: the (az) entry surface ("the journal opens from the professions
+  window's Farming row") did not exist for a pre-attunement farmer, because
+  the professions window's simplified body (syncing, or unattuned with every
+  craft under tier 1; professions_view.ts mode rule) painted the identity
+  paragraph and ONE call to action and no gathering section at all, so a
+  farmer who had never crafted to tier 1 reached the journal only through
+  Shift+K (found by the QA live-client drive: professions_window.ts composed
+  gatheringHtml inside fullHtml only). Fix, in the pure core: the model now
+  derives simplifiedGathering, the rows the simplified body ALSO paints
+  beneath its call to action, which is every gathering row the player has
+  actually WORKED (skill above 0) plus the Farming row while any bed is
+  planted (a new REQUIRED ProfessionsViewInput.farmPlotCount, read from
+  IWorld myFarmPlots.length and folded into professionsRefreshSig as
+  presence, so a farmer's first growth cycle reaches the journal before the
+  first skill point does and a second plant rebuilds nothing). Skill-0 rows
+  stay hidden, so a fresh character's simplified window is unchanged, and
+  full mode is untouched; both modes paint rows through the ONE
+  gatheringSectionHtml builder, the simplified body with `effects: false`
+  (bar plus the journal opener ONLY: the slot, recharge, and ask-each-use
+  controls all spend, and the simplified body's one call to action stays
+  its only spender; pinned). Two honest notes for the read: the syncing
+  trigger paints worked rows under the "syncing" paragraph for the sync
+  window (monotone, harmless, pinned as the same rule); and the strongest
+  justification is touch: mobile has NO other journal launcher (no rail
+  button per (az), no More-tray entry, and Shift+K is keyboard-only), so a
+  pre-attunement touch farmer had ZERO entry before this. Live evidence:
+  docs/screenshots/farming-phase-08/{before,after}-professions-simplified-
+  {desktop,mobile}.png. This is a general professions-window change
+  (a pure gatherer, mining 60 and no craft, also sees their worked rows in
+  simplified mode now, which the tutorial line "craft or gather with any
+  profession to begin" already invited), so it is ledgered here as a
+  Professions 2.0 surface deviation with the read owed; reverting to the
+  strict CTA-only doctrine, or narrowing to the farming row alone, is a
+  one-predicate change in buildProfessionsView. Pinned in
+  tests/professions_view.test.ts (the rule, both simplified triggers, the
+  signature presence arm) and tests/professions_window_layout.test.ts (the
+  opener under the Farming row in both modes, click routing, absence without
+  the dep, under other rows, and for a fresh character).
+  (bf) The four review residuals the phase session left unledgered are
+  recorded here as accepted, with the corrections the QA lanes made: (1) the
+  "offline login notice under the loading overlay with the cue swallowed by
+  the autoplay gate" residual was MIS-STATED: the login check is reachable
+  only where a saved state is restored (the server host and the tests; the
+  offline Sim constructs its player with no state, so notifyFarmReady
+  early-returns on every offline boot), so the loading-overlay/autoplay
+  concern applies to a SWEEP notice arriving during the offline boot, not to
+  a login notice; cosmetic, accepted. (2) farmPatchMarkerAt/stationMarkerAt
+  are twin production-dead exports (real hit-testing goes through
+  mapPointMarkerHitsInto's arms); family consistency, test-covered, delete
+  both together if the family is ever cleaned up. (3) the sprout ratio
+  constants are declared in both painters with reciprocal cross-references;
+  rule of three not met (two copies), hoist on a third surface. (4) the
+  10-11px mobile chip and secondary type (.hj-care-chip/.hj-care-none 10px,
+  .hj-bed/.hj-stage 11px) measured live at 10px on 390x844 with no overflow;
+  legibility judgement, accepted, revisit with the Phase 13 art pass. (5) is
+  the (bd) tail above.
 - Dev command surface: Phase 3 registers /dev farmgrow [bedId] (alias
   /devfarmgrow [bedId]) in src/sim/dev_commands.ts behind ALLOW_DEV_COMMANDS:
   with a bed id it advances that plot, without one it advances ALL of the

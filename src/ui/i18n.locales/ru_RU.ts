@@ -6333,6 +6333,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': 'Таблица лидеров',
   'guide.controls.deeds': 'Книга деяний',
   'guide.controls.reliquary': 'Реликварий',
+  'guide.controls.harvestJournal': 'Журнал урожая',
   'guide.controls.sheathe': 'Убрать/обнажить оружие',
   'guide.controls.crafting': 'Крафт',
   'guide.controls.valeCup': 'Кубок Долины',

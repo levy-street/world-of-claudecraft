@@ -83,6 +83,7 @@ describe('sampled GameAudio facade', () => {
       ['cardShuffle', 'ui_card_shuffle'],
       ['farmPlant', 'ui_farm_plant'],
       ['farmHarvest', 'ui_farm_harvest'],
+      ['farmReady', 'ui_farm_ready'],
     ] as const;
 
     for (const [method, key] of routes) {
@@ -131,6 +132,9 @@ describe('sampled GameAudio facade', () => {
       // The farming RESULT half. Its plant twin is on the ungated arm below,
       // which is the whole point of the split.
       'farmHarvest',
+      // The ready NOTICE: nothing was pressed, so it rides the feedback gate
+      // like the mail and quest chimes and falls silent with them.
+      'farmReady',
     ] as const;
     for (const m of feedback) audio[m]();
     // The parameterized gather/rarity/craft/enchanting cues gate the same way;

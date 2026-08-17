@@ -141,6 +141,30 @@ describe('registry', () => {
     expect(sheathe?.category).toBe('Interface');
     expect(sheathe?.kind).toBe('edge');
     expect(sheathe?.defaults).toEqual(['KeyZ']);
+    // The Harvest Journal is a rebindable Interface toggle on the shifted layer
+    // of KeyK (Shift+H and Shift+J, its own initials, are Damage Meters and
+    // Target Buffs/Debuffs); bare KeyK stays the Leaderboard, so the two share
+    // the physical key across layers and never collide.
+    const journal = BIND_ACTIONS.find((a) => a.id === 'harvestJournal');
+    expect(journal?.category).toBe('Interface');
+    expect(journal?.kind).toBe('edge');
+    expect(journal?.defaults).toEqual(['Shift+KeyK']);
+  });
+
+  it('gives every shipped default code to exactly one action per layer', () => {
+    // The static half of the conflict guarantee the load-time uniqueness sweep
+    // enforces at runtime: two actions shipping the SAME default code would
+    // silently evict one of them for every fresh profile. Attack Move shares
+    // KeyA with Turn Left by design (the one sanctioned pair), so it is the
+    // only allowed collision.
+    const owners = new Map<string, string[]>();
+    for (const action of BIND_ACTIONS) {
+      for (const code of action.defaults) {
+        owners.set(code, [...(owners.get(code) ?? []), action.id]);
+      }
+    }
+    const collisions = [...owners.entries()].filter(([, ids]) => ids.length > 1);
+    expect(collisions).toEqual([['KeyA', ['turnLeft', 'attackMove']]]);
   });
 });
 

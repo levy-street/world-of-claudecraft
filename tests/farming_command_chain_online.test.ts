@@ -451,6 +451,123 @@ describe('farmPlanted is a HEAVY_SELF_EVENTS member: the planter self-mirror re-
   });
 });
 
+describe('farmReady is a HEAVY_SELF_EVENTS member: a plot ripening with NO command re-diffs the farmer', () => {
+  /** Plant through the real command, then ripen the plot IN PLACE by moving
+   *  its deadline behind the authority's own clock (the parity scenario's
+   *  technique: the live server clock is Date.now and cannot be advanced),
+   *  with the pre-rolled survival pinned to the ready outcome so the notice
+   *  is the ready arm and never a withered coin flip. Returns after the
+   *  plant's own routing tick, so the plant's dirtiness is spent. */
+  function plantAndRipen(server: GameServer, session: ClientSession): number {
+    const pid = session.pid as number;
+    standAtBed(server, pid, BED);
+    server.sim.addItem('vale_wheat_seed', 1, pid);
+    server.sim.addItem('garden_hoe', 1, pid);
+    routeTick(server); // flush the setup's loot events (the planted arm's lesson)
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
+    );
+    routeTick(server); // farmPlanted routed; the plot exists
+    // Ride out the FIRST 1 Hz boundary before ripening: the join's welcome
+    // letter is delivered on that same residue and mailArrived is itself a
+    // member, so a notice landing there would be dirtied twice over and the
+    // arm below could not tell the two apart (checked by mutation: without
+    // this the membership drop survived). One full second is enough; the
+    // letter is one-shot.
+    for (let i = 0; i < 20; i++) routeTick(server);
+    const plot = server.sim.meta(pid)?.farmPlots.get(BED);
+    if (!plot) throw new Error('the plant did not land');
+    plot.survivalRoll = 0.01;
+    plot.readyAtMs = server.sim.ctx.lockoutNowMs() - 1;
+    return pid;
+  }
+
+  /** Tick-and-route until the sweep announces this farmer, clearing the
+   *  dirty flag BEFORE every tick so whatever is observed after a tick is that
+   *  tick's own doing. Returns the flag as read on the notice tick, plus the
+   *  flags read on every quiet tick before it. */
+  function tickToNotice(
+    server: GameServer,
+    session: ClientSession,
+    pid: number,
+  ): { noticedDirty: boolean; quietDirty: boolean[] } {
+    const quietDirty: boolean[] = [];
+    for (let i = 0; i < 40; i++) {
+      clearHeavyDirty(session);
+      const events = server.sim.tick();
+      (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(events);
+      if (events.some((ev) => ev.type === 'farmReady' && ev.pid === pid)) {
+        return { noticedDirty: heavyDirty(session), quietDirty };
+      }
+      quietDirty.push(heavyDirty(session));
+    }
+    throw new Error('the 1 Hz sweep never announced the ripened plot');
+  }
+
+  it('dirties the farmer on the sweep tick that announces the ripened plot, and on no tick before it', () => {
+    // The ready flip has NO command behind it and moves no inventory (so no
+    // wireRev bump either): the routed farmReady is the ONLY freshness path
+    // for a plot that ripened on its own timer. Drop the membership and this
+    // arm reds on the notice tick (checked by mutation in the Phase 8 QA
+    // round), while the quiet ticks stay clean because nothing else this
+    // idle farmer does inside one second is a member.
+    const server = new GameServer();
+    const session = joinServer(server, 4, 'Ripener');
+    const pid = plantAndRipen(server, session);
+    const { noticedDirty, quietDirty } = tickToNotice(server, session, pid);
+    expect(noticedDirty).toBe(true);
+    // Non-vacuous: the ride-out ends just past a boundary, so the notice
+    // lands about a second later and the quiet list really has entries (a
+    // setup edit that slid the notice onto the first iteration would make
+    // the every() below constant-true; this line is what stops that).
+    expect(quietDirty.length).toBeGreaterThan(0);
+    expect(quietDirty.every((dirty) => dirty === false)).toBe(true);
+    // The plot really transitioned (the notice was the ready arm, and the
+    // flag it flipped is what the next snapshot must carry).
+    const plot = server.sim.meta(pid)?.farmPlots.get(BED);
+    expect(plot?.notified).toBe(true);
+    expect(server.sim.farmPlotsFor(pid)[0]?.status).toBe('ready');
+  });
+
+  it('carries the ripened row (status ready, notified true) on the very next snapshot', () => {
+    // The observable half over the REAL broadcast path (the "next snapshot"
+    // family below): the client's mirror must agree with the notice it just
+    // rendered, not wait on the staggered HEAVY_SELF_REFRESH_TICKS backstop.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = server.join(fc.ws as never, 5, 5, 'Mirror', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+    const pid = plantAndRipen(server, session);
+    // Baseline broadcast BEFORE the sweep sees the ripened plot: the mirror
+    // holds the growing row, so the assertion below cannot pass on a
+    // first-snapshot-sends-everything effect. (The plot is already past its
+    // deadline, so the authority computes 'ready' at send time; what this
+    // baseline pins is the flag, which only the sweep flips.)
+    broadcast(server);
+    const before = lastSnap(fc.sent).self.fplot as Record<string, unknown>[];
+    expect(before).toHaveLength(1);
+    expect(before[0].notified).toBe(false);
+    tickToNotice(server, session, pid);
+    // Keep the staggered backstop out of the picture, so this broadcast's
+    // fplot can only be the notice's doing: heavyDue also fires when
+    // (tickCount + pid) % HEAVY_SELF_REFRESH_TICKS === 0 (server/game.ts, the
+    // 40-tick backstop), and a future spawn-count change could land the
+    // notice tick on that residue for this pid. The notice's dirty flag
+    // survives quiet ticks (only a broadcast clears it), so ride past the
+    // residue if it coincides. Checked by mutation: with 'farmReady' out of
+    // HEAVY_SELF_EVENTS this arm reds on the missing fplot key.
+    while ((server.sim.tickCount + pid) % 40 === 0) routeTick(server);
+    broadcast(server);
+    const rows = lastSnap(fc.sent).self.fplot as Record<string, unknown>[];
+    expect(rows).toHaveLength(1);
+    expect(rows[0].bedId).toBe(BED);
+    expect(rows[0].status).toBe('ready');
+    expect(rows[0].notified).toBe(true);
+  });
+});
+
 // END-TO-END FRESHNESS through the heavy self gate.
 //
 // `fplot` moved behind the heavyDue gate when the growth phase made its

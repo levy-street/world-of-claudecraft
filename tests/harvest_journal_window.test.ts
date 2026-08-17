@@ -148,6 +148,21 @@ describe('harvest journal window: paint', () => {
     expect(countdownCell()).toBeNull();
   });
 
+  it('paints settled statuses as themselves past the deadline, never as finishing', () => {
+    // The authority's everyday shape: ready and withered only ever arrive
+    // once the deadline is behind the clock, so a painter that let the zero
+    // clamp win here would show every real settled bed as 'Finishing up'.
+    world.plots = [
+      plot({ bedId: 'bed_eastbrook_1', status: 'ready' }),
+      plot({ bedId: 'bed_eastbrook_2', status: 'withered' }),
+    ];
+    world.nowMs = 10 * MINUTE + 30 * SECOND;
+    makeWindow().open();
+    const times = [...root.querySelectorAll('.hj-time')].map((el) => el.textContent);
+    expect(times).toEqual(['Ready to harvest', 'Withered']);
+    expect(countdownCell()).toBeNull();
+  });
+
   it('names the paid knobs and says so plainly when none were paid', () => {
     world.plots = [plot({ compost: true, tonic: true })];
     makeWindow().open();
@@ -342,6 +357,27 @@ describe('harvest journal window: open, close, and focus', () => {
     expect(rebuilt).not.toBeNull();
     expect(rebuilt).not.toBe(closeBtn);
     expect(document.activeElement).toBe(rebuilt);
+  });
+
+  it('does NOT steal focus on a whole repaint when focus was outside the window', () => {
+    // The negative arm of the carry: a plot flipping to ready under an open
+    // journal while the player is typing in chat (or standing on another
+    // window's control) must leave focus exactly where it was. Only a control
+    // INSIDE this root earns a re-focus after the innerHTML rebuild.
+    const outside = document.createElement('input');
+    document.body.appendChild(outside);
+    const win = makeWindow();
+    win.open();
+    outside.focus();
+    expect(document.activeElement).toBe(outside);
+    world.nowMs = 11 * MINUTE;
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    // The repaint really happened (the row is the ready arm now) ...
+    expect(root.querySelector('.hj-time')?.textContent).toBe('Ready to harvest');
+    // ... and focus stayed outside the dialog.
+    expect(document.activeElement).toBe(outside);
+    outside.remove();
   });
 });
 

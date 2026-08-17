@@ -4261,6 +4261,7 @@ export const ru_RU: EnTranslations = {
       "groupCamera": "Камера",
       "talents": "Таланты",
       "professions": "Ремесла",
+      "harvestJournal": "Журнал урожая",
       "arena": "Окно PvP (арены и Терновая Лощина)",
       "leaderboard": "Таблица лидеров",
       "deeds": "Книга деяний",

@@ -4261,6 +4261,7 @@ export const tr_TR: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Yetenekler",
       "professions": "Meslekler",
+      "harvestJournal": "Harvest Journal",
       "arena": "PvP penceresi (arenalar ve Dikenvadi Ovası)",
       "leaderboard": "Lider Tablosu",
       "deeds": "Yiğitlikler Kitabı",

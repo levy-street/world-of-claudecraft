@@ -4261,6 +4261,7 @@ export const ko_KR: EnTranslations = {
       "groupCamera": "카메라",
       "talents": "특성",
       "professions": "생산 전문직",
+      "harvestJournal": "수확 일지",
       "arena": "PvP 창 (투기장과 쏜할로우 평원)",
       "leaderboard": "순위표",
       "deeds": "업적의 서",
