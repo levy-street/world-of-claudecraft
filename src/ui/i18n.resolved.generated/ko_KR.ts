@@ -14513,6 +14513,26 @@ export const ko_KR: EnTranslations = {
         "title": "약방의 주인",
         "greeting": "두 번 재고 한 번에 부어라, {className}. 약방에서는 쏟은 시약을 봐주지 않는다."
       },
+      "farmer_jessica": {
+        "name": "농부 제시카",
+        "title": "텃밭 지기",
+        "greeting": "좋은 흙과 맑은 날씨를 빌어요, {playerName}. 제게서 씨앗을 사서 저기 밭 하나에 심고, 하던 일을 보러 가세요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요."
+      },
+      "farmer_teasel": {
+        "name": "농부 티즐",
+        "title": "습지 논 농부",
+        "greeting": "습지 쌀과 늪지 비트 씨앗, 그리고 거름으로 쓸 퇴비요, {className}. 논은 물이 더디게 빠지니 발밑을 조심하시오."
+      },
+      "farmer_hollis": {
+        "name": "농부 홀리스",
+        "title": "하이워치 계단밭 농부",
+        "greeting": "계단밭은 산이 허락하는 만큼만 내주지, {className}. 퇴비를 팔고 있고, 그대의 작물이 시들어 올라오면 그 껍질을 다시 좋은 흙으로 만들어 주겠소."
+      },
+      "farmer_verbena": {
+        "name": "농부 버베나",
+        "title": "파르테르 정원사",
+        "greeting": "가장자리를 조심하세요, {playerName}, 이 밭들은 파르테르의 자랑이니까요. 파는 건 퇴비이고, 가져오신 시든 껍질은 무엇이든 퇴비로 바꿔 드리겠어요."
+      },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
         "title": "조수지기",
@@ -14527,6 +14547,19 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "광맥 채굴"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "첫 고랑",
+        "text": "이 괭이와 골짜기 밀 씨앗 한 줌을 받으세요, {playerName}. 제 옆의 밭 하나에 씨앗을 심고, 하던 일을 보러 가세요. 언제든 원할 때 돌아와서 작물을 거두면 됩니다. 저는 여기 있을 테니까요.",
+        "completion": "자, 첫 작물이 당신 손에 들어왔네요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요. 밭이 부르면 언제든 씨앗을 사러 오세요, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "골짜기 밀 심기"
+          },
+          "1": {
+            "label": "골짜기 밀 수확"
           }
         }
       },

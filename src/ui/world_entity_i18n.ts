@@ -333,10 +333,17 @@ const NPC_IDS = [
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  // The farmer NPCs (the farming go-live), one per farming hub, in the tier
+  // ladder's order (professions/farming_zones.ts FARMING_ZONE_TIERS).
+  'farmer_jessica', // Eastbrook allotments (zone 1, tier 1)
+  'farmer_teasel', // Fenbridge raised beds (zone 2, tier 2)
+  'farmer_hollis', // Highwatch terraces (zone 3, tier 3)
+  'farmer_verbena', // the Evergarden parterre (tier 4)
 ] as const;
 
 const QUEST_IDS = [
   'q_prof_intro',
+  'q_farm_intro',
   'q_wolves',
   'q_greyjaw',
   'q_boars',

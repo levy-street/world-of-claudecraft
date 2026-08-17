@@ -330,6 +330,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'cook_marlow',
       'weaver_ottilie',
       'tinker_gizzel',
+      'farmer_jessica',
     ]);
     // Reminted for the paladin-only Dawnbound Tome chain, which hangs q_divine_tome
     // off Brother Aldric. The payload covers everything but pos/facing, so a quest
@@ -379,8 +380,21 @@ describe('Eastbrook authored gameplay data integration', () => {
       'simple_fishing_pole',
       'arcanite_bar',
     ]);
+    // Re-minted a third time for the farming go-live: farmer_jessica joined
+    // ZONE1_NPCS as the seventeenth def (a non-town NPC with an inline pos
+    // outside the wall, like Bram, so the 15 town placements below are
+    // untouched and ZONE1_TOWN_NPC_IDS keeps its length). Her payload is the
+    // only new row; the sixteen prior payloads are byte-identical (zone1.ts
+    // diff-checked). The row assertion that follows owns her stock.
+    expect(ZONE1_NPCS.farmer_jessica.vendorItems).toEqual([
+      'vale_wheat_seed',
+      'brook_carrot_seed',
+      'brook_carrot',
+      'compost',
+      'garden_hoe',
+    ]);
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '4c9400baeef7c04572881440cd4ba97e231f23f08ea0af355a3e7bac249cd1c2',
+      '61fe19e5099c99c09886390f2abce30784493f303acbd1fc6924e39d3c2bd31b',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
@@ -393,6 +407,16 @@ describe('Eastbrook authored gameplay data integration', () => {
       facing: Math.PI,
       dynamic: true,
     });
+    // The farmer's inline seat beside the allotments (the go-live), pinned
+    // here beside Bram's as the second non-layout Eastbrook placement; the
+    // world-side proof (never nudged, beside the beds, off the road) lives in
+    // tests/farmer_npc_placement.test.ts.
+    expect(ZONE1_NPCS.farmer_jessica).toMatchObject({
+      pos: { x: 24.5, z: 32.5 },
+      facing: -Math.PI / 2,
+      farmer: true,
+    });
+    expect(ZONE1_NPCS.farmer_jessica.dynamic).toBeUndefined();
   });
 
   it('spawns layout-authored FURY under a reserved id without shifting nextId or RNG', () => {

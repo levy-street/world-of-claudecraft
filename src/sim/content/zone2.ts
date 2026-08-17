@@ -809,6 +809,27 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     vendorItems: ['travelers_knapsack', 'tough_jerky', 'smoked_eel', 'tanning_agent'],
     greeting: 'A hide is only as good as its tanning, $C. The vats are ready when you are.',
   },
+  // The farming go-live: the tier-2 farmer at the Fenbridge raised beds
+  // (content/farm_patches.ts patch_mirefen), on the town side of the beds
+  // facing north across them. His placement row lives in fenbridge_layout.ts
+  // services.npcs like every other Fenbridge NPC (the layout suite pins the
+  // ZONE2_NPCS key list against that table). Stock: the tier-2 seeds and
+  // compost, no tool (the rung-one hoe is Eastbrook's counter and the crafted
+  // hoes are stocked nowhere). tests/farmer_npc_placement.test.ts pins the
+  // seat beside the beds.
+  farmer_teasel: {
+    id: 'farmer_teasel',
+    name: 'Farmer Teasel',
+    title: 'Fen Paddy Farmer',
+    pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.farmer_teasel.position },
+    facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.farmer_teasel.facing,
+    color: 0x6b7f3a,
+    questIds: [],
+    vendorItems: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
+    farmer: true,
+    greeting:
+      'Marsh rice and bog beet seed, $C, and compost to feed them. The paddies drain slow, so mind where you tread.',
+  },
 };
 
 // ---------------------------------------------------------------------------

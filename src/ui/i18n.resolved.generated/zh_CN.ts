@@ -14513,6 +14513,26 @@ export const zh_CN: EnTranslations = {
         "title": "药坊大师",
         "greeting": "量两次，倒一次，{className}。药坊里容不得洒掉的药剂。"
       },
+      "farmer_jessica": {
+        "name": "农妇杰西卡",
+        "title": "菜园管事",
+        "greeting": "祝你土好天晴，{playerName}。从我这里买粒种子，播到那边任意一块田畦里，然后该忙什么忙什么去。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。"
+      },
+      "farmer_teasel": {
+        "name": "农夫蒂泽尔",
+        "title": "沼地稻田农夫",
+        "greeting": "沼泽稻米和沼泽甜菜的种子，{className}，还有喂养它们的堆肥。稻田排水慢，脚下留神。"
+      },
+      "farmer_hollis": {
+        "name": "农夫霍利斯",
+        "title": "高望梯田农夫",
+        "greeting": "梯田只给山肯给的那么多，{className}。我卖堆肥，要是你的庄稼枯萎了，我可以把谷壳重新沤成好土给你。"
+      },
+      "farmer_verbena": {
+        "name": "农妇维贝娜",
+        "title": "花坛园丁",
+        "greeting": "当心镶边，{playerName}，这些田畦可是花坛的骄傲。我卖的是堆肥，你带来的枯萎谷壳，我都能给你变成更多堆肥。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
@@ -14527,6 +14547,19 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已开采矿脉"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "第一道犁沟",
+        "text": "拿着这把锄头和一小撮谷地小麦种子，{playerName}。把种子播到我旁边任意一块田畦里，然后去忙你的事。想什么时候回来收庄稼都行；我会在这儿。",
+        "completion": "瞧，你亲手种出的第一茬庄稼。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。田畦召唤你的时候，随时回来买种子，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已种下谷地小麦"
+          },
+          "1": {
+            "label": "已收获谷地小麦"
           }
         }
       },

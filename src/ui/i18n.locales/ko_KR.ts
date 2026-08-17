@@ -3854,6 +3854,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     '보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
   'entities.quests.q_prof_intro.objectives.0.label': '광맥 채굴',
+  'entities.quests.q_farm_intro.title': '첫 고랑',
+  'entities.quests.q_farm_intro.text':
+    '이 괭이와 골짜기 밀 씨앗 한 줌을 받으세요, {playerName}. 제 옆의 밭 하나에 씨앗을 심고, 하던 일을 보러 가세요. 언제든 원할 때 돌아와서 작물을 거두면 됩니다. 저는 여기 있을 테니까요.',
+  'entities.quests.q_farm_intro.completion':
+    '자, 첫 작물이 당신 손에 들어왔네요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요. 밭이 부르면 언제든 씨앗을 사러 오세요, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': '골짜기 밀 심기',
+  'entities.quests.q_farm_intro.objectives.1.label': '골짜기 밀 수확',
   'entities.quests.q_wolves.title': '문 앞의 늑대들',
   'entities.quests.q_wolves.text':
     '숲늑대들이 북쪽 길의 여행자들을 물어뜯고 있습니다, {playerName}. 8마리를 처치해 이스트브룩이 숨 돌리게 해 주십시오.',
@@ -10217,6 +10224,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '주방의 주인',
   'entities.npcs.cook_marlow.greeting':
     '내 주방에서 설익은 채 나가는 것은 없다, {className}. 앉아서 먹고, 다시 나가라.',
+  'entities.npcs.farmer_jessica.name': '농부 제시카',
+  'entities.npcs.farmer_jessica.title': '텃밭 지기',
+  'entities.npcs.farmer_jessica.greeting':
+    '좋은 흙과 맑은 날씨를 빌어요, {playerName}. 제게서 씨앗을 사서 저기 밭 하나에 심고, 하던 일을 보러 가세요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요.',
+  'entities.npcs.farmer_teasel.name': '농부 티즐',
+  'entities.npcs.farmer_teasel.title': '습지 논 농부',
+  'entities.npcs.farmer_teasel.greeting':
+    '습지 쌀과 늪지 비트 씨앗, 그리고 거름으로 쓸 퇴비요, {className}. 논은 물이 더디게 빠지니 발밑을 조심하시오.',
+  'entities.npcs.farmer_hollis.name': '농부 홀리스',
+  'entities.npcs.farmer_hollis.title': '하이워치 계단밭 농부',
+  'entities.npcs.farmer_hollis.greeting':
+    '계단밭은 산이 허락하는 만큼만 내주지, {className}. 퇴비를 팔고 있고, 그대의 작물이 시들어 올라오면 그 껍질을 다시 좋은 흙으로 만들어 주겠소.',
+  'entities.npcs.farmer_verbena.name': '농부 버베나',
+  'entities.npcs.farmer_verbena.title': '파르테르 정원사',
+  'entities.npcs.farmer_verbena.greeting':
+    '가장자리를 조심하세요, {playerName}, 이 밭들은 파르테르의 자랑이니까요. 파는 건 퇴비이고, 가져오신 시든 껍질은 무엇이든 퇴비로 바꿔 드리겠어요.',
   'entities.npcs.weaver_ottilie.name': '직조공 오틸리에',
   'entities.npcs.weaver_ottilie.title': '베틀의 주인',
   'entities.npcs.weaver_ottilie.greeting':

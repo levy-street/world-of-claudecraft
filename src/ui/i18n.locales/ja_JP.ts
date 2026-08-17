@@ -3878,6 +3878,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     'どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。',
   'entities.quests.q_prof_intro.objectives.0.label': '鉱脈を採掘',
+  'entities.quests.q_farm_intro.title': '最初の畝',
+  'entities.quests.q_farm_intro.text':
+    'この鍬と渓谷小麦の種をひとつまみ持っていきなさい、{playerName}。私のそばの畑のどれかに種を蒔いて、あとは自分の用事を済ませておいで。いつでも好きな時に戻って作物を収穫すればいい。私はここにいるから。',
+  'entities.quests.q_farm_intro.completion':
+    'ほら、初めての作物が自分の手の中に。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。畑に呼ばれたら、いつでも種を買いにおいで、{playerName}。',
+  'entities.quests.q_farm_intro.objectives.0.label': '渓谷小麦を植えた',
+  'entities.quests.q_farm_intro.objectives.1.label': '渓谷小麦を収穫した',
   'entities.quests.q_wolves.title': '戸口の狼',
   'entities.quests.q_wolves.text':
     '森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。',
@@ -10230,6 +10237,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '厨房の主',
   'entities.npcs.cook_marlow.greeting':
     '私の厨房から生煮えのまま出ていくものはない、{className}。座って食べて、それからまた行きな。',
+  'entities.npcs.farmer_jessica.name': '農婦ジェシカ',
+  'entities.npcs.farmer_jessica.title': '菜園の管理人',
+  'entities.npcs.farmer_jessica.greeting':
+    '良い土と良い天気を、{playerName}。私から種を買って、そこの畑のどれかに蒔いたら、あとは好きに過ごしなさい。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。',
+  'entities.npcs.farmer_teasel.name': '農夫ティーゼル',
+  'entities.npcs.farmer_teasel.title': '湿地の水田農夫',
+  'entities.npcs.farmer_teasel.greeting': '湿原米と沼地ビートの種、それに肥やしの堆肥だ、{className}。水田は水はけが悪い、足元に気をつけな。',
+  'entities.npcs.farmer_hollis.name': '農夫ホリス',
+  'entities.npcs.farmer_hollis.title': 'ハイウォッチの段々畑農夫',
+  'entities.npcs.farmer_hollis.greeting':
+    '段々畑は山が許すぶんだけ実る、{className}。堆肥を売っているし、あんたの作物が枯れて上がってきたら、その籾殻を良い土に戻してやろう。',
+  'entities.npcs.farmer_verbena.name': '農婦ヴァーベナ',
+  'entities.npcs.farmer_verbena.title': 'パルテールの庭師',
+  'entities.npcs.farmer_verbena.greeting':
+    '縁取りに気をつけて、{playerName}、この畑はパルテールの誇りなんだから。売っているのは堆肥、それと持ってきた枯れた籾殻はどれも堆肥に変えてあげる。',
   'entities.npcs.weaver_ottilie.name': '織り手オッティリー',
   'entities.npcs.weaver_ottilie.title': '機織り場の主',
   'entities.npcs.weaver_ottilie.greeting':
