@@ -158,6 +158,13 @@ export function delveOccupancyRadius(run: DelveRun): number {
   return delveModuleZOffsetLayout(run.modules, mi) + span + 40;
 }
 
+/** South edge of the occupancy band, in units south of a run's origin. Module 0
+ *  starts at DELVE_MODULE_Z_START + layout.zMin (about -11, the walkable south
+ *  lip), so 40 leaves ~29u of slack while staying ~100u clear of the neighbor
+ *  slot's rooms (they end 143u south). Pinned from both sides by the two
+ *  south-margin tests in tests/delves.test.ts. */
+export const DELVE_OCCUPANCY_SOUTH_MARGIN = 40;
+
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
   const byPlayer = delveRunForPlayer(ctx, e.id);
   if (byPlayer) return byPlayer;
@@ -623,16 +630,18 @@ export function updateDelveRuns(ctx: SimContext): void {
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
       if (!e) continue;
-      // Rooms START at DELVE_MODULE_Z_START + layout.zMin (about -11, so a
-      // player can stand a few units SOUTH of the origin) and extend north up
-      // to ~536u; the neighbor slot's rooms begin 620u away. The old symmetric
-      // +-radius band reached [-536, -143] into the SOUTH neighbor's rooms,
-      // letting busy neighbors pin an abandoned run claimed forever. The -40
-      // south margin covers the walkable south lip with slack while staying
-      // far clear of the neighbor (delveRunForPlayer keeps its symmetric band
-      // on purpose: it is key-gated, so cross-slot binding is unreachable).
+      // Asymmetric band: rooms extend north up to ~536u but only ~11u south
+      // of the origin (see DELVE_OCCUPANCY_SOUTH_MARGIN for the geometry). The
+      // old symmetric +-radius check reached [-536, -143] into the SOUTH
+      // neighbor's rooms (slots sit 620u apart), letting busy neighbors pin an
+      // abandoned run claimed forever. delveRunForPlayer keeps its symmetric
+      // band on purpose: it is key-gated, so cross-slot binding is unreachable.
       const dz = e.pos.z - origin.z;
-      if (Math.abs(e.pos.x - origin.x) < 120 && dz > -40 && dz < delveOccupancyRadius(run)) {
+      if (
+        Math.abs(e.pos.x - origin.x) < 120 &&
+        dz > -DELVE_OCCUPANCY_SOUTH_MARGIN &&
+        dz < delveOccupancyRadius(run)
+      ) {
         occupied = true;
         break;
       }
