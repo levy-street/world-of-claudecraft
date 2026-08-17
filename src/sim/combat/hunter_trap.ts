@@ -7,6 +7,7 @@
 
 import type { GroundAoE } from '../entity_roster';
 import type { SimContext } from '../sim_context';
+import { stunDrCategory } from '../stun_dr';
 import type { Entity } from '../types';
 import { DT, dist2d } from '../types';
 import { hunterBindingPayload, onHunterTrapTriggered } from './hunter_shared';
@@ -192,11 +193,12 @@ export function tickHunterTrap(ctx: SimContext, effect: GroundAoE): void {
       }
       onHunterTrapTriggered(ctx, source, effect.pos);
     } else {
-      // The legacy Rime Snare retains its controlled-stun behavior.
+      // The legacy Rime Snare retains its controlled-stun behavior: frost_trap
+      // is registered in CONTROLLED_STUNS, so the classifier resolves it there.
       const duration = ctx.diminishedCrowdControlDuration(
         source,
         target,
-        'controlledStun',
+        stunDrCategory(trap.abilityId),
         trap.freezeDuration,
       );
       if (duration !== null) {

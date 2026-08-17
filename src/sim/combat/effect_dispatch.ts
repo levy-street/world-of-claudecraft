@@ -3219,7 +3219,7 @@ export function runEffects(
               const duration = ctx.diminishedCrowdControlDuration(
                 p,
                 m,
-                'controlledStun',
+                stunDrCategory(ability.id),
                 eff.duration,
               );
               if (duration !== null) {

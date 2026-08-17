@@ -231,10 +231,10 @@ describe('the crowd-control duration hook', () => {
     const { sim, source, target } = duelists();
     // Baseline first with no reduction, then the same category again from a clean
     // DR state. Comparing against the measured baseline rather than restating the
-    // ladder's own formula is what makes this decisive per category: stuns take an
-    // early return that exempts them from the ladder but NOT from this reduction,
-    // and an implementation applying the cut at the generic exit alone passes a
-    // root-only test while silently missing them.
+    // ladder's own formula is what makes this decisive per category: every
+    // category must take the reduction on top of whatever its ladder arm decided,
+    // and an implementation applying the cut at only one exit passes a root-only
+    // test while silently missing the others.
     target.ccDurationReduction = 0;
     const baseline = cc(sim, source, target, category, 6);
     expect(baseline).not.toBeNull();

@@ -20,6 +20,10 @@ const CONTROLLED_STUNS = new Set([
   'bear_charge',
   'faultline',
   'sun_gods_verdict',
+  'storm_bolt',
+  'deep_freeze',
+  'abyssal_rift',
+  'frost_trap',
 ]);
 
 export function stunDrCategory(abilityId: string): CrowdControlDrCategory {
@@ -36,9 +40,9 @@ export function isStunDrCategory(category: CrowdControlDrCategory): boolean {
 
 // PvP-only diminishing-returns tuning for the resolvers below: the reset
 // window per category (how long until a fresh application starts the ladder
-// over), the shared 100/50/25/immune multiplier ladder that root and lockout
-// walk, the fixed staged durations for polymorph, and the fear multipliers that
-// scale each ability's authored duration.
+// over), the shared 100/50/25/immune multiplier ladder that root, lockout, and
+// the three stun buckets walk, the fixed staged durations for polymorph, and
+// the fear multipliers that scale each ability's authored duration.
 const PVP_ROOT_DR_RESET = 18; // seconds before a repeated PvP root is fresh again
 const PVP_STUN_DR_RESET = 18; // stuns share the root-style 100/50/25/immune scheme
 const PVP_POLYMORPH_DR_RESET = 60;
@@ -61,17 +65,21 @@ const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
  * The PvP diminishing-returns ladder for one crowd-control category: full
  * duration outside hostile player-versus-player combat, a fixed staged
  * schedule for polymorph, the duration-scaled fear ladder, the shared
- * 100/50/25/immune multiplier ladder for root/lockout, and null once that
+ * 100/50/25/immune multiplier ladder for root/lockout/stun, and null once that
  * ladder is exhausted (DR-immune, apply nothing). `now` and `isHostileTo` are
  * passed in rather than read off a host: this keeps the resolver a leaf module
  * with no `SimContext` dependency, so a Vitest can import and exercise it
  * directly. It is NOT a pure function of its arguments: three of its exits
  * write the new DR stage to `target.ccDr`.
  *
- * Balance pass (maintainer): player stuns are exempt from PvP diminishing
- * returns. They operate differently from fear: short flat durations behind
- * real cooldowns, so the ladder only made banked stuns (Twin Gavels) feel
- * broken. Fear, polymorph, root, and school lockouts keep their ladders.
+ * Balance pass (maintainer, 2026-08): player stuns walk the classic-era ladder
+ * like every other category, per stun bucket, on the PVP_STUN_DR_RESET window.
+ * An earlier pass exempted stuns outright (short flat durations behind real
+ * cooldowns), but live PvP disproved the premise: Gut Punch has no cooldown,
+ * and once the Cheap Trick row removes its stealth gate a rogue chains it into
+ * Low Blow indefinitely. The category split above still protects the
+ * sanctioned opener flow (a Gut Punch opener never diminishes the following
+ * Low Blow); only repeated same-bucket stuns shrink and then go immune.
  */
 export function crowdControlDurationAfterDr(
   now: number,
@@ -84,7 +92,6 @@ export function crowdControlDurationAfterDr(
   if (source.kind !== 'player' || target.kind !== 'player' || !isHostileTo(source, target)) {
     return duration;
   }
-  if (isStunDrCategory(category)) return duration;
   const existing = target.ccDr.get(category);
   const stage = existing && existing.resetAt > now ? existing.stage : 0;
   const reset =
@@ -116,14 +123,12 @@ export function crowdControlDurationAfterDr(
  * reduction on top of it.
  *
  * The two are layered rather than fused because they are separate mechanisms.
- * The ladder has five distinct exits inside its hostile branch and they do not
- * all want the same treatment: stuns take an early return that exempts them
- * from the ladder (see the balance-pass comment on `crowdControlDurationAfterDr`)
- * but NOT from the set reduction, and a DR-immune target returns null, which
- * means "apply nothing" and must pass through untouched rather than being
- * multiplied. Applying the reduction at the generic ladder exit alone would
- * silently miss stuns, which is the category the bonus most exists for, so it
- * is applied here once, over whatever the ladder decided.
+ * The ladder has several distinct exits inside its hostile branch (the staged
+ * polymorph schedule, the fear multipliers, the shared root/lockout/stun
+ * ladder) and a DR-immune target returns null, which means "apply nothing" and
+ * must pass through untouched rather than being multiplied. Applying the
+ * reduction here once, over whatever the ladder decided, keeps every exit
+ * covered without threading it through each arm.
  *
  * The player/hostile gate is duplicated from the inner function on purpose: it
  * is three cheap reads, it leaves the ladder's shape byte-identical to what

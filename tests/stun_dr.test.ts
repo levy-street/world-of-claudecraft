@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob, createPlayer } from '../src/sim/entity';
 import {
   crowdControlDurationAfterDr,
@@ -21,6 +21,49 @@ describe('stun DR categories (#1004)', () => {
     expect(stunDrCategory('bash')).toBe('controlledStun');
     expect(stunDrCategory('charge')).toBe('controlledStun');
     expect(stunDrCategory('bear_charge')).toBe('controlledStun');
+    expect(stunDrCategory('storm_bolt')).toBe('controlledStun');
+    expect(stunDrCategory('deep_freeze')).toBe('controlledStun');
+    expect(stunDrCategory('abyssal_rift')).toBe('controlledStun');
+    expect(stunDrCategory('frost_trap')).toBe('controlledStun');
+  });
+
+  it('every authored stun-bearing ability carries a deliberate DR bucket', () => {
+    // Bucket assignment is load-bearing since the stun exemption was removed:
+    // an unregistered stun still diminishes, but in the randomStun catch-all,
+    // cut off from the abilities it should share a chain with. This sweep is
+    // how storm_bolt / deep_freeze / abyssal_rift drift gets caught.
+    const RANDOM_BY_DESIGN = new Set([
+      // The Vale Cup Shoulder deliberately rides the randomStun default:
+      // repeated tumbles on one carrier ladder out by authored intent, and it
+      // must never share a bucket with real combat stuns.
+      'sport_shoulder',
+    ]);
+    const stunIds: string[] = [];
+    for (const [id, def] of Object.entries(ABILITIES)) {
+      const effectLists = [def.effects ?? [], ...(def.ranks ?? []).map((r) => r.effects ?? [])];
+      const carriesStun = effectLists.some((effects) =>
+        effects.some((eff) => {
+          const rec = eff as unknown as Record<string, unknown>;
+          return (
+            eff.type === 'stun' ||
+            eff.type === 'finisherStun' ||
+            (eff.type === 'aoeRoot' && rec.stun === true) ||
+            (typeof rec.stunSec === 'number' && rec.stunSec > 0)
+          );
+        }),
+      );
+      if (carriesStun) stunIds.push(id);
+    }
+    // Vacuity floor: the sweep must actually be seeing the live stun roster.
+    expect(stunIds.length).toBeGreaterThanOrEqual(10);
+    const unregistered = stunIds.filter(
+      (id) => !RANDOM_BY_DESIGN.has(id) && stunDrCategory(id) === 'randomStun',
+    );
+    expect(unregistered).toEqual([]);
+    for (const id of RANDOM_BY_DESIGN) {
+      expect(stunIds).toContain(id);
+      expect(stunDrCategory(id)).toBe('randomStun');
+    }
   });
 
   it('keeps opener and controlled stuns in independent buckets', () => {
@@ -127,13 +170,66 @@ describe('crowdControlDurationAfterDr / diminishedCrowdControlDuration', () => {
     expect(crowdControlDurationAfterDr(0, hostile, source, target, 'fear', 4)).toBe(0.5);
   });
 
-  it('leaves stun categories (openerStun/controlledStun/randomStun) undiminished', () => {
+  it('walks the 100/50/25/immune ladder for every hostile PvP stun category', () => {
     const stunCategories: CrowdControlDrCategory[] = ['openerStun', 'controlledStun', 'randomStun'];
     for (const category of stunCategories) {
       const { source, target } = players();
-      for (let i = 0; i < 5; i++) {
-        expect(crowdControlDurationAfterDr(0, hostile, source, target, category, 3)).toBe(3);
-      }
+      expect(crowdControlDurationAfterDr(0, hostile, source, target, category, 4)).toBe(4);
+      expect(crowdControlDurationAfterDr(0, hostile, source, target, category, 4)).toBe(2);
+      expect(crowdControlDurationAfterDr(0, hostile, source, target, category, 4)).toBe(1);
+      expect(crowdControlDurationAfterDr(0, hostile, source, target, category, 4)).toBeNull();
+    }
+  });
+
+  it('keeps the stun buckets independent: an exhausted opener chain leaves controlled stuns fresh', () => {
+    const { source, target } = players();
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'openerStun', 4)).toBe(4);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'openerStun', 4)).toBe(2);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'openerStun', 4)).toBe(1);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'openerStun', 4)).toBeNull();
+    // The classic opener/controlled split: a spent Gut Punch chain must not have
+    // touched the Low Blow bucket, so the controlled stun still lands full.
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 6)).toBe(6);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 6)).toBe(3);
+  });
+
+  it('an immune-window attempt applies nothing and does not refresh the reset window', () => {
+    const { source, target } = players();
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 6)).toBe(6);
+    expect(crowdControlDurationAfterDr(2, hostile, source, target, 'controlledStun', 6)).toBe(3);
+    expect(crowdControlDurationAfterDr(4, hostile, source, target, 'controlledStun', 6)).toBe(1.5);
+    const stampedReset = target.ccDr.get('controlledStun')!.resetAt;
+    // Immune: the attempts apply nothing AND leave the stamp untouched, so an
+    // attacker spamming into immunity cannot hold the target immune-locked.
+    expect(crowdControlDurationAfterDr(6, hostile, source, target, 'controlledStun', 6)).toBeNull();
+    expect(
+      crowdControlDurationAfterDr(10, hostile, source, target, 'controlledStun', 6),
+    ).toBeNull();
+    expect(target.ccDr.get('controlledStun')!.resetAt).toBe(stampedReset);
+    // Fresh 18s after the last LANDED application (t=4), not the last attempt.
+    expect(crowdControlDurationAfterDr(23, hostile, source, target, 'controlledStun', 6)).toBe(6);
+  });
+
+  it('a stun chain starts fresh once the PVP_STUN_DR_RESET window has passed', () => {
+    const { source, target } = players();
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 6)).toBe(6);
+    expect(crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 6)).toBe(3);
+    // PVP_STUN_DR_RESET is 18s from the last application: well past it, the
+    // ladder restarts at full duration.
+    expect(crowdControlDurationAfterDr(100, hostile, source, target, 'controlledStun', 6)).toBe(6);
+  });
+
+  it('leaves stuns undiminished for PvE and non-hostile pairs', () => {
+    const source = players().source;
+    const target = mob();
+    for (let i = 0; i < 5; i++) {
+      expect(crowdControlDurationAfterDr(0, hostile, source, target, 'controlledStun', 3)).toBe(3);
+    }
+    const pair = players();
+    for (let i = 0; i < 5; i++) {
+      expect(
+        crowdControlDurationAfterDr(0, friendly, pair.source, pair.target, 'controlledStun', 3),
+      ).toBe(3);
     }
   });
 
