@@ -1,6 +1,7 @@
-// Farming's five SimEvent feedback arms (plant, harvest, wither, deny, husk
-// trade), extracted whole from the HUD's event switch at the v0.38.0 release
-// sync (the monolith-ratchet heal): the event-to-line doctrine lives here and
+// Farming's six SimEvent feedback arms (plant, harvest, wither, deny, husk
+// trade, and the ready notice), the first five extracted whole from the HUD's
+// event switch at the v0.38.0 release sync (the monolith-ratchet heal) and the
+// sixth landed here directly: the event-to-line doctrine lives here and
 // the HUD's switch keeps a one-call thin arm. The split of duties is
 // unchanged: the PURE resolution (which line key, which item token id, the
 // deny toast plan) stays in farming_view.ts, the pure core a Vitest drives
@@ -237,8 +238,12 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // The banner leads with the READY sentence, the actionable half, and
       // falls back to the withered one only when nothing is waiting to be
       // brought in. Ambient (the showBanner default), so it replaces rather
-      // than queues: a zone name or a prompt is welcome to take the slot back,
-      // because the log lines are the durable record.
+      // than queues, IN BOTH DIRECTIONS: a zone name or a prompt is welcome to
+      // take the slot back, and this notice may equally pre-empt an ambient
+      // banner the player was mid-read of. Both are accepted because nothing
+      // actionable lives only on the banner: the log lines below are the
+      // durable record, and the journal, pins, and plot status all show the
+      // same truth.
       const bannerText = readyText ?? witheredText;
       // An all-zero notice cannot come from this sim, so it is a stale or
       // foreign server: say nothing and make no sound rather than announce an

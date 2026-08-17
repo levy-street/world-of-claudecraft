@@ -180,9 +180,12 @@ export const HEAVY_SELF_EVENTS = new Set<string>([
   // one mutation the plant entry above could not cover: a plot ripening on
   // its own deadline. The 1 Hz sweep flips the plot's persisted `notified`
   // flag with no inventory change and no command behind it, so without a mark
-  // the heavy-gated `fplot` row would carry the stale flag until the
-  // staggered HEAVY_SELF_REFRESH_TICKS backstop, and the client's mirror
-  // would disagree with the notice it just rendered. It fires only when a
+  // the heavy-gated `fplot` row would sit at the staggered
+  // HEAVY_SELF_REFRESH_TICKS backstop and the client's mirror would disagree
+  // with the notice it just rendered: the client-visible field that goes
+  // stale is the server-computed `status` (growing versus ready) the journal,
+  // pins, and beds all key on; the flipped `notified` byte is what makes the
+  // row differ so the diff gate fires at all. It fires only when a
   // plot actually transitioned (the flag makes it once-per-cycle), so this
   // buys at most one re-diff per growth cycle per farmer.
   'farmReady',

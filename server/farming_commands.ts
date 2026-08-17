@@ -101,8 +101,10 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
  *  behind it is a plot ripening on its own timer (growing to ready), and
  *  since the ready-notice phase that arm has its own event: the 1 Hz sweep
  *  flips the plot's `notified` flag and emits farmReady, a HEAVY_SELF_EVENTS
- *  member, so the ripened row lands within the same second rather than at the
- *  staggered HEAVY_SELF_REFRESH_TICKS backstop. The backstop still covers the
+ *  member, so the ripened row (its server-computed `status`, the field the
+ *  client actually reads; the flipped flag is the byte that makes the row
+ *  differ) lands within the same second rather than at the staggered
+ *  HEAVY_SELF_REFRESH_TICKS backstop. The backstop still covers the
  *  once-notified plot, whose rows no longer move at all. `status` is
  *  computed by the authority at send time either way, so nothing here is
  *  predicted.
