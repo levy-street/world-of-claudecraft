@@ -3858,7 +3858,7 @@ export const zh_CN: EnTranslations = {
       "rename_required": "此角色必须先改名才能进入世界。",
       "invalid_appearance": "无法保存该外观。请调整设计后重试。",
       "reroll_unavailable": "此角色没有可用的免费重新设计。",
-      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
+      "no_redesign_credit": "该角色已没有改造次数。前往东溪谷的造型师处购买。"
     },
     "moderation": {
       "suspended_until": "此账号被停用至 {date}。",
@@ -7251,8 +7251,8 @@ export const zh_CN: EnTranslations = {
     "yourTurn": "出一张牌"
   },
   "stylist": {
-    "buyCredit": "Buy a redesign ({price})",
-    "buyCreditAria": "Buy one character redesign for {price}"
+    "buyCredit": "购买一次改造（{price}）",
+    "buyCreditAria": "以 {price} 购买一次角色改造"
   },
   "delveUi": {
     "board": {
@@ -7837,10 +7837,10 @@ export const zh_CN: EnTranslations = {
     "redesignTitle": "重新设计{name}",
     "redesignSave": "保存新外观",
     "redesignCancel": "保留当前外观",
-    "editAppearance": "Edit Appearance",
-    "editAppearanceAria": "Edit the appearance of {name}",
-    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
-    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
+    "editAppearance": "编辑外观",
+    "editAppearanceAria": "编辑 {name} 的外观",
+    "editAppearanceHint": "你持有 {count} 次造型师改造。保存时消耗一次。",
+    "editAppearanceHintOne": "你持有 1 次造型师改造。保存时将消耗它。"
   },
   "deleteCharacter": {
     "title": "删除角色",
@@ -13824,9 +13824,9 @@ export const zh_CN: EnTranslations = {
         "greeting": "来一局纸牌对决？三局两胜，赢家赢得吹嘘的资本。"
       },
       "stylist_verena": {
-        "name": "Verena Ashlock",
-        "title": "Stylist",
-        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
+        "name": "维蕾娜·阿什洛克",
+        "title": "造型师",
+        "greeting": "请坐，{className}。一把梳子、一面好镜子，再加上足够的钱币，你就能改头换面地走出去。"
       },
       "bursar_petra_vell": {
         "name": "司库佩特拉·维尔",

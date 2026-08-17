@@ -3690,6 +3690,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.title': '운명의 딜러',
   'entities.npcs.card_master.greeting':
     '카드 대결 한 판 어떻소? 삼판양승, 승자에게는 자랑거리가 생기지.',
+  'entities.npcs.stylist_verena.name': '베레나 애슐록',
+  'entities.npcs.stylist_verena.title': '스타일리스트',
+  'entities.npcs.stylist_verena.greeting':
+    '앉으세요, {className}. 빗 한 자루와 좋은 거울 하나, 그리고 넉넉한 금화만 있으면 완전히 딴사람이 되어 걸어 나갈 수 있답니다.',
+  'apiError.character.no_redesign_credit':
+    '이 캐릭터에게 남은 외형 변경권이 없습니다. 이스트브룩 골짜기의 스타일리스트에게서 구매하세요.',
+  'stylist.buyCredit': '외형 변경 구매 ({price})',
+  'stylist.buyCreditAria': '{price}에 캐릭터 외형 변경 1회 구매',
+  'character.editAppearance': '외형 편집',
+  'character.editAppearanceAria': '{name}의 외형 편집',
+  'character.editAppearanceHint':
+    '스타일리스트 외형 변경권을 {count}개 보유하고 있습니다. 저장할 때 1개가 사용됩니다.',
+  'character.editAppearanceHintOne':
+    '스타일리스트 외형 변경권을 1개 보유하고 있습니다. 저장할 때 사용됩니다.',
   'cardDuel.title': '카드 대결',
   'cardDuel.close': '닫기',
   'cardDuel.join': '대기열 참가',

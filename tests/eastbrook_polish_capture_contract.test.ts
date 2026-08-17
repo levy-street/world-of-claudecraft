@@ -116,8 +116,12 @@ interface AttributionTargetFixture {
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted for the Stylist: the authoritative layout gains ONE NPC placement
+// (stylist_verena, appended on the east service apron), so
+// authoritativeLayout.sha256 moves and the composite follows it. Layout data
+// only; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a80d71af0295906172fa66def7f89ce704b9e6b0abdf98a1f3c06164537393b1';
+  'cb7ad61c5d99b59030978e9ffc2e969719921b2470bd60f99eca07a9fc7dd1b2';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

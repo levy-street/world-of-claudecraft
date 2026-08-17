@@ -3858,7 +3858,7 @@ export const zh_TW: EnTranslations = {
       "rename_required": "此角色必須先更名才能進入世界。",
       "invalid_appearance": "無法儲存該外觀。請調整設計後再試一次。",
       "reroll_unavailable": "此角色沒有可用的免費重新設計。",
-      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
+      "no_redesign_credit": "該角色已沒有改造次數。前往東溪谷的造型師處購買。"
     },
     "moderation": {
       "suspended_until": "此帳號停權至 {date}。",
@@ -7251,8 +7251,8 @@ export const zh_TW: EnTranslations = {
     "yourTurn": "出一張牌"
   },
   "stylist": {
-    "buyCredit": "Buy a redesign ({price})",
-    "buyCreditAria": "Buy one character redesign for {price}"
+    "buyCredit": "購買一次改造（{price}）",
+    "buyCreditAria": "以 {price} 購買一次角色改造"
   },
   "delveUi": {
     "board": {
@@ -7837,10 +7837,10 @@ export const zh_TW: EnTranslations = {
     "redesignTitle": "重新設計{name}",
     "redesignSave": "儲存新外觀",
     "redesignCancel": "保留目前外觀",
-    "editAppearance": "Edit Appearance",
-    "editAppearanceAria": "Edit the appearance of {name}",
-    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
-    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
+    "editAppearance": "編輯外觀",
+    "editAppearanceAria": "編輯 {name} 的外觀",
+    "editAppearanceHint": "你持有 {count} 次造型師改造。儲存時消耗一次。",
+    "editAppearanceHintOne": "你持有 1 次造型師改造。儲存時將消耗它。"
   },
   "deleteCharacter": {
     "title": "刪除角色",
@@ -13824,9 +13824,9 @@ export const zh_TW: EnTranslations = {
         "greeting": "來一局紙牌對決？三局兩勝，贏家贏得吹噓的資本。"
       },
       "stylist_verena": {
-        "name": "Verena Ashlock",
-        "title": "Stylist",
-        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
+        "name": "維蕾娜·艾希洛克",
+        "title": "造型師",
+        "greeting": "請坐，{className}。一把梳子、一面好鏡子，再加上足夠的錢幣，你就能改頭換面地走出去。"
       },
       "bursar_petra_vell": {
         "name": "司庫佩特拉·維爾",

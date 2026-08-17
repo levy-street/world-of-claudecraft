@@ -3858,7 +3858,7 @@ export const ja_JP: EnTranslations = {
       "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
       "invalid_appearance": "この外見は保存できませんでした。デザインを調整してもう一度お試しください。",
       "reroll_unavailable": "このキャラクターには無料の再デザインがありません。",
-      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
+      "no_redesign_credit": "このキャラクターにはイメージチェンジの残り回数がありません。イーストブルック渓谷のスタイリストで購入してください。"
     },
     "moderation": {
       "suspended_until": "このアカウントは {date} まで停止されています。",
@@ -7251,8 +7251,8 @@ export const ja_JP: EnTranslations = {
     "yourTurn": "カードを出してください"
   },
   "stylist": {
-    "buyCredit": "Buy a redesign ({price})",
-    "buyCreditAria": "Buy one character redesign for {price}"
+    "buyCredit": "イメージチェンジを購入（{price}）",
+    "buyCreditAria": "{price} でキャラクターのイメージチェンジを一回購入する"
   },
   "delveUi": {
     "board": {
@@ -7837,10 +7837,10 @@ export const ja_JP: EnTranslations = {
     "redesignTitle": "{name}を再デザイン",
     "redesignSave": "新しい外見を保存",
     "redesignCancel": "現在の外見を保持",
-    "editAppearance": "Edit Appearance",
-    "editAppearanceAria": "Edit the appearance of {name}",
-    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
-    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
+    "editAppearance": "外見を編集",
+    "editAppearanceAria": "{name} の外見を編集する",
+    "editAppearanceHint": "スタイリストのイメージチェンジを {count} 回分保有しています。保存時に一回消費されます。",
+    "editAppearanceHintOne": "スタイリストのイメージチェンジを 1 回保有しています。保存時に消費されます。"
   },
   "deleteCharacter": {
     "title": "キャラクターを削除",
@@ -13824,9 +13824,9 @@ export const ja_JP: EnTranslations = {
         "greeting": "カードデュエルはいかが？三本勝負、勝者には自慢の種が手に入る。"
       },
       "stylist_verena": {
-        "name": "Verena Ashlock",
-        "title": "Stylist",
-        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
+        "name": "ヴェレナ・アシュロック",
+        "title": "スタイリスト",
+        "greeting": "お掛けなさい、{className}。櫛が一本、上等な鏡が一枚、そして十分な金貨があれば、まるで別人になって出ていけるわ。"
       },
       "bursar_petra_vell": {
         "name": "出納官ペトラ・ヴェル",

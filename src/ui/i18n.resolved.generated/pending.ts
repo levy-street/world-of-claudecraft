@@ -118,54 +118,10 @@ export const pending: Record<string, readonly string[]> = {
     "stylist.buyCredit",
     "stylist.buyCreditAria"
   ],
-  "zh_CN": [
-    "apiError.character.no_redesign_credit",
-    "character.editAppearance",
-    "character.editAppearanceAria",
-    "character.editAppearanceHint",
-    "character.editAppearanceHintOne",
-    "entities.npcs.stylist_verena.greeting",
-    "entities.npcs.stylist_verena.name",
-    "entities.npcs.stylist_verena.title",
-    "stylist.buyCredit",
-    "stylist.buyCreditAria"
-  ],
-  "zh_TW": [
-    "apiError.character.no_redesign_credit",
-    "character.editAppearance",
-    "character.editAppearanceAria",
-    "character.editAppearanceHint",
-    "character.editAppearanceHintOne",
-    "entities.npcs.stylist_verena.greeting",
-    "entities.npcs.stylist_verena.name",
-    "entities.npcs.stylist_verena.title",
-    "stylist.buyCredit",
-    "stylist.buyCreditAria"
-  ],
-  "ko_KR": [
-    "apiError.character.no_redesign_credit",
-    "character.editAppearance",
-    "character.editAppearanceAria",
-    "character.editAppearanceHint",
-    "character.editAppearanceHintOne",
-    "entities.npcs.stylist_verena.greeting",
-    "entities.npcs.stylist_verena.name",
-    "entities.npcs.stylist_verena.title",
-    "stylist.buyCredit",
-    "stylist.buyCreditAria"
-  ],
-  "ja_JP": [
-    "apiError.character.no_redesign_credit",
-    "character.editAppearance",
-    "character.editAppearanceAria",
-    "character.editAppearanceHint",
-    "character.editAppearanceHintOne",
-    "entities.npcs.stylist_verena.greeting",
-    "entities.npcs.stylist_verena.name",
-    "entities.npcs.stylist_verena.title",
-    "stylist.buyCredit",
-    "stylist.buyCreditAria"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "apiError.character.no_redesign_credit",
     "character.editAppearance",
@@ -184,18 +140,7 @@ export const pending: Record<string, readonly string[]> = {
     "stylist.buyCredit",
     "stylist.buyCreditAria"
   ],
-  "ru_RU": [
-    "apiError.character.no_redesign_credit",
-    "character.editAppearance",
-    "character.editAppearanceAria",
-    "character.editAppearanceHint",
-    "character.editAppearanceHintOne",
-    "entities.npcs.stylist_verena.greeting",
-    "entities.npcs.stylist_verena.name",
-    "entities.npcs.stylist_verena.title",
-    "stylist.buyCredit",
-    "stylist.buyCreditAria"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "apiError.character.no_redesign_credit",
     "character.editAppearance",

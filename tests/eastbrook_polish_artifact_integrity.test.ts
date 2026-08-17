@@ -694,10 +694,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for review round 2 on the prewarm sky-unstarve PR (honest
 // archetype and scene-texture counts; renderer.ts edits only). No capture
 // was retaken.
+// Re-minted for the Stylist: one appended NPC placement moves
+// authoritativeLayout.sha256, so the composite and the swept metadata seal follow
+// it. Layout data only; no capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '457ff6205fd56073b46231c4f97ffa73a3c6ff3f3e22aeb03b57707aa5603e02';
+  '95a43b9df22919bec74ad001a80eef0bc2b35b6473e60341a2f63a26cf350ab3';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a80d71af0295906172fa66def7f89ce704b9e6b0abdf98a1f3c06164537393b1';
+  'cb7ad61c5d99b59030978e9ffc2e969719921b2470bd60f99eca07a9fc7dd1b2';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1624,10 +1627,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // PR 3204) into the creator-appearance branch: both parents move the
     // rendererIntegration leaf, so the merged tree mints a value matching
     // neither parent. No capture was retaken.
+    // Re-minted for the Stylist: the first-order composite follows the one
+    // appended NPC placement in the authoritative layout, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('a7218e4f637be5545f0a844f2b0986b720962358fa3604d294a99925bbbe160c');
+    ).toBe('5b0e51b65709b396d0596e0ee7cc97a544de3df5620924000bd2e7be488a721a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

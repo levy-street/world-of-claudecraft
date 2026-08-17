@@ -3858,7 +3858,7 @@ export const ru_RU: EnTranslations = {
       "rename_required": "Перед входом в мир этому персонажу нужно сменить имя.",
       "invalid_appearance": "Не удалось сохранить этот облик. Измените дизайн и попробуйте снова.",
       "reroll_unavailable": "У этого персонажа нет доступного бесплатного редизайна.",
-      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
+      "no_redesign_credit": "У этого персонажа не осталось смен облика. Купите её у стилиста в Истврукской долине."
     },
     "moderation": {
       "suspended_until": "Эта учетная запись заблокирована до {date}.",
@@ -7251,8 +7251,8 @@ export const ru_RU: EnTranslations = {
     "yourTurn": "Разыграйте карту"
   },
   "stylist": {
-    "buyCredit": "Buy a redesign ({price})",
-    "buyCreditAria": "Buy one character redesign for {price}"
+    "buyCredit": "Купить смену облика ({price})",
+    "buyCreditAria": "Купить одну смену облика персонажа за {price}"
   },
   "delveUi": {
     "board": {
@@ -7837,10 +7837,10 @@ export const ru_RU: EnTranslations = {
     "redesignTitle": "Переделать: {name}",
     "redesignSave": "Сохранить новый облик",
     "redesignCancel": "Оставить текущий облик",
-    "editAppearance": "Edit Appearance",
-    "editAppearanceAria": "Edit the appearance of {name}",
-    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
-    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
+    "editAppearance": "Изменить облик",
+    "editAppearanceAria": "Изменить облик персонажа {name}",
+    "editAppearanceHint": "У вас есть смен облика от стилиста: {count}. Одна будет потрачена при сохранении.",
+    "editAppearanceHintOne": "У вас есть 1 смена облика от стилиста. Она будет потрачена при сохранении."
   },
   "deleteCharacter": {
     "title": "Удалить персонажа",
@@ -13824,9 +13824,9 @@ export const ru_RU: EnTranslations = {
         "greeting": "Не сыграть ли партию в карточную дуэль? До двух побед, победителю достанется слава."
       },
       "stylist_verena": {
-        "name": "Verena Ashlock",
-        "title": "Stylist",
-        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
+        "name": "Верена Эшлок",
+        "title": "Стилист",
+        "greeting": "Присаживайтесь, {className}. Гребень, хорошее зеркало и довольно монет, и вы выйдете отсюда совсем другим человеком."
       },
       "bursar_petra_vell": {
         "name": "Казначей Петра Велль",
