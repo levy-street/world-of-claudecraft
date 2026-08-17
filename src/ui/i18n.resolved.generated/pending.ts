@@ -10,6 +10,11 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -24,6 +29,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "es_ES": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -38,6 +48,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "fr_FR": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -52,6 +67,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "fr_CA": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -67,6 +87,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -81,6 +106,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "de_DE": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -111,6 +141,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "pt_BR": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -129,6 +164,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "cs_CZ": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -143,6 +183,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "nl_NL": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -157,6 +202,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "pl_PL": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -171,6 +221,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "id_ID": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -185,6 +240,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "tr_TR": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -199,6 +259,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "sv_SE": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -213,6 +278,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "vi_VN": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",
@@ -227,6 +297,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "da_DK": [
+    "delveUi.abandonConfirm.body",
+    "delveUi.abandonConfirm.cancel",
+    "delveUi.abandonConfirm.confirm",
+    "delveUi.abandonConfirm.title",
+    "delveUi.tracker.abandon",
     "entities.dungeons.dawnhold_castle.enterText",
     "entities.dungeons.dawnhold_castle.leaveText",
     "entities.dungeons.dawnhold_castle.name",

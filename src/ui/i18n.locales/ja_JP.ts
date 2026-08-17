@@ -7334,6 +7334,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': 'モジュール {current}/{total}',
   'delveUi.tracker.objective': '目標',
   'delveUi.tracker.title': 'デルヴ',
+  'delveUi.tracker.abandon': 'デルヴを出る',
+  'delveUi.abandonConfirm.title': 'デルヴから出ますか？',
+  'delveUi.abandonConfirm.body': 'デルヴの入口に戻りますか？再び入れば、この攻略を続けられます。',
+  'delveUi.abandonConfirm.confirm': '出る',
+  'delveUi.abandonConfirm.cancel': 'キャンセル',
   'sim.delve.alreadyInDelve': 'あなたはすでにデルヴの中にいる。',
   'sim.delve.bossChest':
     'ボスが倒れる。守りの聖遺物庫の宝箱が祭壇にせり上がる。錠を開けて戦利品を手に入れろ。',

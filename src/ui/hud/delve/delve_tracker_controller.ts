@@ -17,11 +17,20 @@ const DELVE_AFFIX_COLORS: Record<string, string> = {
 
 export interface DelveTrackerControllerDeps {
   element: HTMLElement;
-  world(): Pick<IWorld, 'delveRun' | 'delveMarks'>;
+  world(): Pick<IWorld, 'delveRun' | 'delveMarks' | 'leaveDelve'>;
   delveName(delveId: string): string;
   mobName(mobId: string): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   closeRitePanel(restoreFocus: boolean): void;
+  /** Host-owned modal behind the Abandon Delve control (same dep shape as the
+   *  delve board controller's purchase confirm). */
+  confirmDialog(
+    title: string,
+    body: string,
+    okText: string,
+    cancelText: string,
+    onOk: () => void,
+  ): void;
 }
 
 /** Paints the authoritative delve run tracker only when its visible state changes. */
@@ -119,12 +128,27 @@ export class DelveTrackerController {
       riteHint +
       exitHint +
       `<div class="dt-obj">- ${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
-      affixHtml;
+      affixHtml +
+      `<button class="dt-abandon" type="button">${esc(t('delveUi.tracker.abandon'))}</button>`;
     element.querySelectorAll<HTMLElement>('.dt-affix-icon').forEach((icon) => {
       const affixId = icon.dataset.affix ?? '';
       this.deps.attachTooltip(
         icon,
         () => `<div class="tt-title">${esc(this.affixLabel(affixId))}</div>`,
+      );
+    });
+    // Rebound on every repaint: innerHTML replacement drops old listeners.
+    // leaveDelve is the early-abandon path: back to the door, claim kept, so a
+    // confirmed abandon can still walk back in and continue the run.
+    element.querySelectorAll<HTMLElement>('.dt-abandon').forEach((button) => {
+      button.addEventListener('click', () =>
+        this.deps.confirmDialog(
+          t('delveUi.abandonConfirm.title'),
+          t('delveUi.abandonConfirm.body'),
+          t('delveUi.abandonConfirm.confirm'),
+          t('delveUi.abandonConfirm.cancel'),
+          () => this.deps.world().leaveDelve(),
+        ),
       );
     });
   }

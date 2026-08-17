@@ -7354,7 +7354,14 @@ export const cs_CZ: EnTranslations = {
       "riteChoose": "Přistup k Utopenému relikviáři a stiskni F pro zahájení rituálu",
       "ritePlayback": "Sleduj svatyně: zapamatuj si pořadí, v jakém se rozsvítí",
       "riteInput": "Stiskni F u každé svatyně v pořadí, v jakém se rozsvítily ({current}/{total})",
-      "riteOpen": "Relikviář je otevřený: stiskni na něm F a vyzvedni kořist"
+      "riteOpen": "Relikviář je otevřený: stiskni na něm F a vyzvedni kořist",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Zabij {boss}",

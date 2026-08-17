@@ -7354,7 +7354,14 @@ export const vi_VN: EnTranslations = {
       "riteChoose": "Lại gần Hộp Thánh Tích Chết Chìm và nhấn F để bắt đầu nghi lễ",
       "ritePlayback": "Quan sát các miếu thờ: ghi nhớ thứ tự chúng sáng lên",
       "riteInput": "Nhấn F tại từng miếu thờ theo thứ tự chúng đã sáng ({current}/{total})",
-      "riteOpen": "Hộp thánh tích đã mở: nhấn F vào nó để nhận chiến lợi phẩm"
+      "riteOpen": "Hộp thánh tích đã mở: nhấn F vào nó để nhận chiến lợi phẩm",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Hạ gục {boss}",

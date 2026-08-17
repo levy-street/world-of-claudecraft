@@ -7354,7 +7354,14 @@ export const da_DK: EnTranslations = {
       "riteChoose": "Gå hen til Det Druknede Relikvarium, og tryk på F for at begynde riten",
       "ritePlayback": "Hold øje med skrinene: husk den rækkefølge, de lyser op i",
       "riteInput": "Tryk på F ved hvert skrin i den rækkefølge, de lyste op ({current}/{total})",
-      "riteOpen": "Relikvariet er åbent: tryk på F på det for at kræve dit bytte"
+      "riteOpen": "Relikvariet er åbent: tryk på F på det for at kræve dit bytte",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Dræb {boss}",

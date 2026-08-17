@@ -7354,7 +7354,14 @@ export const pl_PL: EnTranslations = {
       "riteChoose": "Podejdź do Utopionego Relikwiarza i naciśnij F, aby rozpocząć obrzęd",
       "ritePlayback": "Obserwuj kapliczki: zapamiętaj kolejność, w jakiej się rozświetlają",
       "riteInput": "Naciśnij F przy każdej kapliczce w kolejności, w jakiej się rozświetliły ({current}/{total})",
-      "riteOpen": "Relikwiarz jest otwarty: naciśnij przy nim F, aby odebrać łupy"
+      "riteOpen": "Relikwiarz jest otwarty: naciśnij przy nim F, aby odebrać łupy",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Zgładź {boss}",

@@ -7354,7 +7354,14 @@ export const tr_TR: EnTranslations = {
       "riteChoose": "Boğulmuş Emanetlik'e yaklaş ve ayini başlatmak için F'ye bas",
       "ritePlayback": "Sunakları izle: yanma sırasını ezberle",
       "riteInput": "Her sunakta, yandıkları sırayla F'ye bas ({current}/{total})",
-      "riteOpen": "Emanetlik açık: ganimetini almak için üzerinde F'ye bas"
+      "riteOpen": "Emanetlik açık: ganimetini almak için üzerinde F'ye bas",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "{boss} adlı düşmanı öldür",

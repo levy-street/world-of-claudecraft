@@ -3845,6 +3845,26 @@
     border: 1px solid #0008;
     cursor: help;
   }
+  /* pointer-events + fit-content: same rail click-steal rationale as the
+     affix row above; the strip itself stays click-through. */
+  #delve-tracker .dt-abandon {
+    pointer-events: auto;
+    width: fit-content;
+    margin: 6px 0 0 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-family: inherit;
+    color: var(--gold);
+    background: #1a1206cc;
+    border: 1px solid #ffd10044;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  #delve-tracker .dt-abandon:hover,
+  #delve-tracker .dt-abandon:focus-visible {
+    border-color: #ffd100aa;
+    color: #ffe66a;
+  }
 
   /* ---------- rift floor tracker ---------- */
   /* Floor progress + the "closes in" event countdown (issue #2655). Same shape

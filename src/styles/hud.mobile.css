@@ -2406,6 +2406,15 @@
   body.mobile-touch #quest-tracker {
     font-size: 11px;
   }
+  /* The 40px interactive touch floor (see the chrome-scale note at the top of
+     this file) for the tracker's Leave Delve control: the desktop button is
+     ~19px and the tracker stack rides --mobile-chrome-scale, so clamp it up. */
+  body.mobile-touch #delve-tracker .dt-abandon {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
   body.mobile-touch #meters-window {
     position: fixed;
     left: calc(max(18px, env(safe-area-inset-left)) + 132px);

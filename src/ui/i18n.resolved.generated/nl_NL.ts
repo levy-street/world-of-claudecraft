@@ -7354,7 +7354,14 @@ export const nl_NL: EnTranslations = {
       "riteChoose": "Ga naar het Verdronken Reliekschrijn en druk op F om het ritueel te beginnen",
       "ritePlayback": "Kijk naar de schrijnen: onthoud de volgorde waarin ze oplichten",
       "riteInput": "Druk op F bij elk schrijn in de volgorde waarin ze oplichtten ({current}/{total})",
-      "riteOpen": "Het reliekschrijn is open: druk op F om je buit op te eisen"
+      "riteOpen": "Het reliekschrijn is open: druk op F om je buit op te eisen",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Versla {boss}",

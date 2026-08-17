@@ -7354,7 +7354,14 @@ export const de_DE: EnTranslations = {
       "riteChoose": "Nähere dich dem Ertrunkenen Reliquiar und drücke F, um den Ritus zu beginnen",
       "ritePlayback": "Beobachte die Schreine: Präge dir die Reihenfolge ein, in der sie aufleuchten",
       "riteInput": "Drücke F an jedem Schrein in der Reihenfolge, in der sie aufgeleuchtet sind ({current}/{total})",
-      "riteOpen": "Das Reliquiar ist offen: Drücke F daran, um deine Beute zu beanspruchen"
+      "riteOpen": "Das Reliquiar ist offen: Drücke F daran, um deine Beute zu beanspruchen",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "{boss} erschlagen",

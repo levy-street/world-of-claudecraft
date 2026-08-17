@@ -43,7 +43,10 @@ describe('DelveTrackerController', () => {
     const tracker = trackerElement();
     tracker.element.innerHTML = 'stale';
     const closeRitePanel = vi.fn();
-    const world = { delveRun: null, delveMarks: 0 } as Pick<IWorld, 'delveRun' | 'delveMarks'>;
+    const world = { delveRun: null, delveMarks: 0, leaveDelve: () => {} } as Pick<
+      IWorld,
+      'delveRun' | 'delveMarks' | 'leaveDelve'
+    >;
     const controller = new DelveTrackerController({
       element: tracker.element,
       world: () => world,
@@ -51,6 +54,7 @@ describe('DelveTrackerController', () => {
       mobName: () => 'Test Boss',
       attachTooltip: () => {},
       closeRitePanel,
+      confirmDialog: () => {},
     });
 
     controller.update();
@@ -62,7 +66,10 @@ describe('DelveTrackerController', () => {
 
   it('elides identical paints and repaints when authoritative marks change', () => {
     const tracker = trackerElement();
-    const world = { delveRun: run(), delveMarks: 3 } as Pick<IWorld, 'delveRun' | 'delveMarks'>;
+    const world = { delveRun: run(), delveMarks: 3, leaveDelve: () => {} } as Pick<
+      IWorld,
+      'delveRun' | 'delveMarks' | 'leaveDelve'
+    >;
     const controller = new DelveTrackerController({
       element: tracker.element,
       world: () => world,
@@ -70,6 +77,7 @@ describe('DelveTrackerController', () => {
       mobName: () => 'Test Boss',
       attachTooltip: () => {},
       closeRitePanel: () => {},
+      confirmDialog: () => {},
     });
 
     controller.update();
@@ -88,7 +96,8 @@ describe('DelveTrackerController', () => {
     const world = {
       delveRun: run({ rite: { phase: 'playback', current: 0, total: 3 } }),
       delveMarks: 0,
-    } as Pick<IWorld, 'delveRun' | 'delveMarks'>;
+      leaveDelve: () => {},
+    } as Pick<IWorld, 'delveRun' | 'delveMarks' | 'leaveDelve'>;
     const controller = new DelveTrackerController({
       element: tracker.element,
       world: () => world,
@@ -96,10 +105,58 @@ describe('DelveTrackerController', () => {
       mobName: () => 'Test Boss',
       attachTooltip: () => {},
       closeRitePanel,
+      confirmDialog: () => {},
     });
 
     controller.update();
 
     expect(closeRitePanel).toHaveBeenCalledWith(false);
+  });
+
+  it('renders an abandon control that routes through the confirm dep', () => {
+    let html = '';
+    const clickHandlers: Array<() => void> = [];
+    const abandonButton = {
+      addEventListener: (type: string, handler: () => void) => {
+        if (type === 'click') clickHandlers.push(handler);
+      },
+    };
+    const element = {
+      style: { display: '' },
+      get innerHTML() {
+        return html;
+      },
+      set innerHTML(value: string) {
+        html = value;
+      },
+      querySelectorAll: (selector: string) => (selector === '.dt-abandon' ? [abandonButton] : []),
+    } as unknown as HTMLElement;
+    const leaveDelve = vi.fn();
+    const confirmDialog = vi.fn();
+    const controller = new DelveTrackerController({
+      element,
+      world: () =>
+        ({ delveRun: run(), delveMarks: 0, leaveDelve }) as Pick<
+          IWorld,
+          'delveRun' | 'delveMarks' | 'leaveDelve'
+        >,
+      delveName: () => 'Test Delve',
+      mobName: () => 'Test Boss',
+      attachTooltip: () => {},
+      closeRitePanel: () => {},
+      confirmDialog,
+    });
+
+    controller.update();
+
+    expect(element.innerHTML).toContain('dt-abandon');
+    expect(clickHandlers.length).toBe(1);
+    clickHandlers[0]();
+    // The click opens the confirm; leaving happens only on the dialog's OK.
+    expect(confirmDialog).toHaveBeenCalledTimes(1);
+    expect(leaveDelve).not.toHaveBeenCalled();
+    const onOk = confirmDialog.mock.calls[0][4] as () => void;
+    onOk();
+    expect(leaveDelve).toHaveBeenCalledTimes(1);
   });
 });

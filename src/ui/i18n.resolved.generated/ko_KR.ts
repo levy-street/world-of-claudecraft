@@ -7354,7 +7354,14 @@ export const ko_KR: EnTranslations = {
       "riteChoose": "가라앉은 성물함에 다가가 F를 눌러 의식을 시작하세요",
       "ritePlayback": "제단을 지켜보세요: 빛나는 순서를 기억하세요",
       "riteInput": "빛난 순서대로 각 제단에서 F를 누르세요 ({current}/{total})",
-      "riteOpen": "성물함이 열렸습니다: F를 눌러 전리품을 획득하세요"
+      "riteOpen": "성물함이 열렸습니다: F를 눌러 전리품을 획득하세요",
+      "abandon": "탐굴 나가기"
+    },
+    "abandonConfirm": {
+      "title": "탐굴에서 나가시겠습니까?",
+      "body": "탐굴 입구로 돌아가시겠습니까? 다시 들어가면 이번 탐굴을 계속할 수 있습니다.",
+      "confirm": "나가기",
+      "cancel": "취소"
     },
     "objective": {
       "kill_boss": "{boss} 처치",

@@ -56,7 +56,12 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Re-pinned 19488 -> 19490 (+2) for the Abandon Delve control, a maintainer
+    // decision prepared for PR review: the addition is the two-line confirmDialog
+    // dep on the extracted DelveTrackerController (the strings and the leaveDelve
+    // call live in the controller module), riding the prior zero-slack pin.
+    // Exact count: any further growth reds again.
+    ceiling: 19490,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

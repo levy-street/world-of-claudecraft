@@ -7354,7 +7354,14 @@ export const es_ES: EnTranslations = {
       "riteChoose": "Acércate al Relicario Ahogado y pulsa F para comenzar el rito",
       "ritePlayback": "Observa los santuarios: memoriza el orden en que se iluminan",
       "riteInput": "Pulsa F en cada santuario en el orden en que se iluminaron ({current}/{total})",
-      "riteOpen": "El relicario está abierto: pulsa F sobre él para reclamar tu botín"
+      "riteOpen": "El relicario está abierto: pulsa F sobre él para reclamar tu botín",
+      "abandon": "Leave Delve"
+    },
+    "abandonConfirm": {
+      "title": "Leave the delve?",
+      "body": "Return to the delve entrance? You can walk back in to continue this run.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
     },
     "objective": {
       "kill_boss": "Da muerte a {boss}",

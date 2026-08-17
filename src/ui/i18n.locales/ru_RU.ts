@@ -7440,6 +7440,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': 'Секция {current} из {total}',
   'delveUi.tracker.objective': 'Задача',
   'delveUi.tracker.title': 'Вылазка',
+  'delveUi.tracker.abandon': 'Выйти из вылазки',
+  'delveUi.abandonConfirm.title': 'Выйти из вылазки?',
+  'delveUi.abandonConfirm.body':
+    'Вернуться ко входу в вылазку? Вы сможете войти снова и продолжить это прохождение.',
+  'delveUi.abandonConfirm.confirm': 'Выйти',
+  'delveUi.abandonConfirm.cancel': 'Отмена',
   'sim.delve.alreadyInDelve': 'Вы уже находитесь в вылазке.',
   'sim.delve.bossChest':
     'Босс пал. На возвышении поднимается заговорённый сундук реликвария: взломайте его замок, чтобы забрать добычу.',
