@@ -517,6 +517,11 @@ describe('farmReady is a HEAVY_SELF_EVENTS member: a plot ripening with NO comma
     const pid = plantAndRipen(server, session);
     const { noticedDirty, quietDirty } = tickToNotice(server, session, pid);
     expect(noticedDirty).toBe(true);
+    // Non-vacuous: the ride-out ends just past a boundary, so the notice
+    // lands about a second later and the quiet list really has entries (a
+    // setup edit that slid the notice onto the first iteration would make
+    // the every() below constant-true; this line is what stops that).
+    expect(quietDirty.length).toBeGreaterThan(0);
     expect(quietDirty.every((dirty) => dirty === false)).toBe(true);
     // The plot really transitioned (the notice was the ready arm, and the
     // flag it flipped is what the next snapshot must carry).
@@ -545,6 +550,15 @@ describe('farmReady is a HEAVY_SELF_EVENTS member: a plot ripening with NO comma
     expect(before).toHaveLength(1);
     expect(before[0].notified).toBe(false);
     tickToNotice(server, session, pid);
+    // Keep the staggered backstop out of the picture, so this broadcast's
+    // fplot can only be the notice's doing: heavyDue also fires when
+    // (tickCount + pid) % HEAVY_SELF_REFRESH_TICKS === 0 (server/game.ts, the
+    // 40-tick backstop), and a future spawn-count change could land the
+    // notice tick on that residue for this pid. The notice's dirty flag
+    // survives quiet ticks (only a broadcast clears it), so ride past the
+    // residue if it coincides. Checked by mutation: with 'farmReady' out of
+    // HEAVY_SELF_EVENTS this arm reds on the missing fplot key.
+    while ((server.sim.tickCount + pid) % 40 === 0) routeTick(server);
     broadcast(server);
     const rows = lastSnap(fc.sent).self.fplot as Record<string, unknown>[];
     expect(rows).toHaveLength(1);

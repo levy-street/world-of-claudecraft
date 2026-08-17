@@ -397,6 +397,73 @@ describe('ProfessionsWindow: the Harvest Journal entry (farming Phase 8, deviati
     expect(names).toEqual(['Mining']);
     expect(el.querySelector('[data-harvest-journal]')).toBeNull();
   });
+
+  it('keeps the simplified rows to bar plus opener: no slot, recharge, or ask-each-use control', () => {
+    // The simplified body's one call to action is meant to be its only
+    // spender. A syncing or pre-attunement player who holds a charm and a
+    // pick with a worked mining row would otherwise see the resource-spending
+    // slot and recharge buttons there; the same state paints them in full
+    // mode (the slotted-tool-effect describe below), so this arm pins the
+    // per-mode difference rather than the buttons' existence.
+    const state = simplifiedState();
+    state.gathering = [
+      { professionId: 'mining', skill: 30, maxSkill: 300 },
+      { ...farmingRow, skill: 2 },
+    ];
+    state.toolEffects = [
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 30,
+        confirmMode: 'always',
+        selfCrafted: true,
+      },
+    ];
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const { el } = makeWindow(state, { openHarvestJournal: () => {} });
+    expect(el.querySelectorAll('.prof-gathering .prof-gather-row')).toHaveLength(2);
+    expect(el.querySelector('.prof-effect')).toBeNull();
+    expect(el.querySelector('[data-slot-profession]')).toBeNull();
+    expect(el.querySelector('[data-recharge-profession]')).toBeNull();
+    expect(el.querySelector('input[type="checkbox"]')).toBeNull();
+    // The opener is the ONE control the rows carry here.
+    expect(el.querySelectorAll('.prof-gathering button')).toHaveLength(1);
+    expect(el.querySelector('.prof-gathering button')?.hasAttribute('data-harvest-journal')).toBe(
+      true,
+    );
+    // The section sits AFTER the call to action, never before it.
+    const cta = el.querySelector('.prof-cta');
+    const gathering = el.querySelector('.prof-gathering');
+    if (!cta || !gathering) throw new Error('missing cta or gathering');
+    expect(cta.compareDocumentPosition(gathering) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('paints the Farming row the moment the first bed is planted under an OPEN window', () => {
+    // The live half of the signature arm: the slow band re-reads the world,
+    // and the presence fold in professionsRefreshSig is what turns a plant
+    // into a repaint while the window is up. Before the plant the fresh
+    // farmer sees only the call to action.
+    const state = simplifiedState();
+    state.gathering = [farmingRow];
+    state.farmPlots = [];
+    const { w, el } = makeWindow(state, { openHarvestJournal: () => {} });
+    w.refreshIfChanged(); // settle the post-open catch-up repaint
+    expect(el.querySelector('.prof-gathering')).toBeNull();
+    state.farmPlots.push({ bedId: 'bed_eastbrook_1' });
+    w.refreshIfChanged();
+    expect(el.querySelector('.prof-gathering .prof-craft-name')?.textContent).toBe('Farming');
+    expect(el.querySelector('button[data-harvest-journal]')).not.toBeNull();
+    // A second bed moves nothing: the fold is presence, and an unchanged
+    // signature must not rebuild the subtree under a possibly focused control.
+    const opener = el.querySelector('button[data-harvest-journal]');
+    state.farmPlots.push({ bedId: 'bed_eastbrook_2' });
+    w.refreshIfChanged();
+    expect(el.querySelector('button[data-harvest-journal]')).toBe(opener);
+  });
 });
 
 describe('ProfessionsWindow: gathering rows', () => {

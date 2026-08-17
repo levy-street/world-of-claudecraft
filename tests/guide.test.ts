@@ -1476,7 +1476,11 @@ describe('Guide controls reference completeness', () => {
   // window bind's default keycap must appear in the controls reference, so
   // the next shipped bind reds here instead of drifting silently. Both halves
   // read the live tables (BIND_ACTIONS through the same keyLabel the options
-  // panel prints, the page through its rendered <kbd> cells).
+  // panel prints, the page through its rendered <kbd> cells). A page-wide
+  // keycap SET is enough here because tests/keybinds.test.ts pins that no two
+  // shipped defaults share a code (the one sanctioned KeyA pair aside), so a
+  // new Interface bind cannot borrow another action's keycap to pass: its
+  // keycap is on the page only if a row was written for it.
   it('lists every Interface bind default on the controls page', () => {
     setLanguage('en');
     const html = controlsPage.render({

@@ -1149,6 +1149,10 @@ describe('axe: professions window tool-effect controls', () => {
         { itemId: 'copper_mining_pick', count: 1 },
         { itemId: 'artisans_eye', count: 1, instance: { signer: 'Testchar' } },
       ],
+      // The viewer's planted beds (IWorld myFarmPlots): the window reads the
+      // count for its simplified-mode Farming-row arm (deviation (be)); none
+      // here, the shape every non-farmer reads.
+      myFarmPlots: [],
       player: { name: 'Testchar' },
     };
     const win = new ProfessionsWindow(
