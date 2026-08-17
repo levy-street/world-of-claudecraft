@@ -356,6 +356,19 @@ describe('Eastbrook authored gameplay data integration', () => {
     // never evaluated in the one case they exist to describe. Ordered this way
     // a drift in some OTHER field of some other NPC moves the hash while these
     // three stay green, which is the diagnostic the digest alone cannot give.
+    //
+    // Re-minted a third time at the farming go-live, when the kitchens
+    // master took on the two produce work orders: exactly one payload moved
+    // and the move is cook_marlow's questIds row (two order ids appended
+    // after q_prof_workorder_kitchens). The row assertion below re-checks
+    // that this is still the row this case owns.
+    expect(ZONE1_NPCS.cook_marlow.questIds).toEqual([
+      'q_prof_attune_apothecary',
+      'q_prof_amends_apothecary',
+      'q_prof_workorder_kitchens',
+      'q_prof_workorder_kitchens_wheat',
+      'q_prof_workorder_kitchens_rice',
+    ]);
     expect(ZONE1_NPCS.trader_wilkes.vendorItems).toEqual([
       'baked_bread',
       'spring_water',
@@ -394,7 +407,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'garden_hoe',
     ]);
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '61fe19e5099c99c09886390f2abce30784493f303acbd1fc6924e39d3c2bd31b',
+      '7f0a09f0bd4c4d83845c57e760b92981af62338feab28ed570ec1390eedfd5e9',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {

@@ -272,9 +272,9 @@ describe('the real work-order lifecycle through computeQuestState', () => {
     expect(questMarkerKind(workOrder, state, done, 'giver')).toBe('repeat');
   });
 
-  it('every one of the eleven repeatable quests classifies repeat once completed and offered', () => {
+  it('every one of the thirteen repeatable quests classifies repeat once completed and offered', () => {
     const repeatables = Object.values(QUESTS).filter((q) => q.repeatable);
-    expect(repeatables).toHaveLength(11);
+    expect(repeatables).toHaveLength(13);
     for (const q of repeatables) {
       expect(questMarkerKind(q, 'available', new Set([q.id]), 'giver'), q.id).toBe('repeat');
     }

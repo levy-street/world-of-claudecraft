@@ -1883,6 +1883,15 @@ describe('Guide professions gathering accuracy', () => {
       'id="prof-nodes"',
     );
     expect(html).toContain('id="prof-rhythm"');
+    // The go-live planting-loop section: farming only, and it names the
+    // front door and the timer surface a reader needs (both literals, so a
+    // reword that drops either fails here rather than on the public page).
+    expect(html, 'the farming page must carry its planting-loop section').toContain(
+      'id="prof-farm-beds"',
+    );
+    expect(html).toContain('Farmer Jessica');
+    expect(html).toContain('Harvest Journal');
+    expect(html).toContain('withered husks');
     // The guard itself stays honest on its absent side: a toolless record
     // still renders neither section, never prose over an empty table.
     const toolless = {
@@ -1904,6 +1913,9 @@ describe('Guide professions gathering accuracy', () => {
     );
     expect(miningHtml, 'the guard is length-based: a full trade keeps nodes').toContain(
       'id="prof-nodes"',
+    );
+    expect(miningHtml, 'the planting loop is farming-only prose').not.toContain(
+      'id="prof-farm-beds"',
     );
   });
 

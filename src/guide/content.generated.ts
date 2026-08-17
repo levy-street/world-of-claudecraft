@@ -12834,6 +12834,24 @@ export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
         "coinCopper": 16
       },
       {
+        "id": "q_prof_workorder_kitchens_wheat",
+        "name": "Kitchens Wheat Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Vale Wheat",
+        "count": 8,
+        "coinCopper": 16
+      },
+      {
+        "id": "q_prof_workorder_kitchens_rice",
+        "name": "Kitchens Rice Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Marsh Rice",
+        "count": 5,
+        "coinCopper": 20
+      },
+      {
         "id": "q_prof_workorder_loom",
         "name": "Loom Work Order",
         "master": "Weaver Ottilie",

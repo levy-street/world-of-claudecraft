@@ -763,7 +763,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // Professions 2.0: the Apothecary pair's (alchemy + cooking) anchor
     // master. Attunement, make-amends return, and the repeatable kitchens work
     // order live here.
-    questIds: ['q_prof_attune_apothecary', 'q_prof_amends_apothecary', 'q_prof_workorder_kitchens'],
+    questIds: [
+      'q_prof_attune_apothecary',
+      'q_prof_amends_apothecary',
+      'q_prof_workorder_kitchens',
+      'q_prof_workorder_kitchens_wheat',
+      'q_prof_workorder_kitchens_rice',
+    ],
     vendorItems: [
       'baked_bread',
       'spring_water',
@@ -1492,6 +1498,49 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     shareable: false,
     repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
   },
+  // Farming go-live: the kitchens take the two early-tier crops off a
+  // farmer's hands on the same work-order contract (fungible produce only:
+  // farming's fine twins have no downward grade substitution, so a Fine Vale
+  // Wheat never fills a plain-wheat order). Two rows, one per early tier, so
+  // both the Eastbrook and the Fenbridge beds have a coin sink from day one.
+  q_prof_workorder_kitchens_wheat: {
+    id: 'q_prof_workorder_kitchens_wheat',
+    name: 'Kitchens Wheat Order',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'Bread does not bake itself, $N, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.',
+    completionText:
+      'Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.',
+    objectives: [
+      { type: 'collect', itemId: 'vale_wheat', count: 8, label: 'Vale Wheat delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 8 * 4) = 16 (vale_wheat sellValue 4).
+    copperReward: 16,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
+  q_prof_workorder_kitchens_rice: {
+    id: 'q_prof_workorder_kitchens_rice',
+    name: 'Kitchens Rice Order',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'The marsh folk swear by their rice, $N, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.',
+    completionText:
+      'Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.',
+    objectives: [
+      { type: 'collect', itemId: 'marsh_rice', count: 5, label: 'Marsh Rice delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 5 * 8) = 20 (marsh_rice sellValue 8).
+    copperReward: 20,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
   q_prof_workorder_loom: {
     id: 'q_prof_workorder_loom',
     name: 'Loom Work Order',
@@ -1597,6 +1646,8 @@ export const ZONE1_QUEST_ORDER = [
   'q_prof_amends_bombardier',
   'q_prof_workorder_forge',
   'q_prof_workorder_kitchens',
+  'q_prof_workorder_kitchens_wheat',
+  'q_prof_workorder_kitchens_rice',
   'q_prof_workorder_loom',
   'q_prof_workorder_toolworks',
   'q_prof_hobby_switch',
