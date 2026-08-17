@@ -113,15 +113,30 @@ model-only snapshot, move it forward to `b0ed7164a6` or later.
 3. **`MOUNT_LAND_BOOST` 1.5 -> 1.125.** Mount landing only; jump and the
    rider's own landing untouched.
 
-### The tail light lens: PARKED, not committed
+### The tail light lens: DONE and committed
 
-**Status as of session 4: Jamie has stopped pursuing this and is generating a
-new texture instead.** Many attempts, none of which landed on screen. Read the
-trap table below before reviving it, and read the paragraph after it before
-deciding to revive it at all.
+**Status as of session 5: this landed and Jamie signed off on it.** It is
+`src/render/vehicle_taillights.ts`, attached from `mount_presentation.ts`.
 
-Everything here is preserved because the traps are general, not because the
-approach is recommended.
+What finally worked, after many attempts that did not: STOP TRYING TO FIND THE
+LAMP IN THE DATA. The mesh is a neural field with no edge flow and its unwrap is
+thousands of tiny UV islands, so there is no lamp boundary to trace in either
+geometry or texture space, and every attempt to fit one was negotiating with
+noise. Instead, render the car cleanly, have JAMIE DRAW the lamp outline on the
+picture in green, and read that stroke back into model units
+(`read_traced_lamps.mjs`). Same fitting maths as before, but pointed at a
+deliberate human stroke rather than at artifacts, which is the whole difference.
+
+The trace also settled an argument: the corners were never wrong. The fitted
+roundness came back at 5.55 against the 6 already in use. The lens was 26% TOO
+TALL, which is what read as square.
+
+Two bugs after that, both in the mesh rather than the shape, both now in the
+trap list below: a world/model unit mix in the raycast, and a superellipse
+sampled too coarsely at the caps.
+
+The Blender-era history below is kept because the traps are general. The
+approach it describes is not the one that shipped.
 
 Built in Blender, `E:\rallycart_work\scripts\19_taillight_lens.py`, output
 `E:\rallycart_work\rallycart-lens.glb`. The repo copy of the model is back to
@@ -891,6 +906,33 @@ the mesh in and re-run the seat solve ONCE, rather than tuning twice.
   the front arch clearance and the wheels fired up through the fenders. Pinned by
   `tests/vehicle_suspension_fx.test.ts` ("keeps travel inside the measured
   clearance whatever the mount scale").
+- **A superellipse this square needs CLUSTERED sampling.** With `ROUND` at 5.5
+  the outline holds full width to about t = 0.95 and then closes almost all at
+  once, so evenly spaced rows put the entire cap in one quad: half-width ran
+  0.98, 0.92, then 0. That rendered as a wide shallow SPIKE at the top and
+  bottom, and because a zero-width row collapses every vertex onto the middle of
+  the angular span, the spike landed right on the body corner where the two
+  halves of the wrap meet, and stuck out past the paint. `heightParam` now
+  distributes rows by sine, which spends five rows on the corner rounding and
+  squeezes the final closure into about 1% of the lamp height. The outline never
+  changed; only how honestly it was sampled. If `ROUND` is ever raised, this
+  gets worse, not better, so raise `SEG_V` with it.
+- **UNITS, again, in a raycast.** `measureDepth` in `vehicle_taillights.ts`
+  builds its rays in model space, sends them through `chassis.matrixWorld` to
+  cast, and then has to bring the answer BACK. The first version did not: it
+  subtracted a world-space `hit.distance` from a model-space `CAST_FROM`. Under
+  the 6.046x mount scale that came out around -2.0, and a negative radius puts
+  the lens on the far side of its sweep axis, so two enormous red sheets
+  rendered out in FRONT of the car. It never showed in the preview renders
+  because that harness draws the model at identity scale, where the two units
+  coincide. The fix takes the hit point into chassis-local space and measures
+  the radius from the sweep axis there, which has no unit to get wrong and needs
+  no `CAST_FROM` term at all. Anything mixing a raycast result with a model
+  constant on this branch is suspect for the same reason. Pinned by
+  `tests/rallycart_taillights.test.ts` ("builds the same lens whatever the mount
+  is scaled to"), added precisely because the older tests in that file
+  re-implement the ray maths instead of calling the runtime, so they validated
+  the CONSTANTS and were blind to a bug in the CODE.
 - **Composing onto another pass's writes.** The suspension writes channels that
   the animation mixer and the jump-attitude pass also write. A naive `+=`
   integrates without bound on any frame those other writers skip (far LOD,

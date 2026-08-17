@@ -33,6 +33,7 @@ import {
   createVehicleSuspensionRig,
   type VehicleSuspensionRig,
 } from './vehicle_suspension_fx';
+import { attachVehicleTaillights, RALLYCART_TAILLIGHTS } from './vehicle_taillights';
 import type { Vfx } from './vfx';
 
 /** The EntityView slice this pass touches: a caller-owned view record. */
@@ -133,6 +134,7 @@ export function updateMountPresentation(
       // costs a property read afterwards and needs no per-frame update.
       if (spec.fx === 'pipes') {
         attachVehicleHeadlights(v.mountSuspension.chassis, RALLYCART_HEADLIGHTS);
+        attachVehicleTaillights(v.mountSuspension.chassis, RALLYCART_TAILLIGHTS);
       }
     }
     // Ambient mount particles: the snail paints its slime path while gliding,
