@@ -5004,7 +5004,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionEvilEye' }],
     description:
-      'Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry.',
+      'Marks one enemy as the focus of your curses. The Eye cannot be dispelled. Moving it preserves Condemnation but does not refresh its 20 sec expiry.',
   },
   maledict_gaze: {
     id: 'maledict_gaze',
@@ -5204,7 +5204,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionCoven', duration: 15, radius: 15, maxSecondary: 4 }],
     description:
-      'Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
+      'Creates undispellable secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
   },
   shadow_bolt: {
     id: 'shadow_bolt',

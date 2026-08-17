@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { addSoulFragments, necromancyCastError } from '../src/sim/combat/necromancy';
+import { addSoulFragments, necromancyCastError, summonUndead } from '../src/sim/combat/necromancy';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers, specLabel } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { petCleaveAttack, petRangedAttack } from '../src/sim/pet/pet_ai';
+import { necromancyPetOwnerScaling } from '../src/sim/pet/pet_scaling';
 import { type ArenaMatch, Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -1021,6 +1022,225 @@ describe('Necromancy Warlock', () => {
     });
   });
 
+  it.each([...NECROMANCY_IDS])(
+    'applies bounded Warlock gear scaling to a freshly raised %s',
+    (templateId) => {
+      const sim = makeNecromancer();
+      const servant = summonUndead(
+        sim.ctx,
+        sim.player,
+        templateId,
+        templateId !== 'graveguard',
+        undefined,
+        undefined,
+        true,
+      );
+      if (!servant) throw new Error(`Expected ${templateId}`);
+      const authored = createMob(-1, MOBS[templateId], sim.player.level, servant.pos);
+      const expected = necromancyPetOwnerScaling(
+        {
+          maxHp: sim.player.maxHp,
+          armor: sim.player.stats.armor,
+          spellPower: sim.player.spellPower,
+        },
+        {
+          maxHp: authored.maxHp,
+          armor: authored.stats.armor,
+          weaponDps: (authored.weapon.min + authored.weapon.max) / 2 / authored.weapon.speed,
+        },
+      );
+
+      expect(servant.maxHp).toBe(authored.maxHp + expected.hp);
+      expect(servant.stats.armor).toBe(authored.stats.armor + expected.armor);
+      expect(servant.attackPower).toBe(expected.attackPower);
+      expect(servant.petOwnerHpBonus).toBe(expected.hp);
+      expect(expected.hp).toBeGreaterThan(0);
+      expect(expected.armor).toBeGreaterThan(0);
+      expect(expected.attackPower).toBeGreaterThan(0);
+    },
+  );
+
+  it('re-derives a Dominion servant without compounding and obeys the caps', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 5);
+    finishCast(sim, 'raise_bone_mage');
+
+    const mage = ownedUndead(sim).find((undead) => undead.templateId === 'necromancy_bone_mage');
+    if (!mage) throw new Error('Expected a Bone Mage');
+    sim.player.maxHp = 100_000;
+    sim.player.hp = sim.player.maxHp;
+    sim.player.stats.armor = 100_000;
+    sim.player.spellPower = 100_000;
+    sim.tick();
+    const authored = createMob(-1, MOBS.necromancy_bone_mage, sim.player.level, mage.pos);
+    const authoredDps = (authored.weapon.min + authored.weapon.max) / 2 / authored.weapon.speed;
+    const cappedAp = Math.round(authoredDps * 14 * 0.3);
+
+    expect(mage.maxHp).toBe(authored.maxHp + Math.round(authored.maxHp * 0.5));
+    expect(mage.stats.armor).toBe(authored.stats.armor + Math.round(authored.stats.armor * 0.5));
+    expect(mage.attackPower).toBe(cappedAp);
+
+    const settled = {
+      maxHp: mage.maxHp,
+      armor: mage.stats.armor,
+      attackPower: mage.attackPower,
+    };
+    for (let tick = 0; tick < 40; tick++) sim.tick();
+    expect({
+      maxHp: mage.maxHp,
+      armor: mage.stats.armor,
+      attackPower: mage.attackPower,
+    }).toEqual(settled);
+  });
+
+  it('tracks owner gear changes on the next tick without a manual rescale call', () => {
+    const sim = makeNecromancer();
+    sim.player.maxHp = 100;
+    sim.player.hp = 100;
+    sim.player.stats.armor = 20;
+    sim.player.spellPower = 10;
+    const mage = summonUndead(
+      sim.ctx,
+      sim.player,
+      'necromancy_bone_mage',
+      true,
+      undefined,
+      undefined,
+      true,
+    );
+    if (!mage) throw new Error('Expected a Bone Mage');
+    const initial = {
+      maxHp: mage.maxHp,
+      armor: mage.stats.armor,
+      attackPower: mage.attackPower,
+    };
+    const ownerInitial = {
+      maxHp: sim.player.maxHp,
+      armor: sim.player.stats.armor,
+      spellPower: sim.player.spellPower,
+    };
+    mage.hp = mage.maxHp - 20;
+    const missingHp = mage.maxHp - mage.hp;
+
+    sim.player.maxHp += 400;
+    sim.player.stats.armor += 200;
+    sim.player.spellPower += 80;
+    sim.tick();
+    expect(mage.maxHp).toBeGreaterThan(initial.maxHp);
+    expect(mage.stats.armor).toBeGreaterThan(initial.armor);
+    expect(mage.attackPower).toBeGreaterThan(initial.attackPower);
+    expect(mage.maxHp - mage.hp).toBe(missingHp);
+
+    sim.player.maxHp = ownerInitial.maxHp;
+    sim.player.stats.armor = ownerInitial.armor;
+    sim.player.spellPower = ownerInitial.spellPower;
+    sim.tick();
+    expect({
+      maxHp: mage.maxHp,
+      armor: mage.stats.armor,
+      attackPower: mage.attackPower,
+    }).toEqual(initial);
+    expect(mage.hp).toBe(mage.maxHp);
+
+    mage.dead = true;
+    mage.hp = 0;
+    sim.player.maxHp += 400;
+    sim.tick();
+    expect(mage.dead).toBe(true);
+    expect(mage.hp).toBe(0);
+  });
+
+  it('keeps the health cap anchored to the authored pool through a percentage stamina aura', () => {
+    const sim = makeNecromancer();
+    sim.player.maxHp = 100_000;
+    sim.player.hp = sim.player.maxHp;
+    const mage = summonUndead(
+      sim.ctx,
+      sim.player,
+      'necromancy_bone_mage',
+      true,
+      undefined,
+      undefined,
+      true,
+    );
+    if (!mage) throw new Error('Expected a Bone Mage');
+    const authored = createMob(-1, MOBS.necromancy_bone_mage, sim.player.level, mage.pos);
+    const cappedShare = Math.round(authored.maxHp * 0.5);
+    const unbuffed = authored.maxHp + cappedShare;
+    expect(mage.maxHp).toBe(unbuffed);
+
+    sim.ctx.applyAura(mage, {
+      id: 'test_fortitude',
+      name: 'Test Fortitude',
+      kind: 'buff_sta_pct',
+      remaining: 0.1,
+      duration: 0.1,
+      value: 5,
+      sourceId: sim.player.id,
+      school: 'holy',
+    });
+    sim.tick();
+    expect(mage.petOwnerHpBonus).toBe(cappedShare);
+    expect(mage.maxHp).toBe(unbuffed + Math.round(unbuffed * 0.05));
+
+    for (let tick = 0; tick < 3; tick++) sim.tick();
+    expect(mage.maxHp).toBe(unbuffed);
+    expect(mage.petOwnerHpBonus).toBe(cappedShare);
+  });
+
+  it('levels every persistent Necromancy servant with its owner', () => {
+    const sim = makeNecromancer();
+    sim.setPlayerLevel(10);
+    for (const templateId of NECROMANCY_IDS) {
+      summonUndead(
+        sim.ctx,
+        sim.player,
+        templateId,
+        templateId !== 'graveguard',
+        undefined,
+        undefined,
+        true,
+      );
+    }
+    expect(ownedUndead(sim).map((servant) => servant.level)).toEqual([10, 10, 10, 10]);
+    const servants = ownedUndead(sim);
+    servants[0].hp = Math.round(servants[0].maxHp * 0.4);
+    const graveguardFraction = servants[0].hp / servants[0].maxHp;
+    servants[1].dead = true;
+    servants[1].hp = 0;
+
+    sim.setPlayerLevel(20);
+
+    for (const servant of ownedUndead(sim)) {
+      const authored = createMob(-1, MOBS[servant.templateId], 20, servant.pos);
+      const share = necromancyPetOwnerScaling(
+        {
+          maxHp: sim.player.maxHp,
+          armor: sim.player.stats.armor,
+          spellPower: sim.player.spellPower,
+        },
+        {
+          maxHp: authored.maxHp,
+          armor: authored.stats.armor,
+          weaponDps: (authored.weapon.min + authored.weapon.max) / 2 / authored.weapon.speed,
+        },
+      );
+      expect(servant.level, servant.templateId).toBe(20);
+      expect(servant.maxHp, servant.templateId).toBe(authored.maxHp + share.hp);
+      expect(servant.stats.armor, servant.templateId).toBe(authored.stats.armor + share.armor);
+      expect(servant.attackPower, servant.templateId).toBe(share.attackPower);
+    }
+    const graveguard = ownedUndead(sim).find((servant) => servant.templateId === 'graveguard');
+    const warrior = ownedUndead(sim).find(
+      (servant) => servant.templateId === 'necromancy_skeletal_warrior',
+    );
+    if (!graveguard || !warrior) throw new Error('Expected synced Necromancy servants');
+    expect(graveguard.hp).toBe(Math.round(graveguard.maxHp * graveguardFraction));
+    expect(warrior.dead).toBe(true);
+    expect(warrior.hp).toBe(0);
+  });
+
   it('arms the Graveguard auto-taunt but leaves Dominion damage servants passive', () => {
     const sim = makeNecromancer();
     addTarget(sim);
@@ -1884,7 +2104,7 @@ describe('Necromancy Warlock', () => {
       .filter(isDominionServant)
       .sort((a, b) => a.id - b.id);
     expect(servants).toHaveLength(2);
-    for (const servant of servants) servant.hp = Math.round(servant.maxHp * 0.5);
+    for (const servant of servants) servant.hp = servant.maxHp;
 
     sim.castAbility('sacrifice_undead');
 
@@ -1996,7 +2216,25 @@ describe('Necromancy Warlock', () => {
     });
     const pid = restored.addPlayer('warlock', 'Restored', { state });
 
-    expect(restored.petOf(pid, true)?.templateId).toBe('graveguard');
+    const graveguard = restored.petOf(pid, true);
+    if (!graveguard) throw new Error('Expected the restored Graveguard');
+    const owner = restored.entities.get(pid);
+    if (!owner) throw new Error('Expected the restored Warlock');
+    const authored = createMob(-1, MOBS.graveguard, owner.level, graveguard.pos);
+    const expected = necromancyPetOwnerScaling(
+      { maxHp: owner.maxHp, armor: owner.stats.armor, spellPower: owner.spellPower },
+      {
+        maxHp: authored.maxHp,
+        armor: authored.stats.armor,
+        weaponDps: (authored.weapon.min + authored.weapon.max) / 2 / authored.weapon.speed,
+      },
+    );
+
+    expect(graveguard.templateId).toBe('graveguard');
+    expect(graveguard.maxHp).toBe(authored.maxHp + expected.hp);
+    expect(graveguard.stats.armor).toBe(authored.stats.armor + expected.armor);
+    expect(graveguard.attackPower).toBe(expected.attackPower);
+    expect(graveguard.petOwnerHpBonus).toBe(expected.hp);
     expect(
       [...restored.entities.values()].filter(
         (entity) => entity.ownerId === pid && entity.templateId === 'necromancy_skeletal_warrior',

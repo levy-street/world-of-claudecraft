@@ -2407,8 +2407,8 @@ export const en: EnTranslations = {
       "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
       "resourceCount": "{value} of {max}",
       "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
+      "afflictionEye": "Cannot be dispelled; Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
+      "afflictionEyeSecondary": "Cannot be dispelled; effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
       "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
       "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
       "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
@@ -9924,7 +9924,7 @@ export const en: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "description": "Marks one enemy as the focus of your curses. The Eye cannot be dispelled. Moving it preserves Condemnation but does not refresh its 20 sec expiry."
       },
       "maledict_gaze": {
         "name": "Maledict Gaze",
@@ -9992,7 +9992,7 @@ export const en: EnTranslations = {
       },
       "coven": {
         "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "description": "Creates undispellable secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
       },
       "fear": {
         "name": "Harrow",

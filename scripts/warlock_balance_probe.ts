@@ -141,6 +141,7 @@ function prepareDestruction(sim: Sim, target: Entity): void {
 }
 
 function prepareDemonology(sim: Sim, target: Entity): void {
+  castAndSettle(sim, 'raise_graveguard', target);
   addSoulFragments(sim.ctx, sim.player, 5);
   castAndSettle(sim, 'raise_bone_mage', target);
   addSoulFragments(sim.ctx, sim.player, 5);

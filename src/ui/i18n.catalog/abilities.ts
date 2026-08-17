@@ -1497,7 +1497,7 @@ const classAbilityNamesEn = {
       [
         'evil_eye',
         'Evil Eye',
-        'Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry.',
+        'Marks one enemy as the focus of your curses. The Eye cannot be dispelled. Moving it preserves Condemnation but does not refresh its 20 sec expiry.',
       ],
       [
         'maledict_gaze',
@@ -1578,7 +1578,7 @@ const classAbilityNamesEn = {
       [
         'coven',
         'Coven',
-        'Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
+        'Creates undispellable secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
       ],
       [
         'fear',

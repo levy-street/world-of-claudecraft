@@ -1,7 +1,10 @@
-import { isTemporaryNecromancyUndeadTemplateId } from '../content/necromancy';
+import {
+  isNecromancyUndeadTemplateId,
+  isTemporaryNecromancyUndeadTemplateId,
+} from '../content/necromancy';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
-import { petDamageMult } from '../pet/pet_ai';
+import { applyPetOwnerScaling, petDamageMult } from '../pet/pet_ai';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { type AbilityDef, armorReduction, type Entity } from '../types';
@@ -44,7 +47,11 @@ export function isTemporaryNecromancyUndead(entity: Entity): boolean {
 }
 
 export function isNecromancyUndead(entity: Entity): boolean {
-  return entity.templateId === 'graveguard' || isTemporaryNecromancyUndead(entity);
+  return (
+    entity.kind === 'mob' &&
+    entity.ownerId !== null &&
+    isNecromancyUndeadTemplateId(entity.templateId)
+  );
 }
 
 export function soulFragmentCount(entity: Entity): number {
@@ -354,6 +361,7 @@ function createUndead(
   pet.wanderTarget = null;
   pet.despawnTimer = duration;
   clearThreat(pet);
+  applyPetOwnerScaling(ctx, pet);
   ctx.addEntity(pet);
   return pet;
 }

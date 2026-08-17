@@ -384,6 +384,7 @@ export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): v
     tickTimer: MALEDICT_GAZE_INTERVAL,
     sourceId: warlock.id,
     school: 'shadow',
+    undispellable: true,
   });
 }
 
@@ -670,6 +671,7 @@ export function applyCoven(
       value: 0.5,
       sourceId: warlock.id,
       school: 'shadow',
+      undispellable: true,
     });
   }
 }

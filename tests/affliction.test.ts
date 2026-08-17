@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { isDispellableAura } from '../src/sim/aura_classify';
 import {
   AFFLICTION_DOOM_DURATION,
   AFFLICTION_DOOM_MAX,
   AFFLICTION_EYE_DEATH_GAIN,
+  applyCoven,
   consumeDoom,
   doomValue,
   FATE_THREAD_DURATION,
@@ -200,6 +202,25 @@ describe('Affliction Warlock', () => {
     const beforeThird = doom();
     onAfflictionDamage(ctx(sim), target, sim.player, 10);
     expect(doom()).toBeGreaterThan(beforeThird);
+  });
+
+  it('makes primary and Coven Evil Eyes impossible to dispel', () => {
+    const sim = makeAffliction();
+    const primary = addTarget(sim, 10);
+    const secondary = addTarget(sim, 12);
+
+    finishCast(sim, 'evil_eye', primary);
+    applyCoven(ctx(sim), sim.player, primary, 15, 8, 1);
+
+    const primaryEye = primary.auras.find((aura) => aura.kind === 'affliction_eye');
+    const secondaryEye = secondary.auras.find((aura) => aura.kind === 'affliction_eye_secondary');
+    if (!primaryEye || !secondaryEye) throw new Error('Expected primary and Coven Evil Eyes');
+    expect(primaryEye).toMatchObject({ id: 'evil_eye', undispellable: true });
+    expect(secondaryEye).toMatchObject({ id: 'coven', undispellable: true });
+    expect(isDispellableAura(primaryEye, false)).toBe(false);
+    expect(isDispellableAura(secondaryEye, false)).toBe(false);
+    expect(ABILITIES.evil_eye.description).toContain('cannot be dispelled');
+    expect(ABILITIES.coven.description).toContain('undispellable secondary Evil Eyes');
   });
 
   it('pins the level-20 Needle and Maledict Gaze damage floor', () => {

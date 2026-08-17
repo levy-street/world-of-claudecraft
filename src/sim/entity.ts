@@ -746,6 +746,46 @@ export function characterDerivedStats(
   };
 }
 
+export interface MobLevelStats {
+  maxHp: number;
+  weapon: Entity['weapon'];
+  armor: number;
+}
+
+export function mobMaxHpAtLevel(template: MobTemplate, level: number): number {
+  return Math.round(
+    (template.hpBase + template.hpPerLevel * (level - 1)) * (template.elite ? 2.3 : 1),
+  );
+}
+
+function mobDamageAtLevel(template: MobTemplate, level: number): number {
+  return (template.dmgBase + template.dmgPerLevel * (level - 1)) * (template.elite ? 1.5 : 1);
+}
+
+export function mobWeaponDpsAtLevel(template: MobTemplate, level: number): number {
+  if (template.attackSpeed <= 0) return 0;
+  const damage = mobDamageAtLevel(template, level);
+  return (Math.round(damage * 0.8) + Math.round(damage * 1.25)) / 2 / template.attackSpeed;
+}
+
+export function mobArmorAtLevel(template: MobTemplate, level: number): number {
+  return Math.round(template.armorPerLevel * (level - 1));
+}
+
+/** Authored combat stats for a mob template at one level, before owner inheritance. */
+export function mobLevelStats(template: MobTemplate, level: number): MobLevelStats {
+  const damage = mobDamageAtLevel(template, level);
+  return {
+    maxHp: mobMaxHpAtLevel(template, level),
+    weapon: {
+      min: Math.round(damage * 0.8),
+      max: Math.round(damage * 1.25),
+      speed: template.attackSpeed,
+    },
+    armor: mobArmorAtLevel(template, level),
+  };
+}
+
 export function createMob(id: number, template: MobTemplate, level: number, pos: Vec3): Entity {
   const e = baseEntity(id, pos);
   e.kind = 'mob';
@@ -754,19 +794,13 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.level = level;
   e.hostile = true;
   // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
-  const hpMult = template.elite ? 2.3 : 1;
-  const dmgMult = template.elite ? 1.5 : 1;
-  e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
+  const levelStats = mobLevelStats(template, level);
+  e.maxHp = levelStats.maxHp;
   e.hp = e.maxHp;
-  const dmg = (template.dmgBase + template.dmgPerLevel * (level - 1)) * dmgMult;
-  e.weapon = {
-    min: Math.round(dmg * 0.8),
-    max: Math.round(dmg * 1.25),
-    speed: template.attackSpeed,
-  };
+  e.weapon = levelStats.weapon;
   // Armor scales from level 1 like hp/dmg above: a template has no armorBase,
   // so a level-1 mob gets 0 and each level adds armorPerLevel.
-  e.stats.armor = Math.round(template.armorPerLevel * (level - 1));
+  e.stats.armor = levelStats.armor;
   e.moveSpeed = template.moveSpeed;
   e.scale = template.scale;
   e.color = template.color;

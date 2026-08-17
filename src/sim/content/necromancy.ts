@@ -10,6 +10,10 @@ export function isTemporaryNecromancyUndeadTemplateId(templateId: string): boole
   return NECROMANCY_TEMPORARY_UNDEAD_SLOTS[templateId] !== undefined;
 }
 
+export function isNecromancyUndeadTemplateId(templateId: string): boolean {
+  return templateId === 'graveguard' || isTemporaryNecromancyUndeadTemplateId(templateId);
+}
+
 export const NECROMANCY_MOBS: Record<string, MobTemplate> = {
   graveguard: {
     id: 'graveguard',

@@ -13,6 +13,7 @@ import {
 } from '../src/sim/pet/pet_commands';
 import {
   isTameableFamily,
+  necromancyPetOwnerScaling,
   PET_CATCHUP_SPEED_MULT,
   petHeelSpeed,
   petOwnerScaling,
@@ -92,6 +93,53 @@ describe('pet_scaling: owner share math', () => {
       armor: 0,
       attackPower: 0,
     });
+  });
+});
+
+describe('pet_scaling: bounded Necromancy owner share math', () => {
+  it('inherits a restrained share of Warlock health, armor, and spell power', () => {
+    expect(
+      necromancyPetOwnerScaling(
+        { maxHp: 1000, armor: 400, spellPower: 300 },
+        { maxHp: 1000, armor: 400, weaponDps: 100 },
+      ),
+    ).toEqual({
+      hp: 200,
+      armor: 100,
+      attackPower: 75,
+    });
+  });
+
+  it('caps inherited durability and damage against the servant template budget', () => {
+    expect(
+      necromancyPetOwnerScaling(
+        { maxHp: 100_000, armor: 100_000, spellPower: 100_000 },
+        { maxHp: 200, armor: 100, weaponDps: 10 },
+      ),
+    ).toEqual({
+      hp: 100,
+      armor: 50,
+      // 42 AP contributes exactly 3 DPS through AP / 14, which is 30% of base DPS.
+      attackPower: 42,
+    });
+  });
+
+  it('never returns a negative share for drained owner or servant stats', () => {
+    expect(
+      necromancyPetOwnerScaling(
+        { maxHp: -1, armor: -1, spellPower: -1 },
+        { maxHp: -1, armor: -1, weaponDps: -1 },
+      ),
+    ).toEqual({ hp: 0, armor: 0, attackPower: 0 });
+  });
+
+  it('rounds fractional shares instead of silently truncating them', () => {
+    expect(
+      necromancyPetOwnerScaling(
+        { maxHp: 503, armor: 206, spellPower: 102 },
+        { maxHp: 1000, armor: 1000, weaponDps: 100 },
+      ),
+    ).toEqual({ hp: 101, armor: 52, attackPower: 26 });
   });
 });
 
@@ -346,12 +394,41 @@ describe('pet_scaling: scope', () => {
     summonPet(sim.ctx, warlock, 'gloomshade');
     const demon = petOf(sim.ctx, wid) as AnyEntity;
     expect(demon.maxHp).toBe(templateHp('gloomshade', demon.level));
+    expect(demon.stats.armor).toBe(
+      createMob(-1, MOBS.gloomshade, demon.level, demon.pos).stats.armor,
+    );
     expect(demon.attackPower).toBe(0);
     expect(demon.petOwnerHpBonus).toBe(0);
     for (let i = 0; i < 20; i++) sim.tick();
     expect(demon.maxHp).toBe(templateHp('gloomshade', demon.level));
+    expect(demon.stats.armor).toBe(
+      createMob(-1, MOBS.gloomshade, demon.level, demon.pos).stats.armor,
+    );
     expect(demon.attackPower).toBe(0);
   });
+
+  it.each(['emberkin', 'gloomshade', 'pyre_colossus'] as const)(
+    'does not give Necromancy scaling to the %s demon',
+    (templateId) => {
+      const sim = new Sim({ seed: 6, playerClass: 'warlock', noPlayer: true }) as AnySim;
+      const wid = sim.addPlayer('warlock', 'Caster') as number;
+      sim.setPlayerLevel(20, wid);
+      const warlock = sim.entities.get(wid) as AnyEntity;
+      const demon = createMob(sim.nextId++, MOBS[templateId], 20, warlock.pos) as AnyEntity;
+      const authored = createMob(-1, MOBS[templateId], 20, warlock.pos) as AnyEntity;
+      demon.ownerId = wid;
+      demon.hostile = false;
+      sim.addEntity(demon);
+
+      applyPetOwnerScaling(sim.ctx, demon);
+
+      expect({
+        maxHp: demon.maxHp,
+        armor: demon.stats.armor,
+        attackPower: demon.attackPower,
+      }).toEqual({ maxHp: authored.maxHp, armor: authored.stats.armor, attackPower: 0 });
+    },
+  );
 });
 
 describe('pet_scaling: heeling a mounted owner', () => {

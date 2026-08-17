@@ -38,6 +38,7 @@
 import { hasUnbreakableMovementLock } from '../combat/cc';
 import { clearPacklordState } from '../combat/hunter_packlord';
 import { isTemporaryNecromancyUndead } from '../combat/necromancy';
+import { isNecromancyUndeadTemplateId } from '../content/necromancy';
 import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import { consumeSelectedInventorySlot } from '../item_copy_ref';
@@ -53,6 +54,7 @@ import {
   PET_GROWL_INTERVAL,
   type PetMode,
 } from '../types';
+import { nonPlayerMaxHpAfterAura } from './non_player_hp';
 import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
 import { isTameableFamily } from './pet_scaling';
 import { isPrimaryOwnedPetEntity } from './pet_selection';
@@ -101,12 +103,6 @@ function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
 // respawnMob paths consume applyNonPlayerStatAura/clearNonPlayerStatAuras via the seam).
 // -------------------------------------------------------------------------
 
-function nonPlayerAuraHp(aura: Aura): number {
-  if (aura.kind === 'buff_sta') return aura.value * 10;
-  if (aura.kind === 'buff_allstats') return aura.value * 10;
-  return 0;
-}
-
 export function applyNonPlayerStatAura(
   _ctx: SimContext,
   target: Entity,
@@ -114,22 +110,11 @@ export function applyNonPlayerStatAura(
   direction: 1 | -1,
 ): void {
   if (target.kind === 'player') return;
-  let hpDelta = nonPlayerAuraHp(aura) * direction;
-  // Percent stamina raid buffs (Power Word: Fortitude via buff_sta_pct, Mark of the
-  // Wild via buff_stats_pct) on a controlled pet scale its HP pool by the percent.
-  // Value is integer percent POINTS; derived symmetrically so an apply/remove cycle
-  // restores the original pool exactly. (buff_allstats_pct is Resurrection Sickness'
-  // signed-fraction drain, a player-only aura, so it never reaches this pet path.)
-  if (aura.kind === 'buff_sta_pct' || aura.kind === 'buff_stats_pct') {
-    const pct = aura.value / 100;
-    hpDelta =
-      direction === 1
-        ? Math.round(target.maxHp * pct)
-        : -Math.round((target.maxHp / (1 + pct)) * pct);
-  }
+  const nextMaxHp = nonPlayerMaxHpAfterAura(target.maxHp, aura, direction);
+  const hpDelta = nextMaxHp - target.maxHp;
   if (hpDelta === 0) return;
   const hpFrac = target.maxHp > 0 ? target.hp / target.maxHp : 1;
-  target.maxHp = Math.max(1, target.maxHp + hpDelta);
+  target.maxHp = nextMaxHp;
   target.hp = target.dead
     ? 0
     : Math.max(1, Math.min(target.maxHp, Math.round(target.maxHp * hpFrac)));
@@ -279,8 +264,20 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
 }
 
 export function syncPetLevel(ctx: SimContext, owner: Entity): void {
-  const pet = petOf(ctx, owner.id, true);
-  if (!pet || pet.level === owner.level) return;
+  for (const pet of ctx.entities.values()) {
+    if (
+      pet.kind !== 'mob' ||
+      pet.ownerId !== owner.id ||
+      (!isPrimaryOwnedPetEntity(pet, owner.id) && !isNecromancyUndeadTemplateId(pet.templateId))
+    ) {
+      continue;
+    }
+    syncOwnedPetLevel(ctx, owner, pet);
+  }
+}
+
+function syncOwnedPetLevel(ctx: SimContext, owner: Entity, pet: Entity): void {
+  if (pet.level === owner.level) return;
   const template = MOBS[pet.templateId];
   if (!template) return;
   const hpFrac = pet.maxHp > 0 ? pet.hp / pet.maxHp : 1;
@@ -292,11 +289,11 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   pet.moveSpeed = scaled.moveSpeed;
   pet.scale = warlockPetScaleAtLevel(template, owner.level);
   pet.color = scaled.color;
-  pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
   // maxHp/armor were just rebuilt from the template alone, so the owner's share is
   // gone with them: drop the tracked delta before re-deriving it at the new level.
   pet.petOwnerHpBonus = 0;
   applyPetOwnerScaling(ctx, pet);
+  pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
 }
 
 function cleanPetName(raw: string): string | null {

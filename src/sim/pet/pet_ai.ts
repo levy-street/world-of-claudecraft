@@ -38,8 +38,9 @@ import { lineOfSightClear } from '../colliders';
 import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
 import { hunterPetFerocityDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
+import { isNecromancyUndeadTemplateId } from '../content/necromancy';
 import { MOBS } from '../data';
-import { pctValue } from '../entity';
+import { mobArmorAtLevel, mobMaxHpAtLevel, mobWeaponDpsAtLevel, pctValue } from '../entity';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
@@ -57,7 +58,13 @@ import {
   RUN_SPEED,
   steadyAngleTo,
 } from '../types';
-import { isTameableFamily, petHeelSpeed, petOwnerScaling } from './pet_scaling';
+import { nonPlayerMaxHpWithAuras } from './non_player_hp';
+import {
+  isTameableFamily,
+  necromancyPetOwnerScaling,
+  petHeelSpeed,
+  petOwnerScaling,
+} from './pet_scaling';
 import { petCanForceTaunt } from './pet_taunt_gate';
 import { tryUseWarlockPetSkill } from './warlock_pet_skills';
 
@@ -351,40 +358,49 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
 }
 
 /**
- * Re-derive the owner-inherited half of a hunter pet's stats (pet/pet_scaling.ts).
+ * Re-derive owner-inherited pet stats (pet/pet_scaling.ts).
  *
  * Idempotent, so updatePet can call it every tick and pick up a gear swap the moment
- * it lands: armor and attack power are recomputed from the template base plus the
- * current share, while the health share is swapped as a DELTA rather than recomputed,
- * because the raid stat auras (applyNonPlayerStatAura) write maxHp too and rebuilding
- * the pool from the template would silently eat their contribution.
+ * it lands. Necromancy rebuilds health from the authored pool, owner share, and active
+ * stat auras so its caps stay anchored while percentage stamina changes. Hunter
+ * health keeps its established delta-based behavior.
  *
- * Hunter-only on purpose. A warlock demon and the mage Water Elemental are authored
- * as pets with their own tuned pools; a tamed beast is a wild mob template that was
- * never balanced to be a companion, which is the gap this closes.
- *
- * KNOWN LIMITATION, pre-existing and deliberately not addressed here: a PERCENT
- * stamina aura (buff_sta_pct / buff_stats_pct) removes itself by taking a cut of the
- * pet's CURRENT maxHp (applyNonPlayerStatAura), which is only exact if the pool did
- * not move while the buff was up. Re-deriving the share inside a buff window
- * therefore leaves a small residue (measured at 9 hp on a 587 pool). syncPetLevel
- * already had the same asymmetry, and worse, since it rebuilds the pool from the
- * template and drops the aura's contribution outright. Making the removal exact
- * means having that aura record the hp it actually added, which is a change to the
- * shared non-player aura bookkeeping (warlock pets included) and belongs in its own
- * commit with its own golden re-mint, not in a hunter balance pass.
+ * Scope is explicit: hunter tameable families use the classic share, Necromancy
+ * servants use bounded Warlock shares, and ordinary Warlock demons plus the mage
+ * Water Elemental keep their authored pools.
  */
 export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
   if (pet.ownerId === null) return;
   const meta = ctx.players.get(pet.ownerId);
-  if (meta?.cls !== 'hunter') return;
   const owner = ctx.entities.get(pet.ownerId);
   if (!owner) return;
   const template = MOBS[pet.templateId];
+  if (!template || !meta) return;
+  if (meta.cls === 'warlock' && isNecromancyUndeadTemplateId(pet.templateId)) {
+    const authoredMaxHp = mobMaxHpAtLevel(template, pet.level);
+    const authoredArmor = mobArmorAtLevel(template, pet.level);
+    const share = necromancyPetOwnerScaling(
+      {
+        maxHp: owner.maxHp,
+        armor: owner.stats.armor,
+        spellPower: owner.spellPower,
+      },
+      {
+        maxHp: authoredMaxHp,
+        armor: authoredArmor,
+        weaponDps: mobWeaponDpsAtLevel(template, pet.level),
+      },
+    );
+    pet.attackPower = share.attackPower;
+    pet.stats.armor = authoredArmor + share.armor;
+    applyNecromancyOwnerHpShare(pet, authoredMaxHp, share.hp);
+    return;
+  }
+  if (meta.cls !== 'hunter') return;
   // Only a pet the hunter could actually have tamed inherits. The owner-class check
   // alone would also catch a demon parked on a hunter, which cannot happen in play
   // but is not what this models.
-  if (!template || !isTameableFamily(template.family)) return;
+  if (!isTameableFamily(template.family)) return;
   const share = petOwnerScaling({
     maxHp: owner.maxHp,
     armor: owner.stats.armor,
@@ -392,9 +408,21 @@ export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
   });
   pet.attackPower = share.attackPower;
   pet.stats.armor = Math.round(template.armorPerLevel * (pet.level - 1)) + share.armor;
-  const gained = share.hp - pet.petOwnerHpBonus;
+  applyPetOwnerHpShare(pet, share.hp);
+}
+
+function applyNecromancyOwnerHpShare(pet: Entity, authoredMaxHp: number, nextShare: number): void {
+  const nextMaxHp = nonPlayerMaxHpWithAuras(authoredMaxHp + nextShare, pet.auras);
+  const gained = nextMaxHp - pet.maxHp;
+  pet.petOwnerHpBonus = nextShare;
+  pet.maxHp = nextMaxHp;
+  pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, pet.hp + Math.max(0, gained)));
+}
+
+function applyPetOwnerHpShare(pet: Entity, nextShare: number): void {
+  const gained = nextShare - pet.petOwnerHpBonus;
   if (gained === 0) return;
-  pet.petOwnerHpBonus = share.hp;
+  pet.petOwnerHpBonus = nextShare;
   pet.maxHp = Math.max(1, pet.maxHp + gained);
   // Growing hands the pet the new headroom outright; shrinking clamps it into the
   // smaller pool. Either way a dead pet stays dead rather than being revived here.

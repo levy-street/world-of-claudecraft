@@ -1,4 +1,5 @@
-// Owner -> pet stat inheritance for hunter beast pets, plus the heel-speed floor.
+// Owner -> pet stat inheritance for hunter beasts and Necromancy servants, plus
+// the heel-speed floor.
 //
 // A tamed pet is a clone of the wild mob it came from, so before this module its
 // power was frozen at tame time: health and damage came only from the template's
@@ -12,7 +13,8 @@
 // Classic-era hunter pet scaling answers both by making the pet a SHARE of its
 // owner rather than a snapshot of a mob: the pet inherits a fraction of the
 // hunter's attack power, health, and armor, and re-derives whenever the hunter's
-// stats change. The shares below follow that model.
+// stats change. Necromancy uses the same seam with smaller, explicitly capped
+// shares so Warlock equipment matters without erasing each undead template's role.
 //
 // This is a pure leaf (no SimContext, no rng, no clock): pet_commands/pet_ai own
 // the application, and tests import these functions directly.
@@ -81,6 +83,17 @@ export const PET_OWNER_ARMOR_SHARE = 0.35;
  */
 export const PET_OWNER_AP_SHARE = 0.22;
 
+// Necromancy gear inheritance is deliberately smaller than an unbounded owner stat
+// copy. The current level 20 Warlock BiS reference has 810 health, 608 armor, and 99
+// spell power. These shares add useful growth at that point while the per-servant caps
+// below keep future equipment from replacing each servant's authored role and budget.
+export const NECROMANCY_OWNER_HP_SHARE = 0.2;
+export const NECROMANCY_OWNER_ARMOR_SHARE = 0.25;
+export const NECROMANCY_OWNER_SPELL_POWER_TO_AP_SHARE = 0.25;
+export const NECROMANCY_HP_BONUS_CAP = 0.5;
+export const NECROMANCY_ARMOR_BONUS_CAP = 0.5;
+export const NECROMANCY_DPS_BONUS_CAP = 0.3;
+
 /**
  * How much faster than its owner a heeling pet may run while catching up. The
  * pet has to close ground it already lost, so it needs headroom above the
@@ -105,6 +118,20 @@ export interface PetScalingOwner {
   rangedPower: number;
 }
 
+/** Warlock fields used by bounded Necromancy servant inheritance. */
+export interface NecromancyScalingOwner {
+  maxHp: number;
+  armor: number;
+  spellPower: number;
+}
+
+/** Authored servant budget used to cap owner-derived growth. */
+export interface NecromancyPetBase {
+  maxHp: number;
+  armor: number;
+  weaponDps: number;
+}
+
 /**
  * The stats a pet inherits from its owner. Pure and idempotent: callers re-derive
  * from the template base plus this, never accumulate onto a previous result.
@@ -114,6 +141,36 @@ export function petOwnerScaling(owner: PetScalingOwner): PetOwnerScaling {
     hp: Math.max(0, Math.round(owner.maxHp * PET_OWNER_HP_SHARE)),
     armor: Math.max(0, Math.round(owner.armor * PET_OWNER_ARMOR_SHARE)),
     attackPower: Math.max(0, Math.round(owner.rangedPower * PET_OWNER_AP_SHARE)),
+  };
+}
+
+/**
+ * Bounded stats a Necromancy servant inherits from its Warlock.
+ *
+ * Attack power is the shared pet combat channel even for Bone Mage shadow bolts.
+ * One AP contributes 1 / 14 weapon DPS, so the damage cap converts 30% of the
+ * servant's authored weapon DPS back into the equivalent AP budget.
+ */
+export function necromancyPetOwnerScaling(
+  owner: NecromancyScalingOwner,
+  petBase: NecromancyPetBase,
+): PetOwnerScaling {
+  const baseHp = Math.max(0, petBase.maxHp);
+  const baseArmor = Math.max(0, petBase.armor);
+  const baseWeaponDps = Math.max(0, petBase.weaponDps);
+  return {
+    hp: Math.min(
+      Math.max(0, Math.round(owner.maxHp * NECROMANCY_OWNER_HP_SHARE)),
+      Math.round(baseHp * NECROMANCY_HP_BONUS_CAP),
+    ),
+    armor: Math.min(
+      Math.max(0, Math.round(owner.armor * NECROMANCY_OWNER_ARMOR_SHARE)),
+      Math.round(baseArmor * NECROMANCY_ARMOR_BONUS_CAP),
+    ),
+    attackPower: Math.min(
+      Math.max(0, Math.round(owner.spellPower * NECROMANCY_OWNER_SPELL_POWER_TO_AP_SHARE)),
+      Math.round(baseWeaponDps * 14 * NECROMANCY_DPS_BONUS_CAP),
+    ),
   };
 }
 

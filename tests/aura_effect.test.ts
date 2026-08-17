@@ -318,6 +318,16 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.afflictionJudgment',
       nums: { eyePct: 100, sentencePct: 20, refund: 20 },
     });
+    expect(desc({ kind: 'affliction_eye', value: 1, tickInterval: 2.5 })).toEqual({
+      key: 'hudChrome.auraEffect.afflictionEye',
+      nums: { interval: 2.5, pct: 100 },
+    });
+    expect(desc({ kind: 'affliction_eye_secondary', value: 0.5 })).toEqual({
+      key: 'hudChrome.auraEffect.afflictionEyeSecondary',
+      nums: { doomPct: 50, echoPct: 35 },
+    });
+    expect(hudChromeStrings.auraEffect.afflictionEye).toContain('Cannot be dispelled');
+    expect(hudChromeStrings.auraEffect.afflictionEyeSecondary).toContain('Cannot be dispelled');
     expect(desc({ kind: 'desolation', value: 2, stacks: 2 })).toEqual({
       key: 'hudChrome.auraEffect.desolation',
       nums: { charges: 2, castPct: 30 },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runWarlockBalanceProbe } from '../scripts/warlock_balance_probe';
+import { runWarlockBalanceProbe, WARLOCK_FULL_BIS_GEAR } from '../scripts/warlock_balance_probe';
 
 // The sub-200 anchor gate (owner ruling, 2026-08-06): every warlock spec lands
 // at or under 200 DPS at 120 seconds in full BiS (no legendary is equippable by
@@ -13,6 +13,23 @@ import { runWarlockBalanceProbe } from '../scripts/warlock_balance_probe';
 const ANCHOR_SEEDS = [42, 1337, 9001, 777] as const;
 
 describe('warlock sub-200 BiS anchor at 120 seconds', () => {
+  it('uses the canonical full-BiS Warlock loadout', () => {
+    expect(WARLOCK_FULL_BIS_GEAR).toEqual({
+      helmet: 'sunbone_oracles_crown',
+      neck: 'zense_meridian',
+      shoulder: 'sunken_court_mantle',
+      chest: 'shroud_of_the_gravewyrm',
+      mainhand: 'heroic_deathless_heartwood',
+      offhand: 'heroic_wraithfire_orb',
+      gloves: 'shadowpulse_handwraps',
+      waist: 'sash_of_the_sunken_court',
+      legs: 'necromancers_legwraps',
+      feet: 'shadowpulse_slippers',
+      ring1: 'architects_cornerstone',
+      ring2: 'zyzzs_deathless_signet',
+    });
+  });
+
   it.each(['demonology'] as const)(
     '%s stays at or under the 200 DPS anchor with a healthy two-minute economy',
     (spec) => {
@@ -20,6 +37,7 @@ describe('warlock sub-200 BiS anchor at 120 seconds', () => {
       const mean = (key: 'dps' | 'starvedPct') =>
         rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
 
+      for (const row of rows) expect(row.damageByAbility.Graveguard).toBeGreaterThan(0);
       expect(mean('dps')).toBeLessThanOrEqual(200);
       // Floor 150 to 140 with the 2026-08-07 top-end trim round: the isolated
       // head benches below the composed tree, and the sanctioned cuts land

@@ -2803,9 +2803,9 @@ export const hudChromeStrings = {
     resourceCount: '{value} of {max}',
     formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
     afflictionEye:
-      'Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation',
+      'Cannot be dispelled; Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation',
     afflictionEyeSecondary:
-      'Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage',
+      'Cannot be dispelled; effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage',
     afflictionAccomplice:
       'Qualifying damage grants {value} Condemnation, at most once every {interval} sec',
     afflictionViolence:
