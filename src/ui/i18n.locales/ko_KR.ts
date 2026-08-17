@@ -10969,6 +10969,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     '이제야 창고가 가득하군. 여기 자네 삯일세. 가방이 또 묵직해지면 다시 오게.',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '야생 고기 납품',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': '주방 밀 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    '빵은 저 혼자 구워지지 않는다네, {playerName}. 내 밀가루 통이 바닥을 긁고 있어. 골짜기 밀 여덟 단을 가져오면 몽땅 정직한 값으로 사겠네. 자네 손으로 길렀든 시장에서 샀든 상관없어, 갈리기만 하면 되니까.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    '잘 마른 낟알이군, 양도 넉넉하고. 여기 자네 삯일세, 정확히 세어 두었네. 다음 수확이 나오면 어느 문을 두드려야 할지 알겠지.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': '골짜기 밀 납품',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': '주방 쌀 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    '습지 사람들은 자기네 쌀이 최고라고 우기지, {playerName}. 왜 그런지 알아볼 참이야. 습지 쌀 다섯 되를 가져오면 여기 돈이 기다리고 있네. 길에서 젖지 않게 조심하게. 젖은 쌀은 죽이고, 나는 죽을 주문한 적이 없으니까.',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    '통통하고 잘 말랐군, 낟알 하나하나가. 여기 자네 돈일세. 습지가 계속 내주는 한, 나도 계속 내겠네.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': '습지 쌀 납품',
   'entities.quests.q_prof_workorder_loom.title': '베틀 작업 의뢰',
   'entities.quests.q_prof_workorder_loom.text':
     '베틀이 비었고, 노는 손은 대낮을 허비하지, {playerName}. 거미 비단 여섯 타래를 가져오면 동전 한 닢까지 헤아려 공정한 삯을 치러 주겠다.',

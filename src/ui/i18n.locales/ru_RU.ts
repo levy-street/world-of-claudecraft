@@ -11165,6 +11165,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     'Вот теперь кладовая полна. Вот твоя плата. Возвращайся, когда сумки снова потяжелеют.',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': 'Мясо дичи доставлено',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': 'Наряд на работу: кухни, пшеница',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    'Хлеб сам себя не испечет, {playerName}, а мои лари с мукой скребут по дну. Принеси мне восемь снопов долинной пшеницы, и я честно заплачу за всю партию. Сам вырастил или купил на рынке, мне все равно, лишь бы мололось.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    'Сухое доброе зерно, и вдоволь. Вот твоя плата, отсчитана до монеты. Когда подойдет следующий урожай, ты знаешь, в какую дверь стучать.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': 'Долинная пшеница доставлена',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': 'Наряд на работу: кухни, рис',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    'Болотный люд клянется своим рисом, {playerName}, и я намерен выяснить почему. Добудь мне пять мер болотного риса, и здесь тебя будут ждать деньги. И смотри, не намочи его в дороге: мокрый рис это каша, а каши я не заказывал.',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    'Крупный и сухой, каждое зернышко. Вот твои деньги. Пока болото родит, я плачу.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': 'Болотный рис доставлен',
   'entities.quests.q_prof_workorder_loom.title': 'Наряд на работу: ткацкий станок',
   'entities.quests.q_prof_workorder_loom.text':
     'Станок стоит без дела, а праздные руки тратят дневной свет впустую, {playerName}. Принеси мне шесть мотков паучьего шёлка, и я заплачу по честной ставке, отсчитанной до последней медной монеты.',

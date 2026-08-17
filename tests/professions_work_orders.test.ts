@@ -1,6 +1,8 @@
 // Repeatable craft work orders (Professions 2.0): the six masters each
 // take a stack of their craft's staple material for coin on a fixed cadence
-// (WORK_ORDER_CADENCE_TICKS). This suite pins the economics as a deliberate,
+// (WORK_ORDER_CADENCE_TICKS); since the farming go-live the kitchens master
+// posts three orders (game meat plus the two early-tier crops), each on its
+// own cadence key. This suite pins the economics as a deliberate,
 // live-data-derived contract so a later material sell-value retune or a count
 // change reds it on purpose:
 //   - copperReward == floor(0.5 * summed vendor sell value of the requested
@@ -23,6 +25,9 @@ import { Sim } from '../src/sim/sim';
 const WORK_ORDERS: { questId: string; master: string }[] = [
   { questId: 'q_prof_workorder_forge', master: 'forgemistress_darva' },
   { questId: 'q_prof_workorder_kitchens', master: 'cook_marlow' },
+  // Farming go-live: the two early-tier produce orders, same master, same contract.
+  { questId: 'q_prof_workorder_kitchens_wheat', master: 'cook_marlow' },
+  { questId: 'q_prof_workorder_kitchens_rice', master: 'cook_marlow' },
   { questId: 'q_prof_workorder_loom', master: 'weaver_ottilie' },
   { questId: 'q_prof_workorder_toolworks', master: 'tinker_gizzel' },
   { questId: 'q_prof_workorder_tannery', master: 'tanner_hesk' },

@@ -10502,6 +10502,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     '这才叫满仓。这是你的酬劳。等你的行囊又沉了，就再来。',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '已交付野味肉',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': '厨房小麦工单',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    '面包不会自己烤出来，{playerName}，我的面粉柜都快见底了。给我送来八捆谷地小麦，我按实价付你整批的钱。是你亲手种的还是从市场买的，我不在乎，磨得出粉就行。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    '好干爽的粮食，还不少。这是你的酬劳，一枚不差。下一茬收上来的时候，你知道该敲哪扇门。',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': '已交付谷地小麦',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': '厨房稻米工单',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    '沼泽人对自家的米赞不绝口，{playerName}，我倒要弄明白是为什么。给我弄来五升沼泽稻米，钱就在这儿等着你。路上留神别弄湿了：湿米就是粥，我可没点过粥。',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    '粒粒饱满干爽。这是你的钱。只要沼泽还长米，我就一直收。',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': '已交付沼泽稻米',
   'entities.quests.q_prof_workorder_loom.title': '织机工单',
   'entities.quests.q_prof_workorder_loom.text':
     '织机空转，闲着的手白白浪费日头，{playerName}。给我带来六束蜘蛛丝，我会按公道的价钱付你，一个铜板都算清楚。',

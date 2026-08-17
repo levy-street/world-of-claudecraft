@@ -15426,6 +15426,26 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "厨房小麦工单",
+        "text": "面包不会自己烤出来，{playerName}，我的面粉柜都快见底了。给我送来八捆谷地小麦，我按实价付你整批的钱。是你亲手种的还是从市场买的，我不在乎，磨得出粉就行。",
+        "completion": "好干爽的粮食，还不少。这是你的酬劳，一枚不差。下一茬收上来的时候，你知道该敲哪扇门。",
+        "objectives": {
+          "0": {
+            "label": "已交付谷地小麦"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "厨房稻米工单",
+        "text": "沼泽人对自家的米赞不绝口，{playerName}，我倒要弄明白是为什么。给我弄来五升沼泽稻米，钱就在这儿等着你。路上留神别弄湿了：湿米就是粥，我可没点过粥。",
+        "completion": "粒粒饱满干爽。这是你的钱。只要沼泽还长米，我就一直收。",
+        "objectives": {
+          "0": {
+            "label": "已交付沼泽稻米"
+          }
+        }
+      },
       "q_prof_workorder_loom": {
         "title": "织机工单",
         "text": "织机空转，闲着的手白白浪费日头，{playerName}。给我带来六束蜘蛛丝，我会按公道的价钱付你，一个铜板都算清楚。",
