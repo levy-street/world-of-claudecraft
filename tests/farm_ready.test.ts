@@ -312,12 +312,15 @@ describe('the ready notice on the 1 Hz sweep', () => {
 });
 
 describe('the ready notice across two farmers in one sim', () => {
-  it('announces each farmer separately, in player-map insertion order, on ONE sweep tick', () => {
+  it('announces each farmer separately, first-joined first, on ONE sweep tick', () => {
     // Deviation (bc): the sweep walks ctx.players in insertion order and
     // draws nothing, so two farmers whose plots finish inside the same second
     // hear two personal notices on the same tick, first-joined first. Pinned
-    // so a future sharding or filtering of the loop cannot silently reorder
-    // (or merge) the per-player events.
+    // so a future sharding or filtering of the loop cannot silently reverse
+    // or merge the per-player events. (Honest scope: pids are allocated
+    // ascending by join, so insertion order and pid order coincide here by
+    // construction; a pid-sorted loop would pass this arm. What it pins is
+    // the observable: two separate events, one tick, first-joined first.)
     let nowMs = START_MS;
     const sim = new Sim({
       seed: 77,
