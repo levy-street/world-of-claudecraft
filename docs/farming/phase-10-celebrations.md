@@ -11,6 +11,14 @@ farming loop the moment this merges: any harvesting player can roll golden_harve
 every farming deed and the farming-100 title become earnable immediately. No dormant
 surface, no reachability change to anything that already shipped.
 
+V0.39.0 SYNC NOTE (2026-08-17, the seventeenth absorb, recorded during Phase 9): the
+release's castles feature re-pinned tests/deeds_content.test.ts to 273 deeds / 3155
+total renown / 11 exploration titles (two new walk-in castle visit deeds,
+exp_the_last_keep and exp_dawnhold_castle at renown 5 each) and re-baselined its frozen
+catalog sha; this phase re-pins FROM those totals, not the ones the phase file was
+authored against, and the two castle deeds sit in DEED_ART_PENDING (src/ui/icons.ts),
+the release's own procedural-fallback ledger beside ITEM_ART_PENDING.
+
 ### Starter Prompt
 
 ```

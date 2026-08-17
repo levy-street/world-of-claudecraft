@@ -23,7 +23,7 @@
 | Phase 7 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-14 | 2026-08-14 |
 | Phase 8 (Harvest Journal) | DONE 2026-08-14 | fix/farming-phase-08-harvest-journal (merge hash in the Phase 8 notes tail) | 2 BLOCKING (language fan-out registry, focus-across-rebuild) found by the frontend review and fixed in-phase; 0 BLOCKING elsewhere across parity, architecture, hot-path, and qa-checklist; the parity gap (no golden farmReady) closed with a deliberate re-mint |
 | Phase 8 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-08-qa, merged --no-ff as 327fa964bd; 0 BLOCKING across eight lanes plus a verification round; one behavior fix (deviation (be), the simplified-mode journal entry), the (bd) ledger corrected, the guide controls row landed, the coverage gaps pinned, 24/24 mutants killed |
-| Phase 9 (world presence, go-live) | not started | | |
+| Phase 9 (world presence, go-live) | IN PROGRESS 2026-08-17 | fix/farming-phase-09-world-presence (seventeenth absorb 89030e4e0f first) | |
 | Phase 9 QA | not started | | |
 | Phase 10 (celebrations) | not started | | |
 | Phase 10 QA | not started | | |
@@ -1884,6 +1884,49 @@ seeds, the intro quest and go-live, with the ready notices going live the
 moment seeds are obtainable; carry the (ap), (bb), and (be) maintainer
 reads, the pin-art debt, the shard-weight harvest at go-public, and the
 go-live checklist additions recorded in earlier phases.
+
+### Phase 9 pre-flight: the seventeenth absorb (2026-08-17)
+Branch fix/farming-phase-09-world-presence off feature/farming-plan at
+26f330cea2 (the Phase 8 QA tip). origin/release/v0.39.0 had moved to
+f48c7a3a9b (80 commits, 952 files, 74-file farming intersection; same
+minor version, two-digit intersection: a regular absorb, not the 06b
+shape). Merge 89030e4e0f, then three heals and two shared shapes:
+d07b578e5d (farm-props lockfile seal, the third firing: byte-level restamp
+of both stamp sites in all fifteen GLBs, sizes held, sha pins
+re-recorded, assets manifest regen), 58d4332993 (farming_session golden
+re-mint for the castles' one static entity, machine-classified as a pure
+entity-id +1 shift: 111 leaves, draws/drawDigest/ticks/coverage
+byte-identical, md5 50a2e54c to 8fe57fe3, the (am) shape), 11e0940da0 (the
+release's icon-art hotbar-item seal at 72 painted failed on the merged
+tree only, farming's twelve hotbar-eligible pending-art items; healed by
+the ART-SUBJECT rule with a hard pending literal 12, the release literal
+and sealed record byte-identical: a new (al)-class member, see the
+state.md (al) paragraph), 2953d6ccb2 (the QuestObjective 'farm' member)
+and 2f22f9a5e9 (the NpcDef `farmer` flag), landed alone so the three
+build slices compile against one shape. Conflicts (40) by doctrine: the
+renderer.ts import block, the renderer ceiling at the exact merged count
+13660 (both parents' extractions compose), the items catalog
+(dawnhold_posy ahead of the farming block), 25 regenerated i18n bundles,
+the char_window test name, the item art audit literals 823/838 with
+pendingArtCount 39 kept, the (al) evidence family and the Eastbrook polish
+provenance re-minted through their CLIs. Baselines held with zero
+movement: commands 202/215, IWorld 329 = 88 + 241, facets 34, delta keys
+87; wiki:content and i18n:gen byte-identical; ci:changed rc 0; the
+farming battery 29 files 807 green; parity 216 green after the isolated
+re-mint. Monolith headroom after the absorb: hud.ts 5, renderer.ts 0,
+sim.ts 1, main.ts 1, server/game.ts 104 (Phase 9 touches none of the four).
+Release-merge audit as a 4-lane Workflow, 4/4 delivered first try: overlaps
+CLEAN, sim arms CLEAN, world content 0 BLOCKING with three should-fixes
+taken as ledger notes (the seventeenth-absorb entry itself; the Phase 10
+deed totals now 273 / 3155 / 11 exploration titles; the release moved the
+hedge_knight camp to (306,872) r 8, 27 yd west of bed_evergarden_1, so the
+tier-4 farmer sits east of the beds), i18n and evidence CLEAN with the one
+BLOCKING (the hotbar seal) fixed as 11e0940da0. Traps: (1) `git checkout
+--theirs` on a conflicted pin suite discards the branch's non-conflicting
+arms; restore with `git checkout -m` and resolve hunk by hunk. (2) The
+release re-records ITS goldens for a static-entity shift but can never
+re-record the branch-only farming_session: expect the (am) re-mint on any
+absorb that adds static world content, classify before minting.
 
 ### Phase 9
 (not started)

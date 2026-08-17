@@ -4,7 +4,62 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 8 QA done 2026-08-17 (PASS-WITH-FOLLOWUPS; branch
+Current phase: Phase 9 (world presence, go-live) IN PROGRESS on
+fix/farming-phase-09-world-presence off feature/farming-plan at 26f330cea2.
+The SEVENTEENTH absorb opened it (2026-08-17): merge 89030e4e0f of
+origin/release/v0.39.0 tip f48c7a3a9b (80 commits, 952 files, 74-file
+farming intersection; same minor version and a two-digit intersection, so
+a regular absorb, not the 06b shape). Headline systems: the castles feature
+(Dawnhold Castle rebuilt in Evergarden with real walkable grounds, the Last
+Keep and the Ashen Bulwark in Drakelands, castle plans on the zone map,
+castle-visit deeds), the icon-art deep pass (painted runtime identities,
+the release_v039_icon_art seal suite), the 0.38.2 and 0.38.3 hotfixes
+(resurrection range and line of sight, the Sanctum gold farm, the composer
+NaN scrub), and the interior_light_rig extraction from renderer.ts. NO
+server/ file moved in the delta. Conflicts (40) resolved by doctrine:
+renderer.ts import block (release interior_light_rig import kept, the
+delve-kit import stays dropped to the branch's delve_interior_scheduler
+extraction), the renderer monolith ceiling at the exact merged count 13660
+(below both parent pins, the two extractions compose), the items catalog
+(dawnhold_posy ahead of the farming block, release wire tokens keep shipped
+positions), the resolved i18n bundles regenerated, the char_window test
+name unioned, the item art audit at the release's 823/838 with the branch's
+ART-SUBJECT rule and pendingArtCount 39, the (al) evidence family and the
+Eastbrook polish provenance re-minted through their CLIs on the merged
+tree. Heals: d07b578e5d (the farm-props lockfile seal fired a THIRD time:
+same byte-level restamp of both stamp sites in all fifteen GLBs, sizes
+held, sha pins re-recorded, assets manifest regen), 58d4332993 (the
+farming_session golden re-minted for the castles' one static entity: the
+release re-recorded all ITS goldens for the same +1 id shift, a4124b9152;
+machine-classified before minting: 111 leaves, every one an entity id +1
+or a digest folding those ids, draws/drawDigest/ticks/coverage
+byte-identical; md5 50a2e54c to 8fe57fe3, the (am) shape), 11e0940da0 (a
+NEW (al)-class collision: the release's icon-art second pass SEALS the live
+hotbar-item inventory at 72 painted, and farming's twelve hotbar-eligible
+pending-art items, the eight dishes and the four hoes, failed it on the
+merged tree only; the guard now applies the ART-SUBJECT rule, live minus
+ITEM_ART_PENDING, with the pending hotbar count a hard literal 12 and every
+pending id checked to ship no webp; the release literal 72 and the sealed
+record stand byte-identical; the hotbar paints pending ids through
+iconDataUrl, so no player-facing gap). Count baselines HELD: commands
+202/215, IWorld 329 = 88 + 241, facets 34, delta keys 87; wiki:content and
+i18n:gen byte-identical; ci:changed rc 0. Monolith headroom after the
+absorb: hud.ts 5 (19483/19488), renderer.ts 0 (13660/13660), sim.ts 1,
+main.ts 1, server/game.ts 104. Release-merge audit (4-lane Workflow, 4/4
+delivered): overlaps CLEAN (line-level both directions), sim arms CLEAN
+(updateFarming and notifyFarmReady in place, no reorder; the release's
+casting_lifecycle resurrection gates inert for the FARMING_CAST_ID cast),
+world content 0 BLOCKING (the Dawnhold pad x 232..300 z 854..944 is 41 yd
+from the nearest Evergarden bed; the flood from Hedgewick passes with the
+castle colliders in the set; the zone-map castle plans paint under the
+farm badges; the release MOVED the hedge_knight camp to (306,872) r 8, 27
+yd west of bed_evergarden_1: seat the tier-4 farmer EAST of the beds; the
+deeds totals Phase 10 re-pins moved to 273 deeds / 3155 renown / 11
+exploration titles), i18n and evidence CLEAN. Phase 9's shared shapes
+landed first on the phase branch: 2953d6ccb2 the QuestObjective 'farm'
+member (action plant|harvest, cropId narrowing, marker-only patchId,
+harvest credits on every outcome) and 2f22f9a5e9 the NpcDef `farmer` flag.
+Prior: Phase 8 QA done 2026-08-17 (PASS-WITH-FOLLOWUPS; branch
 fix/farming-phase-08-qa off feature/farming-plan, merged --no-ff as
 327fa964bd; next is Phase 9, world presence and
 go-live, docs/farming/phase-09-*.md starter). Phase 8 itself was done
@@ -283,8 +338,9 @@ visit or a punishment for lateness is violating the design, not tuning it.
   every push-and-open-a-PR line in the phase files, and state.md wins on
   contradiction): ALL farming work stays local until the user declares the feature
   done. No pushes, no PRs, for anything farming. The integration branch is the LOCAL
-  `feature/farming-plan` in this worktree (it carries docs/farming/ and is based on
-  release/v0.36.0). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
+  `feature/farming-plan` in this worktree (it carries docs/farming/; originally based
+  on release/v0.36.0, it has absorbed every newer release tip since, release/v0.39.0
+  f48c7a3a9b as of the seventeenth absorb). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
   LOCAL `feature/farming-plan` (never off a bare release tip, which lacks the packet);
   if a newer `release/**` tip exists than the branch has absorbed, merge it INTO the
   phase branch first (release-merge-audit for a nontrivial merge, PLUS the
@@ -339,7 +395,7 @@ visit or a punishment for lateness is violating the design, not tuning it.
   work in `~/Documents/woc-farming-plan`.
 - Never set `ALLOW_DEV_COMMANDS=1` outside dev. Never commit secrets.
 
-## Tick and hook points (verified against release/v0.36.0)
+## Tick and hook points (verified against release/v0.36.0; re-verified on the merged tree at every absorb, last the seventeenth)
 
 Verified at packet authoring; the branch has absorbed newer v0.36.0 tips since
 (6ed4d7e12c as of 2026-08-08), so each phase start re-verifies the hook points
@@ -1157,6 +1213,28 @@ question does not arise (farming has no station).
   tests/suite_duration_budget.test.ts (a declared per-suite duration
   ratchet); any future farming phase adding a slow suite declares its
   budget there in the same change.
+  SEVENTEENTH ABSORB (2026-08-17, release/v0.39.0 tip f48c7a3a9b, opening
+  Phase 9): the checklist held again (portrait manifest fingerprint-only
+  re-mint, receipt-free; the audit verdict re-minted through
+  --refresh-verdict, bytes 108135; both registries re-pointed; the builder
+  and consistency literals re-recorded from the merged-tree run: catalog
+  sha 103c2196, renderer fingerprint 84410592 unchanged, sheet set
+  75e58630, verdict 6709601d) and the farm-props lockfile seal fired a
+  third time (same runbook). NEW (al)-CLASS MEMBER: the release's icon-art
+  second pass (tests/release_v039_icon_art.test.ts) seals the live
+  hotbar-item inventory (kind food/drink/potion/mount, use fishing or
+  gatherTool) at 72 painted against
+  docs/achievements/release-v039-icon-art-second-pass-2026-08-16; the branch's
+  eight dishes and four hoes are hotbar-eligible pending-art ids and failed
+  it on the merged tree only. Healed by the ART-SUBJECT rule (11e0940da0):
+  the sealed closure is live minus ITEM_ART_PENDING, the pending hotbar
+  count is a hard literal (12), every pending id must ship NO webp, and the
+  release literal 72 plus the sealed record stand byte-identical. ABSORB
+  CHECKLIST ADDITION: any future release seal over a LIVE inventory that
+  farming's pending-art items can join (hotbar items, bag filters, action
+  affordances) gets the same ART-SUBJECT split, never a raise of the
+  release literal and never a gutted arm; the Phase 13 art batch clears
+  the debt and re-pins the pending literal to zero.
   SIXTEENTH ABSORB (2026-08-15, the v0.39.0 sync): the checklist held
   exactly as written AGAIN: the portrait manifest re-minted
   fingerprint-only (rendererFingerprint plus bundle digest moved with the

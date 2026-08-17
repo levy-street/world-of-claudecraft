@@ -27,6 +27,17 @@ warning), so this phase's NPC/vendor/quest wiring lands in sibling
 modules (the server/farming_commands.ts and server/heavy_self.ts precedents) from
 the start.
 
+V0.39.0 SYNC NOTE (2026-08-17, the seventeenth absorb, opening this phase): the
+release added the castle-plan landmark layer (src/ui/castle_plan_core.ts) on the same
+zone-map surface the quest markers and farm badges share (it paints under the quest and
+label layers, the farm badges paint later); the release MOVED the hedge_knight camp in
+Evergarden to (306,872) r 8, now 27 yd west of bed_evergarden_1, so the tier-4 farmer
+NPC sits EAST of the beds at the parterre POI, never west of x 340; and NO server/ file
+moved in the delta, so the privacy-security row matches only if this phase itself moves
+one. The shared shapes this phase builds against landed on the phase branch before the
+build fan-out: the QuestObjective 'farm' member (2953d6ccb2) and the NpcDef `farmer`
+flag (2f22f9a5e9).
+
 ### Starter Prompt
 
 ```
