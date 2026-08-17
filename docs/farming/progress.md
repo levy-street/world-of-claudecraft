@@ -2100,6 +2100,19 @@ terrain pad: seating one moves the atlas, the chunk digest, and the map
 plates (bh). (6) The release re-records ITS goldens for a static-entity
 shift and can never re-record the branch-only farming_session; classify
 before minting.
+GATE RECORD: run 1 on the frozen tree 35439199fc, `BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs`: mode=full (the
+planner's broad/unclassified arm on tests/fixtures/terrain_height_parity
+.v1.f64le.gz plus tests/helpers/bare_client.ts), "[gate:select] PASS: all 12
+steps green (vitest workers: 8)", 2859 test files / 40,034 tests passed, 2
+expected fail, 115 skipped, zero "[gate:select] FAIL at" or "[gate] FAIL"
+lines, no druid_engines timeout, full-suite vitest 823 s, browser regression
+19 files 129 green, shell rc 0. gate-integrity-reviewer over the cone rows:
+PASS (additive checkout only; the full fallback is owned by the terrain
+fixture; the goldens, plates, and PNGs are inert nonCode with their consumers
+on the always-run floor). qa-checklist: READY, 0 BLOCKING (its should-fixes:
+the (bg) and (bh) maintainer reads, and the garden_hoe reagent knock-on now
+in (bg)).
 
 ### Phase 10
 (not started)
