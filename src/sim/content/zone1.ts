@@ -820,6 +820,35 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },
+  // The farming go-live: the tier-1 farmer, the face of the Eastbrook
+  // allotments (content/farm_patches.ts patch_eastbrook) and the front door
+  // of the profession (q_farm_intro). She stands OUTSIDE the town wall on the
+  // lane side of the beds (the north-east lane passes 5 yd off her shoulder),
+  // so like groundskeeper_bram she carries an INLINE pos rather than an
+  // eastbrook_layout row: the layout is the town's placement table and she is
+  // not a town NPC. Facing the beds (atan2(dx, dz) toward the patch anchor:
+  // -x from where she stands). Her stock is the D9/D11 opening counter:
+  // tier-1 seeds, the one vendor-priced produce (brook_carrot, the starter
+  // watch fee), compost, and the rung-one hoe; tier 3/4 seeds and the crafted
+  // hoes are stocked NOWHERE (tests/professions_zone_rollout.test.ts). Her
+  // placement (never nudged by findSafePos, beside the beds, off the road,
+  // in her zone) is pinned by tests/farmer_npc_placement.test.ts.
+  farmer_jessica: {
+    id: 'farmer_jessica',
+    name: 'Farmer Jessica',
+    title: 'Allotment Keeper',
+    pos: { x: 24.5, z: 32.5 },
+    facing: -Math.PI / 2,
+    color: 0xa8843a,
+    questIds: ['q_farm_intro'],
+    vendorItems: ['vale_wheat_seed', 'brook_carrot_seed', 'brook_carrot', 'compost', 'garden_hoe'],
+    farmer: true,
+    // The two teaching sentences below are pinned VERBATIM (the go-live
+    // greeting arm): the anti-chore promise, and the pointer to the Harvest
+    // Journal, the one durable surface that shows every planted bed's timer.
+    greeting:
+      'Good soil and fair weather, $N. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -860,6 +889,54 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     // found that out). questFallbackGrants hands the pick over on accept and
     // re-grants it if it is ever lost, exactly like a prerequisite quest item.
     requiredItems: ['copper_mining_pick'],
+  },
+  // Farming onboarding (the farming go-live, D20): the profession's front
+  // door, on the q_prof_intro template. Two ACTION objectives on the farm
+  // arm of the objective union (plant one Vale Wheat in the Eastbrook patch,
+  // then harvest it), credited by the plant and harvest commands themselves
+  // (quests/quest_credit.ts): inventory ownership cannot prove a harvest,
+  // since produce also arrives from the market and work-order pouches. No
+  // minLevel and no prerequisite: like q_prof_intro it is a level-1 entry
+  // point at its own NPC. Fallback grants: the rung-one hoe (the step-12
+  // hoe gate refuses a bare-handed plant) and ONE seed, so a day-one
+  // character with zero copper is never dead-ended at the first bed. NOTE
+  // the seed is CONSUMED by planting, and requiredItems re-grants on every
+  // giver talk while the quest is active, so this is a bounded 4-copper
+  // faucet that closes at the first harvest (the quest completes); accepted
+  // at go-live, ruled on by the maintainer.
+  q_farm_intro: {
+    id: 'q_farm_intro',
+    name: 'First Furrow',
+    giverNpcId: 'farmer_jessica',
+    turnInNpcId: 'farmer_jessica',
+    text: 'Take this hoe and a pinch of vale wheat seed, $N. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.',
+    // The two teaching sentences are pinned VERBATIM by
+    // tests/farm_intro_quest_content.test.ts (the D20 magic sentence and the
+    // Harvest Journal pointer, the same two Jessica's greeting carries).
+    completionText:
+      'There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, $N.',
+    objectives: [
+      {
+        type: 'farm',
+        action: 'plant',
+        cropId: 'vale_wheat',
+        patchId: 'patch_eastbrook',
+        count: 1,
+        label: 'Vale Wheat planted',
+      },
+      {
+        type: 'farm',
+        action: 'harvest',
+        cropId: 'vale_wheat',
+        patchId: 'patch_eastbrook',
+        count: 1,
+        label: 'Vale Wheat harvested',
+      },
+    ],
+    xpReward: 150,
+    copperReward: 50,
+    itemRewards: {},
+    requiredItems: ['garden_hoe', 'vale_wheat_seed'],
   },
   q_wolves: {
     id: 'q_wolves',
@@ -1490,6 +1567,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
 
 export const ZONE1_QUEST_ORDER = [
   'q_prof_intro',
+  'q_farm_intro',
   'q_wolves',
   'q_boars',
   'q_spiders',

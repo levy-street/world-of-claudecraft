@@ -3739,6 +3739,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     '看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。',
   'entities.quests.q_prof_intro.objectives.0.label': '已開採礦脈',
+  'entities.quests.q_farm_intro.title': '第一道犁溝',
+  'entities.quests.q_farm_intro.text':
+    '拿著這把鋤頭和一小撮谷地小麥種子，{playerName}。把種子播到我旁邊任意一塊田畦裡，然後去忙你的事。想什麼時候回來收莊稼都行；我會在這兒。',
+  'entities.quests.q_farm_intro.completion':
+    '瞧，你親手種出的第一茬莊稼。你不在的時候它也一直在長，而且永遠不會壞。收成日誌（Shift+K，或專業視窗裡的耕作一行）列出了每塊已播種的田畦和它的計時。田畦召喚你的時候，隨時回來買種子，{playerName}。',
+  'entities.quests.q_farm_intro.objectives.0.label': '已種下谷地小麥',
+  'entities.quests.q_farm_intro.objectives.1.label': '已收穫谷地小麥',
   'entities.quests.q_wolves.title': '門前群狼',
   'entities.quests.q_wolves.text':
     '森林狼已敢撲咬北路旅人，{playerName}。擊敗8隻森林狼，讓東溪能鬆一口氣。',
@@ -8444,6 +8451,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.bad_bed': '那裡沒有田畦。',
   'hudChrome.farming.denied.bad_crop': '你無法在這裡種植它。',
   'hudChrome.farming.denied.range': '你離那片田畦太遠了。',
+  'hudChrome.farming.denied.no_farmer': '你必須靠近農夫才能用穀殼換堆肥。',
+  'hudChrome.farming.huskTrade': '用穀殼換堆肥',
+  'hudChrome.farming.huskTradeAria': '與{name}用枯萎穀殼換取堆肥',
   'hudChrome.farming.denied.bed_taken': '你已經在那裡種下了作物。',
   'hudChrome.farming.denied.skill': '你的耕作技能不足以種植該作物。',
   'hudChrome.farming.denied.no_seed': '你沒有該作物的種子。',
@@ -9788,6 +9798,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '廚房大師',
   'entities.npcs.cook_marlow.greeting':
     '沒有半生不熟的東西能離開我的廚房，{className}。坐下吃完，再回去闖蕩。',
+  'entities.npcs.farmer_jessica.name': '農婦潔西卡',
+  'entities.npcs.farmer_jessica.title': '菜園管事',
+  'entities.npcs.farmer_jessica.greeting':
+    '祝你土好天晴，{playerName}。從我這裡買粒種子，播到那邊任意一塊田畦裡，然後該忙什麼忙什麼去。你不在的時候它也一直在長，而且永遠不會壞。收成日誌（Shift+K，或專業視窗裡的耕作一行）列出了每塊已播種的田畦和它的計時。',
+  'entities.npcs.farmer_teasel.name': '農夫蒂澤爾',
+  'entities.npcs.farmer_teasel.title': '沼地稻田農夫',
+  'entities.npcs.farmer_teasel.greeting': '沼澤稻米和沼澤甜菜的種子，{className}，還有餵養它們的堆肥。稻田排水慢，腳下留神。',
+  'entities.npcs.farmer_hollis.name': '農夫霍利斯',
+  'entities.npcs.farmer_hollis.title': '高望梯田農夫',
+  'entities.npcs.farmer_hollis.greeting': '梯田只給山肯給的那麼多，{className}。我賣堆肥，要是你的莊稼枯萎了，我可以把穀殼重新漚成好土給你。',
+  'entities.npcs.farmer_verbena.name': '農婦維貝娜',
+  'entities.npcs.farmer_verbena.title': '花壇園丁',
+  'entities.npcs.farmer_verbena.greeting':
+    '當心鑲邊，{playerName}，這些田畦可是花壇的驕傲。我賣的是堆肥，你帶來的枯萎穀殼，我都能給你變成更多堆肥。',
   'entities.npcs.weaver_ottilie.name': '奧蒂莉織工',
   'entities.npcs.weaver_ottilie.title': '織機大師',
   'entities.npcs.weaver_ottilie.greeting': '當心絲線，{className}。在織機前，穩的手勝過有力的手。',

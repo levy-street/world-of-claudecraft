@@ -440,7 +440,7 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
 // twin would be a circuit with no entry. One tier down, the twin's crop
 // grows under exactly the hoe the recipe already consumes (rung 2 takes
 // fine_vale_wheat, tier 1, grown under the vendor-PRICED garden_hoe,
-// stocked at Phase 9 go-live per the (aa) dormancy).
+// stocked on the tier-1 farmer NPC since the go-live).
 //
 // ACQUISITION COVERAGE, where this ladder diverges from the rods and why:
 // the rod ladder leaves rungs 2 and 3 vendor-priced and crafts only 4 and 5,
@@ -448,8 +448,8 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
 // arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, AND 4 instead,
 // making craft the only mint above rung 1 and leaving no acquisition gap
 // WITHIN the ladder (each rung is reachable from a state the rung below
-// grants; the ladder's one entry point, rung 1's vendor stocking, opens at
-// Phase 9 go-live, until which the whole surface is dormant by choice). There is
+// grants; the ladder's one entry point is rung 1's vendor stocking on the
+// tier-1 farmer NPC, the go-live counter). There is
 // also, deliberately, NO delve Marks fallback row this phase (see the hoe
 // block in content/items.ts; flagged for the maintainer).
 //
@@ -1667,13 +1667,12 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
 // the recipe-economy unitValue basis (buyValue when one exists, else
 // sellValue); on a raw sellValue basis the beet braise is exactly break-even,
 // which converts produce without minting copper and is the intended shape.
-// TRAINABLE BEFORE GO-LIVE, deliberately (deviation (aj)): the binding
-// Live-surface note wants these visible in the crafting window while the
-// farm is dormant, and trainer acquisition is the only path there, so a
-// player can train dishes they cannot cook until Phase 9 (free at rung 0,
-// the settled R8 fee curve's tier-0 point, and fee-charging at rungs 25/50;
-// the garden_hoe priced-but-dormant precedent; pinned in
-// tests/farm_recipes.test.ts).
+// TRAINABLE FROM THE START, deliberately (deviation (aj)): the binding
+// Live-surface note wanted these visible in the crafting window before the
+// farm opened, and trainer acquisition is the only path there, so the rows
+// were trainable ahead of the go-live and stay so (free at rung 0, the
+// settled R8 fee curve's tier-0 point, and fee-charging at rungs 25/50;
+// pinned in tests/farm_recipes.test.ts).
 export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_vale_hearth_loaf',

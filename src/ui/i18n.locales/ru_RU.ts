@@ -3905,6 +3905,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     'Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Рудная жила разработана',
+  'entities.quests.q_farm_intro.title': 'Первая борозда',
+  'entities.quests.q_farm_intro.text':
+    'Возьми эту мотыгу и щепоть семян долинной пшеницы, {playerName}. Посей семена на одной из грядок рядом со мной, а потом займись своими делами. Возвращайся, когда захочешь, и собери урожай; я буду здесь.',
+  'entities.quests.q_farm_intro.completion':
+    'Вот он, твой первый урожай в собственных руках. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер. Приходи за семенами всякий раз, как позовут грядки, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': 'Долинная пшеница посажена',
+  'entities.quests.q_farm_intro.objectives.1.label': 'Долинная пшеница собрана',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -9010,6 +9017,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.bad_bed': 'Там нет грядки.',
   'hudChrome.farming.denied.bad_crop': 'Это здесь посадить нельзя.',
   'hudChrome.farming.denied.range': 'Вы слишком далеко от этой грядки.',
+  'hudChrome.farming.denied.no_farmer':
+    'Чтобы обменять шелуху на компост, нужно стоять рядом с фермером.',
+  'hudChrome.farming.huskTrade': 'Обменять шелуху на компост',
+  'hudChrome.farming.huskTradeAria': 'Обменять засохшую шелуху на компост у {name}',
   'hudChrome.farming.denied.bed_taken': 'Там у вас уже растет урожай.',
   'hudChrome.farming.denied.skill': 'Ваш навык земледелия слишком низок для этой культуры.',
   'hudChrome.farming.denied.no_seed': 'У вас нет семян этой культуры.',
@@ -10405,6 +10416,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': 'Хозяин кухни',
   'entities.npcs.cook_marlow.greeting':
     'Из моей кухни ничего не выходит полусырым, {className}. Садись, поешь, а потом обратно в путь.',
+  'entities.npcs.farmer_jessica.name': 'Фермер Джессика',
+  'entities.npcs.farmer_jessica.title': 'Хранительница огородов',
+  'entities.npcs.farmer_jessica.greeting':
+    'Доброй земли и ясной погоды, {playerName}. Купи у меня семена, посей их на одной из этих грядок и ступай по своим делам. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер.',
+  'entities.npcs.farmer_teasel.name': 'Фермер Тизель',
+  'entities.npcs.farmer_teasel.title': 'Болотный рисовод',
+  'entities.npcs.farmer_teasel.greeting':
+    'Семена болотного риса и болотной свёклы, {className}, и компост, чтобы их подкормить. Вода с чеков уходит медленно, так что смотри под ноги.',
+  'entities.npcs.farmer_hollis.name': 'Фермер Холлис',
+  'entities.npcs.farmer_hollis.title': 'Террасник Хайвотча',
+  'entities.npcs.farmer_hollis.greeting':
+    'Террасы дают столько, сколько позволяет гора, {className}. Я продаю компост, а если твой урожай засохнет, я переработаю шелуху обратно в добрую землю.',
+  'entities.npcs.farmer_verbena.name': 'Фермер Вербена',
+  'entities.npcs.farmer_verbena.title': 'Садовница партера',
+  'entities.npcs.farmer_verbena.greeting':
+    'Осторожнее с бордюром, {playerName}, эти грядки гордость партера. Я продаю компост, а любую засохшую шелуху, что ты принесёшь, превращу в новый.',
   'entities.npcs.weaver_ottilie.name': 'Ткачиха Оттилия',
   'entities.npcs.weaver_ottilie.title': 'Хозяйка ткацкого стана',
   'entities.npcs.weaver_ottilie.greeting':

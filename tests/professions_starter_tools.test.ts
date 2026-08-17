@@ -35,8 +35,9 @@ const GATHER_QUEST_IDS = [
   'q_prof_hobby_switch',
 ] as const;
 
-/** The three tier-1 tools a gather quest can hand over. */
-const TIER_1_TOOLS = ['copper_mining_pick', 'handaxe', 'gathering_sickle'] as const;
+/** The tier-1 tools a quest can hand over: the three the gather quests grant,
+ *  plus the garden hoe q_farm_intro grants (the farming go-live). */
+const TIER_1_TOOLS = ['copper_mining_pick', 'handaxe', 'gathering_sickle', 'garden_hoe'] as const;
 /** Bought, never granted, so still sellable: the discriminating negative case. */
 const HIGHER_TIER_TOOLS = [
   'iron_mining_pick',
@@ -45,6 +46,7 @@ const HIGHER_TIER_TOOLS = [
   'ironbark_axe',
   'bronze_sickle',
   'silverleaf_sickle',
+  'bronze_hoe',
 ] as const;
 
 /** The gathering profession whose tool clears a node type's gate. */

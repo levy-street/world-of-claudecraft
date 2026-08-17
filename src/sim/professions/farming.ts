@@ -74,6 +74,7 @@ import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../ty
 import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_projection';
 import { notifyFarmReady } from './farm_ready';
 import { planWatchFee, type WatchFeeLeg } from './farm_watch_fee';
+import { nearFarmerNpc } from './farmer_npcs';
 import { queueGatheringGrant } from './gathering';
 import {
   applyToolEffectUse,
@@ -180,8 +181,8 @@ export const FARM_HUSKS_PER_COMPOST = 2;
 // thresholds: under the two-chance it pays 2 of the crop's own seeds, else
 // under the one-chance it pays 1, else 0), on BOTH outcomes, survived and
 // withered. Tier 1 and 2 crops draw NOTHING at harvest: their seeds are
-// vendor-PRICED (stocked at Phase 9 go-live, the (aa) dormancy), so the
-// market pressure this exists for does not apply to them.
+// vendor-PRICED and stocked at the farmer NPCs (the go-live counters), so
+// the market pressure this exists for does not apply to them.
 //
 // TUNING, ALL PROVISIONAL, FLAGGED FOR THE MAINTAINER, and ECONOMY-SENSITIVE
 // (the state.md OPEN items): tier 3/4 seeds are market goods with NO vendor
@@ -953,13 +954,18 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
  *  Draws ZERO rng on every path: the ratio is a constant and the batch count
  *  is arithmetic over the sender's own bag count.
  *
- *  THE LOCATION GATE IS DELIBERATELY PERMISSIVE THIS PHASE. The design fiction
- *  is the farmer NPC working the husks into compost, and the go-live phase
- *  (Phase 9, which ships the farmer NPCs) adds the NPC range gate here, the
- *  same INTERACT_RANGE arm plantCrop's bed check uses. Until an NPC exists
- *  there is nothing to range against, and husks are unobtainable in live play
- *  anyway (no seed faucet exists), so the permissive gate ships nothing a
- *  player can reach.
+ *  THE LOCATION GATE IS A FARMER NPC IN REACH (the farming go-live). The
+ *  design fiction is the farmer working the husks into compost, so the trade
+ *  is refused, text-free with reason 'no_farmer' and nothing spent, unless
+ *  the sender stands within FARMER_TRADE_RANGE of an NpcDef carrying the
+ *  farmer flag (professions/farmer_npcs.ts nearFarmerNpc: the buyItem and
+ *  nearBanker reach, INTERACT_RANGE + 2, so a player who can buy from the
+ *  farmer can trade from the same spot). It gates THIS command only: plant,
+ *  harvest and the watch fee are bed-side actions paid at the bed (D8/D9)
+ *  and never look for a farmer. The gate sits right after the dead check
+ *  and BEFORE the batch arithmetic, so a far-away sender learns the real
+ *  reason rather than a phantom shortage, and the lock-only split below
+ *  still speaks only to a sender who is actually at the counter.
  *
  *  NO BUSY GATE, the harvestCrop rationale: the trade is instant, conflicts
  *  with no cast, and refusing it during one would be a queue in disguise. The
@@ -968,6 +974,10 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
 export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
+  if (!nearFarmerNpc(ctx, p)) {
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_farmer' });
     return;
   }
   // LOCK-AWARE (issue 3042, the v0.38.0 sync heal): a locked husk stack is

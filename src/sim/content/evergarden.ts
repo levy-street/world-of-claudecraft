@@ -310,6 +310,26 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
     greeting:
       'Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks.',
   },
+  // The farming go-live: the tier-4 farmer of the parterre showcase
+  // (content/farm_patches.ts patch_evergarden), on the approach side of the
+  // beds (south of the z 872 row, the way in from Hedgewick), facing north
+  // across them (facing 0 looks along +z), well clear of The Parterre Walk's
+  // lane and of the hedge_knight camp at the far end of the site. Stock:
+  // compost only, the tier-3 and tier-4 seeds being seed-back and market
+  // goods (D11). tests/farmer_npc_placement.test.ts pins the seat.
+  farmer_verbena: {
+    id: 'farmer_verbena',
+    name: 'Farmer Verbena',
+    title: 'Parterre Gardener',
+    pos: { x: 348.5, z: 867 },
+    facing: 0,
+    color: 0x7d9b5c,
+    questIds: [],
+    vendorItems: ['compost'],
+    farmer: true,
+    greeting:
+      'Mind the edging, $N, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it.',
+  },
 };
 
 export const EVERGARDEN_QUESTS: Record<string, QuestDef> = {
