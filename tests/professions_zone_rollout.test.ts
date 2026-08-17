@@ -865,6 +865,13 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // The D9 fee vegetable: priced so the watch fee is payable from vendor
     // stock before a first harvest.
     expect(ITEMS.brook_carrot?.buyValue).toBe(16);
+    // The four stocked seed prices as literals: the day-one entry cost of the
+    // trade and the size of the intro quest's re-grant, so a retune is a
+    // visible edit rather than a positive-only pass.
+    expect(ITEMS.vale_wheat_seed?.buyValue).toBe(4);
+    expect(ITEMS.brook_carrot_seed?.buyValue).toBe(4);
+    expect(ITEMS.marsh_rice_seed?.buyValue).toBe(8);
+    expect(ITEMS.bog_beet_seed?.buyValue).toBe(8);
     let produceSwept = 0;
     for (const crop of Object.values(FARM_CROPS)) {
       if (crop.produceItemId !== 'brook_carrot') {

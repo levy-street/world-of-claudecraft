@@ -220,9 +220,12 @@ describe('the go-live journey: q_farm_intro at Farmer Jessica, end to end', () =
     expect(QUESTS[QUEST_ID].completionText).toContain(JOURNAL_POINTER);
     // Neither surface promises a notice the sim cannot keep (deviation (bb):
     // a transient banner can be lost while linkdead).
+    const promisesANotice = (text: string): boolean =>
+      /\balways\b|will be told|you will always/.test(text.toLowerCase());
+    // Positive control: the predicate really trips on the wording it bans.
+    expect(promisesANotice('You will always be told when a crop is ready.')).toBe(true);
     for (const text of [NPCS[GIVER_ID].greeting, QUESTS[QUEST_ID].completionText]) {
-      expect(text.toLowerCase()).not.toContain('always');
-      expect(text.toLowerCase()).not.toContain('will be told');
+      expect(promisesANotice(text)).toBe(false);
     }
   });
 

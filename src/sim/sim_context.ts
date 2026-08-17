@@ -577,6 +577,11 @@ export interface SimContextCallbacks {
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onRecipeCraftedForQuests(recipeId: string, meta: PlayerMeta): void;
   onNodeGatheredForQuests(node: GatherNodeDef, itemId: string, meta: PlayerMeta): void;
+  // The farm action credit (quests/quest_credit.ts onCropFarmedForQuests) is
+  // NOT a seam callback: professions/farming.ts imports it module-to-module
+  // (the sim.ts host wiring sits at its monolith ceiling), so a reader
+  // enumerating credit routes here must add that one; every crediter still
+  // takes ctx and draws nothing.
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
   countItem(itemId: string, pid?: number): number;

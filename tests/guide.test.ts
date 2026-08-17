@@ -1890,6 +1890,8 @@ describe('Guide professions gathering accuracy', () => {
       'id="prof-farm-beds"',
     );
     expect(html).toContain('Farmer Jessica');
+    // Tied to the live NPC name so a rename cannot leave the page lying.
+    expect(html).toContain(NPCS.farmer_jessica.name);
     expect(html).toContain('Harvest Journal');
     expect(html).toContain('withered husks');
     // The guard itself stays honest on its absent side: a toolless record

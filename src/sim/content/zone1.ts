@@ -907,9 +907,15 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // hoe gate refuses a bare-handed plant) and ONE seed, so a day-one
   // character with zero copper is never dead-ended at the first bed. NOTE
   // the seed is CONSUMED by planting, and requiredItems re-grants on every
-  // giver talk while the quest is active, so this is a bounded 4-copper
-  // faucet that closes at the first harvest (the quest completes); accepted
-  // at go-live, ruled on by the maintainer.
+  // giver talk while the quest is ACTIVE, so this is a small free-seed
+  // faucet: one 4-copper seed per talk, bounded by the beds a player can
+  // hold planted before the first harvest turns the quest ready (the
+  // re-grant runs for active quests only, never once ready or done). The
+  // seed itself is fenced (noVendorSell, noMarketList: no vendor, market,
+  // mail, or guild-bank cash-out), so the faucet feeds beds, not coin;
+  // face-to-face trade is the one exchange pipe that does not read those
+  // flags (a cooperative pair can pass free seeds), ledgered for the
+  // maintainer in docs/farming/state.md. Accepted at go-live.
   q_farm_intro: {
     id: 'q_farm_intro',
     name: 'First Furrow',

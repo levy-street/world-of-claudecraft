@@ -103,8 +103,12 @@ describe('the farmer NPCs: content shape', () => {
     // No greeting over-promises the ready notice: a plot ripening during the
     // linkdead grace loses its transient banner (deviation (bb)), so no farmer
     // may say the player will always be told.
+    const overPromises = (text: string): boolean =>
+      /\balways\b|will be told/.test(text.toLowerCase());
+    // Positive control: the predicate trips on the wording it bans.
+    expect(overPromises('You will always be told when a crop is ready.')).toBe(true);
     for (const { id } of FARMERS) {
-      expect(NPCS[id].greeting.toLowerCase(), id).not.toContain('always');
+      expect(overPromises(NPCS[id].greeting), id).toBe(false);
     }
   });
 });

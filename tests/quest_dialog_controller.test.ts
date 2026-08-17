@@ -638,6 +638,12 @@ describe('QuestDialogController', () => {
     expect(button?.getAttribute('aria-label')).toBe(
       t('hudChrome.farming.huskTradeAria', { name: `npc:${farmerId}` }),
     );
+    // The English literals once, beside the t() form: a key swap to any other
+    // existing key would keep the t() comparisons green on their own.
+    expect(button?.textContent).toContain('Trade husks for compost');
+    expect(button?.getAttribute('aria-label')).toBe(
+      `Trade withered husks for compost with npc:${farmerId}`,
+    );
     // No shop row for an empty stock, so the trade row is the only action.
     expect(farmer.element.querySelector('[data-vendor]')).toBeNull();
     expect(farmer.convertHusks).not.toHaveBeenCalled();

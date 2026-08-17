@@ -307,6 +307,29 @@ describe('the farm ACTION objective: plant credit', () => {
     expect(wideQp.state).toBe('ready');
     expect(progressEvents(wide.sim, from).map((e) => e.text)).toEqual(['Any crop planted: 1/1']);
   });
+
+  it('patchId never gates the credit: a Vale Wheat planted at another patch still counts', () => {
+    // The types.ts contract: patchId is MARKER guidance only. The intro
+    // quest names patch_eastbrook so the map circles those beds, but a
+    // player who sows the wheat in Fenbridge's paddies has done the deed.
+    // Pinned so the marker/credit split cannot be read as a bug later (the
+    // parity and architecture reviews both asked for the pin).
+    const h = makeHarness();
+    const qp = trackQuest(h);
+    standAtBed(h.sim, 'bed_mirefen_1');
+    h.sim.addItem(SEED_ID, 1, h.pid);
+    plant(h, CROP_ID, 'bed_mirefen_1');
+    expect(h.meta.farmPlots.get('bed_mirefen_1')?.cropId).toBe(CROP_ID);
+    expect(qp.counts).toEqual([1, 0]);
+    // And the marker still encloses only the named patch (Eastbrook), never
+    // the bed the credit came from.
+    const areas = questObjectiveAreas(h.meta.questLog);
+    expect(areas).toHaveLength(1);
+    const eastbrook = FARM_PATCHES.find((p) => p.id === PATCH_ID);
+    if (!eastbrook) throw new Error('patch_eastbrook missing');
+    const cx = eastbrook.beds.reduce((sum, b) => sum + b.x, 0) / eastbrook.beds.length;
+    expect(areas[0].center.x).toBeCloseTo(cx, 6);
+  });
 });
 
 describe('the farm ACTION objective: harvest credit', () => {
@@ -534,8 +557,11 @@ describe('the farm objective marker (questObjectiveAreas)', () => {
       { questId: QUEST_ID, objectiveIndex: 0 },
       { questId: QUEST_ID, objectiveIndex: 1 },
     ]);
-    // Fresh points: the area never aliases the frozen content row.
-    expect(patch.beds.some((b) => b === (area.center as unknown))).toBe(false);
+    // The content row is deep-frozen, so an arm that tried to write into a
+    // bed while enclosing it would throw here rather than pass quietly (an
+    // alias check on the returned center is unobservable: the area carries
+    // only the computed centroid and radius, never the input points).
+    expect(Object.isFrozen(patch.beds[0])).toBe(true);
   });
 
   it('a patchless objective draws one circle per farming patch (four), each over its own beds', () => {
