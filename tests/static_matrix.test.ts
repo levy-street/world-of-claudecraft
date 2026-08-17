@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
+  lookAtFrozen,
   refreshFrozenWorldMatrix,
 } from '../src/render/static_matrix';
 
@@ -206,5 +207,96 @@ describe('refreshFrozenWorldMatrix', () => {
     refreshFrozenWorldMatrix(frozen);
     expect(frozen.matrixWorld.elements[12]).toBe(14);
     expect(frozen.matrixWorldAutoUpdate).toBe(false);
+  });
+});
+
+describe('lookAtFrozen', () => {
+  // The v0.38.0 chase-camera regression. Object3D.lookAt derives its EYE
+  // position from matrixWorld, not from .position, and r185 gates a node's own
+  // compose on matrixWorldAutoUpdate. So aiming the renderer's frozen camera
+  // straight after moving it aims from whatever pose the previous refresh
+  // baked, one frame stale. Standing still that is invisible (the position did
+  // not move between frames); ORBITING, which is exactly what an A/D keyboard
+  // turn does, it leaves the avatar off screen centre by one frame of turn.
+  const CAMERA_DIST = 8;
+  const framedCamera = (): THREE.PerspectiveCamera => {
+    const camera = new THREE.PerspectiveCamera(75, 16 / 9, 0.1, 1000);
+    camera.matrixWorldAutoUpdate = false;
+    return camera;
+  };
+  // Where the chase camera sits for a given yaw, mirroring updateCamera's orbit.
+  const orbit = (camera: THREE.PerspectiveCamera, pivot: THREE.Vector3, yaw: number): void => {
+    camera.position.set(
+      pivot.x - Math.sin(yaw) * CAMERA_DIST,
+      pivot.y,
+      pivot.z - Math.cos(yaw) * CAMERA_DIST,
+    );
+  };
+  // Horizontal screen offset of the pivot, 0 at centre and 1 at the frame edge.
+  const offCentre = (camera: THREE.PerspectiveCamera, pivot: THREE.Vector3): number =>
+    Math.abs(pivot.clone().project(camera).x);
+
+  it('pins the r185 hazard: a raw lookAt on a frozen camera aims from the stale pose', () => {
+    const camera = framedCamera();
+    const pivot = new THREE.Vector3(0, 0, 0);
+    orbit(camera, pivot, 0);
+    refreshFrozenWorldMatrix(camera);
+
+    // One 60 fps frame of TURN_SPEED (PI rad/s), the exact A/D case.
+    orbit(camera, pivot, Math.PI / 60);
+    camera.lookAt(pivot);
+    refreshFrozenWorldMatrix(camera);
+
+    expect(offCentre(camera, pivot)).toBeGreaterThan(0.03);
+  });
+
+  it('aims a frozen camera from its CURRENT position and leaves the freeze in place', () => {
+    const camera = framedCamera();
+    const pivot = new THREE.Vector3(0, 0, 0);
+    orbit(camera, pivot, 0);
+    refreshFrozenWorldMatrix(camera);
+
+    orbit(camera, pivot, Math.PI / 60);
+    lookAtFrozen(camera, pivot);
+
+    expect(offCentre(camera, pivot)).toBeLessThan(1e-6);
+    expect(camera.matrixWorldAutoUpdate).toBe(false);
+    // matrixWorld carries the new pose, so the draw and every camera-relative
+    // cull downstream read the same orientation the aim just produced.
+    expect(camera.matrixWorld.elements[12]).toBeCloseTo(camera.position.x, 10);
+    expect(camera.matrixWorld.elements[14]).toBeCloseTo(camera.position.z, 10);
+  });
+
+  it('holds the avatar centred across a sustained keyboard turn', () => {
+    const camera = framedCamera();
+    const pivot = new THREE.Vector3(0, 0, 0);
+    orbit(camera, pivot, 0);
+    refreshFrozenWorldMatrix(camera);
+
+    // Half a second of held A at 60 fps: the offset must never accumulate.
+    let worst = 0;
+    for (let frame = 1; frame <= 30; frame++) {
+      orbit(camera, pivot, (Math.PI * frame) / 60);
+      lookAtFrozen(camera, pivot);
+      worst = Math.max(worst, offCentre(camera, pivot));
+    }
+    expect(worst).toBeLessThan(1e-6);
+  });
+
+  it('aims correctly against a live parent chain', () => {
+    const scene = new THREE.Scene();
+    const rig = new THREE.Group();
+    rig.position.set(100, 0, 0);
+    const camera = framedCamera();
+    rig.add(camera);
+    scene.add(rig);
+    scene.updateMatrixWorld(true);
+
+    const pivot = new THREE.Vector3(100, 0, 0);
+    orbit(camera, new THREE.Vector3(0, 0, 0), Math.PI / 60);
+    lookAtFrozen(camera, pivot);
+
+    expect(offCentre(camera, pivot)).toBeLessThan(1e-6);
+    expect(camera.matrixWorldAutoUpdate).toBe(false);
   });
 });

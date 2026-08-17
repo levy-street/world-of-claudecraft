@@ -565,6 +565,7 @@ import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soul
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
+  lookAtFrozen,
   refreshFrozenWorldMatrix,
 } from './static_matrix';
 import { buildStationProps } from './stations';
@@ -13236,8 +13237,7 @@ export class Renderer {
         this.camera.fov = CAMERA_BASE_FOV;
         this.camera.updateProjectionMatrix();
       }
-      this.camera.lookAt(this.cameraLookAt);
-      refreshFrozenWorldMatrix(this.camera);
+      lookAtFrozen(this.camera, this.cameraLookAt);
       return;
     }
     const p = this.sim.player;
@@ -13361,8 +13361,9 @@ export class Renderer {
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
-    this.camera.lookAt(this.cameraLookAt);
-    refreshFrozenWorldMatrix(this.camera);
+    // lookAtFrozen, never a bare lookAt: r185 aims a frozen node from a STALE
+    // matrix, which reads in game as camera drift.
+    lookAtFrozen(this.camera, this.cameraLookAt);
 
     // Spatial-audio listener (at the camera, facing the player) + ambience state.
     const sink = this.audioSink;

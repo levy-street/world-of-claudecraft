@@ -90,7 +90,10 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/ground_puff.ts. The merged pin above had zero slack by design,
     // so wiring the sled's summon call reddened it by exactly its one line; the
     // extraction bought that back and then some, which is the ratchet's rule.
-    ceiling: 13730,
+    // Nudged by one for the r185 frozen-camera aim fix taken from upstream's
+    // fix/r185-camera-lookat-stale-matrix: a bare lookAt composes from a stale
+    // matrix under r185 and reads in game as camera drift.
+    ceiling: 13731,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

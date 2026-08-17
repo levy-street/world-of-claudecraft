@@ -81,3 +81,28 @@ export function refreshFrozenWorldMatrix(object: THREE.Object3D): void {
   object.updateMatrixWorld();
   object.matrixWorldAutoUpdate = false;
 }
+
+/**
+ * Aim a frozen (matrixWorldAutoUpdate=false) node at `target` from the position
+ * it holds RIGHT NOW, then leave matrixWorld carrying the new orientation.
+ *
+ * Object3D.lookAt takes its eye position from matrixWorld, never from
+ * `.position`, and under the r185 gate a frozen node's own compose is skipped,
+ * so a bare `node.position.set(...)` followed by `node.lookAt(...)` aims from
+ * whatever pose the LAST refresh baked. On the chase camera that is one frame
+ * stale: harmless while the camera holds still (the position did not move), but
+ * an orbit moves it every frame, so a keyboard turn was left aiming from the
+ * previous frame's eye and pushed the avatar off screen centre by a full frame
+ * of turn (PI rad/s, so about 3 degrees at 60 fps and worse as the frame rate
+ * drops). Under r165 the compose was unconditional and this read correctly.
+ *
+ * Holding the flag true across the aim restores that: lookAt's own
+ * updateWorldMatrix composes the new position first, reads the eye from it, and
+ * the trailing refresh bakes the resulting quaternion for the draw.
+ */
+export function lookAtFrozen(object: THREE.Object3D, target: THREE.Vector3): void {
+  object.matrixWorldAutoUpdate = true;
+  object.lookAt(target);
+  object.updateMatrixWorld();
+  object.matrixWorldAutoUpdate = false;
+}
