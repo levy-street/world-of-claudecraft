@@ -2001,7 +2001,13 @@ question does not arise (farming has no station).
   a 4-copper-per-cycle balance leak shared with every requiredItems item,
   not a security hole. Options for the maintainer: extend the trade guard
   to honor noVendorSell/noMarketList (a general trade rule change), or
-  accept and record. Left as-is this phase.
+  accept and record. Left as-is this phase. KNOCK-ON the QA gate named:
+  garden_hoe is also the rung-2 hoe's crafting reagent (HOE_RECIPES,
+  src/sim/content/recipes.ts), so noMarketList means an engineer can no
+  longer buy that reagent off the World Market or receive it by mail; every
+  bronze hoe needs a trip to Farmer Jessica (unlimited at 20 copper) or a
+  face-to-face trade. Crafting consumption itself is unaffected; a market
+  liquidity change, not a dead end. Same read.
   (bh) NPCs ARE TERRAIN: every NPCS row is a calm-anchor pad
   (src/sim/terrain_calm_anchors.ts, rIn 6 / rOut 14), so seating four
   farmers reshaped the ground inside their skirts (the dense atlas moved 60
