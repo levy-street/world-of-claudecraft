@@ -114,9 +114,12 @@ export function analyzePerfSuggestions(
     // Hybrid-GPU laptops (brainstorm finding 16): the browser binds the
     // integrated GPU even when a discrete one exists. Mutually exclusive with
     // 'hardware-acceleration' (software classification wins, ruling R15), and
-    // never inside the desktop shell, which already forces the dGPU (PR #1991).
-    // Copy is conditional on purpose: the adapter string cannot prove a
-    // discrete GPU exists, only that the session is NOT on one.
+    // never inside the desktop shell: the shell REQUESTS the dGPU (PR #1991),
+    // and when the OS ignores that request it detects the miss and explains it
+    // through the boot gpu notice (the phase 3 discreteInactive verdict), so
+    // in-shell messaging is owned there and this copy's desktop-app claim
+    // stays web-only. Copy is conditional on purpose: the adapter string
+    // cannot prove a discrete GPU exists, only that the session is NOT on one.
     out.push({
       id: 'integrated-gpu',
       severity: 'warning',

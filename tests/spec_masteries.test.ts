@@ -117,7 +117,7 @@ describe('spec masteries', () => {
     // on the warrior), and without a stamina multiplier Faithwarden sat at 76% of
     // the prot warrior's effective HP.
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
-      global: { threatPct: 0.5 },
+      global: { threatPct: 0.4 },
       stats: { armorPct: 0.2, staPct: 0.35 },
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
@@ -170,7 +170,7 @@ describe('spec masteries', () => {
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.2 },
+      global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.45 },
       // The v0.27 Dire Bruin retune rides the mastery now that the old
       // feral_choice_bear node is retired.
       stats: { armorPct: 0.15 },
@@ -405,11 +405,11 @@ describe('spec masteries', () => {
       warrior: {
         arms: { global: 'masteryTwoHandDmgPct', value: 0.1 },
         fury: { stat: 'crit', value: 0.05 },
-        prot: { global: 'threatPct', value: 0.3 },
+        prot: { global: 'threatPct', value: 0.8 },
       },
       paladin: {
         holy: { global: 'critDmgHealPct', value: 0.5 },
-        protection: { global: 'threatPct', value: 0.5 },
+        protection: { global: 'threatPct', value: 0.4 },
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
       hunter: {

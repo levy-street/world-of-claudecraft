@@ -14,12 +14,21 @@ function sha256(bytes: Buffer): string {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
+interface AcceptedReference {
+  path: string;
+  bytes: number;
+  sha256: string;
+}
+
 describe('Vale Cup ball target portrait art', () => {
   it('pins the accepted generation and processing record', () => {
     const bytes = readFileSync(EVIDENCE_PATH);
     expect(bytes.byteLength).toBe(3316);
     expect(sha256(bytes)).toBe('93dec13c450325c580641f69d73ad2a2a1228c157e88b173ecff53f13e4dfef5');
-    const evidence = JSON.parse(bytes.toString('utf8'));
+    const evidence = JSON.parse(bytes.toString('utf8')) as {
+      generationPrompt: string;
+      references: AcceptedReference[];
+    };
     expect(evidence).toMatchObject({
       schemaVersion: 1,
       batch: 'vale-cup-ball-portrait-2026-08-10',
@@ -80,6 +89,11 @@ describe('Vale Cup ball target portrait art', () => {
         sha256: '6aae314b86b040c9b19c01b87b5c2c03d8de6b4e1d391d71873a1f7084464d5e',
       },
     ]);
+    for (const reference of evidence.references) {
+      const referenceBytes = readFileSync(resolve(process.cwd(), reference.path));
+      expect(referenceBytes.byteLength, `${reference.path} byte length`).toBe(reference.bytes);
+      expect(sha256(referenceBytes), `${reference.path} SHA-256`).toBe(reference.sha256);
+    }
   });
 
   it('ships the accepted static painting on the live target route', async () => {

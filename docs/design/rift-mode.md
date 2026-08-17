@@ -104,3 +104,18 @@ enchantment, sockets, and gems. Their rolled stats apply while equipped, survive
 save/load and wire round-trips, and are rebuilt from bounded inputs at load rather
 than trusted from JSONB. Gear can be upgraded, enchanted, socketed, unequipped
 without losing its payload, or salvaged back into power-scaled Rift Essence.
+
+The forge (upgrade, enchant, socket) has no shipped client UI yet, so the
+authoritative server refuses its three wire commands unless the realm opts in
+with RIFT_FORGE_ENABLED=1 (server/rift_forge_gate.ts, pinned by
+tests/rift_forge_gate.test.ts). Absent UI is not a gate: a crafted frame
+reaches the wire regardless, and players used exactly that path for premature
+progression before the gate landed. The sim methods stay live offline and in
+tests; only the online dispatch arms are closed. Each refused attempt books
+the woc_rift_forge_refused_total counter, the ops signal that probing
+continues (or that a realm forgot the flag once the UI ships).
+
+Note for whoever ships the forge UI: send the three commands through
+ClientWorld's cmdWithOutcome (not the fire-and-forget cmd sender), because a
+realm with the flag still off refuses with only a commandOutcome ok:false
+ack, and a rid-less sender would surface that as pure silence to the player.

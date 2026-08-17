@@ -38,12 +38,49 @@ interface MonolithRow {
 const MONOLITHS: MonolithRow[] = [
   {
     file: 'src/ui/hud.ts',
-    ceiling: 19600,
+    // Lowered after extracting the ability description prose (the placeholder
+    // values, the over-time string and the talent-conditional field choice) into
+    // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
+    // the ceiling, never raises it).
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    ceiling: 19488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
     file: 'src/render/renderer.ts',
-    ceiling: 13800,
+    // Lowered after extracting the fire-light adopter, the budget pass, the
+    // stranded-light reparent and the registry prune into
+    // src/render/fire_light_registry.ts (the ratchet's own rule: an extraction
+    // lowers the ceiling, never raises it).
+    // Lowered again after extracting the secondary-context preview warming
+    // policy into src/render/preview_prewarm_lane.ts. Earlier steps down: the
+    // per-status manifest rollup to summarizePrewarmManifest
+    // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
+    // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
+    // Raised for the desktop-client-update packet (thin-consumer wiring to the
+    // extracted modules: frame_present, dpr_watch, static_matrix, shadow cadence
+    // hookup), then lowered by that branch's rig_visibility_freeze.ts extraction.
+    // Merging release/v0.38.0 again: upstream lowered its own pin twice more
+    // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
+    // file lands between the two pins, so the ceiling is the exact merged count
+    // per the ratchet's rule: any further growth reds again.
+    // Lowered again by the castle branch's interior_light_rig.ts extraction;
+    // after merging main the merged file lands below both prior pins, so the
+    // ceiling is the exact merged count.
+    ceiling: 13689,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -90,6 +90,8 @@ function routeQuery(sql: string, params: any[]) {
     return { rows: accountRow ? [{ id: accountRow.id }] : [] };
   if (sql.includes('unsubscribe_token'))
     return { rows: [{ unsubscribe_token: params[1] ?? 'unsub-token' }] };
+  if (sql.includes('FROM accounts a') && sql.includes('account_general_chat_rate_limits'))
+    return { rows: accountRow ? [accountRow] : [] };
   if (sql.includes('FROM accounts WHERE id')) return { rows: accountRow ? [accountRow] : [] };
   if (sql.includes('COUNT(*)')) return { rows: [{ count: charCount }] };
   // Must be checked before the generic realm-scoped branch below: this is the

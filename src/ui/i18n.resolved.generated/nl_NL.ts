@@ -801,6 +801,11 @@ export const nl_NL: EnTranslations = {
       "resetAction": "Resetten",
       "note": "Sleep de chattabbladstrook om het venster te verplaatsen, of de hoekgreep om het te vergroten of verkleinen. Resetten zet het terug naar de standaardpositie en -grootte."
     },
+    "chatQuota": {
+      "limitReached": "Limiet voor de algemene chat bereikt. Probeer het over {seconds} opnieuw.",
+      "pending": "Je vorige bericht in de algemene chat wordt nog verzonden. Probeer het zo meteen opnieuw.",
+      "unavailable": "De algemene chat is tijdelijk niet beschikbaar. Probeer het binnenkort opnieuw."
+    },
     "swing": {
       "ready": "Slag",
       "seconds": "{seconds}s"
@@ -894,12 +899,12 @@ export const nl_NL: EnTranslations = {
       "update": "Bijwerken"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Spelupdate",
+      "downloading": "Update downloaden: {percent}",
+      "applying": "Update gedownload. Het spel wordt opnieuw gestart om de update toe te passen.",
+      "incompatible": "Er is een update vereist om te spelen. Deze wordt toegepast zodra het downloaden klaar is.",
+      "continueAnyway": "Doorgaan zonder bijwerken",
+      "progressLabel": "Voortgang van het downloaden van de update"
     },
     "cameraPrompt": {
       "title": "Kies je Camera",
@@ -947,6 +952,22 @@ export const nl_NL: EnTranslations = {
       "closesIn": "Sluit over {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
     },
     "compass": {
       "N": "N",
@@ -1362,6 +1383,10 @@ export const nl_NL: EnTranslations = {
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
       "showPlaytime": "Speeltijd tonen op personagescherm",
+      "forceHighPerfGpu": "Toegewijde game-GPU gebruiken",
+      "forceHighPerfGpuNote": "Standaard aan: de desktop-app vraagt deze computer om zijn toegewijde game-GPU. Zet dit uit als het spel niet opstart of met een zwart scherm opent, of als het laptopscherm leeg blijft. Wordt toegepast bij de volgende start van het spel.",
+      "discordPresence": "Discord-activiteit",
+      "discordPresenceNote": "Toont de zone waarin je je bevindt en hoelang je deze sessie al speelt als je Discord-activiteit, en iedereen die je Discord-profiel kan zien, kan beide zien. Alleen de zonenaam, je sessietijd en het spel worden gedeeld, nooit je personage, je account, of met wie je speelt. Vereist dat de Discord-app op deze computer actief is.",
       "showDevBadges": "Ontwikkelaarsinsignes tonen",
       "showOwnNameplate": "Mijn naambordje tonen",
       "showPlayerNameplates": "Spelersnamen Tonen",
@@ -1734,6 +1759,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughHonor": "Niet genoeg eer.",
       "reasons": {
         "arenaWin": "Arena-overwinning",
+        "arenaComplete": "arenagevecht uitgevochten",
         "fiestaKill": "Fiesta-uitschakeling",
         "fiestaComplete": "Fiesta voltooid",
         "fiestaWin": "Fiesta-overwinning",
@@ -1840,6 +1866,7 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
+    "itemHeroicLabel": "Heroïsch",
     "itemSoulbound": "Zielsgebonden",
     "itemUniqueEquipped": "Uniek-Uitgerust",
     "itemSet": {
@@ -2194,6 +2221,10 @@ export const nl_NL: EnTranslations = {
       "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
       "itemAriaQuest": "{item}, aantal {count}, questvoorwerp",
+      "itemAriaLocked": "{item}, aantal {count}, vergrendeld",
+      "itemLockedLine": "Vergrendeld",
+      "lockItem": "Voorwerp vergrendelen",
+      "unlockItem": "Voorwerp ontgrendelen",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",
@@ -2453,7 +2484,8 @@ export const nl_NL: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Valsspeler >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3224,6 +3256,7 @@ export const nl_NL: EnTranslations = {
       "craftedToast": "Gemaakt: {name}",
       "craftedToastQty": "Gemaakt: {name} x{qty}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
+      "reagentLocked": "Een reagens daarvoor is vergrendeld.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
       "comboRequires": "Afstemming: {craftA} + {craftB}, rang {tier}.",
@@ -3330,6 +3363,7 @@ export const nl_NL: EnTranslations = {
       "notHeld": "Je hebt dat voorwerp niet.",
       "notDisenchantable": "Je kunt dat niet onbetoveren.",
       "notSalvageable": "Je kunt dat niet salvagen.",
+      "salvageLocked": "Dat voorwerp is vergrendeld.",
       "disenchantBusy": "Je bent bezig.",
       "salvageBusy": "Je bent bezig.",
       "enchantBusy": "Je bent bezig.",
@@ -3924,6 +3958,12 @@ export const nl_NL: EnTranslations = {
       "genesis_token_claimed": "Dat Seeker Genesis Token is al geclaimd.",
       "entitlement_required": "Geverifieerde Seeker-rechten zijn vereist.",
       "current_ownership_required": "Actueel bezit van het Seeker Genesis Token is vereist."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatoraccounts kunnen niet worden gemarkeerd.",
+      "reason_required": "Een reden is vereist.",
+      "invalid_duration": "Voer een markeringsduur van minstens één seconde in.",
+      "not_marked": "Dat account is niet gemarkeerd."
     }
   },
   "guide": {
@@ -6540,6 +6580,7 @@ export const nl_NL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "jij@voorbeeld.nl",
     "emailError": "Voer een geldig e-mailadres in.",
+    "marketingOptIn": "Stuur mij nieuws en updates over het spel per e-mail (optioneel)",
     "showPassword": "Wachtwoord tonen",
     "hidePassword": "Wachtwoord verbergen",
     "logIn": "Inloggen",
@@ -6640,6 +6681,19 @@ export const nl_NL: EnTranslations = {
     "style": "Stijl",
     "resetLook": "Uiterlijk Herstellen",
     "resetShort": "Herstellen",
+    "shareTab": "Delen",
+    "designCode": "Uiterlijkcode",
+    "designCodeHint": "Kopieer deze code om dit uiterlijk op te slaan of te delen. Plak hier een code en importeer die om het uiterlijk te laden.",
+    "copyCode": "Code kopiëren",
+    "importCode": "Importeren",
+    "designCodeCopied": "Uiterlijkcode gekopieerd.",
+    "designCodeCopyManual": "Automatisch kopiëren is hier geblokkeerd. De code is geselecteerd; kopieer hem met je toetsenbord.",
+    "designCodeImported": "Uiterlijk geïmporteerd.",
+    "designCodeImportedPartial": "Uiterlijk geïmporteerd. Waarden die deze versie niet kent, zijn overgeslagen.",
+    "designCodeErrEmpty": "Plak eerst een uiterlijkcode.",
+    "designCodeErrHeader": "Dat lijkt niet op een uiterlijkcode.",
+    "designCodeErrVersion": "Die uiterlijkcode komt uit een nieuwere spelversie.",
+    "designCodeErrMalformed": "Die uiterlijkcode is beschadigd. Kopieer de volledige code en probeer het opnieuw.",
     "browFlat": "Vlak",
     "browArched": "Gebogen",
     "browThin": "Dun",
@@ -7760,7 +7814,15 @@ export const nl_NL: EnTranslations = {
       "readyBody": "Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.",
       "restart": "Nu herstarten",
       "later": "Later",
-      "dismiss": "Sluiten"
+      "dismiss": "Sluiten",
+      "whatsNew": "Bekijk wat er is veranderd in je browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is klaar",
+      "updateReadyTitleNoVersion": "Update is klaar",
+      "updateReadyBody": "Herstart World of ClaudeCraft om de update toe te passen.",
+      "partyInviteTitle": "Groepsuitnodiging",
+      "partyInviteBody": "{name} heeft je uitgenodigd voor een groep."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7772,6 +7834,7 @@ export const nl_NL: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
+    "bodyDiscreteInactive": "Het spel gebruikt niet de game-GPU en draait in plaats daarvan op de energiezuinige GPU, waardoor de prestaties zullen lijden. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
     "bodyWeb": "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
     "hybridBodyWindows": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, stel je browser dan in op Hoge prestaties via Instellingen > Systeem > Beeldscherm > Beeldinstellingen, en herstart hem daarna. De desktop-app kiest de game-GPU automatisch.",
     "hybridBodyLinux": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, dan biedt je browser of grafische stuurprogramma mogelijk een eigen GPU-keuze-instelling, of biedt je distributie een GPU-wisselhulpmiddel (zoals PRIME of optimus-manager). De desktop-app kiest de game-GPU automatisch.",
@@ -7999,7 +8062,111 @@ export const nl_NL: EnTranslations = {
       "zoomIn": "Inzoomen",
       "zoomOut": "Uitzoomen",
       "mapCanvasLabel": "Kaart",
-      "mapSummary": "Kaart van {zone}."
+      "mapSummary": "Kaart van {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Er zijn geen relevante markeringen zichtbaar.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Overige markeringen: {count}.",
+      "mapMarkerDirections": {
+        "center": "in het midden",
+        "north": "in het noorden",
+        "northeast": "in het noordoosten",
+        "east": "in het oosten",
+        "southeast": "in het zuidoosten",
+        "south": "in het zuiden",
+        "southwest": "in het zuidwesten",
+        "west": "in het westen",
+        "northwest": "in het noordwesten"
+      },
+      "mapMarkerDistances": {
+        "near": "dichtbij",
+        "medium": "op middellange afstand",
+        "far": "ver weg"
+      },
+      "mapMarkerLabels": {
+        "you": "Jij",
+        "availableQuest": "Beschikbare quest",
+        "readyQuest": "Quest klaar om in te leveren",
+        "repeatQuest": "Herhaalbare quest",
+        "cooldownQuest": "Quest in afkoeltijd",
+        "questObjective": "Gebied met questdoel",
+        "readyOre": "Beschikbare ertsader",
+        "readyWood": "Beschikbare houtopstand",
+        "readyHerb": "Beschikbaar kruidenveld",
+        "readyLockedOre": "Beschikbare ertsader, gereedschap vergrendeld",
+        "readyLockedWood": "Beschikbare houtopstand, gereedschap vergrendeld",
+        "readyLockedHerb": "Beschikbaar kruidenveld, gereedschap vergrendeld",
+        "cooldownOre": "Uitgeputte ertsader",
+        "cooldownWood": "Uitgeputte houtopstand",
+        "cooldownHerb": "Uitgeput kruidenveld",
+        "cooldownLockedOre": "Uitgeputte ertsader, gereedschap vergrendeld",
+        "cooldownLockedWood": "Uitgeputte houtopstand, gereedschap vergrendeld",
+        "cooldownLockedHerb": "Uitgeput kruidenveld, gereedschap vergrendeld",
+        "station": "Ambachtsstation: {name}",
+        "service": "Dienst: {name}",
+        "partyMember": "Groepslid: {name}",
+        "deadPartyMember": "Dood groepslid: {name}",
+        "partyMemberGeneric": "Groepslid",
+        "deadPartyMemberGeneric": "Dood groepslid",
+        "friend": "Vriend: {name}",
+        "guildMember": "Gildelid: {name}",
+        "pointOfInterest": "Interessepunt: {name}",
+        "dungeonEntrance": "Kerkeringang: {name}",
+        "dungeonExit": "Kerkeruitgang",
+        "delveEntrance": "Delve-ingang: {name}",
+        "worldPassage": "Doorgang naar {zone}",
+        "riftEntrance": "Rift-ingang: {name}",
+        "hostileEnemy": "Vijandig doelwit",
+        "aggressiveEnemy": "Vijand valt je aan",
+        "lootableEnemy": "Plunderbare vijand",
+        "corpse": "Je lichaam",
+        "deathZone": "Gevarenzone",
+        "teammate": "Teamgenoot",
+        "deadTeammate": "Dode teamgenoot",
+        "flagCarrier": "Teamgenoot met de vlag",
+        "ownFlagStand": "Jouw vlaggenstandaard",
+        "enemyFlagStand": "Vlaggenstandaard van de vijand",
+        "riftDescent": "Afdaling in de rift",
+        "riftReturnBeacon": "Terugkeerbaken",
+        "riftReturnExit": "Terugkeeruitgang",
+        "ranked": "{marker}, rang {rank}",
+        "riftTreasureAvailable": "Beschikbare schat",
+        "riftTreasureLocked": "Vergrendelde schat",
+        "riftTreasureOpened": "Geopende schat",
+        "riftTreasureJammed": "Schat met vastgelopen slot",
+        "riftCacheAvailable": "Beschikbare riftbergplaats",
+        "riftCacheLocked": "Vergrendelde bergplaats",
+        "riftCacheOpened": "Geopende bergplaats",
+        "riftCacheJammed": "Bergplaats met vastgelopen slot",
+        "pylonUnlit": "Gedoofde runenpyloon",
+        "pylonLit": "Verlichte runenpyloon",
+        "sequenceRuneUnlit": "Gedoofde reeksrune",
+        "sequenceRuneLit": "Verlichte reeksrune",
+        "iceGoal": "IJsdoel",
+        "boulderPad": "Rotsblokdoel",
+        "boulderMovable": "Verplaatsbaar rotsblok",
+        "boulderPlaced": "Geplaatst rotsblok",
+        "gateSealed": "Verzegelde poort",
+        "gateOpen": "Open poort",
+        "switchReady": "Gebruiksklare schakelaar",
+        "switchOn": "Geactiveerde schakelaar",
+        "orbDormant": "Sluimerende orb",
+        "orbActive": "Actieve orb",
+        "rollerHazard": "Gevaarlijk rollend rotsblok",
+        "delvePassageSealed": "Verzegelde doorgang",
+        "delvePassageOpen": "Open doorgang",
+        "delveSurfaceExit": "Uitgang naar de oppervlakte",
+        "delveCacheLocked": "Vergrendelde delve-kist",
+        "delveCacheReady": "Delve-kist gereed",
+        "delveCacheActive": "Delve-kist actief",
+        "delveCacheOpened": "Geopende delve-kist",
+        "delveReliquaryLocked": "Vergrendeld reliekschrijn",
+        "delveReliquaryReady": "Reliekschrijn gereed",
+        "delveReliquaryActive": "Reliekschrijnritueel actief",
+        "delveReliquaryOpened": "Geopend reliekschrijn",
+        "bountiful": "{marker} met rijke buit"
+      }
     },
     "options": {
       "gameMenu": "Spelmenu",
@@ -8039,6 +8206,9 @@ export const nl_NL: EnTranslations = {
       "graphicsReloadNote": "Beeldkwaliteit en Terreindetail worden na een herlaadbeurt toegepast.",
       "reloadNow": "Nu herladen",
       "fullscreen": "Volledig scherm",
+      "displayMode": "Schermmodus",
+      "displayModeBorderless": "Randloos volledig scherm",
+      "displayModeWindowed": "Venster",
       "touchLookSpeed": "Kijksnelheid bij aanraking",
       "joystickSize": "Joystickgrootte",
       "buttonSize": "Knopgrootte",
@@ -8915,6 +9085,10 @@ export const nl_NL: EnTranslations = {
       "filterPrimaryStatAll": "Elke eigenschap",
       "filterRarity": "Zeldzaamheid",
       "filterRarityAll": "Alle zeldzaamheden",
+      "filterSort": "Sorteren",
+      "sortName": "Naam (A-Z)",
+      "sortPriceAsc": "Prijs: laag naar hoog",
+      "collapseLowest": "Alleen de laagste prijs",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",
@@ -8945,6 +9119,8 @@ export const nl_NL: EnTranslations = {
       "quantity": "Aantal",
       "quantityOf": "van {count}",
       "priceEach": "Prijs per stuk",
+      "lowestPriceLabel": "Huidige laagste aanbiedingsprijs",
+      "lowestPriceNone": "Er zijn nog geen actieve aanbiedingen voor dit voorwerp.",
       "listButton": "Aanbieden op de Wereldmarkt",
       "minPriceError": "Noem een prijs van minstens 1 koper.",
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",
@@ -9372,6 +9548,7 @@ export const nl_NL: EnTranslations = {
       "cheap_shot": {
         "name": "Buikstoot",
         "description": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Moet in sluiptocht zijn. Levert 2 combopunten op.",
+        "descriptionNoStealth": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Levert 2 combopunten op.",
         "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec."
       },
       "sap": {
@@ -9584,7 +9761,7 @@ export const nl_NL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brandende Eed",
-        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 60%. Alleen Geloofswachter."
+        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 30%. Alleen Geloofswachter."
       },
       "retribution_aura": {
         "name": "Aura van Vergelding",
@@ -9700,7 +9877,7 @@ export const nl_NL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Steengebonden Wapen",
-        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 30% pantser, krijgt 10% minder schade en wekt tweemaal zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
+        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 40% pantser en 20% Uithouding, krijgt 15% minder schade en is immuun voor kritieke treffers van wezens en wekt 2,75 keer zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
       },
       "healing_wave": {
         "name": "Helende Wateren",
@@ -9879,7 +10056,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruingedaante",
-        "description": "Verander in een beer: pantser +130%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
+        "description": "Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
       },
       "maul": {
         "name": "Botverbrijzelen",
@@ -9889,6 +10066,10 @@ export const nl_NL: EnTranslations = {
       "growl": {
         "name": "Bedreigen",
         "description": "Gromt naar het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
+      },
+      "challenging_roar": {
+        "name": "Onheilspellend Gebrul",
+        "description": "Een onheilspellend gebrul: elke vijand binnen 10 m wordt bedreigd, zijn dreiging jegens jou stijgt tot het niveau van zijn meest gehate vijand, en wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
       },
       "cat_form": {
         "name": "Wolfsgedaante",
@@ -12221,6 +12402,9 @@ export const nl_NL: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Ongerepte Klauw"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -16710,6 +16894,11 @@ export const nl_NL: EnTranslations = {
         "name": "De Laatste Burcht",
         "enterText": "Je stapt de koude, stille hallen van de Laatste Burcht binnen.",
         "leaveText": "Je trekt de burchtdeur dicht en stapt terug de wind van de Drakenlanden in."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "De Verdronken Tempel",

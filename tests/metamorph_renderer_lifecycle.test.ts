@@ -27,6 +27,7 @@ interface LifecycleView {
 
 interface LifecycleHarness {
   views: Map<number, LifecycleView>;
+  healGlowAt: Map<number, number>;
   scene: { remove(object: THREE.Object3D): void };
   lightOwnerGroups: Set<THREE.Group>;
   viewLights: THREE.Light[];
@@ -63,6 +64,7 @@ describe('Metamorphosis renderer lifecycle', () => {
     };
     const renderer = Object.create(Renderer.prototype) as unknown as LifecycleHarness;
     renderer.views = new Map([[42, view]]);
+    renderer.healGlowAt = new Map();
     renderer.scene = { remove: vi.fn() };
     renderer.lightOwnerGroups = new Set([group]);
     renderer.viewLights = [];

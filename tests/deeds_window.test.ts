@@ -171,7 +171,7 @@ describe('hud wiring', () => {
 
   it('keeps the retro arm silent: one summary line, no banner, no audio', () => {
     const start = hud.indexOf('private handleDeedUnlocks(');
-    const end = hud.indexOf('log(text: string', start);
+    const end = hud.indexOf('\n  log(\n', start);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     // Comment-stripped (the reliquary sibling's idiom, and this file's own
@@ -202,7 +202,7 @@ describe('hud wiring', () => {
     // lines are pinned here (comment-stripped, like the arm above) so neither
     // consumer loop can be dropped while the pure plan keeps building the list.
     const start = hud.indexOf('private handleDeedUnlocks(');
-    const end = hud.indexOf('log(text: string', start);
+    const end = hud.indexOf('\n  log(\n', start);
     const body = stripLineComments(hud.slice(start, end));
     expect(body).toMatch(
       /for \(const id of plan\.titleHintIds\) \{\s*this\.log\(\s*t\('hudChrome\.deeds\.unlockedTitleHint', \{ title: deedTitleText\(id\) \}\),\s*'#ffd100',?\s*\);/,
@@ -250,7 +250,7 @@ describe('hud wiring', () => {
     expect(start).toBeGreaterThan(-1);
     // Strip line comments first: this method's prose names the 'deed' variant,
     // so an uncommented slice would let a reworded comment satisfy the pin.
-    const body = stripLineComments(hud.slice(start, hud.indexOf('log(text: string', start)));
+    const body = stripLineComments(hud.slice(start, hud.indexOf('\n  log(\n', start)));
     // The deed variant AND the R38 'deed' banner class both ride the call
     // (the celebration wrapper's second and third arguments): the class is
     // what queues it behind a live level-up instead of replacing it, the
@@ -521,7 +521,7 @@ describe('hud wiring', () => {
     // off, so BOTH earned-moment texts route through the throttled combat
     // announcer (once for the coalesced banner line, once for retro).
     const start = hud.indexOf('private handleDeedUnlocks(');
-    const body = hud.slice(start, hud.indexOf('log(text: string', start));
+    const body = hud.slice(start, hud.indexOf('\n  log(\n', start));
     expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
     expect(body).toContain('this.combatAnnouncer.push(retroText, performance.now());');
     expect(body.match(/combatAnnouncer\.push/g)?.length).toBe(2);

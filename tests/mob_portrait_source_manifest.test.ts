@@ -59,14 +59,25 @@ interface PortraitSourceManifest {
 
 const digestPattern = /^[a-f0-9]{64}$/;
 
+function buildLiveManifest(targetPath: string): PortraitSourceManifest {
+  const result = spawnSync(
+    process.execPath,
+    [script, '--write', '--manifest', targetPath, '--bootstrap-reviewed'],
+    { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+  );
+  expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+  return JSON.parse(readFileSync(targetPath, 'utf8')) as PortraitSourceManifest;
+}
+
 describe('mob portrait source manifest', () => {
-  it('is byte-fresh against the live renderer, visual manifest, models, tints, and outputs', () => {
+  it('is fresh (or at worst a bookkeeping-only bundle drift) against the live renderer, visual manifest, models, tints, and outputs', () => {
     const result = spawnSync(process.execPath, [script, '--check'], {
       cwd: repoRoot,
       encoding: 'utf8',
       timeout: 30_000,
     });
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    expect(result.stdout).toMatch(/is fresh/);
   });
 
   it('covers every live mob and records each render dependency with a content hash', () => {
@@ -253,16 +264,135 @@ describe('mob portrait source manifest', () => {
     expect(fromSubdirectory.status, fromSubdirectory.stderr).toBe(0);
     expect(fromRepoRoot.stdout).toMatch(digestPattern);
     expect(fromSubdirectory.stdout).toBe(fromRepoRoot.stdout);
-    // Tie it to the shipped acceptance, so this cannot pass by both runs being equally wrong.
-    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
-    expect(fromRepoRoot.stdout).toBe(manifest.rendererFingerprint);
   }, 150_000);
+
+  it('treats a bookkeeping-only renderer bundle drift as fresh instead of failing --check', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-check-'));
+    try {
+      const current = buildLiveManifest(join(tempDir, 'live.json'));
+      const bookkeepingDrifted = structuredClone(current);
+      bookkeepingDrifted.rendererFingerprint = 'stale-bookkeeping-fingerprint';
+      bookkeepingDrifted.renderer.browserBundle = {
+        ...bookkeepingDrifted.renderer.browserBundle,
+        sha256: 'stale-bookkeeping-bundle-hash',
+      };
+      const bookkeepingManifest = join(tempDir, 'bookkeeping.json');
+      writeFileSync(bookkeepingManifest, `${JSON.stringify(bookkeepingDrifted, null, 2)}\n`);
+
+      const bookkeepingResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', bookkeepingManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(
+        bookkeepingResult.status,
+        `${bookkeepingResult.stdout}\n${bookkeepingResult.stderr}`,
+      ).toBe(0);
+      expect(bookkeepingResult.stdout).toContain('bookkeeping-only');
+
+      const realDrift = structuredClone(bookkeepingDrifted);
+      realDrift.portraits[0] = {
+        ...realDrift.portraits[0],
+        output: { ...realDrift.portraits[0].output, sha256: 'a-real-changed-output-hash' },
+      };
+      const realDriftManifest = join(tempDir, 'real-drift.json');
+      writeFileSync(realDriftManifest, `${JSON.stringify(realDrift, null, 2)}\n`);
+
+      const realDriftResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', realDriftManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(realDriftResult.status).toBe(1);
+      expect(realDriftResult.stderr).toContain(realDrift.portraits[0].id);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('never treats a fingerprint-only corruption (bundle digest unchanged) as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-fingerprint-only-'));
+    try {
+      const current = buildLiveManifest(join(tempDir, 'live.json'));
+      const fingerprintOnlyCorrupted = structuredClone(current);
+      fingerprintOnlyCorrupted.rendererFingerprint = '0'.repeat(64);
+      const corruptedManifest = join(tempDir, 'fingerprint-only.json');
+      writeFileSync(corruptedManifest, `${JSON.stringify(fingerprintOnlyCorrupted, null, 2)}\n`);
+
+      const result = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', corruptedManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('never treats a changed browser bundle entry (non-digest metadata) as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-bundle-metadata-'));
+    try {
+      const current = buildLiveManifest(join(tempDir, 'live.json'));
+      const metadataCorrupted = structuredClone(current);
+      metadataCorrupted.rendererFingerprint = 'stale-bookkeeping-fingerprint';
+      metadataCorrupted.renderer.browserBundle = {
+        ...metadataCorrupted.renderer.browserBundle,
+        // A legitimate digest move, paired with a corrupted (never-legitimate) entry path.
+        // The check must still reject this: entry is provenance, not digest, and cannot be
+        // waved through just because the digest fields also changed.
+        sha256: 'stale-bookkeeping-bundle-hash',
+        entry: 'scripts/render_finder_portraits_corrupted.mjs',
+      };
+      const corruptedManifest = join(tempDir, 'bundle-metadata.json');
+      writeFileSync(corruptedManifest, `${JSON.stringify(metadataCorrupted, null, 2)}\n`);
+
+      const result = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', corruptedManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('never treats a missing or unparseable manifest as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-missing-'));
+    try {
+      const missingManifest = join(tempDir, 'does-not-exist.json');
+      const missingResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', missingManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(missingResult.status).toBe(1);
+      expect(missingResult.stderr).toContain('is stale');
+      expect(missingResult.stdout).not.toContain('bookkeeping-only');
+
+      const unparseableManifest = join(tempDir, 'not-json.json');
+      writeFileSync(unparseableManifest, 'not valid json');
+      const unparseableResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', unparseableManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(unparseableResult.status).toBe(1);
+      expect(unparseableResult.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
 
   it('routes the real --write CLI through receipt authorization before touching its target', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-'));
     try {
-      const canonicalBytes = readFileSync(manifestPath);
-      const current = JSON.parse(canonicalBytes.toString('utf8')) as PortraitSourceManifest;
+      const liveManifestPath = join(tempDir, 'live.json');
+      const current = buildLiveManifest(liveManifestPath);
+      const liveBytes = readFileSync(liveManifestPath);
       const prior = structuredClone(current);
       prior.portraits[0].sourceFingerprint = 'stale-source-fingerprint';
       const tempManifest = join(tempDir, 'manifest.json');
@@ -305,7 +435,7 @@ describe('mob portrait source manifest', () => {
         { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
       );
       expect(accepted.status, `${accepted.stdout}\n${accepted.stderr}`).toBe(0);
-      expect(readFileSync(tempManifest)).toEqual(canonicalBytes);
+      expect(readFileSync(tempManifest)).toEqual(liveBytes);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

@@ -65,7 +65,7 @@ import {
   DRAKELANDS_ROADS,
   DRAKELANDS_ZONE,
 } from './content/drakelands';
-import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
@@ -349,6 +349,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  DUNGEON_KEEPSAKE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -924,7 +925,6 @@ export function zoneWelcomeText(
 // Legacy single-zone exports (zone 1) — still referenced by tests and the
 // starter-town logic.
 export { DEEPFEN_SHALLOWS_LAKE, GRAVEYARD_POS, LAKE, TOWN_RADIUS };
-export const ZONE_NAME = ZONE1_ZONE.name;
 
 // ---------------------------------------------------------------------------
 // Dungeons — private party instances at far-off flat origins (see
@@ -1060,10 +1060,8 @@ export function migrateLegacyInstancePos(pos: { x: number; z: number }): {
   return { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
 }
 
-// Legacy aliases for the Hollow Crypt (tests + scripts reference these).
+// Legacy aliases for the Hollow Crypt (tests reference these).
 export const CRYPT_DOOR_POS = DUNGEONS.hollow_crypt.doorPos;
-export const CRYPT_ENTRY = DUNGEONS.hollow_crypt.entry;
-export const CRYPT_EXIT_OFFSET = DUNGEONS.hollow_crypt.exitOffset;
 export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------

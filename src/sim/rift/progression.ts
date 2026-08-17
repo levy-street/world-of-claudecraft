@@ -26,7 +26,6 @@ export const RIFT_ENCHANT_STATS = [
   'critRating',
   'hasteRating',
 ] as const;
-export type RiftEnchantStat = (typeof RIFT_ENCHANT_STATS)[number];
 
 const TIER_POWER: Record<RiftTier, number> = { C: 1, B: 2, A: 3, S: 4 };
 const MELEE_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);

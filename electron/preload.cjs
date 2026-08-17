@@ -148,4 +148,131 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     return () => ipcRenderer.removeListener('desktop-update-event', listener);
   },
   installUpdate: () => ipcRenderer.invoke('desktop-update-install'),
+  // The shell's GPU verdict, pushed once the GPU process has reported (and again
+  // after a crash-recovery reload). Payloads are the whitelisted shape built in
+  // electron/gpu_status_events.cjs; the renderer localizes the notice itself.
+  onGpuStatus: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        typeof payload.softwareRendering === 'boolean' &&
+        typeof payload.discreteInactive === 'boolean' &&
+        typeof payload.adapter === 'string'
+      ) {
+        callback(payload);
+      }
+    };
+    ipcRenderer.on('desktop-gpu-status', listener);
+    return () => ipcRenderer.removeListener('desktop-gpu-status', listener);
+  },
+  // Whether the player has opted out of the shell forcing the discrete GPU.
+  // Both are about the NEXT launch: the force levers run before Electron's own
+  // startup, so the shell stores the choice rather than applying it live. The
+  // setter answers whether the value actually reached disk.
+  getGpuForceOptOut: () => ipcRenderer.invoke('desktop-get-gpu-force-opt-out'),
+  setGpuForceOptOut: (optOut) =>
+    ipcRenderer.invoke('desktop-set-gpu-force-opt-out', optOut === true),
+  // How the shell presents its window: 'borderless' (full screen) or 'windowed'.
+  // The setter applies live AND stores for the next launch, and answers whether
+  // the choice actually reached disk. An unknown mode is refused here rather
+  // than crossing the bridge, so main only ever sees a value it can apply.
+  getDisplayMode: () => ipcRenderer.invoke('desktop-get-display-mode'),
+  setDisplayMode: (mode) => {
+    if (mode !== 'borderless' && mode !== 'windowed') return Promise.resolve(false);
+    return ipcRenderer.invoke('desktop-set-display-mode', mode);
+  },
+  // Gamepad activity, so the shell can keep the display awake during a
+  // controller-only session (gamepad input does not reset the OS idle timer).
+  // Fire-and-forget from the renderer's input loop: it returns nothing and
+  // swallows a rejection, because a shell that cannot take the lease must never
+  // surface an unhandled rejection in the game's input path.
+  notifyGamepadActivity: () => {
+    ipcRenderer.invoke('desktop-gamepad-activity').catch(() => {});
+  },
+  // An OS notification, with both strings already rendered by the renderer's
+  // t(). Refused here unless it is one of the two kinds main will accept, and
+  // rebuilt into a fresh object so no renderer prototype crosses the bridge,
+  // pre-capped so a hostile page cannot ship unbounded strings across the IPC
+  // (main re-clamps to the visible 120/240 without trusting these caps).
+  // Fire-and-forget: it returns nothing, swallows the rejection, and guards the
+  // synchronous throw, because a shell that cannot notify must never surface an
+  // error in the caller's path.
+  showNotification: (payload) => {
+    if (!payload || typeof payload !== 'object') return;
+    const kind = payload.kind;
+    if (kind !== 'update-ready' && kind !== 'party-invite') return;
+    if (typeof payload.title !== 'string' || typeof payload.body !== 'string') return;
+    const message = { kind, title: payload.title.slice(0, 512), body: payload.body.slice(0, 1024) };
+    try {
+      ipcRenderer.invoke('desktop-show-notification', message).catch(() => {});
+    } catch {}
+  },
+  // The Discord Rich Presence line, with the details string already rendered by
+  // the renderer's t(). null is the clear. Rebuilt into a fresh object (nested
+  // timestamps included) so no renderer prototype crosses the bridge, and
+  // pre-capped so a hostile page cannot ship an unbounded string across the IPC
+  // (main re-clamps to the visible 128 without trusting this cap). Fire-and-
+  // forget: it returns nothing, swallows the rejection, and guards the
+  // synchronous throw, because a shell that cannot report presence must never
+  // surface an error in the caller's path.
+  setDiscordActivity: (activity) => {
+    let message = null;
+    if (activity !== null) {
+      if (!activity || typeof activity !== 'object') return;
+      if (typeof activity.details !== 'string') return;
+      message = { details: activity.details.slice(0, 256) };
+      const timestamps = activity.timestamps;
+      if (timestamps && typeof timestamps === 'object' && typeof timestamps.start === 'number') {
+        message.timestamps = { start: timestamps.start };
+      }
+    }
+    try {
+      ipcRenderer.invoke('desktop-set-discord-activity', message).catch(() => {});
+    } catch {}
+  },
+  // The player's Discord presence setting. Refused here unless it is a real
+  // boolean, so main only ever sees a value it can store; fire-and-forget for
+  // the same reason as the activity above.
+  setDiscordPresenceEnabled: (enabled) => {
+    if (enabled !== true && enabled !== false) return;
+    try {
+      ipcRenderer.invoke('desktop-set-discord-presence-enabled', enabled).catch(() => {});
+    } catch {}
+  },
+  // Whether the shell's window is minimized or hidden, pushed from the main
+  // process because the page cannot see it: the window sets
+  // backgroundThrottling:false, which keeps document.visibilityState at
+  // 'visible' the whole time it is minimized.
+  onPresentationChanged: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => {
+      if (payload && typeof payload === 'object' && typeof payload.hidden === 'boolean') {
+        callback(payload);
+      }
+    };
+    ipcRenderer.on('desktop-presentation-changed', listener);
+    return () => ipcRenderer.removeListener('desktop-presentation-changed', listener);
+  },
+  // The scale factor of the display the window sits on, pushed when it changes.
+  // The display's identity decides main-side whether a change is worth sending
+  // and never crosses the bridge. The finiteness check is not ceremony: the
+  // renderer resolves a pixel ratio from this, so a NaN would poison every
+  // frame after it.
+  onDisplayChanged: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, payload) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        typeof payload.scaleFactor === 'number' &&
+        Number.isFinite(payload.scaleFactor)
+      ) {
+        callback(payload);
+      }
+    };
+    ipcRenderer.on('desktop-display-changed', listener);
+    return () => ipcRenderer.removeListener('desktop-display-changed', listener);
+  },
 });

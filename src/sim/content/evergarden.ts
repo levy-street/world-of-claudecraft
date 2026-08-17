@@ -13,6 +13,7 @@
 // fountain live in render/garden_features.ts (the greatTrees records below
 // give the sim its solid trunk colliders).
 
+import { DAWNHOLD_BUILDINGS, DAWNHOLD_COURT_STATUE } from '../dawnhold_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -82,11 +83,16 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
     { x: 360, z: 936 },
   ], // Hedgewick -> the Parterre Walk -> dead-aligned with the entrance arch
   [
+    // Runs DOWN THE OUTSIDE of Dawnhold's east curtain to the main gate.
+    // The pre-castle line cut the wall at (292, 867), a solid stretch, and
+    // then ran on inside the bailey: the road reached the gate from behind
+    // instead of arriving at it.
     { x: 320, z: 810 },
     { x: 298, z: 852 },
-    { x: 290, z: 872 },
-    { x: 288, z: 887 },
-  ], // Hedgewick -> the Rose Wilds -> Dawnhold's gate
+    { x: 297, z: 872 },
+    { x: 296, z: 884 },
+    { x: 294, z: 887 },
+  ], // Hedgewick -> the Rose Wilds -> Dawnhold's main gate
   [
     // skirts SOUTH around the bluff dip by the pond inlet: the old straight
     // line ran down a steep bank; these waypoints hold the flat shelf
@@ -547,7 +553,9 @@ export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'topiary_stag', center: { x: 364, z: 898 }, radius: 10, count: 3 },
   { mobId: 'topiary_stag', center: { x: 326, z: 1146 }, radius: 10, count: 3 },
   // the castle pack prowls the gate lawn outside Dawnhold's east wall
-  { mobId: 'topiary_wolf', center: { x: 294, z: 906 }, radius: 10, count: 3 },
+  // (center + radius keep every spawn clear of the wall face at x 293.5,
+  // so no wolf ever spawns inside the bailey)
+  { mobId: 'topiary_wolf', center: { x: 302, z: 898 }, radius: 6, count: 3 },
   { mobId: 'topiary_wolf', center: { x: 418, z: 1124 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 268, z: 1002 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 456, z: 942 }, radius: 10, count: 2 },
@@ -560,7 +568,9 @@ export const EVERGARDEN_CAMPS: CampDef[] = [
 // knights patrol beside the existing topiary wolf camps: the wolves are
 // their hounds.
 export const EVERGARDEN_KNIGHT_CAMPS: CampDef[] = [
-  { mobId: 'hedge_knight', center: { x: 276, z: 886 }, radius: 8, count: 3 }, // Dawnhold gate
+  // moved out of the rebuilt bailey to the garrison annex outside the NE
+  // corner (same array slot: camp order is rng-draw-order load-bearing)
+  { mobId: 'hedge_knight', center: { x: 306, z: 872 }, radius: 8, count: 3 }, // Dawnhold annex
   { mobId: 'hedge_knight', center: { x: 410, z: 1118 }, radius: 8, count: 2 }, // the north watch
   // the maze patrol: lone knights pacing three of the Great Maze's dead-end
   // corridors (tight radius keeps each on its corridor cell; mob movement
@@ -581,7 +591,9 @@ export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [
     // above the Rose Wilds, on the pond-walk road east of the maze, on the
     // west lawn by the gnome warren, and on the south lawn past the hedges.
     positions: [
-      { x: 280, z: 922 },
+      // the Rose Wilds sister now stands inside Dawnhold's courtyard (her
+      // old spot at 280,922 is under the rebuilt south curtain wall)
+      { x: 277, z: 912 },
       { x: 452, z: 930 },
       { x: 274, z: 1012 },
       { x: 426, z: 1118 },
@@ -651,37 +663,29 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { key: 'hexWindmill', x: 504, z: 760, rot: -0.3, scale: 9, r: 5, h: 13 },
     { key: 'hexWindmill', x: 492, z: 744, rot: 0.4, scale: 8, r: 4.5, h: 12 },
     { key: 'hexWindmill', x: 516, z: 750, rot: -1.1, scale: 8, r: 4.5, h: 12 },
-    // Dawnhold: the walled garden castle on the Rose Wilds lawn. The keep
-    // holds the west side with a WIDE courtyard before the east gate wall
-    // (cannon towers flanking the stone arch, plain towers at the rear),
-    // and the Rose Wilds road runs right to the gate. The knights garrison
-    // the courtyard; their wolves prowl the gate lawn outside.
-    { key: 'hexCastle', x: 252, z: 889, rot: Math.PI / 2, scale: 11, r: 12.5, h: 42 },
-    { key: 'hexCannonTower', x: 286, z: 866, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 22 },
-    { key: 'hexCannonTower', x: 286, z: 912, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 22 },
-    { key: 'hexTower', x: 240, z: 866, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 20 },
-    { key: 'hexTower', x: 240, z: 912, rot: Math.PI / 2, scale: 9.5, r: 4.8, h: 20 },
-    // curtain walls in short overlapping runs so their circle colliders
-    // leave no walk-through seams anywhere along a wall line
-    { key: 'hexWall', x: 286, z: 872, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 286, z: 880, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 286, z: 898, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 286, z: 906, rot: Math.PI / 2, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 250, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 258, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 266, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 274, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 281, z: 912, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 250, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 258, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 266, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 274, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'hexWall', x: 281, z: 866, rot: 0, scale: 5, r: 4.5, h: 9 },
-    { key: 'gardenArch', x: 286, z: 889, rot: Math.PI / 2, scale: 2.2 },
-    { key: 'hexFlag', x: 286, z: 884.5, scale: 4 },
-    { key: 'hexFlag', x: 286, z: 893.5, scale: 4 },
-    { key: 'hexCannonballs', x: 272, z: 905, scale: 7 },
-    { key: 'hexWeaponRack', x: 272, z: 873, rot: 1.2, scale: 9 },
+    // Dawnhold: rebuilt from the old decor shell into REAL walkable castle
+    // grounds (the Last Keep idiom, garden-sized). The curtain walls are
+    // now dawnholdLift terrain drawn by render/dawnhold_features.ts; only
+    // the bailey buildings ride the decorProps path (dawnhold_layout.ts is
+    // the plan). The knights garrison the annex outside the northeast
+    // corner; their wolves still prowl the gate lawn.
+    ...DAWNHOLD_BUILDINGS,
+    { key: 'hexCannonballs', x: 276.5, z: 909, scale: 7 },
+    { key: 'hexWeaponRack', x: 250, z: 884, rot: 1.2, scale: 9 },
+    // the leafy fox at the centre of the walled flower court: the maze
+    // arches' topiary gatekeeper, a size larger as the court's
+    // centrepiece. rot 0 puts its front (+z) on the south doorway, and at
+    // scale 5 it stands 4.9 tall, reading over the 3.2yd court wall from
+    // the lawn outside.
+    {
+      key: 'leafyFoxStatue',
+      x: DAWNHOLD_COURT_STATUE.x,
+      z: DAWNHOLD_COURT_STATUE.z,
+      rot: 0,
+      scale: 5,
+      r: 1.8,
+      h: 4.9,
+    },
     { key: 'hexBarracks', x: 306, z: 860, rot: -0.9, scale: 8, r: 6, h: 13 },
     // Hedgewick's medieval quarter, spread for easy walking: chapel by the
     // churchyard, tavern on the pond road, smithy west, homes and the

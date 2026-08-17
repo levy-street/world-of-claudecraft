@@ -801,6 +801,11 @@ export const cs_CZ: EnTranslations = {
       "resetAction": "Reset",
       "note": "Tažením lišty karet chatu přesuneš okno, rohovým úchytem změníš velikost. Reset ho vrátí na výchozí pozici a velikost."
     },
+    "chatQuota": {
+      "limitReached": "Byl dosažen limit chatu Obecného. Zkus to znovu za {seconds}.",
+      "pending": "Tvoje předchozí zpráva v chatu Obecném se ještě odesílá. Zkus to za chvíli znovu.",
+      "unavailable": "Chat Obecný je dočasně nedostupný. Zkus to znovu brzy."
+    },
     "swing": {
       "ready": "Úder",
       "seconds": "{seconds} s"
@@ -894,12 +899,12 @@ export const cs_CZ: EnTranslations = {
       "update": "Aktualizovat"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Aktualizace hry",
+      "downloading": "Stahování aktualizace: {percent}",
+      "applying": "Aktualizace stažena. Hra se restartuje, aby se použila.",
+      "incompatible": "Ke hraní je nutná aktualizace. Použije se, jakmile se dokončí stahování.",
+      "continueAnyway": "Pokračovat bez aktualizace",
+      "progressLabel": "Průběh stahování aktualizace"
     },
     "cameraPrompt": {
       "title": "Zvolte si kameru",
@@ -947,6 +952,22 @@ export const cs_CZ: EnTranslations = {
       "closesIn": "Zavře se za {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
     },
     "compass": {
       "N": "S",
@@ -1362,6 +1383,10 @@ export const cs_CZ: EnTranslations = {
       "showWalletOnCharacterScreen": "Zobrazit peněženku na obrazovce postavy",
       "showWalletOnPlayerCard": "Zobrazit peněženku na kartě hráče",
       "showPlaytime": "Zobrazit odehraný čas na obrazovce postavy",
+      "forceHighPerfGpu": "Používat samostatnou herní grafickou kartu",
+      "forceHighPerfGpuNote": "Ve výchozím nastavení zapnuto: desktopová aplikace požádá tento počítač o jeho samostatnou herní grafickou kartu. Toto vypni, pokud se hra nespustí, otevře se s černou obrazovkou, nebo displej notebooku zhasne. Projeví se až při příštím spuštění hry.",
+      "discordPresence": "Rozšířená aktivita Discordu",
+      "discordPresenceNote": "Zobrazuje zónu, ve které se nacházíš, a jak dlouho hraješ tuto relaci, jako tvou aktivitu na Discordu, a obojí vidí kdokoli, kdo vidí tvůj profil na Discordu. Sdílí se jen název zóny, čas tvé relace a název hry, nikdy tvoje postava, tvůj účet nebo s kým hraješ. Vyžaduje spuštěnou aplikaci Discord na tomto počítači.",
       "showDevBadges": "Zobrazit vývojářské odznaky",
       "showOwnNameplate": "Zobrazit mou jmenovku",
       "showPlayerNameplates": "Zobrazit jmenovky hráčů",
@@ -1734,6 +1759,7 @@ export const cs_CZ: EnTranslations = {
       "notEnoughHonor": "Nemáš dost cti.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
+        "arenaComplete": "Odehrán souboj v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
         "fiestaComplete": "Dokončení Fiesty",
         "fiestaWin": "Vítězství ve Fiestě",
@@ -1840,6 +1866,7 @@ export const cs_CZ: EnTranslations = {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
     "itemHeroicTag": "[HRDINSKÉ]",
+    "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemSet": {
@@ -2194,6 +2221,10 @@ export const cs_CZ: EnTranslations = {
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "itemAriaQuest": "{item}, množství {count}, úkolový předmět",
+      "itemAriaLocked": "{item}, počet {count}, zamčeno",
+      "itemLockedLine": "Zamčeno",
+      "lockItem": "Zamknout předmět",
+      "unlockItem": "Odemknout předmět",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -2453,7 +2484,8 @@ export const cs_CZ: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "PRYČ"
+      "afkTag": "PRYČ",
+      "cheaterTag": "< Podvodník >"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -3224,6 +3256,7 @@ export const cs_CZ: EnTranslations = {
       "craftedToast": "Vyrobeno: {name}",
       "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
+      "reagentLocked": "Reagencie pro to je zamčená.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
       "comboRequires": "Ladění: {craftA} + {craftB}, úroveň {tier}.",
@@ -3330,6 +3363,7 @@ export const cs_CZ: EnTranslations = {
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
       "notSalvageable": "Toto nelze rozebrat.",
+      "salvageLocked": "Tento předmět je zamčený.",
       "disenchantBusy": "Jsi zaneprázdněn(a).",
       "salvageBusy": "Jsi zaneprázdněn(a).",
       "enchantBusy": "Jsi zaneprázdněn(a).",
@@ -3924,6 +3958,12 @@ export const cs_CZ: EnTranslations = {
       "genesis_token_claimed": "Tento Seeker Genesis Token už byl uplatněn.",
       "entitlement_required": "Je vyžadováno ověřené oprávnění Seeker.",
       "current_ownership_required": "Je vyžadováno aktuální vlastnictví Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Účty operátorů nelze označit.",
+      "reason_required": "Je nutné uvést důvod.",
+      "invalid_duration": "Zadejte dobu označení alespoň jednu sekundu.",
+      "not_marked": "Tento účet není označen."
     }
   },
   "guide": {
@@ -6540,6 +6580,7 @@ export const cs_CZ: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Zadej platnou e-mailovou adresu.",
+    "marketingOptIn": "Chci dostávat novinky a aktualizace hry e-mailem (volitelné)",
     "showPassword": "Zobrazit heslo",
     "hidePassword": "Skrýt heslo",
     "logIn": "Přihlásit se",
@@ -6640,6 +6681,19 @@ export const cs_CZ: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetovat vzhled",
     "resetShort": "Resetovat",
+    "shareTab": "Sdílet",
+    "designCode": "Kód vzhledu",
+    "designCodeHint": "Zkopírujte tento kód, chcete-li vzhled uložit nebo sdílet. Vložte sem kód a importujte jej, abyste vzhled načetli.",
+    "copyCode": "Kopírovat kód",
+    "importCode": "Importovat",
+    "designCodeCopied": "Kód vzhledu byl zkopírován.",
+    "designCodeCopyManual": "Automatické kopírování je zde zablokováno. Kód je vybraný, zkopírujte jej pomocí klávesnice.",
+    "designCodeImported": "Vzhled byl importován.",
+    "designCodeImportedPartial": "Vzhled byl importován. Hodnoty, které tato verze nezná, byly přeskočeny.",
+    "designCodeErrEmpty": "Nejprve vložte kód vzhledu.",
+    "designCodeErrHeader": "Toto nevypadá jako kód vzhledu.",
+    "designCodeErrVersion": "Tento kód vzhledu pochází z novější verze hry.",
+    "designCodeErrMalformed": "Tento kód vzhledu je poškozený. Zkopírujte celý kód a zkuste to znovu.",
     "browFlat": "Rovné",
     "browArched": "Klenuté",
     "browThin": "Tenké",
@@ -7760,7 +7814,15 @@ export const cs_CZ: EnTranslations = {
       "readyBody": "Nainstaluje se při ukončení, nebo restartuj hned.",
       "restart": "Restartovat hned",
       "later": "Později",
-      "dismiss": "Zavřít"
+      "dismiss": "Zavřít",
+      "whatsNew": "Zobrazit změny v prohlížeči"
+    },
+    "notify": {
+      "updateReadyTitle": "Aktualizace {version} je připravena",
+      "updateReadyTitleNoVersion": "Aktualizace je připravena",
+      "updateReadyBody": "Restartuj World of ClaudeCraft, aby se aktualizace použila.",
+      "partyInviteTitle": "Pozvánka do skupiny",
+      "partyInviteBody": "{name} tě pozval(a) do skupiny."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7772,6 +7834,7 @@ export const cs_CZ: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.",
+    "bodyDiscreteInactive": "Hra nepoužívá samostatnou (herní) grafickou kartu a místo toho běží na úsporné grafické kartě, takže výkon utrpí. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows navíc nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.",
     "bodyWeb": "Hra běží bez grafické akcelerace a bude pomalá. Povol hardwarovou akceleraci v nastavení prohlížeče, aktualizuj ovladače grafiky a restartuj prohlížeč.",
     "hybridBodyWindows": "Tato relace se vykresluje na integrované (úsporné) grafické kartě. Pokud má tento počítač i samostatnou herní grafickou kartu, nastav prohlížeč na Vysoký výkon v Nastavení, Systém, Displej, Grafika, a pak ho restartuj. Desktopová aplikace vybere samostatnou grafickou kartu automaticky.",
     "hybridBodyLinux": "Tato relace se vykresluje na integrované (úsporné) grafické kartě. Pokud má tento počítač i samostatnou herní grafickou kartu, tvůj prohlížeč nebo grafický ovladač může mít vlastní nastavení výběru GPU, případně tvoje distribuce může nabízet nástroj pro přepínání grafiky (například PRIME nebo optimus-manager). Desktopová aplikace vybere samostatnou grafickou kartu automaticky.",
@@ -7999,7 +8062,111 @@ export const cs_CZ: EnTranslations = {
       "zoomIn": "Přiblížit",
       "zoomOut": "Oddálit",
       "mapCanvasLabel": "Mapa",
-      "mapSummary": "Mapa oblasti {zone}."
+      "mapSummary": "Mapa oblasti {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Nejsou vidět žádné významné značky.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Další značky: {count}.",
+      "mapMarkerDirections": {
+        "center": "uprostřed",
+        "north": "severně",
+        "northeast": "severovýchodně",
+        "east": "východně",
+        "southeast": "jihovýchodně",
+        "south": "jižně",
+        "southwest": "jihozápadně",
+        "west": "západně",
+        "northwest": "severozápadně"
+      },
+      "mapMarkerDistances": {
+        "near": "blízko",
+        "medium": "ve střední vzdálenosti",
+        "far": "daleko"
+      },
+      "mapMarkerLabels": {
+        "you": "Ty",
+        "availableQuest": "Dostupný úkol",
+        "readyQuest": "Úkol připravený k odevzdání",
+        "repeatQuest": "Opakovatelný úkol",
+        "cooldownQuest": "Úkol čeká na obnovení",
+        "questObjective": "Oblast cíle úkolu",
+        "readyOre": "Dostupná rudná žíla",
+        "readyWood": "Dostupná skupina stromů",
+        "readyHerb": "Dostupný porost bylin",
+        "readyLockedOre": "Dostupná rudná žíla, potřebný nástroj je uzamčený",
+        "readyLockedWood": "Dostupná skupina stromů, potřebný nástroj je uzamčený",
+        "readyLockedHerb": "Dostupný porost bylin, potřebný nástroj je uzamčený",
+        "cooldownOre": "Vytěžená rudná žíla",
+        "cooldownWood": "Vykácená skupina stromů",
+        "cooldownHerb": "Sesbíraný porost bylin",
+        "cooldownLockedOre": "Vytěžená rudná žíla, potřebný nástroj je uzamčený",
+        "cooldownLockedWood": "Vykácená skupina stromů, potřebný nástroj je uzamčený",
+        "cooldownLockedHerb": "Sesbíraný porost bylin, potřebný nástroj je uzamčený",
+        "station": "Řemeslná stanice: {name}",
+        "service": "Služba: {name}",
+        "partyMember": "Člen skupiny: {name}",
+        "deadPartyMember": "Mrtvý člen skupiny: {name}",
+        "partyMemberGeneric": "Člen skupiny",
+        "deadPartyMemberGeneric": "Mrtvý člen skupiny",
+        "friend": "Přítel: {name}",
+        "guildMember": "Člen cechu: {name}",
+        "pointOfInterest": "Zajímavé místo: {name}",
+        "dungeonEntrance": "Vstup do dungeonu: {name}",
+        "dungeonExit": "Východ z dungeonu",
+        "delveEntrance": "Vstup do výpravy: {name}",
+        "worldPassage": "Průchod do oblasti: {zone}",
+        "riftEntrance": "Vstup do trhliny: {name}",
+        "hostileEnemy": "Nepřátelská jednotka",
+        "aggressiveEnemy": "Nepřítel, který na tebe útočí",
+        "lootableEnemy": "Nepřítel s dostupnou kořistí",
+        "corpse": "Tvoje mrtvé tělo",
+        "deathZone": "Nebezpečná zóna",
+        "teammate": "Spoluhráč",
+        "deadTeammate": "Mrtvý spoluhráč",
+        "flagCarrier": "Spoluhráč nesoucí vlajku",
+        "ownFlagStand": "Stojan na tvoji vlajku",
+        "enemyFlagStand": "Stojan na nepřátelskou vlajku",
+        "riftDescent": "Sestup trhlinou",
+        "riftReturnBeacon": "Návratový maják",
+        "riftReturnExit": "Východ zpět",
+        "ranked": "{marker}, stupeň {rank}",
+        "riftTreasureAvailable": "Dostupný poklad",
+        "riftTreasureLocked": "Uzamčený poklad",
+        "riftTreasureOpened": "Otevřený poklad",
+        "riftTreasureJammed": "Poklad se zaseknutým zámkem",
+        "riftCacheAvailable": "Dostupná skrýš trhliny",
+        "riftCacheLocked": "Uzamčená skrýš",
+        "riftCacheOpened": "Otevřená skrýš",
+        "riftCacheJammed": "Skrýš se zaseknutým zámkem",
+        "pylonUnlit": "Zhasnutý runový pilíř",
+        "pylonLit": "Rozsvícený runový pilíř",
+        "sequenceRuneUnlit": "Zhasnutá sekvenční runa",
+        "sequenceRuneLit": "Rozsvícená sekvenční runa",
+        "iceGoal": "Ledový cíl",
+        "boulderPad": "Cíl pro balvan",
+        "boulderMovable": "Balvan k přesunutí",
+        "boulderPlaced": "Umístěný balvan",
+        "gateSealed": "Zapečetěná brána",
+        "gateOpen": "Otevřená brána",
+        "switchReady": "Spínač připravený k aktivaci",
+        "switchOn": "Aktivovaný spínač",
+        "orbDormant": "Spící koule",
+        "orbActive": "Aktivní koule",
+        "rollerHazard": "Nebezpečný valící se balvan",
+        "delvePassageSealed": "Zapečetěný průchod",
+        "delvePassageOpen": "Otevřený průchod",
+        "delveSurfaceExit": "Východ na povrch",
+        "delveCacheLocked": "Uzamčená skrýš výpravy",
+        "delveCacheReady": "Připravená skrýš výpravy",
+        "delveCacheActive": "Aktivní skrýš výpravy",
+        "delveCacheOpened": "Otevřená skrýš výpravy",
+        "delveReliquaryLocked": "Uzamčený relikviář",
+        "delveReliquaryReady": "Připravený relikviář",
+        "delveReliquaryActive": "Probíhá obřad relikviáře",
+        "delveReliquaryOpened": "Otevřený relikviář",
+        "bountiful": "{marker} s bohatou kořistí"
+      }
     },
     "options": {
       "gameMenu": "Herní menu",
@@ -8039,6 +8206,9 @@ export const cs_CZ: EnTranslations = {
       "graphicsReloadNote": "Kvalita grafiky a detail terénu se použijí po obnovení.",
       "reloadNow": "Obnovit hned",
       "fullscreen": "Celá obrazovka",
+      "displayMode": "Režim zobrazení",
+      "displayModeBorderless": "Celá obrazovka bez okrajů",
+      "displayModeWindowed": "Okno",
       "touchLookSpeed": "Rychlost dotykového pohledu",
       "joystickSize": "Velikost joysticku",
       "buttonSize": "Velikost tlačítek",
@@ -8915,6 +9085,10 @@ export const cs_CZ: EnTranslations = {
       "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
+      "filterSort": "Řazení",
+      "sortName": "Název (A-Z)",
+      "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
+      "collapseLowest": "Pouze nejnižší cena",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",
@@ -8945,6 +9119,8 @@ export const cs_CZ: EnTranslations = {
       "quantity": "Množství",
       "quantityOf": "z {count}",
       "priceEach": "Cena za kus",
+      "lowestPriceLabel": "Současná nejnižší nabídková cena",
+      "lowestPriceNone": "Pro tento předmět zatím nejsou žádné aktivní nabídky.",
       "listButton": "Nabídnout na Světovém trhu",
       "minPriceError": "Zadej cenu alespoň 1 měď.",
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",
@@ -9372,6 +9548,7 @@ export const cs_CZ: EnTranslations = {
       "cheap_shot": {
         "name": "Rána do břicha",
         "description": "Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Musíš být v skrytí. Udělí 2 combo body.",
+        "descriptionNoStealth": "Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Udělí 2 combo body.",
         "specNote_subtlety": "Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí: takové použití nic nestojí, spotřebuje všechna 3 Šera a spustí Stínový závoj na 6 s."
       },
       "sap": {
@@ -9584,7 +9761,7 @@ export const cs_CZ: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Hořící přísaha",
-        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 60 %. Pouze Strážce víry."
+        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 30 %. Pouze Strážce víry."
       },
       "retribution_aura": {
         "name": "Aura odplaty",
@@ -9700,7 +9877,7 @@ export const cs_CZ: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Zbraň spoutaná kamenem",
-        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 30 % zbroje, utrpí o 10 % nižší poškození a vytváří dvojnásobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
+        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 40 % zbroje a 20 % výdrže, utrpí o 15 % nižší poškození a je odolný vůči kritickým zásahům od nestvůr a vytváří 2,75násobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
       },
       "healing_wave": {
         "name": "Léčivé vody",
@@ -9879,7 +10056,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_form": {
         "name": "Medvědí podoba",
-        "description": "Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
+        "description": "Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
       },
       "maul": {
         "name": "Drcení kostí",
@@ -9889,6 +10066,10 @@ export const cs_CZ: EnTranslations = {
       "growl": {
         "name": "Hrozba",
         "description": "Zavrčí na cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit. Pouze v medvědí podobě."
+      },
+      "challenging_roar": {
+        "name": "Zlověstný řev",
+        "description": "Zlověstný řev: každý nepřítel do 10 yardů je vyprovokován, jeho hrozba vůči tobě se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a je nucen na tebe 3 s útočit. Pouze v medvědí podobě."
       },
       "cat_form": {
         "name": "Vlčí podoba",
@@ -12221,6 +12402,9 @@ export const cs_CZ: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Nedotčený dráp"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -16710,6 +16894,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Poslední tvrz",
         "enterText": "Vstupuješ do chladných, tichých síní Poslední tvrze.",
         "leaveText": "Zavíráš bránu tvrze za sebou a vracíš se do větru Dračích zemí."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Utopený chrám",

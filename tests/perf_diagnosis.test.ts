@@ -12,6 +12,7 @@ function baseSnapshot(): PerfSnapshot {
   return {
     seconds: 20,
     frames: 1200,
+    hiddenPresentSkips: 0,
     fps: 60,
     frameMs: { avg: 16, p50: 16, p95: 16, p99: 18, max: 22, long50: 0 },
     windows: {
@@ -38,6 +39,7 @@ function baseSnapshot(): PerfSnapshot {
     renderer: {
       graphicsConfigVersion: 1,
       tier: 'high',
+      currentZoneId: 'eastbrook_vale',
       qualityBuckets: {
         version: 1,
         bands: {} as never,
@@ -61,6 +63,7 @@ function baseSnapshot(): PerfSnapshot {
       budget: {} as never,
       renderScale: 1,
       effectiveRenderScale: 1,
+      shadowCadenceHalfRate: false,
       renderBudget: {
         enabled: true,
         mode: 'stable',
@@ -119,12 +122,28 @@ function baseSnapshot(): PerfSnapshot {
         units: 0,
         totalSyncMs: 0,
         worstSyncMs: 0,
+        totalFrameGapMs: 0,
+        worstFrameGapMs: 0,
+        worstUnsharedFrameGapMs: 0,
         slowest: [],
+        blockiest: [],
         pending: 0,
         active: null,
         waitingTails: [],
         stallCount: 0,
         stalls: [],
+        worstWaitMs: 0,
+        longestWaits: [],
+        recent: {
+          windowMs: 30000,
+          units: 0,
+          totalSyncMs: 0,
+          totalFrameGapMs: 0,
+          worstSyncMs: 0,
+          worstFrameGapMs: 0,
+          worstWaitMs: 0,
+          lanes: [],
+        },
       },
     },
     hud: { hotDomWrites: 10, hotDomSkippedWrites: 90, hotDomSkipRate: 0.9 },

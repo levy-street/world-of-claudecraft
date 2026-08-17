@@ -14,8 +14,14 @@ import {
 import { applyNodeReadiness, serializeNodeReadiness } from '../src/sim/professions/node_persist';
 import { Rng } from '../src/sim/rng';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
-const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+// Node readiness is keyed off GATHER_NODES (static content) and the caller's
+// own explicit Rng, never off the Sim's ambient world: every Sim here only
+// needs a player and its clock, so EMPTY_TEST_WORLD (no camps, npcs, or
+// ground objects) skips the built-in world's population cost for free.
+const makeSim = (seed = 11) =>
+  new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
 const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
 
 // A real shipped node: the load filter keeps live ids only, so every arm below

@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function devSim(seed = 42): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: EMPTY_TEST_WORLD,
+  });
 }
 
 function devSpawns(sim: Sim, ownerId = sim.playerId) {
@@ -46,7 +53,13 @@ describe('dev commands', () => {
   });
 
   it('despawns only mobs created by the requesting developer', () => {
-    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const alpha = sim.addPlayer('warrior', 'Alpha');
     const beta = sim.addPlayer('mage', 'Beta');
     sim.chat('/dev spawn forest_wolf 2', alpha);
@@ -67,7 +80,13 @@ describe('dev commands', () => {
   });
 
   it('clears every player target and owned spawn when its developer leaves', () => {
-    const sim = new Sim({ seed: 15, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 15,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const alpha = sim.addPlayer('warrior', 'Alpha');
     const beta = sim.addPlayer('mage', 'Beta');
     sim.chat('/dev spawn forest_wolf 2', alpha);
@@ -155,7 +174,12 @@ describe('dev commands', () => {
   });
 
   it('is inert when dev commands are disabled', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
     const beforeIds = [...sim.entities.keys()];
 
     sim.chat('/dev spawn forest_wolf 4');
@@ -165,11 +189,133 @@ describe('dev commands', () => {
     expect(sim.player.level).toBe(1);
     expect(devSpawns(sim)).toEqual([]);
   });
+
+  it('sets the current target to a percent of max health, else self', () => {
+    const sim = devSim();
+    const player = sim.player;
+    player.maxHp = 200;
+    player.hp = 1;
+    sim.chat('/dev hp 50');
+    expect(player.hp).toBe(100);
+
+    sim.chat('/dev spawn forest_wolf');
+    const mob = devSpawns(sim)[0];
+    mob.maxHp = 1000;
+    mob.hp = 1000;
+    player.targetId = mob.id;
+    sim.chat('/dev hp 40');
+    expect(mob.hp).toBe(400);
+    expect(player.hp).toBe(100);
+
+    sim.chat('/dev hp 0');
+    expect(mob.hp).toBe(10);
+    sim.chat('/dev hp 999');
+    expect(mob.hp).toBe(1000);
+  });
+
+  it('never leaves a body at zero, however small its pool', () => {
+    const sim = devSim();
+    const sub = sim.player;
+    sub.maxHp = 50;
+    sub.hp = 50;
+    // 1% of 50 floors to 0, and a body at 0 hp that no death path produced is
+    // a state nothing else in the sim can reach.
+    sim.chat('/dev hp 1');
+    expect(sub.hp).toBe(1);
+  });
+
+  it('refuses a dead or non-self player target instead of silently hitting self', () => {
+    const sim = devSim();
+    const player = sim.player;
+    player.maxHp = 200;
+    player.hp = 200;
+    sim.chat('/dev spawn forest_wolf');
+    const mob = devSpawns(sim)[0];
+    mob.maxHp = 1000;
+    mob.hp = 1000;
+    mob.dead = true;
+    player.targetId = mob.id;
+    const dead = sim.chat('/dev hp 10');
+    expect(dead).toBeNull();
+    expect(mob.hp).toBe(1000);
+    // The caller's own hp must NOT have moved: an automation caller whose
+    // target did not land would otherwise measure itself and never know.
+    expect(player.hp).toBe(200);
+
+    const other = sim.addPlayer('mage', 'Otherling');
+    const otherEntity = sim.entities.get(other);
+    if (!otherEntity) throw new Error('second player missing');
+    otherEntity.maxHp = 300;
+    otherEntity.hp = 300;
+    player.targetId = other;
+    sim.chat('/dev hp 10');
+    expect(otherEntity.hp).toBe(300);
+    expect(player.hp).toBe(200);
+
+    // ...and targeting YOURSELF still works.
+    player.targetId = player.id;
+    sim.chat('/dev hp 25');
+    expect(player.hp).toBe(50);
+  });
+
+  it("refuses another tester's pet, which is an owned mob and not a player", () => {
+    const sim = devSim();
+    const player = sim.player;
+    player.maxHp = 200;
+    player.hp = 200;
+    sim.chat('/dev spawn forest_wolf');
+    const pet = devSpawns(sim)[0];
+    pet.maxHp = 1000;
+    pet.hp = 1000;
+
+    const other = sim.addPlayer('mage', 'Otherling');
+    pet.ownerId = other;
+    player.targetId = pet.id;
+    sim.chat('/dev hp 10');
+    expect(pet.hp).toBe(1000);
+    expect(player.hp).toBe(200);
+
+    // ...while the caller's OWN pet stays theirs to drive.
+    pet.ownerId = player.id;
+    sim.chat('/dev hp 10');
+    expect(pet.hp).toBe(100);
+  });
+
+  it('errors, and changes nothing, when the caller is dead with no target', () => {
+    const sim = devSim();
+    const player = sim.player;
+    player.maxHp = 200;
+    player.hp = 0;
+    player.dead = true;
+    player.targetId = null;
+    sim.chat('/dev hp 90');
+    expect(player.hp).toBe(0);
+  });
+
+  it('draws no rng, like every dev command', () => {
+    const sim = devSim();
+    const player = sim.player;
+    player.maxHp = 200;
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.chat('/dev hp 50');
+    sim.chat('/dev hp 100');
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
+  });
 });
 
 describe('/dev bg (Thornhollow Fields force-start)', () => {
   it('force-starts a short-handed match from whoever is queued, no bots', () => {
-    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const sim = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const a = sim.addPlayer('warrior', 'Alpha');
     const b = sim.addPlayer('mage', 'Beta');
     const c = sim.addPlayer('priest', 'Gamma');
@@ -266,7 +412,12 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
   });
 
   it('is inert without devCommands', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.chat('/dev bg');
     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
   });

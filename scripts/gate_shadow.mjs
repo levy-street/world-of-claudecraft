@@ -28,7 +28,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  chunkFileArgs,
   collectSuiteVisibility,
   compareSelection,
   filterExisting,
@@ -36,7 +35,11 @@ import {
   resolveSelectBase,
 } from './lib/gate_discovery.mjs';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
-import { buildSelectPlan } from './lib/gate_select_plan.mjs';
+import {
+  buildSelectiveLegArgs,
+  buildSelectPlan,
+  planSelectiveLegs,
+} from './lib/gate_select_plan.mjs';
 import { computeGateWorkers, resolveGateWorkerTierCap } from './lib/gate_workers.mjs';
 
 const shell = process.platform === 'win32';
@@ -44,8 +47,23 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const TMP = path.join(repoRoot, 'tmp');
 const LOG = process.env.GATE_SHADOW_LOG ?? path.join(TMP, 'gate-shadow.jsonl');
 
-/** @param {string} cmd @param {string[]} args */
-const git = (cmd, args) => spawnSync(cmd, args, { encoding: 'utf8', shell, cwd: repoRoot });
+/** @param {string} cmd @param {string[]} args
+ *  No .cmd shim on purpose: cmd.exe eats the caret in resolveSelectBase's
+ *  `ref^{commit}` probes, breaking base resolution on Windows (same fix as
+ *  ci_changed.mjs and gate_select.mjs). That makes a spawn FAILURE reachable,
+ *  so report it rather than letting the caller blame the git ref. */
+const git = (cmd, args) => {
+  const res = spawnSync(cmd, args, { encoding: 'utf8', shell: false, cwd: repoRoot });
+  if (res.error !== undefined) {
+    return {
+      status: res.status,
+      stdout: res.stdout,
+      stderr: `${res.error.message}\n${res.stderr ?? ''}`,
+      error: res.error,
+    };
+  }
+  return res;
+};
 
 const workers = computeGateWorkers({
   cpuCount: os.availableParallelism(),
@@ -134,30 +152,27 @@ if (plan.mode === 'full') {
 
 try {
   const selected = new Set();
-  const chunks = chunkFileArgs({
-    files: filterExisting({
+  // The SAME legs the real gate runs (planSelectiveLegs): the first cut of
+  // this validator hand-rolled its own legs, drifted, and validated a plan
+  // the gate did not execute; building from the shared planner closes that
+  // class for good.
+  const legs = planSelectiveLegs({
+    relatedSources: filterExisting({
+      files: plan.relatedSources,
+      exists: (f) => existsSync(path.join(repoRoot, f)),
+    }),
+    alwaysRunFiles: filterExisting({
       files: plan.alwaysRunFiles,
       exists: (f) => existsSync(path.join(repoRoot, f)),
     }),
+    platform: process.platform,
   });
-  chunks.forEach((files, i) => {
-    console.log(`[gate:shadow] always-run leg ${i + 1}/${chunks.length}`);
-    for (const f of runVitest(`always-${i}`, ['run', ...files, `--maxWorkers=${workers}`]).ran) {
+  legs.forEach((leg, i) => {
+    console.log(`[gate:shadow] selective leg ${i + 1}/${legs.length} (${leg.kind})`);
+    for (const f of runVitest(`leg-${i}`, buildSelectiveLegArgs(leg, workers)).ran) {
       selected.add(f);
     }
   });
-
-  if (plan.relatedSources.length > 0) {
-    console.log('[gate:shadow] related leg');
-    const related = runVitest('related', [
-      'related',
-      ...plan.relatedSources,
-      '--run',
-      '--passWithNoTests',
-      `--maxWorkers=${workers}`,
-    ]);
-    for (const f of related.ran) selected.add(f);
-  }
 
   console.log('[gate:shadow] full suite leg');
   const full = runVitest('full', ['run', `--maxWorkers=${workers}`]);

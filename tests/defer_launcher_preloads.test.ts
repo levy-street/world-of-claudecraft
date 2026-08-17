@@ -11,6 +11,7 @@
 // ORDER: beginDeferredPreloads() must run before the assetsReady() that gates the
 // Renderer, or placement could outrun a load and re-open the v0.16.0 farmCrate P0.
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   assetsReady,
@@ -20,6 +21,7 @@ import {
   registerDeferredPreload,
   registerPreload,
 } from '../src/render/assets/preload';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
@@ -280,7 +282,7 @@ describe('no world module fetches at import', () => {
   ]);
 
   it('leaves only the sanctioned eager registrants', () => {
-    const files = tsFilesUnder(new URL('../src/render', import.meta.url).pathname);
+    const files = tsFilesUnder(fileURLToPath(new URL('../src/render', import.meta.url)));
     // Vacuity floor: an empty or misrooted walk must not pass as "no offenders".
     expect(files.length).toBeGreaterThan(100);
     const offenders: string[] = [];
@@ -289,9 +291,7 @@ describe('no world module fetches at import', () => {
       if (repoRel.endsWith('assets/preload.ts') || EAGER_ALLOWED.has(repoRel)) continue;
       // Strip comments first: this guard polices CODE, not prose that happens to
       // name the eager function while explaining the lanes.
-      const code = readFileSync(full, 'utf8')
-        .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/^[ \t]*\/\/.*$/gm, '');
+      const code = stripComments(readFileSync(full, 'utf8'));
       // Match the call, not the identifier inside registerDeferredPreload.
       if (/(?<!Deferred)\bregisterPreload\s*\(/.test(code)) offenders.push(repoRel);
     }
@@ -307,7 +307,7 @@ describe('every assetsReady host opens the lane', () => {
   // this when the lane landed; the gate stayed green because nothing swept the
   // call sites).
   it('finds no Renderer host awaiting assetsReady without beginDeferredPreloads', () => {
-    const files = tsFilesUnder(new URL('../src', import.meta.url).pathname);
+    const files = tsFilesUnder(fileURLToPath(new URL('../src', import.meta.url)));
     expect(files.length).toBeGreaterThan(400);
     const offenders: string[] = [];
     let hosts = 0;

@@ -15,6 +15,7 @@ import {
   runWithStatementTimeout,
   saveWorldState,
 } from './db';
+import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import { REALM } from './realm';
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;
@@ -1126,6 +1127,7 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  generalChatRateLimit: GeneralChatRateLimit | null;
   // Operator-set account flair, as the dashboard's edit form needs to read it back:
   // the two flags plus the stored links. The links are re-normalized on the way out
   // (normalizeAccountFlair), so a value that could not survive the write gate is not
@@ -1135,6 +1137,11 @@ export interface AccountDetail {
   streamerLinks: StreamerLinks;
   dailyRewardsBan?: { reason: string; createdAt: string; expiresAt: string | null } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
+  // The operator-applied Cheater mark (accounts.cheater_mark_*): the remaining
+  // played-second budget, the audited reason, and when it was applied. Null when
+  // the account is not marked, so the dashboard can branch apply-vs-lift the way
+  // it does for dailyRewardsBan.
+  cheaterMark: { secondsRemaining: number; reason: string; setAt: string | null } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -1442,15 +1449,22 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
                 COALESCE(chat_mute_reason, '') AS chat_mute_reason,
                 COALESCE(chat_strikes, 0) AS chat_strikes,
                 is_ai, is_streamer, streamer_links,
+                general_chat_quota.messages AS general_chat_quota_messages,
+                general_chat_quota.window_minutes AS general_chat_quota_window_minutes,
                 active_daily_rewards_ban.daily_rewards_ban_reason,
                 active_daily_rewards_ban.daily_rewards_banned_at,
                 active_daily_rewards_ban.daily_rewards_ban_expires_at,
+                cheater_mark_seconds,
+                COALESCE(cheater_mark_reason, '') AS cheater_mark_reason,
+                cheater_mark_set_at,
                 last_login_ip,
                 (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                            FROM play_sessions s WHERE s.account_id = accounts.id), 0)
                  + COALESCE((SELECT sum(t.playtime_seconds)
                              FROM play_session_totals t WHERE t.account_id = accounts.id), 0))::bigint AS playtime_seconds
          FROM accounts
+         LEFT JOIN account_general_chat_rate_limits general_chat_quota
+           ON general_chat_quota.account_id = accounts.id
          LEFT JOIN LATERAL (
            SELECT reason AS daily_rewards_ban_reason,
                   created_at AS daily_rewards_banned_at,
@@ -1533,6 +1547,13 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
     chatStrikes: Number(a.chat_strikes ?? 0),
+    generalChatRateLimit:
+      a.general_chat_quota_messages == null
+        ? null
+        : {
+            messages: Number(a.general_chat_quota_messages),
+            windowMinutes: Number(a.general_chat_quota_window_minutes),
+          },
     isAi: flair.ai,
     isStreamer: flair.streamer,
     streamerLinks: flair.links,
@@ -1549,6 +1570,14 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       reason: String(row.reason),
       createdAt: row.created_at,
     })),
+    cheaterMark:
+      Number(a.cheater_mark_seconds) > 0
+        ? {
+            secondsRemaining: Number(a.cheater_mark_seconds),
+            reason: String(a.cheater_mark_reason),
+            setAt: a.cheater_mark_set_at ?? null,
+          }
+        : null,
     lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({

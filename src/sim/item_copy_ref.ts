@@ -143,6 +143,22 @@ export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string)
 }
 
 /**
+ * The non-consuming twin of `consumeNewestInventoryUnit` above: SAME walk (highest
+ * bag index down), SAME match predicate, but returns the live slot rather than
+ * taking a unit from it. For a caller that must inspect the copy an id-only
+ * command would consume BEFORE committing to consume it (equipBag's bag-payload
+ * refusal, bags.ts, #2837): peeking through this function rather than a
+ * bespoke walk is what keeps it locked to the real selection `ctx.removeItem`
+ * (`Sim.removeItem`) makes, instead of drifting into its own guess.
+ */
+export function newestMatchingSlot(inventory: InvSlot[], itemId: string): InvSlot | undefined {
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    if (inventory[i].itemId === itemId) return inventory[i];
+  }
+  return undefined;
+}
+
+/**
  * Resolve the bag slot the caller NAMED without consuming anything, for actions
  * that MUTATE a copy in place rather than destroying it (the rift forge upgrades,
  * enchants and sockets the slot's own payload).

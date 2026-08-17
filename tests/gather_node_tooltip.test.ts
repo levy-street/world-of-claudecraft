@@ -72,6 +72,12 @@ describe('gatherNodeTooltipHtml', () => {
     expect(html).not.toContain('tt-green');
   });
 
+  it('a locked cooldown reports both the tool requirement and respawn state', () => {
+    const html = gatherNodeTooltipHtml(model({ locked: true, state: 'cooldown' }));
+    expect(html).toContain('<div class="tt-red">Requires a tier 2 mining pick</div>');
+    expect(html).toContain('<div class="tt-sub">Respawning</div>');
+  });
+
   it('a cooldown with respawnSeconds renders the live countdown, m:ss, ceiled', () => {
     const html = gatherNodeTooltipHtml(model({ state: 'cooldown', respawnSeconds: 226.4 }));
     // 226.4 ceils to 227 = 3:47; the untimed word must NOT also render.
@@ -246,15 +252,34 @@ describe('hud gatherDowngrade case mirrors the gatherDenied toast-only pattern (
   });
 });
 
-describe('minimap painter locked tint (source pin)', () => {
-  it('the locked tint replaces the state COLOR while both state arms keep their silhouette', () => {
-    // Fairness-adjacent composition pin: the painter must pick the locked
-    // color inside BOTH the ready and cooldown branches (silhouette kept),
-    // never collapse the two states into one locked draw.
-    const painter = readFileSync(path.resolve(process.cwd(), 'src/ui/minimap_painter.ts'), 'utf8');
-    const readyArm = painter.indexOf('m.locked ? colors.gatherLocked : colors.gatherReady');
-    const cooldownArm = painter.indexOf('m.locked ? colors.gatherLocked : colors.gatherCooldown');
-    expect(readyArm).toBeGreaterThan(-1);
-    expect(cooldownArm).toBeGreaterThan(readyArm);
+describe('minimap painter gathering-state precedence (source pin)', () => {
+  it('routes independent cooldown and lock facts through cached sprite variants', () => {
+    // Fairness-adjacent composition pin: the four state combinations each own
+    // a raster key, and the combined cooldown + locked state keeps both cues.
+    // The loaded hot path stays one full-alpha blit with no diagonal strike.
+    const painter = readFileSync(path.resolve(process.cwd(), 'src/ui/minimap_painter.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const caseStart = painter.indexOf("case 'gather-node'");
+    const caseEnd = painter.indexOf('\n          break;', caseStart);
+    expect(caseStart).toBeGreaterThan(-1);
+    expect(caseEnd).toBeGreaterThan(caseStart);
+    const block = painter.slice(caseStart, caseEnd);
+    for (const size of [
+      'minimapGatherReady',
+      'minimapGatherReadyLocked',
+      'minimapGatherCooldown',
+      'minimapGatherCooldownLocked',
+    ]) {
+      expect(block).toContain(`'${size}`);
+    }
+    expect(block).toContain('ctx.drawImage(sprite');
+    expect(block).toContain('if (!m.ready)');
+    expect(block).toContain('drawGatherCooldownFallbackArc(');
+    expect(block).toContain('if (m.locked)');
+    expect(block).toContain('drawGatherLockFallback(');
+    expect(block).not.toContain('ctx.globalAlpha');
+    expect(block).not.toContain('ctx.moveTo');
+    expect(block).not.toContain('ctx.lineTo');
   });
 });

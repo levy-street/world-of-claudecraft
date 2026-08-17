@@ -52,6 +52,7 @@ import {
 } from './item_copy_ref';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
+import { isItemLocked } from './item_lock';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
@@ -1182,13 +1183,26 @@ export function sellItem(
   // `?? []`: same contract as social/trade.ts boundCount, a decoupled test ctx
   // may model counts elsewhere and carry no inventory array; its bound count
   // is simply zero and every copy stays sellable.
+  // Locked copies (issue 3042, item_lock.ts) are excluded the same way, and
+  // for the same reason: a player-locked copy is not sellable until unlocked,
+  // exactly like a bound copy is never sellable at all. Classified mutually
+  // exclusive (bound wins when a copy is somehow both) so the exclusion tally
+  // below never double-subtracts one slot's units.
   let boundHeld = 0;
+  let lockedHeld = 0;
   for (const s of meta.inventory ?? []) {
-    if (s.itemId === itemId && s.instance?.boundTo !== undefined) boundHeld += s.count;
+    if (s.itemId !== itemId) continue;
+    if (s.instance?.boundTo !== undefined) boundHeld += s.count;
+    else if (isItemLocked(s.instance)) lockedHeld += s.count;
   }
-  const sellableCount = Math.min(sellCount, available - boundHeld);
+  const sellableCount = Math.min(sellCount, available - boundHeld - lockedHeld);
   if (sellableCount <= 0) {
-    ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
+    ctx.error(
+      meta.entityId,
+      boundHeld > 0
+        ? 'That item is bound and cannot be sold.'
+        : 'That item is locked and cannot be sold.',
+    );
     return;
   }
   // The skip predicate is defence in depth (same as the trade swap): the clamp
@@ -1221,6 +1235,10 @@ export function sellItem(
       ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
       return;
     }
+    if (named?.itemId === itemId && isItemLocked(named.instance)) {
+      ctx.error(meta.entityId, 'That item is locked and cannot be sold.');
+      return;
+    }
     // `!taken` rather than `=== null`: the undefined arm cannot occur inside this
     // branch (slotIndex is defined), and narrowing on it keeps the type honest
     // without an assertion.
@@ -1237,7 +1255,7 @@ export function sellItem(
       itemId,
       sellableCount,
       meta.entityId,
-      (instance) => instance.boundTo !== undefined,
+      (instance) => instance.boundTo !== undefined || isItemLocked(instance),
       // The copy-choice rule on the vendor arm too (the phase 18 whole-branch
       // review): the seller's own self-signed charm copies go last, so selling
       // one of two charms never silently retires the recharge discount.
@@ -1274,10 +1292,11 @@ export function sellItem(
 // The junk-sweep eligibility rule for ONE bag slot, shared by the sim sweep
 // (sellAllJunk below) and the HUD vendor preview (hud.ts renderVendor) so the
 // two surfaces can never drift: gray quality, a sellable kind, and never a
-// soulbound def or a bound copy (instance payload carrying boundTo, the same
-// Maker's Bond gate sellItem applies). No poor-quality def binds or is
-// soulbound in shipped content; the instance arm closes the recorded future
-// hole before content can reopen the buyback wash.
+// soulbound def, a bound copy (instance payload carrying boundTo, the same
+// Maker's Bond gate sellItem applies), or a player-locked copy (issue 3042,
+// item_lock.ts isItemLocked). No poor-quality def binds or is soulbound in
+// shipped content; the instance arms close the recorded future hole before
+// content (or a player's own lock) can reopen the buyback wash.
 export function junkSellableSlot(
   def: ItemDef | undefined,
   slot: { count: number; instance?: ItemInstancePayload },
@@ -1289,6 +1308,7 @@ export function junkSellableSlot(
     !def.noVendorSell &&
     !def.soulbound &&
     slot.instance?.boundTo === undefined &&
+    !isItemLocked(slot.instance) &&
     slot.count > 0
   );
 }
@@ -1328,7 +1348,7 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
       itemId,
       count,
       meta.entityId,
-      (instance) => instance.boundTo !== undefined,
+      (instance) => instance.boundTo !== undefined || isItemLocked(instance),
       // Same copy-choice rule as sellItem; unreachable for charms today
       // (rare quality, never poor), carried for the same-walk symmetry.
       sellerSignedCharmDeprioritize(meta.name, itemId),

@@ -36,6 +36,7 @@ const accountDetail = {
   chatMutedUntil: null,
   chatMuteReason: '',
   chatStrikes: 0,
+  generalChatRateLimit: null,
   lastLoginIp: '203.0.113.7',
   playtimeSeconds: 3600,
   characters: [
@@ -168,6 +169,11 @@ describe('Players pages', () => {
     ).toBeInTheDocument();
     expect(screen.queryByPlaceholderText(t('detail.notePlaceholder'))).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: t('detail.ban') })).toBeInTheDocument();
+    const generalLimit = screen.getByRole('group', {
+      name: t('generalChatRateLimit.title'),
+    });
+    expect(within(generalLimit).getByText(t('generalChatRateLimit.scope'))).toBeInTheDocument();
+    expect(within(generalLimit).getByText(t('generalChatRateLimit.unlimited'))).toBeInTheDocument();
 
     await fireEvent.keyDown(window, { key: 'Escape' });
     await vi.waitFor(() => expect(accountLink).toHaveFocus());

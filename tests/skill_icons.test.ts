@@ -661,7 +661,13 @@ describe('class ability webp icons', () => {
     );
   });
 
-  it('E) pins the normalized shipping bytes while preserving source-art ownership', async () => {
+  it('E) pins the normalized shipping bytes while preserving source-art ownership', {
+    // Sharp re-normalization over the whole shipping icon set: measured
+    // ~19s inside a loaded 2-worker CI shard (timed out at the 20s default
+    // on run 31768, the borderline-default class), ~1s solo. 60s follows
+    // the suite's ~2.5x-measured-plus-contention sizing convention.
+    timeout: 60_000,
+  }, async () => {
     const manifest = skillNormalizationManifest();
     const expected = Object.entries(NORMALIZED_SKILL_IDS)
       .flatMap(([className, ids]) => ids.map((id) => `${className}/${id}`))

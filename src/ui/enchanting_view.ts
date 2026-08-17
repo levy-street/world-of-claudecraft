@@ -54,7 +54,14 @@ export interface SalvageResultEvent {
   /** The reclaimed material and its rolled count (present on ok). */
   materialItemId?: string;
   count?: number;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
+  reason?:
+    | 'unknown_item'
+    | 'not_salvageable'
+    | 'not_held'
+    | 'throttled'
+    | 'no_bag_space'
+    | 'busy'
+    | 'locked';
 }
 export interface ApplyEnchantResultEvent {
   ok: boolean;
@@ -124,6 +131,8 @@ export function salvageResultToast(ev: SalvageResultEvent): EnchantingToast {
       return { key: 'hudChrome.enchanting.notSalvageable', sink: 'error' };
     case 'no_bag_space':
       return { key: 'hudChrome.enchanting.salvageNoSpace', sink: 'error' };
+    case 'locked':
+      return { key: 'hudChrome.enchanting.salvageLocked', sink: 'error' };
     default:
       return { key: 'hudChrome.enchanting.notHeld', sink: 'error' };
   }

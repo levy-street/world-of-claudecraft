@@ -97,8 +97,8 @@ describe('per-system dial staging (round 12)', () => {
     // is medium's exact 2560 map, high is the documented Advanced-Medium
     // profile plus the full high post stack (SMAA + bloom + half-res AO),
     // ultra adds full-res AO and the 128-cell water field, insane the 4-tap
-    // worn walk and the 8yd vista grid; dial shadow level 2 (8192) stays
-    // Advanced-only.
+    // worn walk and the 8yd vista grid; shadows top out at High's 4096 map
+    // everywhere (the dial is capped at level 1).
     expect(advancedDialSeed(1)).toEqual({
       terrainDetail: 0,
       foliageDensity: 0,
@@ -202,17 +202,20 @@ describe('per-system dial staging (round 12)', () => {
 
   it('switches a dial edit under a fixed preset to the Advanced mix seeded from it', () => {
     const high = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 3, terrainDetail: 0 });
-    const staged = stageGraphicsDraftChange(high, 'shadowQuality', 2);
+    const staged = stageGraphicsDraftChange(high, 'shadowQuality', 0.5);
     expect(staged).toEqual({
       graphicsPreset: 5,
       ...advancedDialSeed(3),
-      shadowQuality: 2,
+      shadowQuality: 0.5,
     });
     // What the player was LOOKING at is what the mix starts from: the seed
     // wins over the previously stored (invisible) dial values.
     expect(staged.terrainDetail).toBe(advancedDialSeed(3).terrainDetail);
     expect(Object.isFrozen(staged)).toBe(true);
     expect(high.graphicsPreset).toBe(3);
+    // The shadow ladder is capped at High: a stray historical Insane value
+    // staged onto a draft clamps to the cap instead of surviving.
+    expect(stageGraphicsDraftChange(high, 'shadowQuality', 2).shadowQuality).toBe(1);
   });
 
   it('edits a dial in place once the draft is already Advanced', () => {

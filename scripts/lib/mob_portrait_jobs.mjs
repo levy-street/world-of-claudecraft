@@ -17,6 +17,11 @@ export const PORTRAIT_RENDER_DEFINES = Object.freeze({
   'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
   'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
   'import.meta.env.VITE_WALLET_DISABLED': '""',
+  // r185's KTX2Loader computes its default transcoder URLs from import.meta.url
+  // at module scope. The values are never used (ktx2_support.ts overrides them
+  // with setTranscoderPath('/basis/')), but the module-scope new URL() must not
+  // throw, so give the IIFE an absolute base instead of the empty-object rewrite.
+  'import.meta.url': '"http://localhost/"',
 });
 
 export const PORTRAIT_BROWSER_ENTRY = 'scripts/wiki/stills_render_entry.js';

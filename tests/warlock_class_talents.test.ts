@@ -336,4 +336,28 @@ describe('warlock class talent tree', () => {
     expect(boss.pos).toEqual(positionBefore);
     expect(boss.auras.some((aura) => aura.id === 'abyssal_rift_stun')).toBe(false);
   });
+
+  it('damages a fixed practice dummy with Abyssal Rift without dragging it off its marker', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_curse_mastery' });
+    const dummyTemplate = Object.values(MOBS).find((template) => template.dummy === true);
+    if (!dummyTemplate) throw new Error('The mob registry has no dummy fixture.');
+    const dummy = createMob(9903, dummyTemplate, 20, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + 12,
+    });
+    dummy.hostile = true;
+    dummy.maxHp = dummy.hp = 999999;
+    (sim as unknown as { addEntity(entity: Entity): void }).addEntity(dummy);
+    const positionBefore = { ...dummy.pos };
+    const hpBefore = dummy.hp;
+
+    sim.castAbility('abyssal_rift', undefined, {
+      x: player.pos.x,
+      z: player.pos.z + 10,
+    });
+
+    expect(dummy.hp).toBeLessThan(hpBefore);
+    expect(dummy.pos).toEqual(positionBefore);
+  });
 });

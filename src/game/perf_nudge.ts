@@ -20,7 +20,7 @@ import { initPerfNudgeToast } from '../ui/perf_nudge_toast';
 import { isPerfNudgeArmId } from '../ui/perf_nudge_view';
 import type { PerfSnapshot } from './perf';
 import { analyzePerfSuggestions } from './perf_doctor';
-import { softwareNoticeShown } from './software_render_notice';
+import { discreteNoticeShown, softwareNoticeShown } from './software_render_notice';
 
 const PERF_NUDGE_CHECK_INTERVAL_MS = 30_000;
 const PERF_NUDGE_MIN_FRAMES = 30;
@@ -50,9 +50,13 @@ export function initPerfNudge(options: PerfNudgeOptions): () => void {
     if (!suggestionIds.some(isPerfNudgeArmId)) return;
     // One decisive toast resolution per session, shown or not (see header).
     stop();
+    // Both notice predicates are read HERE, not at init: the boot notice runs
+    // after the renderer, and the shell's GPU verdict can land later still, so
+    // sampling them at check time is what makes the suppression reliable.
     initPerfNudgeToast({
       suggestionIds,
       softwareNoticeAlreadyShown: softwareNoticeShown(),
+      discreteNoticeAlreadyShown: discreteNoticeShown(),
       desktopShell: options.desktopShell,
     });
   };

@@ -43,7 +43,12 @@ COSMETIC (may be tiered down on lower presets):
 - Buff-icon overflow when the bar is full. A buff is active whether or not its icon is on
   screen, so hiding a buff icon removes no actionable information.
 - Portrait and HP-bar redraw smoothness within human reaction tolerance (about 200 ms).
-- Weapon-skin VFX richness (`src/render/weapon_vfx_shed_core.ts`). The rarity rig on a
+- Sun-shadow refresh cadence under budget pressure (`src/render/shadow_cadence_core.ts`).
+  Under sustained over-budget readings the shadow map updates every other frame instead of
+  every frame; shadows are never removed, and a one-frame-stale shadow (50 ms at 20 FPS)
+  conveys nothing a player acts on. This is a GOVERNOR-driven shed by design, like the
+  weapon-VFX `vfx` bucket arm below: a perf-governor output, not a UI tier knob, so the
+  static-preset rule at the bottom of this doc does not apply to it.
   VFX-bearing weapon skin (glow, motes, aurora, shell, cast light) FADES on two inputs.
   Neither reaches zero: what removes a rig is the character LOD swap, which replaces the whole
   articulated rig with one baked mesh and is shared by the entire render path. The fade exists
@@ -178,6 +183,12 @@ it, so the boundary cannot creep back in as decoration.
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/shadow_cadence_core.test.ts` + `tests/shadow_render_wiring.test.ts`: the sun-shadow
+  cadence shed. The policy core imports nothing (preset, tier, and profile blind; its only
+  inputs are the governor's pressure/enabled plus dt), the dwell thresholds are
+  literal-pinned, the shed is strictly every-other-frame (never a removal: the application
+  writes only the `shadowMap.autoUpdate`/`needsUpdate` flags), and the wiring scan pins the
+  renderer call sites.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed

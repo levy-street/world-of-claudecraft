@@ -3,7 +3,9 @@
 // or retaliates; it drops combat and heals to full a few seconds after the last hit,
 // and respawns on its own short timer if somehow felled.
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import type { WorldContent } from '../src/sim/types';
 import { type Entity, PLAYER_INTEREST_DROP_RADIUS } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -11,8 +13,27 @@ type RebucketSim = Sim & {
   rebucket(entity: Entity): void;
 };
 
+// This suite only ever targets the fixed Highwatch training-dummy camp entry
+// (zone3.ts: { mobId: 'training_dummy', center: {x:-40,z:648}, radius:0, count:1 })
+// plus the hardcoded healer practice dummy (spawnHealerPracticeDummy, gated only on
+// noPlayer+devCommands, spawned unconditionally regardless of cfg.world). No other
+// camp, npc, or ground object is ever targeted or asserted on, so the full built-in
+// world was pure Sim-construction overhead here.
+const TRAINING_DUMMY_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'training_dummy'),
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    devCommands: true,
+    world: TRAINING_DUMMY_TEST_WORLD,
+  });
 }
 
 function dummyOf(sim: Sim): Entity {
@@ -111,6 +132,7 @@ describe('Highwatch training dummy', () => {
       noPlayer: true,
       devCommands: true,
       idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+      world: TRAINING_DUMMY_TEST_WORLD,
     });
     const d = dummyOf(sim);
     const pid = meleePlayerAt(sim, d.pos.x + 1, d.pos.z);
@@ -226,6 +248,33 @@ describe('Highwatch training dummy', () => {
     );
     if (!back) throw new Error('training dummy did not respawn');
     expect(back.hp).toBe(back.maxHp);
+  });
+
+  it('stays put when a paladin Oath Chains it (issue: MIA after being dragged off its spot)', () => {
+    const sim = makeWorld();
+    const d = dummyOf(sim);
+    const before = { x: d.pos.x, z: d.pos.z };
+    const pid = sim.addPlayer('paladin', 'Judge', { autoEquip: true });
+    sim.setPlayerLevel(20, pid);
+    expect(sim.setSpec('protection', pid)).toBe(true);
+    const player = entityById(sim, pid);
+    moveEntityTo(sim, player, d.pos.x, d.pos.z + 15);
+    player.facing = Math.atan2(d.pos.x - player.pos.x, d.pos.z - player.pos.z);
+    player.resource = player.maxResource;
+    player.targetId = d.id;
+
+    sim.castAbility('oath_chain', pid);
+
+    // Proves the cast actually fired (rather than being silently refused by
+    // range/facing/LOS, which would make the assertions below pass vacuously).
+    expect(d.inCombat).toBe(true);
+    expect(player.inCombat).toBe(true);
+    expect(d.auras.some((a) => a.kind === 'forced_move')).toBe(false);
+
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+
+    expect(d.pos.x).toBe(before.x);
+    expect(d.pos.z).toBe(before.z);
   });
 
   it('spawns a friendly healer practice dummy that friendly targeting can select', () => {

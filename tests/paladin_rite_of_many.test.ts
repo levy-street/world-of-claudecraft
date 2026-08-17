@@ -127,4 +127,21 @@ describe('Rite of many: the live cast', () => {
     expect(offered.has(first.id)).toBe(true);
     expect(offered.has(second.id), 'must stay single-target below 16').toBe(false);
   });
+
+  it("sweeps only bodies within the rite's own 30 yard reach", () => {
+    const { sim, paladin } = sunmender(RITE_OF_MANY_LEVEL);
+    const near = addFallen(sim, paladin, 'Near Fallen');
+    const beyondRite = addFallen(sim, paladin, 'Beyond Thirty');
+    // Inside the 40 yd mass-rez ceiling but beyond the rite's authored 30 yd
+    // range: the group sweep runs at the ability's own range
+    // (src/sim/combat/resurrection_reach.ts resurrectionCastRange), so the
+    // upgrade must never outreach the button it upgrades.
+    beyondRite.pos = { x: paladin.pos.x + 35, y: beyondRite.pos.y, z: paladin.pos.z };
+    beyondRite.prevPos = { ...beyondRite.pos };
+    beyondRite.corpsePos = { ...beyondRite.pos };
+
+    const offered = riteOffers(sim, near);
+    expect(offered.has(near.id), 'the body the rite was begun over').toBe(true);
+    expect(offered.has(beyondRite.id), 'the sweep must not outreach the rite').toBe(false);
+  });
 });

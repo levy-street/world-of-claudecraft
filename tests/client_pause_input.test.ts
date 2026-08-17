@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
 
 describe('ClientWorld neutralizeInputForClientPause', () => {
   it('overwrites every movement bit and sends an unconditional neutral packet', () => {
@@ -20,12 +21,14 @@ describe('ClientWorld neutralizeInputForClientPause', () => {
       spectating: null,
       ws: {
         readyState: 1,
+        bufferedAmount: INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1,
         send: (payload: string) => sent.push(payload),
       },
       lastInputSentAt: 999,
       lastInputSig: '0,0,0,0,0,0,0,',
       inputSeq: 4,
       pendingInputSeqSentAt: new Map<number, number>(),
+      pendingTransientInput: { jump: true, turnLeft: true, turnRight: true },
     });
     const previousWebSocket = globalThis.WebSocket;
     Object.defineProperty(globalThis, 'WebSocket', {
@@ -58,5 +61,8 @@ describe('ClientWorld neutralizeInputForClientPause', () => {
       seq: 5,
       mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
     });
+    expect(
+      (client as unknown as { pendingTransientInput?: unknown }).pendingTransientInput,
+    ).toBeUndefined();
   });
 });

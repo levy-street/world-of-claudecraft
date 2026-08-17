@@ -1934,8 +1934,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Menace"
       },
       {
+        "id": "challenging_roar",
+        "name": "Baleful Roar"
+      },
+      {
         "id": "demoralizing_roar",
         "name": "Craven Roar"
+      },
+      {
+        "id": "frenzied_regeneration",
+        "name": "Savage Mending"
       },
       {
         "id": "cat_form",
@@ -5558,6 +5566,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "exp_the_last_keep",
+    "name": "The Quiet Halls",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_dawnhold_castle",
+    "name": "An Open Door in the Garden",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 
@@ -12712,6 +12734,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/kobold.glb",
     "idle": "Idle",
     "height": 2.1,
+    "hover": -0.2,
     "tintStrength": 0.12
   },
   "mob_bandit": {

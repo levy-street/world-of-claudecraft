@@ -1,39 +1,57 @@
-// Convert standalone character skin/cosmetic atlas PNGs to KTX2/Basis so they
-// stay GPU-compressed in memory instead of decoding to full RGBA bitmaps, the
-// same win compress_glb_textures.mjs already banks for embedded GLB textures.
+// Convert standalone images the runtime loads by URL (character skin/cosmetic
+// atlas PNGs, plus the ambientCG terrain and structure detail JPGs) to
+// KTX2/Basis so they stay GPU-compressed in memory instead of decoding to full
+// RGBA bitmaps, the same win compress_glb_textures.mjs already banks for
+// embedded GLB textures.
 //
 // loadTexture() (src/render/assets/loader.ts) has no compressed-texture path:
 // every standalone image, including the ~34 1024x1024 player skin atlases
-// under public/textures/skins/, decodes to a full RGBA bitmap. That boot-time
-// sweep alone is well over 100 MB of RGBA (see the eagerSkinAtlases comment in
-// src/render/characters/assets.ts). ETC1S/Basis-LZ uploads as-is at roughly an
-// eighth of the RGBA size, on the CPU and GPU side, same as the GLB path.
+// under public/textures/skins/ and the 1024x1024 terrain splat + surface
+// detail sets, decodes to a full RGBA bitmap. The skin sweep alone is well
+// over 100 MB of RGBA (see the eagerSkinAtlases comment in
+// src/render/characters/assets.ts). ETC1S/Basis-LZ and UASTC upload as-is at
+// roughly an eighth (ETC1S) or a quarter (UASTC) of the RGBA size, on the CPU
+// and GPU side, same as the GLB path.
 //
 // Usage: node scripts/assets/compress_standalone_textures.mjs [options] [files...]
-//   --dir <path>   directory to scan for .png files (default public/textures/skins)
+//   --dir <path>   directory to scan for .png/.jpg files (default public/textures/skins)
 //   --dry-run      report what would be converted, write nothing
+//   --flip         bake a vertical flip into the encoded image (see below)
 //   --jobs <n>     file-level parallelism (default 4)
-// With explicit [files...] arguments only those PNGs are processed.
+// With explicit [files...] arguments only those images are processed; that is
+// how the terrain/structure sets are converted, so the unused pack files
+// sitting beside them in the same directories stay raw.
 //
 // `base.png` is skipped everywhere it is found: it is the raw thumbnail
 // source skinThumbUrl() falls back to, never a URL SKINS/SKIN_EMISSIVE point
 // at, so loadSkinTexInto never requests it and there is nothing to compress.
 //
-// Emits a `.ktx2` SIBLING next to each source PNG. The PNG is never deleted
-// or replaced: tests/visual_manifest.test.ts pins the raw fernando.png path,
-// and loadSkinTexInto (src/render/characters/assets.ts) is what switches to
-// requesting the sibling instead, only for atlases under textures/skins/.
+// `--flip` exists because a CompressedTexture cannot honor `flipY` at runtime,
+// and the terrain/structure JPGs are consumed through TextureLoader with the
+// default `flipY = true`: baking the flip at compress time keeps sampling
+// pixel-identical to the raw path. Skin atlases are consumed at
+// `flipY = false` (the glTF UV convention) and are converted WITHOUT it.
+//
+// Emits a `.ktx2` SIBLING next to each source image. The source is never
+// deleted or replaced: tests/visual_manifest.test.ts pins the raw
+// fernando.png path, the voxel-terrain prototype still reads the raw terrain
+// JPGs, and the runtime consumers (loadSkinTexInto, terrain.ts, worn_stone.ts,
+// detail_normals.ts) are what switch to requesting the sibling.
 //
 // Requires the `ktx` tool from KhronosGroup/KTX-Software 4.3+ on PATH (see
 // scripts/assets/compress_glb_textures.mjs for install notes).
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import {
+  blockAlignmentError,
   buildKtxCreateArgs,
-  isConvertibleSkinPng,
+  classifyStandaloneTexture,
+  flippedSourcePath,
+  isConvertibleStandaloneImage,
   ktx2SiblingPath,
   parseArgs as parseArgsCore,
 } from './lib/standalone_texture_compression_core.mjs';
@@ -48,11 +66,11 @@ export function parseArgs(argv) {
   return opts;
 }
 
-function* walkPngs(dir) {
+function* walkImages(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name);
-    if (e.isDirectory()) yield* walkPngs(p);
-    else if (e.isFile() && isConvertibleSkinPng(e.name)) yield p;
+    if (e.isDirectory()) yield* walkImages(p);
+    else if (e.isFile() && isConvertibleStandaloneImage(e.name)) yield p;
   }
 }
 
@@ -78,16 +96,42 @@ async function checkKtxTool() {
   }
 }
 
-async function convertFile(file, { dryRun }) {
+async function convertFile(file, { dryRun, flip }) {
   const dst = ktx2SiblingPath(file);
   const before = fs.statSync(file).size;
   if (dryRun) return { file, dst, status: 'would-convert', before, after: before };
 
   const meta = await sharp(file).metadata();
-  const args = buildKtxCreateArgs({ hasAlpha: !!meta.hasAlpha, srcPath: file, dstPath: dst });
-  const { code, stderr } = await runKtx(args);
-  if (code !== 0) {
-    return { file, dst, status: 'failed', reason: stderr.trim(), before, after: before };
+  const misaligned = blockAlignmentError(meta.width, meta.height);
+  if (misaligned) {
+    return { file, dst, status: 'failed', reason: misaligned, before, after: before };
+  }
+
+  const cls = classifyStandaloneTexture(path.basename(file));
+  // The flipped copy is a lossless PNG so the flip itself costs no quality;
+  // only the ktx encode is lossy, exactly as on the unflipped path. It stages
+  // in a PRIVATE per-run mkdtemp directory (mode 0700), never bare os.tmpdir():
+  // a deterministic path in a shared temp is pre-creatable and race-swappable
+  // by any local process, symlink overwrite included (review round 2).
+  const stagingDir = flip
+    ? fs.mkdtempSync(path.join(os.tmpdir(), 'woc-flip-'), { mode: 0o700 })
+    : null;
+  const flipped = stagingDir ? flippedSourcePath(file, stagingDir) : null;
+  if (flipped) await sharp(file).flip().png().toFile(flipped);
+  try {
+    const args = buildKtxCreateArgs({
+      hasAlpha: !!meta.hasAlpha,
+      srcPath: flipped ?? file,
+      dstPath: dst,
+      encoding: cls.encoding,
+      transferFunction: cls.transferFunction,
+    });
+    const { code, stderr } = await runKtx(args);
+    if (code !== 0) {
+      return { file, dst, status: 'failed', reason: stderr.trim(), before, after: before };
+    }
+  } finally {
+    if (stagingDir) fs.rmSync(stagingDir, { recursive: true, force: true });
   }
   const after = fs.statSync(dst).size;
   return { file, dst, status: 'converted', before, after };
@@ -96,7 +140,7 @@ async function convertFile(file, { dryRun }) {
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (!opts.dryRun) await checkKtxTool();
-  const files = opts.files.length ? opts.files : [...walkPngs(opts.dir)];
+  const files = opts.files.length ? opts.files : [...walkImages(opts.dir)];
 
   const results = [];
   let next = 0;

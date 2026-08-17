@@ -50,6 +50,7 @@ describe('GameServer market query wire', () => {
         primaryStat: 'int',
         rarity: 'rare',
         page: 2,
+        collapseLowest: true,
       }),
     );
 
@@ -60,7 +61,97 @@ describe('GameServer market query wire', () => {
       armorClass: 'cloth',
       primaryStat: 'int',
       rarity: 'rare',
+      sort: 'name',
       page: 2,
+      collapseLowest: true,
     });
+  });
+
+  it('decodes the price sort axis (issue #3102)', () => {
+    const server = new GameServer();
+    const ws = {
+      readyState: 1,
+      send: () => undefined,
+    } as unknown as WebSocket;
+    const joined = server.join(ws, 1, 1, 'Buyer', 'warrior', null);
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+
+    server.handleMessage(
+      joined,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'market_search',
+        q: '',
+        sort: 'price',
+        page: 0,
+      }),
+    );
+
+    expect(server.sim.players.get(joined.pid)?.marketQuery).toEqual({
+      search: '',
+      itemType: 'all',
+      subtype: 'all',
+      armorClass: 'all',
+      primaryStat: 'all',
+      rarity: 'all',
+      sort: 'price',
+      page: 0,
+      collapseLowest: false,
+    });
+  });
+
+  it('falls back to the classic name sort on an invalid value', () => {
+    const server = new GameServer();
+    const ws = {
+      readyState: 1,
+      send: () => undefined,
+    } as unknown as WebSocket;
+    const joined = server.join(ws, 1, 1, 'Buyer', 'warrior', null);
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+
+    server.handleMessage(
+      joined,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'market_search',
+        q: '',
+        sort: 'bogus',
+        page: 0,
+      }),
+    );
+
+    expect(server.sim.players.get(joined.pid)?.marketQuery?.sort).toBe('name');
+  });
+
+  // Issue #3103: a boolean field coerces by strict identity (raw?.collapseLowest === true
+  // in sanitizeMarketQuery), unlike the enum axes above which fall back through a closed
+  // options list. Pin both a client that never sends it (an old build) and one that sends
+  // a truthy-but-not-true value, so neither can silently collapse the market book.
+  it('defaults collapseLowest to false when the client omits or malforms it', () => {
+    const server = new GameServer();
+    const ws = { readyState: 1, send: () => undefined } as unknown as WebSocket;
+    const joined = server.join(ws, 1, 1, 'Buyer', 'warrior', null);
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+
+    server.handleMessage(
+      joined,
+      JSON.stringify({ t: 'cmd', cmd: 'market_search', q: '', page: 0 }),
+    );
+    expect(server.sim.players.get(joined.pid)?.marketQuery.collapseLowest).toBe(false);
+
+    server.handleMessage(
+      joined,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'market_search',
+        q: 'a',
+        page: 0,
+        collapseLowest: 1,
+      }),
+    );
+    expect(server.sim.players.get(joined.pid)?.marketQuery.collapseLowest).toBe(false);
   });
 });

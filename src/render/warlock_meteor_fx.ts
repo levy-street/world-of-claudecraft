@@ -36,6 +36,21 @@ registerDeferredPreload(() =>
   }),
 );
 
+/**
+ * The renderer's point-light seam. Every point light this fx adds to the world
+ * MUST be ranked inside the renderer's pinned visible point-light count: that
+ * count is part of every lit material's program cache key, so one unranked
+ * visible light relinks every lit material in view synchronously (the first
+ * infernal of a session used to stall mid-combat that way).
+ *
+ * The registry owns the budget bookkeeping (see `Renderer.registerBudgetPointLight`);
+ * the fx only says when a light joins the world and when it leaves it.
+ */
+export interface WarlockMeteorLightRegistry {
+  register(light: THREE.PointLight): void;
+  release(light: THREE.PointLight): void;
+}
+
 export interface WarlockMeteorImpact {
   kind: 'rain' | 'infernal';
   x: number;
@@ -57,6 +72,7 @@ interface ActiveMeteor {
   impactRadius: number;
   eventRadius: number;
   sourceId?: number;
+  light?: THREE.PointLight;
   materials: THREE.Material[];
   geometries: THREE.BufferGeometry[];
 }
@@ -144,6 +160,7 @@ export class WarlockMeteorFx {
     private readonly heightAt: (x: number, z: number) => number,
     private readonly onImpact: (impact: WarlockMeteorImpact) => void,
     private readonly powerfulImpactTexture: THREE.Texture | null = powerfulFelMeteorTexture,
+    private readonly lightRegistry?: WarlockMeteorLightRegistry,
   ) {}
 
   spawnRain(spawn: WarlockMeteorSpawn): void {
@@ -256,19 +273,13 @@ export class WarlockMeteorFx {
         radius: meteor.eventRadius,
         sourceId: meteor.sourceId,
       });
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
+      this.disposeMeteor(meteor);
       this.meteors.splice(index, 1);
     }
   }
 
   dispose(): void {
-    for (const meteor of this.meteors) {
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
-    }
+    for (const meteor of this.meteors) this.disposeMeteor(meteor);
     for (const impact of this.impacts) this.disposeImpact(impact);
     for (const shower of this.showers) this.disposeShower(shower);
     this.meteors.length = 0;
@@ -345,10 +356,18 @@ export class WarlockMeteorFx {
     );
     body.position.copy(start);
 
+    // The fall light burns at a fixed level for the whole descent: nothing here
+    // writes its intensity again, so once the budget zeroes an unchosen light it
+    // stays dark. That is deliberate. This fx updates AFTER the renderer's
+    // budget pass in the frame, so any upward write here would relight a light
+    // the budget had just ruled out (weapon_vfx.ts drives its own level because
+    // it updates BEFORE the pass).
+    let light: THREE.PointLight | undefined;
     if (options.kind === 'infernal') {
-      const light = new THREE.PointLight(FEL_FLAME, 9, 26, 1.7);
+      light = new THREE.PointLight(FEL_FLAME, 9, 26, 1.7);
       light.name = 'warlock-fel-meteor-light';
       body.add(light);
+      this.lightRegistry?.register(light);
     }
 
     this.meteors.push({
@@ -364,6 +383,7 @@ export class WarlockMeteorFx {
       impactRadius: options.impactRadius,
       eventRadius: options.eventRadius,
       sourceId: options.sourceId,
+      light,
       materials,
       geometries: [],
     });
@@ -487,6 +507,7 @@ export class WarlockMeteorFx {
     if (light) {
       light.position.y = 0.8;
       root.add(light);
+      this.lightRegistry?.register(light);
     }
 
     this.impacts.push({
@@ -527,6 +548,9 @@ export class WarlockMeteorFx {
         ring.material.opacity = (0.72 - ringIndex * 0.12) * (1 - progress);
       }
       impact.smoke.opacity = 0.58 * (1 - progress);
+      // Multiplicative on purpose: this update runs AFTER the renderer's
+      // point-light budget pass, and a decay can only ever take the flash
+      // further down, never relight a light the budget zeroed out.
       if (impact.light) impact.light.intensity *= Math.max(0, 1 - dt * 5);
       if (!reducedMotion) {
         for (const child of impact.sparks.children) {
@@ -617,9 +641,7 @@ export class WarlockMeteorFx {
       const rainIndex = this.meteors.findIndex((meteor) => meteor.kind === 'rain');
       if (rainIndex < 0) return;
       const [meteor] = this.meteors.splice(rainIndex, 1);
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
+      this.disposeMeteor(meteor);
     }
   }
 
@@ -646,9 +668,7 @@ export class WarlockMeteorFx {
     for (let index = this.meteors.length - 1; index >= 0; index--) {
       const meteor = this.meteors[index];
       if (meteor.kind !== 'rain' || meteor.root.parent !== shower.root) continue;
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
+      this.disposeMeteor(meteor);
       this.meteors.splice(index, 1);
     }
     shower.pending.length = 0;
@@ -666,8 +686,19 @@ export class WarlockMeteorFx {
     shower.boundaryDisposed = true;
   }
 
+  /** The single teardown for a meteor: every removal path (impact, pool trim,
+   *  cancelled shower, dispose) runs through here so the fall light is released
+   *  from the point-light budget exactly once, wherever it dies. */
+  private disposeMeteor(meteor: ActiveMeteor): void {
+    meteor.root.removeFromParent();
+    if (meteor.light) this.lightRegistry?.release(meteor.light);
+    disposeMaterials(meteor.materials);
+    for (const geometry of meteor.geometries) geometry.dispose();
+  }
+
   private disposeImpact(impact: ActiveImpact): void {
     impact.root.removeFromParent();
+    if (impact.light) this.lightRegistry?.release(impact.light);
     disposeMaterials(impact.materials);
     for (const geometry of impact.geometries) geometry.dispose();
   }

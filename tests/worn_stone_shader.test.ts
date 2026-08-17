@@ -18,6 +18,8 @@ async function compileWornShader(
   vi.stubGlobal('location', { search: `?gfx=${preset}` });
   vi.doMock('../src/render/assets/loader', () => ({
     loadTexture: () => Promise.resolve(new THREE.Texture()),
+    // worn_stone requests the compressed sibling of every family channel.
+    loadKtx2Texture: () => Promise.resolve(new THREE.Texture()),
   }));
   vi.doMock('../src/render/assets/preload', () => ({
     registerPreload: (promise: Promise<unknown>) => {

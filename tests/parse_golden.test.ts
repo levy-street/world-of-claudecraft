@@ -136,6 +136,13 @@ function runScenario(): string {
   ]);
   match.defeated.add(7).add(8);
   (match as { state: string }).state = 'over';
+  // Move the pools between the two resource samples so the fixture pins a real
+  // series rather than the same row twice: the caster spends mana, the target
+  // is dropped to a sliver before the killing blow below.
+  const caster = sim.entities.get(5);
+  if (caster !== undefined) (caster as { resource: number }).resource = 1750;
+  const dying = sim.entities.get(7);
+  if (dying !== undefined) (dying as { hp: number }).hp = 60;
   observe(140, [
     {
       type: 'damage',

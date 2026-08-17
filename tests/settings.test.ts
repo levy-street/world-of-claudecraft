@@ -108,6 +108,10 @@ describe('Settings', () => {
     expect(s.get('shadowQuality')).toBe(SETTING_RANGES.shadowQuality.def);
     expect(s.get('renderScale')).toBe(1);
     expect(s.get('fullscreen')).toBe(1);
+    // Borderless fullscreen, matching the desktop shell's own prefs default:
+    // the shell opens that way, so a fresh profile must not disagree with the
+    // window it is already looking at.
+    expect(s.get('displayMode')).toBe(1);
     expect(s.get('clickToMove')).toBe(0);
     expect(s.get('clickToMoveButton')).toBe(0);
     expect(s.get('cameraFov')).toBe(SETTING_RANGES.cameraFov.def);
@@ -139,6 +143,15 @@ describe('Settings', () => {
     expect(s.set('cameraFov', 75)).toBe(75);
   });
 
+  it('clamps a stored historical Insane shadow dial (2) down to High on load', () => {
+    // The Shadow Quality ladder is capped at High (the 4096 map): the retired
+    // Insane rung persisted 2, which must come back as High, not survive.
+    localStorage.setItem('woc_settings', JSON.stringify({ shadowQuality: 2 }));
+    const s = new Settings();
+    expect(SETTING_RANGES.shadowQuality.max).toBe(1);
+    expect(s.get('shadowQuality')).toBe(1);
+  });
+
   it('clamps out-of-range values to the slider bounds', () => {
     const s = new Settings();
     expect(s.set('cameraSpeed', 99)).toBe(SETTING_RANGES.cameraSpeed.max);
@@ -150,6 +163,10 @@ describe('Settings', () => {
     expect(s.set('effectsQuality', 99)).toBe(SETTING_RANGES.effectsQuality.max);
     expect(s.set('shadowQuality', -1)).toBe(SETTING_RANGES.shadowQuality.min);
     expect(s.set('fullscreen', -1)).toBe(0);
+    // displayMode is a two-value picker stored as a number: anything outside
+    // [0, 1] clamps rather than reaching the shell as an unknown mode.
+    expect(s.set('displayMode', -1)).toBe(0);
+    expect(s.set('displayMode', 4)).toBe(1);
     // Interface Mode (0 Auto, 1 Desktop, 2 Touch) clamps to its 0..2 bounds.
     expect(s.set('interfaceMode', 99)).toBe(SETTING_RANGES.interfaceMode.max);
     expect(s.set('interfaceMode', -1)).toBe(SETTING_RANGES.interfaceMode.min);
@@ -185,10 +202,15 @@ describe('Settings', () => {
     a.set('cameraSpeed', 0.4);
     a.set('musicVolume', 0.2);
     a.set('fullscreen', 0);
+    a.set('displayMode', 0);
     const b = new Settings();
     expect(b.get('cameraSpeed')).toBe(0.4);
     expect(b.get('musicVolume')).toBe(0.2);
     expect(b.get('fullscreen')).toBe(0);
+    // The chosen window mode outlives the session: the shell restores its own
+    // window at launch and the boot reflection re-reads it, but a player who
+    // never opens options must still find their choice on the row.
+    expect(b.get('displayMode')).toBe(0);
   });
 
   it('persists boolean settings across instances', () => {
@@ -231,6 +253,37 @@ describe('Settings', () => {
 
     fresh.set('showPlaytime', false);
     expect(new Settings().get('showPlaytime')).toBe(false);
+  });
+
+  it('defaults the dedicated-GPU preference on and persists an opt-out across instances', () => {
+    // Default true preserves today's shipped behavior (the desktop shell forces
+    // the dedicated GPU). The stored shell field is the INVERSE opt-out, so this
+    // key reads false exactly when the shell is told to opt out; the boot
+    // reflection and the options write arm each invert once.
+    const fresh = new Settings();
+    expect(fresh.get('forceHighPerfGpu')).toBe(true);
+
+    fresh.set('forceHighPerfGpu', false);
+    expect(new Settings().get('forceHighPerfGpu')).toBe(false);
+
+    // and back: an opt-out is not sticky once the player re-enables the row
+    new Settings().set('forceHighPerfGpu', true);
+    expect(new Settings().get('forceHighPerfGpu')).toBe(true);
+  });
+
+  it('defaults Discord Rich Presence on and persists an opt-out across instances', () => {
+    // Default true is the phase 10 decision: presence is on out of the box, and
+    // Discord's own activity-sharing setting still gates who sees it. Same
+    // polarity on both sides of the bridge, so the stored value IS what the
+    // shell is told (no inversion, unlike the GPU preference above).
+    const fresh = new Settings();
+    expect(fresh.get('discordPresence')).toBe(true);
+
+    fresh.set('discordPresence', false);
+    expect(new Settings().get('discordPresence')).toBe(false);
+
+    new Settings().set('discordPresence', true);
+    expect(new Settings().get('discordPresence')).toBe(true);
   });
 
   it('defaults other-player nameplates off for fresh mobile sessions', () => {

@@ -102,6 +102,7 @@ import {
   DEBT_OF_LIGHT_DEVOTION,
   debtOfLightAura,
 } from './paladin_debt_of_light';
+import { clearRadiantResonanceReservation } from './paladin_radiant_resonance';
 import { stripSunGodVerdicts } from './paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { masteredPaladinAuraValue } from './paladin_talents';
@@ -622,7 +623,7 @@ export function dealDamage(
           abilityId,
           // Carry the AoE flag so a redirected slice of an area Arcane hit still
           // rates its Temporal Echo conversion at the area (15%) coefficient, not
-          // the single-target 35%.
+          // the single-target 40%.
           aoe,
         );
       }
@@ -1328,6 +1329,20 @@ export function handleDeath(
   emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castTargetId = null;
+  // Death is a cast cancel: mirror cancelCast's teardown of the channel and
+  // queue state, not just castingAbility. An encounter force-channel (the
+  // Nythraxis wardstone, encounters/nythraxis.ts) clears itself only while
+  // castingAbility still names it, so a death that nulls castingAbility alone
+  // strands channeling=true with channelTickEvery 0, and the victim's next
+  // hard cast runs the channel tick branch once per sim tick for the whole
+  // cast bar (issue #3400).
+  e.castRemaining = 0;
+  e.channeling = false;
+  e.channelTicksLeft = 0;
+  e.castAim = null;
+  e.queuedCastAbility = null;
+  e.queuedCastAim = null;
+  clearRadiantResonanceReservation(e);
   // Hidden per-cast state: death ends any gather/fishing session, so
   // the fields must return to inert here too (the parity samplers rely on them
   // being 0/'' at every sampled frame outside a live cast; cancelCast owns the
@@ -1507,12 +1522,20 @@ export function handleDeath(
     e.corpseTimer = CORPSE_DURATION;
     // Respawn cadence is the zone's, not one flat world timer: the policy leaf
     // reads the mob's SPAWN point so a corpse dragged across a border still
-    // returns on its home band's schedule. Draws no rng.
+    // returns on its home band's schedule. Draws rng ONLY for a template with an
+    // authored respawnWindow (Grix the Tunnelking), so the parity draw order is
+    // unchanged for every fixed-schedule death. The closure is allocated only
+    // for those templates: nearly every death would discard it.
     // A run-scoped mob (an escort ambush wave) was never placed by a camp, so it
     // has no home to return to and never respawns in place; its run drops it.
     e.respawnTimer = e.runScoped
       ? Number.POSITIVE_INFINITY
-      : resolveRespawnSeconds(template, e.spawnPos, ctx.cfg.respawnSeconds);
+      : resolveRespawnSeconds(
+          template,
+          e.spawnPos,
+          ctx.cfg.respawnSeconds,
+          template?.respawnWindow ? (min, max) => ctx.rng.range(min, max) : null,
+        );
     // A fixed respawn also caps corpse decay so the mob returns on schedule whether
     // or not its loot was looted (training dummy: 10s).
     if (template?.respawnSeconds !== undefined) {

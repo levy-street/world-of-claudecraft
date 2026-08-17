@@ -6,6 +6,10 @@
 
 export const ADMIN_PERMISSIONS = [
   'analytics.read',
+  // The ad-spend ledger writes (server/ad_spend.ts): its reads ride
+  // analytics.read like every dashboard, but editing the money record is a
+  // separate grant so viewer-tier roles can see spend without touching it.
+  'analytics.manage',
   'ops_usage.read',
   'ops.perf',
   'accounts.read',

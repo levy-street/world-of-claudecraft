@@ -801,6 +801,11 @@ export const en: EnTranslations = {
       "resetAction": "Reset",
       "note": "Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size."
     },
+    "chatQuota": {
+      "limitReached": "General chat limit reached. Try again in {seconds}.",
+      "pending": "Your previous General chat message is still sending. Try again in a moment.",
+      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+    },
     "swing": {
       "ready": "Swing",
       "seconds": "{seconds}s"
@@ -947,6 +952,22 @@ export const en: EnTranslations = {
       "closesIn": "Closes in {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
     },
     "compass": {
       "N": "N",
@@ -1362,6 +1383,10 @@ export const en: EnTranslations = {
       "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
       "showWalletOnPlayerCard": "Show Wallet on Player Card",
       "showPlaytime": "Show Time Played on Character Screen",
+      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
+      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
+      "discordPresence": "Discord Rich Presence",
+      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
       "showDevBadges": "Show Developer Badges",
       "showOwnNameplate": "Show My Nameplate",
       "showPlayerNameplates": "Show Player Nameplates",
@@ -1734,6 +1759,7 @@ export const en: EnTranslations = {
       "notEnoughHonor": "Not enough Honor.",
       "reasons": {
         "arenaWin": "Arena victory",
+        "arenaComplete": "Arena bout fought",
         "fiestaKill": "Fiesta takedown",
         "fiestaComplete": "Fiesta completed",
         "fiestaWin": "Fiesta victory",
@@ -1840,6 +1866,7 @@ export const en: EnTranslations = {
       "joinChannels": "Tip: type /join world or /join lfg to chat with players across the world."
     },
     "itemHeroicTag": "[HEROIC]",
+    "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Soulbound",
     "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
@@ -2194,6 +2221,10 @@ export const en: EnTranslations = {
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
       "itemAriaQuest": "{item}, quantity {count}, quest item",
+      "itemAriaLocked": "{item}, quantity {count}, locked",
+      "itemLockedLine": "Locked",
+      "lockItem": "Lock Item",
+      "unlockItem": "Unlock Item",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -2453,7 +2484,8 @@ export const en: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Cheater >"
     },
     "mobTooltip": {
       "levelFamily": "Level {level} {family}",
@@ -3224,6 +3256,7 @@ export const en: EnTranslations = {
       "craftedToast": "Crafted: {name}",
       "craftedToastQty": "Crafted: {name} x{qty}",
       "insufficientMaterials": "You do not have the materials for that.",
+      "reagentLocked": "A reagent for that is locked.",
       "unknownRecipe": "That recipe does not exist.",
       "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
       "comboRequires": "Attunement: {craftA} + {craftB}, tier {tier}.",
@@ -3330,6 +3363,7 @@ export const en: EnTranslations = {
       "notHeld": "You do not have that item.",
       "notDisenchantable": "You cannot disenchant that.",
       "notSalvageable": "You cannot salvage that.",
+      "salvageLocked": "That item is locked.",
       "disenchantBusy": "You are busy.",
       "salvageBusy": "You are busy.",
       "enchantBusy": "You are busy.",
@@ -3924,6 +3958,12 @@ export const en: EnTranslations = {
       "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
       "entitlement_required": "Verified Seeker entitlement is required.",
       "current_ownership_required": "Current Seeker Genesis Token ownership is required."
+    },
+    "cheater_mark": {
+      "admin_target": "Operator accounts cannot be marked.",
+      "reason_required": "A reason is required.",
+      "invalid_duration": "Enter a mark duration of at least one second.",
+      "not_marked": "That account is not marked."
     }
   },
   "guide": {
@@ -6540,6 +6580,7 @@ export const en: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "emailError": "Please enter a valid email address.",
+    "marketingOptIn": "Email me game news and updates (optional)",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "logIn": "Log In",
@@ -6640,6 +6681,19 @@ export const en: EnTranslations = {
     "style": "Style",
     "resetLook": "Reset Look",
     "resetShort": "Reset",
+    "shareTab": "Share",
+    "designCode": "Design code",
+    "designCodeHint": "Copy this code to save or share this look. Paste a code here and import it to load one.",
+    "copyCode": "Copy code",
+    "importCode": "Import",
+    "designCodeCopied": "Design code copied.",
+    "designCodeCopyManual": "Automatic copy is blocked here. The code is selected, copy it with your keyboard.",
+    "designCodeImported": "Design imported.",
+    "designCodeImportedPartial": "Design imported. Values this version does not know were skipped.",
+    "designCodeErrEmpty": "Paste a design code first.",
+    "designCodeErrHeader": "That does not look like a design code.",
+    "designCodeErrVersion": "That design code comes from a newer game version.",
+    "designCodeErrMalformed": "That design code is damaged. Copy the whole code and try again.",
     "browFlat": "Flat",
     "browArched": "Arched",
     "browThin": "Thin",
@@ -7760,7 +7814,15 @@ export const en: EnTranslations = {
       "readyBody": "Restart to install now, or keep playing and it installs when you quit.",
       "restart": "Restart now",
       "later": "Later",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "whatsNew": "See what changed in your browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is ready",
+      "updateReadyTitleNoVersion": "Update is ready",
+      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
+      "partyInviteTitle": "Party invite",
+      "partyInviteBody": "{name} invited you to a party."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7772,6 +7834,7 @@ export const en: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
     "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
     "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
@@ -7999,7 +8062,111 @@ export const en: EnTranslations = {
       "zoomIn": "Zoom in",
       "zoomOut": "Zoom out",
       "mapCanvasLabel": "Map",
-      "mapSummary": "Map of {zone}."
+      "mapSummary": "Map of {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "No meaningful markers are visible.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Additional markers: {count}.",
+      "mapMarkerDirections": {
+        "center": "center",
+        "north": "north",
+        "northeast": "northeast",
+        "east": "east",
+        "southeast": "southeast",
+        "south": "south",
+        "southwest": "southwest",
+        "west": "west",
+        "northwest": "northwest"
+      },
+      "mapMarkerDistances": {
+        "near": "near",
+        "medium": "medium distance",
+        "far": "far"
+      },
+      "mapMarkerLabels": {
+        "you": "You",
+        "availableQuest": "Available quest",
+        "readyQuest": "Quest ready to turn in",
+        "repeatQuest": "Repeatable quest",
+        "cooldownQuest": "Quest on cooldown",
+        "questObjective": "Quest objective area",
+        "readyOre": "Ready ore node",
+        "readyWood": "Ready wood node",
+        "readyHerb": "Ready herb node",
+        "readyLockedOre": "Ready ore node, tool locked",
+        "readyLockedWood": "Ready wood node, tool locked",
+        "readyLockedHerb": "Ready herb node, tool locked",
+        "cooldownOre": "Depleted ore node",
+        "cooldownWood": "Depleted wood node",
+        "cooldownHerb": "Depleted herb node",
+        "cooldownLockedOre": "Depleted ore node, tool locked",
+        "cooldownLockedWood": "Depleted wood node, tool locked",
+        "cooldownLockedHerb": "Depleted herb node, tool locked",
+        "station": "Crafting station: {name}",
+        "service": "Service: {name}",
+        "partyMember": "Party member: {name}",
+        "deadPartyMember": "Dead party member: {name}",
+        "partyMemberGeneric": "Party member",
+        "deadPartyMemberGeneric": "Dead party member",
+        "friend": "Friend: {name}",
+        "guildMember": "Guild member: {name}",
+        "pointOfInterest": "Point of interest: {name}",
+        "dungeonEntrance": "Dungeon entrance: {name}",
+        "dungeonExit": "Dungeon exit",
+        "delveEntrance": "Delve entrance: {name}",
+        "worldPassage": "Passage to {zone}",
+        "riftEntrance": "Rift entrance: {name}",
+        "hostileEnemy": "Hostile enemy",
+        "aggressiveEnemy": "Enemy attacking you",
+        "lootableEnemy": "Lootable enemy",
+        "corpse": "Your corpse",
+        "deathZone": "Danger zone",
+        "teammate": "Teammate",
+        "deadTeammate": "Dead teammate",
+        "flagCarrier": "Teammate carrying the flag",
+        "ownFlagStand": "Your flag stand",
+        "enemyFlagStand": "Enemy flag stand",
+        "riftDescent": "Rift descent",
+        "riftReturnBeacon": "Return beacon",
+        "riftReturnExit": "Return exit",
+        "ranked": "{marker}, rank {rank}",
+        "riftTreasureAvailable": "Treasure available",
+        "riftTreasureLocked": "Treasure locked",
+        "riftTreasureOpened": "Treasure opened",
+        "riftTreasureJammed": "Treasure jammed",
+        "riftCacheAvailable": "Rift cache available",
+        "riftCacheLocked": "Locked cache",
+        "riftCacheOpened": "Cache opened",
+        "riftCacheJammed": "Jammed cache",
+        "pylonUnlit": "Unlit pylon",
+        "pylonLit": "Lit pylon",
+        "sequenceRuneUnlit": "Unlit sequence rune",
+        "sequenceRuneLit": "Lit sequence rune",
+        "iceGoal": "Ice target",
+        "boulderPad": "Boulder target",
+        "boulderMovable": "Movable boulder",
+        "boulderPlaced": "Placed boulder",
+        "gateSealed": "Sealed gate",
+        "gateOpen": "Open gate",
+        "switchReady": "Ready switch",
+        "switchOn": "Activated switch",
+        "orbDormant": "Dormant orb",
+        "orbActive": "Active orb",
+        "rollerHazard": "Roller hazard",
+        "delvePassageSealed": "Sealed passage",
+        "delvePassageOpen": "Open passage",
+        "delveSurfaceExit": "Surface exit",
+        "delveCacheLocked": "Locked delve cache",
+        "delveCacheReady": "Delve cache ready",
+        "delveCacheActive": "Delve cache active",
+        "delveCacheOpened": "Opened delve cache",
+        "delveReliquaryLocked": "Locked reliquary",
+        "delveReliquaryReady": "Reliquary ready",
+        "delveReliquaryActive": "Reliquary rite active",
+        "delveReliquaryOpened": "Reliquary opened",
+        "bountiful": "Bountiful {marker}"
+      }
     },
     "options": {
       "gameMenu": "Game Menu",
@@ -8039,6 +8206,9 @@ export const en: EnTranslations = {
       "graphicsReloadNote": "Graphics Quality and Terrain Detail apply after a reload.",
       "reloadNow": "Reload Now",
       "fullscreen": "Fullscreen",
+      "displayMode": "Display Mode",
+      "displayModeBorderless": "Borderless Fullscreen",
+      "displayModeWindowed": "Windowed",
       "touchLookSpeed": "Touch Look Speed",
       "joystickSize": "Joystick Size",
       "buttonSize": "Button Size",
@@ -8915,6 +9085,10 @@ export const en: EnTranslations = {
       "filterPrimaryStatAll": "Any primary stat",
       "filterRarity": "Rarity",
       "filterRarityAll": "All rarities",
+      "filterSort": "Sort",
+      "sortName": "Name (A-Z)",
+      "sortPriceAsc": "Price: Low to High",
+      "collapseLowest": "Lowest price only",
       "weaponSword": "Swords",
       "weaponDagger": "Daggers",
       "weaponStaff": "Staves",
@@ -8945,6 +9119,8 @@ export const en: EnTranslations = {
       "quantity": "Quantity",
       "quantityOf": "of {count}",
       "priceEach": "Price each",
+      "lowestPriceLabel": "Current lowest listed price",
+      "lowestPriceNone": "No active listings for this item yet.",
       "listButton": "List on the World Market",
       "minPriceError": "Name a price of at least 1 copper.",
       "collectEmpty": "Nothing waiting. Sale proceeds and expired listings collect here.",
@@ -9372,6 +9548,7 @@ export const en: EnTranslations = {
       "cheap_shot": {
         "name": "Gut Punch",
         "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
+        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
@@ -9464,7 +9641,7 @@ export const en: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "description": "Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight."
       },
       "beacon_of_light": {
         "name": "Beacon of Light",
@@ -9584,7 +9761,7 @@ export const en: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Burning Oath",
-        "description": "Passively increases the threat generated by your Holy damage by 60%. Faithwarden only."
+        "description": "Passively increases the threat generated by your Holy damage by 30%. Faithwarden only."
       },
       "retribution_aura": {
         "name": "Requital Aura",
@@ -9700,7 +9877,7 @@ export const en: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Weapon",
-        "description": "Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 30% armor, takes 10% less damage, and generates twice as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec."
+        "description": "Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 40% armor and 20% Stamina, takes 15% less damage, is immune to critical strikes from creatures, and generates two and three quarter times as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec."
       },
       "healing_wave": {
         "name": "Mending Waters",
@@ -9879,7 +10056,7 @@ export const en: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +130%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
@@ -9889,6 +10066,10 @@ export const en: EnTranslations = {
       "growl": {
         "name": "Menace",
         "description": "Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only."
+      },
+      "challenging_roar": {
+        "name": "Baleful Roar",
+        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wolf Form",
@@ -10434,7 +10615,7 @@ export const en: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
-        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
+        "description": "Restores 180 health over 10 sec. Bruin Form only."
       },
       "frost_trap": {
         "name": "Rime Snare",
@@ -10502,15 +10683,15 @@ export const en: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Temporal Reversal",
-        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+        "description": "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)"
       },
       "collective_reversal": {
         "name": "Collective Reversal",
-        "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
+        "description": "Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
       },
       "ancestor_return": {
         "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "description": "Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
       },
       "temporal_rewind": {
         "name": "Rewind",
@@ -12221,6 +12402,9 @@ export const en: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Pristine Claw"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"
@@ -16710,6 +16894,11 @@ export const en: EnTranslations = {
         "name": "The Last Keep",
         "enterText": "You step into the cold, silent halls of the Last Keep.",
         "leaveText": "You pull the keep door shut and step back into the Drakelands wind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "The Drowned Temple",

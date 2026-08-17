@@ -223,6 +223,13 @@ const itemStringsEn = {
       filterPrimaryStatAll: 'Any primary stat',
       filterRarity: 'Rarity',
       filterRarityAll: 'All rarities',
+      filterSort: 'Sort',
+      sortName: 'Name (A-Z)',
+      sortPriceAsc: 'Price: Low to High',
+      // Browse toggle (issue #3103): collapses other sellers' listings to the cheapest
+      // per distinct item, so scanning for a deal does not mean paging through every
+      // near-duplicate stack.
+      collapseLowest: 'Lowest price only',
       weaponSword: 'Swords',
       weaponDagger: 'Daggers',
       weaponStaff: 'Staves',
@@ -259,6 +266,13 @@ const itemStringsEn = {
       quantity: 'Quantity',
       quantityOf: 'of {count}',
       priceEach: 'Price each',
+      // The Sell tab's current-lowest-listing-price reference (issue #3043): a
+      // same-page market check so the player never has to leave the sell path
+      // to browse first. lowestPriceNone covers the item having no active
+      // listings; while the server's echo has not caught up to the staged item
+      // yet, the painter shows neither line rather than a stale/wrong price.
+      lowestPriceLabel: 'Current lowest listed price',
+      lowestPriceNone: 'No active listings for this item yet.',
       listButton: 'List on the World Market',
       minPriceError: 'Name a price of at least 1 copper.',
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
@@ -2431,6 +2445,7 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  'dawnhold_posy',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2559,6 +2574,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  dawnhold_posy: 'Dawnhold Garden Posy',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -12,6 +12,7 @@
 // game menu, so it stays out of the registry and is refused by bind().
 
 import { repairStoredBindings } from './keybinds_repair';
+import { parseStoredJson } from './local_storage_json';
 import { isReservedMouseCode, mouseCodeLabel } from './mouse_binds';
 
 export type BindKind = 'held' | 'edge';
@@ -538,12 +539,7 @@ function codeLabel(code: string): string {
 // corrupt (unparseable), or non-object value (including a JSON array) counts as
 // "no profile"; the caller then falls back to the legacy seed or to defaults.
 function readBindingsBlob(key: string): Record<string, unknown> | null {
-  let parsed: unknown = null;
-  try {
-    parsed = JSON.parse(localStorage.getItem(key) ?? 'null');
-  } catch {
-    /* corrupt */
-  }
+  const parsed = parseStoredJson(key);
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
   return parsed as Record<string, unknown>;
 }

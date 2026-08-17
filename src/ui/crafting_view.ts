@@ -11,6 +11,7 @@
 // DOM-free and i18n-free so tests/crafting_view.test.ts can drive it directly.
 
 import { ALL_RECIPES } from '../sim/content/recipes';
+import { countUnlockedInSlots } from '../sim/item_lock';
 import { craftSkillGainMultiplier } from '../sim/professions/archetype';
 import {
   type ComboEligibilityReason,
@@ -131,10 +132,14 @@ export interface CraftingIdentityLike {
   hobbyCraft: string | null;
 }
 
+// Lock-aware (issue 3042): a player-locked reagent copy is not spendable, so
+// it must never count toward "you have enough" here either, or the Craft
+// button would light up green for a craft the sim then refuses. The same
+// count the sim's own hasRecipeMaterials/resolveCraftForRecipe gate on
+// (src/sim/item_lock.ts countUnlockedInSlots), so the two can never disagree
+// about whether a recipe is craftable.
 function countInInventory(inventory: readonly InvSlot[], itemId: string): number {
-  let n = 0;
-  for (const slot of inventory) if (slot.itemId === itemId) n += slot.count;
-  return n;
+  return countUnlockedInSlots(inventory, itemId);
 }
 
 /** The two per-item inventory facts a reagent row needs (see the memo in

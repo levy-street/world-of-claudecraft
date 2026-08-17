@@ -723,7 +723,11 @@ const BOSSES: Record<string, MobTemplate> = {
     deathZoneCast: {
       castId: 'rift_necro_execution',
       name: 'Soul Grave',
-      castTime: 2.5,
+      // 3.5 to match the roster line (Emberforge, Grask, Nyxaris). At 2.5 the
+      // S-rank fuse (castTime * RIFT_S_ZONE_TEMPO) was 1.75s against 1.29s of
+      // run-out from the anchor at the centre, leaving 0.46s to react: the
+      // only unreactable zone in the game. See riftDeathZoneReactionBudget.
+      castTime: 3.5,
       every: 22,
       radius: 9,
       school: 'shadow',
@@ -733,7 +737,10 @@ const BOSSES: Record<string, MobTemplate> = {
     deathZoneStrike: {
       castId: 'rift_necro_strike',
       name: 'Death Sentence',
-      castTime: 3.0,
+      // 4.0 for the same reason as Soul Grave above: at 3.0 the S-rank fuse was
+      // 2.10s against 1.57s of run-out, and at S this one is the barrage (a
+      // zone under EVERY living member), so nobody had a safe anchor to read.
+      castTime: 4.0,
       every: 26,
       radius: 11,
       school: 'shadow',

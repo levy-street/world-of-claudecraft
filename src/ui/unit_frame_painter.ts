@@ -82,6 +82,11 @@ export interface UnitFrameElements {
    *  node (setText clobbers children). */
   titlePre?: HTMLElement;
   titlePost?: HTMLElement;
+  /** The operator-applied Cheater tag span on the name line, written from the
+   *  view's pre-localized `cheaterTag`; omitted by frames with no tag surface,
+   *  which then pay zero writes. Its own span, never folded into titlePre: a
+   *  sanction and a chosen title must be styled and cleared independently. */
+  cheaterTag?: HTMLElement;
   /** The portrait accent host (the `.portrait-wrap`), which carries the Book of
    *  Deeds border ring; omitted by frames with no border surface, which then pay
    *  zero writes. Never the `.portrait` itself: its border-color / box-shadow are
@@ -141,6 +146,7 @@ export class UnitFramePainter {
     if (this.el.name) this.writers.setText(this.el.name, view.name);
     if (this.el.titlePre) this.writers.setText(this.el.titlePre, view.titlePre);
     if (this.el.titlePost) this.writers.setText(this.el.titlePost, view.titlePost);
+    if (this.el.cheaterTag) this.writers.setText(this.el.cheaterTag, view.cheaterTag);
     this.paintPortraitBorder(view);
     this.gatePortrait(view.portraitKey);
     this.writers.setText(this.el.level, view.levelText ?? '');

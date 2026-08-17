@@ -41,6 +41,15 @@ export async function enterOfflineGame(page, opts = {}) {
   } = opts;
   const card = `#offline-select .mini-class[data-class="${charClass}"]`;
   await page.waitForSelector('#btn-offline', { timeout: 30000 });
+  // Mark the first-run camera prompt as already seen BEFORE the world boots:
+  // it waits out the intro cinematic and can surface after the overlay poll in
+  // dismissEntryOverlays returned, which is how it photobombed a capture (the
+  // Thornhollow queue-window shot). Seeding the storage key beats the race at
+  // the source; the dismissal loop stays as the backstop for a prompt already
+  // up. Key: SHOWN_KEY in src/ui/camera_prompt.ts.
+  await page
+    .evaluate(() => localStorage.setItem('woc.cameraModePrompt.shown', '1'))
+    .catch(() => {});
   // Hidden legacy hook: fire its handler in-page rather than page.click (no clickable point).
   await page.evaluate(() => document.querySelector('#btn-offline')?.click());
   await page.waitForSelector(card, { visible: true, timeout: selectorTimeoutMs });

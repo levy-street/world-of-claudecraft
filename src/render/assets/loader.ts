@@ -324,11 +324,33 @@ export interface HdrLoadOptions {
   maxWidth?: number;
 }
 
-/** Equirectangular Radiance .hdr for IBL / sky sampling (HalfFloat). */
-export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THREE.DataTexture> {
+/** The resolved cache key for one (url, options) pair. loadHdr and releaseHdr
+ *  share it so a release can never miss the entry a load created. */
+interface HdrRequest {
+  resolved: string;
+  maxWidth: number | undefined;
+  cacheKey: string;
+}
+
+/** One normalization for url + maxWidth, shared by loadHdr and releaseHdr so
+ *  the pair can never disagree on a cache key (review round 1). */
+function hdrRequest(url: string, options: HdrLoadOptions): HdrRequest {
   const resolved = assetUrl(url);
   const maxWidth = options.maxWidth ? Math.max(1, Math.floor(options.maxWidth)) : undefined;
-  const cacheKey = maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved;
+  return {
+    resolved,
+    maxWidth,
+    cacheKey: maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved,
+  };
+}
+
+function hdrCacheKey(url: string, options: HdrLoadOptions): string {
+  return hdrRequest(url, options).cacheKey;
+}
+
+/** Equirectangular Radiance .hdr for IBL / sky sampling (HalfFloat). */
+export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THREE.DataTexture> {
+  const { resolved, maxWidth, cacheKey } = hdrRequest(url, options);
   let p = hdrCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
@@ -376,12 +398,30 @@ export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THRE
       },
       (err: unknown) => {
         recordAssetLoad('hdr', resolved, startedAt, true);
+        // Same failure eviction as loadGltf (the black-void precedent): a
+        // rejected promise left in the cache poisons every later ensure for
+        // the session, which would defeat the sky evict-and-refetch lane
+        // after an outage outlives the bounded retry. Identity-guarded so a
+        // newer in-flight load is never evicted by an old failure settling.
+        if (hdrCache.get(cacheKey) === p) hdrCache.delete(cacheKey);
         throw err;
       },
     );
     hdrCache.set(cacheKey, p);
   }
   return p;
+}
+
+/** The HDR twin of releaseGltf/releaseTexture: drop a loadHdr entry once its
+ *  decoded texture has been disposed by its owner, so a later loadHdr for the
+ *  same url re-fetches instead of handing out a disposed DataTexture. Pass the
+ *  SAME options the load used - maxWidth discriminates the cache key. The
+ *  sky-residency lane pairs this with the dispose (src/render/sky.ts
+ *  releaseSkyBiomeAssets): releasing the cache entry WITHOUT disposing merely
+ *  costs a re-decode, but disposing without releasing hands the next consumer a
+ *  dead texture. */
+export function releaseHdr(url: string, options: HdrLoadOptions = {}): void {
+  hdrCache.delete(hdrCacheKey(url, options));
 }
 
 /** Plain image texture (terrain splats, water normals, VFX sprites). */
@@ -427,6 +467,11 @@ export function loadTexture(
       },
       (err: unknown) => {
         recordAssetLoad('texture', resolved, startedAt, true);
+        // Same terminal-failure eviction as loadHdr, loadGltf and
+        // loadKtx2Texture: a rejected promise left in the cache poisons every
+        // later load of this url for the session. Identity-guarded so a newer
+        // in-flight load is never evicted by an old failure settling.
+        if (texCache.get(key) === p) texCache.delete(key);
         throw err;
       },
     );
@@ -439,12 +484,19 @@ export function loadTexture(
  *  stays GPU-compressed in memory instead of decoding to a full RGBA bitmap,
  *  the same win GLB-embedded textures already get. Shares the one ktx2Loader()
  *  transcoder singleton the GLB parse path attaches to GLTFLoader, so this pays
- *  no extra transcoder init. Colorspace and mip levels are baked into the KTX2
- *  container at compress time (scripts/assets/compress_standalone_textures.mjs),
- *  so unlike loadTexture there is no `srgb` option to pass. */
-export function loadKtx2Texture(url: string): Promise<THREE.CompressedTexture> {
+ *  no extra transcoder init. Colorspace, mip levels and the vertical flip are
+ *  baked into the KTX2 container at compress time
+ *  (scripts/assets/compress_standalone_textures.mjs), so unlike loadTexture
+ *  there is no `srgb` option to pass and `flipY` is never honored here; only
+ *  `repeat` remains a runtime choice, and it discriminates the cache key
+ *  exactly as it does in loadTexture. */
+export function loadKtx2Texture(
+  url: string,
+  opts: { repeat?: boolean } = {},
+): Promise<THREE.CompressedTexture> {
   const resolved = assetUrl(url);
-  let p = ktx2TexCache.get(resolved);
+  const cacheKey = `${resolved}|${opts.repeat ? 'r' : 'c'}`;
+  let p = ktx2TexCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
     p = scheduleLoad(textureQueue, () => {
@@ -468,19 +520,30 @@ export function loadKtx2Texture(url: string): Promise<THREE.CompressedTexture> {
       );
     }).then(
       (tex) => {
+        if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
         // Standalone KTX2 atlases (character skins) draw in the character
         // preview, portrait and armory renderers too, so their CPU mip chains
         // must stay resident: dismiss the stashed restore source, never arm.
+        // The terrain splat and surface-detail sets are world-only and could
+        // ARM the release instead; that is a follow-up, not this change (it
+        // needs the same category audit assets/ktx2_mip_release.ts documents).
         dismissKtx2Source(tex);
         recordAssetLoad('texture', resolved, startedAt);
         return tex;
       },
       (err: unknown) => {
         recordAssetLoad('texture', resolved, startedAt, true);
+        // Same failure eviction as loadHdr (the loadGltf black-void precedent):
+        // a rejected promise left in the cache poisons every later load for the
+        // session, so the second graphics-profile Apply that the terrain,
+        // surface-detail and stone-normal owners retry through would replay the
+        // old rejection instead of issuing a request. Identity-guarded so a
+        // newer in-flight load is never evicted by an old failure settling.
+        if (ktx2TexCache.get(cacheKey) === p) ktx2TexCache.delete(cacheKey);
         throw err;
       },
     );
-    ktx2TexCache.set(resolved, p);
+    ktx2TexCache.set(cacheKey, p);
   }
   return p;
 }

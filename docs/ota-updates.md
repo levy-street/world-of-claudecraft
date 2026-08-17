@@ -58,11 +58,13 @@ The plugin itself is MPL-2.0; self-hosting is a documented, supported mode.
 5. **The visible update gate.** `src/net/ota_update_gate.ts` (wired in
    `src/main.ts`, painted by `src/ui/ota_update_overlay.ts`) turns the silent
    default into a visible flow on the shells. Pre-world, a running download
-   shows a modal with live percent progress and a "continue without
-   updating" escape; when the download completes and the player has neither
-   dismissed the modal nor entered the world, the staged bundle is applied
-   immediately via `reload()` instead of waiting for a backgrounding. When
-   the server rejects a stale bundle's world-layout epoch
+   shows a modal with live percent progress and no cancel/dismiss action (a
+   skipped update strands the player on a stale bundle headed for the
+   incompatible-version dead end, so the gate holds until the update lands);
+   when the download completes and the player has not entered the world, the
+   staged bundle is applied immediately via `reload()` instead of waiting
+   for a backgrounding. When the server rejects a stale bundle's
+   world-layout epoch
    (`ONLINE_WORLD_INCOMPATIBLE_MESSAGE`) while a download is in flight or
    staged, the gate replaces the dead-end fatal overlay: progress, then
    auto-apply, and the resume marker survives so the reload lands back in the
@@ -311,10 +313,10 @@ feed. Keep it scoped to the one bucket and rotate it on any suspicion.
   `src/main.ts` wiring (boot confirm AND the gate install/disconnect arm),
   `capacitor.config.ts` plugin block, and the `package.json` dependency.
 - `tests/ota_update_gate.test.ts`: the visible-gate state machine (progress,
-  dismiss, auto-apply, in-world suppression, the incompatible-version
+  auto-apply, in-world suppression, the incompatible-version
   takeover and its fatal-mode dead ends).
 - `tests/ota_update_overlay.test.ts`: the overlay painter (mount/update in
-  place, progressbar semantics, continue action, fatal copy).
+  place, progressbar semantics, the no-cancel contract, fatal copy).
 - `tests/ota_publish.test.ts`: the publish planner (keys, URLs, manifest
   shape, validation, the per-file entry builder and its unsafe-path guards),
   CLI flag parsing, and the R2 endpoint override.

@@ -490,10 +490,12 @@ export function recalcPlayerStats(
   s.agi = Math.max(0, s.agi);
   s.armor += s.agi * 2;
   if (bearForm) {
-    // 2.3x (2026-07 tank parity, was 1.9x): leather peaks ~1700-2100 armor
-    // vs the warrior's 2861, so the form multiplier fakes the missing plate
-    // tier, the Dire Bear logic.
-    s.armor = Math.round(s.armor * 2.3);
+    // 2.1x (v0.38 tank parity, was 2.3x): the armor trim funds the bigger form
+    // health pool below so total effective HP stays inside the committed-tank
+    // band while the bear owns the classic big-pool identity. Leather peaks
+    // ~1700-2100 armor vs the warrior's 2861; the form multiplier still fakes
+    // the missing plate tier, the Dire Bear logic.
+    s.armor = Math.round(s.armor * 2.1);
     bonusAp += 15 + Math.round(s.agi * 1.5);
   }
   if (catForm) {
@@ -673,7 +675,9 @@ export function recalcPlayerStats(
 
   const hpFrac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
   e.maxHp = def.baseHp + def.hpPerLevel * (lvl - 1) + hpFromStamina(s.sta);
-  if (bearForm) e.maxHp = Math.round(e.maxHp * 1.15);
+  // 1.30x (v0.38 tank parity, was 1.15x): funded by the form armor trim above,
+  // restoring the classic big-pool bear identity (largest raw tank pool).
+  if (bearForm) e.maxHp = Math.round(e.maxHp * 1.3);
   if (mods?.stats.maxHpPct) e.maxHp = Math.round(e.maxHp * (1 + mods.stats.maxHpPct));
   if (maxHpPctAura !== 0) e.maxHp = Math.max(1, Math.round(e.maxHp * (1 + maxHpPctAura)));
   // Fiesta "Colossus"-style buffs: growing bigger also makes you tankier.

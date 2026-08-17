@@ -31,6 +31,7 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
+import { isItemLocked } from '../sim/item_lock';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import { bagFineMark } from './bag_fine_mark_view';
@@ -55,7 +56,7 @@ import {
 } from './guild_bank_view';
 import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
-import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS } from './item_instance_glyph_mark';
+import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS, lockMarkHtml } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
@@ -474,12 +475,19 @@ export class GuildBankTab {
     const fineMark = bagFineMark(slot.itemId);
     const cornerMark = bagCornerMark(glyphKind, null, fineMark);
     const instanceMark = cornerMarkHtml(cornerMark);
+    // Player item lock (issue 3042): its own bottom-left badge, distinct from
+    // the guild bank's UNRELATED top-right dormant-slot lock mark below (a
+    // guild-permission fact, not a per-copy owner choice). All-surfaces family
+    // (item_instance_glyph_mark.ts): a locked copy keeps this mark visible
+    // after deposit like every other bank/guild-bank instance mark.
+    const locked = isItemLocked(slot.instance);
+    const lockSeal = lockMarkHtml(locked);
     if (slot.known && item) {
       cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}${dormantClass}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
       const mark = slot.dormant ? `<span class="gbank-dormant-mark">${svgIcon('lock')}</span>` : '';
-      cell.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}<span class="bank-count">${
+      cell.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${lockSeal}<span class="bank-count">${
         slot.showCount ? esc(t('itemUi.bags.stackCount', { count })) : ''
       }</span>${mark}`;
       this.deps.attachTooltip(cell, () => {
@@ -509,7 +517,7 @@ export class GuildBankTab {
       cell.className = `bank-item gbank-unknown${bagRimClasses(null, fineMark)}${dormantClass}`;
       cell.innerHTML = `<span class="gbank-unknown-label">${esc(
         t('hudChrome.bank.guildUnknownItem'),
-      )}</span>${instanceMark}<span class="bank-count">${
+      )}</span>${instanceMark}${lockSeal}<span class="bank-count">${
         slot.showCount ? esc(t('itemUi.bags.stackCount', { count })) : ''
       }</span>`;
       this.deps.attachTooltip(cell, () => {
@@ -523,21 +531,30 @@ export class GuildBankTab {
         }`;
       });
     }
-    // Dormant wording outranks the per-copy flag (the lock is the action fact);
-    // otherwise a masterwork / signed / enchanted copy announces itself. The
-    // guild pane keeps the KNOWN key family even for an unknown id: itemName is
-    // already the localized unknown-item label here (the label carries the
-    // unknown fact, the raw id lives in the tooltip), where the personal bank
-    // announces the raw id via the UNKNOWN_ siblings instead. Deliberate; the
-    // guild marker suite pins the exact strings.
+    // Dormant wording outranks every other announcement (the guild-permission
+    // lock is the action fact); the player item lock (issue 3042) outranks
+    // the per-copy glyph next, since "this copy is protected" is the most
+    // actionable owner fact; otherwise a masterwork / signed / enchanted copy
+    // announces itself. The guild pane keeps the KNOWN key family even for an
+    // unknown id: itemName is already the localized unknown-item label here
+    // (the label carries the unknown fact, the raw id lives in the tooltip),
+    // where the personal bank announces the raw id via the UNKNOWN_ siblings
+    // instead. Deliberate; the guild marker suite pins the exact strings.
     cell.setAttribute(
       'aria-label',
       slot.dormant
         ? t('hudChrome.bank.guildDormantAria', { item: itemName, count })
-        : t(glyphKind ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria', {
-            item: itemName,
-            count,
-          }),
+        : t(
+            locked
+              ? 'hudChrome.bags.itemAriaLocked'
+              : glyphKind
+                ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+                : 'itemUi.bags.itemAria',
+            {
+              item: itemName,
+              count,
+            },
+          ),
     );
     // A read-only cell stays FOCUSABLE (the tooltip inspection is the point)
     // but must not announce as actionable: its click is inert by design, and

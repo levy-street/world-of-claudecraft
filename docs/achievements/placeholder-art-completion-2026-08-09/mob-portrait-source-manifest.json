@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "cd7225b29e0a3cfecc5372ae3e452b090cfbbee36a7552c734a652cda858c4a3",
+  "rendererFingerprint": "d6fabd19e708eea168126f4f6d86176292e7fd2e082cd98c3f298072d1753a8d",
   "renderer": {
     "trackedFiles": [
       {
@@ -16,8 +16,8 @@
       },
       {
         "path": "scripts/lib/mob_portrait_jobs.mjs",
-        "bytes": 8547,
-        "sha256": "8811b612d40a20c55800e2f15ab58ee1580a905fa3a8cf81574cfc6e3853077b"
+        "bytes": 8916,
+        "sha256": "641ff277a3bf8af96ae7ce579cd55286dd8f76f6af04d5da35bf0f42318e3aff"
       },
       {
         "path": "scripts/lib/mob_portrait_background.mjs",
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 3817662,
-      "sha256": "c28aad1fa018359aa2cf156f444728013bcadf104e35f3693ec4cfbc1c8af30e",
+      "bytes": 4228916,
+      "sha256": "668870d989696ad4cd1aeb9a2ef155b000e30fca22475868430cf4e1001f13d5",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -2769,7 +2769,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.07,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -2781,7 +2781,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8c5f8738f47b14d6552cae1dee2f65e73e948467835d4723f3f2ce7f416af6fb",
+      "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
       "output": {
         "path": "public/ui/mobs/grix_the_tunnelking.webp",
         "bytes": 2830,
@@ -7298,7 +7298,7 @@
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -7310,11 +7310,11 @@
         "resolved": "#9c640c",
         "strength": 0.12
       },
-      "sourceFingerprint": "d19ee3b2692349523e7ade48a684084ba842f30fb1c7a51507397787dc8a5030",
+      "sourceFingerprint": "820c237cca9f63dfd62ee7459dd0a9c220558db87ee0d0cd5cde52b78e231610",
       "output": {
         "path": "public/ui/mobs/tunnel_rat.webp",
-        "bytes": 2564,
-        "sha256": "54329ab570e0a0dbde0530e22955cf1dc65be72907e8894de831b2c9a504acb2"
+        "bytes": 2560,
+        "sha256": "f9cd6552c6514dc9832fff101740cacc2c021dd978e3a1b120f484c07ba1640b"
       }
     },
     {

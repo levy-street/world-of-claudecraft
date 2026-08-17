@@ -801,6 +801,11 @@ export const ru_RU: EnTranslations = {
       "resetAction": "Сбросить",
       "note": "Перетащите полосу вкладок чата, чтобы переместить окно, или угловой маркер, чтобы изменить размер. Сброс возвращает окно в положение и размер по умолчанию."
     },
+    "chatQuota": {
+      "limitReached": "Достигнут лимит общего чата. Повторите попытку через {seconds}.",
+      "pending": "Предыдущее сообщение в общий чат ещё отправляется. Повторите попытку через мгновение.",
+      "unavailable": "Общий чат временно недоступен. Повторите попытку позже."
+    },
     "swing": {
       "ready": "Замах",
       "seconds": "{seconds} сек."
@@ -947,6 +952,22 @@ export const ru_RU: EnTranslations = {
       "closesIn": "Разлом закроется через {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Подклет",
+        "state": "Парадный этаж",
+        "residence": "Жилой этаж",
+        "tower": "Дозорная башня"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Садовый этаж",
+        "solar": "Светлица"
+      }
     },
     "compass": {
       "N": "С",
@@ -1362,6 +1383,10 @@ export const ru_RU: EnTranslations = {
       "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
       "showPlaytime": "Показывать время в игре на экране персонажей",
+      "forceHighPerfGpu": "Использовать дискретную игровую видеокарту",
+      "forceHighPerfGpuNote": "Включено по умолчанию: настольное приложение запрашивает у компьютера дискретную игровую видеокарту. Отключите, если игра не запускается, показывает черный экран или экран ноутбука гаснет. Настройка применится при следующем запуске игры.",
+      "discordPresence": "Статус в Discord",
+      "discordPresenceNote": "Показывает зону, в которой вы находитесь, и время этой игровой сессии как вашу активность в Discord, и это видит любой, кому доступен ваш профиль Discord. Передаются только название зоны, время сессии и название игры, но никогда ваш персонаж, ваша учетная запись или те, с кем вы играете. Требуется запущенное приложение Discord на этом компьютере.",
       "showDevBadges": "Показывать значки разработчика",
       "showOwnNameplate": "Показывать свою табличку с именем",
       "showPlayerNameplates": "Показывать таблички с именами игроков",
@@ -1734,6 +1759,7 @@ export const ru_RU: EnTranslations = {
       "notEnoughHonor": "Недостаточно чести.",
       "reasons": {
         "arenaWin": "Победа на арене",
+        "arenaComplete": "Бой на арене",
         "fiestaKill": "Устранение на Фиесте",
         "fiestaComplete": "Завершение Фиесты",
         "fiestaWin": "Победа на Фиесте",
@@ -1840,6 +1866,7 @@ export const ru_RU: EnTranslations = {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
+    "itemHeroicLabel": "Героический",
     "itemSoulbound": "Персональный",
     "itemUniqueEquipped": "Уникальный (экипируется)",
     "itemSet": {
@@ -2194,6 +2221,10 @@ export const ru_RU: EnTranslations = {
       "itemAriaBound": "{item}, количество {count}, привязанный экземпляр",
       "itemAriaMasterwork": "{item}, количество {count}, шедевр",
       "itemAriaQuest": "{item}, количество {count}, предмет задания",
+      "itemAriaLocked": "{item}, количество {count}, заблокированный экземпляр",
+      "itemLockedLine": "Заблокировано",
+      "lockItem": "Заблокировать предмет",
+      "unlockItem": "Разблокировать предмет",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -2453,7 +2484,8 @@ export const ru_RU: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Читер >"
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",
@@ -3224,6 +3256,7 @@ export const ru_RU: EnTranslations = {
       "craftedToast": "Создано: {name}",
       "craftedToastQty": "Создано: {name} x{qty}",
       "insufficientMaterials": "У вас недостаточно материалов.",
+      "reagentLocked": "Один из реагентов заблокирован.",
       "unknownRecipe": "Такого рецепта не существует.",
       "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.",
       "comboRequires": "Настройка: {craftA} + {craftB}, ранг {tier}.",
@@ -3330,6 +3363,7 @@ export const ru_RU: EnTranslations = {
       "notHeld": "У вас нет этого предмета.",
       "notDisenchantable": "Это нельзя распылить.",
       "notSalvageable": "Это нельзя разобрать.",
+      "salvageLocked": "Этот предмет заблокирован.",
       "disenchantBusy": "Вы заняты.",
       "salvageBusy": "Вы заняты.",
       "enchantBusy": "Вы заняты.",
@@ -3924,6 +3958,12 @@ export const ru_RU: EnTranslations = {
       "genesis_token_claimed": "Этот Seeker Genesis Token уже был зарегистрирован.",
       "entitlement_required": "Требуются подтвержденные права Seeker.",
       "current_ownership_required": "Требуется текущее владение Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Учетные записи операторов нельзя отметить.",
+      "reason_required": "Необходимо указать причину.",
+      "invalid_duration": "Укажите длительность отметки не менее одной секунды.",
+      "not_marked": "Эта учетная запись не отмечена."
     }
   },
   "guide": {
@@ -6540,6 +6580,7 @@ export const ru_RU: EnTranslations = {
     "email": "Эл. почта",
     "emailPlaceholder": "ivan@example.com",
     "emailError": "Введите корректный адрес эл. почты.",
+    "marketingOptIn": "Присылайте мне новости и обновления игры (необязательно)",
     "showPassword": "Показать пароль",
     "hidePassword": "Скрыть пароль",
     "logIn": "Войти",
@@ -6640,6 +6681,19 @@ export const ru_RU: EnTranslations = {
     "style": "Стиль",
     "resetLook": "Сбросить облик",
     "resetShort": "Сброс",
+    "shareTab": "Поделиться",
+    "designCode": "Код облика",
+    "designCodeHint": "Скопируйте этот код, чтобы сохранить облик или поделиться им. Вставьте код сюда и импортируйте, чтобы загрузить облик.",
+    "copyCode": "Копировать код",
+    "importCode": "Импорт",
+    "designCodeCopied": "Код облика скопирован.",
+    "designCodeCopyManual": "Автоматическое копирование здесь недоступно. Код выделен, скопируйте его с клавиатуры.",
+    "designCodeImported": "Облик импортирован.",
+    "designCodeImportedPartial": "Облик импортирован. Значения, неизвестные этой версии, были пропущены.",
+    "designCodeErrEmpty": "Сначала вставьте код облика.",
+    "designCodeErrHeader": "Это не похоже на код облика.",
+    "designCodeErrVersion": "Этот код облика создан в более новой версии игры.",
+    "designCodeErrMalformed": "Этот код облика повреждён. Скопируйте код целиком и попробуйте снова.",
     "browFlat": "Прямые",
     "browArched": "Дугой",
     "browThin": "Тонкие",
@@ -7760,7 +7814,15 @@ export const ru_RU: EnTranslations = {
       "readyBody": "Оно установится при выходе из игры, либо перезапустите сейчас.",
       "restart": "Перезапустить сейчас",
       "later": "Позже",
-      "dismiss": "Закрыть"
+      "dismiss": "Закрыть",
+      "whatsNew": "Посмотреть изменения в браузере"
+    },
+    "notify": {
+      "updateReadyTitle": "Обновление {version} готово",
+      "updateReadyTitleNoVersion": "Обновление готово",
+      "updateReadyBody": "Перезапустите World of ClaudeCraft, чтобы применить обновление.",
+      "partyInviteTitle": "Приглашение в группу",
+      "partyInviteBody": "{name} приглашает вас в группу."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7772,6 +7834,7 @@ export const ru_RU: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.",
+    "bodyDiscreteInactive": "Игра не использует дискретную (игровую) видеокарту и работает на энергосберегающем графическом процессоре, поэтому производительность будет ниже. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.",
     "bodyWeb": "Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.",
     "hybridBodyWindows": "Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, установите в браузере режим \"Высокая производительность\" в разделе Параметры > Система > Дисплей > Графика, а затем перезапустите браузер. Настольное приложение выбирает дискретную видеокарту автоматически.",
     "hybridBodyLinux": "Этот сеанс работает на встроенной (энергосберегающей) видеокарте. Если на этом компьютере также есть дискретная игровая видеокарта, в вашем браузере или драйвере видеокарты может быть собственная настройка выбора видеокарты, либо ваш дистрибутив может предлагать инструмент переключения видеокарт (например, PRIME или optimus-manager). Настольное приложение выбирает дискретную видеокарту автоматически.",
@@ -7999,7 +8062,111 @@ export const ru_RU: EnTranslations = {
       "zoomIn": "Приблизить",
       "zoomOut": "Отдалить",
       "mapCanvasLabel": "Карта",
-      "mapSummary": "Карта зоны {zone}."
+      "mapSummary": "Карта зоны {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Значимые метки не видны.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Ещё меток: {count}.",
+      "mapMarkerDirections": {
+        "center": "в центре",
+        "north": "на севере",
+        "northeast": "на северо-востоке",
+        "east": "на востоке",
+        "southeast": "на юго-востоке",
+        "south": "на юге",
+        "southwest": "на юго-западе",
+        "west": "на западе",
+        "northwest": "на северо-западе"
+      },
+      "mapMarkerDistances": {
+        "near": "рядом",
+        "medium": "на среднем расстоянии",
+        "far": "далеко"
+      },
+      "mapMarkerLabels": {
+        "you": "Вы",
+        "availableQuest": "Доступное задание",
+        "readyQuest": "Задание готово к сдаче",
+        "repeatQuest": "Повторяемое задание",
+        "cooldownQuest": "Задание восстанавливается",
+        "questObjective": "Область цели задания",
+        "readyOre": "Доступная залежь руды",
+        "readyWood": "Доступная древесина",
+        "readyHerb": "Доступная трава",
+        "readyLockedOre": "Доступная залежь руды, инструмент недоступен",
+        "readyLockedWood": "Доступная древесина, инструмент недоступен",
+        "readyLockedHerb": "Доступная трава, инструмент недоступен",
+        "cooldownOre": "Истощённая залежь руды",
+        "cooldownWood": "Истощённая древесина",
+        "cooldownHerb": "Истощённая трава",
+        "cooldownLockedOre": "Истощённая залежь руды, инструмент недоступен",
+        "cooldownLockedWood": "Истощённая древесина, инструмент недоступен",
+        "cooldownLockedHerb": "Истощённая трава, инструмент недоступен",
+        "station": "Ремесленная станция: {name}",
+        "service": "Служба: {name}",
+        "partyMember": "Участник группы: {name}",
+        "deadPartyMember": "Погибший участник группы: {name}",
+        "partyMemberGeneric": "Участник группы",
+        "deadPartyMemberGeneric": "Погибший участник группы",
+        "friend": "Друг: {name}",
+        "guildMember": "Участник гильдии: {name}",
+        "pointOfInterest": "Примечательное место: {name}",
+        "dungeonEntrance": "Вход в подземелье: {name}",
+        "dungeonExit": "Выход из подземелья",
+        "delveEntrance": "Вход в вылазку: {name}",
+        "worldPassage": "Проход в {zone}",
+        "riftEntrance": "Вход в разлом: {name}",
+        "hostileEnemy": "Враждебный противник",
+        "aggressiveEnemy": "Атакующий вас противник",
+        "lootableEnemy": "Противник с добычей",
+        "corpse": "Ваше тело",
+        "deathZone": "Опасная зона",
+        "teammate": "Союзник",
+        "deadTeammate": "Погибший союзник",
+        "flagCarrier": "Союзник со знаменем",
+        "ownFlagStand": "Ваша стойка знамени",
+        "enemyFlagStand": "Стойка знамени противника",
+        "riftDescent": "Спуск в разлом",
+        "riftReturnBeacon": "Маяк возвращения",
+        "riftReturnExit": "Обратный выход",
+        "ranked": "{marker}, ранг {rank}",
+        "riftTreasureAvailable": "Доступное сокровище",
+        "riftTreasureLocked": "Запертое сокровище",
+        "riftTreasureOpened": "Открытое сокровище",
+        "riftTreasureJammed": "Заклинившее сокровище",
+        "riftCacheAvailable": "Доступный тайник разлома",
+        "riftCacheLocked": "Запертый тайник",
+        "riftCacheOpened": "Открытый тайник",
+        "riftCacheJammed": "Заклинивший тайник",
+        "pylonUnlit": "Незажжённый пилон",
+        "pylonLit": "Зажжённый пилон",
+        "sequenceRuneUnlit": "Незажжённая руна последовательности",
+        "sequenceRuneLit": "Зажжённая руна последовательности",
+        "iceGoal": "Ледяная цель",
+        "boulderPad": "Цель для валуна",
+        "boulderMovable": "Подвижный валун",
+        "boulderPlaced": "Установленный валун",
+        "gateSealed": "Запечатанные врата",
+        "gateOpen": "Открытые врата",
+        "switchReady": "Готовый переключатель",
+        "switchOn": "Включённый переключатель",
+        "orbDormant": "Спящая сфера",
+        "orbActive": "Активная сфера",
+        "rollerHazard": "Опасный каток",
+        "delvePassageSealed": "Запечатанный проход",
+        "delvePassageOpen": "Открытый проход",
+        "delveSurfaceExit": "Выход на поверхность",
+        "delveCacheLocked": "Запертый тайник вылазки",
+        "delveCacheReady": "Готовый тайник вылазки",
+        "delveCacheActive": "Активный тайник вылазки",
+        "delveCacheOpened": "Открытый тайник вылазки",
+        "delveReliquaryLocked": "Запертый реликварий",
+        "delveReliquaryReady": "Готовый реликварий",
+        "delveReliquaryActive": "Обряд реликвария идёт",
+        "delveReliquaryOpened": "Открытый реликварий",
+        "bountiful": "Щедрый {marker}"
+      }
     },
     "options": {
       "gameMenu": "Меню игры",
@@ -8039,6 +8206,9 @@ export const ru_RU: EnTranslations = {
       "graphicsReloadNote": "Качество графики и детализация местности применяются после перезагрузки.",
       "reloadNow": "Перезагрузить сейчас",
       "fullscreen": "Полный экран",
+      "displayMode": "Режим отображения",
+      "displayModeBorderless": "Полноэкранный без рамки",
+      "displayModeWindowed": "Оконный",
       "touchLookSpeed": "Скорость обзора (касание)",
       "joystickSize": "Размер джойстика",
       "buttonSize": "Размер кнопок",
@@ -8915,6 +9085,10 @@ export const ru_RU: EnTranslations = {
       "filterPrimaryStatAll": "Любая основная характеристика",
       "filterRarity": "Редкость",
       "filterRarityAll": "Все редкости",
+      "filterSort": "Сортировка",
+      "sortName": "Название (А-Я)",
+      "sortPriceAsc": "Цена: по возрастанию",
+      "collapseLowest": "Только минимальная цена",
       "weaponSword": "Мечи",
       "weaponDagger": "Кинжалы",
       "weaponStaff": "Посохи",
@@ -8945,6 +9119,8 @@ export const ru_RU: EnTranslations = {
       "quantity": "Количество",
       "quantityOf": "из {count}",
       "priceEach": "Цена за штуку",
+      "lowestPriceLabel": "Текущая минимальная цена лота",
+      "lowestPriceNone": "Активных лотов на этот предмет пока нет.",
       "listButton": "Выставить на мировой рынок",
       "minPriceError": "Назовите цену не меньше 1 меди.",
       "collectEmpty": "Ничего не ждет. Выручка и истекшие лоты собираются здесь.",
@@ -9372,6 +9548,7 @@ export const ru_RU: EnTranslations = {
       "cheap_shot": {
         "name": "Удар под дых",
         "description": "Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.",
+        "descriptionNoStealth": "Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Дает 2 очка серии.",
         "specNote_subtlety": "Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности: такое применение ничего не стоит, тратит все 3 этапа и на 6 сек. окутывает вас тенью."
       },
       "sap": {
@@ -9584,7 +9761,7 @@ export const ru_RU: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Пылающая клятва",
-        "description": "Пассивно повышает угрозу, создаваемую вашим светлым уроном, на 60%. Только Страж веры."
+        "description": "Пассивно повышает угрозу, создаваемую вашим светлым уроном, на 30%. Только Страж веры."
       },
       "retribution_aura": {
         "name": "Аура возмездия",
@@ -9700,7 +9877,7 @@ export const ru_RU: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Оружие каменных уз",
-        "description": "Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона. Совершенствование вдобавок получает 30% брони, принимает на 10% меньше урона и создаёт вдвое больше угрозы. Земной толчок вынуждает свою цель атаковать вас 3 сек., а Громовой оберег даёт 10% снижения урона на 3 сек."
+        "description": "Наполняет ваше оружие на 30 мин. Каждый удар наносит {damage} дополнительного урона. Совершенствование вдобавок получает 40% брони и 20% выносливости, принимает на 15% меньше урона и невосприимчив к критическим ударам существ и создаёт в 2,75 раза больше угрозы. Земной толчок вынуждает свою цель атаковать вас 3 сек., а Громовой оберег даёт 10% снижения урона на 3 сек."
       },
       "healing_wave": {
         "name": "Целебные воды",
@@ -9879,7 +10056,7 @@ export const ru_RU: EnTranslations = {
       },
       "bear_form": {
         "name": "Облик бурого",
-        "description": "Вы принимаете облик медведя: броня +130%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя."
+        "description": "Вы принимаете облик медведя: броня +110%, максимальное здоровье +30%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя."
       },
       "maul": {
         "name": "Костолом",
@@ -9889,6 +10066,10 @@ export const ru_RU: EnTranslations = {
       "growl": {
         "name": "Устрашение",
         "description": "Рычит на цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек. Только в облике бурого."
+      },
+      "challenging_roar": {
+        "name": "Грозный рев",
+        "description": "Грозный рев: каждый враг в пределах 10 м получает провокацию, его угроза к вам повышается до уровня самого ненавистного ему врага, и он вынужден атаковать вас 3 сек. Только в облике бурого."
       },
       "cat_form": {
         "name": "Облик волка",
@@ -12221,6 +12402,9 @@ export const ru_RU: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Безупречный коготь"
+      },
+      "dawnhold_posy": {
+        "name": "Букетик из сада Замка Рассвета"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
@@ -16710,6 +16894,11 @@ export const ru_RU: EnTranslations = {
         "name": "Последний оплот",
         "enterText": "Вы входите в холодные безмолвные залы Последнего оплота.",
         "leaveText": "Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов."
+      },
+      "dawnhold_castle": {
+        "name": "Замок Рассвета",
+        "enterText": "Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.",
+        "leaveText": "Вы возвращаетесь на залитую солнцем садовую лужайку."
       },
       "drowned_temple": {
         "name": "Утонувший храм",

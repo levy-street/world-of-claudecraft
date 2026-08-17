@@ -476,6 +476,10 @@ For off-box safety, sync the directory to S3 occasionally:
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
   `/dev` cheat set (the level/teleport cheats the test bots use, plus item
   grants, mob spawns, instance teleports, and the dev command GUI).
+- Leave `RIFT_FORGE_ENABLED` unset in production: it opens the Rift forge
+  wire commands (upgrade/enchant/socket), whose client UI has not shipped.
+  Enable it only on PTR or internal playtest realms
+  (`server/rift_forge_gate.ts`).
 - **Community test profile**: on a disposable public test realm, set
   `PROVISION_TEST_ACCOUNTS=1` in the host `.env`, then restart the game
   container. The flag gives newly created accounts nine level-20 characters,

@@ -148,7 +148,48 @@ threat handoff after leaving the form (pinned in
 `tests/druid_balance_probe.test.ts`). Groveheart heals from a dedicated
 intellect-leather fixture (the shared agility loadout starves the healer's
 mana pool) and is pinned inside the peer healer envelope on the owned-class
-HPS harness at a shared seed (`tests/owned_class_balance_harness.test.ts`).
+HPS harness at a shared seed (`tests/owned_class_balance_groveheart.test.ts`).
 Groveheart's three-ally throughput sits with the triage healers, well under
 the AoE ceiling of Spiritmend chain healing: a flagged PBE tuning question,
 deliberately not resolved by inventing base heal values here.
+
+## Wolf Form swing-cadence standardization (2026-08)
+
+Wolf Form auto-attacks swing at a fixed fast paw cadence,
+`CAT_FORM_SWING_SPEED` (1.0s) in `src/sim/combat/form_swing.ts`, instead of
+the rogue baseline the form originally borrowed. The mainhand auto's weapon
+roll is rescaled by cadence over weapon speed (`catAutoWeaponRollMult`), so
+feral white DPS tracks the equipped weapon's AUTHORED dps at any speed: a
+slow big-roll caster weapon no longer inflates the auto arm, and weapon
+speed is irrelevant to feral white damage. This is the classic-era cat form
+shape (fixed paw speed, normalized delivery), adopted for feel and
+itemization cleanliness at neutral DPS.
+
+`CAT_FORM_DAMAGE_MULT` (same module) is the single bench-neutrality knob:
+every Wolf Form melee swing, auto and weaponStrike special, is scaled by it
+so the standardization lands DPS-neutral on the wildfang band probe and the
+eight-seed druid matrix rather than as a stealth nerf. It is a tuning
+constant in the same spirit as the Bruin armor multiplier, tuned and
+documented at the level-20 balance anchor (the only tier the balance
+contract measures); revisit it if a higher level cap moves the flat-bonus
+and finisher share of the feral profile.
+
+Deliberate scope decisions, made with the standardization:
+
+- Bruin Form keeps weapon-speed swings; only `form_cat` standardizes.
+- Cat weaponStrike specials (Rendclaw, Flense) keep their RAW weapon roll,
+  the classic non-normalized special shape: only the auto arm rescales its
+  roll. Their attack-power-per-swing term follows the shared
+  `baseSwingSpeed` cadence automatically, and the form multiplier restores
+  their per-cast damage; the rogue instant-normalization constants are
+  untouched.
+- Requital Aura, the one druid-reachable flat on-every-swing damage source,
+  is rescaled by the cadence ratio (`catFlatSwingAdderMult`, anchored to the
+  frozen `CAT_FORM_LEGACY_SWING_SPEED`) so a party paladin's aura contributes
+  the same damage per second as before the cadence change.
+- Faster swings meeting thorns-style reflects (and per-swing proc chances)
+  more often is accepted classic behavior for a fast form, not compensated.
+
+Pinned by `tests/form_swing.test.ts` (cadence, normalization closed forms,
+the special arm, the Requital rescale) and the `cat_form_auto_swing` parity
+scenario (the swing cadence in the deterministic golden net).

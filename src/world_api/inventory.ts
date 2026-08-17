@@ -37,6 +37,12 @@ export interface IWorldInventory {
   unequipBag(socket: number): void;
   useItem(itemId: string, target?: { slotIndex: number }): void;
   discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void;
+  /** Lock or unlock the ONE bag copy at `target.slotIndex` (issue 3042): a
+   *  locked copy refuses salvage, profession-craft reagent consumption, and
+   *  vendor sell (single and bulk) until unlocked again. Always targets a
+   *  specific slot (mutate-in-place, item_copy_ref.ts selectedInventorySlot),
+   *  never an id-only bulk toggle. */
+  setItemLocked(itemId: string, locked: boolean, target: { slotIndex: number }): void;
   // The request rides an options bag (VendorBuyOptions, phase 21): `bulk`
   // requests as many units as the buyer can currently afford in one purchase,
   // capped at the item's bag stack size (VendorGoodsRow.bulkQuantity previews

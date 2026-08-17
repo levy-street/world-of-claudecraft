@@ -35,7 +35,21 @@ export function fakeSim(): FakeSim {
 }
 
 export function fakePlayer(id: number, templateId = 'mage'): RecorderEntityView {
-  return { id, templateId, name: `Fake${id}`, level: 20, dead: false };
+  // Real pools by default: the resource sampler reads these every second, and a
+  // scripted player left at 0/0 makes the golden fixture a row of zeros that
+  // pins nothing. Suites that care about a specific pool override them.
+  return {
+    id,
+    templateId,
+    name: `Fake${id}`,
+    level: 20,
+    dead: false,
+    hp: 1000,
+    maxHp: 1000,
+    resource: 4000,
+    maxResource: 5000,
+    resourceType: 'mana',
+  };
 }
 
 export const FAKE_PARSE_FLAGS: ParseFlags = {

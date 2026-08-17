@@ -17,12 +17,19 @@
 // Selection applies to PR-tier CI only: release-gate keeps its unconditional
 // `npm test -- --shard=i/N` run line and never runs this script, and the
 // nightly workflow re-proves the full suite on the tips daily (docs/qa-gate.md).
+import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { formatLegHeader, runLegsWithFlakeRetry } from './lib/ci_leg_runner.mjs';
-import { buildLanePlan, buildShardPlan, parseShardArg } from './lib/ci_shard_plan.mjs';
+import {
+  buildLanePlan,
+  buildShardPlan,
+  parseShardArg,
+  resolveWorkerCount,
+} from './lib/ci_shard_plan.mjs';
+import { shouldRunEntryPretest, WOC_SKIP_PRETEST } from './lib/gate_artifact_skip.mjs';
 import { collectSuiteVisibility } from './lib/gate_discovery.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -32,7 +39,7 @@ const usage =
 
 const argv = process.argv.slice(2);
 const shard = parseShardArg(argv);
-// The long-sims lanes ("PR gate (long sims A)" / "PR gate (long sims B)"):
+// The long-sims lanes ("PR long sims A" / "PR long sims B"):
 // the two jobs that split the CI_LONG_SUITES files the shard legs exclude
 // (CI_LONG_SUITE_HALVES). Exactly one --lane flag with one of the two exact
 // literals; any other value, a duplicate, or ANY --shard token beside it
@@ -59,10 +66,44 @@ const planOnly = argv.includes('--plan-only');
 // workers on the 4-vCPU runner, run 31107474546) inflated the four sims'
 // aggregate CPU time from 644 s to 1027 s through memory-bandwidth
 // contention and pushed the eastbrook integration sweep past its own 180 s
-// budget, while the half-cores run finished green with a 432 s wall. Every
-// per-test budget in the suite is calibrated against this bound; raise it
-// only with a green measured run at the new value.
-const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
+// budget, while the half-cores run finished green with a 432 s wall. A
+// 3-worker trial (run 31771637461, 2026-08-14) confirmed the bound from
+// the other side: three unrelated suites blew DEFAULT timeouts under the
+// contention (coverage_c 20 s, a terrain_streaming 10 s hook, groveheart
+// 20 s) while the green shards gained at most about a minute of wall, so
+// half cores stands at both neighbors. Every per-test budget in the suite
+// is calibrated against this bound; raise it only with a green measured
+// run at the new value. WOC_TEST_WORKERS is the knob that produces such a
+// run (resolveWorkerCount validates it; anything malformed or out of
+// range falls back to this default, loudly).
+const workerResolution = resolveWorkerCount({
+  cores: os.availableParallelism(),
+  envValue: process.env.WOC_TEST_WORKERS,
+});
+const workers = workerResolution.workers;
+if (workerResolution.source === 'invalid') {
+  // Loud twice by design: the log line for the transcript, the ::warning
+  // annotation (same channel as the known-flake retry in
+  // lib/ci_leg_runner.mjs, and gated the same way so a local repro never
+  // prints a raw workflow command) so a measured-trial run that silently
+  // fell back to the default cannot be mistaken for one that ran at the
+  // trial value.
+  const shown = JSON.stringify(process.env.WOC_TEST_WORKERS);
+  console.log(
+    `[ci-shard] WOC_TEST_WORKERS=${shown} is not an ` +
+      `integer between 1 and the core count; using the measured default ${workers}`,
+  );
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    console.log(
+      `::warning title=ci-shard invalid WOC_TEST_WORKERS::${shown} rejected; ` +
+        `this job ran at the measured default of ${workers} workers`,
+    );
+  }
+}
+// The label always names its arm, so every job log states which resolution
+// produced the number and a trial run is self-auditing even when nobody is
+// diffing env blocks.
+const workersLabel = `workers=${workers} (${workerResolution.source === 'env' ? 'WOC_TEST_WORKERS' : 'default'})`;
 
 const mode = process.env.TEST_MODE ?? '';
 // Echoed into the log only. The producer already strips CR/LF; re-stripping
@@ -120,8 +161,8 @@ const plan = lane
 
 console.log(
   lane
-    ? `[ci-shard] long-sims-${laneHalf} lane, workers=${workers}`
-    : `[ci-shard] shard ${shard.index}/${shard.total}, workers=${workers}`,
+    ? `[ci-shard] long-sims-${laneHalf} lane, ${workersLabel}`
+    : `[ci-shard] shard ${shard.index}/${shard.total}, ${workersLabel}`,
 );
 console.log(
   `[ci-shard] changes-job decision: mode=${mode || '(unset)'}${modeReason ? ` (${modeReason})` : ''}`,
@@ -148,16 +189,17 @@ if (lane) {
     // every leg below and owned by the two long-sims lane jobs in this run.
     console.log(
       `[ci-shard] long-sims lane: ${plan.laneExcluded.length} suite(s) excluded from this ` +
-        'shard and owned by the "PR gate (long sims A)" and "PR gate (long sims B)" jobs',
+        'shard and owned by the "PR long sims A" and "PR long sims B" jobs',
     );
   }
   if (plan.mode === 'selective') {
     console.log(
-      `[ci-shard] runs: ${plan.floorCount} floor file(s) sharded ${shard.total} ways` +
+      `[ci-shard] runs: one merged vitest related leg, ${plan.floorCount} floor file(s) as ` +
+        `self-selecting seeds plus ${plan.relatedCount} changed source(s), sharded ` +
+        `${shard.total} ways` +
         (plan.laneFloorCount > 0
           ? ` (${plan.laneFloorCount} more floor file(s) ride the long-sims lane)`
-          : '') +
-        `, plus vitest related over ${plan.relatedCount} changed source(s)`,
+          : ''),
     );
     // Honest accounting: the related leg covers an unknown further share of the
     // outside-floor files (it can only be known by running vitest), so this line
@@ -176,33 +218,72 @@ if (planOnly) {
   }
   console.log(`\n[ci-shard] plan-only: ${plan.legs.length} leg(s) printed, nothing spawned`);
 } else {
-  // The leg runner (lib/ci_leg_runner.mjs) streams each leg's output through
-  // unchanged, keeps a bounded tail, and applies the ONE sanctioned
-  // known-flake retry: a leg that exits 1 with the exact teardown-rpc
-  // signature (every test passed) reruns once, loudly; nothing else ever
-  // retries. Spawning stays shell-less there: argv elements (which embed
-  // PR-controlled filenames) pass verbatim to execvp, and the floor leg's
-  // long file list is safe under the POSIX arg limits this ubuntu-only entry
-  // runs under. The win32 cmd.exe 8191-char ceiling that forces
-  // gate_select.mjs to chunk does not apply here; local reproduction on
-  // Windows is --plan-only (spawns nothing) per docs/qa-gate.md.
-  const result = await runLegsWithFlakeRetry({ legs: plan.legs, cwd: repoRoot });
-  if (!result.ok) {
-    // exitCode, never process.exit(): the legs' output is piped through this
-    // process now, and a forced exit discards whatever is still queued on
-    // the async stdout pipe (measured: everything past one 64 KB pipe
-    // buffer), which would truncate exactly the failing-shard log a human
-    // needs. Setting exitCode lets the event loop drain and then exit.
-    process.exitCode = result.status;
+  // Artifact regeneration happens ONCE here, at the entry, for every mode:
+  // the merged selective leg is a bare `npx vitest related` with no npm
+  // lifecycle, so pretest cannot ride it, and the npm-test legs then skip
+  // their own lifecycle copy via WOC_SKIP_PRETEST so no job regenerates
+  // twice. Per-JOB regeneration is unchanged (ci.yml records the ruling: the
+  // S3 guard, guide freshness, and the git-subprocess suites need the
+  // artifacts no matter which shard they hash into). Zero-leg lane plans skip
+  // it: nothing below will read the artifacts.
+  let pretestOk = true;
+  if (!shouldRunEntryPretest({ legCount: plan.legs.length })) {
+    // Both arms speak: an unlogged skip would let stale artifacts reach the
+    // guard suites with no audit trace in the job log.
+    if (plan.legs.length > 0) {
+      console.log(
+        '[ci-shard] pretest: SKIPPED (WOC_SKIP_PRETEST=1); legs read whatever is on disk',
+      );
+    }
   } else {
-    console.log(
-      `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on ${
-        lane ? `the long-sims-${laneHalf} lane` : `shard ${shard.index}/${shard.total}`
-      }${
-        result.retriedLegNames.length > 0
-          ? ` (known-flake retry used on: ${result.retriedLegNames.join(', ')})`
-          : ''
-      }`,
-    );
+    console.log('[ci-shard] pretest: regenerating generated artifacts once for this job');
+  }
+  if (shouldRunEntryPretest({ legCount: plan.legs.length })) {
+    // stdio inherit: nothing is piped through this process yet, so the
+    // no-process.exit pipe-drain rule below is not in play for this step.
+    const pretest = spawnSync(process.execPath, [path.join(repoRoot, 'scripts', 'pretest.mjs')], {
+      cwd: repoRoot,
+      stdio: 'inherit',
+    });
+    if (pretest.status !== 0) {
+      console.error(`[ci-shard] pretest failed (exit ${pretest.status ?? 'signal'})`);
+      process.exitCode = pretest.status ?? 1;
+      pretestOk = false;
+    } else {
+      // The npm-test legs (full mode, lanes) inherit this and skip their own
+      // lifecycle copy, so no job regenerates twice.
+      process.env[WOC_SKIP_PRETEST] = '1';
+    }
+  }
+  if (pretestOk) {
+    // The leg runner (lib/ci_leg_runner.mjs) streams each leg's output through
+    // unchanged, keeps a bounded tail, and applies the ONE sanctioned
+    // known-flake retry: a leg that exits 1 with the exact teardown-rpc
+    // signature (every test passed) reruns once, loudly; nothing else ever
+    // retries. Spawning stays shell-less there: argv elements (which embed
+    // PR-controlled filenames) pass verbatim to execvp, and the floor leg's
+    // long file list is safe under the POSIX arg limits this ubuntu-only entry
+    // runs under. The win32 cmd.exe 8191-char ceiling that forces
+    // gate_select.mjs to chunk does not apply here; local reproduction on
+    // Windows is --plan-only (spawns nothing) per docs/qa-gate.md.
+    const result = await runLegsWithFlakeRetry({ legs: plan.legs, cwd: repoRoot });
+    if (!result.ok) {
+      // exitCode, never process.exit(): the legs' output is piped through this
+      // process now, and a forced exit discards whatever is still queued on
+      // the async stdout pipe (measured: everything past one 64 KB pipe
+      // buffer), which would truncate exactly the failing-shard log a human
+      // needs. Setting exitCode lets the event loop drain and then exit.
+      process.exitCode = result.status;
+    } else {
+      console.log(
+        `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on ${
+          lane ? `the long-sims-${laneHalf} lane` : `shard ${shard.index}/${shard.total}`
+        }${
+          result.retriedLegNames.length > 0
+            ? ` (known-flake retry used on: ${result.retriedLegNames.join(', ')})`
+            : ''
+        }`,
+      );
+    }
   }
 }

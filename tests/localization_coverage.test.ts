@@ -360,6 +360,7 @@ describe('i18n Localization Key Coverage', () => {
   ];
   const interpolationValues: Record<string, string | number> = {
     active: 3,
+    area: 'Eastbrook',
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
@@ -379,6 +380,8 @@ describe('i18n Localization Key Coverage', () => {
     current: 120,
     cut: 5,
     delta: '+13',
+    direction: 'north',
+    distance: 'near',
     dps: '7.4',
     // The third leg of a W-L-D record (hud.arena.ratingSummary), beside
     // `wins` and `losses` below.
@@ -408,6 +411,7 @@ describe('i18n Localization Key Coverage', () => {
     losses: 4,
     loser: 'Mira',
     marker: 'Skull',
+    markers: 'Available quest: north, near.',
     max: 25,
     message: 'Meet at the inn',
     min: 16,

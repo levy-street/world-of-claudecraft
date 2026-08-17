@@ -44,7 +44,15 @@ describe('Three.js streaming buffer contracts', () => {
     root.add(laterChild);
     root.updateMatrixWorld();
     expect(laterChild.matrixAutoUpdate).toBe(true);
-    expect(laterChild.getWorldPosition(new THREE.Vector3()).toArray()).toEqual([3, 10, 5]);
+    // Read the composed matrix ELEMENTS, never getWorldPosition: that helper
+    // self-heals (its updateWorldMatrix(true, false) composes the chain on
+    // read), so it would stay green even if the walk above never composed the
+    // streamed child. The elements read pins that the WALK did the work.
+    expect([
+      laterChild.matrixWorld.elements[12],
+      laterChild.matrixWorld.elements[13],
+      laterChild.matrixWorld.elements[14],
+    ]).toEqual([3, 10, 5]);
   });
 
   it('streams mote positions without re-uploading unchanged colors', () => {

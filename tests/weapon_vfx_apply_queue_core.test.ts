@@ -310,7 +310,7 @@ describe('renderer wiring', () => {
     // Clearing a skin builds no rig, so it stays synchronous, and cancels any
     // queued apply first.
     expect(diff).toContain('this.weaponSkinApplies.cancel(id)');
-    expect(diff).toContain('this.applyWeaponSkin(v, null)');
+    expect(diff).toContain('this.applyWeaponSkin(v, null, e.kind)');
     // The chain that used to freeze the frame is gone from the diff entirely,
     // and so is the latch that would have suppressed the retry.
     expect(diff).not.toContain('setWeaponSkin(e.weaponSkinId)');
@@ -327,7 +327,7 @@ describe('renderer wiring', () => {
 
   it('drains one budgeted batch per frame right after the entity loop', () => {
     expect(renderer).toContain(
-      'this.lastVisibleRigCount = visibleRigCount;\n    this.drainWeaponSkinApplies();',
+      'this.lastVisibleRigCount = visibleRigCount;\n    this.blobShadows?.commit();\n    this.drainWeaponSkinApplies();',
     );
     const drain = slice('private drainWeaponSkinApplies(', '\n  private reconcileViewLights(');
     expect(drain).toContain('WEAPON_SKIN_APPLIES_PER_FRAME');
@@ -348,7 +348,7 @@ describe('renderer wiring', () => {
     expect(callbacks).toContain('resolveQueuedSkinLookup(this.sim.entities.get(viewId))');
     expect(callbacks).not.toContain('?.weaponSkinId ?? undefined');
     // Nearest first, by the same squared-XZ measure the view bands use.
-    expect(callbacks).toContain('distSqXZ(entity, this.sim.player)');
+    expect(callbacks).toContain('entityViewDistanceSq(entity, this.sim.player)');
     // Bound as instance fields, so the drain mints no closure pair per frame.
     expect(callbacks).toContain('private readonly weaponSkinRank = (viewId: number)');
   });

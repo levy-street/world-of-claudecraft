@@ -183,7 +183,7 @@ const ORIGINAL_TITLES = Object.freeze(
 
 const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
   es: {
-    'Double Charge': 'Carga doble',
+    'Double Charge': 'Intervenir',
     Pursuit: 'Persecución',
     'Crushing Charge': 'Carga aplastante',
     'Second Wind': 'Segundo aliento',
@@ -196,7 +196,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Master Armorer': 'Maestro armero',
   },
   es_ES: {
-    'Double Charge': 'Carga doble',
+    'Double Charge': 'Intervenir',
     Pursuit: 'Persecución',
     'Crushing Charge': 'Carga aplastante',
     'Second Wind': 'Segundo aliento',

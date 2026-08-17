@@ -21,6 +21,7 @@ import {
   type InterfaceTab,
   interfaceControlsForTab,
   type OptionsControl,
+  type OptionsEnv,
   type OptionsSettingsSource,
   optionsControlKeys,
   sliderDispatchValue,
@@ -234,7 +235,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       const dial = find(controls, key);
       expect(dial, key).toMatchObject({ control: 'choice', rerender: true });
     }
-    for (const key of ['terrainDetail', 'foliageDensity', 'surfaceDetail', 'shadowQuality']) {
+    for (const key of ['terrainDetail', 'foliageDensity', 'surfaceDetail']) {
       const dial = find(controls, key);
       if (dial?.control === 'choice')
         expect(
@@ -251,10 +252,17 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
           key,
         ).toEqual([0, 0.5, 1, 2]);
     }
-    // Effects & Lighting stops at High (the full high-tier post stack).
-    const effects = find(controls, 'effectsQuality');
-    if (effects?.control === 'choice')
-      expect(effects.options.map((o) => o.value)).toEqual([0, 0.5, 1]);
+    // Effects & Lighting stops at High (the full high-tier post stack), and
+    // so does Shadow Quality (High is the 4096 map; the 8192 Insane rung is
+    // retired, so the dial no longer offers it).
+    for (const key of ['effectsQuality', 'shadowQuality']) {
+      const dial = find(controls, key);
+      if (dial?.control === 'choice')
+        expect(
+          dial.options.map((o) => o.value),
+          key,
+        ).toEqual([0, 0.5, 1]);
+    }
     // The per-effect switches: Off/On binaries, AO with the half-res middle,
     // the Low/High pairs (Character Detail, Dynamic Lights), and Particle
     // Effects on the three-step ladder.
@@ -556,6 +564,24 @@ const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   chat: CHAT_KEYS,
   combat: COMBAT_KEYS,
 };
+// The desktop-shell arm: the GPU preference toggle and its next-launch note
+// close the General tab, and appear ONLY when the shell exposes the bridge
+// capability. Every list above is the web/mobile arm, which must stay byte-for-
+// byte what it was, so the row can never leak onto a build that cannot serve it.
+const DESKTOP_GPU_KEYS = ['forceHighPerfGpu', 'note:hudChrome.options.forceHighPerfGpuNote'];
+// The Discord Rich Presence row, behind its OWN capability: a shell can expose
+// the GPU preference without presence (it shipped first), so the two gates are
+// independent and the row order is gpu block then presence block.
+const DESKTOP_DISCORD_KEYS = ['discordPresence', 'note:hudChrome.options.discordPresenceNote'];
+const GENERAL_KEYS_DESKTOP = [...GENERAL_KEYS, ...DESKTOP_GPU_KEYS];
+const INTERFACE_KEYS_BY_TAB_DESKTOP: Record<InterfaceTab, string[]> = {
+  ...INTERFACE_KEYS_BY_TAB,
+  general: GENERAL_KEYS_DESKTOP,
+};
+// The gate is the CAPABILITY flag, never nativeShell (true in the mobile shells
+// too), so the two envs below differ in exactly that one field.
+const WEB_ENV: OptionsEnv = { touch: false, nativeShell: false };
+const DESKTOP_ENV: OptionsEnv = { touch: false, nativeShell: false, desktopGpuPref: true };
 
 describe('options_view: interface dispatch matrix (cluster 5)', () => {
   it('lists the four tabs concatenated in order (deduped, partyFrames note dropped)', () => {
@@ -584,6 +610,146 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       category: 'combat',
       labelKey: 'hudChrome.options.stickyTarget',
     });
+  });
+
+  it('appends the desktop GPU row + note ONLY with the bridge capability', () => {
+    // With the capability: the row and its next-launch note close the General
+    // tab, leaving every other row exactly where it was.
+    const desktop = buildInterfaceControls(makeSource(), DESKTOP_ENV);
+    expect(keysOf(desktop)).toEqual([
+      ...GENERAL_KEYS_DESKTOP,
+      ...FRAMES_KEYS,
+      ...CHAT_KEYS,
+      ...COMBAT_KEYS,
+    ]);
+    expect(find(desktop, 'forceHighPerfGpu')).toMatchObject({
+      control: 'boolToggle',
+      category: 'general',
+      labelKey: 'hudChrome.options.forceHighPerfGpu',
+    });
+    expect(desktop.filter((c) => c.control === 'note')).toEqual([
+      { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
+    ]);
+
+    // Without it: the exact pre-existing list, with no row and no note at all.
+    // A plain browser and a mobile Capacitor shell both land here.
+    for (const env of [undefined, WEB_ENV, { touch: true, nativeShell: true }]) {
+      const withoutCapability = buildInterfaceControls(makeSource(), env);
+      expect(keysOf(withoutCapability)).toEqual([
+        ...GENERAL_KEYS,
+        ...FRAMES_KEYS,
+        ...CHAT_KEYS,
+        ...COMBAT_KEYS,
+      ]);
+      expect(find(withoutCapability, 'forceHighPerfGpu')).toBeUndefined();
+      expect(find(withoutCapability, 'discordPresence')).toBeUndefined();
+      expect(withoutCapability.some((c) => c.control === 'note')).toBe(false);
+    }
+
+    // nativeShell alone never reveals it, and the capability alone always does:
+    // the two flags are independent, so neither can stand in for the other.
+    const desktopShellFlagged = buildInterfaceControls(makeSource(), {
+      touch: false,
+      nativeShell: true,
+      desktopGpuPref: true,
+    });
+    expect(find(desktopShellFlagged, 'forceHighPerfGpu')).toBeTruthy();
+    expect(
+      find(
+        buildInterfaceControls(makeSource(), { ...WEB_ENV, desktopGpuPref: false }),
+        'forceHighPerfGpu',
+      ),
+    ).toBeUndefined();
+  });
+
+  it('appends the Discord presence row + note ONLY with its own bridge capability', () => {
+    // Alone (a shell with presence but no GPU preference): the presence block
+    // closes the General tab and the GPU row is nowhere.
+    const presenceOnly = buildInterfaceControls(makeSource(), {
+      touch: false,
+      nativeShell: false,
+      desktopDiscordPresence: true,
+    });
+    expect(keysOf(presenceOnly)).toEqual([
+      ...GENERAL_KEYS,
+      ...DESKTOP_DISCORD_KEYS,
+      ...FRAMES_KEYS,
+      ...CHAT_KEYS,
+      ...COMBAT_KEYS,
+    ]);
+    expect(find(presenceOnly, 'forceHighPerfGpu')).toBeUndefined();
+    expect(find(presenceOnly, 'discordPresence')).toMatchObject({
+      control: 'boolToggle',
+      category: 'general',
+      labelKey: 'hudChrome.options.discordPresence',
+    });
+
+    // Both capabilities: the GPU block first, then presence, matching the code.
+    const both = buildInterfaceControls(makeSource(), {
+      ...DESKTOP_ENV,
+      desktopDiscordPresence: true,
+    });
+    expect(keysOf(both)).toEqual([
+      ...GENERAL_KEYS,
+      ...DESKTOP_GPU_KEYS,
+      ...DESKTOP_DISCORD_KEYS,
+      ...FRAMES_KEYS,
+      ...CHAT_KEYS,
+      ...COMBAT_KEYS,
+    ]);
+
+    // The capability alone always reveals it and nativeShell alone never does:
+    // the mobile shells cannot publish a presence at all.
+    expect(
+      find(
+        buildInterfaceControls(makeSource(), {
+          touch: true,
+          nativeShell: true,
+          desktopDiscordPresence: true,
+        }),
+        'discordPresence',
+      ),
+    ).toBeTruthy();
+    expect(
+      find(
+        buildInterfaceControls(makeSource(), { touch: false, nativeShell: true }),
+        'discordPresence',
+      ),
+    ).toBeUndefined();
+    expect(
+      find(
+        buildInterfaceControls(makeSource(), { ...WEB_ENV, desktopDiscordPresence: false }),
+        'discordPresence',
+      ),
+    ).toBeUndefined();
+  });
+
+  it('reads the stored presence choice straight through (no inversion at this seam)', () => {
+    const env: OptionsEnv = { touch: false, nativeShell: false, desktopDiscordPresence: true };
+    expect(
+      find(
+        buildInterfaceControls(makeSource({}, { discordPresence: true }), env),
+        'discordPresence',
+      ),
+    ).toMatchObject({ control: 'boolToggle', on: true });
+    expect(
+      find(
+        buildInterfaceControls(makeSource({}, { discordPresence: false }), env),
+        'discordPresence',
+      ),
+    ).toMatchObject({ control: 'boolToggle', on: false });
+  });
+
+  it('reflects the stored GPU preference in BOTH directions (no inversion at this seam)', () => {
+    // The setting is the player-facing "force the dedicated GPU"; the shell
+    // store holds the inverse opt-out. The inversion happens at the bridge
+    // crossings (boot reflection + the options write arm), NOT here, so the
+    // toggle must read the stored value straight through.
+    const on = buildInterfaceControls(makeSource({}, { forceHighPerfGpu: true }), DESKTOP_ENV);
+    expect(find(on, 'forceHighPerfGpu')).toMatchObject({ control: 'boolToggle', on: true });
+
+    const off = buildInterfaceControls(makeSource({}, { forceHighPerfGpu: false }), DESKTOP_ENV);
+    expect(find(off, 'forceHighPerfGpu')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
   it('enables the third action-bar toggle only while the secondary row is visible', () => {
@@ -627,36 +793,58 @@ describe('options_view: interface tab taxonomy', () => {
     }
   });
 
-  it('assigns every interface control to exactly one of the four tabs', () => {
-    const all = buildInterfaceControls(makeSource());
-    for (const c of all) {
-      // an uncategorized control (someone added a setting without a category)
-      // fails here: undefined is not one of the four tabs
-      expect(INTERFACE_TAB_ORDER).toContain(c.category);
-    }
-  });
+  // Both arms: the desktop-capability build adds a row AND the panel's only note
+  // control, so the taxonomy has to hold with a keyless control in the list.
+  it.each([
+    ['web', undefined],
+    ['desktop shell', DESKTOP_ENV],
+  ] as const)(
+    'assigns every interface control (%s) to exactly one of the four tabs',
+    (_arm, env) => {
+      const all = buildInterfaceControls(makeSource(), env);
+      for (const c of all) {
+        // an uncategorized control (someone added a setting without a category)
+        // fails here: undefined is not one of the four tabs
+        expect(INTERFACE_TAB_ORDER).toContain(c.category);
+      }
+    },
+  );
 
-  it('partitions the full list: the union of the tabs equals it, with NO duplicate keys', () => {
-    const all = buildInterfaceControls(makeSource());
-    const union = INTERFACE_TAB_ORDER.flatMap((tab) => interfaceControlsForTab(all, tab));
-    // every control lands in exactly one tab: the union is the same objects, same size
-    expect(union).toHaveLength(all.length);
-    expect(new Set(union)).toEqual(new Set(all));
-    // no setting key appears twice across the whole interface list. This is RED
-    // while the showAttackButton duplicate is present and GREEN once deduped.
-    // (the interface list is all keyed controls: no notes / music toggle here)
-    const keys = all.map((c) => ('key' in c ? c.key : ''));
-    expect(keys).not.toContain('');
-    expect(new Set(keys).size).toBe(keys.length);
-    // showAttackButton in particular resolves to a single combat-tab control
-    expect(all.filter((c) => 'key' in c && c.key === 'showAttackButton')).toHaveLength(1);
-    expect(find(all, 'showAttackButton')?.category).toBe('combat');
-  });
+  it.each([
+    ['web', undefined],
+    ['desktop shell', DESKTOP_ENV],
+  ] as const)(
+    'partitions the full list (%s): the union of the tabs equals it, with NO duplicate keys',
+    (_arm, env) => {
+      const all = buildInterfaceControls(makeSource(), env);
+      const union = INTERFACE_TAB_ORDER.flatMap((tab) => interfaceControlsForTab(all, tab));
+      // every control lands in exactly one tab: the union is the same objects, same size
+      expect(union).toHaveLength(all.length);
+      expect(new Set(union)).toEqual(new Set(all));
+      // no setting key appears twice across the whole interface list. This is RED
+      // while the showAttackButton duplicate is present and GREEN once deduped.
+      // (the desktop arm's next-launch note is the one keyless control; every
+      // other row must still carry a key, so a keyless toggle still fails here)
+      // the audio panel's bespoke music toggle never belongs to this panel
+      expect(all.some((c) => c.control === 'musicToggle')).toBe(false);
+      const keyed = all.filter((c) => c.control !== 'note' && c.control !== 'musicToggle');
+      expect(keyed).toHaveLength(all.length - all.filter((c) => c.control === 'note').length);
+      const keys = keyed.map((c) => c.key);
+      expect(keys).not.toContain('');
+      expect(new Set(keys).size).toBe(keys.length);
+      // showAttackButton in particular resolves to a single combat-tab control
+      expect(all.filter((c) => 'key' in c && c.key === 'showAttackButton')).toHaveLength(1);
+      expect(find(all, 'showAttackButton')?.category).toBe('combat');
+    },
+  );
 
-  it('filters each tab to its mapped controls, in order', () => {
-    const all = buildInterfaceControls(makeSource());
+  it.each([
+    ['web', undefined, INTERFACE_KEYS_BY_TAB],
+    ['desktop shell', DESKTOP_ENV, INTERFACE_KEYS_BY_TAB_DESKTOP],
+  ] as const)('filters each tab (%s) to its mapped controls, in order', (_arm, env, expected) => {
+    const all = buildInterfaceControls(makeSource(), env);
     for (const tab of INTERFACE_TAB_ORDER) {
-      expect(keysOf(interfaceControlsForTab(all, tab))).toEqual(INTERFACE_KEYS_BY_TAB[tab]);
+      expect(keysOf(interfaceControlsForTab(all, tab))).toEqual(expected[tab]);
     }
   });
 
@@ -825,9 +1013,103 @@ describe('options_view: determinism', () => {
     expect(buildGraphicsControls(src, env)).toEqual(buildGraphicsControls(src, env));
     expect(buildAudioControls(src)).toEqual(buildAudioControls(src));
     expect(buildInterfaceControls(src)).toEqual(buildInterfaceControls(src));
+    expect(buildInterfaceControls(src, DESKTOP_ENV)).toEqual(
+      buildInterfaceControls(src, DESKTOP_ENV),
+    );
     expect(buildControllerControls(src)).toEqual(buildControllerControls(src));
     expect(buildOptionsMenu({ bugReportAvailable: true })).toEqual(
       buildOptionsMenu({ bugReportAvailable: true }),
     );
+  });
+});
+
+// The Display card is the one card whose shape changes by HOST: a desktop shell
+// that owns its window gets a real window-mode picker, every other host keeps
+// the browser Fullscreen toggle. Both arms are pinned, because a capability
+// leaking onto the web build would render a control nothing can serve, and a
+// capability that failed to swap would leave the desktop player asking the
+// browser for fullscreen inside an already-fullscreen window.
+describe('options_view: the desktop display-mode picker replaces the fullscreen toggle', () => {
+  const DISPLAY_ENV: OptionsEnv = { touch: false, nativeShell: false, desktopDisplayMode: true };
+  const displayCardKeys = (env: OptionsEnv): string[] => {
+    const card = buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env).find(
+      (s) => s.titleKey === 'hudChrome.options.gfxSectionDisplay',
+    );
+    expect(card, 'the Display card must exist on every host').toBeTruthy();
+    return keysOf(card?.controls ?? []);
+  };
+
+  it('swaps the toggle for the picker IN PLACE when the shell owns the window', () => {
+    // The whole ordered run, not just a membership check: the picker takes the
+    // toggle's slot, so the card's row order is byte-for-byte the web order.
+    expect(displayCardKeys(DISPLAY_ENV)).toEqual([
+      'renderScale',
+      'brightness',
+      'cameraFov',
+      'displayMode',
+      'weather',
+      'waterRipples',
+      'showOverflowXp',
+    ]);
+    expect(displayCardKeys(DISPLAY_ENV)).not.toContain('fullscreen');
+    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), DISPLAY_ENV);
+    expect(find(controls, 'displayMode')).toMatchObject({
+      control: 'choice',
+      labelKey: 'hud.options.displayMode',
+      // Windowed first, borderless second: the picker's order IS the setting's
+      // numeric order, so a reordering here cannot silently re-map the values.
+      options: [
+        { value: 0, labelKey: 'hud.options.displayModeWindowed' },
+        { value: 1, labelKey: 'hud.options.displayModeBorderless' },
+      ],
+    });
+  });
+
+  it('reflects the stored mode in BOTH directions (no mapping at this seam)', () => {
+    // The numeric <-> string mapping happens at the bridge crossings
+    // (desktop_display_mode_sync), never here, so the picker reads straight
+    // through: 1 selects Borderless Fullscreen, 0 selects Windowed.
+    const borderless = buildGraphicsControls(
+      makeSource({ graphicsPreset: 4, displayMode: 1 }),
+      DISPLAY_ENV,
+    );
+    expect(find(borderless, 'displayMode')).toMatchObject({ control: 'choice', current: 1 });
+    const windowed = buildGraphicsControls(
+      makeSource({ graphicsPreset: 4, displayMode: 0 }),
+      DISPLAY_ENV,
+    );
+    expect(find(windowed, 'displayMode')).toMatchObject({ control: 'choice', current: 0 });
+  });
+
+  it('never renders on the web, a mobile shell, or a desktop shell without the bridge', () => {
+    // Every host that is not a display-mode-capable desktop shell keeps the
+    // pre-existing toggle, byte for byte. nativeShell is true in the mobile
+    // shells and desktopGpuPref is a DIFFERENT capability: neither may stand in
+    // for this one.
+    const envs: OptionsEnv[] = [
+      { touch: false, nativeShell: false },
+      { touch: true, nativeShell: true },
+      { touch: false, nativeShell: false, desktopDisplayMode: false },
+      { touch: false, nativeShell: true, desktopGpuPref: true },
+    ];
+    for (const env of envs) {
+      const keys = displayCardKeys(env);
+      // The whole ordered run, mirroring the desktop arm's pin: "byte for
+      // byte" means the toggle holds the exact slot the picker would take,
+      // not merely membership somewhere in the card.
+      expect(keys).toEqual([
+        'renderScale',
+        'brightness',
+        'cameraFov',
+        'fullscreen',
+        'weather',
+        'waterRipples',
+        'showOverflowXp',
+      ]);
+      expect(keys).not.toContain('displayMode');
+      const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), env);
+      expect(find(controls, 'displayMode')).toBeUndefined();
+      expect(find(controls, 'fullscreen')).toMatchObject({ control: 'toggle' });
+    }
   });
 });

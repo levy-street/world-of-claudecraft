@@ -801,6 +801,11 @@ export const sv_SE: EnTranslations = {
       "resetAction": "Återställ",
       "note": "Dra chattflikraden för att flytta fönstret, eller hörnhandtaget för att ändra storlek. Återställ sätter det till standardläge och -storlek."
     },
+    "chatQuota": {
+      "limitReached": "Gränsen för Allmänt-chatten är nådd. Försök igen om {seconds}.",
+      "pending": "Ditt föregående meddelande i Allmänt-chatten skickas fortfarande. Försök igen om en stund.",
+      "unavailable": "Allmänt-chatten är tillfälligt otillgänglig. Försök igen snart."
+    },
     "swing": {
       "ready": "Sving",
       "seconds": "{seconds}s"
@@ -894,12 +899,12 @@ export const sv_SE: EnTranslations = {
       "update": "Uppdatera"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Speluppdatering",
+      "downloading": "Laddar ner uppdatering: {percent}",
+      "applying": "Uppdateringen har laddats ner. Spelet startas om för att tillämpa den.",
+      "incompatible": "En uppdatering krävs för att spela. Den tillämpas så snart nedladdningen är klar.",
+      "continueAnyway": "Fortsätt utan att uppdatera",
+      "progressLabel": "Förlopp för nedladdning av uppdatering"
     },
     "cameraPrompt": {
       "title": "Välj din kamera",
@@ -947,6 +952,22 @@ export const sv_SE: EnTranslations = {
       "closesIn": "Stänger om {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
     },
     "compass": {
       "N": "N",
@@ -1362,6 +1383,10 @@ export const sv_SE: EnTranslations = {
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showPlaytime": "Visa tid spelad på karaktärsskärmen",
+      "forceHighPerfGpu": "Använd det separata spelgrafikkortet",
+      "forceHighPerfGpuNote": "På som standard: skrivbordsappen begär datorns separata spelgrafikkort. Stäng av det här om spelet inte startar, öppnas med en svart skärm, eller om den bärbara datorns skärm blir svart. Träder i kraft nästa gång spelet startar.",
+      "discordPresence": "Discord-aktivitet",
+      "discordPresenceNote": "Visar zonen du befinner dig i och hur länge du har spelat den här sessionen som din Discord-aktivitet, och alla som kan se din Discord-profil kan se båda. Endast zonnamnet, din sessionstid och spelet delas, aldrig din karaktär, ditt konto eller vem du spelar med. Kräver att Discord-appen körs på den här datorn.",
       "showDevBadges": "Visa utvecklarmärken",
       "showOwnNameplate": "Visa min namnskylt",
       "showPlayerNameplates": "Visa spelares namnskyltar",
@@ -1734,6 +1759,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "reasons": {
         "arenaWin": "Arenaseger",
+        "arenaComplete": "arenamatch utkämpad",
         "fiestaKill": "Fiesta-nedtagning",
         "fiestaComplete": "Fiesta avklarad",
         "fiestaWin": "Fiesta-seger",
@@ -1840,6 +1866,7 @@ export const sv_SE: EnTranslations = {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
     "itemHeroicTag": "[HEROISK]",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",
     "itemUniqueEquipped": "Unikt utrustad",
     "itemSet": {
@@ -2194,6 +2221,10 @@ export const sv_SE: EnTranslations = {
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
       "itemAriaQuest": "{item}, antal {count}, uppdragsföremål",
+      "itemAriaLocked": "{item}, antal {count}, låst",
+      "itemLockedLine": "Låst",
+      "lockItem": "Lås föremål",
+      "unlockItem": "Lås upp föremål",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -2453,7 +2484,8 @@ export const sv_SE: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "BV"
+      "afkTag": "BV",
+      "cheaterTag": "< Fuskare >"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -3224,6 +3256,7 @@ export const sv_SE: EnTranslations = {
       "craftedToast": "Tillverkad: {name}",
       "craftedToastQty": "Tillverkad: {name} x{qty}",
       "insufficientMaterials": "Du har inte materialet för det.",
+      "reagentLocked": "En reagens för det är låst.",
       "unknownRecipe": "Det receptet finns inte.",
       "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
       "comboRequires": "Inriktning: {craftA} + {craftB}, nivå {tier}.",
@@ -3330,6 +3363,7 @@ export const sv_SE: EnTranslations = {
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
       "notSalvageable": "Du kan inte bärga det.",
+      "salvageLocked": "Det föremålet är låst.",
       "disenchantBusy": "Du är upptagen.",
       "salvageBusy": "Du är upptagen.",
       "enchantBusy": "Du är upptagen.",
@@ -3924,6 +3958,12 @@ export const sv_SE: EnTranslations = {
       "genesis_token_claimed": "Denna Seeker Genesis Token har redan hämtats.",
       "entitlement_required": "Verifierad Seeker-behörighet krävs.",
       "current_ownership_required": "Du måste fortfarande äga din Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatörskonton kan inte märkas.",
+      "reason_required": "En anledning krävs.",
+      "invalid_duration": "Ange en märkningslängd på minst en sekund.",
+      "not_marked": "Det kontot är inte märkt."
     }
   },
   "guide": {
@@ -6540,6 +6580,7 @@ export const sv_SE: EnTranslations = {
     "email": "E-post",
     "emailPlaceholder": "du@exempel.se",
     "emailError": "Ange en giltig e-postadress.",
+    "marketingOptIn": "Skicka mig nyheter och uppdateringar om spelet via e-post (valfritt)",
     "showPassword": "Visa lösenord",
     "hidePassword": "Dölj lösenord",
     "logIn": "Logga in",
@@ -6640,6 +6681,19 @@ export const sv_SE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Återställ utseende",
     "resetShort": "Återställ",
+    "shareTab": "Dela",
+    "designCode": "Utseendekod",
+    "designCodeHint": "Kopiera den här koden för att spara eller dela utseendet. Klistra in en kod här och importera den för att läsa in utseendet.",
+    "copyCode": "Kopiera kod",
+    "importCode": "Importera",
+    "designCodeCopied": "Utseendekoden har kopierats.",
+    "designCodeCopyManual": "Automatisk kopiering är blockerad här. Koden är markerad; kopiera den med tangentbordet.",
+    "designCodeImported": "Utseendet har importerats.",
+    "designCodeImportedPartial": "Utseendet har importerats. Värden som den här versionen inte känner igen hoppades över.",
+    "designCodeErrEmpty": "Klistra in en utseendekod först.",
+    "designCodeErrHeader": "Det där ser inte ut som en utseendekod.",
+    "designCodeErrVersion": "Den utseendekoden kommer från en nyare spelversion.",
+    "designCodeErrMalformed": "Den utseendekoden är skadad. Kopiera hela koden och försök igen.",
     "browFlat": "Platt",
     "browArched": "Bågformad",
     "browThin": "Tunn",
@@ -7760,7 +7814,15 @@ export const sv_SE: EnTranslations = {
       "readyBody": "Den installeras när du avslutar, eller starta om nu.",
       "restart": "Starta om nu",
       "later": "Senare",
-      "dismiss": "Stäng"
+      "dismiss": "Stäng",
+      "whatsNew": "Se vad som har ändrats i din webbläsare"
+    },
+    "notify": {
+      "updateReadyTitle": "Uppdatering {version} är klar",
+      "updateReadyTitleNoVersion": "Uppdatering är klar",
+      "updateReadyBody": "Starta om World of ClaudeCraft för att tillämpa uppdateringen.",
+      "partyInviteTitle": "Gruppinbjudan",
+      "partyInviteBody": "{name} bjöd in dig till en grupp."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7772,6 +7834,7 @@ export const sv_SE: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
+    "bodyDiscreteInactive": "Spelet använder inte det separata (spel-)grafikkortet och körs i stället på det strömsparande grafikkortet, vilket försämrar prestandan. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
     "bodyWeb": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.",
     "hybridBodyWindows": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort, ställ in din webbläsare på Höga prestanda under Inställningar > System > Bildskärm > Grafik, och starta sedan om den. Skrivbordsappen väljer det separata grafikkortet automatiskt.",
     "hybridBodyLinux": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort kan din webbläsare eller grafikdrivrutin erbjuda en egen inställning för val av grafikkort, eller så kan din distribution erbjuda ett verktyg för att växla grafikkort (till exempel PRIME eller optimus-manager). Skrivbordsappen väljer det separata grafikkortet automatiskt.",
@@ -7999,7 +8062,111 @@ export const sv_SE: EnTranslations = {
       "zoomIn": "Zooma in",
       "zoomOut": "Zooma ut",
       "mapCanvasLabel": "Karta",
-      "mapSummary": "Karta över {zone}."
+      "mapSummary": "Karta över {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Inga relevanta markörer är synliga.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Ytterligare markörer: {count}.",
+      "mapMarkerDirections": {
+        "center": "i mitten",
+        "north": "i norr",
+        "northeast": "i nordost",
+        "east": "i öster",
+        "southeast": "i sydost",
+        "south": "i söder",
+        "southwest": "i sydväst",
+        "west": "i väster",
+        "northwest": "i nordväst"
+      },
+      "mapMarkerDistances": {
+        "near": "i närheten",
+        "medium": "på medellångt avstånd",
+        "far": "långt bort"
+      },
+      "mapMarkerLabels": {
+        "you": "Du",
+        "availableQuest": "Tillgängligt uppdrag",
+        "readyQuest": "Uppdrag redo att lämnas in",
+        "repeatQuest": "Upprepbart uppdrag",
+        "cooldownQuest": "Uppdrag under nedkylning",
+        "questObjective": "Område med uppdragsmål",
+        "readyOre": "Tillgänglig malmåder",
+        "readyWood": "Tillgängligt timmerbestånd",
+        "readyHerb": "Tillgänglig örtfläck",
+        "readyLockedOre": "Tillgänglig malmåder, verktyg låst",
+        "readyLockedWood": "Tillgängligt timmerbestånd, verktyg låst",
+        "readyLockedHerb": "Tillgänglig örtfläck, verktyg låst",
+        "cooldownOre": "Uttömd malmåder",
+        "cooldownWood": "Uttömt timmerbestånd",
+        "cooldownHerb": "Uttömd örtfläck",
+        "cooldownLockedOre": "Uttömd malmåder, verktyg låst",
+        "cooldownLockedWood": "Uttömt timmerbestånd, verktyg låst",
+        "cooldownLockedHerb": "Uttömd örtfläck, verktyg låst",
+        "station": "Hantverksstation: {name}",
+        "service": "Tjänst: {name}",
+        "partyMember": "Gruppmedlem: {name}",
+        "deadPartyMember": "Död gruppmedlem: {name}",
+        "partyMemberGeneric": "Gruppmedlem",
+        "deadPartyMemberGeneric": "Död gruppmedlem",
+        "friend": "Vän: {name}",
+        "guildMember": "Gillesmedlem: {name}",
+        "pointOfInterest": "Intressepunkt: {name}",
+        "dungeonEntrance": "Fängelsehålsingång: {name}",
+        "dungeonExit": "Fängelsehålsutgång",
+        "delveEntrance": "Delve-ingång: {name}",
+        "worldPassage": "Passage till {zone}",
+        "riftEntrance": "Ingång till revan: {name}",
+        "hostileEnemy": "Fientligt mål",
+        "aggressiveEnemy": "Fiende angriper dig",
+        "lootableEnemy": "Plundringsbar fiende",
+        "corpse": "Din kropp",
+        "deathZone": "Farozon",
+        "teammate": "Lagkamrat",
+        "deadTeammate": "Död lagkamrat",
+        "flagCarrier": "Lagkamrat med flaggan",
+        "ownFlagStand": "Din flaggplats",
+        "enemyFlagStand": "Fiendens flaggplats",
+        "riftDescent": "Nedstigning i revan",
+        "riftReturnBeacon": "Återvändningsbåk",
+        "riftReturnExit": "Återvändningsutgång",
+        "ranked": "{marker}, grad {rank}",
+        "riftTreasureAvailable": "Tillgänglig skatt",
+        "riftTreasureLocked": "Låst skatt",
+        "riftTreasureOpened": "Öppnad skatt",
+        "riftTreasureJammed": "Skatt med fastkilat lås",
+        "riftCacheAvailable": "Tillgängligt förråd i revan",
+        "riftCacheLocked": "Låst förråd",
+        "riftCacheOpened": "Öppnat förråd",
+        "riftCacheJammed": "Förråd med fastkilat lås",
+        "pylonUnlit": "Släckt runpelare",
+        "pylonLit": "Tänd runpelare",
+        "sequenceRuneUnlit": "Släckt sekvensruna",
+        "sequenceRuneLit": "Tänd sekvensruna",
+        "iceGoal": "Ismål",
+        "boulderPad": "Stenblocksmål",
+        "boulderMovable": "Flyttbart stenblock",
+        "boulderPlaced": "Placerat stenblock",
+        "gateSealed": "Förseglad port",
+        "gateOpen": "Öppen port",
+        "switchReady": "Brytare redo att användas",
+        "switchOn": "Aktiverad brytare",
+        "orbDormant": "Slumrande orb",
+        "orbActive": "Aktiv orb",
+        "rollerHazard": "Farligt rullande stenblock",
+        "delvePassageSealed": "Förseglad passage",
+        "delvePassageOpen": "Öppen passage",
+        "delveSurfaceExit": "Utgång till ytan",
+        "delveCacheLocked": "Låst delve-kista",
+        "delveCacheReady": "Delve-kista redo",
+        "delveCacheActive": "Delve-kista aktiv",
+        "delveCacheOpened": "Öppnad delve-kista",
+        "delveReliquaryLocked": "Låst relikvarium",
+        "delveReliquaryReady": "Relikvarium redo",
+        "delveReliquaryActive": "Relikvarierit aktiv",
+        "delveReliquaryOpened": "Öppnat relikvarium",
+        "bountiful": "{marker} med rikligt byte"
+      }
     },
     "options": {
       "gameMenu": "Spelmeny",
@@ -8039,6 +8206,9 @@ export const sv_SE: EnTranslations = {
       "graphicsReloadNote": "Grafikkvalitet och terrängdetalj tillämpas efter en omladdning.",
       "reloadNow": "Ladda om nu",
       "fullscreen": "Helskärm",
+      "displayMode": "Visningsläge",
+      "displayModeBorderless": "Kantlös helskärm",
+      "displayModeWindowed": "Fönsterläge",
       "touchLookSpeed": "Pekblickens hastighet",
       "joystickSize": "Styrspakens storlek",
       "buttonSize": "Knappstorlek",
@@ -8915,6 +9085,10 @@ export const sv_SE: EnTranslations = {
       "filterPrimaryStatAll": "Alla primära attribut",
       "filterRarity": "Sällsynthet",
       "filterRarityAll": "Alla sällsyntheter",
+      "filterSort": "Sortera",
+      "sortName": "Namn (A-Z)",
+      "sortPriceAsc": "Pris: lågt till högt",
+      "collapseLowest": "Endast lägsta pris",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",
@@ -8945,6 +9119,8 @@ export const sv_SE: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "av {count}",
       "priceEach": "Pris per styck",
+      "lowestPriceLabel": "Nuvarande lägsta annonspris",
+      "lowestPriceNone": "Det finns inga aktiva annonser för det här föremålet ännu.",
       "listButton": "Lägg upp på Världsmarknaden",
       "minPriceError": "Ange ett pris på minst 1 koppar.",
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",
@@ -9372,6 +9548,7 @@ export const sv_SE: EnTranslations = {
       "cheap_shot": {
         "name": "Magslag",
         "description": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.",
+        "descriptionNoStealth": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Ger 2 kombopoäng.",
         "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan."
       },
       "sap": {
@@ -9584,7 +9761,7 @@ export const sv_SE: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brinnande ed",
-        "description": "Ökar passivt hotet som er Heliga skada alstrar med 60%. Endast Trosväktare."
+        "description": "Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare."
       },
       "retribution_aura": {
         "name": "Vedergällningsaura",
@@ -9700,7 +9877,7 @@ export const sv_SE: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet vapen",
-        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 30% rustning, tar 10% mindre skada och alstrar dubbelt så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
+        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 40% rustning och 20% uthållighet, tar 15% mindre skada och är immun mot kritiska träffar från varelser och alstrar 2,75 gånger så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
       },
       "healing_wave": {
         "name": "Lagande vatten",
@@ -9879,7 +10056,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
@@ -9889,6 +10066,10 @@ export const sv_SE: EnTranslations = {
       "growl": {
         "name": "Hota",
         "description": "Morrar åt målet: ditt hot stiger till nivån hos dess mest hatade fiende och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
+      },
+      "challenging_roar": {
+        "name": "Olycksbådande vrål",
+        "description": "Ett olycksbådande vrål: varje fiende inom 10 meter eggas, dess hot mot dig stiger till nivån hos dess mest hatade fiende, och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
       },
       "cat_form": {
         "name": "Vargform",
@@ -12221,6 +12402,9 @@ export const sv_SE: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Orörd klo"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
@@ -16710,6 +16894,11 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästet",
         "enterText": "Du kliver in i de kalla, tysta hallarna i Sista fästet.",
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",

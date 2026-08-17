@@ -801,6 +801,11 @@ export const pl_PL: EnTranslations = {
       "resetAction": "Resetuj",
       "note": "Przeciągnij pasek zakładek czatu, aby przesunąć okno, lub uchwyt w rogu, aby zmienić jego rozmiar. Reset przywraca domyślną pozycję i rozmiar."
     },
+    "chatQuota": {
+      "limitReached": "Osiągnięto limit czatu Ogólnego. Spróbuj ponownie za {seconds}.",
+      "pending": "Twoja poprzednia wiadomość na czacie Ogólnym wciąż się wysyła. Spróbuj ponownie za chwilę.",
+      "unavailable": "Czat Ogólny jest tymczasowo niedostępny. Spróbuj ponownie wkrótce."
+    },
     "swing": {
       "ready": "Zamach",
       "seconds": "{seconds}s"
@@ -894,12 +899,12 @@ export const pl_PL: EnTranslations = {
       "update": "Aktualizuj"
     },
     "otaUpdate": {
-      "title": "Game Update",
-      "downloading": "Downloading update: {percent}",
-      "applying": "Update downloaded. Restarting the game to apply it.",
-      "incompatible": "An update is required to play. It will be applied as soon as it finishes downloading.",
-      "continueAnyway": "Continue without updating",
-      "progressLabel": "Update download progress"
+      "title": "Aktualizacja gry",
+      "downloading": "Pobieranie aktualizacji: {percent}",
+      "applying": "Aktualizacja pobrana. Gra zostanie uruchomiona ponownie, aby ją zastosować.",
+      "incompatible": "Do gry wymagana jest aktualizacja. Zostanie zastosowana zaraz po zakończeniu pobierania.",
+      "continueAnyway": "Kontynuuj bez aktualizacji",
+      "progressLabel": "Postęp pobierania aktualizacji"
     },
     "cameraPrompt": {
       "title": "Wybierz Kamerę",
@@ -947,6 +952,22 @@ export const pl_PL: EnTranslations = {
       "closesIn": "Zamyka się za {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
     },
     "compass": {
       "N": "Pn",
@@ -1362,6 +1383,10 @@ export const pl_PL: EnTranslations = {
       "showWalletOnCharacterScreen": "Pokaż sakiewkę na ekranie postaci",
       "showWalletOnPlayerCard": "Pokaż sakiewkę na karcie gracza",
       "showPlaytime": "Pokaż czas gry na ekranie postaci",
+      "forceHighPerfGpu": "Użyj dedykowanej karty graficznej do gier",
+      "forceHighPerfGpuNote": "Domyślnie włączone: aplikacja desktopowa prosi ten komputer o użycie dedykowanej karty graficznej do gier. Wyłącz tę opcję, jeśli gra się nie uruchamia, otwiera się na czarnym ekranie lub ekran laptopa gaśnie. Zmiana zacznie obowiązywać przy następnym uruchomieniu gry.",
+      "discordPresence": "Rozbudowana obecność w Discordzie",
+      "discordPresenceNote": "Pokazuje jako twoją aktywność na Discordzie strefę, w której się znajdujesz, oraz czas trwania tej sesji gry, a każdy, kto widzi twój profil Discord, może zobaczyć oba te elementy. Udostępniane są wyłącznie nazwa strefy, czas sesji i nazwa gry, nigdy twoja postać, konto ani osoby, z którymi grasz. Wymaga uruchomionej aplikacji Discord na tym komputerze.",
       "showDevBadges": "Pokaż odznaki deweloperów",
       "showOwnNameplate": "Pokaż moją plakietkę",
       "showPlayerNameplates": "Pokaż plakietki graczy",
@@ -1734,6 +1759,7 @@ export const pl_PL: EnTranslations = {
       "notEnoughHonor": "Za mało Honoru.",
       "reasons": {
         "arenaWin": "Zwycięstwo na arenie",
+        "arenaComplete": "Stoczono pojedynek na arenie",
         "fiestaKill": "Upadek Fiesty",
         "fiestaComplete": "Fiesta zakończona",
         "fiestaWin": "Zwycięstwo Fiesty",
@@ -1840,6 +1866,7 @@ export const pl_PL: EnTranslations = {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
     "itemHeroicTag": "[HEROICZNY]",
+    "itemHeroicLabel": "Heroiczny",
     "itemSoulbound": "Związany z duszą",
     "itemUniqueEquipped": "Unikatowo zakładany",
     "itemSet": {
@@ -2194,6 +2221,10 @@ export const pl_PL: EnTranslations = {
       "itemAriaBound": "{item}, ilość {count}, związana kopia",
       "itemAriaMasterwork": "{item}, ilość {count}, arcydzieło",
       "itemAriaQuest": "{item}, ilość {count}, przedmiot zadania",
+      "itemAriaLocked": "{item}, liczba {count}, zablokowane",
+      "itemLockedLine": "Zablokowane",
+      "lockItem": "Zablokuj przedmiot",
+      "unlockItem": "Odblokuj przedmiot",
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
       "filterWeapon": "Bronie",
@@ -2453,7 +2484,8 @@ export const pl_PL: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Oszust >"
     },
     "mobTooltip": {
       "levelFamily": "Poziom {level}: {family}",
@@ -3224,6 +3256,7 @@ export const pl_PL: EnTranslations = {
       "craftedToast": "Wykonane: {name}",
       "craftedToastQty": "Wykonane: {name} x{qty}",
       "insufficientMaterials": "Nie masz na to materiałów.",
+      "reagentLocked": "Odczynnik do tego jest zablokowany.",
       "unknownRecipe": "Ten przepis nie istnieje.",
       "comboRequirementUnmet": "Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu.",
       "comboRequires": "Dostrojenie: {craftA} + {craftB}, poziom {tier}.",
@@ -3330,6 +3363,7 @@ export const pl_PL: EnTranslations = {
       "notHeld": "Nie posiadasz tego przedmiotu.",
       "notDisenchantable": "Nie możesz tego rozbroić.",
       "notSalvageable": "Nie możesz tego odzyskać.",
+      "salvageLocked": "Ten przedmiot jest zablokowany.",
       "disenchantBusy": "Jesteś zajęty.",
       "salvageBusy": "Jesteś zajęty.",
       "enchantBusy": "Jesteś zajęty.",
@@ -3924,6 +3958,12 @@ export const pl_PL: EnTranslations = {
       "genesis_token_claimed": "Ten Seeker Genesis Token został już odebrany.",
       "entitlement_required": "Wymagane jest zweryfikowane uprawnienie Seeker.",
       "current_ownership_required": "Musisz obecnie posiadać Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Kont operatorów nie można oznaczać.",
+      "reason_required": "Wymagane jest podanie powodu.",
+      "invalid_duration": "Podaj czas trwania oznaczenia wynoszący co najmniej jedną sekundę.",
+      "not_marked": "To konto nie jest oznaczone."
     }
   },
   "guide": {
@@ -6540,6 +6580,7 @@ export const pl_PL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Wprowadź prawidłowy adres e-mail.",
+    "marketingOptIn": "Wysyłaj mi e-mailem nowości i aktualizacje gry (opcjonalnie)",
     "showPassword": "Pokaż hasło",
     "hidePassword": "Ukryj hasło",
     "logIn": "Zaloguj się",
@@ -6640,6 +6681,19 @@ export const pl_PL: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetuj wygląd",
     "resetShort": "Resetuj",
+    "shareTab": "Udostępnij",
+    "designCode": "Kod wyglądu",
+    "designCodeHint": "Skopiuj ten kod, aby zapisać lub udostępnić ten wygląd. Wklej tutaj kod i zaimportuj go, aby wczytać wygląd.",
+    "copyCode": "Kopiuj kod",
+    "importCode": "Importuj",
+    "designCodeCopied": "Kod wyglądu skopiowany.",
+    "designCodeCopyManual": "Automatyczne kopiowanie jest tutaj zablokowane. Kod jest zaznaczony; skopiuj go za pomocą klawiatury.",
+    "designCodeImported": "Wygląd zaimportowany.",
+    "designCodeImportedPartial": "Wygląd zaimportowany. Wartości nieznane tej wersji zostały pominięte.",
+    "designCodeErrEmpty": "Najpierw wklej kod wyglądu.",
+    "designCodeErrHeader": "To nie wygląda na kod wyglądu.",
+    "designCodeErrVersion": "Ten kod wyglądu pochodzi z nowszej wersji gry.",
+    "designCodeErrMalformed": "Ten kod wyglądu jest uszkodzony. Skopiuj cały kod i spróbuj ponownie.",
     "browFlat": "Płaskie",
     "browArched": "Łukowate",
     "browThin": "Cienkie",
@@ -7760,7 +7814,15 @@ export const pl_PL: EnTranslations = {
       "readyBody": "Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.",
       "restart": "Uruchom ponownie teraz",
       "later": "Później",
-      "dismiss": "Zamknij"
+      "dismiss": "Zamknij",
+      "whatsNew": "Zobacz w przeglądarce, co się zmieniło."
+    },
+    "notify": {
+      "updateReadyTitle": "Aktualizacja {version} jest gotowa",
+      "updateReadyTitleNoVersion": "Aktualizacja jest gotowa",
+      "updateReadyBody": "Uruchom ponownie World of ClaudeCraft, aby zastosować aktualizację.",
+      "partyInviteTitle": "Zaproszenie do drużyny",
+      "partyInviteBody": "{name} zaprasza cię do swojej drużyny."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7772,6 +7834,7 @@ export const pl_PL: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Gra działa bez akceleracji GPU i będzie wolna. Zaktualizuj sterowniki karty graficznej, a następnie zrestartuj grę. W systemie Windows ustaw grę na Wysoką wydajność w Ustawienia > System > Ekran > Grafika.",
+    "bodyDiscreteInactive": "Gra nie korzysta z dedykowanej karty graficznej (do gier) i zamiast tego działa na oszczędnej karcie graficznej, przez co wydajność ucierpi. Zaktualizuj sterowniki karty graficznej, a następnie zrestartuj grę. W systemie Windows ustaw także grę na Wysoką wydajność w Ustawienia > System > Ekran > Grafika.",
     "bodyWeb": "Gra działa bez akceleracji GPU i będzie wolna. Włącz akcelerację sprzętową w ustawieniach przeglądarki, zaktualizuj sterowniki karty graficznej, a następnie zrestartuj przeglądarkę.",
     "hybridBodyWindows": "Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, ustaw w przeglądarce Wysoką wydajność w Ustawienia > System > Ekran > Grafika, a następnie ją zrestartuj. Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.",
     "hybridBodyLinux": "Ta sesja jest renderowana na zintegrowanej (oszczędnej) karcie graficznej. Jeśli ten komputer ma także dedykowaną kartę graficzną do gier, twoja przeglądarka lub sterownik graficzny mogą udostępniać własne ustawienie wyboru GPU, albo twoja dystrybucja może oferować narzędzie do przełączania GPU (takie jak PRIME lub optimus-manager). Aplikacja desktopowa wybiera dedykowaną kartę automatycznie.",
@@ -7999,7 +8062,111 @@ export const pl_PL: EnTranslations = {
       "zoomIn": "Przybliż",
       "zoomOut": "Oddal",
       "mapCanvasLabel": "Mapa",
-      "mapSummary": "Mapa {zone}."
+      "mapSummary": "Mapa {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Nie widać żadnych istotnych znaczników.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Pozostałe znaczniki: {count}.",
+      "mapMarkerDirections": {
+        "center": "w centrum",
+        "north": "na północ",
+        "northeast": "na północny wschód",
+        "east": "na wschód",
+        "southeast": "na południowy wschód",
+        "south": "na południe",
+        "southwest": "na południowy zachód",
+        "west": "na zachód",
+        "northwest": "na północny zachód"
+      },
+      "mapMarkerDistances": {
+        "near": "blisko",
+        "medium": "w średniej odległości",
+        "far": "daleko"
+      },
+      "mapMarkerLabels": {
+        "you": "Ty",
+        "availableQuest": "Dostępne zadanie",
+        "readyQuest": "Zadanie gotowe do oddania",
+        "repeatQuest": "Zadanie powtarzalne",
+        "cooldownQuest": "Zadanie wkrótce ponownie dostępne",
+        "questObjective": "Obszar celu zadania",
+        "readyOre": "Żyła rudy gotowa do wydobycia",
+        "readyWood": "Drzewostan gotowy do wyrębu",
+        "readyHerb": "Łan ziół gotowy do zebrania",
+        "readyLockedOre": "Żyła rudy gotowa do wydobycia, narzędzie niedostępne",
+        "readyLockedWood": "Drzewostan gotowy do wyrębu, narzędzie niedostępne",
+        "readyLockedHerb": "Łan ziół gotowy do zebrania, narzędzie niedostępne",
+        "cooldownOre": "Wyczerpana żyła rudy",
+        "cooldownWood": "Wycięty drzewostan",
+        "cooldownHerb": "Zebrany łan ziół",
+        "cooldownLockedOre": "Wyczerpana żyła rudy, narzędzie niedostępne",
+        "cooldownLockedWood": "Wycięty drzewostan, narzędzie niedostępne",
+        "cooldownLockedHerb": "Zebrany łan ziół, narzędzie niedostępne",
+        "station": "Stacja rzemieślnicza: {name}",
+        "service": "Usługa: {name}",
+        "partyMember": "Członek drużyny: {name}",
+        "deadPartyMember": "Martwy członek drużyny: {name}",
+        "partyMemberGeneric": "Członek drużyny",
+        "deadPartyMemberGeneric": "Martwy członek drużyny",
+        "friend": "Znajomy: {name}",
+        "guildMember": "Członek gildii: {name}",
+        "pointOfInterest": "Punkt zainteresowania: {name}",
+        "dungeonEntrance": "Wejście do lochu: {name}",
+        "dungeonExit": "Wyjście z lochu",
+        "delveEntrance": "Wejście do wyprawy: {name}",
+        "worldPassage": "Przejście do {zone}",
+        "riftEntrance": "Wejście do Szczeliny: {name}",
+        "hostileEnemy": "Wrogi przeciwnik",
+        "aggressiveEnemy": "Atakujący cię wróg",
+        "lootableEnemy": "Wróg do ograbienia",
+        "corpse": "Twoje zwłoki",
+        "deathZone": "Strefa zagrożenia",
+        "teammate": "Członek zespołu",
+        "deadTeammate": "Martwy członek zespołu",
+        "flagCarrier": "Członek zespołu niosący flagę",
+        "ownFlagStand": "Twój stojak na flagę",
+        "enemyFlagStand": "Stojak na flagę wroga",
+        "riftDescent": "Zejście do Szczeliny",
+        "riftReturnBeacon": "Latarnia powrotu",
+        "riftReturnExit": "Wyjście prowadzące z powrotem",
+        "ranked": "{marker}, ranga {rank}",
+        "riftTreasureAvailable": "Dostępny skarb",
+        "riftTreasureLocked": "Zamknięty skarb",
+        "riftTreasureOpened": "Otwarty skarb",
+        "riftTreasureJammed": "Skarb z zaciętym zamkiem",
+        "riftCacheAvailable": "Dostępna skrytka Szczeliny",
+        "riftCacheLocked": "Zamknięta skrytka",
+        "riftCacheOpened": "Otwarta skrytka",
+        "riftCacheJammed": "Skrytka z zaciętym zamkiem",
+        "pylonUnlit": "Wygaszony pylon runiczny",
+        "pylonLit": "Zapalony pylon runiczny",
+        "sequenceRuneUnlit": "Wygaszona runa sekwencji",
+        "sequenceRuneLit": "Zapalona runa sekwencji",
+        "iceGoal": "Cel lodowy",
+        "boulderPad": "Cel dla głazu",
+        "boulderMovable": "Ruchomy głaz",
+        "boulderPlaced": "Ustawiony głaz",
+        "gateSealed": "Zapieczętowana brama",
+        "gateOpen": "Otwarta brama",
+        "switchReady": "Przełącznik gotowy do użycia",
+        "switchOn": "Aktywowany przełącznik",
+        "orbDormant": "Uśpiona kula",
+        "orbActive": "Aktywna kula",
+        "rollerHazard": "Niebezpieczny toczący się głaz",
+        "delvePassageSealed": "Zapieczętowane przejście",
+        "delvePassageOpen": "Otwarte przejście",
+        "delveSurfaceExit": "Wyjście na powierzchnię",
+        "delveCacheLocked": "Zamknięta skrytka wyprawy",
+        "delveCacheReady": "Skrytka wyprawy gotowa",
+        "delveCacheActive": "Aktywna skrytka wyprawy",
+        "delveCacheOpened": "Otwarta skrytka wyprawy",
+        "delveReliquaryLocked": "Zamknięty relikwiarz",
+        "delveReliquaryReady": "Relikwiarz gotowy",
+        "delveReliquaryActive": "Aktywny obrzęd relikwiarza",
+        "delveReliquaryOpened": "Otwarty relikwiarz",
+        "bountiful": "Obfita nagroda: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu gry",
@@ -8039,6 +8206,9 @@ export const pl_PL: EnTranslations = {
       "graphicsReloadNote": "Jakość grafiki i szczegółowość terenu zastosują się po ponownym wczytaniu.",
       "reloadNow": "Wczytaj ponownie teraz",
       "fullscreen": "Pełny ekran",
+      "displayMode": "Tryb wyświetlania",
+      "displayModeBorderless": "Pełny ekran bez obramowania",
+      "displayModeWindowed": "Okno",
       "touchLookSpeed": "Prędkość rozglądania dotykiem",
       "joystickSize": "Rozmiar joysticka",
       "buttonSize": "Rozmiar przycisków",
@@ -8915,6 +9085,10 @@ export const pl_PL: EnTranslations = {
       "filterPrimaryStatAll": "Dowolny główny atrybut",
       "filterRarity": "Rzadkość",
       "filterRarityAll": "Wszystkie rzadkości",
+      "filterSort": "Sortuj",
+      "sortName": "Nazwa (A-Z)",
+      "sortPriceAsc": "Cena: od najniższej do najwyższej",
+      "collapseLowest": "Tylko najniższa cena",
       "weaponSword": "Miecze",
       "weaponDagger": "Sztylety",
       "weaponStaff": "Kostury",
@@ -8945,6 +9119,8 @@ export const pl_PL: EnTranslations = {
       "quantity": "Ilość",
       "quantityOf": "z {count}",
       "priceEach": "Cena za sztukę",
+      "lowestPriceLabel": "Obecnie najniższa cena wystawienia",
+      "lowestPriceNone": "Nie ma jeszcze aktywnych ofert tego przedmiotu.",
       "listButton": "Wystaw na Rynku Świata",
       "minPriceError": "Podaj cenę co najmniej 1 miedziaka.",
       "collectEmpty": "Nic nie czeka. Dochód ze sprzedaży i wygasłe oferty zbierają się tutaj.",
@@ -9372,6 +9548,7 @@ export const pl_PL: EnTranslations = {
       "cheap_shot": {
         "name": "Cios w brzuch",
         "description": "Uderz cel za {damage} obrażeń, ogłuszając go na 4 sekundy. Musisz być w ukryciu. Przyznaje 2 punkty combo.",
+        "descriptionNoStealth": "Uderz cel za {damage} obrażeń, ogłuszając go na 4 sekundy. Przyznaje 2 punkty combo.",
         "specNote_subtlety": "Użyte z Zasłony zmierzchu dodaje 1 Mrok (maks. 3). Przy 3 Mroku możesz użyć tej zdolności BEZ ukrycia: takie użycie nic nie kosztuje, zużywa cały Mrok i rozpoczyna 6-sekundową Zasłonę Cieni."
       },
       "sap": {
@@ -9584,7 +9761,7 @@ export const pl_PL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Płonąca przysięga",
-        "description": "Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 60%. Tylko Strażnik wiary."
+        "description": "Pasywnie zwiększa zagrożenie generowane przez twoje obrażenia święte o 30%. Tylko Strażnik wiary."
       },
       "retribution_aura": {
         "name": "Aura odpłaty",
@@ -9700,7 +9877,7 @@ export const pl_PL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Oręż kamiennych okowów",
-        "description": "Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 30% pancerza, otrzymuje o 10% mniej obrażeń i generuje dwukrotnie większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s."
+        "description": "Nasyca twoją broń na 30 min. Każdy cios zadaje {damage} dodatkowych obrażeń. Wzmocnienie żywiołów zyskuje ponadto 40% pancerza i 20% wytrzymałości, otrzymuje o 15% mniej obrażeń i jest odporny na trafienia krytyczne od stworzeń i generuje 2,75 razy większe zagrożenie. Ziemny wstrząs zmusza swój cel do atakowania ciebie przez 3 s, a Osłona gromu daje 10% redukcji obrażeń na 3 s."
       },
       "healing_wave": {
         "name": "Kojące wody",
@@ -9879,7 +10056,7 @@ export const pl_PL: EnTranslations = {
       },
       "bear_form": {
         "name": "Postać Bruina",
-        "description": "Zmień postać w niedźwiedzia: pancerz +130%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
+        "description": "Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "maul": {
         "name": "Kruszenie kości",
@@ -9889,6 +10066,10 @@ export const pl_PL: EnTranslations = {
       "growl": {
         "name": "Groźba",
         "description": "Warczy na cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina."
+      },
+      "challenging_roar": {
+        "name": "Złowieszczy ryk",
+        "description": "Złowieszczy ryk: każdy wróg w promieniu 10 jardów zostaje sprowokowany, a jego zagrożenie wobec ciebie wzrasta do poziomu jego najbardziej znienawidzonego wroga, przez co zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina."
       },
       "cat_form": {
         "name": "Postać wilka",
@@ -12221,6 +12402,9 @@ export const pl_PL: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Nieskazitelny Pazur"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
@@ -16710,6 +16894,11 @@ export const pl_PL: EnTranslations = {
         "name": "Ostatnia Twierdza",
         "enterText": "Wchodzisz w zimne, ciche korytarze Ostatniej Twierdzy.",
         "leaveText": "Zamykasz za sobą bramę twierdzy i wracasz w wiatr Smoczych Ziem."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Zatopiona Świątynia",

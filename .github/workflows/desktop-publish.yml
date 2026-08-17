@@ -19,13 +19,16 @@ name: Desktop publish
 #
 # Triggers:
 #   - a release tag (v<version>) pushed to a commit that is on main; the tag
-#     must match package.json "version" and DESKTOP_VERSION, so the download
-#     page, the feed, and the artifacts stay in lockstep.
+#     must match package.json "version". The download page derives its version
+#     from package.json at build time (src/game/desktop_download.ts via the
+#     __APP_VERSION__ define), so that one check keeps the download page, the
+#     feed, and the artifacts in lockstep.
 #   - manual dispatch, which is a DRY RUN by default: it builds, signs,
 #     verifies, and checksums exactly like a release, then attaches the
 #     artifacts to the workflow run for inspection instead of uploading.
-#     Tick "publish" to really upload (the backfill path). The same version
-#     lockstep guard runs; only the tag and main-ancestry checks are skipped.
+#     Tick "publish" to really upload (the backfill path). Each platform job
+#     still verifies the artifact names carry package.json "version"; only
+#     the tag and main-ancestry checks are skipped.
 #
 # The platform jobs are independent: a mac signing failure never blocks the
 # Linux publish and vice versa. Within each job, versioned artifacts upload
@@ -75,9 +78,16 @@ jobs:
           fi
 
       # Artifact names, the updater feed, and the download-page links all key
-      # off package.json "version"; DESKTOP_VERSION (the download page) must
-      # match it (docs/desktop-release.md, "Publishing a website update"
-      # step 1). Fail fast before the long builds if anything is out of step.
+      # off package.json "version"; the download page derives it at build time
+      # (src/game/desktop_download.ts via the __APP_VERSION__ define, pinned
+      # equal to package.json by tests/desktop_download.test.ts), so there is
+      # no second constant to drift. Fail fast on a mismatched tag before the
+      # long builds. Tag pushes do not run the vitest pin, so the greps below
+      # keep the derive mechanism itself honest at publish time: each anchors
+      # on the load-bearing expression (the assignment reading the define, and
+      # the define entry itself), never any version value, so a mention in a
+      # comment or a type-only declare cannot satisfy it. The exact patterns
+      # are extracted and executed both ways by tests/desktop_publish_guard.test.ts.
       - name: Verify version lockstep
         run: |
           VERSION="$(node -p "require('./package.json').version")"
@@ -86,8 +96,12 @@ jobs:
             echo "Tag ${GITHUB_REF_NAME} does not match package.json version v${VERSION}." >&2
             exit 1
           fi
-          if ! grep -q "DESKTOP_VERSION = '${VERSION}'" src/game/desktop_download.ts; then
-            echo "DESKTOP_VERSION in src/game/desktop_download.ts does not match package.json version ${VERSION}." >&2
+          if ! grep -qF "DESKTOP_VERSION = typeof __APP_VERSION__" src/game/desktop_download.ts; then
+            echo "src/game/desktop_download.ts no longer derives its version from the __APP_VERSION__ define; the download page would go stale. See docs/desktop-release.md." >&2
+            exit 1
+          fi
+          if ! grep -qF "__APP_VERSION__: JSON.stringify(appVersion)" vite.config.ts; then
+            echo "vite.config.ts no longer defines __APP_VERSION__; the download-page version would not be baked at build time. See docs/desktop-release.md." >&2
             exit 1
           fi
 

@@ -801,6 +801,11 @@ export const zh_CN: EnTranslations = {
       "resetAction": "重置",
       "note": "拖动聊天标签栏可移动窗口，拖动右下角手柄可调整大小。重置可恢复到默认位置和大小。"
     },
+    "chatQuota": {
+      "limitReached": "综合聊天已达到限额。请在 {seconds} 后重试。",
+      "pending": "上一条综合聊天消息仍在发送中。请稍候再试。",
+      "unavailable": "综合聊天暂时不可用。请稍后再试。"
+    },
     "swing": {
       "ready": "挥击",
       "seconds": "{seconds}秒"
@@ -947,6 +952,22 @@ export const zh_CN: EnTranslations = {
       "closesIn": "裂隙将在 {time} 后关闭",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "地下穹室",
+        "state": "正殿层",
+        "residence": "起居层",
+        "tower": "瞭望塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "庭园层",
+        "solar": "日光厅"
+      }
     },
     "compass": {
       "N": "北",
@@ -1362,6 +1383,10 @@ export const zh_CN: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "showPlaytime": "在角色界面显示游戏时长",
+      "forceHighPerfGpu": "使用独立游戏显卡",
+      "forceHighPerfGpuNote": "默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。",
+      "discordPresence": "Discord 游戏状态",
+      "discordPresenceNote": "游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。",
       "showDevBadges": "显示开发者徽章",
       "showOwnNameplate": "显示我的姓名板",
       "showPlayerNameplates": "显示玩家姓名板",
@@ -1734,6 +1759,7 @@ export const zh_CN: EnTranslations = {
       "notEnoughHonor": "荣誉不足。",
       "reasons": {
         "arenaWin": "竞技场胜利",
+        "arenaComplete": "竞技场参战",
         "fiestaKill": "嘉年华击倒",
         "fiestaComplete": "完成嘉年华",
         "fiestaWin": "嘉年华胜利",
@@ -1840,6 +1866,7 @@ export const zh_CN: EnTranslations = {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
     "itemHeroicTag": "[英雄]",
+    "itemHeroicLabel": "英雄",
     "itemSoulbound": "灵魂绑定",
     "itemUniqueEquipped": "装备唯一",
     "itemSet": {
@@ -2194,6 +2221,10 @@ export const zh_CN: EnTranslations = {
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
       "itemAriaMasterwork": "{item}，数量 {count}，杰作",
       "itemAriaQuest": "{item}，数量 {count}，任务物品",
+      "itemAriaLocked": "{item}，数量 {count}，已锁定",
+      "itemLockedLine": "已锁定",
+      "lockItem": "锁定物品",
+      "unlockItem": "解锁物品",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -2453,7 +2484,8 @@ export const zh_CN: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "暂离"
+      "afkTag": "暂离",
+      "cheaterTag": "< 作弊者 >"
     },
     "mobTooltip": {
       "levelFamily": "等级 {level} {family}",
@@ -3224,6 +3256,7 @@ export const zh_CN: EnTranslations = {
       "craftedToast": "已制作:{name}",
       "craftedToastQty": "已制作:{name} x{qty}",
       "insufficientMaterials": "你没有足够的材料。",
+      "reagentLocked": "该配方所需的材料已锁定。",
       "unknownRecipe": "该配方不存在。",
       "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。",
       "comboRequires": "调谐要求：{craftA} + {craftB}，阶级 {tier}。",
@@ -3330,6 +3363,7 @@ export const zh_CN: EnTranslations = {
       "notHeld": "你没有那件物品。",
       "notDisenchantable": "你无法分解那件物品。",
       "notSalvageable": "你无法拆解那件物品。",
+      "salvageLocked": "该物品已锁定。",
       "disenchantBusy": "你正忙着。",
       "salvageBusy": "你正忙着。",
       "enchantBusy": "你正忙着。",
@@ -3924,6 +3958,12 @@ export const zh_CN: EnTranslations = {
       "genesis_token_claimed": "该 Seeker Genesis Token 已被领取。",
       "entitlement_required": "需要已验证的 Seeker 权益。",
       "current_ownership_required": "需要当前持有 Seeker Genesis Token。"
+    },
+    "cheater_mark": {
+      "admin_target": "管理员账号无法被标记。",
+      "reason_required": "必须填写原因。",
+      "invalid_duration": "标记时长至少需为 1 秒。",
+      "not_marked": "该账号未被标记。"
     }
   },
   "guide": {
@@ -6540,6 +6580,7 @@ export const zh_CN: EnTranslations = {
     "email": "邮箱",
     "emailPlaceholder": "you@example.com",
     "emailError": "请输入有效的邮箱地址。",
+    "marketingOptIn": "向我发送游戏新闻和更新邮件（可选）",
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
     "logIn": "登录",
@@ -6640,6 +6681,19 @@ export const zh_CN: EnTranslations = {
     "style": "风格",
     "resetLook": "重置外观",
     "resetShort": "重置",
+    "shareTab": "分享",
+    "designCode": "外观代码",
+    "designCodeHint": "复制此代码即可保存或分享这个造型。将代码粘贴到此处并导入即可加载造型。",
+    "copyCode": "复制代码",
+    "importCode": "导入",
+    "designCodeCopied": "外观代码已复制。",
+    "designCodeCopyManual": "此处无法自动复制。代码已选中，请使用键盘复制。",
+    "designCodeImported": "造型已导入。",
+    "designCodeImportedPartial": "造型已导入。此版本无法识别的数值已被跳过。",
+    "designCodeErrEmpty": "请先粘贴外观代码。",
+    "designCodeErrHeader": "这看起来不像外观代码。",
+    "designCodeErrVersion": "该外观代码来自更新的游戏版本。",
+    "designCodeErrMalformed": "该外观代码已损坏。请复制完整代码后重试。",
     "browFlat": "平直",
     "browArched": "拱形",
     "browThin": "细眉",
@@ -7760,7 +7814,15 @@ export const zh_CN: EnTranslations = {
       "readyBody": "退出游戏时将自动安装，也可立即重启。",
       "restart": "立即重启",
       "later": "稍后",
-      "dismiss": "关闭"
+      "dismiss": "关闭",
+      "whatsNew": "在浏览器中查看更新内容"
+    },
+    "notify": {
+      "updateReadyTitle": "更新 {version} 已就绪",
+      "updateReadyTitleNoVersion": "更新已就绪",
+      "updateReadyBody": "重启 World of ClaudeCraft 以应用更新。",
+      "partyInviteTitle": "组队邀请",
+      "partyInviteBody": "{name} 邀请你加入队伍。"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7772,6 +7834,7 @@ export const zh_CN: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
+    "bodyDiscreteInactive": "游戏没有使用独立（游戏）显卡，而是运行在节能显卡上，因此性能会下降。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
     "hybridBodyWindows": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。",
     "hybridBodyLinux": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。",
@@ -7999,7 +8062,111 @@ export const zh_CN: EnTranslations = {
       "zoomIn": "放大",
       "zoomOut": "缩小",
       "mapCanvasLabel": "地图",
-      "mapSummary": "{zone}的地图。"
+      "mapSummary": "{zone}的地图。",
+      "mapMarkerDescription": "{area}。{markers}",
+      "mapMarkerEmpty": "没有可见的重要标记。",
+      "mapMarkerLocated": "{marker}：{direction}，{distance}。",
+      "mapMarkerLocatedCount": "{marker}：{count}个；{direction}，{distance}。",
+      "mapMarkerMore": "另有 {count} 个标记。",
+      "mapMarkerDirections": {
+        "center": "中央",
+        "north": "北方",
+        "northeast": "东北方",
+        "east": "东方",
+        "southeast": "东南方",
+        "south": "南方",
+        "southwest": "西南方",
+        "west": "西方",
+        "northwest": "西北方"
+      },
+      "mapMarkerDistances": {
+        "near": "附近",
+        "medium": "中等距离",
+        "far": "远处"
+      },
+      "mapMarkerLabels": {
+        "you": "你",
+        "availableQuest": "可接任务",
+        "readyQuest": "可交任务",
+        "repeatQuest": "可重复任务",
+        "cooldownQuest": "冷却中的任务",
+        "questObjective": "任务目标区域",
+        "readyOre": "可采集矿点",
+        "readyWood": "可采伐木材点",
+        "readyHerb": "可采集草药点",
+        "readyLockedOre": "可采集矿点，工具未解锁",
+        "readyLockedWood": "可采伐木材点，工具未解锁",
+        "readyLockedHerb": "可采集草药点，工具未解锁",
+        "cooldownOre": "已枯竭的矿点",
+        "cooldownWood": "已枯竭的木材点",
+        "cooldownHerb": "已枯竭的草药点",
+        "cooldownLockedOre": "已枯竭的矿点，工具未解锁",
+        "cooldownLockedWood": "已枯竭的木材点，工具未解锁",
+        "cooldownLockedHerb": "已枯竭的草药点，工具未解锁",
+        "station": "制作站：{name}",
+        "service": "服务：{name}",
+        "partyMember": "队伍成员：{name}",
+        "deadPartyMember": "已死亡的队伍成员：{name}",
+        "partyMemberGeneric": "队伍成员",
+        "deadPartyMemberGeneric": "已死亡的队伍成员",
+        "friend": "好友：{name}",
+        "guildMember": "公会成员：{name}",
+        "pointOfInterest": "地标：{name}",
+        "dungeonEntrance": "地下城入口：{name}",
+        "dungeonExit": "地下城出口",
+        "delveEntrance": "探秘入口：{name}",
+        "worldPassage": "通往{zone}的通道",
+        "riftEntrance": "裂隙入口：{name}",
+        "hostileEnemy": "敌对目标",
+        "aggressiveEnemy": "正在攻击你的敌人",
+        "lootableEnemy": "可拾取战利品的敌人",
+        "corpse": "你的尸体",
+        "deathZone": "危险区域",
+        "teammate": "队友",
+        "deadTeammate": "已死亡的队友",
+        "flagCarrier": "携带旗帜的队友",
+        "ownFlagStand": "己方旗座",
+        "enemyFlagStand": "敌方旗座",
+        "riftDescent": "裂隙下行通道",
+        "riftReturnBeacon": "返回信标",
+        "riftReturnExit": "返回出口",
+        "ranked": "{marker}，阶级 {rank}",
+        "riftTreasureAvailable": "可开启的宝藏",
+        "riftTreasureLocked": "已上锁的宝藏",
+        "riftTreasureOpened": "已开启的宝藏",
+        "riftTreasureJammed": "已卡住的宝藏",
+        "riftCacheAvailable": "可开启的裂隙宝箱",
+        "riftCacheLocked": "已上锁的宝箱",
+        "riftCacheOpened": "已开启的宝箱",
+        "riftCacheJammed": "已卡住的宝箱",
+        "pylonUnlit": "未点亮的塔柱",
+        "pylonLit": "已点亮的塔柱",
+        "sequenceRuneUnlit": "未点亮的序列符文",
+        "sequenceRuneLit": "已点亮的序列符文",
+        "iceGoal": "冰面目标",
+        "boulderPad": "巨石目标点",
+        "boulderMovable": "可移动的巨石",
+        "boulderPlaced": "已就位的巨石",
+        "gateSealed": "封闭的大门",
+        "gateOpen": "开启的大门",
+        "switchReady": "可用的开关",
+        "switchOn": "已启动的开关",
+        "orbDormant": "休眠的法球",
+        "orbActive": "已激活的法球",
+        "rollerHazard": "滚轮陷阱",
+        "delvePassageSealed": "封闭的通道",
+        "delvePassageOpen": "开启的通道",
+        "delveSurfaceExit": "地表出口",
+        "delveCacheLocked": "已上锁的探秘宝箱",
+        "delveCacheReady": "探秘宝箱已就绪",
+        "delveCacheActive": "探秘宝箱已激活",
+        "delveCacheOpened": "已开启的探秘宝箱",
+        "delveReliquaryLocked": "已上锁的圣物匣",
+        "delveReliquaryReady": "圣物匣已就绪",
+        "delveReliquaryActive": "圣物匣仪式进行中",
+        "delveReliquaryOpened": "已开启的圣物匣",
+        "bountiful": "丰裕的{marker}"
+      }
     },
     "options": {
       "gameMenu": "游戏菜单",
@@ -8039,6 +8206,9 @@ export const zh_CN: EnTranslations = {
       "graphicsReloadNote": "图形质量和地形细节会在重新加载后生效。",
       "reloadNow": "立即重新加载",
       "fullscreen": "全屏",
+      "displayMode": "显示模式",
+      "displayModeBorderless": "无边框全屏",
+      "displayModeWindowed": "窗口",
       "touchLookSpeed": "触屏视角速度",
       "joystickSize": "摇杆大小",
       "buttonSize": "按钮大小",
@@ -8915,6 +9085,10 @@ export const zh_CN: EnTranslations = {
       "filterPrimaryStatAll": "任意主属性",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
+      "filterSort": "排序",
+      "sortName": "名称 (A-Z)",
+      "sortPriceAsc": "价格：从低到高",
+      "collapseLowest": "仅显示最低价",
       "weaponSword": "剑",
       "weaponDagger": "匕首",
       "weaponStaff": "法杖",
@@ -8945,6 +9119,8 @@ export const zh_CN: EnTranslations = {
       "quantity": "数量",
       "quantityOf": "共 {count}",
       "priceEach": "单价",
+      "lowestPriceLabel": "当前最低上架价格",
+      "lowestPriceNone": "该物品目前没有在售的上架。",
       "listButton": "上架到世界市场",
       "minPriceError": "价格至少为 1 铜币。",
       "collectEmpty": "没有待领取内容。销售收益和过期上架会在这里领取。",
@@ -9372,6 +9548,7 @@ export const zh_CN: EnTranslations = {
       "cheap_shot": {
         "name": "击腹拳",
         "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。",
+        "descriptionNoStealth": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。奖励 2 个连击点。",
         "specNote_subtlety": "从暮帷中使用可累积1层幽暝（最多3层）。幽暝达到3层时，无需潜行即可使用：该次使用不消耗能量，消耗全部3层幽暝，并开启持续6秒的暗影缠身。"
       },
       "sap": {
@@ -9584,7 +9761,7 @@ export const zh_CN: EnTranslations = {
       },
       "righteous_fury": {
         "name": "炽燃誓约",
-        "description": "被动地将你的神圣伤害所产生的威胁提高 60%。仅限信仰守卫。"
+        "description": "被动地将你的神圣伤害所产生的威胁提高 30%。仅限信仰守卫。"
       },
       "retribution_aura": {
         "name": "报偿光环",
@@ -9700,7 +9877,7 @@ export const zh_CN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
-        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 30% 护甲，受到的伤害降低 10%，并产生两倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。"
+        "description": "为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点伤害。增强还会获得 40% 护甲和 20% 耐力，受到的伤害降低 15%，免疫生物的致命一击，并产生 2.75 倍的威胁。大地震击迫使其目标攻击你 3 秒，而雷霆护罩则给予 3 秒 10% 的伤害减免。"
       },
       "healing_wave": {
         "name": "治愈之水",
@@ -9879,7 +10056,7 @@ export const zh_CN: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形态",
-        "description": "变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
+        "description": "变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
       },
       "maul": {
         "name": "碎骨击",
@@ -9889,6 +10066,10 @@ export const zh_CN: EnTranslations = {
       "growl": {
         "name": "威吓",
         "description": "对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。"
+      },
+      "challenging_roar": {
+        "name": "挑衅咆哮",
+        "description": "发出挑衅的咆哮：10 码内的每个敌人都被嘲讽，其对你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。"
       },
       "cat_form": {
         "name": "狼形态",
@@ -12221,6 +12402,9 @@ export const zh_CN: EnTranslations = {
       },
       "pristine_claw": {
         "name": "完美的爪"
+      },
+      "dawnhold_posy": {
+        "name": "晨曦堡花园小花束"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -16710,6 +16894,11 @@ export const zh_CN: EnTranslations = {
         "name": "最后的堡垒",
         "enterText": "你踏入最后的堡垒那冰冷而寂静的大厅。",
         "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
+      },
+      "dawnhold_castle": {
+        "name": "晨曦堡",
+        "enterText": "你走进晨曦堡温暖而花香四溢的厅堂。",
+        "leaveText": "你回到阳光洒落的花园草坪上。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

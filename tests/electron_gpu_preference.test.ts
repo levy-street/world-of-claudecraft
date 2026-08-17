@@ -847,8 +847,14 @@ describe('main.cjs gpu wiring pin', () => {
     // Moving the call inside whenReady is the most damaging silent regression: the
     // appendSwitch pair becomes a no-op (switches must land before 'ready') and the GPU
     // process can beat the registry write, reverting the whole fix while every unit test
-    // above stays green. Module scope = the call sits at column 0.
-    expect(source).toMatch(/^forceHighPerformanceGpu\(\{ app, log \}\);/m);
+    // above stays green. Module scope now means one level in, inside the else arm of the
+    // player's opt-out guard (the switches are appended on every platform before the
+    // function's own gates, so honoring the opt-out means skipping the CALL); the guard
+    // itself is still top-level, and its polarity is pinned in
+    // tests/electron_shell_startup.test.ts.
+    expect(source).toMatch(
+      /^if \(gpuForceDisabledByEnv\) \{\n[^\n]*\n\} else if \(desktopPrefs\.gpuForceOptOut === true\) \{\n[^\n]*\n\} else \{\n {2}forceHighPerformanceGpu\(\{ app, log \}\);\n\}/m,
+    );
     const callAt = source.indexOf('forceHighPerformanceGpu({ app, log });');
     const readyAt = source.indexOf('app.whenReady()');
     expect(callAt).toBeGreaterThan(-1);
@@ -863,9 +869,12 @@ describe('main.cjs gpu wiring pin', () => {
     // Any of these moving (into whenReady, below initLogging, losing the exit) silently
     // kills the fix while the pure-function tests above stay green.
     // One regex pins the whole shape: guard at column 0 with process.exit(0) as the block
-    // body (comments aside) and nothing else inside.
+    // body (comments aside) and nothing else inside. The guard is now the else arm of the
+    // player's GPU-force opt-out (skipping the relaunch is the only way to honor it, since
+    // the relaunch spawns a process and pins the X11 Ozone backend); the opt-out's own
+    // polarity is pinned in tests/electron_shell_startup.test.ts.
     expect(source).toMatch(
-      /^if \(relaunchForLinuxPrime\(\{ log: console \}\)\) \{\n(?:\s*\/\/[^\n]*\n)*\s*process\.exit\(0\);\n\}/m,
+      /^\} else if \(relaunchForLinuxPrime\(\{ log: console \}\)\) \{\n(?:\s*\/\/[^\n]*\n)*\s*process\.exit\(0\);\n\}/m,
     );
     const guardAt = source.indexOf('if (relaunchForLinuxPrime({ log: console })) {');
     expect(guardAt).toBeGreaterThan(-1);

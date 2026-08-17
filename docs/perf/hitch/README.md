@@ -212,19 +212,38 @@ long frames above their floor, and worst frames above 100 ms prove the referee d
 the production failure class. Optimization work changes the game until it passes. It
 does not loosen this benchmark.
 
-## Three r165 compileAsync patch
+## Three compileAsync patch (r165 analysis, carried to r185)
 
-`patches/three@0.165.0.patch` fixes a three r165 `compileAsync` disposal race. Crowd churn
-or a skin swap can release a material's renderer properties while three's timer poll is
-still pending. The unpatched poll then raises the uncaught window error
-`TypeError: Cannot read properties of undefined (reading 'isReady')` and leaves the
-`compileAsync` promise pending forever.
+`patches/three@0.185.1.patch` reworks three's `compileAsync` readiness poll
+(`checkMaterialsReady`) in three ways, each pinned by the installed-source guard test
+(`tests/three_compile_async_patch.test.ts`):
 
-When renderer properties no longer contain `currentProgram`, there is no shader program
-left for that material to wait on. The patch therefore removes the material from the
-pending set, preventing the TypeError and allowing the promise to settle. A future three
-upgrade must re-verify upstream `compileAsync` behavior and deliberately retain, replace,
-or remove the patch and its installed-source guard test.
+- Disposal race fix. Crowd churn or a skin swap can release a material's renderer
+  properties while three's timer poll is still pending. The unpatched poll then raises
+  the uncaught window error
+  `TypeError: Cannot read properties of undefined (reading 'isReady')` and leaves the
+  `compileAsync` promise pending forever. When renderer properties no longer contain
+  `currentProgram`, there is no shader program left for that material to wait on, so the
+  patch removes the material from the pending set and lets the promise settle.
+- Bounded, backed-off poll pass. Each `isReady()` call is a synchronous
+  `COMPLETION_STATUS_KHR` round-trip to the GPU process; the unpatched unbounded pass
+  measured 10.2 s on the production main thread under a link backlog. One pass now
+  checks pending materials round-robin under a small time budget, and the reschedule
+  interval backs off when a pass was expensive.
+- Per-pass program query dedup. Materials share linked programs through the program
+  cache and `isReady()` only caches a positive result, so while a shared program links,
+  every material holding it repaid the query inside the same pass. One not-ready verdict
+  per distinct program now covers all its materials for the rest of the pass.
+
+The analysis above was derived on r165, where the patch shipped as
+`patches/three@0.165.0.patch`. The desktop-client-update three-train upgrade (phase 6)
+re-verified upstream `compileAsync` on 0.185.1: `WebGLRenderer.compileAsync` is
+unchanged from r165 and all three defects remain, so the decision was RETAIN, taken by
+re-authoring the patch against the r185 sources (the bounded-poll and per-pass dedup
+improvements the release branch landed on the r165 patch were ported in as they
+arrived). The guard test pins the r185 form. Any future three upgrade must again
+re-verify upstream `compileAsync` behavior and deliberately retain, replace, or remove
+the patch and its installed-source guard test.
 
 ## Freeze rule
 

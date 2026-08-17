@@ -270,6 +270,74 @@ export function prewarmEntryShouldDefer(
   return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
 }
 
+/**
+ * True when the compile-submit loop must stop submitting units and leave the
+ * remainder to the compile entry or the resume lane. Each unit's compileAsync
+ * prologue is synchronous main-thread work, and one uninterrupted loop
+ * measured 22 s in production against the 15 s hard deadline, which dropped
+ * every entry behind it, the deadline-exempt debt payers included
+ * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively, and
+ * the Insane finish-full-manifest arm keeps submitting without bound: its
+ * contract is a complete manifest behind the cover.
+ */
+export function prewarmSubmitShouldStop(
+  nowMs: number,
+  gpuSubmitDeadlineMs: number,
+  finishFullManifestBeforeReveal: boolean,
+): boolean {
+  if (finishFullManifestBeforeReveal) return false;
+  return nowMs >= gpuSubmitDeadlineMs;
+}
+
+/**
+ * Manifest entries whose dropped remainder is the BULK link/upload debt of
+ * the INITIAL SCENE: hundreds of programs and whole-scene textures that,
+ * left unpaid, make ordinary first draws stall in live frames (the login
+ * storm's blocking reflection and texture-decode hitches). Their resume
+ * units run at BOOT_DEBT priority so cosmetic background warming (the
+ * char preview lane at BACKGROUND) cannot starve them, which production
+ * measured as minutes of unpaid debt after the reveal.
+ *
+ * Deliberately NOT in the set: the per-family VFX warmers
+ * (props.ghost-fade-variants, vfx.weapon-skins, vfx.ability-primitives).
+ * They also carry compile/upload units, but a handful per family whose first
+ * use is a specific event (a school's first impact, a skin's first draw),
+ * not the ambient scene: they stay on the cosmetic BOOT_RESUME arm below
+ * the preview lane, the pre-change behavior.
+ * `programs.compile-submit` here names the SYNTHETIC dropped entry the
+ * deferred-submit hand-off pushes (the manifest entry of that id declares no
+ * resumeUnits, so no other resume entry can carry it).
+ */
+const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
+  'programs.compile',
+  'programs.compile-submit',
+  'textures.scene',
+  'surface-detail.textures',
+]);
+
+/** True when a dropped entry's resume units are hitch-causing debt. */
+export function prewarmResumeIsDebt(entryId: string): boolean {
+  return PREWARM_DEBT_RESUME_IDS.has(entryId);
+}
+
+/**
+ * Stable debt-first ordering for the dropped-entry resume lane. The lane is
+ * strictly serial in array order (resumeDroppedPrewarmEntries), so the
+ * BOOT_DEBT queue priority alone cannot reorder it: in manifest order the
+ * cosmetic entries, which resume at BOOT_RESUME below the preview lane, sit
+ * ahead of the link/upload debt and the debt drains last, the production
+ * starvation this family exists to fix. Relative order inside each class is
+ * preserved.
+ */
+export function orderPrewarmResumeEntries<T extends { id: string }>(entries: readonly T[]): T[] {
+  const debt: T[] = [];
+  const cosmetic: T[] = [];
+  for (const entry of entries) {
+    (prewarmResumeIsDebt(entry.id) ? debt : cosmetic).push(entry);
+  }
+  return [...debt, ...cosmetic];
+}
+
 /** The mesh-shape bits three folds into a program's cache key, structurally
  * typed so this decision layer stays Three-free. */
 export interface ProgramContentMeshShape {
@@ -290,6 +358,9 @@ export interface ProgramContentMeshShape {
   morphColorCount?: number;
   /** geometry.attributes.tangent flips vertexTangents. */
   hasTangents?: boolean;
+  /** geometry.attributes.normal flips vertexNormals (a program cache-key bit
+   *  since r185, for every material type). */
+  hasNormals?: boolean;
   /** geometry.attributes.color itemSize (4 flips vertexAlphas); 0 = none. */
   vertexColorItemSize?: number;
   castShadow?: boolean;
@@ -297,13 +368,18 @@ export interface ProgramContentMeshShape {
 
 /**
  * Program-content keys for compile-unit dedupe: one key per material slot,
- * covering the object and geometry bits of three r165's program cache key
+ * covering the object and geometry bits of three r185's program cache key
  * this repo can produce (skinning, instancing and instance colour, batched
- * meshes, morph position/normal/colour presence and counts, tangents, vertex
- * colour item size, shadow casting). Not covered, on purpose: BatchedMesh
- * colour textures (batchingColor) and Points uv presence (pointsUvs), which
- * the repo does not produce on this path; adopt either and this key must
- * learn it. A coarser key elects a stand-in
+ * meshes, morph position/normal/colour presence and counts, tangents, normal
+ * presence, vertex colour item size, shadow casting). Not covered, on
+ * purpose: BatchedMesh colour textures (batchingColor) and Points uv
+ * presence (pointsUvs), which the repo does not produce on this path (adopt
+ * either and this key must learn it); hasPositionAttribute (every drawable
+ * prewarm root carries positions, constant true); reversedDepthBuffer
+ * (renderer-level, never enabled here) and numLightProbeGrids (scene-level,
+ * no grids), constant per session like logarithmicDepthBuffer; and the
+ * material-derived bits (packedNormalMap, decodeVideoTextureEmissive), which
+ * the per-material id axis already separates. A coarser key elects a stand-in
  * whose program variant differs, and every other geometry shape of that
  * material is SKIPPED by the dedupe and relinks synchronously at first draw,
  * which is the stall the compile lane exists to prevent. In-repo fidelity
@@ -318,8 +394,8 @@ export function prewarmProgramContentKeys(
     `${shape.hasInstanceColor ? 'ic' : ''}${shape.isBatchedMesh ? 'b' : ''}` +
     `${shape.hasMorphPositions ? 'P' : ''}p${shape.morphTargetCount ?? 0}` +
     `n${shape.morphNormalCount ?? 0}k${shape.morphColorCount ?? 0}` +
-    `${shape.hasTangents ? 't' : ''}v${shape.vertexColorItemSize ?? 0}` +
-    `${shape.castShadow ? 'c' : ''}`;
+    `${shape.hasTangents ? 't' : ''}${shape.hasNormals ? 'N' : ''}` +
+    `v${shape.vertexColorItemSize ?? 0}${shape.castShadow ? 'c' : ''}`;
   return materialIds.map((id) => `${token}:${id}`);
 }
 
@@ -331,15 +407,19 @@ export function prewarmProgramContentKeys(
  * measured 12.4 s behind the loading cover). The signature folds exactly the
  * inputs three keys program defines on that the mesh-shape token does not
  * already carry: material type, hook identity (customProgramCacheKey, whose
- * three default is onBeforeCompile source), the texture-channel presence
- * bits, blending/alpha-test, vertex colors, flat shading, fog opt-out and
- * side. An imperfect signature is fail-soft: world.initial-frame's own
+ * three default is onBeforeCompile source), custom vertex/fragment source,
+ * defines, the texture-channel presence bits, blending/alpha-test, vertex
+ * colors, flat shading, fog opt-out and side. An imperfect signature is
+ * fail-soft: world.initial-frame's own
  * guaranteed submit (its start is bounded ahead of the hard deadline by
  * prewarmCompileAwaitDeadline) links any residue behind the loading cover
  * there, instead of at first live draw. */
 export function materialProgramSignature(material: {
   type?: string;
   customProgramCacheKey?: () => string;
+  vertexShader?: string;
+  fragmentShader?: string;
+  defines?: Record<string, unknown>;
   map?: unknown;
   normalMap?: unknown;
   bumpMap?: unknown;
@@ -361,11 +441,18 @@ export function materialProgramSignature(material: {
   side?: number;
 }): string {
   const bit = (value: unknown): string => (value ? '1' : '0');
+  const source = (value: string | undefined): string =>
+    value === undefined ? '' : `${value.length}:${value}`;
   const hook =
     typeof material.customProgramCacheKey === 'function' ? material.customProgramCacheKey() : '';
+  const defineEntries = Object.entries(material.defines ?? {});
+  const defines = defineEntries.length > 0 ? JSON.stringify(defineEntries) : '';
   return [
     material.type ?? '',
     hook,
+    source(material.vertexShader),
+    source(material.fragmentShader),
+    defines,
     bit(material.map),
     bit(material.normalMap),
     bit(material.bumpMap),

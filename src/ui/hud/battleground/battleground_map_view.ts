@@ -36,6 +36,28 @@ export interface BgMapModel {
   halfZ: number;
 }
 
+/** The inset used by both the visible battleground plate and semantic marker
+ * projection. Keeping this in the pure view prevents accessibility distances
+ * from describing a different screen position than the painter draws. */
+export const BG_MAP_FIELD_PAD_PX = 18;
+
+export function bgMapFitScale(canvasSize: number, halfX: number, halfZ: number): number {
+  return Math.min(
+    (canvasSize - BG_MAP_FIELD_PAD_PX * 2) / (halfX * 2),
+    (canvasSize - BG_MAP_FIELD_PAD_PX * 2) / (halfZ * 2),
+  );
+}
+
+/** Project oriented field-local +x leftward on the M-map canvas. */
+export function bgMapCanvasX(x: number, canvasSize: number, scale: number): number {
+  return canvasSize / 2 - x * scale;
+}
+
+/** Project oriented field-local +z upward on the M-map canvas. */
+export function bgMapCanvasY(z: number, canvasSize: number, scale: number): number {
+  return canvasSize / 2 - z * scale;
+}
+
 const INACTIVE: BgMapModel = {
   active: false,
   myTeam: 0,

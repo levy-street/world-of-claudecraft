@@ -27,6 +27,12 @@ import { MobileActionRingPainter } from '../src/ui/hud/action_bar/mobile_action_
 import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 import { assertAllocationStable } from './util/alloc_probe';
 
+const HUD_CSS = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+const MOBILE_HUD_CSS = readFileSync(
+  new URL('../src/styles/hud.mobile.css', import.meta.url),
+  'utf8',
+);
+
 type Call = { m: keyof PainterHostWriters; args: unknown[] };
 
 function recordingFacet() {
@@ -194,6 +200,48 @@ describe('mobile action ring: source-slot state per page', () => {
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
     const state = view.tick(idleWorld());
     expect(state.slots[1].kind).toBe('empty');
+  });
+});
+
+describe('mobile action ring: proc state remains perceptible', () => {
+  function ruleBody(css: string, selector: string): string {
+    const start = css.indexOf(`${selector} {`);
+    expect(start, selector).toBeGreaterThanOrEqual(0);
+    const open = css.indexOf('{', start);
+    const close = css.indexOf('}', open);
+    expect(close, selector).toBeGreaterThan(open);
+    return css.slice(open + 1, close);
+  }
+
+  it('renders the shared proc class on touch as well as desktop', () => {
+    expect(HUD_CSS).toMatch(/\.action-btn\.proc\s*\{[^}]*abtn-proc-pulse/s);
+    expect(MOBILE_HUD_CSS).toMatch(
+      /body\.mobile-touch #mobile-action-ring button\.proc\s*\{[^}]*abtn-proc-pulse/s,
+    );
+  });
+
+  it('uses a double system-color border as the forced-colors shape cue', () => {
+    expect(HUD_CSS).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?\.action-btn\.proc\s*\{[^}]*border:\s*3px double Highlight/,
+    );
+    expect(MOBILE_HUD_CSS).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?button\.proc\s*\{[^}]*border:\s*3px double Highlight/,
+    );
+  });
+
+  it('stops the touch proc pulse under reduced motion', () => {
+    const steadyRule = ruleBody(
+      MOBILE_HUD_CSS,
+      'body.mobile-touch #mobile-action-ring button.proc',
+    );
+    expect(steadyRule).toContain('border-color: #ffd97a;');
+    expect(steadyRule).toMatch(/box-shadow:\s*[\s\S]*#ffcf40e6/);
+    // The override may share its block with other selectors (button.empowered
+    // groups with it upstream): [^{]* spans the rest of the selector list, so
+    // this still proves button.proc itself receives animation: none.
+    expect(MOBILE_HUD_CSS).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?body\.mobile-touch #mobile-action-ring button\.proc[^{]*\{[^}]*animation:\s*none/,
+    );
   });
 });
 

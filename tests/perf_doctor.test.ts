@@ -168,7 +168,7 @@ describe('integrated-gpu rule', () => {
     expect(suggestions.map((s) => s.id)).not.toContain('integrated-gpu');
   });
 
-  it('never fires inside the desktop shell, which already forces the dGPU', () => {
+  it('never fires inside the desktop shell, whose messaging the boot gpu notice owns', () => {
     const suggestions = analyzePerfSuggestions(
       { ...base, windows: badWindow, renderer: { ...base.renderer, glRenderer: IRIS_XE } },
       '',

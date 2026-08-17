@@ -16,7 +16,6 @@ import type { Entity } from '../types';
 
 export const DEBT_OF_LIGHT_KIND = 'paladin_debt_of_light' as const;
 export const DEBT_OF_LIGHT_DEVOTION = 1;
-export const DEBT_OF_LIGHT_ABILITY_ID = 'faithforged_guard';
 
 export interface DebtOfLightAnswer {
   /** Damage removed from the incoming hit, and the Holy damage owed back. */

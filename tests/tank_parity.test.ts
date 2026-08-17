@@ -7,8 +7,9 @@ import { armorReduction, type EquipSlot, type ItemDef, type PlayerClass } from '
 // Tank parity (2026-07): the three committed tanks land within a band of each
 // other in effective HP against a level-22 heroic mob, each with a distinct
 // texture. Warrior: parry + block + Defensive Stance (the pure-tank ceiling).
-// Paladin: best armor + staPct 0.35 baseline. Druid: Sloth Form 2.3x armor +
-// feral staPct 0.25 (the Dire-Bear logic: the form fakes the missing plate
+// Paladin: best armor + staPct 0.35 baseline. Druid: Bruin Form 2.1x armor +
+// a 1.3x form health pool (the v0.38 retune: the bear owns the biggest raw
+// pool, funded by the armor trim, and the form still fakes the missing plate
 // tier out of leather). Before the parity pass the paladin sat at 76% and the
 // druid at 66% of the warrior's EHP.
 

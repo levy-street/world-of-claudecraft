@@ -2,6 +2,11 @@ import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
+import {
+  collectPrewarmTextures,
+  uploadTexturesInSlices,
+  yieldToMainThread,
+} from '../texture_prewarm';
 import { mechAssetsReady, preloadMechAssets } from './assets';
 import { modularVisualKey, VISUALS, type WeaponLayoutOverride } from './manifest';
 import {
@@ -67,7 +72,10 @@ export class CharacterPreview {
   private appearanceSig: string | null = null;
   /** Look handed to the next modular rebuild (setVisualKey reads it back). */
   private pendingLook: ModularLook | null = null;
-  private clock = new THREE.Clock();
+  // THREE.Timer, not the r183-deprecated Clock: update() advances it once per
+  // frame, reset() re-anchors it after a non-animating span (Clock's
+  // discard-getDelta drain pattern).
+  private timer = new THREE.Timer();
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private unregisterContext: (() => void) | null = null;
@@ -381,10 +389,22 @@ export class CharacterPreview {
       await this.renderer.compileAsync(this.scene, this.camera);
       // A chroma swap rebinds body textures. Upload every class variant now so
       // clicking a skin swatch cannot turn the preview's next rAF into a first-
-      // use texture upload.
+      // use texture upload. The uploads themselves are prepaid in bounded
+      // slices before each draw: a cold skin's render otherwise pays them all
+      // in one synchronous block (128 to 155 ms per paced unit in production).
+      const textures = new Set<THREE.Texture>();
       for (const skin of new Set(skinIndices)) {
+        if (this.destroyed) break;
         this.currentVisual.setSkin(skin);
+        textures.clear();
+        collectPrewarmTextures(this.scene, textures);
+        await uploadTexturesInSlices(this.renderer, textures, {
+          yieldToMain: yieldToMainThread,
+          isCancelled: () => this.destroyed,
+        });
+        if (this.destroyed) break;
         this.renderer.render(this.scene, this.camera);
+        await yieldToMainThread();
       }
     } finally {
       this.currentSkin = previousSkin;
@@ -403,7 +423,7 @@ export class CharacterPreview {
       this.pendingActive = null;
       this.renderActive = requestedActive ?? wasActive;
       if (requestedActive !== null) this.syncSize();
-      this.clock.getDelta();
+      this.timer.reset();
     }
   }
 
@@ -491,12 +511,14 @@ export class CharacterPreview {
         this.container.clientHeight,
       )
     ) {
-      // Drain the clock while hidden so reopening cannot produce a large animation step.
-      this.clock.getDelta();
+      // Re-anchor the timer while hidden so reopening cannot produce a large
+      // animation step.
+      this.timer.reset();
       return;
     }
 
-    const dt = Math.min(this.clock.getDelta(), 0.1); // cap dt to prevent huge jumps
+    this.timer.update();
+    const dt = Math.min(this.timer.getDelta(), 0.1); // cap dt to prevent huge jumps
     if (!this.renderActive) return;
 
     // No idle auto-rotation: the character holds its face-on pose (the classic

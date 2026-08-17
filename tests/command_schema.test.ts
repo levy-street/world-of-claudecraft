@@ -61,9 +61,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // are, and the numbers below were set from a run, not from this narrative.
 // This branch adds buy_redesign_credit as a send + dispatch pair (the Stylist's
 // redesign-credit purchase; carries the NPC entity id, which the Sim re-validates
-// against the Stylist template).
-const EXPECTED_SEND_COUNT = 198;
-const EXPECTED_DISPATCH_COUNT = 211;
+// against the Stylist template), ON TOP of the release/v0.39.0 pairs. Both sides
+// moved these counts, which is exactly the merge trap the note above describes:
+// the numbers below came from a suite run on the MERGED tree, not from adding
+// one to either side.
+const EXPECTED_SEND_COUNT = 200;
+const EXPECTED_DISPATCH_COUNT = 213;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

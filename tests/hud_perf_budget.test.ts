@@ -649,9 +649,10 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // are intentionally outside this HUD-painter file.)
 //
 // The counted reads are the token resolves this file's prose used to merely assert: each of
-// the three map-family painters holds ONE getComputedStyle pass over the document element,
+// the map-family painters holds ONE getComputedStyle pass over the document element,
 // reading its whole --color-* group in one go. Their cadences differ and the old flat "once
-// per redraw" hid it: minimap caches the resolve for the session, while map and delve
+// per redraw" hid it: minimap and lastkeep (the walk-in castle floor plan, which caches by
+// the MinimapPainter rule) resolve once for the session, while map and delve
 // re-resolve on every redraw. unit_portrait keys its decode-race guard off
 // canvas.dataset.portrait, 4 accesses around one async image decode, two of them writes at
 // the start of a decode and two of them reads that abandon a decode whose unit changed;
@@ -662,6 +663,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/battleground/battleground_atlas_marks_painter.ts', allow: {}, reflowAllow: {} },
   // the M-map Thornhollow Fields plan: canvas-only, redrawn on the map cadence;
   // like minimap it caches its one --color-* group resolve for the session
@@ -670,6 +672,7 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: {},
     reflowAllow: { getComputedStyle: 1 },
   },
+  { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'perf_graph_painter.ts', allow: {}, reflowAllow: {} },
@@ -885,6 +888,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       '.scrollLeft': 1,
       '.getBoundingClientRect': 1,
     },
+    driverAllow: {},
+  },
+  // One map-canvas projection read at the bounded map-paint boundary. Pointer hover and
+  // touch hit tests consume only the controller-owned cache, so no pointer event can force
+  // layout.
+  {
+    file: 'hud/map/map_marker_interaction_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
   { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
@@ -1314,6 +1325,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     const controllers = ON_DISK_PAINTERS.filter((f) => f.endsWith('_controller.ts'));
     expect(controllers.length, 'the HUD controllers vanished from the sweep').toBeGreaterThan(10);
     expect(controllers).toContain('hud/chat/chat_geometry_controller.ts');
+    expect(COLD_PAINTERS).toContain('hud/map/map_marker_interaction_controller.ts');
     expect(COLD_PAINTERS).toContain('hud/fiesta/fiesta_controller.ts');
   });
 

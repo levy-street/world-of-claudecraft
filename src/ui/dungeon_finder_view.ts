@@ -40,8 +40,6 @@ import type {
 
 export type FinderTab = 'catalogue' | 'queue' | 'board';
 
-export const FINDER_TABS: readonly FinderTab[] = ['catalogue', 'queue', 'board'];
-
 // Directory of the prerendered boss portrait stills (WebP, fixed 128x128).
 export const FINDER_PORTRAIT_DIR = '/ui/dungeons';
 
@@ -278,7 +276,13 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
     const loot = (mob.loot ?? []).filter((e) => !e.questId);
     const { groups, singles } = lootGroups(loot);
     let copper = 0;
-    for (const e of loot) if (e.copper) copper += e.copper;
+    // Mirror the roller's money arm: a heroic activity's finale pays the
+    // raised heroicCopper base (same truthy-copper gate), so the preview
+    // must advertise the number the kill actually pays.
+    const heroicFinale = activity.difficulty === 'heroic' && enc.final === true;
+    for (const e of loot)
+      if (e.copper)
+        copper += heroicFinale && e.heroicCopper !== undefined ? e.heroicCopper : e.copper;
     const heroicGroups =
       activity.difficulty === 'heroic' && enc.final
         ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? []).groups

@@ -3,6 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { SkeletonUpdateCache } from '../src/render/characters/skeleton_update_cache';
 import { skeletonPaletteNeedsUpdate } from '../src/render/characters/skeleton_update_core';
 
+// r185 types boneMatrices nullable; a bound rig always has a palette.
+function palette(skeleton: THREE.Skeleton): number[] {
+  const matrices = skeleton.boneMatrices;
+  if (matrices === null) throw new Error('skeleton.boneMatrices not initialized');
+  return [...matrices];
+}
+
 function rig(): {
   model: THREE.Group;
   rootBone: THREE.Bone;
@@ -50,10 +57,10 @@ describe('SkeletonUpdateCache', () => {
     const cache = new SkeletonUpdateCache(model);
 
     skeleton.update();
-    const initialPalette = [...skeleton.boneMatrices];
+    const initialPalette = palette(skeleton);
     skeleton.update();
     expect(originalUpdate).toHaveBeenCalledTimes(1);
-    expect([...skeleton.boneMatrices]).toEqual(initialPalette);
+    expect(palette(skeleton)).toEqual(initialPalette);
     expect(cache.stats()).toEqual({
       requests: 2,
       updates: 1,
@@ -67,14 +74,14 @@ describe('SkeletonUpdateCache', () => {
     skeleton.update();
     expect(originalUpdate).toHaveBeenCalledTimes(2);
     expect(cache.stats().updates).toBe(2);
-    const posedPalette = [...skeleton.boneMatrices];
+    const posedPalette = palette(skeleton);
     expect(posedPalette).not.toEqual(initialPalette);
 
     model.position.z = 3;
     model.updateMatrixWorld(true);
     skeleton.update();
     expect(originalUpdate).toHaveBeenCalledTimes(3);
-    expect([...skeleton.boneMatrices]).not.toEqual(posedPalette);
+    expect(palette(skeleton)).not.toEqual(posedPalette);
     expect(cache.stats()).toEqual({
       requests: 4,
       updates: 3,

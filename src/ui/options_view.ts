@@ -197,6 +197,25 @@ export interface OptionsEnv {
   touch: boolean;
   /** isNativeAppShell(): hides the Interface Mode picker (the shell forces touch). */
   nativeShell: boolean;
+  /** desktopGpuPrefSupported(): reveals the desktop GPU preference row. A BRIDGE
+   *  CAPABILITY, deliberately not nativeShell (which is also true in the mobile
+   *  shells, and is true for a desktop shell too old to have the preference).
+   *  Absent (the web/offline callers) means the row never renders. */
+  desktopGpuPref?: boolean;
+  /** desktopDisplayModeSupported(): the shell owns the window, so the Display
+   *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
+   *  toggle (asking the browser for fullscreen inside an already-fullscreen
+   *  shell window makes the two fight). Also a BRIDGE CAPABILITY, not
+   *  nativeShell: a desktop shell too old to have display modes keeps the
+   *  browser toggle, which is what actually works there. Absent (the
+   *  web/offline callers) means the picker never renders. */
+  desktopDisplayMode?: boolean;
+  /** desktopDiscordPresenceSupported(): reveals the Discord Rich Presence row.
+   *  A BRIDGE CAPABILITY like the two above, deliberately not nativeShell: the
+   *  mobile shells cannot publish a presence at all, and neither can a desktop
+   *  shell installed before it shipped. Absent (the web/offline callers) means
+   *  the row never renders. */
+  desktopDiscordPresence?: boolean;
 }
 
 const slider = (
@@ -256,6 +275,14 @@ const choice = (
 
 const note = (textKey: TranslationKey): NoteControl => ({ control: 'note', textKey });
 
+// The desktop shell's window modes, in the order a player reads them: the
+// smaller window first, the default (borderless fullscreen) second, matching
+// the stored numbers 0 and 1 so the picker's order is the setting's order.
+const displayModeOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hud.options.displayModeWindowed' },
+  { value: 1, labelKey: 'hud.options.displayModeBorderless' },
+];
+
 // The advanced-preset sub-setting ladders (round 10). Values are the
 // PERSISTED numbers gfx.ts maps to knob levels: the historical binary rows
 // stored 0 (Low) and 1 (High), so those keep their meaning and the new
@@ -267,9 +294,14 @@ const qualityLadderOptions: ChoiceOption[] = [
   { value: 1, labelKey: 'hud.options.graphicsPresetHigh' },
   { value: 2, labelKey: 'hud.options.graphicsPresetInsane' },
 ];
-// Effects & Lighting stops at High (the full high-tier post stack); the
-// ultra/insane tiers' full-res AO rides the preset, not this dial.
-const effectsLadderOptions: ChoiceOption[] = [
+// The High-capped three-step ladder, shared by the dials that stop at High.
+// Effects & Lighting: High is already the full high-tier post stack (the
+// ultra/insane tiers' full-res AO rides the preset, not this dial). Shadow
+// Quality: High is the 4096 map, and the retired Insane rung's single
+// 8192x8192 shadow target was a ~256 MB-class GPU allocation redrawn every
+// frame for marginal visible gain. Particle Effects: a three-step band clamp
+// by design (see its gfx.ts mapping).
+const highCapLadderOptions: ChoiceOption[] = [
   { value: 0, labelKey: 'hud.options.graphicsPresetLow' },
   { value: 0.5, labelKey: 'hud.options.graphicsPresetMedium' },
   { value: 1, labelKey: 'hud.options.graphicsPresetHigh' },
@@ -420,8 +452,8 @@ export function buildGraphicsSections(
     choice(s, 'characterDetail', 'hudChrome.options.gfxCharacterDetail', lowHighOptions, true),
   ];
   const lighting: OptionsControl[] = [
-    choice(s, 'effectsQuality', 'hud.options.effectsQuality', effectsLadderOptions, true),
-    choice(s, 'shadowQuality', 'hud.options.shadowQuality', qualityLadderOptions, true),
+    choice(s, 'effectsQuality', 'hud.options.effectsQuality', highCapLadderOptions, true),
+    choice(s, 'shadowQuality', 'hud.options.shadowQuality', highCapLadderOptions, true),
     choice(
       s,
       'ambientOcclusion',
@@ -436,7 +468,7 @@ export function buildGraphicsSections(
       s,
       'particleEffects',
       'hudChrome.options.gfxParticleEffects',
-      effectsLadderOptions,
+      highCapLadderOptions,
       true,
     ),
     // The per-effect switches ride the post chain: Effects & Lighting on Low
@@ -452,7 +484,13 @@ export function buildGraphicsSections(
     slider(s, 'renderScale', 'hud.options.renderQuality'),
     slider(s, 'brightness', 'hud.options.brightness'),
     slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1),
-    toggle(s, 'fullscreen', 'hud.options.fullscreen'),
+    // One row, two meanings by host. A desktop shell that owns the window gets
+    // the mode picker (it also covers "make the window smaller", which the
+    // browser toggle cannot); every other host keeps the browser Fullscreen
+    // toggle byte for byte, so the web and mobile arms are untouched.
+    env.desktopDisplayMode
+      ? choice(s, 'displayMode', 'hud.options.displayMode', displayModeOptions)
+      : toggle(s, 'fullscreen', 'hud.options.fullscreen'),
     toggle(s, 'weather', 'game.settings.weather'),
     // Opt-in wake/ripple simulation on water (default off): the one water effect
     // that runs extra GPU passes; bubbles and splashes are unaffected. It sits
@@ -608,31 +646,55 @@ export const INTERFACE_TAB_LABEL_KEY: Record<InterfaceTab, TranslationKey> = {
 const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
   controls.map((c): OptionsControl => ({ ...c, category }));
 
-export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
+export function buildInterfaceControls(
+  s: OptionsSettingsSource,
+  env?: OptionsEnv,
+): OptionsControl[] {
+  const general: OptionsControl[] = [
+    // uiScale commits on release: applying it live rescales the whole UI (the
+    // options window included), which shoves the slider under the cursor and
+    // makes the value hard to land (issue 1558).
+    { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
+    slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
+    slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
+    boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
+    boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
+    boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
+    // Camera comfort (mouse-look direction), so it sits with the comfort
+    // toggles rather than the Combat tab's attack/action-bar cluster.
+    boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
+    boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
+    boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
+    boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
+    boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
+    boolToggle(s, 'showPlaytime', 'hudChrome.options.showPlaytime'),
+    boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
+    boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
+    boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
+    boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+  ];
+  // The desktop shell's GPU preference, last in the tab so the web arm's row
+  // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a
+  // desktop shell that actually exposes the preference; its note carries the
+  // next-launch caveat (the shell applies the choice at startup, not live).
+  if (env?.desktopGpuPref) {
+    general.push(
+      boolToggle(s, 'forceHighPerfGpu', 'hudChrome.options.forceHighPerfGpu'),
+      note('hudChrome.options.forceHighPerfGpuNote'),
+    );
+  }
+  // Discord Rich Presence, behind its own bridge capability (an older shell has
+  // the GPU preference but not this one, so the two gates are independent). Its
+  // note carries the privacy caveat: the activity is visible to anyone who can
+  // see the player's Discord profile.
+  if (env?.desktopDiscordPresence) {
+    general.push(
+      boolToggle(s, 'discordPresence', 'hudChrome.options.discordPresence'),
+      note('hudChrome.options.discordPresenceNote'),
+    );
+  }
   return [
-    ...tag('general', [
-      // uiScale commits on release: applying it live rescales the whole UI (the
-      // options window included), which shoves the slider under the cursor and
-      // makes the value hard to land (issue 1558).
-      { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
-      slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
-      slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
-      boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
-      boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
-      boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
-      // Camera comfort (mouse-look direction), so it sits with the comfort
-      // toggles rather than the Combat tab's attack/action-bar cluster.
-      boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
-      boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
-      boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
-      boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
-      boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
-      boolToggle(s, 'showPlaytime', 'hudChrome.options.showPlaytime'),
-      boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
-      boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
-      boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
-      boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
-    ]),
+    ...tag('general', general),
     ...tag('frames', [
       slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
       slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),

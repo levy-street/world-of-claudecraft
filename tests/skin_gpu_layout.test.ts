@@ -134,7 +134,9 @@ describe('skinned character GPU layout', () => {
     const { root, mesh } = makeRig();
     optimizeSkinGpuLayout(root);
     mesh.skeleton.update();
-    const paletteBefore = Array.from(mesh.skeleton.boneMatrices);
+    // r185 types boneMatrices nullable; a bound rig always has a palette.
+    const paletteBefore = Array.from(mesh.skeleton.boneMatrices ?? []);
+    expect(paletteBefore).not.toHaveLength(0);
 
     const stats = configureTightBoneTextures(root);
     const texture = mesh.skeleton.boneTexture;

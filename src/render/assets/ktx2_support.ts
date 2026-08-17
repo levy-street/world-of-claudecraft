@@ -26,9 +26,12 @@ const TRANSCODER_PATH = '/basis/';
 
 let ktx2: KTX2Loader | null = null;
 
-// The extension each KTX2Loader workerConfig flag answers to: the exact names
-// three r165's detectSupport queries on its WebGL arm. A raw context probe
-// through this table gives the same capability answer as the full renderer.
+// The extension each presence-style KTX2Loader workerConfig flag answers to:
+// the exact names three r185's detectSupport queries on its WebGL arm. A raw
+// context probe through this table, plus the two r185 extras handled inside
+// ktx2WorkerConfigFromRawContext (the ASTC HDR profile query and the Linux
+// Mesa emulated-format filter), gives the same capability answer as the full
+// renderer.
 const KTX2_SUPPORT_EXTENSIONS = {
   astcSupported: 'WEBGL_compressed_texture_astc',
   etc1Supported: 'WEBGL_compressed_texture_etc1',
@@ -38,7 +41,9 @@ const KTX2_SUPPORT_EXTENSIONS = {
   pvrtcSupported: 'WEBGL_compressed_texture_pvrtc',
 } as const;
 
-type Ktx2WorkerConfig = Record<keyof typeof KTX2_SUPPORT_EXTENSIONS, boolean>;
+type Ktx2WorkerConfig = Record<keyof typeof KTX2_SUPPORT_EXTENSIONS, boolean> & {
+  astcHDRSupported: boolean;
+};
 
 interface RawGlContext {
   getExtension(name: string): unknown;
@@ -52,10 +57,45 @@ const PVRTC_WEBKIT_ALIAS = 'WEBKIT_WEBGL_compressed_texture_pvrtc';
  *  Exported for direct unit coverage of the fallback probe. */
 export function ktx2WorkerConfigFromRawContext(gl: RawGlContext): Ktx2WorkerConfig {
   const config = {} as Ktx2WorkerConfig;
-  for (const key of Object.keys(KTX2_SUPPORT_EXTENSIONS) as (keyof Ktx2WorkerConfig)[]) {
-    config[key] = gl.getExtension(KTX2_SUPPORT_EXTENSIONS[key]) != null;
+  let astcExtension: unknown = null;
+  for (const key of Object.keys(
+    KTX2_SUPPORT_EXTENSIONS,
+  ) as (keyof typeof KTX2_SUPPORT_EXTENSIONS)[]) {
+    const extension = gl.getExtension(KTX2_SUPPORT_EXTENSIONS[key]);
+    if (key === 'astcSupported') astcExtension = extension;
+    config[key] = extension != null;
   }
   config.pvrtcSupported = config.pvrtcSupported || gl.getExtension(PVRTC_WEBKIT_ALIAS) != null;
+  // r185's WebGL arm answers two questions r165's did not; both are mirrored
+  // here so the raw probe's answer stays identical to detectSupport's.
+  // 1) ASTC HDR: true only when the astc extension itself lists the 'hdr'
+  //    profile. three calls getSupportedProfiles unguarded; a raw context can
+  //    hand back partial shims (tests, exotic hosts), so a missing method
+  //    degrades to false here instead of throwing.
+  const astc = astcExtension as { getSupportedProfiles?: () => string[] } | null;
+  config.astcHDRSupported =
+    typeof astc?.getSupportedProfiles === 'function' && astc.getSupportedProfiles().includes('hdr');
+  // 2) The Linux Mesa emulated-format filter: Chrome/Firefox on Linux expose
+  //    ASTC/ETC for AMD/Intel GPUs whose hardware lacks them (the driver
+  //    software-decompresses on sample), so when every non-emulated format is
+  //    also present, three disables the likely-emulated trio and transcodes
+  //    to BPTC/S3TC instead. Same guard clauses and same flag writes as the
+  //    r185 source (which deliberately leaves astcHDRSupported alone).
+  if (
+    typeof navigator !== 'undefined' &&
+    typeof navigator.platform !== 'undefined' &&
+    typeof navigator.userAgent !== 'undefined' &&
+    navigator.platform.indexOf('Linux') >= 0 &&
+    navigator.userAgent.indexOf('Android') < 0 &&
+    config.astcSupported &&
+    config.etc2Supported &&
+    config.bptcSupported &&
+    config.dxtSupported
+  ) {
+    config.astcSupported = false;
+    config.etc1Supported = false;
+    config.etc2Supported = false;
+  }
   return config;
 }
 
@@ -113,6 +153,7 @@ function detectViaThrowawayContext(loader: KTX2Loader): void {
       console.warn('[ktx2] no probe context; transcoding to uncompressed RGBA');
       loader.workerConfig = {
         astcSupported: false,
+        astcHDRSupported: false,
         etc1Supported: false,
         etc2Supported: false,
         dxtSupported: false,

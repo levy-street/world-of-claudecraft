@@ -165,13 +165,20 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
 - `market_listing_ids.ts`: the World Market id allocator, including the reserved house
   band and load-time reissue that keeps one row per id.
 - `resurrection.ts`: both sicknesses (The Keeper's Toll and the shorter Unstuck one),
-  shared by every death site.
+  shared by every death site, PLUS the two "which auras survive this wipe" predicates
+  every wipe site routes through so the rule cannot drift: `aurasSurvivingDeath` (death
+  and every respawn/resurrect path) and `aurasSurvivingCleanSlate` (the harsher arena
+  entry and Fiesta down wipes, which shed even the sicknesses).
 - `ride_height.ts`: the waterline ride height slope gating reads for wading and
   swimming bodies (gating on the RAW lakebed height reads an uneven bed as a wall of
   cliffs and sticks waders in shore pockets).
 - `mob/mechanic_spacing.ts`: the rift boss shared mechanic spacing lock and its
   oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
   `runMobAttackMechanics` drivers.
+- `stun_dr.ts`: CC diminishing-return categories, PLUS the PvP diminishing-returns
+  ladder: the seven `PVP_*_DR_*` reset/multiplier/duration constants and the
+  player-sourced crowd-control funnel, `crowdControlDurationAfterDr`/
+  `diminishedCrowdControlDuration`.
 - `jail.ts`: moderation-jail cage layout, gate teleport, and visitor spot; the jail
   SYSTEM logic stays on `Sim`.
 - `professions/proficiency_display_heal.ts`: the one-time gathering-proficiency

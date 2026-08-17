@@ -2,6 +2,8 @@
 // Esc options menu. Pure + persisted to localStorage; main.ts applies each
 // value to the live subsystem (Input / GameAudio / MusicDirector / Renderer).
 
+import { parseStoredJson } from './local_storage_json';
+
 // Camera default is 0.7: the old fixed speed (1.0) was near the top of the
 // reasonable range and drew complaints, so out of the box it's calmer while
 // the slider still reaches 1.25 for players who liked it fast.
@@ -36,13 +38,17 @@ export const SETTING_RANGES = {
   // Advanced-only: 0 keeps terrain/foliage cheap, 1 enables high terrain.
   // Advanced-preset sub-settings (only read when graphicsPreset is 5). The
   // historical rows were binary 0/1; round 10 extended them to level ladders
-  // (0 Low, 0.5 Medium, 1 High, 2 Insane; effectsQuality stops at 1) mapped
+  // (0 Low, 0.5 Medium, 1 High, 2 Insane; effectsQuality and shadowQuality
+  // stop at 1) mapped
   // in gfx.ts settingsFor. Backward compatible by construction: a stored 0
   // still means Low and a stored 1 still means High.
   terrainDetail: { min: 0, max: 2, def: 1 },
   foliageDensity: { min: 0, max: 2, def: 1 },
   effectsQuality: { min: 0, max: 1, def: 1 },
-  shadowQuality: { min: 0, max: 2, def: 1 },
+  // Capped at High (the 4096 map): the retired Insane rung's 8192x8192 shadow
+  // target was a ~256 MB-class GPU allocation redrawn every frame. A stored
+  // historical 2 clamps to 1 on load, and gfx.ts maps it to the High base too.
+  shadowQuality: { min: 0, max: 1, def: 1 },
   // The worn-surface triplanar layer dial (0 Off, 0.5 Basic, 1 Full, 2
   // Insane), new in round 10: the town-street frame-cost dial.
   surfaceDetail: { min: 0, max: 2, def: 1 },
@@ -70,6 +76,13 @@ export const SETTING_RANGES = {
   cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
+  // Desktop-shell window mode: 1 = borderless fullscreen (what the shell opens
+  // with, matching its prefs-store default), 0 = a normal resizable window.
+  // Only the desktop shell can act on it, so its options row replaces the
+  // browser Fullscreen toggle there and never renders anywhere else; the two
+  // are separate keys because a player who leaves fullscreen in the desktop app
+  // has not changed what the web build should do on the same machine.
+  displayMode: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn
   // off for the classic static "MAX LEVEL" text (Max-Level XP Overflow)
   showOverflowXp: { min: 0, max: 1, def: 1 },
@@ -386,6 +399,22 @@ export const BOOL_SETTINGS = {
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
+  // on by default (today's behavior, unchanged out of the box): mirrors the desktop
+  // shell's GPU preference store, whose stored field is the INVERSE opt-out. The
+  // shell asks the OS for the dedicated gaming GPU at launch; a MUXless laptop panel
+  // cannot always drive it, so the row is an escape hatch. Desktop-only: the options
+  // row renders only when the installed shell exposes the preference over the bridge
+  // (see game/desktop_gpu_pref_sync.ts), and the shell store, not this key, is the
+  // source of truth: this value is reflected from it at boot and takes effect on the
+  // next launch, never the running one.
+  forceHighPerfGpu: { def: true },
+  // on by default (the phase 10 decision): publish the current zone as a Discord
+  // Rich Presence activity while playing. Discord's own activity-sharing setting
+  // still gates whether anyone sees it, and the desktop options row is the in-game
+  // off switch. Inert outside the desktop shell: the row renders only when the
+  // installed shell exposes the presence bridge (see game/discord_presence.ts),
+  // and nothing else reads the key.
+  discordPresence: { def: true },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and
@@ -461,12 +490,7 @@ export class Settings {
   }
 
   private load(): GameSettings {
-    let stored: unknown = null;
-    try {
-      stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null');
-    } catch {
-      /* corrupt */
-    }
+    const stored = parseStoredJson(STORE_KEY);
     const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {

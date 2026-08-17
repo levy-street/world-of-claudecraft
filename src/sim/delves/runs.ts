@@ -85,7 +85,6 @@ import {
 import {
   initLitanyBaptistryModule,
   isDelvePuzzleKind,
-  LITANY_PUZZLE_KINDS,
   pullLitanyBellRope,
   tickDrownedLitanyRooms,
 } from './drowned_litany_rooms';
@@ -132,10 +131,6 @@ const DELVE_LORE_ORDER = [
 // these so a Heroic run never rolls an inert affix (PRD §6.7 v1 subset). The
 // other registered crypt affixes (grave_tax / unstable_roof / cult_remnants)
 // keep their UI/i18n entries but are excluded from the roll until implemented.
-export const DELVE_PUZZLE_KINDS = new Set<string>([
-  'pressure_plate',
-  ...Array.from(LITANY_PUZZLE_KINDS),
-]);
 export const DELVE_IMPLEMENTED_AFFIXES = new Set<string>([
   'restless_graves',
   'bad_air',
@@ -605,9 +600,10 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
 
 export function updateDelveRuns(ctx: SimContext): void {
   for (const run of ctx.delveRuns) {
-    // The lockpick per-step clock is enforced for EVERY run (a solo offline run
-    // has partyKey === null and is skipped by tickDelveRun below, but its lock
-    // must still time out identically to an online/headless one).
+    // The lockpick per-step clock is enforced for EVERY run slot. partyKey ===
+    // null means a FREE (unclaimed) slot, skipped by tickDelveRun below; a
+    // claimed solo run carries `solo:<pid>` (claimDelveRun via instanceKeyFor),
+    // so it ticks like any party run and its lock times out identically.
     ctx.tickLockpickTimeout(run);
     if (run.partyKey !== null) tickDelveRun(ctx, run);
   }
@@ -729,20 +725,47 @@ export function onDelveBossDefeated(ctx: SimContext, run: DelveRun): void {
   }
 }
 
+// The daily full-payout window: this many clears per reset day (one tally
+// shared across delves and tiers) pay full base Marks AND may carry chest/rite
+// bonus Marks. Both comparators below read this ONE constant so the base and
+// bonus windows cannot desync under a retune.
+export const DELVE_DAILY_FULL_CLEARS = 3;
+
 // Base Marks payout for one clear. PRD §6.5 FR-5.3: full Marks for the first 3
-// completions per UTC day, then a diminished payout (Heroic 1 guaranteed, Normal
-// 50% chance of 1). §6.7 FR-7.1 Heroic "+30% Marks" rides the tier `rewardMult`.
-// Reads `markClears` BEFORE the caller increments it. NOTE: at the base of 1 Mark
-// the +30% rounds to no per-clear difference; the Heroic mark advantage comes from
-// the post-3 guaranteed-vs-50% rule. Uses `ctx.rng` only (deterministic).
+// completions per reset day (1 Normal / 2 Heroic), then a diminished payout
+// (Heroic 1 guaranteed, Normal 50% chance of 1). Reads `markClears` BEFORE the
+// caller increments it. NOTE: the §6.7 FR-7.1 Heroic "+30% Marks" rides the
+// tier `rewardMult` (1.3) but rounds to no per-clear difference at this base;
+// the real Heroic edge is the in-window 2-vs-1 plus the post-window
+// guaranteed-vs-50% rule. Uses `ctx.rng` only (deterministic).
 export function delveMarkPayout(ctx: SimContext, run: DelveRun, meta: PlayerMeta): number {
   const isHeroic = run.tierId === 'heroic';
-  // First 3 clears/day pay full: 1 Normal / 2 Heroic (§7.4). After that, Heroic
-  // still guarantees 1; Normal has a 50% shot. (The old `Math.round(rewardMult)`
-  // rounded Heroic's 1.3 down to 1, silently erasing the Heroic advantage.)
-  if (meta.delveDaily.markClears < 3) return isHeroic ? 2 : 1;
+  // The first DELVE_DAILY_FULL_CLEARS clears/day pay full: 1 Normal / 2 Heroic
+  // (§7.4); this reads markClears BEFORE the caller increments it, hence `<`.
+  // After that, Heroic still guarantees 1; Normal has a 50% shot. (The old
+  // `Math.round(rewardMult)` rounded Heroic's 1.3 down to 1, silently erasing
+  // the Heroic advantage.)
+  if (meta.delveDaily.markClears < DELVE_DAILY_FULL_CLEARS) return isHeroic ? 2 : 1;
   if (isHeroic) return 1;
   return ctx.rng.chance(0.5) ? 1 : 0;
+}
+
+// Chest/rite bonus Marks ride the SAME daily window as the base payout above: a
+// clear whose base Marks were paid inside the full-payout window may carry its
+// loot-tier bonus Marks; every later clear pays base Marks only. Without this,
+// the uncapped premium bonuses (+2 lockpick / +4 rite) let an all-day grinder
+// outrun the shop pricing the window exists to protect. Both callers
+// (grantLockpickBonus, grantRiteBonus) iterate the member list
+// grantDelveRewards just credited, so `markClears` was incremented for the
+// clear the bonus rides: that clear was in-window exactly when the incremented
+// tally is still `<=` the window (the payout above reads pre-increment, hence
+// its `<`). Bonus COPPER is deliberately not windowed (copper is not the paced
+// currency), and neither is the loot tier itself. Draws no rng.
+export function delveBonusMarksFor(
+  meta: Pick<PlayerMeta, 'delveDaily'>,
+  bonusMarks: number,
+): number {
+  return meta.delveDaily.markClears <= DELVE_DAILY_FULL_CLEARS ? bonusMarks : 0;
 }
 
 // Unlock the next un-owned lore journal entry (PRD §6.4 / §7.6, five entries
@@ -797,16 +820,30 @@ export function grantDelveClearTo(
   ctx.emit({ type: 'delveComplete', delveId: run.delveId, tierId: run.tierId, pid });
 }
 
-export function grantDelveRewards(ctx: SimContext, run: DelveRun): void {
-  if (run.completed) return;
+// Returns the members actually credited with this clear (empty when the run
+// was already completed). The chest/rite bonus granters iterate THAT list, so
+// a bonus can only ever ride a clear this call just granted: the per-member
+// `markClears` tally the window check reads is the one this pass incremented,
+// structurally, not by call-site convention.
+export function grantDelveRewards(ctx: SimContext, run: DelveRun): number[] {
+  // An already-completed run credits nobody, so the downstream granters pay NO
+  // bonus at all (no marks, no copper, no lockpickBonus event); deliberate,
+  // and safer than the old double-pay, but it couples the whole bonus to this
+  // flag. A future second grant path must carry its own credited list rather
+  // than fall back to party membership. Pinned by the "already-completed"
+  // tests in tests/delves.test.ts.
+  if (run.completed) return [];
   run.completed = true;
   const delve = DELVES[run.delveId];
   const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
+  const credited: number[] = [];
   for (const pid of members) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
     grantDelveClearTo(ctx, run, delve, meta, pid);
+    credited.push(pid);
   }
+  return credited;
 }
 
 export function openDelveSurfaceExit(ctx: SimContext, run: DelveRun): void {

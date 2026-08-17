@@ -37,51 +37,39 @@ describe('reduceOtaGateEvent', () => {
     expect(reduceOtaGateEvent(applying, { type: 'complete' })).toBe(applying);
     expect(reduceOtaGateEvent(applying, { type: 'failed' })).toBe(applying);
   });
-
-  it('dismiss is sticky until the incompatible rejection overrides it', () => {
-    let s = stateWith({ phase: 'downloading', percent: 40 });
-    s = reduceOtaGateEvent(s, { type: 'dismiss' });
-    expect(s.dismissed).toBe(true);
-    s = reduceOtaGateEvent(s, { type: 'incompatible' });
-    expect(s).toMatchObject({ fatal: true, dismissed: false });
-  });
 });
 
 describe('otaOverlayModel', () => {
-  it('shows nothing while idle, failed, dismissed, or in-world', () => {
+  it('shows nothing while idle, failed, or in-world', () => {
     expect(otaOverlayModel(initialOtaGateState(), false)).toBeNull();
     expect(otaOverlayModel(stateWith({ phase: 'failed' }), false)).toBeNull();
-    expect(otaOverlayModel(stateWith({ phase: 'downloading', dismissed: true }), false)).toBeNull();
     expect(otaOverlayModel(stateWith({ phase: 'downloading' }), true)).toBeNull();
   });
 
-  it('renders a downloading model with the continue escape hatch', () => {
+  it('renders a downloading model carrying no cancel/continue affordance', () => {
     expect(otaOverlayModel(stateWith({ phase: 'downloading', percent: 55 }), false)).toEqual({
       phase: 'downloading',
       percent: 55,
-      showContinue: true,
       fatal: false,
     } satisfies OtaOverlayModel);
   });
 
-  it('fatal mode loses the continue action and outranks dismissal and in-world', () => {
+  it('fatal mode outranks in-world suppression', () => {
     const fatal = stateWith({ phase: 'downloading', percent: 70, fatal: true });
-    expect(otaOverlayModel(fatal, true)).toMatchObject({ showContinue: false, fatal: true });
+    expect(otaOverlayModel(fatal, true)).toMatchObject({ fatal: true });
   });
 
   it('a ready bundle renders as applying (auto-apply fires in the same turn)', () => {
     expect(otaOverlayModel(stateWith({ phase: 'ready' }), false)).toMatchObject({
       phase: 'applying',
-      showContinue: false,
     });
   });
 });
 
 describe('shouldAutoApplyOta', () => {
-  it('applies a ready bundle pre-world unless dismissed, and always in fatal mode', () => {
+  it('applies a ready bundle pre-world, and always in fatal mode', () => {
     expect(shouldAutoApplyOta(stateWith({ phase: 'ready' }), false)).toBe(true);
     expect(shouldAutoApplyOta(stateWith({ phase: 'ready' }), true)).toBe(false);
-    expect(shouldAutoApplyOta(stateWith({ phase: 'ready', dismissed: true }), false)).toBe(false);
     expect(shouldAutoApplyOta(stateWith({ phase: 'ready', fatal: true }), true)).toBe(true);
     expect(shouldAutoApplyOta(stateWith({ phase: 'downloading' }), false)).toBe(false);
   });
@@ -150,7 +138,6 @@ describe('installOtaUpdateGate', () => {
     expect(rig.render).toHaveBeenLastCalledWith({
       phase: 'downloading',
       percent: 35,
-      showContinue: true,
       fatal: false,
     });
     expect(rig.hide).not.toHaveBeenCalled();
@@ -174,21 +161,10 @@ describe('installOtaUpdateGate', () => {
     expect(rig.render).toHaveBeenLastCalledWith({
       phase: 'applying',
       percent: 100,
-      showContinue: false,
       fatal: false,
     });
     await flushMicrotasks();
     expect(rig.apply).toHaveBeenCalledTimes(1);
-  });
-
-  it('dismiss stops the overlay and disarms the auto-apply', async () => {
-    const rig = makeRig();
-    rig.handlers.onProgress(20);
-    rig.gate.dismiss();
-    expect(rig.hide).toHaveBeenCalled();
-    rig.handlers.onComplete();
-    await flushMicrotasks();
-    expect(rig.apply).not.toHaveBeenCalled();
   });
 
   it('falls back silently to apply-on-background when the reload path is unavailable', async () => {
@@ -212,7 +188,6 @@ describe('installOtaUpdateGate', () => {
     expect(downloading.render).toHaveBeenLastCalledWith({
       phase: 'downloading',
       percent: 60,
-      showContinue: false,
       fatal: true,
     });
   });
@@ -243,6 +218,10 @@ describe('installOtaUpdateGate', () => {
     applyFails.handlers.onComplete();
     await flushMicrotasks();
     expect(applyFails.onFatalRecoveryFailed).toHaveBeenCalledTimes(1);
+    // Handing the screen back means actually hiding this overlay: the caller's
+    // recovery overlay stacks BELOW the OTA scrim, so a still-painted overlay
+    // would bury the only remaining action (the z-order regression this pins).
+    expect(applyFails.hide).toHaveBeenCalled();
 
     const downloadFails = makeRig();
     downloadFails.handlers.onProgress(80);

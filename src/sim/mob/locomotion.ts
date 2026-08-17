@@ -45,6 +45,7 @@ import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
+  riftDeathZoneFuse,
   riftMechanicSuppressed,
   riftRankForBaseLevel,
 } from '../rift/ranks';
@@ -180,7 +181,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     // wherever its summoner stood when the wave erupted (a kited boss hatches
     // adds far from any camp, e.g. Grix dragged to the Eastbrook town square),
     // and the only other cleanup is despawnSummonedAdds on the summoner's own
-    // respawn, hours away for a rare. The corpse keeps its full loot window.
+    // respawn, which for a long-cadence rare (the six-hour Voskar Emberwing)
+    // can be hours away. The corpse keeps its full loot window.
     if (!isInstanceMob && mob.summonedAdd) {
       if (mob.corpseTimer <= 0) ctx.dropEntity(mob.id);
       return;
@@ -1045,9 +1047,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         // deathZoneStrike becomes a barrage (a zone under every living member).
         // Applied AFTER the rng target draw so the draw count and order stay
         // identical across ranks (the difficulty.ts multiplier precedent).
-        const heroicS = riftRankForBaseLevel(inst.baseLevel) === 'S';
+        const rank = riftRankForBaseLevel(inst.baseLevel);
+        const heroicS = rank === 'S';
         const tempo = heroicS ? RIFT_S_ZONE_TEMPO : 1;
-        const fuse = def.castTime * tempo;
+        // Via the shared helper so the reaction-budget guard in
+        // rift_boss_reactable_mechanics.test.ts pins THIS fuse, not a copy of
+        // the formula that could drift away from it.
+        const fuse = riftDeathZoneFuse(def.castTime, rank);
         if (heroicS) mob[timerKey] = (def.every + def.castTime) * tempo;
         const instPids = instancePlayerIds(ctx, inst).filter((pid) => {
           const e = ctx.entities.get(pid);

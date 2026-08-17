@@ -42,6 +42,8 @@ export interface PerfNudgeToastInput {
   suggestionIds: readonly string[];
   softwareNoticeAlreadyShown: boolean;
   desktopShell: boolean;
+  // Optional: absent on a caller with no desktop-shell GPU verdict to report.
+  discreteNoticeAlreadyShown?: boolean;
 }
 
 /** Returns true when the nudge was actually shown (the assembler stops then). */
@@ -50,6 +52,7 @@ export function initPerfNudgeToast(input: PerfNudgeToastInput): boolean {
   let state: PerfNudgeState = resolvePerfNudge({
     suggestionIds: input.suggestionIds,
     softwareNoticeAlreadyShown: input.softwareNoticeAlreadyShown,
+    discreteNoticeAlreadyShown: input.discreteNoticeAlreadyShown === true,
     // An empty dismissal value means nothing nudge-worthy; never read that as
     // dismissed (an empty stored value would otherwise match it).
     dismissedBefore: dismissalValue !== '' && readDismissedValue() === dismissalValue,

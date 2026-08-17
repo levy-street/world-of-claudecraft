@@ -30,6 +30,45 @@ const desktop: GfxRuntimeHints = {
 };
 
 describe('graphics tier resolution', () => {
+  it('never renders shadows on a direct (no composer, no gradePass) profile', () => {
+    // r185 moved info.reset() ahead of the shadow pass, so a DIRECT profile's
+    // live info.render reads would include shadow draws in the governor and
+    // opaque-sort signals. That shift is empty today because every shipped
+    // direct profile also disables dynamic shadows; this pin makes that
+    // invariant explicit so a new tier below medium or a gradePass re-gating
+    // cannot silently move the low-end draw-pressure signal.
+    // Every settingsFor tier ('advanced' is not one: it resolves through the
+    // override path over a base tier's bands, so it cannot mint a direct
+    // profile of its own).
+    const tiers = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
+    // The full hint grid the resolver differentiates on: every platform value
+    // plus the ios tightMemory arm (QA hardening: the original two-hint sample
+    // could not red on an android- or tightMemory-only rewiring).
+    const hintGrid = [
+      undefined,
+      { platform: 'android' as const },
+      { platform: 'other' as const },
+      { platform: 'ios' as const },
+      { platform: 'ios' as const, tightMemory: true },
+    ];
+    let directProfilesSeen = 0;
+    for (const tier of tiers) {
+      for (const hints of hintGrid) {
+        const settings = gfxInternalsForTest.settingsFor(tier, hints);
+        if (!settings.composer && !settings.gradePass) {
+          directProfilesSeen++;
+          expect(settings.dynamicShadows, `${tier} hints:${JSON.stringify(hints ?? null)}`).toBe(
+            false,
+          );
+        }
+      }
+    }
+    // Vacuity floor: plain low is direct on every one of the five hint arms,
+    // and the iOS arms add direct profiles on the higher tiers; the widened
+    // grid sees 13 today and must never quietly drop below that.
+    expect(directProfilesSeen).toBeGreaterThanOrEqual(13);
+  });
+
   it('resolves an unset preset device-aware, matching the medium data-fx-level fallback', () => {
     // The 3D tier (tierFromHints) and the HUD data-fx-level (graphicsPresetLabel(settings def))
     // must agree on the unset/first-run default so they never diverge. An unrecognized device
@@ -188,6 +227,14 @@ describe('graphics tier resolution', () => {
 
   it('keeps medium as a middle tier while high and ultra retain the premium pipeline', () => {
     const low = gfxInternalsForTest.settingsFor('low');
+    // A session that reports hints but whose adapter string is masked or unavailable.
+    const lowNoAdapter = gfxInternalsForTest.settingsFor('low', { search: '?gfx=low' });
+    const lowWeakIntel = gfxInternalsForTest.settingsFor('low', {
+      gpuRenderer: 'ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0)',
+    });
+    const lowSoftware = gfxInternalsForTest.settingsFor('low', {
+      gpuRenderer: 'Google SwiftShader',
+    });
     const medium = gfxInternalsForTest.settingsFor('medium');
     const mediumIris = gfxInternalsForTest.settingsFor('medium', {
       search: '?gfx=medium',
@@ -199,7 +246,13 @@ describe('graphics tier resolution', () => {
     expect(low.standardMaterials).toBe(false);
     expect(low.dynamicShadows).toBe(false);
     expect(low.leanFoliage).toBe(true);
-    expect(low.lowPlus).toBe(true);
+    // lowPlus is the weak-GPU art treatment, not a property of the low tier: a plain
+    // low session (no adapter string, so classifyGpuRenderer is 'unknown') must not
+    // take it, or low draws richer grass cards than medium.
+    expect(low.lowPlus).toBe(false);
+    expect(lowNoAdapter.lowPlus).toBe(false);
+    expect(lowWeakIntel.lowPlus).toBe(true);
+    expect(lowSoftware.lowPlus).toBe(true);
     expect(low.composer).toBe(false);
     expect(low.ao).toBe(false);
 
@@ -210,6 +263,16 @@ describe('graphics tier resolution', () => {
     expect(mediumIris.standardMaterials).toBe(true);
     expect(mediumIris.leanFoliage).toBe(true);
     expect(mediumIris.lowPlus).toBe(false);
+    // denseDressing is lowPlus plus the leanFoliage MEDIUM session: the
+    // dressing compensation follows the lean model set (foliage.ts), so the
+    // medium weak-iGPU cohort keeps it while plain low and plain medium take
+    // medium-parity dressing (the low-monotonicity rationale above).
+    expect(low.denseDressing).toBe(false);
+    expect(lowNoAdapter.denseDressing).toBe(false);
+    expect(lowWeakIntel.denseDressing).toBe(true);
+    expect(lowSoftware.denseDressing).toBe(true);
+    expect(medium.denseDressing).toBe(false);
+    expect(mediumIris.denseDressing).toBe(true);
     expect(medium.terrainSplat).toBe(true);
     expect(medium.composer).toBe(false);
     expect(medium.ao).toBe(false);
@@ -372,13 +435,28 @@ describe('graphics tier resolution', () => {
     expect(effectsHigh.ao).toBe(true);
     expect(effectsHigh.bloom).toBe(true);
     expect(effectsHigh.smaa).toBe(true);
-    // Shadows: pure map-size steps; terrain-cast joins at High.
+    // Shadows: pure map-size steps; terrain-cast joins at High. The ladder
+    // caps at High's 4096: a historical stored Insane (2) falls through to
+    // the High base instead of the retired ~256 MB-class 8192 map.
     expect(adv({ shadowQuality: 0 }).shadowMap).toBe(1024);
     expect(adv({ shadowQuality: 0 }).terrainCastShadows).toBe(false);
     expect(adv({ shadowQuality: 0.5 }).shadowMap).toBe(2560);
     expect(adv({ shadowQuality: 1 }).shadowMap).toBe(4096);
     expect(adv({ shadowQuality: 1 }).terrainCastShadows).toBe(true);
-    expect(adv({ shadowQuality: 2 }).shadowMap).toBe(8192);
+    expect(adv({ shadowQuality: 2 }).shadowMap).toBe(4096);
+    expect(adv({ shadowQuality: 2 }).terrainCastShadows).toBe(true);
+    // The load-bearing constrained arm: the retired explicit 8192 write used
+    // to OVERRIDE the phone-class 2048 cap; falling through to the base
+    // restores it (dynamicShadows stays off there regardless, so this pins
+    // the allocation, not a visible shadow).
+    const constrainedInsane = gfxInternalsForTest.settingsFor('high', {
+      graphicsPreset: 5,
+      shadowQuality: 2,
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+    });
+    expect(constrainedInsane.shadowMap).toBe(2048);
   });
 
   it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {
@@ -472,6 +550,7 @@ describe('graphics tier resolution', () => {
     expect(medium.iosMemoryProfile).toBe(true);
     expect(medium.standardMaterials).toBe(false);
     expect(medium.lowPlus).toBe(true);
+    expect(medium.denseDressing).toBe(true); // rides the lowPlus art cohort
     // Collision-bearing tree/rock placement stays identical to other Medium clients.
     expect(medium.leanFoliage).toBe(false);
     expect(medium.terrainSplat).toBe(false);

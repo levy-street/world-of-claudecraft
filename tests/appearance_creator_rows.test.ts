@@ -46,6 +46,28 @@ describe('creator: body proportions are Fit Studio only', () => {
     host.remove();
   });
 
+  it('randomize keeps sculpted proportions, reset returns them to neutral', () => {
+    // The doctrine the design-code header and the Share tab comment state, and
+    // which a comment alone cannot hold: import and randomize preserve a
+    // sculpted body, reset is the one whole-look action that clears it. The
+    // comments claimed reset preserved it too until #3381 review caught it.
+    const shaped = { ...DEFAULT_APPEARANCE, body: { ...DEFAULT_APPEARANCE.body, shoulders: 0.5 } };
+    const { host, ui, changed } = mount(shaped);
+    const tool = (label: string): HTMLButtonElement => {
+      const btn = [...host.querySelectorAll<HTMLButtonElement>('.ac-tool')].find(
+        (b) => b.getAttribute('aria-label') === label,
+      );
+      if (!btn) throw new Error(`no ${label} tool`);
+      return btn;
+    };
+    tool('Randomize Look').click();
+    expect(changed()?.body?.shoulders).toBe(0.5);
+    tool('Reset Look').click();
+    expect(changed()?.body?.shoulders).toBe(0);
+    ui.destroy();
+    host.remove();
+  });
+
   it('keeps the stored body shape untouched rather than discarding it', () => {
     // A body sculpted in the Fit Studio (or by an older build's sliders) must
     // survive a trip through the creator: the rows are gone, the DATA is not.

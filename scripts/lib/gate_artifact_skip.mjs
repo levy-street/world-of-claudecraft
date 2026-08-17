@@ -23,3 +23,18 @@ export function shouldSkipPretest(env = process.env) {
 export function gateVitestSkipPretestEnv() {
   return { [WOC_SKIP_PRETEST]: '1' };
 }
+
+/**
+ * The CI shard entry's pretest decision (scripts/ci_shard_test.mjs): the
+ * merged selective leg is a bare vitest-related invocation with no npm
+ * lifecycle, so the entry regenerates the artifacts itself, once per job,
+ * BEFORE any leg spawns, then sets the skip flag so the npm-test legs do not
+ * regenerate a second time. Pure so its three arms (zero legs, skip flag,
+ * run) are unit-testable without spawning anything.
+ *
+ * @param {{ legCount: number, env?: NodeJS.ProcessEnv | Record<string, string | undefined> }} opts
+ * @returns {boolean} whether the entry must run scripts/pretest.mjs now
+ */
+export function shouldRunEntryPretest({ legCount, env = process.env }) {
+  return legCount > 0 && !shouldSkipPretest(env);
+}

@@ -62,6 +62,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { readMethodCallSites } from './helpers/method_call_sites';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const uiRoot = fileURLToPath(new URL('../src/ui/', import.meta.url));
@@ -73,11 +74,11 @@ const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'ut
 // source only for the text pins further down.
 const scan = readMethodCallSites('src/ui/hud.ts', hudSource, 'Hud', 'refreshLocalizedDynamicUi');
 
-function stripComments(source: string): string {
-  // The `(^|[^:])` capture keeps a `://` in a URL from eating the rest of its
-  // line, the stripper bug this repo already shipped once (#2499).
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-}
+// Comment stripping goes through the shared single-pass helper
+// (tests/helpers/strip_comments.ts): line comments strip in the same pass as
+// block comments, so a bare /* inside a line comment cannot open a phantom
+// block that hides a gated module from the discovery sweep (the src/main.ts
+// hazard class), and the `(^|[^:])` guard keeps `://` URLs intact (#2499).
 
 // --- half 1: the fan-out's arms -------------------------------------------
 
@@ -93,6 +94,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
+  'this.riftPainter.relocalize|',
   'this.targetFrameMover.relocalize|',
   'this.playerFrameMover.relocalize|',
   'this.partyFrameMover.relocalize|',
@@ -311,9 +313,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'market_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastSig', 'lastSellPriceRefSig'],
     answer: 'this.marketWindow.render',
-    why: 'the listing ids, prices and the active tab; render() carries no self-gate',
+    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig',
   },
   {
     file: 'professions_window.ts',
@@ -383,6 +385,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly memos: readonly string[] | 'coordinator';
   readonly reason: string;
 }> = [
+  {
+    file: 'map_semantic_accessibility_core.ts',
+    memos: ['lastHash', 'lastLanguage'],
+    reason:
+      'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
   {
     file: 'claudium_window.ts',
     memos: ['paintedWalletMarkup'],
@@ -683,7 +691,10 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // no text); fillGrid rebuilds every cell unconditionally and the
       // existing bags fan-out arm repaints the window wholesale on a locale
       // switch.
-    ).toBe(8);
+      // 9 as of map semantic accessibility: lastHash is paired with
+      // lastLanguage in the same guard, so getLanguage() changing explicitly
+      // invalidates the localized summary without a separate fan-out arm.
+    ).toBe(9);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

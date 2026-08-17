@@ -100,7 +100,7 @@ describe('Renderer.createView object branch (source pin)', () => {
       ),
     );
     expect(objectBranch).toContain(
-      'const result = takeOrBuildGroundObject(this.objectPool, this.objectPoolKeyFor(e), () =>',
+      'const result = takeOrBuildGroundObject(this.objectPool, groundObjectPoolKey(e), () =>',
     );
     expect(objectBranch).toContain('objectPoolKey = result.poolKey;');
     // The regression itself: this branch must never null the key it just took.
