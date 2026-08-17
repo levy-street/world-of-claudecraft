@@ -109,7 +109,14 @@ export async function openEconomyAlerts(realm: string, limit = 100): Promise<Eco
       LIMIT $2`,
     [realm, capped],
   );
-  return res.rows.map((r) => ({
+  return res.rows.map(mapAlertRow);
+}
+
+// Shared row mapper: pg returns BIGINT as a string to avoid precision loss, so
+// every numeric column crosses back through Number() in exactly one place. Both
+// readers use it so the two views cannot drift into disagreeing about a row.
+function mapAlertRow(r: Record<string, unknown>): EconomyAlertRow {
+  return {
     id: Number(r.id),
     realm: String(r.realm),
     kind: String(r.kind),
@@ -119,7 +126,7 @@ export async function openEconomyAlerts(realm: string, limit = 100): Promise<Eco
     detail: String(r.detail),
     acknowledgedAt: r.acknowledged_at === null ? null : String(r.acknowledged_at),
     createdAt: r.created_at instanceof Date ? r.created_at.toISOString() : String(r.created_at),
-  }));
+  };
 }
 
 /**
@@ -154,4 +161,62 @@ export async function pruneEconomyAlerts(olderThanDays: number, batch = 500): Pr
     [String(days), Math.max(1, Math.floor(batch))],
   );
   return res.rowCount ?? 0;
+}
+
+/**
+ * Mark one finding handled, by the operator who handled it.
+ *
+ * Idempotent and FIRST-WRITER-WINS: the `acknowledged_at IS NULL` guard means a
+ * second acknowledgement of the same row changes nothing and reports false,
+ * rather than quietly rewriting who handled it. Two operators working the queue
+ * at once is the normal case during an incident, and the record of who looked
+ * first is worth more than the record of who clicked last.
+ *
+ * Acknowledging RE-ARMS the dedupe in `insertEconomyAlerts`, which is the point
+ * and also the hazard: the next pass that still finds the violation files it
+ * again as a fresh row and notifies again. That is intended (a finding that
+ * recurs after an operator called it handled is new information), but it means
+ * acknowledging is not a way to silence anything, and an operator who wants the
+ * noise to stop has to actually fix the leak.
+ */
+export async function acknowledgeEconomyAlert(
+  realm: string,
+  id: number,
+  accountId: number,
+): Promise<boolean> {
+  if (!Number.isSafeInteger(id) || id <= 0) return false;
+  const res = await pool.query(
+    `UPDATE economy_alerts
+        SET acknowledged_at = now(), acknowledged_by = $3
+      WHERE id = $2 AND realm = $1 AND acknowledged_at IS NULL`,
+    [realm, id, accountId],
+  );
+  return (res.rowCount ?? 0) > 0;
+}
+
+/**
+ * One character's findings, newest first, acknowledged ones included.
+ *
+ * The open queue (`openEconomyAlerts`) answers "what needs working"; this
+ * answers "what has this character ever been flagged for", which is the
+ * question an investigation actually asks. Acknowledged rows are included for
+ * exactly that reason: a character with five handled findings over a month is a
+ * pattern, and a view that hid them would show an empty page for the most
+ * interesting account on the realm.
+ */
+export async function economyAlertsForCharacter(
+  realm: string,
+  characterId: number,
+  limit = 50,
+): Promise<EconomyAlertRow[]> {
+  const capped = Math.min(Math.max(1, Math.floor(limit)), 200);
+  const res = await pool.query(
+    `SELECT id, realm, kind, severity, character_id, delta, detail, acknowledged_at, created_at
+       FROM economy_alerts
+      WHERE realm = $1 AND character_id = $2
+      ORDER BY created_at DESC
+      LIMIT $3`,
+    [realm, characterId, capped],
+  );
+  return res.rows.map(mapAlertRow);
 }

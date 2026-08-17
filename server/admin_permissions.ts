@@ -23,6 +23,15 @@ export const ADMIN_PERMISSIONS = [
   'content.moderate',
   'botdetector.read',
   'botdetector.configure',
+  // The gold conservation queue (server/economy_alerts_db.ts). Its own pair
+  // rather than riding analytics.read, for the same reason botdetector.read has
+  // its own: an open finding names a character and says the ledger cannot
+  // explain their coin, which is an anti-abuse internal rather than a dashboard
+  // number. Acknowledging is split from reading because it is the act that
+  // takes a finding OUT of the operator queue and re-arms the dedupe, so a
+  // careless click can hide an unresolved incident from everyone after it.
+  'economy.read',
+  'economy.act',
   // The guild bank dormant-slot escape hatch: remove one permanently
   // unwithdrawable copy from a guild's book (server/game.ts
   // adminPurgeGuildBankSlot). Deliberately its OWN permission rather than
@@ -76,9 +85,13 @@ export const ROLE_PERMISSIONS: Record<AdminRole, readonly AdminPermission[]> = {
     'ipblocks.manage',
     'chatfilter.manage',
     'content.moderate',
+    // Duplication is cheating, so the people who work cheating get both halves.
+    'economy.read',
+    'economy.act',
   ],
-  // Read-only composition brick. Deliberately EXCLUDES botdetector.read: the
-  // anti-bot internals are sensitive, so only admin/superadmin see them.
+  // Read-only composition brick. Deliberately EXCLUDES botdetector.read and
+  // economy.read: both are anti-abuse internals that name suspected players, so
+  // only admin/superadmin/moderator see them.
   viewer: ['analytics.read', 'accounts.read', 'support.read', 'moderation.read'],
 };
 

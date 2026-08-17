@@ -170,6 +170,11 @@ const REGISTRY_ONLY_PARAM_PATHS = new Set([
   // surface, so admin.ts holds no `*Match` regex for them either.
   '/admin/api/moderation/accounts/:id/cheater-mark',
   '/admin/api/moderation/accounts/:id/lift-cheater-mark',
+  // The Economy Watch operator surface (server/economy_admin.ts): registry-only
+  // like the pair above, so admin.ts holds no `*Match` regex for them either.
+  '/admin/api/economy/characters/:id/alerts',
+  '/admin/api/economy/characters/:id/ledger',
+  '/admin/api/economy/alerts/:id/ack',
 ]);
 const registryExactPaths = new Set(
   apiRoutes

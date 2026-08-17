@@ -51,6 +51,26 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
     permission: 'moderation.act',
   },
+  // The gold conservation queue (server/economy_admin.ts). Its own economy.*
+  // grants rather than analytics.read: a finding names a character and says the
+  // ledger cannot explain their coin. The ack is a separate permission because
+  // it takes a finding OUT of the operator queue and re-arms the dedupe.
+  { method: 'GET', pattern: '/admin/api/economy/alerts', permission: 'economy.read' },
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/economy\/characters\/(\d+)\/alerts$/,
+    permission: 'economy.read',
+  },
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/economy\/characters\/(\d+)\/ledger$/,
+    permission: 'economy.read',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/economy\/alerts\/(\d+)\/ack$/,
+    permission: 'economy.act',
+  },
   { method: 'GET', pattern: '/admin/api/guilds', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/guilds\/(\d+)$/, permission: 'accounts.read' },
   {
