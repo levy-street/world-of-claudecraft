@@ -469,6 +469,13 @@ describe('farmReady is a HEAVY_SELF_EVENTS member: a plot ripening with NO comma
       JSON.stringify({ t: 'cmd', cmd: 'plant_crop', bed: BED, crop: CROP }),
     );
     routeTick(server); // farmPlanted routed; the plot exists
+    // Ride out the FIRST 1 Hz boundary before ripening: the join's welcome
+    // letter is delivered on that same residue and mailArrived is itself a
+    // member, so a notice landing there would be dirtied twice over and the
+    // arm below could not tell the two apart (checked by mutation: without
+    // this the membership drop survived). One full second is enough; the
+    // letter is one-shot.
+    for (let i = 0; i < 20; i++) routeTick(server);
     const plot = server.sim.meta(pid)?.farmPlots.get(BED);
     if (!plot) throw new Error('the plant did not land');
     plot.survivalRoll = 0.01;
