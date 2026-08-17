@@ -295,11 +295,10 @@ describe('reconcileWindow', () => {
     rows[1].prevLedgerId = 9999; // a warning
     const alerts = reconcileWindow({
       rowsByCharacter: new Map([[1, rows]]),
-      // A critical: the save disagrees with the ledger's last word.
-      persistedCopper: new Map([[1, 99999]]),
       openingSupply: 0,
+      // A critical: the world holds coin no faucet in this window minted.
       closingSupply: {
-        purses: 200,
+        purses: 99999,
         bankVaults: 0,
         guildTreasuries: 0,
         unclaimedMailCoin: 0,
@@ -311,13 +310,10 @@ describe('reconcileWindow', () => {
     expect(alerts.some((a) => a.kind === 'chain_break')).toBe(true);
   });
 
-  it('does not treat an unsaved character as a finding', () => {
+  it('leaves the save comparison to the job, which asks it globally', () => {
     const rows = chainOf(7, [{ kind: 'mob_loot', amount: 100 }]);
     const alerts = reconcileWindow({
       rowsByCharacter: new Map([[7, rows]]),
-      // No persisted figure for this character: they simply have not been
-      // saved yet. Absence of evidence is not evidence of a dupe.
-      persistedCopper: new Map(),
       openingSupply: 0,
       closingSupply: {
         purses: 100,
@@ -328,6 +324,9 @@ describe('reconcileWindow', () => {
       },
       droppedWrites: 0,
     });
+    // A window is the wrong place to ask whether a save agrees with the ledger:
+    // the character who was robbed may never move another coin, and one window
+    // later they would be out of view. See economy_reconcile_job.ts.
     expect(alerts).toEqual([]);
   });
 });
@@ -387,14 +386,10 @@ describe('pool rows are attributed to the actor without joining their chain', ()
     expect(checkChain([...buy, next])).toEqual([]);
   });
 
-  it('compares the save against the last PURSE row, not the last row', () => {
+  it('closes the supply identity across a market buy, cut and all', () => {
     const buy = marketBuy(3, 5000);
     const alerts = reconcileWindow({
       rowsByCharacter: new Map([[3, buy]]),
-      // The purse really is at 4000. Reading the trailing market_fee row's
-      // balance instead would compare the save against a burn and page an
-      // operator for a healthy trade.
-      persistedCopper: new Map([[3, 4000]]),
       openingSupply: 5000,
       closingSupply: {
         purses: 4000,

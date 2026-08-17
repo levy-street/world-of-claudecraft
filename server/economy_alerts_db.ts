@@ -123,18 +123,30 @@ export async function openEconomyAlerts(realm: string, limit = 100): Promise<Eco
  * how old, because age is not resolution and a stale unhandled critical is
  * exactly the row an operator most needs to still be there.
  *
- * Batched via a LIMIT subquery per the retention rules in server/CLAUDE.md.
+ * Batched via a LIMIT subquery per the retention rules in server/CLAUDE.md, and
+ * OLDEST FIRST, which is the sweep's forward-progress guarantee: a run capped by
+ * the row budget leaves the remainder for the next night rather than deleting an
+ * arbitrary slice and re-scanning the same backlog forever.
+ *
+ * A retention of 0 (or anything non-positive) DISABLES pruning, the same
+ * contract every other `*_RETENTION_DAYS` in this codebase follows. Clamping to
+ * one day instead would turn the documented "keep them forever" setting into
+ * the most aggressive one available.
  */
 export async function pruneEconomyAlerts(olderThanDays: number, batch = 500): Promise<number> {
+  if (!Number.isFinite(olderThanDays) || olderThanDays <= 0) return 0;
+  // A fractional value clamps to at least one day, never floors to '0 days'.
+  const days = Math.max(1, Math.floor(olderThanDays));
   const res = await pool.query(
     `DELETE FROM economy_alerts
       WHERE id IN (
         SELECT id FROM economy_alerts
          WHERE acknowledged_at IS NOT NULL
            AND acknowledged_at < now() - ($1 || ' days')::interval
+         ORDER BY acknowledged_at
          LIMIT $2
       )`,
-    [String(Math.max(1, Math.floor(olderThanDays))), Math.max(1, Math.floor(batch))],
+    [String(days), Math.max(1, Math.floor(batch))],
   );
   return res.rowCount ?? 0;
 }

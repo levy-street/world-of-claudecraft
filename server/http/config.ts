@@ -152,6 +152,18 @@ export interface Config {
   // 0-keeps-forever retention contract above.
   readonly levelUpEventsRetentionDays: number;
   readonly ftueEventsRetentionDays: number;
+  // How many days of ACKNOWLEDGED economy_alerts to keep. An OPEN finding is
+  // never pruned at any age (pruneEconomyAlerts): age is not resolution, and a
+  // stale unhandled critical is the row an operator most needs to still be
+  // there. The evidence behind every alert lives forever in gold_ledger, so a
+  // pruned alert loses a work item and never a fact. 0 keeps them forever.
+  readonly economyAlertRetentionDays: number;
+  // Minutes between reconciliation passes. Minutes rather than the nightly
+  // cadence the retention sweep uses, because the value of catching a
+  // duplication decays fast: found eight hours in, the coin has already been
+  // traded, laundered through the market and mailed to alts. 0 disables the
+  // pass entirely, which also stops economy_alerts from ever being written.
+  readonly economyReconcileIntervalMinutes: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -219,6 +231,13 @@ const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
 // during a paid-campaign burst.
 const DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS = 365;
 const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 90;
+// A quarter, so an acknowledged finding outlives the incident review it came
+// out of; the ledger evidence behind it is kept forever either way.
+const DEFAULT_ECONOMY_ALERT_RETENTION_DAYS = 90;
+// Frequent enough that a duplication is caught inside the same play session,
+// slow enough that the two aggregate sums it takes are noise against gameplay
+// traffic.
+const DEFAULT_ECONOMY_RECONCILE_INTERVAL_MINUTES = 15;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -441,6 +460,14 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,
       DEFAULT_CHAT_VIOLATION_RETENTION_DAYS,
+    ),
+    economyAlertRetentionDays: numberOr(
+      env.ECONOMY_ALERT_RETENTION_DAYS,
+      DEFAULT_ECONOMY_ALERT_RETENTION_DAYS,
+    ),
+    economyReconcileIntervalMinutes: numberOr(
+      env.ECONOMY_RECONCILE_INTERVAL_MINUTES,
+      DEFAULT_ECONOMY_RECONCILE_INTERVAL_MINUTES,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

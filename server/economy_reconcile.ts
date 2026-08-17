@@ -311,19 +311,21 @@ export function checkTransferSymmetry(rows: readonly ReconcileRow[]): EconomyAle
 }
 
 /**
- * Run every check over one window's worth of evidence and return the findings,
- * most severe first so a truncated operator view still shows the worst thing.
+ * Run the WINDOW checks over one window's worth of evidence and return the
+ * findings, most severe first so a truncated operator view still shows the
+ * worst thing.
+ *
+ * `checkPersistedBalance` is deliberately NOT run from here. It asks a question
+ * a window cannot answer: a mutation that bypassed the ledger leaves a
+ * character's save and ledger disagreeing forever after, and that character may
+ * never move another coin, so a window-scoped comparison would lose sight of
+ * them one pass after the incident. The job asks it globally instead, against
+ * every character's current ledger head (`loadPurseDisagreements`), which is
+ * also the only reading that is not stale when the window ends before a
+ * character's newest row.
  */
 export function reconcileWindow(input: {
   rowsByCharacter: ReadonlyMap<number, readonly ReconcileRow[]>;
-  /**
-   * Persisted purses for SETTLED characters only: those whose save is known to
-   * postdate their last ledger row. The job owns that selection, because
-   * comparing an in-session player's half-saved purse against a ledger that is
-   * already ahead of it would report a critical on every active player and
-   * bury the one real finding under them.
-   */
-  persistedCopper: ReadonlyMap<number, number>;
   openingSupply: number;
   closingSupply: SupplySnapshot;
   droppedWrites: number;
@@ -332,16 +334,8 @@ export function reconcileWindow(input: {
 }): EconomyAlert[] {
   const alerts: EconomyAlert[] = [];
   const all: ReconcileRow[] = [];
-  for (const [characterId, rows] of input.rowsByCharacter) {
+  for (const rows of input.rowsByCharacter.values()) {
     alerts.push(...checkChain(rows));
-    const purse = purseRows(rows);
-    const last = purse.length > 0 ? purse[purse.length - 1].balanceAfter : null;
-    const persisted = input.persistedCopper.get(characterId);
-    // A character with no persisted figure is not a finding: they may simply
-    // not have been saved yet. Absence of evidence is not evidence of a dupe.
-    if (persisted !== undefined) {
-      alerts.push(...checkPersistedBalance(characterId, last, persisted));
-    }
     all.push(...rows);
   }
   alerts.push(...checkTransferSymmetry(all));
