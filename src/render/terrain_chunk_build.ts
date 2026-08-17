@@ -123,7 +123,7 @@ function paletteAt(x: number, z: number): void {
   }
 }
 
-// How "marsh" a given z is — mirrors the palette/heightfield blend windows so
+// How "marsh" a given z is: mirrors the palette/heightfield blend windows so
 // the mud texture fades in exactly where the marsh palette does.
 function marshWeightAt(x: number, z: number): number {
   let w = STRIP_ZONES[0].biome === 'marsh' ? 1 : 0;
@@ -298,7 +298,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     cTmp.lerp(sandC, shore);
     lerpSplat(w, 3, shore);
   }
-  // packed dirt at each hub settlement (same feather as the splat weight —
+  // packed dirt at each hub settlement (same feather as the splat weight,
   // a constant lerp stamped a clean-edged brown disc on the grass)
   for (const zn of ZONES) {
     const dHub = Math.hypot(x - zn.hub.x, z - zn.hub.z);
