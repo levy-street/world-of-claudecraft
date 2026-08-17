@@ -3112,8 +3112,11 @@ export const ja_JP: EnTranslations = {
         "no_fee_produce": "見張り料を払う作物がありません。",
         "no_tonic": "成長トニックがありません。",
         "tool": "その作物に合う農耕鍬を持っていません。",
-        "locked": "その支払いに使えるアイテムがロックされています。"
+        "locked": "その支払いに使えるアイテムがロックされています。",
+        "no_farmer": "籾殻を堆肥と交換するには農夫のそばにいなければなりません。"
       },
+      "huskTrade": "籾殻を堆肥と交換する",
+      "huskTradeAria": "{name}と枯れた籾殻を堆肥に交換する",
       "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
       "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。",
       "readyLine": "作物が1区画、収穫できるようになった。",

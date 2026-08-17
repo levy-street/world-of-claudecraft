@@ -6662,7 +6662,12 @@ export type SimEvent = { pid?: number } & (
         // 'locked' twin). Fired when the raw held count would have passed
         // the gate that the unlocked count failed, for any of the five
         // farming spends.
-        | 'locked';
+        | 'locked'
+        // The farming go-live, appended: convert_husks refused because no
+        // farmer NPC stands within FARMER_TRADE_RANGE of the sender
+        // (professions/farmer_npcs.ts). Its own reason rather than 'range',
+        // whose HUD line names a crop bed; the trade has no bed.
+        | 'no_farmer';
       bedId?: string;
       cropId?: string;
     }

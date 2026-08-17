@@ -9017,6 +9017,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.bad_bed': 'Там нет грядки.',
   'hudChrome.farming.denied.bad_crop': 'Это здесь посадить нельзя.',
   'hudChrome.farming.denied.range': 'Вы слишком далеко от этой грядки.',
+  'hudChrome.farming.denied.no_farmer':
+    'Чтобы обменять шелуху на компост, нужно стоять рядом с фермером.',
+  'hudChrome.farming.huskTrade': 'Обменять шелуху на компост',
+  'hudChrome.farming.huskTradeAria': 'Обменять засохшую шелуху на компост у {name}',
   'hudChrome.farming.denied.bed_taken': 'Там у вас уже растет урожай.',
   'hudChrome.farming.denied.skill': 'Ваш навык земледелия слишком низок для этой культуры.',
   'hudChrome.farming.denied.no_seed': 'У вас нет семян этой культуры.',

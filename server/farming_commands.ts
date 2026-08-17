@@ -72,8 +72,9 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
     case 'convert_husks':
       // Farming's knobs phase: trade withered husks for compost. NO payload
       // to guard: the ratio, the batch count and both item ids resolve
-      // sim-side from the sender's own bags, and the refusal (too few
-      // husks) answers with the pid-scoped text-free farmDenied event.
+      // sim-side from the sender's own bags, and the refusals (too few
+      // husks, or no farmer NPC in reach: the go-live's range gate lives in
+      // the sim body) answer with the pid-scoped text-free farmDenied event.
       sim.convertHusks(pid);
       break;
   }

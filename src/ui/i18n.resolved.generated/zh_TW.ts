@@ -3112,8 +3112,11 @@ export const zh_TW: EnTranslations = {
         "no_fee_produce": "你沒有可以支付看守費的農產品。",
         "no_tonic": "你沒有生長滋補劑。",
         "tool": "你沒有適合該作物的耕作鋤。",
-        "locked": "有一件可用於支付的物品已被鎖定。"
+        "locked": "有一件可用於支付的物品已被鎖定。",
+        "no_farmer": "你必須靠近農夫才能用穀殼換堆肥。"
       },
+      "huskTrade": "用穀殼換堆肥",
+      "huskTradeAria": "與{name}用枯萎穀殼換取堆肥",
       "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
       "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。",
       "readyLine": "有一塊作物可以收成了。",
