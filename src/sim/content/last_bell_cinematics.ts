@@ -40,10 +40,15 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
   // out (390.83, 3.77) to (439.41, 22.32); back the same water sailed the
   // other way. Pose positions rotate by the COMBINED yaw (base plus pose)
   // in composeHarborShipAttachFrame, so these locals bake that in.
+  // The glide runs the reviewed 52 yd of water over the 9 s open-water leg
+  // rather than covering more of it, so the shot stays inside the authored
+  // deep-water span; the duration outlasts the leg's fade to full black
+  // (15.6 s) the way the cast-off glide does, since a vessel that stops
+  // while still faintly visible reads as stalled (motion.propWay).
   [LAST_BELL_VOYAGE_SEGMENT_IDS.out.openWater]: {
     start: { x: 157.48, y: 0, z: -8.994, yaw: -1.935526 },
     end: { x: 209.481, y: 0, z: -8.995, yaw: -1.935526 },
-    duration: 5.7,
+    duration: 8.8,
     ease: 'linear',
   },
   // Arrival glides (J9): a long shallow bow-first slide into the berth,
@@ -72,7 +77,7 @@ export const LAST_BELL_PROP_PATH_SEGMENTS = {
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.openWater]: {
     start: { x: 290.615, y: 0, z: -5.869, yaw: 1.206066 },
     end: { x: 342.615, y: 0, z: -5.868, yaw: 1.206066 },
-    duration: 5.7,
+    duration: 8.8,
     ease: 'linear',
   },
   [LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival]: {

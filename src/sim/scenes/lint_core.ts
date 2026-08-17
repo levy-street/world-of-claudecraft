@@ -47,8 +47,13 @@ export const MAX_POSE_POSITION_STEP_YARDS = 3.5;
 export const MAX_POSE_ORIENTATION_STEP_DEG = 10;
 // A held shot shorter than this reads as an accidental camera twitch.
 export const MIN_HELD_SHOT_SECONDS = 1.5;
-// A held shot longer than this stalls the cinematic grammar.
-export const MAX_HELD_SHOT_SECONDS = 8;
+// A held shot longer than this stalls the cinematic grammar. The window is
+// measured cut to cut, so a fade-covered head and tail count toward it: the
+// voyage's open-water leg is authored at 9 s to let the crossing be felt, of
+// which 1.6 s of reveal and 1.6 s of fade-out are covered, leaving 5.4 s of
+// clear held frame. The ceiling sits above that authored case rather than at
+// it so the shape stays reviewable, not so any shot may idle.
+export const MAX_HELD_SHOT_SECONDS = 9.5;
 // A visible release may land at most this far from the gameplay camera.
 export const MAX_RELEASE_POSITION_DELTA_YARDS = 20;
 // A visible release may turn at most this far toward the gameplay camera.
