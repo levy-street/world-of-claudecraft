@@ -966,6 +966,22 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/druid/alt_suit_prismatic.png`,
     `${SKINS_DIR}/druid/alt_suit_chrome.png`,
   ],
+  player_gravecaller: [
+    null,
+    `${SKINS_DIR}/mage/alt_a.png`,
+    `${SKINS_DIR}/mage/alt_b.png`,
+    `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
+  ],
+  player_briar_warden: [
+    null,
+    `${SKINS_DIR}/druid/alt_a.png`,
+    `${SKINS_DIR}/druid/alt_b.png`,
+    `${SKINS_DIR}/druid/alt_c.png`,
+    `${SKINS_DIR}/druid/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/druid/alt_suit_chrome.png`,
+  ],
   // Combat Mech chromas — every index is a real full-model texture (no null
   // default; the embedded base texture is not one of the rewards).
   player_mech: MECH_CHROMAS.map(mechChromaUrl),
@@ -2854,6 +2870,10 @@ export const VISUALS: Record<string, VisualDef> = {
 // Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
 // get no modular def at all and fall back to the warrior's clips through
 // modularKeyFor, silently, with no test able to see it.
+// The expansion classes deliberately inherit established rigs while keeping
+// their own class keys, palettes, ability kits, and modular variants.
+VISUALS.player_gravecaller = VISUALS.player_warlock;
+VISUALS.player_briar_warden = VISUALS.player_druid;
 for (const cls of ALL_CLASSES) {
   const {
     show: _show,

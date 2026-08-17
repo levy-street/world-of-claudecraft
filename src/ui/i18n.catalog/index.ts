@@ -823,6 +823,8 @@ export const en = {
     mage: 'Mage',
     warlock: 'Warlock',
     druid: 'Druid',
+    gravecaller: 'Gravecaller',
+    briar_warden: 'Briar Warden',
     warriorAria: 'Warrior class',
     paladinAria: 'Paladin class',
     hunterAria: 'Hunter class',
@@ -832,6 +834,8 @@ export const en = {
     mageAria: 'Mage class',
     warlockAria: 'Warlock class',
     druidAria: 'Druid class',
+    gravecallerAria: 'Gravecaller class',
+    briar_wardenAria: 'Briar Warden class',
   },
   controls: {
     title: 'Controls Guide',

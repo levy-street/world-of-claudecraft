@@ -2818,6 +2818,48 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'Light of the Sanctum' },
   },
+  prog_ashen_bloom_40: {
+    id: 'prog_ashen_bloom_40',
+    name: 'Beyond the Old Horizon',
+    desc: 'Reach level 40.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'level', level: 40 },
+    reward: { kind: 'title', text: 'Bloomwalker' },
+  },
+  dgn_rotchapel_clear: {
+    id: 'dgn_rotchapel_clear',
+    name: 'No More Sermons',
+    desc: 'Defeat the Abbot of Flies in Rotchapel.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'rotchapel', count: 1 },
+  },
+  dgn_ossuary_clear: {
+    id: 'dgn_ossuary_clear',
+    name: 'Dismissed from Service',
+    desc: 'Defeat General Silex in the Ossuary of the March.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'ossuary_of_the_march', count: 1 },
+  },
+  dgn_crownroot_clear: {
+    id: 'dgn_crownroot_clear',
+    name: 'Uprooted Royalty',
+    desc: 'Defeat the Queen Under Roots in the Heart of Crownroot.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'heart_of_crownroot', count: 1 },
+  },
+  dgn_sepulcher_clear: {
+    id: 'dgn_sepulcher_clear',
+    name: 'The Crown Is Empty',
+    desc: 'Defeat the King in Ashes in the Sepulcher of Ashes.',
+    category: 'dungeon',
+    renown: 50,
+    trigger: { kind: 'dungeonClears', dungeonId: 'sepulcher_of_ashes', count: 1 },
+    reward: { kind: 'title', text: 'Crown-Breaker' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -9,6 +9,7 @@ import {
   SHAMAN_CHOICE_ROWS,
   WARLOCK_CHOICE_ROWS,
 } from './choice_rows_classic';
+import { BRIAR_WARDEN_ROWS, GRAVECALLER_ROWS } from './expansion_talents';
 import type { TalentEffect } from './talents';
 import { WARRIOR_ROWS } from './warrior_rows';
 
@@ -49,6 +50,8 @@ export const ROW_TREES = {
   mage: MAGE_CHOICE_ROWS.rows,
   warlock: WARLOCK_CHOICE_ROWS.rows,
   druid: DRUID_CHOICE_ROWS.rows,
+  gravecaller: GRAVECALLER_ROWS,
+  briar_warden: BRIAR_WARDEN_ROWS,
 } satisfies Record<PlayerClass, RowTree>;
 
 const ROW_LEVEL_SET = new Set<number>(ROW_LEVELS);

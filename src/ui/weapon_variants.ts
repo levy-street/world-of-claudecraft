@@ -22,6 +22,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   hoarfrost_edge: 'sword_e', // rift rare 1H sword (heroic clone rides heroicOf)
   veilsteel_blade: 'sword_b', // realm uncommon 1H sword (arming-sword sibling)
   kingsbane_last_oath: 'sword_f', // LEGENDARY: the flaming blade (exclusive)
+  king_in_ashes_blade: 'sword_f', // LEGENDARY: Ashen Bloom raid blade
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
   highwatch_warblade: 'adv_sword_1handed',
@@ -83,6 +84,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   apprentice_staff: 'staff_b',
   staff_of_drowned_prayers: 'staff_b',
   gravecaller_staff: 'staff_c', // "Staff of the Hollow"
+  gravecallers_crozier: 'staff_c', // Gravecaller Crownroot caster staff
   mirejaw_oracle_staff: 'staff_c',
   hollow_vigil_staff: 'staff_c',
   emberwood_staff: 'staff_d',

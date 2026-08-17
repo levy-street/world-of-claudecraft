@@ -229,6 +229,26 @@ const MOB_IDS = [
   'wildheart_hexcaller',
   'wildheart_beastmaster',
   'wildheart_high_priest',
+  'rotmire_husk',
+  'carrion_bloom',
+  'sporebound_brute',
+  'mother_morva',
+  'stone_legionary',
+  'crownless_knight',
+  'rootscar_widow',
+  'marshal_veyr',
+  'frostroot_stalker',
+  'ashen_dryad',
+  'sepulcher_guardian',
+  'the_hollow_crown',
+  'rotchapel_cultist',
+  'abbot_of_flies',
+  'cairnwall_revenant',
+  'general_silex',
+  'crownroot_heartwood',
+  'queen_under_roots',
+  'sepulcher_crownshard',
+  'king_in_ashes',
 ] as const;
 
 const NPC_IDS = [
@@ -333,6 +353,9 @@ const NPC_IDS = [
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  'mortician_ella',
+  'captain_orren',
+  'sister_briar',
 ] as const;
 
 const QUEST_IDS = [
@@ -545,6 +568,18 @@ const QUEST_IDS = [
   'q_gc_the_far_shore',
   'q_gc_dead_mens_cargo',
   'q_gc_the_wreck_warden',
+  'q_ab_01_wakefort',
+  'q_ab_02_carrion',
+  'q_ab_03_sporefall',
+  'q_ab_04_morva',
+  'q_ab_05_cairnwall',
+  'q_ab_06_stone_host',
+  'q_ab_07_rootscar',
+  'q_ab_08_veyr',
+  'q_ab_09_lastbough',
+  'q_ab_10_canopy',
+  'q_ab_11_guardians',
+  'q_ab_12_crown',
 ] as const;
 
 const ZONE_IDS = [
@@ -562,6 +597,9 @@ const ZONE_IDS = [
   'evergarden',
   'galecrest',
   'farshore_isle',
+  'rotmire_expanse',
+  'petrified_march',
+  'crownroot_wilds',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',
@@ -571,6 +609,10 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
   'wildheart_basin',
   'the_last_keep',
+  'rotchapel',
+  'ossuary_of_the_march',
+  'heart_of_crownroot',
+  'sepulcher_of_ashes',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

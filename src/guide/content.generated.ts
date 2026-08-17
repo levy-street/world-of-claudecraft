@@ -523,6 +523,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "enrage_passive",
         "name": "Mayhem"
+      },
+      {
+        "id": "gravebreaker",
+        "name": "Gravebreaker"
       }
     ],
     "model": "player_warrior",
@@ -743,6 +747,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "veilbound_march",
         "name": "Veilbound March"
+      },
+      {
+        "id": "last_light",
+        "name": "Last Light"
       }
     ],
     "model": "player_paladin",
@@ -909,6 +917,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "counter_shot",
         "name": "Hushing Shot"
+      },
+      {
+        "id": "blackfletch",
+        "name": "Blackfletch"
       }
     ],
     "model": "player_hunter",
@@ -1059,6 +1071,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "venom_dart",
         "name": "Venom Dart"
+      },
+      {
+        "id": "duskstep",
+        "name": "Duskstep"
       }
     ],
     "model": "player_rogue",
@@ -1190,6 +1206,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "summon_tithefiend",
         "name": "Call Tithefiend"
+      },
+      {
+        "id": "memorial_grace",
+        "name": "Memorial Grace"
       }
     ],
     "model": "player_priest",
@@ -1335,6 +1355,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "bloodlust",
         "name": "Storm Chorus"
+      },
+      {
+        "id": "ancestor_storm",
+        "name": "Ancestor Storm"
       }
     ],
     "model": "player_shaman",
@@ -1580,6 +1604,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "fireball_form",
         "name": "Ember Form"
+      },
+      {
+        "id": "cinder_comet",
+        "name": "Cinder Comet"
       }
     ],
     "model": "player_mage",
@@ -1822,6 +1850,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "army_of_the_dead",
         "name": "Army of the Dead"
+      },
+      {
+        "id": "funeral_pyre",
+        "name": "Funeral Pyre"
       }
     ],
     "model": "player_warlock",
@@ -2032,10 +2064,202 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "primal_reflexes",
         "name": "Primal Reflexes"
+      },
+      {
+        "id": "crown_of_briars",
+        "name": "Crown of Briars"
       }
     ],
     "model": "player_druid",
     "still": "/guide-stills/player_druid.webp"
+  },
+  {
+    "id": "gravecaller",
+    "color": "#66507c",
+    "resource": "mana",
+    "roles": [
+      "dps"
+    ],
+    "specs": [
+      {
+        "id": "plagueweaver",
+        "name": "Plagueweaver",
+        "role": "dps",
+        "signature": "the_wasting"
+      },
+      {
+        "id": "ossuary",
+        "name": "Ossuary",
+        "role": "dps",
+        "signature": "gravecaller_bone_coat"
+      },
+      {
+        "id": "bloodsage",
+        "name": "Bloodsage",
+        "role": "dps",
+        "signature": "soul_siphon"
+      }
+    ],
+    "signatureAbilities": [
+      {
+        "id": "pestilent_bolt",
+        "name": "Pestilent Bolt"
+      },
+      {
+        "id": "blood_tithe",
+        "name": "Blood Tithe"
+      },
+      {
+        "id": "the_wasting",
+        "name": "The Wasting"
+      },
+      {
+        "id": "gravecaller_bone_coat",
+        "name": "Bone Coat"
+      },
+      {
+        "id": "plague_wind",
+        "name": "Plague Wind"
+      },
+      {
+        "id": "deaths_bargain",
+        "name": "Death's Bargain"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "pestilent_bolt",
+        "name": "Pestilent Bolt"
+      },
+      {
+        "id": "blood_tithe",
+        "name": "Blood Tithe"
+      },
+      {
+        "id": "the_wasting",
+        "name": "The Wasting"
+      },
+      {
+        "id": "grave_dread",
+        "name": "Dread"
+      },
+      {
+        "id": "gravecaller_bone_coat",
+        "name": "Bone Coat"
+      },
+      {
+        "id": "soul_siphon",
+        "name": "Soul Siphon"
+      },
+      {
+        "id": "grave_chill",
+        "name": "Grave Chill"
+      },
+      {
+        "id": "plague_wind",
+        "name": "Plague Wind"
+      },
+      {
+        "id": "deaths_bargain",
+        "name": "Death's Bargain"
+      }
+    ],
+    "model": "player_gravecaller",
+    "tint": "#8d5fd3",
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_gravecaller__8d5fd3__s12.webp"
+  },
+  {
+    "id": "briar_warden",
+    "color": "#698744",
+    "resource": "mana",
+    "roles": [
+      "tank",
+      "healer",
+      "dps"
+    ],
+    "specs": [
+      {
+        "id": "thornbound",
+        "name": "Thornbound",
+        "role": "tank",
+        "signature": "briar_skin"
+      },
+      {
+        "id": "blightkeeper",
+        "name": "Blightkeeper",
+        "role": "dps",
+        "signature": "spore_hex"
+      },
+      {
+        "id": "grove_covenant",
+        "name": "Grove Covenant",
+        "role": "healer",
+        "signature": "ironbark_boon"
+      }
+    ],
+    "signatureAbilities": [
+      {
+        "id": "briar_skin",
+        "name": "Briar Skin"
+      },
+      {
+        "id": "withering_presence",
+        "name": "Withering Presence"
+      },
+      {
+        "id": "barbed_aegis",
+        "name": "Barbed Aegis"
+      },
+      {
+        "id": "spore_hex",
+        "name": "Spore Hex"
+      },
+      {
+        "id": "vindictive_growth",
+        "name": "Vindictive Growth"
+      },
+      {
+        "id": "walking_calamity",
+        "name": "Walking Calamity"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "briar_skin",
+        "name": "Briar Skin"
+      },
+      {
+        "id": "withering_presence",
+        "name": "Withering Presence"
+      },
+      {
+        "id": "barbed_aegis",
+        "name": "Barbed Aegis"
+      },
+      {
+        "id": "spore_hex",
+        "name": "Spore Hex"
+      },
+      {
+        "id": "ironbark_boon",
+        "name": "Ironbark Boon"
+      },
+      {
+        "id": "pollen_cloud",
+        "name": "Pollen Cloud"
+      },
+      {
+        "id": "vindictive_growth",
+        "name": "Vindictive Growth"
+      },
+      {
+        "id": "walking_calamity",
+        "name": "Walking Calamity"
+      }
+    ],
+    "model": "player_briar_warden",
+    "still": "/guide-stills/player_briar_warden.webp"
   }
 ];
 
@@ -2381,6 +2605,63 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "burrower",
       "demon"
     ]
+  },
+  {
+    "id": "rotmire_expanse",
+    "name": "The Rotmire Expanse",
+    "min": 20,
+    "max": 27,
+    "biome": "marsh",
+    "hub": "Wakefort",
+    "pois": [
+      "Wakefort",
+      "The Carrion Gardens",
+      "Sporefall Basin"
+    ],
+    "welcome": "The dead feed a bloom that should never have taken root. Wakefort holds the last dry road north.",
+    "families": [
+      "burrower",
+      "ogre",
+      "undead"
+    ]
+  },
+  {
+    "id": "petrified_march",
+    "name": "The Petrified March",
+    "min": 27,
+    "max": 34,
+    "biome": "amber",
+    "hub": "Cairnwall",
+    "pois": [
+      "Cairnwall",
+      "The Stone Host",
+      "Rootscar Front"
+    ],
+    "welcome": "A royal army stands petrified mid-charge, and something beneath the road has begun calling their names.",
+    "families": [
+      "spider",
+      "humanoid",
+      "undead"
+    ]
+  },
+  {
+    "id": "crownroot_wilds",
+    "name": "The Crownroot Wilds",
+    "min": 34,
+    "max": 40,
+    "biome": "frost",
+    "hub": "Lastbough",
+    "pois": [
+      "Lastbough",
+      "The Ashen Canopy",
+      "Sepulcher Approach"
+    ],
+    "welcome": "Frost grips a forest growing from a buried crown. Beyond Lastbough, every root points toward the Sepulcher.",
+    "families": [
+      "beast",
+      "humanoid",
+      "elemental"
+    ]
   }
 ];
 
@@ -2431,6 +2712,38 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "suggestedPlayers": 10,
     "min": 20,
     "max": 20
+  },
+  {
+    "id": "rotchapel",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 25,
+    "max": 27,
+    "name": "Rotchapel"
+  },
+  {
+    "id": "ossuary_of_the_march",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 31,
+    "max": 34,
+    "name": "Ossuary of the March"
+  },
+  {
+    "id": "heart_of_crownroot",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 38,
+    "max": 40,
+    "name": "Heart of Crownroot"
+  },
+  {
+    "id": "sepulcher_of_ashes",
+    "isRaid": true,
+    "suggestedPlayers": 10,
+    "min": 40,
+    "max": 40,
+    "name": "Sepulcher of Ashes"
   }
 ];
 
@@ -2692,6 +3005,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#4a8a4e",
         "tintStrength": 0.35,
         "still": "/guide-stills/mob_wolf__4a8a4e__s35.webp"
+      },
+      {
+        "name": "Frostroot Stalker",
+        "min": 34,
+        "max": 37,
+        "rare": false,
+        "templateId": "frostroot_stalker",
+        "model": "mob_wolf",
+        "tint": "#78919b",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__78919b__s35.webp"
       }
     ]
   },
@@ -2750,6 +3074,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#3a3440",
         "tintStrength": 0.35,
         "still": "/guide-stills/mob_spider__3a3440__s35.webp"
+      },
+      {
+        "name": "Rootscar Widow",
+        "min": 31,
+        "max": 34,
+        "rare": false,
+        "templateId": "rootscar_widow",
+        "model": "mob_spider",
+        "tint": "#573b42",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__573b42__s35.webp"
       }
     ]
   },
@@ -2947,6 +3282,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#5a8a46",
         "tintStrength": 0.2,
         "still": "/guide-stills/mob_kobold__5a8a46__s20.webp"
+      },
+      {
+        "name": "Carrion Bloom",
+        "min": 22,
+        "max": 25,
+        "rare": false,
+        "templateId": "carrion_bloom",
+        "model": "mob_kobold",
+        "tint": "#8f4567",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__8f4567__s20.webp"
       }
     ]
   },
@@ -3027,6 +3373,28 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "hedge_knight",
         "model": "npc_knight",
         "still": "/guide-stills/npc_knight.webp"
+      },
+      {
+        "name": "Stone Legionary",
+        "min": 27,
+        "max": 30,
+        "rare": false,
+        "templateId": "stone_legionary",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+      },
+      {
+        "name": "Ashen Dryad",
+        "min": 36,
+        "max": 39,
+        "rare": false,
+        "templateId": "ashen_dryad",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       }
     ]
   },
@@ -3092,6 +3460,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#4e4a3a",
         "tintStrength": 0.72,
         "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
+      },
+      {
+        "name": "Sporebound Brute",
+        "min": 24,
+        "max": 27,
+        "rare": false,
+        "templateId": "sporebound_brute",
+        "model": "mob_ogre",
+        "tint": "#76516f",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_ogre__76516f__s20.webp"
       }
     ]
   },
@@ -3185,6 +3564,28 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#86988e",
         "tintStrength": 0.25,
         "still": "/guide-stills/skel_minion__86988e__s25.webp"
+      },
+      {
+        "name": "Rotmire Husk",
+        "min": 20,
+        "max": 23,
+        "rare": false,
+        "templateId": "rotmire_husk",
+        "model": "skel_minion",
+        "tint": "#6c7650",
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__6c7650__s25.webp"
+      },
+      {
+        "name": "Crownless Knight",
+        "min": 29,
+        "max": 32,
+        "rare": false,
+        "templateId": "crownless_knight",
+        "model": "skel_minion",
+        "tint": "#5e6370",
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__5e6370__s25.webp"
       }
     ]
   },
@@ -3296,6 +3697,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#9ab4a0",
         "tintStrength": 0.55,
         "still": "/guide-stills/mob_ghost__9ab4a0__s55.webp"
+      },
+      {
+        "name": "Sepulcher Guardian",
+        "min": 38,
+        "max": 40,
+        "rare": false,
+        "templateId": "sepulcher_guardian",
+        "model": "mob_elemental",
+        "tint": "#49515d",
+        "tintStrength": 0.4,
+        "still": "/guide-stills/mob_elemental__49515d.webp"
       }
     ]
   },
@@ -5566,6 +5978,43 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "prog_ashen_bloom_40",
+    "name": "Beyond the Old Horizon",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Bloomwalker"
+  },
+  {
+    "id": "dgn_rotchapel_clear",
+    "name": "No More Sermons",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ossuary_clear",
+    "name": "Dismissed from Service",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_crownroot_clear",
+    "name": "Uprooted Royalty",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_sepulcher_clear",
+    "name": "The Crown Is Empty",
+    "category": "dungeon",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Crown-Breaker"
   }
 ];
 
@@ -5989,6 +6438,62 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bloodmane War-Legguards"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_rotchapel",
+    "shelf": "conquerors",
+    "name": "Rotchapel",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Flyblown Censer"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_ossuary_of_the_march",
+    "shelf": "conquerors",
+    "name": "Ossuary of the March",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Crownshard Signet"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_heart_of_crownroot",
+    "shelf": "conquerors",
+    "name": "Heart of Crownroot",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Gravecaller's Crozier"
+      },
+      {
+        "kind": "item",
+        "name": "Mantle of Walking Thorns"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_sepulture_of_ashes",
+    "shelf": "conquerors",
+    "name": "Sepulcher of Ashes",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Sepulcher Bulwark"
+      },
+      {
+        "kind": "item",
+        "name": "Regicide in Bloom"
+      },
+      {
+        "kind": "item",
+        "name": "Phial of Royal Ash"
       }
     ]
   },
@@ -6775,6 +7280,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Light of the Sanctum"
+      },
+      {
+        "kind": "title",
+        "name": "Bloomwalker"
+      },
+      {
+        "kind": "title",
+        "name": "Crown-Breaker"
       }
     ]
   },
@@ -12643,6 +13156,35 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.12
   },
   "player_druid": {
+    "url": "models/chars/players/druid.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "attach": [
+      {
+        "url": "models/weapons/staff.glb",
+        "bone": "handslot.r"
+      }
+    ]
+  },
+  "player_gravecaller": {
+    "url": "models/chars/players/mage.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "show": [],
+    "attach": [
+      {
+        "url": "models/weapons/wand.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/spellbook_open.glb",
+        "bone": "handslot.l",
+        "gripRef": "Spellbook_open"
+      }
+    ],
+    "tintStrength": 0.12
+  },
+  "player_briar_warden": {
     "url": "models/chars/players/druid.glb",
     "idle": "Idle",
     "height": 2.6,

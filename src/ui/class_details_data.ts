@@ -75,6 +75,18 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     armorKey: 'classDetails.armor.leatherCloth',
     weaponsKey: 'classDetails.weapons.staves',
   },
+  gravecaller: {
+    roleKey: 'classDetails.roles.gravecaller',
+    roleType: 'ranged',
+    armorKey: 'classDetails.armor.cloth',
+    weaponsKey: 'classDetails.weapons.staves',
+  },
+  briar_warden: {
+    roleKey: 'classDetails.roles.briar_warden',
+    roleType: 'hybrid',
+    armorKey: 'classDetails.armor.chainLeatherCloth',
+    weaponsKey: 'classDetails.weapons.macesAxes',
+  },
 };
 
 // Three curated "signature" abilities per class, shown on the select screen.
@@ -90,6 +102,8 @@ export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   mage: ['fireball', 'frostbolt', 'polymorph'],
   warlock: ['shadow_bolt', 'corruption', 'life_tap'],
   druid: ['wrath', 'bear_form', 'rejuvenation'],
+  gravecaller: ['pestilent_bolt', 'the_wasting', 'soul_siphon'],
+  briar_warden: ['briar_skin', 'barbed_aegis', 'walking_calamity'],
 };
 
 // Spec-card presentation for the Specialization screen. Keyed by class, then spec id:
@@ -261,5 +275,15 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
       complexity: 'medium',
       examples: ['swiftmend', 'rejuvenation', 'regrowth', 'healing_touch'],
     },
+  },
+  gravecaller: {
+    plagueweaver: { primaryStat: 'int', complexity: 'medium', examples: ['pestilent_bolt', 'the_wasting', 'plague_wind'] },
+    ossuary: { primaryStat: 'int', complexity: 'high', examples: ['gravecaller_bone_coat', 'grave_dread', 'deaths_bargain'] },
+    bloodsage: { primaryStat: 'int', complexity: 'high', examples: ['blood_tithe', 'soul_siphon', 'grave_chill'] },
+  },
+  briar_warden: {
+    thornbound: { primaryStat: 'sta', complexity: 'low', examples: ['briar_skin', 'barbed_aegis', 'vindictive_growth', 'walking_calamity'] },
+    blightkeeper: { primaryStat: 'int', complexity: 'medium', examples: ['spore_hex', 'withering_presence', 'pollen_cloud'] },
+    grove_covenant: { primaryStat: 'spi', complexity: 'medium', examples: ['ironbark_boon', 'briar_skin', 'withering_presence'] },
   },
 };

@@ -6027,6 +6027,29 @@
     "marrowpoint",
     "rimefang"
    ]
+  },
+  {
+   "batchId": "ashen-bloom-expansion-items-2026-08-16",
+   "source": "OpenAI built-in image generation",
+   "owner": "World of ClaudeCraft",
+   "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+   "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+   },
+   "styleReference": "Original Ashen Bloom item paintings generated for this expansion under the repository item-icon contract.",
+   "commonPrompt": "Original hand-painted classic fantasy MMORPG inventory object, centered with safe margins, tactile materials, strong small-size silhouette, no border, writing, watermark, character, or crop.",
+   "itemIds": [
+    "ashen_petal",
+    "crownroot_heartwood_item",
+    "flyblown_censer",
+    "gravecallers_crozier",
+    "mantle_of_walking_thorns",
+    "crownshard_ring",
+    "sepulcher_bulwark",
+    "king_in_ashes_blade",
+    "royal_ash_phial"
+   ]
   }
  ]
 }

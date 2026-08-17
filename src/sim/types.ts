@@ -201,7 +201,9 @@ export type PlayerClass =
   | 'shaman'
   | 'mage'
   | 'warlock'
-  | 'druid';
+  | 'druid'
+  | 'gravecaller'
+  | 'briar_warden';
 
 // Sanguine Aura's class-level melee recipient filter. It excludes the pure
 // casters and Hunter, whose primary attack loop is ranged.
@@ -270,6 +272,8 @@ export const ALL_CLASSES: PlayerClass[] = [
   'mage',
   'warlock',
   'druid',
+  'gravecaller',
+  'briar_warden',
 ];
 export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
 export const OVERHEAD_EMOTE_IDS = [
@@ -6889,7 +6893,7 @@ export const RIFT_TIER_COLORS: Record<RiftTier, number> = {
   S: 0xffb020,
 };
 
-export const MAX_LEVEL = 20;
+export const MAX_LEVEL = 40;
 
 // Shared sim constants relocated here (C1) so both sim.ts and the extracted damage
 // core (src/sim/combat/damage.ts) can import them without a sim.ts cycle.
@@ -6913,7 +6917,10 @@ export const SISTER_NHALIA_BOSS_ID = 'sister_nhalia_drowned_canticle';
 export const TOLLING_BELL_TEMPLATE_ID = 'tolling_bell';
 
 export function xpForLevel(level: number): number {
-  return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];
+  const normalized = Math.max(1, Math.floor(level));
+  if (normalized <= XP_TABLE.length) return XP_TABLE[normalized - 1];
+  const expansionLevels = normalized - XP_TABLE.length;
+  return Math.round(XP_TABLE[XP_TABLE.length - 1] * 1.12 ** expansionLevels);
 }
 
 // ---------------------------------------------------------------------------
@@ -6936,13 +6943,14 @@ export const MAX_VIRTUAL_LEVEL = 200; // table bound; far beyond any reachable l
 const VLEVEL_CUM: number[] = (() => {
   const cum: number[] = [0, 0];
   let total = 0;
-  // real levels: 1→2 … 19→20 come straight from XP_TABLE
+  // Real levels use the classic table through level 20, then the expansion
+  // continuation returned by xpForLevel through the current cap.
   for (let lvl = 1; lvl < MAX_LEVEL; lvl++) {
-    total += XP_TABLE[lvl - 1];
+    total += xpForLevel(lvl);
     cum[lvl + 1] = total;
   }
-  // post-cap: continue from the 20→21 step, growing geometrically
-  let step = XP_TABLE[MAX_LEVEL - 1];
+  // Post-cap continues from the final real-level step.
+  let step = xpForLevel(MAX_LEVEL);
   for (let lvl = MAX_LEVEL; lvl < MAX_VIRTUAL_LEVEL; lvl++) {
     total += Math.round(step);
     cum[lvl + 1] = total;
@@ -7225,7 +7233,7 @@ export interface DeedStats {
 // be spammed from a hacked client to inflate the (leaderboard-visible) rank  -
 // the server caps rank at maxPrestigeRank(lifetimeXp) regardless of how many
 // prestige commands arrive.
-export const PRESTIGE_XP_PER_RANK = xpForLevel(MAX_LEVEL); // = 23,200
+export const PRESTIGE_XP_PER_RANK = xpForLevel(MAX_LEVEL);
 
 // Highest prestige rank the given lifetime XP can support (post-cap XP / cost).
 export function maxPrestigeRank(lifetimeXp: number): number {

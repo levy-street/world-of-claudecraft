@@ -1,6 +1,7 @@
 import type { SavedGearSet } from '../loadout_gear';
 import type { AbilityEffect, AuraKind, ResourceType } from '../types';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../types';
+import { BRIAR_WARDEN_TALENTS, GRAVECALLER_TALENTS } from './expansion_talents';
 import { specBaselineFor } from './spec_baselines';
 import {
   isTalentRowLevel,
@@ -409,6 +410,8 @@ export const TALENTS = {
   mage: MAGE_TALENTS,
   warlock: WARLOCK_TALENTS,
   druid: DRUID_TALENTS,
+  gravecaller: GRAVECALLER_TALENTS,
+  briar_warden: BRIAR_WARDEN_TALENTS,
 } satisfies Record<PlayerClass, ClassTalents>;
 
 export function talentsFor(cls: PlayerClass): ClassTalents | null {

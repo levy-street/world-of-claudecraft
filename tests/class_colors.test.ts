@@ -28,6 +28,8 @@ const PALETTE: Record<PlayerClass, number> = {
   shaman: 0x4e8aea,
   warlock: 0xa785e6,
   druid: 0xff8c1a,
+  gravecaller: 0x66507c,
+  briar_warden: 0x698744,
 };
 const CLASS_IDS = Object.keys(PALETTE) as PlayerClass[];
 
@@ -40,7 +42,7 @@ const shellCss = readFileSync(new URL('../src/styles/shell.css', import.meta.url
   .replace(/\s+/g, ' ');
 
 describe('class color palette', () => {
-  it('CLASSES pins the nine approved colors as exact literals', () => {
+  it('CLASSES pins the approved colors as exact literals', () => {
     for (const cls of CLASS_IDS) {
       expect(CLASSES[cls].color, cls).toBe(PALETTE[cls]);
     }

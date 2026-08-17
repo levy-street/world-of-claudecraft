@@ -21,6 +21,10 @@ const BODY: Record<string, TranslationKey> = {
   drowned_temple: 'guide.dungeonsPage.templeBody',
   gravewyrm_sanctum: 'guide.dungeonsPage.sanctumBody',
   wildheart_basin: 'guide.dungeonsPage.wildheartBody',
+  rotchapel: 'guide.dungeonsPage.rotchapelBody',
+  ossuary_of_the_march: 'guide.dungeonsPage.ossuaryBody',
+  heart_of_crownroot: 'guide.dungeonsPage.crownrootBody',
+  sepulcher_of_ashes: 'guide.dungeonsPage.sepulcherBody',
   raid: 'guide.dungeonsPage.raidBody',
 };
 
@@ -34,7 +38,7 @@ function levelLabel(d: GuideDungeon): string {
 function dungeonCard(d: GuideDungeon): string {
   const bodyKey = BODY[d.id];
   if (!bodyKey) return '';
-  const name = d.isRaid ? t('guide.dungeonsPage.raidName') : (d.name ?? '');
+  const name = d.name ?? t('guide.dungeonsPage.raidName');
   const level = levelLabel(d);
   return `
     <section class="guide-dungeon-card${d.isRaid ? ' guide-dungeon-raid' : ''}" id="dungeon-${esc(d.id)}">
