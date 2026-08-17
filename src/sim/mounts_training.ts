@@ -26,6 +26,7 @@
 
 import { MOUNT_RACE_START_PLATFORM, STABLE_PADDOCK, TRAINING_MOUNT_KEY } from './content/mounts';
 import { QUESTS } from './data';
+import { applyMoneyDelta } from './economy_events';
 import { forceDismount, forceTrainingMount } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -119,7 +120,7 @@ export function learnRiding(ctx: SimContext, npcId: number, pid?: number): void 
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
-  meta.copper -= RIDING_SKILL_FEE_COPPER;
+  applyMoneyDelta(ctx, meta, 'riding_lesson_fee', -RIDING_SKILL_FEE_COPPER);
   meta.ridingTrained = true;
   ctx.notice(meta.entityId, NOTICE_RIDING_LEARNED);
 }

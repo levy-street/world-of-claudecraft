@@ -20,6 +20,8 @@ export const ADMIN_PERMISSIONS = [
   'content.moderate',
   'botdetector.read',
   'botdetector.configure',
+  'economy.read',
+  'economy.act',
   'guildbank.purge',
   'staff.manage',
 ] as const;

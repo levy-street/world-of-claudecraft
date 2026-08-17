@@ -95,7 +95,16 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/game.ts',
-    ceiling: 10900,
+    // Raised by ONE line for Economy Watch, which is a ceiling raise and
+    // therefore a maintainer call: flagged in the PR rather than done quietly.
+    // The subsystem itself adds nothing here. Every part of it lives in
+    // siblings (gold_ledger.ts, gold_ledger_db.ts, gold_ledger_host.ts,
+    // gold_ledger_types.ts) and even the server-only event filter went into
+    // event_delivery.ts rather than the fan-out loop. What is left in this file
+    // is two lines of pure wiring, one import and one call at the tick drain,
+    // and the file had exactly one line of headroom. No margin is added on
+    // purpose: the ratchet stays as tight as it was.
+    ceiling: 10901,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -12,6 +12,7 @@
 import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
 import { rekeySigner } from './character_rename';
 import { ITEMS } from './data';
+import { applyMoneyDelta, emitPoolMovement } from './economy_events';
 import { formatMoney } from './format_money';
 import {
   boundCraftedRecipeIdOnLoad,
@@ -795,7 +796,14 @@ export class Market {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
-    meta.copper -= listing.price;
+    // The buyer's debit. Counterparty is the SELLER's collection box rather
+    // than the seller themselves: the coin lands in the box now and only
+    // reaches a purse when they collect, which is a second, separately
+    // ledgered movement. A house listing has no box, so the whole price is a
+    // sink and the counterparty is the escrow pool all the same.
+    applyMoneyDelta(this.ctx, meta, 'market_purchase', -listing.price, {
+      counterparty: { kind: 'pool', id: 'market_escrow' },
+    });
     grantCopies(
       this.ctx,
       meta.entityId,
@@ -806,8 +814,32 @@ export class Market {
     );
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
+      const fee = listing.price - proceeds;
       const col = this.collectionFor(listing.sellerKey);
       col.copper += proceeds;
+      // The escrow half of the buyer's debit above, for the FULL price. The
+      // Merchant's cut comes out of the escrow on the next row rather than
+      // being netted off here, so the two halves of the transfer are equal and
+      // opposite: the reconciler pairs transfer rows by magnitude, and a hold
+      // booked at 95% would leave both halves looking like orphans on every
+      // single market buy. Emitted against the BUYER's pid (the actor who moved
+      // it); the seller is named as the counterparty so an operator reading the
+      // buyer's page can see where the coin went.
+      const seller = this.metaByMarketSellerKey(listing.sellerKey);
+      emitPoolMovement(
+        this.ctx,
+        meta.entityId,
+        'market_escrow_hold',
+        listing.price,
+        // The escrow's balance BEFORE the cut is taken: the box briefly holds
+        // the whole price, and the fee row below states what it holds after.
+        col.copper + fee,
+        seller ? { kind: 'character', id: seller.entityId } : { kind: 'pool', id: 'market_escrow' },
+      );
+      // The Merchant's cut, taken out of the escrow and destroyed. Booked as
+      // its own sink row so the supply identity balances without anyone having
+      // to re-derive MARKET_CUT from two other rows.
+      emitPoolMovement(this.ctx, meta.entityId, 'market_fee', -fee, col.copper, null);
       // Itemize the sale beside the gold it produced. The listing row is spliced
       // away on the next line, so this is the last point that still knows WHAT
       // sold; without it the seller's collection is a bare copper total.
@@ -828,6 +860,19 @@ export class Market {
           pid: sellerMeta.entityId,
         });
       }
+    }
+    if (listing.house) {
+      // A filler listing has no seller and no collection box, so the entire
+      // price leaves the world. Same two rows as a real sale all the same, with
+      // the cut equal to the whole price: the Merchant's till takes the
+      // transfer's other half (so the buyer's debit is not an orphan), then
+      // burns it (so the supply identity sees where the coin went). The till is
+      // not a pot anyone measures, hence the null balances.
+      emitPoolMovement(this.ctx, meta.entityId, 'market_escrow_hold', listing.price, null, {
+        kind: 'pool',
+        id: 'market_escrow',
+      });
+      emitPoolMovement(this.ctx, meta.entityId, 'market_fee', -listing.price, null, null);
     }
     this.ctx.emit({
       type: 'loot',
@@ -904,7 +949,18 @@ export class Market {
     // granted or kept), so bump once up front.
     this.bumpCollections();
     if (col.copper > 0) {
-      meta.copper += col.copper;
+      const collected = col.copper;
+      // Pool side first, so the two rows read in the order the coin moved. The
+      // 0 balance is REAL here, not the placeholder the burn rows pass null
+      // for: collecting empties the box, and `col.copper = 0` below is that
+      // same figure.
+      emitPoolMovement(this.ctx, meta.entityId, 'market_escrow_release', -collected, 0, {
+        kind: 'character',
+        id: meta.entityId,
+      });
+      applyMoneyDelta(this.ctx, meta, 'market_sale', collected, {
+        counterparty: { kind: 'pool', id: 'market_escrow' },
+      });
       this.ctx.emit({
         type: 'loot',
         text: `You collect ${formatMoney(col.copper)} from the Merchant.`,

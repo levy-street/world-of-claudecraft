@@ -27,6 +27,7 @@ import {
 import { isRawCookingCatch } from './content/items';
 import { ITEMS } from './data';
 import { markItemDiscovered } from './deeds';
+import { applyMoneyDelta } from './economy_events';
 import { recalcPlayerStats } from './entity';
 import {
   canDualWield,
@@ -1089,7 +1090,7 @@ export function buyItem(
     bagsFullError(ctx, meta.entityId);
     return;
   }
-  meta.copper -= copperCost;
+  applyMoneyDelta(ctx, meta, 'vendor_buy', -copperCost);
   meta.honor -= honorCost;
   ctx.addItem(itemId, qty, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
@@ -1266,7 +1267,7 @@ export function sellItem(
     recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
   }
   const payout = def.sellValue * sellableCount;
-  meta.copper += payout;
+  applyMoneyDelta(ctx, meta, 'vendor_sell', payout);
   ctx.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
   ctx.emit({
     type: 'loot',
@@ -1359,7 +1360,7 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     total += def.sellValue * count;
     soldCount += count;
   }
-  meta.copper += total;
+  applyMoneyDelta(ctx, meta, 'vendor_sell', total);
   ctx.emit({ type: 'vendor', action: 'sell', pid: meta.entityId });
   ctx.emit({
     type: 'loot',
@@ -1444,7 +1445,7 @@ export function buyBackItem(
     bagsFullError(ctx, meta.entityId);
     return;
   }
-  meta.copper -= def.sellValue;
+  applyMoneyDelta(ctx, meta, 'vendor_buyback', -def.sellValue);
   const instance = slot.instance;
   const craftedRecipeId = slot.craftedRecipeId;
   slot.count -= 1;

@@ -48,6 +48,7 @@ import {
 } from '../delve_layout';
 import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
+import { applyMoneyDelta } from '../economy_events';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
@@ -810,7 +811,7 @@ export function grantDelveClearTo(
     tier?.copperMin ?? delve.baseRewards.copperMin,
     tier?.copperMax ?? delve.baseRewards.copperMax,
   );
-  meta.copper += copper;
+  applyMoneyDelta(ctx, meta, 'delve_reward', copper);
   unlockNextDelveLore(ctx, meta, pid);
   // Clear predicates re-check; a heroic run whose watermark never saw a second
   // player is the solo task.
@@ -1635,7 +1636,7 @@ export function companionUpgrade(ctx: SimContext, companionId: string, pid?: num
     return;
   }
   r.meta.delveMarks -= cost.marks;
-  r.meta.copper -= cost.copper;
+  applyMoneyDelta(ctx, r.meta, 'companion_upgrade', -cost.copper);
   r.meta.companionUpgrades[companionId] = next;
   // Companion-rank predicates read this map; re-evaluate on the next pass.
   ctx.markDeedsDirty(r.meta.entityId);

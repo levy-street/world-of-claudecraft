@@ -66,9 +66,12 @@ describe('admin permission vocabulary', () => {
   });
 
   it('gives viewer the general read permissions, excluding the restricted ones', () => {
-    // Reads that are NOT part of the general viewer bundle: anti-bot internals
-    // and Operations/Usage are admin/superadmin only.
-    const restricted = ['botdetector.read', 'ops_usage.read'];
+    // Reads that are NOT part of the general viewer bundle: anti-abuse
+    // internals and Operations/Usage. economy.read joins them because an open
+    // finding names a character and says the ledger cannot explain their coin,
+    // which is an accusation in progress rather than a dashboard number; unlike
+    // the other two it does reach MODERATOR, who works cheating.
+    const restricted = ['botdetector.read', 'ops_usage.read', 'economy.read'];
     const reads = ADMIN_PERMISSIONS.filter(
       (permission) => permission.endsWith('.read') && !restricted.includes(permission),
     );

@@ -206,6 +206,15 @@ import {
   handleNativeDiscordExchange,
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
+import { notifyEconomyAlerts } from './economy_alert_outbox';
+import { insertEconomyAlerts, pruneEconomyAlerts } from './economy_alerts_db';
+import {
+  economySupplySnapshot,
+  loadLedgerWindow,
+  loadPurseDisagreements,
+  maxGoldLedgerId,
+} from './economy_reconcile_db';
+import { createEconomyReconcileJob, type EconomyReconcileJob } from './economy_reconcile_job';
 import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
@@ -222,6 +231,7 @@ import {
 } from './github';
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { drainGoldLedger, goldLedgerStats } from './gold_ledger_host';
 import { guildBankLogCacheStats } from './guild_bank_log';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
@@ -235,6 +245,8 @@ import {
   createApiDispatcher,
   selectApiEntry,
 } from './http/dispatch';
+import { registerEconomyMetrics } from './http/economy_metrics';
+import { setEconomyMetricsCounters } from './http/economy_signals';
 import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
 import { setGameMetricsCounters } from './http/game_signals';
 import {
@@ -3282,6 +3294,11 @@ export async function startServer(): Promise<http.Server> {
   // (mirrors setAttackSignalSink). Wired here, after `game` and `wss` exist, so the
   // gauges read live state at scrape time; ws_connections is the raw open-socket
   // count (joined or not), distinct from players_online (joined sessions).
+  // Built further down (it needs the pool and the live session map), but named
+  // here so the /metrics registration just below can close over the slot instead
+  // of the exporter having to be registered after the whole game is wired.
+  let economyReconcile: EconomyReconcileJob | null = null;
+
   const gameStateSource: GameStateSource = {
     playersOnline: () => game.clients.size,
     accountsOnline: () => game.liveAccountIds().size,
@@ -3314,6 +3331,19 @@ export async function startServer(): Promise<http.Server> {
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
   registerParseMetrics(httpMetrics.registry, game.parseCapture.counters);
+  // The gold-integrity exporter. Registered HERE, well before the reconciliation
+  // pass is constructed below, because the counters must exist before the first
+  // coin moves; the gauges reach the pass through the `economyReconcile` slot,
+  // which reads null until it is built and publishes NO supply series rather
+  // than a zero one (a realm that has not reconciled has an unknown supply, and
+  // a flat 0 reads as every coin in the world having vanished).
+  setEconomyMetricsCounters(
+    registerEconomyMetrics(httpMetrics.registry, {
+      ledgerQueueDepth: () => goldLedgerStats().queueDepth,
+      lastPass: () => economyReconcile?.lastPass() ?? null,
+      nowMs: () => Date.now(),
+    }),
+  );
   // Hand the same live source to /livez, so a wedged loop answers 503 from outside
   // the process. Registered HERE rather than read from the route arm: the /livez arm
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
@@ -3486,6 +3516,15 @@ export async function startServer(): Promise<http.Server> {
         name: 'ftue_events',
         pruneBatch: (n) => pruneFtueEventsBatch(pool, config.ftueEventsRetentionDays, n),
       },
+      {
+        // Conservation findings an operator has already acknowledged. Only
+        // ACKNOWLEDGED rows age out (pruneEconomyAlerts): an open finding stays
+        // forever at any age, because age is not resolution. `gold_ledger`
+        // itself is absent from this list and kept forever, so pruning an alert
+        // never removes the evidence behind it.
+        name: 'economy_alerts',
+        pruneBatch: (n) => pruneEconomyAlerts(config.economyAlertRetentionDays, n),
+      },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group
     // when retention is off so quiet configs write nothing to world_state.
@@ -3501,6 +3540,57 @@ export async function startServer(): Promise<http.Server> {
   });
   retentionSweep.start();
 
+  // Economy Watch: the rolling conservation pass. Minutes, not nightly, because
+  // a duplication found eight hours later has already been traded, laundered
+  // through the market and mailed to alts. It lives in the game process rather
+  // than a cron container for one reason it cannot do without: only this process
+  // knows which characters have a live session, and an online character's purse
+  // is mid-flight and must never be compared against the ledger.
+  economyReconcile =
+    config.economyReconcileIntervalMinutes > 0
+      ? createEconomyReconcileJob({
+          realm: REALM,
+          connect: () => pool.connect(),
+          intervalMs: config.economyReconcileIntervalMinutes * 60_000,
+          maxRowId: () => maxGoldLedgerId(REALM),
+          loadWindow: (since, until, limit) => loadLedgerWindow(REALM, since, until, limit),
+          loadPurseDisagreements: () => loadPurseDisagreements(REALM),
+          supplySnapshot: () => economySupplySnapshot(REALM),
+          onlineCharacterIds: () => {
+            const ids = new Set<number>();
+            // Every RESIDENT session, linkdead included: a linkdead character is
+            // still loaded and still unsaved, so their purse is exactly as
+            // mid-flight as an actively playing one. game.liveCharacterIds()
+            // deliberately excludes them and is the wrong set here.
+            for (const s of game.clients.values()) ids.add(s.characterId);
+            return ids;
+          },
+          droppedWrites: () => goldLedgerStats().droppedWrites,
+          insertAlerts: (alerts) => insertEconomyAlerts(REALM, alerts),
+          // The bot drains this queue through the consolidated Discord outbox.
+          // At most once by design: a lost ping costs latency, never evidence,
+          // because economy_alerts holds every finding durably regardless.
+          notify: (filed) => notifyEconomyAlerts(REALM, filed),
+          loadCursor: async () => {
+            const stored = await loadWorldState<{ lastRowId?: unknown; openingSupply?: unknown }>(
+              `economy_reconcile:${REALM}`,
+            );
+            if (
+              typeof stored?.lastRowId !== 'number' ||
+              typeof stored?.openingSupply !== 'number'
+            ) {
+              // A missing or malformed cursor re-establishes the baseline rather
+              // than guessing an opening figure: a wrong opening supply would
+              // report the difference as a dupe on the very next pass.
+              return null;
+            }
+            return { lastRowId: stored.lastRowId, openingSupply: stored.openingSupply };
+          },
+          saveCursor: (cursor) => saveWorldState(`economy_reconcile:${REALM}`, cursor),
+        })
+      : null;
+  economyReconcile?.start();
+
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
     // sheds new traffic before we stop the loop and persist (in-flight requests and
@@ -3515,6 +3605,10 @@ export async function startServer(): Promise<http.Server> {
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();
+    // And the conservation pass, for the same reason: its reads must not race
+    // the pool close. It is read-mostly and window-capped, so this never holds
+    // shutdown long enough to threaten the character saves that follow.
+    await economyReconcile?.stop();
     await generalChatQuotaListener.stop();
     game.stop();
     await game.saveAll('shutdown');
@@ -3563,6 +3657,11 @@ export async function startServer(): Promise<http.Server> {
     await releaseAllCharacterLeases().catch((err) =>
       console.error('lease release-all failed:', err),
     );
+    // Land the tail of the gold ledger BEFORE the pool closes: a deploy must
+    // not discard the audit rows for the last few seconds of play, and those
+    // are exactly the seconds an incident investigation reaches for. Guarded
+    // so a failed drain still lets the shutdown finish and close the pool.
+    await drainGoldLedger().catch((err) => console.error('gold ledger drain failed:', err));
     await game.parseCapture.stop();
     await game.chatLog.stop();
     await closeGeneralChatQuotaPool();

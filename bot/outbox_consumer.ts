@@ -20,8 +20,11 @@ import {
   type ActivityItem,
   buildActivityMessage,
   buildDailyRewardWinnersMessage,
+  buildEconomyAlertMessage,
+  buildEconomyAlertSuppressedMessage,
   buildRelayMessage,
   type DailyRewardWinnersDay,
+  type EconomyAlertItem,
   type RelayItem,
 } from './logic';
 import type { BreakerState } from './rate_governor';
@@ -56,6 +59,8 @@ export interface OutboxIo {
   postRelay: (item: RelayItem) => Promise<unknown>;
   postActivity: (item: ActivityItem) => Promise<unknown>;
   postWinnersDay: (day: DailyRewardWinnersDay) => Promise<unknown>;
+  postEconomyAlert: (item: EconomyAlertItem) => Promise<unknown>;
+  postEconomyAlertsSuppressed: (count: number) => Promise<unknown>;
   /**
    * Mark a day announced. Answers nullish for a failed call rather than
    * rejecting, matching ServerClient, so the RETURN VALUE is the failure signal.
@@ -71,6 +76,7 @@ export interface OutboxChannels {
   relay: string;
   activity: string;
   dailyRewards: string;
+  economyAlerts: string;
 }
 
 export interface OutboxIoOptions {
@@ -124,6 +130,9 @@ export function outboxIoFor(options: OutboxIoOptions): OutboxIo {
       if (payload) await post('activity', payload);
     },
     postWinnersDay: (day) => post('dailyRewards', buildDailyRewardWinnersMessage(day)),
+    postEconomyAlert: (item) => post('economyAlerts', buildEconomyAlertMessage(item)),
+    postEconomyAlertsSuppressed: (count) =>
+      post('economyAlerts', buildEconomyAlertSuppressedMessage(count)),
     markWinnersDay: (day) => options.markDailyRewardWinners(day),
     applyLinkChanges: options.applyLinkChanges,
     onError: options.onError,
@@ -241,7 +250,13 @@ export async function runOutboxPoll(
   const activityItems = listOf(streams.activity?.items);
   const winnerDays = listOf(streams.winners?.days);
   const linkChanges = listOf(streams.linkChanges?.items);
-  const consumedWork = relayItems.length > 0 || activityItems.length > 0 || linkChanges.length > 0;
+  const economyAlerts = listOf(streams.economyAlerts?.items);
+  const economyAlertsSuppressed = Number(streams.economyAlerts?.suppressed) || 0;
+  const consumedWork =
+    relayItems.length > 0 ||
+    activityItems.length > 0 ||
+    linkChanges.length > 0 ||
+    economyAlerts.length > 0;
 
   const report = (error: unknown, where: string): void => {
     // The unset-channel case has already been reported once by the factory;
@@ -264,6 +279,28 @@ export async function runOutboxPoll(
   // per item because one refusal (an open breaker mid-run, a 403 on one channel)
   // must cost that item and not the rest of the drain, which is already consumed
   // and cannot be handed back.
+  // ECONOMY ALERTS GO FIRST, ahead of every social stream. All of these posts
+  // are governor-paced and sequential, so a fifty-item relay backlog would
+  // otherwise sit between a duplication being detected and anyone hearing about
+  // it. The community feed can wait a cycle; a dupe in progress cannot.
+  for (const item of economyAlerts) {
+    try {
+      await io.postEconomyAlert(item);
+    } catch (error) {
+      report(error, 'economy-alerts');
+    }
+  }
+  // Sent whether or not any items came with it: the server counts findings its
+  // bounded queue refused between polls, and a batch that silently omits that
+  // count presents a partial view of an incident as a whole one.
+  if (economyAlertsSuppressed > 0) {
+    try {
+      await io.postEconomyAlertsSuppressed(economyAlertsSuppressed);
+    } catch (error) {
+      report(error, 'economy-alerts-suppressed');
+    }
+  }
+
   for (const item of relayItems) {
     try {
       await io.postRelay(item);

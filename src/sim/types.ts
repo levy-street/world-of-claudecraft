@@ -3,6 +3,11 @@
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
+// Type-only, and from a leaf with ZERO imports on purpose: the economy event
+// vocabulary has to be reachable from both this file (for the SimEvent variant)
+// and from economy_events.ts (which reaches data.ts for the zone lookup), so it
+// lives in neither. See src/sim/economy_event_kinds.ts.
+import type { EconomyCounterparty, EconomyEventKind } from './economy_event_kinds';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
@@ -6549,6 +6554,49 @@ export type SimEvent = { pid?: number } & (
       celebrantName: string;
       pairId: string;
       zoneId: string;
+    }
+  // Economy Watch (src/sim/economy_events.ts): the audit row explaining one
+  // movement of coin. SERVER-ONLY, the one variant of this union that never
+  // reaches a client socket: `SERVER_ONLY_SIM_EVENT_TYPES` names it, the
+  // authoritative host consumes it off the drained batch before routeEvents,
+  // and no client decodes it. It rides the personal event path anyway (pid is
+  // always set) because attribution is the whole point of the row, and because
+  // an out-only SimEvent is the sim's existing way to tell the host something
+  // without the host being able to reach back in.
+  //
+  // `amount` is SIGNED copper from the holder's point of view; `balanceAfter`
+  // is that holder's balance immediately after this event applied. The pair is
+  // what makes a bypassed mutation detectable: a character's rows chain, so a
+  // write that skipped the ledger breaks the chain at exactly the row after it.
+  // `x`/`z` are COARSE (whole world units), never the exact float: a
+  // keep-forever audit table must not become a movement recording.
+  | {
+      type: 'economy';
+      pid: number;
+      kind: EconomyEventKind;
+      // WHOSE balance `balanceAfter` describes. `purse` is the acting
+      // character's own coin, and those rows alone form their chain; `pool` is
+      // a holding area the sim owns but nobody carries (a market collection
+      // box, a guild treasury, a letter in flight), booked against the actor
+      // who MOVED it so the row stays attributable. Without this discriminator
+      // a pool row would sit in the actor's chain stating a balance that is not
+      // their purse, and the chain check would report a critical
+      // balance_mismatch on every market buy, mail send, and guild deposit.
+      holder: 'purse' | 'pool';
+      amount: number;
+      // NULL when the holder has no single running balance to state: a burn
+      // (the Merchant's cut) belongs to nobody, and the mail book is a pile of
+      // letters each holding its own coin rather than one balance. A zero would
+      // be a lie in a keep-forever table, and no reader could tell that lie
+      // from a genuinely drained holder.
+      balanceAfter: number | null;
+      counterparty: EconomyCounterparty;
+      // The sim clock, never a wall clock. Two events from one tick share it,
+      // which is what lets the reconciliation job reason about same-tick races.
+      tick: number;
+      zone: string;
+      x: number;
+      z: number;
     }
 );
 

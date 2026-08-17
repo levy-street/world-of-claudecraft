@@ -33,6 +33,7 @@ const BOT_ENV_KEYS = [
   'DISCORD_RELAY_CHANNEL_ID',
   'DISCORD_ACTIVITY_CHANNEL_ID',
   'DISCORD_DAILY_REWARDS_CHANNEL_ID',
+  'DISCORD_ECONOMY_ALERTS_CHANNEL_ID',
   'DISCORD_SYNC_NICKNAMES',
   'DISCORD_MAX_RPS',
   'DISCORD_BAN_PAUSE_MS',
@@ -213,6 +214,24 @@ describe('loadConfig channel fallback ladders', () => {
 
     delete process.env.DISCORD_TEST_CHANNEL_ID;
     expect(loadConfig().activityChannelId).toBe('');
+  });
+
+  it('gives the economy alert channel NO ladder to walk', () => {
+    // Deliberately the opposite of every sibling above, and the reason is not
+    // stylistic. A gold conservation finding names a character id and says the
+    // ledger cannot explain their coin. Inheriting the relay or test channel
+    // would post that where players can read it: it accuses somebody in public
+    // and tells a real duplicator they have been noticed.
+    setRequired();
+    process.env.DISCORD_RELAY_CHANNEL_ID = 'relay-1';
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-1';
+    process.env.DISCORD_ACTIVITY_CHANNEL_ID = 'activity-1';
+    process.env.DISCORD_DAILY_REWARDS_CHANNEL_ID = 'daily-1';
+    // Every other channel is set, and it STILL resolves empty.
+    expect(loadConfig().economyAlertsChannelId).toBe('');
+
+    process.env.DISCORD_ECONOMY_ALERTS_CHANNEL_ID = 'ops-1';
+    expect(loadConfig().economyAlertsChannelId).toBe('ops-1');
   });
 
   it('walks past an EMPTY rung, not just an absent one', () => {

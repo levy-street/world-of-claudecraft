@@ -26,6 +26,7 @@ import type { GuildBankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, instancedCountCap } from './bags';
 import { moveBetweenContainers, nearBanker } from './bank';
 import { ITEMS } from './data';
+import { applyMoneyDelta, emitPoolMovement } from './economy_events';
 import { formatMoney } from './format_money';
 import {
   boundCraftedRecipeIdOnLoad,
@@ -300,7 +301,7 @@ export function chargeGuildCreationFee(ctx: SimContext, pid: number): number {
   if (!r) return 0;
   const charged = Math.min(r.meta.copper, GUILD_CREATION_FEE_COPPER);
   if (charged <= 0) return 0;
-  r.meta.copper -= charged;
+  applyMoneyDelta(ctx, r.meta, 'guild_create_fee', -charged);
   return charged;
 }
 
@@ -316,7 +317,7 @@ export function refundGuildCreationFee(ctx: SimContext, pid: number, amount: num
   if (!Number.isSafeInteger(amount) || amount <= 0) return 0;
   const refunded = Math.min(amount, Number.MAX_SAFE_INTEGER - r.meta.copper);
   if (refunded <= 0) return 0;
-  r.meta.copper += refunded;
+  applyMoneyDelta(ctx, r.meta, 'guild_create_refund', refunded);
   return refunded;
 }
 
@@ -825,7 +826,10 @@ function resolveActor(ctx: SimContext, pid: number): ReturnType<SimContext['reso
  *  because that is a host wiring state (Phase 3 boot-loads every book before
  *  players join), not a condition the player caused or can act on. Never
  *  mutates. */
-function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState | null {
+function requireOfficerBook(
+  ctx: SimContext,
+  meta: PlayerMeta,
+): { book: GuildBankState; guildId: number } | null {
   const m = meta.guildMembership;
   if (!m) {
     ctx.error(meta.entityId, 'You must be in a guild to use the guild bank.');
@@ -835,7 +839,12 @@ function requireOfficerBook(ctx: SimContext, meta: PlayerMeta): GuildBankState |
     ctx.error(meta.entityId, 'Only guild officers may use the guild bank.');
     return null;
   }
-  return ctx.guildBanks.get(m.guildId) ?? null;
+  const book = ctx.guildBanks.get(m.guildId);
+  // The guild id rides back with the book because the two treasury ops must
+  // name it as their ledger counterparty, and re-reading meta.guildMembership
+  // at the call site would be a second, separately-nullable lookup of exactly
+  // what this guard has already proved.
+  return book ? { book, guildId: m.guildId } : null;
 }
 
 /** The guild bank is an ANONYMOUS EXCHANGE PIPE (officer A deposits, officer B
@@ -894,8 +903,9 @@ export function guildBankDepositGold(ctx: SimContext, amount: number, pid: numbe
   }
   // Shape: malformed input (cheat/desync), no player line, the bank.ts idiom.
   if (!Number.isSafeInteger(amount) || amount <= 0) return;
-  const book = requireOfficerBook(ctx, meta);
-  if (!book) return;
+  const officer = requireOfficerBook(ctx, meta);
+  if (!officer) return;
+  const { book, guildId } = officer;
   if (meta.copper < amount) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
@@ -904,8 +914,14 @@ export function guildBankDepositGold(ctx: SimContext, amount: number, pid: numbe
     ctx.error(meta.entityId, 'The guild treasury cannot hold that much.');
     return;
   }
-  meta.copper -= amount;
+  applyMoneyDelta(ctx, meta, 'guild_bank_deposit', -amount, {
+    counterparty: { kind: 'guild', id: guildId },
+  });
   book.treasury += amount;
+  emitPoolMovement(ctx, meta.entityId, 'guild_bank_deposit', amount, book.treasury, {
+    kind: 'guild',
+    id: guildId,
+  });
   ctx.notice(meta.entityId, `You deposit ${formatMoney(amount)} into the guild treasury.`);
 }
 
@@ -923,8 +939,9 @@ export function guildBankWithdrawGold(ctx: SimContext, amount: number, pid: numb
   }
   // Shape: malformed input (cheat/desync), no player line, the bank.ts idiom.
   if (!Number.isSafeInteger(amount) || amount <= 0) return;
-  const book = requireOfficerBook(ctx, meta);
-  if (!book) return;
+  const officer = requireOfficerBook(ctx, meta);
+  if (!officer) return;
+  const { book, guildId } = officer;
   if (book.treasury < amount) {
     ctx.error(meta.entityId, 'The guild treasury does not hold that much.');
     return;
@@ -936,7 +953,13 @@ export function guildBankWithdrawGold(ctx: SimContext, amount: number, pid: numb
     return;
   }
   book.treasury -= amount;
-  meta.copper += amount;
+  emitPoolMovement(ctx, meta.entityId, 'guild_bank_withdraw', -amount, book.treasury, {
+    kind: 'guild',
+    id: guildId,
+  });
+  applyMoneyDelta(ctx, meta, 'guild_bank_withdraw', amount, {
+    counterparty: { kind: 'guild', id: guildId },
+  });
   ctx.notice(meta.entityId, `You withdraw ${formatMoney(amount)} from the guild treasury.`);
 }
 
@@ -961,8 +984,9 @@ export function guildBankDeposit(
     return;
   }
   if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= meta.inventory.length) return;
-  const book = requireOfficerBook(ctx, meta);
-  if (!book) return;
+  const officer = requireOfficerBook(ctx, meta);
+  if (!officer) return;
+  const { book } = officer;
   const slot = meta.inventory[slotIndex];
   const refusal = guildBankPipeRefusal(slot);
   if (refusal !== null) {
@@ -1008,8 +1032,9 @@ export function guildBankWithdraw(
   // The primitive half of the shape check; the bounds half needs the book,
   // which the rank gate resolves below.
   if (!Number.isInteger(slotIndex) || slotIndex < 0) return;
-  const book = requireOfficerBook(ctx, meta);
-  if (!book) return;
+  const officer = requireOfficerBook(ctx, meta);
+  if (!officer) return;
+  const { book } = officer;
   if (slotIndex >= book.inventory.length) return;
   // The pipe policy holds on the way OUT too: a tampered or legacy Phase 3 row
   // holding a locked/soulbound copy must never complete a cross-character
@@ -1054,8 +1079,9 @@ export function guildBankBuySlots(ctx: SimContext, pid: number): void {
     ctx.error(meta.entityId, 'You are too far from the banker.');
     return;
   }
-  const book = requireOfficerBook(ctx, meta);
-  if (!book) return;
+  const officer = requireOfficerBook(ctx, meta);
+  if (!officer) return;
+  const { book, guildId } = officer;
   const rung = guildBankRungsBought(book.purchasedSlots);
   const price = GUILD_BANK_RUNG_PRICES[rung] ?? null;
   if (price === null) {
@@ -1068,7 +1094,7 @@ export function guildBankBuySlots(ctx: SimContext, pid: number): void {
       ctx.error(meta.entityId, 'Not enough money.');
       return;
     }
-    meta.copper -= price;
+    applyMoneyDelta(ctx, meta, 'guild_bank_expansion', -price);
     book.purchasedSlots += GUILD_BANK_RUNG_SLOTS[0];
     ctx.notice(meta.entityId, 'You open the guild bank.');
     return;
@@ -1078,6 +1104,13 @@ export function guildBankBuySlots(ctx: SimContext, pid: number): void {
     return;
   }
   book.treasury -= price;
+  // Rung 1 and up come out of the TREASURY, so the sink is booked against the
+  // pool rather than the acting officer's purse. Without this row the supply
+  // identity's treasury term drifts down by every expansion ever bought.
+  emitPoolMovement(ctx, meta.entityId, 'guild_bank_expansion', -price, book.treasury, {
+    kind: 'guild',
+    id: guildId,
+  });
   book.purchasedSlots += GUILD_BANK_RUNG_SLOTS[rung];
   ctx.notice(meta.entityId, 'You purchase additional guild bank slots.');
 }

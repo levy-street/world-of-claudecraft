@@ -9,7 +9,12 @@
 // used (see that helper's header), and a lower bound like `>= 3000` would also
 // pass for a loop that waited ten minutes.
 import { describe, expect, it } from 'vitest';
-import type { ActivityItem, DailyRewardWinnersDay, RelayItem } from '../bot/logic';
+import type {
+  ActivityItem,
+  DailyRewardWinnersDay,
+  EconomyAlertItem,
+  RelayItem,
+} from '../bot/logic';
 import {
   ANNOUNCED_DAYS_MAX,
   freshOutboxPollState,
@@ -90,6 +95,7 @@ function envelope(streams: Partial<OutboxEnvelope> = {}): OutboxEnvelope {
     activity: { items: [] },
     winners: { days: [] },
     linkChanges: { items: [] },
+    economyAlerts: { items: [], suppressed: 0 },
     ...streams,
   };
 }
@@ -101,6 +107,9 @@ interface Recorder {
   relay: RelayItem[];
   activity: ActivityItem[];
   winners: DailyRewardWinnersDay[];
+  economyAlerts: EconomyAlertItem[];
+  /** Each "and N more were suppressed" post, by its count. */
+  suppressed: number[];
   marks: string[];
   links: OutboxLinkChangeItem[][];
   errors: { where: string; message: string }[];
@@ -119,6 +128,7 @@ function recorder(
     failRelay?: (item: RelayItem) => boolean;
     failActivity?: (item: ActivityItem) => boolean;
     failWinners?: (day: DailyRewardWinnersDay) => boolean;
+    failEconomyAlert?: (item: EconomyAlertItem) => boolean;
     markResult?: (day: string) => unknown;
   } = {},
 ): Recorder {
@@ -128,6 +138,8 @@ function recorder(
     relay: [],
     activity: [],
     winners: [],
+    economyAlerts: [] as EconomyAlertItem[],
+    suppressed: [] as number[],
     marks: [],
     links: [],
     errors: [],
@@ -147,6 +159,15 @@ function recorder(
         calls.push(`activity:${item.kind}`);
         rec.activity.push(item);
         if (options.failActivity?.(item)) throw new Error(`activity ${item.kind} refused`);
+      },
+      postEconomyAlert: async (item) => {
+        calls.push(`economy:${item.kind}`);
+        rec.economyAlerts.push(item);
+        if (options.failEconomyAlert?.(item)) throw new Error(`economy ${item.kind} refused`);
+      },
+      postEconomyAlertsSuppressed: async (count) => {
+        calls.push(`economy-suppressed:${count}`);
+        rec.suppressed.push(count);
       },
       postWinnersDay: async (day) => {
         calls.push(`winners:${day.day}`);
@@ -574,7 +595,7 @@ describe('outbox channel routing', () => {
   }
 
   function factoryIo(
-    channels: { relay: string; activity: string; dailyRewards: string },
+    channels: { relay: string; activity: string; dailyRewards: string; economyAlerts: string },
     drained: OutboxEnvelope,
   ): {
     io: OutboxIo;
@@ -606,7 +627,12 @@ describe('outbox channel routing', () => {
     return { io, sent, marks, missing, errors };
   }
 
-  const CHANNELS = { relay: 'relay-1', activity: 'activity-1', dailyRewards: 'daily-1' };
+  const CHANNELS = {
+    relay: 'relay-1',
+    activity: 'activity-1',
+    dailyRewards: 'daily-1',
+    economyAlerts: 'ops-1',
+  };
 
   it('sends each stream to its OWN channel, shaped by its OWN builder', async () => {
     // The one mutation this exists for is a swapped channel id, which type-checks
@@ -690,7 +716,7 @@ describe('outbox channel routing', () => {
     // once per channel rather than once per poll, or a deployment that never set
     // one would log a line every 3 seconds for the life of the process.
     const wired = factoryIo(
-      { relay: '', activity: '', dailyRewards: '' },
+      { relay: '', activity: '', dailyRewards: '', economyAlerts: '' },
       envelope({
         relay: { items: [relayItem('c1'), relayItem('c2')] },
         activity: { items: [activityItem()] },
@@ -734,7 +760,10 @@ describe('outbox channel routing', () => {
     // Stated directly on the seam, because the whole no-mark behavior above
     // depends on it: a post that resolved quietly would be indistinguishable
     // from a successful announcement and the day would be marked.
-    const wired = factoryIo({ relay: '', activity: '', dailyRewards: '' }, envelope());
+    const wired = factoryIo(
+      { relay: '', activity: '', dailyRewards: '', economyAlerts: '' },
+      envelope(),
+    );
     await expect(wired.io.postRelay(relayItem('c1'))).rejects.toBeInstanceOf(
       OutboxChannelUnsetError,
     );
@@ -753,7 +782,7 @@ describe('outbox factory pass-through seams', () => {
     const io = outboxIoFor({
       createMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
-      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd', economyAlerts: 'o' },
       gameUrl: 'https://game.test',
       breakerState: () => 'open',
       drain: async () => {
@@ -774,7 +803,7 @@ describe('outbox factory pass-through seams', () => {
     const io = outboxIoFor({
       createMessage: async () => {},
       markDailyRewardWinners: async () => ({ ok: true }),
-      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd', economyAlerts: 'o' },
       gameUrl: 'https://game.test',
       breakerState: () => 'closed',
       drain: async () => envelope({ linkChanges: { items: [linkChange('u9')] } }),
@@ -792,7 +821,7 @@ describe('outbox factory pass-through seams', () => {
         throw new Error('post refused');
       },
       markDailyRewardWinners: async () => ({ ok: true }),
-      channels: { relay: 'r', activity: 'a', dailyRewards: 'd' },
+      channels: { relay: 'r', activity: 'a', dailyRewards: 'd', economyAlerts: 'o' },
       gameUrl: 'https://game.test',
       breakerState: () => 'closed',
       drain: async () => envelope({ relay: { items: [relayItem('c1')] } }),
@@ -927,5 +956,60 @@ describe('outbox poll on the real scheduler', () => {
     await clock.advanceTo(79_000);
     expect(drains).toBe(2);
     task.stop();
+  });
+});
+
+describe('economy alerts jump the queue', () => {
+  function alertItem(kind: string): EconomyAlertItem {
+    return {
+      realm: 'r1',
+      kind,
+      severity: 'critical',
+      characterId: 4,
+      delta: 5000,
+      detail: 'the ledger and the save disagree',
+    };
+  }
+
+  it('posts before the social feeds, not after them', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        relay: { items: [relayItem('lfg'), relayItem('trade')] },
+        activity: { items: [activityItem('levelup')] },
+        economyAlerts: { items: [alertItem('balance_mismatch')], suppressed: 0 },
+      }),
+    });
+    await runOutboxPoll(rec.io);
+    // Every post is governor-paced and sequential, so a fifty-item relay
+    // backlog would otherwise sit between a duplication being detected and
+    // anyone hearing about it. The community can wait; a dupe cannot.
+    const posts = rec.calls.filter((c) => c !== 'drain' && !c.startsWith('links:'));
+    expect(posts[0]).toBe('economy:balance_mismatch');
+  });
+
+  it('says how many findings it is not showing', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        economyAlerts: { items: [alertItem('supply_mismatch')], suppressed: 6 },
+      }),
+    });
+    await runOutboxPoll(rec.io);
+    // A partial view that does not say it is partial is worse than no view.
+    expect(rec.suppressed).toEqual([6]);
+  });
+
+  it('lets one refused alert cost only itself', async () => {
+    const rec = recorder({
+      envelope: envelope({
+        economyAlerts: {
+          items: [alertItem('chain_break'), alertItem('supply_mismatch')],
+          suppressed: 0,
+        },
+      }),
+      failEconomyAlert: (item) => item.kind === 'chain_break',
+    });
+    await runOutboxPoll(rec.io);
+    expect(rec.economyAlerts.map((a) => a.kind)).toEqual(['chain_break', 'supply_mismatch']);
+    expect(rec.errors.map((e) => e.where)).toEqual(['economy-alerts']);
   });
 });

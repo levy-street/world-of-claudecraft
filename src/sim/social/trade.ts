@@ -15,6 +15,7 @@ import type { TradeInfo } from '../../world_api';
 import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { applyMoneyDelta, sanitizeCopperInput } from '../economy_events';
 import {
   removeVendorSellUnits,
   sellerSignedCharmDeprioritize,
@@ -172,7 +173,10 @@ export function tradeSetOffer(
   if (boundDenied) ctx.error(r.meta.entityId, 'That item is bound and cannot be traded.');
   const offer = {
     items: cleaned,
-    copper: Math.max(0, Math.min(Math.floor(copper), r.meta.copper)),
+    // Sanitised BEFORE the clamp rather than by it. `Math.max(0, Math.min(NaN,
+    // held))` is NaN, so the floor that looks like it rejects a poisoned offer
+    // actually stores one, and every later comparison against it reads false.
+    copper: Math.min(sanitizeCopperInput(Math.floor(copper)), r.meta.copper),
   };
   if (session.a === r.meta.entityId) session.offerA = offer;
   else session.offerB = offer;
@@ -414,8 +418,16 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     return;
   }
   // swap
-  metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
-  metaB.copper = metaB.copper - session.offerB.copper + session.offerA.copper;
+  // Booked as each side's NET movement, one row per party, so the two rows sum
+  // to zero and the symmetry check pairs them. Gross legs (A gives X, A
+  // receives Y) would double the row count for no extra fact: both offers are
+  // known at this instant and neither leg can land without the other.
+  applyMoneyDelta(ctx, metaA, 'trade', session.offerB.copper - session.offerA.copper, {
+    counterparty: { kind: 'character', id: metaB.entityId },
+  });
+  applyMoneyDelta(ctx, metaB, 'trade', session.offerA.copper - session.offerB.copper, {
+    counterparty: { kind: 'character', id: metaA.entityId },
+  });
   const grantsToB = removeOffer(ctx, session.offerA.items, session.a);
   const grantsToA = removeOffer(ctx, session.offerB.items, session.b);
   grantOffer(ctx, grantsToB, session.b);
