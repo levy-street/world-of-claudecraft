@@ -25,6 +25,15 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import { Sim } from '../src/sim/sim';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
+// The Last Bell chain ships data-held (every island quest retired: the
+// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
+// suite exercises the OPEN interact-credit machinery through the three-bells
+// quest, so un-hold that one quest before any Sim is built.
+import { QUESTS as __QUESTS } from '../src/sim/data';
+
+(__QUESTS.q_fs_the_three_bells as { retired?: boolean }).retired = false;
+
+
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 

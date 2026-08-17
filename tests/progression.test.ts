@@ -26,6 +26,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
+import { allScenarios } from '../src/sim/scenarios/registry';
 import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
@@ -228,6 +229,15 @@ describe('content referential integrity', () => {
     const spawning = new Set<string>();
     for (const c of CAMPS) spawning.add(c.mobId);
     for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
+    // Scenario stages are a spawn source too (the Tidemill stalker is Q0's
+    // kill target and exists only inside its solo instance), so sweep the
+    // registry instead of growing the raid exception list name by name.
+    for (const sc of allScenarios()) {
+      for (const stage of sc.stages) {
+        for (const s of stage.spawns ?? []) spawning.add(s.mobId);
+        for (const t of stage.timedSpawns ?? []) for (const s of t.spawns) spawning.add(s.mobId);
+      }
+    }
     const problems: string[] = [];
     for (const q of Object.values(QUESTS)) {
       for (const obj of q.objectives) {

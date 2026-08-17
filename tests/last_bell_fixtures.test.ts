@@ -24,6 +24,16 @@ import type { Entity } from '../src/sim/types';
 import { FARSHORE_BREACH, groundHeight } from '../src/sim/world';
 import { lastBellStrings } from '../src/ui/i18n.catalog/last_bell';
 
+// The Last Bell chain ships data-held (every island quest retired: the
+// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
+// suite exercises the OPEN campaign machinery so it cannot rot while held;
+// un-hold before any Sim is built, because fixture spawning and the ferry's
+// Q0 arm read the flag from the quest data itself.
+import { QUESTS as __QUESTS } from '../src/sim/data';
+
+(__QUESTS.q_lb_q0_ashore as { retired?: boolean }).retired = false;
+
+
 const KEEPER_FACING_EPSILON_RADIANS = 1e-6;
 
 function makeSim(): Sim {

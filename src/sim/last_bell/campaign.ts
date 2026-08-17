@@ -11,6 +11,7 @@
 // consumes entity ids (a deliberate world shift; the parity goldens were
 // re-minted with it, see the commit that landed this module).
 
+import { QUESTS } from '../data';
 import { createGroundObject } from '../entity';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../harbor_layout';
 import { acceptQuest } from '../quests/quest_commands';
@@ -22,6 +23,22 @@ import type { Entity } from '../types';
 import { FARSHORE_BREACH } from '../world';
 
 const Q0_ID = 'q_lb_q0_ashore';
+
+// The campaign's one switch. While the chain is being written every island
+// quest ships `retired: true` (the PRE-RELEASE HOLD comment on Q0 in
+// content/last_bell_campaign.ts), and this module keys its own triggers off
+// the same data so nothing here can hand a player campaign content the quest
+// system refuses: the Q0 auto-accept stays silent and the Tidemill scenario
+// door spawns as inert scenery. The ferry and its cinematics stay live either
+// way; they are paid travel, not quest content.
+function campaignOpen(): boolean {
+  return QUESTS[Q0_ID]?.retired !== true;
+}
+
+// Persisted once-per-rider marker for the held-campaign voyage (see
+// firstCrossingFor). Harmless residue after the chain opens.
+const HELD_VOYAGE_FLAG = 'lb_held_voyage_seen';
+
 // The first crossing plays the spliced voyage (departure + Q0 arrival, one
 // Esc skips both halves); re-rides get the short departure cinematic.
 const VOYAGE_SCENE = 'scn_lb_q0_voyage';
@@ -106,8 +123,9 @@ export function initLastBellCampaign(ctx: SimContext): void {
     // interaction.ts only considers ground objects with lootable=true. Only
     // the scenario door is a device; the breach maw AND the ferry moorings
     // are pure scenery (the fare runs through the keepers' gossip button,
-    // never a dockside fixture, per the owner's spec).
-    obj.lootable = def.templateId === 'lb_scenario_door';
+    // never a dockside fixture, per the owner's spec). While the campaign is
+    // held the door is scenery too: its scenario is Q0's climax.
+    obj.lootable = def.templateId === 'lb_scenario_door' && campaignOpen();
     // The sim's object-respawn pass re-arms every non-lootable object once its
     // respawnTimer runs out, so park the breach's timer effectively forever
     // (finite on purpose: it stays JSON-safe wherever entities get serialized).
@@ -120,7 +138,15 @@ export function initLastBellCampaign(ctx: SimContext): void {
 function firstCrossingFor(ctx: SimContext, pid: number, fromMainland: boolean): boolean {
   const meta = ctx.players.get(pid);
   if (!meta) return false;
-  return fromMainland && !meta.questsDone.has(Q0_ID) && !meta.questLog.has(Q0_ID);
+  if (!fromMainland) return false;
+  // While the chain is held there is no Q0 to key on, so the spliced voyage
+  // plays once per rider off a persisted campaign flag. The fare waiver
+  // below keys on the same answer, so a broke rider's free trip stays a
+  // first-crossing courtesy rather than a standing free ferry. When the
+  // chain opens, Q0 owns first-crossing again and the campaign properly
+  // begins with the voyage even for riders who crossed during the hold.
+  if (!campaignOpen()) return !meta.campaignFlags.has(HELD_VOYAGE_FLAG);
+  return !meta.questsDone.has(Q0_ID) && !meta.questLog.has(Q0_ID);
 }
 
 // The crossing itself: teleport, Q0 hook, arrival scene. Runs only after the
@@ -130,9 +156,12 @@ function crossFerry(ctx: SimContext, fromMainland: boolean, pid: number): void {
   if (!r) return;
   const dest = fromMainland ? GULLHAVEN_DECK_ARRIVAL : MAINLAND_DECK_ARRIVAL;
   // First crossing: the campaign begins. acceptQuest is a no-op error path
-  // when already active; gate on the log so re-rides stay silent.
+  // when already active; gate on the log so re-rides stay silent. While the
+  // chain is held the crossing grants nothing (a retired quest would toast
+  // "not available" at every rider) and only marks the session's voyage.
   const firstCrossing = firstCrossingFor(ctx, r.meta.entityId, fromMainland);
-  if (firstCrossing) acceptQuest(ctx, Q0_ID, r.meta.entityId);
+  if (firstCrossing && campaignOpen()) acceptQuest(ctx, Q0_ID, r.meta.entityId);
+  if (!campaignOpen() && fromMainland) r.meta.campaignFlags.set(HELD_VOYAGE_FLAG, '1');
   const p = r.e;
   p.pos = ctx.groundPos(dest.x, dest.z);
   p.prevPos = { ...p.pos };
@@ -200,7 +229,9 @@ function offerFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
 // from receiving the same key press. Only the scenario door is a device.
 export function tryLastBellInteract(ctx: SimContext, target: Entity, pid: number): boolean {
   if (target.templateId === 'lb_scenario_door' && target.scenarioId !== undefined) {
-    startScenario(ctx, target.scenarioId, pid);
+    // Defensive twin of the lootable gate at spawn: a held campaign's door
+    // consumes the press as scenery instead of starting Q0's scenario.
+    if (campaignOpen()) startScenario(ctx, target.scenarioId, pid);
     return true;
   }
   if (target.templateId === 'lb_ferry' || target.templateId === 'lb_breach_maw') return true;

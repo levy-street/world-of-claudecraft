@@ -18,3 +18,10 @@ export function registerScenario(def: ScenarioDef): void {
 export function scenarioById(id: string): ScenarioDef | undefined {
   return SCENARIOS[id];
 }
+
+/** Every registered scenario, for content-integrity sweeps (a scenario's
+ *  stage spawns are a legitimate quest kill-target source the camp/dungeon
+ *  tables know nothing about). */
+export function allScenarios(): readonly ScenarioDef[] {
+  return Object.values(SCENARIOS);
+}

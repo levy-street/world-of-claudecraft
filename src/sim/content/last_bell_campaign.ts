@@ -127,8 +127,17 @@ export const LAST_BELL_CAMPAIGN_QUESTS: Record<string, QuestDef> = {
   // Q0 Ashore. Accepted automatically when the ferry lands (the campaign
   // module's ferry arm calls acceptQuest); turned in to Warden Coalfast,
   // whose completion text is the recruitment.
+  //
+  // PRE-RELEASE HOLD (owner decision): the island ships with its world, ferry,
+  // cinematics, and cast, but the quest chain is still being written, and a
+  // quest players can pick up cannot be taken back after release. So every
+  // Last Bell and Farshore quest carries `retired: true` until the chain is
+  // done. This Q0 flag is THE campaign switch: src/sim/last_bell/campaign.ts
+  // keys its own triggers (the Q0 auto-accept, the Tidemill scenario door) off
+  // it, so opening the campaign is deleting these retired lines, nothing else.
   q_lb_q0_ashore: {
     id: 'q_lb_q0_ashore',
+    retired: true,
     name: 'Ashore',
     giverNpcId: 'ferryman_ewald',
     turnInNpcId: 'warden_coalfast',

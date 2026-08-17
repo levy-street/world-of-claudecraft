@@ -179,8 +179,10 @@ const post = await page.evaluate(() => {
   const w = window.__game.world;
   return {
     log: window.__lsLog,
-    // The first crossing is what starts the campaign, so a silent failure to
-    // accept Q0 would leave every later crossing replaying the full voyage.
+    // While the Last Bell chain is data-held (the PRE-RELEASE HOLD on Q0 in
+    // src/sim/content/last_bell_campaign.ts), the crossing must grant NOTHING:
+    // a rider with Q0 in the log would mean the hold leaked. When the chain
+    // opens, flip this expectation back to requiring Q0.
     hasQ0: [...(w.questLog?.keys?.() ?? [])].includes('q_lb_q0_ashore'),
   };
 });
@@ -190,7 +192,7 @@ check(
   shownAfterArmed.length === 0,
   shownAfterArmed.length ? JSON.stringify(shownAfterArmed) : '',
 );
-check('the first crossing accepted the Q0 campaign quest', post.hasQ0);
+check('the held campaign granted no Q0 on the crossing', !post.hasQ0);
 
 console.log('\n--- #loading-screen transition log ---');
 for (const r of post.log) {

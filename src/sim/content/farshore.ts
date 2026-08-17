@@ -358,6 +358,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
 export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   q_fs_bell_at_the_landing: {
     id: 'q_fs_bell_at_the_landing',
+    retired: true,
     name: 'The Bell at the Landing',
     giverNpcId: 'bellkeeper_tam',
     turnInNpcId: 'warden_coalfast',
@@ -379,6 +380,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_hold_the_riftfields: {
     id: 'q_fs_hold_the_riftfields',
+    retired: true,
     name: 'Hold the Riftfields',
     giverNpcId: 'warden_coalfast',
     turnInNpcId: 'warden_coalfast',
@@ -395,6 +397,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_steel_for_the_redoubt: {
     id: 'q_fs_steel_for_the_redoubt',
+    retired: true,
     name: 'Steel for the Redoubt',
     giverNpcId: 'quartermaster_edda',
     turnInNpcId: 'quartermaster_edda',
@@ -415,6 +418,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_the_three_bells: {
     id: 'q_fs_the_three_bells',
+    retired: true,
     name: 'The Three Bells',
     giverNpcId: 'bellkeeper_tam',
     turnInNpcId: 'bellkeeper_tam',
@@ -436,6 +440,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_song_before_the_break: {
     id: 'q_fs_song_before_the_break',
+    retired: true,
     name: 'The Song Before the Break',
     giverNpcId: 'warden_coalfast',
     turnInNpcId: 'riftwatch_ollun',
@@ -453,6 +458,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_moss_and_mending: {
     id: 'q_fs_moss_and_mending',
+    retired: true,
     name: 'Moss and Mending',
     giverNpcId: 'mender_saul',
     turnInNpcId: 'mender_saul',
@@ -471,6 +477,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_bram_come_home: {
     id: 'q_fs_bram_come_home',
+    retired: true,
     name: 'Bram Come Home',
     giverNpcId: 'fisher_nell',
     turnInNpcId: 'fisher_nell',
@@ -493,6 +500,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_stalkers_off_the_light: {
     id: 'q_fs_stalkers_off_the_light',
+    retired: true,
     name: 'Stalkers off the Light',
     giverNpcId: 'riftwatch_ollun',
     turnInNpcId: 'riftwatch_ollun',
@@ -510,6 +518,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_the_great_break: {
     id: 'q_fs_the_great_break',
+    retired: true,
     name: 'The Great Break',
     giverNpcId: 'riftwatch_ollun',
     turnInNpcId: 'warden_coalfast',
@@ -691,8 +700,11 @@ export const FARSHORE_ESCORTS: Record<string, EscortDef> = {
     id: 'esc_fs_bram',
     npcMobId: 'fisher_bram',
     questId: 'q_fs_bram_come_home',
-    // The wreck sits at the beach edge on the Landing point's north strand.
-    start: { x: 770, z: -56 },
+    // The wreck sits at the beach edge west of the Landing. Main's coast
+    // relief redrew this strand: the waterline now runs north-south along
+    // x 762, so the wreck moved onto its edge to keep open sea a few yards
+    // to the SOUTH and none for sixty north (the escort test samples both).
+    start: { x: 762, z: -60 },
     waypoints: [
       { x: 778, z: -44 },
       { x: 792, z: -26 },
