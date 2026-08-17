@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
 import { ROW_TREES } from '../src/sim/content/talent_rows';
@@ -5,6 +6,25 @@ import { TALENTS } from '../src/sim/content/talents';
 import { ALL_CLASSES, MAX_LEVEL, xpForLevel } from '../src/sim/types';
 
 describe('Ashen Bloom class foundations', () => {
+  it('offers every playable class in offline and online character creation', () => {
+    const entries = {
+      index: readFileSync(new URL('../index.html', import.meta.url), 'utf8'),
+      play: readFileSync(new URL('../play.html', import.meta.url), 'utf8'),
+    };
+    const roster = (html: string, panelId: string): string[] => {
+      const endId = panelId === 'offline-select' ? 'offline-skin-row' : 'online-skin-row';
+      const panel = html.match(new RegExp(`<div id="${panelId}"[\\s\\S]*?<div id="${endId}"`))?.[0];
+      expect(panel, `${panelId} panel`).toBeDefined();
+      return [...(panel ?? '').matchAll(/class="mini-class" data-class="([^"]+)"/g)].map(
+        (match) => match[1],
+      );
+    };
+
+    expect(roster(entries.index, 'offline-select')).toEqual(ALL_CLASSES);
+    expect(roster(entries.index, 'charcreate-panel')).toEqual(ALL_CLASSES);
+    expect(roster(entries.play, 'charcreate-panel')).toEqual(ALL_CLASSES);
+  });
+
   it('raises the real level cap to 40 with a growing expansion XP curve', () => {
     expect(MAX_LEVEL).toBe(40);
     expect(xpForLevel(21)).toBeGreaterThan(xpForLevel(20));

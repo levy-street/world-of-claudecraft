@@ -2714,6 +2714,12 @@
   .mini-class[data-class="druid"] {
     --class-color: #ff8c1a;
   }
+  .mini-class[data-class="gravecaller"] {
+    --class-color: #66507c;
+  }
+  .mini-class[data-class="briar_warden"] {
+    --class-color: #698744;
+  }
 
   .mini-class {
     text-align: center;
@@ -5960,6 +5966,12 @@
   }
   [data-class="druid"] {
     --class-color: #ff8c1a;
+  }
+  [data-class="gravecaller"] {
+    --class-color: #66507c;
+  }
+  [data-class="briar_warden"] {
+    --class-color: #698744;
   }
 
   /* Portrait chip, a class-ringed headshot rendered from the 3D model.

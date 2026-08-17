@@ -42,7 +42,7 @@ const shellCss = readFileSync(new URL('../src/styles/shell.css', import.meta.url
   .replace(/\s+/g, ' ');
 
 describe('class color palette', () => {
-  it('CLASSES pins the nine approved colors as exact literals', () => {
+  it('CLASSES pins the approved colors as exact literals', () => {
     for (const cls of CLASS_IDS) {
       expect(CLASSES[cls].color, cls).toBe(PALETTE[cls]);
     }

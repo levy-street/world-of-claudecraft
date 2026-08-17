@@ -9,19 +9,9 @@
 
 import { deflateSync } from 'node:zlib';
 import { CLASSES } from '../src/sim/content/classes';
-import type { PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 
-export const PLAYER_CLASSES: readonly PlayerClass[] = [
-  'warrior',
-  'paladin',
-  'hunter',
-  'rogue',
-  'priest',
-  'shaman',
-  'mage',
-  'warlock',
-  'druid',
-];
+export const PLAYER_CLASSES: readonly PlayerClass[] = ALL_CLASSES;
 
 export const MAX_SKIN = 7;
 
